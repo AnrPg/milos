@@ -1,0 +1,86 @@
+services:
+  api_setup:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile.dev
+    command: sh -lc "mix deps.get && mix ecto.create && mix ecto.migrate && mix run priv/repo/seeds.exs"
+    volumes:
+      - ./apps/api:/app
+    environment:
+      DB_HOST: postgres
+      DB_NAME: ${DB_NAME:-milos_training_dev}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_USER: ${DB_USER:-postgres}
+      MIX_ENV: dev
+      PORT: 4000
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks: [app]
+    restart: "no"
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile.dev
+    command: sh -lc "mix deps.get && exec mix phx.server"
+    volumes:
+      - ./apps/api:/app
+    environment:
+      DB_HOST: postgres
+      DB_NAME: ${DB_NAME:-milos_training_dev}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_USER: ${DB_USER:-postgres}
+      MIX_ENV: dev
+      PORT: 4000
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      api_setup:
+        condition: service_completed_successfully
+    ports:
+      - "${API_HOST_PORT:-18400}:4000"
+    healthcheck:
+      start_period: 180s
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile.dev
+    command: sh -lc "npm install && npm run dev -- --hostname 0.0.0.0 --port 3000"
+    volumes:
+      - ./apps/web:/app
+    environment:
+      API_PROXY_TARGET: http://api:4000
+      NODE_ENV: development
+      PORT: 3000
+      NEXT_PUBLIC_API_BASE_URL: /api
+    ports:
+      - "${WEB_HOST_PORT:-18300}:3000"
+    healthcheck:
+      start_period: 120s
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  postgres:
+    ports:
+      - "${POSTGRES_HOST_PORT:-15434}:5432"
+
+  redis:
+    ports:
+      - "${REDIS_HOST_PORT:-16379}:6379"
+
+  meilisearch:
+    ports:
+      - "${MEILI_HOST_PORT:-17700}:7700"
+
+  minio:
+    ports:
+      - "${MINIO_API_HOST_PORT:-19000}:9000"
+      - "${MINIO_CONSOLE_HOST_PORT:-19001}:9001"

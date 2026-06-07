@@ -1,0 +1,8 @@
+{
+	email {$ACME_EMAIL:admin@example.com}
+}
+
+{$SITE_ADDRESS:localhost} {
+	reverse_proxy /api/* api:4000
+	reverse_proxy web:3000
+}

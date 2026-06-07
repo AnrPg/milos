@@ -1,0 +1,9 @@
+FROM elixir:1.17.3-otp-27-alpine
+
+RUN apk add --no-cache build-base git inotify-tools
+
+WORKDIR /app
+
+RUN mix local.hex --force && mix local.rebar --force
+
+CMD ["mix", "phx.server"]

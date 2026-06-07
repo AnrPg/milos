@@ -1,0 +1,24 @@
+# Elixir
+apps/api/_build/
+apps/api/deps/
+apps/api/.elixir_ls/
+apps/api/priv/static/uploads/
+
+# Node
+apps/web/node_modules/
+apps/web/.next/
+apps/web/.env*.local
+
+# Docker
+.postgres-data/
+.redis-data/
+.meilisearch-data/
+.minio-data/
+
+# Superpowers
+.superpowers/
+
+# Env files
+.env
+.env.local
+*.secret
