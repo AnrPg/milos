@@ -283,8 +283,10 @@ function DragGhostCard({ assignment }: { assignment: AssignedWorkoutRecord }) {
 
 export function AssignedWorkoutsConsole({
   initialOpenAssignmentId = null,
+  pageTitle,
 }: {
   initialOpenAssignmentId?: string | null;
+  pageTitle?: string;
 } = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -1068,7 +1070,7 @@ export function AssignedWorkoutsConsole({
         >
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#d95d39]">
-              {isAdmin ? "Workout Board" : "My Workouts"}
+              {pageTitle ?? (isAdmin ? "Workout Board" : "My Workouts")}
             </p>
             <h1 className="mt-1 text-2xl font-bold tracking-tight" style={{ color: "#F0EDF8" }}>
               {periodLabel}

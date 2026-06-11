@@ -75,8 +75,10 @@ function normalizeTrainingType(value: string | undefined): TrainingType | null {
 
 export function ScheduleConsole({
   initialOpenSlotId = null,
+  pageTitle = "Schedule",
 }: {
   initialOpenSlotId?: string | null;
+  pageTitle?: string;
 } = {}) {
   const { tokens, currentUser } = useSession();
   const { days, setDays, shiftWindow, resetWindow, startDate, trainingType, setTrainingType } = useScheduleStore();
@@ -307,7 +309,7 @@ export function ScheduleConsole({
       <div className="mx-auto max-w-7xl space-y-8">
         <section className="rounded-[2.4rem] px-8 py-6" style={{ background: "#111118", border: "1px solid #1a1a28" }}>
           <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#d95d39]">Class Schedule</p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight" style={{ color: "#F0EDF8" }}>Schedule</h1>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight" style={{ color: "#F0EDF8" }}>{pageTitle}</h1>
         </section>
 
         <section className="rounded-[2rem] p-6" style={{ background: "#111118", border: "1px solid #1a1a28" }}>
