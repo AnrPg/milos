@@ -1,9 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { ApiError } from "@/api/client";
-import { deleteAssignedWorkout, rejectAssignment, sendAssignmentMessage, type AssignedWorkoutRecord } from "@/api/assigned-workouts";
+import {
+  deleteAssignedWorkout,
+  fetchAssignmentMessages,
+  postAssignmentMessage,
+  rejectAssignment,
+  type AssignedWorkoutRecord,
+  type AssignmentMessage,
+} from "@/api/assigned-workouts";
 import { WorkoutPreviewDetail, type PreviewSection } from "@/components/workouts/WorkoutPreviewDetail";
 import { workoutTypeColor } from "@/lib/workout-colors";
 
@@ -11,6 +18,7 @@ type Props = {
   assignment: AssignedWorkoutRecord;
   isAdmin: boolean;
   accessToken: string;
+  currentUserId?: string;
   onClose: () => void;
   onStartWorkout: (assignment: AssignedWorkoutRecord) => void;
   onRejected?: (assignmentId: string) => void;
@@ -23,6 +31,7 @@ export function AssignedWorkoutPanel({
   assignment,
   isAdmin,
   accessToken,
+  currentUserId,
   onClose,
   onStartWorkout,
   onRejected,
@@ -30,14 +39,29 @@ export function AssignedWorkoutPanel({
   onEditWorkout,
   launching,
 }: Props) {
+  const [messages, setMessages] = useState<AssignmentMessage[]>([]);
+  const [messagesLoading, setMessagesLoading] = useState(true);
   const [messageText, setMessageText] = useState("");
   const [messageSending, setMessageSending] = useState(false);
-  const [messageSent, setMessageSent] = useState(false);
   const [messageError, setMessageError] = useState<string | null>(null);
   const [rejecting, setRejecting] = useState(false);
   const [rejectError, setRejectError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setMessagesLoading(true);
+    fetchAssignmentMessages(accessToken, assignment.id, isAdmin)
+      .then((msgs) => { if (!cancelled) { setMessages(msgs); setMessagesLoading(false); } })
+      .catch(() => { if (!cancelled) setMessagesLoading(false); });
+    return () => { cancelled = true; };
+  }, [accessToken, assignment.id, isAdmin]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const sections = assignment.workout.sections as PreviewSection[];
 
@@ -62,8 +86,8 @@ export function AssignedWorkoutPanel({
     setMessageError(null);
 
     try {
-      await sendAssignmentMessage(accessToken, assignment.id, messageText.trim());
-      setMessageSent(true);
+      const message = await postAssignmentMessage(accessToken, assignment.id, messageText.trim(), isAdmin);
+      setMessages((current) => [...current, message]);
       setMessageText("");
     } catch (err) {
       setMessageError(err instanceof Error ? err.message : "Failed to send message.");
@@ -104,8 +128,8 @@ export function AssignedWorkoutPanel({
 
       {/* Panel */}
       <div
-        className="fixed inset-y-0 right-0 z-50 flex w-full flex-col overflow-hidden md:max-w-[480px]"
-        style={{ background: "#0A0A0F", borderLeft: "1px solid #1a1a28" }}
+        className="fixed right-0 z-50 flex w-full flex-col overflow-hidden md:max-w-[480px]"
+        style={{ background: "#0A0A0F", borderLeft: "1px solid #1a1a28", top: "3.25rem", bottom: 0 }}
       >
         {/* Sticky header */}
         <div
@@ -224,55 +248,74 @@ export function AssignedWorkoutPanel({
             </section>
           ) : null}
 
-          {/* Message form — non-admin users */}
-          {!isAdmin ? (
-            <section>
-              <p
-                className="mb-2 text-xs font-semibold uppercase tracking-[0.2em]"
-                style={{ color: "#55556a" }}
-              >
-                Message your coach
-              </p>
+          {/* Persistent chat thread — visible to both admin and athlete */}
+          <section>
+            <p
+              className="mb-3 text-xs font-semibold uppercase tracking-[0.2em]"
+              style={{ color: "#55556a" }}
+            >
+              {isAdmin ? "Conversation with athlete" : "Message your coach"}
+            </p>
 
-              {messageSent ? (
-                <p
-                  className="rounded-[1.2rem] px-4 py-3 text-sm font-semibold"
-                  style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", color: "#34d399" }}
-                >
-                  Message sent to your coach.
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  <textarea
-                    className="w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
-                    style={{
-                      background: "#111118",
-                      border: "1px solid #1e1e2e",
-                      color: "#F0EDF8",
-                      minHeight: "6rem",
-                      resize: "vertical",
-                    }}
-                    placeholder="Ask a question or send a note about this workout…"
-                    value={messageText}
-                    onChange={(e) => setMessageText(e.target.value)}
-                    maxLength={1000}
-                  />
-                  {messageError ? (
-                    <p className="text-xs" style={{ color: "#e07a5f" }}>{messageError}</p>
-                  ) : null}
-                  <button
-                    className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
-                    style={{ background: "#F0EDF8", color: "#0A0A0F" }}
-                    disabled={messageSending || !messageText.trim()}
-                    onClick={() => void handleSendMessage()}
-                    type="button"
-                  >
-                    {messageSending ? "Sending…" : "Send message"}
-                  </button>
-                </div>
-              )}
-            </section>
-          ) : null}
+            {messagesLoading ? (
+              <p className="text-xs" style={{ color: "#3a3a55" }}>Loading…</p>
+            ) : messages.length > 0 ? (
+              <div className="mb-3 max-h-60 space-y-2 overflow-y-auto rounded-[1rem] p-3" style={{ background: "#0d0d18", border: "1px solid #1a1a28" }}>
+                {messages.map((msg) => {
+                  const isMine = msg.sender_id === currentUserId;
+                  return (
+                    <div key={msg.id} className={`flex flex-col gap-0.5 ${isMine ? "items-end" : "items-start"}`}>
+                      <span className="text-[10px]" style={{ color: "#55556a" }}>
+                        {msg.sender_nickname}
+                      </span>
+                      <div
+                        className="max-w-[85%] rounded-[0.9rem] px-3 py-2 text-sm"
+                        style={
+                          isMine
+                            ? { background: "rgba(217,93,57,0.15)", color: "#F0EDF8" }
+                            : { background: "#111118", border: "1px solid #1a1a28", color: "#F0EDF8" }
+                        }
+                      >
+                        {msg.body}
+                      </div>
+                    </div>
+                  );
+                })}
+                <div ref={messagesEndRef} />
+              </div>
+            ) : (
+              <p className="mb-3 text-xs" style={{ color: "#3a3a55" }}>No messages yet.</p>
+            )}
+
+            <div className="space-y-2">
+              <textarea
+                className="w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
+                style={{
+                  background: "#111118",
+                  border: "1px solid #1e1e2e",
+                  color: "#F0EDF8",
+                  minHeight: "5rem",
+                  resize: "vertical",
+                }}
+                placeholder={isAdmin ? "Reply to athlete…" : "Ask a question or send a note…"}
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
+                maxLength={2000}
+              />
+              {messageError ? (
+                <p className="text-xs" style={{ color: "#e07a5f" }}>{messageError}</p>
+              ) : null}
+              <button
+                className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
+                style={{ background: "#F0EDF8", color: "#0A0A0F" }}
+                disabled={messageSending || !messageText.trim()}
+                onClick={() => void handleSendMessage()}
+                type="button"
+              >
+                {messageSending ? "Sending…" : "Send"}
+              </button>
+            </div>
+          </section>
 
           {/* Athlete rejection */}
           {!isAdmin ? (
@@ -291,6 +334,34 @@ export function AssignedWorkoutPanel({
               </button>
             </section>
           ) : null}
+
+          {/* Completion scores */}
+          {assignment.execution_status === "completed" && (assignment.execution_scores ?? []).length > 0 ? (
+            <section>
+              <p
+                className="mb-3 text-xs font-semibold uppercase tracking-[0.2em]"
+                style={{ color: "#55556a" }}
+              >
+                Your scores
+              </p>
+              <div className="space-y-2">
+                {(assignment.execution_scores ?? []).map((score, index) => (
+                  <div
+                    key={score.section_id ?? index}
+                    className="flex items-center justify-between rounded-[1rem] px-4 py-2.5"
+                    style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.15)" }}
+                  >
+                    <span className="text-xs" style={{ color: "#8888aa" }}>
+                      {score.section_name ?? score.section_id}
+                    </span>
+                    <span className="text-sm font-semibold" style={{ color: "#34d399" }}>
+                      {score.value}{score.unit ? ` ${score.unit}` : ""}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : null}
         </div>
 
         {/* Bottom CTA */}
@@ -298,15 +369,27 @@ export function AssignedWorkoutPanel({
           className="border-t px-5 py-4"
           style={{ borderColor: "#1a1a28", background: "#0A0A0F" }}
         >
-          <button
-            className="w-full rounded-full py-3 text-sm font-bold tracking-wide disabled:opacity-50"
-            style={{ background: "#d95d39", color: "#fff" }}
-            disabled={launching}
-            onClick={() => onStartWorkout(assignment)}
-            type="button"
-          >
-            {launching ? "Starting…" : "Start Workout"}
-          </button>
+          {assignment.execution_status === "completed" ? (
+            <button
+              className="w-full rounded-full py-3 text-sm font-bold tracking-wide disabled:opacity-50"
+              style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", color: "#34d399" }}
+              disabled={launching}
+              onClick={() => onStartWorkout(assignment)}
+              type="button"
+            >
+              {launching ? "Starting…" : "Redo Workout"}
+            </button>
+          ) : (
+            <button
+              className="w-full rounded-full py-3 text-sm font-bold tracking-wide disabled:opacity-50"
+              style={{ background: "#d95d39", color: "#fff" }}
+              disabled={launching}
+              onClick={() => onStartWorkout(assignment)}
+              type="button"
+            >
+              {launching ? "Starting…" : "Start Workout"}
+            </button>
+          )}
         </div>
       </div>
     </>

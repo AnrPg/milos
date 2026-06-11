@@ -122,7 +122,7 @@ export function SlotPopup({
     >
       <div
         className="h-full w-full max-w-xl overflow-y-auto"
-        style={{ background: "#111118", borderLeft: "1px solid #1a1a28" }}
+        style={{ background: "#111118", borderLeft: "1px solid #1a1a28", paddingTop: "3.25rem" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Sticky header — clears the top nav bar */}
