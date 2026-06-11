@@ -322,9 +322,11 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
           format,
           formatParams: makeDefaultFormatParams(format),
           scoreable: format === "rest" ? false : section.scoreable,
-          scoreType: autoScore,
+          scoreType: isEmom && section.emomScoringMode
+            ? EMOM_SCORING_MODE_SCORE_TYPE[section.emomScoringMode]
+            : autoScore,
           emomScoringMode: isEmom ? section.emomScoringMode : null,
-          emomAmrapScoringStyle: isEmom ? section.emomAmrapScoringStyle : null,
+          emomAmrapScoringStyle: format === "complex_emom" ? section.emomAmrapScoringStyle : null,
         };
       }),
     })),
