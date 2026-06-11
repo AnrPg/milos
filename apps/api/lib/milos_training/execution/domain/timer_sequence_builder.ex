@@ -147,24 +147,28 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
           {1, duration}
       end
 
-    Enum.map(1..total_rounds, fn round ->
-      round_exercises =
-        if exercises == [] do
-          []
-        else
-          round_exercises_for_emom(exercises, round, total_rounds)
-        end
+    if total_rounds > 0 do
+      Enum.map(1..total_rounds, fn round ->
+        round_exercises =
+          if exercises == [] do
+            []
+          else
+            round_exercises_for_emom(exercises, round, total_rounds)
+          end
 
-      segment(
-        section,
-        :countdown,
-        interval_duration(effective_duration, interval, round),
-        round,
-        total_rounds,
-        round_exercises,
-        label: "Min #{round}"
-      )
-    end)
+        segment(
+          section,
+          :countdown,
+          interval_duration(effective_duration, interval, round),
+          round,
+          total_rounds,
+          round_exercises,
+          label: "Min #{round}"
+        )
+      end)
+    else
+      []
+    end
   end
 
   defp round_exercises_for_emom(exercises, round, total_rounds) do

@@ -59,6 +59,7 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilderTest do
 
     segments = TimerSequenceBuilder.build(workout([s]))
     assert length(segments) == 100
+    assert Enum.all?(segments, &(&1.duration_seconds == 60))
   end
 
   test "emom for_time mode: generates same segment count as amrap" do
@@ -101,6 +102,20 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilderTest do
     segments = TimerSequenceBuilder.build(workout([s]))
     assert length(segments) == 15
     assert Enum.all?(segments, &(&1.duration_seconds == 60))
+  end
+
+  test "emom to_failure mode: max_windows 0 produces no segments" do
+    s =
+      section(%{
+        type: "emom",
+        duration_seconds: 0,
+        interval_seconds: 60,
+        scoring_mode: "to_failure",
+        max_windows: 0
+      })
+
+    segments = TimerSequenceBuilder.build(workout([s]))
+    assert segments == []
   end
 
   test "emom labels each segment Min N" do
