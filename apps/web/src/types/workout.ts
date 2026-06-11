@@ -1,5 +1,27 @@
 export type PrescriptionUnit = "reps" | "secs" | "kcal";
-export type LoadMode = "absolute" | "pct_1rm";
+export type LoadMode = "absolute" | "pct_1rm" | "bw";
+export type LoadProgressionMode = "linear" | "per_set";
+export type IntervalMode = "none" | "minute" | "odd_even";
+
+export type LoadProgression = {
+  mode: LoadProgressionMode;
+  startValue: number;
+  startMode: LoadMode;
+  stepValue: number;
+  perSetValues: number[];
+};
+
+export type ExerciseFormatContext = {
+  showSets: boolean;
+  showPrescription: boolean;
+  prescriptionHint?: string;
+  prescriptionSuffix?: string;
+  ladderPrescription?: boolean;
+  showClusters?: boolean;
+  showLoad: boolean;
+  intervalMode: IntervalMode;
+};
+
 export type WorkoutType =
   | "crossfit"
   | "strength"
@@ -37,7 +59,33 @@ export type ScoreType =
   | "rounds+reps"
   | "kcal"
   | "hr_drop"
-  | "load";
+  | "load"
+  | "accumulated_work_time"
+  | "pass_fail"
+  | "intervals_survived";
+
+export type EmomScoringMode = "for_time" | "for_quality" | "amrap" | "to_failure";
+
+export const EMOM_SCORING_MODE_LABELS: Record<EmomScoringMode, string> = {
+  for_time: "For Time",
+  for_quality: "For Quality",
+  amrap: "AMRAP",
+  to_failure: "To Failure",
+};
+
+export const EMOM_SCORING_MODE_DESCRIPTIONS: Record<EmomScoringMode, string> = {
+  for_time: "Sprint each window. Score = accumulated work time (lower is better).",
+  for_quality: "Prioritize perfect form. Score = Pass / Fail.",
+  amrap: "Max reps each window. Score = total cumulative reps.",
+  to_failure: "Fixed reps each window, keep going until you fail. Score = windows survived.",
+};
+
+export const EMOM_SCORING_MODE_SCORE_TYPE: Record<EmomScoringMode, ScoreType> = {
+  for_time: "accumulated_work_time",
+  for_quality: "pass_fail",
+  amrap: "reps",
+  to_failure: "intervals_survived",
+};
 
 export type FormatParams = Record<string, number | null>;
 
@@ -67,8 +115,11 @@ export type DraftExercise = {
   sets: number;
   prescriptionValue: number;
   prescriptionUnit: PrescriptionUnit;
+  prescriptionStep: number | null;
+  clustersPerSet: number | null;
   loadValue: number | null;
   loadMode: LoadMode;
+  loadProgression: LoadProgression | null;
   isBodyweight: boolean;
   supersetGroupId: string | null;
   intervalAssignment: number | null;
@@ -85,6 +136,9 @@ export type DraftSection = {
   formatParams: FormatParams;
   scoreable: boolean;
   scoreType: ScoreType | null;
+  emomScoringMode: EmomScoringMode | null;
+  emomAmrapScoringStyle: "grand_total" | "lowest_window" | null;
+  restAfterSeconds: number | null;
   exercises: DraftExercise[];
 };
 
@@ -187,14 +241,16 @@ export const FORMAT_TOOLTIPS: Record<
     score: "Kcal",
   },
   emom: {
-    bestFor: "Pacing and power output",
-    trains: "Power, pacing",
-    how: "Complete prescribed work every minute on the minute.",
+    bestFor: "Interval training with defined objectives",
+    trains: "Power output, pacing, endurance, or technique",
+    how: "Same movement every interval. Choose a mode: For Time (sprint + rest), For Quality (form focus), AMRAP (max reps), or To Failure (survive as many windows as possible).",
+    score: "Accumulated work time / Pass-Fail / Total reps / Windows survived",
   },
   complex_emom: {
-    bestFor: "Mixed modality pacing",
-    trains: "Varied skills, pacing",
-    how: "Alternate different work across the minute structure.",
+    bestFor: "Mixed modality circuit training",
+    trains: "Varied skills, pacing, multi-modal conditioning",
+    how: "2+ movements rotating each interval window. Choose: For Time, For Quality, AMRAP (grand total or lowest window), or To Failure.",
+    score: "Accumulated work time / Pass-Fail / Total reps or lowest window / Stations cleared",
   },
   even_odd: {
     bestFor: "Paired movement training",
@@ -282,10 +338,12 @@ export const FORMAT_FIELD_DEFS: Partial<Record<SectionFormat, FormatFieldDef[]>>
   emom: [
     { key: "duration_seconds", defaultValue: 600, required: true },
     { key: "interval_seconds", defaultValue: 60, required: true },
+    { key: "max_windows", defaultValue: 100 },
   ],
   complex_emom: [
     { key: "duration_seconds", defaultValue: 600, required: true },
     { key: "interval_seconds", defaultValue: 60, required: true },
+    { key: "max_windows", defaultValue: 100 },
   ],
   even_odd: [{ key: "duration_seconds", defaultValue: 600, required: true }],
   billat: [
@@ -296,9 +354,7 @@ export const FORMAT_FIELD_DEFS: Partial<Record<SectionFormat, FormatFieldDef[]>>
   amrap: [{ key: "duration_seconds", defaultValue: 720, required: true }],
   edt: [{ key: "duration_seconds", defaultValue: 900, required: true }, { key: "pr_zone_rounds", defaultValue: 5 }],
   death_by: [
-    { key: "start_reps", defaultValue: 1, required: true },
-    { key: "step_reps", defaultValue: 1, required: true },
-    { key: "ladder_cap", defaultValue: 20 },
+    { key: "max_rounds", defaultValue: 0 },
   ],
   tabata: [
     { key: "work_seconds", defaultValue: 20, required: true },
@@ -312,22 +368,22 @@ export const FORMAT_FIELD_DEFS: Partial<Record<SectionFormat, FormatFieldDef[]>>
   ],
   cluster: [
     { key: "intra_rest_seconds", defaultValue: 15, required: true },
-    { key: "sets", defaultValue: 5, required: true },
   ],
-  hrr: [{ key: "effort_seconds", defaultValue: 30, required: true }, { key: "hr_zone", defaultValue: 3 }],
+  hrr: [
+    { key: "hr_ceiling_bpm", defaultValue: 175, required: true },
+    { key: "hr_floor_bpm", defaultValue: 130, required: true },
+    { key: "cycles", defaultValue: 0 },
+    { key: "effort_cap_seconds", defaultValue: 0 },
+  ],
   ladder_ascending: [
-    { key: "start_reps", defaultValue: 1, required: true },
-    { key: "step_reps", defaultValue: 1, required: true },
-    { key: "ladder_cap", defaultValue: 10 },
+    { key: "time_cap_seconds", defaultValue: 0 },
   ],
   ladder_descending: [
-    { key: "start_reps", defaultValue: 10, required: true },
-    { key: "step_reps", defaultValue: 1, required: true },
-    { key: "min_reps", defaultValue: 1, required: true },
+    { key: "min_reps", defaultValue: 1 },
+    { key: "time_cap_seconds", defaultValue: 0 },
   ],
   pyramid: [
-    { key: "peak_reps", defaultValue: 10, required: true },
-    { key: "step_reps", defaultValue: 2, required: true },
+    { key: "time_cap_seconds", defaultValue: 0 },
   ],
   rest: [{ key: "duration_seconds", defaultValue: 60, required: true }],
 };
@@ -348,6 +404,34 @@ export function makeDefaultAdvancedSettings(): AdvancedSettings {
   };
 }
 
+export const FORMAT_EXERCISE_CONTEXT: Record<SectionFormat, ExerciseFormatContext> = {
+  untimed:             { showSets: true,  showPrescription: true,  showLoad: true,  intervalMode: "none" },
+  for_time:            { showSets: true,  showPrescription: true,  showLoad: true,  intervalMode: "none" },
+  // No rep count for TTE — load is the prescription; athlete goes until failure
+  train_to_exhaustion: { showSets: true,  showPrescription: false, showLoad: true,  intervalMode: "none" },
+  kcal_target:         { showSets: false, showPrescription: false, showLoad: false, intervalMode: "none" },
+  emom:                { showSets: false, showPrescription: true,  showLoad: true,  intervalMode: "none" },
+  complex_emom:        { showSets: false, showPrescription: true,  showLoad: true,  intervalMode: "minute" },
+  even_odd:            { showSets: false, showPrescription: true,  showLoad: true,  intervalMode: "odd_even" },
+  billat:              { showSets: false, showPrescription: true,  prescriptionSuffix: "max", showLoad: true,  intervalMode: "none" },
+  amrap:               { showSets: false, showPrescription: true,  showLoad: true,  intervalMode: "none" },
+  // Starting reps; athlete reduces as fatigue accumulates through the PR zone
+  edt:                 { showSets: false, showPrescription: true,  prescriptionSuffix: "starting", showLoad: true,  intervalMode: "none" },
+  // Death By: each exercise has its own start + step (like a per-exercise ladder)
+  death_by:            { showSets: false, showPrescription: true,  ladderPrescription: true, showLoad: true,  intervalMode: "none" },
+  tabata:              { showSets: false, showPrescription: true,  prescriptionSuffix: "per interval", showLoad: true,  intervalMode: "none" },
+  custom_hiit:         { showSets: false, showPrescription: true,  prescriptionSuffix: "per interval", showLoad: true,  intervalMode: "none" },
+  // showClusters exposes the second prescription dimension: clusters per set
+  cluster:             { showSets: true,  showPrescription: true,  showClusters: true, showLoad: true, intervalMode: "none" },
+  // HR ceiling/floor are section-level; per-exercise shows effort intensity
+  hrr:                 { showSets: false, showPrescription: true,  prescriptionHint: "until HR ceiling", showLoad: true,  intervalMode: "none" },
+  ladder_ascending:    { showSets: false, showPrescription: true,  ladderPrescription: true, showLoad: true, intervalMode: "none" },
+  ladder_descending:   { showSets: false, showPrescription: true,  ladderPrescription: true, showLoad: true, intervalMode: "none" },
+  // Pyramid reuses ladderPrescription to show peak + step inline
+  pyramid:             { showSets: false, showPrescription: true,  ladderPrescription: true, showLoad: true, intervalMode: "none" },
+  rest:                { showSets: false, showPrescription: false, showLoad: false, intervalMode: "none" },
+};
+
 export function makeDefaultExercise(): DraftExercise {
   return {
     localId: crypto.randomUUID(),
@@ -355,8 +439,11 @@ export function makeDefaultExercise(): DraftExercise {
     sets: 3,
     prescriptionValue: 10,
     prescriptionUnit: "reps",
+    prescriptionStep: null,
+    clustersPerSet: null,
     loadValue: null,
     loadMode: "absolute",
+    loadProgression: null,
     isBodyweight: false,
     supersetGroupId: null,
     intervalAssignment: null,
@@ -367,6 +454,79 @@ export function makeDefaultExercise(): DraftExercise {
   };
 }
 
+function fmins(secs: number | null | undefined): string {
+  if (!secs) return "—";
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  return s > 0 ? `${m}:${String(s).padStart(2, "0")}` : `${m}min`;
+}
+
+function fsecs(secs: number | null | undefined): string {
+  return secs ? `${secs}s` : "—";
+}
+
+export function getFormatInstruction(format: SectionFormat, params: FormatParams): string {
+  switch (format) {
+    case "untimed":
+      return "";
+    case "for_time":
+      return params.time_cap_seconds
+        ? `Complete for time · cap ${fmins(params.time_cap_seconds)}`
+        : "Complete for time";
+    case "train_to_exhaustion":
+      return params.rest_seconds
+        ? `Sets to failure · ${fsecs(params.rest_seconds)} rest between sets`
+        : "Sets to failure";
+    case "kcal_target":
+      return params.kcal_target
+        ? `Machine to ${params.kcal_target}kcal${params.time_cap_seconds ? ` · cap ${fmins(params.time_cap_seconds)}` : ""}`
+        : "Machine calorie target";
+    case "emom":
+      return `EMOM ${fmins(params.duration_seconds)} · every ${fsecs(params.interval_seconds)}`;
+    case "complex_emom": {
+      const perMinuteKeys = Object.keys(params)
+        .filter((k) => /^interval_seconds_\d+$/.test(k))
+        .sort((a, b) => Number(a.replace("interval_seconds_", "")) - Number(b.replace("interval_seconds_", "")));
+      if (perMinuteKeys.length === 0) {
+        return `Complex EMOM ${fmins(params.duration_seconds)} · ${fsecs(params.interval_seconds)} intervals`;
+      }
+      const minuteParts = perMinuteKeys.map((k) => {
+        const min = k.replace("interval_seconds_", "");
+        return `Min${min}: ${fsecs(params[k])}`;
+      });
+      return `Complex EMOM ${fmins(params.duration_seconds)} · ${minuteParts.join(", ")}`;
+    }
+    case "even_odd":
+      return `E/O EMOM ${fmins(params.duration_seconds)} · alternate odd/even minutes`;
+    case "billat":
+      return `${params.cycles ?? 8}× ${fsecs(params.work_seconds)} @vVO2max / ${fsecs(params.rest_seconds)} @50%`;
+    case "amrap":
+      return `AMRAP ${fmins(params.duration_seconds)}`;
+    case "edt":
+      return `EDT ${fmins(params.duration_seconds)} · accumulate max reps, reduce as needed`;
+    case "death_by":
+      return `EMOM · +N/round per exercise until failure${params.max_rounds ? ` · max ${params.max_rounds} rounds` : ""}`;
+    case "tabata":
+      return `Tabata · ${fsecs(params.work_seconds)} on / ${fsecs(params.rest_seconds)} off × ${params.rounds ?? 8} rounds`;
+    case "custom_hiit":
+      return `${fsecs(params.work_seconds)} on / ${fsecs(params.rest_seconds)} off × ${params.rounds ?? 10} rounds`;
+    case "cluster":
+      return params.intra_rest_seconds
+        ? `Cluster sets · ${fsecs(params.intra_rest_seconds)} intra-set rest`
+        : "Cluster sets";
+    case "hrr":
+      return `Work → rest to ${params.hr_floor_bpm ?? 130}bpm · resume at ${params.hr_ceiling_bpm ?? 175}bpm${params.cycles ? ` · ${params.cycles} cycles` : ""}`;
+    case "ladder_ascending":
+      return `Ladder ↑${params.time_cap_seconds ? ` · cap ${fmins(params.time_cap_seconds)}` : ""}`;
+    case "ladder_descending":
+      return `Ladder ↓ (for time)${params.time_cap_seconds ? ` · cap ${fmins(params.time_cap_seconds)}` : ""}`;
+    case "pyramid":
+      return `Pyramid — up to peak then back down${params.time_cap_seconds ? ` · cap ${fmins(params.time_cap_seconds)}` : ""}`;
+    case "rest":
+      return "";
+  }
+}
+
 export function makeDefaultSection(): DraftSection {
   return {
     localId: crypto.randomUUID(),
@@ -375,6 +535,24 @@ export function makeDefaultSection(): DraftSection {
     formatParams: {},
     scoreable: false,
     scoreType: null,
+    emomScoringMode: null,
+    emomAmrapScoringStyle: null,
+    restAfterSeconds: null,
     exercises: [],
+  };
+}
+
+export function adaptExerciseToDestination(
+  exercise: DraftExercise,
+  destFormat: SectionFormat,
+): DraftExercise {
+  const destCtx = FORMAT_EXERCISE_CONTEXT[destFormat];
+  return {
+    ...exercise,
+    prescriptionStep: destCtx.ladderPrescription ? (exercise.prescriptionStep ?? 1) : null,
+    intervalAssignment: null,
+    clustersPerSet: destCtx.showClusters ? (exercise.clustersPerSet ?? 5) : null,
+    advancedOpen: false,
+    variationsOpen: false,
   };
 }
