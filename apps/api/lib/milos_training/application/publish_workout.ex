@@ -164,8 +164,9 @@ defmodule MilosTraining.Application.PublishWorkout do
         kind: "assigned_workout",
         assigned_workout_id: target.assigned_workout_id,
         scheduled_for: Date.to_iso8601(target.scheduled_for),
+        change_type: "sections_updated",
         body:
-          "Your coach updated the workout for #{format_date(target.scheduled_for)}: #{workout.title}.",
+          "Your coach updated the exercises for your workout on #{format_date(target.scheduled_for)}: #{workout.title}.",
         url: "/my-workouts?open_assignment=#{target.assigned_workout_id}"
       }
 
@@ -183,8 +184,9 @@ defmodule MilosTraining.Application.PublishWorkout do
         kind: "scheduled_class",
         scheduled_class_id: Map.get(target, :scheduled_class_id),
         training_type: to_string(training_type || ""),
+        change_type: "sections_updated",
         body:
-          "The workout for your #{format_training_type(training_type)} class has been updated: #{workout.title}.",
+          "Your coach updated the exercises for your #{format_training_type(training_type)} class: #{workout.title}.",
         url: "/schedule?open_slot=#{Map.get(target, :scheduled_class_id)}"
       }
 

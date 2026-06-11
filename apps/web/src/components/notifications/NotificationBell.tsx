@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 import {
   fetchNotifications,
-  markNotificationRead,
+  markNotificationClicked,
   markAllNotificationsRead,
   type NotificationsResponse,
   type NotificationRecord,
@@ -39,7 +39,7 @@ function notificationTitle(type: string) {
     case "workout_changed":
       return "Workout changed";
     case "workout_deleted":
-      return "Workout removed";
+      return "Workout deleted by coach";
     case "workout_rejected":
       return "Workout rejected";
     case "athlete_message":
@@ -97,9 +97,11 @@ function notificationBody(notification: NotificationRecord) {
   }
 
   if (notification.type === "workout_changed") {
-    return typeof notification.payload.body === "string"
-      ? notification.payload.body
-      : "Your coach changed a scheduled workout.";
+    if (typeof notification.payload?.body === "string") return notification.payload.body;
+    const changeType = notification.payload?.change_type;
+    if (changeType === "datetime_changed") return "The scheduled time for this workout was changed.";
+    if (changeType === "sections_updated") return "Your coach updated the exercises in this workout.";
+    return "Your coach changed a scheduled workout.";
   }
 
   if (notification.type === "workout_deleted") {
@@ -263,15 +265,15 @@ export function NotificationBell() {
       await queryClient.invalidateQueries({ queryKey: ["notifications", currentUser?.id] });
     },
   });
-  const markRead = useMutation({
-    mutationFn: async (notificationId: string) => {
+  const markClicked = useMutation({
+    mutationFn: async ({ notificationId, url }: { notificationId: string; url: string }) => {
       if (!tokens?.access_token) {
         throw new Error("Authentication required.");
       }
 
-      return markNotificationRead(tokens.access_token, notificationId);
+      return markNotificationClicked(tokens.access_token, notificationId, url);
     },
-    onSuccess: async (_result, notificationId) => {
+    onSuccess: async (_result, variables) => {
       queryClient.setQueryData(["notifications", currentUser?.id], (current: { pages: NotificationsResponse[]; pageParams: unknown[] } | undefined) => {
         if (!current) return current;
 
@@ -281,7 +283,7 @@ export function NotificationBell() {
             let pageChanged = false;
 
             const notifications = page.notifications.map((notification) => {
-              if (notification.id !== notificationId || notification.read_at) {
+              if (notification.id !== variables.notificationId || notification.read_at) {
                 return notification;
               }
 
@@ -393,7 +395,7 @@ export function NotificationBell() {
 
     if (!notification.read_at) {
       try {
-        await markRead.mutateAsync(notification.id);
+        await markClicked.mutateAsync({ notificationId: notification.id, url });
       } catch {
         // Navigation should still proceed if marking the notification read fails.
       }

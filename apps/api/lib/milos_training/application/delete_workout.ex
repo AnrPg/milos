@@ -41,7 +41,7 @@ defmodule MilosTraining.Application.DeleteWorkout do
         assigned_workout_id: target.assigned_workout_id,
         scheduled_for: Date.to_iso8601(target.scheduled_for),
         body:
-          "The coach removed your workout scheduled for #{format_date(target.scheduled_for)}.",
+          "The coach removed your workout scheduled for #{format_date(target.scheduled_for)}. This workout no longer exists.",
         url: "/my-workouts?open_assignment=#{target.assigned_workout_id}"
       }
 
@@ -61,7 +61,7 @@ defmodule MilosTraining.Application.DeleteWorkout do
         scheduled_at: DateTime.to_iso8601(target.scheduled_at),
         training_type: to_string(target.training_type),
         body:
-          "The coach removed the workout for your #{format_training_type(target.training_type)} class on #{format_datetime(target.scheduled_at)}.",
+          "The coach removed the workout for your #{format_training_type(target.training_type)} class on #{format_datetime(target.scheduled_at)}. This class may be rescheduled.",
         url: "/schedule?open_slot=#{target.scheduled_class_id}"
       }
 
