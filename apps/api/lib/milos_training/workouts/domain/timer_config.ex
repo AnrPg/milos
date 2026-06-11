@@ -12,6 +12,9 @@ defmodule MilosTraining.Workouts.Domain.TimerConfig do
     rest
   )
 
+  @valid_scoring_modes ~w(for_time for_quality amrap to_failure)
+  @valid_amrap_scoring_styles ~w(grand_total lowest_window)
+
   def normalize(nil), do: {:ok, %{type: "untimed"}}
 
   def normalize(config) when is_map(config) do
@@ -77,10 +80,11 @@ defmodule MilosTraining.Workouts.Domain.TimerConfig do
   defp optional_fields("hrr"), do: [:hr_zone]
   defp optional_fields(_type), do: []
 
-  @valid_scoring_modes ~w(for_time for_quality amrap to_failure)
-  @valid_amrap_scoring_styles ~w(grand_total lowest_window)
+  defp validate_optional_fields("emom", config) do
+    validate_enum_field(config, :scoring_mode, @valid_scoring_modes)
+  end
 
-  defp validate_optional_fields(type, config) when type in ["emom", "complex_emom"] do
+  defp validate_optional_fields("complex_emom", config) do
     with :ok <- validate_enum_field(config, :scoring_mode, @valid_scoring_modes),
          :ok <- validate_enum_field(config, :amrap_scoring_style, @valid_amrap_scoring_styles) do
       :ok
@@ -97,7 +101,7 @@ defmodule MilosTraining.Workouts.Domain.TimerConfig do
       value ->
         if value in valid_values,
           do: :ok,
-          else: {:error, "invalid #{field}: #{inspect(value)}"}
+          else: {:error, "#{field} must be one of: #{Enum.join(valid_values, ", ")}"}
     end
   end
 

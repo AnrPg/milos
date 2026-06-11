@@ -93,6 +93,16 @@ defmodule MilosTraining.Workouts.Domain.TimerConfigTest do
                })
       assert config.max_windows == 50
     end
+
+    test "ignores amrap_scoring_style on emom type" do
+      assert {:ok, _} =
+               TimerConfig.normalize(%{
+                 "type" => "emom",
+                 "duration_seconds" => 600,
+                 "interval_seconds" => 60,
+                 "amrap_scoring_style" => "invalid_value"
+               })
+    end
   end
 
   describe "complex_emom scoring_mode and amrap_scoring_style" do
@@ -140,6 +150,17 @@ defmodule MilosTraining.Workouts.Domain.TimerConfigTest do
                  "max_windows" => 15
                })
       assert config.max_windows == 15
+    end
+
+    test "rejects invalid scoring_mode on complex_emom" do
+      assert {:error, reason} =
+               TimerConfig.normalize(%{
+                 "type" => "complex_emom",
+                 "duration_seconds" => 600,
+                 "interval_seconds" => 60,
+                 "scoring_mode" => "unknown_mode"
+               })
+      assert reason =~ "scoring_mode"
     end
   end
 end
