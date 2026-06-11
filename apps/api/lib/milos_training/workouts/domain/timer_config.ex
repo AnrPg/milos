@@ -18,7 +18,8 @@ defmodule MilosTraining.Workouts.Domain.TimerConfig do
     type = config |> get_value(:type) |> normalize_type()
 
     with :ok <- validate_type(type),
-         :ok <- validate_required_fields(type, config) do
+         :ok <- validate_required_fields(type, config),
+         :ok <- validate_optional_fields(type, config) do
       {:ok, build_config(type, config)}
     end
   end
@@ -68,11 +69,37 @@ defmodule MilosTraining.Workouts.Domain.TimerConfig do
   defp optional_fields("for_time"), do: [:time_cap_seconds]
   defp optional_fields("train_to_exhaustion"), do: [:rest_seconds]
   defp optional_fields("kcal_target"), do: [:kcal_target, :time_cap_seconds]
+  defp optional_fields("emom"), do: [:scoring_mode, :max_windows]
+  defp optional_fields("complex_emom"), do: [:scoring_mode, :amrap_scoring_style]
   defp optional_fields("edt"), do: [:pr_zone_rounds]
   defp optional_fields("death_by"), do: [:ladder_cap]
   defp optional_fields("ladder_ascending"), do: [:ladder_cap]
   defp optional_fields("hrr"), do: [:hr_zone]
   defp optional_fields(_type), do: []
+
+  @valid_scoring_modes ~w(for_time for_quality amrap to_failure)
+  @valid_amrap_scoring_styles ~w(grand_total lowest_window)
+
+  defp validate_optional_fields(type, config) when type in ["emom", "complex_emom"] do
+    with :ok <- validate_enum_field(config, :scoring_mode, @valid_scoring_modes),
+         :ok <- validate_enum_field(config, :amrap_scoring_style, @valid_amrap_scoring_styles) do
+      :ok
+    end
+  end
+
+  defp validate_optional_fields(_type, _config), do: :ok
+
+  defp validate_enum_field(config, field, valid_values) do
+    case get_value(config, field) do
+      nil ->
+        :ok
+
+      value ->
+        if value in valid_values,
+          do: :ok,
+          else: {:error, "invalid #{field}: #{inspect(value)}"}
+    end
+  end
 
   defp build_config(type, config) do
     Enum.reduce(required_fields(type) ++ optional_fields(type), %{type: type}, fn key, acc ->

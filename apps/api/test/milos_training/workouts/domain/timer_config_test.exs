@@ -55,4 +55,79 @@ defmodule MilosTraining.Workouts.Domain.TimerConfigTest do
     assert {:error, "has unsupported timer type"} =
              TimerConfig.normalize(%{"type" => "foobar"})
   end
+
+  describe "emom scoring_mode" do
+    test "accepts all valid scoring modes" do
+      base = %{"type" => "emom", "duration_seconds" => 600, "interval_seconds" => 60}
+
+      for mode <- ~w(for_time for_quality amrap to_failure) do
+        assert {:ok, config} = TimerConfig.normalize(Map.put(base, "scoring_mode", mode))
+        assert config.scoring_mode == mode
+      end
+    end
+
+    test "rejects unknown scoring mode" do
+      base = %{"type" => "emom", "duration_seconds" => 600, "interval_seconds" => 60}
+      assert {:error, reason} = TimerConfig.normalize(Map.put(base, "scoring_mode", "banana"))
+      assert reason =~ "scoring_mode"
+    end
+
+    test "allows missing scoring_mode (defaults to nil)" do
+      assert {:ok, config} =
+               TimerConfig.normalize(%{
+                 "type" => "emom",
+                 "duration_seconds" => 600,
+                 "interval_seconds" => 60
+               })
+      refute Map.has_key?(config, :scoring_mode)
+    end
+
+    test "accepts max_windows for to_failure mode" do
+      assert {:ok, config} =
+               TimerConfig.normalize(%{
+                 "type" => "emom",
+                 "duration_seconds" => 600,
+                 "interval_seconds" => 60,
+                 "scoring_mode" => "to_failure",
+                 "max_windows" => 50
+               })
+      assert config.max_windows == 50
+    end
+  end
+
+  describe "complex_emom scoring_mode and amrap_scoring_style" do
+    test "accepts amrap_scoring_style values" do
+      base = %{
+        "type" => "complex_emom",
+        "duration_seconds" => 600,
+        "interval_seconds" => 60,
+        "scoring_mode" => "amrap"
+      }
+
+      for style <- ~w(grand_total lowest_window) do
+        assert {:ok, config} = TimerConfig.normalize(Map.put(base, "amrap_scoring_style", style))
+        assert config.amrap_scoring_style == style
+      end
+    end
+
+    test "rejects invalid amrap_scoring_style" do
+      assert {:error, reason} =
+               TimerConfig.normalize(%{
+                 "type" => "complex_emom",
+                 "duration_seconds" => 600,
+                 "interval_seconds" => 60,
+                 "amrap_scoring_style" => "biggest_number"
+               })
+      assert reason =~ "amrap_scoring_style"
+    end
+
+    test "allows missing amrap_scoring_style" do
+      assert {:ok, _config} =
+               TimerConfig.normalize(%{
+                 "type" => "complex_emom",
+                 "duration_seconds" => 600,
+                 "interval_seconds" => 60
+               })
+    end
+  end
 end
