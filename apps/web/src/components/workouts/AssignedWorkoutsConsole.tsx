@@ -281,7 +281,11 @@ function DragGhostCard({ assignment }: { assignment: AssignedWorkoutRecord }) {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export function AssignedWorkoutsConsole() {
+export function AssignedWorkoutsConsole({
+  initialOpenAssignmentId = null,
+}: {
+  initialOpenAssignmentId?: string | null;
+} = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { currentUser, tokens, signOut } = useSession();
@@ -315,6 +319,7 @@ export function AssignedWorkoutsConsole() {
   const openParamId = searchParams.get("open");
   const openParamDate = searchParams.get("date");
   const autoOpenedRef = useRef<string | null>(null);
+  const initialOpenHandledRef = useRef(false);
 
   const [todayIso, setTodayIso] = useState(() => formatLocalDate(new Date()));
   useEffect(() => {
@@ -466,6 +471,15 @@ export function AssignedWorkoutsConsole() {
       }
     }
   }, [openParamId, openParamDate, loading, allAssignments, searchParams, router]);
+
+  useEffect(() => {
+    if (!initialOpenAssignmentId || initialOpenHandledRef.current || allAssignments.length === 0) return;
+    const assignment = allAssignments.find((a) => a.id === initialOpenAssignmentId);
+    if (assignment) {
+      setPanelAssignment(assignment);
+      initialOpenHandledRef.current = true;
+    }
+  }, [initialOpenAssignmentId, allAssignments]);
 
   const visibleDates = useMemo(() => {
     if (viewMode === "3day") {
