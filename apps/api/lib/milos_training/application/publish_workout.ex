@@ -17,6 +17,7 @@ defmodule MilosTraining.Application.PublishWorkout do
 
     with {:ok, workout} <- Workouts.publish_workout(id, params),
          :ok <- apply_substitution(substitute_for, workout.id) do
+      Workouts.delete_superseded_drafts(id, workout.created_by_id)
       maybe_notify(is_republish, substitute_for, assignment_targets, booking_targets, workout)
       broadcast_admin_workout_refresh(workout.id)
 

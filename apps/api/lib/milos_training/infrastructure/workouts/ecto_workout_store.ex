@@ -1494,4 +1494,16 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         end
     end
   end
+
+  @impl true
+  def delete_superseded_drafts(published_id, admin_id) do
+    MasterWorkout
+    |> where(
+      [w],
+      w.status == :draft and w.created_by_id == ^admin_id and w.id != ^published_id
+    )
+    |> Repo.delete_all()
+
+    :ok
+  end
 end

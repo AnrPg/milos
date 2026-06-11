@@ -35,4 +35,5 @@ defmodule MilosTraining.Workouts.Ports.WorkoutStore do
   @callback create_assignment_message(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback update_assignment_date(Ecto.UUID.t(), String.t(), Date.t()) ::
               {:ok, map()} | {:error, :not_found | Ecto.Changeset.t()}
+  @callback delete_superseded_drafts(String.t(), String.t()) :: :ok
 end

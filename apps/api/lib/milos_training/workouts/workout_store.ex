@@ -92,4 +92,8 @@ defmodule MilosTraining.Workouts.WorkoutStore do
   @impl true
   def update_assignment_date(id, from_date, new_date),
     do: adapter().update_assignment_date(id, from_date, new_date)
+
+  @impl true
+  def delete_superseded_drafts(published_id, admin_id),
+    do: adapter().delete_superseded_drafts(published_id, admin_id)
 end

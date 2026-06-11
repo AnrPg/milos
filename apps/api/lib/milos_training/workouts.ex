@@ -64,6 +64,9 @@ defmodule MilosTraining.Workouts do
     to: SubstituteAssignmentWorkout,
     as: :call
 
+  defdelegate delete_superseded_drafts(published_id, admin_id),
+    to: MilosTraining.Workouts.WorkoutStore
+
   def materialize_workout_for_scale(id, scale_slug) do
     case get_workout(id) do
       nil ->
