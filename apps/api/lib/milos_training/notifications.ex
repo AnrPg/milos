@@ -1,0 +1,458 @@
+defmodule MilosTraining.Notifications do
+  require Logger
+
+  alias MilosTraining.Identity
+  alias MilosTraining.Notifications.Commands.DeletePushSubscription
+  alias MilosTraining.Notifications.Commands.DispatchNotification
+  alias MilosTraining.Notifications.Commands.EnqueueNotificationEvent
+  alias MilosTraining.Notifications.Commands.MarkAllRead
+  alias MilosTraining.Notifications.Commands.MarkNotificationRead
+  alias MilosTraining.Notifications.Commands.SavePushSubscription
+  alias MilosTraining.Notifications.Domain.NotificationDedupe
+  alias MilosTraining.Notifications.PushConfig
+  alias MilosTraining.Notifications.Queries.GetUnreadCount
+  alias MilosTraining.Notifications.Queries.ListInboxPage
+  alias MilosTraining.Notifications.Queries.GetPushSubscriptionStatus
+  alias MilosTraining.Notifications.Queries.ListPushSubscriptions
+  alias MilosTraining.Notifications.NotificationStore
+  alias MilosTraining.Notifications.Queries.ListNotifications
+
+  def create_notification(params), do: create_and_broadcast_notification(params)
+
+  def list_for_user(user_id), do: ListNotifications.for_user(user_id)
+
+  def list_inbox(user_id, params \\ %{}) do
+    with {:ok, page} <- ListInboxPage.call(user_id, params) do
+      {:ok,
+       %{
+         notifications: page.notifications,
+         unread_count: GetUnreadCount.call(user_id),
+         next_cursor: page.next_cursor
+       }}
+    end
+  end
+
+  def mark_all_read(user_id) do
+    marked_count = MarkAllRead.call(user_id)
+
+    if marked_count > 0 do
+      broadcast_notification_changed(user_id)
+    end
+
+    marked_count
+  end
+
+  def mark_read(user_id, notification_id) do
+    case MarkNotificationRead.call(user_id, notification_id) do
+      true ->
+        broadcast_notification_changed(user_id)
+        :ok
+
+      false ->
+        {:error, :not_found}
+    end
+  end
+
+  def push_config do
+    %{
+      enabled: PushConfig.enabled?(),
+      vapid_public_key: PushConfig.public_key()
+    }
+  end
+
+  def save_push_subscription(user_id, attrs) do
+    attrs
+    |> unwrap_subscription_attrs()
+    |> normalize_subscription_attrs(user_id)
+    |> SavePushSubscription.call()
+  end
+
+  def get_push_subscriptions(user_id), do: ListPushSubscriptions.call(user_id)
+
+  def get_push_subscription_status(user_id, endpoint) when is_binary(endpoint) do
+    GetPushSubscriptionStatus.call(user_id, endpoint)
+  end
+
+  def delete_push_subscription(user_id, endpoint) when is_binary(endpoint) do
+    DeletePushSubscription.call(user_id, endpoint)
+  end
+
+  def enqueue_event(event, payload), do: EnqueueNotificationEvent.call(event, payload)
+
+  def dispatch_event(event, payload) when is_atom(event) and is_map(payload) do
+    case enqueue_event(event, payload) do
+      :ok ->
+        :ok
+
+      {:error, reason} ->
+        Logger.error("notification_event_enqueue_failed event=#{event} reason=#{inspect(reason)}")
+
+        process_event(Atom.to_string(event), payload)
+    end
+  end
+
+  def process_event("booking_submitted", booking), do: enqueue_admins_new_booking(booking)
+
+  def process_event("booking_resolved", %{"status" => "approved"} = booking),
+    do: enqueue_member_booking_approved(booking)
+
+  def process_event("booking_resolved", %{status: :approved} = booking),
+    do: enqueue_member_booking_approved(booking)
+
+  def process_event("booking_resolved", %{"status" => "rejected"} = booking),
+    do: enqueue_member_booking_rejected(booking)
+
+  def process_event("booking_resolved", %{status: :rejected} = booking),
+    do: enqueue_member_booking_rejected(booking)
+
+  def process_event("booking_timed_out", booking), do: enqueue_booking_timeout_alert(booking)
+  def process_event("workout_note_submitted", payload), do: enqueue_workout_note(payload)
+  def process_event("admin_note_written", payload), do: enqueue_admin_note(payload)
+  def process_event("challenge_completed", payload), do: enqueue_challenge_completed(payload)
+  def process_event("workout_rejected", payload), do: enqueue_workout_rejected(payload)
+  def process_event("athlete_message_sent", payload), do: enqueue_athlete_message(payload)
+  def process_event("workout_moved", payload), do: enqueue_workout_moved(payload)
+  def process_event(_event, _payload), do: {:error, :bad_request}
+
+  def enqueue_admins_new_booking(booking),
+    do: enqueue_for_users(Identity.list_by_role(:admin), :booking_pending, booking)
+
+  def enqueue_member_booking_approved(booking),
+    do: enqueue_for_users([%{id: field(booking, :user_id)}], :booking_approved, booking)
+
+  def enqueue_member_booking_rejected(booking),
+    do: enqueue_for_users([%{id: field(booking, :user_id)}], :booking_rejected, booking)
+
+  def enqueue_booking_timeout_alert(booking),
+    do: enqueue_for_users(Identity.list_by_role(:admin), :booking_timeout, booking)
+
+  def enqueue_workout_note(note_payload) do
+    Identity.list_by_role(:admin)
+    |> Enum.each(fn admin ->
+      result =
+        deliver_notification(
+          admin.id,
+          :workout_note,
+          note_payload
+          |> add_default_url()
+          |> Map.put_new(:dedupe_key, workout_note_dedupe_key(admin.id, note_payload))
+        )
+
+      unless delivered?(result) do
+        Logger.error(
+          "workout_note delivery failed admin_id=#{admin.id} execution_id=#{field(note_payload, :execution_id)}"
+        )
+      end
+    end)
+
+    :ok
+  end
+
+  def enqueue_admin_note(payload) when is_map(payload) do
+    athlete_id = field(payload, :athlete_id)
+
+    payload =
+      payload
+      |> Map.put_new(:url, "/#coach-notes")
+      |> Map.put_new(:dedupe_key, admin_note_dedupe_key(athlete_id, payload))
+
+    case deliver_notification(athlete_id, :admin_note, payload) do
+      {:ok, _notification} ->
+        :ok
+
+      :ok ->
+        :ok
+
+      {:error, reason} = error ->
+        Logger.error(
+          "admin_note delivery failed athlete_id=#{athlete_id} reason=#{inspect(reason)}"
+        )
+
+        error
+    end
+  end
+
+  def enqueue_challenge_completed(payload) when is_map(payload) do
+    user_id = field(payload, :user_id)
+
+    payload =
+      payload
+      |> Map.put_new(:url, "/#challenges")
+      |> Map.put_new(:dedupe_key, challenge_completed_dedupe_key(user_id, payload))
+
+    case deliver_notification(user_id, :challenge_completed, payload) do
+      {:ok, _notification} ->
+        :ok
+
+      :ok ->
+        :ok
+
+      {:error, reason} = error ->
+        Logger.error(
+          "challenge_completed delivery failed user_id=#{user_id} reason=#{inspect(reason)}"
+        )
+
+        error
+    end
+  end
+
+  def enqueue_workout_changed(user_id, payload) do
+    case deliver_notification(user_id, :workout_changed, payload) do
+      {:ok, _notification} -> :ok
+      {:error, {:push_enqueue_failed, _notification, _reason}} -> :ok
+      {:error, _changeset} -> {:error, :notification_failed}
+    end
+  end
+
+  def enqueue_workout_deleted(user_id, payload) do
+    case deliver_notification(user_id, :workout_deleted, payload) do
+      {:ok, _notification} -> :ok
+      {:error, {:push_enqueue_failed, _notification, _reason}} -> :ok
+      {:error, _changeset} -> {:error, :notification_failed}
+    end
+  end
+
+  def enqueue_workout_rejected(payload) do
+    assigned_workout_id = field(payload, :assigned_workout_id)
+    workout_title = field(payload, :workout_title)
+    athlete_nickname = field(payload, :athlete_nickname)
+    scheduled_for = field(payload, :scheduled_for)
+
+    url =
+      case scheduled_for do
+        nil -> "/my-workouts?open=#{assigned_workout_id}"
+        date -> "/my-workouts?open=#{assigned_workout_id}&date=#{Date.to_iso8601(date)}"
+      end
+
+    Identity.list_by_role(:admin)
+    |> Enum.each(fn admin ->
+      result =
+        deliver_notification(admin.id, :workout_rejected, %{
+          assigned_workout_id: assigned_workout_id,
+          workout_title: workout_title,
+          athlete_nickname: athlete_nickname,
+          body: "#{athlete_nickname} rejected the workout \"#{workout_title}\".",
+          url: url
+        })
+
+      unless delivered?(result) do
+        Logger.error(
+          "workout_rejected delivery failed admin_id=#{admin.id} assigned_workout_id=#{assigned_workout_id}"
+        )
+      end
+    end)
+
+    :ok
+  end
+
+  def enqueue_athlete_message(payload) do
+    sender_nickname = field(payload, :sender_nickname)
+    body = field(payload, :body)
+    context_url = field(payload, :context_url) || "/"
+
+    Identity.list_by_role(:admin)
+    |> Enum.each(fn admin ->
+      result =
+        deliver_notification(admin.id, :athlete_message, %{
+          sender_id: field(payload, :sender_id),
+          sender_nickname: sender_nickname,
+          body: body,
+          context_url: context_url,
+          url: context_url
+        })
+
+      unless delivered?(result) do
+        Logger.error(
+          "athlete_message delivery failed admin_id=#{admin.id} sender_nickname=#{sender_nickname}"
+        )
+      end
+    end)
+
+    :ok
+  end
+
+  def enqueue_workout_moved(payload) do
+    assigned_workout_id = field(payload, :assigned_workout_id)
+    athlete_nickname = field(payload, :athlete_nickname)
+    workout_title = field(payload, :workout_title)
+    from_date = field(payload, :from_date)
+    to_date = field(payload, :to_date)
+
+    url = "/my-workouts?open=#{assigned_workout_id}&date=#{to_date}"
+    body = "#{athlete_nickname} moved \"#{workout_title}\" from #{from_date} to #{to_date}."
+
+    Identity.list_by_role(:admin)
+    |> Enum.each(fn admin ->
+      result =
+        deliver_notification(admin.id, :workout_moved, %{
+          assigned_workout_id: assigned_workout_id,
+          athlete_nickname: athlete_nickname,
+          workout_title: workout_title,
+          from_date: from_date,
+          to_date: to_date,
+          body: body,
+          url: url
+        })
+
+      unless delivered?(result) do
+        Logger.error(
+          "workout_moved delivery failed admin_id=#{admin.id} assigned_workout_id=#{assigned_workout_id}"
+        )
+      end
+    end)
+
+    :ok
+  end
+
+  def delete_booking_pending_notifications(booking_id) do
+    case NotificationStore.delete_booking_pending_for_booking(booking_id) do
+      :ok -> :ok
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  def create_booking_notification_once(user_id, type, booking) do
+    case deliver_notification(user_id, type, booking_payload(user_id, type, booking)) do
+      {:ok, _notification} -> :ok
+      :ok -> :ok
+      {:error, reason} -> {:error, {:notification_failed, reason}}
+    end
+  end
+
+  defp enqueue_for_users(users, type, booking) do
+    Enum.each(users, fn user ->
+      result = create_booking_notification_once(user.id, type, booking)
+
+      unless delivered?(result) do
+        Logger.error(
+          "booking notification delivery failed user_id=#{user.id} type=#{type} booking_id=#{field(booking, :id)}"
+        )
+      end
+    end)
+
+    :ok
+  end
+
+  defp booking_payload(user_id, type, booking) do
+    scheduled_class = nested_map(booking, :scheduled_class)
+
+    %{
+      booking_id: field(booking, :id),
+      scheduled_class_id: field(booking, :scheduled_class_id),
+      scheduled_at: scheduled_class && field(scheduled_class, :scheduled_at),
+      training_type: scheduled_class && field(scheduled_class, :training_type),
+      user_id: field(booking, :user_id),
+      status: to_string(field(booking, :status)),
+      admin_message: field(booking, :admin_message),
+      dedupe_key: NotificationDedupe.booking_key(user_id, type, field(booking, :id)),
+      url: "/schedule"
+    }
+  end
+
+  defp deliver_notification(user_id, type, payload) do
+    case DispatchNotification.call(user_id, type, payload) do
+      :ok ->
+        :ok
+
+      {:ok, notification} = ok ->
+        broadcast_notification_changed(notification.user_id)
+        ok
+
+      {:error, {:push_enqueue_failed, notification, _reason}} = error ->
+        broadcast_notification_changed(notification.user_id)
+        error
+
+      {:error, _reason} = error ->
+        error
+    end
+  end
+
+  defp add_default_url(%{} = payload) do
+    execution_id = Map.get(payload, :execution_id) || Map.get(payload, "execution_id")
+
+    case execution_id do
+      value when is_binary(value) -> Map.put_new(payload, :url, "/workouts/#{value}/execute")
+      _ -> payload
+    end
+  end
+
+  defp normalize_subscription_attrs(attrs, user_id) do
+    keys = Map.get(attrs, :keys) || Map.get(attrs, "keys") || %{}
+
+    %{
+      user_id: user_id,
+      endpoint: Map.get(attrs, :endpoint) || Map.get(attrs, "endpoint"),
+      expiration_time: Map.get(attrs, :expiration_time) || Map.get(attrs, "expiration_time"),
+      p256dh_key: Map.get(keys, :p256dh) || Map.get(keys, "p256dh"),
+      auth_key: Map.get(keys, :auth) || Map.get(keys, "auth")
+    }
+  end
+
+  defp unwrap_subscription_attrs(attrs) when is_map(attrs) do
+    Map.get(attrs, :push_subscription) ||
+      Map.get(attrs, "push_subscription") ||
+      Map.get(attrs, :body) ||
+      Map.get(attrs, "body") ||
+      attrs
+  end
+
+  defp broadcast_notification_changed(user_id) do
+    Phoenix.PubSub.broadcast(
+      MilosTraining.PubSub,
+      "notifications:changed",
+      {:notifications_changed, %{user_id: user_id}}
+    )
+  end
+
+  defp create_and_broadcast_notification(params) do
+    case MilosTraining.Notifications.Commands.CreateNotification.call(params) do
+      {:ok, notification} = ok ->
+        case notification do
+          :duplicate ->
+            :ok
+
+          _notification ->
+            broadcast_notification_changed(notification.user_id)
+            ok
+        end
+
+      {:error, _changeset} = error ->
+        error
+    end
+  end
+
+  defp delivered?({:ok, _notification}), do: true
+  defp delivered?(:ok), do: true
+  defp delivered?(_result), do: false
+
+  defp field(map, key) when is_map(map) do
+    Map.get(map, key) || Map.get(map, Atom.to_string(key))
+  end
+
+  defp nested_map(map, key) do
+    case field(map, key) do
+      value when is_map(value) -> value
+      _ -> nil
+    end
+  end
+
+  defp workout_note_dedupe_key(user_id, payload) do
+    note_id =
+      payload
+      |> nested_map(:note)
+      |> case do
+        nil -> nil
+        note -> field(note, :id)
+      end
+
+    NotificationDedupe.workout_note_key(user_id, note_id)
+  end
+
+  defp admin_note_dedupe_key(user_id, payload) do
+    NotificationDedupe.admin_note_key(user_id, field(payload, :note_id))
+  end
+
+  defp challenge_completed_dedupe_key(user_id, payload) do
+    NotificationDedupe.challenge_completed_key(user_id, field(payload, :challenge_id))
+  end
+end

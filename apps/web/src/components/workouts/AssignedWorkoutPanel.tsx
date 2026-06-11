@@ -8,6 +8,8 @@ import {
   fetchAssignmentMessages,
   postAssignmentMessage,
   rejectAssignment,
+  rescheduleAssignment,
+  updateAssignedWorkout,
   type AssignedWorkoutRecord,
   type AssignmentMessage,
 } from "@/api/assigned-workouts";
@@ -24,6 +26,7 @@ type Props = {
   onRejected?: (assignmentId: string) => void;
   onDeleted?: (assignmentId: string) => void;
   onEditWorkout?: (assignment: AssignedWorkoutRecord) => void;
+  onRescheduled?: (updated: AssignedWorkoutRecord) => void;
   launching?: boolean;
 };
 
@@ -37,6 +40,7 @@ export function AssignedWorkoutPanel({
   onRejected,
   onDeleted,
   onEditWorkout,
+  onRescheduled,
   launching,
 }: Props) {
   const [messages, setMessages] = useState<AssignmentMessage[]>([]);
@@ -48,7 +52,13 @@ export function AssignedWorkoutPanel({
   const [rejectError, setRejectError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [rescheduling, setRescheduling] = useState(false);
+  const [rescheduleDate, setRescheduleDate] = useState("");
+  const [rescheduleError, setRescheduleError] = useState<string | null>(null);
+  const [rescheduleSaving, setRescheduleSaving] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const todayIso = new Date().toISOString().split("T")[0]!;
 
   useEffect(() => {
     let cancelled = false;
@@ -114,6 +124,27 @@ export function AssignedWorkoutPanel({
       }
     } finally {
       setRejecting(false);
+    }
+  }
+
+  async function handleReschedule() {
+    if (!rescheduleDate) return;
+    setRescheduleSaving(true);
+    setRescheduleError(null);
+    try {
+      const updated = isAdmin
+        ? await updateAssignedWorkout(accessToken, assignment.id, {
+            scheduled_for: rescheduleDate,
+            athlete_ids: assignment.athlete_ids ?? [],
+            admin_notes: assignment.admin_notes ?? undefined,
+          })
+        : await rescheduleAssignment(accessToken, assignment.id, rescheduleDate);
+      onRescheduled?.(updated);
+      onClose();
+    } catch (err) {
+      setRescheduleError(err instanceof Error ? err.message : "Could not reschedule.");
+    } finally {
+      setRescheduleSaving(false);
     }
   }
 
@@ -334,6 +365,56 @@ export function AssignedWorkoutPanel({
               </button>
             </section>
           ) : null}
+
+          {/* Reschedule */}
+          <section className="px-0 pb-4">
+            {!rescheduling ? (
+              <button
+                className="rounded-full px-4 py-2 text-sm font-semibold"
+                style={{ background: "#1a1a28", color: "#c0c0d8" }}
+                onClick={() => {
+                  setRescheduleDate(assignment.scheduled_for);
+                  setRescheduling(true);
+                }}
+                type="button"
+              >
+                Reschedule
+              </button>
+            ) : (
+              <div className="space-y-2">
+                <input
+                  className="w-full rounded-[1rem] px-4 py-2 text-sm outline-none"
+                  style={{ background: "#111118", border: "1px solid #1e1e2e", color: "#F0EDF8" }}
+                  type="date"
+                  min={todayIso}
+                  value={rescheduleDate}
+                  onChange={(e) => setRescheduleDate(e.target.value)}
+                />
+                {rescheduleError ? (
+                  <p className="text-xs" style={{ color: "#e07a5f" }}>{rescheduleError}</p>
+                ) : null}
+                <div className="flex gap-2">
+                  <button
+                    className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
+                    style={{ background: "#F0EDF8", color: "#0A0A0F" }}
+                    disabled={rescheduleSaving || !rescheduleDate}
+                    onClick={() => void handleReschedule()}
+                    type="button"
+                  >
+                    {rescheduleSaving ? "Saving…" : "Confirm"}
+                  </button>
+                  <button
+                    className="rounded-full px-4 py-2 text-sm font-semibold"
+                    style={{ background: "#1a1a28", color: "#8888aa" }}
+                    onClick={() => setRescheduling(false)}
+                    type="button"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </section>
 
           {/* Completion scores */}
           {assignment.execution_status === "completed" && (assignment.execution_scores ?? []).length > 0 ? (

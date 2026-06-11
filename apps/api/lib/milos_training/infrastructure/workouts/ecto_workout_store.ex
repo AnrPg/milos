@@ -1473,4 +1473,25 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       inserted_at: message.inserted_at
     }
   end
+
+  @impl true
+  def update_assignment_date(id, _from_date, new_date) do
+    case Repo.get(AssignedWorkout, id) do
+      nil ->
+        {:error, :not_found}
+
+      assignment ->
+        assignment
+        |> Ecto.Changeset.change(scheduled_for: new_date)
+        |> Repo.update()
+        |> case do
+          {:ok, updated} ->
+            preloaded = Repo.preload(updated, @assigned_workout_preloads)
+            {:ok, normalize_assignment(preloaded)}
+
+          {:error, changeset} ->
+            {:error, changeset}
+        end
+    end
+  end
 end

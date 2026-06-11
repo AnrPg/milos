@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   DndContext,
   DragOverlay,
@@ -22,14 +22,17 @@ import {
   deleteAssignedWorkout,
   fetchAssignedWorkoutWeek,
   listAthletes,
+  rescheduleAssignment,
   updateAssignedWorkout,
   type AssignedWorkoutRecord,
   type AthleteOption,
 } from "@/api/assigned-workouts";
 import { useSession } from "@/components/session-provider";
 import { AssignedWorkoutPanel } from "@/components/workouts/AssignedWorkoutPanel";
+import { QuickAssignModal } from "@/components/workouts/QuickAssignModal";
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { addLocalDays, formatLocalDate, startOfLocalWeek } from "@/lib/local-date";
+import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { workoutTypeColor } from "@/lib/workout-colors";
 import { useExecutionStore } from "@/stores/execution";
 
@@ -113,7 +116,7 @@ function DraggableCard({
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, isDragging } = useDraggable({
     id: assignment.id,
     data: { assignment },
-    disabled: !isAdmin,
+    disabled: false,
   });
 
   return (
@@ -122,20 +125,18 @@ function DraggableCard({
       className={className}
       style={{ ...style, opacity: isDragging ? 0.3 : 1, position: "relative" }}
     >
-      {isAdmin ? (
-        <span
-          ref={(el) => setActivatorNodeRef(el)}
-          className="absolute right-2 top-2 z-10 select-none rounded p-1 text-base leading-none"
-          style={{ color: "#3a3a55", cursor: "grab", touchAction: "none" }}
-          {...listeners}
-          {...attributes}
-          role="button"
-          tabIndex={-1}
-          aria-label="Drag to reschedule"
-        >
-          ⠿
-        </span>
-      ) : null}
+      <span
+        ref={(el) => setActivatorNodeRef(el)}
+        className="absolute right-2 top-2 z-10 select-none rounded p-1 text-base leading-none"
+        style={{ color: "#3a3a55", cursor: "grab", touchAction: "none" }}
+        {...listeners}
+        {...attributes}
+        role="button"
+        tabIndex={-1}
+        aria-label="Drag to reschedule"
+      >
+        ⠿
+      </span>
       {children}
     </div>
   );
@@ -176,7 +177,7 @@ function DraggableMonthChip({
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: assignment.id,
     data: { assignment },
-    disabled: !isAdmin,
+    disabled: false,
   });
 
   return (
@@ -187,11 +188,12 @@ function DraggableMonthChip({
         background: `${workoutTypeColor(assignment.workout.type)}26`,
         color: workoutTypeColor(assignment.workout.type),
         opacity: isDragging ? 0.3 : 1,
-        cursor: isAdmin ? "grab" : undefined,
-        touchAction: isAdmin ? "none" : undefined,
+        cursor: "grab",
+        touchAction: "none",
       }}
-      onClick={(e) => { if (isAdmin) e.stopPropagation(); }}
-      {...(isAdmin ? { ...listeners, ...attributes } : {})}
+      onClick={(e) => e.stopPropagation()}
+      {...listeners}
+      {...attributes}
     >
       {assignment.workout.title}
     </p>
@@ -281,6 +283,7 @@ function DragGhostCard({ assignment }: { assignment: AssignedWorkoutRecord }) {
 
 export function AssignedWorkoutsConsole() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { currentUser, tokens, signOut } = useSession();
   const initExecution = useExecutionStore((state) => state.initExecution);
   const [refDate, setRefDate] = useState<Date>(() => new Date());
@@ -301,8 +304,17 @@ export function AssignedWorkoutsConsole() {
   const [error, setError] = useState<string | null>(null);
   const [activeAssignment, setActiveAssignment] = useState<AssignedWorkoutRecord | null>(null);
   const [editWorkoutTarget, setEditWorkoutTarget] = useState<AssignedWorkoutRecord | null>(null);
+  const [filterAthleteIds, setFilterAthleteIds] = useState<string[]>([]);
+  const [filterQuery, setFilterQuery] = useState("");
+  const [filterAthletes, setFilterAthletes] = useState<AthleteOption[]>([]);
+  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
+  const [showQuickAssign, setShowQuickAssign] = useState(false);
 
   const isAdmin = currentUser?.role === "admin";
+
+  const openParamId = searchParams.get("open");
+  const openParamDate = searchParams.get("date");
+  const autoOpenedRef = useRef<string | null>(null);
 
   const [todayIso, setTodayIso] = useState(() => formatLocalDate(new Date()));
   useEffect(() => {
@@ -325,53 +337,72 @@ export function AssignedWorkoutsConsole() {
     return [formatLocalDate(startOfLocalWeek(refDate))];
   }, [refDate, viewMode]);
 
-  useEffect(() => {
+  const loadAssignments = useCallback(async () => {
     if (!tokens?.access_token) return;
 
-    let cancelled = false;
+    setLoading(true);
+    setError(null);
 
-    void Promise.all(
-      weekStartsToFetch.map((weekStart) =>
-        fetchAssignedWorkoutWeek(tokens.access_token!, weekStart),
-      ),
-    )
-      .then((results) => {
-        if (cancelled) return;
-        const seen = new Set<string>();
-        const merged: AssignedWorkoutRecord[] = [];
-        for (const result of results) {
-          for (const a of result.assignments) {
-            if (!seen.has(a.id)) {
-              seen.add(a.id);
-              merged.push(a);
-            }
+    try {
+      const results = await Promise.all(
+        weekStartsToFetch.map((weekStart) =>
+          fetchAssignedWorkoutWeek(tokens.access_token!, weekStart),
+        ),
+      );
+
+      const seen = new Set<string>();
+      const merged: AssignedWorkoutRecord[] = [];
+
+      for (const result of results) {
+        for (const assignment of result.assignments) {
+          if (!seen.has(assignment.id)) {
+            seen.add(assignment.id);
+            merged.push(assignment);
           }
         }
-        setAllAssignments(merged);
-      })
-      .catch((requestError) => {
-        if (cancelled) return;
-        if (
-          requestError instanceof ApiError &&
-          (requestError.status === 401 || requestError.status === 403)
-        ) {
-          signOut();
-          return;
-        }
-        setError(
-          requestError instanceof Error
-            ? requestError.message
-            : "Could not load assigned workouts.",
-        );
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+      }
+
+      setAllAssignments(merged);
+    } catch (requestError) {
+      if (
+        requestError instanceof ApiError &&
+        (requestError.status === 401 || requestError.status === 403)
+      ) {
+        signOut();
+        return;
+      }
+
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "Could not load assigned workouts.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [signOut, tokens?.access_token, weekStartsToFetch]);
+
+  useEffect(() => {
+    void loadAssignments();
+  }, [loadAssignments]);
+
+  useEffect(() => {
+    function handleUserSync(event: Event) {
+      const detail = (event as CustomEvent<UserSyncDetail>).detail;
+
+      if (!detail?.scopes.includes("assigned_workouts")) {
+        return;
+      }
+
+      void loadAssignments();
+    }
+
+    window.addEventListener(USER_SYNC_EVENT, handleUserSync as EventListener);
 
     return () => {
-      cancelled = true;
+      window.removeEventListener(USER_SYNC_EVENT, handleUserSync as EventListener);
     };
-  }, [signOut, tokens?.access_token, weekStartsToFetch]);
+  }, [loadAssignments]);
 
   useEffect(() => {
     if (!isAdmin || !tokens?.access_token || !editingId) return;
@@ -396,6 +427,46 @@ export function AssignedWorkoutsConsole() {
     };
   }, [editQuery, editingId, isAdmin, tokens?.access_token]);
 
+  useEffect(() => {
+    if (!isAdmin || !tokens?.access_token || !filterDropdownOpen) return;
+
+    let cancelled = false;
+    const timeoutId = window.setTimeout(() => {
+      void listAthletes(tokens.access_token!, filterQuery)
+        .then((result) => { if (!cancelled) setFilterAthletes(result); })
+        .catch(() => { if (!cancelled) setFilterAthletes([]); });
+    }, 200);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, [filterQuery, filterDropdownOpen, isAdmin, tokens?.access_token]);
+
+  useEffect(() => {
+    if (!openParamId || autoOpenedRef.current === openParamId) return;
+
+    const target = allAssignments.find((a) => a.id === openParamId);
+    if (target) {
+      autoOpenedRef.current = openParamId;
+      setPanelAssignment(target);
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("open");
+      params.delete("date");
+      router.replace(`?${params.toString()}`, { scroll: false });
+      return;
+    }
+
+    // Assignment not in loaded week — navigate to the week containing the target date
+    if (!loading && openParamDate) {
+      const targetDate = new Date(openParamDate + "T00:00:00");
+      if (!isNaN(targetDate.getTime())) {
+        autoOpenedRef.current = openParamId;
+        setRefDate(targetDate);
+      }
+    }
+  }, [openParamId, openParamDate, loading, allAssignments, searchParams, router]);
+
   const visibleDates = useMemo(() => {
     if (viewMode === "3day") {
       return Array.from({ length: 3 }, (_, i) => formatLocalDate(addLocalDays(refDate, i)));
@@ -407,14 +478,21 @@ export function AssignedWorkoutsConsole() {
     return generateMonthGrid(refDate);
   }, [refDate, viewMode]);
 
+  const filteredAssignments = useMemo(() => {
+    if (!isAdmin || filterAthleteIds.length === 0) return allAssignments;
+    return allAssignments.filter((a) =>
+      (a.athlete_ids ?? []).some((id) => filterAthleteIds.includes(id)),
+    );
+  }, [allAssignments, filterAthleteIds, isAdmin]);
+
   const assignmentMap = useMemo(() => {
     const map: Record<string, AssignedWorkoutRecord[]> = {};
     for (const date of visibleDates) map[date] = [];
-    for (const a of allAssignments) {
+    for (const a of filteredAssignments) {
       if (map[a.scheduled_for]) map[a.scheduled_for].push(a);
     }
     return map;
-  }, [allAssignments, visibleDates]);
+  }, [filteredAssignments, visibleDates]);
 
   const periodLabel = useMemo(() => {
     if (viewMode === "month") return formatMonthLabel(refDate);
@@ -577,17 +655,29 @@ export function AssignedWorkoutsConsole() {
     const assignment = allAssignments.find((a) => a.id === active.id);
     if (!assignment || assignment.scheduled_for === newDate) return;
 
+    if (newDate < todayIso) {
+      setError("Cannot reschedule a workout to a past date.");
+      return;
+    }
+
     setAllAssignments((current) =>
       current.map((a) => (a.id === assignment.id ? { ...a, scheduled_for: newDate } : a)),
     );
 
     void (async () => {
       try {
-        await updateAssignedWorkout(tokens.access_token!, assignment.id, {
-          scheduled_for: newDate,
-          athlete_ids: assignment.athlete_ids ?? [],
-          admin_notes: assignment.admin_notes ?? undefined,
-        });
+        if (isAdmin) {
+          await updateAssignedWorkout(tokens.access_token!, assignment.id, {
+            scheduled_for: newDate,
+            athlete_ids: assignment.athlete_ids ?? [],
+            admin_notes: assignment.admin_notes ?? undefined,
+          });
+        } else {
+          const updated = await rescheduleAssignment(tokens.access_token!, assignment.id, newDate);
+          setAllAssignments((current) =>
+            current.map((a) => (a.id === updated.id ? updated : a)),
+          );
+        }
       } catch {
         setAllAssignments((current) =>
           current.map((a) => (a.id === assignment.id ? assignment : a)),
@@ -734,6 +824,7 @@ export function AssignedWorkoutsConsole() {
 
                 {dayAssignments.map((assignment) => {
                   const isRejected = assignment.my_athlete_status === "rejected";
+                  const isDone = assignment.execution_status === "completed";
                   return (
                   <DraggableCard
                     key={assignment.id}
@@ -742,7 +833,7 @@ export function AssignedWorkoutsConsole() {
                     className="rounded-[1.4rem] p-4"
                     style={{
                       background: "#0d0d18",
-                      border: `1px solid ${isRejected ? "#2a1a1a" : "#1a1a28"}`,
+                      border: `1px solid ${isRejected ? "#2a1a1a" : isDone ? "#1a2a1a" : "#1a1a28"}`,
                       opacity: isRejected ? 0.55 : 1,
                     }}
                   >
@@ -757,6 +848,10 @@ export function AssignedWorkoutsConsole() {
                       {isRejected ? (
                         <span className="mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "rgba(100,30,30,0.4)", color: "#e07a5f" }}>
                           Rejected by you
+                        </span>
+                      ) : isDone ? (
+                        <span className="mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "rgba(16,185,129,0.15)", color: "#34d399" }}>
+                          Done ✓
                         </span>
                       ) : null}
                       <h2 className="mt-1.5 text-base font-semibold" style={{ color: isRejected ? "#55556a" : "#F0EDF8" }}>
@@ -1016,6 +1111,94 @@ export function AssignedWorkoutsConsole() {
           </div>
         </section>
 
+        {isAdmin ? (
+          <section className="relative flex flex-wrap items-center gap-2">
+            <div className="relative">
+              <input
+                className="rounded-full px-4 py-2 text-sm outline-none"
+                style={{ background: "#111118", border: "1px solid #1a1a28", color: "#F0EDF8", minWidth: "14rem" }}
+                placeholder="Filter by athlete…"
+                value={filterQuery}
+                onFocus={() => setFilterDropdownOpen(true)}
+                onBlur={() => window.setTimeout(() => setFilterDropdownOpen(false), 150)}
+                onChange={(e) => {
+                  setFilterQuery(e.target.value);
+                  setFilterDropdownOpen(true);
+                }}
+              />
+              {filterDropdownOpen && filterAthletes.length > 0 ? (
+                <div
+                  className="absolute left-0 top-full z-30 mt-1 w-64 rounded-[1rem] py-1 shadow-xl"
+                  style={{ background: "#111118", border: "1px solid #1a1a28" }}
+                >
+                  {filterAthletes.map((athlete) => {
+                    const selected = filterAthleteIds.includes(athlete.id);
+                    return (
+                      <button
+                        key={athlete.id}
+                        className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm transition-colors"
+                        style={{ color: selected ? "#d95d39" : "#F0EDF8" }}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => {
+                          setFilterAthleteIds((current) =>
+                            selected ? current.filter((id) => id !== athlete.id) : [...current, athlete.id],
+                          );
+                        }}
+                        type="button"
+                      >
+                        <span
+                          className="flex h-4 w-4 shrink-0 items-center justify-center rounded"
+                          style={{
+                            background: selected ? "#d95d39" : "#1a1a28",
+                            border: `1px solid ${selected ? "#d95d39" : "#3a3a55"}`,
+                          }}
+                        >
+                          {selected ? <span className="text-[10px] font-bold text-white">✓</span> : null}
+                        </span>
+                        {athlete.nickname}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : null}
+            </div>
+
+            {filterAthleteIds.length > 0 ? (
+              <>
+                {filterAthleteIds.map((id) => {
+                  const athlete = filterAthletes.find((a) => a.id === id) ?? allAssignments
+                    .flatMap((a) => a.athletes ?? [])
+                    .find((a) => a.id === id);
+                  return athlete ? (
+                    <span
+                      key={id}
+                      className="flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold"
+                      style={{ background: "rgba(217,93,57,0.15)", border: "1px solid rgba(217,93,57,0.25)", color: "#d95d39" }}
+                    >
+                      {athlete.nickname}
+                      <button
+                        className="ml-0.5 opacity-70 hover:opacity-100"
+                        onClick={() => setFilterAthleteIds((c) => c.filter((fid) => fid !== id))}
+                        type="button"
+                      >
+                        ✕
+                      </button>
+                    </span>
+                  ) : null;
+                })}
+                <button
+                  className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
+                  style={{ background: "#1a1a28", color: "#8888aa" }}
+                  onClick={() => { setFilterAthleteIds([]); setFilterQuery(""); }}
+                  type="button"
+                >
+                  Clear filter
+                </button>
+              </>
+            ) : null}
+          </section>
+        ) : null}
+
         {error ? (
           <section
             className="rounded-[1.8rem] px-5 py-4 text-sm"
@@ -1063,19 +1246,29 @@ export function AssignedWorkoutsConsole() {
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "#55556a" }}>
-                  Assign more
+                  Assign workout
                 </p>
                 <p className="mt-2 text-xl font-semibold" style={{ color: "#F0EDF8" }}>
-                  Open the workout library to assign templates.
+                  Assign a workout to one or more athletes.
                 </p>
               </div>
-              <Link
-                className="rounded-full px-4 py-2 text-sm font-semibold"
-                style={{ background: "#F0EDF8", color: "#0A0A0F" }}
-                href="/admin/workouts"
-              >
-                Workout library
-              </Link>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  className="rounded-full px-4 py-2 text-sm font-semibold"
+                  style={{ background: "#d95d39", color: "#fff" }}
+                  onClick={() => setShowQuickAssign(true)}
+                  type="button"
+                >
+                  Assign workout
+                </button>
+                <Link
+                  className="rounded-full px-4 py-2 text-sm font-semibold"
+                  style={{ background: "#1a1a28", color: "#c0c0d8" }}
+                  href="/admin/workouts"
+                >
+                  Workout library
+                </Link>
+              </div>
             </div>
           </section>
         ) : null}
@@ -1083,9 +1276,11 @@ export function AssignedWorkoutsConsole() {
 
       {panelAssignment && tokens?.access_token ? (
         <AssignedWorkoutPanel
+          key={panelAssignment.id}
           assignment={panelAssignment}
           isAdmin={isAdmin}
           accessToken={tokens.access_token}
+          currentUserId={currentUser?.id}
           onClose={() => setPanelAssignment(null)}
           onStartWorkout={(assignment) => void executeAssignedWorkout(assignment)}
           onRejected={(rejectedId) =>
@@ -1103,6 +1298,11 @@ export function AssignedWorkoutsConsole() {
             setPanelAssignment(null);
             setEditWorkoutTarget(assignment);
           }}
+          onRescheduled={(updated) => {
+            setAllAssignments((current) =>
+              current.map((a) => (a.id === updated.id ? updated : a)),
+            );
+          }}
           launching={launchingId === panelAssignment.id}
         />
       ) : null}
@@ -1118,6 +1318,18 @@ export function AssignedWorkoutsConsole() {
             sourceLabel: `assignment on ${editWorkoutTarget.scheduled_for}`,
           }}
           onClose={() => setEditWorkoutTarget(null)}
+        />
+      ) : null}
+
+      {showQuickAssign && tokens?.access_token ? (
+        <QuickAssignModal
+          accessToken={tokens.access_token}
+          defaultDate={todayIso}
+          onClose={() => setShowQuickAssign(false)}
+          onAssigned={() => {
+            setShowQuickAssign(false);
+            void loadAssignments();
+          }}
         />
       ) : null}
     </main>

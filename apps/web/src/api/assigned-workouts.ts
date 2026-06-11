@@ -173,6 +173,18 @@ export async function postAssignmentMessage(
   return data.message;
 }
 
+export async function rescheduleAssignment(
+  token: string,
+  assignmentId: string,
+  scheduledFor: string,
+): Promise<AssignedWorkoutRecord> {
+  const response = await apiRequest<{ assignment: AssignedWorkoutRecord }>(
+    `/my-workouts/assignments/${assignmentId}/reschedule`,
+    { method: "PATCH", token, body: { scheduled_for: scheduledFor } },
+  );
+  return response.assignment;
+}
+
 export async function sendAssignmentMessage(token: string, assignmentId: string, body: string) {
   await apiRequest(`/my-workouts/assignments/${assignmentId}/message`, {
     method: "POST",
