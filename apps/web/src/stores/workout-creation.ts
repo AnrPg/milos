@@ -16,7 +16,7 @@ import type {
   SectionFormat,
   WorkoutType,
 } from "@/types/workout";
-import { AUTO_SCORE_MAP, FORMAT_EXERCISE_CONTEXT, adaptExerciseToDestination, makeDefaultAdvancedSettings, makeDefaultExercise, makeDefaultFormatParams, makeDefaultSection } from "@/types/workout";
+import { AUTO_SCORE_MAP, EMOM_SCORING_MODE_SCORE_TYPE, FORMAT_EXERCISE_CONTEXT, adaptExerciseToDestination, makeDefaultAdvancedSettings, makeDefaultExercise, makeDefaultFormatParams, makeDefaultSection } from "@/types/workout";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 
@@ -41,6 +41,8 @@ type WorkoutCreationStore = DraftWorkoutState & {
   reorderSections: (fromId: string, toId: string) => void;
   setFormat: (sectionId: string, format: SectionFormat) => void;
   setFormatParams: (sectionId: string, params: FormatParams) => void;
+  setEmomScoringMode: (sectionId: string, mode: EmomScoringMode | null) => void;
+  setEmomAmrapScoringStyle: (sectionId: string, style: "grand_total" | "lowest_window" | null) => void;
   addExercise: (sectionId: string) => void;
   updateExercise: (sectionId: string, exerciseId: string, patch: Partial<DraftExercise>) => void;
   deleteExercise: (sectionId: string, exerciseId: string) => void;
@@ -181,9 +183,15 @@ function parseDraftSections(raw: unknown): DraftSection[] {
     const timerConfig = (sec.timer_config && typeof sec.timer_config === "object")
       ? sec.timer_config as Record<string, unknown>
       : {};
-    const format = parseSectionFormat(timerConfig.type);
-    const formatParamRaw = { ...timerConfig };
-    delete formatParamRaw.type;
+    const {
+      type: _type,
+      scoring_mode: rawScoringMode,
+      amrap_scoring_style: rawAmrapStyle,
+      ...formatParamRaw
+    } = timerConfig;
+    const format = parseSectionFormat(_type);
+    const emomScoringMode = parseEmomScoringMode(rawScoringMode);
+    const emomAmrapScoringStyle = parseEmomAmrapScoringStyle(rawAmrapStyle);
     const formatParams: FormatParams = {};
     for (const [k, v] of Object.entries(formatParamRaw)) {
       formatParams[k] = v != null ? Number(v) : null;
@@ -192,8 +200,6 @@ function parseDraftSections(raw: unknown): DraftSection[] {
       ? sec.score_config as Record<string, unknown>
       : null;
     const scoreType = scoreConfig ? parseScoreType(scoreConfig.type) : null;
-    const emomScoringMode = scoreConfig ? parseEmomScoringMode(scoreConfig.scoring_mode) : null;
-    const emomAmrapScoringStyle = scoreConfig ? parseEmomAmrapScoringStyle(scoreConfig.amrap_scoring_style) : null;
     const exercises = Array.isArray(sec.exercises)
       ? sec.exercises.map(parseDraftExercise)
       : [];
@@ -309,6 +315,7 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
         if (section.localId !== sectionId) return section;
 
         const autoScore = AUTO_SCORE_MAP[format] ?? null;
+        const isEmom = format === "emom" || format === "complex_emom";
 
         return {
           ...section,
@@ -316,6 +323,8 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
           formatParams: makeDefaultFormatParams(format),
           scoreable: format === "rest" ? false : section.scoreable,
           scoreType: autoScore,
+          emomScoringMode: isEmom ? section.emomScoringMode : null,
+          emomAmrapScoringStyle: isEmom ? section.emomAmrapScoringStyle : null,
         };
       }),
     })),
@@ -324,6 +333,24 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
     set((state) => ({
       sections: state.sections.map((section) =>
         section.localId === sectionId ? { ...section, formatParams: params } : section,
+      ),
+    })),
+
+  setEmomScoringMode: (sectionId, mode) =>
+    set((state) => ({
+      sections: state.sections.map((section) => {
+        if (section.localId !== sectionId) return section;
+        const scoreType = mode ? EMOM_SCORING_MODE_SCORE_TYPE[mode] : null;
+        return { ...section, emomScoringMode: mode, scoreType };
+      }),
+    })),
+
+  setEmomAmrapScoringStyle: (sectionId, style) =>
+    set((state) => ({
+      sections: state.sections.map((section) =>
+        section.localId === sectionId
+          ? { ...section, emomAmrapScoringStyle: style }
+          : section,
       ),
     })),
 
@@ -584,6 +611,8 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
           type: section.format,
           ...section.formatParams,
           ...deriveLadderTimerParams(section),
+          ...(section.emomScoringMode ? { scoring_mode: section.emomScoringMode } : {}),
+          ...(section.emomAmrapScoringStyle ? { amrap_scoring_style: section.emomAmrapScoringStyle } : {}),
         },
         scoreable: section.scoreable,
         score_config: section.scoreType ? { type: section.scoreType } : null,
