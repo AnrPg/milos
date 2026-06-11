@@ -231,12 +231,14 @@ defmodule MilosTraining.Execution.Domain.ProgressSnapshotter do
   # ── EMOM: scoring-mode-aware snapshots ───────────────────────────────────────
 
   defp emom_scoring_mode(section_segments) do
-    tc = hd(section_segments) |> Map.get(:timer_config) || %{}
+    seg = hd(section_segments)
+    tc = seg[:timer_config] || seg["timer_config"] || %{}
     tc[:scoring_mode] || tc["scoring_mode"] || "amrap"
   end
 
   defp emom_amrap_scoring_style(section_segments) do
-    tc = hd(section_segments) |> Map.get(:timer_config) || %{}
+    seg = hd(section_segments)
+    tc = seg[:timer_config] || seg["timer_config"] || %{}
     tc[:amrap_scoring_style] || tc["amrap_scoring_style"] || "grand_total"
   end
 
@@ -288,8 +290,13 @@ defmodule MilosTraining.Execution.Domain.ProgressSnapshotter do
       "for_quality" ->
         total = length(section_segments)
         survived = Enum.count(section_segments, &(completed_cycles(&1, state) > 0))
-        result = if survived >= total, do: "Pass", else: "Fail"
-        %{value: result, score_type: "pass_fail"}
+
+        if survived == 0 do
+          nil
+        else
+          result = if survived >= total, do: "Pass", else: "Fail"
+          %{value: result, score_type: "pass_fail"}
+        end
 
       "amrap" when format == "complex_emom" ->
         case emom_amrap_scoring_style(section_segments) do
