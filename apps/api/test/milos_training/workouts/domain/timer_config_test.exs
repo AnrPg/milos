@@ -129,5 +129,17 @@ defmodule MilosTraining.Workouts.Domain.TimerConfigTest do
                  "interval_seconds" => 60
                })
     end
+
+    test "accepts max_windows for complex_emom" do
+      assert {:ok, config} =
+               TimerConfig.normalize(%{
+                 "type" => "complex_emom",
+                 "duration_seconds" => 600,
+                 "interval_seconds" => 60,
+                 "scoring_mode" => "to_failure",
+                 "max_windows" => 15
+               })
+      assert config.max_windows == 15
+    end
   end
 end

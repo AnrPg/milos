@@ -70,7 +70,7 @@ defmodule MilosTraining.Workouts.Domain.TimerConfig do
   defp optional_fields("train_to_exhaustion"), do: [:rest_seconds]
   defp optional_fields("kcal_target"), do: [:kcal_target, :time_cap_seconds]
   defp optional_fields("emom"), do: [:scoring_mode, :max_windows]
-  defp optional_fields("complex_emom"), do: [:scoring_mode, :amrap_scoring_style]
+  defp optional_fields("complex_emom"), do: [:scoring_mode, :amrap_scoring_style, :max_windows]
   defp optional_fields("edt"), do: [:pr_zone_rounds]
   defp optional_fields("death_by"), do: [:ladder_cap]
   defp optional_fields("ladder_ascending"), do: [:ladder_cap]
