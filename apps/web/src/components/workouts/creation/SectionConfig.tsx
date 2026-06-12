@@ -328,7 +328,7 @@ export function SectionConfig({ section }: Props) {
             onChange={(event) =>
               setFormatParams(section.localId, {
                 ...section.formatParams,
-                max_windows: Number(event.target.value) || 100,
+                max_windows: Math.max(1, Number(event.target.value) || 1),
               })
             }
             className="w-20 rounded-lg px-2 py-1 text-right text-sm outline-none"
