@@ -93,9 +93,9 @@ export function ScoreModal({
                           color: "#ef4444",
                         }
                     : {
-                        background: "var(--bg)",
-                        border: "1px solid var(--dim)",
-                        color: "var(--muted)",
+                        background: "var(--bg, #0d0d14)",
+                        border: "1px solid var(--dim, #3a3a4a)",
+                        color: "var(--muted, #888)",
                       }
                 }
               >
