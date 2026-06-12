@@ -72,14 +72,14 @@ export function computeMeasuredScore(
   switch (segment.format) {
     case "emom":
     case "complex_emom": {
-      const scoringMode = String(segment.timer_config?.scoring_mode ?? "amrap");
+      const rawMode = segment.timer_config?.scoring_mode;
+      const scoringMode = typeof rawMode === "string" && rawMode ? rawMode : "amrap";
 
       if (scoringMode === "for_time") {
-        const elapsed = effectiveSectionElapsedMs(segment, state);
-        return elapsed > 0
+        return segmentElapsedMs > 0
           ? {
               section_id: segment.section_id,
-              value: formatDurationMs(elapsed),
+              value: formatDurationMs(segmentElapsedMs),
               score_type: "accumulated_work_time",
               kind: "final",
               source: "auto",
