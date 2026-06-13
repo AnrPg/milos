@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { fetchExecution } from "@/api/executions";
+import { ChallengeCard } from "@/components/workouts/ChallengeCard";
 import {
   fetchLandingPayload,
   updateLeaderboardOptIn,
@@ -136,6 +137,7 @@ export function LandingPage() {
   }
 
   const stats = landing.gamification.stats;
+  const weeklyWorkoutTarget = landing.gamification.settings.weekly_workout_target;
   const isAdmin = currentUser?.role === "admin";
   const selectedExecution = selectedExecutionQuery.data;
   const leaderboardVisible = landing.gamification.leaderboard.visible;
@@ -267,35 +269,9 @@ export function LandingPage() {
                   No active seasonal challenges yet.
                 </p>
               ) : (
-                landing.gamification.active_challenges.map((challenge) => {
-                  const completion = Math.min(100, Math.round((challenge.progress / Math.max(challenge.target, 1)) * 100));
-
-                  return (
-                    <article key={challenge.id} className="rounded-[1.6rem] p-4" style={{ background: "#0d0d18", border: "1px solid #1a1a28" }}>
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <p className="text-sm font-semibold" style={{ color: "#F0EDF8" }}>{challenge.title}</p>
-                          <p className="mt-1 text-sm" style={{ color: "#8888aa" }}>{challenge.description}</p>
-                        </div>
-                        <span
-                          className="rounded-full px-3 py-1 text-xs font-semibold"
-                          style={{ background: "rgba(217,93,57,0.12)", color: "#d95d39" }}
-                        >
-                          {challenge.badge_label}
-                        </span>
-                      </div>
-                      <div className="mt-4 h-3 overflow-hidden rounded-full" style={{ background: "#1a1a28" }}>
-                        <div className="h-full rounded-full" style={{ width: `${completion}%`, background: "#d95d39" }} />
-                      </div>
-                      <div className="mt-3 flex items-center justify-between text-sm" style={{ color: "#8888aa" }}>
-                        <span>
-                          {challenge.progress} / {challenge.target}
-                        </span>
-                        <span>{challenge.completed ? "Completed" : `${completion}%`}</span>
-                      </div>
-                    </article>
-                  );
-                })
+                landing.gamification.active_challenges.map((challenge) => (
+                  <ChallengeCard key={challenge.id} challenge={challenge} />
+                ))
               )}
             </div>
           </article>
@@ -422,6 +398,14 @@ export function LandingPage() {
               <h2 className="mt-3 text-2xl font-semibold tracking-tight" style={{ color: "#F0EDF8" }}>Status snapshot</h2>
               <dl className="mt-5 space-y-3 text-sm" style={{ color: "#8888aa" }}>
                 <div className="flex items-center justify-between gap-4">
+                  <dt>Package</dt>
+                  <dd style={{ color: "#F0EDF8" }}>{landing.membership.package_name ?? "Not assigned"}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <dt>Entitlement</dt>
+                  <dd style={{ color: "#F0EDF8" }}>{landing.membership.entitlement_status ?? "Inactive"}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-4">
                   <dt>Expiration</dt>
                   <dd style={{ color: "#F0EDF8" }}>{landing.membership.expiration_date ?? "Not set"}</dd>
                 </div>
@@ -431,7 +415,14 @@ export function LandingPage() {
                 </div>
                 <div className="flex items-center justify-between gap-4">
                   <dt>Amount</dt>
-                  <dd style={{ color: "#F0EDF8" }}>{landing.membership.amount ?? "Not set"}</dd>
+                  <dd style={{ color: "#F0EDF8" }}>
+                    {landing.membership.amount == null
+                      ? "Not set"
+                      : new Intl.NumberFormat("en-GB", {
+                          style: "currency",
+                          currency: landing.membership.currency ?? "EUR",
+                        }).format(landing.membership.amount / 100)}
+                  </dd>
                 </div>
               </dl>
             </article>
@@ -511,15 +502,17 @@ export function LandingPage() {
         <InfoModal title="Current Streak" onClose={() => setActiveInfoModal(null)}>
           <p>
             <strong style={{ color: "#F0EDF8" }}>What it measures:</strong> The number of
-            consecutive days you completed at least one workout.
+            consecutive user-relative training weeks in which you completed at least {weeklyWorkoutTarget}{" "}
+            workout{weeklyWorkoutTarget === 1 ? "" : "s"}.
           </p>
           <p>
-            <strong style={{ color: "#F0EDF8" }}>How to improve:</strong> Complete a workout every
-            day. Missing a day resets your streak to zero.
+            <strong style={{ color: "#F0EDF8" }}>How to improve:</strong> Complete at least{" "}
+            {weeklyWorkoutTarget} workout{weeklyWorkoutTarget === 1 ? "" : "s"} each training week.
+            A streak shield can protect one missed target week.
           </p>
           <p>
             <strong style={{ color: "#F0EDF8" }}>Why it matters:</strong> Streaks build the habit
-            of daily movement — even a short recovery session counts.
+            of regular weekly training volume.
           </p>
         </InfoModal>
       ) : null}
@@ -549,11 +542,13 @@ export function LandingPage() {
         <InfoModal title="Consistency Score" onClose={() => setActiveInfoModal(null)}>
           <p>
             <strong style={{ color: "#F0EDF8" }}>What it measures:</strong> The percentage of weeks
-            in the last 12 in which you completed at least one workout.
+            in the last 12 weeks in which you completed at least {weeklyWorkoutTarget} workout
+            {weeklyWorkoutTarget === 1 ? "" : "s"}.
           </p>
           <p>
             <strong style={{ color: "#F0EDF8" }}>How to improve:</strong> Show up consistently —
-            even one session per week counts toward your score.
+            complete at least {weeklyWorkoutTarget} workout{weeklyWorkoutTarget === 1 ? "" : "s"} per
+            week to count that week toward your score.
           </p>
           <p>
             <strong style={{ color: "#F0EDF8" }}>Why it matters:</strong> Consistency over time
