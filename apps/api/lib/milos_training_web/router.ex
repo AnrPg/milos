@@ -42,6 +42,7 @@ defmodule MilosTrainingWeb.Router do
 
     get("/health", MilosTrainingWeb.HealthController, :index)
     get("/openapi", OpenApiSpex.Plug.RenderSpec, [])
+    get("/calendar/feed.ics", MilosTrainingWeb.CalendarFeedController, :feed)
   end
 
   scope "/api/auth", MilosTrainingWeb do
@@ -63,6 +64,7 @@ defmodule MilosTrainingWeb.Router do
 
     patch("/users/:id/role", AdminUserController, :update_role)
     get("/search", AdminSearchController, :index)
+    get("/analytics/summary", AdminAnalyticsController, :summary)
     get("/athletes", AdminUserController, :index_athletes)
     get("/scale-levels", AdminScaleLevelController, :index)
     put("/scale-levels", AdminScaleLevelController, :update)
@@ -93,22 +95,70 @@ defmodule MilosTrainingWeb.Router do
     patch("/bookings/:id/reject", AdminScheduleController, :reject_booking)
     post("/athletes/:id/notes", AdminCoachingController, :create_note)
     get("/finance/summary", AdminFinanceController, :summary)
+    get("/finance/queues", AdminFinanceController, :operational_queues)
     get("/finance/packages", AdminFinanceController, :packages)
     post("/finance/packages", AdminFinanceController, :create_package)
+    get("/finance/packages/:id", AdminFinanceController, :package)
     patch("/finance/packages/:id", AdminFinanceController, :update_package)
     get("/finance/members/:id", AdminFinanceController, :member)
     patch("/finance/members/:id", AdminFinanceController, :update_member)
     post("/finance/members/:id/packages", AdminFinanceController, :assign_package)
     post("/finance/members/:id/payments", AdminFinanceController, :record_payment)
+    post("/finance/members/:id/invoices", AdminFinanceController, :create_invoice)
+
+    post(
+      "/finance/members/:id/invoices/renewal",
+      AdminFinanceController,
+      :generate_renewal_invoice
+    )
+
+    post("/finance/members/:id/credits", AdminFinanceController, :create_manual_credit)
+
+    post(
+      "/finance/members/:id/payments/:payment_id/credits",
+      AdminFinanceController,
+      :apply_credit_to_payment
+    )
+
+    post(
+      "/finance/members/:id/payments/:payment_id/reversals",
+      AdminFinanceController,
+      :reverse_payment
+    )
+
+    post(
+      "/finance/members/:id/invoices/:invoice_id/credits",
+      AdminFinanceController,
+      :apply_credit_to_invoice
+    )
+
+    post(
+      "/finance/members/:id/credits/:credit_ledger_entry_id/reversals",
+      AdminFinanceController,
+      :reverse_credit_ledger_entry
+    )
+
+    patch("/finance/invoices/:id/issue", AdminFinanceController, :issue_invoice)
+    patch("/finance/invoices/:id/void", AdminFinanceController, :void_invoice)
+
     post("/finance/members/:id/promotion-redemptions", AdminFinanceController, :redeem_promotion)
     get("/finance/promotions", AdminFinanceController, :promotions)
     post("/finance/promotions", AdminFinanceController, :create_promotion)
     get("/finance/promotions/:id/codes", AdminFinanceController, :promotion_codes)
     post("/finance/promotions/:id/codes", AdminFinanceController, :create_promotion_code)
+    get("/finance/referral-programs", AdminFinanceController, :referral_programs)
+    post("/finance/referral-programs", AdminFinanceController, :create_referral_program)
     get("/finance/referrals", AdminFinanceController, :referrals)
     post("/finance/referrals", AdminFinanceController, :create_referral)
     patch("/finance/referrals/:id/status", AdminFinanceController, :update_referral_status)
     get("/finance/referral-rewards", AdminFinanceController, :referral_rewards)
+
+    patch(
+      "/finance/referral-rewards/:id/status",
+      AdminFinanceController,
+      :update_referral_reward_status
+    )
+
     post("/finance/referrals/:id/rewards", AdminFinanceController, :create_referral_reward)
     get("/reviews", AdminReviewController, :index)
     patch("/reviews/:id/status", AdminReviewController, :update_status)
@@ -140,11 +190,13 @@ defmodule MilosTrainingWeb.Router do
   scope "/api", MilosTrainingWeb do
     pipe_through([:api, :authenticated, :user_only])
 
+    get("/calendar/export-links", CalendarFeedController, :links)
     get("/landing", LandingController, :show)
     post("/landing/leaderboard-opt-in", LandingController, :update_leaderboard_preference)
     get("/notifications", NotificationController, :index)
     post("/notifications/read-all", NotificationController, :mark_all_read)
     post("/notifications/:id/read", NotificationController, :mark_read)
+    post("/notifications/:id/click", NotificationController, :mark_clicked)
     get("/notifications/push-config", NotificationController, :push_config)
     post("/notifications/push-subscriptions", NotificationController, :create_push_subscription)
 
@@ -160,6 +212,9 @@ defmodule MilosTrainingWeb.Router do
     get("/wellbeing/injuries", WellbeingController, :index)
     post("/wellbeing/injuries", WellbeingController, :create)
     patch("/wellbeing/injuries/:id/heal", WellbeingController, :heal)
+    get("/challenges/:id/leaderboard", ChallengeController, :leaderboard)
+    post("/challenges/:id/opt_in", ChallengeController, :opt_in)
+    delete("/challenges/:id/opt_in", ChallengeController, :opt_out)
   end
 
   scope "/api/workouts", MilosTrainingWeb do
