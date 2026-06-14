@@ -1166,81 +1166,13 @@ apps/web/src/
 
 - [ ] **Write ADR-004:** Booking approval flow (Oban timeout job vs cron polling — chose Oban for reliability and no polling)
 
-- [ ] **Write failing test for BookingPolicy domain module**
-  ```elixir
-  defmodule MilosTraining.Scheduling.Domain.BookingPolicyTest do
-    use ExUnit.Case, async: true
-    alias MilosTraining.Scheduling.Domain.BookingPolicy
-
-    test "slot_full?/1 returns true when bookings >= capacity" do
-      slot = %{capacity: 2, approved_booking_count: 2}
-      assert BookingPolicy.slot_full?(slot)
-    end
-
-    test "slot_full?/1 returns false when bookings < capacity" do
-      slot = %{capacity: 10, approved_booking_count: 3}
-      refute BookingPolicy.slot_full?(slot)
-    end
-
-    test "can_book?/2 returns false when slot is full" do
-      slot = %{capacity: 1, approved_booking_count: 1, scheduled_at: future()}
-      assert {:error, :slot_full} = BookingPolicy.can_book?(slot, user_id: "u1")
-    end
-
-    test "can_book?/2 returns false when slot is in the past" do
-      slot = %{capacity: 10, approved_booking_count: 0, scheduled_at: past()}
-      assert {:error, :slot_in_past} = BookingPolicy.can_book?(slot, user_id: "u1")
-    end
-
-    defp future, do: DateTime.add(DateTime.utc_now(), 3600)
-    defp past, do: DateTime.add(DateTime.utc_now(), -3600)
-  end
-  ```
+- [ ] **Write failing tests for BookingPolicy domain module**
 
 - [ ] **Implement BookingPolicy, scheduled_class schema, booking schema, migrations**
 
-- [ ] **Write failing test for BookingTimeoutJob**
-  ```elixir
-  defmodule MilosTraining.Workers.BookingTimeoutJobTest do
-    use MilosTraining.DataCase, async: true
-    use Oban.Testing, repo: MilosTraining.Repo
-    alias MilosTraining.Workers.BookingTimeoutJob
-
-    test "sends alert when booking still pending" do
-      booking = insert_pending_booking()
-      assert :ok = perform_job(BookingTimeoutJob, %{"booking_id" => booking.id})
-      # Assert notification created for admin
-      assert MilosTraining.Notifications.pending_for_admin() |> length() == 1
-    end
-
-    test "no-ops when booking already resolved" do
-      booking = insert_approved_booking()
-      assert :ok = perform_job(BookingTimeoutJob, %{"booking_id" => booking.id})
-      assert MilosTraining.Notifications.pending_for_admin() |> length() == 0
-    end
-  end
-  ```
+- [ ] **Write failing tests for BookingTimeoutJob**
 
 - [ ] **Implement BookingTimeoutJob**
-
-  `apps/api/lib/milos_training/infrastructure/workers/booking_timeout_job.ex`:
-  ```elixir
-  defmodule MilosTraining.Workers.BookingTimeoutJob do
-    use Oban.Worker, queue: :notifications, max_attempts: 3
-
-    alias MilosTraining.{Scheduling, Notifications}
-
-    @impl Oban.Worker
-    def perform(%Oban.Job{args: %{"booking_id" => booking_id}}) do
-      case Scheduling.Queries.get_booking(booking_id) do
-        %{status: :pending} = booking ->
-          Notifications.create_booking_timeout_alert(booking)
-        _ ->
-          :ok  # already resolved — no-op
-      end
-    end
-  end
-  ```
 
 - [ ] **Implement SubmitBooking Application Service**
 
@@ -1306,7 +1238,7 @@ apps/web/src/
 
 **Goal:** Members and Athletes can start a workout and enter fullscreen Execution Mode with a step-synced timer, auto-advance, pause/resume, check-offs, score capture per section, and long-press notes.
 
-**Deliverable:** Full Execution Mode UI working on both mobile and desktop. Timer auto-advances correctly for timed sections. Notes dispatch push stubs to admin.
+**Deliverable:** Full Execution Mode UI working on both mobile and desktop. Timer auto-advances correctly for timed sections. Text-linked workout annotations dispatch push stubs to admin.
 
 ### File Map
 
@@ -1349,225 +1281,33 @@ apps/web/src/
 
 - [ ] **Read:** Design doc §7 (Workout Execution Mode), §4 (Flow 2, 3), §5 (workout_executions schema), §2.7 (Optimistic UI pattern)
 
-- [ ] **Write ADR-005:** Timer architecture (step-synced sequence vs single flat timer — chose sequence for correctness with complex ladder workouts)
+- [ ] **Write ADR:** Timer architecture (step-synced sequence vs single flat timer — chose sequence for correctness with complex ladder workouts)
 
-- [ ] **Write failing test for TimerSequenceBuilder (pure Domain)**
-  ```elixir
-  defmodule MilosTraining.Execution.Domain.TimerSequenceBuilderTest do
-    use ExUnit.Case, async: true
-    alias MilosTraining.Execution.Domain.TimerSequenceBuilder
+- [ ] **Write failing tests for TimerSequenceBuilder (pure Domain)**
 
-    @workout %{
-      sections: [
-        %{id: "s1", name: "Warmup", order: 1,
-          timer_config: %{type: :untimed},
-          exercises: [%{id: "e1", name: "Jog", base_sets: 1, base_reps: nil}]},
-        %{id: "s2", name: "EMOM Round 1", order: 2,
-          timer_config: %{type: :emom, interval_seconds: 60, rounds: 3},
-          exercises: [%{id: "e2", name: "Push-ups", base_sets: 3, base_reps: 10}]},
-        %{id: "s3", name: "Rest", order: 3,
-          timer_config: %{type: :rest, duration_seconds: 60},
-          exercises: []}
-      ]
-    }
-
-    test "builds a segment per section in depth-first order" do
-      sequence = TimerSequenceBuilder.build(@workout)
-      assert length(sequence) == 3
-      assert Enum.at(sequence, 0).section_id == "s1"
-      assert Enum.at(sequence, 1).section_id == "s2"
-      assert Enum.at(sequence, 2).section_id == "s3"
-    end
-
-    test "emom segment auto_advance is true" do
-      sequence = TimerSequenceBuilder.build(@workout)
-      emom = Enum.find(sequence, &(&1.section_id == "s2"))
-      assert emom.auto_advance == true
-    end
-
-    test "untimed segment auto_advance is false" do
-      sequence = TimerSequenceBuilder.build(@workout)
-      warmup = Enum.find(sequence, &(&1.section_id == "s1"))
-      assert warmup.auto_advance == false
-    end
-
-    test "expands emom rounds into steps" do
-      sequence = TimerSequenceBuilder.build(@workout)
-      emom = Enum.find(sequence, &(&1.section_id == "s2"))
-      # 3 rounds × 1 exercise = 3 steps
-      assert length(emom.steps) == 3
-    end
-  end
-  ```
+- [ ] **Do an online search and create a matrix (data structure) to map out the the workout's (and consequently and timers) sequence for every workout format**
 
 - [ ] **Implement TimerSequenceBuilder (pure Domain)**
-
-  `apps/api/lib/milos_training/execution/domain/timer_sequence_builder.ex`:
-  ```elixir
-  defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
-    @auto_advance_types [:emom, :amrap, :tabata, :fixed_duration, :rest]
-
-    def build(workout) do
-      workout.sections
-      |> Enum.sort_by(& &1.order)
-      |> Enum.flat_map(&build_segment/1)
-    end
-
-    defp build_segment(section) do
-      timer = section.timer_config || %{type: :untimed}
-      steps = expand_steps(section)
-
-      [%{
-        section_id: section.id,
-        section_name: section.name,
-        timer_config: timer,
-        auto_advance: timer.type in @auto_advance_types,
-        scoreable: section.scoreable,
-        score_config: section.score_config,
-        steps: steps
-      }]
-    end
-
-    defp expand_steps(section) do
-      section.exercises
-      |> Enum.sort_by(& &1.order)
-      |> Enum.flat_map(fn exercise ->
-        sets = exercise.base_sets || 1
-        Enum.map(1..sets, fn set_n ->
-          %{
-            exercise_id: exercise.id,
-            exercise_name: exercise.name,
-            reps: exercise.base_reps,
-            description: exercise.description,
-            set_number: set_n,
-            total_sets: sets
-          }
-        end)
-      end)
-    end
-  end
-  ```
 
 - [ ] **Run TimerSequenceBuilder tests — all pass**
 
 - [ ] **Create workout_executions migration and schema**
 
 - [ ] **Create CompleteWorkout Application Service**
-  ```elixir
-  defmodule MilosTraining.Application.CompleteWorkout do
-    alias MilosTraining.{Execution, Gamification, Notifications}
-
-    def call(user_id, execution_params) do
-      with {:ok, execution} <- Execution.Commands.CompleteExecution.call(user_id, execution_params),
-           {:ok, _stats} <- Gamification.update_stats_for_completion(user_id, execution),
-           {:ok, _prs} <- Gamification.detect_prs(user_id, execution) do
-        Notifications.dispatch_if_notes(execution)  # non-critical, does not rollback
-        {:ok, execution}
-      end
-    end
-  end
-  ```
 
 - [ ] **Create `useWorkoutTimer` hook** (frontend, key implementation)
 
-  `apps/web/src/hooks/useWorkoutTimer.ts`:
-  ```typescript
-  import { useEffect, useRef, useCallback } from "react"
-  import { useExecutionStore } from "@/stores/executionStore"
-
-  export function useWorkoutTimer(sequence: TimerSegment[]) {
-    const { currentIndex, isPaused, advanceSegment, setTimeRemaining } = useExecutionStore()
-    const rafRef = useRef<number>()
-    const endTimeRef = useRef<number | null>(null)
-
-    const currentSegment = sequence[currentIndex]
-
-    const tick = useCallback(() => {
-      if (isPaused || !endTimeRef.current) return
-      const remaining = Math.max(0, endTimeRef.current - Date.now())
-      setTimeRemaining(remaining)
-
-      if (remaining === 0 && currentSegment?.auto_advance) {
-        advanceSegment()
-      } else {
-        rafRef.current = requestAnimationFrame(tick)
-      }
-    }, [isPaused, currentSegment, advanceSegment, setTimeRemaining])
-
-    useEffect(() => {
-      if (!currentSegment || isPaused) return
-      const config = currentSegment.timer_config
-
-      if (config.type === "untimed") return
-
-      endTimeRef.current = Date.now() + (config.duration_seconds ?? config.interval_seconds ?? 0) * 1000
-      rafRef.current = requestAnimationFrame(tick)
-
-      return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
-    }, [currentIndex, isPaused])
-
-    return { currentSegment, timeRemaining: useExecutionStore(s => s.timeRemaining) }
-  }
-  ```
-
 - [ ] **Create `executionStore.ts`** (Zustand, optimistic check-offs)
 
-  ```typescript
-  import { create } from "zustand"
+- [ ] **Build `TimerDisplay` component** — renders correct UI per timer type (EMOM countdown, AMRAP countdown, For Time count-up, Tabata work/rest, rest countdown, "No Timer" and all other workout formats)
 
-  interface ExecutionStore {
-    currentIndex: number
-    isPaused: boolean
-    timeRemaining: number
-    checkedSteps: Set<string>  // step keys
-    advanceSegment: () => void
-    toggleStep: (key: string) => void
-    pause: () => void
-    resume: () => void
-    setTimeRemaining: (ms: number) => void
-  }
-
-  export const useExecutionStore = create<ExecutionStore>((set) => ({
-    currentIndex: 0,
-    isPaused: false,
-    timeRemaining: 0,
-    checkedSteps: new Set(),
-    advanceSegment: () => set(s => ({ currentIndex: s.currentIndex + 1 })),
-    toggleStep: (key) => set(s => {
-      const next = new Set(s.checkedSteps)
-      next.has(key) ? next.delete(key) : next.add(key)
-      return { checkedSteps: next }
-    }),
-    pause: () => set({ isPaused: true }),
-    resume: () => set({ isPaused: false }),
-    setTimeRemaining: (ms) => set({ timeRemaining: ms }),
-  }))
-  ```
-
-- [ ] **Build `TimerDisplay` component** — renders correct UI per timer type (EMOM countdown, AMRAP countdown, For Time count-up, Tabata work/rest, rest countdown, "No Timer")
-
-- [ ] **Build `WorkoutChecklist` + `ChecklistItem`** — expandable sets, long-press handler (300ms touch hold → `NoteModal`)
+- [ ] **Build `WorkoutChecklist` + `ChecklistItem`** — expandable sets, text selection annotation flow, right-click / long-press handler (300ms touch hold → `NoteModal`)
 
 - [ ] **Build `ScoreModal`** — appears on scoreable section transition, one input per `score_config.type`
 
 - [ ] **Build fullscreen `ExecutionMode` container** with pause/resume button and 3-second countdown animation
 
 - [ ] **Build `/workouts` browsing page** (`apps/web/src/app/workouts/page.tsx`) — the 3-step discovery flow:
-
-  ```typescript
-  // Step 1: Training type buttons (full width, color-coded per type)
-  // Step 2: Swipeable WeekView — each day renders ScaleBoxes fetched from
-  //         GET /api/workouts?date=YYYY-MM-DD&type=crossfit
-  //         ScaleBox: color dot (beginner=green/intermediate=yellow/advanced=red),
-  //                   duration label, workout highlights (first exercise name)
-  // Step 3: On ScaleBox click → week-view collapses (CSS height transition) →
-  //         full workout detail below with "Start Workout" button
-  ```
-
-  Key state machine (Zustand or local `useReducer`):
-  ```typescript
-  type Step = "type-select" | "week-view" | "workout-detail"
-  ```
 
   WeekView is swipeable on mobile via touch events (use `@use-gesture/react`).
   Add `{@use-gesture/react}` to `apps/web/package.json`.
@@ -1583,10 +1323,10 @@ apps/web/src/
   - Open a workout → click "Start Workout" → fullscreen activates
   - EMOM timer counts down from 60s → auto-advances to next step at 0
   - Pause → timer freezes → resume → 3-second countdown → timer continues
-  - Long-press on exercise name → note modal appears → submit note
+  - Select text in an exercise label → right-click / long-press → note modal appears → submit note
   - Complete workout → score modal appears for scoreable sections → submit → redirected to landing page
 
-- [ ] **Update ADR-005** `Implementation Notes`
+- [ ] **Update the ADR you wrote in the beginning of the phase** `Implementation Notes`
 - [ ] **Update `docs/technical_debt.md`** if needed
 - [ ] **Commit & push** (domain → commands → application service → hooks → store → components)
 
