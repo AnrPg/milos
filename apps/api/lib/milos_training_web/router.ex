@@ -93,6 +93,14 @@ defmodule MilosTrainingWeb.Router do
     delete("/schedule/slots/:id", AdminScheduleController, :delete_slot)
     patch("/bookings/:id/approve", AdminScheduleController, :approve_booking)
     patch("/bookings/:id/reject", AdminScheduleController, :reject_booking)
+
+    post(
+      "/schedule/slots/:slot_id/attendance/:user_id",
+      AdminScheduleController,
+      :record_attendance
+    )
+
+    get("/athletes/:id/drill-down", AdminCoachingController, :drill_down)
     post("/athletes/:id/notes", AdminCoachingController, :create_note)
     get("/finance/summary", AdminFinanceController, :summary)
     get("/finance/queues", AdminFinanceController, :operational_queues)
@@ -100,6 +108,7 @@ defmodule MilosTrainingWeb.Router do
     post("/finance/packages", AdminFinanceController, :create_package)
     get("/finance/packages/:id", AdminFinanceController, :package)
     patch("/finance/packages/:id", AdminFinanceController, :update_package)
+    get("/finance/members", AdminFinanceController, :members)
     get("/finance/members/:id", AdminFinanceController, :member)
     patch("/finance/members/:id", AdminFinanceController, :update_member)
     post("/finance/members/:id/packages", AdminFinanceController, :assign_package)
@@ -140,6 +149,8 @@ defmodule MilosTrainingWeb.Router do
 
     patch("/finance/invoices/:id/issue", AdminFinanceController, :issue_invoice)
     patch("/finance/invoices/:id/void", AdminFinanceController, :void_invoice)
+    post("/finance/invoices/:id/upload-url", AdminFinanceController, :invoice_upload_url)
+    get("/finance/invoices/:id/download-url", AdminFinanceController, :invoice_download_url)
 
     post("/finance/members/:id/promotion-redemptions", AdminFinanceController, :redeem_promotion)
     get("/finance/promotions", AdminFinanceController, :promotions)
@@ -191,6 +202,7 @@ defmodule MilosTrainingWeb.Router do
     pipe_through([:api, :authenticated, :user_only])
 
     get("/calendar/export-links", CalendarFeedController, :links)
+    post("/calendar/export-links/regenerate", CalendarFeedController, :regenerate_links)
     get("/landing", LandingController, :show)
     post("/landing/leaderboard-opt-in", LandingController, :update_leaderboard_preference)
     get("/notifications", NotificationController, :index)

@@ -388,6 +388,28 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   end
 
   @impl true
+  def get_invoice(invoice_id) do
+    case Repo.get(FinanceInvoice, invoice_id) do
+      nil -> {:error, :not_found}
+      invoice -> {:ok, invoice}
+    end
+  end
+
+  @impl true
+  def update_invoice_params(invoice_id, params) do
+    case Repo.get(FinanceInvoice, invoice_id) do
+      nil ->
+        {:error, :not_found}
+
+      invoice ->
+        invoice
+        |> FinanceInvoice.changeset(%{params: params})
+        |> Repo.update()
+        |> normalize_result(&normalize_invoice/1)
+    end
+  end
+
+  @impl true
   def create_invoice(membership_id, params) do
     params = string_key_map(params)
 
@@ -865,8 +887,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
             |> Map.put("referral_event_id", event.id)
             |> Map.put("recipient_user_id", event.referrer_user_id)
             |> Map.put("membership_id", event.membership_id)
-            |> Map.put("reward_type", program.reward_type)
-            |> Map.put("reward_value", program.reward_value)
+            |> Map.put_new("reward_type", program.reward_type)
+            |> Map.put_new("reward_value", program.reward_value)
 
           %ReferralReward{}
           |> ReferralReward.changeset(params)

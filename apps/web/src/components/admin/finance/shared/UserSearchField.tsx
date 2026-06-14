@@ -10,6 +10,7 @@ interface Props {
   token: string;
   onChange: (userId: string, user: FinanceRecord | null) => void;
   excludeUserId?: string;
+  locked?: boolean;
 }
 
 function field(record: FinanceRecord | null | undefined, key: string): string {
@@ -18,7 +19,7 @@ function field(record: FinanceRecord | null | undefined, key: string): string {
   return String(v);
 }
 
-export function UserSearchField({ label, value, prefillUser, token, onChange, excludeUserId }: Props) {
+export function UserSearchField({ label, value, prefillUser, token, onChange, excludeUserId, locked }: Props) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<FinanceRecord[]>([]);
   const [selectedUser, setSelectedUser] = useState<FinanceRecord | null>(null);
@@ -113,14 +114,23 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
           >
             {field(selectedUser, "identity_role")}
           </span>
-          <button
-            type="button"
-            onClick={clear}
-            className="ml-auto text-xs hover:opacity-70 transition-opacity"
-            style={{ color: "#55556a" }}
-          >
-            ✕
-          </button>
+          {!locked && (
+            <button
+              type="button"
+              onClick={clear}
+              className="ml-auto text-xs hover:opacity-70 transition-opacity"
+              style={{ color: "#55556a" }}
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      ) : locked ? (
+        <div
+          className="rounded-xl px-3 py-2 w-full"
+          style={{ background: "#18181f", border: "1px solid #2a2a3a", color: "#55556a" }}
+        >
+          <span className="text-sm italic">Not selected</span>
         </div>
       ) : (
         <div className="relative">

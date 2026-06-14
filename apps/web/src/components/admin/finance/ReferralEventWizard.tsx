@@ -39,7 +39,7 @@ export function ReferralEventWizard({
   onClose,
 }: WizardProps) {
   const { tokens } = useSession();
-  const token = tokens?.access_token!;
+  const token = tokens?.access_token ?? "";
   const queryClient = useQueryClient();
 
   const [step, setStep] = useState<Step>(1);
@@ -60,15 +60,20 @@ export function ReferralEventWizard({
   const [showMembershipSetup, setShowMembershipSetup] = useState(false);
   const [inlinePackageId, setInlinePackageId] = useState("");
 
+  // Step 3 reward overrides (pre-filled from program defaults)
+  const defaultProgram = programs.find((p) => field(p, "id") === form.referral_program_id);
+  const [rewardForm, setRewardForm] = useState({
+    reward_type: field(defaultProgram, "reward_type") || "manual",
+    reward_value: field(defaultProgram, "reward_value") || "0",
+  });
+
   // Packages — use prop if provided, otherwise fetch once
   const packagesQuery = useQuery({
     queryKey: ["admin", "finance", "packages"],
     enabled: Boolean(token) && !packagesProp,
     queryFn: () => fetchFinancePackages(token),
   });
-  const packages = (
-    packagesProp ?? packagesQuery.data?.packages ?? []
-  ).filter((p) => field(p, "status") === "active");
+  const packages = packagesProp ?? packagesQuery.data?.packages ?? [];
 
   const selectedProgram = programs.find((p) => field(p, "id") === form.referral_program_id);
   const refereeHasNoMembership =
@@ -87,6 +92,7 @@ export function ReferralEventWizard({
     mutationFn: () =>
       assignFinancePackage(token, form.referred_user_id, {
         membership_package_id: inlinePackageId,
+        signup_source: "referral",
       }),
     onSuccess: (data) => {
       const sub = data.package_subscription as FinanceRecord | null | undefined;
@@ -131,7 +137,11 @@ export function ReferralEventWizard({
   });
 
   const createRewardMutation = useMutation({
-    mutationFn: () => createReferralReward(token, createdEventId!, {}),
+    mutationFn: () =>
+      createReferralReward(token, createdEventId!, {
+        reward_type: rewardForm.reward_type,
+        reward_value: parseInt(rewardForm.reward_value, 10) || 0,
+      }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "referrals"] });
       await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "referral-rewards"] });
@@ -201,7 +211,7 @@ export function ReferralEventWizard({
             </select>
           </label>
 
-          {/* Referrer search */}
+          {/* Referrer search — locked when opened from the members table "+" button */}
           <UserSearchField
             label="Referrer"
             value={form.referrer_user_id}
@@ -209,6 +219,7 @@ export function ReferralEventWizard({
             token={token}
             onChange={handleReferrerChange}
             excludeUserId={form.referred_user_id || undefined}
+            locked={Boolean(prefillReferrerId)}
           />
 
           {/* Referee search */}
@@ -257,8 +268,14 @@ export function ReferralEventWizard({
                     >
                       <option value="">Select package…</option>
                       {packages.map((pkg) => (
-                        <option key={String(pkg.id)} value={String(pkg.id)}>
-                          {String(pkg.code)}
+                        <option
+                          key={String(pkg.id)}
+                          value={String(pkg.id)}
+                          disabled={pkg.active === false}
+                        >
+                          {field(pkg, "name", field(pkg, "code"))}
+                          {field(pkg, "code") ? ` (${field(pkg, "code")})` : ""}
+                          {pkg.active === false ? " — Inactive" : ""}
                         </option>
                       ))}
                     </select>
@@ -445,14 +462,59 @@ export function ReferralEventWizard({
               className="text-xs font-semibold uppercase tracking-[0.18em]"
               style={{ color: "#4db89c" }}
             >
-              Event approved
+              Event approved — configure reward
             </p>
             <p className="text-sm" style={{ color: "#8888aa" }}>
-              Reward policy from{" "}
-              <span style={{ color: "#F0EDF8" }}>{field(selectedProgram, "name")}</span>
+              Defaults from{" "}
+              <span style={{ color: "#F0EDF8" }}>{field(selectedProgram, "name")}</span>.
+              You can adjust before issuing.
             </p>
-            <SummaryRow label="Reward type" value={field(selectedProgram, "reward_type")} />
-            <SummaryRow label="Reward value" value={field(selectedProgram, "reward_value")} />
+          </div>
+
+          {/* Editable reward fields */}
+          <div className="space-y-3">
+            <label className="block space-y-1">
+              <span
+                className="text-xs font-semibold uppercase tracking-[0.18em]"
+                style={{ color: "#55556a" }}
+              >
+                Reward type
+              </span>
+              <select
+                className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
+                style={{ background: "#111118", border: "1px solid #1a1a28", color: "#F0EDF8" }}
+                value={rewardForm.reward_type}
+                onChange={(e) => setRewardForm({ ...rewardForm, reward_type: e.target.value })}
+              >
+                <option value="credit">Credit</option>
+                <option value="discount">Discount</option>
+                <option value="free_period">Free period</option>
+                <option value="manual">Manual</option>
+              </select>
+            </label>
+
+            {rewardForm.reward_type !== "manual" && (
+              <label className="block space-y-1">
+                <span
+                  className="text-xs font-semibold uppercase tracking-[0.18em]"
+                  style={{ color: "#55556a" }}
+                >
+                  {rewardForm.reward_type === "credit"
+                    ? "Amount (cents)"
+                    : rewardForm.reward_type === "discount"
+                      ? "Discount (cents)"
+                      : "Days"}
+                </span>
+                <input
+                  type="number"
+                  min={0}
+                  className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
+                  style={{ background: "#111118", border: "1px solid #1a1a28", color: "#F0EDF8" }}
+                  value={rewardForm.reward_value}
+                  onChange={(e) => setRewardForm({ ...rewardForm, reward_value: e.target.value })}
+                />
+              </label>
+            )}
           </div>
 
           <p className="text-sm leading-6" style={{ color: "#8888aa" }}>
