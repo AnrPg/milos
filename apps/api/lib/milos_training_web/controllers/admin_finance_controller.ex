@@ -548,6 +548,22 @@ defmodule MilosTrainingWeb.AdminFinanceController do
     end
   end
 
+  operation(:update_invoice,
+    summary: "Update due_date and/or notes on a finance invoice",
+    parameters: [@id_parameter],
+    request_body: @request_body,
+    responses: [ok: {"Finance invoice", "application/json", @open_object}]
+  )
+
+  def update_invoice(conn, params) do
+    invoice_id = param_id(params)
+    body = body_params(conn, params)
+
+    with {:ok, invoice} <- MilosTraining.Finance.update_invoice(invoice_id, body) do
+      json(conn, %{invoice: invoice})
+    end
+  end
+
   operation(:void_invoice,
     summary: "Void a finance invoice",
     parameters: [@id_parameter],
@@ -896,7 +912,8 @@ defmodule MilosTrainingWeb.AdminFinanceController do
 
     with {:ok, upload_url} <- MinioStorage.presigned_upload_url(key),
          {:ok, invoice} <- MilosTraining.Finance.get_invoice(invoice_id),
-         updated_params <- Map.merge(invoice.params || %{}, %{"file_key" => key, "file_name" => file_name}),
+         updated_params <-
+           Map.merge(invoice.params || %{}, %{"file_key" => key, "file_name" => file_name}),
          {:ok, _} <- MilosTraining.Finance.update_invoice_params(invoice_id, updated_params) do
       json(conn, %{upload_url: upload_url, file_key: key, content_type: content_type})
     end

@@ -111,6 +111,18 @@ export async function getInvoiceDownloadUrl(token: string, invoiceId: string) {
   );
 }
 
+export async function updateFinanceInvoice(
+  token: string,
+  invoiceId: string,
+  body: { due_date?: string; notes?: string },
+) {
+  return apiRequest<{ invoice: FinanceRecord }>(`/admin/finance/invoices/${invoiceId}`, {
+    method: "PATCH",
+    token,
+    body,
+  });
+}
+
 export async function issueFinanceInvoice(token: string, invoiceId: string, body: FinanceRecord = {}) {
   return apiRequest<{ invoice: FinanceRecord }>(`/admin/finance/invoices/${invoiceId}/issue`, {
     method: "PATCH",

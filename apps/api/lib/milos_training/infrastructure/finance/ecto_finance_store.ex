@@ -410,6 +410,61 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   end
 
   @impl true
+  def update_invoice(invoice_id, params) do
+    params = string_key_map(params)
+
+    case Repo.get(FinanceInvoice, invoice_id) do
+      nil ->
+        {:error, :not_found}
+
+      %FinanceInvoice{} = invoice ->
+        today = Date.utc_today()
+
+        due_date =
+          case params["due_date"] do
+            nil -> invoice.due_date
+            d when is_binary(d) -> Date.from_iso8601!(d)
+            d -> d
+          end
+
+        auto_status =
+          if invoice.status == "overdue" and due_date != nil and
+               Date.compare(due_date, today) != :lt do
+            "issued"
+          else
+            nil
+          end
+
+        changeset_params =
+          params
+          |> Map.take(["due_date", "notes"])
+          |> then(fn p -> if auto_status, do: Map.put(p, "status", auto_status), else: p end)
+
+        invoice
+        |> FinanceInvoice.changeset(changeset_params)
+        |> Repo.update()
+        |> normalize_result(&normalize_invoice/1)
+    end
+  end
+
+  @impl true
+  def mark_overdue_invoices do
+    today = Date.utc_today()
+
+    {_, _} =
+      FinanceInvoice
+      |> where([i], i.status == "issued" and not is_nil(i.due_date) and i.due_date < ^today)
+      |> Repo.update_all(set: [status: "overdue"])
+
+    {_, _} =
+      FinanceInvoice
+      |> where([i], i.status == "overdue" and not is_nil(i.due_date) and i.due_date >= ^today)
+      |> Repo.update_all(set: [status: "issued"])
+
+    :ok
+  end
+
+  @impl true
   def create_invoice(membership_id, params) do
     params = string_key_map(params)
 

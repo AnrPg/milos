@@ -17,6 +17,8 @@ defmodule MilosTraining.Finance.Ports.FinanceStore do
               {:ok, map()} | {:error, term()}
   @callback get_invoice(Ecto.UUID.t()) :: {:ok, struct()} | {:error, :not_found}
   @callback update_invoice_params(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
+  @callback update_invoice(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
+  @callback mark_overdue_invoices() :: :ok | {:error, term()}
   @callback create_invoice(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback generate_renewal_invoice(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback issue_invoice(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}

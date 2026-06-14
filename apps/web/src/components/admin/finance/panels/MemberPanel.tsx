@@ -12,6 +12,7 @@ import {
   getInvoiceUploadUrl,
   recordFinancePayment,
   updateFinanceMember,
+  updateFinanceInvoice,
   type FinanceRecord,
 } from "@/api/finance";
 import { useSession } from "@/components/session-provider";
@@ -459,6 +460,11 @@ function InvoiceCard({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editDueDate, setEditDueDate] = useState(field(invoice, "due_date"));
+  const [editNotes, setEditNotes] = useState(field(invoice, "notes"));
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const invoiceParams = (invoice.params as Record<string, string> | null) ?? {};
   const hasFile = Boolean(invoiceParams.file_key);
 
@@ -505,6 +511,23 @@ function InvoiceCard({
     }
   }
 
+  async function handleSaveEdit() {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await updateFinanceInvoice(token, invoiceId, {
+        due_date: editDueDate || undefined,
+        notes: editNotes || undefined,
+      });
+      setEditing(false);
+      onUploaded();
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Save failed");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <div
       className="rounded-[1.2rem] px-4 py-3 space-y-2"
@@ -514,16 +537,83 @@ function InvoiceCard({
         <span className="text-sm font-semibold" style={{ color: "#F0EDF8" }}>
           {money(invoice.total_cents)}
         </span>
-        <span
-          className="text-xs font-semibold"
-          style={{ color: statusColor(field(invoice, "status")) }}
-        >
-          {field(invoice, "status")}
-        </span>
+        <div className="flex items-center gap-2">
+          <span
+            className="text-xs font-semibold"
+            style={{ color: statusColor(field(invoice, "status")) }}
+          >
+            {field(invoice, "status")}
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              setEditing((v) => !v);
+              setSaveError(null);
+            }}
+            className="text-xs hover:opacity-70 transition-opacity"
+            style={{ color: "#55556a" }}
+          >
+            {editing ? "Cancel" : "Edit"}
+          </button>
+        </div>
       </div>
-      <p className="text-xs" style={{ color: "#55556a" }}>
-        {field(invoice, "notes") || "—"} · due {field(invoice, "due_date") || "—"}
-      </p>
+
+      {/* Notes prominent display */}
+      {!editing && (
+        <div className="space-y-0.5">
+          {field(invoice, "notes") ? (
+            <p className="text-sm font-medium" style={{ color: "#c0c0d8" }}>
+              {field(invoice, "notes")}
+            </p>
+          ) : (
+            <p className="text-xs italic" style={{ color: "#3a3a52" }}>No description</p>
+          )}
+          <p className="text-xs" style={{ color: "#55556a" }}>
+            Due: {field(invoice, "due_date") || "—"}
+          </p>
+        </div>
+      )}
+
+      {/* Inline edit */}
+      {editing && (
+        <div className="space-y-2 pt-1">
+          <div className="space-y-1">
+            <label className="text-xs font-semibold uppercase tracking-[0.15em]" style={{ color: "#55556a" }}>
+              Description
+            </label>
+            <input
+              type="text"
+              value={editNotes}
+              onChange={(e) => setEditNotes(e.target.value)}
+              placeholder="Invoice description…"
+              className="w-full rounded-xl px-3 py-1.5 text-sm"
+              style={{ background: "#13131f", border: "1px solid #2a2a3a", color: "#F0EDF8" }}
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs font-semibold uppercase tracking-[0.15em]" style={{ color: "#55556a" }}>
+              Due date
+            </label>
+            <input
+              type="date"
+              value={editDueDate}
+              onChange={(e) => setEditDueDate(e.target.value)}
+              className="w-full rounded-xl px-3 py-1.5 text-sm"
+              style={{ background: "#13131f", border: "1px solid #2a2a3a", color: "#F0EDF8" }}
+            />
+          </div>
+          {saveError && <p className="text-xs" style={{ color: "#e07a5f" }}>{saveError}</p>}
+          <button
+            type="button"
+            onClick={handleSaveEdit}
+            disabled={saving}
+            className="rounded-full px-3 py-1 text-xs font-semibold disabled:opacity-50 transition-opacity hover:opacity-80"
+            style={{ background: "rgba(77,184,156,0.15)", color: "#4db89c", border: "1px solid rgba(77,184,156,0.3)" }}
+          >
+            {saving ? "Saving…" : "Save"}
+          </button>
+        </div>
+      )}
 
       {/* File actions */}
       <div className="flex items-center gap-2 pt-1">

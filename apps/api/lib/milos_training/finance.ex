@@ -65,7 +65,13 @@ defmodule MilosTraining.Finance do
     as: :call
 
   defdelegate get_invoice(invoice_id), to: FinanceStore, as: :get_invoice
-  defdelegate update_invoice_params(invoice_id, params), to: FinanceStore, as: :update_invoice_params
+
+  defdelegate update_invoice_params(invoice_id, params),
+    to: FinanceStore,
+    as: :update_invoice_params
+
+  defdelegate update_invoice(invoice_id, params), to: FinanceStore, as: :update_invoice
+  defdelegate mark_overdue_invoices(), to: FinanceStore, as: :mark_overdue_invoices
   defdelegate create_invoice(membership_id, params), to: CreateInvoice, as: :call
 
   defdelegate generate_renewal_invoice(membership_id, params),

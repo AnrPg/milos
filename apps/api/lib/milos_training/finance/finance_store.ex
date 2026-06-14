@@ -52,6 +52,11 @@ defmodule MilosTraining.Finance.FinanceStore do
     do: adapter().update_invoice_params(invoice_id, params)
 
   @impl true
+  def update_invoice(invoice_id, params), do: adapter().update_invoice(invoice_id, params)
+  @impl true
+  def mark_overdue_invoices, do: adapter().mark_overdue_invoices()
+
+  @impl true
   def create_invoice(membership_id, params), do: adapter().create_invoice(membership_id, params)
   @impl true
   def generate_renewal_invoice(membership_id, params),

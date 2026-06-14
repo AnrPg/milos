@@ -23,6 +23,7 @@ import {
   reverseCreditLedgerEntry,
   reverseFinancePayment,
   updateFinanceMember,
+  updateFinanceInvoice,
   voidFinanceInvoice,
   type FinanceRecord,
 } from "@/api/finance";
@@ -934,6 +935,11 @@ function InvoiceFileActions({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editDueDate, setEditDueDate] = useState(field(invoice, "due_date"));
+  const [editNotes, setEditNotes] = useState(field(invoice, "notes"));
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const invoiceParams = (invoice.params as Record<string, string> | null) ?? {};
   const hasFile = Boolean(invoiceParams.file_key);
 
@@ -980,33 +986,123 @@ function InvoiceFileActions({
     }
   }
 
+  async function handleSaveEdit() {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await updateFinanceInvoice(token, invoiceId, {
+        due_date: editDueDate || undefined,
+        notes: editNotes || undefined,
+      });
+      setEditing(false);
+      onRefresh();
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Save failed");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
-    <div className="space-y-1">
-      <div className="flex flex-wrap items-center gap-2">
-        <input ref={fileInputRef} type="file" accept="image/*,.pdf" className="hidden" onChange={handleFileChange} />
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={uploading}
-          className="rounded-full border border-[#d9cbb8] bg-[#f7f2e8] px-3 py-1 text-xs font-semibold text-[#6f6254] hover:bg-[#ede5d8] disabled:opacity-50 transition-colors"
-        >
-          {uploading ? "Uploading…" : hasFile ? "Replace file" : "Upload file"}
-        </button>
-        {hasFile && (
+    <div className="space-y-3">
+      {/* Prominent notes display */}
+      {!editing && (
+        <div className="rounded-xl bg-[#fdf8f2] border border-[#ede5d8] px-3 py-2 space-y-0.5">
+          {field(invoice, "notes") ? (
+            <p className="text-sm font-semibold text-[#3a2a1a]">{field(invoice, "notes")}</p>
+          ) : (
+            <p className="text-xs italic text-[#b8a89a]">No description</p>
+          )}
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-medium text-[#9b4d2e]">
+              Due: {field(invoice, "due_date") || "not set"}
+            </p>
+            <button
+              type="button"
+              onClick={() => { setEditing(true); setSaveError(null); }}
+              className="text-xs text-[#6f6254] hover:text-[#3a2a1a] transition-colors"
+            >
+              Edit
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Inline edit form */}
+      {editing && (
+        <div className="rounded-xl bg-[#fdf8f2] border border-[#ede5d8] px-3 py-3 space-y-2">
+          <div className="space-y-1">
+            <label className="text-xs font-semibold uppercase tracking-[0.15em] text-[#6f6254]">
+              Description
+            </label>
+            <input
+              type="text"
+              value={editNotes}
+              onChange={(e) => setEditNotes(e.target.value)}
+              placeholder="Invoice description…"
+              className="w-full rounded-lg border border-[#d9cbb8] bg-white px-3 py-1.5 text-sm text-[#191713]"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs font-semibold uppercase tracking-[0.15em] text-[#6f6254]">
+              Due date
+            </label>
+            <input
+              type="date"
+              value={editDueDate}
+              onChange={(e) => setEditDueDate(e.target.value)}
+              className="w-full rounded-lg border border-[#d9cbb8] bg-white px-3 py-1.5 text-sm text-[#191713]"
+            />
+          </div>
+          {saveError && <p className="text-xs text-[#b1422c]">{saveError}</p>}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleSaveEdit}
+              disabled={saving}
+              className="rounded-full bg-[#191713] px-4 py-1.5 text-xs font-bold text-white disabled:opacity-50"
+            >
+              {saving ? "Saving…" : "Save"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditing(false)}
+              className="rounded-full border border-[#d9cbb8] px-4 py-1.5 text-xs font-semibold text-[#6f6254] hover:bg-[#f7f2e8]"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* File actions */}
+      <div className="space-y-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <input ref={fileInputRef} type="file" accept="image/*,.pdf" className="hidden" onChange={handleFileChange} />
           <button
             type="button"
-            onClick={handleDownload}
-            disabled={downloading}
-            className="rounded-full border border-[#9b4d2e] bg-[#fdf5ef] px-3 py-1 text-xs font-semibold text-[#9b4d2e] hover:bg-[#f5e8df] disabled:opacity-50 transition-colors"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="rounded-full border border-[#d9cbb8] bg-[#f7f2e8] px-3 py-1 text-xs font-semibold text-[#6f6254] hover:bg-[#ede5d8] disabled:opacity-50 transition-colors"
           >
-            {downloading ? "…" : "Download"}
+            {uploading ? "Uploading…" : hasFile ? "Replace file" : "Upload file"}
           </button>
-        )}
-        {invoiceParams.file_name && (
-          <span className="text-xs text-[#6f6254] truncate max-w-[160px]">{invoiceParams.file_name}</span>
-        )}
+          {hasFile && (
+            <button
+              type="button"
+              onClick={handleDownload}
+              disabled={downloading}
+              className="rounded-full border border-[#9b4d2e] bg-[#fdf5ef] px-3 py-1 text-xs font-semibold text-[#9b4d2e] hover:bg-[#f5e8df] disabled:opacity-50 transition-colors"
+            >
+              {downloading ? "…" : "Download"}
+            </button>
+          )}
+          {invoiceParams.file_name && (
+            <span className="text-xs text-[#6f6254] truncate max-w-[160px]">{invoiceParams.file_name}</span>
+          )}
+        </div>
+        {uploadError && <p className="text-xs text-[#b1422c]">{uploadError}</p>}
       </div>
-      {uploadError && <p className="text-xs text-[#b1422c]">{uploadError}</p>}
     </div>
   );
 }
