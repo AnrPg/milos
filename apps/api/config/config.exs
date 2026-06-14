@@ -9,10 +9,20 @@ import Config
 
 config :milos_training,
   ecto_repos: [MilosTraining.Repo],
-  generators: [timestamp_type: :utc_datetime]
+  generators: [timestamp_type: :utc_datetime],
+  env: config_env()
 
 config :milos_training, Oban,
   repo: MilosTraining.Repo,
+  plugins: [
+    {Oban.Plugins.Cron,
+     crontab: [
+       {"*/15 * * * *", MilosTraining.Workers.RefreshLeaderboardJob},
+       {"*/15 * * * *", MilosTraining.Workers.RefreshFinanceAggregatesJob},
+       {"*/15 * * * *", MilosTraining.Workers.RefreshCoachingAggregatesJob},
+       {"0 2 * * *", MilosTraining.Workers.MarkOverdueInvoicesJob}
+     ]}
+  ],
   queues: [
     default: 10,
     notifications: 20,
@@ -30,6 +40,23 @@ config :milos_training, :start_oban, true
 config :milos_training, :redis_url, System.get_env("REDIS_URL", "redis://localhost:6379")
 config :milos_training, :readiness_checker, MilosTraining.Infrastructure.Readiness.Live
 config :milos_training, :identity_user_store, MilosTraining.Infrastructure.Identity.EctoUserStore
+
+config :milos_training,
+       :messaging_thread_store,
+       MilosTraining.Infrastructure.Messaging.EctoThreadStore
+
+config :milos_training,
+       :messaging_message_store,
+       MilosTraining.Infrastructure.Messaging.EctoMessageStore
+
+config :milos_training,
+       :admin_member_search_index,
+       MilosTraining.Infrastructure.Search.MeilisearchMemberIndex
+
+config :milos_training, :meilisearch,
+  url: System.get_env("MEILI_URL", "http://localhost:7700"),
+  api_key: System.get_env("MEILI_MASTER_KEY", "dev-meili-master-key"),
+  admin_member_index: System.get_env("MEILI_ADMIN_MEMBER_INDEX", "admin_members")
 
 config :milos_training,
        :identity_password_hasher,

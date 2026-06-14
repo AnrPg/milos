@@ -4,20 +4,14 @@ defmodule MilosTrainingWeb.MyWorkoutController do
 
   alias Guardian.Plug, as: GuardianPlug
   alias MilosTraining.Application.GetAssignedWorkoutWeek
-  alias MilosTraining.Application.ListAssignmentMessages
-  alias MilosTraining.Application.PostAssignmentMessage
   alias MilosTraining.Application.RejectAssignedWorkout
   alias MilosTraining.Application.RescheduleAssignedWorkout
-  alias MilosTraining.Application.SendAthleteMessage
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
   action_fallback MilosTrainingWeb.FallbackController
 
   tags(["Assigned Workouts"])
   security([%{"bearerAuth" => []}])
-
-  plug OpenApiSpex.Plug.CastAndValidate,
-       [json_render_error_v2: true] when action in [:send_message, :post_message]
 
   operation(:index,
     summary:
@@ -128,107 +122,6 @@ defmodule MilosTrainingWeb.MyWorkoutController do
       {:error, :not_found} -> {:error, :not_found}
       {:error, :forbidden} -> {:error, :forbidden}
       {:error, :past_date} -> {:error, :unprocessable_entity}
-      {:error, _} -> {:error, :unprocessable_entity}
-    end
-  end
-
-  operation(:send_message,
-    summary: "Athlete sends a message to all coaches about an assigned workout",
-    parameters: [
-      %Parameter{
-        name: :id,
-        in: :path,
-        required: true,
-        schema: %Schema{type: :string, format: :uuid}
-      }
-    ],
-    request_body: %RequestBody{
-      required: true,
-      content: %{
-        "application/json" => %MediaType{
-          schema: %Schema{
-            type: :object,
-            properties: %{body: %Schema{type: :string, minLength: 1, maxLength: 1000}},
-            required: [:body]
-          }
-        }
-      }
-    },
-    responses: [ok: {"OK", "application/json", %Schema{type: :object}}]
-  )
-
-  def send_message(conn, params) do
-    user = GuardianPlug.current_resource(conn)
-    body_text = get_in(params, ["body"]) || get_in(conn.body_params, ["body"]) || ""
-
-    context_url = "/my-workouts"
-
-    case SendAthleteMessage.call(user.id, user.nickname, String.trim(body_text), context_url) do
-      :ok -> json(conn, %{ok: true})
-      {:error, _} -> {:error, :unprocessable_entity}
-    end
-  end
-
-  operation(:list_messages,
-    summary: "List messages for an assigned workout",
-    parameters: [
-      %Parameter{
-        name: :id,
-        in: :path,
-        required: true,
-        schema: %Schema{type: :string, format: :uuid}
-      }
-    ],
-    responses: [
-      ok: {"Messages", "application/json", %Schema{type: :object, additionalProperties: true}}
-    ]
-  )
-
-  def list_messages(conn, %{"id" => assignment_id}) do
-    user = GuardianPlug.current_resource(conn)
-
-    case ListAssignmentMessages.call(assignment_id, user) do
-      {:ok, messages} -> json(conn, %{messages: messages})
-      {:error, :not_found} -> {:error, :not_found}
-      {:error, :forbidden} -> {:error, :forbidden}
-    end
-  end
-
-  operation(:post_message,
-    summary: "Post a message on an assigned workout thread",
-    parameters: [
-      %Parameter{
-        name: :id,
-        in: :path,
-        required: true,
-        schema: %Schema{type: :string, format: :uuid}
-      }
-    ],
-    request_body: %RequestBody{
-      required: true,
-      content: %{
-        "application/json" => %MediaType{
-          schema: %Schema{
-            type: :object,
-            properties: %{body: %Schema{type: :string, minLength: 1, maxLength: 2000}},
-            required: [:body]
-          }
-        }
-      }
-    },
-    responses: [
-      ok: {"Message", "application/json", %Schema{type: :object, additionalProperties: true}}
-    ]
-  )
-
-  def post_message(conn, %{id: assignment_id} = params) do
-    user = GuardianPlug.current_resource(conn)
-    body_text = params[:body] || get_in(conn.body_params, ["body"]) || ""
-
-    case PostAssignmentMessage.call(assignment_id, user, body_text) do
-      {:ok, message} -> json(conn, %{message: message})
-      {:error, :not_found} -> {:error, :not_found}
-      {:error, :forbidden} -> {:error, :forbidden}
       {:error, _} -> {:error, :unprocessable_entity}
     end
   end

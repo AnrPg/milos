@@ -103,7 +103,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       nil ->
         {:error, :not_found}
 
-      %MasterWorkout{status: :published} ->
+      %MasterWorkout{status: :published, draft_data: nil} ->
         {:error, :already_published}
 
       workout ->
@@ -117,11 +117,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
         sections = Map.get(merged_params, "sections") || Map.get(merged_params, :sections) || []
 
-        all_exercises_empty =
-          sections == [] or
-            Enum.all?(sections, fn s ->
-              (s["exercises"] || s[:exercises] || []) == []
-            end)
+        all_exercises_empty = sections == [] or not sections_have_exercises?(sections)
 
         if all_exercises_empty do
           {:error, :no_sections}
@@ -185,6 +181,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           title: workout.title,
           type: workout.type && to_string(workout.type),
           status: to_string(workout.status),
+          is_team_workout: workout.is_team_workout,
           draft_data: workout.draft_data,
           sections: draft_sections
         }
@@ -198,6 +195,13 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           base
         end
     end
+  end
+
+  @impl true
+  def exercise_exists?(id) do
+    WorkoutExercise
+    |> where([exercise], exercise.id == ^id)
+    |> Repo.exists?()
   end
 
   @impl true
@@ -338,24 +342,20 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       |> where(
         [assignment, link],
         link.athlete_id == ^athlete_id and
-          assignment.scheduled_for >= ^start_date and
-          assignment.scheduled_for <= ^end_date
+          (is_nil(link.athlete_status) or link.athlete_status != :archived) and
+          link.scheduled_for >= ^start_date and
+          link.scheduled_for <= ^end_date
       )
-      |> order_by([assignment, _link], asc: assignment.scheduled_for, asc: assignment.inserted_at)
+      |> order_by([assignment, link], asc: link.scheduled_for, asc: assignment.inserted_at)
       |> Repo.all()
       |> Repo.preload(@assigned_workout_preloads)
       |> Enum.map(&normalize_assignment_for_athlete(&1, athlete_id))
 
-    workout_ids =
-      normalized
-      |> Enum.map(& &1.master_workout_id)
-      |> Enum.reject(&is_nil/1)
-      |> Enum.uniq()
-
-    completion_map = fetch_latest_completed_executions(athlete_id, workout_ids)
+    assignment_ids = Enum.map(normalized, & &1.id)
+    completion_map = fetch_completed_assignment_executions(athlete_id, assignment_ids)
 
     Enum.map(normalized, fn assignment ->
-      case Map.get(completion_map, assignment.master_workout_id) do
+      case Map.get(completion_map, assignment.id) do
         nil ->
           assignment
 
@@ -388,13 +388,40 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     |> Repo.all()
     |> Repo.preload(:athlete_links)
     |> Enum.flat_map(fn assignment ->
-      Enum.map(assignment.athlete_links, fn link ->
+      assignment.athlete_links
+      |> Enum.reject(&(&1.athlete_status == :archived))
+      |> Enum.map(fn link ->
         %{
           user_id: link.athlete_id,
           scheduled_for: assignment.scheduled_for,
           assigned_workout_id: assignment.id
         }
       end)
+    end)
+  end
+
+  @impl true
+  def archive_active_assignments_for_athlete(athlete_id) do
+    Repo.transaction(fn ->
+      links =
+        AssignedWorkoutAthlete
+        |> where(
+          [link],
+          link.athlete_id == ^athlete_id and
+            (is_nil(link.athlete_status) or link.athlete_status == :accepted)
+        )
+        |> order_by([link], asc: link.id)
+        |> lock("FOR UPDATE")
+        |> Repo.all()
+
+      Enum.reduce_while(links, [], fn link, assignment_ids ->
+        case link |> AssignedWorkoutAthlete.archive_changeset() |> Repo.update() do
+          {:ok, archived} -> {:cont, [archived.assigned_workout_id | assignment_ids]}
+          {:error, changeset} -> Repo.rollback(changeset)
+        end
+      end)
+      |> Enum.uniq()
+      |> Enum.reverse()
     end)
   end
 
@@ -547,7 +574,12 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     end)
     |> Multi.insert_or_update(:assignment, changeset)
     |> Multi.run(:athlete_links, fn repo, %{assignment: assignment} ->
-      sync_athlete_links(repo, assignment.id, athlete_ids)
+      sync_athlete_links(
+        repo,
+        assignment.id,
+        athlete_ids,
+        Ecto.Changeset.changed?(changeset, :scheduled_for)
+      )
     end)
     |> Repo.transaction()
     |> case do
@@ -633,6 +665,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       title: workout.title,
       type: workout.type |> to_string(),
       status: workout.status |> to_string(),
+      is_team_workout: workout.is_team_workout,
       created_by_id: workout.created_by_id,
       inserted_at: workout.inserted_at,
       updated_at: workout.updated_at,
@@ -660,23 +693,29 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
     assignment
     |> normalize_assignment()
+    |> Map.put(:athlete_ids, [athlete_id])
+    |> Map.put(:scheduled_for, Date.to_iso8601(link.scheduled_for))
     |> Map.put(:my_athlete_status, my_status)
   end
 
-  defp fetch_latest_completed_executions(_athlete_id, []), do: %{}
+  defp fetch_completed_assignment_executions(_athlete_id, []), do: %{}
 
-  defp fetch_latest_completed_executions(athlete_id, workout_ids) do
+  defp fetch_completed_assignment_executions(athlete_id, assignment_ids) do
     WorkoutExecution
     |> where(
       [e],
       e.user_id == ^athlete_id and
-        e.master_workout_id in ^workout_ids and
+        e.source == :assigned and
+        e.source_reference_id in ^assignment_ids and
         not is_nil(e.completed_at_utc)
     )
     |> order_by([e], desc: e.completed_at_utc)
-    |> select([e], %{master_workout_id: e.master_workout_id, section_scores: e.section_scores})
+    |> select([e], %{
+      source_reference_id: e.source_reference_id,
+      section_scores: e.section_scores
+    })
     |> Repo.all()
-    |> Enum.group_by(& &1.master_workout_id)
+    |> Enum.group_by(& &1.source_reference_id)
     |> Map.new(fn {id, [first | _rest]} -> {id, first} end)
   end
 
@@ -705,27 +744,6 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     }
   end
 
-  defp normalize_base_exercise(%WorkoutExercise{} = exercise) do
-    %{
-      id: exercise.id,
-      name: exercise.name,
-      sets: exercise.sets,
-      prescription_value: exercise.prescription_value,
-      prescription_unit: exercise.prescription_unit && to_string(exercise.prescription_unit),
-      load_value: exercise.load_value,
-      load_mode: exercise.load_mode && to_string(exercise.load_mode),
-      superset_group_id: exercise.superset_group_id,
-      hr_zone: exercise.hr_zone,
-      tempo: exercise.tempo,
-      rest_seconds: exercise.rest_seconds,
-      cluster_rest_seconds: exercise.cluster_rest_seconds,
-      rest_pause_seconds: exercise.rest_pause_seconds,
-      pacing: exercise.pacing,
-      interval_assignment: exercise.interval_assignment,
-      order: exercise.order
-    }
-  end
-
   defp normalize_variation(%ExerciseVariation{} = variation) do
     %{
       id: variation.id,
@@ -744,6 +762,14 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     sections = Map.get(params, :sections) || Map.get(params, "sections") || []
 
     insert_sections(workout_id, sections, nil)
+  end
+
+  defp sections_have_exercises?(sections) do
+    Enum.any?(sections, fn section ->
+      exercises = Map.get(section, "exercises") || Map.get(section, :exercises) || []
+      children = Map.get(section, "sections") || Map.get(section, :sections) || []
+      exercises != [] or sections_have_exercises?(children)
+    end)
   end
 
   defp insert_sections(_workout_id, [], _parent_section_id), do: {:ok, []}
@@ -876,6 +902,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       id: workout.id,
       title: workout.title,
       type: workout.type |> to_string(),
+      is_team_workout: workout.is_team_workout,
       sections: normalize_sections(workout.sections)
     }
   end
@@ -950,13 +977,35 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     end
   end
 
-  defp sync_athlete_links(repo, assignment_id, athlete_ids) do
+  defp sync_athlete_links(repo, assignment_id, athlete_ids, reset_scheduled_for?) do
+    assignment_date =
+      repo.one!(
+        from assignment in AssignedWorkout,
+          where: assignment.id == ^assignment_id,
+          select: assignment.scheduled_for
+      )
+
     existing_athlete_ids =
       repo.all(
         from link in AssignedWorkoutAthlete,
           where: link.assigned_workout_id == ^assignment_id,
           select: link.athlete_id
       )
+
+    archived_links =
+      repo.all(
+        from link in AssignedWorkoutAthlete,
+          where:
+            link.assigned_workout_id == ^assignment_id and
+              link.athlete_id in ^athlete_ids and
+              link.athlete_status == :archived
+      )
+
+    Enum.each(archived_links, fn link ->
+      link
+      |> Ecto.Changeset.change(athlete_status: nil)
+      |> repo.update!()
+    end)
 
     ids_to_remove = existing_athlete_ids -- athlete_ids
 
@@ -967,12 +1016,28 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       )
     end
 
+    if reset_scheduled_for? and existing_athlete_ids != [] do
+      AssignedWorkoutAthlete
+      |> where(
+        [link],
+        link.assigned_workout_id == ^assignment_id and
+          link.athlete_id in ^existing_athlete_ids
+      )
+      |> repo.all()
+      |> Enum.each(fn link ->
+        link
+        |> AssignedWorkoutAthlete.reschedule_changeset(assignment_date)
+        |> repo.update!()
+      end)
+    end
+
     (athlete_ids -- existing_athlete_ids)
     |> Enum.reduce_while({:ok, []}, fn athlete_id, {:ok, acc} ->
       case %AssignedWorkoutAthlete{}
            |> AssignedWorkoutAthlete.changeset(%{
              assigned_workout_id: assignment_id,
-             athlete_id: athlete_id
+             athlete_id: athlete_id,
+             scheduled_for: assignment_date
            })
            |> repo.insert() do
         {:ok, link} -> {:cont, {:ok, [link | acc]}}
@@ -1151,7 +1216,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     |> Multi.delete(:conflicting_assignment, conflicting_assignment)
     |> Multi.update(:assignment, changeset)
     |> Multi.run(:athlete_links, fn repo, %{assignment: assignment} ->
-      sync_athlete_links(repo, assignment.id, merged_athlete_ids)
+      sync_athlete_links(repo, assignment.id, merged_athlete_ids, false)
     end)
     |> Repo.transaction()
     |> case do
@@ -1324,14 +1389,18 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       %MasterWorkout{status: :draft} ->
         {:error, :not_published}
 
+      %MasterWorkout{status: :published, draft_data: draft_data} = workout
+      when not is_nil(draft_data) ->
+        {:ok, %{id: workout.id, status: "published"}}
+
       %MasterWorkout{status: :published} = workout ->
         workout_with_sections = Repo.preload(workout, @workout_preloads)
         draft_data = reconstruct_draft_data(workout_with_sections)
 
         case workout
-             |> Ecto.Changeset.change(status: :draft, draft_data: draft_data)
+             |> Ecto.Changeset.change(draft_data: draft_data)
              |> Repo.update() do
-          {:ok, reopened} -> {:ok, %{id: reopened.id, status: "draft"}}
+          {:ok, reopened} -> {:ok, %{id: reopened.id, status: "published"}}
           {:error, changeset} -> {:error, changeset}
         end
     end
@@ -1349,8 +1418,36 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         %{
           id: assignment.id,
           athlete_ids: Enum.map(assignment.athlete_links, & &1.athlete_id),
+          athlete_scheduled_for:
+            Map.new(assignment.athlete_links, &{&1.athlete_id, &1.scheduled_for}),
           scheduled_for: assignment.scheduled_for
         }
+    end
+  end
+
+  @impl true
+  def get_assignment_execution_access(assignment_id, athlete_id) do
+    AssignedWorkout
+    |> join(:inner, [assignment], link in AssignedWorkoutAthlete,
+      on: link.assigned_workout_id == assignment.id
+    )
+    |> where(
+      [assignment, link],
+      assignment.id == ^assignment_id and link.athlete_id == ^athlete_id and
+        (is_nil(link.athlete_status) or link.athlete_status != :archived)
+    )
+    |> select([assignment, link], %{
+      assignment_id: assignment.id,
+      master_workout_id: assignment.master_workout_id,
+      athlete_status: link.athlete_status
+    })
+    |> Repo.one()
+    |> case do
+      nil ->
+        nil
+
+      access ->
+        %{access | athlete_status: access.athlete_status && to_string(access.athlete_status)}
     end
   end
 
@@ -1433,7 +1530,10 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           actor.role == :admin ->
             {:ok, assignment}
 
-          Enum.any?(assignment.athlete_links, &(&1.athlete_id == actor.id)) ->
+          Enum.any?(
+            assignment.athlete_links,
+            &(&1.athlete_id == actor.id and &1.athlete_status != :archived)
+          ) ->
             {:ok, assignment}
 
           true ->
@@ -1443,51 +1543,23 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   end
 
   @impl true
-  def list_assignment_messages(assignment_id) do
-    alias MilosTraining.Workouts.AssignmentMessage
-
-    AssignmentMessage
-    |> where([m], m.assigned_workout_id == ^assignment_id)
-    |> order_by([m], asc: m.inserted_at)
-    |> Repo.all()
-    |> Enum.map(&normalize_assignment_message/1)
-  end
-
-  @impl true
-  def create_assignment_message(params) do
-    alias MilosTraining.Workouts.AssignmentMessage
-
-    case AssignmentMessage.changeset(%AssignmentMessage{}, params) |> Repo.insert() do
-      {:ok, message} -> {:ok, normalize_assignment_message(message)}
-      {:error, changeset} -> {:error, changeset}
-    end
-  end
-
-  defp normalize_assignment_message(message) do
-    %{
-      id: message.id,
-      assigned_workout_id: message.assigned_workout_id,
-      sender_id: message.sender_id,
-      sender_nickname: message.sender_nickname,
-      body: message.body,
-      inserted_at: message.inserted_at
-    }
-  end
-
-  @impl true
-  def update_assignment_date(id, _from_date, new_date) do
-    case Repo.get(AssignedWorkout, id) do
+  def update_assignment_date(id, athlete_id, new_date) do
+    case Repo.get_by(AssignedWorkoutAthlete, assigned_workout_id: id, athlete_id: athlete_id) do
       nil ->
         {:error, :not_found}
 
-      assignment ->
-        assignment
-        |> Ecto.Changeset.change(scheduled_for: new_date)
+      link ->
+        link
+        |> AssignedWorkoutAthlete.reschedule_changeset(new_date)
         |> Repo.update()
         |> case do
-          {:ok, updated} ->
-            preloaded = Repo.preload(updated, @assigned_workout_preloads)
-            {:ok, normalize_assignment(preloaded)}
+          {:ok, _updated} ->
+            assignment =
+              AssignedWorkout
+              |> Repo.get!(id)
+              |> Repo.preload(@assigned_workout_preloads)
+
+            {:ok, normalize_assignment_for_athlete(assignment, athlete_id)}
 
           {:error, changeset} ->
             {:error, changeset}

@@ -79,8 +79,6 @@ defmodule MilosTrainingWeb.Router do
     post("/assigned-workouts", AdminAssignedWorkoutController, :create)
     patch("/assigned-workouts/:id", AdminAssignedWorkoutController, :update)
     delete("/assigned-workouts/:id", AdminAssignedWorkoutController, :delete)
-    get("/assigned-workouts/:id/messages", MyWorkoutController, :list_messages)
-    post("/assigned-workouts/:id/messages", MyWorkoutController, :post_message)
     get("/challenges", AdminChallengeController, :index)
     post("/challenges", AdminChallengeController, :create)
     get("/challenges/:id", AdminChallengeController, :show)
@@ -101,7 +99,6 @@ defmodule MilosTrainingWeb.Router do
     )
 
     get("/athletes/:id/drill-down", AdminCoachingController, :drill_down)
-    post("/athletes/:id/notes", AdminCoachingController, :create_note)
     get("/finance/summary", AdminFinanceController, :summary)
     get("/finance/queues", AdminFinanceController, :operational_queues)
     get("/finance/packages", AdminFinanceController, :packages)
@@ -147,6 +144,7 @@ defmodule MilosTrainingWeb.Router do
       :reverse_credit_ledger_entry
     )
 
+    patch("/finance/invoices/:id", AdminFinanceController, :update_invoice)
     patch("/finance/invoices/:id/issue", AdminFinanceController, :issue_invoice)
     patch("/finance/invoices/:id/void", AdminFinanceController, :void_invoice)
     post("/finance/invoices/:id/upload-url", AdminFinanceController, :invoice_upload_url)
@@ -184,7 +182,6 @@ defmodule MilosTrainingWeb.Router do
     get("/schedule", ScheduleController, :index)
     post("/bookings", ScheduleController, :create_booking)
     delete("/bookings/:id", ScheduleController, :delete_booking)
-    post("/schedule/slots/:id/message", ScheduleController, :send_slot_message)
   end
 
   scope "/api", MilosTrainingWeb do
@@ -193,9 +190,6 @@ defmodule MilosTrainingWeb.Router do
     get("/my-workouts", MyWorkoutController, :index)
     patch("/my-workouts/assignments/:id/reject", MyWorkoutController, :reject)
     patch("/my-workouts/assignments/:id/reschedule", MyWorkoutController, :reschedule)
-    post("/my-workouts/assignments/:id/message", MyWorkoutController, :send_message)
-    get("/my-workouts/assignments/:id/messages", MyWorkoutController, :list_messages)
-    post("/my-workouts/assignments/:id/messages", MyWorkoutController, :post_message)
   end
 
   scope "/api", MilosTrainingWeb do
@@ -227,6 +221,13 @@ defmodule MilosTrainingWeb.Router do
     get("/challenges/:id/leaderboard", ChallengeController, :leaderboard)
     post("/challenges/:id/opt_in", ChallengeController, :opt_in)
     delete("/challenges/:id/opt_in", ChallengeController, :opt_out)
+
+    post("/threads", MessagingController, :create_thread)
+    get("/threads", MessagingController, :list_threads)
+    get("/threads/:id", MessagingController, :show_thread)
+    get("/threads/:id/messages", MessagingController, :list_messages)
+    post("/threads/:id/messages", MessagingController, :send_message)
+    post("/threads/:id/read", MessagingController, :mark_read)
   end
 
   scope "/api/workouts", MilosTrainingWeb do

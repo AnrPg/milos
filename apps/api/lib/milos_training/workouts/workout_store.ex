@@ -31,6 +31,9 @@ defmodule MilosTraining.Workouts.WorkoutStore do
   def get_workout_for_admin(id), do: adapter().get_workout_for_admin(id)
 
   @impl true
+  def exercise_exists?(id), do: adapter().exercise_exists?(id)
+
+  @impl true
   def assign_workout(params), do: adapter().assign_workout(params)
 
   @impl true
@@ -65,10 +68,18 @@ defmodule MilosTraining.Workouts.WorkoutStore do
     do: adapter().reject_assignment_for_athlete(assignment_id, athlete_id)
 
   @impl true
+  def archive_active_assignments_for_athlete(athlete_id),
+    do: adapter().archive_active_assignments_for_athlete(athlete_id)
+
+  @impl true
   def reopen_workout(id), do: adapter().reopen_workout(id)
 
   @impl true
   def get_assigned_workout(id), do: adapter().get_assigned_workout(id)
+
+  @impl true
+  def get_assignment_execution_access(assignment_id, athlete_id),
+    do: adapter().get_assignment_execution_access(assignment_id, athlete_id)
 
   @impl true
   def duplicate_workout(id, title_suffix), do: adapter().duplicate_workout(id, title_suffix)
@@ -82,16 +93,8 @@ defmodule MilosTraining.Workouts.WorkoutStore do
     do: adapter().get_assignment_with_auth(assignment_id, actor)
 
   @impl true
-  def list_assignment_messages(assignment_id),
-    do: adapter().list_assignment_messages(assignment_id)
-
-  @impl true
-  def create_assignment_message(params),
-    do: adapter().create_assignment_message(params)
-
-  @impl true
-  def update_assignment_date(id, from_date, new_date),
-    do: adapter().update_assignment_date(id, from_date, new_date)
+  def update_assignment_date(id, athlete_id, new_date),
+    do: adapter().update_assignment_date(id, athlete_id, new_date)
 
   @impl true
   def delete_superseded_drafts(published_id, admin_id),
