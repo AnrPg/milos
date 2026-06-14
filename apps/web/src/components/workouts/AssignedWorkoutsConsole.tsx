@@ -32,6 +32,7 @@ import { AssignedWorkoutPanel } from "@/components/workouts/AssignedWorkoutPanel
 import { QuickAssignModal } from "@/components/workouts/QuickAssignModal";
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { addLocalDays, formatLocalDate, startOfLocalWeek } from "@/lib/local-date";
+import { downloadIcsEvent } from "@/lib/ics";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { workoutTypeColor } from "@/lib/workout-colors";
 import { useExecutionStore } from "@/stores/execution";
@@ -102,13 +103,13 @@ function DayHeader({ isoDate, compact, todayIso }: { isoDate: string; compact: b
 
 function DraggableCard({
   assignment,
-  isAdmin,
+  disabled = false,
   className,
   style,
   children,
 }: {
   assignment: AssignedWorkoutRecord;
-  isAdmin: boolean;
+  disabled?: boolean;
   className?: string;
   style?: React.CSSProperties;
   children: React.ReactNode;
@@ -116,7 +117,7 @@ function DraggableCard({
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, isDragging } = useDraggable({
     id: assignment.id,
     data: { assignment },
-    disabled: false,
+    disabled,
   });
 
   return (
@@ -169,15 +170,15 @@ function DroppableDay({
 
 function DraggableMonthChip({
   assignment,
-  isAdmin,
+  disabled = false,
 }: {
   assignment: AssignedWorkoutRecord;
-  isAdmin: boolean;
+  disabled?: boolean;
 }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: assignment.id,
     data: { assignment },
-    disabled: false,
+    disabled,
   });
 
   return (
@@ -195,7 +196,7 @@ function DraggableMonthChip({
       {...listeners}
       {...attributes}
     >
-      {assignment.workout.title}
+      {assignment.workout.is_team_workout ? "👥 " : ""}{assignment.workout.title}
     </p>
   );
 }
@@ -206,16 +207,16 @@ function DroppableMonthCell({
   outsideMonth,
   dayNum,
   assignments,
-  isAdmin,
   onNavigate,
+  todayIso,
 }: {
   date: string;
   isToday: boolean;
   outsideMonth: boolean;
   dayNum: number;
   assignments: AssignedWorkoutRecord[];
-  isAdmin: boolean;
   onNavigate: () => void;
+  todayIso: string;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: date });
 
@@ -247,7 +248,11 @@ function DroppableMonthCell({
         {dayNum}
       </span>
       {assignments.slice(0, 2).map((a) => (
-        <DraggableMonthChip key={a.id} assignment={a} isAdmin={isAdmin} />
+        <DraggableMonthChip
+          key={a.id}
+          assignment={a}
+          disabled={a.execution_status === "completed" && date <= todayIso}
+        />
       ))}
       {assignments.length > 2 ? (
         <p className="mt-0.5 text-[9px]" style={{ color: "#55556a" }}>
@@ -344,8 +349,10 @@ export function AssignedWorkoutsConsole({
     return [formatLocalDate(startOfLocalWeek(refDate))];
   }, [refDate, viewMode]);
 
+  const accessToken = tokens?.access_token;
+
   const loadAssignments = useCallback(async () => {
-    if (!tokens?.access_token) return;
+    if (!accessToken) return;
 
     setLoading(true);
     setError(null);
@@ -353,7 +360,7 @@ export function AssignedWorkoutsConsole({
     try {
       const results = await Promise.all(
         weekStartsToFetch.map((weekStart) =>
-          fetchAssignedWorkoutWeek(tokens.access_token!, weekStart),
+          fetchAssignedWorkoutWeek(accessToken, weekStart),
         ),
       );
 
@@ -387,10 +394,12 @@ export function AssignedWorkoutsConsole({
     } finally {
       setLoading(false);
     }
-  }, [signOut, tokens?.access_token, weekStartsToFetch]);
+  }, [accessToken, signOut, weekStartsToFetch]);
 
   useEffect(() => {
-    void loadAssignments();
+    queueMicrotask(() => {
+      void loadAssignments();
+    });
   }, [loadAssignments]);
 
   useEffect(() => {
@@ -456,12 +465,12 @@ export function AssignedWorkoutsConsole({
     const target = allAssignments.find((a) => a.id === openParamId);
     if (target) {
       autoOpenedRef.current = openParamId;
-      setPanelAssignment(target);
+      const frame = window.requestAnimationFrame(() => setPanelAssignment(target));
       const params = new URLSearchParams(searchParams.toString());
       params.delete("open");
       params.delete("date");
       router.replace(`?${params.toString()}`, { scroll: false });
-      return;
+      return () => window.cancelAnimationFrame(frame);
     }
 
     // Assignment not in loaded week — navigate to the week containing the target date
@@ -469,7 +478,9 @@ export function AssignedWorkoutsConsole({
       const targetDate = new Date(openParamDate + "T00:00:00");
       if (!isNaN(targetDate.getTime())) {
         autoOpenedRef.current = openParamId;
-        setRefDate(targetDate);
+        const frame = window.requestAnimationFrame(() => setRefDate(targetDate));
+
+        return () => window.cancelAnimationFrame(frame);
       }
     }
   }, [openParamId, openParamDate, loading, allAssignments, searchParams, router]);
@@ -478,8 +489,10 @@ export function AssignedWorkoutsConsole({
     if (!initialOpenAssignmentId || initialOpenHandledRef.current || allAssignments.length === 0) return;
     const assignment = allAssignments.find((a) => a.id === initialOpenAssignmentId);
     if (assignment) {
-      setPanelAssignment(assignment);
       initialOpenHandledRef.current = true;
+      const frame = window.requestAnimationFrame(() => setPanelAssignment(assignment));
+
+      return () => window.cancelAnimationFrame(frame);
     }
   }, [initialOpenAssignmentId, allAssignments]);
 
@@ -613,10 +626,14 @@ export function AssignedWorkoutsConsole({
       const execution = await startExecution(tokens.access_token, {
         master_workout_id: assignment.workout.id,
         source: "assigned",
+        source_reference_id: assignment.id,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
 
-      const segments = await fetchTimerSequence(tokens.access_token, assignment.workout.id);
+      const segments = await fetchTimerSequence(tokens.access_token, assignment.workout.id, {
+        source: "assigned",
+        sourceReferenceId: assignment.id,
+      });
 
       initExecution({
         executionId: execution.id,
@@ -734,7 +751,7 @@ export function AssignedWorkoutsConsole({
                 outsideMonth={outsideMonth}
                 dayNum={dayNum}
                 assignments={dayAssignments}
-                isAdmin={isAdmin}
+                todayIso={todayIso}
                 onNavigate={() => {
                   setLoading(true);
                   setError(null);
@@ -776,29 +793,48 @@ export function AssignedWorkoutsConsole({
                     <DraggableCard
                       key={a.id}
                       assignment={a}
-                      isAdmin={isAdmin}
+                      disabled={a.execution_status === "completed" && date <= todayIso}
                       style={{ background: "#0d0d18", border: "1px solid #1a1a28", borderRadius: "0.8rem" }}
                     >
-                      <button
-                        className="w-full truncate rounded-[0.8rem] px-2 py-1.5 text-left transition-opacity hover:opacity-80"
-                        onClick={() => {
-                          setLoading(true);
-                          setError(null);
-                          setRefDate(parseLocalDate(date));
-                          setViewMode("3day");
-                        }}
-                        type="button"
-                      >
-                        <p className="truncate text-[10px] font-semibold" style={{ color: "#F0EDF8" }}>
-                          {a.workout.title}
-                        </p>
-                        <p
-                          className="text-[9px] uppercase tracking-[0.12em]"
-                          style={{ color: workoutTypeColor(a.workout.type) }}
+                      <div className="flex items-start gap-1">
+                        <button
+                          className="min-w-0 flex-1 truncate rounded-[0.8rem] px-2 py-1.5 text-left transition-opacity hover:opacity-80"
+                          onClick={() => {
+                            setLoading(true);
+                            setError(null);
+                            setRefDate(parseLocalDate(date));
+                            setViewMode("3day");
+                          }}
+                          type="button"
                         >
-                          {a.workout.type}
-                        </p>
-                      </button>
+                          <div className="flex items-center gap-1">
+                            <p className="truncate text-[10px] font-semibold" style={{ color: "#F0EDF8" }}>
+                              {a.workout.title}
+                            </p>
+                            {a.workout.is_team_workout ? (
+                              <span className="shrink-0 rounded px-1 text-[8px] font-bold" style={{ background: "rgba(251,191,36,0.2)", color: "#fbbf24" }}>T</span>
+                            ) : null}
+                          </div>
+                          <p
+                            className="text-[9px] uppercase tracking-[0.12em]"
+                            style={{ color: workoutTypeColor(a.workout.type) }}
+                          >
+                            {a.workout.type}
+                          </p>
+                        </button>
+                        <button
+                          className="shrink-0 rounded px-1 py-1 text-[9px] font-bold leading-none transition-colors hover:opacity-80"
+                          style={{ color: "#3a3a55" }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            downloadIcsEvent({ title: a.workout.title, date });
+                          }}
+                          title="Add to calendar"
+                          type="button"
+                        >
+                          +cal
+                        </button>
+                      </div>
                     </DraggableCard>
                   ))}
                 </DroppableDay>
@@ -841,15 +877,16 @@ export function AssignedWorkoutsConsole({
                 {dayAssignments.map((assignment) => {
                   const isRejected = assignment.my_athlete_status === "rejected";
                   const isDone = assignment.execution_status === "completed";
+                  const isPastDone = isDone && date <= todayIso;
                   return (
                   <DraggableCard
                     key={assignment.id}
                     assignment={assignment}
-                    isAdmin={isAdmin}
+                    disabled={isPastDone}
                     className="rounded-[1.4rem] p-4"
                     style={{
                       background: "#0d0d18",
-                      border: `1px solid ${isRejected ? "#2a1a1a" : isDone ? "#1a2a1a" : "#1a1a28"}`,
+                      border: `1px solid ${isRejected ? "#2a1a1a" : isPastDone ? "#1a2a1a" : "#1a1a28"}`,
                       opacity: isRejected ? 0.55 : 1,
                     }}
                   >
@@ -858,14 +895,21 @@ export function AssignedWorkoutsConsole({
                       onClick={() => setPanelAssignment(assignment)}
                       type="button"
                     >
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: isRejected ? "#55556a" : workoutTypeColor(assignment.workout.type) }}>
-                        {assignment.workout.type}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: isRejected ? "#55556a" : workoutTypeColor(assignment.workout.type) }}>
+                          {assignment.workout.type}
+                        </p>
+                        {assignment.workout.is_team_workout ? (
+                          <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold" style={{ background: "rgba(251,191,36,0.15)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.3)" }}>
+                            Team
+                          </span>
+                        ) : null}
+                      </div>
                       {isRejected ? (
                         <span className="mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "rgba(100,30,30,0.4)", color: "#e07a5f" }}>
                           Rejected by you
                         </span>
-                      ) : isDone ? (
+                      ) : isPastDone ? (
                         <span className="mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "rgba(16,185,129,0.15)", color: "#34d399" }}>
                           Done ✓
                         </span>
@@ -902,6 +946,20 @@ export function AssignedWorkoutsConsole({
                         {assignment.admin_notes}
                       </p>
                     ) : null}
+
+                    <div className="mt-2.5">
+                      <button
+                        className="rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors"
+                        style={{ background: "#1a1a28", color: "#55556a", border: "1px solid #1e1e2e" }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          downloadIcsEvent({ title: assignment.workout.title, date });
+                        }}
+                        type="button"
+                      >
+                        + Add to calendar
+                      </button>
+                    </div>
 
                     {isAdmin ? (
                       <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -1127,6 +1185,7 @@ export function AssignedWorkoutsConsole({
           </div>
         </section>
 
+
         {isAdmin ? (
           <section className="relative flex flex-wrap items-center gap-2">
             <div className="relative">
@@ -1296,7 +1355,6 @@ export function AssignedWorkoutsConsole({
           assignment={panelAssignment}
           isAdmin={isAdmin}
           accessToken={tokens.access_token}
-          currentUserId={currentUser?.id}
           onClose={() => setPanelAssignment(null)}
           onStartWorkout={(assignment) => void executeAssignedWorkout(assignment)}
           onRejected={(rejectedId) =>

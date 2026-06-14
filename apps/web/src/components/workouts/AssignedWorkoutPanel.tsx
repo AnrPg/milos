@@ -1,26 +1,24 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import { ApiError } from "@/api/client";
 import {
   deleteAssignedWorkout,
-  fetchAssignmentMessages,
-  postAssignmentMessage,
   rejectAssignment,
   rescheduleAssignment,
   updateAssignedWorkout,
   type AssignedWorkoutRecord,
-  type AssignmentMessage,
 } from "@/api/assigned-workouts";
+import { ChatSection } from "@/components/chat/ChatSection";
 import { WorkoutPreviewDetail, type PreviewSection } from "@/components/workouts/WorkoutPreviewDetail";
 import { workoutTypeColor } from "@/lib/workout-colors";
+import { downloadIcsEvent } from "@/lib/ics";
 
 type Props = {
   assignment: AssignedWorkoutRecord;
   isAdmin: boolean;
   accessToken: string;
-  currentUserId?: string;
   onClose: () => void;
   onStartWorkout: (assignment: AssignedWorkoutRecord) => void;
   onRejected?: (assignmentId: string) => void;
@@ -34,7 +32,6 @@ export function AssignedWorkoutPanel({
   assignment,
   isAdmin,
   accessToken,
-  currentUserId,
   onClose,
   onStartWorkout,
   onRejected,
@@ -43,11 +40,7 @@ export function AssignedWorkoutPanel({
   onRescheduled,
   launching,
 }: Props) {
-  const [messages, setMessages] = useState<AssignmentMessage[]>([]);
-  const [messagesLoading, setMessagesLoading] = useState(true);
-  const [messageText, setMessageText] = useState("");
-  const [messageSending, setMessageSending] = useState(false);
-  const [messageError, setMessageError] = useState<string | null>(null);
+  const [chatExpanded, setChatExpanded] = useState(false);
   const [rejecting, setRejecting] = useState(false);
   const [rejectError, setRejectError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -56,22 +49,22 @@ export function AssignedWorkoutPanel({
   const [rescheduleDate, setRescheduleDate] = useState("");
   const [rescheduleError, setRescheduleError] = useState<string | null>(null);
   const [rescheduleSaving, setRescheduleSaving] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
   const todayIso = new Date().toISOString().split("T")[0]!;
 
-  useEffect(() => {
-    let cancelled = false;
-    setMessagesLoading(true);
-    fetchAssignmentMessages(accessToken, assignment.id, isAdmin)
-      .then((msgs) => { if (!cancelled) { setMessages(msgs); setMessagesLoading(false); } })
-      .catch(() => { if (!cancelled) setMessagesLoading(false); });
-    return () => { cancelled = true; };
-  }, [accessToken, assignment.id, isAdmin]);
+  const scaleLevels = (() => {
+    const map = new Map<string, { slug: string; label: string; sort_order: number }>();
+    for (const section of assignment.workout.sections) {
+      for (const exercise of section.exercises) {
+        for (const variation of exercise.variations ?? []) {
+          const sl = variation.scale_level;
+          if (sl?.slug) map.set(sl.slug, { slug: sl.slug, label: sl.label ?? sl.slug, sort_order: sl.sort_order ?? 0 });
+        }
+      }
+    }
+    return Array.from(map.values()).sort((a, b) => a.sort_order - b.sort_order || a.label.localeCompare(b.label));
+  })();
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  const [activeScale, setActiveScale] = useState<string | null>(null);;
 
   const sections = assignment.workout.sections as PreviewSection[];
 
@@ -87,22 +80,6 @@ export function AssignedWorkoutPanel({
       setDeleteError(err instanceof Error ? err.message : "Failed to delete assignment.");
     } finally {
       setDeleting(false);
-    }
-  }
-
-  async function handleSendMessage() {
-    if (!messageText.trim()) return;
-    setMessageSending(true);
-    setMessageError(null);
-
-    try {
-      const message = await postAssignmentMessage(accessToken, assignment.id, messageText.trim(), isAdmin);
-      setMessages((current) => [...current, message]);
-      setMessageText("");
-    } catch (err) {
-      setMessageError(err instanceof Error ? err.message : "Failed to send message.");
-    } finally {
-      setMessageSending(false);
     }
   }
 
@@ -172,27 +149,84 @@ export function AssignedWorkoutPanel({
           }}
         >
           <div className="min-w-0">
-            <p
-              className="truncate text-xs font-semibold uppercase tracking-[0.2em]"
-              style={{ color: workoutTypeColor(assignment.workout.type) }}
-            >
-              {assignment.workout.type}
-            </p>
+            <div className="flex items-center gap-2">
+              <p
+                className="truncate text-xs font-semibold uppercase tracking-[0.2em]"
+                style={{ color: workoutTypeColor(assignment.workout.type) }}
+              >
+                {assignment.workout.type}
+              </p>
+              {assignment.workout.is_team_workout ? (
+                <span
+                  className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+                  style={{ background: "rgba(251,191,36,0.15)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.35)" }}
+                >
+                  Team
+                </span>
+              ) : null}
+            </div>
             <h2
               className="mt-0.5 truncate text-base font-bold"
               style={{ color: "#F0EDF8" }}
             >
               {assignment.workout.title}
             </h2>
+            {scaleLevels.length > 0 ? (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                <button
+                  className="rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors"
+                  style={{
+                    background: activeScale === null ? "#F0EDF8" : "#1a1a28",
+                    color: activeScale === null ? "#0A0A0F" : "#c0c0d8",
+                    border: activeScale === null ? "1px solid #F0EDF8" : "1px solid #25253a",
+                  }}
+                  onClick={() => setActiveScale(null)}
+                  type="button"
+                >
+                  Base
+                </button>
+                {scaleLevels.map((sl) => (
+                  <button
+                    key={sl.slug}
+                    className="rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors"
+                    style={{
+                      background: activeScale === sl.slug ? "rgba(156,121,156,0.22)" : "#1a1a28",
+                      color: activeScale === sl.slug ? "#c79ac7" : "#c0c0d8",
+                      border: activeScale === sl.slug ? "1px solid rgba(156,121,156,0.5)" : "1px solid #25253a",
+                    }}
+                    onClick={() => setActiveScale(sl.slug)}
+                    type="button"
+                  >
+                    {sl.label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
-          <button
-            className="shrink-0 rounded-full px-3 py-1 text-xs font-semibold transition-colors"
-            style={{ background: "#1a1a28", color: "#8888aa" }}
-            onClick={onClose}
-            type="button"
-          >
-            Close ✕
-          </button>
+          <div className="flex shrink-0 flex-col items-end gap-2">
+            <button
+              className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
+              style={{ background: "#1a1a28", color: "#8888aa" }}
+              onClick={onClose}
+              type="button"
+            >
+              Close ✕
+            </button>
+            <button
+              className="rounded-full px-3 py-1 text-[10px] font-semibold transition-colors"
+              style={{ background: "#1a1a28", color: "#55556a", border: "1px solid #1e1e2e" }}
+              onClick={() =>
+                downloadIcsEvent({
+                  title: assignment.workout.title,
+                  date: assignment.scheduled_for,
+                  description: assignment.admin_notes ?? undefined,
+                })
+              }
+              type="button"
+            >
+              + Calendar
+            </button>
+          </div>
         </div>
 
         {/* Scrollable body */}
@@ -205,7 +239,12 @@ export function AssignedWorkoutPanel({
             >
               Workout
             </p>
-            <WorkoutPreviewDetail sections={sections} initiallyExpanded />
+            <WorkoutPreviewDetail
+                sections={sections}
+                initiallyExpanded
+                activeScaleOverride={scaleLevels.length > 0 ? activeScale : undefined}
+                hideScaleChips={scaleLevels.length > 0}
+              />
           </section>
 
           {/* Admin notes */}
@@ -279,74 +318,19 @@ export function AssignedWorkoutPanel({
             </section>
           ) : null}
 
-          {/* Persistent chat thread — visible to both admin and athlete */}
-          <section>
-            <p
-              className="mb-3 text-xs font-semibold uppercase tracking-[0.2em]"
-              style={{ color: "#55556a" }}
-            >
-              {isAdmin ? "Conversation with athlete" : "Message your coach"}
-            </p>
-
-            {messagesLoading ? (
-              <p className="text-xs" style={{ color: "#3a3a55" }}>Loading…</p>
-            ) : messages.length > 0 ? (
-              <div className="mb-3 max-h-60 space-y-2 overflow-y-auto rounded-[1rem] p-3" style={{ background: "#0d0d18", border: "1px solid #1a1a28" }}>
-                {messages.map((msg) => {
-                  const isMine = msg.sender_id === currentUserId;
-                  return (
-                    <div key={msg.id} className={`flex flex-col gap-0.5 ${isMine ? "items-end" : "items-start"}`}>
-                      <span className="text-[10px]" style={{ color: "#55556a" }}>
-                        {msg.sender_nickname}
-                      </span>
-                      <div
-                        className="max-w-[85%] rounded-[0.9rem] px-3 py-2 text-sm"
-                        style={
-                          isMine
-                            ? { background: "rgba(217,93,57,0.15)", color: "#F0EDF8" }
-                            : { background: "#111118", border: "1px solid #1a1a28", color: "#F0EDF8" }
-                        }
-                      >
-                        {msg.body}
-                      </div>
-                    </div>
-                  );
-                })}
-                <div ref={messagesEndRef} />
-              </div>
-            ) : (
-              <p className="mb-3 text-xs" style={{ color: "#3a3a55" }}>No messages yet.</p>
-            )}
-
-            <div className="space-y-2">
-              <textarea
-                className="w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
-                style={{
-                  background: "#111118",
-                  border: "1px solid #1e1e2e",
-                  color: "#F0EDF8",
-                  minHeight: "5rem",
-                  resize: "vertical",
-                }}
-                placeholder={isAdmin ? "Reply to athlete…" : "Ask a question or send a note…"}
-                value={messageText}
-                onChange={(e) => setMessageText(e.target.value)}
-                maxLength={2000}
-              />
-              {messageError ? (
-                <p className="text-xs" style={{ color: "#e07a5f" }}>{messageError}</p>
-              ) : null}
-              <button
-                className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
-                style={{ background: "#F0EDF8", color: "#0A0A0F" }}
-                disabled={messageSending || !messageText.trim()}
-                onClick={() => void handleSendMessage()}
-                type="button"
-              >
-                {messageSending ? "Sending…" : "Send"}
-              </button>
-            </div>
-          </section>
+          <ChatSection
+            contextType="assignment"
+            contextId={assignment.id}
+            isExpanded={chatExpanded}
+            onToggle={() => setChatExpanded((v) => !v)}
+            participantNicknames={
+              isAdmin
+                ? Object.fromEntries(
+                    (assignment.athletes ?? []).map((a) => [a.id, a.nickname ?? a.id]),
+                  )
+                : {}
+            }
+          />
 
           {/* Athlete rejection */}
           {!isAdmin ? (
@@ -450,7 +434,7 @@ export function AssignedWorkoutPanel({
           className="border-t px-5 py-4"
           style={{ borderColor: "#1a1a28", background: "#0A0A0F" }}
         >
-          {assignment.execution_status === "completed" ? (
+          {assignment.execution_status === "completed" && assignment.scheduled_for <= todayIso ? (
             <button
               className="w-full rounded-full py-3 text-sm font-bold tracking-wide disabled:opacity-50"
               style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", color: "#34d399" }}

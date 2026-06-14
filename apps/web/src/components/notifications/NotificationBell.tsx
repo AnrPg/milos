@@ -46,6 +46,8 @@ function notificationTitle(type: string) {
       return "Message from athlete";
     case "admin_note":
       return "Coach note";
+    case "chat_message":
+      return "New message";
     case "challenge_completed":
       return "Challenge completed";
     case "workout_moved":
@@ -130,6 +132,12 @@ function notificationBody(notification: NotificationRecord) {
     const body =
       typeof notification.payload.body === "string" ? notification.payload.body : "";
     return body ? `${sender}: ${body}` : `${sender} sent you a message.`;
+  }
+
+  if (notification.type === "chat_message") {
+    const body =
+      typeof notification.payload.body === "string" ? notification.payload.body : "";
+    return body || "You received a new message.";
   }
 
   if (notification.type === "challenge_completed") {
@@ -226,7 +234,7 @@ const FILTER_TYPES: Record<FilterTab, string[] | null> = {
   all: null,
   workouts: ["workout_note", "workout_changed", "workout_deleted", "workout_rejected", "workout_moved", "admin_note"],
   bookings: ["booking_pending", "booking_approved", "booking_rejected", "booking_timeout"],
-  messages: ["athlete_message"],
+  messages: ["athlete_message", "chat_message"],
 };
 
 export function NotificationBell() {
