@@ -10,9 +10,11 @@ import {
   fetchFinancePackages,
   getInvoiceDownloadUrl,
   getInvoiceUploadUrl,
+  issueFinanceInvoice,
   recordFinancePayment,
   updateFinanceMember,
   updateFinanceInvoice,
+  voidFinanceInvoice,
   type FinanceRecord,
 } from "@/api/finance";
 import { useSession } from "@/components/session-provider";
@@ -456,6 +458,7 @@ function InvoiceCard({
   onUploaded: () => void;
 }) {
   const invoiceId = field(invoice, "id");
+  const status = field(invoice, "status");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -465,8 +468,30 @@ function InvoiceCard({
   const [editNotes, setEditNotes] = useState(field(invoice, "notes"));
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [actioning, setActioning] = useState(false);
   const invoiceParams = (invoice.params as Record<string, string> | null) ?? {};
   const hasFile = Boolean(invoiceParams.file_key);
+
+  async function handleIssue() {
+    setActioning(true);
+    try {
+      await issueFinanceInvoice(token, invoiceId);
+      onUploaded();
+    } finally {
+      setActioning(false);
+    }
+  }
+
+  async function handleVoid() {
+    if (!confirm("Void this invoice? This cannot be undone.")) return;
+    setActioning(true);
+    try {
+      await voidFinanceInvoice(token, invoiceId);
+      onUploaded();
+    } finally {
+      setActioning(false);
+    }
+  }
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -540,10 +565,35 @@ function InvoiceCard({
         <div className="flex items-center gap-2">
           <span
             className="text-xs font-semibold"
-            style={{ color: statusColor(field(invoice, "status")) }}
+            style={{ color: statusColor(status) }}
           >
-            {field(invoice, "status")}
+            {status}
           </span>
+
+          {status === "draft" && (
+            <button
+              type="button"
+              onClick={handleIssue}
+              disabled={actioning}
+              className="rounded-full px-2 py-0.5 text-xs font-semibold disabled:opacity-50 transition-opacity hover:opacity-80"
+              style={{ background: "rgba(77,184,156,0.15)", color: "#4db89c", border: "1px solid rgba(77,184,156,0.3)" }}
+            >
+              {actioning ? "…" : "Issue"}
+            </button>
+          )}
+
+          {status !== "void" && status !== "paid" && (
+            <button
+              type="button"
+              onClick={handleVoid}
+              disabled={actioning}
+              className="rounded-full px-2 py-0.5 text-xs font-semibold disabled:opacity-50 transition-opacity hover:opacity-80"
+              style={{ background: "rgba(224,122,95,0.1)", color: "#e07a5f", border: "1px solid rgba(224,122,95,0.25)" }}
+            >
+              Void
+            </button>
+          )}
+
           <button
             type="button"
             onClick={() => {
