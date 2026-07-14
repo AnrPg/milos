@@ -3,6 +3,7 @@ defmodule MilosTrainingWeb.AuthController do
   use OpenApiSpex.ControllerSpecs
 
   alias MilosTraining.Application.{LoginUser, RefreshToken, RegisterUser}
+  alias MilosTraining.Identity.Queries.FindUser
   alias Guardian.Plug, as: GuardianPlug
   alias OpenApiSpex.{RequestBody, Schema}
 
@@ -12,7 +13,7 @@ defmodule MilosTrainingWeb.AuthController do
 
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true]
-       when action in [:register, :login, :refresh]
+       when action in [:register, :login, :refresh, :nickname_available]
 
   operation(:register,
     summary: "Register a new user",
@@ -197,6 +198,27 @@ defmodule MilosTrainingWeb.AuthController do
     ]
   )
 
+  operation(:nickname_available,
+    summary: "Check whether a nickname is available for registration",
+    parameters: [
+      %OpenApiSpex.Parameter{
+        name: :nickname,
+        in: :query,
+        required: true,
+        schema: %Schema{type: :string}
+      }
+    ],
+    responses: [
+      ok:
+        {"Availability result", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{available: %Schema{type: :boolean}},
+           required: [:available]
+         }}
+    ]
+  )
+
   operation(:me,
     summary: "Return the authenticated user",
     security: [%{"bearerAuth" => []}],
@@ -208,7 +230,8 @@ defmodule MilosTrainingWeb.AuthController do
            properties: %{
              id: %Schema{type: :string, format: :uuid},
              nickname: %Schema{type: :string},
-             role: %Schema{type: :string}
+             role: %Schema{type: :string},
+             avatar_url: %Schema{type: :string, nullable: true}
            },
            required: [:id, :nickname, :role]
          }},
@@ -221,6 +244,11 @@ defmodule MilosTrainingWeb.AuthController do
          }}
     ]
   )
+
+  def nickname_available(conn, %{nickname: nickname}) do
+    available = is_nil(FindUser.by_nickname(nickname))
+    json(conn, %{available: available})
+  end
 
   def register(conn, _params) do
     case RegisterUser.call(conn.body_params) do
@@ -256,6 +284,12 @@ defmodule MilosTrainingWeb.AuthController do
 
   def me(conn, _params) do
     user = GuardianPlug.current_resource(conn)
-    json(conn, %{id: user.id, nickname: user.nickname, role: to_string(user.role)})
+
+    json(conn, %{
+      id: user.id,
+      nickname: user.nickname,
+      role: to_string(user.role),
+      avatar_url: user.avatar_url
+    })
   end
 end

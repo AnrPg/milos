@@ -21,5 +21,23 @@ defmodule MilosTraining.Infrastructure.Security.RedisTokenStore do
     end
   end
 
+  def consume(nil, _ttl_ms), do: {:error, :invalid_jti}
+  def consume(_jti, ttl_ms) when ttl_ms <= 0, do: {:error, :invalid_ttl}
+
+  def consume(jti, ttl_ms) do
+    case Redix.command(:redix, [
+           "SET",
+           key(jti),
+           "1",
+           "PX",
+           Integer.to_string(ttl_ms),
+           "NX"
+         ]) do
+      {:ok, "OK"} -> {:ok, true}
+      {:ok, nil} -> {:ok, false}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
   defp key(jti), do: @prefix <> jti
 end

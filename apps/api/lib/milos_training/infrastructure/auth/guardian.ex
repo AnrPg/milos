@@ -10,17 +10,12 @@ defmodule MilosTraining.Infrastructure.Auth.Guardian do
   end
 
   def fetch_secret do
-    case System.get_env("GUARDIAN_SECRET_KEY") do
-      nil ->
-        if System.get_env("MIX_ENV") == "prod" do
-          raise "environment variable GUARDIAN_SECRET_KEY is missing"
-        else
-          "dev-guardian-secret-change-me"
-        end
-
-      secret ->
-        secret
-    end
+    System.get_env("GUARDIAN_SECRET_KEY") ||
+      if Application.get_env(:milos_training, :env, :prod) in [:dev, :test] do
+        "dev-guardian-secret-change-me"
+      else
+        raise "GUARDIAN_SECRET_KEY environment variable is not set."
+      end
   end
 
   def resource_from_claims(%{"sub" => id}) do

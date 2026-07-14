@@ -1,19 +1,18 @@
 defmodule MilosTraining.Application.RefreshToken do
   alias MilosTraining.Application.TokenIssuer
+  alias MilosTraining.Application.TokenStore
   alias MilosTraining.Application.TokenVerifier
-  alias MilosTraining.Infrastructure.Security.TokenStore
 
   def call(params) when is_map(params) do
     refresh_token = Map.get(params, "refresh_token") || Map.get(params, :refresh_token)
 
     with {:ok, claims} <- TokenVerifier.decode_refresh_token(refresh_token),
-         {:ok, false} <- TokenStore.revoked?(claims["jti"]),
          {:ok, user} <- TokenVerifier.user_from_claims(claims),
          {:ok, tokens} <- TokenIssuer.issue_pair(user),
-         :ok <- TokenStore.revoke(claims["jti"], ttl_ms(claims["exp"])) do
+         {:ok, true} <- TokenStore.consume(claims["jti"], ttl_ms(claims["exp"])) do
       {:ok, tokens}
     else
-      {:ok, true} ->
+      {:ok, false} ->
         {:error, :invalid_refresh_token}
 
       {:error, :token_issuance_failed} ->

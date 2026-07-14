@@ -31,6 +31,30 @@ defmodule MilosTraining.Infrastructure.Security.MemoryTokenStore do
     end
   end
 
+  def consume(nil, _ttl_ms), do: {:error, :invalid_jti}
+  def consume(_jti, ttl_ms) when ttl_ms <= 0, do: {:error, :invalid_ttl}
+
+  def consume(jti, ttl_ms) do
+    ensure_table!()
+    now = System.system_time(:millisecond)
+    expires_at = now + ttl_ms
+
+    case :ets.insert_new(@table, {jti, expires_at}) do
+      true ->
+        {:ok, true}
+
+      false ->
+        case :ets.lookup(@table, jti) do
+          [{^jti, current_expiry}] when current_expiry <= now ->
+            :ets.delete_object(@table, {jti, current_expiry})
+            consume(jti, ttl_ms)
+
+          _ ->
+            {:ok, false}
+        end
+    end
+  end
+
   def reset! do
     ensure_table!()
     :ets.delete_all_objects(@table)

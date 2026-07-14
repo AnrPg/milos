@@ -2,7 +2,7 @@ defmodule MilosTrainingWeb.AdminUserController do
   use MilosTrainingWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias MilosTraining.Application.UpdateUserRole
+  alias MilosTraining.Application.{ListAthletes, UpdateUserRole}
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
   action_fallback MilosTrainingWeb.FallbackController
@@ -12,6 +12,40 @@ defmodule MilosTrainingWeb.AdminUserController do
 
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true] when action in [:update_role]
+
+  operation(:index_athletes,
+    summary: "List athlete users",
+    parameters: [
+      %Parameter{
+        name: :q,
+        in: :query,
+        required: false,
+        schema: %Schema{type: :string}
+      }
+    ],
+    responses: [
+      ok:
+        {"Athletes", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             athletes: %Schema{
+               type: :array,
+               items: %Schema{
+                 type: :object,
+                 properties: %{
+                   id: %Schema{type: :string, format: :uuid},
+                   nickname: %Schema{type: :string},
+                   role: %Schema{type: :string}
+                 },
+                 required: [:id, :nickname, :role]
+               }
+             }
+           },
+           required: [:athletes]
+         }}
+    ]
+  )
 
   operation(:update_role,
     summary: "Update a user's role",
@@ -104,5 +138,9 @@ defmodule MilosTrainingWeb.AdminUserController do
       error ->
         error
     end
+  end
+
+  def index_athletes(conn, params) do
+    json(conn, %{athletes: ListAthletes.call(params["q"] || params[:q])})
   end
 end
