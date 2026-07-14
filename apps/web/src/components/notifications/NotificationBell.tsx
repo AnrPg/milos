@@ -52,6 +52,10 @@ function notificationTitle(type: string) {
       return "Challenge completed";
     case "workout_moved":
       return "Workout rescheduled";
+    case "invoice_issued":
+      return "Invoice issued";
+    case "payment_reminder":
+      return "Outstanding balance";
     default:
       return "Notification";
   }
@@ -61,10 +65,50 @@ function payloadUrl(notification: NotificationRecord) {
   return typeof notification.payload.url === "string" ? notification.payload.url : null;
 }
 
+function notificationTargetUrl(notification: NotificationRecord, role: string | null | undefined) {
+  const rawUrl = payloadUrl(notification);
+  const isAdmin = role === "admin" || role === "coach";
+
+  if (notification.type === "chat_message" && typeof notification.payload.thread_id === "string") {
+    return `/account/activity/chats?thread=${encodeURIComponent(notification.payload.thread_id)}`;
+  }
+
+  if (!rawUrl) return null;
+  if (!isAdmin) return rawUrl;
+
+  const [path, query = ""] = rawUrl.split("?");
+  const params = new URLSearchParams(query);
+
+  if (path === "/my-workouts") {
+    const assignmentId = params.get("open") ?? params.get("open_assignment");
+    if (!assignmentId) return "/admin/coaching-assignments";
+
+    const nextParams = new URLSearchParams({ open: assignmentId });
+    const date = params.get("date");
+    if (date) nextParams.set("date", date);
+    return `/admin/coaching-assignments?${nextParams.toString()}`;
+  }
+
+  if (path === "/schedule") {
+    const nextParams = params.toString();
+    return `/admin/schedule${nextParams ? `?${nextParams}` : ""}`;
+  }
+
+  return rawUrl;
+}
+
 function titleFromPayload(notification: NotificationRecord) {
-  return typeof notification.payload.title === "string"
-    ? notification.payload.title
-    : notificationTitle(notification.type);
+  if (typeof notification.payload.title === "string") return notification.payload.title;
+
+  if (notification.type === "chat_message") {
+    const contextType =
+      typeof notification.payload.context_type === "string" ? notification.payload.context_type : null;
+    if (contextType === "assignment" || contextType === "class_slot") {
+      return "New message in workout thread";
+    }
+  }
+
+  return notificationTitle(notification.type);
 }
 
 function notificationBody(notification: NotificationRecord) {
@@ -135,9 +179,21 @@ function notificationBody(notification: NotificationRecord) {
   }
 
   if (notification.type === "chat_message") {
+    const sender =
+      typeof notification.payload.sender_nickname === "string"
+        ? notification.payload.sender_nickname
+        : null;
     const body =
       typeof notification.payload.body === "string" ? notification.payload.body : "";
-    return body || "You received a new message.";
+    const contextType =
+      typeof notification.payload.context_type === "string" ? notification.payload.context_type : null;
+    const isWorkoutThread = contextType === "assignment" || contextType === "class_slot";
+
+    if (sender && body) {
+      return isWorkoutThread ? `${sender} in your workout thread: ${body}` : `${sender}: ${body}`;
+    }
+    if (body) return body;
+    return isWorkoutThread ? "New message in your workout thread." : "You received a new message.";
   }
 
   if (notification.type === "challenge_completed") {
@@ -166,12 +222,14 @@ function notificationBody(notification: NotificationRecord) {
 
 function NotificationCard({
   notification,
+  targetUrl,
   onClick,
 }: {
   notification: NotificationRecord;
+  targetUrl: string | null;
   onClick: () => void;
 }) {
-  const clickable = Boolean(payloadUrl(notification));
+  const clickable = Boolean(targetUrl);
 
   return (
     <article
@@ -180,8 +238,8 @@ function NotificationCard({
       onClick={clickable ? onClick : undefined}
       role={clickable ? "button" : undefined}
       style={{
-        border: notification.read_at ? "1px solid #1a1a28" : "1px solid rgba(217,93,57,0.3)",
-        background: notification.read_at ? "#0d0d18" : "rgba(217,93,57,0.06)",
+        border: notification.read_at ? "1px solid var(--border)" : "1px solid color-mix(in srgb, var(--primary) 30%, transparent)",
+        background: notification.read_at ? "var(--panel-muted)" : "color-mix(in srgb, var(--primary) 6%, transparent)",
         cursor: clickable ? "pointer" : "default",
       }}
       tabIndex={clickable ? 0 : undefined}
@@ -198,23 +256,23 @@ function NotificationCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold" style={{ color: "#F0EDF8" }}>
+          <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
             {titleFromPayload(notification)}
           </p>
-          <p className="mt-2 text-sm leading-6" style={{ color: "#8888aa" }}>
+          <p className="mt-2 text-sm leading-6" style={{ color: "var(--muted)" }}>
             {notificationBody(notification)}
           </p>
         </div>
         {!notification.read_at ? (
           <span
             className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]"
-            style={{ background: "#d95d39", color: "#fff" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             New
           </span>
         ) : null}
       </div>
-      <p className="mt-3 text-xs uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+      <p className="mt-3 text-xs uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
         {formatTimestamp(notification.inserted_at)}
       </p>
     </article>
@@ -370,7 +428,7 @@ export function NotificationBell() {
         return "Enable browser push for approvals, notes, and alerts.";
     }
   })();
-  const pushStatusTone = push.error || push.configured === false ? "#d95d39" : "#8888aa";
+  const pushStatusTone = push.error || push.configured === false ? "var(--primary)" : "var(--muted)";
   const pushButtonLabel = push.busy
     ? push.step === "server-save"
       ? "Saving..."
@@ -398,7 +456,7 @@ export function NotificationBell() {
   }
 
   async function handleNotificationClick(notification: NotificationRecord) {
-    const url = payloadUrl(notification);
+    const url = notificationTargetUrl(notification, currentUser?.role);
     if (!url) return;
 
     if (!notification.read_at) {
@@ -419,7 +477,7 @@ export function NotificationBell() {
         aria-expanded={open}
         aria-label="Open notifications"
         className="flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition-colors"
-        style={{ background: "#111118", border: "1px solid #1a1a28", color: "#c0c0d8" }}
+        style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
         onClick={openPanel}
         type="button"
       >
@@ -427,7 +485,7 @@ export function NotificationBell() {
         {hasUnread ? (
           <span
             className="rounded-full px-1.5 py-0.5 text-[10px] font-bold"
-            style={{ background: "#d95d39", color: "#fff" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {unreadCount}
           </span>
@@ -443,17 +501,17 @@ export function NotificationBell() {
         >
           <aside
             className="absolute right-0 top-0 h-full w-full max-w-md overflow-y-auto p-6 shadow-[-20px_0_60px_rgba(0,0,0,0.5)]"
-            style={{ background: "#111118", borderLeft: "1px solid #1a1a28" }}
+            style={{ background: "var(--panel)", borderLeft: "1px solid var(--border)" }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#d95d39]">Notifications</p>
-                <h2 className="mt-3 text-2xl font-semibold" style={{ color: "#F0EDF8" }}>Inbox</h2>
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">Notifications</p>
+                <h2 className="mt-3 text-2xl font-semibold" style={{ color: "var(--text)" }}>Inbox</h2>
               </div>
               <button
                 className="rounded-full px-3 py-2 text-sm font-semibold transition-colors"
-                style={{ background: "#1a1a28", color: "#c0c0d8" }}
+                style={{ background: "var(--border)", color: "var(--text-soft)" }}
                 onClick={() => setOpen(false)}
                 type="button"
               >
@@ -468,8 +526,8 @@ export function NotificationBell() {
                   className="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors"
                   style={
                     activeFilter === tab.key
-                      ? { background: "#d95d39", color: "#fff" }
-                      : { background: "#1a1a28", color: "#8888aa" }
+                      ? { background: "var(--primary)", color: "var(--primary-contrast)" }
+                      : { background: "var(--border)", color: "var(--muted)" }
                   }
                   onClick={() => { setActiveFilter(tab.key); setReadSectionOpen(false); }}
                   type="button"
@@ -482,7 +540,7 @@ export function NotificationBell() {
             {shouldShowPushPrompt ? (
               <div
                 className="mt-5 rounded-[1.2rem] p-4"
-                style={{ border: "1px solid #1a1a28", background: "#0d0d18" }}
+                style={{ border: "1px solid var(--border)", background: "var(--panel-muted)" }}
               >
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-sm" style={{ color: pushStatusTone }}>
@@ -491,7 +549,7 @@ export function NotificationBell() {
                   {push.permission !== "denied" && push.configured !== false ? (
                     <button
                       className="shrink-0 rounded-full px-4 py-2 text-xs font-semibold"
-                      style={{ background: "#d95d39", color: "#fff" }}
+                      style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                       disabled={push.busy}
                       onClick={() => void push.enablePush()}
                       type="button"
@@ -507,7 +565,7 @@ export function NotificationBell() {
               {notifications.length === 0 ? (
                 <div
                   className="rounded-[1.4rem] p-5 text-sm"
-                  style={{ border: "1px solid #1a1a28", color: "#55556a" }}
+                  style={{ border: "1px solid var(--border)", color: "var(--dim)" }}
                 >
                   {emptyMessage}
                 </div>
@@ -517,12 +575,12 @@ export function NotificationBell() {
               {notifications.length > 0 ? (
                 <section>
                   <div className="mb-3 flex items-center justify-between gap-3">
-                    <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "#55556a" }}>
+                    <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
                       New
                       {unreadNotifications.length > 0 ? (
                         <span
                           className="ml-2 rounded-full px-1.5 py-0.5 text-[10px]"
-                          style={{ background: "#d95d39", color: "#fff" }}
+                          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                         >
                           {unreadNotifications.length}
                         </span>
@@ -531,7 +589,7 @@ export function NotificationBell() {
                     {hasUnread ? (
                       <button
                         className="rounded-full px-3 py-1 text-xs font-semibold disabled:opacity-50"
-                        style={{ background: "#1a1a28", color: "#c0c0d8" }}
+                        style={{ background: "var(--border)", color: "var(--text-soft)" }}
                         disabled={markAllRead.isPending}
                         onClick={() => void handleMarkAllRead()}
                         type="button"
@@ -541,7 +599,7 @@ export function NotificationBell() {
                     ) : null}
                   </div>
                   {unreadNotifications.length === 0 ? (
-                    <p className="rounded-[1.4rem] px-4 py-3 text-sm" style={{ border: "1px solid #1a1a28", color: "#55556a" }}>
+                    <p className="rounded-[1.4rem] px-4 py-3 text-sm" style={{ border: "1px solid var(--border)", color: "var(--dim)" }}>
                       You&apos;re all caught up.
                     </p>
                   ) : (
@@ -550,6 +608,7 @@ export function NotificationBell() {
                         <NotificationCard
                           key={notification.id}
                           notification={notification}
+                          targetUrl={notificationTargetUrl(notification, currentUser?.role)}
                           onClick={() => handleNotificationClick(notification)}
                         />
                       ))}
@@ -566,10 +625,10 @@ export function NotificationBell() {
                     onClick={() => setReadSectionOpen((v) => !v)}
                     type="button"
                   >
-                    <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "#3a3a55" }}>
+                    <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
                       Read ({readNotifications.length})
                     </p>
-                    <span className="text-xs" style={{ color: "#3a3a55" }}>
+                    <span className="text-xs" style={{ color: "var(--dim)" }}>
                       {readSectionOpen ? "▲" : "▼"}
                     </span>
                   </button>
@@ -579,6 +638,7 @@ export function NotificationBell() {
                         <NotificationCard
                           key={notification.id}
                           notification={notification}
+                          targetUrl={notificationTargetUrl(notification, currentUser?.role)}
                           onClick={() => handleNotificationClick(notification)}
                         />
                       ))}
@@ -590,7 +650,7 @@ export function NotificationBell() {
               {notifications.length > 0 && nextCursor ? (
                 <button
                   className="w-full rounded-[1.4rem] border px-4 py-3 text-sm font-semibold disabled:opacity-50"
-                  style={{ borderColor: "#1a1a28", color: "#c0c0d8", background: "#0d0d18" }}
+                  style={{ borderColor: "var(--border)", color: "var(--text-soft)", background: "var(--panel-muted)" }}
                   disabled={notificationQuery.isFetchingNextPage}
                   onClick={() => void notificationQuery.fetchNextPage()}
                   type="button"

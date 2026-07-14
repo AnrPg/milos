@@ -18,7 +18,9 @@ defmodule MilosTraining.Notifications.Notification do
     :workout_completed,
     :admin_note,
     :challenge_completed,
-    :chat_message
+    :chat_message,
+    :invoice_issued,
+    :payment_reminder
   ]
 
   schema "notifications" do

@@ -85,7 +85,7 @@ defmodule MilosTraining.Notifications do
         :ok
 
       {:error, reason} ->
-        Logger.error("notification_event_enqueue_failed event=#{event} reason=#{inspect(reason)}")
+        log_notification_event_enqueue_failure(event, reason)
 
         process_event(Atom.to_string(event), payload)
     end
@@ -112,7 +112,12 @@ defmodule MilosTraining.Notifications do
   def process_event("workout_rejected", payload), do: enqueue_workout_rejected(payload)
   def process_event("athlete_message_sent", payload), do: enqueue_athlete_message(payload)
   def process_event("workout_moved", payload), do: enqueue_workout_moved(payload)
+  def process_event("invoice_issued", payload), do: enqueue_invoice_issued(payload)
+  def process_event("payment_reminder", payload), do: enqueue_payment_reminder(payload)
   def process_event(_event, _payload), do: {:error, :bad_request}
+
+  def propagate_nickname_change(old_nickname, new_nickname),
+    do: NotificationStore.propagate_nickname_change(old_nickname, new_nickname)
 
   def enqueue_admins_new_booking(booking),
     do: enqueue_for_users(Identity.list_by_role(:admin), :booking_pending, booking)
@@ -220,8 +225,11 @@ defmodule MilosTraining.Notifications do
 
     url =
       case scheduled_for do
-        nil -> "/my-workouts?open=#{assigned_workout_id}"
-        date -> "/my-workouts?open=#{assigned_workout_id}&date=#{Date.to_iso8601(date)}"
+        nil ->
+          "/admin/coaching-assignments?open=#{assigned_workout_id}"
+
+        date ->
+          "/admin/coaching-assignments?open=#{assigned_workout_id}&date=#{Date.to_iso8601(date)}"
       end
 
     Identity.list_by_role(:admin)
@@ -278,7 +286,7 @@ defmodule MilosTraining.Notifications do
     from_date = field(payload, :from_date)
     to_date = field(payload, :to_date)
 
-    url = "/my-workouts?open=#{assigned_workout_id}&date=#{to_date}"
+    url = "/admin/coaching-assignments?open=#{assigned_workout_id}&date=#{to_date}"
     body = "#{athlete_nickname} moved \"#{workout_title}\" from #{from_date} to #{to_date}."
 
     Identity.list_by_role(:admin)
@@ -304,6 +312,65 @@ defmodule MilosTraining.Notifications do
     :ok
   end
 
+  def enqueue_invoice_issued(invoice) when is_map(invoice) do
+    user_id = field(invoice, :user_id)
+    invoice_number = field(invoice, :invoice_number)
+    total_cents = field(invoice, :total_cents)
+    due_date = field(invoice, :due_date)
+    invoice_id = field(invoice, :id)
+
+    payload = %{
+      invoice_id: invoice_id,
+      invoice_number: invoice_number,
+      total_cents: total_cents,
+      due_date: due_date,
+      body: "Invoice #{invoice_number} has been issued for your account.",
+      url: "/account/billing"
+    }
+
+    case deliver_notification(user_id, :invoice_issued, payload) do
+      {:ok, _notification} ->
+        :ok
+
+      :ok ->
+        :ok
+
+      {:error, reason} = error ->
+        Logger.error(
+          "invoice_issued delivery failed user_id=#{user_id} invoice_id=#{invoice_id} reason=#{inspect(reason)}"
+        )
+
+        error
+    end
+  end
+
+  def enqueue_payment_reminder(payload) when is_map(payload) do
+    user_id = field(payload, :user_id)
+    outstanding_cents = field(payload, :outstanding_balance_cents) || 0
+
+    notification_payload = %{
+      outstanding_balance_cents: outstanding_cents,
+      body:
+        "You have an outstanding balance of €#{:erlang.float_to_binary(outstanding_cents / 100, [{:decimals, 2}])} due.",
+      url: "/account/billing"
+    }
+
+    case deliver_notification(user_id, :payment_reminder, notification_payload) do
+      {:ok, _notification} ->
+        :ok
+
+      :ok ->
+        :ok
+
+      {:error, reason} = error ->
+        Logger.error(
+          "payment_reminder delivery failed user_id=#{user_id} reason=#{inspect(reason)}"
+        )
+
+        error
+    end
+  end
+
   def delete_booking_pending_notifications(booking_id) do
     case NotificationStore.delete_booking_pending_for_booking(booking_id) do
       :ok -> :ok
@@ -320,17 +387,19 @@ defmodule MilosTraining.Notifications do
   end
 
   defp enqueue_for_users(users, type, booking) do
-    Enum.each(users, fn user ->
-      result = create_booking_notification_once(user.id, type, booking)
+    Enum.reduce_while(users, :ok, fn user, :ok ->
+      case create_booking_notification_once(user.id, type, booking) do
+        :ok ->
+          {:cont, :ok}
 
-      unless delivered?(result) do
-        Logger.error(
-          "booking notification delivery failed user_id=#{user.id} type=#{type} booking_id=#{field(booking, :id)}"
-        )
+        {:error, reason} = error ->
+          Logger.error(
+            "booking notification delivery failed user_id=#{user.id} type=#{type} booking_id=#{field(booking, :id)} reason=#{inspect(reason)}"
+          )
+
+          {:halt, error}
       end
     end)
-
-    :ok
   end
 
   defp booking_payload(user_id, type, booking) do
@@ -424,6 +493,18 @@ defmodule MilosTraining.Notifications do
   defp delivered?({:ok, _notification}), do: true
   defp delivered?(:ok), do: true
   defp delivered?(_result), do: false
+
+  defp log_notification_event_enqueue_failure(_event, :oban_unavailable) do
+    if Application.get_env(:milos_training, :start_oban, true) do
+      Logger.error("notification_event_enqueue_failed reason=:oban_unavailable")
+    else
+      Logger.debug("notification_event_enqueue_skipped reason=:oban_disabled")
+    end
+  end
+
+  defp log_notification_event_enqueue_failure(event, reason) do
+    Logger.error("notification_event_enqueue_failed event=#{event} reason=#{inspect(reason)}")
+  end
 
   defp field(map, key) when is_map(map) do
     Map.get(map, key) || Map.get(map, Atom.to_string(key))

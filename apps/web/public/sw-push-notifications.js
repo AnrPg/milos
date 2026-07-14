@@ -9,27 +9,12 @@ self.addEventListener("push", (event) => {
   const notificationId = data.notification_id ?? null;
 
   event.waitUntil(
-    (async () => {
-      await self.registration.showNotification(data.title ?? "Milos Training", {
-        body: data.body ?? "",
-        icon: "/globe.svg",
-        badge: "/globe.svg",
-        data: { url: data.url, notification_id: notificationId },
-      });
-
-      if (notificationId) {
-        const token = await readTokenFromDb();
-        if (token) {
-          await fetch(
-            `${self.location.origin}/api/notifications/${notificationId}/read`,
-            {
-              method: "POST",
-              headers: { Authorization: `Bearer ${token}` },
-            },
-          ).catch(() => {});
-        }
-      }
-    })(),
+    self.registration.showNotification(data.title ?? "Milos Training", {
+      body: data.body ?? "",
+      icon: "/globe.svg",
+      badge: "/globe.svg",
+      data: { url: data.url, notification_id: notificationId },
+    }),
   );
 });
 
@@ -54,10 +39,36 @@ self.addEventListener("pushsubscriptionchange", (event) => {
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
 
-  if (event.notification.data?.url) {
-    event.waitUntil(clients.openWindow(event.notification.data.url));
-  }
+  event.waitUntil(handleNotificationClick(event.notification.data ?? {}));
 });
+
+async function handleNotificationClick(data) {
+  const url = data.url || "/";
+  const notificationId = data.notification_id || null;
+
+  if (notificationId) {
+    await recordNotificationClick(notificationId, url);
+  }
+
+  await clients.openWindow(url);
+}
+
+async function recordNotificationClick(notificationId, url) {
+  const token = await readTokenFromDb();
+
+  if (!token) {
+    return;
+  }
+
+  await fetch(`${self.location.origin}/api/notifications/${notificationId}/click`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ url }),
+  }).catch(() => {});
+}
 
 const PUSH_CONFIG_CACHE = "milos-push-config-v1";
 const PUSH_CONFIG_REQUEST = "/__milos_push_config__";
