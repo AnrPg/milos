@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  api-test:
+    runs-on: self-hosted
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: milos_training_test
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres -d milos_training_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          elixir-version: "1.17.2"
+          otp-version: "27.0"
+      - run: mix deps.get
+        working-directory: apps/api
+      - run: mix test
+        working-directory: apps/api
+        env:
+          DB_HOST: localhost
+          DB_NAME: milos_training_test
+          DB_PASSWORD: postgres
+          DB_USER: postgres
+
+  web-test:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: apps/web/package-lock.json
+      - uses: erlef/setup-beam@v1
+        with:
+          elixir-version: "1.17.2"
+          otp-version: "27.0"
+      - run: npm ci
+        working-directory: apps/web
+      - run: mix deps.get
+        working-directory: apps/api
+      - run: npm run generate:api
+        working-directory: apps/web
+      - run: npm run build
+        working-directory: apps/web
