@@ -3,7 +3,8 @@
 import { useState } from "react";
 
 import { ApiError } from "@/api/client";
-import { cancelBooking, sendSlotMessage, type ScheduleBooking, type ScheduleSlot, type TrainingType } from "@/api/schedule";
+import { cancelBooking, sendSlotMessage, type ScheduleBooking, type ScheduleSlot } from "@/api/schedule";
+import { downloadIcsEvent } from "@/lib/ics";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { workoutTypeColor } from "@/lib/workout-colors";
@@ -64,6 +65,28 @@ export function SlotPopup({
   const [cancelling, setCancelling] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
   const [editWorkoutOpen, setEditWorkoutOpen] = useState(false);
+  const [activeScale, setActiveScale] = useState<string | null>(null);
+
+  const allScales = (() => {
+    const seen = new Map<string, { slug: string; label: string; sortOrder: number }>();
+    for (const section of slot.workout?.sections ?? []) {
+      for (const ex of section.exercises) {
+        for (const v of ex.variations ?? []) {
+          const slug = v.scale_level?.slug;
+          if (slug && !seen.has(slug)) {
+            seen.set(slug, {
+              slug,
+              label: v.scale_level?.label ?? slug,
+              sortOrder: v.scale_level?.sort_order ?? 0,
+            });
+          }
+        }
+      }
+    }
+    return Array.from(seen.values()).sort((a, b) =>
+      a.sortOrder !== b.sortOrder ? a.sortOrder - b.sortOrder : a.label.localeCompare(b.label),
+    );
+  })();
 
   async function handleSendMessage() {
     if (!messageText.trim()) return;
@@ -122,13 +145,13 @@ export function SlotPopup({
     >
       <div
         className="h-full w-full max-w-xl overflow-y-auto"
-        style={{ background: "#111118", borderLeft: "1px solid #1a1a28", paddingTop: "3.25rem" }}
+        style={{ background: "var(--panel)", borderLeft: "1px solid var(--border)", paddingTop: "3.25rem" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Sticky header — clears the top nav bar */}
         <div
           className="sticky top-0 z-10 flex items-center justify-between gap-4 px-6 py-4"
-          style={{ background: "#111118", borderBottom: "1px solid #1a1a28" }}
+          style={{ background: "var(--panel)", borderBottom: "1px solid var(--border)" }}
         >
           <p
             className="text-xs font-bold uppercase tracking-[0.24em]"
@@ -138,7 +161,7 @@ export function SlotPopup({
           </p>
           <button
             className="shrink-0 rounded-full px-3 py-1.5 text-sm font-semibold transition-colors"
-            style={{ background: "#1a1a28", color: "#c0c0d8" }}
+            style={{ background: "var(--card)", color: "var(--text-soft)" }}
             onClick={onClose}
             type="button"
           >
@@ -147,122 +170,173 @@ export function SlotPopup({
         </div>
 
         <div className="p-6">
-          <h2 className="text-3xl font-semibold" style={{ color: "#F0EDF8" }}>
-            {slot.workout?.title ?? "Scheduled class"}
-          </h2>
-          <p className="mt-2 text-sm" style={{ color: "#8888aa" }}>
-            {formatDateTime(slot.scheduled_at)}
-          </p>
-
-          {/* Info boxes */}
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
-            <div
-              className="rounded-[1.4rem] p-4"
-              style={{ background: "#0d0d18", border: "1px solid #1a1a28" }}
-            >
-              <p
-                className="text-xs font-semibold uppercase tracking-[0.22em]"
-                style={{ color: "#55556a" }}
-              >
-                Capacity
-              </p>
-              <p className="mt-2 text-2xl font-semibold" style={{ color: "#F0EDF8" }}>
-                {slot.approved_booking_count}/{slot.capacity}
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h2 className="text-3xl font-semibold" style={{ color: "var(--text)" }}>
+                {slot.workout?.title ?? "Scheduled class"}
+              </h2>
+              <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
+                {formatDateTime(slot.scheduled_at)}
               </p>
             </div>
-
-            <div
-              className="rounded-[1.4rem] p-4"
-              style={{ background: "#0d0d18", border: "1px solid #1a1a28" }}
+            <button
+              className="mt-1 shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-colors"
+              style={{
+                background: "color-mix(in srgb, var(--primary) 18%, transparent)",
+                color: "var(--primary-strong)",
+                border: "1px solid color-mix(in srgb, var(--primary) 45%, transparent)",
+              }}
+              onClick={() =>
+                downloadIcsEvent({
+                  title: slot.workout?.title ?? "Scheduled class",
+                  date: slot.scheduled_at.slice(0, 10),
+                  datetime: slot.scheduled_at,
+                  durationMinutes: 60,
+                })
+              }
+              type="button"
             >
-              <p
-                className="text-xs font-semibold uppercase tracking-[0.22em]"
-                style={{ color: "#55556a" }}
-              >
-                Participation approval
-              </p>
-              <p className="mt-2 text-base font-semibold" style={{ color: "#F0EDF8" }}>
-                {slot.auto_approve ? "Auto-confirmed" : "By coach"}
-              </p>
-            </div>
-
-            <div
-              className="rounded-[1.4rem] p-4"
-              style={{ background: "#0d0d18", border: "1px solid #1a1a28" }}
-            >
-              <p
-                className="text-xs font-semibold uppercase tracking-[0.22em]"
-                style={{ color: "#55556a" }}
-              >
-                Deadline to book
-              </p>
-              <p className="mt-2 text-sm font-semibold" style={{ color: "#F0EDF8" }}>
-                {deadline.relative}
-              </p>
-              <p className="mt-1 text-xs" style={{ color: "#8888aa" }}>
-                ({deadline.exact})
-              </p>
-            </div>
+              + Add to Calendar
+            </button>
           </div>
 
-          {/* Booking status */}
-          {slot.current_user_booking ? (
-            <div className="mt-6 space-y-3">
+          {/* Compact info strip (admin sees full detail; members get a summary) */}
+          {isAdmin ? (
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
               <div
-                className="rounded-[1.4rem] p-4 text-sm"
-                style={{
-                  background: "rgba(156,121,156,0.12)",
-                  border: "1px solid rgba(156,121,156,0.2)",
-                }}
+                className="rounded-[1.4rem] p-4"
+                style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
               >
-                Your booking is currently{" "}
-                <span className="font-semibold" style={{ color: "#9c799c" }}>
-                  {slot.current_user_booking.status}
-                </span>
-                .
-                {slot.current_user_booking.admin_message
-                  ? ` ${slot.current_user_booking.admin_message}`
-                  : null}
+                <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
+                  Capacity
+                </p>
+                <p className="mt-2 text-2xl font-semibold" style={{ color: "var(--text)" }}>
+                  {slot.approved_booking_count}/{slot.capacity}
+                </p>
               </div>
+              <div
+                className="rounded-[1.4rem] p-4"
+                style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
+                  Approval
+                </p>
+                <p className="mt-2 text-base font-semibold" style={{ color: "var(--text)" }}>
+                  {slot.auto_approve ? "Auto" : "Manual"}
+                </p>
+              </div>
+              <div
+                className="rounded-[1.4rem] p-4"
+                style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
+                  Book by
+                </p>
+                <p className="mt-2 text-sm font-semibold" style={{ color: "var(--text)" }}>
+                  {deadline.relative}
+                </p>
+                <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>({deadline.exact})</p>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span
+                className="rounded-full px-3 py-1 text-xs font-semibold"
+                style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--muted)" }}
+              >
+                {slot.spots_remaining} spot{slot.spots_remaining !== 1 ? "s" : ""} left
+              </span>
+              <span
+                className="rounded-full px-3 py-1 text-xs font-semibold"
+                style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--muted)" }}
+              >
+                Book by {deadline.relative}
+              </span>
+              {slot.auto_approve ? null : (
+                <span
+                  className="rounded-full px-3 py-1 text-xs font-semibold"
+                  style={{ background: "color-mix(in srgb, var(--warning) 14%, transparent)", border: "1px solid color-mix(in srgb, var(--warning) 30%, transparent)", color: "var(--warning)" }}
+                >
+                  Requires approval
+                </span>
+              )}
+            </div>
+          )}
 
-              {(slot.current_user_booking.status === "pending" ||
-                slot.current_user_booking.status === "approved") ? (
-                <div>
-                  {cancelError ? (
-                    <p className="mb-2 text-xs" style={{ color: "#e07a5f" }}>{cancelError}</p>
-                  ) : null}
-                  <button
-                    className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
-                    style={{
-                      background: "rgba(217,93,57,0.1)",
-                      border: "1px solid rgba(217,93,57,0.2)",
-                      color: "#d95d39",
-                    }}
-                    disabled={cancelling}
-                    onClick={() => void handleCancelBooking()}
-                    type="button"
-                  >
-                    {cancelling ? "Cancelling…" : "Cancel booking"}
-                  </button>
-                </div>
+          {/* Pending-approval banner */}
+          {slot.current_user_booking?.status === "pending" && !isAdmin ? (
+            <div
+              className="mt-5 rounded-[1.4rem] px-5 py-4 text-sm"
+              style={{
+                background: "color-mix(in srgb, var(--warning) 12%, transparent)",
+                border: "1px solid color-mix(in srgb, var(--warning) 30%, transparent)",
+              }}
+            >
+              <p className="font-semibold" style={{ color: "var(--warning)" }}>
+                Waiting for coach approval
+              </p>
+              <p className="mt-1" style={{ color: "var(--muted)" }}>
+                Your spot is reserved — you'll get a notification once approved.
+              </p>
+            </div>
+          ) : null}
+
+          {/* Approved booking confirmation */}
+          {slot.current_user_booking?.status === "approved" && !isAdmin ? (
+            <div
+              className="mt-5 rounded-[1.4rem] px-5 py-4 text-sm"
+              style={{
+                background: "color-mix(in srgb, var(--success) 12%, transparent)",
+                border: "1px solid color-mix(in srgb, var(--success) 30%, transparent)",
+              }}
+            >
+              <p className="font-semibold" style={{ color: "var(--success)" }}>You're confirmed ✓</p>
+              {slot.current_user_booking.admin_message ? (
+                <p className="mt-1" style={{ color: "var(--muted)" }}>
+                  {slot.current_user_booking.admin_message}
+                </p>
               ) : null}
+            </div>
+          ) : null}
+
+          {/* Cancel booking action */}
+          {slot.current_user_booking &&
+            (slot.current_user_booking.status === "pending" || slot.current_user_booking.status === "approved") &&
+            !isAdmin ? (
+            <div className="mt-3">
+              {cancelError ? (
+                <p className="mb-2 text-xs" style={{ color: "var(--danger)" }}>{cancelError}</p>
+              ) : null}
+              <button
+                className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
+                style={{
+                  background: "color-mix(in srgb, var(--danger) 10%, transparent)",
+                  border: "1px solid color-mix(in srgb, var(--danger) 24%, transparent)",
+                  color: "var(--danger)",
+                }}
+                disabled={cancelling}
+                onClick={() => void handleCancelBooking()}
+                type="button"
+              >
+                {cancelling ? "Cancelling…" : "Cancel booking"}
+              </button>
             </div>
           ) : null}
 
           {/* Workout preview */}
           <section
             className="mt-8 rounded-[1.8rem] p-5"
-            style={{ background: "#0d0d18", border: "1px solid #1a1a28" }}
+            style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
           >
             <div className="mb-4 flex items-center justify-between gap-3">
-              <h3 className="text-lg font-semibold" style={{ color: "#F0EDF8" }}>
+              <h3 className="text-lg font-semibold" style={{ color: "var(--text)" }}>
                 Workout
               </h3>
               {isAdmin ? (
                 <div className="flex gap-2">
                   <button
                     className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-                    style={{ background: "#1a1a28", color: "#c0c0d8" }}
+                    style={{ background: "var(--card)", color: "var(--text-soft)" }}
                     onClick={onEdit}
                     type="button"
                   >
@@ -271,7 +345,7 @@ export function SlotPopup({
                   {slot.workout ? (
                     <button
                       className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-                      style={{ background: "#1a1a28", color: "#c0c0d8" }}
+                      style={{ background: "var(--card)", color: "var(--text-soft)" }}
                       onClick={() => setEditWorkoutOpen(true)}
                       type="button"
                     >
@@ -282,10 +356,47 @@ export function SlotPopup({
               ) : null}
             </div>
 
+            {/* Scale chips — member-facing global scale selector */}
+            {!isAdmin && allScales.length > 0 ? (
+              <div className="mb-4 flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  className="rounded-full px-3 py-1 text-xs font-semibold"
+                  style={{
+                    background: activeScale === null ? "var(--primary)" : "var(--card)",
+                    color: activeScale === null ? "var(--primary-contrast)" : "var(--text-soft)",
+                    border: activeScale === null ? "1px solid var(--primary)" : "1px solid var(--border-strong)",
+                  }}
+                  onClick={() => setActiveScale(null)}
+                >
+                  Base
+                </button>
+                {allScales.map((scale) => (
+                  <button
+                    key={scale.slug}
+                    type="button"
+                    className="rounded-full px-3 py-1 text-xs font-semibold"
+                    style={{
+                      background: activeScale === scale.slug ? "var(--primary)" : "var(--card)",
+                      color: activeScale === scale.slug ? "var(--primary-contrast)" : "var(--text-soft)",
+                      border: activeScale === scale.slug ? "1px solid var(--primary)" : "1px solid var(--border-strong)",
+                    }}
+                    onClick={() => setActiveScale(scale.slug)}
+                  >
+                    {scale.label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+
             {slot.workout ? (
-              <WorkoutPreviewDetail sections={slot.workout.sections} />
+              <WorkoutPreviewDetail
+                sections={slot.workout.sections}
+                activeScaleOverride={!isAdmin ? activeScale : undefined}
+                hideScaleChips={!isAdmin}
+              />
             ) : (
-              <p className="text-sm" style={{ color: "#3a3a55" }}>
+              <p className="text-sm" style={{ color: "var(--dim)" }}>
                 No workout assigned to this slot.
               </p>
             )}
@@ -293,7 +404,7 @@ export function SlotPopup({
             {canBook ? (
               <button
                 className="mt-5 w-full rounded-full px-5 py-3 text-sm font-semibold"
-                style={{ background: "#F0EDF8", color: "#0A0A0F" }}
+                style={{ background: "var(--text)", color: "var(--bg)" }}
                 onClick={onBook}
                 type="button"
               >
@@ -302,56 +413,70 @@ export function SlotPopup({
             ) : unavailableReason ? (
               <p
                 className="mt-5 rounded-[1.2rem] px-4 py-3 text-sm"
-                style={{ background: "#1a1a28", color: "#55556a" }}
+                style={{ background: "var(--card)", color: "var(--dim)" }}
               >
                 {unavailableReason}
               </p>
             ) : null}
           </section>
 
-          {/* Message to coach (members only) */}
+          {/* Chat section (members only) */}
           {!isAdmin ? (
             <section
               className="mt-6 rounded-[1.8rem] p-5"
-              style={{ background: "#0d0d18", border: "1px solid #1a1a28" }}
+              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
             >
-              <h3 className="mb-3 text-base font-semibold" style={{ color: "#F0EDF8" }}>
+              <h3 className="mb-1 text-base font-semibold" style={{ color: "var(--text)" }}>
                 Message your coach
               </h3>
+              <p className="mb-4 text-xs" style={{ color: "var(--dim)" }}>
+                Ask a question or leave a note about this class.
+              </p>
               {messageSent ? (
-                <p
-                  className="rounded-[1.2rem] px-4 py-3 text-sm font-semibold"
-                  style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", color: "#34d399" }}
+                <div
+                  className="flex items-start gap-3 rounded-[1.2rem] px-4 py-3"
+                  style={{
+                    background: "color-mix(in srgb, var(--success) 10%, transparent)",
+                    border: "1px solid color-mix(in srgb, var(--success) 24%, transparent)",
+                  }}
                 >
-                  Message sent to your coach.
-                </p>
+                  <span style={{ color: "var(--success)" }}>✓</span>
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: "var(--success)" }}>
+                      Message sent
+                    </p>
+                    <p className="mt-0.5 text-xs" style={{ color: "var(--muted)" }}>
+                      Your coach will see it before the class.
+                    </p>
+                  </div>
+                </div>
               ) : (
                 <div className="space-y-2">
-                  <textarea
-                    className="w-full resize-none rounded-[1rem] px-4 py-3 text-sm outline-none"
-                    style={{
-                      background: "#111118",
-                      border: "1px solid #1a1a28",
-                      color: "#F0EDF8",
-                      minHeight: "80px",
-                    }}
-                    placeholder="Ask a question or leave a note for this class..."
-                    value={messageText}
-                    onChange={(e) => setMessageText(e.target.value)}
-                    maxLength={1000}
-                  />
-                  {messageError ? (
-                    <p className="text-xs" style={{ color: "#e07a5f" }}>{messageError}</p>
-                  ) : null}
-                  <button
-                    className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-40"
-                    style={{ background: "#1a1a28", color: "#c0c0d8" }}
-                    disabled={messageSending || !messageText.trim()}
-                    onClick={() => void handleSendMessage()}
-                    type="button"
+                  <div
+                    className="flex gap-3 rounded-[1.4rem] p-3"
+                    style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
                   >
-                    {messageSending ? "Sending…" : "Send message"}
-                  </button>
+                    <textarea
+                      className="flex-1 resize-none bg-transparent text-sm outline-none"
+                      style={{ color: "var(--text)", minHeight: "64px" }}
+                      placeholder="Type your message…"
+                      value={messageText}
+                      onChange={(e) => setMessageText(e.target.value)}
+                      maxLength={1000}
+                    />
+                    <button
+                      className="self-end shrink-0 rounded-2xl px-4 py-2 text-sm font-semibold disabled:opacity-40"
+                      style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+                      disabled={messageSending || !messageText.trim()}
+                      onClick={() => void handleSendMessage()}
+                      type="button"
+                    >
+                      {messageSending ? "…" : "Send"}
+                    </button>
+                  </div>
+                  {messageError ? (
+                    <p className="text-xs" style={{ color: "var(--danger)" }}>{messageError}</p>
+                  ) : null}
                 </div>
               )}
             </section>
@@ -361,36 +486,36 @@ export function SlotPopup({
           {isAdmin ? (
             <section
               className="mt-8 rounded-[1.8rem] p-5"
-              style={{ background: "#0d0d18", border: "1px solid #1a1a28" }}
+              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
             >
-              <h3 className="text-lg font-semibold" style={{ color: "#F0EDF8" }}>
+              <h3 className="text-lg font-semibold" style={{ color: "var(--text)" }}>
                 Bookings
               </h3>
               <div className="mt-4 space-y-3">
                 {slot.bookings.length === 0 ? (
-                  <p className="text-sm" style={{ color: "#3a3a55" }}>
+                  <p className="text-sm" style={{ color: "var(--dim)" }}>
                     No bookings yet.
                   </p>
                 ) : null}
                 {slot.bookings.map((booking) => (
                   <div
                     className="rounded-[1.2rem] p-4"
-                    style={{ background: "#111118", border: "1px solid #1a1a28" }}
+                    style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
                     key={booking.id}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-sm font-semibold" style={{ color: "#F0EDF8" }}>
+                        <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
                           {booking.user_nickname ?? booking.user_id}
                         </p>
                         <p
                           className="mt-1 text-xs uppercase tracking-[0.18em]"
-                          style={{ color: "#55556a" }}
+                          style={{ color: "var(--dim)" }}
                         >
                           {booking.status}
                         </p>
                         {booking.admin_message ? (
-                          <p className="mt-2 text-sm" style={{ color: "#8888aa" }}>
+                          <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
                             {booking.admin_message}
                           </p>
                         ) : null}
@@ -400,7 +525,7 @@ export function SlotPopup({
                         <div className="flex gap-2">
                           <button
                             className="rounded-full px-3 py-2 text-xs font-semibold"
-                            style={{ background: "#F0EDF8", color: "#0A0A0F" }}
+                            style={{ background: "var(--text)", color: "var(--bg)" }}
                             onClick={() => onApproveBooking(booking)}
                             type="button"
                           >
@@ -409,9 +534,9 @@ export function SlotPopup({
                           <button
                             className="rounded-full px-3 py-2 text-xs font-semibold"
                             style={{
-                              background: "rgba(217,93,57,0.12)",
-                              border: "1px solid rgba(217,93,57,0.25)",
-                              color: "#d95d39",
+                              background: "color-mix(in srgb, var(--danger) 12%, transparent)",
+                              border: "1px solid color-mix(in srgb, var(--danger) 25%, transparent)",
+                              color: "var(--danger)",
                             }}
                             onClick={() => onRejectBooking(booking)}
                             type="button"

@@ -179,8 +179,10 @@ export function ScheduleConsole({
     if (!initialOpenSlotId || initialOpenHandledRef.current || schedule.length === 0) return;
     const slot = schedule.find((s) => s.id === initialOpenSlotId);
     if (slot) {
-      setSelectedSlot(slot);
       initialOpenHandledRef.current = true;
+      const frame = window.requestAnimationFrame(() => setSelectedSlot(slot));
+
+      return () => window.cancelAnimationFrame(frame);
     }
   }, [initialOpenSlotId, schedule]);
 
@@ -305,26 +307,27 @@ export function ScheduleConsole({
   }
 
   return (
-    <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "#0A0A0F" }}>
+    <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-7xl space-y-8">
-        <section className="rounded-[2.4rem] px-8 py-6" style={{ background: "#111118", border: "1px solid #1a1a28" }}>
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#d95d39]">Class Schedule</p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight" style={{ color: "#F0EDF8" }}>{pageTitle}</h1>
+        <section className="rounded-[2.4rem] px-8 py-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">Class Schedule</p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight" style={{ color: "var(--text)" }}>{pageTitle}</h1>
         </section>
 
-        <section className="rounded-[2rem] p-6" style={{ background: "#111118", border: "1px solid #1a1a28" }}>
+
+        <section className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
             <TypeFilterChips value={trainingType} onChange={setTrainingType} />
 
             <div className="flex flex-wrap gap-3">
-              <div className="flex rounded-full p-1" style={{ background: "#0d0d18", border: "1px solid #1a1a28" }}>
+              <div className="flex rounded-full p-1" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
                 {[3, 7, 30].map((value) => (
                   <button
                     className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
                     style={
                       days === value
-                        ? { background: "#F0EDF8", color: "#0A0A0F" }
-                        : { color: "#55556a" }
+                        ? { background: "var(--text)", color: "var(--bg)" }
+                        : { color: "var(--dim)" }
                     }
                     key={value}
                     onClick={() => setDays(value as 3 | 7 | 30)}
@@ -346,7 +349,7 @@ export function ScheduleConsole({
                   <button
                     key={label}
                     className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-                    style={{ background: "#111118", border: "1px solid #1a1a28", color: "#c0c0d8" }}
+                    style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
                     onClick={handler}
                     type="button"
                   >
@@ -359,13 +362,13 @@ export function ScheduleConsole({
         </section>
 
         {error ? (
-          <div className="rounded-[1.6rem] px-5 py-4 text-sm" style={{ background: "#d95d39]/10", border: "1px solid #d95d3930", color: "#e07a5f" }}>
+          <div className="rounded-[1.6rem] px-5 py-4 text-sm" style={{ background: "var(--primary)]/10", border: "1px solid var(--primary)30", color: "var(--primary-strong)" }}>
             {error}
           </div>
         ) : null}
 
         {loading ? (
-          <section className="rounded-[2rem] p-10 text-center text-sm font-semibold uppercase tracking-[0.24em]" style={{ background: "#111118", border: "1px solid #1a1a28", color: "#55556a" }}>
+          <section className="rounded-[2rem] p-10 text-center text-sm font-semibold uppercase tracking-[0.24em]" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--dim)" }}>
             Loading schedule...
           </section>
         ) : (
@@ -438,17 +441,17 @@ export function ScheduleConsole({
 
       {editor ? (
         <div className="fixed inset-0 z-40 flex items-center justify-center px-4" style={{ background: "rgba(0,0,0,0.7)" }}>
-          <div className="w-full max-w-2xl rounded-[2rem] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.7)]" style={{ background: "#111118", border: "1px solid #1a1a28" }}>
+          <div className="w-full max-w-2xl rounded-[2rem] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.7)]" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#d95d39]">Admin slot editor</p>
-                <h3 className="mt-3 text-2xl font-semibold" style={{ color: "#F0EDF8" }}>
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">Admin slot editor</p>
+                <h3 className="mt-3 text-2xl font-semibold" style={{ color: "var(--text)" }}>
                   {editor.slotId ? "Edit scheduled class" : "Create scheduled class"}
                 </h3>
               </div>
               <button
                 className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-                style={{ background: "#1a1a28", color: "#c0c0d8" }}
+                style={{ background: "var(--border)", color: "var(--text-soft)" }}
                 onClick={() => setEditor(null)}
                 type="button"
               >
@@ -464,12 +467,12 @@ export function ScheduleConsole({
                 { label: "Capacity", type: "number-cap" as const },
                 { label: "Timeout minutes", type: "number-timeout" as const },
               ].map(({ label, type }) => (
-                <label key={label} className="space-y-2 text-sm font-semibold" style={{ color: "#8888aa" }}>
+                <label key={label} className="space-y-2 text-sm font-semibold" style={{ color: "var(--muted)" }}>
                   <span>{label}</span>
                   {type === "select" ? (
                     <select
                       className="w-full rounded-2xl px-4 py-3 outline-none"
-                      style={{ background: "#0d0d18", border: "1px solid #1a1a28", color: "#F0EDF8" }}
+                      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                       onChange={(event) =>
                         setEditor((current) =>
                           current ? { ...current, values: { ...current.values, master_workout_id: event.target.value } } : current,
@@ -484,7 +487,7 @@ export function ScheduleConsole({
                   ) : type === "select-type" ? (
                     <select
                       className="w-full rounded-2xl px-4 py-3 outline-none"
-                      style={{ background: "#0d0d18", border: "1px solid #1a1a28", color: "#F0EDF8" }}
+                      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                       onChange={(event) =>
                         setEditor((current) =>
                           current ? { ...current, values: { ...current.values, training_type: event.target.value as TrainingType } } : current,
@@ -499,7 +502,7 @@ export function ScheduleConsole({
                   ) : type === "datetime" ? (
                     <input
                       className="w-full rounded-2xl px-4 py-3 outline-none"
-                      style={{ background: "#0d0d18", border: "1px solid #1a1a28", color: "#F0EDF8" }}
+                      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                       onChange={(event) =>
                         setEditor((current) =>
                           current ? { ...current, values: { ...current.values, scheduled_at: toIsoDateTime(event.target.value) } } : current,
@@ -511,7 +514,7 @@ export function ScheduleConsole({
                   ) : type === "number-cap" ? (
                     <input
                       className="w-full rounded-2xl px-4 py-3 outline-none"
-                      style={{ background: "#0d0d18", border: "1px solid #1a1a28", color: "#F0EDF8" }}
+                      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                       min={1}
                       onChange={(event) =>
                         setEditor((current) =>
@@ -524,7 +527,7 @@ export function ScheduleConsole({
                   ) : (
                     <input
                       className="w-full rounded-2xl px-4 py-3 outline-none"
-                      style={{ background: "#0d0d18", border: "1px solid #1a1a28", color: "#F0EDF8" }}
+                      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                       min={1}
                       onChange={(event) =>
                         setEditor((current) =>
@@ -539,7 +542,7 @@ export function ScheduleConsole({
               ))}
             </div>
 
-            <label className="mt-4 flex items-center gap-3 text-sm font-semibold" style={{ color: "#8888aa" }}>
+            <label className="mt-4 flex items-center gap-3 text-sm font-semibold" style={{ color: "var(--muted)" }}>
               <input
                 checked={editor.values.auto_approve}
                 onChange={(event) =>
@@ -556,7 +559,7 @@ export function ScheduleConsole({
               {editor.slotId ? (
                 <button
                   className="rounded-full px-4 py-2 text-sm font-semibold"
-                  style={{ background: "rgba(217,93,57,0.12)", border: "1px solid rgba(217,93,57,0.25)", color: "#d95d39" }}
+                  style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 25%, transparent)", color: "var(--primary)" }}
                   onClick={() => void removeEditedSlot()}
                   type="button"
                 >
@@ -567,7 +570,7 @@ export function ScheduleConsole({
               <div className="flex gap-3">
                 <button
                   className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-                  style={{ background: "#1a1a28", color: "#c0c0d8" }}
+                  style={{ background: "var(--border)", color: "var(--text-soft)" }}
                   onClick={() => setEditor(null)}
                   type="button"
                 >
@@ -575,7 +578,7 @@ export function ScheduleConsole({
                 </button>
                 <button
                   className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
-                  style={{ background: "#F0EDF8", color: "#0A0A0F" }}
+                  style={{ background: "var(--text)", color: "var(--bg)" }}
                   disabled={busy || !editor.values.master_workout_id}
                   onClick={() => void saveSlot()}
                   type="button"

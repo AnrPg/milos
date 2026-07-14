@@ -24,8 +24,8 @@ export function TypeFilterChips({ value, onChange }: TypeFilterChipsProps) {
         className="rounded-full border px-4 py-2 text-sm font-semibold transition-colors"
         style={
           value === null
-            ? { background: "#F0EDF8", borderColor: "#F0EDF8", color: "#0A0A0F" }
-            : { background: "transparent", borderColor: "#1a1a28", color: "#55556a" }
+            ? { background: "var(--text)", borderColor: "var(--text)", color: "var(--bg)" }
+            : { background: "transparent", borderColor: "var(--border)", color: "var(--dim)" }
         }
         onClick={() => onChange(null)}
         type="button"
@@ -34,15 +34,15 @@ export function TypeFilterChips({ value, onChange }: TypeFilterChipsProps) {
       </button>
 
       {TYPES.map((type) => {
-        const color = WORKOUT_TYPE_COLORS[type.value] ?? "#d95d39";
+        const color = WORKOUT_TYPE_COLORS[type.value] ?? "var(--primary)";
         return (
           <button
             key={type.value}
             className="rounded-full border px-4 py-2 text-sm font-semibold transition-colors"
             style={
               value === type.value
-                ? { background: color, borderColor: color, color: "#fff" }
-                : { background: "transparent", borderColor: "#1a1a28", color: "#55556a" }
+                ? { background: color, borderColor: color, color: "var(--bg)" }
+                : { background: "transparent", borderColor: "var(--border)", color: "var(--dim)" }
             }
             onClick={() => onChange(type.value === value ? null : type.value)}
             type="button"

@@ -51,12 +51,12 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
     return (
       <div>
         <div className="mb-3 flex items-center">
-          <h2 className="text-lg font-bold" style={{ color: "#F0EDF8" }}>{monthLabel}</h2>
+          <h2 className="text-lg font-bold" style={{ color: "var(--text)" }}>{monthLabel}</h2>
         </div>
         {/* Day-of-week header */}
         <div className="mb-1 grid grid-cols-7 gap-1">
           {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((label) => (
-            <div key={label} className="py-1 text-center text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#55556a" }}>
+            <div key={label} className="py-1 text-center text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>
               {label}
             </div>
           ))}
@@ -74,23 +74,23 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
                 key={date}
                 className="min-h-[5.5rem] rounded-xl p-1.5"
                 style={{
-                  background: outsideMonth ? "transparent" : "#111118",
-                  border: `1px solid ${isToday ? "#d95d39" : outsideMonth ? "transparent" : "#1a1a28"}`,
+                  background: outsideMonth ? "transparent" : "var(--panel)",
+                  border: `1px solid ${isToday ? "var(--primary)" : outsideMonth ? "transparent" : "var(--border)"}`,
                 }}
               >
                 <div className="flex items-center justify-between">
                   <span
                     className="flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold"
                     style={{
-                      background: isToday ? "#d95d39" : "transparent",
-                      color: isToday ? "#fff" : outsideMonth ? "#2a2a3a" : "#F0EDF8",
+                      background: isToday ? "var(--primary)" : "transparent",
+                      color: isToday ? "var(--primary-contrast)" : outsideMonth ? "var(--border-strong)" : "var(--text)",
                     }}
                   >
                     {dayNum}
                   </span>
                   {isAdmin && !outsideMonth ? (
                     <button
-                      className="text-[11px] font-bold leading-none text-[#d95d39] hover:opacity-70"
+                      className="text-[11px] font-bold leading-none text-[var(--primary)] hover:opacity-70"
                       onClick={() => onCreateSlot(date)}
                       type="button"
                     >
@@ -99,12 +99,12 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
                   ) : null}
                 </div>
                 {daySlots.slice(0, 3).map((slot) => {
-                  const slotColor = WORKOUT_TYPE_COLORS[slot.training_type] ?? "#d95d39";
+                  const slotColor = WORKOUT_TYPE_COLORS[slot.training_type] ?? "var(--primary)";
                   return (
                     <button
                       key={slot.id}
                       className="mt-0.5 w-full truncate rounded px-1 py-0.5 text-left text-[9px] font-semibold transition-opacity hover:opacity-80"
-                      style={{ background: `${slotColor}26`, color: slotColor }}
+                      style={{ background: `color-mix(in srgb, ${slotColor} 15%, transparent)`, color: slotColor }}
                       onClick={() => onSelectSlot(slot)}
                       type="button"
                     >
@@ -113,7 +113,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
                   );
                 })}
                 {daySlots.length > 3 ? (
-                  <p className="mt-0.5 text-[9px]" style={{ color: "#55556a" }}>+{daySlots.length - 3} more</p>
+                  <p className="mt-0.5 text-[9px]" style={{ color: "var(--dim)" }}>+{daySlots.length - 3} more</p>
                 ) : null}
               </section>
             );
@@ -138,8 +138,8 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
             <section
               className="rounded-[1.8rem] p-4"
               style={{
-                background: "#111118",
-                border: `1px solid ${isToday ? "#d95d39" : "#1a1a28"}`,
+                background: "var(--panel)",
+                border: `1px solid ${isToday ? "var(--primary)" : "var(--border)"}`,
                 minHeight: days === 3 ? "16rem" : "10rem",
               }}
               key={date}
@@ -148,16 +148,16 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
                 <div>
                   {days === 3 ? (
                     <>
-                      <p className="text-base font-bold" style={{ color: "#F0EDF8" }}>{weekday}</p>
+                      <p className="text-base font-bold" style={{ color: "var(--text)" }}>{weekday}</p>
                       <p className="mt-0.5 text-xs">
-                        <span style={{ color: "#55556a" }}>{formatDayLabel(date).split(", ").slice(1, 2).join("").split(" ")[0]} </span>
-                        <span style={{ color: isToday ? "#d95d39" : "#8888aa" }}>{day}</span>
+                        <span style={{ color: "var(--dim)" }}>{formatDayLabel(date).split(", ").slice(1, 2).join("").split(" ")[0]} </span>
+                        <span style={{ color: isToday ? "var(--primary)" : "var(--muted)" }}>{day}</span>
                       </p>
                     </>
                   ) : (
                     <>
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>{weekday}</p>
-                      <p className="mt-0.5 text-lg font-bold" style={{ color: isToday ? "#d95d39" : "#F0EDF8" }}>{day}</p>
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{weekday}</p>
+                      <p className="mt-0.5 text-lg font-bold" style={{ color: isToday ? "var(--primary)" : "var(--text)" }}>{day}</p>
                     </>
                   )}
                 </div>
@@ -165,7 +165,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
                 {isAdmin ? (
                   <button
                     className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
-                    style={{ background: "rgba(217,93,57,0.12)", border: "1px solid rgba(217,93,57,0.2)", color: "#d95d39" }}
+                    style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)", color: "var(--primary)" }}
                     onClick={() => onCreateSlot(date)}
                     type="button"
                   >
@@ -179,14 +179,14 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
                   isAdmin ? (
                     <button
                       className="w-full rounded-[1.2rem] px-4 py-6 text-left text-sm transition-colors"
-                      style={{ border: "1px dashed #1a1a28", color: "#2a2a3a" }}
+                      style={{ border: "1px dashed var(--border)", color: "var(--border-strong)" }}
                       onClick={() => onCreateSlot(date)}
                       type="button"
                     >
                       Add the first class slot for this day.
                     </button>
                   ) : (
-                    <p className="rounded-[1.2rem] px-4 py-6 text-sm" style={{ border: "1px dashed #1a1a28", color: "#2a2a3a" }}>
+                    <p className="rounded-[1.2rem] px-4 py-6 text-sm" style={{ border: "1px dashed var(--border)", color: "var(--border-strong)" }}>
                       No classes scheduled for this day.
                     </p>
                   )
@@ -206,23 +206,23 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
 function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact: boolean; onSelectSlot: (slot: ScheduleSlot) => void }) {
   const isPast = new Date(slot.scheduled_at) <= new Date();
   const isUnavailable = !slot.current_user_booking && (slot.spots_remaining === 0 || isPast);
-  const typeColor = WORKOUT_TYPE_COLORS[slot.training_type] ?? "#d95d39";
+  const typeColor = WORKOUT_TYPE_COLORS[slot.training_type] ?? "var(--primary)";
 
   if (compact) {
     return (
       <button
         className="w-full truncate rounded-[0.9rem] p-2.5 text-left transition-all"
         style={{
-          background: isUnavailable ? "#0d0d18" : "#151520",
-          border: `1px solid ${isUnavailable ? "#111118" : "#1e1e2e"}`,
+          background: isUnavailable ? "var(--panel-muted)" : "var(--panel-muted)",
+          border: `1px solid ${isUnavailable ? "var(--panel)" : "var(--border)"}`,
         }}
         onClick={() => onSelectSlot(slot)}
         type="button"
       >
-        <p className="text-xs font-semibold" style={{ color: isUnavailable ? "#3a3a55" : "#F0EDF8" }}>
+        <p className="text-xs font-semibold" style={{ color: isUnavailable ? "var(--dim)" : "var(--text)" }}>
           {new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" }).format(new Date(slot.scheduled_at))}
         </p>
-        <p className="truncate text-[10px] uppercase tracking-[0.14em]" style={{ color: isUnavailable ? "#3a3a55" : typeColor }}>
+        <p className="truncate text-[10px] uppercase tracking-[0.14em]" style={{ color: isUnavailable ? "var(--dim)" : typeColor }}>
           {trainingTypeLabel(slot.training_type)}
         </p>
       </button>
@@ -233,35 +233,35 @@ function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact
     <button
       className="w-full rounded-[1.3rem] p-4 text-left transition-all"
       style={{
-        background: isUnavailable ? "#0d0d18" : "#151520",
-        border: `1px solid ${isUnavailable ? "#111118" : "#1e1e2e"}`,
+        background: isUnavailable ? "var(--panel-muted)" : "var(--panel-muted)",
+        border: `1px solid ${isUnavailable ? "var(--panel)" : "var(--border)"}`,
       }}
       onClick={() => onSelectSlot(slot)}
       type="button"
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold" style={{ color: isUnavailable ? "#3a3a55" : "#F0EDF8" }}>
+          <p className="text-sm font-semibold" style={{ color: isUnavailable ? "var(--dim)" : "var(--text)" }}>
             {new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" }).format(new Date(slot.scheduled_at))}
           </p>
-          <p className="mt-1 text-sm" style={{ color: isUnavailable ? "#2a2a3a" : "#8888aa" }}>
+          <p className="mt-1 text-sm" style={{ color: isUnavailable ? "var(--border-strong)" : "var(--muted)" }}>
             {slot.workout?.title ?? "Workout preview unavailable"}
           </p>
         </div>
         <span
           className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]"
           style={{
-            background: isUnavailable ? "#1a1a28" : `${typeColor}26`,
-            color: isUnavailable ? "#3a3a55" : typeColor,
+            background: isUnavailable ? "var(--border)" : `color-mix(in srgb, ${typeColor} 15%, transparent)`,
+            color: isUnavailable ? "var(--dim)" : typeColor,
           }}
         >
           {trainingTypeLabel(slot.training_type)}
         </span>
       </div>
 
-      <div className="mt-3 flex items-center justify-between text-xs" style={{ color: "#3a3a55" }}>
+      <div className="mt-3 flex items-center justify-between text-xs" style={{ color: "var(--dim)" }}>
         <span>{slot.approved_booking_count}/{slot.capacity} booked</span>
-        <span style={{ color: slot.current_user_booking ? "#9c799c" : isUnavailable ? "#2a2a3a" : "#55556a" }}>
+        <span style={{ color: slot.current_user_booking ? "var(--primary)" : isUnavailable ? "var(--border-strong)" : "var(--dim)" }}>
           {slotStatusLabel(slot, isPast)}
         </span>
       </div>
