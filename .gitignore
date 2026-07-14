@@ -5,7 +5,8 @@ apps/api/.elixir_ls/
 apps/api/priv/static/uploads/
 
 # Node
-apps/web/node_modules/
+# No leading path: matches node_modules at any depth, not just apps/web.
+node_modules/
 apps/web/.next/
 apps/web/.env*.local
 
@@ -17,6 +18,11 @@ apps/web/.env*.local
 
 # Superpowers
 .superpowers/
+
+# Local tooling — machine-specific, not shared
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.playwright-mcp/
 
 # Env files
 .env
