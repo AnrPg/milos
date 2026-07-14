@@ -9,7 +9,8 @@ defmodule MilosTraining.Application.RescheduleAssignedWorkout do
          :ok <- guard_future_date(new_date),
          assignment when not is_nil(assignment) <- Workouts.get_assigned_workout(assignment_id),
          :ok <- verify_athlete_access(assignment, athlete_id),
-         {:ok, updated} <- Workouts.update_assignment_date(assignment_id, assignment.scheduled_for, new_date) do
+         {:ok, updated} <-
+           Workouts.update_assignment_date(assignment_id, athlete_id, new_date) do
       notify_admins_workout_moved(assignment, updated, athlete_id)
       broadcast_assignment_refresh(assignment, athlete_id)
       {:ok, updated}
@@ -45,7 +46,7 @@ defmodule MilosTraining.Application.RescheduleAssignedWorkout do
     athlete = Identity.find_by_id(athlete_id)
     athlete_nickname = (athlete && athlete.nickname) || "An athlete"
     workout_title = updated |> Map.get(:workout, %{}) |> Map.get(:title, "a workout")
-    from_date = assignment.scheduled_for
+    from_date = athlete_scheduled_for(assignment, athlete_id)
     to_date = Map.get(updated, :scheduled_for, "")
 
     Notifications.dispatch_event(:workout_moved, %{
@@ -55,6 +56,12 @@ defmodule MilosTraining.Application.RescheduleAssignedWorkout do
       from_date: from_date,
       to_date: to_date
     })
+  end
+
+  defp athlete_scheduled_for(assignment, athlete_id) do
+    assignment
+    |> Map.get(:athlete_scheduled_for, %{})
+    |> Map.get(athlete_id, assignment.scheduled_for)
   end
 
   defp broadcast_assignment_refresh(assignment, athlete_id) do

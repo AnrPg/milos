@@ -2,7 +2,7 @@ defmodule MilosTrainingWeb.WorkoutController do
   use MilosTrainingWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias MilosTraining.Workouts
+  alias MilosTraining.Application.{GetMaterializedWorkout, GetPublishedWorkout}
   alias OpenApiSpex.{Parameter, Schema}
 
   action_fallback MilosTrainingWeb.FallbackController
@@ -59,16 +59,14 @@ defmodule MilosTrainingWeb.WorkoutController do
   )
 
   def show(conn, %{"id" => id}) do
-    case Workouts.get_workout(id) do
-      nil -> {:error, :not_found}
-      workout -> json(conn, %{workout: workout})
+    with {:ok, workout} <- GetPublishedWorkout.call(id) do
+      json(conn, %{workout: workout})
     end
   end
 
   def scales(conn, %{"id" => id}) do
-    case Workouts.materialize_workout(id) do
-      nil -> {:error, :not_found}
-      payload -> json(conn, payload)
+    with {:ok, payload} <- GetMaterializedWorkout.call(id) do
+      json(conn, payload)
     end
   end
 end

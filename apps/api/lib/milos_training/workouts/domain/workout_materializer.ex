@@ -16,9 +16,8 @@ defmodule MilosTraining.Workouts.Domain.WorkoutMaterializer do
   end
 
   def materialize_all(workout) do
-    Enum.map(available_scales(workout), fn scale_level ->
-      materialize(workout, scale_level.slug)
-    end)
+    scales = available_scales(workout)
+    Enum.map(scales, fn scale_level -> materialize_with_scale(workout, scale_level) end)
   end
 
   @doc """
@@ -27,15 +26,18 @@ defmodule MilosTraining.Workouts.Domain.WorkoutMaterializer do
   """
   def materialize(workout, scale_slug) do
     scale_level = Enum.find(available_scales(workout), &(&1.slug == scale_slug))
+    materialize_with_scale(workout, scale_level)
+  end
 
+  defp materialize_with_scale(workout, scale_level) do
     sections =
       Enum.map(workout.sections, fn section ->
         exercises =
           Enum.map(section.exercises, fn exercise ->
-            apply_variation(exercise, scale_slug)
+            apply_variation(exercise, scale_level.slug)
           end)
 
-        %{section | exercises: exercises}
+        Map.put(section, :exercises, exercises)
       end)
 
     workout

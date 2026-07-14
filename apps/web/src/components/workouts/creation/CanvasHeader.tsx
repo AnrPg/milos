@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-import { publishWorkout } from "@/api/workouts";
+import { publishWorkoutDraft } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { completionSummary, isPublishReady, useWorkoutCreationStore } from "@/stores/workout-creation";
-import type { WorkoutType } from "@/types/workout";
+import { FORMAT_EXERCISE_CONTEXT, type WorkoutType } from "@/types/workout";
 
 const WORKOUT_TYPES: WorkoutType[] = [
   "crossfit",
@@ -58,13 +58,15 @@ function publishValidationMessages({
   if (sections.length === 0) messages.push("Add at least one section");
 
   sections.forEach((section, sectionIndex) => {
+    const ctx = FORMAT_EXERCISE_CONTEXT[section.format];
     const sectionLabel = section.name.trim() || `Section ${sectionIndex + 1}`;
+    const needsExercises = section.format !== "rest" && section.format !== "kcal_target";
 
     if (!section.name.trim()) {
       messages.push(`${sectionLabel}: add a section name`);
     }
 
-    if (section.exercises.length === 0) {
+    if (needsExercises && section.exercises.length === 0) {
       messages.push(`${sectionLabel}: add at least one exercise`);
     }
 
@@ -75,11 +77,11 @@ function publishValidationMessages({
         messages.push(`${sectionLabel}: ${exerciseLabel} needs a name`);
       }
 
-      if (exercise.sets <= 0) {
+      if (ctx.showSets && exercise.sets <= 0) {
         messages.push(`${sectionLabel}: ${exerciseLabel} needs sets`);
       }
 
-      if (exercise.prescriptionValue <= 0) {
+      if (ctx.showPrescription && !ctx.prescriptionHint && !ctx.ladderPrescription && exercise.prescriptionValue <= 0) {
         messages.push(`${sectionLabel}: ${exerciseLabel} needs a prescription`);
       }
     });
@@ -90,14 +92,23 @@ function publishValidationMessages({
 
 export function CanvasHeader() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { tokens } = useSession();
-  const { draftId, title, type, sections, setTitle, setType } = useWorkoutCreationStore();
+  const { draftId, title, type, isTeamWorkout, sections, setTitle, setType, setIsTeamWorkout } = useWorkoutCreationStore();
+  const toApiPayload = useWorkoutCreationStore((state) => state.toApiPayload);
   const [publishing, setPublishing] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
+
+  const isReopen = searchParams.get("is_reopen") === "true";
+  const substituteForAssignment = searchParams.get("substitute_for_assignment");
+  const substituteForSlot = searchParams.get("substitute_for_slot");
+  const isSubstitute = Boolean(substituteForAssignment ?? substituteForSlot);
 
   const ready = isPublishReady({ title, type, sections });
   const summary = completionSummary(sections);
   const publishMessages = publishValidationMessages({ title, type, sections });
+
+  const publishLabel = isReopen || isSubstitute ? "Apply changes" : "Publish";
 
   async function handlePublish() {
     if (!draftId || !tokens?.access_token || !ready) return;
@@ -106,7 +117,15 @@ export function CanvasHeader() {
     setPublishError(null);
 
     try {
-      await publishWorkout(tokens.access_token, draftId);
+      const payload = toApiPayload() as Record<string, unknown>;
+
+      if (substituteForAssignment) {
+        payload.substitute_for = { type: "assignment", id: substituteForAssignment };
+      } else if (substituteForSlot) {
+        payload.substitute_for = { type: "slot", id: substituteForSlot };
+      }
+
+      await publishWorkoutDraft(tokens.access_token, draftId, payload);
       router.push("/admin/workouts");
     } catch (error: unknown) {
       setPublishError(error instanceof Error ? error.message : "Publish failed");
@@ -116,12 +135,21 @@ export function CanvasHeader() {
 
   return (
     <header
-      className="flex shrink-0 items-center gap-4 border-b px-6 py-3"
-      style={{
-        background: "var(--panel)",
-        borderColor: "var(--dim)",
-      }}
+      className="flex shrink-0 flex-col border-b"
+      style={{ background: "var(--panel)", borderColor: "var(--dim)" }}
     >
+      {isReopen && !isSubstitute ? (
+        <div className="px-6 py-2 text-xs font-semibold" style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", color: "var(--primary)", borderBottom: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)" }}>
+          Editing a live workout — changes will affect all assignments and classes when published
+        </div>
+      ) : isSubstitute ? (
+        <div className="px-6 py-2 text-xs font-semibold" style={{ background: "color-mix(in srgb, var(--success) 8%, transparent)", color: "var(--success)", borderBottom: "1px solid color-mix(in srgb, var(--success) 15%, transparent)" }}>
+          {substituteForAssignment
+            ? "Publishing will replace the workout for this assignment only"
+            : "Publishing will replace the workout for this class slot only"}
+        </div>
+      ) : null}
+      <div className="flex items-center gap-4 px-6 py-3">
       <span className="text-xl font-black" style={{ color: "var(--accent)" }}>
         ✦
       </span>
@@ -155,6 +183,20 @@ export function CanvasHeader() {
         ))}
       </select>
 
+      <button
+        type="button"
+        onClick={() => setIsTeamWorkout(!isTeamWorkout)}
+        className="flex items-center gap-1.5 rounded-2xl px-3 py-2 text-xs font-bold transition-colors"
+        style={{
+          background: isTeamWorkout ? "color-mix(in srgb, var(--warning) 15%, transparent)" : "var(--card)",
+          color: isTeamWorkout ? "var(--warning)" : "var(--muted)",
+          border: isTeamWorkout ? "1px solid color-mix(in srgb, var(--warning) 40%, transparent)" : "1px solid var(--dim)",
+        }}
+        title="Team workout (executed in pairs or groups)"
+      >
+        Team
+      </button>
+
       <div className="flex-1" />
 
       {sections.length > 0 ? (
@@ -172,11 +214,11 @@ export function CanvasHeader() {
           className="rounded-3xl px-6 py-2 text-sm font-bold transition-opacity"
           style={{
             background: ready ? "var(--lime)" : "var(--dim)",
-            color: ready ? "#0A0A0F" : "var(--muted)",
+            color: ready ? "var(--bg)" : "var(--muted)",
             cursor: ready ? "pointer" : "not-allowed",
           }}
         >
-          {publishing ? "Publishing..." : "Publish"}
+          {publishing ? `${publishLabel}…` : publishLabel}
         </button>
 
         {!ready ? (
@@ -196,6 +238,7 @@ export function CanvasHeader() {
           {publishError}
         </span>
       ) : null}
+    </div>
     </header>
   );
 }

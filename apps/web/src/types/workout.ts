@@ -127,6 +127,7 @@ export type DraftExercise = {
   variationsOpen: boolean;
   advancedOpen: boolean;
   variations: DraftVariation[];
+  note: string | null;
 };
 
 export type DraftSection = {
@@ -140,12 +141,14 @@ export type DraftSection = {
   emomAmrapScoringStyle: "grand_total" | "lowest_window" | null;
   restAfterSeconds: number | null;
   exercises: DraftExercise[];
+  note: string | null;
 };
 
 export type DraftWorkoutState = {
   draftId: string | null;
   title: string;
   type: WorkoutType | null;
+  isTeamWorkout: boolean;
   sections: DraftSection[];
 };
 
@@ -451,6 +454,7 @@ export function makeDefaultExercise(): DraftExercise {
     variationsOpen: false,
     advancedOpen: false,
     variations: [],
+    note: null,
   };
 }
 
@@ -539,6 +543,7 @@ export function makeDefaultSection(): DraftSection {
     emomAmrapScoringStyle: null,
     restAfterSeconds: null,
     exercises: [],
+    note: null,
   };
 }
 

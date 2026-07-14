@@ -32,6 +32,7 @@ type WorkoutCreationStore = DraftWorkoutState & {
   loadFromDraftData: (data: unknown) => void;
   setTitle: (title: string) => void;
   setType: (type: WorkoutType) => void;
+  setIsTeamWorkout: (value: boolean) => void;
   setSaveStatus: (status: SaveStatus) => void;
   addSection: () => void;
   selectSection: (id: string | null) => void;
@@ -172,6 +173,7 @@ function parseDraftExercise(src: unknown): DraftExercise {
     variationsOpen: false,
     advancedOpen: false,
     variations,
+    note: typeof e.note === "string" ? e.note : null,
   };
 }
 
@@ -214,6 +216,7 @@ function parseDraftSections(raw: unknown): DraftSection[] {
       emomAmrapScoringStyle,
       restAfterSeconds: sec.rest_after_seconds != null ? Number(sec.rest_after_seconds) : null,
       exercises,
+      note: typeof sec.note === "string" ? sec.note : null,
     };
   });
 }
@@ -237,6 +240,7 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
   draftId: null,
   title: "",
   type: null,
+  isTeamWorkout: false,
   sections: [],
   saveStatus: "idle",
   selectedSectionId: null,
@@ -248,7 +252,7 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
   initDraft: (id) => set({ draftId: id }),
 
   resetDraft: () =>
-    set({ draftId: null, title: "", type: null, sections: [], selectedSectionId: null, sectionConfigOpen: false }),
+    set({ draftId: null, title: "", type: null, isTeamWorkout: false, sections: [], selectedSectionId: null, sectionConfigOpen: false }),
 
   loadFromDraftData: (data) => {
     if (!data || typeof data !== "object") return;
@@ -261,12 +265,14 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
     set({
       title: typeof source.title === "string" ? source.title : (typeof record.title === "string" ? record.title : ""),
       type: parseWorkoutType(source.type ?? record.type),
+      isTeamWorkout: Boolean(record.is_team_workout),
       sections: parseDraftSections(source.sections),
     });
   },
 
   setTitle: (title) => set({ title }),
   setType: (type) => set({ type }),
+  setIsTeamWorkout: (isTeamWorkout) => set({ isTeamWorkout }),
   setSaveStatus: (saveStatus) => set({ saveStatus }),
 
   addSection: () =>
@@ -580,7 +586,7 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
   setRightCollapsed: (rightCollapsed) => set({ rightCollapsed }),
 
   toApiPayload: () => {
-    const { title, type, sections } = get();
+    const { title, type, isTeamWorkout, sections } = get();
 
     function deriveLadderTimerParams(section: DraftSection): Record<string, number> {
       const first = section.exercises[0];
@@ -607,6 +613,7 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
     return {
       title,
       type,
+      is_team_workout: isTeamWorkout,
       sections: sections.map((section) => ({
         name: section.name,
         timer_config: {
@@ -619,6 +626,7 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
         scoreable: section.scoreable,
         score_config: section.scoreType ? { type: section.scoreType } : null,
         rest_after_seconds: section.restAfterSeconds ?? null,
+        note: section.note,
         exercises: section.exercises.map((exercise) => ({
           name: exercise.name,
           sets: exercise.sets,
@@ -651,6 +659,7 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
             ? exercise.advanced.restPauseSeconds.value
             : null,
           pacing: exercise.advanced.pacing.enabled ? exercise.advanced.pacing.value : null,
+          note: exercise.note,
           variations: exercise.variations.map((variation) => ({
             scale_level_slug: variation.scaleLevelSlug,
             exercise_name_override: variation.exerciseNameOverride,

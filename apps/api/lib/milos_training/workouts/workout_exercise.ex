@@ -7,7 +7,7 @@ defmodule MilosTraining.Workouts.WorkoutExercise do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   @prescription_units [:reps, :secs, :kcal]
-  @load_modes [:absolute, :pct_1rm]
+  @load_modes [:absolute, :pct_1rm, :bw]
 
   schema "workout_exercises" do
     field :name, :string
@@ -25,9 +25,12 @@ defmodule MilosTraining.Workouts.WorkoutExercise do
     field :rest_pause_seconds, :integer
     field :pacing, :integer
     field :interval_assignment, :integer
+    field :note, :string
 
     belongs_to :workout_section, WorkoutSection
     has_many :variations, ExerciseVariation
+
+    timestamps()
   end
 
   def changeset(exercise \\ %__MODULE__{}, params) do
@@ -48,26 +51,27 @@ defmodule MilosTraining.Workouts.WorkoutExercise do
       :cluster_rest_seconds,
       :rest_pause_seconds,
       :pacing,
-      :interval_assignment
+      :interval_assignment,
+      :note
     ])
     |> update_change(:name, &normalize_name/1)
     |> validate_required([:name, :order])
     |> validate_number(:order, greater_than_or_equal_to: 1)
-    |> validate_optional_number(:sets)
-    |> validate_optional_number(:prescription_value)
-    |> validate_optional_number(:load_value)
-    |> validate_optional_number(:hr_zone)
-    |> validate_optional_number(:rest_seconds)
-    |> validate_optional_number(:cluster_rest_seconds)
-    |> validate_optional_number(:rest_pause_seconds)
-    |> validate_optional_number(:pacing)
-    |> validate_optional_number(:interval_assignment)
+    |> validate_optional_number(:sets, 1)
+    |> validate_optional_number(:prescription_value, 1)
+    |> validate_optional_number(:load_value, 0)
+    |> validate_optional_number(:hr_zone, 1)
+    |> validate_optional_number(:rest_seconds, 0)
+    |> validate_optional_number(:cluster_rest_seconds, 0)
+    |> validate_optional_number(:rest_pause_seconds, 0)
+    |> validate_optional_number(:pacing, 0)
+    |> validate_optional_number(:interval_assignment, 0)
     |> foreign_key_constraint(:workout_section_id)
     |> cast_assoc(:variations, with: &ExerciseVariation.changeset/2)
   end
 
-  defp validate_optional_number(changeset, field) do
-    validate_number(changeset, field, greater_than_or_equal_to: 1)
+  defp validate_optional_number(changeset, field, min) do
+    validate_number(changeset, field, greater_than_or_equal_to: min)
   end
 
   defp normalize_name(nil), do: nil

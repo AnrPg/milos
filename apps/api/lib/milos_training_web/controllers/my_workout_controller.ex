@@ -5,6 +5,7 @@ defmodule MilosTrainingWeb.MyWorkoutController do
   alias Guardian.Plug, as: GuardianPlug
   alias MilosTraining.Application.GetAssignedWorkoutWeek
   alias MilosTraining.Application.RejectAssignedWorkout
+  alias MilosTraining.Application.RequestWorkoutAssignment
   alias MilosTraining.Application.RescheduleAssignedWorkout
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
@@ -123,6 +124,62 @@ defmodule MilosTrainingWeb.MyWorkoutController do
       {:error, :forbidden} -> {:error, :forbidden}
       {:error, :past_date} -> {:error, :unprocessable_entity}
       {:error, _} -> {:error, :unprocessable_entity}
+    end
+  end
+
+  operation(:request_assignment,
+    summary: "Athlete requests a workout assignment for a specific date",
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{
+              requested_for: %Schema{type: :string, format: :date},
+              note: %Schema{type: :string, maxLength: 500}
+            },
+            required: [:requested_for]
+          }
+        }
+      }
+    },
+    responses: [
+      accepted:
+        {"Workout assignment request accepted", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             requested_for: %Schema{type: :string, format: :date},
+             notified_admins: %Schema{type: :integer}
+           },
+           required: [:requested_for, :notified_admins]
+         }},
+      forbidden:
+        {"Only athletes can request assignments", "application/json", %Schema{type: :object}},
+      unprocessable_entity: {"Invalid or past date", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def request_assignment(conn, params) do
+    user = GuardianPlug.current_resource(conn)
+
+    case RequestWorkoutAssignment.call(user, params) do
+      {:ok, payload} ->
+        conn
+        |> put_status(:accepted)
+        |> json(%{
+          requested_for: Date.to_iso8601(payload.requested_for),
+          notified_admins: payload.notified_admins
+        })
+
+      {:error, :forbidden} ->
+        {:error, :forbidden}
+
+      {:error, _reason} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> json(%{error: "Invalid workout assignment request"})
     end
   end
 end

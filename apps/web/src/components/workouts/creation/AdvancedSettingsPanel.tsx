@@ -3,6 +3,8 @@
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import type { DraftExercise, DraftSection } from "@/types/workout";
 
+import { TimeInput } from "./TimeInput";
+
 type SettingKey = keyof DraftExercise["advanced"];
 
 const SETTINGS: Array<{
@@ -45,7 +47,7 @@ export function AdvancedSettingsPanel({ exercise, section, sectionOptions = [] }
       </div>
 
       <div className="flex flex-col gap-1">
-        {SETTINGS.map(({ key, label, unit, inputType }) => {
+        {SETTINGS.filter(({ key }) => key !== "clusterRestSeconds" || section.format === "cluster").map(({ key, label, unit, inputType }) => {
           const setting = exercise.advanced[key];
 
           return (
@@ -57,7 +59,7 @@ export function AdvancedSettingsPanel({ exercise, section, sectionOptions = [] }
                 style={{ background: setting.enabled ? "var(--accent)" : "var(--dim)" }}
               >
                 <span
-                  className="absolute top-0.5 h-3 w-3 rounded-full bg-white transition-transform"
+                  className="absolute top-0.5 h-3 w-3 rounded-full bg-[var(--panel)] transition-transform"
                   style={{ transform: setting.enabled ? "translateX(18px)" : "translateX(2px)" }}
                 />
               </button>
@@ -68,29 +70,40 @@ export function AdvancedSettingsPanel({ exercise, section, sectionOptions = [] }
 
               {setting.enabled ? (
                 <div className="shrink-0 flex items-center gap-2">
-                  <input
-                    type={inputType}
-                    value={String(setting.value)}
-                    onChange={(event) =>
-                      updateAdvancedValue(
-                        section.localId,
-                        exercise.localId,
-                        key,
-                        inputType === "number" ? Number.parseInt(event.target.value, 10) || 0 : event.target.value,
-                      )
-                    }
-                    className="w-16 rounded-lg px-2 py-1 text-right text-sm outline-none"
-                    style={{
-                      background: "var(--bg)",
-                      border: "1px solid var(--dim)",
-                      color: "var(--text)",
-                    }}
-                  />
-                  {unit ? (
-                    <span className="text-sm" style={{ color: "var(--muted)" }}>
-                      {unit}
-                    </span>
-                  ) : null}
+                  {unit === "secs" ? (
+                    <TimeInput
+                      value={typeof setting.value === "number" ? setting.value : null}
+                      onChange={(secs) =>
+                        updateAdvancedValue(section.localId, exercise.localId, key, secs ?? 0)
+                      }
+                    />
+                  ) : (
+                    <>
+                      <input
+                        type={inputType}
+                        value={String(setting.value)}
+                        onChange={(event) =>
+                          updateAdvancedValue(
+                            section.localId,
+                            exercise.localId,
+                            key,
+                            inputType === "number" ? Number.parseInt(event.target.value, 10) || 0 : event.target.value,
+                          )
+                        }
+                        className="w-16 rounded-lg px-2 py-1 text-right text-sm outline-none"
+                        style={{
+                          background: "var(--bg)",
+                          border: "1px solid var(--dim)",
+                          color: "var(--text)",
+                        }}
+                      />
+                      {unit ? (
+                        <span className="text-sm" style={{ color: "var(--muted)" }}>
+                          {unit}
+                        </span>
+                      ) : null}
+                    </>
+                  )}
                 </div>
               ) : null}
             </div>

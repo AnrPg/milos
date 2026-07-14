@@ -14,12 +14,13 @@ defmodule MilosTraining.Workouts.WorkoutSection do
     field :scoreable, :boolean, default: false
     field :score_config, :map
     field :timer_config, :map
+    field :note, :string
 
     belongs_to :master_workout, MasterWorkout
     belongs_to :parent_section, __MODULE__
     has_many :exercises, WorkoutExercise, preload_order: [asc: :order]
 
-    timestamps(updated_at: false)
+    timestamps()
   end
 
   def changeset(section \\ %__MODULE__{}, params) do
@@ -42,7 +43,8 @@ defmodule MilosTraining.Workouts.WorkoutSection do
       :scoreable,
       :score_config,
       :timer_config,
-      :parent_section_id
+      :parent_section_id,
+      :note
     ])
     |> update_change(:name, &normalize_name/1)
     |> validate_required([:name, :order])

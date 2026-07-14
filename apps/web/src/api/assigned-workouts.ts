@@ -11,6 +11,7 @@ export type AssignedWorkoutPreview = {
   id: string;
   title: string;
   type: string;
+  is_team_workout?: boolean;
   sections: Array<{
     id?: string;
     parent_section_id?: string | null;
@@ -39,6 +40,7 @@ export type AssignedWorkoutPreview = {
       variations?: Array<{
         id?: string;
         description?: string | null;
+        exercise_name_override?: string | null;
         sets?: number | null;
         prescription_value?: number | null;
         prescription_unit?: string | null;
@@ -138,6 +140,7 @@ export async function rejectAssignment(token: string, assignmentId: string) {
 export type AssignmentMessage = {
   id: string;
   assigned_workout_id: string;
+  athlete_id: string;
   sender_id: string;
   sender_nickname: string;
   body: string;
@@ -148,10 +151,12 @@ export async function fetchAssignmentMessages(
   token: string,
   assignmentId: string,
   isAdmin = false,
+  athleteId?: string,
 ): Promise<AssignmentMessage[]> {
-  const path = isAdmin
+  const basePath = isAdmin
     ? `/admin/assigned-workouts/${assignmentId}/messages`
     : `/my-workouts/assignments/${assignmentId}/messages`;
+  const path = athleteId ? `${basePath}?athlete_id=${encodeURIComponent(athleteId)}` : basePath;
   const data = await apiRequest<{ messages: AssignmentMessage[] }>(path, { token });
   return data.messages;
 }
@@ -161,6 +166,7 @@ export async function postAssignmentMessage(
   assignmentId: string,
   body: string,
   isAdmin = false,
+  athleteId?: string,
 ): Promise<AssignmentMessage> {
   const path = isAdmin
     ? `/admin/assigned-workouts/${assignmentId}/messages`
@@ -168,7 +174,7 @@ export async function postAssignmentMessage(
   const data = await apiRequest<{ message: AssignmentMessage }>(path, {
     method: "POST",
     token,
-    body: { body },
+    body: { body, ...(athleteId ? { athlete_id: athleteId } : {}) },
   });
   return data.message;
 }
@@ -183,6 +189,14 @@ export async function rescheduleAssignment(
     { method: "PATCH", token, body: { scheduled_for: scheduledFor } },
   );
   return response.assignment;
+}
+
+export async function requestWorkoutAssignment(token: string, requestedFor: string, note?: string) {
+  return apiRequest<{ requested_for: string; notified_admins: number }>("/my-workouts/requests", {
+    method: "POST",
+    token,
+    body: { requested_for: requestedFor, ...(note?.trim() ? { note: note.trim() } : {}) },
+  });
 }
 
 export async function sendAssignmentMessage(token: string, assignmentId: string, body: string) {

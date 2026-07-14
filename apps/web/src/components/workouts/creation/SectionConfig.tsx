@@ -170,9 +170,9 @@ export function SectionConfig({ section }: Props) {
                 <div
                   className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-xs"
                   style={{
-                    background: "color-mix(in srgb, #f59e0b 12%, transparent)",
-                    border: "1px solid color-mix(in srgb, #f59e0b 35%, transparent)",
-                    color: "#f59e0b",
+                    background: "color-mix(in srgb, var(--warning) 12%, transparent)",
+                    border: "1px solid color-mix(in srgb, var(--warning) 35%, transparent)",
+                    color: "var(--warning)",
                   }}
                 >
                   <span>
@@ -188,8 +188,8 @@ export function SectionConfig({ section }: Props) {
                     }
                     className="shrink-0 rounded-lg px-2 py-0.5 font-bold"
                     style={{
-                      background: "color-mix(in srgb, #f59e0b 20%, transparent)",
-                      border: "1px solid #f59e0b",
+                      background: "color-mix(in srgb, var(--warning) 20%, transparent)",
+                      border: "1px solid var(--warning)",
                     }}
                   >
                     Fix
@@ -221,7 +221,7 @@ export function SectionConfig({ section }: Props) {
             style={{ background: section.scoreable ? "var(--accent)" : "var(--dim)" }}
           >
             <span
-              className="absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform"
+              className="absolute top-0.5 h-4 w-4 rounded-full bg-[var(--panel)] transition-transform"
               style={{ transform: section.scoreable ? "translateX(22px)" : "translateX(2px)" }}
             />
           </button>

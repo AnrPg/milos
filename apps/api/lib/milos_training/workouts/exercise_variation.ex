@@ -7,7 +7,7 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   @prescription_units [:reps, :secs, :kcal]
-  @load_modes [:absolute, :pct_1rm]
+  @load_modes [:absolute, :pct_1rm, :bw]
 
   schema "exercise_variations" do
     field :exercise_name_override, :string
@@ -21,7 +21,7 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
     belongs_to :workout_exercise, WorkoutExercise
     belongs_to :scale_level, ScaleLevel
 
-    timestamps(updated_at: false)
+    timestamps()
   end
 
   def changeset(variation \\ %__MODULE__{}, params) do
@@ -61,7 +61,7 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
   end
 
   defp validate_at_least_one_override(changeset) do
-    fields = [:exercise_name_override, :sets, :prescription_value, :load_value]
+    fields = [:exercise_name_override, :sets, :prescription_value, :load_value, :load_mode]
 
     if Enum.all?(fields, &(get_field(changeset, &1) |> blank?())) do
       add_error(

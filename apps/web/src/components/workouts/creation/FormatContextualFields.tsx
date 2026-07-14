@@ -2,6 +2,8 @@
 
 import { FORMAT_FIELD_DEFS, type FormatParams, type SectionFormat } from "@/types/workout";
 
+import { TimeInput } from "./TimeInput";
+
 type FieldLabel = {
   key: string;
   label: string;
@@ -36,9 +38,7 @@ const FORMAT_FIELD_LABELS: Partial<Record<SectionFormat, FieldLabel[]>> = {
     { key: "pr_zone_rounds", label: "PR Zone Rounds", unit: "", optional: true },
   ],
   death_by: [
-    { key: "start_reps", label: "Starting Reps", unit: "" },
-    { key: "step_reps", label: "Added per Round", unit: "" },
-    { key: "ladder_cap", label: "Cap", unit: "", optional: true },
+    { key: "max_rounds", label: "Max Rounds", unit: "rounds", optional: true },
   ],
   tabata: [
     { key: "work_seconds", label: "Work", unit: "secs" },
@@ -52,25 +52,22 @@ const FORMAT_FIELD_LABELS: Partial<Record<SectionFormat, FieldLabel[]>> = {
   ],
   cluster: [
     { key: "intra_rest_seconds", label: "Intra-set Rest", unit: "secs" },
-    { key: "sets", label: "Sets", unit: "" },
   ],
   hrr: [
-    { key: "effort_seconds", label: "Effort Duration", unit: "secs" },
-    { key: "hr_zone", label: "Target HR Zone", unit: "Zone", optional: true },
+    { key: "hr_ceiling_bpm", label: "HR Ceiling (stop work)", unit: "bpm" },
+    { key: "hr_floor_bpm", label: "HR Floor (resume work)", unit: "bpm" },
+    { key: "cycles", label: "Cycles", unit: "", optional: true },
+    { key: "effort_cap_seconds", label: "Effort Cap", unit: "secs", optional: true },
   ],
   ladder_ascending: [
-    { key: "start_reps", label: "Start Reps", unit: "" },
-    { key: "step_reps", label: "Step", unit: "" },
-    { key: "ladder_cap", label: "Cap", unit: "", optional: true },
+    { key: "time_cap_seconds", label: "Time Cap", unit: "secs", optional: true },
   ],
   ladder_descending: [
-    { key: "start_reps", label: "Start Reps", unit: "" },
-    { key: "step_reps", label: "Step", unit: "" },
-    { key: "min_reps", label: "Min Reps", unit: "" },
+    { key: "min_reps", label: "Min Reps", unit: "", optional: true },
+    { key: "time_cap_seconds", label: "Time Cap", unit: "secs", optional: true },
   ],
   pyramid: [
-    { key: "peak_reps", label: "Peak Reps", unit: "" },
-    { key: "step_reps", label: "Step", unit: "" },
+    { key: "time_cap_seconds", label: "Time Cap", unit: "secs", optional: true },
   ],
   rest: [{ key: "duration_seconds", label: "Duration", unit: "secs" }],
 };
@@ -96,7 +93,8 @@ export function FormatContextualFields({ format, params, onChange }: Props) {
     <div className="mt-2 flex flex-col gap-3">
       {labelDefs.map((label) => {
         const defaultValue = fieldDefs?.find((f) => f.key === label.key)?.defaultValue ?? 0;
-        const value = params[label.key] ?? defaultValue;
+        const hasValue = Object.prototype.hasOwnProperty.call(params, label.key);
+        const value = hasValue ? params[label.key] : defaultValue;
         const field = { ...label, defaultValue };
 
         return (
@@ -111,22 +109,31 @@ export function FormatContextualFields({ format, params, onChange }: Props) {
             </label>
 
             <div className="flex items-center gap-2">
-              <input
-                type="number"
-                value={value ?? ""}
-                onChange={(event) => handleChange(field.key, event.target.value)}
-                className="w-20 rounded-lg px-2 py-1 text-right text-sm outline-none"
-                style={{
-                  background: "var(--bg)",
-                  border: "1px solid var(--dim)",
-                  color: "var(--text)",
-                }}
-              />
-              {field.unit ? (
-                <span className="shrink-0 text-sm" style={{ color: "var(--muted)" }}>
-                  {field.unit}
-                </span>
-              ) : null}
+              {field.unit === "secs" ? (
+                <TimeInput
+                  value={typeof value === "number" ? value : null}
+                  onChange={(secs) => onChange({ ...params, [field.key]: secs })}
+                />
+              ) : (
+                <>
+                  <input
+                    type="number"
+                    value={value ?? ""}
+                    onChange={(event) => handleChange(field.key, event.target.value)}
+                    className="w-20 rounded-lg px-2 py-1 text-right text-sm outline-none"
+                    style={{
+                      background: "var(--bg)",
+                      border: "1px solid var(--dim)",
+                      color: "var(--text)",
+                    }}
+                  />
+                  {field.unit ? (
+                    <span className="shrink-0 text-sm" style={{ color: "var(--muted)" }}>
+                      {field.unit}
+                    </span>
+                  ) : null}
+                </>
+              )}
             </div>
           </div>
         );

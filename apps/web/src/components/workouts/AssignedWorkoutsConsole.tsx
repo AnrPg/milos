@@ -17,11 +17,12 @@ import {
 } from "@dnd-kit/core";
 
 import { ApiError } from "@/api/client";
-import { fetchTimerSequence, startExecution } from "@/api/executions";
+import { fetchTimerSequence, startExecution, type SectionScore } from "@/api/executions";
 import {
   deleteAssignedWorkout,
   fetchAssignedWorkoutWeek,
   listAthletes,
+  requestWorkoutAssignment,
   rescheduleAssignment,
   updateAssignedWorkout,
   type AssignedWorkoutRecord,
@@ -38,6 +39,43 @@ import { workoutTypeColor } from "@/lib/workout-colors";
 import { useExecutionStore } from "@/stores/execution";
 
 type ViewMode = "3day" | "week" | "month";
+
+function formatScoreValue(score: SectionScore): string {
+  const val = typeof score.value === "number" ? score.value : String(score.value);
+  if (score.unit) return `${val} ${score.unit}`;
+  return String(val);
+}
+
+function ScoreTooltip({ scores }: { scores: SectionScore[] }) {
+  if (scores.length === 0) return null;
+  return (
+    <div
+      className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 rounded-[1rem] px-3 py-2 shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
+      style={{
+        background: "var(--panel)",
+        border: "1px solid var(--border-strong)",
+        minWidth: "140px",
+        maxWidth: "220px",
+      }}
+    >
+      <p className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+        Scores
+      </p>
+      <div className="space-y-1">
+        {scores.map((s, i) => (
+          <div key={i} className="flex items-baseline justify-between gap-2">
+            <span className="truncate text-[10px]" style={{ color: "var(--muted)" }}>
+              {s.section_name ?? `Section ${i + 1}`}
+            </span>
+            <span className="shrink-0 text-[11px] font-semibold" style={{ color: "var(--success)" }}>
+              {formatScoreValue(s)}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function parseLocalDate(iso: string): Date {
   const [y, m, d] = iso.split("-").map(Number);
@@ -82,18 +120,18 @@ function DayHeader({ isoDate, compact, todayIso }: { isoDate: string; compact: b
   if (compact) {
     return (
       <div className="text-center">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#55556a" }}>{weekday}</p>
-        <p className="text-base font-bold" style={{ color: isToday ? "#d95d39" : "#F0EDF8" }}>{day}</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>{weekday}</p>
+        <p className="text-base font-bold" style={{ color: isToday ? "var(--primary)" : "var(--text)" }}>{day}</p>
       </div>
     );
   }
 
   return (
     <div>
-      <p className="text-base font-bold" style={{ color: "#F0EDF8" }}>{weekday}</p>
+      <p className="text-base font-bold" style={{ color: "var(--text)" }}>{weekday}</p>
       <p className="mt-0.5 text-xs">
-        <span style={{ color: "#55556a" }}>{month} </span>
-        <span style={{ color: isToday ? "#d95d39" : "#8888aa" }}>{day}</span>
+        <span style={{ color: "var(--dim)" }}>{month} </span>
+        <span style={{ color: isToday ? "var(--primary)" : "var(--muted)" }}>{day}</span>
       </p>
     </div>
   );
@@ -129,7 +167,7 @@ function DraggableCard({
       <span
         ref={(el) => setActivatorNodeRef(el)}
         className="absolute right-2 top-2 z-10 select-none rounded p-1 text-base leading-none"
-        style={{ color: "#3a3a55", cursor: "grab", touchAction: "none" }}
+        style={{ color: "var(--dim)", cursor: "grab", touchAction: "none" }}
         {...listeners}
         {...attributes}
         role="button"
@@ -158,7 +196,7 @@ function DroppableDay({
       ref={setNodeRef}
       className={className}
       style={{
-        outline: isOver ? "1px dashed rgba(217,93,57,0.6)" : "1px solid transparent",
+        outline: isOver ? "1px dashed color-mix(in srgb, var(--primary) 60%, transparent)" : "1px solid transparent",
         borderRadius: "0.8rem",
         transition: "outline-color 0.1s",
       }}
@@ -181,23 +219,36 @@ function DraggableMonthChip({
     disabled,
   });
 
+  const isDone = assignment.execution_status === "completed";
+  const hasScores = (assignment.execution_scores?.length ?? 0) > 0;
+
   return (
-    <p
-      ref={setNodeRef}
-      className="mt-0.5 truncate rounded px-1 py-0.5 text-[9px] font-semibold"
-      style={{
-        background: `${workoutTypeColor(assignment.workout.type)}26`,
-        color: workoutTypeColor(assignment.workout.type),
-        opacity: isDragging ? 0.3 : 1,
-        cursor: "grab",
-        touchAction: "none",
-      }}
-      onClick={(e) => e.stopPropagation()}
-      {...listeners}
-      {...attributes}
-    >
-      {assignment.workout.is_team_workout ? "👥 " : ""}{assignment.workout.title}
-    </p>
+    <div className="group relative mt-0.5">
+      <div
+        ref={setNodeRef}
+        className="truncate rounded px-1 py-0.5 text-[9px] font-semibold"
+        style={{
+          background: isDone
+            ? "color-mix(in srgb, var(--success) 15%, transparent)"
+            : `color-mix(in srgb, ${workoutTypeColor(assignment.workout.type)} 15%, transparent)`,
+          color: isDone ? "var(--success)" : workoutTypeColor(assignment.workout.type),
+          opacity: isDragging ? 0.3 : 1,
+          cursor: disabled ? "default" : "grab",
+          touchAction: "none",
+        }}
+        onClick={(e) => e.stopPropagation()}
+        {...listeners}
+        {...attributes}
+      >
+        {assignment.workout.is_team_workout ? "👥 " : ""}{assignment.workout.title}
+        {isDone ? " ✓" : ""}
+      </div>
+      {isDone && hasScores ? (
+        <div className="invisible absolute bottom-full left-1/2 z-50 mb-1 -translate-x-1/2 group-hover:visible">
+          <ScoreTooltip scores={assignment.execution_scores!} />
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -226,11 +277,11 @@ function DroppableMonthCell({
       className="min-h-[5.5rem] cursor-pointer rounded-xl p-1.5"
       style={{
         background: isOver
-          ? "rgba(217,93,57,0.1)"
+          ? "color-mix(in srgb, var(--primary) 10%, transparent)"
           : outsideMonth
             ? "transparent"
-            : "#111118",
-        border: `1px solid ${isOver ? "#d95d39" : isToday ? "#d95d39" : outsideMonth ? "transparent" : "#1a1a28"}`,
+            : "var(--panel)",
+        border: `1px solid ${isOver ? "var(--primary)" : isToday ? "var(--primary)" : outsideMonth ? "transparent" : "var(--border)"}`,
         transition: "background 0.1s, border-color 0.1s",
       }}
       onClick={onNavigate}
@@ -241,8 +292,8 @@ function DroppableMonthCell({
       <span
         className="flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold"
         style={{
-          background: isToday ? "#d95d39" : "transparent",
-          color: isToday ? "#fff" : outsideMonth ? "#2a2a3a" : "#F0EDF8",
+          background: isToday ? "var(--primary)" : "transparent",
+          color: isToday ? "var(--primary-contrast)" : outsideMonth ? "var(--border-strong)" : "var(--text)",
         }}
       >
         {dayNum}
@@ -255,7 +306,7 @@ function DroppableMonthCell({
         />
       ))}
       {assignments.length > 2 ? (
-        <p className="mt-0.5 text-[9px]" style={{ color: "#55556a" }}>
+        <p className="mt-0.5 text-[9px]" style={{ color: "var(--dim)" }}>
           +{assignments.length - 2} more
         </p>
       ) : null}
@@ -268,8 +319,8 @@ function DragGhostCard({ assignment }: { assignment: AssignedWorkoutRecord }) {
     <div
       className="rounded-[1.4rem] p-4 shadow-xl"
       style={{
-        background: "#0d0d18",
-        border: "1px solid #d95d39",
+        background: "var(--panel-muted)",
+        border: "1px solid var(--primary)",
         width: 220,
         pointerEvents: "none",
       }}
@@ -277,7 +328,7 @@ function DragGhostCard({ assignment }: { assignment: AssignedWorkoutRecord }) {
       <p className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: workoutTypeColor(assignment.workout.type) }}>
         {assignment.workout.type}
       </p>
-      <p className="mt-1 truncate text-sm font-semibold" style={{ color: "#F0EDF8" }}>
+      <p className="mt-1 truncate text-sm font-semibold" style={{ color: "var(--text)" }}>
         {assignment.workout.title}
       </p>
     </div>
@@ -320,6 +371,13 @@ export function AssignedWorkoutsConsole({
   const [filterAthletes, setFilterAthletes] = useState<AthleteOption[]>([]);
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
   const [showQuickAssign, setShowQuickAssign] = useState(false);
+  const [requestingDate, setRequestingDate] = useState<string | null>(null);
+  const [requestDate, setRequestDate] = useState("");
+  const [requestNote, setRequestNote] = useState("");
+  const [requestSaving, setRequestSaving] = useState(false);
+  const [requestStatus, setRequestStatus] = useState<string | null>(null);
+  const [requestError, setRequestError] = useState<string | null>(null);
+  const [requestedDates, setRequestedDates] = useState<string[]>([]);
 
   const isAdmin = currentUser?.role === "admin";
 
@@ -544,6 +602,45 @@ export function AssignedWorkoutsConsole({
     setRefDate(new Date());
   }
 
+  function beginWorkoutRequest(date: string) {
+    setRequestingDate(date);
+    setRequestDate(date < todayIso ? todayIso : date);
+    setRequestNote("");
+    setRequestError(null);
+    setRequestStatus(null);
+  }
+
+  function cancelWorkoutRequest() {
+    setRequestingDate(null);
+    setRequestDate("");
+    setRequestNote("");
+    setRequestError(null);
+  }
+
+  async function submitWorkoutRequest() {
+    if (!tokens?.access_token || !requestDate) return;
+
+    setRequestSaving(true);
+    setRequestError(null);
+    setRequestStatus(null);
+
+    try {
+      await requestWorkoutAssignment(tokens.access_token, requestDate, requestNote);
+      setRequestedDates((current) =>
+        current.includes(requestDate) ? current : [...current, requestDate],
+      );
+      setRequestStatus(`Request sent for ${requestDate}.`);
+      setRequestingDate(null);
+      setRequestNote("");
+    } catch (requestError) {
+      setRequestError(
+        requestError instanceof Error ? requestError.message : "Could not send request.",
+      );
+    } finally {
+      setRequestSaving(false);
+    }
+  }
+
   function beginEdit(assignment: AssignedWorkoutRecord) {
     setEditingId(assignment.id);
     setEditScheduledFor(assignment.scheduled_for);
@@ -730,7 +827,7 @@ export function AssignedWorkoutsConsole({
             <div
               key={label}
               className="py-1 text-center text-[10px] font-semibold uppercase tracking-[0.16em]"
-              style={{ color: "#55556a" }}
+              style={{ color: "var(--dim)" }}
             >
               {label}
             </div>
@@ -779,23 +876,31 @@ export function AssignedWorkoutsConsole({
                 key={date}
                 className="rounded-[1.4rem] p-3"
                 style={{
-                  background: "#111118",
-                  border: `1px solid ${isToday ? "#d95d39" : "#1a1a28"}`,
+                  background: "var(--panel)",
+                  border: `1px solid ${isToday ? "var(--primary)" : "var(--border)"}`,
                   minHeight: "10rem",
                 }}
               >
                 <DayHeader isoDate={date} compact todayIso={todayIso} />
                 <DroppableDay date={date} className="mt-3 space-y-1.5">
                   {dayAssignments.length === 0 ? (
-                    <p className="text-[10px]" style={{ color: "#2a2a3a" }}>—</p>
+                    <p className="text-[10px]" style={{ color: "var(--border-strong)" }}>—</p>
                   ) : null}
-                  {dayAssignments.map((a) => (
+                  {dayAssignments.map((a) => {
+                    const isWeekDone = a.execution_status === "completed" && date <= todayIso;
+                    return (
                     <DraggableCard
                       key={a.id}
                       assignment={a}
-                      disabled={a.execution_status === "completed" && date <= todayIso}
-                      style={{ background: "#0d0d18", border: "1px solid #1a1a28", borderRadius: "0.8rem" }}
+                      disabled={isWeekDone}
+                      className="group"
+                      style={{ background: "var(--panel-muted)", border: `1px solid ${isWeekDone ? "color-mix(in srgb, var(--success) 25%, var(--border))" : "var(--border)"}`, borderRadius: "0.8rem", position: "relative" }}
                     >
+                      {isWeekDone && (a.execution_scores?.length ?? 0) > 0 ? (
+                        <div className="invisible absolute bottom-full left-1/2 z-50 mb-1.5 -translate-x-1/2 group-hover:visible">
+                          <ScoreTooltip scores={a.execution_scores!} />
+                        </div>
+                      ) : null}
                       <div className="flex items-start gap-1">
                         <button
                           className="min-w-0 flex-1 truncate rounded-[0.8rem] px-2 py-1.5 text-left transition-opacity hover:opacity-80"
@@ -808,11 +913,11 @@ export function AssignedWorkoutsConsole({
                           type="button"
                         >
                           <div className="flex items-center gap-1">
-                            <p className="truncate text-[10px] font-semibold" style={{ color: "#F0EDF8" }}>
+                            <p className="truncate text-[10px] font-semibold" style={{ color: isWeekDone ? "var(--success)" : "var(--text)" }}>
                               {a.workout.title}
                             </p>
                             {a.workout.is_team_workout ? (
-                              <span className="shrink-0 rounded px-1 text-[8px] font-bold" style={{ background: "rgba(251,191,36,0.2)", color: "#fbbf24" }}>T</span>
+                              <span className="shrink-0 rounded px-1 text-[8px] font-bold" style={{ background: "color-mix(in srgb, var(--warning) 20%, transparent)", color: "var(--warning)" }}>T</span>
                             ) : null}
                           </div>
                           <p
@@ -824,7 +929,7 @@ export function AssignedWorkoutsConsole({
                         </button>
                         <button
                           className="shrink-0 rounded px-1 py-1 text-[9px] font-bold leading-none transition-colors hover:opacity-80"
-                          style={{ color: "#3a3a55" }}
+                          style={{ color: "var(--dim)" }}
                           onClick={(e) => {
                             e.stopPropagation();
                             downloadIcsEvent({ title: a.workout.title, date });
@@ -836,7 +941,8 @@ export function AssignedWorkoutsConsole({
                         </button>
                       </div>
                     </DraggableCard>
-                  ))}
+                  );
+                  })}
                 </DroppableDay>
               </div>
             );
@@ -858,8 +964,8 @@ export function AssignedWorkoutsConsole({
               key={date}
               className="rounded-[1.8rem] p-5"
               style={{
-                background: "#111118",
-                border: `1px solid ${isToday ? "#d95d39" : "#1a1a28"}`,
+                background: "var(--panel)",
+                border: `1px solid ${isToday ? "var(--primary)" : "var(--border)"}`,
               }}
             >
               <DayHeader isoDate={date} compact={false} todayIso={todayIso} />
@@ -868,9 +974,68 @@ export function AssignedWorkoutsConsole({
                 {dayAssignments.length === 0 ? (
                   <div
                     className="rounded-[1.2rem] px-3 py-5 text-sm"
-                    style={{ border: "1px dashed #1a1a28", color: "#3a3a55" }}
+                    style={{ border: "1px dashed var(--border)", color: "var(--dim)" }}
                   >
-                    No workout assigned.
+                    <div className="flex flex-col gap-3">
+                      <p>No workout assigned.</p>
+                      {!isAdmin && date >= todayIso ? (
+                        requestingDate === date ? (
+                          <div className="space-y-2">
+                            <input
+                              className="w-full rounded-[0.8rem] px-3 py-2 text-xs outline-none"
+                              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+                              type="date"
+                              min={todayIso}
+                              value={requestDate}
+                              onChange={(event) => setRequestDate(event.target.value)}
+                            />
+                            <textarea
+                              className="min-h-16 w-full rounded-[0.8rem] px-3 py-2 text-xs outline-none"
+                              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+                              placeholder="Optional note"
+                              value={requestNote}
+                              onChange={(event) => setRequestNote(event.target.value)}
+                              maxLength={500}
+                            />
+                            {requestError ? (
+                              <p className="text-[11px]" style={{ color: "var(--primary-strong)" }}>{requestError}</p>
+                            ) : null}
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                className="rounded-full px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+                                style={{ background: "var(--border)", color: "var(--text-soft)", border: "1px solid var(--border-strong)" }}
+                                disabled={requestSaving || !requestDate}
+                                onClick={() => void submitWorkoutRequest()}
+                                type="button"
+                              >
+                                {requestSaving ? "Sending…" : "Send"}
+                              </button>
+                              <button
+                                className="rounded-full px-3 py-1.5 text-xs font-semibold"
+                                style={{ color: "var(--dim)" }}
+                                onClick={cancelWorkoutRequest}
+                                type="button"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : requestedDates.includes(date) ? (
+                          <p className="text-[11px]" style={{ color: "var(--dim)" }}>
+                            Request sent.
+                          </p>
+                        ) : (
+                          <button
+                            className="w-fit rounded-full px-2.5 py-1 text-[11px] font-semibold transition-opacity hover:opacity-80"
+                            style={{ background: "transparent", border: "1px solid var(--border-strong)", color: "var(--dim)" }}
+                            onClick={() => beginWorkoutRequest(date)}
+                            type="button"
+                          >
+                            Request workout
+                          </button>
+                        )
+                      ) : null}
+                    </div>
                   </div>
                 ) : null}
 
@@ -883,10 +1048,16 @@ export function AssignedWorkoutsConsole({
                     key={assignment.id}
                     assignment={assignment}
                     disabled={isPastDone}
-                    className="rounded-[1.4rem] p-4"
+                    className="group relative rounded-[1.4rem] p-4"
                     style={{
-                      background: "#0d0d18",
-                      border: `1px solid ${isRejected ? "#2a1a1a" : isPastDone ? "#1a2a1a" : "#1a1a28"}`,
+                      background: "var(--panel-muted)",
+                      border: `1px solid ${
+                        isRejected
+                          ? "color-mix(in srgb, var(--danger) 25%, var(--border))"
+                          : isPastDone
+                            ? "color-mix(in srgb, var(--success) 25%, var(--border))"
+                            : "var(--border)"
+                      }`,
                       opacity: isRejected ? 0.55 : 1,
                     }}
                   >
@@ -896,28 +1067,35 @@ export function AssignedWorkoutsConsole({
                       type="button"
                     >
                       <div className="flex items-center gap-2">
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: isRejected ? "#55556a" : workoutTypeColor(assignment.workout.type) }}>
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: isRejected ? "var(--dim)" : workoutTypeColor(assignment.workout.type) }}>
                           {assignment.workout.type}
                         </p>
                         {assignment.workout.is_team_workout ? (
-                          <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold" style={{ background: "rgba(251,191,36,0.15)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.3)" }}>
+                          <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold" style={{ background: "color-mix(in srgb, var(--warning) 15%, transparent)", color: "var(--warning)", border: "1px solid color-mix(in srgb, var(--warning) 30%, transparent)" }}>
                             Team
                           </span>
                         ) : null}
                       </div>
                       {isRejected ? (
-                        <span className="mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "rgba(100,30,30,0.4)", color: "#e07a5f" }}>
+                        <span className="mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "color-mix(in srgb, var(--danger) 18%, transparent)", color: "var(--danger)" }}>
                           Rejected by you
                         </span>
                       ) : isPastDone ? (
-                        <span className="mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "rgba(16,185,129,0.15)", color: "#34d399" }}>
-                          Done ✓
-                        </span>
+                        <div className="relative mt-1 inline-block">
+                          <span className="inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "color-mix(in srgb, var(--success) 15%, transparent)", color: "var(--success)" }}>
+                            Done ✓
+                          </span>
+                          {(assignment.execution_scores?.length ?? 0) > 0 ? (
+                            <div className="invisible absolute bottom-full left-1/2 z-50 mb-1.5 -translate-x-1/2 group-hover:visible">
+                              <ScoreTooltip scores={assignment.execution_scores!} />
+                            </div>
+                          ) : null}
+                        </div>
                       ) : null}
-                      <h2 className="mt-1.5 text-base font-semibold" style={{ color: isRejected ? "#55556a" : "#F0EDF8" }}>
+                      <h2 className="mt-1.5 text-base font-semibold" style={{ color: isRejected ? "var(--dim)" : "var(--text)" }}>
                         {assignment.workout.title}
                       </h2>
-                      <p className="mt-1 text-xs" style={{ color: "#8888aa" }}>
+                      <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
                         {assignment.workout.sections.length} section{assignment.workout.sections.length !== 1 ? "s" : ""}
                         {" · "}
                         {assignment.workout.sections.reduce((n, s) => n + s.exercises.length, 0)} exercises
@@ -930,7 +1108,7 @@ export function AssignedWorkoutsConsole({
                           <span
                             key={`${assignment.id}-${athlete.id}`}
                             className="rounded-full px-2 py-0.5 text-[10px] font-semibold"
-                            style={{ background: "#9c799c", color: "#0A0A0F" }}
+                            style={{ background: "var(--primary)", color: "var(--bg)" }}
                           >
                             {athlete.nickname}
                           </span>
@@ -941,7 +1119,7 @@ export function AssignedWorkoutsConsole({
                     {assignment.admin_notes ? (
                       <p
                         className="mt-2.5 rounded-[1rem] px-3 py-2 text-xs"
-                        style={{ background: "rgba(217,93,57,0.1)", color: "#e07a5f" }}
+                        style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", color: "var(--primary-strong)" }}
                       >
                         {assignment.admin_notes}
                       </p>
@@ -950,7 +1128,7 @@ export function AssignedWorkoutsConsole({
                     <div className="mt-2.5">
                       <button
                         className="rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors"
-                        style={{ background: "#1a1a28", color: "#55556a", border: "1px solid #1e1e2e" }}
+                        style={{ background: "var(--border)", color: "var(--dim)", border: "1px solid var(--border)" }}
                         onClick={(e) => {
                           e.stopPropagation();
                           downloadIcsEvent({ title: assignment.workout.title, date });
@@ -966,9 +1144,9 @@ export function AssignedWorkoutsConsole({
                         <button
                           className="rounded-full px-3 py-1.5 text-xs font-semibold transition-colors"
                           style={{
-                            background: "rgba(156,121,156,0.12)",
-                            border: "1px solid rgba(156,121,156,0.2)",
-                            color: "#9c799c",
+                            background: "color-mix(in srgb, var(--primary) 12%, transparent)",
+                            border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)",
+                            color: "var(--primary)",
                           }}
                           onClick={() => beginEdit(assignment)}
                           type="button"
@@ -978,9 +1156,9 @@ export function AssignedWorkoutsConsole({
                         <button
                           className="rounded-full px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
                           style={{
-                            background: "rgba(217,93,57,0.1)",
-                            border: "1px solid rgba(217,93,57,0.2)",
-                            color: "#d95d39",
+                            background: "color-mix(in srgb, var(--primary) 10%, transparent)",
+                            border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)",
+                            color: "var(--primary)",
                           }}
                           disabled={deletingId === assignment.id}
                           onClick={() => void removeAssignment(assignment.id)}
@@ -991,9 +1169,9 @@ export function AssignedWorkoutsConsole({
                         <button
                           className="rounded-full px-3 py-1.5 text-xs font-semibold transition-colors"
                           style={{
-                            background: "rgba(136,136,170,0.1)",
-                            border: "1px solid rgba(136,136,170,0.2)",
-                            color: "#8888aa",
+                            background: "color-mix(in srgb, var(--muted) 10%, transparent)",
+                            border: "1px solid color-mix(in srgb, var(--muted) 20%, transparent)",
+                            color: "var(--muted)",
                           }}
                           onClick={() => setEditWorkoutTarget(assignment)}
                           type="button"
@@ -1006,15 +1184,15 @@ export function AssignedWorkoutsConsole({
                     {isAdmin && editingId === assignment.id ? (
                       <div
                         className="mt-4 space-y-4 rounded-[1.2rem] p-4"
-                        style={{ background: "#111118", border: "1px solid #1e1e2e" }}
+                        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
                       >
                         <label className="block">
-                          <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+                          <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                             Date
                           </span>
                           <input
                             className="mt-2 w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
-                            style={{ background: "#0d0d18", border: "1px solid #1a1a28", color: "#F0EDF8" }}
+                            style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                             onChange={(event) => setEditScheduledFor(event.target.value)}
                             type="date"
                             value={editScheduledFor}
@@ -1022,12 +1200,12 @@ export function AssignedWorkoutsConsole({
                         </label>
 
                         <label className="block">
-                          <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+                          <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                             Athlete search
                           </span>
                           <input
                             className="mt-2 w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
-                            style={{ background: "#0d0d18", border: "1px solid #1a1a28", color: "#F0EDF8" }}
+                            style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                             onChange={(event) => {
                               setAthletesLoading(true);
                               setEditQuery(event.target.value);
@@ -1046,8 +1224,8 @@ export function AssignedWorkoutsConsole({
                                 className="flex w-full items-center justify-between rounded-[0.9rem] px-3 py-2 text-left text-sm transition-colors"
                                 style={
                                   selected
-                                    ? { background: "#9c799c", color: "#0A0A0F" }
-                                    : { background: "#0d0d18", border: "1px solid #1a1a28", color: "#c0c0d8" }
+                                    ? { background: "var(--primary)", color: "var(--bg)" }
+                                    : { background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text-soft)" }
                                 }
                                 onClick={() =>
                                   setEditAthleteIds((current) =>
@@ -1068,7 +1246,7 @@ export function AssignedWorkoutsConsole({
                           {!athletesLoading && athletes.length === 0 ? (
                             <p
                               className="rounded-[0.9rem] px-3 py-4 text-sm"
-                              style={{ border: "1px dashed #1a1a28", color: "#3a3a55" }}
+                              style={{ border: "1px dashed var(--border)", color: "var(--dim)" }}
                             >
                               No athletes matched that search.
                             </p>
@@ -1076,12 +1254,12 @@ export function AssignedWorkoutsConsole({
                         </div>
 
                         <label className="block">
-                          <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+                          <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                             Admin notes
                           </span>
                           <textarea
                             className="mt-2 min-h-24 w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
-                            style={{ background: "#0d0d18", border: "1px solid #1a1a28", color: "#F0EDF8" }}
+                            style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                             onChange={(event) => setEditAdminNotes(event.target.value)}
                             value={editAdminNotes}
                           />
@@ -1090,7 +1268,7 @@ export function AssignedWorkoutsConsole({
                         <div className="flex flex-wrap gap-2">
                           <button
                             className="rounded-full px-3 py-2 text-sm font-semibold disabled:opacity-50"
-                            style={{ background: "#F0EDF8", color: "#0A0A0F" }}
+                            style={{ background: "var(--text)", color: "var(--bg)" }}
                             disabled={savingEdit || editAthleteIds.length === 0 || !editScheduledFor}
                             onClick={() => void saveEdit(assignment.id)}
                             type="button"
@@ -1099,7 +1277,7 @@ export function AssignedWorkoutsConsole({
                           </button>
                           <button
                             className="rounded-full px-3 py-2 text-sm font-medium transition-colors"
-                            style={{ background: "#1a1a28", color: "#c0c0d8" }}
+                            style={{ background: "var(--border)", color: "var(--text-soft)" }}
                             onClick={cancelEdit}
                             type="button"
                           >
@@ -1120,31 +1298,31 @@ export function AssignedWorkoutsConsole({
   }
 
   return (
-    <main className="min-h-screen px-4 py-8 md:px-8 md:py-12" style={{ background: "#0A0A0F" }}>
+    <main className="min-h-screen px-4 py-8 md:px-8 md:py-12" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-7xl space-y-6">
         <section
           className="flex flex-col gap-4 rounded-[2rem] px-6 py-5 sm:flex-row sm:items-center sm:justify-between"
-          style={{ background: "#111118", border: "1px solid #1a1a28" }}
+          style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
         >
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#d95d39]">
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">
               {pageTitle ?? (isAdmin ? "Workout Board" : "My Workouts")}
             </p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight" style={{ color: "#F0EDF8" }}>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
               {periodLabel}
             </h1>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex rounded-full p-0.5" style={{ background: "#1a1a28" }}>
+            <div className="flex rounded-full p-0.5" style={{ background: "var(--border)" }}>
               {(["3day", "week", "month"] as ViewMode[]).map((mode) => (
                 <button
                   key={mode}
                   className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
                   style={
                     viewMode === mode
-                      ? { background: "#F0EDF8", color: "#0A0A0F" }
-                      : { color: "#55556a" }
+                      ? { background: "var(--text)", color: "var(--bg)" }
+                      : { color: "var(--dim)" }
                   }
                   onClick={() => {
                     setLoading(true);
@@ -1160,7 +1338,7 @@ export function AssignedWorkoutsConsole({
 
             <button
               className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
-              style={{ background: "#1a1a28", color: "#c0c0d8" }}
+              style={{ background: "var(--border)", color: "var(--text-soft)" }}
               onClick={() => navigate(-1)}
               type="button"
             >
@@ -1168,7 +1346,7 @@ export function AssignedWorkoutsConsole({
             </button>
             <button
               className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
-              style={{ background: "#1a1a28", color: "#c0c0d8" }}
+              style={{ background: "var(--border)", color: "var(--text-soft)" }}
               onClick={goToToday}
               type="button"
             >
@@ -1176,7 +1354,7 @@ export function AssignedWorkoutsConsole({
             </button>
             <button
               className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
-              style={{ background: "#1a1a28", color: "#c0c0d8" }}
+              style={{ background: "var(--border)", color: "var(--text-soft)" }}
               onClick={() => navigate(1)}
               type="button"
             >
@@ -1191,7 +1369,7 @@ export function AssignedWorkoutsConsole({
             <div className="relative">
               <input
                 className="rounded-full px-4 py-2 text-sm outline-none"
-                style={{ background: "#111118", border: "1px solid #1a1a28", color: "#F0EDF8", minWidth: "14rem" }}
+                style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)", minWidth: "14rem" }}
                 placeholder="Filter by athlete…"
                 value={filterQuery}
                 onFocus={() => setFilterDropdownOpen(true)}
@@ -1204,7 +1382,7 @@ export function AssignedWorkoutsConsole({
               {filterDropdownOpen && filterAthletes.length > 0 ? (
                 <div
                   className="absolute left-0 top-full z-30 mt-1 w-64 rounded-[1rem] py-1 shadow-xl"
-                  style={{ background: "#111118", border: "1px solid #1a1a28" }}
+                  style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
                 >
                   {filterAthletes.map((athlete) => {
                     const selected = filterAthleteIds.includes(athlete.id);
@@ -1212,7 +1390,7 @@ export function AssignedWorkoutsConsole({
                       <button
                         key={athlete.id}
                         className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm transition-colors"
-                        style={{ color: selected ? "#d95d39" : "#F0EDF8" }}
+                        style={{ color: selected ? "var(--primary)" : "var(--text)" }}
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => {
                           setFilterAthleteIds((current) =>
@@ -1224,11 +1402,11 @@ export function AssignedWorkoutsConsole({
                         <span
                           className="flex h-4 w-4 shrink-0 items-center justify-center rounded"
                           style={{
-                            background: selected ? "#d95d39" : "#1a1a28",
-                            border: `1px solid ${selected ? "#d95d39" : "#3a3a55"}`,
+                            background: selected ? "var(--primary)" : "var(--border)",
+                            border: `1px solid ${selected ? "var(--primary)" : "var(--dim)"}`,
                           }}
                         >
-                          {selected ? <span className="text-[10px] font-bold text-white">✓</span> : null}
+                          {selected ? <span className="text-[10px] font-bold text-[var(--primary-contrast)]">✓</span> : null}
                         </span>
                         {athlete.nickname}
                       </button>
@@ -1248,7 +1426,7 @@ export function AssignedWorkoutsConsole({
                     <span
                       key={id}
                       className="flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold"
-                      style={{ background: "rgba(217,93,57,0.15)", border: "1px solid rgba(217,93,57,0.25)", color: "#d95d39" }}
+                      style={{ background: "color-mix(in srgb, var(--primary) 15%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 25%, transparent)", color: "var(--primary)" }}
                     >
                       {athlete.nickname}
                       <button
@@ -1263,7 +1441,7 @@ export function AssignedWorkoutsConsole({
                 })}
                 <button
                   className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
-                  style={{ background: "#1a1a28", color: "#8888aa" }}
+                  style={{ background: "var(--border)", color: "var(--muted)" }}
                   onClick={() => { setFilterAthleteIds([]); setFilterQuery(""); }}
                   type="button"
                 >
@@ -1278,19 +1456,28 @@ export function AssignedWorkoutsConsole({
           <section
             className="rounded-[1.8rem] px-5 py-4 text-sm"
             style={{
-              background: "rgba(217,93,57,0.1)",
-              border: "1px solid rgba(217,93,57,0.2)",
-              color: "#e07a5f",
+              background: "color-mix(in srgb, var(--primary) 10%, transparent)",
+              border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)",
+              color: "var(--primary-strong)",
             }}
           >
             {error}
           </section>
         ) : null}
 
+        {!isAdmin && requestStatus ? (
+          <section
+            className="rounded-[1.2rem] px-4 py-3 text-xs"
+            style={{ background: "color-mix(in srgb, var(--success) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--success) 16%, transparent)", color: "var(--success)" }}
+          >
+            {requestStatus}
+          </section>
+        ) : null}
+
         {loading ? (
           <section
             className="rounded-[1.8rem] px-5 py-4 text-sm"
-            style={{ background: "#111118", border: "1px solid #1a1a28", color: "#55556a" }}
+            style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--dim)" }}
           >
             Loading…
           </section>
@@ -1316,21 +1503,21 @@ export function AssignedWorkoutsConsole({
         {isAdmin && !loading ? (
           <section
             className="rounded-[1.8rem] p-6"
-            style={{ background: "#111118", border: "1px solid #1a1a28" }}
+            style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
           >
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "#55556a" }}>
+                <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>
                   Assign workout
                 </p>
-                <p className="mt-2 text-xl font-semibold" style={{ color: "#F0EDF8" }}>
+                <p className="mt-2 text-xl font-semibold" style={{ color: "var(--text)" }}>
                   Assign a workout to one or more athletes.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <button
                   className="rounded-full px-4 py-2 text-sm font-semibold"
-                  style={{ background: "#d95d39", color: "#fff" }}
+                  style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                   onClick={() => setShowQuickAssign(true)}
                   type="button"
                 >
@@ -1338,7 +1525,7 @@ export function AssignedWorkoutsConsole({
                 </button>
                 <Link
                   className="rounded-full px-4 py-2 text-sm font-semibold"
-                  style={{ background: "#1a1a28", color: "#c0c0d8" }}
+                  style={{ background: "var(--border)", color: "var(--text-soft)" }}
                   href="/admin/workouts"
                 >
                   Workout library

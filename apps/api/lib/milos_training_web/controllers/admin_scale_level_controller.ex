@@ -2,8 +2,7 @@ defmodule MilosTrainingWeb.AdminScaleLevelController do
   use MilosTrainingWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias MilosTraining.Application.ReplaceScaleLevels
-  alias MilosTraining.Workouts
+  alias MilosTraining.Application.{ListScaleLevels, ReplaceScaleLevels}
   alias OpenApiSpex.{MediaType, RequestBody, Schema}
 
   action_fallback MilosTrainingWeb.FallbackController
@@ -105,7 +104,7 @@ defmodule MilosTrainingWeb.AdminScaleLevelController do
   )
 
   def index(conn, _params) do
-    json(conn, %{scale_levels: Workouts.list_scale_levels()})
+    json(conn, %{scale_levels: ListScaleLevels.call()})
   end
 
   def update(conn, params) do

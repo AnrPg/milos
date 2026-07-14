@@ -11,7 +11,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAuthoring do
       params
       |> get_sections()
       |> Enum.with_index(1)
-      |> Enum.map(fn {section, index} -> normalize_section(section, index) end)
+      |> Enum.map(fn {section, index} -> normalize_section(section, index, nil) end)
 
     params
     |> drop_key(:sections)
@@ -19,20 +19,39 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAuthoring do
     |> Map.put(:sections, sections)
   end
 
-  defp normalize_section(section, order) do
+  defp normalize_section(section, order, parent_section_id) do
     exercises =
       section
       |> get_exercises()
       |> Enum.with_index(1)
       |> Enum.map(fn {exercise, index} -> normalize_exercise(exercise, index) end)
 
-    section
-    |> drop_key(:order)
-    |> drop_key("order")
-    |> drop_key(:exercises)
-    |> drop_key("exercises")
-    |> Map.put(:order, order)
-    |> Map.put(:exercises, exercises)
+    child_sections =
+      section
+      |> get_sections()
+      |> Enum.with_index(1)
+      |> Enum.map(fn {child_section, index} ->
+        # child sections track their parent by the parent's id or localId (client-assigned temp id)
+        normalize_section(child_section, index, parent_section_id_from(section))
+      end)
+
+    normalized =
+      section
+      |> drop_key(:order)
+      |> drop_key("order")
+      |> drop_key(:exercises)
+      |> drop_key("exercises")
+      |> drop_key(:sections)
+      |> drop_key("sections")
+      |> maybe_put(:parent_section_id, parent_section_id)
+      |> Map.put(:order, order)
+      |> Map.put(:exercises, exercises)
+
+    if child_sections == [] do
+      normalized
+    else
+      Map.put(normalized, :sections, child_sections)
+    end
   end
 
   defp normalize_exercise(exercise, order) do
@@ -46,6 +65,14 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAuthoring do
 
   defp get_exercises(section),
     do: Map.get(section, :exercises) || Map.get(section, "exercises") || []
+
+  defp parent_section_id_from(section),
+    do:
+      Map.get(section, :id) || Map.get(section, "id") || Map.get(section, :localId) ||
+        Map.get(section, "localId")
+
+  defp maybe_put(map, _key, nil), do: map
+  defp maybe_put(map, key, value), do: Map.put(map, key, value)
 
   defp drop_key(map, key), do: Map.delete(map, key)
 end

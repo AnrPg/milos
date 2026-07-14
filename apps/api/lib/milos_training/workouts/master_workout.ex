@@ -15,6 +15,7 @@ defmodule MilosTraining.Workouts.MasterWorkout do
     field :status, Ecto.Enum, values: @statuses, default: :draft
     field :draft_data, :map
     field :created_by_id, :binary_id
+    field :is_team_workout, :boolean, default: false
 
     has_many :sections, WorkoutSection, preload_order: [asc: :order]
 
@@ -23,27 +24,28 @@ defmodule MilosTraining.Workouts.MasterWorkout do
 
   def draft_changeset(workout \\ %__MODULE__{}, params) do
     workout
-    |> cast(params, [:title, :type, :created_by_id, :draft_data, :status])
+    |> cast(params, [:title, :type, :created_by_id, :draft_data, :status, :is_team_workout])
     |> validate_required([:created_by_id])
     |> foreign_key_constraint(:created_by_id)
   end
 
   def update_draft_changeset(workout, params) do
     workout
-    |> cast(params, [:title, :type, :draft_data])
+    |> cast(params, [:title, :type, :draft_data, :is_team_workout])
   end
 
   def publish_changeset(workout, params) do
     workout
-    |> cast(params, [:title, :type, :status])
+    |> cast(params, [:title, :type, :status, :is_team_workout])
     |> validate_required([:title, :type])
     |> validate_length(:title, min: 3, max: 160)
     |> put_change(:status, :published)
+    |> put_change(:draft_data, nil)
   end
 
   def create_changeset(workout \\ %__MODULE__{}, params) do
     workout
-    |> cast(params, [:title, :type, :created_by_id])
+    |> cast(params, [:title, :type, :created_by_id, :is_team_workout])
     |> validate_required([:title, :type, :created_by_id])
     |> validate_length(:title, min: 3, max: 160)
     |> put_change(:status, :published)

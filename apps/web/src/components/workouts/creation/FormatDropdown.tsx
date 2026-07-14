@@ -2,22 +2,52 @@
 
 import { useCallback, useRef, useState } from "react";
 
-import { AUTO_SCORE_MAP, FORMAT_GROUPS, FORMAT_LABELS, FORMAT_TOOLTIPS, type SectionFormat } from "@/types/workout";
+import { FORMAT_GROUPS, FORMAT_LABELS, FORMAT_TOOLTIPS, type SectionFormat } from "@/types/workout";
 
 type FormatDropdownProps = {
   value: SectionFormat;
   onChange: (format: SectionFormat) => void;
 };
 
+type DropdownRect = {
+  top?: number;
+  bottom?: number;
+  left: number;
+  width: number;
+  maxHeight: number;
+};
+
 export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
   const [open, setOpen] = useState(false);
   const [hoveredFormat, setHoveredFormat] = useState<SectionFormat | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [dropdownRect, setDropdownRect] = useState<DropdownRect | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   const close = useCallback(() => {
     setOpen(false);
     setHoveredFormat(null);
   }, []);
+
+  function openDropdown() {
+    if (!triggerRef.current) return;
+    const rect = triggerRef.current.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const openBelow = spaceBelow >= 200 || spaceBelow >= spaceAbove;
+    const maxHeight = Math.max(120, openBelow
+      ? Math.min(360, spaceBelow - 8)
+      : Math.min(360, spaceAbove - 8));
+
+    setDropdownRect({
+      left: rect.left,
+      width: rect.width,
+      maxHeight,
+      ...(openBelow
+        ? { top: rect.bottom + 4 }
+        : { bottom: window.innerHeight - rect.top + 4 }),
+    });
+    setOpen(true);
+  }
 
   function handleSelect(format: SectionFormat) {
     onChange(format);
@@ -27,10 +57,11 @@ export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
   const tooltip = hoveredFormat ? FORMAT_TOOLTIPS[hoveredFormat] : null;
 
   return (
-    <div ref={containerRef} className="relative w-full">
+    <div className="relative w-full">
       <button
+        ref={triggerRef}
         type="button"
-        onClick={() => setOpen((current) => !current)}
+        onClick={() => (open ? close() : openDropdown())}
         className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm font-semibold transition-colors"
         style={{
           background: "var(--card)",
@@ -42,14 +73,26 @@ export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
         <span style={{ color: "var(--muted)" }}>{open ? "^" : "v"}</span>
       </button>
 
-      {open ? (
+      {open && dropdownRect ? (
         <>
+          {/* Click-away overlay — scrolling in section config works independently */}
           <div className="fixed inset-0 z-40" onClick={close} />
 
-          <div className="absolute left-0 top-full z-50 mt-1 flex">
+          {/* Dropdown panel — fixed to viewport, escapes all overflow containers */}
+          <div
+            className="fixed z-50 flex"
+            style={{
+              top: dropdownRect.top,
+              bottom: dropdownRect.bottom,
+              left: dropdownRect.left,
+              width: dropdownRect.width,
+              alignItems: dropdownRect.bottom !== undefined ? "flex-end" : "flex-start",
+            }}
+          >
             <div
-              className="max-h-[360px] min-w-[220px] overflow-y-auto rounded-xl py-2"
+              className="min-w-[220px] w-full overflow-y-auto rounded-xl py-2"
               style={{
+                maxHeight: dropdownRect.maxHeight,
                 background: "var(--card)",
                 border: "1px solid var(--dim)",
                 boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
@@ -70,7 +113,7 @@ export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
                       onClick={() => handleSelect(format)}
                       onMouseEnter={() => setHoveredFormat(format)}
                       onMouseLeave={() => setHoveredFormat(null)}
-                      className="flex w-full items-center justify-between px-3 py-2 text-left text-sm transition-colors"
+                      className="w-full px-3 py-2 text-left text-sm transition-colors"
                       style={{
                         background:
                           format === value
@@ -81,18 +124,14 @@ export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
                         color: format === value ? "var(--accent)" : "var(--text)",
                       }}
                     >
-                      <span>{FORMAT_LABELS[format]}</span>
-                      {AUTO_SCORE_MAP[format] ? (
-                        <span className="ml-2 text-xs" style={{ color: "var(--muted)" }}>
-                          {AUTO_SCORE_MAP[format]}
-                        </span>
-                      ) : null}
+                      {FORMAT_LABELS[format]}
                     </button>
                   ))}
                 </div>
               ))}
             </div>
 
+            {/* Tooltip — rendered as sibling so it never clips */}
             {tooltip ? (
               <div
                 className="pointer-events-none ml-2 w-[240px] shrink-0 self-start rounded-xl p-4 text-xs"

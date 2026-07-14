@@ -1,6 +1,7 @@
 defmodule MilosTraining.Application.CompleteWorkout do
   alias MilosTraining.Application.{BroadcastUserSync, InvalidateLandingPages}
   alias MilosTraining.{Execution, Gamification, Identity, Notifications, Workouts}
+  alias MilosTraining.Workers.ProcessWorkoutCompletionJob
   alias MilosTraining.Workers.RefreshLeaderboardJob
 
   def call(execution_id, user_id, params) do
@@ -10,8 +11,10 @@ defmodule MilosTraining.Application.CompleteWorkout do
            Execution.complete_execution(
              execution_id,
              user_id,
-             Map.put(params, :segments, segments)
-           ) do
+             Map.put(params, :segments, segments),
+             completion_options(execution_id)
+           ),
+         :ok <- process_inline_if_needed(execution) do
       broadcast_completion(execution)
       {:ok, execution}
     end
@@ -70,6 +73,20 @@ defmodule MilosTraining.Application.CompleteWorkout do
       "workout:completed",
       {:workout_completed, execution}
     )
+  end
+
+  defp completion_options(execution_id) do
+    if Application.get_env(:milos_training, :start_oban, true) do
+      [completion_job: ProcessWorkoutCompletionJob.new(%{execution_id: execution_id})]
+    else
+      []
+    end
+  end
+
+  defp process_inline_if_needed(execution) do
+    if Application.get_env(:milos_training, :start_oban, true),
+      do: :ok,
+      else: process_completion(execution)
   end
 
   defp dispatch_challenge_notifications(challenge_completions) do

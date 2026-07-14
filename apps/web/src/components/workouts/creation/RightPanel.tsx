@@ -70,7 +70,7 @@ export function RightPanel({ scaleLevels, mobile = false }: Props) {
           className="rounded-2xl px-3 py-1 text-xs font-semibold transition-colors"
           style={{
             background: activeScale === null ? "var(--lime)" : "var(--card)",
-            color: activeScale === null ? "#0A0A0F" : "var(--muted)",
+            color: activeScale === null ? "var(--bg)" : "var(--muted)",
           }}
         >
           Base
@@ -82,7 +82,7 @@ export function RightPanel({ scaleLevels, mobile = false }: Props) {
             className="rounded-2xl px-3 py-1 text-xs font-semibold transition-colors"
             style={{
               background: activeScale === scaleLevel.slug ? "var(--lime)" : "var(--card)",
-              color: activeScale === scaleLevel.slug ? "#0A0A0F" : "var(--muted)",
+              color: activeScale === scaleLevel.slug ? "var(--bg)" : "var(--muted)",
             }}
           >
             {scaleLevel.label}

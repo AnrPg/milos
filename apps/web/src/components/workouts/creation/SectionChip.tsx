@@ -13,8 +13,9 @@ type SectionChipProps = {
 };
 
 export function SectionChip({ section, isSelected, onSelect }: SectionChipProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging, isOver } = useSortable({
     id: section.localId,
+    data: { type: "section" },
   });
 
   const complete = isSectionComplete(section);
@@ -31,16 +32,16 @@ export function SectionChip({ section, isSelected, onSelect }: SectionChipProps)
       className="flex cursor-pointer select-none items-center gap-2 rounded-2xl px-3 py-2 transition-colors"
       style={{
         ...style,
-        background: isSelected ? "var(--accent)" : "var(--card)",
-        border: `1px solid ${isSelected ? "var(--accent)" : "var(--dim)"}`,
-        color: isSelected ? "#0A0A0F" : "var(--text)",
+        background: isSelected ? "var(--accent)" : isOver ? "color-mix(in srgb, var(--accent) 20%, var(--card))" : "var(--card)",
+        border: `1px solid ${isSelected || isOver ? "var(--accent)" : "var(--dim)"}`,
+        color: isSelected ? "var(--bg)" : "var(--text)",
       }}
     >
       <span
         {...attributes}
         {...listeners}
         className="cursor-grab text-sm"
-        style={{ color: isSelected ? "#0A0A0F" : "var(--dim)" }}
+        style={{ color: isSelected ? "var(--bg)" : "var(--dim)" }}
         onClick={(event) => event.stopPropagation()}
       >
         ::

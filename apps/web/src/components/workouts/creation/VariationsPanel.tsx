@@ -7,10 +7,11 @@ import type { DraftExercise, DraftSection, LoadMode, PrescriptionUnit } from "@/
 import { UnitCycler } from "./UnitCycler";
 
 const PRESCRIPTION_UNITS: PrescriptionUnit[] = ["reps", "secs", "kcal"];
-const LOAD_MODES: LoadMode[] = ["absolute", "pct_1rm"];
+const LOAD_MODES: LoadMode[] = ["absolute", "pct_1rm", "bw"];
 const LOAD_LABELS: Record<LoadMode, string> = {
   absolute: "kg",
   pct_1rm: "%RM",
+  bw: "BW",
 };
 
 type Props = {
@@ -86,7 +87,7 @@ export function VariationsPanel({ exercise, section, scaleLevels }: Props) {
                   exerciseNameOverride: event.target.value === exercise.name ? null : event.target.value,
                 })
               }
-              className="w-28 min-w-0 border-b border-transparent bg-transparent text-sm outline-none transition-colors focus:border-current"
+              className="min-w-[6rem] flex-1 border-b border-transparent bg-transparent text-sm outline-none transition-colors focus:border-current"
               style={{ color: "var(--dim)" }}
             />
 

@@ -20,6 +20,7 @@ export type ReplaceScaleLevelsRequest = {
 export type CreateWorkoutRequest = {
   title: string;
   type: WorkoutType;
+  is_team_workout?: boolean;
   sections: Array<{
     name: string;
     order: number;
@@ -67,9 +68,6 @@ export type WorkoutExerciseRecord = {
   id?: string;
   name: string;
   description?: string | null;
-  base_sets?: number | null;
-  base_reps?: number | null;
-  base_duration_seconds?: number | null;
   sets?: number | null;
   prescription_value?: number | null;
   prescription_unit?: PrescriptionUnit | null;
@@ -107,6 +105,7 @@ export type WorkoutRecord = {
   id: string;
   title: string;
   type: string;
+  is_team_workout?: boolean;
   status?: string;
   created_by_id?: string;
   inserted_at?: string;
@@ -140,6 +139,24 @@ export async function replaceScaleLevels(token: string, payload: ReplaceScaleLev
 export async function listAdminWorkouts(token: string) {
   const response = await apiRequest<{ workouts: WorkoutRecord[] }>("/admin/workouts", { token });
   return response.workouts;
+}
+
+function stripNullDraftFields(payload: unknown) {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return payload;
+  }
+
+  const record = { ...(payload as Record<string, unknown>) };
+
+  if (record.type == null) {
+    delete record.type;
+  }
+
+  if (record.title == null) {
+    delete record.title;
+  }
+
+  return record;
 }
 
 function mapLegacyCreatePayload(payload: CreateWorkoutRequest) {
@@ -187,13 +204,23 @@ export async function updateDraftWorkout(
   token: string,
   id: string,
   payload: unknown,
+  options?: { editorSessionId?: string },
 ): Promise<{ id: string; status?: string }> {
+  const normalizedPayload = stripNullDraftFields(payload);
+  const requestBody =
+    options?.editorSessionId && normalizedPayload && typeof normalizedPayload === "object"
+      ? {
+          ...(normalizedPayload as Record<string, unknown>),
+          editor_session_id: options.editorSessionId,
+        }
+      : normalizedPayload;
+
   const response = await apiRequest<{ draft: { id: string; status?: string } }>(
     `/admin/workouts/${id}/draft`,
     {
       method: "PATCH",
       token,
-      body: payload,
+      body: requestBody,
     },
   );
 
@@ -210,9 +237,50 @@ export async function publishWorkout(token: string, id: string): Promise<Workout
   return response.workout;
 }
 
+export async function publishWorkoutDraft(
+  token: string,
+  id: string,
+  payload: unknown,
+): Promise<WorkoutRecord> {
+  const response = await apiRequest<{ workout: WorkoutRecord }>(`/admin/workouts/${id}/publish`, {
+    method: "POST",
+    token,
+    body: payload,
+  });
+
+  return response.workout;
+}
+
 export async function fetchAdminWorkout(token: string, id: string) {
   const response = await apiRequest<{ workout: WorkoutRecord }>(`/admin/workouts/${id}`, { token });
   return response.workout;
+}
+
+export async function deleteWorkout(token: string, id: string) {
+  await apiRequest<void>(`/admin/workouts/${id}`, {
+    method: "DELETE",
+    token,
+  });
+}
+
+export async function reopenWorkout(token: string, id: string): Promise<{ id: string; status: string }> {
+  const response = await apiRequest<{ draft: { id: string; status: string } }>(
+    `/admin/workouts/${id}/reopen`,
+    { method: "POST", token, body: {} },
+  );
+  return response.draft;
+}
+
+export async function duplicateWorkout(
+  token: string,
+  id: string,
+  context?: { assignment_id?: string; slot_id?: string },
+): Promise<{ id: string; status: string; title: string }> {
+  const response = await apiRequest<{ draft: { id: string; status: string; title: string } }>(
+    `/admin/workouts/${id}/duplicate`,
+    { method: "POST", token, body: context ?? {} },
+  );
+  return response.draft;
 }
 
 export async function fetchWorkout(token: string, id: string) {

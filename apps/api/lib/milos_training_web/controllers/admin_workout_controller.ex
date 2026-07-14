@@ -3,9 +3,19 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
   use OpenApiSpex.ControllerSpecs
 
   alias Guardian.Plug, as: GuardianPlug
-  alias MilosTraining.Application.{CreateDraftWorkout, PublishWorkout, UpdateDraftWorkout}
-  alias MilosTraining.Workouts
-  alias OpenApiSpex.{MediaType, RequestBody, Schema}
+
+  alias MilosTraining.Application.{
+    CreateDraftWorkout,
+    DeleteWorkout,
+    DuplicateWorkout,
+    GetAdminWorkout,
+    ListAdminWorkouts,
+    PublishWorkout,
+    ReopenWorkout,
+    UpdateDraftWorkout
+  }
+
+  alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
   action_fallback MilosTrainingWeb.FallbackController
 
@@ -13,78 +23,13 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
   security([%{"bearerAuth" => []}])
 
   plug OpenApiSpex.Plug.CastAndValidate,
-       [json_render_error_v2: true] when action in [:create, :publish]
+       [json_render_error_v2: true] when action in [:create, :update_draft, :publish]
 
-  @score_schema %Schema{
-    type: :object,
-    properties: %{
-      type: %Schema{type: :string},
-      unit: %Schema{type: :string},
-      label: %Schema{type: :string}
-    }
-  }
-
-  @timer_schema %Schema{
-    type: :object,
-    properties: %{
-      type: %Schema{type: :string},
-      interval_seconds: %Schema{type: :integer},
-      duration_seconds: %Schema{type: :integer},
-      rounds: %Schema{type: :integer},
-      work_seconds: %Schema{type: :integer},
-      rest_seconds: %Schema{type: :integer}
-    }
-  }
-
-  @variation_schema %Schema{
-    type: :object,
-    properties: %{
-      scale_level_slug: %Schema{type: :string},
-      sets: %Schema{type: :integer},
-      exercise_name_override: %Schema{type: :string},
-      prescription_value: %Schema{type: :integer},
-      prescription_unit: %Schema{type: :string},
-      load_value: %Schema{type: :integer},
-      load_mode: %Schema{type: :string},
-      excluded: %Schema{type: :boolean}
-    },
-    required: [:scale_level_slug]
-  }
-
-  @exercise_schema %Schema{
-    type: :object,
-    properties: %{
-      name: %Schema{type: :string},
-      sets: %Schema{type: :integer},
-      prescription_value: %Schema{type: :integer},
-      prescription_unit: %Schema{type: :string},
-      load_value: %Schema{type: :integer},
-      load_mode: %Schema{type: :string},
-      superset_group_id: %Schema{type: :string, format: :uuid},
-      hr_zone: %Schema{type: :integer},
-      tempo: %Schema{type: :string},
-      rest_seconds: %Schema{type: :integer},
-      cluster_rest_seconds: %Schema{type: :integer},
-      rest_pause_seconds: %Schema{type: :integer},
-      pacing: %Schema{type: :integer},
-      interval_assignment: %Schema{type: :integer},
-      order: %Schema{type: :integer},
-      variations: %Schema{type: :array, items: @variation_schema}
-    },
-    required: [:name, :order]
-  }
-
-  @section_schema %Schema{
-    type: :object,
-    properties: %{
-      name: %Schema{type: :string},
-      order: %Schema{type: :integer},
-      scoreable: %Schema{type: :boolean},
-      score_config: @score_schema,
-      timer_config: @timer_schema,
-      exercises: %Schema{type: :array, items: @exercise_schema}
-    },
-    required: [:name, :order, :exercises]
+  @id_param %Parameter{
+    name: :id,
+    in: :path,
+    required: true,
+    schema: %Schema{type: :string, format: :uuid}
   }
 
   operation(:index,
@@ -126,14 +71,7 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
 
   operation(:show,
     summary: "Get an admin workout draft or published workout",
-    parameters: [
-      %OpenApiSpex.Parameter{
-        name: :id,
-        in: :path,
-        required: true,
-        schema: %Schema{type: :string, format: :uuid}
-      }
-    ],
+    parameters: [@id_param],
     responses: [
       ok:
         {"Workout", "application/json",
@@ -150,6 +88,7 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
 
   operation(:update_draft,
     summary: "Autosave a workout draft",
+    parameters: [@id_param],
     request_body: %RequestBody{
       description: "Draft payload",
       required: true,
@@ -161,10 +100,15 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
               title: %Schema{type: :string},
               type: %Schema{
                 type: :string,
-                enum: Enum.map(MilosTraining.Workouts.MasterWorkout.types(), &to_string/1)
+                enum: Enum.map(MilosTraining.Workouts.MasterWorkout.types(), &to_string/1),
+                nullable: true
               },
-              sections: %Schema{type: :array, items: @section_schema}
-            }
+              sections: %Schema{
+                type: :array,
+                items: %Schema{type: :object, additionalProperties: true}
+              }
+            },
+            additionalProperties: true
           }
         }
       }
@@ -182,8 +126,9 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
 
   operation(:publish,
     summary: "Publish a workout draft",
+    parameters: [@id_param],
     request_body: %RequestBody{
-      description: "Optional publish overrides",
+      description: "Optional publish payload or overrides",
       required: false,
       content: %{
         "application/json" => %MediaType{
@@ -193,9 +138,15 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
               title: %Schema{type: :string},
               type: %Schema{
                 type: :string,
-                enum: Enum.map(MilosTraining.Workouts.MasterWorkout.types(), &to_string/1)
+                enum: Enum.map(MilosTraining.Workouts.MasterWorkout.types(), &to_string/1),
+                nullable: true
+              },
+              sections: %Schema{
+                type: :array,
+                items: %Schema{type: :object, additionalProperties: true}
               }
-            }
+            },
+            additionalProperties: true
           }
         }
       }
@@ -223,8 +174,21 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
     ]
   )
 
+  operation(:delete,
+    summary: "Hard delete a workout and dependent records",
+    parameters: [@id_param],
+    responses: [
+      no_content: {"Deleted", "application/json", %Schema{type: :object}},
+      not_found:
+        {"Not found", "application/json",
+         %Schema{type: :object, properties: %{error: %Schema{type: :string}}, required: [:error]}}
+    ]
+  )
+
   def index(conn, _params) do
-    json(conn, %{workouts: Workouts.list_workouts()})
+    with {:ok, workouts} <- ListAdminWorkouts.call() do
+      json(conn, %{workouts: workouts})
+    end
   end
 
   def create(conn, _params) do
@@ -242,14 +206,13 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
   end
 
   def show(conn, %{"id" => id}) do
-    case Workouts.get_workout_for_admin(id) do
-      nil -> {:error, :not_found}
-      workout -> json(conn, %{workout: workout})
+    with {:ok, workout} <- GetAdminWorkout.call(id) do
+      json(conn, %{workout: workout})
     end
   end
 
   def update_draft(conn, params) do
-    id = Map.get(params, "id") || get_in(conn.path_params, ["id"])
+    id = params[:id] || params["id"]
 
     case UpdateDraftWorkout.call(id, conn.body_params) do
       {:ok, draft} -> json(conn, %{draft: draft})
@@ -258,11 +221,85 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
   end
 
   def publish(conn, params) do
-    id = Map.get(params, "id") || get_in(conn.path_params, ["id"])
+    id = params[:id] || params["id"]
 
     case PublishWorkout.call(id, conn.body_params) do
       {:ok, workout} -> json(conn, %{workout: workout})
       error -> error
+    end
+  end
+
+  def delete(conn, %{"id" => id}) do
+    with :ok <- DeleteWorkout.call(id) do
+      send_resp(conn, :no_content, "")
+    end
+  end
+
+  operation(:reopen,
+    summary: "Reopen a published workout for editing",
+    parameters: [@id_param],
+    responses: [
+      ok:
+        {"Draft", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{draft: %Schema{type: :object, additionalProperties: true}},
+           required: [:draft]
+         }},
+      not_found:
+        {"Not found", "application/json",
+         %Schema{type: :object, properties: %{error: %Schema{type: :string}}, required: [:error]}},
+      unprocessable_entity:
+        {"Not published", "application/json",
+         %Schema{type: :object, properties: %{error: %Schema{type: :string}}, required: [:error]}}
+    ]
+  )
+
+  def reopen(conn, %{"id" => id}) do
+    case ReopenWorkout.call(id) do
+      {:ok, draft} -> json(conn, %{draft: draft})
+      {:error, :not_found} -> {:error, :not_found}
+      {:error, :not_published} -> {:error, :unprocessable_entity}
+      error -> error
+    end
+  end
+
+  operation(:duplicate,
+    summary: "Duplicate a workout as a new draft",
+    parameters: [@id_param],
+    responses: [
+      created:
+        {"Draft", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{draft: %Schema{type: :object, additionalProperties: true}},
+           required: [:draft]
+         }},
+      not_found:
+        {"Not found", "application/json",
+         %Schema{type: :object, properties: %{error: %Schema{type: :string}}, required: [:error]}}
+    ]
+  )
+
+  def duplicate(conn, params) do
+    id = Map.get(params, "id") || Map.get(params, :id)
+
+    opts = [
+      assignment_id: Map.get(conn.body_params, "assignment_id"),
+      slot_id: Map.get(conn.body_params, "slot_id")
+    ]
+
+    case DuplicateWorkout.call(id, opts) do
+      {:ok, draft} ->
+        conn
+        |> put_status(:created)
+        |> json(%{draft: draft})
+
+      {:error, :not_found} ->
+        {:error, :not_found}
+
+      error ->
+        error
     end
   end
 end

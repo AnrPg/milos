@@ -40,7 +40,7 @@ export function AssignedWorkoutPanel({
   onRescheduled,
   launching,
 }: Props) {
-  const [chatExpanded, setChatExpanded] = useState(false);
+  const [activeSection, setActiveSection] = useState<"details" | "conversation">("details");
   const [rejecting, setRejecting] = useState(false);
   const [rejectError, setRejectError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -137,14 +137,14 @@ export function AssignedWorkoutPanel({
       {/* Panel */}
       <div
         className="fixed right-0 z-50 flex w-full flex-col overflow-hidden md:max-w-[480px]"
-        style={{ background: "#0A0A0F", borderLeft: "1px solid #1a1a28", top: "3.25rem", bottom: 0 }}
+        style={{ background: "var(--bg)", borderLeft: "1px solid var(--border)", top: "3.25rem", bottom: 0 }}
       >
         {/* Sticky header */}
         <div
           className="sticky top-0 z-10 flex items-center justify-between gap-4 px-5 py-4"
           style={{
-            background: "#0A0A0F",
-            borderBottom: "1px solid #1a1a28",
+            background: "var(--bg)",
+            borderBottom: "1px solid var(--border)",
             minHeight: "3.25rem",
           }}
         >
@@ -159,7 +159,7 @@ export function AssignedWorkoutPanel({
               {assignment.workout.is_team_workout ? (
                 <span
                   className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-                  style={{ background: "rgba(251,191,36,0.15)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.35)" }}
+                  style={{ background: "color-mix(in srgb, var(--warning) 15%, transparent)", color: "var(--warning)", border: "1px solid color-mix(in srgb, var(--warning) 35%, transparent)" }}
                 >
                   Team
                 </span>
@@ -167,7 +167,7 @@ export function AssignedWorkoutPanel({
             </div>
             <h2
               className="mt-0.5 truncate text-base font-bold"
-              style={{ color: "#F0EDF8" }}
+              style={{ color: "var(--text)" }}
             >
               {assignment.workout.title}
             </h2>
@@ -176,9 +176,9 @@ export function AssignedWorkoutPanel({
                 <button
                   className="rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors"
                   style={{
-                    background: activeScale === null ? "#F0EDF8" : "#1a1a28",
-                    color: activeScale === null ? "#0A0A0F" : "#c0c0d8",
-                    border: activeScale === null ? "1px solid #F0EDF8" : "1px solid #25253a",
+                    background: activeScale === null ? "var(--text)" : "var(--border)",
+                    color: activeScale === null ? "var(--bg)" : "var(--text-soft)",
+                    border: activeScale === null ? "1px solid var(--text)" : "1px solid var(--border-strong)",
                   }}
                   onClick={() => setActiveScale(null)}
                   type="button"
@@ -190,9 +190,9 @@ export function AssignedWorkoutPanel({
                     key={sl.slug}
                     className="rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors"
                     style={{
-                      background: activeScale === sl.slug ? "rgba(156,121,156,0.22)" : "#1a1a28",
-                      color: activeScale === sl.slug ? "#c79ac7" : "#c0c0d8",
-                      border: activeScale === sl.slug ? "1px solid rgba(156,121,156,0.5)" : "1px solid #25253a",
+                      background: activeScale === sl.slug ? "color-mix(in srgb, var(--primary) 22%, transparent)" : "var(--border)",
+                      color: activeScale === sl.slug ? "var(--primary-strong)" : "var(--text-soft)",
+                      border: activeScale === sl.slug ? "1px solid color-mix(in srgb, var(--primary) 50%, transparent)" : "1px solid var(--border-strong)",
                     }}
                     onClick={() => setActiveScale(sl.slug)}
                     type="button"
@@ -206,7 +206,7 @@ export function AssignedWorkoutPanel({
           <div className="flex shrink-0 flex-col items-end gap-2">
             <button
               className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
-              style={{ background: "#1a1a28", color: "#8888aa" }}
+              style={{ background: "var(--border)", color: "var(--muted)" }}
               onClick={onClose}
               type="button"
             >
@@ -214,7 +214,7 @@ export function AssignedWorkoutPanel({
             </button>
             <button
               className="rounded-full px-3 py-1 text-[10px] font-semibold transition-colors"
-              style={{ background: "#1a1a28", color: "#55556a", border: "1px solid #1e1e2e" }}
+              style={{ background: "var(--border)", color: "var(--dim)", border: "1px solid var(--border)" }}
               onClick={() =>
                 downloadIcsEvent({
                   title: assignment.workout.title,
@@ -230,42 +230,57 @@ export function AssignedWorkoutPanel({
         </div>
 
         {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto px-5 py-5 space-y-6">
-          {/* Workout preview */}
-          <section>
-            <p
-              className="mb-3 text-xs font-semibold uppercase tracking-[0.2em]"
-              style={{ color: "#55556a" }}
+        <div className="flex-1 overflow-y-auto px-5 py-5 space-y-3">
+          <section className="overflow-hidden rounded-[1.2rem]" style={{ border: "1px solid var(--border)" }}>
+            <button
+              className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+              style={{ background: "var(--panel-muted)" }}
+              onClick={() => setActiveSection("details")}
+              type="button"
             >
-              Workout
-            </p>
-            <WorkoutPreviewDetail
-                sections={sections}
-                initiallyExpanded
-                activeScaleOverride={scaleLevels.length > 0 ? activeScale : undefined}
-                hideScaleChips={scaleLevels.length > 0}
-              />
-          </section>
+              <span className="text-sm font-medium" style={{ color: "var(--text)" }}>
+                Workout Details
+              </span>
+              <span style={{ color: "var(--dim)" }}>{activeSection === "details" ? "▲" : "▼"}</span>
+            </button>
 
-          {/* Admin notes */}
-          {assignment.admin_notes ? (
-            <section
-              className="rounded-[1.2rem] px-4 py-3 text-sm"
-              style={{ background: "rgba(217,93,57,0.1)", border: "1px solid rgba(217,93,57,0.15)", color: "#e07a5f" }}
-            >
-              <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: "#d95d39" }}>
-                Coach note
-              </p>
-              {assignment.admin_notes}
-            </section>
-          ) : null}
+            {activeSection === "details" ? (
+              <div className="space-y-6 px-4 py-4">
+                {/* Workout preview */}
+                <section>
+                  <p
+                    className="mb-3 text-xs font-semibold uppercase tracking-[0.2em]"
+                    style={{ color: "var(--dim)" }}
+                  >
+                    Workout
+                  </p>
+                  <WorkoutPreviewDetail
+                    sections={sections}
+                    initiallyExpanded
+                    activeScaleOverride={scaleLevels.length > 0 ? activeScale : undefined}
+                    hideScaleChips={scaleLevels.length > 0}
+                  />
+                </section>
 
-          {/* Admin controls */}
-          {isAdmin ? (
-            <section className="space-y-3">
+                {/* Admin notes */}
+                {assignment.admin_notes ? (
+                  <section
+                    className="rounded-[1.2rem] px-4 py-3 text-sm"
+                    style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 15%, transparent)", color: "var(--primary-strong)" }}
+                  >
+                    <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: "var(--primary)" }}>
+                      Coach note
+                    </p>
+                    {assignment.admin_notes}
+                  </section>
+                ) : null}
+
+                {/* Admin controls */}
+                {isAdmin ? (
+                  <section className="space-y-3">
               {(assignment.athletes ?? []).length > 0 ? (
                 <div>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "#55556a" }}>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
                     Assigned athletes
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -273,7 +288,7 @@ export function AssignedWorkoutPanel({
                       <span
                         key={athlete.id}
                         className="rounded-full px-3 py-1 text-xs font-semibold"
-                        style={{ background: "rgba(156,121,156,0.15)", border: "1px solid rgba(156,121,156,0.25)", color: "#9c799c" }}
+                        style={{ background: "color-mix(in srgb, var(--primary) 15%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 25%, transparent)", color: "var(--primary)" }}
                       >
                         {athlete.nickname}
                       </span>
@@ -283,10 +298,10 @@ export function AssignedWorkoutPanel({
               ) : null}
 
               <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "#55556a" }}>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
                   Scheduled for
                 </p>
-                <p className="text-sm font-semibold" style={{ color: "#F0EDF8" }}>
+                <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
                   {assignment.scheduled_for}
                 </p>
               </div>
@@ -295,7 +310,7 @@ export function AssignedWorkoutPanel({
                 {onEditWorkout ? (
                   <button
                     className="rounded-full px-4 py-2 text-xs font-semibold transition-colors"
-                    style={{ background: "rgba(136,136,170,0.1)", border: "1px solid rgba(136,136,170,0.2)", color: "#8888aa" }}
+                    style={{ background: "color-mix(in srgb, var(--muted) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--muted) 20%, transparent)", color: "var(--muted)" }}
                     onClick={() => onEditWorkout(assignment)}
                     type="button"
                   >
@@ -304,7 +319,7 @@ export function AssignedWorkoutPanel({
                 ) : null}
                 <button
                   className="rounded-full px-4 py-2 text-xs font-semibold disabled:opacity-50 transition-colors"
-                  style={{ background: "rgba(217,93,57,0.1)", border: "1px solid rgba(217,93,57,0.2)", color: "#d95d39" }}
+                  style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)", color: "var(--primary)" }}
                   disabled={deleting}
                   onClick={() => void handleDelete()}
                   type="button"
@@ -313,16 +328,113 @@ export function AssignedWorkoutPanel({
                 </button>
               </div>
               {deleteError ? (
-                <p className="text-xs" style={{ color: "#e07a5f" }}>{deleteError}</p>
+                <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{deleteError}</p>
               ) : null}
-            </section>
-          ) : null}
+                  </section>
+                ) : null}
+
+                {/* Athlete actions: Reject + Reschedule side-by-side */}
+                {!isAdmin ? (
+                  <section className="pb-4">
+                    {rejectError ? (
+                      <p className="mb-2 text-xs" style={{ color: "var(--primary-strong)" }}>{rejectError}</p>
+                    ) : null}
+                    {!rescheduling ? (
+                      <div className="flex gap-2">
+                        <button
+                          className="flex-1 rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
+                          style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", color: "var(--primary)", border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)" }}
+                          disabled={rejecting}
+                          onClick={() => void handleReject()}
+                          type="button"
+                        >
+                          {rejecting ? "Rejecting…" : "Reject workout"}
+                        </button>
+                        <button
+                          className="flex-1 rounded-full px-4 py-2 text-sm font-semibold"
+                          style={{ background: "var(--border)", color: "var(--text-soft)" }}
+                          onClick={() => {
+                            setRescheduleDate(assignment.scheduled_for);
+                            setRescheduling(true);
+                          }}
+                          type="button"
+                        >
+                          Reschedule
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <input
+                          className="w-full rounded-[1rem] px-4 py-2 text-sm outline-none"
+                          style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+                          type="date"
+                          min={todayIso}
+                          value={rescheduleDate}
+                          onChange={(e) => setRescheduleDate(e.target.value)}
+                        />
+                        {rescheduleError ? (
+                          <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{rescheduleError}</p>
+                        ) : null}
+                        <div className="flex gap-2">
+                          <button
+                            className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
+                            style={{ background: "var(--text)", color: "var(--bg)" }}
+                            disabled={rescheduleSaving || !rescheduleDate}
+                            onClick={() => void handleReschedule()}
+                            type="button"
+                          >
+                            {rescheduleSaving ? "Saving…" : "Confirm"}
+                          </button>
+                          <button
+                            className="rounded-full px-4 py-2 text-sm font-semibold"
+                            style={{ background: "var(--border)", color: "var(--muted)" }}
+                            onClick={() => setRescheduling(false)}
+                            type="button"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </section>
+                ) : null}
+
+                {/* Completion scores */}
+                {assignment.execution_status === "completed" && (assignment.execution_scores ?? []).length > 0 ? (
+                  <section>
+                    <p
+                      className="mb-3 text-xs font-semibold uppercase tracking-[0.2em]"
+                      style={{ color: "var(--dim)" }}
+                    >
+                      Your scores
+                    </p>
+                    <div className="space-y-2">
+                      {(assignment.execution_scores ?? []).map((score, index) => (
+                        <div
+                          key={score.section_id ?? index}
+                          className="flex items-center justify-between rounded-[1rem] px-4 py-2.5"
+                          style={{ background: "color-mix(in srgb, var(--success) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--success) 15%, transparent)" }}
+                        >
+                          <span className="text-xs" style={{ color: "var(--muted)" }}>
+                            {score.section_name ?? score.section_id}
+                          </span>
+                          <span className="text-sm font-semibold" style={{ color: "var(--success)" }}>
+                            {score.value}{score.unit ? ` ${score.unit}` : ""}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                ) : null}
+              </div>
+            ) : null}
+          </section>
 
           <ChatSection
             contextType="assignment"
             contextId={assignment.id}
-            isExpanded={chatExpanded}
-            onToggle={() => setChatExpanded((v) => !v)}
+            isExpanded={activeSection === "conversation"}
+            onToggle={() => setActiveSection("conversation")}
             participantNicknames={
               isAdmin
                 ? Object.fromEntries(
@@ -332,112 +444,18 @@ export function AssignedWorkoutPanel({
             }
           />
 
-          {/* Athlete rejection */}
-          {!isAdmin ? (
-            <section>
-              {rejectError ? (
-                <p className="mb-2 text-xs" style={{ color: "#e07a5f" }}>{rejectError}</p>
-              ) : null}
-              <button
-                className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
-                style={{ background: "rgba(217,93,57,0.12)", color: "#d95d39", border: "1px solid rgba(217,93,57,0.2)" }}
-                disabled={rejecting}
-                onClick={() => void handleReject()}
-                type="button"
-              >
-                {rejecting ? "Rejecting…" : "Reject workout"}
-              </button>
-            </section>
-          ) : null}
-
-          {/* Reschedule */}
-          <section className="px-0 pb-4">
-            {!rescheduling ? (
-              <button
-                className="rounded-full px-4 py-2 text-sm font-semibold"
-                style={{ background: "#1a1a28", color: "#c0c0d8" }}
-                onClick={() => {
-                  setRescheduleDate(assignment.scheduled_for);
-                  setRescheduling(true);
-                }}
-                type="button"
-              >
-                Reschedule
-              </button>
-            ) : (
-              <div className="space-y-2">
-                <input
-                  className="w-full rounded-[1rem] px-4 py-2 text-sm outline-none"
-                  style={{ background: "#111118", border: "1px solid #1e1e2e", color: "#F0EDF8" }}
-                  type="date"
-                  min={todayIso}
-                  value={rescheduleDate}
-                  onChange={(e) => setRescheduleDate(e.target.value)}
-                />
-                {rescheduleError ? (
-                  <p className="text-xs" style={{ color: "#e07a5f" }}>{rescheduleError}</p>
-                ) : null}
-                <div className="flex gap-2">
-                  <button
-                    className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
-                    style={{ background: "#F0EDF8", color: "#0A0A0F" }}
-                    disabled={rescheduleSaving || !rescheduleDate}
-                    onClick={() => void handleReschedule()}
-                    type="button"
-                  >
-                    {rescheduleSaving ? "Saving…" : "Confirm"}
-                  </button>
-                  <button
-                    className="rounded-full px-4 py-2 text-sm font-semibold"
-                    style={{ background: "#1a1a28", color: "#8888aa" }}
-                    onClick={() => setRescheduling(false)}
-                    type="button"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
-          </section>
-
-          {/* Completion scores */}
-          {assignment.execution_status === "completed" && (assignment.execution_scores ?? []).length > 0 ? (
-            <section>
-              <p
-                className="mb-3 text-xs font-semibold uppercase tracking-[0.2em]"
-                style={{ color: "#55556a" }}
-              >
-                Your scores
-              </p>
-              <div className="space-y-2">
-                {(assignment.execution_scores ?? []).map((score, index) => (
-                  <div
-                    key={score.section_id ?? index}
-                    className="flex items-center justify-between rounded-[1rem] px-4 py-2.5"
-                    style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.15)" }}
-                  >
-                    <span className="text-xs" style={{ color: "#8888aa" }}>
-                      {score.section_name ?? score.section_id}
-                    </span>
-                    <span className="text-sm font-semibold" style={{ color: "#34d399" }}>
-                      {score.value}{score.unit ? ` ${score.unit}` : ""}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </section>
-          ) : null}
         </div>
 
         {/* Bottom CTA */}
-        <div
-          className="border-t px-5 py-4"
-          style={{ borderColor: "#1a1a28", background: "#0A0A0F" }}
-        >
+        {activeSection === "details" ? (
+          <div
+            className="border-t px-5 py-4"
+            style={{ borderColor: "var(--border)", background: "var(--bg)" }}
+          >
           {assignment.execution_status === "completed" && assignment.scheduled_for <= todayIso ? (
             <button
               className="w-full rounded-full py-3 text-sm font-bold tracking-wide disabled:opacity-50"
-              style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", color: "#34d399" }}
+              style={{ background: "color-mix(in srgb, var(--success) 15%, transparent)", border: "1px solid color-mix(in srgb, var(--success) 30%, transparent)", color: "var(--success)" }}
               disabled={launching}
               onClick={() => onStartWorkout(assignment)}
               type="button"
@@ -447,7 +465,7 @@ export function AssignedWorkoutPanel({
           ) : (
             <button
               className="w-full rounded-full py-3 text-sm font-bold tracking-wide disabled:opacity-50"
-              style={{ background: "#d95d39", color: "#fff" }}
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
               disabled={launching}
               onClick={() => onStartWorkout(assignment)}
               type="button"
@@ -455,7 +473,8 @@ export function AssignedWorkoutPanel({
               {launching ? "Starting…" : "Start Workout"}
             </button>
           )}
-        </div>
+          </div>
+        ) : null}
       </div>
     </>
   );
