@@ -11,17 +11,21 @@ services:
       DB_USER: ${DB_USER:-postgres}
       GUARDIAN_ISSUER: ${GUARDIAN_ISSUER:-milos_training}
       GUARDIAN_SECRET_KEY: ${GUARDIAN_SECRET_KEY:?set GUARDIAN_SECRET_KEY in your environment or .env}
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-dev-meili-master-key}
+      MEILI_URL: http://meilisearch:7700
       PHX_HOST: ${PHX_HOST:-localhost}
       PHX_SERVER: "true"
       PORT: 4000
       REDIS_URL: redis://redis:6379
       SECRET_KEY_BASE: ${SECRET_KEY_BASE:?set SECRET_KEY_BASE in your environment or .env}
       MIX_ENV: prod
-    command: ./bin/milos_training start
+    command: sh -lc "./bin/milos_training eval \"MilosTraining.Release.migrate()\" && exec ./bin/milos_training start"
     depends_on:
       postgres:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      meilisearch:
         condition: service_healthy
     networks: [app]
     healthcheck:
@@ -44,6 +48,8 @@ services:
       DB_USER: ${DB_USER:-postgres}
       GUARDIAN_ISSUER: ${GUARDIAN_ISSUER:-milos_training}
       GUARDIAN_SECRET_KEY: ${GUARDIAN_SECRET_KEY:?set GUARDIAN_SECRET_KEY in your environment or .env}
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-dev-meili-master-key}
+      MEILI_URL: http://meilisearch:7700
       PHX_HOST: ${PHX_HOST:-localhost}
       PORT: 4000
       REDIS_URL: redis://redis:6379
@@ -52,6 +58,8 @@ services:
     command: ./bin/milos_training eval "MilosTraining.Release.migrate()"
     depends_on:
       postgres:
+        condition: service_healthy
+      meilisearch:
         condition: service_healthy
     networks: [app]
     restart: "no"
@@ -117,7 +125,7 @@ services:
       retries: 10
 
   meilisearch:
-    image: getmeili/meilisearch:latest
+    image: getmeili/meilisearch:v1.45.2@sha256:271ee84030a77cfa8e60358138bb34260f69110795c2441437b44832fe865618
     environment:
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-dev-meili-master-key}
     volumes:
@@ -130,7 +138,7 @@ services:
       retries: 10
 
   minio:
-    image: minio/minio
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-milos_minio}

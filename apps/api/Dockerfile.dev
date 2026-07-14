@@ -1,4 +1,5 @@
-FROM elixir:1.17.3-otp-27-alpine
+ARG API_DEV_BASE_IMAGE=elixir:1.17.3-otp-27-alpine
+FROM ${API_DEV_BASE_IMAGE}
 
 RUN apk add --no-cache build-base git inotify-tools
 
