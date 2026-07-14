@@ -7,6 +7,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     FinanceCreditLedgerEntry,
     FinanceInvoice,
     FinanceInvoiceLine,
+    FinanceSetting,
     Membership,
     MembershipPackage,
     MembershipPackageSubscription,
@@ -23,6 +24,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   alias MilosTraining.Finance.Domain.{
     CreditLedger,
     InvoiceLifecycle,
+    InvoiceNumber,
     MembershipLifecycle,
     MembershipLinks,
     PromotionRedemptionPolicy,
@@ -469,18 +471,21 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     params = string_key_map(params)
 
     with %Membership{} = membership <- Repo.get(Membership, membership_id),
+         {:ok, params} <- maybe_prefill_invoice_from_subscription(membership.id, params),
          :ok <- validate_invoice_subscription_link(membership.id, params),
          {:ok, line_params} <- invoice_line_params(params),
          :ok <- validate_invoice_line_subscription_links(membership.id, line_params),
          totals <- InvoiceLifecycle.invoice_totals(line_params) do
       Repo.transaction(fn ->
+        invoice_number = next_invoice_number(line_params)
+
         invoice =
           %FinanceInvoice{}
           |> FinanceInvoice.changeset(
             params
             |> Map.put("membership_id", membership.id)
             |> Map.put("user_id", membership.user_id)
-            |> Map.put_new("invoice_number", next_invoice_number())
+            |> Map.put_new("invoice_number", invoice_number)
             |> Map.put_new("invoice_type", "manual")
             |> Map.put_new("status", "draft")
             |> Map.put_new("currency", "EUR")
@@ -871,6 +876,20 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   end
 
   @impl true
+  def update_referral_program(id, params) do
+    case Repo.get(ReferralProgram, id) do
+      nil ->
+        {:error, :not_found}
+
+      %ReferralProgram{} = program ->
+        program
+        |> ReferralProgram.changeset(params)
+        |> Repo.update()
+        |> normalize_result(&normalize_referral_program/1)
+    end
+  end
+
+  @impl true
   def list_referral_programs do
     ReferralProgram
     |> order_by([program], desc: program.active, asc: program.name)
@@ -968,13 +987,17 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         {:error, :not_found}
 
       %ReferralReward{} = reward ->
-        with :ok <- ReferralLifecycle.validate_transition(reward.status, status),
+        with :ok <- validate_reward_transition(reward.status, status),
              {:ok, event} <- get_reward_event(reward),
              :ok <- validate_reward_event_status(event, status),
              {:ok, updated_reward} <- update_reward_and_event(reward, event, status) do
           {:ok, normalize_referral_reward(updated_reward)}
         end
     end
+  end
+
+  defp validate_reward_transition(current_status, next_status) do
+    ReferralLifecycle.validate_reward_transition(current_status, next_status)
   end
 
   defp update_reward_and_event(reward, event, status) do
@@ -1012,7 +1035,20 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp fulfill_referral_reward(%ReferralReward{} = reward, "applied") do
     case ReferralRewardFulfillment.plan(reward) do
       {:ok, {:credit_grant, amount_cents}} ->
-        maybe_create_referral_reward_credit_grant(reward, amount_cents)
+        sync_referral_reward_credit(reward, amount_cents, amount_cents)
+
+      {:ok, :lifecycle_only} ->
+        reward
+
+      {:error, reason} ->
+        Repo.rollback(reason)
+    end
+  end
+
+  defp fulfill_referral_reward(%ReferralReward{} = reward, "rejected") do
+    case ReferralRewardFulfillment.plan(reward) do
+      {:ok, {:credit_grant, amount_cents}} ->
+        sync_referral_reward_credit(reward, amount_cents, 0)
 
       {:ok, :lifecycle_only} ->
         reward
@@ -1024,38 +1060,110 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   defp fulfill_referral_reward(%ReferralReward{} = reward, _status), do: reward
 
-  defp maybe_create_referral_reward_credit_grant(%ReferralReward{} = reward, amount_cents) do
-    idempotency_key = "referral_reward:#{reward.id}"
+  defp sync_referral_reward_credit(%ReferralReward{} = reward, amount_cents, target_cents) do
+    current_cents = referral_reward_credit_total(reward.id)
+    delta_cents = target_cents - current_cents
 
-    if Repo.get_by(FinanceCreditLedgerEntry, idempotency_key: idempotency_key) do
+    if delta_cents == 0 do
       reward
     else
       with %Membership{} = membership <-
              Repo.get_by(Membership, user_id: reward.recipient_user_id),
            {:ok, _entry} <-
-             create_credit_entry(%{
-               "membership_id" => membership.id,
-               "user_id" => membership.user_id,
-               "referral_reward_id" => reward.id,
-               "source_type" => "referral_reward",
-               "entry_type" => "grant",
-               "amount_cents" => amount_cents,
-               "currency" => "EUR",
-               "occurred_on" => Date.utc_today(),
-               "occurred_at" => reward.applied_at || utc_now(),
-               "description" => "Referral reward credit",
-               "idempotency_key" => idempotency_key,
-               "params" => %{
-                 referral_event_id: reward.referral_event_id,
-                 reward_type: reward.reward_type
-               }
-             }) do
+             create_referral_reward_credit_adjustment(
+               reward,
+               membership,
+               amount_cents,
+               target_cents,
+               delta_cents
+             ) do
         reward
       else
         nil -> Repo.rollback(:recipient_membership_not_found)
         {:error, reason} -> Repo.rollback(reason)
       end
     end
+  end
+
+  defp create_referral_reward_credit_adjustment(
+         reward,
+         membership,
+         amount_cents,
+         target_cents,
+         delta_cents
+       ) do
+    create_credit_entry(%{
+      "membership_id" => membership.id,
+      "user_id" => membership.user_id,
+      "referral_reward_id" => reward.id,
+      "source_type" => referral_reward_credit_source(delta_cents),
+      "entry_type" => referral_reward_credit_entry_type(delta_cents),
+      "amount_cents" => delta_cents,
+      "currency" => "EUR",
+      "occurred_on" => Date.utc_today(),
+      "occurred_at" => referral_reward_credit_occurred_at(reward, delta_cents),
+      "description" => referral_reward_credit_description(delta_cents),
+      "reversed_credit_ledger_entry_id" =>
+        referral_reward_credit_reversed_entry_id(reward.id, delta_cents),
+      "idempotency_key" => referral_reward_credit_idempotency_key(reward.id),
+      "params" => %{
+        referral_event_id: reward.referral_event_id,
+        reward_type: reward.reward_type,
+        reward_value: amount_cents,
+        target_cents: target_cents
+      }
+    })
+  end
+
+  defp referral_reward_credit_total(reward_id) do
+    FinanceCreditLedgerEntry
+    |> where([entry], entry.referral_reward_id == ^reward_id)
+    |> Repo.aggregate(:sum, :amount_cents)
+    |> case do
+      nil -> 0
+      value -> value
+    end
+  end
+
+  defp referral_reward_credit_source(delta_cents) when delta_cents > 0, do: "referral_reward"
+  defp referral_reward_credit_source(_delta_cents), do: "reversal"
+
+  defp referral_reward_credit_entry_type(delta_cents) when delta_cents > 0, do: "grant"
+  defp referral_reward_credit_entry_type(_delta_cents), do: "reversal"
+
+  defp referral_reward_credit_occurred_at(reward, delta_cents) when delta_cents > 0,
+    do: reward.applied_at || utc_now()
+
+  defp referral_reward_credit_occurred_at(_reward, _delta_cents), do: utc_now()
+
+  defp referral_reward_credit_description(delta_cents) when delta_cents > 0,
+    do: "Referral reward credit"
+
+  defp referral_reward_credit_description(_delta_cents), do: "Referral reward credit reversal"
+
+  defp referral_reward_credit_reversed_entry_id(_reward_id, delta_cents) when delta_cents > 0,
+    do: nil
+
+  defp referral_reward_credit_reversed_entry_id(reward_id, _delta_cents) do
+    FinanceCreditLedgerEntry
+    |> where([entry], entry.referral_reward_id == ^reward_id)
+    |> where([entry], entry.amount_cents > 0)
+    |> order_by([entry], desc: entry.occurred_at, desc: entry.inserted_at)
+    |> limit(1)
+    |> Repo.one()
+    |> case do
+      nil -> nil
+      entry -> entry.id
+    end
+  end
+
+  defp referral_reward_credit_idempotency_key(reward_id) do
+    adjustment_count =
+      FinanceCreditLedgerEntry
+      |> where([entry], entry.referral_reward_id == ^reward_id)
+      |> Repo.aggregate(:count, :id)
+
+    "referral_reward:#{reward_id}:adjustment:#{adjustment_count + 1}"
   end
 
   defp locked_membership(membership_id) do
@@ -1197,6 +1305,58 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     |> Repo.all()
     |> Enum.map(&normalize_invoice_with_balance/1)
   end
+
+  defp maybe_prefill_invoice_from_subscription(_membership_id, %{"lines" => lines} = params)
+       when is_list(lines) and length(lines) > 0 do
+    {:ok, params}
+  end
+
+  defp maybe_prefill_invoice_from_subscription(
+         membership_id,
+         %{"membership_package_subscription_id" => subscription_id} = params
+       )
+       when is_binary(subscription_id) and subscription_id != "" do
+    case Repo.get(MembershipPackageSubscription, subscription_id) do
+      nil ->
+        {:error, :not_found}
+
+      %MembershipPackageSubscription{} = subscription ->
+        with :ok <-
+               MembershipLinks.validate_optional_link(
+                 :membership_package_subscription_id,
+                 membership_id,
+                 subscription.membership_id
+               ) do
+          amount_cents =
+            parse_integer(params["amount_cents"], subscription.price_cents_snapshot || 0)
+
+          description =
+            params["description"] || params["notes"] ||
+              "Package: #{subscription.package_code_snapshot}"
+
+          {:ok,
+           params
+           |> Map.put("amount_cents", amount_cents)
+           |> Map.put_new("line_type", "membership_package")
+           |> Map.put_new("description", description)
+           |> Map.put_new("notes", description)
+           |> Map.put("lines", [
+             %{
+               "membership_package_subscription_id" => subscription.id,
+               "line_type" => "membership_package",
+               "description" => description,
+               "quantity" => 1,
+               "unit_amount_cents" => amount_cents,
+               "discount_cents" => parse_integer(params["discount_cents"], 0),
+               "package_code_snapshot" => subscription.package_code_snapshot,
+               "package_family_snapshot" => subscription.package_family_snapshot
+             }
+           ])}
+        end
+    end
+  end
+
+  defp maybe_prefill_invoice_from_subscription(_membership_id, params), do: {:ok, params}
 
   defp invoice_line_params(%{"lines" => lines}) when is_list(lines) and length(lines) > 0 do
     normalize_line_params(lines)
@@ -1590,9 +1750,14 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       |> Repo.all()
       |> Map.new(&{&1.membership_id, &1})
 
+    outstanding_by_membership_id =
+      outstanding_balance_per_membership(membership_ids)
+
     Map.new(memberships, fn membership ->
       subscriptions = Map.get(subscriptions_by_membership_id, membership.id, [])
       last_payment = Map.get(last_payments_by_membership_id, membership.id)
+      credit_balance_cents = credit_balance(membership.id)
+      outstanding_cents = Map.get(outstanding_by_membership_id, membership.id, 0)
 
       {membership.user_id,
        %{
@@ -1603,6 +1768,9 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
              subscriptions,
              &(&1.status in InvoiceLifecycle.active_subscription_statuses())
            ),
+         credit_balance: credit_balance_cents,
+         credit_balance_cents: credit_balance_cents,
+         outstanding_balance_cents: outstanding_cents,
          last_payment_on: last_payment && last_payment.paid_on,
          last_payment_amount_cents: last_payment && last_payment.amount_cents
        }}
@@ -2172,6 +2340,12 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   defp normalize_uuid_list(_values), do: []
 
+  defp dump_uuid_list(values) do
+    values
+    |> normalize_uuid_list()
+    |> Enum.map(&Ecto.UUID.dump!/1)
+  end
+
   defp summary_since(nil), do: Date.add(Date.utc_today(), -30)
 
   defp summary_since(days) when is_integer(days) do
@@ -2196,9 +2370,31 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   defp parse_date(_value, default), do: default
 
-  defp next_invoice_number do
-    "INV-" <> (Ecto.UUID.generate() |> String.slice(0, 8) |> String.upcase())
+  defp next_invoice_number(line_params) when is_list(line_params) do
+    next_invoice_sequence()
+    |> InvoiceNumber.format(DateTime.utc_now(), invoice_package_code(line_params))
   end
+
+  defp next_invoice_sequence do
+    case Repo.query("SELECT nextval('finance_invoice_number_seq')") do
+      {:ok, %{rows: [[sequence]]}} when is_integer(sequence) ->
+        sequence
+
+      {:ok, %{rows: [[sequence]]}} ->
+        sequence
+        |> to_string()
+        |> String.to_integer()
+
+      {:error, reason} ->
+        raise "could not generate invoice number sequence: #{inspect(reason)}"
+    end
+  end
+
+  defp invoice_package_code([first_line | _rest]) when is_map(first_line) do
+    first_line["package_code_snapshot"] || first_line["package_family_snapshot"] || "manual"
+  end
+
+  defp invoice_package_code(_line_params), do: "manual"
 
   defp refresh_view(view_name) do
     case Repo.query("REFRESH MATERIALIZED VIEW CONCURRENTLY #{view_name}") do
@@ -2609,5 +2805,240 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   defp string_key_map(params) when is_map(params) do
     Map.new(params, fn {key, value} -> {to_string(key), value} end)
+  end
+
+  defp to_integer_cents(nil), do: 0
+  defp to_integer_cents(value) when is_integer(value), do: value
+  defp to_integer_cents(%Decimal{} = value), do: Decimal.to_integer(value)
+  defp to_integer_cents(value), do: trunc(value)
+
+  # ── Finance Settings ────────────────────────────────────────────────────────
+
+  @impl true
+  def get_finance_settings do
+    case Repo.one(from s in FinanceSetting, limit: 1) do
+      nil -> %{payment_reminder_interval_days: 7}
+      settings -> normalize_finance_settings(settings)
+    end
+  end
+
+  @impl true
+  def update_finance_settings(params) do
+    case Repo.one(from s in FinanceSetting, limit: 1) do
+      nil ->
+        %FinanceSetting{}
+        |> FinanceSetting.changeset(params)
+        |> Repo.insert()
+        |> normalize_result(&normalize_finance_settings/1)
+
+      %FinanceSetting{} = settings ->
+        settings
+        |> FinanceSetting.changeset(params)
+        |> Repo.update()
+        |> normalize_result(&normalize_finance_settings/1)
+    end
+  end
+
+  defp normalize_finance_settings(%FinanceSetting{} = s) do
+    %{
+      id: s.id,
+      payment_reminder_interval_days: s.payment_reminder_interval_days,
+      inserted_at: s.inserted_at,
+      updated_at: s.updated_at
+    }
+  end
+
+  # ── Outstanding Balance Batch Queries ───────────────────────────────────────
+
+  @impl true
+  def outstanding_balance_per_membership([]), do: %{}
+
+  def outstanding_balance_per_membership(membership_ids) when is_list(membership_ids) do
+    db_membership_ids = dump_uuid_list(membership_ids)
+
+    sql = """
+    SELECT fi.membership_id::text, COALESCE(SUM(
+      GREATEST(
+        fi.total_cents
+        - GREATEST(
+            COALESCE((
+              SELECT SUM(p.amount_cents)
+              FROM membership_payments p
+              WHERE p.finance_invoice_id = fi.id
+                AND p.payment_status IN ('paid', 'waived')
+            ), 0) - COALESCE((
+              SELECT SUM(r.amount_cents)
+              FROM finance_payment_reversals r
+              WHERE r.finance_invoice_id = fi.id
+            ), 0),
+            0
+          )
+        - GREATEST(
+            -COALESCE((
+              SELECT SUM(e.amount_cents)
+              FROM finance_credit_ledger_entries e
+              WHERE e.finance_invoice_id = fi.id
+                AND e.entry_type IN ('invoice_offset', 'reversal')
+            ), 0),
+            0
+          ),
+        0
+      )
+    ), 0) AS outstanding_cents
+    FROM finance_invoices fi
+    WHERE fi.membership_id = ANY($1::uuid[])
+      AND fi.status IN ('issued', 'partially_paid', 'overdue')
+    GROUP BY fi.membership_id
+    """
+
+    case Repo.query(sql, [db_membership_ids]) do
+      {:ok, %{rows: rows}} ->
+        Map.new(rows, fn [membership_id, cents] ->
+          {membership_id, to_integer_cents(cents)}
+        end)
+
+      _ ->
+        %{}
+    end
+  end
+
+  @impl true
+  def membership_outstanding_balance_cents(membership_id) do
+    outstanding_balance_per_membership([membership_id])
+    |> Map.get(membership_id, 0)
+  end
+
+  @impl true
+  def invoice_balance_due_map([]), do: %{}
+
+  def invoice_balance_due_map(invoice_ids) when is_list(invoice_ids) do
+    db_invoice_ids = dump_uuid_list(invoice_ids)
+
+    sql = """
+    SELECT fi.id::text, GREATEST(
+      fi.total_cents
+      - GREATEST(
+          COALESCE((
+            SELECT SUM(p.amount_cents)
+            FROM membership_payments p
+            WHERE p.finance_invoice_id = fi.id
+              AND p.payment_status IN ('paid', 'waived')
+          ), 0) - COALESCE((
+            SELECT SUM(r.amount_cents)
+            FROM finance_payment_reversals r
+            WHERE r.finance_invoice_id = fi.id
+          ), 0),
+          0
+        )
+      - GREATEST(
+          -COALESCE((
+            SELECT SUM(e.amount_cents)
+            FROM finance_credit_ledger_entries e
+            WHERE e.finance_invoice_id = fi.id
+              AND e.entry_type IN ('invoice_offset', 'reversal')
+          ), 0),
+          0
+        ),
+      0
+    ) AS balance_due_cents
+    FROM finance_invoices fi
+    WHERE fi.id = ANY($1::uuid[])
+      AND fi.status NOT IN ('void', 'draft')
+    """
+
+    case Repo.query(sql, [db_invoice_ids]) do
+      {:ok, %{rows: rows}} ->
+        Map.new(rows, fn [invoice_id, cents] ->
+          {invoice_id, to_integer_cents(cents)}
+        end)
+
+      _ ->
+        %{}
+    end
+  end
+
+  # ── Payment Reminder Scheduling ─────────────────────────────────────────────
+
+  @impl true
+  def memberships_needing_payment_reminder(interval_days) do
+    threshold = DateTime.add(DateTime.utc_now(), -interval_days * 86_400, :second)
+
+    memberships =
+      Membership
+      |> where(
+        [m],
+        is_nil(m.last_payment_reminder_sent_at) or m.last_payment_reminder_sent_at < ^threshold
+      )
+      |> Repo.all()
+
+    membership_ids = Enum.map(memberships, & &1.id)
+    balances = outstanding_balance_per_membership(membership_ids)
+
+    memberships
+    |> Enum.filter(fn m -> Map.get(balances, m.id, 0) > 0 end)
+    |> Enum.map(fn m ->
+      %{
+        membership_id: m.id,
+        user_id: m.user_id,
+        outstanding_balance_cents: Map.get(balances, m.id, 0)
+      }
+    end)
+  end
+
+  @impl true
+  def update_membership_reminder_timestamp(membership_id) do
+    Membership
+    |> where([m], m.id == ^membership_id)
+    |> Repo.update_all(set: [last_payment_reminder_sent_at: DateTime.utc_now()])
+
+    :ok
+  end
+
+  @impl true
+  def total_outstanding_balance_cents do
+    sql = """
+    SELECT COALESCE(SUM(GREATEST(
+      fi.total_cents
+      - GREATEST(
+          COALESCE((
+            SELECT SUM(p.amount_cents)
+            FROM membership_payments p
+            WHERE p.finance_invoice_id = fi.id
+              AND p.payment_status IN ('paid', 'waived')
+          ), 0) - COALESCE((
+            SELECT SUM(r.amount_cents)
+            FROM finance_payment_reversals r
+            WHERE r.finance_invoice_id = fi.id
+          ), 0),
+          0
+        )
+      - GREATEST(
+          -COALESCE((
+            SELECT SUM(e.amount_cents)
+            FROM finance_credit_ledger_entries e
+            WHERE e.finance_invoice_id = fi.id
+              AND e.entry_type IN ('invoice_offset', 'reversal')
+          ), 0),
+          0
+        ),
+      0
+    )), 0)
+    FROM finance_invoices fi
+    WHERE fi.status NOT IN ('void', 'draft')
+    """
+
+    case Repo.query(sql, []) do
+      {:ok, %{rows: [[total]]}} -> to_integer_cents(total)
+      _ -> 0
+    end
+  end
+
+  @impl true
+  def count_pending_referral_approvals do
+    ReferralReward
+    |> where([r], r.status == "pending")
+    |> select([r], count(r.id))
+    |> Repo.one()
+    |> Kernel.||(0)
   end
 end

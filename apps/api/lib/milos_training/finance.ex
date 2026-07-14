@@ -1,4 +1,6 @@
 defmodule MilosTraining.Finance do
+  alias MilosTraining.Finance.FinanceStore
+
   alias MilosTraining.Finance.Commands.{
     ApplyCreditToPayment,
     AssignPackage,
@@ -20,6 +22,7 @@ defmodule MilosTraining.Finance do
     ReversePayment,
     UpdatePackage,
     UpdateReferralRewardStatus,
+    UpdateReferralProgram,
     UpdateReferralStatus,
     VoidInvoice,
     UpsertMembership
@@ -95,6 +98,7 @@ defmodule MilosTraining.Finance do
   defdelegate list_promotion_codes(campaign_id \\ nil), to: ListPromotionCodes, as: :call
   defdelegate redeem_promotion(membership_id, params), to: RedeemPromotion, as: :call
   defdelegate create_referral_program(params), to: CreateReferralProgram, as: :call
+  defdelegate update_referral_program(id, params), to: UpdateReferralProgram, as: :call
   defdelegate list_referral_programs(), to: ListReferralPrograms, as: :call
   defdelegate create_referral_event(params), to: CreateReferralEvent, as: :call
   defdelegate update_referral_status(id, status), to: UpdateReferralStatus, as: :call
@@ -107,4 +111,31 @@ defmodule MilosTraining.Finance do
   defdelegate list_referral_rewards(), to: ListReferralRewards, as: :call
   defdelegate update_referral_reward_status(id, status), to: UpdateReferralRewardStatus, as: :call
   defdelegate refresh_aggregates(), to: RefreshAggregates, as: :call
+
+  defdelegate get_finance_settings(), to: FinanceStore, as: :get_finance_settings
+  defdelegate update_finance_settings(params), to: FinanceStore, as: :update_finance_settings
+
+  defdelegate membership_outstanding_balance_cents(membership_id),
+    to: FinanceStore,
+    as: :membership_outstanding_balance_cents
+
+  defdelegate invoice_balance_due_map(invoice_ids),
+    to: FinanceStore,
+    as: :invoice_balance_due_map
+
+  defdelegate memberships_needing_payment_reminder(interval_days),
+    to: FinanceStore,
+    as: :memberships_needing_payment_reminder
+
+  defdelegate update_membership_reminder_timestamp(membership_id),
+    to: FinanceStore,
+    as: :update_membership_reminder_timestamp
+
+  defdelegate total_outstanding_balance_cents(),
+    to: FinanceStore,
+    as: :total_outstanding_balance_cents
+
+  defdelegate count_pending_referral_approvals(),
+    to: FinanceStore,
+    as: :count_pending_referral_approvals
 end

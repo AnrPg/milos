@@ -260,6 +260,17 @@ export async function createReferralProgram(token: string, body: FinanceRecord) 
   });
 }
 
+export async function updateReferralProgram(token: string, referralProgramId: string, body: FinanceRecord) {
+  return apiRequest<{ referral_program: FinanceRecord }>(
+    `/admin/finance/referral-programs/${referralProgramId}`,
+    {
+      method: "PATCH",
+      token,
+      body,
+    },
+  );
+}
+
 export async function updateReferralEventStatus(token: string, referralEventId: string, status: string) {
   return apiRequest<{ referral_event: FinanceRecord }>(`/admin/finance/referrals/${referralEventId}/status`, {
     method: "PATCH",

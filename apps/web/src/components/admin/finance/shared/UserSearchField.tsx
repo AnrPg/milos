@@ -29,8 +29,10 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
   // Prefill without API call
   useEffect(() => {
     if (prefillUser && !value) {
-      setSelectedUser(prefillUser);
-      onChange(field(prefillUser, "id"), prefillUser);
+      queueMicrotask(() => {
+        setSelectedUser(prefillUser);
+        onChange(field(prefillUser, "id"), prefillUser);
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefillUser]);
@@ -38,14 +40,16 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
   // Clear selection if value externally reset to empty
   useEffect(() => {
     if (!value) {
-      setSelectedUser(null);
-      setQuery("");
+      queueMicrotask(() => {
+        setSelectedUser(null);
+        setQuery("");
+      });
     }
   }, [value]);
 
   useEffect(() => {
     if (query.length < 2) {
-      setResults([]);
+      queueMicrotask(() => setResults([]));
       return;
     }
 
@@ -89,16 +93,16 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
 
   return (
     <div className="space-y-1">
-      <label className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+      <label className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
         {label}
       </label>
 
       {selectedUser ? (
         <div
           className="flex items-center gap-2 rounded-xl px-3 py-2 w-full"
-          style={{ background: "#18181f", border: "1px solid #2a2a3a" }}
+          style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)" }}
         >
-          <span className="text-sm font-semibold" style={{ color: "#F0EDF8" }}>
+          <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
             {field(selectedUser, "nickname")}
           </span>
           <span
@@ -106,10 +110,10 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
             style={{
               background:
                 field(selectedUser, "identity_role") === "athlete"
-                  ? "rgba(217,93,57,0.12)"
-                  : "rgba(136,136,170,0.12)",
+                  ? "color-mix(in srgb, var(--primary) 12%, transparent)"
+                  : "color-mix(in srgb, var(--muted) 12%, transparent)",
               color:
-                field(selectedUser, "identity_role") === "athlete" ? "#d95d39" : "#8888aa",
+                field(selectedUser, "identity_role") === "athlete" ? "var(--primary)" : "var(--muted)",
             }}
           >
             {field(selectedUser, "identity_role")}
@@ -119,7 +123,7 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
               type="button"
               onClick={clear}
               className="ml-auto text-xs hover:opacity-70 transition-opacity"
-              style={{ color: "#55556a" }}
+              style={{ color: "var(--dim)" }}
             >
               ✕
             </button>
@@ -128,7 +132,7 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
       ) : locked ? (
         <div
           className="rounded-xl px-3 py-2 w-full"
-          style={{ background: "#18181f", border: "1px solid #2a2a3a", color: "#55556a" }}
+          style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)", color: "var(--dim)" }}
         >
           <span className="text-sm italic">Not selected</span>
         </div>
@@ -141,19 +145,19 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
             placeholder="Search by nickname…"
             className="w-full rounded-xl px-3 py-2 text-sm"
             style={{
-              background: "#18181f",
-              border: "1px solid #2a2a3a",
-              color: "#F0EDF8",
+              background: "var(--panel-muted)",
+              border: "1px solid var(--border-strong)",
+              color: "var(--text)",
             }}
           />
 
           {(results.length > 0 || loading) && (
             <div
               className="absolute left-0 top-full z-50 mt-1 w-full rounded-xl overflow-hidden shadow-xl"
-              style={{ background: "#18181f", border: "1px solid #2a2a3a" }}
+              style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)" }}
             >
               {loading ? (
-                <p className="px-3 py-2 text-xs" style={{ color: "#55556a" }}>
+                <p className="px-3 py-2 text-xs" style={{ color: "var(--dim)" }}>
                   Searching…
                 </p>
               ) : (
@@ -162,12 +166,12 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
                     key={field(u, "id")}
                     type="button"
                     onClick={() => select(u)}
-                    className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-[#1a1a28] transition-colors"
+                    className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-[var(--border)] transition-colors"
                   >
-                    <span className="text-sm font-semibold" style={{ color: "#F0EDF8" }}>
+                    <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
                       {field(u, "nickname")}
                     </span>
-                    <span className="text-xs" style={{ color: "#55556a" }}>
+                    <span className="text-xs" style={{ color: "var(--dim)" }}>
                       {field(u, "identity_role")}
                     </span>
                   </button>

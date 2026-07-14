@@ -38,14 +38,14 @@ export function SortableHeader({ column, label, sort, hasFilter, onSort, filterS
   return (
     <th
       className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em]"
-      style={{ color: "#55556a", background: "#111118", whiteSpace: "nowrap" }}
+      style={{ color: "var(--dim)", background: "var(--panel)", whiteSpace: "nowrap" }}
     >
       <div ref={ref} className="group relative flex items-center gap-1">
         <button
           type="button"
           onClick={onSort}
-          className="flex items-center gap-1 hover:text-[#c0c0d8] transition-colors"
-          style={{ color: isActive ? "#c0c0d8" : undefined }}
+          className="flex items-center gap-1 hover:text-[var(--text-soft)] transition-colors"
+          style={{ color: isActive ? "var(--text-soft)" : undefined }}
         >
           {label}
           <span className="w-3 inline-block text-center">
@@ -58,7 +58,7 @@ export function SortableHeader({ column, label, sort, hasFilter, onSort, filterS
           onClick={() => setFilterOpen((v) => !v)}
           className="transition-opacity"
           style={{
-            color: hasFilter ? "#d95d39" : "#55556a",
+            color: hasFilter ? "var(--primary)" : "var(--dim)",
             opacity: hasFilter ? 1 : undefined,
           }}
           title="Filter"
@@ -74,7 +74,7 @@ export function SortableHeader({ column, label, sort, hasFilter, onSort, filterS
         {filterOpen && (
           <div
             className="absolute left-0 top-full z-50 mt-1 min-w-[200px] rounded-xl p-3 shadow-xl"
-            style={{ background: "#18181f", border: "1px solid #2a2a3a" }}
+            style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)" }}
           >
             {filterSlot}
           </div>

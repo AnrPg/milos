@@ -33,6 +33,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
     ReverseFinancePayment,
     UpdateFinanceMember,
     UpdateFinancePackage,
+    UpdateFinanceReferralProgram,
     UpdateFinanceReferralRewardStatus,
     UpdateFinanceReferralStatus,
     VoidFinanceInvoice
@@ -144,6 +145,28 @@ defmodule MilosTrainingWeb.AdminFinanceController do
             params: %Schema{type: :object, additionalProperties: true}
           },
           required: [:name, :reward_type, :reward_value],
+          additionalProperties: false
+        }
+      }
+    }
+  }
+  @update_referral_program_request_body %RequestBody{
+    required: true,
+    content: %{
+      "application/json" => %MediaType{
+        schema: %Schema{
+          type: :object,
+          properties: %{
+            name: %Schema{type: :string},
+            description: %Schema{type: :string, nullable: true},
+            active: %Schema{type: :boolean},
+            reward_type: %Schema{
+              type: :string,
+              enum: ["credit", "discount", "free_period", "manual"]
+            },
+            reward_value: %Schema{type: :integer, minimum: 0},
+            params: %Schema{type: :object, additionalProperties: true}
+          },
           additionalProperties: false
         }
       }
@@ -810,6 +833,20 @@ defmodule MilosTrainingWeb.AdminFinanceController do
       conn
       |> put_status(:created)
       |> json(%{referral_program: program})
+    end
+  end
+
+  operation(:update_referral_program,
+    summary: "Update a referral program",
+    parameters: [@id_parameter],
+    request_body: @update_referral_program_request_body,
+    responses: [ok: {"Referral program", "application/json", @open_object}]
+  )
+
+  def update_referral_program(conn, params) do
+    with {:ok, program} <-
+           UpdateFinanceReferralProgram.call(param_id(params), body_params(conn, params)) do
+      json(conn, %{referral_program: program})
     end
   end
 

@@ -45,6 +45,9 @@ defmodule MilosTraining.Application.ListFinanceMembers do
       membership: membership,
       active_package_subscription: active_sub,
       referrals_made_user_ids: made,
+      credit_balance: profile && Map.get(profile, :credit_balance),
+      credit_balance_cents: profile && Map.get(profile, :credit_balance_cents),
+      outstanding_balance_cents: profile && Map.get(profile, :outstanding_balance_cents, 0),
       last_payment_on: profile && Map.get(profile, :last_payment_on),
       last_payment_amount_cents: profile && Map.get(profile, :last_payment_amount_cents),
       notes: membership && Map.get(membership, :notes)

@@ -22,7 +22,6 @@ import { SortableHeader } from "@/components/admin/finance/shared/SortableHeader
 import {
   useSortFilter,
   type ColumnKey,
-  type FilterValue,
 } from "@/components/admin/finance/hooks/useSortFilter";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
@@ -69,8 +68,8 @@ function PillGroup({
           className="rounded-full px-2 py-0.5 text-xs font-semibold transition-colors"
           style={
             o.value === value
-              ? { background: "#d95d39", color: "#fff" }
-              : { background: "#1a1a28", color: "#55556a" }
+              ? { background: "var(--primary)", color: "var(--primary-contrast)" }
+              : { background: "var(--border)", color: "var(--dim)" }
           }
         >
           {o.label}
@@ -100,9 +99,9 @@ function MultiCheck({
             type="checkbox"
             checked={values.includes(o.value)}
             onChange={() => toggle(o.value)}
-            className="accent-[#d95d39]"
+            className="accent-[var(--primary)]"
           />
-          <span className="text-xs" style={{ color: "#c0c0d8" }}>
+          <span className="text-xs" style={{ color: "var(--text-soft)" }}>
             {o.label}
           </span>
         </label>
@@ -115,7 +114,7 @@ function MultiCheck({
 
 export function MembersTab() {
   const { tokens } = useSession();
-  const token = tokens?.access_token!;
+  const token = tokens?.access_token ?? "";
   const queryClient = useQueryClient();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -156,9 +155,7 @@ export function MembersTab() {
 
   const members = membersQuery.data?.members ?? [];
   const referralPrograms = referralProgramsQuery.data?.referral_programs ?? [];
-  const packages = (packagesQuery.data?.packages ?? []).filter(
-    (p) => field(p, "status") === "active",
-  );
+  const packages = packagesQuery.data?.packages ?? [];
 
   const { sort, cycleSort, filters, setFilter, clearFilters, result: filteredMembers } =
     useSortFilter(members);
@@ -250,7 +247,7 @@ export function MembersTab() {
 
   if (membersQuery.isLoading) {
     return (
-      <p className="px-6 py-10 text-sm" style={{ color: "#55556a" }}>
+      <p className="px-6 py-10 text-sm" style={{ color: "var(--dim)" }}>
         Loading members…
       </p>
     );
@@ -263,7 +260,7 @@ export function MembersTab() {
       <div className="flex items-center justify-between gap-4">
         <p
           className="text-sm font-semibold uppercase tracking-[0.22em]"
-          style={{ color: "#55556a" }}
+          style={{ color: "var(--dim)" }}
         >
           {filteredMembers.length === members.length
             ? `${members.length} member${members.length !== 1 ? "s" : ""}`
@@ -274,7 +271,7 @@ export function MembersTab() {
             type="button"
             onClick={clearFilters}
             className="text-xs hover:opacity-70 transition-opacity"
-            style={{ color: "#d95d39" }}
+            style={{ color: "var(--primary)" }}
           >
             Clear filters
           </button>
@@ -283,12 +280,12 @@ export function MembersTab() {
 
       <div
         className="rounded-[2rem] overflow-hidden"
-        style={{ background: "#111118", border: "1px solid #1a1a28" }}
+        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
       >
         <div className="overflow-x-auto">
           <table className="w-full border-collapse" style={{ minWidth: "1400px" }}>
             <thead>
-              <tr style={{ borderBottom: "1px solid #1a1a28" }}>
+              <tr style={{ borderBottom: "1px solid var(--border)" }}>
                 {/* Nickname — sticky */}
                 <SortableHeader
                   column="nickname"
@@ -307,7 +304,7 @@ export function MembersTab() {
                           : setFilter("nickname", undefined)
                       }
                       className="w-full rounded-lg px-2 py-1 text-xs"
-                      style={{ background: "#111118", color: "#c0c0d8", border: "1px solid #2a2a3a" }}
+                      style={{ background: "var(--panel)", color: "var(--text-soft)", border: "1px solid var(--border-strong)" }}
                     />
                   }
                 />
@@ -422,6 +419,14 @@ export function MembersTab() {
                   }
                 />
                 <SortableHeader
+                  column="balance_due"
+                  label="Balance Due"
+                  sort={sort}
+                  hasFilter={Boolean(filters.balance_due)}
+                  onSort={() => cycleSort("balance_due")}
+                  filterSlot={presenceFilter("balance_due", "Has balance due", "Settled")}
+                />
+                <SortableHeader
                   column="notes"
                   label="Notes"
                   sort={sort}
@@ -450,7 +455,7 @@ export function MembersTab() {
             <tbody>
               {filteredMembers.length === 0 ? (
                 <tr>
-                  <td colSpan={11} className="px-6 py-8 text-sm" style={{ color: "#55556a" }}>
+                  <td colSpan={12} className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>
                     {members.length === 0 ? "No members yet." : "No members match the active filters."}
                   </td>
                 </tr>
@@ -536,7 +541,14 @@ function MemberRow({
   const expiresOn = field(activeSub, "ends_on") || field(membership, "expires_on");
   const membershipStatus = field(membership, "status", "trial");
   const referredById = field(membership, "referred_by_user_id");
-  const creditCents = typeof member.credit_balance === "number" ? member.credit_balance : 0;
+  const creditCents =
+    typeof member.credit_balance === "number"
+      ? member.credit_balance
+      : typeof member.credit_balance_cents === "number"
+        ? member.credit_balance_cents
+        : 0;
+  const outstandingCents =
+    typeof member.outstanding_balance_cents === "number" ? member.outstanding_balance_cents : 0;
   const userType = field(membership, "user_type_snapshot") || field(member, "identity_role");
   const currentPlanCode = activeSub ? field(activeSub, "package_code_snapshot") || null : null;
   const lastPaidOn = field(member, "last_payment_on");
@@ -544,15 +556,15 @@ function MemberRow({
     typeof member.last_payment_amount_cents === "number" ? member.last_payment_amount_cents : null;
   const notes = field(member, "notes");
 
-  const borderStyle = last ? undefined : "1px solid #1a1a28";
+  const borderStyle = last ? undefined : "1px solid var(--border)";
 
   return (
     <tr style={{ borderBottom: borderStyle }}>
       {/* Nickname — sticky, opens detail panel */}
-      <td className="sticky left-0 z-10 px-4 py-3" style={{ background: "#111118" }}>
+      <td className="sticky left-0 z-10 px-4 py-3" style={{ background: "var(--panel)" }}>
         <button
           className="text-sm font-semibold text-left hover:opacity-70 transition-opacity"
-          style={{ color: "#F0EDF8" }}
+          style={{ color: "var(--text)" }}
           onClick={onOpenPanel}
           type="button"
         >
@@ -567,14 +579,14 @@ function MemberRow({
             className="rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-wider"
             style={{
               background:
-                userType === "athlete" ? "rgba(217,93,57,0.12)" : "rgba(136,136,170,0.12)",
-              color: userType === "athlete" ? "#d95d39" : "#8888aa",
+                userType === "athlete" ? "color-mix(in srgb, var(--primary) 12%, transparent)" : "color-mix(in srgb, var(--muted) 12%, transparent)",
+              color: userType === "athlete" ? "var(--primary)" : "var(--muted)",
             }}
           >
             {userType}
           </span>
         ) : (
-          <span className="text-xs" style={{ color: "#3a3a55" }}>—</span>
+          <span className="text-xs" style={{ color: "var(--dim)" }}>—</span>
         )}
       </td>
 
@@ -613,22 +625,22 @@ function MemberRow({
       {/* Last paid */}
       <td className="px-4 py-3" style={{ whiteSpace: "nowrap" }}>
         {lastPaidOn ? (
-          <span className="text-xs" style={{ color: "#c0c0d8" }}>
+          <span className="text-xs" style={{ color: "var(--text-soft)" }}>
             {lastPaidOn}
           </span>
         ) : (
-          <span className="text-xs" style={{ color: "#3a3a55" }}>—</span>
+          <span className="text-xs" style={{ color: "var(--dim)" }}>—</span>
         )}
       </td>
 
       {/* Amount */}
       <td className="px-4 py-3" style={{ whiteSpace: "nowrap" }}>
         {lastPaidCents !== null ? (
-          <span className="text-xs font-semibold" style={{ color: "#c0c0d8" }}>
+          <span className="text-xs font-semibold" style={{ color: "var(--text-soft)" }}>
             {EUR.format(lastPaidCents / 100)}
           </span>
         ) : (
-          <span className="text-xs" style={{ color: "#3a3a55" }}>—</span>
+          <span className="text-xs" style={{ color: "var(--dim)" }}>—</span>
         )}
       </td>
 
@@ -637,12 +649,29 @@ function MemberRow({
         {creditCents !== 0 ? (
           <span
             className="text-xs font-semibold"
-            style={{ color: creditCents > 0 ? "#4db89c" : "#e07a5f" }}
+            style={{ color: creditCents > 0 ? "var(--success)" : "var(--primary-strong)" }}
           >
             {EUR.format(creditCents / 100)}
           </span>
         ) : (
-          <span className="text-xs" style={{ color: "#3a3a55" }}>—</span>
+          <span className="text-xs" style={{ color: "var(--dim)" }}>—</span>
+        )}
+      </td>
+
+      {/* Balance Due */}
+      <td className="px-4 py-3" style={{ whiteSpace: "nowrap" }}>
+        {outstandingCents > 0 ? (
+          <span
+            className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold"
+            style={{
+              background: "color-mix(in srgb, var(--danger) 12%, transparent)",
+              color: "var(--danger)",
+            }}
+          >
+            {EUR.format(outstandingCents / 100)} due
+          </span>
+        ) : (
+          <span className="text-xs" style={{ color: "var(--dim)" }}>—</span>
         )}
       </td>
 
@@ -673,18 +702,18 @@ function MemberRow({
       <td className="px-4 py-3" style={{ whiteSpace: "nowrap" }}>
         <div className="flex items-center gap-2">
           {referralsMade.length > 0 ? (
-            <span className="text-xs font-semibold" style={{ color: "#c0c0d8" }}>
+            <span className="text-xs font-semibold" style={{ color: "var(--text-soft)" }}>
               {referralsMade.length}
             </span>
           ) : (
-            <span className="text-xs" style={{ color: "#3a3a55" }}>0</span>
+            <span className="text-xs" style={{ color: "var(--dim)" }}>0</span>
           )}
           <button
             className="rounded-full px-2 py-0.5 text-xs font-semibold"
             style={{
-              background: "rgba(217,93,57,0.1)",
-              border: "1px solid rgba(217,93,57,0.2)",
-              color: "#d95d39",
+              background: "color-mix(in srgb, var(--primary) 10%, transparent)",
+              border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)",
+              color: "var(--primary)",
             }}
             onClick={onOpenReferralWizard}
             disabled={updatePending}

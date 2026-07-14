@@ -76,6 +76,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
     due_date: "",
     service_period_start: "",
     service_period_end: "",
+    membership_package_subscription_id: "",
   });
   const [renewalForm, setRenewalForm] = useState({
     membership_package_subscription_id: "",
@@ -129,6 +130,11 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
     (payment) => ["paid", "waived"].includes(field(payment, "payment_status")) && Number(payment.net_amount_cents ?? 0) > 0,
   );
   const invoices = memberQuery.data?.invoices ?? [];
+  const payableInvoices = invoices.filter((invoice) => {
+    const status = field(invoice, "status");
+    const balanceDue = typeof invoice.balance_due_cents === "number" ? invoice.balance_due_cents : 0;
+    return ["issued", "partially_paid", "overdue"].includes(status) && balanceDue > 0;
+  });
   const creditLedgerEntries = memberQuery.data?.credit_ledger_entries ?? [];
   const reversibleCreditEntries = creditLedgerEntries.filter(
     (entry) =>
@@ -218,9 +224,17 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
         due_date: invoiceForm.due_date || null,
         service_period_start: invoiceForm.service_period_start || null,
         service_period_end: invoiceForm.service_period_end || null,
+        membership_package_subscription_id: invoiceForm.membership_package_subscription_id || undefined,
       }),
     onSuccess: async () => {
-      setInvoiceForm({ amount: "0", description: "", due_date: "", service_period_start: "", service_period_end: "" });
+      setInvoiceForm({
+        amount: "0",
+        description: "",
+        due_date: "",
+        service_period_start: "",
+        service_period_end: "",
+        membership_package_subscription_id: "",
+      });
       await invalidateMember();
     },
   });
@@ -331,21 +345,21 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
   });
 
   return (
-    <main className="min-h-screen bg-[#f7f2e8] px-6 py-10 text-[#191713] md:px-10">
+    <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-6xl space-y-6">
-        <Link className="text-sm font-bold text-[#9b4d2e]" href="/admin/finance">
+        <Link className="text-sm font-bold text-[var(--primary)]" href="/admin/finance">
           Back to finance
         </Link>
-        <section className="rounded-[2rem] border border-[#d9cbb8] bg-white p-8">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#9b4d2e]">Member finance profile</p>
+        <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--panel)] p-8">
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">Member finance profile</p>
           <h1 className="mt-3 break-all text-3xl font-black md:text-4xl">{userId}</h1>
-          <p className="mt-2 text-sm text-[#6f6254]">
+          <p className="mt-2 text-sm text-[var(--muted)]">
             Status {field(membership, "status", "no membership")} · Type {field(membership, "user_type_snapshot", "unknown")}
           </p>
-          <div className="mt-5 inline-flex rounded-full bg-[#191713] px-5 py-3 text-sm font-black text-white">
+          <div className="mt-5 inline-flex rounded-full bg-[var(--text)] px-5 py-3 text-sm font-black text-[var(--primary-contrast)]">
             Available credit {money(creditBalance)}
           </div>
-          <div className="mt-3 inline-flex rounded-full bg-[#e5f0d2] px-5 py-3 text-sm font-black text-[#27330d]">
+          <div className="mt-3 inline-flex rounded-full bg-[color-mix(in_srgb,var(--success)_18%,transparent)] px-5 py-3 text-sm font-black text-[var(--success)]">
             Entitlement {field(entitlement, "status", "inactive")} · {field(entitlement, "source", "not evaluated")}
           </div>
         </section>
@@ -455,13 +469,23 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
               <Select
                 label="Invoice"
                 value={paymentForm.finance_invoice_id}
-                options={invoices.map((invoice) => field(invoice, "id"))}
+                options={payableInvoices.map((invoice) => field(invoice, "id"))}
                 optionLabel={(id) => {
-                  const invoice = invoices.find((item) => field(item, "id") === id);
+                  const invoice = payableInvoices.find((item) => field(item, "id") === id);
                   return `${field(invoice, "invoice_number", id)} · due ${money(invoice?.balance_due_cents)}`;
                 }}
                 required={false}
-                onChange={(finance_invoice_id) => setPaymentForm({ ...paymentForm, finance_invoice_id })}
+                onChange={(finance_invoice_id) => {
+                  const invoice = payableInvoices.find((item) => field(item, "id") === finance_invoice_id);
+                  const balanceDue =
+                    typeof invoice?.balance_due_cents === "number" ? invoice.balance_due_cents : null;
+
+                  setPaymentForm({
+                    ...paymentForm,
+                    finance_invoice_id,
+                    amount: balanceDue !== null ? euroInputValue(balanceDue) : paymentForm.amount,
+                  });
+                }}
               />
               <Input label="Notes" required={false} value={paymentForm.notes} onChange={(notes) => setPaymentForm({ ...paymentForm, notes })} />
               <SubmitButton pending={recordPaymentMutation.isPending}>Record payment</SubmitButton>
@@ -478,6 +502,31 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
               }}
             >
               <Input label="Amount in EUR" type="number" value={invoiceForm.amount} onChange={(amount) => setInvoiceForm({ ...invoiceForm, amount })} />
+              <Select
+                label="Package subscription"
+                value={invoiceForm.membership_package_subscription_id}
+                options={packageSubscriptions.map((subscription) => field(subscription, "id"))}
+                optionLabel={(id) => {
+                  const subscription = packageSubscriptions.find((item) => field(item, "id") === id);
+                  return `${field(subscription, "package_code_snapshot", id)} · ${money(subscription?.price_cents_snapshot)}`;
+                }}
+                required={false}
+                onChange={(membership_package_subscription_id) => {
+                  const subscription = packageSubscriptions.find(
+                    (item) => field(item, "id") === membership_package_subscription_id,
+                  );
+                  const priceCents =
+                    typeof subscription?.price_cents_snapshot === "number" ? subscription.price_cents_snapshot : null;
+                  const code = field(subscription, "package_code_snapshot");
+
+                  setInvoiceForm({
+                    ...invoiceForm,
+                    membership_package_subscription_id,
+                    amount: priceCents !== null ? euroInputValue(priceCents) : invoiceForm.amount,
+                    description: code ? `Package: ${code}` : invoiceForm.description,
+                  });
+                }}
+              />
               <Input label="Description" value={invoiceForm.description} onChange={(description) => setInvoiceForm({ ...invoiceForm, description })} />
               <Input label="Due date" required={false} type="date" value={invoiceForm.due_date} onChange={(due_date) => setInvoiceForm({ ...invoiceForm, due_date })} />
               <div className="grid gap-3 md:grid-cols-2">
@@ -583,7 +632,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 applyCreditMutation.mutate();
               }}
             >
-              <p className="rounded-2xl bg-[#fffaf0] p-4 text-sm font-bold text-[#6f6254]">
+              <p className="rounded-2xl bg-[var(--panel)] p-4 text-sm font-bold text-[var(--muted)]">
                 Available credit: {money(creditBalance)}
               </p>
               <Select
@@ -627,7 +676,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 applyInvoiceCreditMutation.mutate();
               }}
             >
-              <p className="rounded-2xl bg-[#fffaf0] p-4 text-sm font-bold text-[#6f6254]">
+              <p className="rounded-2xl bg-[var(--panel)] p-4 text-sm font-bold text-[var(--muted)]">
                 Available credit: {money(creditBalance)}
               </p>
               <Select
@@ -777,7 +826,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
 
 function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-[1.8rem] border border-[#d9cbb8] bg-white p-6">
+    <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--panel)] p-6">
       <h2 className="text-xl font-black">{title}</h2>
       <div className="mt-4">{children}</div>
     </section>
@@ -801,7 +850,7 @@ function Input({
     <label className="block space-y-1 text-sm font-semibold">
       <span>{label}</span>
       <input
-        className="w-full rounded-2xl border border-[#d9cbb8] px-4 py-3"
+        className="w-full rounded-2xl border border-[var(--border)] px-4 py-3"
         required={required}
         type={type}
         value={value}
@@ -832,13 +881,13 @@ function Select({
     <label className="block space-y-1 text-sm font-semibold">
       <span>{label}</span>
       <select
-        className="w-full rounded-2xl border border-[#d9cbb8] px-4 py-3"
+        className="w-full rounded-2xl border border-[var(--border)] px-4 py-3"
         required={required}
         disabled={disabled}
         value={value}
         onChange={(event) => onChange(event.target.value)}
       >
-        <option value="" disabled>
+        <option value="" disabled={required}>
           {required ? `Select ${label.toLowerCase()}` : `No ${label.toLowerCase()}`}
         </option>
         {options.map((option) => (
@@ -869,30 +918,30 @@ function InvoiceHistory({
   onRefresh: () => void;
 }) {
   return (
-    <section className="rounded-[1.8rem] border border-[#d9cbb8] bg-white p-6 xl:col-span-4">
+    <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--panel)] p-6 xl:col-span-4">
       <h2 className="text-xl font-black">Invoices</h2>
       <div className="mt-4 grid gap-3 md:grid-cols-2">
-        {rows.length === 0 ? <p className="text-sm text-[#6f6254]">No invoices.</p> : null}
+        {rows.length === 0 ? <p className="text-sm text-[var(--muted)]">No invoices.</p> : null}
         {rows.map((row) => {
           const id = field(row, "id");
           const status = field(row, "status");
 
           return (
-            <div key={id} className="rounded-2xl border border-[#eadcca] p-4 space-y-3">
+            <div key={id} className="rounded-2xl border border-[var(--border)] p-4 space-y-3">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <p className="font-black">{field(row, "invoice_number", id)}</p>
-                  <p className="text-sm text-[#6f6254]">
+                  <p className="text-sm text-[var(--muted)]">
                     {status} · total {money(row.total_cents)} · due {money(row.balance_due_cents)}
                   </p>
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#9b4d2e]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--primary)]">
                     due {field(row, "due_date", "not set")}
                   </p>
                 </div>
                 <div className="flex gap-2">
                   {status === "draft" ? (
                     <button
-                      className="rounded-full bg-[#191713] px-4 py-2 text-xs font-bold text-white disabled:opacity-50"
+                      className="rounded-full bg-[var(--text)] px-4 py-2 text-xs font-bold text-[var(--primary-contrast)] disabled:opacity-50"
                       disabled={issuePending}
                       type="button"
                       onClick={() => onIssue(id)}
@@ -902,7 +951,7 @@ function InvoiceHistory({
                   ) : null}
                   {status !== "void" && status !== "paid" ? (
                     <button
-                      className="rounded-full border border-[#b1422c] px-4 py-2 text-xs font-bold text-[#b1422c] disabled:opacity-50"
+                      className="rounded-full border border-[var(--danger)] px-4 py-2 text-xs font-bold text-[var(--danger)] disabled:opacity-50"
                       disabled={voidPending}
                       type="button"
                       onClick={() => onVoid(id)}
@@ -1007,20 +1056,20 @@ function InvoiceFileActions({
     <div className="space-y-3">
       {/* Prominent notes display */}
       {!editing && (
-        <div className="rounded-xl bg-[#fdf8f2] border border-[#ede5d8] px-3 py-2 space-y-0.5">
+        <div className="rounded-xl bg-[var(--panel)] border border-[var(--border)] px-3 py-2 space-y-0.5">
           {field(invoice, "notes") ? (
-            <p className="text-sm font-semibold text-[#3a2a1a]">{field(invoice, "notes")}</p>
+            <p className="text-sm font-semibold text-[var(--text)]">{field(invoice, "notes")}</p>
           ) : (
-            <p className="text-xs italic text-[#b8a89a]">No description</p>
+            <p className="text-xs italic text-[var(--dim)]">No description</p>
           )}
           <div className="flex items-center justify-between">
-            <p className="text-xs font-medium text-[#9b4d2e]">
+            <p className="text-xs font-medium text-[var(--primary)]">
               Due: {field(invoice, "due_date") || "not set"}
             </p>
             <button
               type="button"
               onClick={() => { setEditing(true); setSaveError(null); }}
-              className="text-xs text-[#6f6254] hover:text-[#3a2a1a] transition-colors"
+              className="text-xs text-[var(--muted)] hover:text-[var(--text)] transition-colors"
             >
               Edit
             </button>
@@ -1030,9 +1079,9 @@ function InvoiceFileActions({
 
       {/* Inline edit form */}
       {editing && (
-        <div className="rounded-xl bg-[#fdf8f2] border border-[#ede5d8] px-3 py-3 space-y-2">
+        <div className="rounded-xl bg-[var(--panel)] border border-[var(--border)] px-3 py-3 space-y-2">
           <div className="space-y-1">
-            <label className="text-xs font-semibold uppercase tracking-[0.15em] text-[#6f6254]">
+            <label className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--muted)]">
               Description
             </label>
             <input
@@ -1040,34 +1089,34 @@ function InvoiceFileActions({
               value={editNotes}
               onChange={(e) => setEditNotes(e.target.value)}
               placeholder="Invoice description…"
-              className="w-full rounded-lg border border-[#d9cbb8] bg-white px-3 py-1.5 text-sm text-[#191713]"
+              className="w-full rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-1.5 text-sm text-[var(--text)]"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-semibold uppercase tracking-[0.15em] text-[#6f6254]">
+            <label className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--muted)]">
               Due date
             </label>
             <input
               type="date"
               value={editDueDate}
               onChange={(e) => setEditDueDate(e.target.value)}
-              className="w-full rounded-lg border border-[#d9cbb8] bg-white px-3 py-1.5 text-sm text-[#191713]"
+              className="w-full rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-1.5 text-sm text-[var(--text)]"
             />
           </div>
-          {saveError && <p className="text-xs text-[#b1422c]">{saveError}</p>}
+          {saveError && <p className="text-xs text-[var(--danger)]">{saveError}</p>}
           <div className="flex gap-2">
             <button
               type="button"
               onClick={handleSaveEdit}
               disabled={saving}
-              className="rounded-full bg-[#191713] px-4 py-1.5 text-xs font-bold text-white disabled:opacity-50"
+              className="rounded-full bg-[var(--text)] px-4 py-1.5 text-xs font-bold text-[var(--primary-contrast)] disabled:opacity-50"
             >
               {saving ? "Saving…" : "Save"}
             </button>
             <button
               type="button"
               onClick={() => setEditing(false)}
-              className="rounded-full border border-[#d9cbb8] px-4 py-1.5 text-xs font-semibold text-[#6f6254] hover:bg-[#f7f2e8]"
+              className="rounded-full border border-[var(--border)] px-4 py-1.5 text-xs font-semibold text-[var(--muted)] hover:bg-[var(--bg)]"
             >
               Cancel
             </button>
@@ -1083,7 +1132,7 @@ function InvoiceFileActions({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="rounded-full border border-[#d9cbb8] bg-[#f7f2e8] px-3 py-1 text-xs font-semibold text-[#6f6254] hover:bg-[#ede5d8] disabled:opacity-50 transition-colors"
+            className="rounded-full border border-[var(--border)] bg-[var(--bg)] px-3 py-1 text-xs font-semibold text-[var(--muted)] hover:bg-[var(--border)] disabled:opacity-50 transition-colors"
           >
             {uploading ? "Uploading…" : hasFile ? "Replace file" : "Upload file"}
           </button>
@@ -1092,16 +1141,16 @@ function InvoiceFileActions({
               type="button"
               onClick={handleDownload}
               disabled={downloading}
-              className="rounded-full border border-[#9b4d2e] bg-[#fdf5ef] px-3 py-1 text-xs font-semibold text-[#9b4d2e] hover:bg-[#f5e8df] disabled:opacity-50 transition-colors"
+              className="rounded-full border border-[var(--primary)] bg-[var(--panel)] px-3 py-1 text-xs font-semibold text-[var(--primary)] hover:bg-[color-mix(in_srgb,var(--primary)_12%,transparent)] disabled:opacity-50 transition-colors"
             >
               {downloading ? "…" : "Download"}
             </button>
           )}
           {invoiceParams.file_name && (
-            <span className="text-xs text-[#6f6254] truncate max-w-[160px]">{invoiceParams.file_name}</span>
+            <span className="text-xs text-[var(--muted)] truncate max-w-[160px]">{invoiceParams.file_name}</span>
           )}
         </div>
-        {uploadError && <p className="text-xs text-[#b1422c]">{uploadError}</p>}
+        {uploadError && <p className="text-xs text-[var(--danger)]">{uploadError}</p>}
       </div>
     </div>
   );
@@ -1118,7 +1167,7 @@ function SubmitButton({
 }) {
   return (
     <button
-      className="rounded-full bg-[#191713] px-5 py-3 text-sm font-bold text-white disabled:opacity-50"
+      className="rounded-full bg-[var(--text)] px-5 py-3 text-sm font-bold text-[var(--primary-contrast)] disabled:opacity-50"
       disabled={pending || disabled}
       type="submit"
     >
@@ -1129,7 +1178,7 @@ function SubmitButton({
 
 function ErrorText({ error }: { error: unknown }) {
   if (!(error instanceof Error)) return null;
-  return <p className="text-sm font-semibold text-[#b1422c]">{error.message}</p>;
+  return <p className="text-sm font-semibold text-[var(--danger)]">{error.message}</p>;
 }
 
 function History({
@@ -1146,14 +1195,14 @@ function History({
   moneySecondary?: boolean;
 }) {
   return (
-    <section className="rounded-[1.8rem] border border-[#d9cbb8] bg-white p-6">
+    <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--panel)] p-6">
       <h2 className="text-xl font-black">{title}</h2>
       <div className="mt-4 grid gap-3">
-        {rows.length === 0 ? <p className="text-sm text-[#6f6254]">No records.</p> : null}
+        {rows.length === 0 ? <p className="text-sm text-[var(--muted)]">No records.</p> : null}
         {rows.map((row) => (
-          <div key={field(row, "id")} className="rounded-2xl border border-[#eadcca] p-4">
+          <div key={field(row, "id")} className="rounded-2xl border border-[var(--border)] p-4">
             <p className="font-bold">{field(row, primary)}</p>
-            <p className="text-sm text-[#6f6254]">{moneySecondary ? money(row[secondary]) : field(row, secondary)}</p>
+            <p className="text-sm text-[var(--muted)]">{moneySecondary ? money(row[secondary]) : field(row, secondary)}</p>
           </div>
         ))}
       </div>

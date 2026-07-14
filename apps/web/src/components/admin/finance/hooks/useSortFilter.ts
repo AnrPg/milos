@@ -12,6 +12,7 @@ export type ColumnKey =
   | "last_paid"
   | "amount"
   | "credits"
+  | "balance_due"
   | "notes"
   | "referred_by"
   | "referrals";
@@ -119,6 +120,11 @@ function applyFilter(member: FinanceRecord, col: ColumnKey, filter: FilterValue)
       const bal = num(field(member, "credit_balance"));
       return filter.value === "positive" ? bal > 0 : bal < 0;
     }
+    case "balance_due": {
+      if (filter.kind !== "presence") return true;
+      const due = num(field(member, "outstanding_balance_cents"));
+      return filter.value === "has" ? due > 0 : due === 0;
+    }
     case "notes": {
       if (filter.kind !== "presence") return true;
       const has = Boolean(str(field(member, "notes")));
@@ -177,6 +183,8 @@ function cmp(a: FinanceRecord, b: FinanceRecord, col: ColumnKey): number {
       return num(field(a, "last_payment_amount_cents")) - num(field(b, "last_payment_amount_cents"));
     case "credits":
       return num(field(a, "credit_balance")) - num(field(b, "credit_balance"));
+    case "balance_due":
+      return num(field(a, "outstanding_balance_cents")) - num(field(b, "outstanding_balance_cents"));
     case "notes": {
       const na = str(field(a, "notes"));
       const nb = str(field(b, "notes"));

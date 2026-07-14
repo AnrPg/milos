@@ -95,6 +95,8 @@ defmodule MilosTraining.Finance.FinanceStore do
   @impl true
   def create_referral_program(params), do: adapter().create_referral_program(params)
   @impl true
+  def update_referral_program(id, params), do: adapter().update_referral_program(id, params)
+  @impl true
   def list_referral_programs, do: adapter().list_referral_programs()
   @impl true
   def create_referral_event(params), do: adapter().create_referral_event(params)
@@ -114,4 +116,33 @@ defmodule MilosTraining.Finance.FinanceStore do
 
   @impl true
   def refresh_aggregates, do: adapter().refresh_aggregates()
+
+  @impl true
+  def get_finance_settings, do: adapter().get_finance_settings()
+  @impl true
+  def update_finance_settings(params), do: adapter().update_finance_settings(params)
+  @impl true
+  def membership_outstanding_balance_cents(membership_id),
+    do: adapter().membership_outstanding_balance_cents(membership_id)
+
+  @impl true
+  def outstanding_balance_per_membership(membership_ids),
+    do: adapter().outstanding_balance_per_membership(membership_ids)
+
+  @impl true
+  def invoice_balance_due_map(invoice_ids), do: adapter().invoice_balance_due_map(invoice_ids)
+
+  @impl true
+  def update_membership_reminder_timestamp(membership_id),
+    do: adapter().update_membership_reminder_timestamp(membership_id)
+
+  @impl true
+  def memberships_needing_payment_reminder(interval_days),
+    do: adapter().memberships_needing_payment_reminder(interval_days)
+
+  @impl true
+  def total_outstanding_balance_cents, do: adapter().total_outstanding_balance_cents()
+
+  @impl true
+  def count_pending_referral_approvals, do: adapter().count_pending_referral_approvals()
 end

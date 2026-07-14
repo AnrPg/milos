@@ -35,6 +35,7 @@ defmodule MilosTraining.Finance.Ports.FinanceStore do
   @callback list_promotion_codes(Ecto.UUID.t() | nil) :: [map()]
   @callback redeem_promotion(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback create_referral_program(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
+  @callback update_referral_program(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback list_referral_programs() :: [map()]
   @callback create_referral_event(map()) :: {:ok, map()} | {:error, term()}
   @callback update_referral_status(Ecto.UUID.t(), String.t()) :: {:ok, map()} | {:error, term()}
@@ -44,4 +45,15 @@ defmodule MilosTraining.Finance.Ports.FinanceStore do
   @callback update_referral_reward_status(Ecto.UUID.t(), String.t()) ::
               {:ok, map()} | {:error, term()}
   @callback refresh_aggregates() :: :ok | {:error, term()}
+  @callback get_finance_settings() :: map()
+  @callback update_finance_settings(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
+  @callback membership_outstanding_balance_cents(Ecto.UUID.t()) :: non_neg_integer()
+  @callback outstanding_balance_per_membership([Ecto.UUID.t()]) ::
+              %{optional(Ecto.UUID.t()) => non_neg_integer()}
+  @callback invoice_balance_due_map([Ecto.UUID.t()]) ::
+              %{optional(Ecto.UUID.t()) => non_neg_integer()}
+  @callback update_membership_reminder_timestamp(Ecto.UUID.t()) :: :ok
+  @callback memberships_needing_payment_reminder(non_neg_integer()) :: [map()]
+  @callback total_outstanding_balance_cents() :: non_neg_integer()
+  @callback count_pending_referral_approvals() :: non_neg_integer()
 end

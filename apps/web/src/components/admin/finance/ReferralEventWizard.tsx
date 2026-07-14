@@ -179,7 +179,7 @@ export function ReferralEventWizard({
           <div
             key={s}
             className="h-1 flex-1 rounded-full"
-            style={{ background: s <= step ? "#d95d39" : "#1a1a28" }}
+            style={{ background: s <= step ? "var(--primary)" : "var(--border)" }}
           />
         ))}
       </div>
@@ -191,13 +191,13 @@ export function ReferralEventWizard({
           <label className="block space-y-1">
             <span
               className="text-xs font-semibold uppercase tracking-[0.18em]"
-              style={{ color: "#55556a" }}
+              style={{ color: "var(--dim)" }}
             >
               Referral program
             </span>
             <select
               className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
-              style={{ background: "#111118", border: "1px solid #1a1a28", color: "#F0EDF8" }}
+              style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
               value={form.referral_program_id}
               onChange={(e) => setForm({ ...form, referral_program_id: e.target.value })}
             >
@@ -237,11 +237,11 @@ export function ReferralEventWizard({
               <div
                 className="rounded-xl p-3 space-y-3"
                 style={{
-                  background: "rgba(224,122,95,0.07)",
-                  border: "1px solid rgba(224,122,95,0.25)",
+                  background: "color-mix(in srgb, var(--primary-strong) 7%, transparent)",
+                  border: "1px solid color-mix(in srgb, var(--primary-strong) 25%, transparent)",
                 }}
               >
-                <p className="text-xs font-semibold" style={{ color: "#e07a5f" }}>
+                <p className="text-xs font-semibold" style={{ color: "var(--primary-strong)" }}>
                   ⚠ This user has no membership.
                 </p>
 
@@ -250,7 +250,7 @@ export function ReferralEventWizard({
                     type="button"
                     onClick={() => setShowMembershipSetup(true)}
                     className="text-xs font-semibold hover:opacity-70 transition-opacity"
-                    style={{ color: "#d95d39" }}
+                    style={{ color: "var(--primary)" }}
                   >
                     Assign a package to continue →
                   </button>
@@ -261,9 +261,9 @@ export function ReferralEventWizard({
                       onChange={(e) => setInlinePackageId(e.target.value)}
                       className="w-full rounded-lg px-2 py-1.5 text-xs"
                       style={{
-                        background: "#111118",
-                        color: "#c0c0d8",
-                        border: "1px solid #2a2a3a",
+                        background: "var(--panel)",
+                        color: "var(--text-soft)",
+                        border: "1px solid var(--border-strong)",
                       }}
                     >
                       <option value="">Select package…</option>
@@ -286,7 +286,7 @@ export function ReferralEventWizard({
                         onClick={() => assignMembershipMutation.mutate()}
                         disabled={!inlinePackageId || assignMembershipMutation.isPending}
                         className="flex-1 rounded-lg py-1.5 text-xs font-semibold disabled:opacity-40"
-                        style={{ background: "#d95d39", color: "#fff" }}
+                        style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                       >
                         {assignMembershipMutation.isPending ? "Assigning…" : "Assign & continue"}
                       </button>
@@ -297,14 +297,14 @@ export function ReferralEventWizard({
                           setInlinePackageId("");
                         }}
                         className="rounded-lg px-3 py-1.5 text-xs"
-                        style={{ background: "#1a1a28", color: "#55556a" }}
+                        style={{ background: "var(--border)", color: "var(--dim)" }}
                       >
                         Cancel
                       </button>
                     </div>
 
                     {assignMembershipMutation.error instanceof Error && (
-                      <p className="text-xs" style={{ color: "#e07a5f" }}>
+                      <p className="text-xs" style={{ color: "var(--primary-strong)" }}>
                         {assignMembershipMutation.error.message}
                       </p>
                     )}
@@ -318,13 +318,13 @@ export function ReferralEventWizard({
           <label className="block space-y-1">
             <span
               className="text-xs font-semibold uppercase tracking-[0.18em]"
-              style={{ color: "#55556a" }}
+              style={{ color: "var(--dim)" }}
             >
               Notes (optional)
             </span>
             <textarea
               className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none resize-none"
-              style={{ background: "#111118", border: "1px solid #1a1a28", color: "#F0EDF8" }}
+              style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
               rows={3}
               value={form.notes}
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
@@ -334,7 +334,7 @@ export function ReferralEventWizard({
           {/* Summary */}
           <div
             className="rounded-[1.4rem] p-4 space-y-2"
-            style={{ background: "#0d0d18", border: "1px solid #1a1a28" }}
+            style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
           >
             <SummaryRow
               label="Referrer"
@@ -368,8 +368,8 @@ export function ReferralEventWizard({
           <button
             className="w-full rounded-full py-3 text-sm font-semibold disabled:opacity-50"
             style={{
-              background: canProceedStep1 ? "#F0EDF8" : "#1a1a28",
-              color: canProceedStep1 ? "#0A0A0F" : "#55556a",
+              background: canProceedStep1 ? "var(--text)" : "var(--border)",
+              color: canProceedStep1 ? "var(--bg)" : "var(--dim)",
             }}
             disabled={!canProceedStep1 || createEventMutation.isPending}
             onClick={() => createEventMutation.mutate()}
@@ -378,7 +378,7 @@ export function ReferralEventWizard({
             {createEventMutation.isPending ? "Recording…" : "Record referral → Step 2"}
           </button>
           {createEventMutation.error instanceof Error && (
-            <p className="text-sm" style={{ color: "#e07a5f" }}>
+            <p className="text-sm" style={{ color: "var(--primary-strong)" }}>
               {createEventMutation.error.message}
             </p>
           )}
@@ -390,11 +390,11 @@ export function ReferralEventWizard({
         <div className="space-y-5">
           <div
             className="rounded-[1.4rem] p-4 space-y-3"
-            style={{ background: "#0d0d18", border: "1px solid #1a1a28" }}
+            style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
           >
             <p
               className="text-xs font-semibold uppercase tracking-[0.18em]"
-              style={{ color: "#55556a" }}
+              style={{ color: "var(--dim)" }}
             >
               Referral summary
             </p>
@@ -411,7 +411,7 @@ export function ReferralEventWizard({
             {form.notes && <SummaryRow label="Notes" value={form.notes} />}
           </div>
 
-          <p className="text-sm leading-6" style={{ color: "#8888aa" }}>
+          <p className="text-sm leading-6" style={{ color: "var(--muted)" }}>
             Approving records this referral as valid and enables reward issuance. Rejecting marks it
             as permanently invalid — no reward can ever be issued for this event.
           </p>
@@ -419,7 +419,7 @@ export function ReferralEventWizard({
           <div className="flex gap-3">
             <button
               className="flex-1 rounded-full py-3 text-sm font-semibold disabled:opacity-50"
-              style={{ background: "#F0EDF8", color: "#0A0A0F" }}
+              style={{ background: "var(--text)", color: "var(--bg)" }}
               disabled={approveEventMutation.isPending || rejectEventMutation.isPending}
               onClick={() => approveEventMutation.mutate()}
               type="button"
@@ -429,9 +429,9 @@ export function ReferralEventWizard({
             <button
               className="flex-1 rounded-full py-3 text-sm font-semibold disabled:opacity-50"
               style={{
-                background: "rgba(217,93,57,0.1)",
-                border: "1px solid rgba(217,93,57,0.3)",
-                color: "#d95d39",
+                background: "color-mix(in srgb, var(--primary) 10%, transparent)",
+                border: "1px solid color-mix(in srgb, var(--primary) 30%, transparent)",
+                color: "var(--primary)",
               }}
               disabled={approveEventMutation.isPending || rejectEventMutation.isPending}
               onClick={() => rejectEventMutation.mutate()}
@@ -441,7 +441,7 @@ export function ReferralEventWizard({
             </button>
           </div>
           {(approveEventMutation.error ?? rejectEventMutation.error) instanceof Error && (
-            <p className="text-sm" style={{ color: "#e07a5f" }}>
+            <p className="text-sm" style={{ color: "var(--primary-strong)" }}>
               {((approveEventMutation.error ?? rejectEventMutation.error) as Error).message}
             </p>
           )}
@@ -454,19 +454,19 @@ export function ReferralEventWizard({
           <div
             className="rounded-[1.4rem] p-4 space-y-3"
             style={{
-              background: "rgba(77,184,156,0.07)",
-              border: "1px solid rgba(77,184,156,0.2)",
+              background: "color-mix(in srgb, var(--success) 7%, transparent)",
+              border: "1px solid color-mix(in srgb, var(--success) 20%, transparent)",
             }}
           >
             <p
               className="text-xs font-semibold uppercase tracking-[0.18em]"
-              style={{ color: "#4db89c" }}
+              style={{ color: "var(--success)" }}
             >
               Event approved — configure reward
             </p>
-            <p className="text-sm" style={{ color: "#8888aa" }}>
+            <p className="text-sm" style={{ color: "var(--muted)" }}>
               Defaults from{" "}
-              <span style={{ color: "#F0EDF8" }}>{field(selectedProgram, "name")}</span>.
+              <span style={{ color: "var(--text)" }}>{field(selectedProgram, "name")}</span>.
               You can adjust before issuing.
             </p>
           </div>
@@ -476,13 +476,13 @@ export function ReferralEventWizard({
             <label className="block space-y-1">
               <span
                 className="text-xs font-semibold uppercase tracking-[0.18em]"
-                style={{ color: "#55556a" }}
+                style={{ color: "var(--dim)" }}
               >
                 Reward type
               </span>
               <select
                 className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
-                style={{ background: "#111118", border: "1px solid #1a1a28", color: "#F0EDF8" }}
+                style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
                 value={rewardForm.reward_type}
                 onChange={(e) => setRewardForm({ ...rewardForm, reward_type: e.target.value })}
               >
@@ -497,7 +497,7 @@ export function ReferralEventWizard({
               <label className="block space-y-1">
                 <span
                   className="text-xs font-semibold uppercase tracking-[0.18em]"
-                  style={{ color: "#55556a" }}
+                  style={{ color: "var(--dim)" }}
                 >
                   {rewardForm.reward_type === "credit"
                     ? "Amount (cents)"
@@ -509,7 +509,7 @@ export function ReferralEventWizard({
                   type="number"
                   min={0}
                   className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
-                  style={{ background: "#111118", border: "1px solid #1a1a28", color: "#F0EDF8" }}
+                  style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
                   value={rewardForm.reward_value}
                   onChange={(e) => setRewardForm({ ...rewardForm, reward_value: e.target.value })}
                 />
@@ -517,7 +517,7 @@ export function ReferralEventWizard({
             )}
           </div>
 
-          <p className="text-sm leading-6" style={{ color: "#8888aa" }}>
+          <p className="text-sm leading-6" style={{ color: "var(--muted)" }}>
             Issue the reward now, or skip and create it later from the Rewards section. Skipping does
             not affect the approved event.
           </p>
@@ -525,7 +525,7 @@ export function ReferralEventWizard({
           <div className="flex gap-3">
             <button
               className="flex-1 rounded-full py-3 text-sm font-semibold disabled:opacity-50"
-              style={{ background: "#F0EDF8", color: "#0A0A0F" }}
+              style={{ background: "var(--text)", color: "var(--bg)" }}
               disabled={createRewardMutation.isPending}
               onClick={() => createRewardMutation.mutate()}
               type="button"
@@ -534,7 +534,7 @@ export function ReferralEventWizard({
             </button>
             <button
               className="flex-1 rounded-full py-3 text-sm font-semibold"
-              style={{ background: "#1a1a28", color: "#c0c0d8" }}
+              style={{ background: "var(--border)", color: "var(--text-soft)" }}
               onClick={onClose}
               type="button"
             >
@@ -542,7 +542,7 @@ export function ReferralEventWizard({
             </button>
           </div>
           {createRewardMutation.error instanceof Error && (
-            <p className="text-sm" style={{ color: "#e07a5f" }}>
+            <p className="text-sm" style={{ color: "var(--primary-strong)" }}>
               {createRewardMutation.error.message}
             </p>
           )}
@@ -555,10 +555,10 @@ export function ReferralEventWizard({
 function SummaryRow({ label, value, warn }: { label: string; value: string; warn?: boolean }) {
   return (
     <div className="flex items-start justify-between gap-4 text-sm">
-      <span style={{ color: "#55556a" }}>{label}</span>
+      <span style={{ color: "var(--dim)" }}>{label}</span>
       <span
         className="text-right font-semibold"
-        style={{ color: warn ? "#e07a5f" : "#F0EDF8" }}
+        style={{ color: warn ? "var(--primary-strong)" : "var(--text)" }}
       >
         {value || "—"}
       </span>
