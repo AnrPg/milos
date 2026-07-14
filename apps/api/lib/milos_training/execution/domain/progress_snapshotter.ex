@@ -25,6 +25,24 @@ defmodule MilosTraining.Execution.Domain.ProgressSnapshotter do
     |> Enum.sort_by(& &1.section_id)
   end
 
+  def validate_manual_scores(segments, manual_scores)
+      when is_list(segments) and is_list(manual_scores) do
+    scoreable_sections =
+      segments
+      |> Enum.group_by(&segment_section_id/1)
+      |> Map.new(fn {section_id, section_segments} ->
+        {section_id, expected_score_type(section_segments)}
+      end)
+
+    if Enum.all?(manual_scores, &valid_manual_score?(&1, scoreable_sections)) do
+      :ok
+    else
+      {:error, :bad_request}
+    end
+  end
+
+  def validate_manual_scores(_segments, _manual_scores), do: {:error, :bad_request}
+
   defp build_snapshots(segments, state, kind, manual_scores) do
     manual_sections =
       manual_scores
@@ -380,6 +398,51 @@ defmodule MilosTraining.Execution.Domain.ProgressSnapshotter do
       true -> score_config[:type] || score_config["type"]
     end
   end
+
+  defp expected_score_type(section_segments) do
+    if scoreable_section?(section_segments) do
+      format = section_format(section_segments)
+
+      if format in ["emom", "complex_emom"] do
+        section_segments
+        |> emom_final_snapshot(%{
+          section_elapsed_ms: %{},
+          segment_cycle_counts: %{},
+          checked_exercise_ids: []
+        })
+        |> case do
+          %{score_type: score_type} -> score_type
+          _ -> emom_expected_score_type(section_segments)
+        end
+      else
+        final_score_type(format, score_config(section_segments))
+      end
+    end
+  end
+
+  defp emom_expected_score_type(section_segments) do
+    case emom_scoring_mode(section_segments) do
+      "for_time" -> "accumulated_work_time"
+      "for_quality" -> "pass_fail"
+      "to_failure" -> "intervals_survived"
+      _ -> "reps"
+    end
+  end
+
+  defp valid_manual_score?(score, scoreable_sections) when is_map(score) do
+    section_id = score[:section_id] || score["section_id"]
+    supplied_type = score[:score_type] || score["score_type"]
+
+    case Map.get(scoreable_sections, section_id) do
+      nil ->
+        false
+
+      expected_type ->
+        is_nil(supplied_type) or to_string(supplied_type) == to_string(expected_type)
+    end
+  end
+
+  defp valid_manual_score?(_score, _scoreable_sections), do: false
 
   defp scoreable_section?(segments), do: Enum.any?(segments, &segment_scoreable?/1)
 

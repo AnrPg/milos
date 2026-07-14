@@ -56,18 +56,18 @@ export function ScoreModal({
       />
       <div
         className="relative z-10 w-full max-w-sm rounded-2xl p-6"
-        style={{ background: "var(--panel, #111118)", border: "1px solid var(--border, #2a2a3a)" }}
+        style={{ background: "var(--panel, var(--panel))", border: "1px solid var(--border)" }}
       >
         <div
           className="mb-1 text-xs font-semibold uppercase tracking-widest"
-          style={{ color: "var(--muted, #8888aa)" }}
+          style={{ color: "var(--muted)" }}
         >
           {segment.section_name}
         </div>
-        <div className="mb-4 text-lg font-bold" style={{ color: "var(--text, #f0edf8)" }}>
+        <div className="mb-4 text-lg font-bold" style={{ color: "var(--text)" }}>
           {label}
         </div>
-        <p className="mb-3 text-xs" style={{ color: "var(--muted, #8888aa)" }}>
+        <p className="mb-3 text-xs" style={{ color: "var(--muted)" }}>
           The measured score is prefilled. Change it only if you want to override it.
         </p>
 
@@ -83,19 +83,19 @@ export function ScoreModal({
                   value === option
                     ? option === "Pass"
                       ? {
-                          background: "color-mix(in srgb, #22c55e 20%, transparent)",
-                          border: "2px solid #22c55e",
-                          color: "#22c55e",
+                          background: "color-mix(in srgb, var(--success) 20%, transparent)",
+                          border: "2px solid var(--success)",
+                          color: "var(--success)",
                         }
                       : {
-                          background: "color-mix(in srgb, #ef4444 20%, transparent)",
-                          border: "2px solid #ef4444",
-                          color: "#ef4444",
+                          background: "color-mix(in srgb, var(--danger) 20%, transparent)",
+                          border: "2px solid var(--danger)",
+                          color: "var(--danger)",
                         }
                     : {
-                        background: "var(--bg, #0d0d14)",
-                        border: "1px solid var(--dim, #3a3a4a)",
-                        color: "var(--muted, #888)",
+                        background: "var(--bg)",
+                        border: "1px solid var(--dim)",
+                        color: "var(--muted)",
                       }
                 }
               >
@@ -115,13 +115,13 @@ export function ScoreModal({
               onKeyDown={(e) => e.key === "Enter" && handleSave()}
               className="w-full rounded-xl px-4 py-3 text-base outline-none focus:ring-2"
               style={{
-                background: "var(--card, #151520)",
-                border: "1px solid var(--border, #2a2a3a)",
-                color: "var(--text, #f0edf8)",
+                background: "var(--card, var(--panel-muted))",
+                border: "1px solid var(--border)",
+                color: "var(--text)",
               }}
             />
             {unit && (
-              <div className="mt-1 text-right text-xs" style={{ color: "var(--muted, #8888aa)" }}>
+              <div className="mt-1 text-right text-xs" style={{ color: "var(--muted)" }}>
                 {unit}
               </div>
             )}
@@ -134,9 +134,9 @@ export function ScoreModal({
             disabled={isSaving}
             className="flex-1 rounded-xl py-2.5 text-sm font-semibold"
             style={{
-              background: "var(--card, #151520)",
-              border: "1px solid var(--border, #2a2a3a)",
-              color: "var(--muted, #8888aa)",
+              background: "var(--card, var(--panel-muted))",
+              border: "1px solid var(--border)",
+              color: "var(--muted)",
             }}
           >
             Back
@@ -145,7 +145,7 @@ export function ScoreModal({
             onClick={handleSave}
             disabled={!value.trim() || isSaving}
             className="flex-1 rounded-xl py-2.5 text-sm font-semibold disabled:opacity-30"
-            style={{ background: "var(--accent, #9c799c)", color: "var(--text, #f0edf8)" }}
+            style={{ background: "var(--accent, var(--primary))", color: "var(--text)" }}
           >
             {isSaving ? "Saving…" : "Save"}
           </button>
