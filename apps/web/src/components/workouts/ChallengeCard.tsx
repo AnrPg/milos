@@ -69,15 +69,15 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
   return (
     <article
       className="rounded-[1.6rem] p-4"
-      style={{ background: "#0d0d18", border: "1px solid #1a1a28" }}
+      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-sm font-semibold" style={{ color: "#F0EDF8" }}>
+          <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
             {challenge.title}
           </p>
           {challenge.description ? (
-            <p className="mt-1 text-xs" style={{ color: "#55556a" }}>
+            <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
               {challenge.description}
             </p>
           ) : null}
@@ -87,9 +87,9 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
             <span
               className="rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-wider"
               style={{
-                background: "rgba(34,197,94,0.12)",
-                color: "#4ade80",
-                border: "1px solid rgba(34,197,94,0.3)",
+                background: "color-mix(in srgb, var(--success) 12%, transparent)",
+                color: "var(--success)",
+                border: "1px solid color-mix(in srgb, var(--success) 30%, transparent)",
               }}
             >
               {pastTarget && challenge.is_opted_in ? "🏆 In Hall of Fame" : "Target reached!"}
@@ -97,26 +97,26 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
           ) : null}
           <span
             className="rounded-full px-2 py-1 text-[10px] font-semibold"
-            style={{ background: "rgba(217,93,57,0.12)", color: "#d95d39" }}
+            style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", color: "var(--primary)" }}
           >
             {challenge.badge_label}
           </span>
         </div>
       </div>
 
-      <div className="mt-3 h-2 overflow-hidden rounded-full" style={{ background: "#1a1a28" }}>
+      <div className="mt-3 h-2 overflow-hidden rounded-full" style={{ background: "var(--border)" }}>
         <div
           className="h-full rounded-full transition-all"
           style={{
             width: `${progressPct}%`,
-            background: challenge.completed ? "#4ade80" : "#d95d39",
+            background: challenge.completed ? "var(--success)" : "var(--primary)",
           }}
         />
       </div>
 
       <div
         className="mt-2 flex items-center justify-between text-xs"
-        style={{ color: "#8888aa" }}
+        style={{ color: "var(--muted)" }}
       >
         <span>
           {challenge.progress}/{challenge.target}
@@ -125,13 +125,13 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
             ? ` · ${challenge.progress - challenge.target} pts bonus`
             : ""}
         </span>
-        <span style={{ color: challenge.completed ? "#4ade80" : "#8888aa" }}>
+        <span style={{ color: challenge.completed ? "var(--success)" : "var(--muted)" }}>
           {isCustom ? completionsRemainingText(challenge) : null}
         </span>
       </div>
 
       {isCustom && challenge.last_progress_event ? (
-        <p className="mt-2 text-xs font-medium" style={{ color: "#fbbf24" }}>
+        <p className="mt-2 text-xs font-medium" style={{ color: "var(--warning)" }}>
           {progressEventText(challenge.last_progress_event)}
         </p>
       ) : null}
@@ -145,11 +145,11 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
               style={
                 challenge.is_opted_in
                   ? {
-                      background: "rgba(251,191,36,0.12)",
-                      color: "#fbbf24",
-                      border: "1px solid rgba(251,191,36,0.3)",
+                      background: "color-mix(in srgb, var(--warning) 12%, transparent)",
+                      color: "var(--warning)",
+                      border: "1px solid color-mix(in srgb, var(--warning) 30%, transparent)",
                     }
-                  : { background: "#1a1a28", color: "#8888aa" }
+                  : { background: "var(--border)", color: "var(--muted)" }
               }
               disabled={optInMutation.isPending || optOutMutation.isPending}
               onClick={() => {
@@ -167,7 +167,7 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
               <button
                 type="button"
                 className="text-[11px]"
-                style={{ color: "#55556a" }}
+                style={{ color: "var(--dim)" }}
                 onClick={() => setExpanded((v) => !v)}
               >
                 {expanded ? "▲ Hide" : "▼ Hall of Fame"}
@@ -179,16 +179,16 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
             <div className="mt-3">
               <p
                 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em]"
-                style={{ color: "#55556a" }}
+                style={{ color: "var(--dim)" }}
               >
                 🏆 Hall of Fame
               </p>
               {leaderboardQuery.isPending ? (
-                <p className="text-xs" style={{ color: "#55556a" }}>
+                <p className="text-xs" style={{ color: "var(--dim)" }}>
                   Loading…
                 </p>
               ) : leaderboardQuery.data?.participants.length === 0 ? (
-                <p className="text-xs" style={{ color: "#55556a" }}>
+                <p className="text-xs" style={{ color: "var(--dim)" }}>
                   No entries yet — be the first!
                 </p>
               ) : (
@@ -209,15 +209,15 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
                         style={
                           isMine
                             ? {
-                                background: "rgba(251,191,36,0.08)",
-                                border: "1px solid rgba(251,191,36,0.2)",
+                                background: "color-mix(in srgb, var(--warning) 8%, transparent)",
+                                border: "1px solid color-mix(in srgb, var(--warning) 20%, transparent)",
                               }
-                            : { background: "#111118" }
+                            : { background: "var(--panel)" }
                         }
                       >
                         <span
                           className="w-5 shrink-0 text-[11px] font-bold"
-                          style={{ color: "#55556a" }}
+                          style={{ color: "var(--dim)" }}
                         >
                           {entry.rank}
                         </span>
@@ -225,24 +225,24 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
                           <div className="flex items-center justify-between gap-2">
                             <span
                               className="truncate text-xs font-medium"
-                              style={{ color: isMine ? "#fbbf24" : "#F0EDF8" }}
+                              style={{ color: isMine ? "var(--warning)" : "var(--text)" }}
                             >
                               {entry.nickname ?? "Athlete"}
                               {isMine ? " (you)" : ""}
                             </span>
-                            <span className="shrink-0 text-[11px]" style={{ color: "#8888aa" }}>
+                            <span className="shrink-0 text-[11px]" style={{ color: "var(--muted)" }}>
                               {entry.progress} pts
                             </span>
                           </div>
                           <div
                             className="mt-1 h-1 overflow-hidden rounded-full"
-                            style={{ background: "#1a1a28" }}
+                            style={{ background: "var(--border)" }}
                           >
                             <div
                               className="h-full rounded-full"
                               style={{
                                 width: `${barPct}%`,
-                                background: entry.completed_at ? "#4ade80" : "#d95d39",
+                                background: entry.completed_at ? "var(--success)" : "var(--primary)",
                               }}
                             />
                           </div>

@@ -35,6 +35,10 @@ defmodule MilosTraining.Gamification.GamificationStore do
   def create_challenge(params), do: adapter().create_challenge(params)
 
   @impl true
+  def create_challenge_with_limit(params, max_active),
+    do: adapter().create_challenge_with_limit(params, max_active)
+
+  @impl true
   def get_challenge(id), do: adapter().get_challenge(id)
 
   @impl true
@@ -52,6 +56,9 @@ defmodule MilosTraining.Gamification.GamificationStore do
   @impl true
   def get_user_challenge_progress(user_id, challenge_id),
     do: adapter().get_user_challenge_progress(user_id, challenge_id)
+
+  @impl true
+  def lock_challenge(challenge_id), do: adapter().lock_challenge(challenge_id)
 
   @impl true
   def list_challenge_progress(challenge_id), do: adapter().list_challenge_progress(challenge_id)
@@ -74,6 +81,13 @@ defmodule MilosTraining.Gamification.GamificationStore do
 
   @impl true
   def transaction(fun), do: adapter().transaction(fun)
+
+  @impl true
+  def get_user_preferences(user_id), do: adapter().get_user_preferences(user_id)
+
+  @impl true
+  def upsert_user_preferences(user_id, params),
+    do: adapter().upsert_user_preferences(user_id, params)
 
   @impl true
   def opt_in_challenge_leaderboard(user_id, challenge_id),

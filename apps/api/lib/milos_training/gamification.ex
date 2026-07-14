@@ -38,6 +38,10 @@ defmodule MilosTraining.Gamification do
   defdelegate leaderboard_opted_in?(user_id), to: LeaderboardOptedIn, as: :call
   defdelegate refresh_leaderboard(), to: RefreshLeaderboard, as: :call
 
+  defdelegate get_user_preferences(user_id), to: GamificationStore
+
+  defdelegate upsert_user_preferences(user_id, params), to: GamificationStore
+
   defdelegate opt_in_challenge_leaderboard(user_id, challenge_id),
     to: GamificationStore
 

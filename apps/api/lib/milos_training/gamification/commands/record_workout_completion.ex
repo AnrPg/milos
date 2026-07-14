@@ -2,6 +2,9 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
   alias MilosTraining.Gamification.Domain.{
     AchievementRules,
     ChallengeProgress,
+    DayStreakCalculator,
+    MotivationCalculator,
+    PerseveranceCalculator,
     PRDetector,
     StreakCalculator
   }
@@ -28,15 +31,32 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
     pr_scores = PRDetector.detect(current_scores, previous_scores)
     existing_stats = GamificationStore.get_user_stats(user_id) || %{longest_streak: 0}
     completed_dates = Enum.map(completed_executions, &DateTime.to_date(&1.completed_at_utc))
+    prefs = GamificationStore.get_user_preferences(user_id) || %{}
+    off_days = Map.get(prefs, :off_days, [])
+    today = Date.utc_today()
 
     streaks =
       StreakCalculator.update(existing_stats,
         completed_dates: completed_dates,
-        current_date: Date.utc_today(),
+        current_date: today,
         anchor_date: signup_anchor_date(account, completed_dates),
         target: settings.weekly_workout_target,
         shield_reset_day: settings.streak_shield_reset_day
       )
+
+    day_streaks = DayStreakCalculator.calculate(completed_dates, off_days, today)
+
+    motivation_score =
+      MotivationCalculator.calculate(completed_dates, settings.weekly_workout_target, today)
+
+    perseverance_score =
+      PerseveranceCalculator.calculate(
+        current_execution.exercise_modifications || [],
+        off_days,
+        today
+      )
+
+    advancement_count = existing_stats[:advancement_count] || 0
 
     type_counts = workout_type_counts(completed_executions, workout_lookup)
     current_type = get_workout_type(current_execution, workout_lookup)
@@ -55,10 +75,17 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
       end
     }
 
+    extra_scores = %{
+      motivation_score: motivation_score,
+      perseverance_score: perseverance_score,
+      advancement_count: advancement_count,
+      day_streaks: day_streaks
+    }
+
     GamificationStore.transaction(fn ->
       with {:ok, _pr_events} <- persist_pr_events(user_id, execution_id, pr_scores, completed_at),
            total_prs <- GamificationStore.count_achievements_by_prefix(user_id, "pr_event:"),
-           stats <- build_stats(user_id, streaks, completed_executions, total_prs, execution),
+           stats <- build_stats(user_id, streaks, completed_executions, total_prs, execution, extra_scores),
            {:ok, _stats} <- GamificationStore.upsert_user_stats(stats),
            {:ok, _badges} <-
              persist_achievements(
@@ -67,7 +94,12 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
                completed_at
              ),
            {:ok, challenge_result} <-
-             persist_challenge_progress(user_id, current_execution, completion_facts, completed_at) do
+             persist_challenge_progress(
+               user_id,
+               current_execution,
+               completion_facts,
+               completed_at
+             ) do
         {:ok,
          %{
            challenge_completions: challenge_result.completions,
@@ -77,16 +109,19 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
     end)
   end
 
-  defp build_stats(user_id, streaks, completed_executions, total_prs, current_execution) do
+  defp build_stats(user_id, streaks, completed_executions, total_prs, current_execution, extra) do
     %{
       user_id: user_id,
-      current_streak: streaks.current_streak,
-      longest_streak: streaks.longest_streak,
+      current_streak: extra.day_streaks.current_streak,
+      longest_streak: extra.day_streaks.longest_streak,
       total_workouts: length(completed_executions),
       total_prs: total_prs,
       current_streak_shields: streaks.current_streak_shields,
       last_workout_at: List.last(completed_executions, current_execution).completed_at_utc,
       consistency_score: streaks.consistency_score,
+      motivation_score: extra.motivation_score,
+      perseverance_score: extra.perseverance_score,
+      advancement_count: extra.advancement_count,
       updated_at: DateTime.utc_now()
     }
   end
@@ -118,66 +153,70 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
     completion_date = DateTime.to_date(completed_at)
 
     GamificationStore.list_active_challenges(completion_date)
-    |> Enum.reduce_while({:ok, %{completions: [], increments: []}}, fn challenge,
-                                                                        {:ok, acc} ->
-      current_progress =
-        GamificationStore.get_user_challenge_progress(user_id, challenge.id) ||
-          %{progress: 0, completed_at: nil, last_increment_event: nil}
+    |> Enum.reduce_while({:ok, %{completions: [], increments: []}}, fn challenge, {:ok, acc} ->
+      with :ok <- GamificationStore.lock_challenge(challenge.id) do
+        current_progress =
+          GamificationStore.get_user_challenge_progress(user_id, challenge.id) ||
+            %{progress: 0, completed_at: nil, last_increment_event: nil}
 
-      update =
-        ChallengeProgress.advance(challenge, current_progress.progress || 0, completion_facts)
+        update =
+          ChallengeProgress.advance(challenge, current_progress.progress || 0, completion_facts)
 
-      opted_in = GamificationStore.challenge_leaderboard_opted_in?(user_id, challenge.id)
-      next_progress = if opted_in, do: update.progress, else: min(update.progress, update.target)
+        opted_in = GamificationStore.challenge_leaderboard_opted_in?(user_id, challenge.id)
 
-      next_completed_at =
-        if is_nil(current_progress.completed_at) and update.completed?,
-          do: completed_at,
-          else: current_progress.completed_at
+        next_progress =
+          if opted_in, do: update.progress, else: min(update.progress, update.target)
 
-      last_increment_event =
-        if update.increment > 0 do
-          %{
-            "total_points" => update.increment,
-            "events" =>
-              Enum.map(update.events, &%{"points" => &1.points, "label" => &1.label})
-          }
-        else
-          current_progress[:last_increment_event]
+        next_completed_at =
+          if is_nil(current_progress.completed_at) and update.completed?,
+            do: completed_at,
+            else: current_progress.completed_at
+
+        last_increment_event =
+          if update.increment > 0 do
+            %{
+              "total_points" => update.increment,
+              "events" => Enum.map(update.events, &%{"points" => &1.points, "label" => &1.label})
+            }
+          else
+            current_progress[:last_increment_event]
+          end
+
+        case GamificationStore.upsert_user_challenge_progress(%{
+               user_id: user_id,
+               challenge_id: challenge.id,
+               progress: next_progress,
+               completed_at: next_completed_at,
+               last_increment_event: last_increment_event
+             }) do
+          {:ok, _progress} ->
+            new_increment =
+              if update.increment > 0,
+                do: [
+                  %{
+                    challenge_id: challenge.id,
+                    title: challenge.title,
+                    total_points: update.increment,
+                    events: update.events
+                  }
+                ],
+                else: []
+
+            maybe_complete_challenge(
+              user_id,
+              challenge,
+              current_progress,
+              update.completed?,
+              completed_at,
+              acc,
+              new_increment
+            )
+
+          {:error, reason} ->
+            {:halt, {:error, reason}}
         end
-
-      case GamificationStore.upsert_user_challenge_progress(%{
-             user_id: user_id,
-             challenge_id: challenge.id,
-             progress: next_progress,
-             completed_at: next_completed_at,
-             last_increment_event: last_increment_event
-           }) do
-        {:ok, _progress} ->
-          new_increment =
-            if update.increment > 0,
-              do: [
-                %{
-                  challenge_id: challenge.id,
-                  title: challenge.title,
-                  total_points: update.increment,
-                  events: update.events
-                }
-              ],
-              else: []
-
-          maybe_complete_challenge(
-            user_id,
-            challenge,
-            current_progress,
-            update.completed?,
-            completed_at,
-            acc,
-            new_increment
-          )
-
-        {:error, reason} ->
-          {:halt, {:error, reason}}
+      else
+        {:error, reason} -> {:halt, {:error, reason}}
       end
     end)
   end

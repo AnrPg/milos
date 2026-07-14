@@ -218,15 +218,15 @@ function RuleRowEditor({
   onRemove: () => void;
 }) {
   const inputStyle = {
-    background: "#0d0d18",
-    borderColor: "#1a1a28",
-    color: "#F0EDF8",
+    background: "var(--panel-muted)",
+    borderColor: "var(--border)",
+    color: "var(--text)",
   };
 
   return (
     <div
       className="rounded-[1.2rem] p-3 space-y-2"
-      style={{ background: "#0a0a14", border: "1px solid #1a1a28" }}
+      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
     >
       <div className="flex flex-wrap items-center gap-2">
         <select
@@ -268,7 +268,7 @@ function RuleRowEditor({
         )}
 
         {row.condition === "weekly_consistency" && (
-          <label className="flex items-center gap-1 text-xs" style={{ color: "#8888aa" }}>
+          <label className="flex items-center gap-1 text-xs" style={{ color: "var(--muted)" }}>
             ≥
             <input
               className="rounded-xl border px-2 py-2 text-xs w-16"
@@ -284,7 +284,7 @@ function RuleRowEditor({
         )}
 
         {row.condition === "rare_workout_type" && (
-          <label className="flex items-center gap-1 text-xs" style={{ color: "#8888aa" }}>
+          <label className="flex items-center gap-1 text-xs" style={{ color: "var(--muted)" }}>
             &lt;
             <input
               className="rounded-xl border px-2 py-2 text-xs w-16"
@@ -300,7 +300,7 @@ function RuleRowEditor({
         )}
 
         {row.condition === "team_workout_streak" && (
-          <label className="flex items-center gap-1 text-xs" style={{ color: "#8888aa" }}>
+          <label className="flex items-center gap-1 text-xs" style={{ color: "var(--muted)" }}>
             ≥
             <input
               className="rounded-xl border px-2 py-2 text-xs w-16"
@@ -314,7 +314,7 @@ function RuleRowEditor({
           </label>
         )}
 
-        <label className="flex items-center gap-1 text-xs ml-auto" style={{ color: "#8888aa" }}>
+        <label className="flex items-center gap-1 text-xs ml-auto" style={{ color: "var(--muted)" }}>
           pts:
           <input
             className="rounded-xl border px-2 py-2 text-xs w-16"
@@ -330,7 +330,7 @@ function RuleRowEditor({
         <button
           type="button"
           className="rounded-xl px-2 py-1 text-xs"
-          style={{ background: "rgba(217,93,57,0.12)", color: "#e07a5f" }}
+          style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", color: "var(--primary-strong)" }}
           onClick={onRemove}
         >
           ×
@@ -339,7 +339,7 @@ function RuleRowEditor({
 
       <input
         className="w-full rounded-xl border px-3 py-2 text-xs"
-        style={{ ...inputStyle, color: "#8888aa" }}
+        style={{ ...inputStyle, color: "var(--muted)" }}
         placeholder="Label (e.g. for beating a PR)"
         value={row.label}
         onChange={(e) => onChange({ ...row, label: e.target.value })}
@@ -350,11 +350,11 @@ function RuleRowEditor({
 
 function metricCard(label: string, value: string | number) {
   return (
-    <div className="rounded-[1.3rem] p-4" style={{ background: "#0d0d18", border: "1px solid #1a1a28" }}>
-      <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+    <div className="rounded-[1.3rem] p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
+      <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
         {label}
       </p>
-      <p className="mt-2 text-xl font-semibold" style={{ color: "#F0EDF8" }}>
+      <p className="mt-2 text-xl font-semibold" style={{ color: "var(--text)" }}>
         {value}
       </p>
     </div>
@@ -425,26 +425,26 @@ export function AdminChallenges() {
   }
 
   return (
-    <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "#0A0A0F" }}>
+    <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-7xl space-y-8">
-        <section className="rounded-[2.4rem] p-8" style={{ background: "#111118", border: "1px solid #1a1a28" }}>
+        <section className="rounded-[2.4rem] p-8" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="max-w-4xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#d95d39]">Admin Challenges</p>
-              <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "#F0EDF8" }}>
+              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">Admin Challenges</p>
+              <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>
                 Seasonal challenge management.
               </h1>
-              <p className="mt-4 text-base leading-7" style={{ color: "#8888aa" }}>
+              <p className="mt-4 text-base leading-7" style={{ color: "var(--muted)" }}>
                 Create and edit seasonal challenges, inspect live participation, and review how members and
                 athletes are progressing against each target.
               </p>
             </div>
 
-            <div className="rounded-[1.4rem] px-5 py-4" style={{ background: "#0d0d18", border: "1px solid #1a1a28" }}>
-              <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+            <div className="rounded-[1.4rem] px-5 py-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
+              <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                 Active today
               </p>
-              <p className="mt-2 text-2xl font-semibold" style={{ color: "#F0EDF8" }}>
+              <p className="mt-2 text-2xl font-semibold" style={{ color: "var(--text)" }}>
                 {activeCount} / 3
               </p>
             </div>
@@ -452,13 +452,13 @@ export function AdminChallenges() {
         </section>
 
         <section className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
-          <article className="rounded-[2rem] p-6" style={{ background: "#111118", border: "1px solid #1a1a28" }}>
+          <article className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "#55556a" }}>
+                <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>
                   {editing ? "Edit challenge" : "Create challenge"}
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold" style={{ color: "#F0EDF8" }}>
+                <h2 className="mt-2 text-2xl font-semibold" style={{ color: "var(--text)" }}>
                   {editing ? "Update the active definition." : "Define a new seasonal challenge."}
                 </h2>
               </div>
@@ -466,7 +466,7 @@ export function AdminChallenges() {
               {editing ? (
                 <button
                   className="rounded-full px-4 py-2 text-sm font-semibold"
-                  style={{ background: "#1a1a28", color: "#c0c0d8" }}
+                  style={{ background: "var(--border)", color: "var(--text-soft)" }}
                   onClick={startCreateMode}
                   type="button"
                 >
@@ -477,24 +477,24 @@ export function AdminChallenges() {
 
             <div className="mt-6 space-y-4">
               <label className="block space-y-2">
-                <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+                <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                   Title
                 </span>
                 <input
                   className="w-full rounded-2xl border px-4 py-3 text-sm"
-                  style={{ background: "#0d0d18", borderColor: "#1a1a28", color: "#F0EDF8" }}
+                  style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
                   value={form.title}
                   onChange={(event) => updateForm("title", event.target.value)}
                 />
               </label>
 
               <label className="block space-y-2">
-                <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+                <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                   Description
                 </span>
                 <textarea
                   className="min-h-28 w-full rounded-2xl border px-4 py-3 text-sm"
-                  style={{ background: "#0d0d18", borderColor: "#1a1a28", color: "#F0EDF8" }}
+                  style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
                   value={form.description}
                   onChange={(event) => updateForm("description", event.target.value)}
                 />
@@ -502,12 +502,12 @@ export function AdminChallenges() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block space-y-2">
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                     Criteria type
                   </span>
                   <select
                     className="w-full rounded-2xl border px-4 py-3 text-sm"
-                    style={{ background: "#0d0d18", borderColor: "#1a1a28", color: "#F0EDF8" }}
+                    style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
                     value={form.criteriaType}
                     onChange={(event) => updateForm("criteriaType", event.target.value as CriteriaType)}
                   >
@@ -519,12 +519,12 @@ export function AdminChallenges() {
                 </label>
 
                 <label className="block space-y-2">
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                     Target count
                   </span>
                   <input
                     className="w-full rounded-2xl border px-4 py-3 text-sm"
-                    style={{ background: "#0d0d18", borderColor: "#1a1a28", color: "#F0EDF8" }}
+                    style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
                     value={form.targetCount}
                     onChange={(event) => updateForm("targetCount", event.target.value)}
                     type="number"
@@ -534,12 +534,12 @@ export function AdminChallenges() {
 
               {form.criteriaType === "workout_type_count" ? (
                 <label className="block space-y-2">
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                     Workout type filter
                   </span>
                   <select
                     className="w-full rounded-2xl border px-4 py-3 text-sm"
-                    style={{ background: "#0d0d18", borderColor: "#1a1a28", color: "#F0EDF8" }}
+                    style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
                     value={form.typeFilter}
                     onChange={(event) => updateForm("typeFilter", event.target.value)}
                   >
@@ -557,14 +557,14 @@ export function AdminChallenges() {
                   <div className="flex items-center justify-between">
                     <span
                       className="text-xs font-semibold uppercase tracking-[0.18em]"
-                      style={{ color: "#55556a" }}
+                      style={{ color: "var(--dim)" }}
                     >
                       Points Rules
                     </span>
                     <button
                       type="button"
                       className="rounded-full px-3 py-1 text-xs font-semibold"
-                      style={{ background: "#1a1a28", color: "#c0c0d8" }}
+                      style={{ background: "var(--border)", color: "var(--text-soft)" }}
                       onClick={() => updateForm("rules", [...form.rules, defaultRuleRow()])}
                     >
                       + Add rule
@@ -576,13 +576,13 @@ export function AdminChallenges() {
                       <label className="block space-y-2">
                         <span
                           className="text-xs font-semibold uppercase tracking-[0.18em]"
-                          style={{ color: "#55556a" }}
+                          style={{ color: "var(--dim)" }}
                         >
                           Increment per completion
                         </span>
                         <input
                           className="w-full rounded-2xl border px-4 py-3 text-sm"
-                          style={{ background: "#0d0d18", borderColor: "#1a1a28", color: "#F0EDF8" }}
+                          style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
                           value={form.incrementPerCompletion}
                           onChange={(e) => updateForm("incrementPerCompletion", e.target.value)}
                           type="number"
@@ -593,13 +593,13 @@ export function AdminChallenges() {
                       <label className="block space-y-2">
                         <span
                           className="text-xs font-semibold uppercase tracking-[0.18em]"
-                          style={{ color: "#55556a" }}
+                          style={{ color: "var(--dim)" }}
                         >
                           Points label (optional)
                         </span>
                         <input
                           className="w-full rounded-2xl border px-4 py-3 text-sm"
-                          style={{ background: "#0d0d18", borderColor: "#1a1a28", color: "#F0EDF8" }}
+                          style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
                           placeholder="e.g. for completing any workout"
                           value={form.incrementLabel}
                           onChange={(e) => updateForm("incrementLabel", e.target.value)}
@@ -633,24 +633,24 @@ export function AdminChallenges() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block space-y-2">
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                     Badge label
                   </span>
                   <input
                     className="w-full rounded-2xl border px-4 py-3 text-sm"
-                    style={{ background: "#0d0d18", borderColor: "#1a1a28", color: "#F0EDF8" }}
+                    style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
                     value={form.badgeLabel}
                     onChange={(event) => updateForm("badgeLabel", event.target.value)}
                   />
                 </label>
 
                 <div className="space-y-2">
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                     Badge key preview
                   </span>
                   <div
                     className="rounded-2xl border px-4 py-3 text-sm"
-                    style={{ background: "#0d0d18", borderColor: "#1a1a28", color: "#F0EDF8" }}
+                    style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
                   >
                     {`challenge_${slugify(form.badgeLabel || form.title || "new_challenge")}`}
                   </div>
@@ -659,12 +659,12 @@ export function AdminChallenges() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block space-y-2">
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                     Starts
                   </span>
                   <input
                     className="w-full rounded-2xl border px-4 py-3 text-sm"
-                    style={{ background: "#0d0d18", borderColor: "#1a1a28", color: "#F0EDF8" }}
+                    style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
                     type="date"
                     value={form.startsAt}
                     onChange={(event) => updateForm("startsAt", event.target.value)}
@@ -672,12 +672,12 @@ export function AdminChallenges() {
                 </label>
 
                 <label className="block space-y-2">
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                     Ends
                   </span>
                   <input
                     className="w-full rounded-2xl border px-4 py-3 text-sm"
-                    style={{ background: "#0d0d18", borderColor: "#1a1a28", color: "#F0EDF8" }}
+                    style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
                     type="date"
                     value={form.endsAt}
                     onChange={(event) => updateForm("endsAt", event.target.value)}
@@ -687,21 +687,21 @@ export function AdminChallenges() {
 
               <div className="flex flex-wrap items-center gap-3">
                 <button
-                  className="rounded-full px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
-                  style={{ background: "#d95d39" }}
+                  className="rounded-full px-5 py-3 text-sm font-semibold text-[var(--primary-contrast)] disabled:opacity-50"
+                  style={{ background: "var(--primary)" }}
                   disabled={saveMutation.isPending || form.title.trim().length === 0}
                   onClick={() => void saveMutation.mutateAsync()}
                   type="button"
                 >
                   {saveMutation.isPending ? "Saving..." : editing ? "Save changes" : "Create challenge"}
                 </button>
-                <span className="text-sm" style={{ color: "#8888aa" }}>
+                <span className="text-sm" style={{ color: "var(--muted)" }}>
                   {criteriaSummary(payloadFromForm(form))}
                 </span>
               </div>
 
               {saveMutation.isError ? (
-                <p className="text-sm" style={{ color: "#d95d39" }}>
+                <p className="text-sm" style={{ color: "var(--primary)" }}>
                   {saveMutation.error instanceof Error ? saveMutation.error.message : "Challenge could not be saved."}
                 </p>
               ) : null}
@@ -709,13 +709,13 @@ export function AdminChallenges() {
           </article>
 
           <div className="space-y-6">
-            <article className="rounded-[2rem] p-6" style={{ background: "#111118", border: "1px solid #1a1a28" }}>
+            <article className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "#55556a" }}>
+                  <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>
                     Challenge roster
                   </p>
-                  <h2 className="mt-2 text-2xl font-semibold" style={{ color: "#F0EDF8" }}>
+                  <h2 className="mt-2 text-2xl font-semibold" style={{ color: "var(--text)" }}>
                     Existing challenges
                   </h2>
                 </div>
@@ -723,11 +723,11 @@ export function AdminChallenges() {
 
               <div className="mt-5 space-y-4">
                 {challengesQuery.isPending ? (
-                  <p className="text-sm" style={{ color: "#8888aa" }}>
+                  <p className="text-sm" style={{ color: "var(--muted)" }}>
                     Loading challenges...
                   </p>
                 ) : challenges.length === 0 ? (
-                  <p className="rounded-2xl px-4 py-5 text-sm" style={{ background: "#0d0d18", color: "#8888aa" }}>
+                  <p className="rounded-2xl px-4 py-5 text-sm" style={{ background: "var(--panel-muted)", color: "var(--muted)" }}>
                     No seasonal challenges created yet.
                   </p>
                 ) : (
@@ -741,8 +741,8 @@ export function AdminChallenges() {
                         className="w-full rounded-[1.6rem] p-4 text-left transition-colors"
                         style={
                           selected
-                            ? { background: "#151126", border: "1px solid #9c799c" }
-                            : { background: "#0d0d18", border: "1px solid #1a1a28" }
+                            ? { background: "var(--panel-raised)", border: "1px solid var(--primary)" }
+                            : { background: "var(--panel-muted)", border: "1px solid var(--border)" }
                         }
                         onClick={async () => {
                           setSelectedChallengeId(challenge.id);
@@ -756,10 +756,10 @@ export function AdminChallenges() {
                       >
                         <div className="flex items-start justify-between gap-4">
                           <div>
-                            <p className="text-sm font-semibold" style={{ color: "#F0EDF8" }}>
+                            <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
                               {challenge.title}
                             </p>
-                            <p className="mt-1 text-sm" style={{ color: "#8888aa" }}>
+                            <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
                               {challenge.description || "No description"}
                             </p>
                           </div>
@@ -768,16 +768,16 @@ export function AdminChallenges() {
                             style={{
                               background:
                                 status === "active"
-                                  ? "rgba(34,197,94,0.12)"
+                                  ? "color-mix(in srgb, var(--success) 12%, transparent)"
                                   : status === "upcoming"
-                                    ? "rgba(217,93,57,0.12)"
-                                    : "#1a1a28",
+                                    ? "color-mix(in srgb, var(--primary) 12%, transparent)"
+                                    : "var(--border)",
                               color:
                                 status === "active"
-                                  ? "#4ade80"
+                                  ? "var(--success)"
                                   : status === "upcoming"
-                                    ? "#d95d39"
-                                    : "#8888aa",
+                                    ? "var(--primary)"
+                                    : "var(--muted)",
                             }}
                           >
                             {status}
@@ -786,34 +786,34 @@ export function AdminChallenges() {
 
                         <div className="mt-4 grid gap-3 sm:grid-cols-4">
                           <div>
-                            <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+                            <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                               Participants
                             </p>
-                            <p className="mt-1 text-sm font-semibold" style={{ color: "#F0EDF8" }}>
+                            <p className="mt-1 text-sm font-semibold" style={{ color: "var(--text)" }}>
                               {challenge.progress_summary.participants}
                             </p>
                           </div>
                           <div>
-                            <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+                            <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                               Completed
                             </p>
-                            <p className="mt-1 text-sm font-semibold" style={{ color: "#F0EDF8" }}>
+                            <p className="mt-1 text-sm font-semibold" style={{ color: "var(--text)" }}>
                               {challenge.progress_summary.completed}
                             </p>
                           </div>
                           <div>
-                            <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+                            <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                               Avg progress
                             </p>
-                            <p className="mt-1 text-sm font-semibold" style={{ color: "#F0EDF8" }}>
+                            <p className="mt-1 text-sm font-semibold" style={{ color: "var(--text)" }}>
                               {challenge.progress_summary.average_progress}
                             </p>
                           </div>
                           <div>
-                            <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+                            <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                               Completion rate
                             </p>
-                            <p className="mt-1 text-sm font-semibold" style={{ color: "#F0EDF8" }}>
+                            <p className="mt-1 text-sm font-semibold" style={{ color: "var(--text)" }}>
                               {(challenge.progress_summary.completion_rate * 100).toFixed(0)}%
                             </p>
                           </div>
@@ -825,29 +825,29 @@ export function AdminChallenges() {
               </div>
             </article>
 
-            <article className="rounded-[2rem] p-6" style={{ background: "#111118", border: "1px solid #1a1a28" }}>
+            <article className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "#55556a" }}>
+                  <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>
                     Participation
                   </p>
-                  <h2 className="mt-2 text-2xl font-semibold" style={{ color: "#F0EDF8" }}>
+                  <h2 className="mt-2 text-2xl font-semibold" style={{ color: "var(--text)" }}>
                     {selectedChallenge ? selectedChallenge.title : "Select a challenge"}
                   </h2>
                 </div>
                 {selectedChallenge ? (
-                  <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "rgba(217,93,57,0.12)", color: "#d95d39" }}>
+                  <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", color: "var(--primary)" }}>
                     Target {selectedChallenge.progress_summary.target}
                   </span>
                 ) : null}
               </div>
 
               {detailQuery.isPending && selectedChallengeId ? (
-                <p className="mt-5 text-sm" style={{ color: "#8888aa" }}>
+                <p className="mt-5 text-sm" style={{ color: "var(--muted)" }}>
                   Loading challenge detail...
                 </p>
               ) : !selectedChallenge ? (
-                <p className="mt-5 rounded-2xl px-4 py-5 text-sm" style={{ background: "#0d0d18", color: "#8888aa" }}>
+                <p className="mt-5 rounded-2xl px-4 py-5 text-sm" style={{ background: "var(--panel-muted)", color: "var(--muted)" }}>
                   Choose a challenge from the roster to inspect member and athlete progress.
                 </p>
               ) : (
@@ -859,9 +859,9 @@ export function AdminChallenges() {
                     {metricCard("Completion rate", `${(selectedChallenge.progress_summary.completion_rate * 100).toFixed(0)}%`)}
                   </div>
 
-                  <div className="mt-5 overflow-x-auto rounded-[1.4rem]" style={{ border: "1px solid #1a1a28" }}>
-                    <table className="min-w-full divide-y divide-[#1a1a28] text-sm">
-                      <thead style={{ background: "#0d0d18", color: "#8888aa" }}>
+                  <div className="mt-5 overflow-x-auto rounded-[1.4rem]" style={{ border: "1px solid var(--border)" }}>
+                    <table className="min-w-full divide-y divide-[var(--border)] text-sm">
+                      <thead style={{ background: "var(--panel-muted)", color: "var(--muted)" }}>
                         <tr>
                           <th className="px-4 py-3 text-left font-semibold">User</th>
                           <th className="px-4 py-3 text-left font-semibold">Role</th>
@@ -877,22 +877,22 @@ export function AdminChallenges() {
                           <th className="px-4 py-3 text-left font-semibold">Completed at</th>
                         </tr>
                       </thead>
-                      <tbody style={{ background: "#111118", color: "#F0EDF8" }}>
+                      <tbody style={{ background: "var(--panel)", color: "var(--text)" }}>
                         {participants.length === 0 ? (
                           <tr>
                             <td
                               className="px-4 py-5 text-sm"
                               colSpan={selectedChallenge?.criteria_type === "custom" ? 8 : 6}
-                              style={{ color: "#8888aa" }}
+                              style={{ color: "var(--muted)" }}
                             >
                               No members or athletes have registered progress for this challenge yet.
                             </td>
                           </tr>
                         ) : (
                           participants.map((participant) => (
-                            <tr key={participant.user_id} style={{ borderTop: "1px solid #1a1a28" }}>
+                            <tr key={participant.user_id} style={{ borderTop: "1px solid var(--border)" }}>
                               <td className="px-4 py-3">{participant.nickname || participant.user_id}</td>
-                              <td className="px-4 py-3" style={{ color: "#8888aa" }}>
+                              <td className="px-4 py-3" style={{ color: "var(--muted)" }}>
                                 {participant.role || "unknown"}
                               </td>
                               <td className="px-4 py-3">{participant.progress}</td>
@@ -906,7 +906,7 @@ export function AdminChallenges() {
                               <td className="px-4 py-3">{(participant.completion_ratio * 100).toFixed(0)}%</td>
                               <td
                                 className="px-4 py-3"
-                                style={{ color: participant.completed_at ? "#4ade80" : "#8888aa" }}
+                                style={{ color: participant.completed_at ? "var(--success)" : "var(--muted)" }}
                               >
                                 {participant.completed_at
                                   ? new Intl.DateTimeFormat("en-US", {

@@ -13,6 +13,7 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
     UserStat
   }
 
+  alias MilosTraining.Gamification.Domain.ChallengeSchedulePolicy
   alias MilosTraining.Repo
 
   @impl true
@@ -30,7 +31,8 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
         %{
           weekly_workout_target: 2,
           streak_shield_reset_day: nil,
-          leaderboard_enabled: true
+          leaderboard_enabled: true,
+          theme_slug: "ember"
         }
 
       settings ->
@@ -112,6 +114,51 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
   end
 
   @impl true
+  def create_challenge_with_limit(params, max_active) do
+    create_challenge_with_limit(params, max_active, 3)
+  end
+
+  defp create_challenge_with_limit(params, max_active, attempts_left) do
+    Repo.transaction(
+      fn ->
+        existing_challenges =
+          SeasonalChallenge
+          |> order_by([challenge], asc: challenge.starts_at, asc: challenge.inserted_at)
+          |> Repo.all()
+          |> Enum.map(&normalize_challenge/1)
+
+        with :ok <-
+               ChallengeSchedulePolicy.validate_max_active(
+                 existing_challenges,
+                 params.starts_at,
+                 params.ends_at,
+                 max_active: max_active
+               ),
+             {:ok, challenge} <-
+               %SeasonalChallenge{}
+               |> SeasonalChallenge.changeset(params)
+               |> Repo.insert() do
+          normalize_challenge(challenge)
+        else
+          {:error, reason} -> Repo.rollback(reason)
+        end
+      end,
+      isolation: :serializable
+    )
+    |> case do
+      {:ok, challenge} ->
+        {:ok, challenge}
+
+      {:error, %Postgrex.Error{postgres: %{code: :serialization_failure}}}
+      when attempts_left > 1 ->
+        create_challenge_with_limit(params, max_active, attempts_left - 1)
+
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  @impl true
   def get_challenge(id) do
     case Repo.get(SeasonalChallenge, id) do
       nil -> nil
@@ -169,6 +216,18 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
     case Repo.get_by(UserChallengeProgress, user_id: user_id, challenge_id: challenge_id) do
       nil -> nil
       progress -> normalize_progress(progress)
+    end
+  end
+
+  @impl true
+  def lock_challenge(challenge_id) do
+    SeasonalChallenge
+    |> where([challenge], challenge.id == ^challenge_id)
+    |> lock("FOR UPDATE")
+    |> Repo.one()
+    |> case do
+      nil -> {:error, :not_found}
+      %SeasonalChallenge{} -> :ok
     end
   end
 
@@ -375,6 +434,7 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
       weekly_workout_target: settings.weekly_workout_target,
       streak_shield_reset_day: settings.streak_shield_reset_day,
       leaderboard_enabled: settings.leaderboard_enabled,
+      theme_slug: settings.theme_slug,
       inserted_at: settings.inserted_at,
       updated_at: settings.updated_at
     }
@@ -427,11 +487,37 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
   def list_challenge_leaderboard_participants(challenge_id) do
     UserChallengeProgress
     |> join(:inner, [p], o in ChallengeLeaderboardOptIn,
-        on: p.user_id == o.user_id and p.challenge_id == o.challenge_id)
+      on: p.user_id == o.user_id and p.challenge_id == o.challenge_id
+    )
     |> where([p, _o], p.challenge_id == ^challenge_id)
     |> order_by([p, _o], desc: p.progress)
     |> limit(50)
     |> Repo.all()
     |> Enum.map(&normalize_progress/1)
+  end
+
+  @impl true
+  def get_user_preferences(user_id) do
+    alias MilosTraining.Gamification.UserGamificationPreferences
+
+    case Repo.get_by(UserGamificationPreferences, user_id: user_id) do
+      nil -> nil
+      prefs -> %{off_days: prefs.off_days}
+    end
+  end
+
+  @impl true
+  def upsert_user_preferences(user_id, params) do
+    alias MilosTraining.Gamification.UserGamificationPreferences
+
+    existing = Repo.get_by(UserGamificationPreferences, user_id: user_id) || %UserGamificationPreferences{}
+
+    existing
+    |> UserGamificationPreferences.changeset(Map.put(params, :user_id, user_id))
+    |> Repo.insert_or_update()
+    |> case do
+      {:ok, prefs} -> {:ok, %{off_days: prefs.off_days}}
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 end

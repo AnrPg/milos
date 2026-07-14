@@ -50,7 +50,10 @@ defmodule MilosTraining.Gamification.Domain.ChallengeRule do
 
   defp default_label(%{"condition" => "pr_beaten"}), do: "for beating a PR"
   defp default_label(%{"condition" => "weekly_consistency"}), do: "for weekly consistency"
-  defp default_label(%{"condition" => "rare_workout_type"}), do: "for exploring a new workout type"
+
+  defp default_label(%{"condition" => "rare_workout_type"}),
+    do: "for exploring a new workout type"
+
   defp default_label(%{"condition" => "team_workout_streak"}), do: "for team participation"
   defp default_label(_), do: "for this workout"
 end

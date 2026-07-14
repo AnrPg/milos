@@ -1,19 +1,56 @@
 defmodule MilosTraining.Application.GetLandingPage do
   alias MilosTraining.Application.{GetLeaderboardSnippet, ListWorkoutExecutions}
-  alias MilosTraining.{Finance, Gamification, Messaging}
+  alias MilosTraining.{Finance, Gamification, Identity, Messaging, Scheduling}
   alias MilosTraining.Gamification.Domain.{ChallengeCriteria, ChallengeProgress}
+  alias MilosTraining.Gamification.TrainingQuote
   alias MilosTraining.Infrastructure.Cache.LandingCache
+  alias MilosTraining.Repo
+
+  import Ecto.Query
 
   def call(user) do
-    payload =
-      LandingCache.get_or_fetch(user.id, fn ->
-        build_payload(user)
-      end)
-
-    {:ok, payload}
+    cached = LandingCache.get_or_fetch(user.id, fn -> build_cached_payload(user) end)
+    quote = random_quote()
+    {:ok, Map.put(cached, "quote", quote)}
   end
 
-  defp build_payload(user) do
+  defp build_cached_payload(%{role: :admin} = _user) do
+    empty_stats = %{
+      "current_streak" => 0,
+      "longest_streak" => 0,
+      "total_workouts" => 0,
+      "total_prs" => 0,
+      "current_streak_shields" => 0,
+      "consistency_score" => 0.0,
+      "motivation_score" => 0.0,
+      "perseverance_score" => 0.0,
+      "advancement_count" => 0,
+      "last_workout_at" => nil
+    }
+
+    %{
+      "role" => "admin",
+      "admin_metrics" => admin_metrics(),
+      "gamification" => %{
+        "settings" => Gamification.get_settings(),
+        "stats" => empty_stats,
+        "preferences" => nil,
+        "badges" => [],
+        "active_challenges" => [],
+        "leaderboard" => %{
+          "visible" => false,
+          "opted_in" => false,
+          "weekly" => [],
+          "monthly" => []
+        }
+      },
+      "coach_notes" => [],
+      "membership" => nil,
+      "recent_executions" => []
+    }
+  end
+
+  defp build_cached_payload(user) do
     stats =
       Gamification.get_user_stats(user.id) ||
         %{
@@ -23,8 +60,13 @@ defmodule MilosTraining.Application.GetLandingPage do
           total_prs: 0,
           current_streak_shields: 1,
           consistency_score: 0.0,
+          motivation_score: 0.0,
+          perseverance_score: 100.0,
+          advancement_count: 0,
           last_workout_at: nil
         }
+
+    preferences = Gamification.get_user_preferences(user.id) || %{off_days: []}
 
     active_challenges =
       Date.utc_today()
@@ -83,21 +125,42 @@ defmodule MilosTraining.Application.GetLandingPage do
     {:ok, executions} = ListWorkoutExecutions.call(user.id)
 
     %{
-      gamification: %{
-        settings: Gamification.get_settings(),
-        stats: stats,
-        badges: Gamification.list_visible_achievements(user.id),
-        active_challenges: active_challenges,
-        leaderboard: GetLeaderboardSnippet.call(user)
+      "gamification" => %{
+        "settings" => Gamification.get_settings(),
+        "stats" => stats,
+        "preferences" => preferences,
+        "badges" => Gamification.list_visible_achievements(user.id),
+        "active_challenges" => active_challenges,
+        "leaderboard" => GetLeaderboardSnippet.call(user)
       },
-      coach_notes: coach_notes_payload(user),
-      membership: membership_payload(user.id),
-      recent_executions:
+      "coach_notes" => coach_notes_payload(user),
+      "membership" => membership_payload(user.id),
+      "recent_executions" =>
         executions
         |> Enum.filter(& &1.completed_at_utc)
         |> Enum.sort_by(& &1.completed_at_utc, {:desc, DateTime})
         |> Enum.take(12)
     }
+  end
+
+  defp admin_metrics do
+    %{
+      "member_count" => Identity.count_by_role(:member),
+      "total_outstanding_cents" => Finance.total_outstanding_balance_cents(),
+      "pending_referral_approvals" => Finance.count_pending_referral_approvals(),
+      "classes_today" => Scheduling.count_classes_today()
+    }
+  end
+
+  defp random_quote do
+    TrainingQuote
+    |> order_by(fragment("RANDOM()"))
+    |> limit(1)
+    |> Repo.one()
+    |> case do
+      nil -> nil
+      q -> %{"body" => q.body, "author" => q.author}
+    end
   end
 
   defp coach_notes_payload(%{role: :athlete, id: user_id}) do

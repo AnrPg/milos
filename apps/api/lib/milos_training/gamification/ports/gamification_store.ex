@@ -7,6 +7,10 @@ defmodule MilosTraining.Gamification.Ports.GamificationStore do
   @callback list_user_achievements(Ecto.UUID.t()) :: [map()]
   @callback count_achievements_by_prefix(Ecto.UUID.t(), String.t()) :: non_neg_integer()
   @callback create_challenge(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
+  @callback create_challenge_with_limit(map(), pos_integer()) ::
+              {:ok, map()}
+              | {:error, Ecto.Changeset.t()}
+              | {:error, :active_challenge_limit_reached | term()}
   @callback get_challenge(Ecto.UUID.t()) :: map() | nil
   @callback update_challenge(Ecto.UUID.t(), map()) ::
               {:ok, map()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
@@ -14,6 +18,7 @@ defmodule MilosTraining.Gamification.Ports.GamificationStore do
   @callback list_challenges() :: [map()]
   @callback list_active_challenges(Date.t()) :: [map()]
   @callback get_user_challenge_progress(Ecto.UUID.t(), Ecto.UUID.t()) :: map() | nil
+  @callback lock_challenge(Ecto.UUID.t()) :: :ok | {:error, :not_found}
   @callback list_challenge_progress(Ecto.UUID.t()) :: [map()]
   @callback upsert_user_challenge_progress(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback set_leaderboard_opt_in(Ecto.UUID.t(), boolean()) ::
@@ -31,4 +36,7 @@ defmodule MilosTraining.Gamification.Ports.GamificationStore do
               challenge_id :: Ecto.UUID.t()
             ) :: boolean()
   @callback list_challenge_leaderboard_participants(challenge_id :: Ecto.UUID.t()) :: [map()]
+  @callback get_user_preferences(user_id :: Ecto.UUID.t()) :: map() | nil
+  @callback upsert_user_preferences(user_id :: Ecto.UUID.t(), params :: map()) ::
+              {:ok, map()} | {:error, Ecto.Changeset.t()}
 end
