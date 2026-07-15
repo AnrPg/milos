@@ -122,6 +122,66 @@ reset dates. Realtime user-scoped invalidations refresh these views without
 polling.
 
 ## Implementation Notes
-To be completed after all three implementation phases. Emergent decisions,
-deviations, validation evidence, and any explicitly deferred work will be
-recorded here before TD-017 is marked resolved.
+### Phase 1 — Finance foundation
+
+The package contract is parsed by pure `EntitlementPlan` and `AllowancePeriod`
+modules with closed atom vocabularies; no package input is converted into a new
+runtime atom. Existing packages without `entitlement_version` remain storable
+during the observe rollout, while any package that declares a version is
+strictly validated.
+
+Allowance extensions are represented as negative `adjustment` deltas. Normal
+reserve/consume/release facts therefore remain independently measurable, while
+effective capacity is calculated as base limit plus extensions minus committed
+usage. This avoids disguising a personal grant as ordinary usage.
+
+The adapter locks the membership/effective-subscription boundary before policy
+evaluation and insert. Idempotency is checked before quota evaluation so a
+retry of a successful final-unit request returns the original fact rather than
+being rejected as newly exhausted.
+
+Focused validation after Phase 1 completed with eight Domain/Finance tests and
+zero failures against PostgreSQL, including plan validation, period boundaries,
+rollout behavior, reservation idempotency, exhaustion, release, and an audited
+one-person admin extension.
+
+### Phase 2 — Orchestration and contracts
+
+Booking uses a reservation saga: Finance reserves before Scheduling writes,
+creation failures compensate, withdrawal/rejection release, and attendance
+finalizes. Execution authenticates its source relationship before asking
+Finance for the source-specific channel and capability, so class executions
+reuse the booking visit rather than charging twice. Programming delivery and
+explicit coach check-ins consume coaching touchpoints; normal chat remains
+unmetered.
+
+The API returns stable entitlement denial codes and exposes effective benefits
+to both the current user and the unified admin dossier. Package authoring is a
+closed OpenAPI contract. Personal extensions and revocations are represented by
+opposite-signed adjustment facts linked through `parent_entry_id`; the original
+grant is never edited or deleted.
+
+An hourly Oban reconciliation job releases reservations older than 24 hours
+that have no terminal fact. This is a safety net for process interruption, not
+a replacement for synchronous compensation.
+
+### Phase 3 — Product surfaces and rollout
+
+The package editor now authors channels, capabilities and both initial
+allowances without raw JSON. The admin user profile shows live remaining units,
+reset boundaries, extension history and reason-required grant/revoke actions.
+The member billing view shows the same effective contract and refreshes through
+the existing user-scoped realtime invalidation event without polling.
+
+Legacy rollout is an idempotent cross-context Application service with a shared
+dry-run/apply classifier. It validates mapped packages before mutation, creates
+only missing member/athlete Finance profiles, assigns only accounts without an
+active subscription, reports unmapped/failing accounts, and is safe to repeat.
+The admin package screen exposes readiness and apply controls. Existing active
+subscriptions are deliberately preserved rather than silently rewritten.
+
+Validation completed with 10 focused entitlement/backfill tests and the full
+backend suite (375 tests, zero failures), frontend ESLint, `tsc --noEmit`, and a
+production Next.js build. The development migration was also exercised against
+PostgreSQL before live-flow verification. No TD-017 implementation work was
+deferred.

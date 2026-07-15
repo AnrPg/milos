@@ -44,3 +44,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-037 | Configurable class type lifecycle | Accepted |
 | ADR-038 | Transient page heroes and per-device push choice | Accepted |
 | ADR-039 | Embedded workout authoring | Accepted |
+| ADR-040 | Package entitlements and allowance ledger | Accepted |
