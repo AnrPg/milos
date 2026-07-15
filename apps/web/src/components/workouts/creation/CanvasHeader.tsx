@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { publishWorkoutDraft } from "@/api/workouts";
+import { publishWorkoutDraft, type WorkoutRecord } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { completionSummary, isPublishReady, useWorkoutCreationStore } from "@/stores/workout-creation";
 import { FORMAT_EXERCISE_CONTEXT, type WorkoutType } from "@/types/workout";
@@ -90,7 +90,13 @@ function publishValidationMessages({
   return messages;
 }
 
-export function CanvasHeader() {
+type Props = {
+  embedded?: boolean;
+  onCancel?: () => void;
+  onPublished?: (workout: WorkoutRecord) => void;
+};
+
+export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { tokens } = useSession();
@@ -125,8 +131,13 @@ export function CanvasHeader() {
         payload.substitute_for = { type: "slot", id: substituteForSlot };
       }
 
-      await publishWorkoutDraft(tokens.access_token, draftId, payload);
-      router.push("/admin/workouts");
+      const workout = await publishWorkoutDraft(tokens.access_token, draftId, payload);
+
+      if (onPublished) {
+        onPublished(workout);
+      } else {
+        router.push("/admin/workouts");
+      }
     } catch (error: unknown) {
       setPublishError(error instanceof Error ? error.message : "Publish failed");
       setPublishing(false);
@@ -149,7 +160,7 @@ export function CanvasHeader() {
             : "Publishing will replace the workout for this class slot only"}
         </div>
       ) : null}
-      <div className="flex items-center gap-4 px-6 py-3">
+      <div className="flex flex-wrap items-center gap-3 px-4 py-3 sm:px-6">
       <span className="text-xl font-black" style={{ color: "var(--accent)" }}>
         ✦
       </span>
@@ -198,6 +209,17 @@ export function CanvasHeader() {
       </button>
 
       <div className="flex-1" />
+
+      {embedded && onCancel ? (
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded-full px-4 py-2 text-xs font-bold"
+          style={{ border: "1px solid var(--dim)", color: "var(--muted)" }}
+        >
+          Keep draft & close
+        </button>
+      ) : null}
 
       {sections.length > 0 ? (
         <span className="text-sm" style={{ color: "var(--muted)" }}>

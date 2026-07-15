@@ -19,7 +19,7 @@ import {
   type UniqueIdentifier,
 } from "@dnd-kit/core";
 
-import { createDraftWorkout, fetchAdminWorkout, listScaleLevels, type ScaleLevel, updateDraftWorkout } from "@/api/workouts";
+import { createDraftWorkout, fetchAdminWorkout, listScaleLevels, type ScaleLevel, type WorkoutRecord, updateDraftWorkout } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
@@ -131,11 +131,17 @@ type ActiveDrag = {
   exerciseSection?: DraftSection;
 };
 
-export function WorkoutCreationCanvas() {
+type Props = {
+  embedded?: boolean;
+  onCancel?: () => void;
+  onPublished?: (workout: WorkoutRecord) => void;
+};
+
+export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished }: Props) {
   const { tokens } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const urlDraftId = searchParams.get("draft");
+  const urlDraftId = embedded ? null : searchParams.get("draft");
   const draftId = useWorkoutCreationStore((state) => state.draftId);
   const initDraft = useWorkoutCreationStore((state) => state.initDraft);
   const resetDraft = useWorkoutCreationStore((state) => state.resetDraft);
@@ -249,13 +255,15 @@ export function WorkoutCreationCanvas() {
         .then((draft) => {
           initDraft(draft.id);
           draftLoadedRef.current = true;
-          router.replace(`/admin/workouts/new?draft=${draft.id}`);
+          if (!embedded) {
+            router.replace(`/admin/workouts/new?draft=${draft.id}`);
+          }
         })
         .catch(() => {
           setSaveStatus("error");
         });
     }
-  }, [draftId, initDraft, loadFromDraftData, router, setSaveStatus, tokens?.access_token, urlDraftId]);
+  }, [draftId, embedded, initDraft, loadFromDraftData, router, setSaveStatus, tokens?.access_token, urlDraftId]);
 
   // On remount (navigated away and back to the same draft URL), draftId is already set in
   // the Zustand store but draftLoadedRef is false (refs reset on unmount). Re-fetch to
@@ -479,14 +487,14 @@ export function WorkoutCreationCanvas() {
 
   return (
     <div
-      className="flex h-screen flex-col overflow-hidden"
+      className={embedded ? "relative flex h-[min(88vh,54rem)] flex-col overflow-hidden" : "relative flex h-screen flex-col overflow-hidden"}
       style={{
         background: "var(--bg)",
         color: "var(--text)",
         "--accent": "var(--primary)",
       } as React.CSSProperties}
     >
-      <CanvasHeader />
+      <CanvasHeader embedded={embedded} onCancel={onCancel} onPublished={onPublished} />
       <DndContext
         sensors={sensors}
         collisionDetection={collisionDetection}
@@ -510,7 +518,7 @@ export function WorkoutCreationCanvas() {
       <button
         type="button"
         onClick={() => setShowShortcuts(true)}
-        className="fixed bottom-4 right-4 z-40 hidden rounded-full h-8 w-8 items-center justify-center text-sm font-bold md:flex"
+        className={`${embedded ? "absolute" : "fixed"} bottom-4 right-4 z-40 hidden h-8 w-8 items-center justify-center rounded-full text-sm font-bold md:flex`}
         style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--muted)" }}
         title="Keyboard shortcuts (?)"
       >

@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { assignWorkout, listAthletes, type AthleteOption } from "@/api/assigned-workouts";
 import { listAdminWorkouts, type WorkoutRecord } from "@/api/workouts";
 import { workoutTypeColor } from "@/lib/workout-colors";
+import { useWorkoutCreationStore } from "@/stores/workout-creation";
+import { WorkoutCreationCanvas } from "@/components/workouts/creation/WorkoutCreationCanvas";
 
 type Props = {
   accessToken: string;
@@ -26,6 +28,24 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
   const [adminNotes, setAdminNotes] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [creatingWorkout, setCreatingWorkout] = useState(false);
+
+  function openWorkoutCreator() {
+    useWorkoutCreationStore.getState().resetDraft();
+    setCreatingWorkout(true);
+  }
+
+  function closeWorkoutCreator() {
+    useWorkoutCreationStore.getState().resetDraft();
+    setCreatingWorkout(false);
+  }
+
+  function handleWorkoutPublished(workout: WorkoutRecord) {
+    setAllWorkouts((current) => [workout, ...current.filter((item) => item.id !== workout.id)]);
+    setSelectedWorkout(workout);
+    useWorkoutCreationStore.getState().resetDraft();
+    setCreatingWorkout(false);
+  }
 
   useEffect(() => {
     listAdminWorkouts(accessToken)
@@ -115,14 +135,25 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
           <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
             {step === "workout" ? (
               <>
-                <input
-                  autoFocus
-                  className="w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
-                  style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-                  placeholder="Search workouts…"
-                  value={workoutQuery}
-                  onChange={(e) => setWorkoutQuery(e.target.value)}
-                />
+                <div className="flex gap-2">
+                  <input
+                    autoFocus
+                    className="min-w-0 flex-1 rounded-[1rem] px-4 py-3 text-sm outline-none"
+                    style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+                    placeholder="Search workouts…"
+                    value={workoutQuery}
+                    onChange={(e) => setWorkoutQuery(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={openWorkoutCreator}
+                    className="shrink-0 rounded-[1rem] px-4 text-sm font-bold"
+                    style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+                    aria-label="Create a workout without leaving assignment"
+                  >
+                    + New
+                  </button>
+                </div>
 
                 {workoutsLoading ? (
                   <p className="text-sm" style={{ color: "var(--dim)" }}>Loading…</p>
@@ -290,6 +321,26 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
           </div>
         </div>
       </div>
+      {creatingWorkout ? (
+        <div
+          className="fixed inset-0 z-[70] flex items-center justify-center p-2 sm:p-5"
+          style={{ background: "rgba(0,0,0,0.82)" }}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Create workout"
+        >
+          <div
+            className="w-full max-w-[96rem] overflow-hidden rounded-[1.5rem]"
+            style={{ border: "1px solid var(--border)", boxShadow: "0 30px 90px rgba(0,0,0,.55)" }}
+          >
+            <WorkoutCreationCanvas
+              embedded
+              onCancel={closeWorkoutCreator}
+              onPublished={handleWorkoutPublished}
+            />
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }
