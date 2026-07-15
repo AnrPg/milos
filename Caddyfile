@@ -3,7 +3,15 @@
 }
 
 {$SITE_ADDRESS:http://localhost} {
-	reverse_proxy /api/* api:4000
-	reverse_proxy /socket/* api:4000
+	reverse_proxy /api/* api:4000 {
+		header_up Host {host}
+		header_up X-Forwarded-Host {host}
+		header_up X-Forwarded-Proto {scheme}
+	}
+	reverse_proxy /socket/* api:4000 {
+		header_up Host {host}
+		header_up X-Forwarded-Host {host}
+		header_up X-Forwarded-Proto {scheme}
+	}
 	reverse_proxy web:3000
 }
