@@ -44,9 +44,12 @@ defmodule MilosTraining.Messaging.Application.SendMessage do
         type: :chat_message,
         payload: %{
           thread_id: thread.id,
+          context_type: thread.context_type,
+          context_id: thread.context_id,
           message_id: message.id,
           sender_id: sender_id,
-          body: String.slice(message.body, 0, 100)
+          body: String.slice(message.body, 0, 100),
+          url: "/account/activity/chats?thread=#{thread.id}"
         }
       })
     end)

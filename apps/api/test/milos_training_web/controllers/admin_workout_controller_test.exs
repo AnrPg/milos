@@ -2,7 +2,6 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
   alias MilosTraining.Identity
-  alias MilosTraining.Infrastructure.Auth.Guardian
 
   describe "admin workout draft flow" do
     test "admin can create, autosave, inspect, and publish a draft", %{conn: conn} do
@@ -95,6 +94,55 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
                "competition"
              ]
     end
+
+    test "publishes a container whose exercises are in nested child sections", %{conn: conn} do
+      admin_conn = authenticate_as_admin(conn, "nested_draft_author")
+      create_conn = post(admin_conn, "/api/admin/workouts")
+      draft_id = json_response(create_conn, 201)["draft"]["id"]
+
+      draft_payload = %{
+        title: "Nested Strength",
+        type: "strength",
+        sections: [
+          %{
+            name: "Main Course",
+            order: 1,
+            exercises: [],
+            sections: [
+              %{
+                name: "Part A",
+                order: 1,
+                exercises: [
+                  %{
+                    name: "Back Squat",
+                    order: 1,
+                    sets: 5,
+                    prescription_value: 5,
+                    prescription_unit: "reps"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+
+      autosave_conn =
+        admin_conn
+        |> recycle()
+        |> put_req_header("content-type", "application/json")
+        |> patch("/api/admin/workouts/#{draft_id}/draft", Jason.encode!(draft_payload))
+
+      assert json_response(autosave_conn, 200)["draft"]["id"] == draft_id
+
+      publish_conn =
+        admin_conn
+        |> recycle()
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/admin/workouts/#{draft_id}/publish", Jason.encode!(%{}))
+
+      assert json_response(publish_conn, 200)["workout"]["status"] == "published"
+    end
   end
 
   defp authenticate_as_admin(conn, nickname) do
@@ -112,10 +160,5 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
 
     {:ok, admin} = Identity.update_role(user, :admin)
     admin
-  end
-
-  defp put_bearer_token(conn, user) do
-    {:ok, token, _claims} = Guardian.encode_and_sign(user, %{}, token_type: "access")
-    put_req_header(conn, "authorization", "Bearer " <> token)
   end
 end

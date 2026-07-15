@@ -70,6 +70,11 @@ The backend now persists draft workouts on `master_workouts` with `status` and
 canvas, and materializes published sections, exercises, and variations from the
 draft blob during publish.
 
+ADR-031 supersedes the original reopening detail that changed a published
+record back to `status: draft`. Published workouts now remain published while
+their next revision is edited in `draft_data`, so live references continue to
+resolve until republish atomically replaces the materialized section tree.
+
 The frontend now uses a dedicated Zustand authoring store and a three-panel
 canvas on `/admin/workouts/new`, with debounced autosave, live preview, scale
 variation editing, and a mobile drill-down layout.

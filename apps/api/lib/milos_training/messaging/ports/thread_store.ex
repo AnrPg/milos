@@ -10,4 +10,5 @@ defmodule MilosTraining.Messaging.Ports.ThreadStore do
   @callback add_participant(Ecto.UUID.t(), Ecto.UUID.t()) ::
               {:ok, MilosTraining.Messaging.Participant.t()} | {:error, Ecto.Changeset.t()}
   @callback mark_read(Ecto.UUID.t(), Ecto.UUID.t(), Ecto.UUID.t()) :: :ok
+  @callback count_unread_threads(Ecto.UUID.t()) :: non_neg_integer()
 end

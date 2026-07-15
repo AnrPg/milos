@@ -21,6 +21,9 @@ defmodule MilosTraining.Messaging.ThreadStore do
   def mark_read(thread_id, user_id, message_id),
     do: impl().mark_read(thread_id, user_id, message_id)
 
+  @impl true
+  def count_unread_threads(user_id), do: impl().count_unread_threads(user_id)
+
   defp impl do
     Application.get_env(
       :milos_training,

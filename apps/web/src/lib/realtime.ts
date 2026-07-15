@@ -37,6 +37,15 @@ function ensureSocket(token: string) {
   return activeSocket;
 }
 
+export function resetRealtimeSocket() {
+  if (activeSocket) {
+    activeSocket.disconnect();
+  }
+
+  activeSocket = null;
+  activeToken = null;
+}
+
 export function joinChannelWithPush(
   token: string,
   topic: string,

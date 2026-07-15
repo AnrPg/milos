@@ -437,6 +437,7 @@ defmodule MilosTraining.FinanceTest do
     assert invoice.invoice_type == "renewal"
     assert invoice.status == "draft"
     assert invoice.total_cents == 9000
+    assert invoice.invoice_number =~ ~r/^INV-\d{6}-INVOICEMONTH-20\d{12}$/
     assert [line] = invoice.lines
     assert line.package_code_snapshot == "invoice_monthly"
 
@@ -482,6 +483,86 @@ defmodule MilosTraining.FinanceTest do
     assert summary.totals.renewal_invoices_paid_count == 1
     assert summary.totals.renewal_conversion_percent == 100.0
     assert summary.totals.invoice_credit_offset_cents == 3000
+  end
+
+  test "package-linked invoice partial payments keep balance due visible across finance read models" do
+    user = TestFixtures.user_fixture(%{role: :member})
+
+    assert {:ok, package} =
+             Finance.create_package(%{
+               code: "balance_package",
+               name: "Balance Package",
+               family: "unlimited",
+               billing_period: "monthly",
+               base_price_cents: 10_000
+             })
+
+    assert {:ok, membership} =
+             Finance.upsert_membership(user.id, %{
+               user_type_snapshot: "member",
+               status: "active",
+               signup_source: "direct",
+               expires_on: Date.add(Date.utc_today(), 30)
+             })
+
+    assert {:ok, subscription} =
+             Finance.assign_package(membership.id, package.id, %{starts_on: Date.utc_today()})
+
+    assert {:ok, invoice} =
+             Finance.create_invoice(membership.id, %{
+               membership_package_subscription_id: subscription.id,
+               due_date: Date.add(Date.utc_today(), 7)
+             })
+
+    assert invoice.membership_package_subscription_id == subscription.id
+    assert invoice.total_cents == 10_000
+    assert invoice.invoice_number =~ ~r/^INV-\d{6}-BALANCEPACKA-20\d{12}$/
+    assert [line] = invoice.lines
+    assert line.membership_package_subscription_id == subscription.id
+    assert line.line_type == "membership_package"
+    assert line.unit_amount_cents == 10_000
+    assert line.package_code_snapshot == "balance_package"
+
+    assert {:ok, issued_invoice} = Finance.issue_invoice(invoice.id)
+    assert issued_invoice.balance_due_cents == 10_000
+
+    assert {:ok, payment} =
+             Finance.record_payment(membership.id, %{
+               finance_invoice_id: invoice.id,
+               amount_cents: 4_000,
+               payment_method: "cash",
+               payment_status: "paid"
+             })
+
+    assert payment.finance_invoice_id == invoice.id
+
+    profile = Finance.get_member_profile(user.id)
+    open_invoice = Enum.find(profile.invoices, &(&1.id == invoice.id))
+    assert open_invoice.status == "partially_paid"
+    assert open_invoice.paid_cents == 4_000
+    assert open_invoice.balance_due_cents == 6_000
+    assert profile.entitlement.status == "grace"
+
+    assert Finance.membership_outstanding_balance_cents(membership.id) == 6_000
+    assert Finance.invoice_balance_due_map([invoice.id]) == %{invoice.id => 6_000}
+    assert Finance.total_outstanding_balance_cents() >= 6_000
+
+    member_summary =
+      Finance.search_member_summaries(%{user_ids: [user.id], limit: 1})
+      |> Map.fetch!(user.id)
+
+    assert member_summary.outstanding_balance_cents == 6_000
+
+    assert {:ok, my_finance} = MilosTraining.Application.GetMyFinance.call(user.id)
+    assert my_finance.total_outstanding_balance_cents == 6_000
+
+    assert Enum.any?(
+             my_finance.invoices,
+             &(&1.id == invoice.id and &1.balance_due_cents == 6_000)
+           )
+
+    summary = Finance.financial_summary()
+    assert summary.totals.outstanding_invoice_balance_cents >= 6_000
   end
 
   test "refunds invoice payments and reverses invoice credit offsets before voiding" do
@@ -1298,6 +1379,13 @@ defmodule MilosTraining.FinanceTest do
     referrer = TestFixtures.user_fixture(%{role: :member})
     referred = TestFixtures.user_fixture(%{role: :athlete})
 
+    assert {:ok, _referrer_membership} =
+             Finance.upsert_membership(referrer.id, %{
+               user_type_snapshot: "member",
+               status: "active",
+               signup_source: "direct"
+             })
+
     assert {:ok, membership} =
              Finance.upsert_membership(referred.id, %{
                user_type_snapshot: "athlete",
@@ -1334,6 +1422,76 @@ defmodule MilosTraining.FinanceTest do
     assert reward.membership_id == membership.id
     assert reward.reward_type == "credit"
     assert reward.reward_value == 1000
+
+    assert {:ok, applied_reward} = Finance.update_referral_reward_status(reward.id, "applied")
+    assert applied_reward.status == "applied"
+    assert Finance.get_member_profile(referrer.id).credit_balance == 1000
+
+    assert {:ok, rejected_reward} = Finance.update_referral_reward_status(reward.id, "rejected")
+    assert rejected_reward.status == "rejected"
+    assert Finance.get_member_profile(referrer.id).credit_balance == 0
+
+    assert {:ok, reapplied_reward} = Finance.update_referral_reward_status(reward.id, "applied")
+    assert reapplied_reward.status == "applied"
+    assert Finance.get_member_profile(referrer.id).credit_balance == 1000
+
+    another_referred = TestFixtures.user_fixture(%{role: :member})
+
+    assert {:ok, another_membership} =
+             Finance.upsert_membership(another_referred.id, %{
+               user_type_snapshot: "member",
+               status: "trial",
+               signup_source: "referral",
+               referred_by_user_id: referrer.id
+             })
+
+    assert {:ok, another_event} =
+             Finance.create_referral_event(%{
+               referral_program_id: program.id,
+               referrer_user_id: referrer.id,
+               referred_user_id: another_referred.id,
+               membership_id: another_membership.id,
+               referrer_role_snapshot: "member",
+               referred_role_snapshot: "member"
+             })
+
+    assert {:ok, another_event} = Finance.update_referral_status(another_event.id, "approved")
+    assert {:ok, another_reward} = Finance.create_referral_reward(another_event.id, %{})
+
+    assert {:ok, _another_applied_reward} =
+             Finance.update_referral_reward_status(another_reward.id, "applied")
+
+    assert Finance.get_member_profile(referrer.id).credit_balance == 2000
+
+    assert {:ok, _rejected_reward} = Finance.update_referral_reward_status(reward.id, "rejected")
+
+    assert Finance.get_member_profile(referrer.id).credit_balance == 1000
+  end
+
+  test "updates referral programs" do
+    assert {:ok, program} =
+             Finance.create_referral_program(%{
+               name: "Original referral",
+               reward_type: "manual",
+               reward_value: 0,
+               active: true
+             })
+
+    assert {:ok, updated} =
+             Finance.update_referral_program(program.id, %{
+               name: "Bring a friend",
+               description: "1+1",
+               reward_type: "credit",
+               reward_value: 750,
+               active: false
+             })
+
+    assert updated.id == program.id
+    assert updated.name == "Bring a friend"
+    assert updated.description == "1+1"
+    assert updated.reward_type == "credit"
+    assert updated.reward_value == 750
+    assert updated.active == false
   end
 
   test "requires an active referral program for new referral events" do
@@ -1616,12 +1774,6 @@ defmodule MilosTraining.FinanceTest do
                status: "pending"
              })
 
-    assert {:error, :invalid_referral_status_transition} =
-             Finance.update_referral_reward_status(reward.id, "applied")
-
-    assert {:ok, approved_reward} = Finance.update_referral_reward_status(reward.id, "approved")
-    assert approved_reward.status == "approved"
-
     assert {:ok, applied_reward} = Finance.update_referral_reward_status(reward.id, "applied")
     assert applied_reward.status == "applied"
     assert applied_reward.applied_at
@@ -1666,6 +1818,8 @@ defmodule MilosTraining.FinanceTest do
 
     assert profile.last_payment_on == ~D[2026-06-01]
     assert profile.last_payment_amount_cents == 8000
+    assert profile.credit_balance == 0
+    assert profile.credit_balance_cents == 0
   end
 
   test "search_member_summaries returns nil last_payment fields when no payments exist" do

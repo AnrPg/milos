@@ -2,7 +2,6 @@ defmodule MilosTrainingWeb.WorkoutControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
   alias MilosTraining.Identity
-  alias MilosTraining.Infrastructure.Auth.Guardian
 
   describe "member workout queries" do
     test "member can view a workout and its materialized scales", %{conn: conn} do
@@ -139,10 +138,5 @@ defmodule MilosTrainingWeb.WorkoutControllerTest do
       })
 
     put_bearer_token(conn, athlete)
-  end
-
-  defp put_bearer_token(conn, user) do
-    {:ok, token, _claims} = Guardian.encode_and_sign(user, %{}, token_type: "access")
-    put_req_header(conn, "authorization", "Bearer " <> token)
   end
 end

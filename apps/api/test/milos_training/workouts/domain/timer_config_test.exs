@@ -79,6 +79,7 @@ defmodule MilosTraining.Workouts.Domain.TimerConfigTest do
                  "duration_seconds" => 600,
                  "interval_seconds" => 60
                })
+
       refute Map.has_key?(config, :scoring_mode)
     end
 
@@ -91,6 +92,7 @@ defmodule MilosTraining.Workouts.Domain.TimerConfigTest do
                  "scoring_mode" => "to_failure",
                  "max_windows" => 50
                })
+
       assert config.max_windows == 50
     end
 
@@ -128,6 +130,7 @@ defmodule MilosTraining.Workouts.Domain.TimerConfigTest do
                  "interval_seconds" => 60,
                  "amrap_scoring_style" => "biggest_number"
                })
+
       assert reason =~ "amrap_scoring_style"
     end
 
@@ -149,6 +152,7 @@ defmodule MilosTraining.Workouts.Domain.TimerConfigTest do
                  "scoring_mode" => "to_failure",
                  "max_windows" => 15
                })
+
       assert config.max_windows == 15
     end
 
@@ -160,6 +164,7 @@ defmodule MilosTraining.Workouts.Domain.TimerConfigTest do
                  "interval_seconds" => 60,
                  "scoring_mode" => "unknown_mode"
                })
+
       assert reason =~ "scoring_mode"
     end
   end

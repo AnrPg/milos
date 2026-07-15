@@ -3,10 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { fetchMyFinance } from "@/api/my-finance";
+import { fetchUnreadCount } from "@/api/messaging";
 import { DirectMessagesPanel } from "@/components/chat/DirectMessagesPanel";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useSession } from "@/components/session-provider";
+import { subscribeToTopic } from "@/lib/realtime";
 
 const CANVAS_PATHS = ["/admin/workouts/new", "/login"];
 
@@ -18,9 +22,9 @@ const NAV_LINKS: NavLink[] = [
   { href: "/schedule", label: "Schedule", roles: ["member"] },
   { href: "/admin/class-schedule", label: "Class Schedule", roles: ["admin"] },
   { href: "/my-workouts", label: "My Workouts", roles: ["athlete"] },
+  { href: "/my-workouts/pantheon", label: "Pantheon", roles: ["athlete", "member"] },
   { href: "/admin/coaching-assignments", label: "Coaching Assignments", roles: ["admin"] },
-  { href: "/reviews", label: "Reviews", roles: ["member", "athlete"] },
-  { href: "/wellbeing", label: "Wellbeing", roles: ["member", "athlete"] },
+  { href: "/account/billing", label: "Billing", roles: ["member", "athlete"] },
 ];
 
 type DashboardCategory = {
@@ -36,7 +40,6 @@ const DASHBOARD_CATEGORIES: DashboardCategory[] = [
       { href: "/admin/class-schedule", label: "Class Schedule", description: "Slots, bookings & attendance" },
       { href: "/admin/coaching-assignments", label: "Coaching Assignments", description: "Athlete programming board" },
       { href: "/admin/challenges", label: "Challenges", description: "Seasonal training goals" },
-      { href: "/admin/gamification", label: "Gamification", description: "Streaks, shields & leaderboard" },
     ],
   },
   {
@@ -47,11 +50,17 @@ const DASHBOARD_CATEGORIES: DashboardCategory[] = [
     ],
   },
   {
-    label: "System",
+    label: "Analytics",
     items: [
-      { href: "/admin/analytics", label: "Analytics", description: "Events, revenue & engagement" },
+      { href: "/admin/metrics", label: "Metrics", description: "Events, revenue & engagement" },
       { href: "/admin/reviews", label: "Reviews", description: "Workout feedback queue" },
       { href: "/admin/wellbeing", label: "Wellbeing", description: "Injury flags & follow-up" },
+    ],
+  },
+  {
+    label: "Settings",
+    items: [
+      { href: "/admin/settings", label: "Settings", description: "Appearance, gamification & level taxonomy" },
     ],
   },
 ];
@@ -64,8 +73,8 @@ function pathActive(pathname: string, href: string) {
         !pathname.startsWith("/admin/class-schedule") &&
         !pathname.startsWith("/admin/coaching-assignments") &&
         !pathname.startsWith("/admin/finance") &&
-        !pathname.startsWith("/admin/analytics") &&
-        !pathname.startsWith("/admin/gamification") &&
+        !pathname.startsWith("/admin/metrics") &&
+        !pathname.startsWith("/admin/settings") &&
         !pathname.startsWith("/admin/workouts"))
     );
   }
@@ -100,8 +109,8 @@ function DashboardDropdown({ pathname }: { pathname: string }) {
         href="/admin"
         className="rounded-full px-3 py-1 text-sm font-semibold transition-colors"
         style={{
-          background: isAdminActive ? "#1a1a28" : "transparent",
-          color: isAdminActive ? "#F0EDF8" : "#55556a",
+          background: isAdminActive ? "var(--border)" : "transparent",
+          color: isAdminActive ? "var(--text)" : "var(--dim)",
         }}
         onMouseEnter={() => setOpen(true)}
       >
@@ -111,25 +120,25 @@ function DashboardDropdown({ pathname }: { pathname: string }) {
       {open ? (
         <div
           className="absolute left-0 top-full mt-1 flex rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7)]"
-          style={{ background: "#111118", border: "1px solid #1a1a28", zIndex: 100 }}
+          style={{ background: "var(--panel)", border: "1px solid var(--border)", zIndex: 100 }}
           onMouseLeave={() => { setOpen(false); setActiveCategory(null); }}
         >
           {/* Category list */}
-          <div className="w-40 border-r py-1.5" style={{ borderColor: "#1a1a28" }}>
+          <div className="w-40 border-r py-1.5" style={{ borderColor: "var(--border)" }}>
             {DASHBOARD_CATEGORIES.map((cat) => (
               <button
                 key={cat.label}
                 className="flex w-full items-center justify-between gap-2 px-4 py-2 text-left text-xs font-semibold transition-colors"
                 style={{
-                  color: activeCategory === cat.label ? "#F0EDF8" : "#8888aa",
-                  background: activeCategory === cat.label ? "rgba(240,237,248,0.05)" : "transparent",
+                  color: activeCategory === cat.label ? "var(--text)" : "var(--muted)",
+                  background: activeCategory === cat.label ? "color-mix(in srgb, var(--text) 5%, transparent)" : "transparent",
                 }}
                 onMouseEnter={() => setActiveCategory(cat.label)}
                 onClick={() => setActiveCategory(cat.label)}
                 type="button"
               >
                 {cat.label}
-                <span style={{ color: "#3a3a55" }}>›</span>
+                <span style={{ color: "var(--dim)" }}>›</span>
               </button>
             ))}
           </div>
@@ -141,13 +150,13 @@ function DashboardDropdown({ pathname }: { pathname: string }) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="block px-4 py-2.5 transition-colors hover:bg-[rgba(240,237,248,0.04)]"
+                  className="block px-4 py-2.5 transition-colors hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)]"
                   onClick={() => { setOpen(false); setActiveCategory(null); }}
                 >
-                  <p className="text-sm font-semibold" style={{ color: pathname.startsWith(item.href) ? "#d95d39" : "#F0EDF8" }}>
+                  <p className="text-sm font-semibold" style={{ color: pathname.startsWith(item.href) ? "var(--primary)" : "var(--text)" }}>
                     {item.label}
                   </p>
-                  <p className="mt-0.5 text-xs" style={{ color: "#55556a" }}>{item.description}</p>
+                  <p className="mt-0.5 text-xs" style={{ color: "var(--dim)" }}>{item.description}</p>
                 </Link>
               ))}
             </div>
@@ -160,15 +169,44 @@ function DashboardDropdown({ pathname }: { pathname: string }) {
 
 export function TopNav() {
   const pathname = usePathname();
-  const { currentUser, signOut } = useSession();
+  const { tokens, currentUser, signOut } = useSession();
+  const queryClient = useQueryClient();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [showMessages, setShowMessages] = useState(false);
+  const [msgOpen, setMsgOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const role = (currentUser?.role ?? "") as UserRole;
   const initials = currentUser?.nickname
     ? currentUser.nickname.slice(0, 2).toUpperCase()
     : "?";
+  const avatarUrl = currentUser?.avatar_url ?? null;
+
+  const financeQuery = useQuery({
+    queryKey: ["my", "finance"],
+    enabled: Boolean(tokens?.access_token) && role !== "admin",
+    queryFn: () => fetchMyFinance(tokens!.access_token),
+    staleTime: 2 * 60 * 1000,
+  });
+  const outstandingCents = financeQuery.data?.total_outstanding_balance_cents ?? 0;
+
+  const unreadQuery = useQuery({
+    queryKey: ["messages", "unread"],
+    enabled: Boolean(tokens?.access_token),
+    queryFn: () => fetchUnreadCount(tokens!.access_token),
+    staleTime: 15 * 1000,
+    refetchInterval: 30 * 1000,
+  });
+  const unreadCount = unreadQuery.data?.unread_count ?? 0;
+
+  // Subscribe to notification channel for live unread count updates
+  useEffect(() => {
+    if (!tokens?.access_token || !currentUser?.id) return;
+    return subscribeToTopic(tokens.access_token, `notifications:${currentUser.id}`, {
+      "notifications:changed": () => {
+        void queryClient.invalidateQueries({ queryKey: ["messages", "unread"] });
+      },
+    });
+  }, [tokens?.access_token, currentUser?.id, queryClient]);
 
   useEffect(() => {
     function handler(e: MouseEvent) {
@@ -190,8 +228,8 @@ export function TopNav() {
     <header
       className="sticky top-0 z-50 flex items-center"
       style={{
-        background: "#0A0A0F",
-        borderBottom: "1px solid #1a1a28",
+        background: "var(--bg)",
+        borderBottom: "1px solid var(--border)",
         height: "3.25rem",
       }}
     >
@@ -199,88 +237,132 @@ export function TopNav() {
         <Link
           href="/"
           className="shrink-0 text-xs font-bold uppercase tracking-[0.28em]"
-          style={{ color: "#F0EDF8" }}
+          style={{ color: "var(--text)" }}
         >
           Milos
         </Link>
 
         <nav className="flex flex-1 items-center gap-1">
+          {role === "admin" ? <DashboardDropdown pathname={pathname} /> : null}
           {NAV_LINKS.filter((link) => link.roles.includes(role)).map((link) => {
             const active = pathActive(pathname, link.href);
+            const showBalanceBadge = link.href === "/account/billing" && outstandingCents > 0;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-full px-3 py-1 text-sm font-semibold transition-colors"
+                className="relative rounded-full px-3 py-1 text-sm font-semibold transition-colors"
                 style={{
-                  background: active ? "#1a1a28" : "transparent",
-                  color: active ? "#F0EDF8" : "#55556a",
+                  background: active ? "var(--border)" : "transparent",
+                  color: active ? "var(--text)" : "var(--dim)",
                 }}
               >
                 {link.label}
+                {showBalanceBadge && (
+                  <span
+                    className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold"
+                    style={{ background: "var(--danger)", color: "#fff" }}
+                  >
+                    !
+                  </span>
+                )}
               </Link>
             );
           })}
-          {role === "admin" ? <DashboardDropdown pathname={pathname} /> : null}
-        </nav>
 
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setShowMessages((v) => !v)}
-            className="relative p-2 rounded-full"
-            style={{ color: "#c8c8e0" }}
-            aria-label="Messages"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-            </svg>
-          </button>
-          {showMessages && (
-            <DirectMessagesPanel onClose={() => setShowMessages(false)} />
-          )}
-        </div>
+          {/* Messages button — opens dropdown panel, does not navigate */}
+          <div className="relative">
+            <button
+              type="button"
+              className="relative rounded-full px-3 py-1 text-sm font-semibold transition-colors"
+              style={{
+                background: msgOpen ? "var(--border)" : "transparent",
+                color: msgOpen ? "var(--text)" : "var(--dim)",
+              }}
+              onClick={() => setMsgOpen((v) => !v)}
+            >
+              Messages
+              {unreadCount > 0 && (
+                <span
+                  className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold"
+                  style={{ background: "var(--primary)", color: "var(--bg)" }}
+                >
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </button>
+            {msgOpen ? <DirectMessagesPanel onClose={() => setMsgOpen(false)} /> : null}
+          </div>
+
+        </nav>
 
         <NotificationBell />
 
         <div ref={menuRef} className="relative shrink-0">
           <button
             className="flex items-center gap-2 rounded-full py-1 pl-1 pr-3 text-sm font-semibold transition-colors"
-            style={{ background: "#111118", color: "#F0EDF8" }}
+            style={{ background: "var(--panel)", color: "var(--text)" }}
             onClick={() => setMenuOpen((v) => !v)}
             type="button"
           >
-            <span
-              className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
-              style={{ background: "#9c799c", color: "#0A0A0F" }}
-            >
-              {initials}
-            </span>
-            <span className="hidden max-w-[7rem] truncate sm:block" style={{ color: "#c0c0d8" }}>
+            {avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={avatarUrl}
+                alt={currentUser?.nickname ?? ""}
+                className="h-7 w-7 rounded-full object-cover"
+              />
+            ) : (
+              <span
+                className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
+                style={{ background: "var(--primary)", color: "var(--bg)" }}
+              >
+                {initials}
+              </span>
+            )}
+            <span className="hidden max-w-[7rem] truncate sm:block" style={{ color: "var(--text-soft)" }}>
               {currentUser.nickname}
             </span>
-            <span className="text-[10px]" style={{ color: "#55556a" }}>▾</span>
+            <span className="text-[10px]" style={{ color: "var(--dim)" }}>▾</span>
           </button>
 
           {menuOpen ? (
             <div
               className="absolute right-0 top-full mt-2 w-44 overflow-hidden rounded-2xl py-1 shadow-[0_16px_60px_rgba(0,0,0,0.6)]"
-              style={{ background: "#111118", border: "1px solid #1a1a28" }}
+              style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
             >
-              <div className="border-b px-4 py-3" style={{ borderColor: "#1a1a28" }}>
-                <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "#55556a" }}>
+              <div className="border-b px-4 py-3" style={{ borderColor: "var(--border)" }}>
+                <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
                   Signed in as
                 </p>
-                <p className="mt-1 truncate text-sm font-semibold" style={{ color: "#F0EDF8" }}>
+                <p className="mt-1 truncate text-sm font-semibold" style={{ color: "var(--text)" }}>
                   {currentUser.nickname}
                 </p>
-                <p className="mt-0.5 text-xs uppercase tracking-[0.18em]" style={{ color: "#55556a" }}>
+                <p className="mt-0.5 text-xs uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                   {currentUser.role}
                 </p>
               </div>
+              <Link
+                href="/profile"
+                className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[var(--border)]"
+                style={{ color: "var(--text-soft)" }}
+                onClick={() => setMenuOpen(false)}
+              >
+                Profile
+              </Link>
+              {role !== "admin" && (
+                <Link
+                  href="/account/billing"
+                  className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[var(--border)]"
+                  style={{ color: "var(--text-soft)" }}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Billing
+                </Link>
+              )}
               <button
-                className="w-full px-4 py-2.5 text-left text-sm font-semibold transition-colors hover:bg-[#1a1a28]"
-                style={{ color: "#d95d39" }}
+                className="w-full px-4 py-2.5 text-left text-sm font-semibold transition-colors hover:bg-[var(--border)]"
+                style={{ color: "var(--primary)" }}
                 onClick={() => { signOut(); setMenuOpen(false); }}
                 type="button"
               >

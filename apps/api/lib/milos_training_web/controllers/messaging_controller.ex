@@ -2,7 +2,7 @@ defmodule MilosTrainingWeb.MessagingController do
   use MilosTrainingWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias MilosTraining.Messaging
+  alias MilosTraining.{Identity, Messaging}
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
   action_fallback MilosTrainingWeb.FallbackController
@@ -28,6 +28,7 @@ defmodule MilosTrainingWeb.MessagingController do
           properties: %{
             id: %Schema{type: :string, format: :uuid},
             user_id: %Schema{type: :string, format: :uuid},
+            nickname: %Schema{type: :string, nullable: true},
             last_read_message_id: %Schema{type: :string, format: :uuid, nullable: true}
           }
         }
@@ -185,6 +186,19 @@ defmodule MilosTrainingWeb.MessagingController do
     ]
   )
 
+  operation(:unread_count,
+    summary: "Count unread threads for the current user",
+    responses: [
+      ok:
+        {"Unread count", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{unread_count: %Schema{type: :integer}},
+           required: [:unread_count]
+         }}
+    ]
+  )
+
   operation(:mark_read,
     summary: "Mark a message as read in a thread",
     parameters: [
@@ -214,6 +228,12 @@ defmodule MilosTrainingWeb.MessagingController do
     ]
   )
 
+  def unread_count(conn, _params) do
+    user = Guardian.Plug.current_resource(conn)
+    count = Messaging.count_unread_threads(user.id)
+    json(conn, %{unread_count: count})
+  end
+
   def create_thread(conn, _params) do
     user = Guardian.Plug.current_resource(conn)
     raw_context_type = bp(conn, "context_type") || "direct"
@@ -234,7 +254,18 @@ defmodule MilosTrainingWeb.MessagingController do
     context_type = parse_context_type(params["context_type"])
 
     threads = Messaging.list_threads_for_user(user.id, context_type)
-    json(conn, %{threads: Enum.map(threads, &serialize_thread/1)})
+
+    all_participant_user_ids =
+      threads
+      |> Enum.flat_map(fn t -> Enum.map(t.participants || [], & &1.user_id) end)
+      |> Enum.uniq()
+
+    nickname_map =
+      all_participant_user_ids
+      |> Identity.list_by_ids()
+      |> Map.new(fn account -> {account.id, account.nickname} end)
+
+    json(conn, %{threads: Enum.map(threads, &serialize_thread(&1, nickname_map))})
   end
 
   def show_thread(conn, params) do
@@ -281,26 +312,31 @@ defmodule MilosTrainingWeb.MessagingController do
   def mark_read(conn, params) do
     user = Guardian.Plug.current_resource(conn)
     thread_id = params["id"] || params[:id]
-    message_id = bp(conn, "message_id")
+    message_id = bp(conn, "last_message_id")
 
     with :ok <- Messaging.mark_read(thread_id, user.id, message_id) do
       json(conn, %{})
     end
   end
 
-  defp serialize_thread(thread) do
+  defp serialize_thread(thread, nickname_map \\ %{}) do
     %{
       id: thread.id,
       context_type: thread.context_type,
       context_id: thread.context_id,
       created_by_id: thread.created_by_id,
       inserted_at: thread.inserted_at,
-      participants: Enum.map(thread.participants || [], &serialize_participant/1)
+      participants: Enum.map(thread.participants || [], &serialize_participant(&1, nickname_map))
     }
   end
 
-  defp serialize_participant(p) do
-    %{id: p.id, user_id: p.user_id, last_read_message_id: p.last_read_message_id}
+  defp serialize_participant(p, nickname_map) do
+    %{
+      id: p.id,
+      user_id: p.user_id,
+      nickname: Map.get(nickname_map, p.user_id),
+      last_read_message_id: p.last_read_message_id
+    }
   end
 
   defp serialize_message(message) do

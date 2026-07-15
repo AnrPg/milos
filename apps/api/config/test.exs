@@ -13,7 +13,9 @@ config :milos_training, MilosTraining.Repo,
   database:
     System.get_env("DB_NAME", "milos_training_test#{System.get_env("MIX_TEST_PARTITION")}"),
   pool: Ecto.Adapters.SQL.Sandbox,
-  pool_size: System.schedulers_online() * 2
+  pool_size: System.schedulers_online() * 2,
+  queue_target: 5_000,
+  queue_interval: 5_000
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
@@ -41,3 +43,9 @@ config :milos_training, :token_store, MilosTraining.Infrastructure.Security.Memo
 config :milos_training, :token_issuer, MilosTraining.Infrastructure.Auth.GuardianTokenIssuer
 config :milos_training, :token_verifier, MilosTraining.Infrastructure.Auth.GuardianTokenVerifier
 config :milos_training, :password_verifier, MilosTraining.Infrastructure.Auth.Password
+
+config :milos_training, :meilisearch,
+  url: System.get_env("MEILI_URL", "http://localhost:7700"),
+  api_key: System.get_env("MEILI_MASTER_KEY", "dev-meili-master-key"),
+  admin_member_index: System.get_env("MEILI_ADMIN_MEMBER_INDEX", "admin_members"),
+  log_failures: false

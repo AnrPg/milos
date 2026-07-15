@@ -85,9 +85,10 @@ The backend now exposes `GET/PUT /api/admin/scale-levels`,
 web app. The web admin surface includes scale-level management, workout list
 view, workout creation, and client-side preview of materialized instances.
 
-Because the broader authenticated web shell is still intentionally in-memory
-from Phase 1, the Phase 2 admin workouts UI uses a local in-memory admin login
-on its own page rather than introducing persistent session transport early.
+The early Phase 2 implementation briefly shipped before the broader
+authenticated web shell was fully wired. That transitional note is now
+obsolete: the admin workouts surface runs inside the shared authenticated web
+shell and no longer relies on a separate in-memory-only login path.
 
 On 2026-06-06, Phase 2 was hardened so workout section order and exercise order
 are derived from authoring list position rather than trusting caller-supplied
@@ -100,3 +101,10 @@ and admins, `master_workouts.created_by_id` is enforced as a real user foreign
 key, section parent references must stay within the same workout, timer
 configs are validated by timer type before persistence, and blank exercise
 variations are rejected unless they actually override at least one base field.
+
+On 2026-06-10, the authored workout tree was normalized to carry real
+database-backed audit timestamps across sections, exercises, and variations.
+`workout_exercises` now persists both `inserted_at` and `updated_at`, while
+`workout_sections` and `exercise_variations` gained `updated_at`. This keeps
+the Ecto schema shape aligned with the actual tables and supports future admin
+audit/read-model use without relying on schema-only assumptions.

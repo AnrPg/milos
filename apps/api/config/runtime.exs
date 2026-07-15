@@ -11,9 +11,11 @@ config :web_push_elixir,
 
 config :milos_training,
   minio_endpoint: System.get_env("MINIO_ENDPOINT", "http://localhost:9000"),
+  minio_public_endpoint: System.get_env("MINIO_PUBLIC_ENDPOINT"),
   minio_access_key: System.get_env("MINIO_ACCESS_KEY", "minioadmin"),
   minio_secret_key: System.get_env("MINIO_SECRET_KEY", "minioadmin"),
-  minio_bucket: System.get_env("MINIO_BUCKET", "milos-invoices")
+  minio_bucket: System.get_env("MINIO_BUCKET", "milos-invoices"),
+  minio_avatar_bucket: System.get_env("MINIO_AVATAR_BUCKET", "milos-avatars")
 
 if config_env() == :prod do
   guardian_secret_key =

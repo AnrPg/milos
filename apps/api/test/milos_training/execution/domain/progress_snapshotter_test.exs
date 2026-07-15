@@ -197,15 +197,15 @@ defmodule MilosTraining.Execution.Domain.ProgressSnapshotterTest do
     test "handles string-keyed timer_config (JSON-decoded segments)" do
       segments = [
         %{
+          "format" => "emom",
+          "timer_config" => %{"type" => "emom", "scoring_mode" => "for_time"},
           segment_key: "seg:0",
           section_id: "sec-str",
           section_name: "EMOM",
-          "format" => "emom",
           format: "emom",
           kind: :countdown,
           scoreable: true,
           score_config: nil,
-          "timer_config" => %{"type" => "emom", "scoring_mode" => "for_time"},
           timer_config: nil,
           exercises: []
         }

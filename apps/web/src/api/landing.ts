@@ -49,7 +49,22 @@ export type CoachNoteRecord = {
   inserted_at: string;
 };
 
+export type TrainingQuote = {
+  body: string;
+  author: string | null;
+};
+
+export type AdminMetrics = {
+  member_count: number;
+  total_outstanding_cents: number;
+  pending_referral_approvals: number;
+  classes_today: number;
+};
+
 export type LandingPayload = {
+  role?: string;
+  quote?: TrainingQuote | null;
+  admin_metrics?: AdminMetrics;
   gamification: {
     settings: {
       weekly_workout_target: number;
@@ -63,8 +78,14 @@ export type LandingPayload = {
       total_prs: number;
       current_streak_shields: number;
       consistency_score: number;
+      motivation_score: number;
+      perseverance_score: number;
+      advancement_count: number;
       last_workout_at: string | null;
     };
+    preferences: {
+      off_days: number[];
+    } | null;
     badges: BadgeRecord[];
     active_challenges: ChallengeRecord[];
     leaderboard: {

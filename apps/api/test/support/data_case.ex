@@ -37,8 +37,11 @@ defmodule MilosTraining.DataCase do
   """
   def setup_sandbox(tags) do
     pid = Ecto.Adapters.SQL.Sandbox.start_owner!(MilosTraining.Repo, shared: not tags[:async])
+    allow_background_processes(pid)
     on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
   end
+
+  defp allow_background_processes(_owner_pid), do: :ok
 
   @doc """
   A helper that transforms changeset errors into a map of messages.

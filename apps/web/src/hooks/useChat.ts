@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { type ChatMessage, fetchThreadMessages, markThreadRead } from "@/api/messaging";
 import { joinChannelWithPush } from "@/lib/realtime";
@@ -29,10 +30,15 @@ export function useChat({ threadId, accessToken, currentUserId }: UseChatOptions
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [typingUsers, setTypingUsers] = useState<TypingUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
 
   const channelRef = useRef<ReturnType<typeof joinChannelWithPush> | null>(null);
 
-  // Load initial history via REST
+  function invalidateUnreadCount() {
+    void queryClient.invalidateQueries({ queryKey: ["messages", "unread"] });
+  }
+
+  // Load initial history via REST and mark existing messages as read
   useEffect(() => {
     if (!threadId || !accessToken) return;
 
@@ -46,6 +52,10 @@ export function useChat({ threadId, accessToken, currentUserId }: UseChatOptions
           if (!cancelled) {
             setMessages(data.messages);
             setIsLoading(false);
+            const lastMessage = data.messages.at(-1);
+            if (lastMessage) {
+              void markThreadRead(accessToken, threadId, lastMessage.id).then(invalidateUnreadCount);
+            }
           }
         })
         .catch(() => {
@@ -70,7 +80,7 @@ export function useChat({ threadId, accessToken, currentUserId }: UseChatOptions
           return [...prev, message];
         });
         if (message.sender_id !== currentUserId && accessToken) {
-          void markThreadRead(accessToken, threadId, message.id);
+          void markThreadRead(accessToken, threadId, message.id).then(invalidateUnreadCount);
         }
       },
       typing: (payload) => {

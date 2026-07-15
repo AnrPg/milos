@@ -206,6 +206,17 @@ Phoenix.PubSub.broadcast(MilosTraining.PubSub, "workout:completed",
 # Notifications.EventHandler subscribes and reacts independently
 ```
 
+#### Phoenix Channels External Real-Time Delivery
+User-visible real-time updates fan out from internal PubSub events through Phoenix Channels. The REST API remains the source of truth for full payload reads, while channels carry low-latency update or invalidation events.
+
+Required topics:
+
+- `schedule:lobby` → authenticated schedule viewers receive `schedule:refresh` events after slot CRUD, booking submission/resolution, and timeout escalation.
+- `notifications:{user_id}` → the owning user receives `notifications:changed` events after notification creation or bulk read.
+- `execution:{execution_id}` → the owning athlete or an admin receives `execution:progress_updated`, `execution:note_submitted`, and `execution:completed` events during workout execution.
+
+Channel payloads must be plain maps and must never embed foreign Ecto schemas.
+
 #### Redis Cache-Aside for Landing Page
 `user_stats`, `recent_executions`, and `active_challenges` are cached in Redis with TTL 60 seconds. Cache is invalidated on `workout_execution` insert or gamification update. The Landing Page API endpoint reads from cache first; DB only on miss.
 
@@ -297,7 +308,11 @@ Member opens /workouts
   → Clicks "Start Workout" → Workout Execution Mode (fullscreen)
        → Timer starts (pre-configured per section)
        → Step-by-step checklist (sets × reps expanded to individual rounds)
-       → Long-press (mobile) / right-click (desktop) on word → note input → push to Admin
+       → Select text within an exercise label
+       → Right-click (desktop) or long-press selected text / word (mobile)
+       → Annotation modal opens with multi-select quick tags + free-text note
+       → Selected text is highlighted in-place; hover/click reveals attached annotations
+       → Admin notification includes the associated selected text
   → Completion → score input per scoreable section → gamification update
 ```
 
@@ -496,7 +511,17 @@ workout_executions
     { section_id, section_name, score_type, value, unit }
   ])
   exercise_notes (jsonb: [
-    { exercise_id, word, note_text }
+    {
+      id,
+      exercise_id,
+      selected_text,
+      selection_start,
+      selection_end,
+      tags: [string],
+      note_text,
+      inserted_at,
+      updated_at
+    }
   ])
   inserted_at
 
@@ -697,7 +722,7 @@ leaderboard_opt_ins
 | Booking submitted (pending) | Admin |
 | Booking approved/rejected | Member |
 | Booking unanswered after X min | Admin (alert) |
-| Workout note/modification submitted | Admin |
+| Workout note/modification submitted | Admin (includes associated selected text) |
 | Admin note written to athlete | Athlete |
 | Challenge completed | User |
 

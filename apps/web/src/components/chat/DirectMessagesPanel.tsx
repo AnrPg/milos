@@ -10,6 +10,7 @@ import {
 } from "@/api/messaging";
 import { useSession } from "@/components/session-provider";
 import { useChat } from "@/hooks/useChat";
+import { useUiPrefs } from "@/stores/ui-prefs";
 import { MessageBubble } from "./MessageBubble";
 import { TypingIndicator } from "./TypingIndicator";
 
@@ -26,6 +27,8 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
   const accessToken = tokens?.access_token ?? null;
   const currentUserId = currentUser?.id ?? null;
 
+  const { hideThread, isThreadHidden } = useUiPrefs();
+
   const [view, setView] = useState<PanelView>("list");
   const [threads, setThreads] = useState<ChatThread[]>([]);
   const [activeThread, setActiveThread] = useState<ChatThread | null>(null);
@@ -40,17 +43,30 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
   }, [accessToken]);
 
   useEffect(() => {
-    if (!accessToken || searchQuery.length < 2) return;
+    if (!accessToken || searchQuery.length < 2) {
+      queueMicrotask(() => setSearchResults([]));
+      return;
+    }
 
     const timeout = setTimeout(() => {
       void searchUsers(accessToken, searchQuery)
-        .then((data) =>
-          setSearchResults(data.users.filter((u) => u.id !== currentUserId).slice(0, 6)),
-        )
+        .then((data) => {
+          const filtered = data.users.filter((u) => u.id !== currentUserId);
+          const existingIds = new Set(
+            threads.flatMap((t) =>
+              t.participants
+                .filter((p) => p.user_id !== currentUserId)
+                .map((p) => p.user_id),
+            ),
+          );
+          const withThread = filtered.filter((u) => existingIds.has(u.id));
+          const withoutThread = filtered.filter((u) => !existingIds.has(u.id));
+          setSearchResults([...withThread, ...withoutThread].slice(0, 8));
+        })
         .catch(() => setSearchResults([]));
     }, 300);
     return () => clearTimeout(timeout);
-  }, [searchQuery, accessToken, currentUserId]);
+  }, [searchQuery, accessToken, currentUserId, threads]);
 
   const { messages, typingUsers, sendMessage, sendTypingStart, sendTypingStop } = useChat({
     threadId: view === "thread" ? (activeThread?.id ?? null) : null,
@@ -87,32 +103,34 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
   const otherParticipant = (thread: ChatThread) =>
     thread.participants.find((p) => p.user_id !== currentUserId);
 
+  const visibleThreads = threads.filter((t) => !isThreadHidden(currentUserId ?? "", t.id));
+
   return (
     <div
-      className="fixed right-4 top-14 z-50 rounded-[1.5rem] shadow-2xl flex flex-col overflow-hidden"
+      className="fixed right-4 top-14 z-[60] rounded-[1.5rem] shadow-2xl flex flex-col overflow-hidden"
       style={{
         width: "340px",
         height: "520px",
-        background: "#0d0d18",
-        border: "1px solid #2a2a40",
+        background: "var(--panel-muted)",
+        border: "1px solid var(--border-strong)",
       }}
     >
       {/* Header */}
       <div
         className="flex items-center justify-between px-4 py-3 border-b"
-        style={{ borderColor: "#1a1a28" }}
+        style={{ borderColor: "var(--border)" }}
       >
         {view === "thread" ? (
           <button
             type="button"
             onClick={() => setView("list")}
             className="text-sm font-medium flex items-center gap-1"
-            style={{ color: "#c8c8e0" }}
+            style={{ color: "var(--text-soft)" }}
           >
             ← Messages
           </button>
         ) : (
-          <span className="text-sm font-semibold" style={{ color: "#c8c8e0" }}>
+          <span className="text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
             Messages
           </span>
         )}
@@ -120,7 +138,7 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
           type="button"
           onClick={onClose}
           className="text-lg leading-none"
-          style={{ color: "#55556a" }}
+          style={{ color: "var(--dim)" }}
         >
           ✕
         </button>
@@ -128,12 +146,12 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
 
       {view === "list" && (
         <>
-          <div className="px-3 py-2 border-b" style={{ borderColor: "#1a1a28" }}>
+          <div className="px-3 py-2 border-b" style={{ borderColor: "var(--border)" }}>
             <input
               type="text"
               placeholder="Search or start a conversation…"
               className="w-full rounded-[1rem] px-3 py-2 text-sm outline-none"
-              style={{ background: "#1a1a28", color: "#e8e8f0", border: "1px solid #2a2a40" }}
+              style={{ background: "var(--card)", color: "var(--text)", border: "1px solid var(--border-strong)" }}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -146,51 +164,71 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
                   key={u.id}
                   type="button"
                   onClick={() => void startNewThread(u)}
-                  className="flex items-center gap-3 w-full px-4 py-3 text-left hover:bg-[#1a1a28] transition-colors"
+                  className="flex items-center gap-3 w-full px-4 py-3 text-left transition-colors"
+                  style={{ background: "transparent" }}
                 >
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                    style={{ background: "#2a1a4a", color: "#c5aaf0" }}
+                    style={{
+                      background: "color-mix(in srgb, var(--primary) 18%, transparent)",
+                      color: "var(--primary-strong)",
+                    }}
                   >
                     {u.nickname[0]?.toUpperCase()}
                   </div>
                   <div>
-                    <p className="text-sm font-medium" style={{ color: "#e8e8f0" }}>
+                    <p className="text-sm font-medium" style={{ color: "var(--text)" }}>
                       {u.nickname}
                     </p>
-                    <p className="text-xs" style={{ color: "#55556a" }}>
+                    <p className="text-xs" style={{ color: "var(--dim)" }}>
                       {u.role}
                     </p>
                   </div>
                 </button>
               ))
-            ) : threads.length === 0 ? (
-              <p className="text-sm text-center p-4" style={{ color: "#55556a" }}>
+            ) : visibleThreads.length === 0 ? (
+              <p className="text-sm text-center p-4" style={{ color: "var(--dim)" }}>
                 No conversations yet. Search to start one.
               </p>
             ) : (
-              threads.map((thread) => {
+              visibleThreads.map((thread) => {
                 const other = otherParticipant(thread);
                 return (
-                  <button
+                  <div
                     key={thread.id}
-                    type="button"
-                    onClick={() => openThread(thread)}
-                    className="flex items-center gap-3 w-full px-4 py-3 text-left hover:bg-[#1a1a28] transition-colors border-b"
-                    style={{ borderColor: "#111120" }}
+                    className="relative flex items-center border-b group"
+                    style={{ borderColor: "var(--border)" }}
                   >
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                      style={{ background: "#1a1a2e", color: "#9988cc" }}
+                    <button
+                      type="button"
+                      onClick={() => openThread(thread)}
+                      className="flex items-center gap-3 flex-1 px-4 py-3 text-left transition-colors min-w-0 pr-10"
                     >
-                      {other?.user_id?.[0]?.toUpperCase() ?? "?"}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate" style={{ color: "#e8e8f0" }}>
-                        {other?.user_id ?? "Direct message"}
-                      </p>
-                    </div>
-                  </button>
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                        style={{
+                          background: "color-mix(in srgb, var(--primary) 12%, var(--card))",
+                          color: "var(--primary-strong)",
+                        }}
+                      >
+                        {other?.nickname?.[0]?.toUpperCase() ?? "?"}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate" style={{ color: "var(--text)" }}>
+                          {other?.nickname ?? "Direct message"}
+                        </p>
+                      </div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); hideThread(currentUserId ?? "", thread.id); }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-60 hover:!opacity-100 rounded-lg p-1 transition-opacity text-sm leading-none"
+                      style={{ color: "var(--dim)" }}
+                      title="Hide conversation"
+                    >
+                      🗑️
+                    </button>
+                  </div>
                 );
               })
             )}
@@ -214,12 +252,12 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
 
           <div
             className="flex items-center gap-2 p-3 border-t"
-            style={{ background: "#0d0d18", borderColor: "#1a1a28" }}
+            style={{ background: "var(--panel-muted)", borderColor: "var(--border)" }}
           >
             <input
               type="text"
               className="flex-1 rounded-[1rem] px-3 py-2 text-sm outline-none"
-              style={{ background: "#1a1a28", color: "#e8e8f0", border: "1px solid #2a2a40" }}
+              style={{ background: "var(--card)", color: "var(--text)", border: "1px solid var(--border-strong)" }}
               placeholder="Write a message…"
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -238,8 +276,8 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
               disabled={!input.trim()}
               className="rounded-full px-3 py-2 text-xs font-semibold"
               style={{
-                background: "#4f3a7a",
-                color: "#f0edf8",
+                background: "var(--primary)",
+                color: "var(--primary-contrast)",
                 opacity: input.trim() ? 1 : 0.4,
               }}
             >

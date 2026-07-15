@@ -1,304 +1,356 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { ApiError } from "@/api/client";
-import {
-  type LoginRequest,
-  type RegisterRequest,
-} from "@/api/auth";
+import { checkNicknameAvailable, type LoginRequest, type RegisterRequest } from "@/api/auth";
+import { getAvatarUploadUrl, updateAvatar } from "@/api/profile";
 import { useSession } from "@/components/session-provider";
 
 type Mode = "register" | "login";
 type FieldErrors = Record<string, string[]>;
 
-const initialRegister: RegisterRequest = {
-  nickname: "",
-  password: "",
-  role: "member",
-};
+const initialRegister: RegisterRequest = { nickname: "", password: "", role: "member" };
+const initialLogin: LoginRequest = { nickname: "", password: "" };
 
-const initialLogin: LoginRequest = {
-  nickname: "",
-  password: "",
-};
+function flatFieldErrors(errors: Record<string, unknown> | undefined): FieldErrors {
+  if (!errors) return {};
+  return Object.fromEntries(
+    Object.entries(errors).filter((entry): entry is [string, string[]] => {
+      const [, messages] = entry;
+      return Array.isArray(messages) && messages.every((m) => typeof m === "string");
+    }),
+  );
+}
 
 export function AuthConsole() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { currentUser, signIn, signOut, signUp, status } = useSession();
+  const { signIn, signUp, status, tokens } = useSession();
+
   const [mode, setMode] = useState<Mode>("login");
   const [registerForm, setRegisterForm] = useState<RegisterRequest>(initialRegister);
   const [loginForm, setLoginForm] = useState<LoginRequest>(initialLogin);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [busyAction, setBusyAction] = useState<string | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [nicknameStatus, setNicknameStatus] = useState<"idle" | "checking" | "available" | "taken">("idle");
+
+  // Stored in a ref so the post-registration upload effect doesn't need it as a dep
+  const pendingAvatarRef = useRef<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (status !== "authenticated") return;
     router.replace(searchParams.get("next") || "/");
   }, [router, searchParams, status]);
 
+  // Debounced nickname availability check
+  useEffect(() => {
+    if (mode !== "register") return;
+    const nickname = registerForm.nickname.trim();
+    if (nickname.length < 3) {
+      setNicknameStatus("idle");
+      return;
+    }
+    setNicknameStatus("checking");
+    const timer = setTimeout(async () => {
+      try {
+        const { available } = await checkNicknameAvailable(nickname);
+        setNicknameStatus(available ? "available" : "taken");
+      } catch {
+        setNicknameStatus("idle");
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [registerForm.nickname, mode]);
+
+  // After registration the session is committed and tokens become available —
+  // upload the chosen avatar file at that point
+  useEffect(() => {
+    if (status !== "authenticated" || !pendingAvatarRef.current || !tokens) return;
+    const file = pendingAvatarRef.current;
+    const token = tokens.access_token;
+    pendingAvatarRef.current = null;
+
+    void (async () => {
+      try {
+        const { upload_url, public_url } = await getAvatarUploadUrl(token);
+        await fetch(upload_url, { method: "PUT", body: file, headers: { "Content-Type": file.type } });
+        await updateAvatar(token, public_url);
+      } catch {
+        // non-blocking: user is signed in even if avatar upload fails
+      }
+    })();
+  }, [status, tokens]);
+
+  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0] ?? null;
+    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    pendingAvatarRef.current = file;
+    setAvatarPreview(file ? URL.createObjectURL(file) : null);
+  }
+
   async function runAction(action: string, effect: () => Promise<void>) {
     setBusyAction(action);
     setError(null);
     setFieldErrors({});
-
     try {
       await effect();
-    } catch (actionError) {
-      if (actionError instanceof ApiError) {
-        setError(actionError.message);
-        setFieldErrors(actionError.payload.errors ?? {});
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message);
+        setFieldErrors(flatFieldErrors(err.payload.errors));
       } else {
-        setError(actionError instanceof Error ? actionError.message : "Unexpected request failure");
+        setError(err instanceof Error ? err.message : "Unexpected request failure");
       }
     } finally {
       setBusyAction(null);
     }
   }
 
-  const registerNicknameErrors = fieldErrors.nickname ?? [];
-  const registerPasswordErrors = fieldErrors.password ?? [];
-  const registerRoleErrors = fieldErrors.role ?? [];
+  const nicknameErrors = fieldErrors.nickname ?? [];
+  const passwordErrors = fieldErrors.password ?? [];
+  const roleErrors = fieldErrors.role ?? [];
 
   return (
-    <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "#0A0A0F" }}>
-      <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-      <div className="rounded-[2rem] p-6" style={{ background: "#111118", border: "1px solid #1a1a28" }}>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "#d95d39" }}>
-              Login
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight" style={{ color: "#F0EDF8" }}>Register and log in against the live API.</h2>
+    <main
+      className="flex min-h-screen items-center justify-center px-6 py-10"
+      style={{ background: "var(--bg)" }}
+    >
+      <div className="w-full max-w-md">
+        <div
+          className="rounded-[2rem] p-7"
+          style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+        >
+          {/* Mode toggle */}
+          <div className="mb-7 flex justify-center">
+            <div
+              className="inline-flex rounded-full p-1 text-sm"
+              style={{ background: "var(--border)", border: "1px solid var(--border-strong)" }}
+            >
+              <button
+                className="rounded-full px-5 py-2 transition-colors"
+                style={
+                  mode === "register"
+                    ? { background: "var(--primary)", color: "var(--text)" }
+                    : { background: "transparent", color: "var(--dim)" }
+                }
+                onClick={() => setMode("register")}
+                type="button"
+              >
+                Register
+              </button>
+              <button
+                className="rounded-full px-5 py-2 transition-colors"
+                style={
+                  mode === "login"
+                    ? { background: "var(--primary)", color: "var(--text)" }
+                    : { background: "transparent", color: "var(--dim)" }
+                }
+                onClick={() => setMode("login")}
+                type="button"
+              >
+                Login
+              </button>
+            </div>
           </div>
 
-          <div className="inline-flex rounded-full p-1 text-sm" style={{ background: "#1a1a28", border: "1px solid #2a2a3a" }}>
-            <button
-              className="rounded-full px-4 py-2 transition-colors"
-              style={mode === "register" ? { background: "#d95d39", color: "#F0EDF8" } : { background: "transparent", color: "#55556a" }}
-              onClick={() => setMode("register")}
-              type="button"
-            >
-              Register
-            </button>
-            <button
-              className="rounded-full px-4 py-2 transition-colors"
-              style={mode === "login" ? { background: "#d95d39", color: "#F0EDF8" } : { background: "transparent", color: "#55556a" }}
-              onClick={() => setMode("login")}
-              type="button"
-            >
-              Login
-            </button>
-          </div>
-        </div>
+          <div className="space-y-4">
+            {mode === "register" ? (
+              <>
+                {/* Avatar picker */}
+                <div className="flex flex-col items-center gap-3 pb-2">
+                  <button
+                    type="button"
+                    className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full transition-opacity hover:opacity-80"
+                    style={{ background: "var(--border)", border: "2px dashed var(--border-strong)" }}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    {avatarPreview ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={avatarPreview} alt="Avatar preview" className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="text-2xl" style={{ color: "var(--dim)" }}>+</span>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    className="text-xs font-semibold"
+                    style={{ color: "var(--primary)" }}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    {avatarPreview ? "Change photo" : "Upload photo"}
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleAvatarChange}
+                  />
+                </div>
 
-        <div className="mt-6 space-y-4">
-          {mode === "register" ? (
-            <>
-              <label className="block text-sm font-medium" style={{ color: "#c0c0d8" }}>
-                Nickname
-                <input
-                  className="mt-2 w-full rounded-2xl px-4 py-3 outline-none ring-0"
-                  style={{ background: "#111118", border: "1px solid #1e1e2e", color: "#F0EDF8" }}
-                  value={registerForm.nickname}
-                  onChange={(event) =>
-                    setRegisterForm((current: RegisterRequest) => ({
-                      ...current,
-                      nickname: event.target.value,
-                    }))
-                  }
-                />
-                {registerNicknameErrors.length > 0 ? (
-                  <span className="mt-2 block text-sm" style={{ color: "#e07a5f" }}>
-                    {registerNicknameErrors.join(", ")}
-                  </span>
-                ) : null}
-              </label>
-              <label className="block text-sm font-medium" style={{ color: "#c0c0d8" }}>
-                Password
-                <input
-                  className="mt-2 w-full rounded-2xl px-4 py-3 outline-none ring-0"
-                  style={{ background: "#111118", border: "1px solid #1e1e2e", color: "#F0EDF8" }}
-                  type="password"
-                  value={registerForm.password}
-                  onChange={(event) =>
-                    setRegisterForm((current: RegisterRequest) => ({
-                      ...current,
-                      password: event.target.value,
-                    }))
-                  }
-                />
-                {registerPasswordErrors.length > 0 ? (
-                  <span className="mt-2 block text-sm" style={{ color: "#e07a5f" }}>
-                    {registerPasswordErrors.join(", ")}
-                  </span>
-                ) : null}
-              </label>
-              <label className="block text-sm font-medium" style={{ color: "#c0c0d8" }}>
-                Role
-                <select
-                  className="mt-2 w-full rounded-2xl px-4 py-3 outline-none ring-0"
-                  style={{ background: "#111118", border: "1px solid #1e1e2e", color: "#F0EDF8" }}
-                  value={registerForm.role}
-                  onChange={(event) =>
-                    setRegisterForm((current: RegisterRequest) => ({
-                      ...current,
-                      role: event.target.value as RegisterRequest["role"],
-                    }))
-                  }
+                {/* Nickname */}
+                <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
+                  <div className="flex items-center justify-between">
+                    <span>Nickname</span>
+                    {nicknameStatus === "checking" && (
+                      <span className="text-xs" style={{ color: "var(--dim)" }}>Checking…</span>
+                    )}
+                    {nicknameStatus === "available" && (
+                      <span className="text-xs font-semibold" style={{ color: "var(--success, #4ade80)" }}>✓ Available</span>
+                    )}
+                    {nicknameStatus === "taken" && (
+                      <span className="text-xs font-semibold" style={{ color: "var(--primary-strong)" }}>✗ Already taken</span>
+                    )}
+                  </div>
+                  <input
+                    className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
+                    style={{
+                      background: "var(--bg)",
+                      border: `1px solid ${nicknameStatus === "available" ? "var(--success, #4ade80)" : nicknameStatus === "taken" ? "var(--primary-strong)" : "var(--border)"}`,
+                      color: "var(--text)",
+                    }}
+                    value={registerForm.nickname}
+                    placeholder="Choose a unique nickname"
+                    onChange={(e) =>
+                      setRegisterForm((f) => ({ ...f, nickname: e.target.value }))
+                    }
+                  />
+                  {nicknameErrors.length > 0 && (
+                    <span className="mt-1.5 block text-xs" style={{ color: "var(--primary-strong)" }}>
+                      {nicknameErrors.join(", ")}
+                    </span>
+                  )}
+                </label>
+
+                {/* Password */}
+                <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
+                  Password
+                  <input
+                    className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
+                    style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
+                    type="password"
+                    value={registerForm.password}
+                    placeholder="At least 8 characters"
+                    onChange={(e) =>
+                      setRegisterForm((f) => ({ ...f, password: e.target.value }))
+                    }
+                  />
+                  {passwordErrors.length > 0 && (
+                    <span className="mt-1.5 block text-xs" style={{ color: "var(--primary-strong)" }}>
+                      {passwordErrors.join(", ")}
+                    </span>
+                  )}
+                </label>
+
+                {/* Role cards */}
+                <div>
+                  <p className="mb-2 text-sm font-medium" style={{ color: "var(--text-soft)" }}>I am a…</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {(
+                      [
+                        { value: "member", label: "Gym Member", description: "Train with a structured programme" },
+                        { value: "athlete", label: "Autonomous Athlete", description: "Self-directed training" },
+                      ] as const
+                    ).map(({ value, label, description }) => {
+                      const selected = registerForm.role === value;
+                      return (
+                        <button
+                          key={value}
+                          type="button"
+                          className="rounded-2xl p-4 text-left transition-all"
+                          style={{
+                            background: selected
+                              ? "color-mix(in srgb, var(--primary) 12%, transparent)"
+                              : "var(--bg)",
+                            border: selected
+                              ? "1.5px solid var(--primary)"
+                              : "1.5px solid var(--border)",
+                          }}
+                          onClick={() => setRegisterForm((f) => ({ ...f, role: value }))}
+                        >
+                          <p className="text-sm font-semibold" style={{ color: selected ? "var(--primary)" : "var(--text)" }}>
+                            {label}
+                          </p>
+                          <p className="mt-1 text-xs leading-snug" style={{ color: "var(--dim)" }}>
+                            {description}
+                          </p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {roleErrors.length > 0 && (
+                    <span className="mt-1.5 block text-xs" style={{ color: "var(--primary-strong)" }}>
+                      {roleErrors.join(", ")}
+                    </span>
+                  )}
+                </div>
+
+                <button
+                  className="w-full rounded-2xl px-4 py-3 font-semibold disabled:opacity-60"
+                  style={{ background: "var(--primary)", color: "var(--text)" }}
+                  disabled={busyAction === "register"}
+                  onClick={() => runAction("register", async () => { await signUp(registerForm); })}
+                  type="button"
                 >
-                  <option value="member">Member</option>
-                  <option value="athlete">Athlete</option>
-                </select>
-                {registerRoleErrors.length > 0 ? (
-                  <span className="mt-2 block text-sm" style={{ color: "#e07a5f" }}>
-                    {registerRoleErrors.join(", ")}
-                  </span>
-                ) : null}
-              </label>
-              <button
-                className="w-full rounded-2xl px-4 py-3 font-semibold disabled:opacity-60"
-                style={{ background: "#d95d39", color: "#F0EDF8" }}
-                disabled={busyAction === "register"}
-                onClick={() =>
-                  runAction("register", async () => {
-                    await signUp(registerForm);
-                  })
-                }
-                type="button"
-              >
-                {busyAction === "register" ? "Registering..." : "Create account"}
-              </button>
-            </>
-          ) : (
-            <>
-              <label className="block text-sm font-medium" style={{ color: "#c0c0d8" }}>
-                Nickname
-                <input
-                  className="mt-2 w-full rounded-2xl px-4 py-3 outline-none ring-0"
-                  style={{ background: "#111118", border: "1px solid #1e1e2e", color: "#F0EDF8" }}
-                  value={loginForm.nickname}
-                  onChange={(event) =>
-                    setLoginForm((current: LoginRequest) => ({
-                      ...current,
-                      nickname: event.target.value,
-                    }))
-                  }
-                />
-              </label>
-              <label className="block text-sm font-medium" style={{ color: "#c0c0d8" }}>
-                Password
-                <input
-                  className="mt-2 w-full rounded-2xl px-4 py-3 outline-none ring-0"
-                  style={{ background: "#111118", border: "1px solid #1e1e2e", color: "#F0EDF8" }}
-                  type="password"
-                  value={loginForm.password}
-                  onChange={(event) =>
-                    setLoginForm((current: LoginRequest) => ({
-                      ...current,
-                      password: event.target.value,
-                    }))
-                  }
-                />
-              </label>
-              <button
-                className="w-full rounded-2xl px-4 py-3 font-semibold disabled:opacity-60"
-                style={{ background: "#d95d39", color: "#F0EDF8" }}
-                disabled={busyAction === "login"}
-                onClick={() =>
-                  runAction("login", async () => {
-                    await signIn(loginForm);
-                  })
-                }
-                type="button"
-              >
-                {busyAction === "login" ? "Signing in..." : "Sign in"}
-              </button>
-            </>
-          )}
-        </div>
-
-        {error ? (
-          <p className="mt-4 rounded-2xl px-4 py-3 text-sm" style={{ border: "1px solid rgba(217,93,57,0.25)", background: "rgba(217,93,57,0.08)", color: "#e07a5f" }}>
-            {error}
-          </p>
-        ) : null}
-      </div>
-
-      <div className="rounded-[2rem] p-6" style={{ background: "#111118", border: "1px solid #1a1a28" }}>
-        <div className="space-y-5">
-          <div>
-            <p className="text-sm uppercase tracking-[0.24em]" style={{ color: "#8888aa" }}>Phase Surface</p>
-            <h3 className="mt-2 text-2xl font-semibold" style={{ color: "#F0EDF8" }}>Minimal authenticated flow for the implemented slices.</h3>
-          </div>
-
-          <div className="space-y-4 rounded-[1.5rem] p-4" style={{ border: "1px solid #1a1a28", background: "rgba(255,255,255,0.03)" }}>
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em]" style={{ color: "#8888aa" }}>Session posture</p>
-              <p className="mt-2 text-sm" style={{ color: "#c0c0d8" }}>
-                {status === "authenticated"
-                  ? "Authenticated session is persisted locally and restored on refresh."
-                  : "No active session yet."}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em]" style={{ color: "#8888aa" }}>Reload behavior</p>
-              <p className="mt-2 text-sm" style={{ color: "#c0c0d8" }}>
-                Refresh now restores the session instead of dropping credentials.
-              </p>
-            </div>
-          </div>
-
-          {status === "authenticated" ? (
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Link
-                className="rounded-2xl px-4 py-3 text-center text-sm font-semibold"
-                style={{ border: "1px solid #2a2a3a", background: "#1a1a28", color: "#F0EDF8" }}
-                href="/"
-              >
-                Continue to landing page
-              </Link>
-
-              <button
-                className="rounded-2xl px-4 py-3 text-sm font-semibold"
-                style={{ border: "1px solid #2a2a3a", background: "transparent", color: "#c0c0d8" }}
-                onClick={signOut}
-                type="button"
-              >
-                Log out
-              </button>
-            </div>
-          ) : null}
-
-          <div className="rounded-[1.5rem] p-4" style={{ border: "1px solid #1a1a28", background: "rgba(0,0,0,0.2)" }}>
-            <p className="text-xs uppercase tracking-[0.2em]" style={{ color: "#8888aa" }}>Authenticated user</p>
-            {currentUser ? (
-              <dl className="mt-3 space-y-2 text-sm" style={{ color: "#c0c0d8" }}>
-                <div className="flex items-center justify-between gap-4">
-                  <dt style={{ color: "#8888aa" }}>ID</dt>
-                  <dd className="break-all text-right">{currentUser.id}</dd>
-                </div>
-                <div className="flex items-center justify-between gap-4">
-                  <dt style={{ color: "#8888aa" }}>Nickname</dt>
-                  <dd>{currentUser.nickname}</dd>
-                </div>
-                <div className="flex items-center justify-between gap-4">
-                  <dt style={{ color: "#8888aa" }}>Role</dt>
-                  <dd>{currentUser.role}</dd>
-                </div>
-              </dl>
+                  {busyAction === "register" ? "Creating account…" : "Create account"}
+                </button>
+              </>
             ) : (
-              <p className="mt-3 text-sm" style={{ color: "#55556a" }}>
-                No authenticated user loaded yet.
-              </p>
+              <>
+                {/* Nickname */}
+                <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
+                  Nickname
+                  <input
+                    className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
+                    style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
+                    value={loginForm.nickname}
+                    onChange={(e) => setLoginForm((f) => ({ ...f, nickname: e.target.value }))}
+                  />
+                </label>
+
+                {/* Password */}
+                <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
+                  Password
+                  <input
+                    className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
+                    style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
+                    type="password"
+                    value={loginForm.password}
+                    onChange={(e) => setLoginForm((f) => ({ ...f, password: e.target.value }))}
+                  />
+                </label>
+
+                <button
+                  className="w-full rounded-2xl px-4 py-3 font-semibold disabled:opacity-60"
+                  style={{ background: "var(--primary)", color: "var(--text)" }}
+                  disabled={busyAction === "login"}
+                  onClick={() => runAction("login", async () => { await signIn(loginForm); })}
+                  type="button"
+                >
+                  {busyAction === "login" ? "Signing in…" : "Sign in"}
+                </button>
+              </>
             )}
           </div>
+
+          {error ? (
+            <p
+              className="mt-4 rounded-2xl px-4 py-3 text-sm"
+              style={{
+                border: "1px solid color-mix(in srgb, var(--primary) 25%, transparent)",
+                background: "color-mix(in srgb, var(--primary) 8%, transparent)",
+                color: "var(--primary-strong)",
+              }}
+            >
+              {error}
+            </p>
+          ) : null}
         </div>
-      </div>
       </div>
     </main>
   );

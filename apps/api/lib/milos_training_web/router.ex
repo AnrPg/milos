@@ -43,11 +43,13 @@ defmodule MilosTrainingWeb.Router do
     get("/health", MilosTrainingWeb.HealthController, :index)
     get("/openapi", OpenApiSpex.Plug.RenderSpec, [])
     get("/calendar/feed.ics", MilosTrainingWeb.CalendarFeedController, :feed)
+    get("/theme", MilosTrainingWeb.ThemeController, :show)
   end
 
   scope "/api/auth", MilosTrainingWeb do
     pipe_through([:api, :auth_rate_limited])
 
+    get("/nickname-available", AuthController, :nickname_available)
     post("/register", AuthController, :register)
     post("/login", AuthController, :login)
     post("/refresh", AuthController, :refresh)
@@ -57,6 +59,17 @@ defmodule MilosTrainingWeb.Router do
     pipe_through([:api, :authenticated])
 
     get("/me", AuthController, :me)
+  end
+
+  scope "/api/me", MilosTrainingWeb do
+    pipe_through([:api, :authenticated])
+
+    get("/finance", MyFinanceController, :index)
+    get("/invoices/:id/download-url", MyFinanceController, :invoice_download_url)
+    patch("/profile", MeController, :update_profile)
+    post("/avatar/upload-url", MeController, :avatar_upload_url)
+    patch("/avatar", MeController, :update_avatar)
+    get("/search/users", MeController, :search_users)
   end
 
   scope "/api/admin", MilosTrainingWeb do
@@ -157,6 +170,7 @@ defmodule MilosTrainingWeb.Router do
     post("/finance/promotions/:id/codes", AdminFinanceController, :create_promotion_code)
     get("/finance/referral-programs", AdminFinanceController, :referral_programs)
     post("/finance/referral-programs", AdminFinanceController, :create_referral_program)
+    patch("/finance/referral-programs/:id", AdminFinanceController, :update_referral_program)
     get("/finance/referrals", AdminFinanceController, :referrals)
     post("/finance/referrals", AdminFinanceController, :create_referral)
     patch("/finance/referrals/:id/status", AdminFinanceController, :update_referral_status)
@@ -188,6 +202,7 @@ defmodule MilosTrainingWeb.Router do
     pipe_through([:api, :authenticated, :athlete_or_admin])
 
     get("/my-workouts", MyWorkoutController, :index)
+    post("/my-workouts/requests", MyWorkoutController, :request_assignment)
     patch("/my-workouts/assignments/:id/reject", MyWorkoutController, :reject)
     patch("/my-workouts/assignments/:id/reschedule", MyWorkoutController, :reschedule)
   end
@@ -222,6 +237,7 @@ defmodule MilosTrainingWeb.Router do
     post("/challenges/:id/opt_in", ChallengeController, :opt_in)
     delete("/challenges/:id/opt_in", ChallengeController, :opt_out)
 
+    get("/threads/unread-count", MessagingController, :unread_count)
     post("/threads", MessagingController, :create_thread)
     get("/threads", MessagingController, :list_threads)
     get("/threads/:id", MessagingController, :show_thread)
@@ -252,6 +268,25 @@ defmodule MilosTrainingWeb.Router do
     patch("/:id/progress", ExecutionController, :update_progress)
     post("/:id/notes", ExecutionController, :submit_note)
     patch("/:id/complete", ExecutionController, :complete)
+    post("/:id/modifications", ExecutionController, :add_modifications)
+  end
+
+  scope "/api/gamification", MilosTrainingWeb do
+    pipe_through([:api, :authenticated, :user_only])
+
+    get("/preferences", GamificationPreferencesController, :show)
+    put("/preferences", GamificationPreferencesController, :update)
+  end
+
+  scope "/api/prs", MilosTrainingWeb do
+    pipe_through([:api, :authenticated, :user_only])
+
+    get("/", PRController, :index)
+    post("/", PRController, :create)
+    patch("/:id", PRController, :update)
+    delete("/:id", PRController, :delete)
+    get("/:id/history", PRController, :history)
+    post("/:id/share", PRController, :share)
   end
 
   if Application.compile_env(:milos_training, :dev_routes) do

@@ -33,3 +33,9 @@ export function refreshSession(payload: RefreshRequest) {
 export function fetchCurrentUser(token: string) {
   return apiRequest<CurrentUser>("/auth/me", { token });
 }
+
+export function checkNicknameAvailable(nickname: string) {
+  return apiRequest<{ available: boolean }>(
+    `/auth/nickname-available?nickname=${encodeURIComponent(nickname)}`,
+  );
+}

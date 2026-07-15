@@ -35,7 +35,8 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
     notifications = wait_for_notifications(athlete.id)
 
     assert Enum.any?(notifications, fn notification ->
-             notification.type in [:chat_message, "chat_message"]
+             notification.type in [:chat_message, "chat_message"] and
+               notification.payload["url"] == "/account/activity/chats?thread=#{thread.id}"
            end)
   end
 

@@ -12,3 +12,31 @@ must have an ADR. See `template.md` for the format.
 | ADR-004 | Phase 0 and 1 production hardening | Accepted |
 | ADR-005 | Workout materialization and admin-managed scale levels | Accepted |
 | ADR-006 | Workout draft canvas authoring flow | Accepted |
+| ADR-007 | Scheduling booking approval and timeout flow | Accepted |
+| ADR-008 | Assigned workouts athlete delivery | Accepted |
+| ADR-009 | Workout execution mode | Accepted |
+| ADR-010 | Notification delivery and Web Push | Accepted |
+| ADR-011 | Gamification landing read model | Accepted |
+| ADR-011 | Workout hard deletion across dependent contexts | Accepted |
+| ADR-012 | Execution score snapshots and authoring audit timestamps | Accepted |
+| ADR-014 | User-scoped realtime sync for landing and assigned workouts | Accepted |
+| ADR-015 | Phase 8 finance, analytics, wellbeing, and feedback foundations | Accepted |
+| ADR-016 | Finance credit ledger and entitlements | Accepted |
+| ADR-017 | Finance invoices, renewals, and entitlements | Accepted |
+| ADR-018 | Finance and Coaching read model hardening | Accepted |
+| ADR-019 | Finance refunds and allocation reversals | Accepted |
+| ADR-020 | Referral reward and coaching refresh hardening | Accepted |
+| ADR-021 | Finance net accounting projections | Accepted |
+| ADR-022 | Phase 8 lifecycle policy contract hardening | Accepted |
+| ADR-023 | Dynamic gamification help copy | Accepted |
+| ADR-024 | is_team_workout field and realtime sync infrastructure fix | Accepted |
+| ADR-025 | Admin search, communication, attendance, and calendar export foundations | Accepted |
+| ADR-026 | Financial member drill-down contract | Accepted |
+| ADR-027 | Coaching athlete drill-down contract | Accepted |
+| ADR-028 | Admin drill-down cross-surface alignment | Accepted |
+| ADR-029 | Execution, booking, and challenge integrity | Accepted |
+| ADR-030 | Athlete assignment and command integrity | Accepted |
+| ADR-031 | Authenticated cache, workout revisions, and role transitions | Accepted |
+| ADR-032 | Side effect, attendance, search, and notification lifecycle hardening | Accepted |
+| ADR-033 | Global UI theme palette | Accepted |
+| ADR-034 | Finance invoice reference format | Accepted |

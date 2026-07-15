@@ -3,9 +3,11 @@ import { apiRequest } from "@/api/client";
 export type MessageType = "chat" | "coaching_note" | "system";
 
 export interface ChatParticipant {
+  id: string;
   user_id: string;
+  nickname?: string | null;
   last_read_message_id: string | null;
-  joined_at: string;
+  joined_at?: string;
 }
 
 export interface ChatThread {
@@ -90,9 +92,13 @@ export async function markThreadRead(token: string, threadId: string, lastMessag
   });
 }
 
+export async function fetchUnreadCount(token: string) {
+  return apiRequest<{ unread_count: number }>("/threads/unread-count", { token });
+}
+
 export async function searchUsers(token: string, query: string) {
   return apiRequest<{ users: { id: string; nickname: string; role: string }[] }>(
-    `/admin/search?q=${encodeURIComponent(query)}`,
+    `/me/search/users?q=${encodeURIComponent(query)}`,
     { token },
   );
 }

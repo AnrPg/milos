@@ -91,6 +91,23 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoThreadStore do
     :ok
   end
 
+  @impl true
+  def count_unread_threads(user_id) do
+    latest_msg_subq =
+      from m in Message,
+        distinct: m.thread_id,
+        order_by: [asc: m.thread_id, desc: m.inserted_at],
+        select: %{thread_id: m.thread_id, id: m.id}
+
+    Participant
+    |> where([p], p.user_id == ^user_id)
+    |> join(:inner, [p], lm in subquery(latest_msg_subq), on: lm.thread_id == p.thread_id)
+    |> where([p, lm], is_nil(p.last_read_message_id) or p.last_read_message_id != lm.id)
+    |> select([p], count(p.thread_id))
+    |> Repo.one()
+    |> Kernel.||(0)
+  end
+
   defp maybe_filter_context(query, nil), do: query
 
   defp maybe_filter_context(query, context_type) do

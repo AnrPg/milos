@@ -136,6 +136,63 @@ defmodule MilosTrainingWeb.MyWorkoutControllerTest do
     assert Enum.any?(other_assignments, &(&1.id == assignment.id))
   end
 
+  test "athlete can request a workout assignment for a future date", %{conn: conn} do
+    admin = TestFixtures.admin_fixture(%{nickname: "assignment_request_admin"})
+    athlete = TestFixtures.user_fixture(%{nickname: "assignment_request_athlete", role: :athlete})
+    requested_for = Date.add(Date.utc_today(), 2)
+
+    payload =
+      conn
+      |> put_bearer_token(athlete)
+      |> post("/api/my-workouts/requests", %{
+        requested_for: Date.to_iso8601(requested_for),
+        note: "Prefer strength."
+      })
+      |> json_response(202)
+
+    assert payload["requested_for"] == Date.to_iso8601(requested_for)
+    assert payload["notified_admins"] >= 1
+
+    {:ok, thread} =
+      MilosTraining.Messaging.get_or_create_thread(%{
+        context_type: :direct,
+        actor_id: admin.id,
+        participant_id: athlete.id
+      })
+
+    {:ok, messages} = MilosTraining.Messaging.list_messages(thread.id, %{})
+
+    assert Enum.any?(messages, fn message ->
+             message.sender_id == athlete.id and
+               message.body =~
+                 "requested a workout assignment for #{Date.to_iso8601(requested_for)}" and
+               message.body =~ "Prefer strength."
+           end)
+  end
+
+  test "workout assignment request rejects past dates", %{conn: conn} do
+    TestFixtures.admin_fixture(%{nickname: "assignment_request_past_admin"})
+    athlete = TestFixtures.user_fixture(%{nickname: "assignment_request_past", role: :athlete})
+
+    conn
+    |> put_bearer_token(athlete)
+    |> post("/api/my-workouts/requests", %{
+      requested_for: Date.utc_today() |> Date.add(-1) |> Date.to_iso8601()
+    })
+    |> json_response(422)
+  end
+
+  test "workout assignment request is athlete-only", %{conn: conn} do
+    admin = TestFixtures.admin_fixture(%{nickname: "request_forbidden_admin"})
+
+    conn
+    |> put_bearer_token(admin)
+    |> post("/api/my-workouts/requests", %{
+      requested_for: Date.utc_today() |> Date.add(1) |> Date.to_iso8601()
+    })
+    |> json_response(403)
+  end
+
   test "direct messaging threads between admin and each athlete are isolated", %{conn: _conn} do
     admin = TestFixtures.admin_fixture(%{nickname: "shared_messages_admin"})
     athlete = TestFixtures.user_fixture(%{nickname: "shared_messages_one", role: :athlete})

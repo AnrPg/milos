@@ -8,12 +8,12 @@ defmodule MilosTrainingWeb.Plugs.Cors do
   @allowed_methods "GET,POST,PUT,PATCH,DELETE,OPTIONS"
   @default_allowed_headers "authorization,content-type,accept"
 
-  def init(opts), do: opts
+  def init(_opts), do: default_origins()
 
-  def call(conn, _opts) do
+  def call(conn, allowed_origins) do
     case get_req_header(conn, "origin") do
       [origin] ->
-        if origin_allowed?(origin) do
+        if origin in allowed_origins do
           conn
           |> maybe_handle_preflight(origin)
           |> register_cors_headers(origin)
@@ -75,6 +75,4 @@ defmodule MilosTrainingWeb.Plugs.Cors do
       |> put_resp_header("vary", "Origin")
     end)
   end
-
-  defp origin_allowed?(origin), do: origin in default_origins()
 end

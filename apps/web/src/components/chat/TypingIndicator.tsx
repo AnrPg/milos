@@ -23,13 +23,13 @@ export function TypingIndicator({ typingUsers }: TypingIndicatorProps) {
             key={i}
             className="block w-1.5 h-1.5 rounded-full"
             style={{
-              background: "#7755aa",
+              background: "var(--primary)",
               animation: `bounce 1.2s ease-in-out ${i * 0.2}s infinite`,
             }}
           />
         ))}
       </div>
-      <span className="text-[11px]" style={{ color: "#8888aa" }}>
+      <span className="text-[11px]" style={{ color: "var(--muted)" }}>
         {label}
       </span>
     </div>

@@ -1,20 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6f1e8;
-  --foreground: #14281d;
-  --surface: #fffdf8;
-  --accent: #d95d39;
-  --accent-strong: #9f2d17;
-  --bg: #0A0A0F;
-  --panel: #221F29;
-  --card: #1c1926;
-  --lime: #C6FF2E;
-  --red: #FF4D6D;
-  --amber: #FFB547;
-  --text: #F0EDF8;
-  --muted: #8B82A7;
-  --dim: #4A4460;
+  --background: var(--bg);
+  --foreground: var(--text);
+  --surface: var(--panel);
+  --accent: var(--primary);
+  --accent-strong: var(--primary-strong);
+  --bg: var(--bg);
+  --panel: var(--panel);
+  --panel-raised: var(--panel-raised);
+  --panel-muted: var(--panel-muted);
+  --card: var(--card);
+  --border: var(--border);
+  --border-strong: var(--border-strong);
+  --primary: var(--primary);
+  --primary-strong: var(--primary-strong);
+  --primary-contrast: var(--bg);
+  --success: var(--success);
+  --danger: var(--danger);
+  --info: #6EC6D9;
+  --amber: var(--warning);
+  --text: var(--text);
+  --text-soft: var(--text-soft);
+  --muted: var(--muted);
+  --dim: var(--dim);
+  --lime: var(--success);
+  --red: var(--danger);
+  --scale-base: var(--text);
+  --scale-scaled: var(--success);
+  --scale-rx: var(--warning);
+  --scale-advanced: var(--danger);
+  --workout-crossfit: #D94D3D;
+  --workout-strength: var(--primary);
+  --workout-gymnastics: #E08A4B;
+  --workout-aerobics: #D9A441;
+  --workout-flexibility: #78BFA6;
+  --workout-recovery: #9C8CC8;
 }
 
 @theme inline {
@@ -28,7 +49,23 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg);
+  color: var(--text);
   font-family: "Avenir Next", "Segoe UI", sans-serif;
+}
+
+/* Remove native spin buttons from number inputs — custom stepper handles this */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Stable scrollbar gutter prevents layout shift when scrollbar appears */
+.scroll-area {
+  overflow-y: auto;
+  scrollbar-gutter: stable;
 }

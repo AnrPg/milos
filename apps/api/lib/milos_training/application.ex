@@ -12,7 +12,8 @@ defmodule MilosTraining.Application do
         MilosTrainingWeb.Telemetry,
         MilosTraining.Repo,
         {DNSCluster, query: Application.get_env(:milos_training, :dns_cluster_query) || :ignore},
-        {Phoenix.PubSub, name: MilosTraining.PubSub}
+        {Phoenix.PubSub, name: MilosTraining.PubSub},
+        MilosTrainingWeb.RealtimeEventHandler
       ]
       |> maybe_add_oban()
       |> maybe_add_redix()
