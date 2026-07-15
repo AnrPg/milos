@@ -208,13 +208,13 @@ function notificationBody(notification: NotificationRecord) {
       : "An athlete rescheduled their workout.";
   }
 
-  const trainingType =
-    typeof notification.payload.training_type === "string" ? notification.payload.training_type : null;
+  const classType =
+    typeof notification.payload.class_type_name === "string" ? notification.payload.class_type_name : null;
   const adminMessage =
     typeof notification.payload.admin_message === "string" ? notification.payload.admin_message : null;
 
   const parts = [];
-  if (trainingType) parts.push(trainingType.replaceAll("_", " ").replace(/\b\w/g, (char) => char.toUpperCase()));
+  if (classType) parts.push(classType);
   if (adminMessage) parts.push(adminMessage);
 
   return parts.length > 0 ? parts.join(" · ") : "Open the schedule to review the latest booking state.";
@@ -302,6 +302,7 @@ export function NotificationBell() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
+  const [pushHelpOpen, setPushHelpOpen] = useState(false);
   const push = usePushNotifications(tokens?.access_token);
   const notificationQuery = useInfiniteQuery({
     queryKey: ["notifications", currentUser?.id],
@@ -397,7 +398,7 @@ export function NotificationBell() {
   const readNotifications = notifications.filter((n) => Boolean(n.read_at));
   const nextCursor = notificationQuery.data?.pages.at(-1)?.next_cursor ?? null;
   const hasUnread = typeof unreadCount === "number" && unreadCount > 0;
-  const shouldShowPushPrompt = push.supported && !push.enabled;
+  const shouldShowPushControl = push.supported;
   const pushStatusMessage = (() => {
     if (push.error) {
       return push.error;
@@ -448,6 +449,7 @@ export function NotificationBell() {
   function openPanel() {
     setOpen(true);
     void notificationQuery.refetch();
+    void push.refreshCapability();
   }
 
   async function handleMarkAllRead() {
@@ -537,16 +539,31 @@ export function NotificationBell() {
               ))}
             </div>
 
-            {shouldShowPushPrompt ? (
+            {shouldShowPushControl ? (
               <div
                 className="mt-5 rounded-[1.2rem] p-4"
                 style={{ border: "1px solid var(--border)", background: "var(--panel-muted)" }}
               >
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm" style={{ color: pushStatusTone }}>
-                    {pushStatusMessage}
-                  </p>
-                  {push.permission !== "denied" && push.configured !== false ? (
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: push.enabled ? "var(--success)" : pushStatusTone }}>
+                      {push.enabled ? "Browser push is on for this device." : pushStatusMessage}
+                    </p>
+                    <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
+                      This choice applies only to this browser and device.
+                    </p>
+                  </div>
+                  {push.enabled ? (
+                    <button
+                      className="shrink-0 rounded-full px-4 py-2 text-xs font-semibold"
+                      style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
+                      disabled={push.busy}
+                      onClick={() => void push.disablePush()}
+                      type="button"
+                    >
+                      {push.busy ? "Disabling…" : "Disable"}
+                    </button>
+                  ) : push.permission !== "denied" && push.configured !== false ? (
                     <button
                       className="shrink-0 rounded-full px-4 py-2 text-xs font-semibold"
                       style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
@@ -556,8 +573,28 @@ export function NotificationBell() {
                     >
                       {pushButtonLabel}
                     </button>
-                  ) : null}
+                  ) : (
+                    <button
+                      className="shrink-0 rounded-full px-4 py-2 text-xs font-semibold"
+                      style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}
+                      onClick={() => setPushHelpOpen((current) => !current)}
+                      type="button"
+                    >
+                      {currentUser?.role === "admin" ? "Setup" : "What now?"}
+                    </button>
+                  )}
                 </div>
+                {pushHelpOpen && push.configured === false ? (
+                  <div className="mt-3 rounded-xl p-3 text-xs leading-5" style={{ background: "var(--panel)", color: "var(--muted)" }}>
+                    {currentUser?.role === "admin"
+                      ? "Generate a VAPID key pair, set WEB_PUSH_PUBLIC_KEY, WEB_PUSH_PRIVATE_KEY, and WEB_PUSH_SUBJECT on the API service, then restart it. This status is checked again whenever the inbox opens."
+                      : "The gym server has not enabled browser push yet. In-app notifications still work; ask an administrator to configure Web Push."}
+                  </div>
+                ) : pushHelpOpen && push.permission === "denied" ? (
+                  <div className="mt-3 rounded-xl p-3 text-xs leading-5" style={{ background: "var(--panel)", color: "var(--muted)" }}>
+                    Open this site&apos;s permissions in your browser settings, allow notifications, then reopen the inbox. Browsers do not let the app reverse a denied permission itself.
+                  </div>
+                ) : null}
               </div>
             ) : null}
 

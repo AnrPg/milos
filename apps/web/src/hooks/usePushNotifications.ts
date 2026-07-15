@@ -141,7 +141,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
       setEnabled(false);
       setState("ready");
       setStep("fetch-config");
-      setError("Browser push is not configured on the server yet.");
+      setError(null);
       return false;
     }
 
@@ -314,6 +314,21 @@ export function usePushNotifications(accessToken: string | null | undefined) {
     }
   }
 
+  async function refreshCapability() {
+    if (!accessToken || !supported) return false;
+
+    setPermission(Notification.permission);
+
+    try {
+      return await syncSubscription(accessToken, Notification.permission === "granted");
+    } catch (caught) {
+      setEnabled(false);
+      setState("error");
+      setError(caught instanceof Error ? caught.message : "Unable to refresh browser push status.");
+      return false;
+    }
+  }
+
   return {
     supported,
     enabled,
@@ -325,5 +340,6 @@ export function usePushNotifications(accessToken: string | null | undefined) {
     error,
     enablePush,
     disablePush,
+    refreshCapability,
   };
 }

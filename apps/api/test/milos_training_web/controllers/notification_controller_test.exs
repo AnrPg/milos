@@ -243,10 +243,13 @@ defmodule MilosTrainingWeb.NotificationControllerTest do
       end
     end)
 
-    response =
+    response_conn =
       conn
       |> get("/api/notifications/push-config")
-      |> json_response(200)
+
+    response = json_response(response_conn, 200)
+
+    assert get_resp_header(response_conn, "cache-control") == ["no-store"]
 
     assert response == %{
              "enabled" => true,

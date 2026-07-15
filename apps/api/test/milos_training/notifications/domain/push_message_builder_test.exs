@@ -22,11 +22,11 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilderTest do
   test "builds booking approval copy with schedule route" do
     message =
       PushMessageBuilder.build("booking_approved", %{
-        "training_type" => "crossfit"
+        "class_type_name" => "CrossFit Foundations"
       })
 
     assert message.title == "Booking approved"
-    assert message.body =~ "Crossfit"
+    assert message.body =~ "CrossFit Foundations"
     assert message.url == "/schedule"
   end
 end

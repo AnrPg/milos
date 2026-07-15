@@ -404,12 +404,14 @@ defmodule MilosTraining.Notifications do
 
   defp booking_payload(user_id, type, booking) do
     scheduled_class = nested_map(booking, :scheduled_class)
+    class_type = scheduled_class && nested_map(scheduled_class, :class_type)
 
     %{
       booking_id: field(booking, :id),
       scheduled_class_id: field(booking, :scheduled_class_id),
       scheduled_at: scheduled_class && field(scheduled_class, :scheduled_at),
-      training_type: scheduled_class && field(scheduled_class, :training_type),
+      class_type_id: scheduled_class && field(scheduled_class, :class_type_id),
+      class_type_name: class_type && field(class_type, :name),
       user_id: field(booking, :user_id),
       status: to_string(field(booking, :status)),
       admin_message: field(booking, :admin_message),

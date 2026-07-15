@@ -130,19 +130,10 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
   end
 
   defp booking_body(payload) do
-    [training_type_label(payload["training_type"]), payload["admin_message"]]
+    [payload["class_type_name"], payload["admin_message"]]
     |> Enum.filter(&(is_binary(&1) and &1 != ""))
     |> Enum.join(" · ")
     |> default_to("Open the schedule to review the latest booking state.")
-  end
-
-  defp training_type_label(nil), do: nil
-
-  defp training_type_label(value) when is_binary(value) do
-    value
-    |> String.replace("_", " ")
-    |> String.split()
-    |> Enum.map_join(" ", &String.capitalize/1)
   end
 
   defp execution_url(%{"execution_id" => execution_id}) when is_binary(execution_id),

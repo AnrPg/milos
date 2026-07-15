@@ -21,6 +21,7 @@ type SessionExpiredDetail = {
 export type ApiErrorPayload = {
   error?: string;
   errors?: Record<string, unknown>;
+  future_class_count?: number;
 };
 
 export class ApiError extends Error {

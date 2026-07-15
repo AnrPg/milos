@@ -311,7 +311,9 @@ defmodule MilosTrainingWeb.NotificationController do
   end
 
   def push_config(conn, _params) do
-    json(conn, GetPushNotificationConfig.call())
+    conn
+    |> put_resp_header("cache-control", "no-store")
+    |> json(GetPushNotificationConfig.call())
   end
 
   def create_push_subscription(conn, params) do
