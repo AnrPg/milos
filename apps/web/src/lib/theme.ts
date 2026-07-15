@@ -458,6 +458,7 @@ export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
 };
 
 export const DEFAULT_THEME_SLUG: ThemeSlug = "ember";
+export const THEME_STORAGE_KEY = "milos:theme-slug";
 
 export function themeBySlug(slug: string | null | undefined): AppTheme {
   return APP_THEMES[normalizeThemeSlug(slug)];
