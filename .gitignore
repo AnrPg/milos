@@ -23,6 +23,7 @@ apps/web/.env*.local
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
 .playwright-mcp/
+docs/HANDOFF_CODEX.md
 
 # Env files
 .env
