@@ -10,6 +10,22 @@ defmodule MilosTraining.Scheduling.SchedulingStore do
   end
 
   @impl true
+  def create_class_type(params), do: adapter().create_class_type(params)
+
+  @impl true
+  def update_class_type(id, params), do: adapter().update_class_type(id, params)
+
+  @impl true
+  def archive_class_type(id, replacement_id),
+    do: adapter().archive_class_type(id, replacement_id)
+
+  @impl true
+  def list_class_types(opts \\ []), do: adapter().list_class_types(opts)
+
+  @impl true
+  def get_class_type(id, opts \\ []), do: adapter().get_class_type(id, opts)
+
+  @impl true
   def create_slot(params), do: adapter().create_slot(params)
 
   @impl true

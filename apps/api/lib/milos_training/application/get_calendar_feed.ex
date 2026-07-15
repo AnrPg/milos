@@ -34,7 +34,7 @@ defmodule MilosTraining.Application.GetCalendarFeed do
     |> Enum.map(fn slot ->
       %{
         uid: "class-#{slot.id}@milos-training",
-        title: "Class: #{format_training_type(slot.training_type)}",
+        title: "Class: #{class_type_name(slot)}",
         starts_at: slot.scheduled_at,
         ends_at: DateTime.add(slot.scheduled_at, 60 * 60, :second),
         description: class_description(slot, user)
@@ -82,7 +82,7 @@ defmodule MilosTraining.Application.GetCalendarFeed do
   end
 
   defp class_description(slot, %{role: :admin}) do
-    "Scheduled #{format_training_type(slot.training_type)} class in Milos Training."
+    "Scheduled #{class_type_name(slot)} class in Milos Training."
   end
 
   defp class_description(slot, user) do
@@ -138,13 +138,8 @@ defmodule MilosTraining.Application.GetCalendarFeed do
     ]
   end
 
-  defp format_training_type(type) do
-    type
-    |> to_string()
-    |> String.replace("_", " ")
-    |> String.split()
-    |> Enum.map_join(" ", &String.capitalize/1)
-  end
+  defp class_type_name(%{class_type: %{name: name}}) when is_binary(name), do: name
+  defp class_type_name(_slot), do: "Class"
 
   defp format_datetime(datetime) do
     datetime

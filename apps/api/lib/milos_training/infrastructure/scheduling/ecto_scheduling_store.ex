@@ -5,10 +5,124 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
 
   alias Ecto.Multi
   alias MilosTraining.Repo
-  alias MilosTraining.Scheduling.{Booking, ClassAttendanceRecord, ScheduledClass}
+  alias MilosTraining.Scheduling.{Booking, ClassAttendanceRecord, ClassType, ScheduledClass}
+  alias MilosTraining.Scheduling.Domain.ClassTypeArchivePolicy
   alias MilosTraining.Workers.BookingTimeoutJob
 
-  @slot_preloads [:bookings]
+  @slot_preloads [:bookings, :class_type]
+
+  @impl true
+  def create_class_type(params) do
+    %ClassType{}
+    |> ClassType.create_changeset(params)
+    |> Repo.insert()
+    |> normalize_class_type_result()
+  end
+
+  @impl true
+  def update_class_type(id, params) do
+    case Repo.get(ClassType, id) do
+      nil ->
+        {:error, :not_found}
+
+      %ClassType{archived_at: archived_at} when not is_nil(archived_at) ->
+        {:error, :class_type_archived}
+
+      class_type ->
+        class_type
+        |> ClassType.update_changeset(params)
+        |> Repo.update()
+        |> normalize_class_type_result()
+    end
+  end
+
+  @impl true
+  def archive_class_type(id, replacement_id) do
+    now = DateTime.utc_now() |> DateTime.truncate(:second)
+
+    Repo.transaction(fn ->
+      source =
+        ClassType
+        |> where([class_type], class_type.id == ^id)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      cond do
+        is_nil(source) ->
+          Repo.rollback(:not_found)
+
+        not is_nil(source.archived_at) ->
+          Repo.rollback(:class_type_archived)
+
+        true ->
+          future_query =
+            ScheduledClass
+            |> where(
+              [slot],
+              slot.class_type_id == ^id and slot.scheduled_at > ^now
+            )
+
+          future_count = Repo.aggregate(future_query, :count)
+
+          active_ids =
+            ClassType
+            |> where([class_type], is_nil(class_type.archived_at))
+            |> select([class_type], class_type.id)
+            |> Repo.all()
+
+          case ClassTypeArchivePolicy.validate(future_count, id, replacement_id, active_ids) do
+            :ok ->
+              if future_count > 0 do
+                future_query
+                |> lock("FOR UPDATE")
+                |> Repo.all()
+
+                Repo.update_all(future_query,
+                  set: [class_type_id: replacement_id, updated_at: now]
+                )
+              end
+
+              source
+              |> ClassType.archive_changeset(now)
+              |> Repo.update!()
+              |> normalize_class_type()
+              |> Map.put(:future_classes_reassigned, future_count)
+
+            {:error, :class_type_replacement_required} ->
+              Repo.rollback({:class_type_replacement_required, future_count})
+
+            {:error, reason} ->
+              Repo.rollback(reason)
+          end
+      end
+    end)
+    |> case do
+      {:ok, class_type} -> {:ok, class_type}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  @impl true
+  def list_class_types(opts \\ []) do
+    include_archived = Keyword.get(opts, :include_archived, false)
+
+    ClassType
+    |> maybe_include_archived(include_archived)
+    |> order_by([class_type], asc: class_type.sort_order, asc: class_type.name)
+    |> Repo.all()
+    |> Enum.map(&normalize_class_type/1)
+  end
+
+  @impl true
+  def get_class_type(id, opts \\ []) do
+    include_archived = Keyword.get(opts, :include_archived, false)
+
+    ClassType
+    |> where([class_type], class_type.id == ^id)
+    |> maybe_include_archived(include_archived)
+    |> Repo.one()
+    |> normalize_class_type()
+  end
 
   @impl true
   def create_slot(params) do
@@ -100,7 +214,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
           user_id: booking.user_id,
           scheduled_class_id: slot.id,
           scheduled_at: slot.scheduled_at,
-          training_type: slot.training_type
+          class_type_id: slot.class_type_id,
+          class_type_name: slot.class_type && slot.class_type.name
         }
       end)
     end)
@@ -124,13 +239,11 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
 
   @impl true
   def list_slots_window(start_at, end_at, opts \\ []) do
-    training_type =
-      opts[:training_type]
-      |> normalize_training_type()
+    class_type_ids = opts[:class_type_ids] || []
 
     ScheduledClass
     |> where([slot], slot.scheduled_at >= ^start_at and slot.scheduled_at < ^end_at)
-    |> maybe_filter_training_type(training_type)
+    |> maybe_filter_class_types(class_type_ids)
     |> order_by([slot], asc: slot.scheduled_at)
     |> Repo.all()
     |> Repo.preload(@slot_preloads)
@@ -460,21 +573,13 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
     |> Repo.aggregate(:count)
   end
 
-  defp maybe_filter_training_type(query, nil), do: query
+  defp maybe_filter_class_types(query, []), do: query
+  defp maybe_filter_class_types(query, ids), do: where(query, [slot], slot.class_type_id in ^ids)
 
-  defp maybe_filter_training_type(query, training_type) do
-    where(query, [slot], slot.training_type == ^training_type)
-  end
+  defp maybe_include_archived(query, true), do: query
 
-  defp normalize_training_type(nil), do: nil
-  defp normalize_training_type(""), do: nil
-  defp normalize_training_type(value) when is_atom(value), do: value
-
-  defp normalize_training_type(value) when is_binary(value) do
-    String.to_existing_atom(value)
-  rescue
-    ArgumentError -> nil
-  end
+  defp maybe_include_archived(query, false),
+    do: where(query, [class_type], is_nil(class_type.archived_at))
 
   defp preload_slot(nil), do: nil
   defp preload_slot(%ScheduledClass{} = slot), do: Repo.preload(slot, @slot_preloads)
@@ -482,7 +587,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   defp preload_booking(nil), do: nil
 
   defp preload_booking(%Booking{} = booking),
-    do: Repo.preload(booking, scheduled_class: :bookings)
+    do: Repo.preload(booking, scheduled_class: @slot_preloads)
 
   defp wrap_slot_result({:ok, %ScheduledClass{} = slot}),
     do: {:ok, slot |> preload_slot() |> normalize_slot()}
@@ -545,7 +650,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
     %{
       id: slot.id,
       master_workout_id: slot.master_workout_id,
-      training_type: to_string(slot.training_type),
+      class_type_id: slot.class_type_id,
+      class_type: normalize_loaded_class_type(slot.class_type),
       scheduled_at: slot.scheduled_at,
       capacity: slot.capacity,
       auto_approve: slot.auto_approve,
@@ -601,6 +707,26 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       params: record.params || %{},
       inserted_at: record.inserted_at,
       updated_at: record.updated_at
+    }
+  end
+
+  defp normalize_class_type_result({:ok, class_type}), do: {:ok, normalize_class_type(class_type)}
+  defp normalize_class_type_result({:error, changeset}), do: {:error, changeset}
+
+  defp normalize_loaded_class_type(%Ecto.Association.NotLoaded{}), do: nil
+  defp normalize_loaded_class_type(class_type), do: normalize_class_type(class_type)
+
+  defp normalize_class_type(nil), do: nil
+
+  defp normalize_class_type(%ClassType{} = class_type) do
+    %{
+      id: class_type.id,
+      name: class_type.name,
+      slug: class_type.slug,
+      sort_order: class_type.sort_order,
+      archived_at: class_type.archived_at,
+      inserted_at: class_type.inserted_at,
+      updated_at: class_type.updated_at
     }
   end
 

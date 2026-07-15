@@ -2,21 +2,24 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
   alias MilosTraining.{Identity, Scheduling, Workouts}
 
   def call(actor, params) do
-    with {:ok, start_at, end_at, days, training_type} <- normalize_window(params) do
+    with {:ok, start_at, end_at, days, class_type_ids} <- normalize_window(params) do
       slots =
         %{
           start_at: start_at,
           end_at: end_at,
-          training_type: training_type
+          class_type_ids: class_type_ids
         }
         |> Scheduling.get_calendar_week()
         |> enrich_slots(actor)
+
+      class_types = schedule_class_types(slots)
 
       {:ok,
        %{
          start_date: DateTime.to_date(start_at),
          end_date: DateTime.to_date(DateTime.add(end_at, -1, :second)),
          days: days,
+         class_types: class_types,
          slots: slots
        }}
     end
@@ -41,7 +44,8 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
         id: slot.id,
         master_workout_id: slot.master_workout_id,
         scheduled_at: slot.scheduled_at,
-        training_type: slot.training_type,
+        class_type_id: slot.class_type_id,
+        class_type: slot.class_type,
         capacity: slot.capacity,
         auto_approve: slot.auto_approve,
         booking_timeout_minutes: slot.booking_timeout_minutes,
@@ -149,12 +153,26 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
   defp active_booking_for_user?(booking, user_id),
     do: booking.user_id == user_id and booking.status in [:pending, :approved]
 
+  defp schedule_class_types(slots) do
+    active = Scheduling.list_class_types()
+
+    referenced_archived =
+      slots
+      |> Enum.map(& &1.class_type)
+      |> Enum.reject(&is_nil/1)
+      |> Enum.reject(&is_nil(&1.archived_at))
+
+    (active ++ referenced_archived)
+    |> Enum.uniq_by(& &1.id)
+    |> Enum.sort_by(&{&1.sort_order, &1.name})
+  end
+
   defp normalize_window(params) do
     with {:ok, days} <- parse_days(params["days"] || params[:days]),
          {:ok, start_at, end_at} <- parse_explicit_window(params, days),
-         {:ok, training_type} <-
-           parse_training_type(params["training_type"] || params[:training_type]) do
-      {:ok, start_at, end_at, days, training_type}
+         {:ok, class_type_ids} <-
+           parse_class_type_ids(params["class_type_ids"] || params[:class_type_ids]) do
+      {:ok, start_at, end_at, days, class_type_ids}
     end
   end
 
@@ -177,6 +195,7 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
   end
 
   defp parse_date(nil), do: {:ok, Date.utc_today()}
+  defp parse_date(%Date{} = value), do: {:ok, value}
 
   defp parse_date(value) when is_binary(value) do
     case Date.from_iso8601(value) do
@@ -204,6 +223,8 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
     end
   end
 
+  defp parse_datetime(%DateTime{} = value), do: {:ok, value}
+
   defp parse_datetime(_), do: {:error, :bad_request}
 
   defp validate_window_order(start_at, end_at) do
@@ -213,22 +234,21 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
     end
   end
 
-  defp parse_training_type(nil), do: {:ok, nil}
-  defp parse_training_type(""), do: {:ok, nil}
+  defp parse_class_type_ids(nil), do: {:ok, []}
+  defp parse_class_type_ids(""), do: {:ok, []}
 
-  defp parse_training_type(value) when is_atom(value) do
-    if value in MilosTraining.Scheduling.ScheduledClass.training_types() do
-      {:ok, value}
-    else
-      {:error, :bad_request}
+  defp parse_class_type_ids(value) do
+    value
+    |> List.wrap()
+    |> Enum.reduce_while({:ok, []}, fn id, {:ok, ids} ->
+      case Ecto.UUID.cast(id) do
+        {:ok, normalized} -> {:cont, {:ok, [normalized | ids]}}
+        :error -> {:halt, {:error, :bad_request}}
+      end
+    end)
+    |> case do
+      {:ok, ids} -> {:ok, Enum.reverse(ids) |> Enum.uniq()}
+      error -> error
     end
-  end
-
-  defp parse_training_type(value) when is_binary(value) do
-    training_type = String.to_existing_atom(value)
-
-    parse_training_type(training_type)
-  rescue
-    ArgumentError -> {:error, :bad_request}
   end
 end

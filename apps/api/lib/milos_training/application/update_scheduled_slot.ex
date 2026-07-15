@@ -4,15 +4,29 @@ defmodule MilosTraining.Application.UpdateScheduledSlot do
 
   def call(id, params) do
     master_workout_id = params[:master_workout_id] || params["master_workout_id"]
+    class_type_id = params[:class_type_id] || params["class_type_id"]
 
-    with %{type: training_type} <- Workouts.get_workout(master_workout_id),
-         slot_params <- put_training_type(params, training_type),
-         {:ok, slot} <- Scheduling.update_slot(id, slot_params) do
+    with {:ok, _workout} <- fetch_workout(master_workout_id),
+         {:ok, _class_type} <- fetch_class_type(class_type_id),
+         {:ok, slot} <- Scheduling.update_slot(id, params) do
       broadcast_slot_updated(slot)
       {:ok, slot}
     else
-      nil -> {:error, :workout_not_found}
       {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp fetch_workout(id) do
+    case Workouts.get_workout(id) do
+      nil -> {:error, :workout_not_found}
+      workout -> {:ok, workout}
+    end
+  end
+
+  defp fetch_class_type(id) do
+    case Scheduling.get_class_type(id) do
+      nil -> {:error, :class_type_not_found}
+      class_type -> {:ok, class_type}
     end
   end
 
@@ -22,23 +36,5 @@ defmodule MilosTraining.Application.UpdateScheduledSlot do
       "schedule:slot_updated",
       {:schedule_slot_updated, slot}
     )
-  end
-
-  defp put_training_type(params, training_type) do
-    cond do
-      has_atom_keys?(params) ->
-        params
-        |> Map.delete("training_type")
-        |> Map.put(:training_type, training_type)
-
-      true ->
-        params
-        |> Map.delete(:training_type)
-        |> Map.put("training_type", to_string(training_type))
-    end
-  end
-
-  defp has_atom_keys?(params) do
-    Enum.any?(Map.keys(params), &is_atom/1)
   end
 end

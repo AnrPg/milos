@@ -3,6 +3,7 @@ defmodule MilosTraining.Scheduling do
     ApproveBooking,
     AttachTimeoutJob,
     CancelUserBookingsForRoleTransition,
+    CreateClassType,
     CreateSlot,
     DeleteSlotsForWorkout,
     DeleteSlot,
@@ -10,6 +11,8 @@ defmodule MilosTraining.Scheduling do
     RejectBooking,
     SubmitBooking,
     SubmitAutoApprovedBooking,
+    ArchiveClassType,
+    UpdateClassType,
     UpdateSlot,
     WithdrawBooking
   }
@@ -19,6 +22,8 @@ defmodule MilosTraining.Scheduling do
     GetCalendarWeek,
     GetAttendance,
     GetApprovedBookingForClass,
+    GetClassType,
+    ListClassTypes,
     ListWorkoutChangeTargets,
     GetPendingBookings,
     GetSlot
@@ -28,6 +33,12 @@ defmodule MilosTraining.Scheduling do
   defdelegate update_slot(id, params), to: UpdateSlot, as: :call
   defdelegate delete_slot(id), to: DeleteSlot, as: :call
   defdelegate delete_slots_for_workout(workout_id), to: DeleteSlotsForWorkout, as: :call
+
+  defdelegate create_class_type(params), to: CreateClassType, as: :call
+  defdelegate update_class_type(id, params), to: UpdateClassType, as: :call
+  defdelegate archive_class_type(id, replacement_id), to: ArchiveClassType, as: :call
+  defdelegate list_class_types(opts \\ []), to: ListClassTypes, as: :call
+  defdelegate get_class_type(id, opts \\ []), to: GetClassType, as: :call
 
   defdelegate list_workout_change_targets(workout_id),
     to: ListWorkoutChangeTargets,

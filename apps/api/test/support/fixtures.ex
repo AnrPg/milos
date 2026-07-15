@@ -1,5 +1,5 @@
 defmodule MilosTraining.TestFixtures do
-  alias MilosTraining.{Identity, Workouts}
+  alias MilosTraining.{Identity, Scheduling, Workouts}
 
   def user_fixture(attrs \\ %{}) do
     unique = System.unique_integer([:positive])
@@ -50,11 +50,26 @@ defmodule MilosTraining.TestFixtures do
     workout
   end
 
+  def class_type_fixture(attrs \\ %{}) do
+    unique = System.unique_integer([:positive])
+
+    params = %{
+      name: Map.get(attrs, :name, "Class Type #{unique}"),
+      slug: Map.get(attrs, :slug, "class-type-#{unique}"),
+      sort_order: Map.get(attrs, :sort_order, unique)
+    }
+
+    {:ok, class_type} = Scheduling.create_class_type(params)
+    class_type
+  end
+
   def slot_fixture(workout, attrs \\ %{}) do
+    default_class_type = Scheduling.list_class_types() |> List.first()
+
     params =
       %{
         master_workout_id: workout.id,
-        training_type: workout.type,
+        class_type_id: default_class_type.id,
         scheduled_at:
           DateTime.add(DateTime.utc_now() |> DateTime.truncate(:second), 3600, :second),
         capacity: 10,

@@ -1,4 +1,16 @@
 defmodule MilosTraining.Scheduling.Ports.SchedulingStore do
+  @callback create_class_type(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
+  @callback update_class_type(Ecto.UUID.t(), map()) ::
+              {:ok, map()}
+              | {:error, :not_found | :class_type_archived}
+              | {:error, Ecto.Changeset.t()}
+  @callback archive_class_type(Ecto.UUID.t(), Ecto.UUID.t() | nil) ::
+              {:ok, map()}
+              | {:error, :not_found | :class_type_archived | :invalid_class_type_replacement}
+              | {:error, {:class_type_replacement_required, non_neg_integer()}}
+              | {:error, Ecto.Changeset.t()}
+  @callback list_class_types(keyword()) :: [map()]
+  @callback get_class_type(Ecto.UUID.t(), keyword()) :: map() | nil
   @callback create_slot(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback update_slot(Ecto.UUID.t(), map()) ::
               {:ok, map()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}

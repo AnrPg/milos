@@ -5,12 +5,14 @@ defmodule MilosTraining.Application.ScheduledSlotParamsTest do
 
   import MilosTraining.TestFixtures
 
-  test "create handles OpenAPI-cast atom-key params without mixing training_type keys" do
+  test "create handles OpenAPI-cast atom-key params with an explicit class type" do
     admin = admin_fixture()
     workout = workout_fixture(admin, %{type: :crossfit})
+    class_type = class_type_fixture()
 
     params = %{
       master_workout_id: workout.id,
+      class_type_id: class_type.id,
       scheduled_at: DateTime.add(DateTime.utc_now() |> DateTime.truncate(:second), 3600, :second),
       capacity: 12,
       auto_approve: false,
@@ -18,16 +20,18 @@ defmodule MilosTraining.Application.ScheduledSlotParamsTest do
     }
 
     assert {:ok, slot} = CreateScheduledSlot.call(params)
-    assert slot.training_type == "crossfit"
+    assert slot.class_type_id == class_type.id
   end
 
-  test "update handles OpenAPI-cast atom-key params without mixing training_type keys" do
+  test "update handles OpenAPI-cast atom-key params with an explicit class type" do
     admin = admin_fixture()
     workout = workout_fixture(admin, %{type: :crossfit})
     slot = slot_fixture(workout)
+    class_type = class_type_fixture()
 
     params = %{
       master_workout_id: workout.id,
+      class_type_id: class_type.id,
       scheduled_at: DateTime.add(DateTime.utc_now() |> DateTime.truncate(:second), 7200, :second),
       capacity: 8,
       auto_approve: true,
@@ -35,7 +39,7 @@ defmodule MilosTraining.Application.ScheduledSlotParamsTest do
     }
 
     assert {:ok, updated_slot} = UpdateScheduledSlot.call(slot.id, params)
-    assert updated_slot.training_type == "crossfit"
+    assert updated_slot.class_type_id == class_type.id
     assert updated_slot.capacity == 8
   end
 end
