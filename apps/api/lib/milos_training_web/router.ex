@@ -75,6 +75,14 @@ defmodule MilosTrainingWeb.Router do
   scope "/api/admin", MilosTrainingWeb do
     pipe_through([:api, :authenticated, :admin_only])
 
+    get("/users", AdminUserController, :index)
+    get("/users/:id", AdminUserController, :show)
+    get("/users/:id/finance", AdminUserController, :finance)
+    get("/users/:id/training-history", AdminUserController, :training_history)
+    get("/users/:id/prs", AdminUserController, :prs)
+    get("/users/:id/incidents", AdminUserController, :incidents)
+    get("/users/:id/messages", AdminUserController, :messages)
+    get("/users/:id/coaching-context", AdminUserController, :coaching_context)
     patch("/users/:id/role", AdminUserController, :update_role)
     get("/search", AdminSearchController, :index)
     get("/analytics/summary", AdminAnalyticsController, :summary)

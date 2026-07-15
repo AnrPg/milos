@@ -38,6 +38,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/prs/{id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get score history for a PR */
+        get: operations["MilosTrainingWeb.PRController.history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/reviews": {
         parameters: {
             query?: never;
@@ -416,6 +433,23 @@ export interface paths {
         patch: operations["MilosTrainingWeb.AdminFinanceController.update_referral_program"];
         trace?: never;
     };
+    "/api/admin/users/{id}/coaching-context": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get role-aware coaching context for a user */
+        get: operations["MilosTrainingWeb.AdminUserController.coaching_context"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/finance/summary": {
         parameters: {
             query?: never;
@@ -425,6 +459,23 @@ export interface paths {
         };
         /** Fetch finance analytics summary */
         get: operations["MilosTrainingWeb.AdminFinanceController.summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/users/{id}/prs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a user's personal records */
+        get: operations["MilosTrainingWeb.AdminUserController.prs"];
         put?: never;
         post?: never;
         delete?: never;
@@ -451,6 +502,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/nickname-available": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Check whether a nickname is available for registration */
+        get: operations["MilosTrainingWeb.AuthController.nickname_available"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/calendar/export-links/regenerate": {
         parameters: {
             query?: never;
@@ -462,6 +530,23 @@ export interface paths {
         put?: never;
         /** Regenerate calendar export links and revoke previous feed URLs */
         post: operations["MilosTrainingWeb.CalendarFeedController.regenerate_links"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/users/{id}/incidents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a user's health and injury incidents */
+        get: operations["MilosTrainingWeb.AdminUserController.incidents"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -485,6 +570,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/class-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List active and archived class types */
+        get: operations["MilosTrainingWeb.AdminClassTypeController.index"];
+        put?: never;
+        /** Create a class type */
+        post: operations["MilosTrainingWeb.AdminClassTypeController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/register": {
         parameters: {
             query?: never;
@@ -496,6 +599,23 @@ export interface paths {
         put?: never;
         /** Register a new user */
         post: operations["MilosTrainingWeb.AuthController.register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/users/{id}/finance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a user's finance dossier section */
+        get: operations["MilosTrainingWeb.AdminUserController.finance"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -517,6 +637,23 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/me/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update current user avatar URL */
+        patch: operations["MilosTrainingWeb.MeController.update_avatar"];
         trace?: never;
     };
     "/api/landing": {
@@ -658,6 +795,23 @@ export interface paths {
         patch: operations["MilosTrainingWeb.AdminWellbeingController.heal"];
         trace?: never;
     };
+    "/api/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all users for the admin directory */
+        get: operations["MilosTrainingWeb.AdminUserController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/schedule/slots/{id}": {
         parameters: {
             query?: never;
@@ -727,6 +881,23 @@ export interface paths {
         patch: operations["MilosTrainingWeb.AdminFinanceController.update_referral_status"];
         trace?: never;
     };
+    "/api/executions/{id}/modifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Log exercise modifications during execution */
+        post: operations["MilosTrainingWeb.ExecutionController.add_modifications"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/search/users": {
         parameters: {
             query?: never;
@@ -772,6 +943,23 @@ export interface paths {
         put?: never;
         /** Publish a workout draft */
         post: operations["MilosTrainingWeb.AdminWorkoutController.publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/threads/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Count unread threads for the current user */
+        get: operations["MilosTrainingWeb.MessagingController.unread_count"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -881,6 +1069,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/prs/{id}/share": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Get a shareable text for a PR */
+        post: operations["MilosTrainingWeb.PRController.share"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/users/{id}/role": {
         parameters: {
             query?: never;
@@ -947,6 +1152,24 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/prs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a PR record */
+        delete: operations["MilosTrainingWeb.PRController.delete"];
+        options?: never;
+        head?: never;
+        /** Update a PR record */
+        patch: operations["MilosTrainingWeb.PRController.update"];
         trace?: never;
     };
     "/api/landing/leaderboard-opt-in": {
@@ -1176,6 +1399,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/prs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List my PRs */
+        get: operations["MilosTrainingWeb.PRController.index"];
+        put?: never;
+        /** Create a PR record */
+        post: operations["MilosTrainingWeb.PRController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/athletes": {
         parameters: {
             query?: never;
@@ -1242,6 +1483,24 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/admin/class-types/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Archive a class type and map future classes when necessary */
+        delete: operations["MilosTrainingWeb.AdminClassTypeController.delete"];
+        options?: never;
+        head?: never;
+        /** Rename or reorder an active class type */
+        patch: operations["MilosTrainingWeb.AdminClassTypeController.update"];
         trace?: never;
     };
     "/api/admin/workouts/{id}/duplicate": {
@@ -1467,6 +1726,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/gamification/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get my gamification preferences */
+        get: operations["MilosTrainingWeb.GamificationPreferencesController.show"];
+        /** Update my gamification preferences */
+        put: operations["MilosTrainingWeb.GamificationPreferencesController.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/finance/promotions/{id}/codes": {
         parameters: {
             query?: never;
@@ -1547,6 +1824,23 @@ export interface paths {
         put?: never;
         /** Report an injury on behalf of a user */
         post: operations["MilosTrainingWeb.AdminWellbeingController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/users/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the common role-aware admin user profile shell */
+        get: operations["MilosTrainingWeb.AdminUserController.show"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1639,6 +1933,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/users/{id}/training-history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a user's executions, scores, assignments, and class participation */
+        get: operations["MilosTrainingWeb.AdminUserController.training_history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/avatar/upload-url": {
         parameters: {
             query?: never;
@@ -1720,6 +2031,23 @@ export interface paths {
         put?: never;
         /** Send a message in a thread */
         post: operations["MilosTrainingWeb.MessagingController.send_message"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/users/{id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a user's communication thread summary */
+        get: operations["MilosTrainingWeb.AdminUserController.messages"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1829,6 +2157,38 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PRController.history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description PR Record ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description PR History */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };
@@ -2706,6 +3066,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        finance: {
+                            /** Format: uuid */
+                            id?: string | null;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            payment_reminder_interval_days: number;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                        };
                         gamification: {
                             /** Format: uuid */
                             id?: string | null;
@@ -2734,6 +3103,9 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    finance?: {
+                        payment_reminder_interval_days?: number;
+                    };
                     gamification: {
                         leaderboard_enabled?: boolean;
                         streak_shield_reset_day?: number | null;
@@ -2752,6 +3124,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        finance: {
+                            /** Format: uuid */
+                            id?: string | null;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            payment_reminder_interval_days: number;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                        };
                         gamification: {
                             /** Format: uuid */
                             id?: string | null;
@@ -2808,6 +3189,35 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminUserController.coaching_context": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Coaching context */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        available: boolean;
+                        drill_down: {
+                            [key: string]: unknown;
+                        } | null;
+                        /** Format: uuid */
+                        user_id: string;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminFinanceController.summary": {
         parameters: {
             query?: never;
@@ -2825,6 +3235,46 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminUserController.prs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Personal records */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        incidents?: {
+                            [key: string]: unknown;
+                        }[];
+                        operational_links?: {
+                            [key: string]: string;
+                        };
+                        prs?: {
+                            [key: string]: unknown;
+                        }[];
+                        summary?: {
+                            [key: string]: unknown;
+                        };
+                        threads?: {
+                            [key: string]: unknown;
+                        }[];
+                        /** Format: uuid */
+                        user_id: string;
                     };
                 };
             };
@@ -2900,6 +3350,30 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AuthController.nickname_available": {
+        parameters: {
+            query: {
+                nickname: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Availability result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        available: boolean;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.CalendarFeedController.regenerate_links": {
         parameters: {
             query?: never;
@@ -2917,6 +3391,46 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminUserController.incidents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Health incidents */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        incidents?: {
+                            [key: string]: unknown;
+                        }[];
+                        operational_links?: {
+                            [key: string]: string;
+                        };
+                        prs?: {
+                            [key: string]: unknown;
+                        }[];
+                        summary?: {
+                            [key: string]: unknown;
+                        };
+                        threads?: {
+                            [key: string]: unknown;
+                        }[];
+                        /** Format: uuid */
+                        user_id: string;
                     };
                 };
             };
@@ -2980,6 +3494,84 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminClassTypeController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Class types */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class_types: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            future_classes_reassigned?: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            name: string;
+                            slug: string;
+                            sort_order: number;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminClassTypeController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    /** @default 0 */
+                    sort_order?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Class type */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class_type: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            future_classes_reassigned?: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            name: string;
+                            slug: string;
+                            sort_order: number;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
                     };
                 };
             };
@@ -3064,6 +3656,41 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminUserController.finance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Finance profile */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        available: boolean;
+                        drill_down: {
+                            [key: string]: unknown;
+                        } | null;
+                        operational_links: {
+                            [key: string]: string;
+                        };
+                        summary: {
+                            [key: string]: unknown;
+                        } | null;
+                        /** Format: uuid */
+                        user_id: string;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminFinanceController.assign_package": {
         parameters: {
             query?: never;
@@ -3090,6 +3717,47 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MeController.update_avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    avatar_url: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Updated avatar */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        user?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id?: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation errors */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };
@@ -3456,6 +4124,33 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminUserController.index": {
+        parameters: {
+            query?: {
+                q?: string;
+                role?: "member" | "athlete" | "admin";
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description User directory */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminScheduleController.delete_slot": {
         parameters: {
             query?: never;
@@ -3494,11 +4189,11 @@ export interface operations {
                     booking_timeout_minutes: number;
                     capacity: number;
                     /** Format: uuid */
+                    class_type_id: string;
+                    /** Format: uuid */
                     master_workout_id: string;
                     /** Format: date-time */
                     scheduled_at: string;
-                    /** @enum {string} */
-                    training_type?: "crossfit" | "strength" | "gymnastics" | "aerobics" | "flexibility" | "recovery";
                 };
             };
         };
@@ -3620,6 +4315,55 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.ExecutionController.add_modifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Execution ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Modifications */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    modifications: {
+                        actual_mins?: number | null;
+                        actual_value?: number | null;
+                        exercise_id: string;
+                        note?: string | null;
+                        prescribed_mins?: number | null;
+                        prescribed_value?: number | null;
+                        sets?: number | null;
+                        /** @enum {string} */
+                        type: "skipped" | "weight_changed" | "reps_changed" | "time_changed" | "other";
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description Execution */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.MeController.search_users": {
         parameters: {
             query?: {
@@ -3734,6 +4478,28 @@ export interface operations {
                         errors: {
                             [key: string]: string[];
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MessagingController.unread_count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Unread count */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        unread_count: number;
                     };
                 };
             };
@@ -4046,6 +4812,38 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PRController.share": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description PR Record ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Share message */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminUserController.update_role": {
         parameters: {
             query?: never;
@@ -4222,11 +5020,11 @@ export interface operations {
                     booking_timeout_minutes: number;
                     capacity: number;
                     /** Format: uuid */
+                    class_type_id: string;
+                    /** Format: uuid */
                     master_workout_id: string;
                     /** Format: date-time */
                     scheduled_at: string;
-                    /** @enum {string} */
-                    training_type?: "crossfit" | "strength" | "gymnastics" | "aerobics" | "flexibility" | "recovery";
                 };
             };
         };
@@ -4242,6 +5040,92 @@ export interface operations {
                             [key: string]: unknown;
                         };
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PRController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description PR Record ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PRController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description PR Record ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description PR params */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** Format: date */
+                    beaten_on?: string;
+                    current_score?: number;
+                    higher_is_better?: boolean;
+                    name?: string;
+                    /** @enum {string} */
+                    unit?: "mins_secs" | "reps" | "sets" | "kcals" | "m" | "kg";
+                };
+            };
+        };
+        responses: {
+            /** @description PR */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };
@@ -5053,6 +5937,70 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PRController.index": {
+        parameters: {
+            query?: {
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description PRs */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PRController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description PR params */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** Format: date */
+                    beaten_on: string;
+                    current_score: number;
+                    higher_is_better?: boolean;
+                    name: string;
+                    /** @enum {string} */
+                    unit: "mins_secs" | "reps" | "sets" | "kcals" | "m" | "kg";
+                };
+            };
+        };
+        responses: {
+            /** @description PR */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminUserController.index_athletes": {
         parameters: {
             query?: {
@@ -5154,6 +6102,99 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminClassTypeController.delete": {
+        parameters: {
+            query?: {
+                replacement_class_type_id?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archived class type */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class_type: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            future_classes_reassigned?: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            name: string;
+                            slug: string;
+                            sort_order: number;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+            /** @description Replacement required */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminClassTypeController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    /** @default 0 */
+                    sort_order?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Class type */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class_type: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            future_classes_reassigned?: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            name: string;
+                            slug: string;
+                            sort_order: number;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
                     };
                 };
             };
@@ -5702,6 +6743,63 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.GamificationPreferencesController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Preferences */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.GamificationPreferencesController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Preferences params */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @description Day-of-week indices (0=Sun..6=Sat) treated as rest days */
+                    off_days?: number[];
+                };
+            };
+        };
+        responses: {
+            /** @description Preferences */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminFinanceController.promotion_codes": {
         parameters: {
             query?: never;
@@ -5918,6 +7016,41 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminUserController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description User profile shell */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.ScheduleController.index": {
         parameters: {
             query?: {
@@ -5929,8 +7062,8 @@ export interface operations {
                 end_at?: string;
                 /** @description Window size in days */
                 days?: 3 | 7 | 30;
-                /** @description Optional training type filter */
-                training_type?: "crossfit" | "strength" | "gymnastics" | "aerobics" | "flexibility" | "recovery";
+                /** @description Optional class type filters */
+                class_type_ids?: string[];
             };
             header?: never;
             path?: never;
@@ -5945,6 +7078,9 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        class_types: {
+                            [key: string]: unknown;
+                        }[];
                         days: number;
                         /** Format: date */
                         end_date: string;
@@ -6162,6 +7298,46 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminUserController.training_history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Training history */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        assigned_workouts: {
+                            [key: string]: unknown;
+                        }[];
+                        class_participation: {
+                            [key: string]: unknown;
+                        }[];
+                        executions: {
+                            [key: string]: unknown;
+                        }[];
+                        scores: {
+                            [key: string]: unknown;
+                        }[];
+                        summary: {
+                            [key: string]: unknown;
+                        };
+                        /** Format: uuid */
+                        user_id: string;
                     };
                 };
             };
@@ -6535,6 +7711,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminUserController.messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Communication summary */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        incidents?: {
+                            [key: string]: unknown;
+                        }[];
+                        operational_links?: {
+                            [key: string]: string;
+                        };
+                        prs?: {
+                            [key: string]: unknown;
+                        }[];
+                        summary?: {
+                            [key: string]: unknown;
+                        };
+                        threads?: {
+                            [key: string]: unknown;
+                        }[];
+                        /** Format: uuid */
+                        user_id: string;
+                    };
                 };
             };
         };
