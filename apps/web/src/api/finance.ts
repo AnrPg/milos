@@ -30,6 +30,21 @@ export async function updateFinancePackage(token: string, packageId: string, bod
   });
 }
 
+export type EntitlementBackfillReport = {
+  dry_run: boolean;
+  ready: boolean;
+  counts: Record<string, number>;
+  failures: Array<{ user_id: string; reason: string }>;
+};
+
+export async function backfillFinanceEntitlements(token: string, body: { dry_run: boolean; package_by_role: { member?: string; athlete?: string } }) {
+  return apiRequest<EntitlementBackfillReport>("/admin/finance/entitlements/backfill", {
+    method: "POST",
+    token,
+    body,
+  });
+}
+
 export async function fetchFinanceMembers(token: string, params: Record<string, string> = {}) {
   const qs = new URLSearchParams(params).toString();
   return apiRequest<{ members: FinanceRecord[]; meta: FinanceRecord }>(

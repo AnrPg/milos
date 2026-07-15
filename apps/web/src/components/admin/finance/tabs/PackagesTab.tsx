@@ -5,10 +5,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
-import { createFinancePackage, fetchFinancePackages, type FinanceRecord } from "@/api/finance";
+import { backfillFinanceEntitlements, createFinancePackage, fetchFinancePackages, type EntitlementBackfillReport, type FinanceRecord } from "@/api/finance";
 import { useSession } from "@/components/session-provider";
 import { PackagePanel } from "@/components/admin/finance/panels/PackagePanel";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
+import {
+  DEFAULT_ENTITLEMENT,
+  EntitlementEditor,
+  entitlementParams,
+  type EntitlementDraft,
+} from "@/components/admin/finance/shared/EntitlementEditor";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -51,6 +57,9 @@ export function PackagesTab() {
 
   const packages = packagesQuery.data?.packages ?? [];
   const [form, setForm] = useState(BLANK_FORM);
+  const [entitlement, setEntitlement] = useState<EntitlementDraft>(DEFAULT_ENTITLEMENT);
+  const [legacyPackages, setLegacyPackages] = useState({ member: "", athlete: "" });
+  const [backfillReport, setBackfillReport] = useState<EntitlementBackfillReport | null>(null);
 
   const createMutation = useMutation({
     mutationFn: () =>
@@ -62,13 +71,21 @@ export function PackagesTab() {
         base_price_cents: Math.round(Number(form.price || 0) * 100),
         currency: "EUR",
         tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
-        params: {},
+        params: entitlementParams(entitlement),
       }),
     onSuccess: async () => {
       setForm(BLANK_FORM);
+      setEntitlement(DEFAULT_ENTITLEMENT);
       setParam("new", null);
       await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "packages"] });
     },
+  });
+  const backfillMutation = useMutation({
+    mutationFn: (dryRun: boolean) => backfillFinanceEntitlements(token, {
+      dry_run: dryRun,
+      package_by_role: Object.fromEntries(Object.entries(legacyPackages).filter(([, value]) => value)),
+    }),
+    onSuccess: setBackfillReport,
   });
 
   return (
@@ -87,6 +104,16 @@ export function PackagesTab() {
           + New package
         </button>
       </div>
+
+      <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div><h3 className="text-sm font-semibold" style={{ color: "var(--text)" }}>Legacy entitlement rollout</h3><p className="mt-1 max-w-2xl text-xs leading-5" style={{ color: "var(--dim)" }}>Map legacy members and athletes to approved versioned packages. Dry-run classifies every account; apply creates only missing profiles/subscriptions and is safe to repeat.</p></div>
+          <div className="flex gap-2"><button type="button" disabled={backfillMutation.isPending} onClick={() => backfillMutation.mutate(true)} className="rounded-full px-3 py-2 text-xs font-semibold" style={{ background: "var(--border)" }}>Check readiness</button><button type="button" disabled={backfillMutation.isPending || (!legacyPackages.member && !legacyPackages.athlete)} onClick={() => backfillMutation.mutate(false)} className="rounded-full px-3 py-2 text-xs font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--bg)" }}>Apply backfill</button></div>
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">{(["member", "athlete"] as const).map((role) => <label key={role} className="space-y-1"><span className="text-xs font-semibold" style={{ color: "var(--text-soft)" }}>Legacy {role} package</span><select className="w-full rounded-xl px-3 py-2 text-sm" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }} value={legacyPackages[role]} onChange={(event) => setLegacyPackages({ ...legacyPackages, [role]: event.target.value })}><option value="">Not mapped</option>{packages.filter((pkg) => pkg.active !== false).map((pkg) => <option key={field(pkg, "id")} value={field(pkg, "id")}>{field(pkg, "name", field(pkg, "code"))}</option>)}</select></label>)}</div>
+        {backfillReport ? <p className="mt-3 text-xs" style={{ color: backfillReport.ready ? "var(--success)" : "var(--warning)" }}>{backfillReport.ready ? "Ready for strict enforcement." : "Backfill still required."} {Object.entries(backfillReport.counts).map(([key, value]) => `${key.replaceAll("_", " ")}: ${value}`).join(" · ")}</p> : null}
+        {backfillMutation.isError ? <p className="mt-3 text-xs" style={{ color: "var(--danger)" }}>Readiness/backfill failed. Confirm both selected packages contain valid entitlement contracts.</p> : null}
+      </section>
 
       {/* Package list */}
       <div className="rounded-[2rem] overflow-hidden" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
@@ -228,6 +255,7 @@ export function PackagesTab() {
                 onChange={(e) => setForm({ ...form, tags: e.target.value })}
               />
             </PanelField>
+            <EntitlementEditor value={entitlement} onChange={setEntitlement} />
             {createMutation.error instanceof Error && (
               <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{createMutation.error.message}</p>
             )}

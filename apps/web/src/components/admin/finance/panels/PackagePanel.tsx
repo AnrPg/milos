@@ -6,6 +6,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchFinancePackage, updateFinancePackage, type FinanceRecord } from "@/api/finance";
 import { useSession } from "@/components/session-provider";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
+import {
+  EntitlementEditor,
+  entitlementDraft,
+  entitlementParams,
+  type EntitlementDraft,
+} from "@/components/admin/finance/shared/EntitlementEditor";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -32,6 +38,7 @@ export function PackagePanel({ packageId, onClose }: { packageId: string; onClos
   const pkg = packageQuery.data?.package ?? null;
 
   const [form, setForm] = useState<FinanceRecord | null>(null);
+  const [entitlement, setEntitlement] = useState<EntitlementDraft | null>(null);
   const editing = form !== null;
 
   function startEdit() {
@@ -45,6 +52,7 @@ export function PackagePanel({ packageId, onClose }: { packageId: string; onClos
       tags: Array.isArray(pkg.tags) ? (pkg.tags as string[]).join(", ") : "",
       active: pkg.active !== false,
     });
+    setEntitlement(entitlementDraft(pkg.params));
   }
 
   const updateMutation = useMutation({
@@ -53,10 +61,16 @@ export function PackagePanel({ packageId, onClose }: { packageId: string; onClos
       const tags = typeof form.tags === "string"
         ? (form.tags as string).split(",").map((t) => t.trim()).filter(Boolean)
         : [];
-      return updateFinancePackage(token, packageId, { ...form, tags });
+      if (!entitlement) throw new Error("No entitlement contract");
+      return updateFinancePackage(token, packageId, {
+        ...form,
+        tags,
+        params: entitlementParams(entitlement),
+      });
     },
     onSuccess: async () => {
       setForm(null);
+      setEntitlement(null);
       await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "package", packageId] });
       await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "packages"] });
     },
@@ -82,7 +96,7 @@ export function PackagePanel({ packageId, onClose }: { packageId: string; onClos
             <button
               className="rounded-full px-5 py-2 text-sm font-semibold"
               style={{ background: "var(--border)", color: "var(--text-soft)" }}
-              onClick={() => setForm(null)}
+              onClick={() => { setForm(null); setEntitlement(null); }}
               type="button"
             >
               Cancel
@@ -165,6 +179,7 @@ export function PackagePanel({ packageId, onClose }: { packageId: string; onClos
               onChange={(e) => setForm({ ...form, tags: e.target.value })}
             />
           </Field>
+          {entitlement ? <EntitlementEditor value={entitlement} onChange={setEntitlement} /> : null}
           <label className="flex items-center gap-3 text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
             <input
               type="checkbox"
@@ -185,6 +200,7 @@ export function PackagePanel({ packageId, onClose }: { packageId: string; onClos
           <Stat label="Billing period" value={field(pkg, "billing_period")} />
           <Stat label="Base price" value={money(pkg.base_price_cents)} />
           <Stat label="Status" value={pkg.active !== false ? "Active" : "Inactive"} />
+          <EntitlementSummary params={pkg.params} />
           {Array.isArray(pkg.tags) && (pkg.tags as string[]).length > 0 && (
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: "var(--dim)" }}>Tags</p>
@@ -215,6 +231,19 @@ function Stat({ label, value }: { label: string; value: string }) {
     <div>
       <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{label}</p>
       <p className="mt-1 text-sm font-semibold" style={{ color: "var(--text)" }}>{value || "—"}</p>
+    </div>
+  );
+}
+
+function EntitlementSummary({ params }: { params: unknown }) {
+  const draft = entitlementDraft(params);
+  return (
+    <div className="space-y-2 rounded-xl p-4" style={{ background: "var(--bg-soft)" }}>
+      <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>Entitlements</p>
+      <p className="text-sm"><strong>Channels:</strong> {draft.channels.join(", ") || "None"}</p>
+      <p className="text-sm"><strong>Capabilities:</strong> {draft.capabilities.join(", ") || "None"}</p>
+      <p className="text-sm"><strong>Class visits:</strong> {draft.classVisitLimit} / {draft.classVisitPeriod.replaceAll("_", " ")}</p>
+      <p className="text-sm"><strong>Coaching:</strong> {draft.coachingTouchpointLimit} / {draft.coachingTouchpointPeriod.replaceAll("_", " ")}</p>
     </div>
   );
 }
