@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.ResolveBooking do
-  alias MilosTraining.Scheduling
+  alias MilosTraining.{Finance, Scheduling}
 
   def call(booking_id, params) do
     action = Map.get(params, :action) || Map.get(params, "action")
@@ -8,6 +8,7 @@ defmodule MilosTraining.Application.ResolveBooking do
     with booking when not is_nil(booking) <- Scheduling.get_booking(booking_id),
          {:ok, updated_booking} <- run_resolution(action, booking_id, admin_message) do
       maybe_cancel_timeout(booking.timeout_job_id)
+      reconcile_visit(action, updated_booking)
       MilosTraining.Notifications.dispatch_event(:booking_resolved, updated_booking)
       broadcast_resolution(updated_booking)
       {:ok, updated_booking}
@@ -31,6 +32,21 @@ defmodule MilosTraining.Application.ResolveBooking do
     do: run_resolution(:reject, booking_id, admin_message)
 
   defp run_resolution(_, _booking_id, _admin_message), do: :error
+
+  defp reconcile_visit(action, booking) when action in [:reject, "reject"] do
+    Finance.release_entitlement_source(
+      booking.user_id,
+      "scheduling",
+      booking.scheduled_class_id,
+      :class_visits,
+      %{
+        reason: "Booking rejected",
+        idempotency_key: "booking-rejected:#{booking.id}"
+      }
+    )
+  end
+
+  defp reconcile_visit(_action, _booking), do: :ok
 
   defp maybe_cancel_timeout(nil), do: :ok
 

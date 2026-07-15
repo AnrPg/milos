@@ -11,15 +11,24 @@ defmodule MilosTraining.Application.StartWorkoutExecution do
     source = params[:source] || params["source"]
     source_reference_id = params[:source_reference_id] || params["source_reference_id"]
 
-    with :ok <- AuthorizeFinanceEntitlement.call(actor.id, :workout_execution),
-         {:ok, authorized_source} <-
+    with {:ok, authorized_source} <-
            AuthorizeWorkoutExecutionSource.call(
              actor,
              workout_id,
              source,
              source_reference_id
-           ) do
+           ),
+         :ok <- authorize_entitlement(actor, authorized_source) do
       Execution.start_execution(actor.id, Map.merge(params, authorized_source))
+    end
+  end
+
+  defp authorize_entitlement(actor, authorized_source) do
+    request = AuthorizeFinanceEntitlement.execution_request(authorized_source)
+
+    case AuthorizeFinanceEntitlement.call(actor, request) do
+      {:ok, _decision} -> :ok
+      result -> result
     end
   end
 end

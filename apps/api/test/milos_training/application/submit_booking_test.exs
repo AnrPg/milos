@@ -106,6 +106,62 @@ defmodule MilosTraining.Application.SubmitBookingTest do
              SubmitBooking.call(member.id, slot.id)
   end
 
+  test "package visit quota is reserved across different slots and withdrawal restores it" do
+    admin = admin_fixture()
+    member = user_fixture()
+    workout = workout_fixture(admin)
+    first_slot = slot_fixture(workout, %{auto_approve: true})
+
+    second_slot =
+      slot_fixture(workout, %{
+        auto_approve: true,
+        scheduled_at: DateTime.add(first_slot.scheduled_at, 3600)
+      })
+
+    {:ok, _settings} =
+      Finance.update_finance_settings(%{
+        entitlement_enforcement_mode: "enforce_managed",
+        entitlement_timezone: "Europe/Athens",
+        payment_reminder_interval_days: 7
+      })
+
+    {:ok, package} =
+      Finance.create_package(%{
+        code: "one_visit_monthly",
+        name: "One visit monthly",
+        family: "limited-visits",
+        billing_period: "monthly",
+        params: %{
+          "entitlement_version" => 1,
+          "channels" => ["in_person"],
+          "capabilities" => ["book_classes", "execute_class_workouts"],
+          "allowances" => %{
+            "class_visits" => %{"limit" => 1, "period" => "calendar_month"}
+          }
+        }
+      })
+
+    {:ok, membership} =
+      Finance.upsert_membership(member.id, %{
+        user_type_snapshot: "member",
+        status: "active",
+        signup_source: "direct"
+      })
+
+    {:ok, _subscription} =
+      Finance.assign_package(membership.id, package.id, %{starts_on: Date.utc_today()})
+
+    assert {:ok, booking} = SubmitBooking.call(member.id, first_slot.id)
+
+    assert {:error, :finance_allowance_exhausted, %{limit: 1, committed: 1}} =
+             SubmitBooking.call(member.id, second_slot.id)
+
+    assert {:ok, _withdrawn} =
+             MilosTraining.Application.WithdrawBooking.call(member.id, booking.id)
+
+    assert {:ok, _second_booking} = SubmitBooking.call(member.id, second_slot.id)
+  end
+
   test "returns the committed booking when notification dispatch fails" do
     Application.put_env(:milos_training, :notification_dispatcher, __MODULE__.FailingDispatcher)
 

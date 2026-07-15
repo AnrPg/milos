@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.WithdrawBooking do
   require Logger
 
-  alias MilosTraining.Scheduling
+  alias MilosTraining.{Finance, Scheduling}
   alias MilosTraining.Notifications
 
   def call(user_id, booking_id) do
@@ -9,6 +9,7 @@ defmodule MilosTraining.Application.WithdrawBooking do
          :ok <- verify_ownership(booking, user_id),
          {:ok, withdrawn_booking} <- Scheduling.withdraw_booking(booking_id) do
       delete_booking_pending_notifications(booking_id)
+      release_visit(booking)
       {:ok, withdrawn_booking}
     else
       nil -> {:error, :not_found}
@@ -19,6 +20,19 @@ defmodule MilosTraining.Application.WithdrawBooking do
 
   defp verify_ownership(%{user_id: uid}, user_id) when uid == user_id, do: :ok
   defp verify_ownership(_, _), do: {:error, :not_owner}
+
+  defp release_visit(booking) do
+    Finance.release_entitlement_source(
+      booking.user_id,
+      "scheduling",
+      booking.scheduled_class_id,
+      :class_visits,
+      %{
+        reason: "Booking withdrawn",
+        idempotency_key: "booking-withdrawn:#{booking.id}"
+      }
+    )
+  end
 
   # Hard-delete the booking_pending admin notifications that were created when
   # the user submitted the booking — they are no longer actionable after withdrawal.

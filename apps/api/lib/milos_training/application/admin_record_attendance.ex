@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.AdminRecordAttendance do
   alias MilosTraining.Scheduling.Domain.AttendancePolicy
-  alias MilosTraining.Scheduling
+  alias MilosTraining.{Finance, Scheduling}
 
   def call(slot_id, user_id, admin_id, params \\ %{}) do
     with {:ok, approved_booking} <- approved_booking(slot_id, user_id),
@@ -16,8 +16,37 @@ defmodule MilosTraining.Application.AdminRecordAttendance do
           "status" => params["status"] || params[:status] || "attended"
         })
 
-      Scheduling.record_attendance(attendance_params)
+      with {:ok, attendance} <- Scheduling.record_attendance(attendance_params),
+           {:ok, _transition} <- reconcile_visit(attendance) do
+        {:ok, attendance}
+      end
     end
+  end
+
+  defp reconcile_visit(%{status: "cancelled"} = attendance) do
+    Finance.release_entitlement_source(
+      attendance.user_id,
+      "scheduling",
+      attendance.scheduled_class_id,
+      :class_visits,
+      %{
+        reason: "Attendance cancelled",
+        idempotency_key: "attendance-cancelled:#{attendance.id}"
+      }
+    )
+  end
+
+  defp reconcile_visit(attendance) do
+    Finance.finalize_entitlement_source(
+      attendance.user_id,
+      "scheduling",
+      attendance.scheduled_class_id,
+      :class_visits,
+      %{
+        reason: "Attendance recorded as #{attendance.status}",
+        idempotency_key: "attendance-finalized:#{attendance.id}"
+      }
+    )
   end
 
   defp string_key_map(params) when is_map(params) do

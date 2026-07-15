@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.GetWorkoutTimerSequence do
-  alias MilosTraining.Application.AuthorizeWorkoutExecutionSource
+  alias MilosTraining.Application.{AuthorizeFinanceEntitlement, AuthorizeWorkoutExecutionSource}
   alias MilosTraining.{Execution, Workouts}
 
   def call(actor, workout_id, params \\ %{}) do
@@ -7,19 +7,29 @@ defmodule MilosTraining.Application.GetWorkoutTimerSequence do
     source = params[:source] || params["source"]
     source_reference_id = params[:source_reference_id] || params["source_reference_id"]
 
-    with {:ok, _authorized_source} <-
+    with {:ok, authorized_source} <-
            AuthorizeWorkoutExecutionSource.call(
              actor,
              workout_id,
              source,
              source_reference_id
            ),
+         :ok <- authorize_entitlement(actor, authorized_source),
          workout when not is_nil(workout) <- Workouts.get_workout(workout_id),
          {:ok, materialized_workout} <- materialize_workout(workout, scale_slug) do
       {:ok, Execution.build_timer_sequence(materialized_workout)}
     else
       nil -> {:error, :not_found}
       error -> error
+    end
+  end
+
+  defp authorize_entitlement(actor, authorized_source) do
+    request = AuthorizeFinanceEntitlement.execution_request(authorized_source)
+
+    case AuthorizeFinanceEntitlement.call(actor, request) do
+      {:ok, _decision} -> :ok
+      result -> result
     end
   end
 
