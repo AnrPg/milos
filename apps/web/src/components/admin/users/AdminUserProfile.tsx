@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 import {
   fetchAdminUserCoachingContext,
@@ -11,10 +12,14 @@ import {
   fetchAdminUserPRs,
   fetchAdminUserProfile,
   fetchAdminUserTraining,
+  grantAdminUserAllowance,
+  revokeAdminUserAllowance,
   updateAdminUserRole,
   type AdminUserDirectoryEntry,
 } from "@/api/admin-users";
+import type { EffectiveEntitlement } from "@/api/my-finance";
 import { useSession } from "@/components/session-provider";
+import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 
 function label(section: string) {
   return section.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
@@ -46,6 +51,40 @@ function useDossierQuery<T>(token: string | undefined, userId: string, key: stri
   });
 }
 
+function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: string; userId: string; entitlement: EffectiveEntitlement | null | undefined; onRefresh: () => Promise<unknown> }) {
+  const [form, setForm] = useState({ allowance: "class_visits" as "class_visits" | "coaching_touchpoints", quantity: 1, period: "calendar_month" as "calendar_week" | "calendar_month" | "subscription_period", reason: "" });
+  const [revokeTarget, setRevokeTarget] = useState<string | null>(null);
+  const [revokeReason, setRevokeReason] = useState("");
+  const grant = useMutation({ mutationFn: () => grantAdminUserAllowance(token, userId, form), onSuccess: async () => { setForm((value) => ({ ...value, quantity: 1, reason: "" })); await onRefresh(); } });
+  const revoke = useMutation({ mutationFn: () => revokeAdminUserAllowance(token, userId, revokeTarget!, revokeReason), onSuccess: async () => { setRevokeTarget(null); setRevokeReason(""); await onRefresh(); } });
+  const entries = entitlement?.usage_entries ?? [];
+  const revoked = new Set(entries.filter((entry) => entry.parent_entry_id).map((entry) => entry.parent_entry_id));
+
+  return (
+    <>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        {Object.entries(entitlement?.allowances ?? {}).map(([key, allowance]) => allowance ? <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><p className="font-semibold">{label(key)}</p><p>{String(allowance.remaining)} remaining of {String(allowance.limit)}{allowance.extensions > 0 ? ` · +${allowance.extensions} personal` : ""}</p><p className="text-xs" style={{ color: "var(--muted)" }}>Resets after {date(allowance.period_end)}</p></div> : null)}
+      </div>
+      <form className="mt-5 space-y-3 rounded-2xl p-4" style={{ border: "1px solid var(--border)" }} onSubmit={(event) => { event.preventDefault(); grant.mutate(); }}>
+        <p className="font-semibold" style={{ color: "var(--text)" }}>Extend this user&apos;s allowance</p>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <select value={form.allowance} onChange={(event) => setForm({ ...form, allowance: event.target.value as typeof form.allowance })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)" }}><option value="class_visits">Class visits</option><option value="coaching_touchpoints">Coaching touchpoints</option></select>
+          <input aria-label="Additional units" type="number" min={1} value={form.quantity} onChange={(event) => setForm({ ...form, quantity: Number(event.target.value) })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)" }} />
+          <select value={form.period} onChange={(event) => setForm({ ...form, period: event.target.value as typeof form.period })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)" }}><option value="calendar_week">This calendar week</option><option value="calendar_month">This calendar month</option><option value="subscription_period">Subscription period</option></select>
+        </div>
+        <textarea required minLength={3} placeholder="Reason for this personal extension" value={form.reason} onChange={(event) => setForm({ ...form, reason: event.target.value })} className="min-h-20 w-full rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)" }} />
+        <button disabled={grant.isPending || form.reason.trim().length < 3} className="rounded-full px-4 py-2 font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--bg)" }}>{grant.isPending ? "Extending…" : "Extend allowance"}</button>
+        {grant.isError ? <p style={{ color: "var(--danger)" }}>The extension could not be recorded.</p> : null}
+      </form>
+      <div className="mt-5 space-y-2">
+        <p className="font-semibold" style={{ color: "var(--text)" }}>Personal extension history</p>
+        {entries.filter((entry) => entry.event_type === "adjustment" && entry.quantity_delta < 0).map((entry) => <div key={entry.id} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><div className="flex flex-wrap items-center justify-between gap-2"><div><strong>+{Math.abs(entry.quantity_delta)} {label(entry.allowance_key)}</strong><p className="text-xs" style={{ color: "var(--muted)" }}>{entry.reason} · {date(entry.inserted_at)} · valid through {date(entry.period_end)}</p></div>{revoked.has(entry.id) ? <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>Revoked</span> : <button type="button" onClick={() => setRevokeTarget(entry.id)} className="text-xs font-semibold" style={{ color: "var(--danger)" }}>Revoke</button>}</div>{revokeTarget === entry.id ? <form className="mt-3 flex flex-col gap-2 sm:flex-row" onSubmit={(event) => { event.preventDefault(); revoke.mutate(); }}><input required minLength={3} value={revokeReason} onChange={(event) => setRevokeReason(event.target.value)} placeholder="Reason for revocation" className="min-w-0 flex-1 rounded-xl px-3 py-2" style={{ background: "var(--panel)" }} /><button disabled={revoke.isPending || revokeReason.trim().length < 3} className="rounded-full px-3 py-2 text-xs font-semibold disabled:opacity-50" style={{ background: "var(--danger)", color: "white" }}>Confirm revocation</button></form> : null}</div>)}
+        {entries.every((entry) => entry.event_type !== "adjustment" || entry.quantity_delta >= 0) ? <Empty>No personal extensions recorded.</Empty> : null}
+      </div>
+    </>
+  );
+}
+
 export function AdminUserProfile({ userId }: { userId: string }) {
   const { tokens } = useSession();
   const token = tokens?.access_token;
@@ -63,12 +102,25 @@ export function AdminUserProfile({ userId }: { userId: string }) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin", "users"] }),
   });
 
+  useEffect(() => {
+    function handleUserSync(event: Event) {
+      const detail = (event as CustomEvent<UserSyncDetail>).detail;
+      if (detail.scopes.includes("finance_entitlement")) {
+        void queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] });
+      }
+    }
+
+    window.addEventListener(USER_SYNC_EVENT, handleUserSync as EventListener);
+    return () => window.removeEventListener(USER_SYNC_EVENT, handleUserSync as EventListener);
+  }, [queryClient, userId]);
+
   if (profileQuery.isLoading) return <main className="min-h-screen p-10" style={{ background: "var(--bg)", color: "var(--muted)" }}>Loading profile…</main>;
   if (!profile) return <main className="min-h-screen p-10" style={{ background: "var(--bg)", color: "var(--danger)" }}>User profile could not be loaded.</main>;
 
   const sections = new Set(profile.available_sections);
   const executions = training.data?.executions ?? [];
   const scores = training.data?.scores ?? [];
+  const effectiveEntitlement = finance.data?.summary?.effective_entitlement;
 
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
@@ -87,7 +139,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
         <section className="grid gap-4 md:grid-cols-2">
           <Panel id="overview" title="Overview"><dl className="grid grid-cols-2 gap-3"><div><dt style={{ color: "var(--muted)" }}>Role</dt><dd className="font-semibold">{profile.identity.role}</dd></div><div><dt style={{ color: "var(--muted)" }}>Account</dt><dd className="font-semibold">{profile.account_status}</dd></div></dl></Panel>
 
-          {sections.has("finance") ? <Panel id="finance" title="Finance" href="/admin/finance"><p className="text-2xl font-semibold" style={{ color: "var(--text)" }}>{finance.data?.summary?.credit_balance ?? 0} credits</p><p className="mt-2">{String(finance.data?.summary?.current_status?.state ?? "Loading membership status…")}</p>{finance.data?.summary?.outstanding_items?.length ? <p className="mt-2" style={{ color: "var(--warning)" }}>{finance.data.summary.outstanding_items.length} item(s) need attention</p> : <p className="mt-2">No outstanding finance actions.</p>}</Panel> : null}
+          {sections.has("finance") ? <Panel id="finance" title="Entitlements & allowances" href="/admin/finance"><p className="text-2xl font-semibold" style={{ color: "var(--text)" }}>{finance.data?.summary?.credit_balance ?? 0} credits</p><p className="mt-2">{String(finance.data?.summary?.current_status?.state ?? "Loading membership status…")}</p>{token ? <AdminEntitlements token={token} userId={userId} entitlement={effectiveEntitlement} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
 
           {sections.has("training_history") ? <Panel id="training_history" title="Training history" href="/admin/workouts"><p>{training.data?.summary.completed_count ?? 0} completed of {training.data?.summary.execution_count ?? 0} executions</p><div className="mt-3 space-y-2">{executions.length ? executions.slice(0, 5).map((item) => <div key={item.id} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><span className="font-semibold">{item.workout_title}</span><span className="ml-2" style={{ color: "var(--muted)" }}>{item.status} · {date(item.started_at_utc)}</span></div>) : <Empty>No workout executions recorded.</Empty>}</div></Panel> : null}
 

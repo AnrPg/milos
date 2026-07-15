@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { fetchMyFinance, getMyInvoiceDownloadUrl, type MyFinanceData } from "@/api/my-finance";
+import { fetchMyEntitlement, fetchMyFinance, getMyInvoiceDownloadUrl, type EffectiveEntitlement, type MyFinanceData } from "@/api/my-finance";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
+import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -258,6 +259,7 @@ export default function BillingPage() {
   const accessToken = tokens?.access_token ?? null;
 
   const [finance, setFinance] = useState<MyFinanceData | null>(null);
+  const [entitlement, setEntitlement] = useState<EffectiveEntitlement | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showPackages, setShowPackages] = useState(false);
@@ -273,10 +275,11 @@ export default function BillingPage() {
       }
     });
 
-    fetchMyFinance(accessToken)
-      .then((data) => {
+    Promise.all([fetchMyFinance(accessToken), fetchMyEntitlement(accessToken)])
+      .then(([data, entitlementData]) => {
         if (!cancelled) {
           setFinance(data);
+          setEntitlement(entitlementData.entitlement);
           setLoading(false);
         }
       })
@@ -290,6 +293,19 @@ export default function BillingPage() {
     return () => {
       cancelled = true;
     };
+  }, [accessToken]);
+
+  useEffect(() => {
+    if (!accessToken) return;
+    const token = accessToken;
+    function handleUserSync(event: Event) {
+      const detail = (event as CustomEvent<UserSyncDetail>).detail;
+      if (detail.scopes.includes("finance_entitlement")) {
+        void fetchMyEntitlement(token).then((data) => setEntitlement(data.entitlement));
+      }
+    }
+    window.addEventListener(USER_SYNC_EVENT, handleUserSync as EventListener);
+    return () => window.removeEventListener(USER_SYNC_EVENT, handleUserSync as EventListener);
   }, [accessToken]);
 
   const membership = finance?.membership as Record<string, unknown> | null;
@@ -390,6 +406,8 @@ export default function BillingPage() {
                 </div>
               )}
             </div>
+
+            <EntitlementCard entitlement={entitlement} />
 
             {/* credits */}
             {hasCredits && (
@@ -529,5 +547,31 @@ export default function BillingPage() {
         />
       )}
     </div>
+  );
+}
+
+function EntitlementCard({ entitlement }: { entitlement: EffectiveEntitlement | null }) {
+  if (!entitlement?.plan) return null;
+  const allowanceEntries = Object.entries(entitlement.allowances);
+  return (
+    <section className="rounded-2xl p-5" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-sm font-medium" style={{ color: "var(--text-soft)" }}>Your package benefits</h2>
+        <StatusBadge status={entitlement.status} />
+      </div>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {entitlement.plan.channels.map((channel) => <span key={channel} className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }}>{channel.replaceAll("_", " ")}</span>)}
+      </div>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        {allowanceEntries.map(([key, usage]) => usage ? (
+          <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}>
+            <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{key.replaceAll("_", " ")}</p>
+            <p className="mt-1 text-2xl font-semibold" style={{ color: "var(--primary)" }}>{String(usage.remaining)}</p>
+            <p className="text-xs" style={{ color: "var(--dim)" }}>remaining of {String(usage.limit)} · resets {formatDate(usage.period_end)}</p>
+            {usage.extensions > 0 ? <p className="mt-1 text-xs" style={{ color: "var(--success)" }}>Includes +{usage.extensions} personal extension</p> : null}
+          </div>
+        ) : null)}
+      </div>
+    </section>
   );
 }

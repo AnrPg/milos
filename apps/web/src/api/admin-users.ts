@@ -1,4 +1,10 @@
 import { apiRequest } from "@/api/client";
+import type { paths } from "@/api/generated/schema";
+import type { EffectiveEntitlement } from "@/api/my-finance";
+
+export type AllowanceExtensionRequest = NonNullable<
+  paths["/api/admin/users/{id}/allowance-extensions"]["post"]["requestBody"]
+>["content"]["application/json"];
 
 export type AdminUserDirectoryEntry = {
   id: string;
@@ -27,6 +33,7 @@ export type AdminUserFinance = {
     current_status: Record<string, unknown>;
     package_relationship: Record<string, unknown>;
     outstanding_items: Array<Record<string, unknown>>;
+    effective_entitlement: EffectiveEntitlement | null;
   };
   drill_down: Record<string, unknown> | null;
   operational_links: Record<string, string>;
@@ -124,4 +131,22 @@ export function updateAdminUserRole(token: string, userId: string, role: AdminUs
     method: "PATCH",
     body: { role },
   });
+}
+
+export function grantAdminUserAllowance(
+  token: string,
+  userId: string,
+  body: AllowanceExtensionRequest,
+) {
+  return apiRequest<{ entry: Record<string, unknown>; entitlement: EffectiveEntitlement }>(
+    `/admin/users/${userId}/allowance-extensions`,
+    { token, method: "POST", body },
+  );
+}
+
+export function revokeAdminUserAllowance(token: string, userId: string, entryId: string, reason: string) {
+  return apiRequest<{ entry: Record<string, unknown>; entitlement: EffectiveEntitlement }>(
+    `/admin/users/${userId}/allowance-extensions/${entryId}/revoke`,
+    { token, method: "POST", body: { reason } },
+  );
 }
