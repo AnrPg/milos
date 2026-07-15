@@ -3,6 +3,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
   use OpenApiSpex.ControllerSpecs
 
   alias MilosTraining.Application.{
+    BackfillFinanceEntitlements,
     ApplyFinanceCreditToInvoice,
     ApplyFinanceCreditToPayment,
     AssignFinanceMemberPackage,
@@ -159,6 +160,29 @@ defmodule MilosTrainingWeb.AdminFinanceController do
           type: :object,
           properties: @package_properties,
           additionalProperties: false
+        }
+      }
+    }
+  }
+  @entitlement_backfill_request_body %RequestBody{
+    required: true,
+    content: %{
+      "application/json" => %MediaType{
+        schema: %Schema{
+          type: :object,
+          required: [:dry_run, :package_by_role],
+          additionalProperties: false,
+          properties: %{
+            dry_run: %Schema{type: :boolean},
+            package_by_role: %Schema{
+              type: :object,
+              additionalProperties: false,
+              properties: %{
+                member: %Schema{type: :string, format: :uuid},
+                athlete: %Schema{type: :string, format: :uuid}
+              }
+            }
+          }
         }
       }
     }
@@ -401,6 +425,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
               :create_promotion_code,
               :create_package,
               :update_package,
+              :backfill_entitlements,
               :create_promotion,
               :create_referral_program,
               :create_referral,
@@ -482,6 +507,18 @@ defmodule MilosTrainingWeb.AdminFinanceController do
   def update_package(conn, params) do
     with {:ok, package} <- UpdateFinancePackage.call(param_id(params), body_params(conn, params)) do
       json(conn, %{package: package})
+    end
+  end
+
+  operation(:backfill_entitlements,
+    summary: "Dry-run or apply the legacy entitlement-profile backfill",
+    request_body: @entitlement_backfill_request_body,
+    responses: [ok: {"Entitlement rollout readiness report", "application/json", @open_object}]
+  )
+
+  def backfill_entitlements(conn, params) do
+    with {:ok, report} <- BackfillFinanceEntitlements.call(body_params(conn, params)) do
+      json(conn, report)
     end
   end
 

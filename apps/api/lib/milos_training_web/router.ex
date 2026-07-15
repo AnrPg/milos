@@ -85,6 +85,13 @@ defmodule MilosTrainingWeb.Router do
     get("/users/:id/messages", AdminUserController, :messages)
     get("/users/:id/coaching-context", AdminUserController, :coaching_context)
     post("/users/:id/allowance-extensions", AdminUserController, :grant_allowance)
+
+    post(
+      "/users/:id/allowance-extensions/:entry_id/revoke",
+      AdminUserController,
+      :revoke_allowance
+    )
+
     patch("/users/:id/role", AdminUserController, :update_role)
     get("/search", AdminSearchController, :index)
     get("/analytics/summary", AdminAnalyticsController, :summary)
@@ -132,6 +139,7 @@ defmodule MilosTrainingWeb.Router do
     post("/finance/packages", AdminFinanceController, :create_package)
     get("/finance/packages/:id", AdminFinanceController, :package)
     patch("/finance/packages/:id", AdminFinanceController, :update_package)
+    post("/finance/entitlements/backfill", AdminFinanceController, :backfill_entitlements)
     get("/finance/members", AdminFinanceController, :members)
     get("/finance/members/:id", AdminFinanceController, :member)
     patch("/finance/members/:id", AdminFinanceController, :update_member)

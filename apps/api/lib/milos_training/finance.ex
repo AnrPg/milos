@@ -20,12 +20,14 @@ defmodule MilosTraining.Finance do
     RecordPayment,
     ReleaseEntitlement,
     ReleaseEntitlementSource,
+    ReleaseStaleEntitlementReservations,
     ReserveEntitlement,
     FinalizeEntitlement,
     RedeemPromotion,
     RefreshAggregates,
     ReverseCreditLedgerEntry,
     ReversePayment,
+    RevokeAllowanceGrant,
     UpdatePackage,
     UpdateReferralRewardStatus,
     UpdateReferralProgram,
@@ -101,6 +103,14 @@ defmodule MilosTraining.Finance do
   defdelegate finalize_entitlement(reservation_id, params), to: FinalizeEntitlement, as: :call
   defdelegate release_entitlement(reservation_id, params), to: ReleaseEntitlement, as: :call
   defdelegate grant_allowance(user_id, admin_id, params), to: GrantAllowance, as: :call
+
+  defdelegate revoke_allowance_grant(user_id, admin_id, grant_id, params),
+    to: RevokeAllowanceGrant,
+    as: :call
+
+  defdelegate release_stale_entitlement_reservations(cutoff),
+    to: ReleaseStaleEntitlementReservations,
+    as: :call
 
   defdelegate finalize_entitlement_source(user_id, source_context, source_id, allowance, params),
     to: FinalizeEntitlementSource,

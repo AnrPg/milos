@@ -13,6 +13,7 @@ defmodule MilosTrainingWeb.AdminUserController do
     GrantUserAllowance,
     ListAdminUsers,
     ListAthletes,
+    RevokeUserAllowance,
     UpdateUserRole
   }
 
@@ -77,7 +78,8 @@ defmodule MilosTrainingWeb.AdminUserController do
   }
 
   plug OpenApiSpex.Plug.CastAndValidate,
-       [json_render_error_v2: true] when action in [:update_role, :grant_allowance]
+       [json_render_error_v2: true]
+       when action in [:update_role, :grant_allowance, :revoke_allowance]
 
   @allowance_grant_body %RequestBody{
     required: true,
@@ -101,6 +103,19 @@ defmodule MilosTrainingWeb.AdminUserController do
             reason: %Schema{type: :string, minLength: 3, maxLength: 500},
             idempotency_key: %Schema{type: :string, minLength: 8, maxLength: 200, nullable: true}
           }
+        }
+      }
+    }
+  }
+  @allowance_revoke_body %RequestBody{
+    required: true,
+    content: %{
+      "application/json" => %MediaType{
+        schema: %Schema{
+          type: :object,
+          additionalProperties: false,
+          required: [:reason],
+          properties: %{reason: %Schema{type: :string, minLength: 3, maxLength: 500}}
         }
       }
     }
@@ -337,6 +352,31 @@ defmodule MilosTrainingWeb.AdminUserController do
       conn
       |> put_status(:created)
       |> json(result)
+    end
+  end
+
+  operation(:revoke_allowance,
+    summary: "Revoke a personal allowance extension with a compensating ledger entry",
+    parameters: [
+      @id_parameter,
+      %Parameter{name: :entry_id, in: :path, required: true, schema: @user_id}
+    ],
+    request_body: @allowance_revoke_body,
+    responses: [
+      created: {"Allowance compensation", "application/json", @summary_object},
+      not_found: {"User or allowance extension not found", "application/json", @summary_object},
+      unprocessable_entity:
+        {"Invalid or already revoked extension", "application/json", @summary_object}
+    ]
+  )
+
+  def revoke_allowance(conn, params) do
+    admin = Guardian.Plug.current_resource(conn)
+    user_id = params["id"] || params[:id]
+    entry_id = params["entry_id"] || params[:entry_id]
+
+    with {:ok, result} <- RevokeUserAllowance.call(user_id, admin.id, entry_id, conn.body_params) do
+      conn |> put_status(:created) |> json(result)
     end
   end
 

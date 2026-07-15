@@ -804,6 +804,84 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   end
 
   @impl true
+  def revoke_allowance_grant(user_id, admin_id, grant_id, params) do
+    params = atom_key_map(params)
+
+    Repo.transaction(fn ->
+      grant =
+        from(entry in FinanceEntitlementUsageEntry,
+          join: membership in Membership,
+          on: membership.id == entry.membership_id,
+          where: entry.id == ^grant_id and membership.user_id == ^user_id,
+          lock: "FOR UPDATE"
+        )
+        |> Repo.one()
+        |> case do
+          nil -> Repo.rollback(:not_found)
+          entry -> entry
+        end
+
+      if grant.event_type != "adjustment" or grant.quantity_delta >= 0,
+        do: Repo.rollback(:invalid_allowance_grant)
+
+      if Repo.exists?(
+           from child in FinanceEntitlementUsageEntry,
+             where: child.parent_entry_id == ^grant.id and child.event_type == "adjustment"
+         ),
+         do: Repo.rollback(:allowance_grant_already_revoked)
+
+      reason = Map.get(params, :reason)
+
+      if not (is_binary(reason) and String.trim(reason) != ""),
+        do: Repo.rollback(:invalid_allowance_grant)
+
+      insert_usage_entry!(%{
+        membership_id: grant.membership_id,
+        membership_package_subscription_id: grant.membership_package_subscription_id,
+        allowance_key: grant.allowance_key,
+        event_type: "adjustment",
+        quantity_delta: -grant.quantity_delta,
+        period_start: grant.period_start,
+        period_end: grant.period_end,
+        source_context: "admin",
+        parent_entry_id: grant.id,
+        admin_id: admin_id,
+        reason: reason,
+        idempotency_key: Map.fetch!(params, :idempotency_key),
+        metadata: Map.get(params, :metadata, %{})
+      })
+    end)
+  end
+
+  @impl true
+  def release_stale_entitlement_reservations(cutoff) do
+    reservations =
+      from(entry in FinanceEntitlementUsageEntry, as: :entry)
+      |> where([entry], entry.event_type == "reserve" and entry.inserted_at < ^cutoff)
+      |> where(
+        [entry],
+        not exists(
+          from child in FinanceEntitlementUsageEntry,
+            where: child.parent_entry_id == parent_as(:entry).id,
+            where: child.event_type in ["finalize", "release"],
+            select: 1
+        )
+      )
+      |> Repo.all()
+
+    Enum.reduce_while(reservations, {:ok, 0}, fn reservation, {:ok, count} ->
+      case release_entitlement(reservation.id, %{
+             idempotency_key: "stale-entitlement-reservation:#{reservation.id}",
+             reason: "automatic stale reservation reconciliation"
+           }) do
+        {:ok, _entry} -> {:cont, {:ok, count + 1}}
+        {:error, :entitlement_reservation_already_closed} -> {:cont, {:ok, count}}
+        {:error, reason} -> {:halt, {:error, reason}}
+      end
+    end)
+  end
+
+  @impl true
   def transition_entitlement_source(
         user_id,
         source_context,
@@ -1028,7 +1106,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       extensions =
         entries
         |> Enum.filter(&(&1.event_type == "adjustment"))
-        |> Enum.reduce(0, &(max(-&1.quantity_delta, 0) + &2))
+        |> Enum.reduce(0, &(&1.quantity_delta + &2))
+        |> then(&max(-&1, 0))
 
       {period_start, period_end, committed, extensions, limit}
     else

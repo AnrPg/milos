@@ -32,6 +32,10 @@ defmodule MilosTraining.Finance.Ports.FinanceStore do
   @callback release_entitlement(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback grant_allowance(Ecto.UUID.t(), Ecto.UUID.t(), map()) ::
               {:ok, map()} | {:error, term()}
+  @callback revoke_allowance_grant(Ecto.UUID.t(), Ecto.UUID.t(), Ecto.UUID.t(), map()) ::
+              {:ok, map()} | {:error, term()}
+  @callback release_stale_entitlement_reservations(DateTime.t()) ::
+              {:ok, non_neg_integer()} | {:error, term()}
   @callback transition_entitlement_source(
               Ecto.UUID.t(),
               String.t(),

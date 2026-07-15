@@ -449,6 +449,29 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  def call(conn, {:error, :allowance_grant_already_revoked}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      error: %{
+        code: "allowance_grant_already_revoked",
+        message: "Allowance extension is already revoked"
+      }
+    })
+  end
+
+  def call(conn, {:error, {:invalid_backfill_package, role, reason}}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      error: %{
+        code: "invalid_backfill_package",
+        message: "Backfill package is missing or has an invalid entitlement contract",
+        details: %{role: role, reason: inspect(reason)}
+      }
+    })
+  end
+
   def call(conn, {:error, :finance_entitlement_inactive}) do
     conn
     |> put_status(:forbidden)

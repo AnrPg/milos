@@ -14,6 +14,13 @@ defmodule MilosTraining.Finance.EntitlementAllowanceTest do
   }
 
   test "serially reserves, releases, and extends one member's allowance with audit history" do
+    {:ok, _settings} =
+      Finance.update_finance_settings(%{
+        entitlement_enforcement_mode: "enforce_managed",
+        entitlement_timezone: "Europe/Athens",
+        payment_reminder_interval_days: 7
+      })
+
     user = TestFixtures.user_fixture(%{role: :member})
     admin = TestFixtures.admin_fixture()
 
@@ -105,5 +112,18 @@ defmodule MilosTraining.Finance.EntitlementAllowanceTest do
     assert effective.allowances.class_visits.extensions == 1
     assert effective.allowances.class_visits.remaining == 1
     assert length(effective.usage_entries) == 5
+
+    assert {:ok, compensation} =
+             Finance.revoke_allowance_grant(user.id, admin.id, grant.id, %{
+               reason: "Competition was cancelled",
+               idempotency_key: "revoke:competition"
+             })
+
+    assert compensation.parent_entry_id == grant.id
+    assert compensation.quantity_delta == 1
+
+    effective = Finance.get_effective_entitlement(user.id)
+    assert effective.allowances.class_visits.extensions == 0
+    assert effective.allowances.class_visits.remaining == 0
   end
 end

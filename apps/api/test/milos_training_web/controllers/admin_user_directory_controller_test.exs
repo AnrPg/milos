@@ -203,6 +203,19 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     entitlement = response["entitlement"]
     assert entitlement["allowances"]["class_visits"]["extensions"] == 2
     assert entitlement["allowances"]["class_visits"]["remaining"] == 6
+
+    revoked =
+      conn
+      |> put_bearer_token(admin)
+      |> post(
+        "/api/admin/users/#{member.id}/allowance-extensions/#{response["entry"]["id"]}/revoke",
+        %{reason: "Competition cancelled"}
+      )
+      |> json_response(201)
+
+    assert revoked["entry"]["parent_entry_id"] == response["entry"]["id"]
+    assert revoked["entry"]["quantity_delta"] == 2
+    assert revoked["entitlement"]["allowances"]["class_visits"]["extensions"] == 0
   end
 
   defp get_as_admin(conn, admin, user_id, section) do

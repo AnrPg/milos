@@ -89,6 +89,14 @@ defmodule MilosTraining.Finance.FinanceStore do
     do: adapter().grant_allowance(user_id, admin_id, params)
 
   @impl true
+  def revoke_allowance_grant(user_id, admin_id, grant_id, params),
+    do: adapter().revoke_allowance_grant(user_id, admin_id, grant_id, params)
+
+  @impl true
+  def release_stale_entitlement_reservations(cutoff),
+    do: adapter().release_stale_entitlement_reservations(cutoff)
+
+  @impl true
   def transition_entitlement_source(
         user_id,
         source_context,
