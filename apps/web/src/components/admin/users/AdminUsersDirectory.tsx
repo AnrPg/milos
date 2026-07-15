@@ -1,0 +1,93 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
+import { useState } from "react";
+
+import { fetchAdminUsers } from "@/api/admin-users";
+import { useSession } from "@/components/session-provider";
+
+const FILTERS = [
+  ["all", "All"],
+  ["member", "Members"],
+  ["athlete", "Athletes"],
+  ["admin", "Admins"],
+] as const;
+
+export function AdminUsersDirectory() {
+  const { tokens } = useSession();
+  const [role, setRole] = useState<(typeof FILTERS)[number][0]>("all");
+  const [query, setQuery] = useState("");
+  const token = tokens?.access_token;
+
+  const usersQuery = useQuery({
+    queryKey: ["admin", "users", role, query],
+    enabled: Boolean(token),
+    queryFn: () => fetchAdminUsers(token!, { q: query.trim() || undefined, role: role === "all" ? undefined : role }),
+  });
+
+  const users = usersQuery.data?.users ?? [];
+
+  return (
+    <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
+      <div className="mx-auto max-w-6xl space-y-6">
+        <section className="rounded-[2.4rem] p-8" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+          <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>Users</p>
+          <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>
+            Every person, one directory.
+          </h1>
+          <p className="mt-4 max-w-3xl text-base leading-7" style={{ color: "var(--muted)" }}>
+            Find members, athletes, and admins, then open their role-aware profile.
+          </p>
+        </section>
+
+        <section className="rounded-[2rem] p-4" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-wrap gap-2">
+              {FILTERS.map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  className="rounded-full px-4 py-2 text-sm font-semibold"
+                  onClick={() => setRole(value)}
+                  style={role === value ? { background: "var(--text)", color: "var(--bg)" } : { background: "var(--panel-muted)", color: "var(--muted)" }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <input
+              aria-label="Search users"
+              className="min-w-64 rounded-full px-4 py-2.5 text-sm outline-none"
+              placeholder="Search nickname"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+            />
+          </div>
+        </section>
+
+        <section className="grid gap-3">
+          {usersQuery.isLoading ? <p className="p-5 text-sm" style={{ color: "var(--muted)" }}>Loading users…</p> : null}
+          {!usersQuery.isLoading && users.length === 0 ? <p className="rounded-2xl p-5 text-sm" style={{ background: "var(--panel)", color: "var(--muted)" }}>No users match this view.</p> : null}
+          {users.map((user) => (
+            <Link
+              key={user.id}
+              href={`/admin/users/${user.id}`}
+              className="grid items-center gap-3 rounded-[1.6rem] p-5 transition-transform hover:-translate-y-0.5 md:grid-cols-[1fr_auto_auto_auto]"
+              style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+            >
+              <div>
+                <p className="font-semibold" style={{ color: "var(--text)" }}>{user.nickname}</p>
+                <p className="mt-1 text-xs uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>{user.role}</p>
+              </div>
+              <span className="text-sm" style={{ color: "var(--muted)" }}>{user.account_status}</span>
+              <span className="text-sm" style={{ color: "var(--muted)" }}>{user.finance_status ?? "No finance profile"}</span>
+              <span className="text-sm font-semibold" style={{ color: "var(--primary)" }}>Open →</span>
+            </Link>
+          ))}
+        </section>
+      </div>
+    </main>
+  );
+}
