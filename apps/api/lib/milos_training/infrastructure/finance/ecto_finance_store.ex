@@ -803,6 +803,45 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     end)
   end
 
+  @impl true
+  def transition_entitlement_source(
+        user_id,
+        source_context,
+        source_id,
+        allowance,
+        transition,
+        params
+      ) do
+    params = atom_key_map(params)
+
+    reservation =
+      from(entry in FinanceEntitlementUsageEntry, as: :entry)
+      |> join(:inner, [entry], membership in Membership, on: membership.id == entry.membership_id)
+      |> where([entry, membership], membership.user_id == ^user_id)
+      |> where([entry], entry.source_context == ^to_string(source_context))
+      |> where([entry], entry.source_id == ^source_id)
+      |> where([entry], entry.allowance_key == ^to_string(allowance))
+      |> where([entry], entry.event_type == "reserve")
+      |> where(
+        [entry],
+        not exists(
+          from child in FinanceEntitlementUsageEntry,
+            where: child.parent_entry_id == parent_as(:entry).id,
+            where: child.event_type in ["finalize", "release"],
+            select: 1
+        )
+      )
+      |> order_by([entry], desc: entry.inserted_at)
+      |> limit(1)
+      |> Repo.one()
+
+    case reservation do
+      nil -> {:ok, %{transition: :not_required}}
+      entry when transition == :finalize -> finalize_entitlement(entry.id, params)
+      entry when transition == :release -> release_entitlement(entry.id, params)
+    end
+  end
+
   defp reserve_for_membership!(membership, request) do
     occurred_on = Map.get(request, :occurred_on, Date.utc_today())
     subscription = effective_subscription(membership.id, occurred_on)
@@ -826,7 +865,10 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       |> Map.put(:committed, committed)
       |> Map.put(:limit, effective_limit(limit, extensions))
 
-    case EntitlementPolicy.authorize(entitlement, policy_request, mode: mode) do
+    case EntitlementPolicy.authorize(entitlement, policy_request,
+           mode: mode,
+           actor_role: Map.get(request, :actor_role)
+         ) do
       {:ok, decision} ->
         if allowance && subscription do
           entry =
@@ -861,7 +903,10 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   end
 
   defp authorize_missing_profile!(request) do
-    case EntitlementPolicy.authorize(nil, request, mode: entitlement_enforcement_mode()) do
+    case EntitlementPolicy.authorize(nil, request,
+           mode: entitlement_enforcement_mode(),
+           actor_role: Map.get(request, :actor_role)
+         ) do
       :ok -> %{id: nil, observed?: true}
       {:ok, decision} -> %{id: nil, observed?: true, decision: decision}
       {:error, reason} -> Repo.rollback(reason)
@@ -944,7 +989,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
           |> Enum.map(&normalize_usage_entry/1)
 
         base
-        |> Map.put(:plan, plan)
+        |> Map.put(:plan, serialize_entitlement_plan(plan))
         |> Map.put(:subscription, normalize_subscription(subscription))
         |> Map.put(:allowances, allowances)
         |> Map.put(:usage_entries, entries)
@@ -1039,6 +1084,15 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       idempotency_key: entry.idempotency_key,
       metadata: entry.metadata,
       inserted_at: entry.inserted_at
+    }
+  end
+
+  defp serialize_entitlement_plan(plan) do
+    %{
+      entitlement_version: plan.version,
+      channels: plan.channels |> MapSet.to_list() |> Enum.sort(),
+      capabilities: plan.capabilities |> MapSet.to_list() |> Enum.sort(),
+      allowances: plan.allowances
     }
   end
 

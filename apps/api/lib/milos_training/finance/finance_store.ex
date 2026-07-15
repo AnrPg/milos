@@ -89,6 +89,25 @@ defmodule MilosTraining.Finance.FinanceStore do
     do: adapter().grant_allowance(user_id, admin_id, params)
 
   @impl true
+  def transition_entitlement_source(
+        user_id,
+        source_context,
+        source_id,
+        allowance,
+        transition,
+        params
+      ),
+      do:
+        adapter().transition_entitlement_source(
+          user_id,
+          source_context,
+          source_id,
+          allowance,
+          transition,
+          params
+        )
+
+  @impl true
   def list_expiring_memberships(days), do: adapter().list_expiring_memberships(days)
   @impl true
   def operational_queues(params), do: adapter().operational_queues(params)

@@ -48,6 +48,21 @@ defmodule MilosTraining.Finance.Domain.EntitlementPolicy do
     do: {:error, :finance_entitlement_inactive}
 
   defp authorize_plan(raw_plan, request, mode) do
+    result = authorize_plan_enforced(raw_plan, request, mode)
+
+    case {mode, result} do
+      {:observe, {:error, reason}} ->
+        {:ok, %{observed?: true, reason: reason}}
+
+      {:observe, {:error, reason, details}} ->
+        {:ok, %{observed?: true, reason: reason, details: details}}
+
+      _ ->
+        result
+    end
+  end
+
+  defp authorize_plan_enforced(raw_plan, request, mode) do
     with {:ok, plan} <- EntitlementPlan.parse(raw_plan),
          :ok <- require_member(plan.channels, request_value(request, :channel), :channel, mode),
          :ok <-
