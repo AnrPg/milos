@@ -3,6 +3,7 @@ defmodule MilosTrainingWeb.MessagingController do
   use OpenApiSpex.ControllerSpecs
 
   alias MilosTraining.{Identity, Messaging}
+  alias MilosTraining.Application.SendMessage, as: SendMessageUseCase
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
   action_fallback MilosTrainingWeb.FallbackController
@@ -297,7 +298,7 @@ defmodule MilosTrainingWeb.MessagingController do
     message_type = parse_message_type(bp(conn, "message_type") || "chat")
 
     with {:ok, message} <-
-           Messaging.send_message(%{
+           SendMessageUseCase.call(user, %{
              thread_id: thread_id,
              sender_id: user.id,
              body: bp(conn, "body"),
