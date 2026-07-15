@@ -385,6 +385,70 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{error: "Finance entitlement blocked"})
   end
 
+  def call(conn, {:error, :finance_profile_missing}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{error: %{code: "finance_profile_missing", message: "Finance profile required"}})
+  end
+
+  def call(conn, {:error, :finance_entitlement_plan_missing}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      error: %{
+        code: "finance_entitlement_plan_missing",
+        message: "The active package has no enforceable entitlement plan"
+      }
+    })
+  end
+
+  def call(conn, {:error, :finance_channel_not_included}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      error: %{code: "finance_channel_not_included", message: "Package channel not included"}
+    })
+  end
+
+  def call(conn, {:error, :finance_capability_not_included}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      error: %{
+        code: "finance_capability_not_included",
+        message: "Package capability not included"
+      }
+    })
+  end
+
+  def call(conn, {:error, :finance_allowance_not_included}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      error: %{code: "finance_allowance_not_included", message: "Package allowance not included"}
+    })
+  end
+
+  def call(conn, {:error, :finance_allowance_exhausted, details}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      error: %{
+        code: "finance_allowance_exhausted",
+        message: "Package allowance exhausted",
+        details: details
+      }
+    })
+  end
+
+  def call(conn, {:error, :invalid_allowance_grant}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      error: %{code: "invalid_allowance_grant", message: "Allowance extension is invalid"}
+    })
+  end
+
   def call(conn, {:error, :finance_entitlement_inactive}) do
     conn
     |> put_status(:forbidden)

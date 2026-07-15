@@ -65,6 +65,7 @@ defmodule MilosTrainingWeb.Router do
     pipe_through([:api, :authenticated])
 
     get("/finance", MyFinanceController, :index)
+    get("/entitlement", MyFinanceController, :entitlement)
     get("/invoices/:id/download-url", MyFinanceController, :invoice_download_url)
     patch("/profile", MeController, :update_profile)
     post("/avatar/upload-url", MeController, :avatar_upload_url)
@@ -83,6 +84,7 @@ defmodule MilosTrainingWeb.Router do
     get("/users/:id/incidents", AdminUserController, :incidents)
     get("/users/:id/messages", AdminUserController, :messages)
     get("/users/:id/coaching-context", AdminUserController, :coaching_context)
+    post("/users/:id/allowance-extensions", AdminUserController, :grant_allowance)
     patch("/users/:id/role", AdminUserController, :update_role)
     get("/search", AdminSearchController, :index)
     get("/analytics/summary", AdminAnalyticsController, :summary)
