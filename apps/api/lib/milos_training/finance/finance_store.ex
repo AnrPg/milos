@@ -73,6 +73,22 @@ defmodule MilosTraining.Finance.FinanceStore do
   @impl true
   def get_entitlement(user_id), do: adapter().get_entitlement(user_id)
   @impl true
+  def get_effective_entitlement(user_id), do: adapter().get_effective_entitlement(user_id)
+  @impl true
+  def reserve_entitlement(user_id, request), do: adapter().reserve_entitlement(user_id, request)
+  @impl true
+  def finalize_entitlement(reservation_id, params),
+    do: adapter().finalize_entitlement(reservation_id, params)
+
+  @impl true
+  def release_entitlement(reservation_id, params),
+    do: adapter().release_entitlement(reservation_id, params)
+
+  @impl true
+  def grant_allowance(user_id, admin_id, params),
+    do: adapter().grant_allowance(user_id, admin_id, params)
+
+  @impl true
   def list_expiring_memberships(days), do: adapter().list_expiring_memberships(days)
   @impl true
   def operational_queues(params), do: adapter().operational_queues(params)

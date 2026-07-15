@@ -26,6 +26,12 @@ defmodule MilosTraining.Finance.Ports.FinanceStore do
   @callback apply_credit_to_invoice(Ecto.UUID.t(), Ecto.UUID.t(), map()) ::
               {:ok, map()} | {:error, term()}
   @callback get_entitlement(Ecto.UUID.t()) :: map() | nil
+  @callback get_effective_entitlement(Ecto.UUID.t()) :: map() | nil
+  @callback reserve_entitlement(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
+  @callback finalize_entitlement(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
+  @callback release_entitlement(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
+  @callback grant_allowance(Ecto.UUID.t(), Ecto.UUID.t(), map()) ::
+              {:ok, map()} | {:error, term()}
   @callback list_expiring_memberships(non_neg_integer()) :: [map()]
   @callback operational_queues(map()) :: map()
   @callback financial_summary(map()) :: map()

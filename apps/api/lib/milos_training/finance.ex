@@ -14,8 +14,12 @@ defmodule MilosTraining.Finance do
     CreateReferralProgram,
     CreateReferralReward,
     GenerateRenewalInvoice,
+    GrantAllowance,
     IssueInvoice,
     RecordPayment,
+    ReleaseEntitlement,
+    ReserveEntitlement,
+    FinalizeEntitlement,
     RedeemPromotion,
     RefreshAggregates,
     ReverseCreditLedgerEntry,
@@ -31,6 +35,7 @@ defmodule MilosTraining.Finance do
   alias MilosTraining.Finance.Queries.{
     FinancialSummary,
     GetEntitlement,
+    GetEffectiveEntitlement,
     GetMemberProfile,
     GetPackage,
     ListExpiringMemberships,
@@ -89,6 +94,11 @@ defmodule MilosTraining.Finance do
     as: :call
 
   defdelegate get_entitlement(user_id), to: GetEntitlement, as: :call
+  defdelegate get_effective_entitlement(user_id), to: GetEffectiveEntitlement, as: :call
+  defdelegate reserve_entitlement(user_id, request), to: ReserveEntitlement, as: :call
+  defdelegate finalize_entitlement(reservation_id, params), to: FinalizeEntitlement, as: :call
+  defdelegate release_entitlement(reservation_id, params), to: ReleaseEntitlement, as: :call
+  defdelegate grant_allowance(user_id, admin_id, params), to: GrantAllowance, as: :call
   defdelegate list_expiring_memberships(days), to: ListExpiringMemberships, as: :call
   defdelegate operational_queues(params \\ %{}), to: OperationalQueues, as: :call
   def financial_summary(params \\ %{}), do: FinancialSummary.call(params)

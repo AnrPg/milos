@@ -5,6 +5,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   alias MilosTraining.Finance.{
     FinanceCreditLedgerEntry,
+    FinanceEntitlementUsageEntry,
     FinanceInvoice,
     FinanceInvoiceLine,
     FinanceSetting,
@@ -22,7 +23,10 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   }
 
   alias MilosTraining.Finance.Domain.{
+    AllowancePeriod,
     CreditLedger,
+    EntitlementPlan,
+    EntitlementPolicy,
     InvoiceLifecycle,
     InvoiceNumber,
     MembershipLifecycle,
@@ -705,6 +709,365 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       nil -> nil
       %Membership{} = membership -> entitlement_for_membership(membership)
     end
+  end
+
+  @impl true
+  def get_effective_entitlement(user_id) do
+    case Repo.get_by(Membership, user_id: user_id) do
+      nil -> nil
+      %Membership{} = membership -> effective_entitlement(membership, Date.utc_today())
+    end
+  end
+
+  @impl true
+  def reserve_entitlement(user_id, request) do
+    request = atom_key_map(request)
+
+    result =
+      Repo.transaction(fn ->
+        idempotency_key = Map.fetch!(request, :idempotency_key)
+
+        case Repo.get_by(FinanceEntitlementUsageEntry, idempotency_key: idempotency_key) do
+          %FinanceEntitlementUsageEntry{} = existing ->
+            normalize_usage_entry(existing)
+
+          nil ->
+            case Repo.one(from m in Membership, where: m.user_id == ^user_id, lock: "FOR UPDATE") do
+              nil -> authorize_missing_profile!(request)
+              %Membership{} = membership -> reserve_for_membership!(membership, request)
+            end
+        end
+      end)
+
+    case result do
+      {:error, {reason, details}} -> {:error, reason, details}
+      other -> other
+    end
+  end
+
+  @impl true
+  def finalize_entitlement(reservation_id, params) do
+    transition_entitlement(reservation_id, params, "finalize", 0)
+  end
+
+  @impl true
+  def release_entitlement(reservation_id, params) do
+    transition_entitlement(reservation_id, params, "release", :reverse)
+  end
+
+  @impl true
+  def grant_allowance(user_id, admin_id, params) do
+    params = atom_key_map(params)
+
+    Repo.transaction(fn ->
+      membership =
+        Repo.one(from m in Membership, where: m.user_id == ^user_id, lock: "FOR UPDATE") ||
+          Repo.rollback(:finance_profile_missing)
+
+      occurred_on = Map.get(params, :occurred_on, Date.utc_today())
+      subscription = effective_subscription(membership.id, occurred_on)
+      if is_nil(subscription), do: Repo.rollback(:finance_entitlement_inactive)
+
+      allowance = Map.get(params, :allowance)
+
+      with {:ok, plan} <- EntitlementPlan.parse(subscription.params_snapshot || %{}),
+           %{period: package_period} <- Map.get(plan.allowances, allowance) do
+        period = Map.get(params, :period, package_period)
+        {period_start, period_end} = AllowancePeriod.bounds(period, occurred_on, subscription)
+        quantity = Map.get(params, :quantity, 0)
+        reason = Map.get(params, :reason)
+
+        if not (is_integer(quantity) and quantity > 0 and is_binary(reason) and
+                  String.trim(reason) != "") do
+          Repo.rollback(:invalid_allowance_grant)
+        end
+
+        insert_usage_entry!(%{
+          membership_id: membership.id,
+          membership_package_subscription_id: subscription.id,
+          allowance_key: to_string(allowance),
+          event_type: "adjustment",
+          quantity_delta: -quantity,
+          period_start: period_start,
+          period_end: period_end,
+          source_context: "admin",
+          admin_id: admin_id,
+          reason: reason,
+          idempotency_key: Map.fetch!(params, :idempotency_key),
+          metadata: Map.get(params, :metadata, %{})
+        })
+      else
+        nil -> Repo.rollback(:finance_allowance_not_included)
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+  end
+
+  defp reserve_for_membership!(membership, request) do
+    occurred_on = Map.get(request, :occurred_on, Date.utc_today())
+    subscription = effective_subscription(membership.id, occurred_on)
+    entitlement = entitlement_for_membership(membership)
+    mode = entitlement_enforcement_mode()
+
+    entitlement =
+      if subscription do
+        Map.put(entitlement, :plan, subscription.params_snapshot || %{})
+      else
+        entitlement
+      end
+
+    allowance = Map.get(request, :allowance)
+
+    {period_start, period_end, committed, extensions, limit} =
+      allowance_state(subscription, allowance, occurred_on)
+
+    policy_request =
+      request
+      |> Map.put(:committed, committed)
+      |> Map.put(:limit, effective_limit(limit, extensions))
+
+    case EntitlementPolicy.authorize(entitlement, policy_request, mode: mode) do
+      {:ok, decision} ->
+        if allowance && subscription do
+          entry =
+            insert_usage_entry!(%{
+              membership_id: membership.id,
+              membership_package_subscription_id: subscription.id,
+              allowance_key: to_string(allowance),
+              event_type: "reserve",
+              quantity_delta: Map.get(request, :quantity, 1),
+              period_start: period_start,
+              period_end: period_end,
+              source_context: to_string(Map.get(request, :source_context, "application")),
+              source_id: Map.get(request, :source_id),
+              idempotency_key: Map.fetch!(request, :idempotency_key),
+              metadata: Map.get(request, :metadata, %{})
+            })
+
+          Map.put(entry, :decision, decision)
+        else
+          %{id: nil, decision: decision, observed?: true}
+        end
+
+      :ok ->
+        %{id: nil, decision: %{remaining: :not_metered}, observed?: true}
+
+      {:error, reason} ->
+        Repo.rollback(reason)
+
+      {:error, reason, details} ->
+        Repo.rollback({reason, details})
+    end
+  end
+
+  defp authorize_missing_profile!(request) do
+    case EntitlementPolicy.authorize(nil, request, mode: entitlement_enforcement_mode()) do
+      :ok -> %{id: nil, observed?: true}
+      {:ok, decision} -> %{id: nil, observed?: true, decision: decision}
+      {:error, reason} -> Repo.rollback(reason)
+    end
+  end
+
+  defp transition_entitlement(reservation_id, params, event_type, delta) do
+    params = atom_key_map(params)
+
+    Repo.transaction(fn ->
+      idempotency_key = Map.fetch!(params, :idempotency_key)
+
+      case Repo.get_by(FinanceEntitlementUsageEntry, idempotency_key: idempotency_key) do
+        %FinanceEntitlementUsageEntry{} = existing ->
+          normalize_usage_entry(existing)
+
+        nil ->
+          reservation =
+            Repo.one(
+              from entry in FinanceEntitlementUsageEntry,
+                where: entry.id == ^reservation_id,
+                lock: "FOR UPDATE"
+            ) || Repo.rollback(:not_found)
+
+          if reservation.event_type != "reserve",
+            do: Repo.rollback(:invalid_entitlement_reservation)
+
+          terminal =
+            Repo.get_by(FinanceEntitlementUsageEntry, parent_entry_id: reservation.id)
+
+          if terminal, do: Repo.rollback(:entitlement_reservation_already_closed)
+
+          insert_usage_entry!(%{
+            membership_id: reservation.membership_id,
+            membership_package_subscription_id: reservation.membership_package_subscription_id,
+            allowance_key: reservation.allowance_key,
+            event_type: event_type,
+            quantity_delta: if(delta == :reverse, do: -reservation.quantity_delta, else: delta),
+            period_start: reservation.period_start,
+            period_end: reservation.period_end,
+            source_context: reservation.source_context,
+            source_id: Map.get(params, :source_id, reservation.source_id),
+            parent_entry_id: reservation.id,
+            reason: Map.get(params, :reason),
+            idempotency_key: idempotency_key,
+            metadata: Map.get(params, :metadata, %{})
+          })
+      end
+    end)
+  end
+
+  defp effective_entitlement(membership, occurred_on) do
+    base = entitlement_for_membership(membership)
+    subscription = effective_subscription(membership.id, occurred_on)
+
+    case subscription && EntitlementPlan.parse(subscription.params_snapshot || %{}) do
+      {:ok, plan} ->
+        allowances =
+          Map.new(plan.allowances, fn {allowance, config} ->
+            {period_start, period_end, committed, extensions, limit} =
+              allowance_state(subscription, allowance, occurred_on)
+
+            {allowance,
+             %{
+               limit: limit,
+               period: config.period,
+               period_start: period_start,
+               period_end: period_end,
+               committed: committed,
+               extensions: extensions,
+               remaining: remaining(limit, extensions, committed)
+             }}
+          end)
+
+        entries =
+          FinanceEntitlementUsageEntry
+          |> where([entry], entry.membership_id == ^membership.id)
+          |> order_by([entry], desc: entry.inserted_at)
+          |> Repo.all()
+          |> Enum.map(&normalize_usage_entry/1)
+
+        base
+        |> Map.put(:plan, plan)
+        |> Map.put(:subscription, normalize_subscription(subscription))
+        |> Map.put(:allowances, allowances)
+        |> Map.put(:usage_entries, entries)
+        |> Map.put(:enforcement_mode, entitlement_enforcement_mode())
+
+      _ ->
+        base
+        |> Map.put(:plan, nil)
+        |> Map.put(:allowances, %{})
+        |> Map.put(:usage_entries, [])
+        |> Map.put(:enforcement_mode, entitlement_enforcement_mode())
+    end
+  end
+
+  defp allowance_state(nil, _allowance, occurred_on),
+    do: {occurred_on, occurred_on, 0, 0, nil}
+
+  defp allowance_state(subscription, allowance, occurred_on) do
+    with {:ok, plan} <- EntitlementPlan.parse(subscription.params_snapshot || %{}),
+         %{limit: limit, period: period} <- Map.get(plan.allowances, allowance) do
+      {period_start, period_end} = AllowancePeriod.bounds(period, occurred_on, subscription)
+
+      entries =
+        FinanceEntitlementUsageEntry
+        |> where([entry], entry.membership_package_subscription_id == ^subscription.id)
+        |> where([entry], entry.allowance_key == ^to_string(allowance))
+        |> where([entry], entry.period_start == ^period_start and entry.period_end == ^period_end)
+        |> Repo.all()
+
+      committed =
+        entries
+        |> Enum.reject(&(&1.event_type == "adjustment"))
+        |> Enum.reduce(0, &(&1.quantity_delta + &2))
+        |> max(0)
+
+      extensions =
+        entries
+        |> Enum.filter(&(&1.event_type == "adjustment"))
+        |> Enum.reduce(0, &(max(-&1.quantity_delta, 0) + &2))
+
+      {period_start, period_end, committed, extensions, limit}
+    else
+      _ -> {occurred_on, occurred_on, 0, 0, nil}
+    end
+  end
+
+  defp effective_subscription(membership_id, occurred_on) do
+    MembershipPackageSubscription
+    |> where([subscription], subscription.membership_id == ^membership_id)
+    |> where([subscription], subscription.status == "active")
+    |> where(
+      [subscription],
+      is_nil(subscription.starts_on) or subscription.starts_on <= ^occurred_on
+    )
+    |> where([subscription], is_nil(subscription.ends_on) or subscription.ends_on >= ^occurred_on)
+    |> order_by([subscription], desc: subscription.starts_on, desc: subscription.inserted_at)
+    |> limit(1)
+    |> Repo.one()
+  end
+
+  defp insert_usage_entry!(params) do
+    case Repo.get_by(FinanceEntitlementUsageEntry, idempotency_key: params.idempotency_key) do
+      %FinanceEntitlementUsageEntry{} = entry ->
+        normalize_usage_entry(entry)
+
+      nil ->
+        %FinanceEntitlementUsageEntry{}
+        |> FinanceEntitlementUsageEntry.changeset(params)
+        |> Repo.insert()
+        |> case do
+          {:ok, entry} -> normalize_usage_entry(entry)
+          {:error, changeset} -> Repo.rollback(changeset)
+        end
+    end
+  end
+
+  defp normalize_usage_entry(entry) do
+    %{
+      id: entry.id,
+      membership_id: entry.membership_id,
+      membership_package_subscription_id: entry.membership_package_subscription_id,
+      allowance_key: entry.allowance_key,
+      event_type: entry.event_type,
+      quantity_delta: entry.quantity_delta,
+      period_start: entry.period_start,
+      period_end: entry.period_end,
+      source_context: entry.source_context,
+      source_id: entry.source_id,
+      parent_entry_id: entry.parent_entry_id,
+      admin_id: entry.admin_id,
+      reason: entry.reason,
+      idempotency_key: entry.idempotency_key,
+      metadata: entry.metadata,
+      inserted_at: entry.inserted_at
+    }
+  end
+
+  defp remaining(:unlimited, _extensions, _committed), do: :unlimited
+  defp remaining(limit, extensions, committed), do: max(limit + extensions - committed, 0)
+  defp effective_limit(:unlimited, _extensions), do: :unlimited
+  defp effective_limit(nil, _extensions), do: nil
+  defp effective_limit(limit, extensions), do: limit + extensions
+
+  defp entitlement_enforcement_mode do
+    case get_finance_settings().entitlement_enforcement_mode do
+      "enforce_managed" -> :enforce_managed
+      "enforce_all" -> :enforce_all
+      _ -> :observe
+    end
+  end
+
+  defp atom_key_map(params) when is_map(params) do
+    Map.new(params, fn
+      {key, value} when is_atom(key) ->
+        {key, value}
+
+      {key, value} when is_binary(key) ->
+        try do
+          {String.to_existing_atom(key), value}
+        rescue
+          ArgumentError -> {key, value}
+        end
+    end)
   end
 
   @impl true
@@ -2817,8 +3180,15 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   @impl true
   def get_finance_settings do
     case Repo.one(from s in FinanceSetting, limit: 1) do
-      nil -> %{payment_reminder_interval_days: 7}
-      settings -> normalize_finance_settings(settings)
+      nil ->
+        %{
+          payment_reminder_interval_days: 7,
+          entitlement_enforcement_mode: "observe",
+          entitlement_timezone: "Europe/Athens"
+        }
+
+      settings ->
+        normalize_finance_settings(settings)
     end
   end
 
@@ -2843,6 +3213,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     %{
       id: s.id,
       payment_reminder_interval_days: s.payment_reminder_interval_days,
+      entitlement_enforcement_mode: s.entitlement_enforcement_mode,
+      entitlement_timezone: s.entitlement_timezone,
       inserted_at: s.inserted_at,
       updated_at: s.updated_at
     }
