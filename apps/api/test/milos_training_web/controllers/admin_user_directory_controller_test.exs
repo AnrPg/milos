@@ -154,6 +154,57 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     assert json_response(conn, 403)["error"] == "Forbidden"
   end
 
+  test "admin extends one user's allowance from the unified profile contract", %{conn: conn} do
+    admin = admin_fixture()
+    member = user_fixture(%{role: :member})
+
+    {:ok, package} =
+      MilosTraining.Finance.create_package(%{
+        code: "profile_extension_package",
+        name: "Profile extension package",
+        family: "limited-visits",
+        billing_period: "monthly",
+        params: %{
+          "entitlement_version" => 1,
+          "channels" => ["in_person"],
+          "capabilities" => ["book_classes"],
+          "allowances" => %{
+            "class_visits" => %{"limit" => 4, "period" => "calendar_month"}
+          }
+        }
+      })
+
+    {:ok, membership} =
+      MilosTraining.Finance.upsert_membership(member.id, %{
+        user_type_snapshot: "member",
+        status: "active",
+        signup_source: "admin_created"
+      })
+
+    {:ok, _subscription} =
+      MilosTraining.Finance.assign_package(membership.id, package.id, %{
+        starts_on: Date.utc_today()
+      })
+
+    response =
+      conn
+      |> put_bearer_token(admin)
+      |> post("/api/admin/users/#{member.id}/allowance-extensions", %{
+        allowance: "class_visits",
+        quantity: 2,
+        period: "calendar_month",
+        reason: "Competition preparation"
+      })
+      |> json_response(201)
+
+    assert response["entry"]["allowance_key"] == "class_visits"
+    assert response["entry"]["quantity_delta"] == -2
+
+    entitlement = response["entitlement"]
+    assert entitlement["allowances"]["class_visits"]["extensions"] == 2
+    assert entitlement["allowances"]["class_visits"]["remaining"] == 6
+  end
+
   defp get_as_admin(conn, admin, user_id, section) do
     conn
     |> put_bearer_token(admin)

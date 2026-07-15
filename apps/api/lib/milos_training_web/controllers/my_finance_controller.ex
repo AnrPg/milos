@@ -30,6 +30,25 @@ defmodule MilosTrainingWeb.MyFinanceController do
     json(conn, finance)
   end
 
+  operation(:entitlement,
+    summary: "Get the current user's effective package benefits and allowance usage",
+    responses: [
+      ok:
+        {"Effective entitlement", "application/json",
+         %Schema{type: :object, additionalProperties: true}},
+      not_found: {"Finance profile not found", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def entitlement(conn, _params) do
+    user = GuardianPlug.current_resource(conn)
+
+    case Finance.get_effective_entitlement(user.id) do
+      nil -> {:error, :not_found}
+      entitlement -> json(conn, %{entitlement: entitlement})
+    end
+  end
+
   operation(:invoice_download_url,
     summary: "Get a presigned download URL for one of the current member's invoices",
     parameters: [

@@ -67,6 +67,62 @@ defmodule MilosTrainingWeb.AdminFinanceController do
     required: true,
     content: %{"application/json" => %MediaType{schema: @open_object}}
   }
+  @allowance_config_schema %Schema{
+    type: :object,
+    additionalProperties: false,
+    required: [:limit, :period],
+    properties: %{
+      limit: %Schema{
+        oneOf: [
+          %Schema{type: :integer, minimum: 0},
+          %Schema{type: :string, enum: ["unlimited"]}
+        ]
+      },
+      period: %Schema{
+        type: :string,
+        enum: ["calendar_week", "calendar_month", "subscription_period"]
+      },
+      counted_kinds: %Schema{type: :array, items: %Schema{type: :string}}
+    }
+  }
+  @entitlement_params_schema %Schema{
+    type: :object,
+    additionalProperties: false,
+    required: [:entitlement_version, :channels, :capabilities, :allowances],
+    properties: %{
+      entitlement_version: %Schema{type: :integer, enum: [1]},
+      channels: %Schema{
+        type: :array,
+        uniqueItems: true,
+        items: %Schema{
+          type: :string,
+          enum: ["in_person", "workout_library", "personal_programming", "coach_messaging"]
+        }
+      },
+      capabilities: %Schema{
+        type: :array,
+        uniqueItems: true,
+        items: %Schema{
+          type: :string,
+          enum: [
+            "book_classes",
+            "execute_class_workouts",
+            "execute_library_workouts",
+            "execute_assigned_workouts",
+            "receive_coaching_touchpoints"
+          ]
+        }
+      },
+      allowances: %Schema{
+        type: :object,
+        additionalProperties: false,
+        properties: %{
+          class_visits: @allowance_config_schema,
+          coaching_touchpoints: @allowance_config_schema
+        }
+      }
+    }
+  }
   @package_properties %{
     code: %Schema{type: :string},
     name: %Schema{type: :string},
@@ -79,7 +135,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
     base_price_cents: %Schema{type: :integer, minimum: 0},
     currency: %Schema{type: :string},
     tags: %Schema{type: :array, items: %Schema{type: :string}},
-    params: %Schema{type: :object, additionalProperties: true},
+    params: @entitlement_params_schema,
     active: %Schema{type: :boolean}
   }
   @create_package_request_body %RequestBody{

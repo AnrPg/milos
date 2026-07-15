@@ -19,7 +19,8 @@ defmodule MilosTraining.Application.GetMyFinance do
            total_outstanding_balance_cents: 0,
            referral_credits: [],
            promotion_redemptions: [],
-           available_packages: packages
+           available_packages: packages,
+           effective_entitlement: nil
          }}
 
       profile ->
@@ -49,7 +50,8 @@ defmodule MilosTraining.Application.GetMyFinance do
            referral_credits:
              Enum.filter(profile.credit_ledger_entries, &(&1.referral_reward_id != nil)),
            promotion_redemptions: profile.promotion_redemptions,
-           available_packages: packages
+           available_packages: packages,
+           effective_entitlement: Finance.get_effective_entitlement(user_id)
          }}
     end
   end

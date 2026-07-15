@@ -10,6 +10,7 @@ defmodule MilosTrainingWeb.AdminUserController do
     GetAdminUserProfile,
     GetAdminUserPRs,
     GetAdminUserTrainingHistory,
+    GrantUserAllowance,
     ListAdminUsers,
     ListAthletes,
     UpdateUserRole
@@ -76,7 +77,34 @@ defmodule MilosTrainingWeb.AdminUserController do
   }
 
   plug OpenApiSpex.Plug.CastAndValidate,
-       [json_render_error_v2: true] when action in [:update_role]
+       [json_render_error_v2: true] when action in [:update_role, :grant_allowance]
+
+  @allowance_grant_body %RequestBody{
+    required: true,
+    content: %{
+      "application/json" => %MediaType{
+        schema: %Schema{
+          type: :object,
+          additionalProperties: false,
+          required: [:allowance, :quantity, :period, :reason],
+          properties: %{
+            allowance: %Schema{
+              type: :string,
+              enum: ["class_visits", "coaching_touchpoints"]
+            },
+            quantity: %Schema{type: :integer, minimum: 1, maximum: 10_000},
+            period: %Schema{
+              type: :string,
+              enum: ["calendar_week", "calendar_month", "subscription_period"]
+            },
+            occurred_on: %Schema{type: :string, format: :date, nullable: true},
+            reason: %Schema{type: :string, minLength: 3, maxLength: 500},
+            idempotency_key: %Schema{type: :string, minLength: 8, maxLength: 200, nullable: true}
+          }
+        }
+      }
+    }
+  }
 
   operation(:index,
     summary: "List all users for the admin directory",
@@ -278,6 +306,17 @@ defmodule MilosTrainingWeb.AdminUserController do
     ]
   )
 
+  operation(:grant_allowance,
+    summary: "Extend one user's named package allowance for a specific period",
+    parameters: [@id_parameter],
+    request_body: @allowance_grant_body,
+    responses: [
+      created: {"Allowance extension", "application/json", @summary_object},
+      not_found: {"User or Finance profile not found", "application/json", @summary_object},
+      unprocessable_entity: {"Invalid allowance extension", "application/json", @summary_object}
+    ]
+  )
+
   def update_role(conn, params) do
     id = params["id"] || params[:id]
 
@@ -287,6 +326,17 @@ defmodule MilosTrainingWeb.AdminUserController do
 
       error ->
         error
+    end
+  end
+
+  def grant_allowance(conn, params) do
+    admin = Guardian.Plug.current_resource(conn)
+    user_id = params["id"] || params[:id]
+
+    with {:ok, result} <- GrantUserAllowance.call(user_id, admin.id, conn.body_params) do
+      conn
+      |> put_status(:created)
+      |> json(result)
     end
   end
 
