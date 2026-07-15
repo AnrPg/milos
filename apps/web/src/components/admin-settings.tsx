@@ -13,6 +13,8 @@ import { listScaleLevels, replaceScaleLevels, type ScaleLevel } from "@/api/work
 import { useSession } from "@/components/session-provider";
 import { THEME_UPDATED_EVENT } from "@/components/theme-provider";
 import { APP_THEMES, THEME_SLUGS, normalizeThemeSlug, type ThemeSlug } from "@/lib/theme";
+import { ClassTypeSettings } from "@/components/admin/ClassTypeSettings";
+import { TransientHero } from "@/components/TransientHero";
 
 // ── Shared sub-components ────────────────────────────────────────────────────
 
@@ -623,6 +625,14 @@ export function AdminSettingsHub() {
               description="Payment reminders"
             >
               <FinanceSection token={token} />
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              id="class-types"
+              title="Class Types"
+              description="Schedule classification and filters"
+            >
+              <ClassTypeSettings token={token} />
             </CollapsibleSection>
 
             <CollapsibleSection

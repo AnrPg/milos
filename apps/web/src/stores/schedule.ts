@@ -1,13 +1,12 @@
 import { create } from "zustand";
 
-import type { TrainingType } from "@/api/schedule";
 import { formatLocalIsoDate, parseLocalDate } from "@/components/schedule/calendar-window";
 
 type ScheduleStore = {
-  trainingType: TrainingType | null;
+  classTypeIds: string[];
   days: 3 | 7 | 30;
   startDate: string;
-  setTrainingType: (value: TrainingType | null) => void;
+  setClassTypeIds: (value: string[]) => void;
   setDays: (value: 3 | 7 | 30) => void;
   shiftWindow: (direction: -1 | 1) => void;
   resetWindow: () => void;
@@ -30,10 +29,10 @@ function addMonths(isoDate: string, months: number) {
 }
 
 export const useScheduleStore = create<ScheduleStore>((set, get) => ({
-  trainingType: null,
+  classTypeIds: [],
   days: 3,
   startDate: todayIso(),
-  setTrainingType: (trainingType) => set({ trainingType }),
+  setClassTypeIds: (classTypeIds) => set({ classTypeIds }),
   setDays: (days) => set({ days }),
   shiftWindow: (direction) => {
     const { days, startDate } = get();

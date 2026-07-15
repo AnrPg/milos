@@ -12,12 +12,14 @@ import {
   rejectBooking,
   updateScheduleSlot,
   type ScheduleBooking,
+  type ClassTypeRecord,
   type ScheduleSlot,
   type ScheduleSlotPayload,
-  type TrainingType,
 } from "@/api/schedule";
 import { listAdminWorkouts, type WorkoutRecord } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
+import { TransientHero } from "@/components/TransientHero";
+import { ViewModeSelector } from "@/components/calendar/ViewModeSelector";
 import { BookingModal } from "@/components/schedule/BookingModal";
 import { CalendarView } from "@/components/schedule/CalendarView";
 import { buildScheduleWindow } from "@/components/schedule/calendar-window";
@@ -31,15 +33,6 @@ type SlotEditorState = {
   values: ScheduleSlotPayload;
 };
 
-const TRAINING_TYPE_OPTIONS: Array<{ value: TrainingType; label: string }> = [
-  { value: "crossfit", label: "CrossFit" },
-  { value: "strength", label: "Strength" },
-  { value: "gymnastics", label: "Gymnastics" },
-  { value: "aerobics", label: "Aerobics" },
-  { value: "flexibility", label: "Flexibility" },
-  { value: "recovery", label: "Recovery" },
-];
-
 function formatDateTimeLocal(isoString: string) {
   const date = new Date(isoString);
   const tzOffset = date.getTimezoneOffset();
@@ -51,26 +44,21 @@ function toIsoDateTime(localValue: string) {
   return new Date(localValue).toISOString();
 }
 
-function defaultSlotValues(isoDate: string, workouts: WorkoutRecord[]): ScheduleSlotPayload {
+function defaultSlotValues(
+  isoDate: string,
+  workouts: WorkoutRecord[],
+  classTypes: ClassTypeRecord[],
+): ScheduleSlotPayload {
   const date = new Date(`${isoDate}T09:00:00`);
-  const defaultTrainingType = normalizeTrainingType(workouts[0]?.type);
 
   return {
     master_workout_id: workouts[0]?.id ?? "",
-    training_type: defaultTrainingType ?? "crossfit",
+    class_type_id: classTypes.find((type) => !type.archived_at)?.id ?? "",
     scheduled_at: date.toISOString(),
     capacity: 12,
     auto_approve: false,
     booking_timeout_minutes: 60,
   };
-}
-
-function normalizeTrainingType(value: string | undefined): TrainingType | null {
-  if (value === "crossfit" || value === "strength" || value === "gymnastics" || value === "aerobics" || value === "flexibility" || value === "recovery") {
-    return value;
-  }
-
-  return null;
 }
 
 export function ScheduleConsole({
@@ -81,8 +69,9 @@ export function ScheduleConsole({
   pageTitle?: string;
 } = {}) {
   const { tokens, currentUser } = useSession();
-  const { days, setDays, shiftWindow, resetWindow, startDate, trainingType, setTrainingType } = useScheduleStore();
+  const { days, setDays, shiftWindow, resetWindow, startDate, classTypeIds, setClassTypeIds } = useScheduleStore();
   const [schedule, setSchedule] = useState<ScheduleSlot[]>([]);
+  const [classTypes, setClassTypes] = useState<ClassTypeRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<ScheduleSlot | null>(null);
@@ -111,10 +100,11 @@ export function ScheduleConsole({
         startAt: calendarWindow.queryStartAt,
         endAt: calendarWindow.queryEndAt,
         days,
-        trainingType,
+        classTypeIds,
       });
 
       setSchedule(window.slots);
+      setClassTypes(window.class_types);
       return window.slots;
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : "Failed to load schedule.");
@@ -122,7 +112,7 @@ export function ScheduleConsole({
     } finally {
       setLoading(false);
     }
-  }, [calendarWindow.queryEndAt, calendarWindow.queryStartAt, days, tokens, trainingType]);
+  }, [calendarWindow.queryEndAt, calendarWindow.queryStartAt, classTypeIds, days, tokens]);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -281,14 +271,14 @@ export function ScheduleConsole({
   }
 
   function openCreateEditor(isoDate: string) {
-    if (!workouts.length) {
-      setError("Create at least one published workout before adding schedule slots.");
+    if (!workouts.length || !classTypes.some((type) => !type.archived_at)) {
+      setError("Create a published workout and an active class type before adding schedule slots.");
       return;
     }
 
     setEditor({
       slotId: null,
-      values: defaultSlotValues(isoDate, workouts),
+      values: defaultSlotValues(isoDate, workouts, classTypes),
     });
   }
 
@@ -297,7 +287,7 @@ export function ScheduleConsole({
       slotId: slot.id,
       values: {
         master_workout_id: slot.master_workout_id,
-        training_type: slot.training_type,
+        class_type_id: slot.class_type_id,
         scheduled_at: slot.scheduled_at,
         capacity: slot.capacity,
         auto_approve: slot.auto_approve,
@@ -309,34 +299,28 @@ export function ScheduleConsole({
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-7xl space-y-8">
-        <section className="rounded-[2.4rem] px-8 py-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">Class Schedule</p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight" style={{ color: "var(--text)" }}>{pageTitle}</h1>
-        </section>
+        <TransientHero label="class schedule introduction">
+          <section className="rounded-[2rem] px-6 py-4" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">Class Schedule</p>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight" style={{ color: "var(--text)" }}>{pageTitle}</h1>
+          </section>
+        </TransientHero>
 
 
         <section className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-            <TypeFilterChips value={trainingType} onChange={setTrainingType} />
+            <TypeFilterChips classTypes={classTypes} value={classTypeIds} onChange={setClassTypeIds} />
 
             <div className="flex flex-wrap gap-3">
-              <div className="flex rounded-full p-1" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
-                {[3, 7, 30].map((value) => (
-                  <button
-                    className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-                    style={
-                      days === value
-                        ? { background: "var(--text)", color: "var(--bg)" }
-                        : { color: "var(--dim)" }
-                    }
-                    key={value}
-                    onClick={() => setDays(value as 3 | 7 | 30)}
-                    type="button"
-                  >
-                    {value === 3 ? "3-day" : value === 7 ? "Week" : "Month"}
-                  </button>
-                ))}
-              </div>
+              <ViewModeSelector
+                onChange={setDays}
+                options={[
+                  { value: 3, label: "3d", accessibleLabel: "Three-day view" },
+                  { value: 7, label: "7d", accessibleLabel: "Week view" },
+                  { value: 30, label: "Mo", accessibleLabel: "Month view" },
+                ]}
+                value={days}
+              />
 
               <div className="flex gap-2">
                 {(
@@ -462,7 +446,7 @@ export function ScheduleConsole({
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               {[
                 { label: "Workout", type: "select" as const },
-                { label: "Training type", type: "select-type" as const },
+                { label: "Class type", type: "select-type" as const },
                 { label: "Scheduled at", type: "datetime" as const },
                 { label: "Capacity", type: "number-cap" as const },
                 { label: "Timeout minutes", type: "number-timeout" as const },
@@ -490,13 +474,13 @@ export function ScheduleConsole({
                       style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                       onChange={(event) =>
                         setEditor((current) =>
-                          current ? { ...current, values: { ...current.values, training_type: event.target.value as TrainingType } } : current,
+                          current ? { ...current, values: { ...current.values, class_type_id: event.target.value } } : current,
                         )
                       }
-                      value={editor.values.training_type}
+                      value={editor.values.class_type_id}
                     >
-                      {TRAINING_TYPE_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>{option.label}</option>
+                      {classTypes.filter((classType) => !classType.archived_at).map((option) => (
+                        <option key={option.id} value={option.id}>{option.name}</option>
                       ))}
                     </select>
                   ) : type === "datetime" ? (
@@ -579,7 +563,7 @@ export function ScheduleConsole({
                 <button
                   className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
                   style={{ background: "var(--text)", color: "var(--bg)" }}
-                  disabled={busy || !editor.values.master_workout_id}
+                  disabled={busy || !editor.values.master_workout_id || !editor.values.class_type_id}
                   onClick={() => void saveSlot()}
                   type="button"
                 >

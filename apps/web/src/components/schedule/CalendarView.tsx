@@ -1,7 +1,7 @@
 "use client";
 
 import type { ScheduleSlot } from "@/api/schedule";
-import { buildScheduleWindow, localDateKey, monthKey, parseLocalDate, trainingTypeLabel, type ScheduleDays } from "@/components/schedule/calendar-window";
+import { buildScheduleWindow, localDateKey, monthKey, parseLocalDate, type ScheduleDays } from "@/components/schedule/calendar-window";
 import { WORKOUT_TYPE_COLORS } from "@/lib/workout-colors";
 
 type CalendarViewProps = {
@@ -99,7 +99,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
                   ) : null}
                 </div>
                 {daySlots.slice(0, 3).map((slot) => {
-                  const slotColor = WORKOUT_TYPE_COLORS[slot.training_type] ?? "var(--primary)";
+                  const slotColor = WORKOUT_TYPE_COLORS[slot.class_type.slug] ?? "var(--primary)";
                   return (
                     <button
                       key={slot.id}
@@ -108,7 +108,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
                       onClick={() => onSelectSlot(slot)}
                       type="button"
                     >
-                      {formatTime(slot.scheduled_at)} {trainingTypeLabel(slot.training_type)}
+                      {formatTime(slot.scheduled_at)} {slot.class_type.name}
                     </button>
                   );
                 })}
@@ -206,7 +206,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
 function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact: boolean; onSelectSlot: (slot: ScheduleSlot) => void }) {
   const isPast = new Date(slot.scheduled_at) <= new Date();
   const isUnavailable = !slot.current_user_booking && (slot.spots_remaining === 0 || isPast);
-  const typeColor = WORKOUT_TYPE_COLORS[slot.training_type] ?? "var(--primary)";
+  const typeColor = WORKOUT_TYPE_COLORS[slot.class_type.slug] ?? "var(--primary)";
 
   if (compact) {
     return (
@@ -223,7 +223,7 @@ function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact
           {new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" }).format(new Date(slot.scheduled_at))}
         </p>
         <p className="truncate text-[10px] uppercase tracking-[0.14em]" style={{ color: isUnavailable ? "var(--dim)" : typeColor }}>
-          {trainingTypeLabel(slot.training_type)}
+          {slot.class_type.name}
         </p>
       </button>
     );
@@ -255,7 +255,7 @@ function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact
             color: isUnavailable ? "var(--dim)" : typeColor,
           }}
         >
-          {trainingTypeLabel(slot.training_type)}
+          {slot.class_type.name}
         </span>
       </div>
 

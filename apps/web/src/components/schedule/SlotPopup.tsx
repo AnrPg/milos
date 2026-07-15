@@ -134,7 +134,7 @@ export function SlotPopup({
           : "Booking is unavailable for this slot.";
 
   const deadline = formatDeadline(slot.scheduled_at, slot.booking_timeout_minutes);
-  const typeColor = workoutTypeColor(slot.training_type);
+  const typeColor = workoutTypeColor(slot.class_type.slug);
 
   return (
     <div
@@ -157,7 +157,7 @@ export function SlotPopup({
             className="text-xs font-bold uppercase tracking-[0.24em]"
             style={{ color: typeColor }}
           >
-            {slot.training_type}
+            {slot.class_type.name}
           </p>
           <button
             className="shrink-0 rounded-full px-3 py-1.5 text-sm font-semibold transition-colors"
@@ -276,7 +276,7 @@ export function SlotPopup({
                 Waiting for coach approval
               </p>
               <p className="mt-1" style={{ color: "var(--muted)" }}>
-                Your spot is reserved — you'll get a notification once approved.
+                Your spot is reserved — you&apos;ll get a notification once approved.
               </p>
             </div>
           ) : null}
@@ -290,7 +290,7 @@ export function SlotPopup({
                 border: "1px solid color-mix(in srgb, var(--success) 30%, transparent)",
               }}
             >
-              <p className="font-semibold" style={{ color: "var(--success)" }}>You're confirmed ✓</p>
+              <p className="font-semibold" style={{ color: "var(--success)" }}>You&apos;re confirmed ✓</p>
               {slot.current_user_booking.admin_message ? (
                 <p className="mt-1" style={{ color: "var(--muted)" }}>
                   {slot.current_user_booking.admin_message}

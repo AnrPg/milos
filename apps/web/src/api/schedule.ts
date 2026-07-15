@@ -4,7 +4,16 @@ import type { paths } from "@/api/generated/schema";
 type ScheduleQuery = NonNullable<
   paths["/api/schedule"]["get"]["parameters"]["query"]
 >;
-export type TrainingType = "crossfit" | "strength" | "gymnastics" | "aerobics" | "flexibility" | "recovery";
+export type ClassTypeRecord = {
+  id: string;
+  name: string;
+  slug: string;
+  sort_order: number;
+  archived_at: string | null;
+  inserted_at?: string;
+  updated_at?: string;
+  future_classes_reassigned?: number;
+};
 
 export type WorkoutPreviewExercise = {
   id: string;
@@ -67,7 +76,8 @@ export type ScheduleSlot = {
   id: string;
   master_workout_id: string;
   scheduled_at: string;
-  training_type: TrainingType;
+  class_type_id: string;
+  class_type: ClassTypeRecord;
   capacity: number;
   auto_approve: boolean;
   booking_timeout_minutes: number;
@@ -82,12 +92,13 @@ export type ScheduleWindow = {
   start_date: string;
   end_date: string;
   days: number;
+  class_types: ClassTypeRecord[];
   slots: ScheduleSlot[];
 };
 
 export type ScheduleSlotPayload = {
   master_workout_id: string;
-  training_type: TrainingType;
+  class_type_id: string;
   scheduled_at: string;
   capacity: number;
   auto_approve: boolean;
@@ -100,7 +111,7 @@ export async function fetchSchedule(
     startAt: NonNullable<ScheduleQuery["start_at"]>;
     endAt: NonNullable<ScheduleQuery["end_at"]>;
     days: NonNullable<ScheduleQuery["days"]>;
-    trainingType: TrainingType | null;
+    classTypeIds: string[];
   },
 ) {
   const search = new URLSearchParams({
@@ -109,11 +120,47 @@ export async function fetchSchedule(
     days: String(params.days),
   });
 
-  if (params.trainingType) {
-    search.set("training_type", params.trainingType);
-  }
+  params.classTypeIds.forEach((id) => search.append("class_type_ids[]", id));
 
   return apiRequest<ScheduleWindow>(`/schedule?${search.toString()}`, { token });
+}
+
+export async function listAdminClassTypes(token: string) {
+  const response = await apiRequest<{ class_types: ClassTypeRecord[] }>("/admin/class-types", { token });
+  return response.class_types;
+}
+
+export async function createClassType(token: string, payload: { name: string; sort_order?: number }) {
+  const response = await apiRequest<{ class_type: ClassTypeRecord }>("/admin/class-types", {
+    method: "POST",
+    token,
+    body: payload,
+  });
+  return response.class_type;
+}
+
+export async function updateClassType(
+  token: string,
+  id: string,
+  payload: { name: string; sort_order?: number },
+) {
+  const response = await apiRequest<{ class_type: ClassTypeRecord }>(`/admin/class-types/${id}`, {
+    method: "PATCH",
+    token,
+    body: payload,
+  });
+  return response.class_type;
+}
+
+export async function archiveClassType(token: string, id: string, replacementClassTypeId?: string) {
+  const search = new URLSearchParams();
+  if (replacementClassTypeId) search.set("replacement_class_type_id", replacementClassTypeId);
+  const suffix = search.size > 0 ? `?${search.toString()}` : "";
+  const response = await apiRequest<{ class_type: ClassTypeRecord }>(`/admin/class-types/${id}${suffix}`, {
+    method: "DELETE",
+    token,
+  });
+  return response.class_type;
 }
 
 export async function createBooking(token: string, slotId: string) {

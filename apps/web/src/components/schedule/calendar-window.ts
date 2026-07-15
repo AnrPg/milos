@@ -1,5 +1,3 @@
-import type { TrainingType } from "@/api/schedule";
-
 export type ScheduleDays = 3 | 7 | 30;
 
 export type ScheduleWindowBounds = {
@@ -85,5 +83,3 @@ function enumerateDates(start: Date, days: number) {
     return formatLocalIsoDate(date);
   });
 }
-
-export const trainingTypeLabel = (type: TrainingType) => type.charAt(0).toUpperCase() + type.slice(1);

@@ -5,24 +5,16 @@ import { useRouter } from "next/navigation";
 import { useDrag } from "@use-gesture/react";
 
 import { fetchTimerSequence, startExecution } from "@/api/executions";
-import { fetchSchedule, type ScheduleSlot, type TrainingType } from "@/api/schedule";
+import { fetchSchedule, type ClassTypeRecord, type ScheduleSlot } from "@/api/schedule";
 import {
   fetchMaterializedWorkout,
   type WorkoutRecord,
 } from "@/api/workouts";
 import { AuthGuard } from "@/components/auth-guard";
 import { useSession } from "@/components/session-provider";
+import { TransientHero } from "@/components/TransientHero";
 import { subscribeToTopic } from "@/lib/realtime";
 import { useExecutionStore } from "@/stores/execution";
-
-const TRAINING_TYPES: { value: TrainingType; label: string; icon: string }[] = [
-  { value: "crossfit", label: "CrossFit", icon: "🔥" },
-  { value: "strength", label: "Strength", icon: "🏋️" },
-  { value: "gymnastics", label: "Gymnastics", icon: "🤸" },
-  { value: "aerobics", label: "Aerobics", icon: "🏃" },
-  { value: "flexibility", label: "Flexibility", icon: "🧘" },
-  { value: "recovery", label: "Recovery", icon: "💆" },
-];
 
 type Step = "type" | "week" | "preview";
 
@@ -89,7 +81,8 @@ function WorkoutsPageContent() {
   const initExecution = useExecutionStore((s) => s.initExecution);
 
   const [step, setStep] = useState<Step>("type");
-  const [selectedType, setSelectedType] = useState<TrainingType | null>(null);
+  const [classTypes, setClassTypes] = useState<ClassTypeRecord[]>([]);
+  const [selectedClassType, setSelectedClassType] = useState<ClassTypeRecord | null>(null);
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date()));
   const [slots, setSlots] = useState<ScheduleSlot[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
@@ -122,8 +115,23 @@ function WorkoutsPageContent() {
 
   const accessToken = tokens?.access_token;
 
+  useEffect(() => {
+    if (!accessToken) return;
+
+    const start = startOfWeek(new Date());
+    const end = new Date(start);
+    end.setDate(end.getDate() + 7);
+
+    void fetchSchedule(accessToken, {
+      startAt: start.toISOString(),
+      endAt: end.toISOString(),
+      days: 7,
+      classTypeIds: [],
+    }).then((schedule) => setClassTypes(schedule.class_types)).catch(() => setClassTypes([]));
+  }, [accessToken]);
+
   const loadWeek = useCallback(async () => {
-    if (step !== "week" || !accessToken || !selectedType) return;
+    if (step !== "week" || !accessToken || !selectedClassType) return;
 
     let cancelled = false;
 
@@ -139,7 +147,7 @@ function WorkoutsPageContent() {
         startAt: weekStart.toISOString(),
         endAt: endDate.toISOString(),
         days: 7,
-        trainingType: selectedType,
+        classTypeIds: [selectedClassType.id],
       });
 
       if (cancelled) return;
@@ -197,7 +205,7 @@ function WorkoutsPageContent() {
     return () => {
       cancelled = true;
     };
-  }, [accessToken, selectedType, step, weekStart]);
+  }, [accessToken, selectedClassType, step, weekStart]);
 
   useEffect(() => {
     let cleanup: (() => void) | undefined;
@@ -372,16 +380,20 @@ function WorkoutsPageContent() {
         style={{ background: "var(--bg)", color: "var(--text)" }}
       >
         <div className="mx-auto max-w-lg">
-          <h1 className="mb-3 text-3xl font-bold">Start Workout</h1>
-          <p className="mb-8 text-sm" style={{ color: "var(--muted)" }}>
-            Pick a training type, then choose a day and scale before launching.
-          </p>
+          <TransientHero label="workout selection introduction">
+            <div className="mb-5">
+              <h1 className="text-2xl font-bold">Start Workout</h1>
+              <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
+                Pick a class type, then choose a day and scale before launching.
+              </p>
+            </div>
+          </TransientHero>
           <div className="grid grid-cols-2 gap-3">
-            {TRAINING_TYPES.map((t) => (
+            {classTypes.map((classType) => (
               <button
-                key={t.value}
+                key={classType.id}
                 onClick={() => {
-                  setSelectedType(t.value);
+                  setSelectedClassType(classType);
                   setSelectedSlot(null);
                   setSelectedWorkout(null);
                   setSelectedScale(null);
@@ -394,10 +406,11 @@ function WorkoutsPageContent() {
                   borderColor: "color-mix(in srgb, var(--primary) 18%, transparent)",
                 }}
               >
-                <span className="text-3xl">{t.icon}</span>
-                <span className="text-sm font-semibold">{t.label}</span>
+                <span className="text-3xl">◆</span>
+                <span className="text-sm font-semibold">{classType.name}</span>
               </button>
             ))}
+            {classTypes.length === 0 ? <p className="col-span-2 text-sm" style={{ color: "var(--muted)" }}>No active class types are available.</p> : null}
           </div>
         </div>
       </div>
@@ -428,7 +441,7 @@ function WorkoutsPageContent() {
             </button>
             <div className="text-center">
               <div className="text-xs uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
-                {selectedType}
+                {selectedClassType?.name}
               </div>
               <div className="text-sm font-semibold">
                 {weekStart.toLocaleDateString(undefined, { month: "short", day: "numeric" })} –{" "}
@@ -478,7 +491,7 @@ function WorkoutsPageContent() {
             </div>
           ) : slots.length === 0 ? (
             <div className="py-12 text-center text-sm" style={{ color: "var(--muted)" }}>
-              No {selectedType} classes are available this week.
+              No {selectedClassType?.name} classes are available this week.
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

@@ -29,6 +29,8 @@ import {
   type AthleteOption,
 } from "@/api/assigned-workouts";
 import { useSession } from "@/components/session-provider";
+import { TransientHero } from "@/components/TransientHero";
+import { ViewModeSelector } from "@/components/calendar/ViewModeSelector";
 import { AssignedWorkoutPanel } from "@/components/workouts/AssignedWorkoutPanel";
 import { QuickAssignModal } from "@/components/workouts/QuickAssignModal";
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
@@ -1304,37 +1306,31 @@ export function AssignedWorkoutsConsole({
           className="flex flex-col gap-4 rounded-[2rem] px-6 py-5 sm:flex-row sm:items-center sm:justify-between"
           style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
         >
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">
-              {pageTitle ?? (isAdmin ? "Workout Board" : "My Workouts")}
-            </p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
-              {periodLabel}
-            </h1>
-          </div>
+          <TransientHero label="workout calendar introduction">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">
+                {pageTitle ?? (isAdmin ? "Workout Board" : "My Workouts")}
+              </p>
+              <h1 className="mt-1 text-xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
+                {periodLabel}
+              </h1>
+            </div>
+          </TransientHero>
 
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex rounded-full p-0.5" style={{ background: "var(--border)" }}>
-              {(["3day", "week", "month"] as ViewMode[]).map((mode) => (
-                <button
-                  key={mode}
-                  className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
-                  style={
-                    viewMode === mode
-                      ? { background: "var(--text)", color: "var(--bg)" }
-                      : { color: "var(--dim)" }
-                  }
-                  onClick={() => {
-                    setLoading(true);
-                    setError(null);
-                    setViewMode(mode);
-                  }}
-                  type="button"
-                >
-                  {mode === "3day" ? "3d" : mode === "week" ? "7d" : "Mo"}
-                </button>
-              ))}
-            </div>
+            <ViewModeSelector
+              onChange={(mode) => {
+                setLoading(true);
+                setError(null);
+                setViewMode(mode);
+              }}
+              options={[
+                { value: "3day", label: "3d", accessibleLabel: "Three-day view" },
+                { value: "week", label: "7d", accessibleLabel: "Week view" },
+                { value: "month", label: "Mo", accessibleLabel: "Month view" },
+              ] satisfies Array<{ value: ViewMode; label: string; accessibleLabel: string }>}
+              value={viewMode}
+            />
 
             <button
               className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
