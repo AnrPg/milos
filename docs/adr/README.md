@@ -40,3 +40,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-032 | Side effect, attendance, search, and notification lifecycle hardening | Accepted |
 | ADR-033 | Global UI theme palette | Accepted |
 | ADR-034 | Finance invoice reference format | Accepted |
+| ADR-035 | Admin information architecture and user profiles | Accepted |
