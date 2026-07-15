@@ -484,6 +484,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/users/{id}/allowance-extensions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Extend one user's named package allowance for a specific period */
+        post: operations["MilosTrainingWeb.AdminUserController.grant_allowance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/workouts/{id}": {
         parameters: {
             query?: never;
@@ -599,6 +616,23 @@ export interface paths {
         put?: never;
         /** Register a new user */
         post: operations["MilosTrainingWeb.AuthController.register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/finance/entitlements/backfill": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Dry-run or apply the legacy entitlement-profile backfill */
+        post: operations["MilosTrainingWeb.AdminFinanceController.backfill_entitlements"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1623,6 +1657,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/users/{id}/allowance-extensions/{entry_id}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revoke a personal allowance extension with a compensating ledger entry */
+        post: operations["MilosTrainingWeb.AdminUserController.revoke_allowance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/my-workouts/requests": {
         parameters: {
             query?: never;
@@ -1961,6 +2012,23 @@ export interface paths {
         put?: never;
         /** Get a presigned URL for avatar upload */
         post: operations["MilosTrainingWeb.MeController.avatar_upload_url"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/entitlement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the current user's effective package benefits and allowance usage */
+        get: operations["MilosTrainingWeb.MyFinanceController.entitlement"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2946,7 +3014,24 @@ export interface operations {
                     family?: string;
                     name?: string;
                     params?: {
-                        [key: string]: unknown;
+                        allowances: {
+                            class_visits?: {
+                                counted_kinds?: string[];
+                                limit: number | "unlimited";
+                                /** @enum {string} */
+                                period: "calendar_week" | "calendar_month" | "subscription_period";
+                            };
+                            coaching_touchpoints?: {
+                                counted_kinds?: string[];
+                                limit: number | "unlimited";
+                                /** @enum {string} */
+                                period: "calendar_week" | "calendar_month" | "subscription_period";
+                            };
+                        };
+                        capabilities: ("book_classes" | "execute_class_workouts" | "execute_library_workouts" | "execute_assigned_workouts" | "receive_coaching_touchpoints")[];
+                        channels: ("in_person" | "workout_library" | "personal_programming" | "coach_messaging")[];
+                        /** @enum {integer} */
+                        entitlement_version: 1;
                     };
                     tags?: string[];
                 };
@@ -3030,7 +3115,24 @@ export interface operations {
                     family: string;
                     name: string;
                     params?: {
-                        [key: string]: unknown;
+                        allowances: {
+                            class_visits?: {
+                                counted_kinds?: string[];
+                                limit: number | "unlimited";
+                                /** @enum {string} */
+                                period: "calendar_week" | "calendar_month" | "subscription_period";
+                            };
+                            coaching_touchpoints?: {
+                                counted_kinds?: string[];
+                                limit: number | "unlimited";
+                                /** @enum {string} */
+                                period: "calendar_week" | "calendar_month" | "subscription_period";
+                            };
+                        };
+                        capabilities: ("book_classes" | "execute_class_workouts" | "execute_library_workouts" | "execute_assigned_workouts" | "receive_coaching_touchpoints")[];
+                        channels: ("in_person" | "workout_library" | "personal_programming" | "coach_messaging")[];
+                        /** @enum {integer} */
+                        entitlement_version: 1;
                     };
                     tags?: string[];
                 };
@@ -3275,6 +3377,66 @@ export interface operations {
                         }[];
                         /** Format: uuid */
                         user_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminUserController.grant_allowance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    allowance: "class_visits" | "coaching_touchpoints";
+                    idempotency_key?: string | null;
+                    /** Format: date */
+                    occurred_on?: string | null;
+                    /** @enum {string} */
+                    period: "calendar_week" | "calendar_month" | "subscription_period";
+                    quantity: number;
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Allowance extension */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description User or Finance profile not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Invalid allowance extension */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };
@@ -3651,6 +3813,40 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminFinanceController.backfill_entitlements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    dry_run: boolean;
+                    package_by_role: {
+                        /** Format: uuid */
+                        athlete?: string;
+                        /** Format: uuid */
+                        member?: string;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Entitlement rollout readiness report */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };
@@ -6469,6 +6665,59 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminUserController.revoke_allowance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Allowance compensation */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description User or allowance extension not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Invalid or already revoked extension */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.MyWorkoutController.request_assignment": {
         parameters: {
             query?: never;
@@ -7363,6 +7612,37 @@ export interface operations {
                         public_url?: string;
                         upload_url?: string;
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyFinanceController.entitlement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Effective entitlement */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Finance profile not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };

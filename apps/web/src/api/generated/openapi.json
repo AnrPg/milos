@@ -1697,7 +1697,130 @@
                     "type": "string"
                   },
                   "params": {
-                    "additionalProperties": true,
+                    "additionalProperties": false,
+                    "properties": {
+                      "allowances": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "class_visits": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "counted_kinds": {
+                                "items": {
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              },
+                              "limit": {
+                                "oneOf": [
+                                  {
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "enum": [
+                                      "unlimited"
+                                    ],
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "period": {
+                                "enum": [
+                                  "calendar_week",
+                                  "calendar_month",
+                                  "subscription_period"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "limit",
+                              "period"
+                            ],
+                            "type": "object"
+                          },
+                          "coaching_touchpoints": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "counted_kinds": {
+                                "items": {
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              },
+                              "limit": {
+                                "oneOf": [
+                                  {
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "enum": [
+                                      "unlimited"
+                                    ],
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "period": {
+                                "enum": [
+                                  "calendar_week",
+                                  "calendar_month",
+                                  "subscription_period"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "limit",
+                              "period"
+                            ],
+                            "type": "object"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "capabilities": {
+                        "items": {
+                          "enum": [
+                            "book_classes",
+                            "execute_class_workouts",
+                            "execute_library_workouts",
+                            "execute_assigned_workouts",
+                            "receive_coaching_touchpoints"
+                          ],
+                          "type": "string"
+                        },
+                        "type": "array",
+                        "uniqueItems": true
+                      },
+                      "channels": {
+                        "items": {
+                          "enum": [
+                            "in_person",
+                            "workout_library",
+                            "personal_programming",
+                            "coach_messaging"
+                          ],
+                          "type": "string"
+                        },
+                        "type": "array",
+                        "uniqueItems": true
+                      },
+                      "entitlement_version": {
+                        "enum": [
+                          1
+                        ],
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "entitlement_version",
+                      "channels",
+                      "capabilities",
+                      "allowances"
+                    ],
                     "type": "object"
                   },
                   "tags": {
@@ -1837,7 +1960,130 @@
                     "type": "string"
                   },
                   "params": {
-                    "additionalProperties": true,
+                    "additionalProperties": false,
+                    "properties": {
+                      "allowances": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "class_visits": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "counted_kinds": {
+                                "items": {
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              },
+                              "limit": {
+                                "oneOf": [
+                                  {
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "enum": [
+                                      "unlimited"
+                                    ],
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "period": {
+                                "enum": [
+                                  "calendar_week",
+                                  "calendar_month",
+                                  "subscription_period"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "limit",
+                              "period"
+                            ],
+                            "type": "object"
+                          },
+                          "coaching_touchpoints": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "counted_kinds": {
+                                "items": {
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              },
+                              "limit": {
+                                "oneOf": [
+                                  {
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "enum": [
+                                      "unlimited"
+                                    ],
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "period": {
+                                "enum": [
+                                  "calendar_week",
+                                  "calendar_month",
+                                  "subscription_period"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "limit",
+                              "period"
+                            ],
+                            "type": "object"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "capabilities": {
+                        "items": {
+                          "enum": [
+                            "book_classes",
+                            "execute_class_workouts",
+                            "execute_library_workouts",
+                            "execute_assigned_workouts",
+                            "receive_coaching_touchpoints"
+                          ],
+                          "type": "string"
+                        },
+                        "type": "array",
+                        "uniqueItems": true
+                      },
+                      "channels": {
+                        "items": {
+                          "enum": [
+                            "in_person",
+                            "workout_library",
+                            "personal_programming",
+                            "coach_messaging"
+                          ],
+                          "type": "string"
+                        },
+                        "type": "array",
+                        "uniqueItems": true
+                      },
+                      "entitlement_version": {
+                        "enum": [
+                          1
+                        ],
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "entitlement_version",
+                      "channels",
+                      "capabilities",
+                      "allowances"
+                    ],
                     "type": "object"
                   },
                   "tags": {
@@ -2407,6 +2653,122 @@
           }
         ],
         "summary": "Get a user's personal records",
+        "tags": [
+          "Admin Users"
+        ]
+      }
+    },
+    "/api/admin/users/{id}/allowance-extensions": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminUserController.grant_allowance",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "allowance": {
+                    "enum": [
+                      "class_visits",
+                      "coaching_touchpoints"
+                    ],
+                    "type": "string"
+                  },
+                  "idempotency_key": {
+                    "maxLength": 200,
+                    "minLength": 8,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "occurred_on": {
+                    "format": "date",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "period": {
+                    "enum": [
+                      "calendar_week",
+                      "calendar_month",
+                      "subscription_period"
+                    ],
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "maximum": 10000,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "reason": {
+                    "maxLength": 500,
+                    "minLength": 3,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "allowance",
+                  "quantity",
+                  "period",
+                  "reason"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Allowance extension"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "User or Finance profile not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid allowance extension"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Extend one user's named package allowance for a specific period",
         "tags": [
           "Admin Users"
         ]
@@ -3163,6 +3525,69 @@
         "summary": "Register a new user",
         "tags": [
           "Authentication"
+        ]
+      }
+    },
+    "/api/admin/finance/entitlements/backfill": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFinanceController.backfill_entitlements",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "dry_run": {
+                    "type": "boolean"
+                  },
+                  "package_by_role": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "athlete": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "member": {
+                        "format": "uuid",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "dry_run",
+                  "package_by_role"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Entitlement rollout readiness report"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Dry-run or apply the legacy entitlement-profile backfill",
+        "tags": [
+          "Admin Finance"
         ]
       }
     },
@@ -8859,6 +9284,97 @@
         ]
       }
     },
+    "/api/admin/users/{id}/allowance-extensions/{entry_id}/revoke": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminUserController.revoke_allowance",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "reason": {
+                    "maxLength": 500,
+                    "minLength": 3,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "reason"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Allowance compensation"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "User or allowance extension not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid or already revoked extension"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Revoke a personal allowance extension with a compensating ledger entry",
+        "tags": [
+          "Admin Users"
+        ]
+      }
+    },
     "/api/my-workouts/requests": {
       "post": {
         "callbacks": {},
@@ -9364,7 +9880,7 @@
                       "minimum": 0,
                       "type": "integer"
                     },
-                    "maxItems": 3,
+                    "maxItems": 5,
                     "type": "array"
                   }
                 },
@@ -10554,6 +11070,45 @@
         "summary": "Get a presigned URL for avatar upload",
         "tags": [
           "Me"
+        ]
+      }
+    },
+    "/api/me/entitlement": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyFinanceController.entitlement",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Effective entitlement"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Finance profile not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get the current user's effective package benefits and allowance usage",
+        "tags": [
+          "Member Finance"
         ]
       }
     },
