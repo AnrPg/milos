@@ -25,10 +25,7 @@ defmodule MilosTrainingWeb.AdminScheduleController do
     type: :object,
     properties: %{
       master_workout_id: %Schema{type: :string, format: :uuid},
-      training_type: %Schema{
-        type: :string,
-        enum: Enum.map(MilosTraining.Scheduling.ScheduledClass.training_types(), &to_string/1)
-      },
+      class_type_id: %Schema{type: :string, format: :uuid},
       scheduled_at: %Schema{type: :string, format: :"date-time"},
       capacity: %Schema{type: :integer},
       auto_approve: %Schema{type: :boolean},
@@ -36,6 +33,7 @@ defmodule MilosTrainingWeb.AdminScheduleController do
     },
     required: [
       :master_workout_id,
+      :class_type_id,
       :scheduled_at,
       :capacity,
       :auto_approve,

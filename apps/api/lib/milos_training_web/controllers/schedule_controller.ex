@@ -14,7 +14,7 @@ defmodule MilosTrainingWeb.ScheduleController do
   security([%{"bearerAuth" => []}])
 
   plug OpenApiSpex.Plug.CastAndValidate,
-       [json_render_error_v2: true] when action in [:create_booking]
+       [json_render_error_v2: true] when action in [:index, :create_booking]
 
   @date_param %Parameter{
     name: :start_date,
@@ -48,20 +48,19 @@ defmodule MilosTrainingWeb.ScheduleController do
     schema: %Schema{type: :integer, enum: [3, 7, 30]}
   }
 
-  @type_param %Parameter{
-    name: :training_type,
+  @class_types_param %Parameter{
+    name: :class_type_ids,
     in: :query,
-    description: "Optional training type filter",
+    description: "Optional class type filters",
     required: false,
-    schema: %Schema{
-      type: :string,
-      enum: Enum.map(MilosTraining.Scheduling.ScheduledClass.training_types(), &to_string/1)
-    }
+    schema: %Schema{type: :array, items: %Schema{type: :string, format: :uuid}},
+    style: :form,
+    explode: true
   }
 
   operation(:index,
     summary: "Get the schedule window",
-    parameters: [@date_param, @start_at_param, @end_at_param, @days_param, @type_param],
+    parameters: [@date_param, @start_at_param, @end_at_param, @days_param, @class_types_param],
     responses: [
       ok:
         {"Schedule", "application/json",
@@ -71,12 +70,16 @@ defmodule MilosTrainingWeb.ScheduleController do
              start_date: %Schema{type: :string, format: :date},
              end_date: %Schema{type: :string, format: :date},
              days: %Schema{type: :integer},
+             class_types: %Schema{
+               type: :array,
+               items: %Schema{type: :object, additionalProperties: true}
+             },
              slots: %Schema{
                type: :array,
                items: %Schema{type: :object, additionalProperties: true}
              }
            },
-           required: [:start_date, :end_date, :days, :slots]
+           required: [:start_date, :end_date, :days, :class_types, :slots]
          }}
     ]
   )

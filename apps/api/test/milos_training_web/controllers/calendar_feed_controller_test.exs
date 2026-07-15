@@ -31,7 +31,7 @@ defmodule MilosTrainingWeb.CalendarFeedControllerTest do
       |> get("/api/calendar/feed.ics", %{token: links["token"]})
 
     assert response(feed_response, 200) =~ "BEGIN:VCALENDAR"
-    assert response(feed_response, 200) =~ "SUMMARY:Class: Crossfit"
+    assert response(feed_response, 200) =~ "SUMMARY:Class: CrossFit"
   end
 
   test "calendar feed rejects invalid tokens", %{conn: conn} do

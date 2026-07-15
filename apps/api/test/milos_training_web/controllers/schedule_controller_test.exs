@@ -20,6 +20,7 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
       admin = admin_fixture(%{nickname: "sched_admin"})
       member = user_fixture(%{nickname: "sched_member"})
       workout = workout_fixture(admin, %{title: "Morning Burner"})
+      class_type = class_type_fixture(%{name: "Morning Class"})
 
       admin_conn = put_bearer_token(conn, admin)
 
@@ -31,6 +32,7 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
           "/api/admin/schedule/slots",
           Jason.encode!(%{
             master_workout_id: workout.id,
+            class_type_id: class_type.id,
             scheduled_at:
               DateTime.add(DateTime.utc_now(), 7200, :second) |> DateTime.truncate(:second),
             capacity: 12,
@@ -46,7 +48,7 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
       index_response =
         get(
           member_conn,
-          "/api/schedule?start_date=#{Date.utc_today()}&days=7&training_type=crossfit"
+          "/api/schedule?start_date=#{Date.utc_today()}&days=7&class_type_ids[]=#{class_type.id}"
         )
 
       payload = json_response(index_response, 200)
@@ -83,6 +85,7 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
   test "admin can delete an empty slot", %{conn: conn} do
     admin = admin_fixture(%{nickname: "slot_admin"})
     workout = workout_fixture(admin)
+    class_type = class_type_fixture(%{name: "Open Gym"})
     admin_conn = put_bearer_token(conn, admin)
 
     create_response =
@@ -93,6 +96,7 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
         "/api/admin/schedule/slots",
         Jason.encode!(%{
           master_workout_id: workout.id,
+          class_type_id: class_type.id,
           scheduled_at:
             DateTime.add(DateTime.utc_now(), 7200, :second) |> DateTime.truncate(:second),
           capacity: 8,
@@ -140,6 +144,7 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
       })
 
     admin_conn = put_bearer_token(conn, admin)
+    class_type = class_type_fixture(%{name: "Republish Class"})
 
     reopen_response = post(admin_conn |> recycle(), "/api/admin/workouts/#{workout.id}/reopen")
     assert json_response(reopen_response, 200)["draft"]["status"] == "published"
@@ -165,6 +170,7 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
         "/api/admin/schedule/slots",
         Jason.encode!(%{
           master_workout_id: workout.id,
+          class_type_id: class_type.id,
           scheduled_at:
             DateTime.add(DateTime.utc_now(), 7200, :second) |> DateTime.truncate(:second),
           capacity: 12,
@@ -178,7 +184,7 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
     response =
       get(
         admin_conn |> recycle(),
-        "/api/schedule?start_date=#{Date.utc_today()}&days=7&training_type=crossfit"
+        "/api/schedule?start_date=#{Date.utc_today()}&days=7&class_type_ids[]=#{class_type.id}"
       )
 
     payload = json_response(response, 200)

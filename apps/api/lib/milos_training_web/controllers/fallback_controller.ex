@@ -73,6 +73,39 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{error: "Not found"})
   end
 
+  def call(conn, {:error, {:class_type_replacement_required, future_class_count}}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      error: "Future classes require a replacement class type",
+      future_class_count: future_class_count
+    })
+  end
+
+  def call(conn, {:error, :invalid_class_type_replacement}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{error: "Replacement class type must be a different active type"})
+  end
+
+  def call(conn, {:error, :last_active_class_type}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{error: "At least one active class type must remain"})
+  end
+
+  def call(conn, {:error, :class_type_archived}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{error: "Archived class types cannot be modified or selected"})
+  end
+
+  def call(conn, {:error, :class_type_not_found}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{error: "Class type is missing or archived"})
+  end
+
   def call(conn, {:error, :bad_request}) do
     conn
     |> put_status(:bad_request)
