@@ -1,6 +1,7 @@
 defmodule MilosTraining.Finance.MembershipPackage do
   use Ecto.Schema
   import Ecto.Changeset
+  alias MilosTraining.Finance.Domain.EntitlementPlan
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -38,6 +39,7 @@ defmodule MilosTraining.Finance.MembershipPackage do
     |> validate_required([:code, :name, :family, :billing_period])
     |> validate_inclusion(:billing_period, ["monthly", "quarterly", "annual", "custom"])
     |> validate_number(:base_price_cents, greater_than_or_equal_to: 0)
+    |> validate_entitlement_plan()
     |> unique_constraint(:code)
   end
 
@@ -49,5 +51,21 @@ defmodule MilosTraining.Finance.MembershipPackage do
     |> String.downcase()
     |> String.replace(~r/[^a-z0-9_]+/, "_")
     |> String.trim("_")
+  end
+
+  defp validate_entitlement_plan(changeset) do
+    params = get_field(changeset, :params) || %{}
+
+    if Map.has_key?(params, "entitlement_version") or Map.has_key?(params, :entitlement_version) do
+      case EntitlementPlan.parse(params) do
+        {:ok, _plan} ->
+          changeset
+
+        {:error, reason} ->
+          add_error(changeset, :params, "invalid entitlement plan: #{inspect(reason)}")
+      end
+    else
+      changeset
+    end
   end
 end
