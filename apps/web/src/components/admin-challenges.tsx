@@ -12,6 +12,7 @@ import {
   type SaveChallengePayload,
 } from "@/api/challenges";
 import { useSession } from "@/components/session-provider";
+import { TransientHero } from "@/components/TransientHero";
 import { addLocalDays, formatLocalDate } from "@/lib/local-date";
 
 type CriteriaType = SaveChallengePayload["criteria_type"];
@@ -427,14 +428,15 @@ export function AdminChallenges() {
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-7xl space-y-8">
-        <section className="rounded-[2.4rem] p-8" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+        <TransientHero label="challenge management introduction">
+        <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="max-w-4xl">
               <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">Admin Challenges</p>
-              <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>
+              <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
                 Seasonal challenge management.
               </h1>
-              <p className="mt-4 text-base leading-7" style={{ color: "var(--muted)" }}>
+              <p className="mt-2 text-sm leading-6" style={{ color: "var(--muted)" }}>
                 Create and edit seasonal challenges, inspect live participation, and review how members and
                 athletes are progressing against each target.
               </p>
@@ -450,6 +452,7 @@ export function AdminChallenges() {
             </div>
           </div>
         </section>
+        </TransientHero>
 
         <section className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
           <article className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>

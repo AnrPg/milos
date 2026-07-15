@@ -9,6 +9,7 @@ import { getAvatarUploadUrl, updateProfile } from "@/api/profile";
 import { fetchGamificationPreferences, updateGamificationPreferences } from "@/api/gamification";
 import { ReviewList } from "@/components/my-reviews";
 import { useSession } from "@/components/session-provider";
+import { TransientHero } from "@/components/TransientHero";
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 
@@ -229,14 +230,16 @@ export function ProfilePage() {
   return (
     <main className="min-h-screen px-6 py-10 md:px-10" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-3xl space-y-4">
-        <div className="mb-8">
+        <TransientHero label="profile introduction">
+        <div className="mb-4">
           <p className="text-xs font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
             Profile
           </p>
-          <h1 className="mt-2 text-4xl font-black" style={{ color: "var(--text)" }}>
+          <h1 className="mt-1 text-3xl font-black" style={{ color: "var(--text)" }}>
             Your account
           </h1>
         </div>
+        </TransientHero>
 
         <CollapsibleSection
           id="personal"

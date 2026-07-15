@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { listPRs, deletePR, type PRRecord } from "@/api/gamification";
 import { useSession } from "@/components/session-provider";
+import { TransientHero } from "@/components/TransientHero";
 import { PantheonCard } from "./PantheonCard";
 import { PRFormModal } from "./PRFormModal";
 import { PRShareModal } from "./PRShareModal";
@@ -51,14 +52,16 @@ export function PantheonPage() {
       <div className="mx-auto max-w-4xl space-y-8">
         {/* Header */}
         <div className="flex items-end justify-between gap-4 flex-wrap">
+          <TransientHero label="personal records introduction">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
               Hall of Fame
             </p>
-            <h1 className="mt-2 text-4xl font-black" style={{ color: "var(--text)" }}>
+            <h1 className="mt-1 text-3xl font-black" style={{ color: "var(--text)" }}>
               Personal Records
             </h1>
           </div>
+          </TransientHero>
           <button
             type="button"
             onClick={() => setFormPR("new")}
@@ -112,7 +115,7 @@ export function PantheonPage() {
           <div className="w-full max-w-sm rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
             <h3 className="text-lg font-semibold" style={{ color: "var(--text)" }}>Delete PR?</h3>
             <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
-              "{deleteConfirm.name}" will be permanently removed, including its history.
+              &quot;{deleteConfirm.name}&quot; will be permanently removed, including its history.
             </p>
             <div className="mt-5 flex gap-3">
               <button

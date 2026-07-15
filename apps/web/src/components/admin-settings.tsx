@@ -589,17 +589,19 @@ export function AdminSettingsHub() {
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-5xl space-y-6">
 
-        <section className="rounded-[2.4rem] p-8" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+        <TransientHero label="application settings introduction">
+        <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
-            Settings
+            App configurations
           </p>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>
-            App configuration.
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
+            App configurations.
           </h1>
-          <p className="mt-4 max-w-3xl text-base leading-7" style={{ color: "var(--muted)" }}>
+          <p className="mt-2 max-w-3xl text-sm leading-6" style={{ color: "var(--muted)" }}>
             Global settings for appearance, engagement rules, and workout level definitions. Changes apply immediately across the app.
           </p>
         </section>
+        </TransientHero>
 
         {token ? (
           <>

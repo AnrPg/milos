@@ -14,6 +14,7 @@ import {
 
 import { fetchFinanceQueues, fetchFinanceSummary, type FinanceRecord } from "@/api/finance";
 import { useSession } from "@/components/session-provider";
+import { TransientHero } from "@/components/TransientHero";
 
 function money(cents: unknown) {
   const amount = typeof cents === "number" ? cents : Number(cents ?? 0);
@@ -41,7 +42,7 @@ function daysOverdue(dateStr: string | null | undefined): number {
   return Math.floor((Date.now() - new Date(dateStr).getTime()) / 86_400_000);
 }
 
-export function FinanceDashboard() {
+export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: boolean }) {
   const { tokens } = useSession();
   const token = tokens?.access_token;
   const enabled = Boolean(token);
@@ -80,35 +81,41 @@ export function FinanceDashboard() {
       <div className="mx-auto max-w-6xl space-y-8">
 
         {/* Hero */}
-        <section className="rounded-[2.6rem] p-8" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+        <TransientHero label="finance dashboard introduction">
+        <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>Revenue</p>
-              <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>
+              <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
+                {analyticsMode ? "Finance Analytics" : "Revenue"}
+              </p>
+              <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
                 Membership revenue overview
               </h1>
-              <p className="mt-4 text-base leading-7" style={{ color: "var(--muted)" }}>
-                Read-only financial snapshot. Use Finance Operations for management actions.
+              <p className="mt-2 text-sm leading-6" style={{ color: "var(--muted)" }}>
+                {analyticsMode
+                  ? "Membership, revenue, renewal, and package signals. Use Finance for management actions."
+                  : "Read-only financial snapshot. Use Finance Operations for management actions."}
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
               <Link
-                href="/admin/finance/operations"
+                href="/admin/finance"
                 className="rounded-2xl px-5 py-3 text-sm font-semibold text-center"
                 style={{ background: "var(--text)", color: "var(--bg)" }}
               >
                 Open Finance Operations →
               </Link>
               <Link
-                href="/admin"
+                href={analyticsMode ? "/admin/metrics" : "/admin"}
                 className="rounded-2xl px-5 py-3 text-sm font-semibold text-center"
                 style={{ background: "var(--border)", border: "1px solid var(--border-strong)", color: "var(--text-soft)" }}
               >
-                ← Dashboard
+                {analyticsMode ? "← Analytics & Marketing" : "← Dashboard"}
               </Link>
             </div>
           </div>
         </section>
+        </TransientHero>
 
         {/* KPIs */}
         <section className="grid gap-4 md:grid-cols-4">
@@ -159,7 +166,7 @@ export function FinanceDashboard() {
         <section className="grid gap-6 md:grid-cols-2">
           <QueuePanel
             title="Expiring Soon"
-            href="/admin/finance/operations?tab=queues"
+            href="/admin/finance?tab=queues"
             rows={queues.expiring_memberships ?? []}
             renderRow={(row) => (
               <>
@@ -170,7 +177,7 @@ export function FinanceDashboard() {
           />
           <QueuePanel
             title="Overdue Invoices"
-            href="/admin/finance/operations?tab=queues"
+            href="/admin/finance?tab=queues"
             rows={queues.overdue_invoices ?? []}
             renderRow={(row) => (
               <>
@@ -183,7 +190,7 @@ export function FinanceDashboard() {
           />
           <QueuePanel
             title="Pending Payments"
-            href="/admin/finance/operations?tab=queues"
+            href="/admin/finance?tab=queues"
             rows={queues.pending_payments ?? []}
             renderRow={(row) => (
               <>
@@ -194,7 +201,7 @@ export function FinanceDashboard() {
           />
           <QueuePanel
             title="Pending Rewards"
-            href="/admin/finance/operations?tab=referrals"
+            href="/admin/finance?tab=referrals"
             rows={queues.pending_referral_rewards ?? []}
             renderRow={(row) => (
               <>

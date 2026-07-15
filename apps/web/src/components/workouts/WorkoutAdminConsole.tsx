@@ -11,6 +11,7 @@ import {
   type WorkoutRecord,
 } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
+import { TransientHero } from "@/components/TransientHero";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { AssignWorkoutPanel } from "@/components/workouts/AssignWorkoutPanel";
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
@@ -128,11 +129,12 @@ export function WorkoutAdminConsole() {
   return (
     <main className="min-h-screen px-6 py-8 md:px-10 md:py-12" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-7xl space-y-8">
-        <section className="rounded-[2.4rem] p-7" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+        <TransientHero label="workout management introduction">
+        <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">Workouts</p>
-              <h1 className="mt-2 max-w-3xl text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>
+              <h1 className="mt-2 max-w-3xl text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
                 Workout content management.
               </h1>
               <p className="mt-4 max-w-3xl text-base leading-7" style={{ color: "var(--muted)" }}>
@@ -165,6 +167,7 @@ export function WorkoutAdminConsole() {
             </Link>
           </div>
         </section>
+        </TransientHero>
 
         {!currentUser ? null : (
           <>

@@ -5,6 +5,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { fetchAdminReviews, updateReviewStatus } from "@/api/reviews";
 import { useSession } from "@/components/session-provider";
+import { TransientHero } from "@/components/TransientHero";
 
 type ReviewAnswer = {
   question_key?: unknown;
@@ -37,14 +38,16 @@ export function AdminReviews() {
   return (
     <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-5xl space-y-6">
-        <section className="rounded-[2rem] border border-[color:var(--border)] bg-[var(--panel)] p-8">
+        <TransientHero label="feedback administration introduction">
+        <section className="rounded-[2rem] border border-[color:var(--border)] bg-[var(--panel)] p-5">
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">Feedback admin</p>
-          <h1 className="mt-3 text-4xl font-black">Reviews and satisfaction signals</h1>
+          <h1 className="mt-2 text-3xl font-black">Reviews and satisfaction signals</h1>
           <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
             MVP moderation view for workout, exercise, gym, and coaching reviews. Analytics will consume the same
             persisted records.
           </p>
         </section>
+        </TransientHero>
 
         <section className="grid gap-4">
           {reviews.length === 0 ? <p className="rounded-2xl bg-[var(--panel)]/5 p-5 text-sm">No reviews yet.</p> : null}

@@ -11,6 +11,7 @@ import {
   type AthleteDrillDown,
 } from "@/api/admin";
 import { useSession } from "@/components/session-provider";
+import { TransientHero } from "@/components/TransientHero";
 
 function asRecord(v: unknown): Record<string, unknown> {
   return v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
@@ -22,7 +23,6 @@ function asList(v: unknown): unknown[] {
 
 function DrillDownPanel({ drillDown }: { drillDown: AthleteDrillDown }) {
   const d = asRecord(drillDown);
-  const athlete = asRecord(d.athlete);
   const assignments = asList(d.assignments);
   const executions = asList(d.executions);
   const notes = asList(d.notes);
@@ -146,12 +146,13 @@ export function AdminCoaching() {
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-6xl space-y-8">
-        <section className="rounded-[2.4rem] p-8" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+        <TransientHero label="coaching workspace introduction">
+        <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">Admin coaching</p>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
             Athlete coaching workspace
           </h1>
-          <p className="mt-4 max-w-3xl text-base leading-7" style={{ color: "var(--muted)" }}>
+          <p className="mt-2 max-w-3xl text-sm leading-6" style={{ color: "var(--muted)" }}>
             Select an athlete to view their drill-down (assignments, execution history, scores, attention flags) and write coaching notes.
           </p>
           <Link
@@ -162,6 +163,7 @@ export function AdminCoaching() {
             Back to admin home
           </Link>
         </section>
+        </TransientHero>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_1.5fr]">
           {/* Athlete list */}

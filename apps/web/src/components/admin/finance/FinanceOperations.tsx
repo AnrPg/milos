@@ -3,12 +3,16 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
 
+import { fetchFinanceQueues, fetchFinanceSummary, type FinanceRecord } from "@/api/finance";
 import { MembersTab } from "@/components/admin/finance/tabs/MembersTab";
 import { PackagesTab } from "@/components/admin/finance/tabs/PackagesTab";
 import { PromotionsTab } from "@/components/admin/finance/tabs/PromotionsTab";
 import { QueuesTab } from "@/components/admin/finance/tabs/QueuesTab";
 import { ReferralsTab } from "@/components/admin/finance/tabs/ReferralsTab";
+import { useSession } from "@/components/session-provider";
+import { TransientHero } from "@/components/TransientHero";
 
 type Tab = "members" | "packages" | "promotions" | "referrals" | "queues";
 
@@ -23,7 +27,42 @@ const TABS: Array<{ id: Tab; label: string }> = [
 export function FinanceOperations() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const activeTab = (searchParams.get("tab") as Tab | null) ?? "members";
+  const { tokens } = useSession();
+  const token = tokens?.access_token;
+  const requestedTab = searchParams.get("tab");
+  const activeTab: Tab = TABS.some(({ id }) => id === requestedTab) ? (requestedTab as Tab) : "members";
+
+  const summaryQuery = useQuery({
+    queryKey: ["admin", "finance", "summary"],
+    enabled: Boolean(token),
+    queryFn: () => fetchFinanceSummary(token!),
+  });
+
+  const queuesQuery = useQuery({
+    queryKey: ["admin", "finance", "queues"],
+    enabled: Boolean(token),
+    queryFn: () => fetchFinanceQueues(token!, { expires_within_days: "30" }),
+  });
+
+  const totals = (summaryQuery.data?.totals ?? {}) as FinanceRecord;
+  const queues = (queuesQuery.data?.queues ?? {}) as Record<string, FinanceRecord[]>;
+  const attentionItems = [
+    {
+      label: "Overdue invoices",
+      count: (queues.overdue_invoices ?? []).length,
+      href: "/admin/finance?tab=queues",
+    },
+    {
+      label: "Pending payments",
+      count: (queues.pending_payments ?? []).length,
+      href: "/admin/finance?tab=queues",
+    },
+    {
+      label: "Referral rewards",
+      count: (queues.pending_referral_rewards ?? []).length,
+      href: "/admin/finance?tab=referrals",
+    },
+  ].filter((item) => item.count > 0);
 
   const setTab = useCallback(
     (tab: Tab) => {
@@ -38,25 +77,58 @@ export function FinanceOperations() {
       <div className="mx-auto max-w-7xl space-y-8">
 
         {/* Hero */}
-        <section className="rounded-[2.6rem] p-8" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+        <TransientHero label="finance operations introduction">
+        <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>Revenue</p>
-              <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>
-                Finance Operations
+              <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>Finance</p>
+              <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
+                Finance operations
               </h1>
-              <p className="mt-4 text-base leading-7" style={{ color: "var(--muted)" }}>
+              <p className="mt-2 text-sm leading-6" style={{ color: "var(--muted)" }}>
                 Manage members, packages, promotions, referrals, and operational queues.
               </p>
             </div>
             <Link
-              href="/admin/finance"
+              href="/admin/metrics/finance"
               className="rounded-2xl px-5 py-3 text-sm font-semibold text-center self-start"
               style={{ background: "var(--border)", border: "1px solid var(--border-strong)", color: "var(--text-soft)" }}
             >
-              ← Finance Dashboard
+              Finance analytics →
             </Link>
           </div>
+        </section>
+        </TransientHero>
+
+        <section
+          aria-label="Urgent finance attention"
+          className="flex items-center gap-2 overflow-x-auto rounded-full px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+        >
+          <span className="shrink-0 px-2 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+            Attention
+          </span>
+          {summaryQuery.isLoading || queuesQuery.isLoading ? (
+            <span className="whitespace-nowrap px-2 text-sm" style={{ color: "var(--muted)" }}>Loading…</span>
+          ) : attentionItems.length === 0 ? (
+            <span className="whitespace-nowrap px-2 text-sm" style={{ color: "var(--muted)" }}>No urgent finance items.</span>
+          ) : (
+            attentionItems.map((item) => (
+              <Link
+                key={item.label}
+                className="shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-semibold"
+                href={item.href}
+                style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", color: "var(--danger)" }}
+              >
+                {item.label}: {item.count}
+              </Link>
+            ))
+          )}
+          {Number(totals.overdue_invoice_balance_cents ?? 0) > 0 ? (
+            <span className="ml-auto shrink-0 whitespace-nowrap px-2 text-xs font-semibold" style={{ color: "var(--muted)" }}>
+              Overdue balance {money(totals.overdue_invoice_balance_cents)}
+            </span>
+          ) : null}
         </section>
 
         {/* Tab switcher */}
@@ -88,4 +160,9 @@ export function FinanceOperations() {
       </div>
     </main>
   );
+}
+
+function money(cents: unknown) {
+  const amount = typeof cents === "number" ? cents : Number(cents ?? 0);
+  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" }).format(amount / 100);
 }

@@ -10,6 +10,7 @@ import { fetchFinanceQueues, fetchFinanceSummary, type FinanceRecord } from "@/a
 import { fetchLandingPayload, type AdminMetrics } from "@/api/landing";
 import { fetchSchedule } from "@/api/schedule";
 import { useSession } from "@/components/session-provider";
+import { TransientHero } from "@/components/TransientHero";
 
 type AlertCategory = "finance" | "coaching" | "training";
 
@@ -89,19 +90,22 @@ function AdminMetricChip({ label, value, href, danger = false, loading = false }
   return (
     <Link
       href={href}
-      className="flex flex-col rounded-[1.9rem] p-5 transition-transform hover:-translate-y-0.5"
+      className="flex items-center gap-4 rounded-[1.6rem] p-4 transition-transform hover:-translate-y-0.5"
       style={{
         background: "var(--panel)",
         border: `1px solid ${danger ? "color-mix(in srgb, var(--danger, var(--primary)) 30%, transparent)" : "var(--border)"}`,
       }}
     >
-      <span className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{label}</span>
       <span
-        className="mt-3 text-3xl font-semibold tracking-tight"
-        style={{ color: loading ? "var(--border)" : danger ? "var(--danger, var(--primary))" : "var(--text)" }}
+        className="grid h-16 w-16 shrink-0 place-items-center rounded-full p-[3px]"
+        style={{ background: `conic-gradient(${danger ? "var(--danger, var(--primary))" : "var(--primary)"} 0 78%, var(--border) 78% 100%)` }}
+        aria-hidden="true"
       >
-        {loading ? "…" : value}
+        <span className="grid h-full w-full place-items-center rounded-full text-base font-bold" style={{ background: "var(--panel)", color: loading ? "var(--border)" : danger ? "var(--danger, var(--primary))" : "var(--text)" }}>
+          {loading ? "…" : value}
+        </span>
       </span>
+      <span className="min-w-0 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{label}</span>
     </Link>
   );
 }
@@ -148,7 +152,7 @@ function AdminChallengeCard({ challenge }: { challenge: AdminChallengeRecord }) 
 }
 
 export function AdminDashboard() {
-  const { currentUser, signOut, tokens } = useSession();
+  const { currentUser, tokens } = useSession();
   const [configOpen, setConfigOpen] = useState(false);
   const [activeCategories, setActiveCategories] = useState<AlertCategory[]>(DEFAULT_CATEGORIES);
 
@@ -189,7 +193,7 @@ export function AdminDashboard() {
         startAt: today.toISOString(),
         endAt: endDate.toISOString(),
         days: 7,
-        trainingType: null,
+        classTypeIds: [],
       });
     },
   });
@@ -289,20 +293,28 @@ export function AdminDashboard() {
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
   return (
-    <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
+    <main
+      className="min-h-screen px-6 py-10 md:px-10 md:py-14"
+      style={{
+        backgroundColor: "var(--bg)",
+        backgroundImage: "linear-gradient(color-mix(in srgb, var(--border) 35%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--border) 35%, transparent) 1px, transparent 1px)",
+        backgroundSize: "32px 32px",
+      }}
+    >
       <div className="mx-auto max-w-6xl space-y-8">
 
         {/* Hero */}
-        <section className="rounded-[2.6rem] p-8" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+        <TransientHero label="administrator dashboard introduction">
+        <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
                 Admin
               </p>
-              <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>
+              <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
                 {greeting}, {currentUser?.nickname}.
               </h1>
-              <p className="mt-4 text-base leading-7" style={{ color: "var(--muted)" }}>
+              <p className="mt-2 text-sm leading-6" style={{ color: "var(--muted)" }}>
                 {new Date().toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
               </p>
             </div>
@@ -321,17 +333,10 @@ export function AdminDashboard() {
               >
                 Class Schedule
               </Link>
-              <button
-                className="rounded-2xl px-5 py-3 text-sm font-semibold"
-                style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)", color: "var(--primary)" }}
-                onClick={signOut}
-                type="button"
-              >
-                Log out
-              </button>
             </div>
           </div>
         </section>
+        </TransientHero>
 
         {/* Finance KPIs */}
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

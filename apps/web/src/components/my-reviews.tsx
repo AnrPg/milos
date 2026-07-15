@@ -6,6 +6,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { listMyExecutions, type WorkoutExecution } from "@/api/executions";
 import { fetchMyReviews, submitReview } from "@/api/reviews";
 import { useSession } from "@/components/session-provider";
+import { TransientHero } from "@/components/TransientHero";
 
 export function recentWorkoutTargets(executions: WorkoutExecution[]) {
   const byWorkout = new Map<string, { id: string; label: string }>();
@@ -238,12 +239,14 @@ export function MyReviews() {
   return (
     <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-4xl space-y-6">
-        <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--panel)] p-8">
+        <TransientHero label="reviews introduction">
+        <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--panel)] p-5">
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">
             My reviews
           </p>
-          <h1 className="mt-3 text-4xl font-black">Leave feedback without losing history.</h1>
+          <h1 className="mt-2 text-3xl font-black">Leave feedback without losing history.</h1>
         </section>
+        </TransientHero>
 
         <ReviewForm />
 

@@ -1,9 +1,11 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 
 import { fetchAdminAnalyticsSummary } from "@/api/analytics";
 import { useSession } from "@/components/session-provider";
+import { TransientHero } from "@/components/TransientHero";
 
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
@@ -108,6 +110,7 @@ export function AdminAnalytics() {
   const dashboard = asRecord(payload.dashboard);
   const crossContext = asRecord(dashboard.cross_context);
   const dashboardFinance = asRecord(dashboard.finance);
+  const dashboardCoaching = asRecord(dashboard.coaching);
   const financeTotals = asRecord(finance.totals);
   const pushDispatch = asRecord(analytics.push_dispatch);
   const attendance = asRecord(analytics.attendance);
@@ -118,14 +121,23 @@ export function AdminAnalytics() {
   return (
     <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-6xl space-y-8">
-        <section className="rounded-[2rem] border border-[color:var(--border)] bg-[var(--panel)] p-8">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">Admin analytics</p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">Analytics facts dashboard</h1>
+        <TransientHero label="analytics introduction">
+        <section className="rounded-[2rem] border border-[color:var(--border)] bg-[var(--panel)] p-5">
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">Analytics &amp; Marketing</p>
+          <h1 className="mt-2 text-3xl font-black tracking-tight md:text-4xl">Analytics &amp; Marketing</h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--muted)]">
             Review finance, coaching, feedback, wellbeing, attendance, communication, and notification engagement from
             persisted facts. Empty values mean no matching facts were captured in the selected window.
           </p>
+          <Link
+            className="mt-5 inline-flex rounded-full px-4 py-2 text-sm font-semibold"
+            href="/admin/metrics"
+            style={{ background: "var(--panel-muted)", color: "var(--text-soft)" }}
+          >
+            ← Analytics &amp; Marketing
+          </Link>
         </section>
+        </TransientHero>
 
         {summaryQuery.error instanceof Error ? (
           <p className="rounded-2xl border border-[color:var(--danger)] bg-[color-mix(in_srgb,var(--danger)_15%,transparent)] p-4 text-sm text-[var(--danger)]">
@@ -152,7 +164,7 @@ export function AdminAnalytics() {
           />
         </section>
 
-        <section className="rounded-[1.6rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
+        <section id="training-analytics" className="scroll-mt-20 rounded-[1.6rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
           <h2 className="text-xl font-black">Team workout breakdown (last 30 days)</h2>
           <div className="mt-4 grid gap-4 md:grid-cols-3">
             <KpiCard label="Team completions" value={formatCount(metricNumber(teamWorkoutsAggregate, "team_count"))} />
@@ -177,14 +189,57 @@ export function AdminAnalytics() {
               </table>
             </div>
           ) : null}
+          <div className="mt-6">
+            <BreakdownList title="Attendance" rows={entries(asRecord(attendance.by_status))} />
+          </div>
         </section>
 
-        <section className="grid gap-4 lg:grid-cols-2">
+        <section id="user-engagement" className="scroll-mt-20 grid gap-4 lg:grid-cols-2">
+          <div className="lg:col-span-2">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--primary)]">User Engagement</p>
+            <h2 className="mt-2 text-xl font-black">Interaction and communication signals</h2>
+          </div>
           <BreakdownList title="Event mix" rows={entries(asRecord(events.by_name))} />
-          <BreakdownList title="Attendance" rows={entries(asRecord(attendance.by_status))} />
           <BreakdownList title="Push delivery" rows={entries(asRecord(pushDispatch.by_status))} />
           <BreakdownList title="Communication" rows={entries(asRecord(communication.by_direction))} />
           <BreakdownList title="Review ratings" rows={entries(reviewByRating)} />
+        </section>
+
+        <section id="coaching-analytics" className="scroll-mt-20 rounded-[1.6rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--primary)]">Coaching Analytics</p>
+              <h2 className="mt-2 text-xl font-black">Athlete activity and follow-up</h2>
+            </div>
+            <Link className="text-sm font-bold text-[var(--primary)]" href="/admin/coaching-assignments">
+              Open Personal Coaching →
+            </Link>
+          </div>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            <KpiCard label="Active athletes" value={formatCount(metricNumber(coaching, "active_athletes"))} />
+            <KpiCard label="Captured events" value={formatCount(metricNumber(dashboardCoaching, "event_count"))} />
+            <KpiCard label="Reviews" value={formatCount(metricNumber(dashboardCoaching, "review_count"))} />
+          </div>
+        </section>
+
+        <section id="health-incidents" className="scroll-mt-20 rounded-[1.6rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--primary)]">Health / Incidents</p>
+              <h2 className="mt-2 text-xl font-black">Injury and limitation signals</h2>
+            </div>
+            <Link className="text-sm font-bold text-[var(--primary)]" href="/admin/wellbeing">
+              Open incident records →
+            </Link>
+          </div>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            <KpiCard label="Active injuries" value={formatCount(metricNumber(wellbeing, "active_count"))} />
+            <KpiCard label="Total reports" value={formatCount(metricNumber(wellbeing, "total"))} />
+            <KpiCard label="Recent injury flags" value={formatCount(metricNumber(dashboardCoaching, "injury_count"))} />
+          </div>
+        </section>
+
+        <section className="grid gap-4 lg:grid-cols-2">
           <article className="rounded-[1.6rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
             <h2 className="text-xl font-black">Operational status</h2>
             <dl className="mt-5 space-y-4 text-sm">

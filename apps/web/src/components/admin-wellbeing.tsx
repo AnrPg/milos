@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { adminMarkInjuryHealed, adminReportInjury, fetchAdminInjuries } from "@/api/wellbeing";
 import { useSession } from "@/components/session-provider";
+import { TransientHero } from "@/components/TransientHero";
 
 export function AdminWellbeing() {
   const { tokens } = useSession();
@@ -71,14 +72,16 @@ export function AdminWellbeing() {
   return (
     <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-5xl space-y-6">
-        <section className="rounded-[2rem] border border-[color:var(--border)] bg-[var(--panel)] p-8">
+        <TransientHero label="wellbeing administration introduction">
+        <section className="rounded-[2rem] border border-[color:var(--border)] bg-[var(--panel)] p-5">
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">Wellbeing admin</p>
-          <h1 className="mt-3 text-4xl font-black">Injury and limitation history</h1>
+          <h1 className="mt-2 text-3xl font-black">Injury and limitation history</h1>
           <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
             Staff can see injury status, body-area tags, severity, and healing history for analytics and coaching
             safety workflows.
           </p>
         </section>
+        </TransientHero>
 
         <section className="rounded-[2rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">

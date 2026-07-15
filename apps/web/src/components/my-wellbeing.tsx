@@ -5,6 +5,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { fetchMyInjuries, markMyInjuryHealed, reportInjury } from "@/api/wellbeing";
 import { useSession } from "@/components/session-provider";
+import { TransientHero } from "@/components/TransientHero";
 
 export function MyWellbeing() {
   const { tokens } = useSession();
@@ -40,10 +41,12 @@ export function MyWellbeing() {
   return (
     <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-4xl space-y-6">
-        <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--panel)] p-8">
+        <TransientHero label="wellbeing introduction">
+        <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--panel)] p-5">
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">My wellbeing</p>
-          <h1 className="mt-3 text-4xl font-black">Report injuries and mark healing.</h1>
+          <h1 className="mt-2 text-3xl font-black">Report injuries and mark healing.</h1>
         </section>
+        </TransientHero>
 
         <form
           className="space-y-4 rounded-[1.6rem] border border-[var(--border)] bg-[var(--panel)] p-6"

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { fetchMyFinance, getMyInvoiceDownloadUrl, type MyFinanceData } from "@/api/my-finance";
 import { useSession } from "@/components/session-provider";
+import { TransientHero } from "@/components/TransientHero";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -309,9 +310,11 @@ export default function BillingPage() {
 
         {/* header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold" style={{ color: "var(--text)" }}>
-            Billing
-          </h1>
+          <TransientHero label="billing introduction">
+            <h1 className="text-xl font-semibold" style={{ color: "var(--text)" }}>
+              Billing
+            </h1>
+          </TransientHero>
           <button
             type="button"
             onClick={() => setShowPackages(true)}
