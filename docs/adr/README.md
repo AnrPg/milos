@@ -41,3 +41,6 @@ must have an ADR. See `template.md` for the format.
 | ADR-033 | Global UI theme palette | Accepted |
 | ADR-034 | Finance invoice reference format | Accepted |
 | ADR-035 | Admin information architecture and user profiles | Accepted |
+| ADR-037 | Configurable class type lifecycle | Accepted |
+| ADR-038 | Transient page heroes and per-device push choice | Accepted |
+| ADR-039 | Embedded workout authoring | Accepted |

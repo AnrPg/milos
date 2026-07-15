@@ -53,4 +53,18 @@ The capability endpoint is non-cacheable, and stale browser subscriptions do
 not override a disabled server state.
 
 ## Implementation Notes
-To be completed after implementation.
+`TransientHero` owns the three-second lifecycle and leaves an accessible
+`Show intro` control after collapse. Operational admin and user pages use the
+compact component; the public/home landing hero remains persistent. Calendar
+controls that must remain usable are kept outside transient content.
+
+The admin dashboard no longer exposes logout as an operational shortcut. Its
+surface uses a subtle control-panel grid and circular KPI dials while preserving
+exact textual values.
+
+The push capability response sends `Cache-Control: no-store`. The client checks
+capability during authenticated initialization and whenever the inbox opens.
+Missing VAPID configuration is a capability state rather than a request error.
+Admins receive deployment setup guidance; other users receive an administrator
+handoff. Each browser can explicitly enable or disable its own subscription,
+and denied permission guidance directs users to browser/site settings.

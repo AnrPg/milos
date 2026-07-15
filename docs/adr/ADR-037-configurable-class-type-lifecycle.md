@@ -58,4 +58,23 @@ one transaction. A replacement must be active, distinct from the source, and
 present whenever future references exist.
 
 ## Implementation Notes
-To be completed after implementation.
+The final contract uses `class_type_id` for slot writes and the plural
+`class_type_ids[]` query parameter for schedule filtering. The removed
+`training_type` schedule alias was not restored: remaining OpenAPI consumers,
+Dashboard schedule reads, and the workout browser were updated to use the
+configured class-type contract directly.
+
+The workout browser now discovers active class types from the schedule response
+instead of embedding a second fixed list. Calendar feeds preserve the configured
+display name from `slot.class_type.name`, so renaming a class type is reflected
+consistently without reintroducing workout-training taxonomy inference.
+
+Archival uses a row lock and transaction. It rejects removal of the final active
+type, reports the number of future references when mapping is missing, locks and
+reassigns only future slots, and archives the source. Schedule responses include
+active types plus archived types referenced by the requested historical window.
+
+The settings UI performs an initial archive request without guessing whether a
+mapping is needed. A 409 response opens the replacement dialog. Desktop filters
+are compact and non-wrapping, mobile uses an apply/clear multi-choice disclosure,
+and both scheduling calendars share one view selector.
