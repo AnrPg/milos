@@ -1,4 +1,4 @@
-FROM elixir:1.17.3-otp-27-alpine AS build
+FROM hexpm/elixir:1.17.3-erlang-27.3.4.14-alpine-3.22.5 AS build
 
 RUN apk add --no-cache build-base git
 
@@ -20,7 +20,7 @@ COPY priv priv
 RUN mix compile
 RUN mix release
 
-FROM alpine:3.20 AS runtime
+FROM alpine:3.22.5 AS runtime
 
 RUN apk add --no-cache libstdc++ openssl ncurses-libs
 
