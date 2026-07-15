@@ -510,7 +510,8 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
   def upsert_user_preferences(user_id, params) do
     alias MilosTraining.Gamification.UserGamificationPreferences
 
-    existing = Repo.get_by(UserGamificationPreferences, user_id: user_id) || %UserGamificationPreferences{}
+    existing =
+      Repo.get_by(UserGamificationPreferences, user_id: user_id) || %UserGamificationPreferences{}
 
     existing
     |> UserGamificationPreferences.changeset(Map.put(params, :user_id, user_id))

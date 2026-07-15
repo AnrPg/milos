@@ -86,8 +86,7 @@ defmodule MilosTrainingWeb.PRController do
     summary: "Update a PR record",
     parameters: [@id_param],
     request_body:
-      {"PR params", "application/json",
-       %Schema{type: :object, properties: @pr_fields}},
+      {"PR params", "application/json", %Schema{type: :object, properties: @pr_fields}},
     responses: [
       ok: {"PR", "application/json", %Schema{type: :object}},
       not_found: {"Error", "application/json", %Schema{type: :object}},

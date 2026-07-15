@@ -19,7 +19,10 @@ defmodule MilosTraining.Repo.Migrations.CreateUserPrRecordsAndHistory do
 
     create table(:user_pr_history, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :pr_record_id, references(:user_pr_records, type: :binary_id, on_delete: :delete_all), null: false
+
+      add :pr_record_id, references(:user_pr_records, type: :binary_id, on_delete: :delete_all),
+        null: false
+
       add :score, :numeric, null: false
       add :beaten_on, :date, null: false
 

@@ -85,7 +85,15 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
     GamificationStore.transaction(fn ->
       with {:ok, _pr_events} <- persist_pr_events(user_id, execution_id, pr_scores, completed_at),
            total_prs <- GamificationStore.count_achievements_by_prefix(user_id, "pr_event:"),
-           stats <- build_stats(user_id, streaks, completed_executions, total_prs, execution, extra_scores),
+           stats <-
+             build_stats(
+               user_id,
+               streaks,
+               completed_executions,
+               total_prs,
+               execution,
+               extra_scores
+             ),
            {:ok, _stats} <- GamificationStore.upsert_user_stats(stats),
            {:ok, _badges} <-
              persist_achievements(

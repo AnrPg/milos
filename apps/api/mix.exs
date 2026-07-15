@@ -5,7 +5,7 @@ defmodule MilosTraining.MixProject do
     [
       app: :milos_training,
       version: "0.1.0",
-      elixir: "~> 1.15",
+      elixir: "~> 1.18",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -38,22 +38,23 @@ defmodule MilosTraining.MixProject do
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:swoosh, "~> 1.16"},
       {:req, "~> 0.5"},
+      {:castore, "~> 1.0"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
       {:open_api_spex, "~> 3.18"},
-      {:oban, "~> 2.17"},
+      {:oban, "~> 2.22.1"},
       {:guardian, "~> 2.3"},
       {:argon2_elixir, "~> 4.0"},
       {:ex_rated, "~> 2.1"},
       {:redix, "~> 1.3"},
-      {:web_push_elixir, "~> 0.5.0"},
+      {:web_push_elixir, "~> 0.8.0"},
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
       {:ex_aws, "~> 2.5"},
       {:ex_aws_s3, "~> 2.5"},
-      {:hackney, "~> 1.20"}
+      {:hackney, "~> 4.5"}
     ]
   end
 

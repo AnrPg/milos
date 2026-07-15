@@ -25,10 +25,9 @@ defmodule MilosTrainingWeb.MyFinanceController do
   def index(conn, _params) do
     user = GuardianPlug.current_resource(conn)
 
-    case GetMyFinance.call(user.id) do
-      {:ok, finance} -> json(conn, finance)
-      {:error, reason} -> {:error, reason}
-    end
+    {:ok, finance} = GetMyFinance.call(user.id)
+
+    json(conn, finance)
   end
 
   operation(:invoice_download_url,

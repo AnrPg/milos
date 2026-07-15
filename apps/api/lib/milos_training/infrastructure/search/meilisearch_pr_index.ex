@@ -7,18 +7,28 @@ defmodule MilosTraining.Infrastructure.Search.MeilisearchPRIndex do
   def upsert_document(pr) do
     with :ok <- ensure_settings() do
       case request(:post, index_path("/documents"), json: [serialize(pr)]) do
-        {:ok, %Req.Response{status: status}} when status in 200..299 -> :ok
-        {:ok, %Req.Response{status: status, body: body}} -> {:error, {:meilisearch_status, status, body}}
-        {:error, reason} -> {:error, reason}
+        {:ok, %Req.Response{status: status}} when status in 200..299 ->
+          :ok
+
+        {:ok, %Req.Response{status: status, body: body}} ->
+          {:error, {:meilisearch_status, status, body}}
+
+        {:error, reason} ->
+          {:error, reason}
       end
     end
   end
 
   def delete_document(pr_id) do
     case request(:delete, index_path("/documents/#{pr_id}")) do
-      {:ok, %Req.Response{status: status}} when status in 200..299 -> :ok
-      {:ok, %Req.Response{status: status, body: body}} -> {:error, {:meilisearch_status, status, body}}
-      {:error, reason} -> {:error, reason}
+      {:ok, %Req.Response{status: status}} when status in 200..299 ->
+        :ok
+
+      {:ok, %Req.Response{status: status, body: body}} ->
+        {:error, {:meilisearch_status, status, body}}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 

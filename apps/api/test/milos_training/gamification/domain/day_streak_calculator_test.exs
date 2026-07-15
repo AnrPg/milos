@@ -28,6 +28,7 @@ defmodule MilosTraining.Gamification.Domain.DayStreakCalculatorTest do
       dates = [~D[2026-06-13], ~D[2026-06-16]]
       # Sat=6, Sun=0 are off days
       result = DayStreakCalculator.calculate(dates, [0, 6], ~D[2026-06-16])
+
       # June 16 = Mon (trained), June 15 = Sun (off, skip), June 14 = Sat (off, skip), June 13 = Fri (trained)
       assert result.current_streak == 2
     end
