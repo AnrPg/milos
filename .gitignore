@@ -8,6 +8,7 @@ apps/api/priv/static/uploads/
 # No leading path: matches node_modules at any depth, not just apps/web.
 node_modules/
 apps/web/.next/
+apps/web/.next-*/
 apps/web/.env*.local
 
 # Docker

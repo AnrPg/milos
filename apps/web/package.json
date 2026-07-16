@@ -7,6 +7,7 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
+    "i18n:check": "node scripts/validate-messages.mjs",
     "generate:api": "cd ../api && mix milos.export_openapi ../web/src/api/generated/openapi.json && cd ../web && openapi-typescript src/api/generated/openapi.json -o src/api/generated/schema.ts"
   },
   "dependencies": {
@@ -16,6 +17,7 @@
     "@tanstack/react-query": "^5.90.7",
     "@use-gesture/react": "^10.3.1",
     "next": "16.2.7",
+    "next-intl": "^4.13.2",
     "phoenix": "^1.8.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
