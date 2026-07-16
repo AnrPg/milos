@@ -286,6 +286,7 @@ defmodule MilosTraining.Notifications do
     to_date = field(payload, :to_date)
 
     url = "/admin/coaching-assignments?open=#{assigned_workout_id}&date=#{to_date}"
+
     Identity.list_by_role(:admin)
     |> Enum.each(fn admin ->
       result =
