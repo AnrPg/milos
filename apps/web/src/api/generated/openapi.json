@@ -1503,6 +1503,9 @@
             },
             "description": "Access session"
           },
+          "204": {
+            "description": "No refresh session"
+          },
           "401": {
             "content": {
               "application/json": {
@@ -2614,11 +2617,50 @@
                         "theme_slug"
                       ],
                       "type": "object"
+                    },
+                    "notifications": {
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "vapid_private_key_configured": {
+                          "type": "boolean"
+                        },
+                        "vapid_public_key": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "vapid_subject": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "enabled",
+                        "vapid_private_key_configured"
+                      ],
+                      "type": "object"
                     }
                   },
                   "required": [
                     "gamification",
-                    "finance"
+                    "finance",
+                    "notifications"
                   ],
                   "type": "object"
                 }
@@ -2688,11 +2730,25 @@
                       }
                     },
                     "type": "object"
+                  },
+                  "notifications": {
+                    "properties": {
+                      "vapid_private_key": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "vapid_public_key": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "vapid_subject": {
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
                   }
                 },
-                "required": [
-                  "gamification"
-                ],
                 "type": "object"
               }
             }
@@ -2785,11 +2841,50 @@
                         "theme_slug"
                       ],
                       "type": "object"
+                    },
+                    "notifications": {
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "vapid_private_key_configured": {
+                          "type": "boolean"
+                        },
+                        "vapid_public_key": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "vapid_subject": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "enabled",
+                        "vapid_private_key_configured"
+                      ],
+                      "type": "object"
                     }
                   },
                   "required": [
                     "gamification",
-                    "finance"
+                    "finance",
+                    "notifications"
                   ],
                   "type": "object"
                 }

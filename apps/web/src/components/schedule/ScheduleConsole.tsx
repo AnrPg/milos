@@ -116,9 +116,12 @@ export function ScheduleConsole({
         classTypeIds,
       });
 
-      setSchedule(window.slots);
-      setClassTypes(window.class_types);
-      return window.slots;
+      const nextSlots = Array.isArray(window.slots) ? window.slots : [];
+      const nextClassTypes = Array.isArray(window.class_types) ? window.class_types : [];
+
+      setSchedule(nextSlots);
+      setClassTypes(nextClassTypes);
+      return nextSlots;
     } catch (loadError) {
       setError(loadError instanceof Error ? localizeError(loadError, i18n) : t("failedToLoadSchedule"));
       return null;

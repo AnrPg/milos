@@ -216,6 +216,15 @@ defmodule MilosTrainingWeb.AuthControllerTest do
   end
 
   describe "POST /api/auth/refresh" do
+    test "returns no content when no refresh cookie is present", %{conn: conn} do
+      conn =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/auth/refresh", %{})
+
+      assert response(conn, 204) == ""
+    end
+
     test "rotates refresh tokens and rejects replay of the old token", %{conn: conn} do
       register_conn =
         conn

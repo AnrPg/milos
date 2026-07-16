@@ -2927,6 +2927,13 @@ export interface operations {
                     };
                 };
             };
+            /** @description No refresh session */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Unauthorized */
             401: {
                 headers: {
@@ -3369,6 +3376,18 @@ export interface operations {
                             updated_at?: string | null;
                             weekly_workout_target: number;
                         };
+                        notifications: {
+                            enabled: boolean;
+                            /** Format: uuid */
+                            id?: string | null;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            vapid_private_key_configured: boolean;
+                            vapid_public_key?: string | null;
+                            vapid_subject?: string | null;
+                        };
                     };
                 };
             };
@@ -3387,12 +3406,17 @@ export interface operations {
                     finance?: {
                         payment_reminder_interval_days?: number;
                     };
-                    gamification: {
+                    gamification?: {
                         leaderboard_enabled?: boolean;
                         streak_shield_reset_day?: number | null;
                         /** @enum {string} */
                         theme_slug?: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
                         weekly_workout_target?: number;
+                    };
+                    notifications?: {
+                        vapid_private_key?: string | null;
+                        vapid_public_key?: string | null;
+                        vapid_subject?: string | null;
                     };
                 };
             };
@@ -3426,6 +3450,18 @@ export interface operations {
                             /** Format: date-time */
                             updated_at?: string | null;
                             weekly_workout_target: number;
+                        };
+                        notifications: {
+                            enabled: boolean;
+                            /** Format: uuid */
+                            id?: string | null;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            vapid_private_key_configured: boolean;
+                            vapid_public_key?: string | null;
+                            vapid_subject?: string | null;
                         };
                     };
                 };

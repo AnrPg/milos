@@ -39,6 +39,13 @@ function formatTime(locale: string, isoString: string) {
 
 const todayKey = localDateKey(new Date());
 
+function slotClassType(slot: ScheduleSlot) {
+  return {
+    name: slot.class_type?.name ?? slot.class_type_id ?? "—",
+    slug: slot.class_type?.slug ?? slot.class_type_id ?? "class",
+  };
+}
+
 export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, onCreateSlot }: CalendarViewProps) {
   const i18n = useUiTranslations();
   const locale = useLocale();
@@ -111,7 +118,8 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
                   ) : null}
                 </div>
                 {daySlots.slice(0, 3).map((slot) => {
-                  const slotColor = WORKOUT_TYPE_COLORS[slot.class_type.slug] ?? "var(--primary)";
+                  const classType = slotClassType(slot);
+                  const slotColor = WORKOUT_TYPE_COLORS[classType.slug] ?? "var(--primary)";
                   return (
                     <button
                       key={slot.id}
@@ -120,7 +128,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
                       onClick={() => onSelectSlot(slot)}
                       type="button"
                     >
-                      {formatTime(locale, slot.scheduled_at)} {slot.class_type.name}
+                      {formatTime(locale, slot.scheduled_at)} {classType.name}
                     </button>
                   );
                 })}
@@ -228,7 +236,8 @@ function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact
   const locale = useLocale();
   const isPast = new Date(slot.scheduled_at) <= new Date();
   const isUnavailable = !slot.current_user_booking && (slot.spots_remaining === 0 || isPast);
-  const typeColor = WORKOUT_TYPE_COLORS[slot.class_type.slug] ?? "var(--primary)";
+  const classType = slotClassType(slot);
+  const typeColor = WORKOUT_TYPE_COLORS[classType.slug] ?? "var(--primary)";
 
   if (compact) {
     return (
@@ -245,7 +254,7 @@ function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact
           {new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" }).format(new Date(slot.scheduled_at))}
         </p>
         <p className="truncate text-[10px] uppercase tracking-[0.14em]" style={{ color: isUnavailable ? "var(--dim)" : typeColor }}>
-          {slot.class_type.name}
+          {classType.name}
         </p>
       </button>
     );
@@ -277,7 +286,7 @@ function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact
             color: isUnavailable ? "var(--dim)" : typeColor,
           }}
         >
-          {slot.class_type.name}
+          {classType.name}
         </span>
       </div>
 

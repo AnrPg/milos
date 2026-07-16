@@ -60,6 +60,10 @@ defmodule MilosTraining.Notifications do
     }
   end
 
+  def get_push_settings, do: NotificationStore.get_push_settings()
+
+  def update_push_settings(params), do: NotificationStore.update_push_settings(params)
+
   def save_push_subscription(user_id, attrs) do
     attrs
     |> unwrap_subscription_attrs()

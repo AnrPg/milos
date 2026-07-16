@@ -40,13 +40,28 @@ defmodule MilosTrainingWeb.AdminSettingsController do
     required: [:payment_reminder_interval_days]
   }
 
+  @notification_push_settings_schema %Schema{
+    type: :object,
+    properties: %{
+      id: %Schema{type: :string, format: :uuid, nullable: true},
+      enabled: %Schema{type: :boolean},
+      vapid_public_key: %Schema{type: :string, nullable: true},
+      vapid_private_key_configured: %Schema{type: :boolean},
+      vapid_subject: %Schema{type: :string, nullable: true},
+      inserted_at: %Schema{type: :string, format: :"date-time", nullable: true},
+      updated_at: %Schema{type: :string, format: :"date-time", nullable: true}
+    },
+    required: [:enabled, :vapid_private_key_configured]
+  }
+
   @admin_settings_response_schema %Schema{
     type: :object,
     properties: %{
       gamification: @gamification_settings_schema,
-      finance: @finance_settings_schema
+      finance: @finance_settings_schema,
+      notifications: @notification_push_settings_schema
     },
-    required: [:gamification, :finance]
+    required: [:gamification, :finance, :notifications]
   }
 
   @admin_settings_update_schema %Schema{
@@ -73,9 +88,18 @@ defmodule MilosTrainingWeb.AdminSettingsController do
           payment_reminder_interval_days: %Schema{type: :integer, minimum: 1}
         },
         required: []
+      },
+      notifications: %Schema{
+        type: :object,
+        properties: %{
+          vapid_public_key: %Schema{type: :string, nullable: true},
+          vapid_private_key: %Schema{type: :string, nullable: true},
+          vapid_subject: %Schema{type: :string, nullable: true}
+        },
+        required: []
       }
     },
-    required: [:gamification]
+    required: []
   }
 
   operation(:show,

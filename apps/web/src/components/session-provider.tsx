@@ -117,6 +117,10 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     if (!tokens) return;
 
     const refreshedTokens = await refreshSession();
+    if (!refreshedTokens?.access_token) {
+      resetSession(tokens.access_token);
+      return;
+    }
     const user = currentUser ?? (await fetchCurrentUser(refreshedTokens.access_token));
     commitSession(refreshedTokens, user);
   }
@@ -145,6 +149,10 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     async function bootstrap() {
       try {
         const refreshedTokens = await refreshSession();
+        if (!refreshedTokens?.access_token) {
+          if (!cancelled) setStatus("guest");
+          return;
+        }
         const user = await fetchCurrentUser(refreshedTokens.access_token);
         if (cancelled) return;
         commitSession(refreshedTokens, user);

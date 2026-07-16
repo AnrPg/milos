@@ -30,4 +30,13 @@ defmodule MilosTraining.Notifications.NotificationStore do
   @impl true
   def propagate_nickname_change(old_nickname, new_nickname),
     do: adapter().propagate_nickname_change(old_nickname, new_nickname)
+
+  @impl true
+  def get_push_settings, do: adapter().get_push_settings()
+
+  @impl true
+  def get_push_delivery_config, do: adapter().get_push_delivery_config()
+
+  @impl true
+  def update_push_settings(params), do: adapter().update_push_settings(params)
 end

@@ -54,3 +54,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-046 | Workout hard deletion across dependent contexts (historical renumbering) | Superseded in part by ADR-029 |
 | ADR-047 | Frontend catalog and RTL migration | Accepted |
 | ADR-048 | Semantic localization at system boundaries | Accepted |
+| ADR-049 | Admin-managed browser push configuration | Accepted |

@@ -164,6 +164,45 @@ export function MembersTab() {
   const updateMutation = useMutation({
     mutationFn: ({ userId, body }: { userId: string; body: FinanceRecord }) =>
       updateFinanceMember(token, userId, body),
+    onMutate: async ({ userId, body }) => {
+      await queryClient.cancelQueries({ queryKey: ["admin", "finance", "members"] });
+
+      const previous = queryClient.getQueryData<{ members: FinanceRecord[]; meta: FinanceRecord }>([
+        "admin",
+        "finance",
+        "members",
+      ]);
+
+      queryClient.setQueryData<{ members: FinanceRecord[]; meta: FinanceRecord }>(
+        ["admin", "finance", "members"],
+        (current) => {
+          if (!current) return current;
+
+          return {
+            ...current,
+            members: current.members.map((member) => {
+              if (field(member, "id") !== userId) return member;
+
+              const membership = (member.membership as FinanceRecord | null | undefined) ?? {};
+              return {
+                ...member,
+                membership: {
+                  ...membership,
+                  ...body,
+                },
+              };
+            }),
+          };
+        },
+      );
+
+      return { previous };
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(["admin", "finance", "members"], context.previous);
+      }
+    },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "members"] });
     },

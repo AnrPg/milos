@@ -5,7 +5,8 @@ defmodule MilosTraining.Infrastructure.Notifications.WebPushDispatcher do
 
   @impl true
   def send_push(subscription, message) do
-    with true <- PushConfig.enabled?(),
+    with :ok <- PushConfig.apply_to_web_push_elixir(),
+         true <- PushConfig.enabled?(),
          true <- Code.ensure_loaded?(WebPushElixir) do
       subscription
       |> encode_subscription()

@@ -14,6 +14,7 @@ import {
   updateAdminSettings,
   type FinanceSettings,
   type GamificationSettings,
+  type NotificationPushSettings,
 } from "@/api/settings";
 import { listScaleLevels, replaceScaleLevels, type ScaleLevel } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
@@ -592,6 +593,219 @@ function FinanceSection({ token }: { token: string }) {
   );
 }
 
+// ── Notifications section ────────────────────────────────────────────────────
+
+type NotificationPushFormState = {
+  publicKey: string;
+  privateKey: string;
+  subject: string;
+  clearPrivateKey: boolean;
+};
+
+function notificationPushFormFromSettings(s: NotificationPushSettings): NotificationPushFormState {
+  return {
+    publicKey: s.vapid_public_key ?? "",
+    privateKey: "",
+    subject: s.vapid_subject ?? "",
+    clearPrivateKey: false,
+  };
+}
+
+function bytesToBase64Url(bytes: ArrayBuffer) {
+  const raw = String.fromCharCode(...new Uint8Array(bytes));
+  return window.btoa(raw).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+async function generateVapidKeyPair() {
+  const pair = await window.crypto.subtle.generateKey(
+    { name: "ECDH", namedCurve: String.fromCharCode(80, 45, 50, 53, 54) },
+    true,
+    ["deriveBits"],
+  );
+
+  const publicKey = await window.crypto.subtle.exportKey("raw", pair.publicKey);
+  const privateKey = await window.crypto.subtle.exportKey("jwk", pair.privateKey);
+
+  if (typeof privateKey.d !== "string") {
+    throw new Error("vapid_key_export_failed");
+  }
+
+  return {
+    publicKey: bytesToBase64Url(publicKey),
+    privateKey: privateKey.d,
+  };
+}
+
+function NotificationsSection({ token }: { token: string }) {
+  const i18n = useUiTranslations();
+  const queryClient = useQueryClient();
+  const [form, setForm] = useState<NotificationPushFormState>({
+    publicKey: "",
+    privateKey: "",
+    subject: "",
+    clearPrivateKey: false,
+  });
+  const [initialized, setInitialized] = useState(false);
+  const [generateError, setGenerateError] = useState<string | null>(null);
+
+  const settingsQuery = useQuery({
+    queryKey: ["admin", "settings"],
+    queryFn: () => fetchAdminSettings(token),
+  });
+
+  useEffect(() => {
+    if (!settingsQuery.data?.notifications) return;
+    const next = notificationPushFormFromSettings(settingsQuery.data.notifications);
+    queueMicrotask(() => { setForm(next); setInitialized(true); });
+  }, [settingsQuery.data]);
+
+  const saveMutation = useMutation({
+    mutationFn: () => {
+      const privateKey = form.privateKey.trim();
+      const payload: {
+        vapid_public_key: string | null;
+        vapid_subject: string | null;
+        vapid_private_key?: string | null;
+      } = {
+        vapid_public_key: form.publicKey.trim() || null,
+        vapid_subject: form.subject.trim() || null,
+      };
+
+      if (privateKey || form.clearPrivateKey) {
+        payload.vapid_private_key = privateKey || null;
+      }
+
+      return updateAdminSettings(token, {
+        notifications: payload,
+      });
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["admin", "settings"], data);
+      setForm(notificationPushFormFromSettings(data.notifications));
+    },
+  });
+
+  const serverForm = settingsQuery.data?.notifications
+    ? notificationPushFormFromSettings(settingsQuery.data.notifications)
+    : null;
+  const dirty =
+    initialized &&
+    serverForm !== null &&
+    (form.publicKey !== serverForm.publicKey ||
+      form.subject !== serverForm.subject ||
+      form.privateKey.trim() !== "" ||
+      form.clearPrivateKey);
+  const configured = Boolean(settingsQuery.data?.notifications.enabled);
+  const privateKeyConfigured = Boolean(settingsQuery.data?.notifications.vapid_private_key_configured);
+
+  async function handleGenerate() {
+    setGenerateError(null);
+
+    try {
+      const keyPair = await generateVapidKeyPair();
+      setForm((current) => ({
+        ...current,
+        publicKey: keyPair.publicKey,
+        privateKey: keyPair.privateKey,
+        clearPrivateKey: false,
+      }));
+    } catch {
+      setGenerateError(i18n("browserCouldNotGeneratePushKeys6c91b0a"));
+    }
+  }
+
+  return (
+    <div className="max-w-3xl space-y-5">
+      <div
+        className="rounded-[1.4rem] p-4 text-sm"
+        style={{
+          background: configured
+            ? "color-mix(in srgb, var(--success) 10%, var(--panel-muted))"
+            : "var(--panel-muted)",
+          border: "1px solid var(--border)",
+          color: configured ? "var(--success)" : "var(--muted)",
+        }}
+      >
+        {configured ? i18n("browserAlertsAreAvailableForUserOptIn9f7f20d") : i18n("browserAlertsAreNotAvailableYetc3c13bb")}
+      </div>
+
+      <div className="flex flex-wrap gap-3">
+        <button
+          className="rounded-full px-4 py-2 text-sm font-semibold"
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+          type="button"
+          onClick={() => void handleGenerate()}
+        >
+          {i18n("generateBrowserAlertKeys3f8d1bf")}
+        </button>
+        {privateKeyConfigured ? (
+          <button
+            className="rounded-full px-4 py-2 text-sm font-semibold"
+            style={{ background: "var(--panel-muted)", color: "var(--muted)" }}
+            type="button"
+            onClick={() => setForm((current) => ({ ...current, publicKey: "", privateKey: "", subject: "", clearPrivateKey: true }))}
+          >
+            {i18n("turnOffBrowserAlerts17b2048")}
+          </button>
+        ) : null}
+      </div>
+      {generateError ? <p className="text-sm" style={{ color: "var(--danger)" }}>{generateError}</p> : null}
+
+      <label className="block space-y-2">
+        <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+          {i18n("contactForBrowserAlertsfc50ab0")}
+        </span>
+        <input
+          className="w-full rounded-2xl border px-4 py-3 text-sm"
+          style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
+          value={form.subject}
+          onChange={(e) => setForm((current) => ({ ...current, subject: e.target.value, clearPrivateKey: false }))}
+        />
+      </label>
+
+      <label className="block space-y-2">
+        <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+          {i18n("publicBrowserAlertKeyacbc22f")}
+        </span>
+        <textarea
+          className="min-h-24 w-full rounded-2xl border px-4 py-3 font-mono text-xs"
+          spellCheck={false}
+          style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
+          value={form.publicKey}
+          onChange={(e) => setForm((current) => ({ ...current, publicKey: e.target.value, clearPrivateKey: false }))}
+        />
+      </label>
+
+      <label className="block space-y-2">
+        <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+          {privateKeyConfigured ? i18n("replacePrivateBrowserAlertKey2d09431") : i18n("privateBrowserAlertKey09f05b1")}
+        </span>
+        <textarea
+          className="min-h-24 w-full rounded-2xl border px-4 py-3 font-mono text-xs"
+          placeholder={privateKeyConfigured ? i18n("leaveBlankToKeepCurrentKeyea85d22") : ""}
+          spellCheck={false}
+          style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
+          value={form.privateKey}
+          onChange={(e) => setForm((current) => ({ ...current, privateKey: e.target.value, clearPrivateKey: false }))}
+        />
+      </label>
+
+      <p className="text-xs leading-5" style={{ color: "var(--dim)" }}>
+        {i18n("adminsManageTheSharedBrowserAlertServiceHerec33b6e5")}
+      </p>
+
+      <SaveBar
+        dirty={dirty}
+        pending={saveMutation.isPending}
+        success={saveMutation.isSuccess}
+        error={saveMutation.error}
+        onSave={() => saveMutation.mutate()}
+        onReset={() => serverForm && setForm(serverForm)}
+      />
+    </div>
+  );
+}
+
 export function AdminSettingsHub() {
   const i18n = useUiTranslations();
   const { tokens } = useSession();
@@ -639,6 +853,14 @@ export function AdminSettingsHub() {
               description={i18n("paymentReminders64c6e44")}
             >
               <FinanceSection token={token} />
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              id="notifications"
+              title={i18n("notificationseee2ef2")}
+              description={i18n("browserAlertsAndInAppInboxDeliveryc83f515")}
+            >
+              <NotificationsSection token={token} />
             </CollapsibleSection>
 
             <CollapsibleSection

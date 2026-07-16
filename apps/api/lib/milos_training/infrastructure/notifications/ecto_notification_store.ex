@@ -5,6 +5,7 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
 
   alias MilosTraining.Notifications.Domain.{InboxCursor, VisibleTypes}
   alias MilosTraining.Notifications.Notification
+  alias MilosTraining.Notifications.PushSetting
   alias MilosTraining.Repo
 
   @impl true
@@ -129,6 +130,46 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
     :ok
   end
 
+  @impl true
+  def get_push_settings do
+    case Repo.one(from s in PushSetting, limit: 1) do
+      nil -> normalize_push_settings(%PushSetting{})
+      %PushSetting{} = settings -> normalize_push_settings(settings)
+    end
+  end
+
+  @impl true
+  def get_push_delivery_config do
+    case Repo.one(from s in PushSetting, limit: 1) do
+      nil ->
+        %{}
+
+      %PushSetting{} = settings ->
+        %{
+          vapid_public_key: settings.vapid_public_key,
+          vapid_private_key: settings.vapid_private_key,
+          vapid_subject: settings.vapid_subject
+        }
+    end
+  end
+
+  @impl true
+  def update_push_settings(params) do
+    case Repo.one(from s in PushSetting, limit: 1) do
+      nil ->
+        %PushSetting{}
+        |> PushSetting.changeset(params)
+        |> Repo.insert()
+        |> normalize_push_settings_result()
+
+      %PushSetting{} = settings ->
+        settings
+        |> PushSetting.changeset(params)
+        |> Repo.update()
+        |> normalize_push_settings_result()
+    end
+  end
+
   defp maybe_apply_cursor(query, nil), do: query
 
   defp maybe_apply_cursor(query, %{inserted_at: inserted_at, id: id}) do
@@ -175,4 +216,29 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
       inserted_at: notification.inserted_at
     }
   end
+
+  defp normalize_push_settings_result({:ok, %PushSetting{} = settings}),
+    do: {:ok, normalize_push_settings(settings)}
+
+  defp normalize_push_settings_result({:error, %Ecto.Changeset{} = changeset}),
+    do: {:error, changeset}
+
+  defp normalize_push_settings(%PushSetting{} = settings) do
+    %{
+      id: settings.id,
+      enabled: push_settings_enabled?(settings),
+      vapid_public_key: settings.vapid_public_key,
+      vapid_private_key_configured: present?(settings.vapid_private_key),
+      vapid_subject: settings.vapid_subject,
+      inserted_at: settings.inserted_at,
+      updated_at: settings.updated_at
+    }
+  end
+
+  defp push_settings_enabled?(%PushSetting{} = settings) do
+    present?(settings.vapid_public_key) and present?(settings.vapid_private_key) and
+      present?(settings.vapid_subject)
+  end
+
+  defp present?(value), do: is_binary(value) and String.trim(value) != ""
 end

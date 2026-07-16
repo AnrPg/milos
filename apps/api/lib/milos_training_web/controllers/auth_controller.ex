@@ -111,6 +111,7 @@ defmodule MilosTrainingWeb.AuthController do
            properties: %{access_token: %Schema{type: :string}},
            required: [:access_token]
          }},
+      no_content: {"No refresh session", nil, nil},
       unauthorized:
         {"Unauthorized", "application/json",
          %Schema{
@@ -278,8 +279,17 @@ defmodule MilosTrainingWeb.AuthController do
 
   def refresh(conn, _params) do
     conn = fetch_cookies(conn)
+    refresh_token = conn.req_cookies[refresh_cookie_name()]
 
-    case RefreshToken.call(%{refresh_token: conn.req_cookies[refresh_cookie_name()]}) do
+    if is_nil(refresh_token) do
+      send_resp(conn, :no_content, "")
+    else
+      refresh_with_cookie(conn, refresh_token)
+    end
+  end
+
+  defp refresh_with_cookie(conn, refresh_token) do
+    case RefreshToken.call(%{refresh_token: refresh_token}) do
       {:ok, %{access_token: access_token, refresh_token: refresh_token}} ->
         conn
         |> put_refresh_cookie(refresh_token)

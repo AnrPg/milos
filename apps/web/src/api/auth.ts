@@ -23,7 +23,7 @@ export function loginUser(payload: LoginRequest) {
 }
 
 export function refreshSession() {
-  return apiRequest<AuthTokens>("/auth/refresh", { method: "POST" }, false);
+  return apiRequest<AuthTokens | undefined>("/auth/refresh", { method: "POST" }, false);
 }
 
 export function logoutSession() {

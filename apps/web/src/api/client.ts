@@ -211,6 +211,10 @@ export async function apiRequest<T>(
     throw new ApiError(response.status, message, (payload as ApiErrorPayload) ?? {});
   }
 
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
   return payload as T;
 }
 
