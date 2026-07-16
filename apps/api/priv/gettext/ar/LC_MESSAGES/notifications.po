@@ -1,0 +1,104 @@
+msgid ""
+msgstr ""
+"Language: ar\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "New booking request"
+msgstr "طلب حجز جديد"
+
+msgid "Booking approved"
+msgstr "تمت الموافقة على الحجز"
+
+msgid "Booking rejected"
+msgstr "تم رفض الحجز"
+
+msgid "Booking timed out"
+msgstr "انتهت مهلة الحجز"
+
+msgid "Open the schedule to review the latest booking state."
+msgstr "افتح الجدول لمراجعة حالة الحجز الأخيرة."
+
+msgid "Workout annotation"
+msgstr "شرح التمرين"
+
+msgid "A workout annotation needs review."
+msgstr "يحتاج التعليق التوضيحي للتمرين إلى المراجعة."
+
+msgid "Workout changed"
+msgstr "تم تغيير التمرين"
+
+msgid "Your coach changed a scheduled workout."
+msgstr "قام مدربك بتغيير التمرين المقرر."
+
+msgid "Workout removed"
+msgstr "تمت إزالة التمرين"
+
+msgid "Your coach removed a scheduled workout."
+msgstr "قام مدربك بإزالة تمرين مجدول."
+
+msgid "Workout rejected"
+msgstr "تم رفض التمرين"
+
+msgid "An athlete"
+msgstr "رياضي"
+
+msgid "a workout"
+msgstr "تجريب"
+
+msgid "%{nickname} rejected %{title}."
+msgstr "%{nickname} مرفوض %{title}."
+
+msgid "Workout rescheduled"
+msgstr "تمت إعادة جدولة التمرين"
+
+msgid "An athlete rescheduled their workout."
+msgstr "قام أحد الرياضيين بإعادة جدولة تمرينهم."
+
+msgid "Message from %{nickname}"
+msgstr "رسالة من %{nickname}"
+
+msgid "%{nickname} sent you a message."
+msgstr "%{nickname} أرسل لك رسالة."
+
+msgid "New coach note"
+msgstr "مذكرة المدرب الجديد"
+
+msgid "Your coach added a new note."
+msgstr "أضاف مدربك ملاحظة جديدة."
+
+msgid "Challenge completed"
+msgstr "اكتمل التحدي"
+
+msgid "You completed a challenge."
+msgstr "لقد أكملت التحدي."
+
+msgid "New message in your workout thread"
+msgstr "رسالة جديدة في موضوع التمرين"
+
+msgid "New message"
+msgstr "رسالة جديدة"
+
+msgid "You received a new message."
+msgstr "لقد تلقيت رسالة جديدة."
+
+msgid "Milos Training"
+msgstr "تدريب ميلوس"
+
+msgid "You have a new notification."
+msgstr "لديك إشعار جديد."
+
+msgid "invoice"
+msgstr "فاتورة"
+
+msgid "New invoice"
+msgstr "فاتورة جديدة"
+
+msgid "Invoice %{invoice_number} has been issued for your account."
+msgstr "تم إصدار الفاتورة %{invoice_number} لحسابك."
+
+msgid "Payment reminder"
+msgstr "تذكير بالدفع"
+
+msgid "You have an outstanding balance of %{amount} due."
+msgstr "لديك رصيد مستحق بقيمة %{amount}."

@@ -1,0 +1,104 @@
+msgid ""
+msgstr ""
+"Language: el\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "New booking request"
+msgstr "Νέα αίτηση κράτησης"
+
+msgid "Booking approved"
+msgstr "Εγκρίθηκε η κράτηση"
+
+msgid "Booking rejected"
+msgstr "Η κράτηση απορρίφθηκε"
+
+msgid "Booking timed out"
+msgstr "Το χρονικό όριο της κράτησης έληξε"
+
+msgid "Open the schedule to review the latest booking state."
+msgstr "Ανοίξτε το πρόγραμμα για να ελέγξετε την πιο πρόσφατη κατάσταση κράτησης."
+
+msgid "Workout annotation"
+msgstr "Σχολιασμός προπόνησης"
+
+msgid "A workout annotation needs review."
+msgstr "Ένας σχολιασμός προπόνησης χρειάζεται έλεγχο."
+
+msgid "Workout changed"
+msgstr "Η προπόνηση άλλαξε"
+
+msgid "Your coach changed a scheduled workout."
+msgstr "Ο προπονητής σας άλλαξε μια προγραμματισμένη προπόνηση."
+
+msgid "Workout removed"
+msgstr "Η προπόνηση καταργήθηκε"
+
+msgid "Your coach removed a scheduled workout."
+msgstr "Ο προπονητής σας αφαίρεσε μια προγραμματισμένη προπόνηση."
+
+msgid "Workout rejected"
+msgstr "Η προπόνηση απορρίφθηκε"
+
+msgid "An athlete"
+msgstr "Ένας αθλητής"
+
+msgid "a workout"
+msgstr "μια προπόνηση"
+
+msgid "%{nickname} rejected %{title}."
+msgstr "Ο %{nickname} απέρριψε το %{title}."
+
+msgid "Workout rescheduled"
+msgstr "Η προπόνηση επαναπρογραμματίστηκε"
+
+msgid "An athlete rescheduled their workout."
+msgstr "Ένας αθλητής ξαναπρογραμμάτισε την προπόνησή του."
+
+msgid "Message from %{nickname}"
+msgstr "Μήνυμα από %{nickname}"
+
+msgid "%{nickname} sent you a message."
+msgstr "Το %{nickname} σας έστειλε ένα μήνυμα."
+
+msgid "New coach note"
+msgstr "Νέο σημείωμα προπονητή"
+
+msgid "Your coach added a new note."
+msgstr "Ο προπονητής σας πρόσθεσε μια νέα σημείωση."
+
+msgid "Challenge completed"
+msgstr "Η πρόκληση ολοκληρώθηκε"
+
+msgid "You completed a challenge."
+msgstr "Ολοκληρώσατε μια πρόκληση."
+
+msgid "New message in your workout thread"
+msgstr "Νέο μήνυμα στο νήμα της προπόνησής σας"
+
+msgid "New message"
+msgstr "Νέο μήνυμα"
+
+msgid "You received a new message."
+msgstr "Λάβατε νέο μήνυμα."
+
+msgid "Milos Training"
+msgstr "Μήλος Προπόνηση"
+
+msgid "You have a new notification."
+msgstr "Έχετε μια νέα ειδοποίηση."
+
+msgid "invoice"
+msgstr "τιμολόγιο"
+
+msgid "New invoice"
+msgstr "Νέο τιμολόγιο"
+
+msgid "Invoice %{invoice_number} has been issued for your account."
+msgstr "Το τιμολόγιο %{invoice_number} έχει εκδοθεί για τον λογαριασμό σας."
+
+msgid "Payment reminder"
+msgstr "Υπενθύμιση πληρωμής"
+
+msgid "You have an outstanding balance of %{amount} due."
+msgstr "Έχετε ένα οφειλόμενο υπόλοιπο %{amount}."

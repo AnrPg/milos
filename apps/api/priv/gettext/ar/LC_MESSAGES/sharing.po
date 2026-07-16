@@ -1,0 +1,26 @@
+msgid ""
+msgstr ""
+"Language: ar\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "New PR — %{name}: %{score} %{unit} (achieved on %{date})"
+msgstr "العلاقات العامة الجديدة — %{name}: %{score} %{unit} (تم تحقيقه في %{date})"
+
+msgid "minutes and seconds"
+msgstr "الدقائق والثواني"
+
+msgid "repetitions"
+msgstr "التكرار"
+
+msgid "sets"
+msgstr "مجموعات"
+
+msgid "kilocalories"
+msgstr "سعرة حرارية"
+
+msgid "metres"
+msgstr "متر"
+
+msgid "kilograms"
+msgstr "كيلوغرام"

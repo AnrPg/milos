@@ -1,0 +1,104 @@
+msgid ""
+msgstr ""
+"Language: nl\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "New booking request"
+msgstr "Nieuwe boekingsaanvraag"
+
+msgid "Booking approved"
+msgstr "Boeking goedgekeurd"
+
+msgid "Booking rejected"
+msgstr "Boeking afgewezen"
+
+msgid "Booking timed out"
+msgstr "Er is een time-out voor de boeking opgetreden"
+
+msgid "Open the schedule to review the latest booking state."
+msgstr "Open het schema om de laatste boekingsstatus te bekijken."
+
+msgid "Workout annotation"
+msgstr "Annotatie van de training"
+
+msgid "A workout annotation needs review."
+msgstr "Een trainingsannotatie moet worden beoordeeld."
+
+msgid "Workout changed"
+msgstr "Training gewijzigd"
+
+msgid "Your coach changed a scheduled workout."
+msgstr "Je coach heeft een geplande training gewijzigd."
+
+msgid "Workout removed"
+msgstr "Training verwijderd"
+
+msgid "Your coach removed a scheduled workout."
+msgstr "Je coach heeft een geplande training verwijderd."
+
+msgid "Workout rejected"
+msgstr "Training afgewezen"
+
+msgid "An athlete"
+msgstr "Een atleet"
+
+msgid "a workout"
+msgstr "een training"
+
+msgid "%{nickname} rejected %{title}."
+msgstr "%{nickname} heeft %{title} afgewezen."
+
+msgid "Workout rescheduled"
+msgstr "Training opnieuw gepland"
+
+msgid "An athlete rescheduled their workout."
+msgstr "Een atleet heeft zijn training opnieuw gepland."
+
+msgid "Message from %{nickname}"
+msgstr "Bericht van %{nickname}"
+
+msgid "%{nickname} sent you a message."
+msgstr "%{nickname} heeft je een bericht gestuurd."
+
+msgid "New coach note"
+msgstr "Nieuwe coachnotitie"
+
+msgid "Your coach added a new note."
+msgstr "Je coach heeft een nieuwe notitie toegevoegd."
+
+msgid "Challenge completed"
+msgstr "Uitdaging voltooid"
+
+msgid "You completed a challenge."
+msgstr "Je hebt een uitdaging voltooid."
+
+msgid "New message in your workout thread"
+msgstr "Nieuw bericht in je trainingsthread"
+
+msgid "New message"
+msgstr "Nieuw bericht"
+
+msgid "You received a new message."
+msgstr "Je hebt een nieuw bericht ontvangen."
+
+msgid "Milos Training"
+msgstr "Milos-training"
+
+msgid "You have a new notification."
+msgstr "U heeft een nieuwe melding."
+
+msgid "invoice"
+msgstr "factuur"
+
+msgid "New invoice"
+msgstr "Nieuwe factuur"
+
+msgid "Invoice %{invoice_number} has been issued for your account."
+msgstr "Factuur %{invoice_number} is uitgegeven voor uw account."
+
+msgid "Payment reminder"
+msgstr "Betalingsherinnering"
+
+msgid "You have an outstanding balance of %{amount} due."
+msgstr "U heeft een openstaand saldo van %{amount}."

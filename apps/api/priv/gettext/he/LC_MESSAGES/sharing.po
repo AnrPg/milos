@@ -1,0 +1,26 @@
+msgid ""
+msgstr ""
+"Language: he\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "New PR — %{name}: %{score} %{unit} (achieved on %{date})"
+msgstr "יחסי ציבור חדשים — %{name}: %{score} %{unit} (הושג ב-%{date})"
+
+msgid "minutes and seconds"
+msgstr "דקות ושניות"
+
+msgid "repetitions"
+msgstr "חזרות"
+
+msgid "sets"
+msgstr "סטים"
+
+msgid "kilocalories"
+msgstr "קילוקלוריות"
+
+msgid "metres"
+msgstr "מטרים"
+
+msgid "kilograms"
+msgstr "קילוגרמים"

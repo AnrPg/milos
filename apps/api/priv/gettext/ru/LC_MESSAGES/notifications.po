@@ -1,0 +1,104 @@
+msgid ""
+msgstr ""
+"Language: ru\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "New booking request"
+msgstr "Новый запрос на бронирование"
+
+msgid "Booking approved"
+msgstr "Бронирование одобрено"
+
+msgid "Booking rejected"
+msgstr "Бронирование отклонено"
+
+msgid "Booking timed out"
+msgstr "Время бронирования истекло"
+
+msgid "Open the schedule to review the latest booking state."
+msgstr "Откройте расписание, чтобы просмотреть последнее состояние бронирования."
+
+msgid "Workout annotation"
+msgstr "Аннотация к тренировке"
+
+msgid "A workout annotation needs review."
+msgstr "Аннотацию тренировки необходимо просмотреть."
+
+msgid "Workout changed"
+msgstr "Тренировка изменена"
+
+msgid "Your coach changed a scheduled workout."
+msgstr "Ваш тренер изменил расписание тренировки."
+
+msgid "Workout removed"
+msgstr "Тренировка удалена."
+
+msgid "Your coach removed a scheduled workout."
+msgstr "Ваш тренер удалил запланированную тренировку."
+
+msgid "Workout rejected"
+msgstr "Тренировка отклонена"
+
+msgid "An athlete"
+msgstr "Спортсмен"
+
+msgid "a workout"
+msgstr "тренировка"
+
+msgid "%{nickname} rejected %{title}."
+msgstr "%{nickname} отклонил %{title}."
+
+msgid "Workout rescheduled"
+msgstr "Тренировка перенесена"
+
+msgid "An athlete rescheduled their workout."
+msgstr "Спортсмен перенес тренировку."
+
+msgid "Message from %{nickname}"
+msgstr "Сообщение от %{nickname}"
+
+msgid "%{nickname} sent you a message."
+msgstr "%{nickname} отправил вам сообщение."
+
+msgid "New coach note"
+msgstr "Новое замечание тренера"
+
+msgid "Your coach added a new note."
+msgstr "Ваш тренер добавил новую заметку."
+
+msgid "Challenge completed"
+msgstr "Вызов выполнен"
+
+msgid "You completed a challenge."
+msgstr "Вы выполнили задание."
+
+msgid "New message in your workout thread"
+msgstr "Новое сообщение в вашей теме тренировок."
+
+msgid "New message"
+msgstr "Новое сообщение"
+
+msgid "You received a new message."
+msgstr "Вы получили новое сообщение."
+
+msgid "Milos Training"
+msgstr "Милош Тренинг"
+
+msgid "You have a new notification."
+msgstr "У вас есть новое уведомление."
+
+msgid "invoice"
+msgstr "счет"
+
+msgid "New invoice"
+msgstr "Новый счет"
+
+msgid "Invoice %{invoice_number} has been issued for your account."
+msgstr "Для вашего аккаунта выставлен счет %{invoice_number}."
+
+msgid "Payment reminder"
+msgstr "Напоминание об оплате"
+
+msgid "You have an outstanding balance of %{amount} due."
+msgstr "У вас есть задолженность в размере %{amount}."

@@ -1,0 +1,44 @@
+msgid ""
+msgstr ""
+"Language: el\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Google Calendar: copy the HTTPS .ics URL, then use Other calendars → From URL."
+msgstr "Ημερολόγιο Google: αντιγράψτε τη διεύθυνση URL HTTPS .ics και, στη συνέχεια, χρησιμοποιήστε Άλλα ημερολόγια → Από τη διεύθυνση URL."
+
+msgid "Apple Calendar: use Subscribe with the webcal:// link for automatic updates."
+msgstr "Ημερολόγιο Apple: χρησιμοποιήστε την Εγγραφή με τον σύνδεσμο webcal:// για αυτόματες ενημερώσεις."
+
+msgid "Outlook: use Add calendar → Subscribe from web and paste the HTTPS .ics URL."
+msgstr "Outlook: χρησιμοποιήστε Προσθήκη ημερολογίου → Εγγραφή από τον ιστό και επικολλήστε τη διεύθυνση URL HTTPS .ics."
+
+msgid "Downloading the .ics file imports a one-off snapshot and will not stay synchronized."
+msgstr "Η λήψη του αρχείου .ics εισάγει ένα μεμονωμένο στιγμιότυπο και δεν θα παραμείνει συγχρονισμένο."
+
+msgid "Class: %{name}"
+msgstr "Κατηγορία: %{name}"
+
+msgid "Assigned workout"
+msgstr "Ανατεθειμένη προπόνηση"
+
+msgid "Workout: %{title}"
+msgstr "Προπόνηση: %{title}"
+
+msgid "Assigned workout in Milos Training."
+msgstr "Ανατέθηκε προπόνηση στο Milos Training."
+
+msgid "Scheduled %{name} class in Milos Training."
+msgstr "Προγραμματισμένο %{name} μάθημα στο Milos Training."
+
+msgid "Pending"
+msgstr "Εκκρεμής"
+
+msgid "Approved"
+msgstr "Εγκρίθηκε"
+
+msgid "Scheduled"
+msgstr "Προγραμματισμένος"
+
+msgid "Milos Training class booking status: %{status}."
+msgstr "Κατάσταση κράτησης για το προπονητικό μάθημα Milos: %{status}."

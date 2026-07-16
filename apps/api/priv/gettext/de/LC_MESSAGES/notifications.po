@@ -1,0 +1,104 @@
+msgid ""
+msgstr ""
+"Language: de\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "New booking request"
+msgstr "Neue Buchungsanfrage"
+
+msgid "Booking approved"
+msgstr "Buchung genehmigt"
+
+msgid "Booking rejected"
+msgstr "Buchung abgelehnt"
+
+msgid "Booking timed out"
+msgstr "Zeitüberschreitung bei der Buchung"
+
+msgid "Open the schedule to review the latest booking state."
+msgstr "Öffnen Sie den Zeitplan, um den aktuellen Buchungsstatus anzuzeigen."
+
+msgid "Workout annotation"
+msgstr "Anmerkung zum Training"
+
+msgid "A workout annotation needs review."
+msgstr "Eine Trainingsanmerkung muss überprüft werden."
+
+msgid "Workout changed"
+msgstr "Das Training hat sich geändert"
+
+msgid "Your coach changed a scheduled workout."
+msgstr "Ihr Trainer hat ein geplantes Training geändert."
+
+msgid "Workout removed"
+msgstr "Training entfernt"
+
+msgid "Your coach removed a scheduled workout."
+msgstr "Ihr Trainer hat ein geplantes Training entfernt."
+
+msgid "Workout rejected"
+msgstr "Training abgelehnt"
+
+msgid "An athlete"
+msgstr "Ein Athlet"
+
+msgid "a workout"
+msgstr "ein Training"
+
+msgid "%{nickname} rejected %{title}."
+msgstr "%{nickname} hat %{title} abgelehnt."
+
+msgid "Workout rescheduled"
+msgstr "Training verschoben"
+
+msgid "An athlete rescheduled their workout."
+msgstr "Ein Athlet hat sein Training verschoben."
+
+msgid "Message from %{nickname}"
+msgstr "Nachricht von %{nickname}"
+
+msgid "%{nickname} sent you a message."
+msgstr "%{nickname} hat Ihnen eine Nachricht gesendet."
+
+msgid "New coach note"
+msgstr "Neue Trainernotiz"
+
+msgid "Your coach added a new note."
+msgstr "Ihr Trainer hat eine neue Notiz hinzugefügt."
+
+msgid "Challenge completed"
+msgstr "Herausforderung abgeschlossen"
+
+msgid "You completed a challenge."
+msgstr "Du hast eine Herausforderung abgeschlossen."
+
+msgid "New message in your workout thread"
+msgstr "Neue Nachricht in deinem Trainingsthread"
+
+msgid "New message"
+msgstr "Neue Nachricht"
+
+msgid "You received a new message."
+msgstr "Sie haben eine neue Nachricht erhalten."
+
+msgid "Milos Training"
+msgstr "Milos-Training"
+
+msgid "You have a new notification."
+msgstr "Sie haben eine neue Benachrichtigung."
+
+msgid "invoice"
+msgstr "Rechnung"
+
+msgid "New invoice"
+msgstr "Neue Rechnung"
+
+msgid "Invoice %{invoice_number} has been issued for your account."
+msgstr "Für Ihr Konto wurde die Rechnung %{invoice_number} ausgestellt."
+
+msgid "Payment reminder"
+msgstr "Zahlungserinnerung"
+
+msgid "You have an outstanding balance of %{amount} due."
+msgstr "Sie haben einen ausstehenden Betrag von %{amount}."

@@ -1,0 +1,104 @@
+msgid ""
+msgstr ""
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "New booking request"
+msgstr ""
+
+msgid "Booking approved"
+msgstr ""
+
+msgid "Booking rejected"
+msgstr ""
+
+msgid "Booking timed out"
+msgstr ""
+
+msgid "Open the schedule to review the latest booking state."
+msgstr ""
+
+msgid "Workout annotation"
+msgstr ""
+
+msgid "A workout annotation needs review."
+msgstr ""
+
+msgid "Workout changed"
+msgstr ""
+
+msgid "Your coach changed a scheduled workout."
+msgstr ""
+
+msgid "Workout removed"
+msgstr ""
+
+msgid "Your coach removed a scheduled workout."
+msgstr ""
+
+msgid "Workout rejected"
+msgstr ""
+
+msgid "An athlete"
+msgstr ""
+
+msgid "a workout"
+msgstr ""
+
+msgid "%{nickname} rejected %{title}."
+msgstr ""
+
+msgid "Workout rescheduled"
+msgstr ""
+
+msgid "An athlete rescheduled their workout."
+msgstr ""
+
+msgid "Message from %{nickname}"
+msgstr ""
+
+msgid "%{nickname} sent you a message."
+msgstr ""
+
+msgid "New coach note"
+msgstr ""
+
+msgid "Your coach added a new note."
+msgstr ""
+
+msgid "Challenge completed"
+msgstr ""
+
+msgid "You completed a challenge."
+msgstr ""
+
+msgid "New message in your workout thread"
+msgstr ""
+
+msgid "New message"
+msgstr ""
+
+msgid "You received a new message."
+msgstr ""
+
+msgid "Milos Training"
+msgstr ""
+
+msgid "You have a new notification."
+msgstr ""
+
+msgid "invoice"
+msgstr ""
+
+msgid "New invoice"
+msgstr ""
+
+msgid "Invoice %{invoice_number} has been issued for your account."
+msgstr ""
+
+msgid "Payment reminder"
+msgstr ""
+
+msgid "You have an outstanding balance of %{amount} due."
+msgstr ""

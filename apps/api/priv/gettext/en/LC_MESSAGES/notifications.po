@@ -1,0 +1,104 @@
+msgid ""
+msgstr ""
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "New booking request"
+msgstr "New booking request"
+
+msgid "Booking approved"
+msgstr "Booking approved"
+
+msgid "Booking rejected"
+msgstr "Booking rejected"
+
+msgid "Booking timed out"
+msgstr "Booking timed out"
+
+msgid "Open the schedule to review the latest booking state."
+msgstr "Open the schedule to review the latest booking state."
+
+msgid "Workout annotation"
+msgstr "Workout annotation"
+
+msgid "A workout annotation needs review."
+msgstr "A workout annotation needs review."
+
+msgid "Workout changed"
+msgstr "Workout changed"
+
+msgid "Your coach changed a scheduled workout."
+msgstr "Your coach changed a scheduled workout."
+
+msgid "Workout removed"
+msgstr "Workout removed"
+
+msgid "Your coach removed a scheduled workout."
+msgstr "Your coach removed a scheduled workout."
+
+msgid "Workout rejected"
+msgstr "Workout rejected"
+
+msgid "An athlete"
+msgstr "An athlete"
+
+msgid "a workout"
+msgstr "a workout"
+
+msgid "%{nickname} rejected %{title}."
+msgstr "%{nickname} rejected %{title}."
+
+msgid "Workout rescheduled"
+msgstr "Workout rescheduled"
+
+msgid "An athlete rescheduled their workout."
+msgstr "An athlete rescheduled their workout."
+
+msgid "Message from %{nickname}"
+msgstr "Message from %{nickname}"
+
+msgid "%{nickname} sent you a message."
+msgstr "%{nickname} sent you a message."
+
+msgid "New coach note"
+msgstr "New coach note"
+
+msgid "Your coach added a new note."
+msgstr "Your coach added a new note."
+
+msgid "Challenge completed"
+msgstr "Challenge completed"
+
+msgid "You completed a challenge."
+msgstr "You completed a challenge."
+
+msgid "New message in your workout thread"
+msgstr "New message in your workout thread"
+
+msgid "New message"
+msgstr "New message"
+
+msgid "You received a new message."
+msgstr "You received a new message."
+
+msgid "Milos Training"
+msgstr "Milos Training"
+
+msgid "You have a new notification."
+msgstr "You have a new notification."
+
+msgid "invoice"
+msgstr "invoice"
+
+msgid "New invoice"
+msgstr "New invoice"
+
+msgid "Invoice %{invoice_number} has been issued for your account."
+msgstr "Invoice %{invoice_number} has been issued for your account."
+
+msgid "Payment reminder"
+msgstr "Payment reminder"
+
+msgid "You have an outstanding balance of %{amount} due."
+msgstr "You have an outstanding balance of %{amount} due."

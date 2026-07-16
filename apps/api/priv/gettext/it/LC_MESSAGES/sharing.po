@@ -1,0 +1,26 @@
+msgid ""
+msgstr ""
+"Language: it\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "New PR — %{name}: %{score} %{unit} (achieved on %{date})"
+msgstr "Nuovo PR — %{name}: %{score} %{unit} (raggiunto il %{date})"
+
+msgid "minutes and seconds"
+msgstr "minuti e secondi"
+
+msgid "repetitions"
+msgstr "ripetizioni"
+
+msgid "sets"
+msgstr "insiemi"
+
+msgid "kilocalories"
+msgstr "kilocalorie"
+
+msgid "metres"
+msgstr "metri"
+
+msgid "kilograms"
+msgstr "chilogrammi"

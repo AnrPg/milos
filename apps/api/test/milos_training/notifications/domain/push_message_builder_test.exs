@@ -29,4 +29,23 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilderTest do
     assert message.body =~ "CrossFit Foundations"
     assert message.url == "/schedule"
   end
+
+  test "renders system copy through the supplied locale function while preserving authored text" do
+    localize = fn message, bindings ->
+      "el:" <>
+        Enum.reduce(bindings, message, fn {key, value}, copy ->
+          String.replace(copy, "%{#{key}}", to_string(value))
+        end)
+    end
+
+    message =
+      PushMessageBuilder.build(
+        "athlete_message",
+        %{"sender_nickname" => "Νίκη", "body" => "User-authored body"},
+        localize
+      )
+
+    assert message.title == "el:Message from Νίκη"
+    assert message.body == "User-authored body"
+  end
 end

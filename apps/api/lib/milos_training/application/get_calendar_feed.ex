@@ -1,6 +1,7 @@
 defmodule MilosTraining.Application.GetCalendarFeed do
   alias MilosTraining.Application.CalendarFeedToken
   alias MilosTraining.{Scheduling, Workouts}
+  alias MilosTraining.Localization
 
   @past_days 30
   @future_days 365
@@ -12,6 +13,7 @@ defmodule MilosTraining.Application.GetCalendarFeed do
   end
 
   defp build_feed(user) do
+    locale = user.preferred_locale || "en"
     now = DateTime.utc_now()
     start_date = Date.utc_today() |> Date.add(-@past_days)
     end_date = Date.utc_today() |> Date.add(@future_days)
@@ -19,49 +21,49 @@ defmodule MilosTraining.Application.GetCalendarFeed do
     end_at = DateTime.new!(Date.add(end_date, 1), ~T[00:00:00], "Etc/UTC")
 
     events =
-      class_events(user, start_at, end_at) ++
-        assignment_events(user, start_date, end_date)
+      class_events(user, start_at, end_at, locale) ++
+        assignment_events(user, start_date, end_date, locale)
 
     render_ics(events, now)
   end
 
-  defp class_events(%{role: :athlete}, _start_at, _end_at), do: []
+  defp class_events(%{role: :athlete}, _start_at, _end_at, _locale), do: []
 
-  defp class_events(user, start_at, end_at) do
+  defp class_events(user, start_at, end_at, locale) do
     %{start_at: start_at, end_at: end_at}
     |> Scheduling.get_calendar_week()
     |> Enum.filter(&include_slot?(&1, user))
     |> Enum.map(fn slot ->
       %{
         uid: "class-#{slot.id}@milos-training",
-        title: "Class: #{class_type_name(slot)}",
+        title: translate(locale, "Class: %{name}", %{name: class_type_name(slot)}),
         starts_at: slot.scheduled_at,
         ends_at: DateTime.add(slot.scheduled_at, 60 * 60, :second),
-        description: class_description(slot, user)
+        description: class_description(slot, user, locale)
       }
     end)
   end
 
-  defp assignment_events(%{role: :member}, _start_date, _end_date), do: []
+  defp assignment_events(%{role: :member}, _start_date, _end_date, _locale), do: []
 
-  defp assignment_events(%{role: :admin}, start_date, end_date) do
+  defp assignment_events(%{role: :admin}, start_date, end_date, locale) do
     Workouts.list_assigned_workouts_for_admin(start_date, end_date)
-    |> Enum.map(&assignment_event/1)
+    |> Enum.map(&assignment_event(&1, locale))
   end
 
-  defp assignment_events(user, start_date, end_date) do
+  defp assignment_events(user, start_date, end_date, locale) do
     Workouts.list_assigned_workouts_for_athlete(user.id, start_date, end_date)
-    |> Enum.map(&assignment_event/1)
+    |> Enum.map(&assignment_event(&1, locale))
   end
 
-  defp assignment_event(assignment) do
+  defp assignment_event(assignment, locale) do
     title =
       assignment
       |> get_in([:workout, :title])
       |> case do
-        nil -> "Assigned workout"
-        "" -> "Assigned workout"
-        value -> "Workout: #{value}"
+        nil -> translate(locale, "Assigned workout")
+        "" -> translate(locale, "Assigned workout")
+        value -> translate(locale, "Workout: %{title}", %{title: value})
       end
 
     %{
@@ -69,7 +71,7 @@ defmodule MilosTraining.Application.GetCalendarFeed do
       title: title,
       starts_on: assignment.scheduled_for,
       ends_on: Date.add(assignment.scheduled_for, 1),
-      description: "Assigned workout in Milos Training."
+      description: translate(locale, "Assigned workout in Milos Training.")
     }
   end
 
@@ -81,18 +83,22 @@ defmodule MilosTraining.Application.GetCalendarFeed do
     end)
   end
 
-  defp class_description(slot, %{role: :admin}) do
-    "Scheduled #{class_type_name(slot)} class in Milos Training."
+  defp class_description(slot, %{role: :admin}, locale) do
+    translate(locale, "Scheduled %{name} class in Milos Training.", %{name: class_type_name(slot)})
   end
 
-  defp class_description(slot, user) do
+  defp class_description(slot, user, locale) do
     booking =
       Enum.find(slot.bookings || [], fn booking ->
         booking.user_id == user.id and booking.status in [:pending, :approved]
       end)
 
     status = if booking, do: booking.status, else: "scheduled"
-    "Milos Training class booking status: #{status}."
+    localized_status = translate(locale, status_message(status))
+
+    translate(locale, "Milos Training class booking status: %{status}.", %{
+      status: localized_status
+    })
   end
 
   defp render_ics(events, now) do
@@ -139,7 +145,15 @@ defmodule MilosTraining.Application.GetCalendarFeed do
   end
 
   defp class_type_name(%{class_type: %{name: name}}) when is_binary(name), do: name
-  defp class_type_name(_slot), do: "Class"
+  defp class_type_name(_slot), do: "—"
+
+  defp status_message(:pending), do: "Pending"
+  defp status_message(:approved), do: "Approved"
+  defp status_message("scheduled"), do: "Scheduled"
+  defp status_message(status), do: to_string(status)
+
+  defp translate(locale, message, bindings \\ %{}),
+    do: Localization.translate(locale, message, bindings, "calendar")
 
   defp format_datetime(datetime) do
     datetime

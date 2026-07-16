@@ -166,8 +166,7 @@ defmodule MilosTraining.Application.PublishWorkout do
         assigned_workout_id: target.assigned_workout_id,
         scheduled_for: Date.to_iso8601(target.scheduled_for),
         change_type: "sections_updated",
-        body:
-          "Your coach updated the exercises for your workout on #{format_date(target.scheduled_for)}: #{workout.title}.",
+        workout_title: workout.title,
         url: "/my-workouts?open_assignment=#{target.assigned_workout_id}"
       }
 
@@ -186,8 +185,7 @@ defmodule MilosTraining.Application.PublishWorkout do
         scheduled_class_id: Map.get(target, :scheduled_class_id),
         training_type: to_string(training_type || ""),
         change_type: "sections_updated",
-        body:
-          "Your coach updated the exercises for your #{format_training_type(training_type)} class: #{workout.title}.",
+        workout_title: workout.title,
         url: "/schedule?open_slot=#{Map.get(target, :scheduled_class_id)}"
       }
 
@@ -195,18 +193,6 @@ defmodule MilosTraining.Application.PublishWorkout do
         Logger.error("workout_changed booking notification failed user_id=#{target.user_id}")
       end
     end)
-  end
-
-  defp format_date(date), do: Calendar.strftime(date, "%b %d, %Y")
-
-  defp format_training_type(nil), do: "training"
-
-  defp format_training_type(training_type) do
-    training_type
-    |> to_string()
-    |> String.replace("_", " ")
-    |> String.split()
-    |> Enum.map_join(" ", &String.capitalize/1)
   end
 
   defp maybe_put(map, _key, nil), do: map

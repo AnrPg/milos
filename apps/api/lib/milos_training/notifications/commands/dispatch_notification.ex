@@ -3,12 +3,13 @@ defmodule MilosTraining.Notifications.Commands.DispatchNotification do
   alias MilosTraining.Notifications.Commands.EnqueuePushDispatch
   alias MilosTraining.Notifications.Domain.{PayloadNormalizer, PushMessageBuilder}
   alias MilosTraining.Notifications.PushConfig
+  alias MilosTraining.Localization
 
-  def call(user_id, type, payload) do
+  def call(user_id, type, payload, locale \\ "en") do
     normalized_payload =
       payload
       |> PayloadNormalizer.normalize()
-      |> enrich_payload(type)
+      |> enrich_payload(type, locale)
 
     with {:ok, notification} <-
            CreateNotification.call(%{
@@ -38,12 +39,14 @@ defmodule MilosTraining.Notifications.Commands.DispatchNotification do
     end
   end
 
-  defp enrich_payload(payload, type) do
-    message = PushMessageBuilder.build(type, payload)
+  defp enrich_payload(payload, type, locale) do
+    localize = fn message, bindings -> Localization.translate(locale, message, bindings) end
+    message = PushMessageBuilder.build(type, payload, localize)
 
     payload
     |> Map.put_new("title", message.title)
     |> Map.put_new("body", message.body)
     |> Map.put_new("url", message.url)
+    |> Map.put_new("locale", locale)
   end
 end

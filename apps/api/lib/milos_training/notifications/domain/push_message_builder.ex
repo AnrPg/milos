@@ -1,39 +1,44 @@
 defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
-  def build(type, payload) when is_atom(type), do: build(to_string(type), payload)
+  @type localizer :: (String.t(), map() -> String.t())
 
-  def build("booking_pending", payload) do
+  def build(type, payload, localize \\ &default_localize/2)
+
+  def build(type, payload, localize) when is_atom(type),
+    do: build(to_string(type), payload, localize)
+
+  def build("booking_pending", payload, localize) do
     %{
-      title: "New booking request",
-      body: payload["body"] || booking_body(payload),
+      title: localize.("New booking request", %{}),
+      body: payload["body"] || booking_body(payload, localize),
       url: payload["url"] || "/schedule"
     }
   end
 
-  def build("booking_approved", payload) do
+  def build("booking_approved", payload, localize) do
     %{
-      title: "Booking approved",
-      body: payload["body"] || booking_body(payload),
+      title: localize.("Booking approved", %{}),
+      body: payload["body"] || booking_body(payload, localize),
       url: payload["url"] || "/schedule"
     }
   end
 
-  def build("booking_rejected", payload) do
+  def build("booking_rejected", payload, localize) do
     %{
-      title: "Booking rejected",
-      body: payload["body"] || booking_body(payload),
+      title: localize.("Booking rejected", %{}),
+      body: payload["body"] || booking_body(payload, localize),
       url: payload["url"] || "/schedule"
     }
   end
 
-  def build("booking_timeout", payload) do
+  def build("booking_timeout", payload, localize) do
     %{
-      title: "Booking timed out",
-      body: payload["body"] || booking_body(payload),
+      title: localize.("Booking timed out", %{}),
+      body: payload["body"] || booking_body(payload, localize),
       url: payload["url"] || "/schedule"
     }
   end
 
-  def build("workout_note", payload) do
+  def build("workout_note", payload, localize) do
     note = payload["note"] || %{}
 
     parts =
@@ -41,99 +46,132 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
       |> Enum.filter(&(is_binary(&1) and &1 != ""))
 
     %{
-      title: "Workout annotation",
-      body: Enum.join(parts, " · ") |> default_to("A workout annotation needs review."),
+      title: localize.("Workout annotation", %{}),
+      body:
+        Enum.join(parts, " · ")
+        |> default_to(localize.("A workout annotation needs review.", %{})),
       url: payload["url"] || execution_url(payload)
     }
   end
 
-  def build("workout_changed", payload) do
+  def build("workout_changed", payload, localize) do
     %{
-      title: "Workout changed",
-      body: payload["body"] || "Your coach changed a scheduled workout.",
+      title: localize.("Workout changed", %{}),
+      body: payload["body"] || localize.("Your coach changed a scheduled workout.", %{}),
       url: payload["url"] || "/"
     }
   end
 
-  def build("workout_deleted", payload) do
+  def build("workout_deleted", payload, localize) do
     %{
-      title: "Workout removed",
-      body: payload["body"] || "Your coach removed a scheduled workout.",
+      title: localize.("Workout removed", %{}),
+      body: payload["body"] || localize.("Your coach removed a scheduled workout.", %{}),
       url: payload["url"] || "/"
     }
   end
 
-  def build("workout_rejected", payload) do
-    nickname = payload["athlete_nickname"] || "An athlete"
-    title = payload["workout_title"] || "a workout"
+  def build("workout_rejected", payload, localize) do
+    nickname = payload["athlete_nickname"] || localize.("An athlete", %{})
+    title = payload["workout_title"] || localize.("a workout", %{})
 
     %{
-      title: "Workout rejected",
-      body: payload["body"] || "#{nickname} rejected #{title}.",
+      title: localize.("Workout rejected", %{}),
+      body:
+        payload["body"] ||
+          localize.("%{nickname} rejected %{title}.", %{nickname: nickname, title: title}),
       url: payload["url"] || "/my-workouts"
     }
   end
 
-  def build("workout_moved", payload) do
+  def build("workout_moved", payload, localize) do
     %{
-      title: "Workout rescheduled",
-      body: payload["body"] || "An athlete rescheduled their workout.",
+      title: localize.("Workout rescheduled", %{}),
+      body: payload["body"] || localize.("An athlete rescheduled their workout.", %{}),
       url: payload["url"] || "/my-workouts"
     }
   end
 
-  def build("athlete_message", payload) do
-    nickname = payload["sender_nickname"] || "An athlete"
+  def build("athlete_message", payload, localize) do
+    nickname = payload["sender_nickname"] || localize.("An athlete", %{})
 
     %{
-      title: "Message from #{nickname}",
-      body: payload["body"] || "#{nickname} sent you a message.",
+      title: localize.("Message from %{nickname}", %{nickname: nickname}),
+      body:
+        payload["body"] || localize.("%{nickname} sent you a message.", %{nickname: nickname}),
       url: payload["url"] || payload["context_url"] || "/"
     }
   end
 
-  def build("admin_note", payload) do
+  def build("admin_note", payload, localize) do
     %{
-      title: "New coach note",
-      body: payload["body"] || "Your coach added a new note.",
+      title: localize.("New coach note", %{}),
+      body: payload["body"] || localize.("Your coach added a new note.", %{}),
       url: payload["url"] || "/#coach-notes"
     }
   end
 
-  def build("challenge_completed", payload) do
+  def build("challenge_completed", payload, localize) do
     %{
-      title: "Challenge completed",
-      body: payload["badge_label"] || payload["title"] || "You completed a challenge.",
+      title: localize.("Challenge completed", %{}),
+      body:
+        payload["badge_label"] || payload["title"] || localize.("You completed a challenge.", %{}),
       url: payload["url"] || "/#challenges"
     }
   end
 
-  def build("chat_message", payload) do
-    context =
+  def build("invoice_issued", payload, localize) do
+    invoice_number = payload["invoice_number"] || localize.("invoice", %{})
+
+    %{
+      title: localize.("New invoice", %{}),
+      body:
+        payload["body"] ||
+          localize.("Invoice %{invoice_number} has been issued for your account.", %{
+            invoice_number: invoice_number
+          }),
+      url: payload["url"] || "/account/billing"
+    }
+  end
+
+  def build("payment_reminder", payload, localize) do
+    cents = payload["outstanding_balance_cents"] || 0
+    amount = "€" <> :erlang.float_to_binary(cents / 100, decimals: 2)
+
+    %{
+      title: localize.("Payment reminder", %{}),
+      body:
+        payload["body"] ||
+          localize.("You have an outstanding balance of %{amount} due.", %{amount: amount}),
+      url: payload["url"] || "/account/billing"
+    }
+  end
+
+  def build("chat_message", payload, localize) do
+    title =
       if payload["context_type"] in ["assignment", "class_slot"],
-        do: " in your workout thread",
-        else: ""
+        do: localize.("New message in your workout thread", %{}),
+        else: localize.("New message", %{})
 
     %{
-      title: "New message#{context}",
-      body: payload["body"] || "You received a new message.",
+      title: title,
+      body: payload["body"] || localize.("You received a new message.", %{}),
       url: payload["url"] || "/"
     }
   end
 
-  def build(_type, payload) do
+  def build(_type, payload, localize) do
     %{
-      title: "Milos Training",
-      body: payload["body"] || "You have a new notification.",
+      title: localize.("Milos Training", %{}),
+      body: payload["body"] || localize.("You have a new notification.", %{}),
       url: payload["url"] || "/"
     }
   end
 
-  defp booking_body(payload) do
+  defp booking_body(payload, localize) do
     [payload["class_type_name"], payload["admin_message"]]
     |> Enum.filter(&(is_binary(&1) and &1 != ""))
     |> Enum.join(" · ")
-    |> default_to("Open the schedule to review the latest booking state.")
+    |> default_to(localize.("Open the schedule to review the latest booking state.", %{}))
   end
 
   defp execution_url(%{"execution_id" => execution_id}) when is_binary(execution_id),
@@ -143,4 +181,10 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
 
   defp default_to("", fallback), do: fallback
   defp default_to(value, _fallback), do: value
+
+  defp default_localize(message, bindings) do
+    Enum.reduce(bindings, message, fn {key, value}, copy ->
+      String.replace(copy, "%{#{key}}", to_string(value))
+    end)
+  end
 end

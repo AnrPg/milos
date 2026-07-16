@@ -1,0 +1,104 @@
+msgid ""
+msgstr ""
+"Language: bg\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "New booking request"
+msgstr "Нова заявка за резервация"
+
+msgid "Booking approved"
+msgstr "Резервацията е одобрена"
+
+msgid "Booking rejected"
+msgstr "Резервацията е отхвърлена"
+
+msgid "Booking timed out"
+msgstr "Времето за изчакване на резервацията изтече"
+
+msgid "Open the schedule to review the latest booking state."
+msgstr "Отворете графика, за да прегледате последното състояние на резервацията."
+
+msgid "Workout annotation"
+msgstr "Анотация за тренировка"
+
+msgid "A workout annotation needs review."
+msgstr "Анотация за тренировка се нуждае от преглед."
+
+msgid "Workout changed"
+msgstr "Тренировката е променена"
+
+msgid "Your coach changed a scheduled workout."
+msgstr "Вашият треньор промени планираната тренировка."
+
+msgid "Workout removed"
+msgstr "Тренировката е премахната"
+
+msgid "Your coach removed a scheduled workout."
+msgstr "Вашият треньор премахна планирана тренировка."
+
+msgid "Workout rejected"
+msgstr "Тренировката е отхвърлена"
+
+msgid "An athlete"
+msgstr "Спортист"
+
+msgid "a workout"
+msgstr "тренировка"
+
+msgid "%{nickname} rejected %{title}."
+msgstr "%{nickname} отхвърлен %{title}."
+
+msgid "Workout rescheduled"
+msgstr "Тренировката е пренасрочена"
+
+msgid "An athlete rescheduled their workout."
+msgstr "Спортист пренасрочи тренировката си."
+
+msgid "Message from %{nickname}"
+msgstr "Съобщение от %{nickname}"
+
+msgid "%{nickname} sent you a message."
+msgstr "%{nickname} ви изпрати съобщение."
+
+msgid "New coach note"
+msgstr "Нова треньорска бележка"
+
+msgid "Your coach added a new note."
+msgstr "Вашият треньор добави нова бележка."
+
+msgid "Challenge completed"
+msgstr "Предизвикателството завършено"
+
+msgid "You completed a challenge."
+msgstr "Изпълнихте предизвикателство."
+
+msgid "New message in your workout thread"
+msgstr "Ново съобщение в темата за вашата тренировка"
+
+msgid "New message"
+msgstr "Ново съобщение"
+
+msgid "You received a new message."
+msgstr "Получихте ново съобщение."
+
+msgid "Milos Training"
+msgstr "Обучение на Милош"
+
+msgid "You have a new notification."
+msgstr "Имате ново известие."
+
+msgid "invoice"
+msgstr "фактура"
+
+msgid "New invoice"
+msgstr "Нова фактура"
+
+msgid "Invoice %{invoice_number} has been issued for your account."
+msgstr "За вашия акаунт е издадена фактура %{invoice_number}."
+
+msgid "Payment reminder"
+msgstr "Напомняне за плащане"
+
+msgid "You have an outstanding balance of %{amount} due."
+msgstr "Имате дължимо салдо от %{amount}."

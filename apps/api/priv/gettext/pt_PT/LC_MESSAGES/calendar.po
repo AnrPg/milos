@@ -1,0 +1,44 @@
+msgid ""
+msgstr ""
+"Language: pt-PT\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Google Calendar: copy the HTTPS .ics URL, then use Other calendars → From URL."
+msgstr "Google Agenda: copie o URL HTTPS .ics e use Outros calendários → Do URL."
+
+msgid "Apple Calendar: use Subscribe with the webcal:// link for automatic updates."
+msgstr "Calendário Apple: use o Assine com o link webcal:// para atualizações automáticas."
+
+msgid "Outlook: use Add calendar → Subscribe from web and paste the HTTPS .ics URL."
+msgstr "Outlook: use Adicionar calendário → Inscrever-se na web e cole o URL HTTPS .ics."
+
+msgid "Downloading the .ics file imports a one-off snapshot and will not stay synchronized."
+msgstr "Baixar o arquivo .ics importa um instantâneo único e não permanecerá sincronizado."
+
+msgid "Class: %{name}"
+msgstr "Classe: %{name}"
+
+msgid "Assigned workout"
+msgstr "Treino atribuído"
+
+msgid "Workout: %{title}"
+msgstr "Treino: %{title}"
+
+msgid "Assigned workout in Milos Training."
+msgstr "Treino atribuído no Milos Training."
+
+msgid "Scheduled %{name} class in Milos Training."
+msgstr "%{name} aula agendada no Treinamento Milos."
+
+msgid "Pending"
+msgstr "Pendente"
+
+msgid "Approved"
+msgstr "Aprovado"
+
+msgid "Scheduled"
+msgstr "Agendado"
+
+msgid "Milos Training class booking status: %{status}."
+msgstr "Status de reserva da aula do Milos Training: %{status}."

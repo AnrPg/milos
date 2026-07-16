@@ -1,0 +1,104 @@
+msgid ""
+msgstr ""
+"Language: he\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "New booking request"
+msgstr "בקשת הזמנה חדשה"
+
+msgid "Booking approved"
+msgstr "ההזמנה אושרה"
+
+msgid "Booking rejected"
+msgstr "ההזמנה נדחתה"
+
+msgid "Booking timed out"
+msgstr "תם הזמן הקצוב להזמנה"
+
+msgid "Open the schedule to review the latest booking state."
+msgstr "פתח את לוח הזמנים כדי לבדוק את מצב ההזמנה האחרון."
+
+msgid "Workout annotation"
+msgstr "הערת אימון"
+
+msgid "A workout annotation needs review."
+msgstr "הערת אימון דורשת בדיקה."
+
+msgid "Workout changed"
+msgstr "האימון השתנה"
+
+msgid "Your coach changed a scheduled workout."
+msgstr "המאמן שלך שינה אימון מתוכנן."
+
+msgid "Workout removed"
+msgstr "האימון הוסר"
+
+msgid "Your coach removed a scheduled workout."
+msgstr "המאמן שלך הסיר אימון מתוזמן."
+
+msgid "Workout rejected"
+msgstr "האימון נדחה"
+
+msgid "An athlete"
+msgstr "ספורטאי"
+
+msgid "a workout"
+msgstr "אימון"
+
+msgid "%{nickname} rejected %{title}."
+msgstr "%{nickname} דחה את %{title}."
+
+msgid "Workout rescheduled"
+msgstr "האימון נקבע מחדש"
+
+msgid "An athlete rescheduled their workout."
+msgstr "ספורטאי קבע מחדש את האימון שלו."
+
+msgid "Message from %{nickname}"
+msgstr "הודעה מאת %{nickname}"
+
+msgid "%{nickname} sent you a message."
+msgstr "%{nickname} שלח לך הודעה."
+
+msgid "New coach note"
+msgstr "הערת מאמן חדש"
+
+msgid "Your coach added a new note."
+msgstr "המאמן שלך הוסיף הערה חדשה."
+
+msgid "Challenge completed"
+msgstr "האתגר הושלם"
+
+msgid "You completed a challenge."
+msgstr "השלמת אתגר."
+
+msgid "New message in your workout thread"
+msgstr "הודעה חדשה בשרשור האימון שלך"
+
+msgid "New message"
+msgstr "הודעה חדשה"
+
+msgid "You received a new message."
+msgstr "קיבלת הודעה חדשה."
+
+msgid "Milos Training"
+msgstr "אימון מילוס"
+
+msgid "You have a new notification."
+msgstr "יש לך הודעה חדשה."
+
+msgid "invoice"
+msgstr "חֶשׁבּוֹנִית"
+
+msgid "New invoice"
+msgstr "חשבונית חדשה"
+
+msgid "Invoice %{invoice_number} has been issued for your account."
+msgstr "חשבונית %{invoice_number} הונפקה עבור חשבונך."
+
+msgid "Payment reminder"
+msgstr "תזכורת לתשלום"
+
+msgid "You have an outstanding balance of %{amount} due."
+msgstr "יש לך יתרת חוב של %{amount} לפירעון."

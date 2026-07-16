@@ -1,0 +1,26 @@
+msgid ""
+msgstr ""
+"Language: el\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "New PR — %{name}: %{score} %{unit} (achieved on %{date})"
+msgstr "Νέο PR — %{name}: %{score} %{unit} (επιτεύχθηκε το %{date})"
+
+msgid "minutes and seconds"
+msgstr "λεπτά και δευτερόλεπτα"
+
+msgid "repetitions"
+msgstr "επαναλήψεις"
+
+msgid "sets"
+msgstr "σκηνικά"
+
+msgid "kilocalories"
+msgstr "χιλιοθερμίδες"
+
+msgid "metres"
+msgstr "μέτρα"
+
+msgid "kilograms"
+msgstr "κιλά"

@@ -1,7 +1,7 @@
 defmodule MilosTrainingWeb.CalendarFeedControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
-  alias MilosTraining.Scheduling
+  alias MilosTraining.{Identity, Scheduling}
 
   import MilosTraining.TestFixtures
 
@@ -37,6 +37,33 @@ defmodule MilosTrainingWeb.CalendarFeedControllerTest do
   test "calendar feed rejects invalid tokens", %{conn: conn} do
     conn = get(conn, "/api/calendar/feed.ics", %{token: "invalid"})
     assert json_response(conn, 401)
+  end
+
+  test "calendar links and feed system copy use the recipient locale", %{conn: conn} do
+    admin = admin_fixture(%{nickname: "calendar_locale_admin"})
+    member = user_fixture(%{nickname: "calendar_locale_member"})
+    assert {:ok, member} = Identity.update_profile(member.id, %{preferred_locale: "el"})
+    workout = workout_fixture(admin, %{title: "Author supplied title", type: "crossfit"})
+    slot = slot_fixture(workout)
+
+    assert {:ok, _booking} =
+             Scheduling.submit_booking(member.id, slot.id, slot.booking_timeout_minutes)
+
+    links =
+      conn
+      |> put_bearer_token(member)
+      |> get("/api/calendar/export-links")
+      |> json_response(200)
+
+    assert links["help"]["google"] =~ "Ημερολόγιο Google"
+
+    feed =
+      conn
+      |> recycle()
+      |> get("/api/calendar/feed.ics", %{token: links["token"]})
+      |> response(200)
+
+    assert feed =~ "SUMMARY:Κατηγορία: CrossFit"
   end
 
   test "regenerating calendar links revokes prior feed tokens", %{conn: conn} do

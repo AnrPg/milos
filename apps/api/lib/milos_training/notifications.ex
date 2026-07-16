@@ -239,7 +239,6 @@ defmodule MilosTraining.Notifications do
           assigned_workout_id: assigned_workout_id,
           workout_title: workout_title,
           athlete_nickname: athlete_nickname,
-          body: "#{athlete_nickname} rejected the workout \"#{workout_title}\".",
           url: url
         })
 
@@ -287,8 +286,6 @@ defmodule MilosTraining.Notifications do
     to_date = field(payload, :to_date)
 
     url = "/admin/coaching-assignments?open=#{assigned_workout_id}&date=#{to_date}"
-    body = "#{athlete_nickname} moved \"#{workout_title}\" from #{from_date} to #{to_date}."
-
     Identity.list_by_role(:admin)
     |> Enum.each(fn admin ->
       result =
@@ -298,7 +295,6 @@ defmodule MilosTraining.Notifications do
           workout_title: workout_title,
           from_date: from_date,
           to_date: to_date,
-          body: body,
           url: url
         })
 
@@ -324,7 +320,6 @@ defmodule MilosTraining.Notifications do
       invoice_number: invoice_number,
       total_cents: total_cents,
       due_date: due_date,
-      body: "Invoice #{invoice_number} has been issued for your account.",
       url: "/account/billing"
     }
 
@@ -350,8 +345,6 @@ defmodule MilosTraining.Notifications do
 
     notification_payload = %{
       outstanding_balance_cents: outstanding_cents,
-      body:
-        "You have an outstanding balance of €#{:erlang.float_to_binary(outstanding_cents / 100, [{:decimals, 2}])} due.",
       url: "/account/billing"
     }
 
@@ -421,7 +414,13 @@ defmodule MilosTraining.Notifications do
   end
 
   defp deliver_notification(user_id, type, payload) do
-    case DispatchNotification.call(user_id, type, payload) do
+    locale =
+      case Identity.find_by_id(user_id) do
+        %{preferred_locale: preferred_locale} when is_binary(preferred_locale) -> preferred_locale
+        _ -> "en"
+      end
+
+    case DispatchNotification.call(user_id, type, payload, locale) do
       :ok ->
         :ok
 

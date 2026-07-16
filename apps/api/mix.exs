@@ -79,6 +79,7 @@ defmodule MilosTraining.MixProject do
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       precommit: [
+        "cmd node scripts/validate_gettext_catalogs.mjs",
         "compile --warning-as-errors",
         "milos.architecture",
         "credo --strict",

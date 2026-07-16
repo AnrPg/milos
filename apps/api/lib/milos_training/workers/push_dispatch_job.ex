@@ -33,7 +33,13 @@ defmodule MilosTraining.Workers.PushDispatchJob do
 
       subscription ->
         message =
-          PushMessageBuilder.build(type, payload)
+          %{
+            title: payload["title"],
+            body: payload["body"],
+            url: payload["url"],
+            locale: payload["locale"]
+          }
+          |> fallback_message(type, payload)
           |> Map.put(:notification_id, notification_id)
 
         case dispatcher().send_push(subscription, message) do
@@ -53,4 +59,10 @@ defmodule MilosTraining.Workers.PushDispatchJob do
         end
     end
   end
+
+  defp fallback_message(%{title: title, body: body} = message, _type, _payload)
+       when is_binary(title) and is_binary(body),
+       do: message
+
+  defp fallback_message(_message, type, payload), do: PushMessageBuilder.build(type, payload)
 end

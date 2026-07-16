@@ -1,0 +1,104 @@
+msgid ""
+msgstr ""
+"Language: pt-PT\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "New booking request"
+msgstr "Novo pedido de reserva"
+
+msgid "Booking approved"
+msgstr "Reserva aprovada"
+
+msgid "Booking rejected"
+msgstr "Reserva rejeitada"
+
+msgid "Booking timed out"
+msgstr "A reserva expirou"
+
+msgid "Open the schedule to review the latest booking state."
+msgstr "Abra a programação para revisar o estado da reserva mais recente."
+
+msgid "Workout annotation"
+msgstr "Anotação de treino"
+
+msgid "A workout annotation needs review."
+msgstr "Uma anotação de treino precisa de revisão."
+
+msgid "Workout changed"
+msgstr "Treino alterado"
+
+msgid "Your coach changed a scheduled workout."
+msgstr "Seu treinador alterou um treino programado."
+
+msgid "Workout removed"
+msgstr "Treino removido"
+
+msgid "Your coach removed a scheduled workout."
+msgstr "Seu treinador removeu um treino programado."
+
+msgid "Workout rejected"
+msgstr "Treino rejeitado"
+
+msgid "An athlete"
+msgstr "Um atleta"
+
+msgid "a workout"
+msgstr "um treino"
+
+msgid "%{nickname} rejected %{title}."
+msgstr "%{nickname} rejeitou %{title}."
+
+msgid "Workout rescheduled"
+msgstr "Treino remarcado"
+
+msgid "An athlete rescheduled their workout."
+msgstr "Um atleta remarcou seu treino."
+
+msgid "Message from %{nickname}"
+msgstr "Mensagem de %{nickname}"
+
+msgid "%{nickname} sent you a message."
+msgstr "%{nickname} enviou uma mensagem para você."
+
+msgid "New coach note"
+msgstr "Nova nota do treinador"
+
+msgid "Your coach added a new note."
+msgstr "Seu treinador adicionou uma nova nota."
+
+msgid "Challenge completed"
+msgstr "Desafio concluído"
+
+msgid "You completed a challenge."
+msgstr "Você completou um desafio."
+
+msgid "New message in your workout thread"
+msgstr "Nova mensagem no seu tópico de treino"
+
+msgid "New message"
+msgstr "Nova mensagem"
+
+msgid "You received a new message."
+msgstr "Você recebeu uma nova mensagem."
+
+msgid "Milos Training"
+msgstr "Treinamento Milos"
+
+msgid "You have a new notification."
+msgstr "Você tem uma nova notificação."
+
+msgid "invoice"
+msgstr "fatura"
+
+msgid "New invoice"
+msgstr "Nova fatura"
+
+msgid "Invoice %{invoice_number} has been issued for your account."
+msgstr "A fatura %{invoice_number} foi emitida para sua conta."
+
+msgid "Payment reminder"
+msgstr "Lembrete de pagamento"
+
+msgid "You have an outstanding balance of %{amount} due."
+msgstr "Você tem um saldo pendente de %{amount} devido."
