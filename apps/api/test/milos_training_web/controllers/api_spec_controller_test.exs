@@ -152,6 +152,52 @@ defmodule MilosTrainingWeb.ApiSpecControllerTest do
                "403"
              ])
     end
+
+    test "publishes closed review and wellbeing response contracts", %{conn: conn} do
+      body = conn |> get("/api/openapi") |> json_response(200)
+
+      review = response_item_schema(body, "/api/reviews", "get", "reviews")
+      injury = response_item_schema(body, "/api/wellbeing/injuries", "get", "injuries")
+
+      assert review["additionalProperties"] == false
+      assert injury["additionalProperties"] == false
+
+      assert_schema_properties(review, [
+        "id",
+        "user_id",
+        "target_type",
+        "sentiment",
+        "status",
+        "answers",
+        "inserted_at"
+      ])
+
+      assert_schema_properties(injury, [
+        "id",
+        "user_id",
+        "body_area",
+        "severity",
+        "status",
+        "training_limitations",
+        "inserted_at"
+      ])
+    end
+  end
+
+  defp response_item_schema(spec, path, method, collection) do
+    get_in(spec, [
+      "paths",
+      path,
+      method,
+      "responses",
+      "200",
+      "content",
+      "application/json",
+      "schema",
+      "properties",
+      collection,
+      "items"
+    ])
   end
 
   defp assert_schema_properties(schema, properties) do

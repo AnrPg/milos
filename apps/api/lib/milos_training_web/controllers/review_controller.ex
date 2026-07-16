@@ -3,6 +3,7 @@ defmodule MilosTrainingWeb.ReviewController do
   use OpenApiSpex.ControllerSpecs
 
   alias MilosTraining.Application.{ListMyReviews, SubmitReview}
+  alias MilosTrainingWeb.Schemas.FeedbackWellbeing
   alias OpenApiSpex.{MediaType, RequestBody, Schema}
 
   action_fallback(MilosTrainingWeb.FallbackController)
@@ -10,7 +11,6 @@ defmodule MilosTrainingWeb.ReviewController do
   tags(["Reviews"])
   security([%{"bearerAuth" => []}])
 
-  @open_object %Schema{type: :object, additionalProperties: true}
   @review_answer_schema %Schema{
     type: :object,
     properties: %{
@@ -57,7 +57,7 @@ defmodule MilosTrainingWeb.ReviewController do
 
   operation(:index,
     summary: "List reviews submitted by the current user",
-    responses: [ok: {"Reviews", "application/json", @open_object}]
+    responses: [ok: {"Reviews", "application/json", FeedbackWellbeing.review_collection()}]
   )
 
   def index(conn, _params) do
@@ -74,7 +74,7 @@ defmodule MilosTrainingWeb.ReviewController do
       required: true,
       content: %{"application/json" => %MediaType{schema: @review_request_schema}}
     },
-    responses: [created: {"Review", "application/json", @open_object}]
+    responses: [created: {"Review", "application/json", FeedbackWellbeing.review_response()}]
   )
 
   def create(conn, params) do

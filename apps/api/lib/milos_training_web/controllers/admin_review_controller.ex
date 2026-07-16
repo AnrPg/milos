@@ -3,6 +3,7 @@ defmodule MilosTrainingWeb.AdminReviewController do
   use OpenApiSpex.ControllerSpecs
 
   alias MilosTraining.Application.{ListAdminReviews, UpdateReviewStatus}
+  alias MilosTrainingWeb.Schemas.FeedbackWellbeing
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
   action_fallback(MilosTrainingWeb.FallbackController)
@@ -10,7 +11,6 @@ defmodule MilosTrainingWeb.AdminReviewController do
   tags(["Admin Reviews"])
   security([%{"bearerAuth" => []}])
 
-  @open_object %Schema{type: :object, additionalProperties: true}
   @moderation_update_schema %Schema{
     type: :object,
     properties: %{
@@ -40,7 +40,7 @@ defmodule MilosTrainingWeb.AdminReviewController do
         schema: %Schema{type: :integer, minimum: 0}
       }
     ],
-    responses: [ok: {"Reviews", "application/json", @open_object}]
+    responses: [ok: {"Reviews", "application/json", FeedbackWellbeing.review_collection()}]
   )
 
   def index(conn, params) do
@@ -63,7 +63,7 @@ defmodule MilosTrainingWeb.AdminReviewController do
       required: true,
       content: %{"application/json" => %MediaType{schema: @moderation_update_schema}}
     },
-    responses: [ok: {"Review", "application/json", @open_object}]
+    responses: [ok: {"Review", "application/json", FeedbackWellbeing.review_response()}]
   )
 
   def update_status(conn, params) do

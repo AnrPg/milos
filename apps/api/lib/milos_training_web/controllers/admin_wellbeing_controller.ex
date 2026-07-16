@@ -3,6 +3,7 @@ defmodule MilosTrainingWeb.AdminWellbeingController do
   use OpenApiSpex.ControllerSpecs
 
   alias MilosTraining.Application.{AdminReportInjury, ListAdminInjuries, MarkInjuryHealed}
+  alias MilosTrainingWeb.Schemas.FeedbackWellbeing
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
   action_fallback(MilosTrainingWeb.FallbackController)
@@ -10,7 +11,6 @@ defmodule MilosTrainingWeb.AdminWellbeingController do
   tags(["Admin Wellbeing"])
   security([%{"bearerAuth" => []}])
 
-  @open_object %Schema{type: :object, additionalProperties: true}
   @injury_report_schema %Schema{
     type: :object,
     properties: %{
@@ -69,7 +69,7 @@ defmodule MilosTrainingWeb.AdminWellbeingController do
         schema: %Schema{type: :integer, minimum: 0}
       }
     ],
-    responses: [ok: {"Injury reports", "application/json", @open_object}]
+    responses: [ok: {"Injury reports", "application/json", FeedbackWellbeing.injury_collection()}]
   )
 
   def index(conn, params) do
@@ -82,7 +82,9 @@ defmodule MilosTrainingWeb.AdminWellbeingController do
     summary: "Report an injury on behalf of a user",
     parameters: [@id_parameter],
     request_body: @injury_request_body,
-    responses: [created: {"Injury report", "application/json", @open_object}]
+    responses: [
+      created: {"Injury report", "application/json", FeedbackWellbeing.injury_response()}
+    ]
   )
 
   def create(conn, params) do
@@ -100,7 +102,7 @@ defmodule MilosTrainingWeb.AdminWellbeingController do
     summary: "Mark an injury report healed",
     parameters: [@id_parameter],
     request_body: @heal_request_body,
-    responses: [ok: {"Injury report", "application/json", @open_object}]
+    responses: [ok: {"Injury report", "application/json", FeedbackWellbeing.injury_response()}]
   )
 
   def heal(conn, params) do
