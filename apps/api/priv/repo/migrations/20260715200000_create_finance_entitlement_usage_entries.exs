@@ -8,7 +8,8 @@ defmodule MilosTraining.Repo.Migrations.CreateFinanceEntitlementUsageEntries do
     end
 
     create constraint(:finance_settings, :finance_settings_entitlement_enforcement_mode,
-             check: "entitlement_enforcement_mode IN ('observe', 'enforce_managed', 'enforce_all')"
+             check:
+               "entitlement_enforcement_mode IN ('observe', 'enforce_managed', 'enforce_all')"
            )
 
     create table(:finance_entitlement_usage_entries, primary_key: false) do
