@@ -38,7 +38,9 @@ defmodule MilosTrainingWeb.ConnCase do
 
   def put_bearer_token(conn, user) do
     alias MilosTraining.Infrastructure.Auth.Guardian
-    {:ok, token, _claims} = Guardian.encode_and_sign(user, %{}, token_type: "access")
+
+    {:ok, token, _claims} =
+      Guardian.encode_and_sign(user, %{"sv" => user.security_version || 1}, token_type: "access")
 
     conn
     |> Plug.Conn.put_req_header("authorization", "Bearer " <> token)

@@ -17,8 +17,10 @@ defmodule MilosTrainingWeb.GamificationPreferencesController do
 
   def show(conn, _params) do
     current_user = Guardian.Plug.current_resource(conn)
-    prefs = GetGamificationPreferences.call(current_user.id)
-    json(conn, %{preferences: prefs || %{off_days: []}})
+
+    with {:ok, prefs} <- GetGamificationPreferences.call(current_user.id) do
+      json(conn, %{preferences: prefs || %{off_days: []}})
+    end
   end
 
   operation(:update,
@@ -31,7 +33,7 @@ defmodule MilosTrainingWeb.GamificationPreferencesController do
            off_days: %Schema{
              type: :array,
              items: %Schema{type: :integer, minimum: 0, maximum: 6},
-             maxItems: 3,
+             maxItems: 5,
              description: "Day-of-week indices (0=Sun..6=Sat) treated as rest days"
            }
          }

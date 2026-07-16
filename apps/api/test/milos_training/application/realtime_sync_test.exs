@@ -12,6 +12,7 @@ defmodule MilosTraining.Application.RealtimeSyncTest do
   }
 
   alias MilosTraining.Messaging
+  alias MilosTraining.Workers.DispatchMessageJob
 
   setup do
     Phoenix.PubSub.subscribe(MilosTraining.PubSub, "user:sync")
@@ -29,13 +30,16 @@ defmodule MilosTraining.Application.RealtimeSyncTest do
         participant_id: athlete.id
       })
 
-    assert {:ok, _message} =
+    assert {:ok, message} =
              Messaging.send_message(%{
                thread_id: thread.id,
                sender_id: admin.id,
                body: "Stay sharp on pacing.",
                message_type: :coaching_note
              })
+
+    assert :ok =
+             DispatchMessageJob.perform(%Oban.Job{args: %{"message_id" => message.id}})
 
     assert_user_syncs([
       %{user_id: athlete.id, scopes: ["landing"], reason: "landing_invalidated"}

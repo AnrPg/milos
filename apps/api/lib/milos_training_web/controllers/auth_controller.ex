@@ -2,8 +2,15 @@ defmodule MilosTrainingWeb.AuthController do
   use MilosTrainingWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias MilosTraining.Application.{LoginUser, RefreshToken, RegisterUser}
-  alias MilosTraining.Identity.Queries.FindUser
+  alias MilosTraining.Application.{
+    LoginUser,
+    LogoutSession,
+    NicknameAvailability,
+    RefreshToken,
+    RegisterUser,
+    SignOutAllDevices
+  }
+
   alias Guardian.Plug, as: GuardianPlug
   alias OpenApiSpex.{RequestBody, Schema}
 
@@ -36,14 +43,11 @@ defmodule MilosTrainingWeb.AuthController do
     },
     responses: [
       created:
-        {"Auth tokens", "application/json",
+        {"Access session", "application/json",
          %Schema{
            type: :object,
-           properties: %{
-             access_token: %Schema{type: :string},
-             refresh_token: %Schema{type: :string}
-           },
-           required: [:access_token, :refresh_token]
+           properties: %{access_token: %Schema{type: :string}},
+           required: [:access_token]
          }},
       unprocessable_entity:
         {"Validation errors", "application/json",
@@ -101,14 +105,11 @@ defmodule MilosTrainingWeb.AuthController do
     },
     responses: [
       ok:
-        {"Auth tokens", "application/json",
+        {"Access session", "application/json",
          %Schema{
            type: :object,
-           properties: %{
-             access_token: %Schema{type: :string},
-             refresh_token: %Schema{type: :string}
-           },
-           required: [:access_token, :refresh_token]
+           properties: %{access_token: %Schema{type: :string}},
+           required: [:access_token]
          }},
       unauthorized:
         {"Unauthorized", "application/json",
@@ -143,29 +144,13 @@ defmodule MilosTrainingWeb.AuthController do
 
   operation(:refresh,
     summary: "Refresh an access token",
-    request_body: %RequestBody{
-      description: "Refresh params",
-      required: true,
-      content: %{
-        "application/json" => %OpenApiSpex.MediaType{
-          schema: %Schema{
-            type: :object,
-            properties: %{refresh_token: %Schema{type: :string}},
-            required: [:refresh_token]
-          }
-        }
-      }
-    },
     responses: [
       ok:
-        {"Auth tokens", "application/json",
+        {"Access session", "application/json",
          %Schema{
            type: :object,
-           properties: %{
-             access_token: %Schema{type: :string},
-             refresh_token: %Schema{type: :string}
-           },
-           required: [:access_token, :refresh_token]
+           properties: %{access_token: %Schema{type: :string}},
+           required: [:access_token]
          }},
       unauthorized:
         {"Unauthorized", "application/json",
@@ -219,6 +204,17 @@ defmodule MilosTrainingWeb.AuthController do
     ]
   )
 
+  operation(:logout,
+    summary: "Sign out the current browser session",
+    responses: [no_content: {"Signed out", nil, nil}]
+  )
+
+  operation(:sign_out_all,
+    summary: "Invalidate every session for the authenticated user",
+    security: [%{"bearerAuth" => []}],
+    responses: [no_content: {"All sessions invalidated", nil, nil}]
+  )
+
   operation(:me,
     summary: "Return the authenticated user",
     security: [%{"bearerAuth" => []}],
@@ -250,16 +246,18 @@ defmodule MilosTrainingWeb.AuthController do
   )
 
   def nickname_available(conn, %{nickname: nickname}) do
-    available = is_nil(FindUser.by_nickname(nickname))
-    json(conn, %{available: available})
+    with {:ok, available} <- NicknameAvailability.call(nickname) do
+      json(conn, %{available: available})
+    end
   end
 
   def register(conn, _params) do
     case RegisterUser.call(conn.body_params) do
       {:ok, %{access_token: access_token, refresh_token: refresh_token}} ->
         conn
+        |> put_refresh_cookie(refresh_token)
         |> put_status(:created)
-        |> json(%{access_token: access_token, refresh_token: refresh_token})
+        |> json(%{access_token: access_token})
 
       error ->
         error
@@ -269,7 +267,9 @@ defmodule MilosTrainingWeb.AuthController do
   def login(conn, _params) do
     case LoginUser.call(conn.body_params) do
       {:ok, %{access_token: access_token, refresh_token: refresh_token}} ->
-        json(conn, %{access_token: access_token, refresh_token: refresh_token})
+        conn
+        |> put_refresh_cookie(refresh_token)
+        |> json(%{access_token: access_token})
 
       error ->
         error
@@ -277,12 +277,35 @@ defmodule MilosTrainingWeb.AuthController do
   end
 
   def refresh(conn, _params) do
-    case RefreshToken.call(conn.body_params) do
+    conn = fetch_cookies(conn)
+
+    case RefreshToken.call(%{refresh_token: conn.req_cookies[refresh_cookie_name()]}) do
       {:ok, %{access_token: access_token, refresh_token: refresh_token}} ->
-        json(conn, %{access_token: access_token, refresh_token: refresh_token})
+        conn
+        |> put_refresh_cookie(refresh_token)
+        |> json(%{access_token: access_token})
 
       error ->
         error
+    end
+  end
+
+  def logout(conn, _params) do
+    conn = fetch_cookies(conn)
+    :ok = LogoutSession.call(conn.req_cookies[refresh_cookie_name()])
+
+    conn
+    |> delete_resp_cookie(refresh_cookie_name(), refresh_cookie_options())
+    |> send_resp(:no_content, "")
+  end
+
+  def sign_out_all(conn, _params) do
+    user = GuardianPlug.current_resource(conn)
+
+    with :ok <- SignOutAllDevices.call(user) do
+      conn
+      |> delete_resp_cookie(refresh_cookie_name(), refresh_cookie_options())
+      |> send_resp(:no_content, "")
     end
   end
 
@@ -296,5 +319,21 @@ defmodule MilosTrainingWeb.AuthController do
       avatar_url: user.avatar_url,
       preferred_locale: user.preferred_locale
     })
+  end
+
+  defp put_refresh_cookie(conn, token) do
+    put_resp_cookie(conn, refresh_cookie_name(), token, refresh_cookie_options())
+  end
+
+  defp refresh_cookie_name, do: "milos_refresh"
+
+  defp refresh_cookie_options do
+    [
+      http_only: true,
+      secure: Application.get_env(:milos_training, :env) == :prod,
+      same_site: "Strict",
+      path: "/api/auth",
+      max_age: 30 * 24 * 60 * 60
+    ]
   end
 end

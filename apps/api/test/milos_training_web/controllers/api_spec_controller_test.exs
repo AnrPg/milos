@@ -17,8 +17,7 @@ defmodule MilosTrainingWeb.ApiSpecControllerTest do
 
       assert get_in(body, ["paths", "/api/auth/login", "post", "requestBody", "required"]) == true
 
-      assert get_in(body, ["paths", "/api/auth/refresh", "post", "requestBody", "required"]) ==
-               true
+      refute get_in(body, ["paths", "/api/auth/refresh", "post", "requestBody"])
 
       assert get_in(body, [
                "paths",
@@ -42,7 +41,7 @@ defmodule MilosTrainingWeb.ApiSpecControllerTest do
         ])
 
       assert Map.has_key?(refresh_properties, "access_token")
-      assert Map.has_key?(refresh_properties, "refresh_token")
+      refute Map.has_key?(refresh_properties, "refresh_token")
       assert get_in(body, ["paths", "/api/auth/login", "post", "responses", "429"]) != nil
       assert get_in(body, ["paths", "/api/auth/refresh", "post", "responses", "503"]) != nil
 

@@ -153,11 +153,38 @@ defmodule MilosTrainingWeb.ExecutionController do
       {"Execution progress params", "application/json",
        %Schema{
          type: :object,
-         required: [:checked_exercise_ids, :current_segment_index, :status, :paused_elapsed_ms],
+         required: [
+           :expected_version,
+           :operation_id,
+           :checked_exercise_ids,
+           :current_segment_index,
+           :status,
+           :paused_elapsed_ms
+         ],
          properties: %{
+           expected_version: %Schema{type: :integer, minimum: 1},
+           operation_id: %Schema{type: :string, format: :uuid},
            checked_exercise_ids: %Schema{
              type: :array,
              items: %Schema{type: :string}
+           },
+           section_scores: %Schema{
+             type: :array,
+             maxItems: 100,
+             items: %Schema{
+               type: :object,
+               required: [:section_id, :value],
+               properties: %{
+                 section_id: %Schema{type: :string, format: :uuid},
+                 value: %Schema{
+                   oneOf: [%Schema{type: :string, maxLength: 100}, %Schema{type: :number}]
+                 },
+                 unit: %Schema{type: :string, maxLength: 32, nullable: true},
+                 score_type: %Schema{type: :string, maxLength: 32, nullable: true},
+                 source: %Schema{type: :string, maxLength: 16, nullable: true},
+                 kind: %Schema{type: :string, maxLength: 16, nullable: true}
+               }
+             }
            },
            current_segment_index: %Schema{type: :integer, minimum: 0},
            status: %Schema{type: :string, enum: ["active", "paused"]},
@@ -186,7 +213,8 @@ defmodule MilosTrainingWeb.ExecutionController do
     responses: [
       ok: {"Execution", "application/json", %Schema{type: :object}},
       forbidden: {"Error", "application/json", %Schema{type: :object}},
-      not_found: {"Error", "application/json", %Schema{type: :object}}
+      not_found: {"Error", "application/json", %Schema{type: :object}},
+      conflict: {"Stale execution version", "application/json", %Schema{type: :object}}
     ]
   )
 

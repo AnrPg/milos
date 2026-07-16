@@ -1083,8 +1083,8 @@ defmodule MilosTraining.FinanceTest do
     assert {:ok, campaign} =
              Finance.create_promotion_campaign(%{
                name: "Founders",
-               starts_on: ~D[2026-06-01],
-               ends_on: ~D[2026-06-30]
+               starts_on: Date.add(Date.utc_today(), -7),
+               ends_on: Date.add(Date.utc_today(), 30)
              })
 
     assert {:ok, code} =

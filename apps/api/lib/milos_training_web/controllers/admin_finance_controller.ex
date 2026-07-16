@@ -32,6 +32,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
     RedeemFinancePromotion,
     ReverseFinanceCreditLedgerEntry,
     ReverseFinancePayment,
+    RetireFinancePackage,
     UpdateFinanceMember,
     UpdateFinancePackage,
     UpdateFinanceReferralProgram,
@@ -40,7 +41,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
     VoidFinanceInvoice
   }
 
-  alias MilosTraining.Infrastructure.Storage.MinioStorage
+  alias MilosTraining.Application.DocumentStorage
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
   alias MilosTrainingWeb.Schemas.AdminDrillDown
 
@@ -160,6 +161,28 @@ defmodule MilosTrainingWeb.AdminFinanceController do
           type: :object,
           properties: @package_properties,
           additionalProperties: false
+        }
+      }
+    }
+  }
+  @retire_package_request_body %RequestBody{
+    required: true,
+    content: %{
+      "application/json" => %MediaType{
+        schema: %Schema{
+          type: :object,
+          required: [:replacement_package_by_role],
+          additionalProperties: false,
+          properties: %{
+            replacement_package_by_role: %Schema{
+              type: :object,
+              additionalProperties: false,
+              properties: %{
+                member: %Schema{type: :string, format: :uuid},
+                athlete: %Schema{type: :string, format: :uuid}
+              }
+            }
+          }
         }
       }
     }
@@ -507,6 +530,19 @@ defmodule MilosTrainingWeb.AdminFinanceController do
   def update_package(conn, params) do
     with {:ok, package} <- UpdateFinancePackage.call(param_id(params), body_params(conn, params)) do
       json(conn, %{package: package})
+    end
+  end
+
+  operation(:retire_package,
+    summary: "Retire a package and atomically reconcile its effective subscribers",
+    parameters: [@id_parameter],
+    request_body: @retire_package_request_body,
+    responses: [ok: {"Retired package reconciliation", "application/json", @open_object}]
+  )
+
+  def retire_package(conn, params) do
+    with {:ok, result} <- RetireFinancePackage.call(param_id(params), body_params(conn, params)) do
+      json(conn, result)
     end
   end
 
@@ -1040,7 +1076,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
     ext = Path.extname(file_name)
     key = "invoices/#{invoice_id}/#{Ecto.UUID.generate()}#{ext}"
 
-    with {:ok, upload_url} <- MinioStorage.presigned_upload_url(key),
+    with {:ok, upload_url} <- DocumentStorage.presigned_upload_url(key),
          {:ok, invoice} <- MilosTraining.Finance.get_invoice(invoice_id),
          updated_params <-
            Map.merge(invoice.params || %{}, %{"file_key" => key, "file_name" => file_name}),
@@ -1060,7 +1096,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
 
     with {:ok, invoice} <- MilosTraining.Finance.get_invoice(invoice_id),
          file_key when is_binary(file_key) <- (invoice.params || %{})["file_key"],
-         {:ok, download_url} <- MinioStorage.presigned_download_url(file_key) do
+         {:ok, download_url} <- DocumentStorage.presigned_download_url(file_key) do
       file_name = (invoice.params || %{})["file_name"] || Path.basename(file_key)
       json(conn, %{download_url: download_url, file_name: file_name})
     else

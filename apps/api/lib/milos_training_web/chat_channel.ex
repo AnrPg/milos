@@ -2,6 +2,7 @@ defmodule MilosTrainingWeb.ChatChannel do
   use Phoenix.Channel
 
   alias MilosTraining.Messaging
+  alias MilosTraining.Application.SendMessage
 
   @impl true
   def join("chat:thread:" <> thread_id, _payload, socket) do
@@ -25,7 +26,7 @@ defmodule MilosTrainingWeb.ChatChannel do
     thread_id = socket.assigns.thread_id
     message_type = parse_message_type(Map.get(params, "message_type", "chat"))
 
-    case Messaging.send_message(%{
+    case SendMessage.call(socket.assigns.current_user, %{
            thread_id: thread_id,
            sender_id: user_id,
            body: body,
@@ -43,21 +44,37 @@ defmodule MilosTrainingWeb.ChatChannel do
   end
 
   @impl true
-  def handle_in("typing", _payload, socket) do
-    user_id = socket.assigns.current_user.id
-    thread_id = socket.assigns.thread_id
+  def handle_in("typing_start", _payload, socket), do: broadcast_typing(socket, true)
 
-    broadcast_from!(socket, "typing", %{user_id: user_id, thread_id: thread_id})
-    {:noreply, socket}
-  end
+  @impl true
+  def handle_in("typing_stop", _payload, socket), do: broadcast_typing(socket, false)
 
   @impl true
   def handle_in("mark_read", %{"message_id" => message_id}, socket) do
     user_id = socket.assigns.current_user.id
     thread_id = socket.assigns.thread_id
 
-    Messaging.mark_read(thread_id, user_id, message_id)
-    {:noreply, socket}
+    case Messaging.mark_read(thread_id, user_id, message_id) do
+      {:ok, result} -> {:reply, {:ok, result}, socket}
+      {:error, reason} -> {:reply, {:error, %{reason: to_string(reason)}}, socket}
+    end
+  end
+
+  @impl true
+  def handle_in(_event, _payload, socket),
+    do: {:reply, {:error, %{reason: "unsupported_event"}}, socket}
+
+  defp broadcast_typing(socket, typing) do
+    user_id = socket.assigns.current_user.id
+    nickname = socket.assigns.current_user.nickname
+
+    broadcast_from!(socket, "typing", %{
+      user_id: user_id,
+      nickname: nickname,
+      typing: typing
+    })
+
+    {:reply, {:ok, %{typing: typing}}, socket}
   end
 
   defp serialize_message(message) do

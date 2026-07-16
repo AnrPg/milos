@@ -5,6 +5,85 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
 
   import MilosTraining.TestFixtures
 
+  test "retiring a package atomically reconciles effective subscribers by role", %{conn: conn} do
+    admin = admin_fixture()
+    member = user_fixture(%{role: :member, nickname: "retired_plan_member"})
+    athlete = user_fixture(%{role: :athlete, nickname: "retired_plan_athlete"})
+
+    {:ok, source} =
+      Finance.create_package(%{
+        code: "retiring-source",
+        name: "Retiring source",
+        family: "hybrid",
+        billing_period: "monthly",
+        base_price_cents: 8_000
+      })
+
+    {:ok, member_replacement} =
+      Finance.create_package(%{
+        code: "member-replacement",
+        name: "Member replacement",
+        family: "unlimited",
+        billing_period: "monthly",
+        base_price_cents: 6_000
+      })
+
+    {:ok, athlete_replacement} =
+      Finance.create_package(%{
+        code: "athlete-replacement",
+        name: "Athlete replacement",
+        family: "personal-programming",
+        billing_period: "monthly",
+        base_price_cents: 10_000
+      })
+
+    {:ok, member_membership} =
+      Finance.upsert_membership(member.id, %{
+        user_type_snapshot: "member",
+        status: "active",
+        signup_source: "admin_created"
+      })
+
+    {:ok, athlete_membership} =
+      Finance.upsert_membership(athlete.id, %{
+        user_type_snapshot: "athlete",
+        status: "active",
+        signup_source: "admin_created"
+      })
+
+    {:ok, _} = Finance.assign_package(member_membership.id, source.id, %{})
+    {:ok, _} = Finance.assign_package(athlete_membership.id, source.id, %{})
+
+    blocked_response =
+      conn
+      |> put_bearer_token(admin)
+      |> patch("/api/admin/finance/packages/#{source.id}", %{active: false})
+      |> json_response(409)
+
+    assert blocked_response["error"] =~ "reconciliation"
+
+    response =
+      conn
+      |> recycle()
+      |> put_bearer_token(admin)
+      |> patch("/api/admin/finance/packages/#{source.id}/retire", %{
+        replacement_package_by_role: %{
+          member: member_replacement.id,
+          athlete: athlete_replacement.id
+        }
+      })
+      |> json_response(200)
+
+    assert response["package"]["active"] == false
+    assert response["reassigned_count"] == 2
+
+    assert Finance.get_member_profile(member.id).active_package_subscription.membership_package_id ==
+             member_replacement.id
+
+    assert Finance.get_member_profile(athlete.id).active_package_subscription.membership_package_id ==
+             athlete_replacement.id
+  end
+
   test "admin can manage package, membership, promo code, redemption, and search slices", %{
     conn: conn
   } do

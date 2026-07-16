@@ -23,13 +23,12 @@ defmodule MilosTraining.Gamification.Domain.DayStreakCalculatorTest do
       assert result.current_streak == 4
     end
 
-    test "skipping an off day (Sunday=0) does not break streak" do
-      # Trained Fri + Mon, off on Sat+Sun
+    test "skipping off days does not break streak" do
+      # Trained Sat + Tue, off on Sun+Mon
       dates = [~D[2026-06-13], ~D[2026-06-16]]
-      # Sat=6, Sun=0 are off days
-      result = DayStreakCalculator.calculate(dates, [0, 6], ~D[2026-06-16])
+      result = DayStreakCalculator.calculate(dates, [0, 1], ~D[2026-06-16])
 
-      # June 16 = Mon (trained), June 15 = Sun (off, skip), June 14 = Sat (off, skip), June 13 = Fri (trained)
+      # June 16 = Tue (trained), June 15 = Mon (off), June 14 = Sun (off), June 13 = Sat (trained)
       assert result.current_streak == 2
     end
 

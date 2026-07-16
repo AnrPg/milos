@@ -266,10 +266,19 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
         |> json_response(201)
         |> get_in(["execution", "id"])
 
+      execution_version =
+        athlete_conn
+        |> recycle()
+        |> get("/api/executions/#{execution_id}")
+        |> json_response(200)
+        |> get_in(["execution", "lock_version"])
+
       response =
         athlete_conn
         |> recycle()
         |> patch("/api/executions/#{execution_id}/progress", %{
+          expected_version: execution_version,
+          operation_id: Ecto.UUID.generate(),
           checked_exercise_ids: ["segment:0::#{exercise_id}::set:1"],
           current_segment_index: 0,
           status: "active",
@@ -292,6 +301,77 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
                  "value" => 8
                }
              ]
+    end
+
+    test "progress rejects stale writes and semantic state outside the timer sequence", %{
+      conn: conn
+    } do
+      admin = create_admin!("execution_integrity_admin")
+      athlete_conn = authenticate_as_member(conn, "execution_integrity_athlete")
+      workout = scoreable_for_time_workout!(admin)
+
+      execution =
+        athlete_conn
+        |> post("/api/executions", %{
+          master_workout_id: workout.id,
+          scale_level_slug: "scaled",
+          source: "self_selected"
+        })
+        |> json_response(201)
+        |> Map.fetch!("execution")
+
+      valid = %{
+        expected_version: execution["lock_version"],
+        operation_id: Ecto.UUID.generate(),
+        checked_exercise_ids: [],
+        current_segment_index: 0,
+        status: "paused",
+        paused_elapsed_ms: 1_000,
+        total_elapsed_ms: 1_000,
+        section_elapsed_ms: %{},
+        segment_cycle_counts: %{}
+      }
+
+      updated =
+        athlete_conn
+        |> recycle()
+        |> patch("/api/executions/#{execution["id"]}/progress", valid)
+        |> json_response(200)
+        |> Map.fetch!("execution")
+
+      assert updated["lock_version"] == execution["lock_version"] + 1
+
+      replayed =
+        athlete_conn
+        |> recycle()
+        |> patch("/api/executions/#{execution["id"]}/progress", valid)
+        |> json_response(200)
+        |> Map.fetch!("execution")
+
+      assert replayed["lock_version"] == updated["lock_version"]
+      assert replayed["status"] == updated["status"]
+
+      athlete_conn
+      |> recycle()
+      |> patch(
+        "/api/executions/#{execution["id"]}/progress",
+        Map.put(valid, :operation_id, Ecto.UUID.generate())
+      )
+      |> json_response(409)
+
+      athlete_conn
+      |> recycle()
+      |> patch("/api/executions/#{execution["id"]}/progress", %{
+        valid
+        | expected_version: updated["lock_version"],
+          operation_id: Ecto.UUID.generate(),
+          current_segment_index: 999,
+          checked_exercise_ids: ["forged-step"],
+          total_elapsed_ms: 9_999_999_999,
+          section_elapsed_ms: %{Ecto.UUID.generate() => 42},
+          segment_cycle_counts: %{forged: 42}
+      })
+      |> json_response(400)
     end
 
     test "completion persists measured fallback scores when none are submitted manually", %{

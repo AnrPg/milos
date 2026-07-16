@@ -15,6 +15,7 @@ defmodule MilosTrainingWeb.Router do
     plug(Guardian.Plug.VerifyHeader, scheme: "Bearer")
     plug(Guardian.Plug.EnsureAuthenticated)
     plug(Guardian.Plug.LoadResource)
+    plug(MilosTrainingWeb.Plugs.LoggerUserMetadata)
   end
 
   pipeline :auth_rate_limited do
@@ -53,12 +54,14 @@ defmodule MilosTrainingWeb.Router do
     post("/register", AuthController, :register)
     post("/login", AuthController, :login)
     post("/refresh", AuthController, :refresh)
+    post("/logout", AuthController, :logout)
   end
 
   scope "/api/auth", MilosTrainingWeb do
     pipe_through([:api, :authenticated])
 
     get("/me", AuthController, :me)
+    post("/sign-out-all", AuthController, :sign_out_all)
   end
 
   scope "/api/me", MilosTrainingWeb do
@@ -139,6 +142,7 @@ defmodule MilosTrainingWeb.Router do
     post("/finance/packages", AdminFinanceController, :create_package)
     get("/finance/packages/:id", AdminFinanceController, :package)
     patch("/finance/packages/:id", AdminFinanceController, :update_package)
+    patch("/finance/packages/:id/retire", AdminFinanceController, :retire_package)
     post("/finance/entitlements/backfill", AdminFinanceController, :backfill_entitlements)
     get("/finance/members", AdminFinanceController, :members)
     get("/finance/members/:id", AdminFinanceController, :member)

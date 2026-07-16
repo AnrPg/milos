@@ -5,7 +5,7 @@ defmodule MilosTrainingWeb.MyFinanceController do
   alias Guardian.Plug, as: GuardianPlug
   alias MilosTraining.Application.GetMyFinance
   alias MilosTraining.Finance
-  alias MilosTraining.Infrastructure.Storage.MinioStorage
+  alias MilosTraining.Application.DocumentStorage
   alias OpenApiSpex.Schema
 
   action_fallback MilosTrainingWeb.FallbackController
@@ -35,18 +35,14 @@ defmodule MilosTrainingWeb.MyFinanceController do
     responses: [
       ok:
         {"Effective entitlement", "application/json",
-         %Schema{type: :object, additionalProperties: true}},
-      not_found: {"Finance profile not found", "application/json", %Schema{type: :object}}
+         %Schema{type: :object, additionalProperties: true}}
     ]
   )
 
   def entitlement(conn, _params) do
     user = GuardianPlug.current_resource(conn)
 
-    case Finance.get_effective_entitlement(user.id) do
-      nil -> {:error, :not_found}
-      entitlement -> json(conn, %{entitlement: entitlement})
-    end
+    json(conn, %{entitlement: Finance.get_effective_entitlement(user.id)})
   end
 
   operation(:invoice_download_url,
@@ -73,7 +69,7 @@ defmodule MilosTrainingWeb.MyFinanceController do
     with {:ok, invoice} <- Finance.get_invoice(invoice_id),
          :ok <- verify_invoice_owner(invoice, user.id),
          file_key when is_binary(file_key) <- (invoice.params || %{})["file_key"],
-         {:ok, download_url} <- MinioStorage.presigned_download_url(file_key) do
+         {:ok, download_url} <- DocumentStorage.presigned_download_url(file_key) do
       file_name = (invoice.params || %{})["file_name"] || Path.basename(file_key)
       json(conn, %{download_url: download_url, file_name: file_name})
     else

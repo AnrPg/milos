@@ -112,10 +112,34 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{error: "Bad request"})
   end
 
+  def call(conn, {:error, :self_conversation}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{error: "A direct conversation requires another participant"})
+  end
+
+  def call(conn, {:error, :invalid_message}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{error: "Read pointers must reference a message in this thread"})
+  end
+
+  def call(conn, {:error, :invalid_avatar_upload}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{error: "Avatar must be a verified JPEG, PNG, or WebP up to 5 MiB"})
+  end
+
   def call(conn, {:error, :invalid_execution_source}) do
     conn
     |> put_status(:unprocessable_entity)
     |> json(%{error: "Invalid execution source"})
+  end
+
+  def call(conn, {:error, :stale_execution}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{error: "Execution progress changed on another client", code: "stale_execution"})
   end
 
   def call(conn, {:error, :execution_source_forbidden}) do
@@ -170,6 +194,24 @@ defmodule MilosTrainingWeb.FallbackController do
     conn
     |> put_status(:conflict)
     |> json(%{error: "Inactive packages cannot be assigned"})
+  end
+
+  def call(conn, {:error, {:package_replacement_required, role}}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{error: "A replacement package is required for #{role} subscribers", role: role})
+  end
+
+  def call(conn, {:error, :invalid_package_replacement}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{error: "Replacement packages must be different active packages"})
+  end
+
+  def call(conn, {:error, :package_retirement_reconciliation_required}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{error: "Current subscribers require package retirement reconciliation"})
   end
 
   def call(conn, {:error, :referral_program_required}) do

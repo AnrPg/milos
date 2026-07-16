@@ -20,7 +20,10 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         |> put_req_header("content-type", "application/json")
         |> post("/api/auth/register", Jason.encode!(params))
 
-      assert %{"access_token" => _, "refresh_token" => _} = json_response(conn, 201)
+      assert %{"access_token" => _} = json_response(conn, 201)
+      refute Map.has_key?(json_response(conn, 201), "refresh_token")
+      assert conn.resp_cookies["milos_refresh"].http_only
+      assert conn.resp_cookies["milos_refresh"].same_site == "Strict"
     end
 
     test "returns 422 on duplicate nickname", %{conn: conn} do
@@ -84,7 +87,8 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         |> post("/api/auth/login", Jason.encode!(%{nickname: "hermes", password: "S3cur3P@ss!"}))
 
       assert json_response(conn, 200)["access_token"]
-      assert json_response(conn, 200)["refresh_token"]
+      refute Map.has_key?(json_response(conn, 200), "refresh_token")
+      assert conn.resp_cookies["milos_refresh"].http_only
     end
 
     test "returns 401 on wrong password", %{conn: conn} do
@@ -221,22 +225,24 @@ defmodule MilosTrainingWeb.AuthControllerTest do
           Jason.encode!(%{nickname: "apollo", password: "S3cur3P@ss!", role: "member"})
         )
 
-      %{"refresh_token" => refresh_token} = json_response(register_conn, 201)
+      refresh_token = register_conn.resp_cookies["milos_refresh"].value
 
       refresh_conn =
         build_conn()
+        |> put_req_cookie("milos_refresh", refresh_token)
         |> put_req_header("content-type", "application/json")
-        |> post("/api/auth/refresh", Jason.encode!(%{refresh_token: refresh_token}))
+        |> post("/api/auth/refresh", %{})
 
-      %{"access_token" => _, "refresh_token" => rotated_refresh_token} =
-        json_response(refresh_conn, 200)
+      assert %{"access_token" => _} = json_response(refresh_conn, 200)
+      rotated_refresh_token = refresh_conn.resp_cookies["milos_refresh"].value
 
       refute rotated_refresh_token == refresh_token
 
       replay_conn =
         build_conn()
+        |> put_req_cookie("milos_refresh", refresh_token)
         |> put_req_header("content-type", "application/json")
-        |> post("/api/auth/refresh", Jason.encode!(%{refresh_token: refresh_token}))
+        |> post("/api/auth/refresh", %{})
 
       assert %{"error" => "Invalid refresh token"} = json_response(replay_conn, 401)
     end
@@ -251,7 +257,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
           Jason.encode!(%{nickname: "odin", password: "S3cur3P@ss!", role: "member"})
         )
 
-      %{"refresh_token" => refresh_token} = json_response(register_conn, 201)
+      refresh_token = register_conn.resp_cookies["milos_refresh"].value
 
       original = Application.get_env(:milos_training, :token_store)
 
@@ -267,8 +273,9 @@ defmodule MilosTrainingWeb.AuthControllerTest do
 
       failing_refresh_conn =
         build_conn()
+        |> put_req_cookie("milos_refresh", refresh_token)
         |> put_req_header("content-type", "application/json")
-        |> post("/api/auth/refresh", Jason.encode!(%{refresh_token: refresh_token}))
+        |> post("/api/auth/refresh", %{})
 
       assert %{"error" => "Authentication dependency unavailable"} =
                json_response(failing_refresh_conn, 503)
@@ -277,10 +284,43 @@ defmodule MilosTrainingWeb.AuthControllerTest do
 
       retry_refresh_conn =
         build_conn()
+        |> put_req_cookie("milos_refresh", refresh_token)
         |> put_req_header("content-type", "application/json")
-        |> post("/api/auth/refresh", Jason.encode!(%{refresh_token: refresh_token}))
+        |> post("/api/auth/refresh", %{})
 
-      assert %{"access_token" => _, "refresh_token" => _} = json_response(retry_refresh_conn, 200)
+      assert %{"access_token" => _} = json_response(retry_refresh_conn, 200)
+      assert retry_refresh_conn.resp_cookies["milos_refresh"].value != refresh_token
+    end
+  end
+
+  describe "session-family revocation" do
+    test "sign out all invalidates existing access and refresh credentials", %{conn: conn} do
+      login_conn =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post(
+          "/api/auth/register",
+          Jason.encode!(%{nickname: "security_family", password: "S3cur3P@ss!", role: "member"})
+        )
+
+      %{"access_token" => access_token} = json_response(login_conn, 201)
+      refresh_token = login_conn.resp_cookies["milos_refresh"].value
+
+      login_conn
+      |> recycle()
+      |> put_req_header("authorization", "Bearer " <> access_token)
+      |> post("/api/auth/sign-out-all", %{})
+      |> response(204)
+
+      build_conn()
+      |> put_req_header("authorization", "Bearer " <> access_token)
+      |> get("/api/auth/me")
+      |> json_response(401)
+
+      build_conn()
+      |> put_req_cookie("milos_refresh", refresh_token)
+      |> post("/api/auth/refresh", %{})
+      |> json_response(401)
     end
   end
 
@@ -331,7 +371,8 @@ defmodule MilosTrainingWeb.AuthControllerTest do
           role: :member
         })
 
-      {:ok, access_token, _claims} = Guardian.encode_and_sign(admin, %{}, token_type: "access")
+      {:ok, access_token, _claims} =
+        Guardian.encode_and_sign(admin, %{"sv" => admin.security_version}, token_type: "access")
 
       conn =
         conn
@@ -380,7 +421,9 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         })
 
       {:ok, admin} = Identity.update_role(admin, :admin)
-      {:ok, access_token, _claims} = Guardian.encode_and_sign(admin, %{}, token_type: "access")
+
+      {:ok, access_token, _claims} =
+        Guardian.encode_and_sign(admin, %{"sv" => admin.security_version}, token_type: "access")
 
       conn =
         conn

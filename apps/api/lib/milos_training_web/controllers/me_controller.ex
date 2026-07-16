@@ -2,8 +2,7 @@ defmodule MilosTrainingWeb.MeController do
   use MilosTrainingWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias MilosTraining.Application.{SearchUsers, UpdateAvatar, UpdateProfile}
-  alias MilosTraining.Infrastructure.Storage.MinioStorage
+  alias MilosTraining.Application.{RequestAvatarUpload, SearchUsers, UpdateAvatar, UpdateProfile}
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
   action_fallback MilosTrainingWeb.FallbackController
@@ -12,7 +11,8 @@ defmodule MilosTrainingWeb.MeController do
   security([%{"bearerAuth" => []}])
 
   plug OpenApiSpex.Plug.CastAndValidate,
-       [json_render_error_v2: true] when action in [:update_profile]
+       [json_render_error_v2: true]
+       when action in [:update_profile, :avatar_upload_url, :update_avatar]
 
   operation(:update_profile,
     summary: "Update current user profile and language preference",
@@ -26,7 +26,6 @@ defmodule MilosTrainingWeb.MeController do
               nickname: %Schema{type: :string, minLength: 3, maxLength: 30},
               current_password: %Schema{type: :string},
               password: %Schema{type: :string, minLength: 8},
-              avatar_url: %Schema{type: :string, nullable: true},
               preferred_locale: %Schema{
                 type: :string,
                 enum: MilosTraining.Identity.supported_locales()
@@ -59,7 +58,25 @@ defmodule MilosTrainingWeb.MeController do
   )
 
   operation(:avatar_upload_url,
-    summary: "Get a presigned URL for avatar upload",
+    summary: "Create a constrained presigned avatar upload",
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            required: [:content_type, :byte_size],
+            properties: %{
+              content_type: %Schema{
+                type: :string,
+                enum: ["image/jpeg", "image/png", "image/webp"]
+              },
+              byte_size: %Schema{type: :integer, minimum: 1, maximum: 5_242_880}
+            }
+          }
+        }
+      }
+    },
     responses: [
       ok:
         {"Upload URL", "application/json",
@@ -67,24 +84,26 @@ defmodule MilosTrainingWeb.MeController do
            type: :object,
            properties: %{
              upload_url: %Schema{type: :string},
-             public_url: %Schema{type: :string},
-             key: %Schema{type: :string}
+             key: %Schema{type: :string},
+             required_headers: %Schema{type: :object},
+             expires_in: %Schema{type: :integer},
+             max_bytes: %Schema{type: :integer}
            }
          }}
     ]
   )
 
   operation(:update_avatar,
-    summary: "Update current user avatar URL",
+    summary: "Finalize or clear the current user's avatar",
     request_body: %RequestBody{
       required: true,
       content: %{
         "application/json" => %MediaType{
           schema: %Schema{
             type: :object,
-            required: [:avatar_url],
+            required: [:avatar_key],
             properties: %{
-              avatar_url: %Schema{type: :string, nullable: true}
+              avatar_key: %Schema{type: :string, nullable: true}
             }
           }
         }
@@ -160,9 +179,9 @@ defmodule MilosTrainingWeb.MeController do
 
   def update_avatar(conn, _params) do
     user = Guardian.Plug.current_resource(conn)
-    avatar_url = conn.body_params["avatar_url"]
+    avatar_key = conn.body_params["avatar_key"]
 
-    with {:ok, updated_user} <- UpdateAvatar.call(user.id, avatar_url) do
+    with {:ok, updated_user} <- UpdateAvatar.call(user.id, avatar_key) do
       json(conn, %{user: %{id: updated_user.id, avatar_url: updated_user.avatar_url}})
     end
   end
@@ -170,7 +189,7 @@ defmodule MilosTrainingWeb.MeController do
   def avatar_upload_url(conn, _params) do
     user = Guardian.Plug.current_resource(conn)
 
-    with {:ok, result} <- MinioStorage.presigned_avatar_upload_url(user.id) do
+    with {:ok, result} <- RequestAvatarUpload.call(user.id, conn.body_params) do
       json(conn, result)
     end
   end

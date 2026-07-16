@@ -23,9 +23,9 @@ defmodule MilosTrainingWeb.CorsTest do
     conn =
       conn
       |> put_req_header("origin", "http://localhost:18300")
-      |> get("/api/health")
+      |> get("/api/openapi")
 
-    assert %{"status" => "ok"} = json_response(conn, 200)
+    assert is_map(json_response(conn, 200)["paths"])
     assert get_resp_header(conn, "access-control-allow-origin") == ["http://localhost:18300"]
   end
 
@@ -33,9 +33,9 @@ defmodule MilosTrainingWeb.CorsTest do
     conn =
       conn
       |> put_req_header("origin", "http://localhost:9999")
-      |> get("/api/health")
+      |> get("/api/openapi")
 
-    assert %{"status" => "ok"} = json_response(conn, 200)
+    assert is_map(json_response(conn, 200)["paths"])
     assert get_resp_header(conn, "access-control-allow-origin") == []
   end
 end

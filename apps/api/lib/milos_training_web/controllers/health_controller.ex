@@ -2,7 +2,7 @@ defmodule MilosTrainingWeb.HealthController do
   use MilosTrainingWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias MilosTraining.Infrastructure.Readiness
+  alias MilosTraining.Application.Readiness
   alias OpenApiSpex.Schema
 
   action_fallback MilosTrainingWeb.FallbackController
@@ -24,9 +24,12 @@ defmodule MilosTrainingWeb.HealthController do
                type: :object,
                properties: %{
                  database: %Schema{type: :string, example: "ok"},
-                 redis: %Schema{type: :string, example: "ok"}
+                 redis: %Schema{type: :string, example: "ok"},
+                 jobs: %Schema{type: :string, example: "ok"},
+                 search: %Schema{type: :string, example: "ok"},
+                 object_storage: %Schema{type: :string, example: "ok"}
                },
-               required: [:database, :redis]
+               required: [:database, :redis, :jobs, :search, :object_storage]
              }
            },
            required: [:status, :version, :dependencies]
@@ -42,9 +45,12 @@ defmodule MilosTrainingWeb.HealthController do
                type: :object,
                properties: %{
                  database: %Schema{type: :string, example: "error"},
-                 redis: %Schema{type: :string, example: "error"}
+                 redis: %Schema{type: :string, example: "error"},
+                 jobs: %Schema{type: :string, example: "error"},
+                 search: %Schema{type: :string, example: "error"},
+                 object_storage: %Schema{type: :string, example: "error"}
                },
-               required: [:database, :redis]
+               required: [:database, :redis, :jobs, :search, :object_storage]
              }
            },
            required: [:status, :version, :dependencies]

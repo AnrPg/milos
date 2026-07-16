@@ -100,7 +100,7 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
               title: %Schema{type: :string},
               type: %Schema{
                 type: :string,
-                enum: Enum.map(MilosTraining.Workouts.MasterWorkout.types(), &to_string/1),
+                enum: Enum.map(MilosTraining.Workouts.supported_workout_types(), &to_string/1),
                 nullable: true
               },
               sections: %Schema{
@@ -138,7 +138,7 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
               title: %Schema{type: :string},
               type: %Schema{
                 type: :string,
-                enum: Enum.map(MilosTraining.Workouts.MasterWorkout.types(), &to_string/1),
+                enum: Enum.map(MilosTraining.Workouts.supported_workout_types(), &to_string/1),
                 nullable: true
               },
               sections: %Schema{

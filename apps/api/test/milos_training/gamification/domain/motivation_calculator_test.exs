@@ -9,9 +9,9 @@ defmodule MilosTraining.Gamification.Domain.MotivationCalculatorTest do
     end
 
     test "returns 100.0 when all 10 weeks hit target" do
-      # Generate 3 workouts per week for 10 weeks
+      # Generate 3 workouts per week for the 10 complete weeks before current_date.
       dates =
-        for week <- 1..10, day <- 0..2 do
+        for week <- 0..9, day <- 0..2 do
           Date.add(~D[2026-06-09], -(week * 7) + day)
         end
 

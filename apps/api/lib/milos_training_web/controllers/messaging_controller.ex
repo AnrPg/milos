@@ -2,7 +2,15 @@ defmodule MilosTrainingWeb.MessagingController do
   use MilosTrainingWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias MilosTraining.{Identity, Messaging}
+  alias MilosTraining.Application.{
+    CountUnreadMessagingThreads,
+    GetMessagingThread,
+    GetOrCreateMessagingThread,
+    ListMessagingMessages,
+    ListMessagingThreads,
+    MarkMessagingThreadRead
+  }
+
   alias MilosTraining.Application.SendMessage, as: SendMessageUseCase
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
@@ -12,7 +20,8 @@ defmodule MilosTrainingWeb.MessagingController do
   security([%{"bearerAuth" => []}])
 
   plug OpenApiSpex.Plug.CastAndValidate,
-       [json_render_error_v2: true] when action in [:create_thread, :send_message]
+       [json_render_error_v2: true]
+       when action in [:create_thread, :send_message, :mark_read]
 
   @thread_schema %Schema{
     type: :object,
@@ -31,10 +40,12 @@ defmodule MilosTrainingWeb.MessagingController do
             user_id: %Schema{type: :string, format: :uuid},
             nickname: %Schema{type: :string, nullable: true},
             last_read_message_id: %Schema{type: :string, format: :uuid, nullable: true}
-          }
+          },
+          required: [:id, :user_id, :nickname, :last_read_message_id]
         }
       }
-    }
+    },
+    required: [:id, :context_type, :context_id, :created_by_id, :inserted_at, :participants]
   }
 
   @message_schema %Schema{
@@ -46,7 +57,8 @@ defmodule MilosTrainingWeb.MessagingController do
       body: %Schema{type: :string},
       message_type: %Schema{type: :string, enum: ["chat", "coaching_note", "system"]},
       inserted_at: %Schema{type: :string, format: :"date-time"}
-    }
+    },
+    required: [:id, :thread_id, :sender_id, :body, :message_type, :inserted_at]
   }
 
   operation(:create_thread,
@@ -73,7 +85,7 @@ defmodule MilosTrainingWeb.MessagingController do
     responses: [
       ok:
         {"Thread", "application/json",
-         %Schema{type: :object, properties: %{thread: @thread_schema}}}
+         %Schema{type: :object, properties: %{thread: @thread_schema}, required: [:thread]}}
     ]
   )
 
@@ -92,7 +104,8 @@ defmodule MilosTrainingWeb.MessagingController do
         {"Threads list", "application/json",
          %Schema{
            type: :object,
-           properties: %{threads: %Schema{type: :array, items: @thread_schema}}
+           properties: %{threads: %Schema{type: :array, items: @thread_schema}},
+           required: [:threads]
          }}
     ]
   )
@@ -110,7 +123,7 @@ defmodule MilosTrainingWeb.MessagingController do
     responses: [
       ok:
         {"Thread", "application/json",
-         %Schema{type: :object, properties: %{thread: @thread_schema}}},
+         %Schema{type: :object, properties: %{thread: @thread_schema}, required: [:thread]}},
       not_found: {"Not found", "application/json", %Schema{type: :object}},
       forbidden: {"Forbidden", "application/json", %Schema{type: :object}}
     ]
@@ -129,7 +142,7 @@ defmodule MilosTrainingWeb.MessagingController do
         name: :limit,
         in: :query,
         required: false,
-        schema: %Schema{type: :integer, default: 50}
+        schema: %Schema{type: :integer, default: 50, minimum: 1, maximum: 100}
       },
       %Parameter{
         name: :before_id,
@@ -140,10 +153,11 @@ defmodule MilosTrainingWeb.MessagingController do
     ],
     responses: [
       ok:
-        {"Messages", "application/json",
+        {"Chat messages", "application/json",
          %Schema{
            type: :object,
-           properties: %{messages: %Schema{type: :array, items: @message_schema}}
+           properties: %{messages: %Schema{type: :array, items: @message_schema}},
+           required: [:messages]
          }},
       forbidden: {"Forbidden", "application/json", %Schema{type: :object}}
     ]
@@ -181,7 +195,7 @@ defmodule MilosTrainingWeb.MessagingController do
     responses: [
       created:
         {"Message created", "application/json",
-         %Schema{type: :object, properties: %{message: @message_schema}}},
+         %Schema{type: :object, properties: %{message: @message_schema}, required: [:message]}},
       not_found: {"Not found", "application/json", %Schema{type: :object}},
       forbidden: {"Forbidden", "application/json", %Schema{type: :object}}
     ]
@@ -223,7 +237,16 @@ defmodule MilosTrainingWeb.MessagingController do
       }
     },
     responses: [
-      ok: {"Marked read", "application/json", %Schema{type: :object}},
+      ok:
+        {"Marked read", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             read: %Schema{type: :boolean},
+             message_id: %Schema{type: :string, format: :uuid}
+           },
+           required: [:read, :message_id]
+         }},
       not_found: {"Not found", "application/json", %Schema{type: :object}},
       forbidden: {"Forbidden", "application/json", %Schema{type: :object}}
     ]
@@ -231,7 +254,7 @@ defmodule MilosTrainingWeb.MessagingController do
 
   def unread_count(conn, _params) do
     user = Guardian.Plug.current_resource(conn)
-    count = Messaging.count_unread_threads(user.id)
+    count = CountUnreadMessagingThreads.call(user.id)
     json(conn, %{unread_count: count})
   end
 
@@ -245,7 +268,7 @@ defmodule MilosTrainingWeb.MessagingController do
       |> maybe_put(:participant_id, bp(conn, "participant_id"))
       |> maybe_put(:context_id, bp(conn, "context_id"))
 
-    with {:ok, thread} <- Messaging.get_or_create_thread(params) do
+    with {:ok, thread} <- GetOrCreateMessagingThread.call(user, params) do
       json(conn, %{thread: serialize_thread(thread)})
     end
   end
@@ -254,26 +277,16 @@ defmodule MilosTrainingWeb.MessagingController do
     user = Guardian.Plug.current_resource(conn)
     context_type = parse_context_type(params["context_type"])
 
-    threads = Messaging.list_threads_for_user(user.id, context_type)
+    threads = ListMessagingThreads.call(user.id, context_type)
 
-    all_participant_user_ids =
-      threads
-      |> Enum.flat_map(fn t -> Enum.map(t.participants || [], & &1.user_id) end)
-      |> Enum.uniq()
-
-    nickname_map =
-      all_participant_user_ids
-      |> Identity.list_by_ids()
-      |> Map.new(fn account -> {account.id, account.nickname} end)
-
-    json(conn, %{threads: Enum.map(threads, &serialize_thread(&1, nickname_map))})
+    json(conn, %{threads: Enum.map(threads, &serialize_thread/1)})
   end
 
   def show_thread(conn, params) do
     user = Guardian.Plug.current_resource(conn)
     thread_id = params["id"] || params[:id]
 
-    with {:ok, thread} <- Messaging.get_thread(thread_id, user.id) do
+    with {:ok, thread} <- GetMessagingThread.call(thread_id, user.id) do
       json(conn, %{thread: serialize_thread(thread)})
     end
   end
@@ -284,10 +297,10 @@ defmodule MilosTrainingWeb.MessagingController do
 
     list_params =
       %{actor_id: user.id}
-      |> maybe_put(:limit, parse_int(params["limit"] || params[:limit]))
+      |> maybe_put(:limit, params["limit"] || params[:limit])
       |> maybe_put(:before_id, params["before_id"] || params[:before_id])
 
-    with {:ok, messages} <- Messaging.list_messages(thread_id, list_params) do
+    with {:ok, messages} <- ListMessagingMessages.call(thread_id, list_params) do
       json(conn, %{messages: Enum.map(messages, &serialize_message/1)})
     end
   end
@@ -313,29 +326,29 @@ defmodule MilosTrainingWeb.MessagingController do
   def mark_read(conn, params) do
     user = Guardian.Plug.current_resource(conn)
     thread_id = params["id"] || params[:id]
-    message_id = bp(conn, "last_message_id")
+    message_id = bp(conn, "message_id")
 
-    with :ok <- Messaging.mark_read(thread_id, user.id, message_id) do
-      json(conn, %{})
+    with {:ok, result} <- MarkMessagingThreadRead.call(thread_id, user.id, message_id) do
+      json(conn, result)
     end
   end
 
-  defp serialize_thread(thread, nickname_map \\ %{}) do
+  defp serialize_thread(thread) do
     %{
       id: thread.id,
       context_type: thread.context_type,
       context_id: thread.context_id,
       created_by_id: thread.created_by_id,
       inserted_at: thread.inserted_at,
-      participants: Enum.map(thread.participants || [], &serialize_participant(&1, nickname_map))
+      participants: Enum.map(thread.participants || [], &serialize_participant/1)
     }
   end
 
-  defp serialize_participant(p, nickname_map) do
+  defp serialize_participant(p) do
     %{
       id: p.id,
       user_id: p.user_id,
-      nickname: Map.get(nickname_map, p.user_id),
+      nickname: Map.get(p, :nickname),
       last_read_message_id: p.last_read_message_id
     }
   end
@@ -367,8 +380,4 @@ defmodule MilosTrainingWeb.MessagingController do
   defp parse_message_type("coaching_note"), do: :coaching_note
   defp parse_message_type("system"), do: :system
   defp parse_message_type(_), do: :chat
-
-  defp parse_int(nil), do: nil
-  defp parse_int(str) when is_binary(str), do: String.to_integer(str)
-  defp parse_int(int) when is_integer(int), do: int
 end

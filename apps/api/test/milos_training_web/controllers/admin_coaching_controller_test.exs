@@ -3,6 +3,7 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
 
   alias MilosTraining.{Messaging, Notifications}
   alias MilosTraining.{Execution, Workouts}
+  alias MilosTraining.Workers.DispatchMessageJob
 
   import MilosTraining.TestFixtures
 
@@ -31,6 +32,11 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
     assert response["message"]["sender_id"] == admin.id
     assert response["message"]["body"] == "Keep your squat tempo controlled this week."
     assert response["message"]["message_type"] == "coaching_note"
+
+    assert :ok =
+             DispatchMessageJob.perform(%Oban.Job{
+               args: %{"message_id" => response["message"]["id"]}
+             })
 
     notifications = wait_for_notifications(athlete.id)
 
