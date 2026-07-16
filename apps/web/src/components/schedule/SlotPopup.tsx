@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale } from "next-intl";
 
 import { ApiError } from "@/api/client";
 import { cancelBooking, sendSlotMessage, type ScheduleBooking, type ScheduleSlot } from "@/api/schedule";
@@ -9,8 +10,8 @@ import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { workoutTypeColor } from "@/lib/workout-colors";
 
-function formatDateTime(isoString: string) {
-  return new Intl.DateTimeFormat("en-US", {
+function formatDateTime(locale: string, isoString: string) {
+  return new Intl.DateTimeFormat(locale, {
     weekday: "long",
     month: "short",
     day: "numeric",
@@ -19,10 +20,10 @@ function formatDateTime(isoString: string) {
   }).format(new Date(isoString));
 }
 
-function formatDeadline(scheduledAt: string, timeoutMinutes: number) {
+function formatDeadline(locale: string, scheduledAt: string, timeoutMinutes: number) {
   const deadline = new Date(new Date(scheduledAt).getTime() - timeoutMinutes * 60 * 1000);
   const relative = `${timeoutMinutes >= 60 ? `${timeoutMinutes / 60}h` : `${timeoutMinutes}m`} before start`;
-  const exact = new Intl.DateTimeFormat("en-GB", {
+  const exact = new Intl.DateTimeFormat(locale, {
     weekday: "short",
     day: "2-digit",
     month: "2-digit",
@@ -56,6 +57,7 @@ export function SlotPopup({
   onRejectBooking,
   onCancelBooking,
 }: SlotPopupProps) {
+  const locale = useLocale();
   const isPast = new Date(slot.scheduled_at) <= new Date();
   const canBook = !isAdmin && !slot.current_user_booking && slot.spots_remaining > 0 && !isPast;
   const [messageText, setMessageText] = useState("");
@@ -133,7 +135,7 @@ export function SlotPopup({
           ? "This class is currently full."
           : "Booking is unavailable for this slot.";
 
-  const deadline = formatDeadline(slot.scheduled_at, slot.booking_timeout_minutes);
+  const deadline = formatDeadline(locale, slot.scheduled_at, slot.booking_timeout_minutes);
   const typeColor = workoutTypeColor(slot.class_type.slug);
 
   return (
@@ -145,7 +147,7 @@ export function SlotPopup({
     >
       <div
         className="h-full w-full max-w-xl overflow-y-auto"
-        style={{ background: "var(--panel)", borderLeft: "1px solid var(--border)", paddingTop: "3.25rem" }}
+        style={{ background: "var(--panel)", borderInlineStart: "1px solid var(--border)", paddingTop: "3.25rem" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Sticky header — clears the top nav bar */}
@@ -176,7 +178,7 @@ export function SlotPopup({
                 {slot.workout?.title ?? "Scheduled class"}
               </h2>
               <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
-                {formatDateTime(slot.scheduled_at)}
+                {formatDateTime(locale, slot.scheduled_at)}
               </p>
             </div>
             <button

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 
 import { ApiError } from "@/api/client";
 import {
@@ -63,11 +64,16 @@ function defaultSlotValues(
 
 export function ScheduleConsole({
   initialOpenSlotId = null,
-  pageTitle = "Schedule",
+  pageTitle,
+  heroTimeoutMs,
 }: {
   initialOpenSlotId?: string | null;
   pageTitle?: string;
+  heroTimeoutMs?: number;
 } = {}) {
+  const t = useTranslations("Schedule");
+  const common = useTranslations("Common");
+  const locale = useLocale();
   const { tokens, currentUser } = useSession();
   const { days, setDays, shiftWindow, resetWindow, startDate, classTypeIds, setClassTypeIds } = useScheduleStore();
   const [schedule, setSchedule] = useState<ScheduleSlot[]>([]);
@@ -88,6 +94,7 @@ export function ScheduleConsole({
 
   const isAdmin = currentUser?.role === "admin";
   const calendarWindow = useMemo(() => buildScheduleWindow(startDate, days), [days, startDate]);
+  const title = pageTitle ?? t("title");
 
   const loadSchedule = useCallback(async () => {
     if (!tokens?.access_token) return null;
@@ -107,12 +114,12 @@ export function ScheduleConsole({
       setClassTypes(window.class_types);
       return window.slots;
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : "Failed to load schedule.");
+      setError(loadError instanceof Error ? loadError.message : t("failedToLoadSchedule"));
       return null;
     } finally {
       setLoading(false);
     }
-  }, [calendarWindow.queryEndAt, calendarWindow.queryStartAt, classTypeIds, days, tokens]);
+  }, [calendarWindow.queryEndAt, calendarWindow.queryStartAt, classTypeIds, days, t, tokens]);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -192,7 +199,7 @@ export function ScheduleConsole({
       setSelectedSlot(null);
       await loadSchedule();
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Could not create booking.");
+      setError(requestError instanceof Error ? requestError.message : t("failedToCreateBooking"));
     } finally {
       setBusy(false);
     }
@@ -219,7 +226,7 @@ export function ScheduleConsole({
         if (refreshed) setSelectedSlot(refreshed);
       }
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Could not resolve booking.");
+      setError(requestError instanceof Error ? requestError.message : t("failedToResolveBooking"));
     } finally {
       setBusy(false);
     }
@@ -240,7 +247,7 @@ export function ScheduleConsole({
       setEditor(null);
       await loadSchedule();
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Could not save slot.");
+      setError(requestError instanceof Error ? requestError.message : t("failedToSaveSlot"));
     } finally {
       setBusy(false);
     }
@@ -263,7 +270,7 @@ export function ScheduleConsole({
       await loadSchedule();
     } catch (requestError) {
       const message =
-        requestError instanceof ApiError ? requestError.message : "Could not delete slot with existing bookings.";
+        requestError instanceof ApiError ? requestError.message : t("failedToDeleteSlot");
       setError(message);
     } finally {
       setBusy(false);
@@ -272,7 +279,7 @@ export function ScheduleConsole({
 
   function openCreateEditor(isoDate: string) {
     if (!workouts.length || !classTypes.some((type) => !type.archived_at)) {
-      setError("Create a published workout and an active class type before adding schedule slots.");
+      setError(t("createPrerequisites"));
       return;
     }
 
@@ -299,10 +306,10 @@ export function ScheduleConsole({
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-7xl space-y-8">
-        <TransientHero label="class schedule introduction">
+        <TransientHero label={t("introduction")} showIntroLabel={t("showIntro")} timeoutMs={heroTimeoutMs}>
           <section className="rounded-[2rem] px-6 py-4" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">Class Schedule</p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight" style={{ color: "var(--text)" }}>{pageTitle}</h1>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">{t("classSchedule")}</p>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight" style={{ color: "var(--text)" }}>{title}</h1>
           </section>
         </TransientHero>
 
@@ -313,11 +320,12 @@ export function ScheduleConsole({
 
             <div className="flex flex-wrap gap-3">
               <ViewModeSelector
+                ariaLabel={t("calendarView")}
                 onChange={setDays}
                 options={[
-                  { value: 3, label: "3d", accessibleLabel: "Three-day view" },
-                  { value: 7, label: "7d", accessibleLabel: "Week view" },
-                  { value: 30, label: "Mo", accessibleLabel: "Month view" },
+                  { value: 3, label: "3d", accessibleLabel: t("threeDayView") },
+                  { value: 7, label: "7d", accessibleLabel: t("weekView") },
+                  { value: 30, label: "Mo", accessibleLabel: t("monthView") },
                 ]}
                 value={days}
               />
@@ -325,9 +333,9 @@ export function ScheduleConsole({
               <div className="flex gap-2">
                 {(
                   [
-                    ["Prev", () => shiftWindow(-1)],
-                    ["Today", resetWindow],
-                    ["Next", () => shiftWindow(1)],
+                    [t("previous"), () => shiftWindow(-1)],
+                    [t("today"), resetWindow],
+                    [t("next"), () => shiftWindow(1)],
                   ] as const
                 ).map(([label, handler]) => (
                   <button
@@ -353,7 +361,7 @@ export function ScheduleConsole({
 
         {loading ? (
           <section className="rounded-[2rem] p-10 text-center text-sm font-semibold uppercase tracking-[0.24em]" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--dim)" }}>
-            Loading schedule...
+            {t("loading")}
           </section>
         ) : (
           <CalendarView
@@ -391,27 +399,33 @@ export function ScheduleConsole({
       {bookingTarget ? (
         <BookingModal
           busy={busy}
-          confirmLabel="Confirm booking"
-          description={`Reserve ${bookingTarget.workout?.title ?? "this slot"} on ${new Intl.DateTimeFormat("en-US", {
-            weekday: "long",
-            month: "short",
-            day: "numeric",
-            hour: "numeric",
-            minute: "2-digit",
-          }).format(new Date(bookingTarget.scheduled_at))}.`}
+          confirmLabel={t("confirmBooking")}
+          description={t("bookClassDescription", {
+            workoutTitle: bookingTarget.workout?.title ?? t("thisSlot"),
+            scheduledAt: new Intl.DateTimeFormat(locale, {
+              weekday: "long",
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+            }).format(new Date(bookingTarget.scheduled_at)),
+          })}
           onCancel={() => setBookingTarget(null)}
           onConfirm={() => void handleBook()}
-          title="Book class slot"
+          title={t("bookClassSlot")}
         />
       ) : null}
 
       {resolveTarget ? (
         <BookingModal
           busy={busy}
-          confirmLabel={resolveTarget.action === "approve" ? "Approve booking" : "Reject booking"}
-          description={`Update ${resolveTarget.booking.user_nickname ?? "this member"} to ${resolveTarget.action}.`}
-          inputLabel="Admin message"
-          inputPlaceholder="Optional note for the member"
+          confirmLabel={resolveTarget.action === "approve" ? t("approveBooking") : t("rejectBooking")}
+          description={t("resolveBookingDescription", {
+            memberName: resolveTarget.booking.user_nickname ?? t("thisMember"),
+            action: resolveTarget.action === "approve" ? t("approve") : t("reject"),
+          })}
+          inputLabel={t("adminMessage")}
+          inputPlaceholder={t("optionalNoteForMember")}
           inputValue={resolveMessage}
           onCancel={() => {
             setResolveTarget(null);
@@ -419,7 +433,7 @@ export function ScheduleConsole({
           }}
           onConfirm={() => void handleResolve()}
           onInputChange={setResolveMessage}
-          title={resolveTarget.action === "approve" ? "Approve booking" : "Reject booking"}
+          title={resolveTarget.action === "approve" ? t("approveBooking") : t("rejectBooking")}
         />
       ) : null}
 
@@ -428,9 +442,9 @@ export function ScheduleConsole({
           <div className="w-full max-w-2xl rounded-[2rem] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.7)]" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">Admin slot editor</p>
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">{t("adminSlotEditor")}</p>
                 <h3 className="mt-3 text-2xl font-semibold" style={{ color: "var(--text)" }}>
-                  {editor.slotId ? "Edit scheduled class" : "Create scheduled class"}
+                  {editor.slotId ? t("editScheduledClass") : t("createScheduledClass")}
                 </h3>
               </div>
               <button
@@ -439,17 +453,17 @@ export function ScheduleConsole({
                 onClick={() => setEditor(null)}
                 type="button"
               >
-                Close
+                {common("close")}
               </button>
             </div>
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               {[
-                { label: "Workout", type: "select" as const },
-                { label: "Class type", type: "select-type" as const },
-                { label: "Scheduled at", type: "datetime" as const },
-                { label: "Capacity", type: "number-cap" as const },
-                { label: "Timeout minutes", type: "number-timeout" as const },
+                { label: t("workout"), type: "select" as const },
+                { label: t("classType"), type: "select-type" as const },
+                { label: t("scheduledAt"), type: "datetime" as const },
+                { label: t("capacity"), type: "number-cap" as const },
+                { label: t("timeoutMinutes"), type: "number-timeout" as const },
               ].map(({ label, type }) => (
                 <label key={label} className="space-y-2 text-sm font-semibold" style={{ color: "var(--muted)" }}>
                   <span>{label}</span>
@@ -536,7 +550,7 @@ export function ScheduleConsole({
                 }
                 type="checkbox"
               />
-              Auto-approve bookings for this slot
+              {t("autoApproveBookingsForThisSlot")}
             </label>
 
             <div className="mt-6 flex flex-wrap justify-between gap-3">
@@ -547,7 +561,7 @@ export function ScheduleConsole({
                   onClick={() => void removeEditedSlot()}
                   type="button"
                 >
-                  Delete slot
+                  {t("deleteSlot")}
                 </button>
               ) : <span />}
 
@@ -558,7 +572,7 @@ export function ScheduleConsole({
                   onClick={() => setEditor(null)}
                   type="button"
                 >
-                  Cancel
+                  {common("cancel")}
                 </button>
                 <button
                   className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
@@ -567,7 +581,7 @@ export function ScheduleConsole({
                   onClick={() => void saveSlot()}
                   type="button"
                 >
-                  {busy ? "Saving..." : editor.slotId ? "Save changes" : "Create slot"}
+                  {busy ? common("saving") : editor.slotId ? t("saveChanges") : t("createSlot")}
                 </button>
               </div>
             </div>

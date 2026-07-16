@@ -1,6 +1,7 @@
 "use client";
 
 import type { ScheduleSlot } from "@/api/schedule";
+import { useLocale } from "next-intl";
 import { buildScheduleWindow, localDateKey, monthKey, parseLocalDate, type ScheduleDays } from "@/components/schedule/calendar-window";
 import { WORKOUT_TYPE_COLORS } from "@/lib/workout-colors";
 
@@ -13,26 +14,27 @@ type CalendarViewProps = {
   onCreateSlot: (isoDate: string) => void;
 };
 
-function formatDayLabel(isoDate: string) {
+function formatDayLabel(locale: string, isoDate: string) {
   const [year, month, day] = isoDate.split("-").map(Number);
   const date = new Date(year, month - 1, day, 12, 0, 0);
-  return new Intl.DateTimeFormat("en-US", { weekday: "long", month: "short", day: "numeric" }).format(date);
+  return new Intl.DateTimeFormat(locale, { weekday: "long", month: "short", day: "numeric" }).format(date);
 }
 
-function formatDayLabelCompact(isoDate: string) {
+function formatDayLabelCompact(locale: string, isoDate: string) {
   const [year, month, day] = isoDate.split("-").map(Number);
   const date = new Date(year, month - 1, day, 12, 0, 0);
-  const weekday = new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date);
+  const weekday = new Intl.DateTimeFormat(locale, { weekday: "short" }).format(date);
   return { weekday, day };
 }
 
-function formatTime(isoString: string) {
-  return new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" }).format(new Date(isoString));
+function formatTime(locale: string, isoString: string) {
+  return new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" }).format(new Date(isoString));
 }
 
 const todayKey = localDateKey(new Date());
 
 export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, onCreateSlot }: CalendarViewProps) {
+  const locale = useLocale();
   const { currentMonthKey, visibleDates, monthLabel } = buildScheduleWindow(startDate, days);
   const slotMap = visibleDates.reduce<Record<string, ScheduleSlot[]>>((acc, date) => {
     acc[date] = [];
@@ -55,7 +57,10 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
         </div>
         {/* Day-of-week header */}
         <div className="mb-1 grid grid-cols-7 gap-1">
-          {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((label) => (
+          {Array.from({ length: 7 }, (_, index) => {
+            const date = new Date(2026, 5, 1 + index, 12, 0, 0);
+            return new Intl.DateTimeFormat(locale, { weekday: "short" }).format(date);
+          }).map((label) => (
             <div key={label} className="py-1 text-center text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>
               {label}
             </div>
@@ -103,12 +108,12 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
                   return (
                     <button
                       key={slot.id}
-                      className="mt-0.5 w-full truncate rounded px-1 py-0.5 text-left text-[9px] font-semibold transition-opacity hover:opacity-80"
+                      className="mt-0.5 w-full truncate rounded px-1 py-0.5 text-start text-[9px] font-semibold transition-opacity hover:opacity-80"
                       style={{ background: `color-mix(in srgb, ${slotColor} 15%, transparent)`, color: slotColor }}
                       onClick={() => onSelectSlot(slot)}
                       type="button"
                     >
-                      {formatTime(slot.scheduled_at)} {slot.class_type.name}
+                      {formatTime(locale, slot.scheduled_at)} {slot.class_type.name}
                     </button>
                   );
                 })}
@@ -131,7 +136,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
       >
         {visibleDates.map((date) => {
           const daySlots = slotMap[date] ?? [];
-          const { weekday, day } = formatDayLabelCompact(date);
+          const { weekday, day } = formatDayLabelCompact(locale, date);
           const isToday = date === todayKey;
 
           return (
@@ -150,7 +155,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
                     <>
                       <p className="text-base font-bold" style={{ color: "var(--text)" }}>{weekday}</p>
                       <p className="mt-0.5 text-xs">
-                        <span style={{ color: "var(--dim)" }}>{formatDayLabel(date).split(", ").slice(1, 2).join("").split(" ")[0]} </span>
+                        <span style={{ color: "var(--dim)" }}>{formatDayLabel(locale, date).split(", ").slice(1, 2).join("").split(" ")[0]} </span>
                         <span style={{ color: isToday ? "var(--primary)" : "var(--muted)" }}>{day}</span>
                       </p>
                     </>
@@ -163,22 +168,22 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
                 </div>
 
                 {isAdmin ? (
-                  <button
-                    className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
-                    style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)", color: "var(--primary)" }}
-                    onClick={() => onCreateSlot(date)}
-                    type="button"
-                  >
-                    + Slot
-                  </button>
-                ) : null}
+                    <button
+                      className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
+                      style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)", color: "var(--primary)" }}
+                      onClick={() => onCreateSlot(date)}
+                      type="button"
+                    >
+                      + Slot
+                    </button>
+                  ) : null}
               </div>
 
               <div className="mt-4 space-y-3">
                 {daySlots.length === 0 ? (
                   isAdmin ? (
                     <button
-                      className="w-full rounded-[1.2rem] px-4 py-6 text-left text-sm transition-colors"
+                      className="w-full rounded-[1.2rem] px-4 py-6 text-start text-sm transition-colors"
                       style={{ border: "1px dashed var(--border)", color: "var(--border-strong)" }}
                       onClick={() => onCreateSlot(date)}
                       type="button"
@@ -204,6 +209,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
 }
 
 function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact: boolean; onSelectSlot: (slot: ScheduleSlot) => void }) {
+  const locale = useLocale();
   const isPast = new Date(slot.scheduled_at) <= new Date();
   const isUnavailable = !slot.current_user_booking && (slot.spots_remaining === 0 || isPast);
   const typeColor = WORKOUT_TYPE_COLORS[slot.class_type.slug] ?? "var(--primary)";
@@ -211,7 +217,7 @@ function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact
   if (compact) {
     return (
       <button
-        className="w-full truncate rounded-[0.9rem] p-2.5 text-left transition-all"
+        className="w-full truncate rounded-[0.9rem] p-2.5 text-start transition-all"
         style={{
           background: isUnavailable ? "var(--panel-muted)" : "var(--panel-muted)",
           border: `1px solid ${isUnavailable ? "var(--panel)" : "var(--border)"}`,
@@ -220,7 +226,7 @@ function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact
         type="button"
       >
         <p className="text-xs font-semibold" style={{ color: isUnavailable ? "var(--dim)" : "var(--text)" }}>
-          {new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" }).format(new Date(slot.scheduled_at))}
+          {new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" }).format(new Date(slot.scheduled_at))}
         </p>
         <p className="truncate text-[10px] uppercase tracking-[0.14em]" style={{ color: isUnavailable ? "var(--dim)" : typeColor }}>
           {slot.class_type.name}
@@ -231,7 +237,7 @@ function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact
 
   return (
     <button
-      className="w-full rounded-[1.3rem] p-4 text-left transition-all"
+      className="w-full rounded-[1.3rem] p-4 text-start transition-all"
       style={{
         background: isUnavailable ? "var(--panel-muted)" : "var(--panel-muted)",
         border: `1px solid ${isUnavailable ? "var(--panel)" : "var(--border)"}`,
@@ -242,10 +248,10 @@ function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold" style={{ color: isUnavailable ? "var(--dim)" : "var(--text)" }}>
-            {new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" }).format(new Date(slot.scheduled_at))}
+            {new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" }).format(new Date(slot.scheduled_at))}
           </p>
           <p className="mt-1 text-sm" style={{ color: isUnavailable ? "var(--border-strong)" : "var(--muted)" }}>
-            {slot.workout?.title ?? "Workout preview unavailable"}
+          {slot.workout?.title ?? "Workout preview unavailable"}
           </p>
         </div>
         <span

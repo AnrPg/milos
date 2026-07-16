@@ -2,6 +2,8 @@
 
 import { useRef, useState } from "react";
 
+import { useTranslations } from "next-intl";
+
 import type { ClassTypeRecord } from "@/api/schedule";
 import { WORKOUT_TYPE_COLORS } from "@/lib/workout-colors";
 
@@ -22,10 +24,11 @@ function toggle(values: string[], id: string) {
 export function TypeFilterChips({ classTypes, value, onChange }: TypeFilterChipsProps) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const [pending, setPending] = useState(value);
+  const t = useTranslations("Schedule");
 
   return (
     <div className="min-w-0 flex-1">
-      <div className="hidden min-w-0 items-center gap-1.5 md:flex" aria-label="Filter by class type">
+      <div className="hidden min-w-0 items-center gap-1.5 md:flex" aria-label={t("filterByClassType")}>
         <button
           aria-pressed={value.length === 0}
           className="shrink-0 rounded-full border px-2.5 py-1.5 text-xs font-semibold transition-colors"
@@ -37,7 +40,7 @@ export function TypeFilterChips({ classTypes, value, onChange }: TypeFilterChips
           onClick={() => onChange([])}
           type="button"
         >
-          All
+          {t("all")}
         </button>
 
         {classTypes.map((type) => {
@@ -55,7 +58,7 @@ export function TypeFilterChips({ classTypes, value, onChange }: TypeFilterChips
                   ? { background: color, borderColor: color, color: "var(--bg)" }
                   : { background: "transparent", borderColor: "var(--border)", color: "var(--dim)" }
               }
-              title={`${type.name}${type.archived_at ? " (archived)" : ""}`}
+              title={`${type.name}${type.archived_at ? ` (${t("archived")})` : ""}`}
               type="button"
             >
               {type.name}
@@ -75,12 +78,12 @@ export function TypeFilterChips({ classTypes, value, onChange }: TypeFilterChips
           className="flex cursor-pointer list-none items-center justify-between rounded-full px-4 py-2.5 text-sm font-semibold"
           style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
         >
-          <span>Class types</span>
-          <span style={{ color: "var(--primary)" }}>{value.length === 0 ? "All" : `${value.length} selected`}</span>
+          <span>{t("classTypes")}</span>
+          <span style={{ color: "var(--primary)" }}>{value.length === 0 ? t("all") : t("selectedCount", { count: value.length })}</span>
         </summary>
 
         <div
-          className="absolute left-0 right-0 top-full z-30 mt-2 rounded-[1.4rem] p-4 shadow-[0_20px_60px_rgba(0,0,0,0.55)]"
+          className="absolute inset-x-0 top-full z-30 mt-2 rounded-[1.4rem] p-4 shadow-[0_20px_60px_rgba(0,0,0,0.55)]"
           style={{ background: "var(--panel)", border: "1px solid var(--border-strong)" }}
         >
           <div className="max-h-64 space-y-2 overflow-y-auto">
@@ -110,7 +113,7 @@ export function TypeFilterChips({ classTypes, value, onChange }: TypeFilterChips
               style={{ background: "var(--border)", color: "var(--text-soft)" }}
               type="button"
             >
-              Clear
+              {t("clear")}
             </button>
             <button
               className="flex-1 rounded-full px-3 py-2 text-xs font-semibold"
@@ -121,7 +124,7 @@ export function TypeFilterChips({ classTypes, value, onChange }: TypeFilterChips
               style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
               type="button"
             >
-              Apply
+              {t("apply")}
             </button>
           </div>
         </div>

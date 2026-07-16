@@ -4,16 +4,18 @@ type ViewModeSelectorProps<T extends string | number> = {
   value: T;
   options: Array<{ value: T; label: string; accessibleLabel: string }>;
   onChange: (value: T) => void;
+  ariaLabel: string;
 };
 
 export function ViewModeSelector<T extends string | number>({
   value,
   options,
   onChange,
+  ariaLabel,
 }: ViewModeSelectorProps<T>) {
   return (
     <div
-      aria-label="Calendar view"
+      aria-label={ariaLabel}
       className="flex rounded-full p-0.5"
       role="group"
       style={{ background: "var(--border)" }}

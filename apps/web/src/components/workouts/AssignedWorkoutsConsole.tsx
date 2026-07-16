@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   DndContext,
@@ -1302,149 +1301,175 @@ export function AssignedWorkoutsConsole({
   return (
     <main className="min-h-screen px-4 py-8 md:px-8 md:py-12" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-7xl space-y-6">
-        <section
-          className="flex flex-col gap-4 rounded-[2rem] px-6 py-5 sm:flex-row sm:items-center sm:justify-between"
-          style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+        <TransientHero
+          collapsedTitle={pageTitle ?? (isAdmin ? "Workout Board" : "My Workouts")}
+          label="workout calendar introduction"
+          timeoutMs={3000}
         >
-          <TransientHero label="workout calendar introduction">
+          <section className="rounded-[2rem] px-6 py-4" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">
+              {isAdmin ? "Personal Coaching" : "Workout Calendar"}
+            </p>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
+              {pageTitle ?? (isAdmin ? "Workout Board" : "My Workouts")}
+            </h1>
+          </section>
+        </TransientHero>
+
+        <section className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+          <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">
-                {pageTitle ?? (isAdmin ? "Workout Board" : "My Workouts")}
+              <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>
+                Calendar window
               </p>
-              <h1 className="mt-1 text-xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
+              <h2 className="mt-1 text-xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
                 {periodLabel}
-              </h1>
+              </h2>
             </div>
-          </TransientHero>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <ViewModeSelector
-              onChange={(mode) => {
-                setLoading(true);
-                setError(null);
-                setViewMode(mode);
-              }}
-              options={[
-                { value: "3day", label: "3d", accessibleLabel: "Three-day view" },
-                { value: "week", label: "7d", accessibleLabel: "Week view" },
-                { value: "month", label: "Mo", accessibleLabel: "Month view" },
-              ] satisfies Array<{ value: ViewMode; label: string; accessibleLabel: string }>}
-              value={viewMode}
-            />
+            <div className="flex flex-wrap items-center gap-3">
+              <ViewModeSelector
+                ariaLabel="Calendar view"
+                onChange={(mode) => {
+                  setLoading(true);
+                  setError(null);
+                  setViewMode(mode);
+                }}
+                options={[
+                  { value: "3day", label: "3d", accessibleLabel: "Three-day view" },
+                  { value: "week", label: "7d", accessibleLabel: "Week view" },
+                  { value: "month", label: "Mo", accessibleLabel: "Month view" },
+                ] satisfies Array<{ value: ViewMode; label: string; accessibleLabel: string }>}
+                value={viewMode}
+              />
 
-            <button
-              className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
-              style={{ background: "var(--border)", color: "var(--text-soft)" }}
-              onClick={() => navigate(-1)}
-              type="button"
-            >
-              ←
-            </button>
-            <button
-              className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
-              style={{ background: "var(--border)", color: "var(--text-soft)" }}
-              onClick={goToToday}
-              type="button"
-            >
-              Today
-            </button>
-            <button
-              className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
-              style={{ background: "var(--border)", color: "var(--text-soft)" }}
-              onClick={() => navigate(1)}
-              type="button"
-            >
-              →
-            </button>
+              <div className="flex gap-2">
+                <button
+                  className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+                  style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+                  onClick={() => navigate(-1)}
+                  type="button"
+                >
+                  Prev
+                </button>
+                <button
+                  className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+                  style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+                  onClick={goToToday}
+                  type="button"
+                >
+                  Today
+                </button>
+                <button
+                  className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+                  style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+                  onClick={() => navigate(1)}
+                  type="button"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           </div>
         </section>
 
 
         {isAdmin ? (
-          <section className="relative flex flex-wrap items-center gap-2">
-            <div className="relative">
-              <input
-                className="rounded-full px-4 py-2 text-sm outline-none"
-                style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)", minWidth: "14rem" }}
-                placeholder="Filter by athlete…"
-                value={filterQuery}
-                onFocus={() => setFilterDropdownOpen(true)}
-                onBlur={() => window.setTimeout(() => setFilterDropdownOpen(false), 150)}
-                onChange={(e) => {
-                  setFilterQuery(e.target.value);
-                  setFilterDropdownOpen(true);
-                }}
-              />
-              {filterDropdownOpen && filterAthletes.length > 0 ? (
-                <div
-                  className="absolute left-0 top-full z-30 mt-1 w-64 rounded-[1rem] py-1 shadow-xl"
-                  style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-                >
-                  {filterAthletes.map((athlete) => {
-                    const selected = filterAthleteIds.includes(athlete.id);
-                    return (
-                      <button
-                        key={athlete.id}
-                        className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm transition-colors"
-                        style={{ color: selected ? "var(--primary)" : "var(--text)" }}
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => {
-                          setFilterAthleteIds((current) =>
-                            selected ? current.filter((id) => id !== athlete.id) : [...current, athlete.id],
-                          );
-                        }}
-                        type="button"
-                      >
-                        <span
-                          className="flex h-4 w-4 shrink-0 items-center justify-center rounded"
-                          style={{
-                            background: selected ? "var(--primary)" : "var(--border)",
-                            border: `1px solid ${selected ? "var(--primary)" : "var(--dim)"}`,
+          <section className="relative flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+              <div className="relative">
+                <input
+                  className="rounded-full px-4 py-2 text-sm outline-none"
+                  style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)", minWidth: "14rem" }}
+                  placeholder="Filter by athlete…"
+                  value={filterQuery}
+                  onFocus={() => setFilterDropdownOpen(true)}
+                  onBlur={() => window.setTimeout(() => setFilterDropdownOpen(false), 150)}
+                  onChange={(e) => {
+                    setFilterQuery(e.target.value);
+                    setFilterDropdownOpen(true);
+                  }}
+                />
+                {filterDropdownOpen && filterAthletes.length > 0 ? (
+                  <div
+                    className="absolute left-0 top-full z-30 mt-1 w-64 rounded-[1rem] py-1 shadow-xl"
+                    style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+                  >
+                    {filterAthletes.map((athlete) => {
+                      const selected = filterAthleteIds.includes(athlete.id);
+                      return (
+                        <button
+                          key={athlete.id}
+                          className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm transition-colors"
+                          style={{ color: selected ? "var(--primary)" : "var(--text)" }}
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => {
+                            setFilterAthleteIds((current) =>
+                              selected ? current.filter((id) => id !== athlete.id) : [...current, athlete.id],
+                            );
                           }}
+                          type="button"
                         >
-                          {selected ? <span className="text-[10px] font-bold text-[var(--primary-contrast)]">✓</span> : null}
-                        </span>
+                          <span
+                            className="flex h-4 w-4 shrink-0 items-center justify-center rounded"
+                            style={{
+                              background: selected ? "var(--primary)" : "var(--border)",
+                              border: `1px solid ${selected ? "var(--primary)" : "var(--dim)"}`,
+                            }}
+                          >
+                            {selected ? <span className="text-[10px] font-bold text-[var(--primary-contrast)]">✓</span> : null}
+                          </span>
+                          {athlete.nickname}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
+
+              {filterAthleteIds.length > 0 ? (
+                <>
+                  {filterAthleteIds.map((id) => {
+                    const athlete = filterAthletes.find((a) => a.id === id) ?? allAssignments
+                      .flatMap((a) => a.athletes ?? [])
+                      .find((a) => a.id === id);
+                    return athlete ? (
+                      <span
+                        key={id}
+                        className="flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold"
+                        style={{ background: "color-mix(in srgb, var(--primary) 15%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 25%, transparent)", color: "var(--primary)" }}
+                      >
                         {athlete.nickname}
-                      </button>
-                    );
+                        <button
+                          className="ml-0.5 opacity-70 hover:opacity-100"
+                          onClick={() => setFilterAthleteIds((c) => c.filter((fid) => fid !== id))}
+                          type="button"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ) : null;
                   })}
-                </div>
+                  <button
+                    className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
+                    style={{ background: "var(--border)", color: "var(--muted)" }}
+                    onClick={() => { setFilterAthleteIds([]); setFilterQuery(""); }}
+                    type="button"
+                  >
+                    Clear filter
+                  </button>
+                </>
               ) : null}
             </div>
 
-            {filterAthleteIds.length > 0 ? (
-              <>
-                {filterAthleteIds.map((id) => {
-                  const athlete = filterAthletes.find((a) => a.id === id) ?? allAssignments
-                    .flatMap((a) => a.athletes ?? [])
-                    .find((a) => a.id === id);
-                  return athlete ? (
-                    <span
-                      key={id}
-                      className="flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold"
-                      style={{ background: "color-mix(in srgb, var(--primary) 15%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 25%, transparent)", color: "var(--primary)" }}
-                    >
-                      {athlete.nickname}
-                      <button
-                        className="ml-0.5 opacity-70 hover:opacity-100"
-                        onClick={() => setFilterAthleteIds((c) => c.filter((fid) => fid !== id))}
-                        type="button"
-                      >
-                        ✕
-                      </button>
-                    </span>
-                  ) : null;
-                })}
-                <button
-                  className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
-                  style={{ background: "var(--border)", color: "var(--muted)" }}
-                  onClick={() => { setFilterAthleteIds([]); setFilterQuery(""); }}
-                  type="button"
-                >
-                  Clear filter
-                </button>
-              </>
-            ) : null}
+            <button
+              className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold"
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+              onClick={() => setShowQuickAssign(true)}
+              type="button"
+            >
+              Assign workout
+            </button>
           </section>
         ) : null}
 
@@ -1496,40 +1521,6 @@ export function AssignedWorkoutsConsole({
           </DragOverlay>
         </DndContext>
 
-        {isAdmin && !loading ? (
-          <section
-            className="rounded-[1.8rem] p-6"
-            style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-          >
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>
-                  Assign workout
-                </p>
-                <p className="mt-2 text-xl font-semibold" style={{ color: "var(--text)" }}>
-                  Assign a workout to one or more athletes.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  className="rounded-full px-4 py-2 text-sm font-semibold"
-                  style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-                  onClick={() => setShowQuickAssign(true)}
-                  type="button"
-                >
-                  Assign workout
-                </button>
-                <Link
-                  className="rounded-full px-4 py-2 text-sm font-semibold"
-                  style={{ background: "var(--border)", color: "var(--text-soft)" }}
-                  href="/admin/workouts"
-                >
-                  Workout library
-                </Link>
-              </div>
-            </div>
-          </section>
-        ) : null}
       </div>
 
       {panelAssignment && tokens?.access_token ? (
