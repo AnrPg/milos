@@ -1,6 +1,6 @@
 # Plan: Profile Page + Messaging Improvements + Nav Refactor
 
-**Status:** Ready to implement — all design decisions confirmed by user.  
+**Status:** Implemented in code; validation pass on 2026-07-15 found environment/tooling blockers and frontend lint issues.  
 **Working directory:** `/home/rodochrousbisbiki/MyApps/milos`  
 **Elixir app:** `apps/api/` | **Next.js app:** `apps/web/`
 
@@ -10,13 +10,13 @@
 
 | # | Feature | Status |
 |---|---------|--------|
-| 1 | Nav chat badge search: all users, recents first | Design approved |
-| 2 | Thread list: show nickname instead of UUID | Design approved |
-| 3 | Workout chat notifications → "Messages" filter | Already correct in frontend |
-| 4 | Fix `push_message_builder` for `chat_message` type | Design approved |
-| 5 | Remove Wellbeing from TopNav → "Training Readiness" side panel button (non-admin only) | Approved |
-| 6 | Remove Reviews from TopNav → "Leave a Review" side panel button (non-admin only) | Approved |
-| 7 | New `/profile` page (personal info, avatar, account activity) | Design approved |
+| 1 | Nav chat badge search: all users, recents first | Implemented; validation pending green lint/backend |
+| 2 | Thread list: show nickname instead of UUID | Implemented |
+| 3 | Workout chat notifications → "Chat" filter | Already correct in frontend |
+| 4 | Fix `push_message_builder` for `chat_message` type | Implemented |
+| 5 | Remove Wellbeing from TopNav → "Training Readiness" side panel button (non-admin only) | Implemented |
+| 6 | Remove Reviews from TopNav → "Leave a Review" side panel button (non-admin only) | Implemented |
+| 7 | New `/profile` page (personal info, avatar, account activity) | Implemented |
 
 ---
 
@@ -141,62 +141,62 @@ Controllers use `OpenApiSpex.ControllerSpecs` with `operation/2`. Export with `m
 
 ### Backend — New Files
 
-- [ ] **`apps/api/priv/repo/migrations/20260615010000_add_avatar_url_to_users.exs`**  
+- [x] **`apps/api/priv/repo/migrations/20260615010000_add_avatar_url_to_users.exs`**  
   Add `avatar_url :string` column to `users` table
 
-- [ ] **`apps/api/lib/milos_training/application/update_profile.ex`**  
+- [x] **`apps/api/lib/milos_training/application/update_profile.ex`**  
   App service: verify current password if changing password, call `Identity.update_profile`, enqueue `PropagateNicknameJob` if nickname changed
 
-- [ ] **`apps/api/lib/milos_training/application/update_avatar.ex`**  
+- [x] **`apps/api/lib/milos_training/application/update_avatar.ex`**  
   App service: calls `Identity.update_avatar(user.id, avatar_url)`
 
-- [ ] **`apps/api/lib/milos_training/application/search_users.ex`**  
+- [x] **`apps/api/lib/milos_training/application/search_users.ex`**  
   App service: calls `Identity.search_users(query)`, returns list of `%{id, nickname, role}`
 
-- [ ] **`apps/api/lib/milos_training/workers/propagate_nickname_job.ex`**  
+- [x] **`apps/api/lib/milos_training/workers/propagate_nickname_job.ex`**  
   Oban worker: refresh leaderboard MV + Meilisearch re-sync + notification payload update
 
-- [ ] **`apps/api/lib/milos_training_web/controllers/me_controller.ex`**  
+- [x] **`apps/api/lib/milos_training_web/controllers/me_controller.ex`**  
   3 actions: `update_profile` (PATCH /api/me/profile), `avatar_upload_url` (POST /api/me/avatar/upload-url), `search_users` (GET /api/me/search/users)
 
 ### Backend — Modified Files
 
-- [ ] **`apps/api/config/runtime.exs`**  
+- [x] **`apps/api/config/runtime.exs`**  
   Add: `minio_avatar_bucket: System.get_env("MINIO_AVATAR_BUCKET", "milos-avatars")`  
   Add: `minio_public_endpoint: System.get_env("MINIO_PUBLIC_ENDPOINT")` (optional, falls back to minio_endpoint)
 
-- [ ] **`apps/api/lib/milos_training/identity/user.ex`**  
+- [x] **`apps/api/lib/milos_training/identity/user.ex`**  
   Add field: `avatar_url :string`  
   Add changeset: `profile_changeset/2` — casts `[:nickname, :password, :avatar_url]`, applies normalize_nickname, validates nickname (3–30, format `/^[a-zA-Z0-9_]+$/`, unique), validates password (min 8), all conditionally if field present  
   Add changeset: `avatar_changeset/2` — casts `[:avatar_url]`
 
-- [ ] **`apps/api/lib/milos_training/identity/account.ex`**  
+- [x] **`apps/api/lib/milos_training/identity/account.ex`**  
   Add `avatar_url` to `@enforce_keys` (NO — keep it optional) and `defstruct`
 
-- [ ] **`apps/api/lib/milos_training/infrastructure/identity/ecto_user_store.ex`**  
+- [x] **`apps/api/lib/milos_training/infrastructure/identity/ecto_user_store.ex`**  
   Update `to_account/1`: add `avatar_url: user.avatar_url`  
   Add `update_profile/2`: fetch User, apply `profile_changeset`, call `maybe_put_password_hash`, `Repo.update`, return `{:ok, account}`  
   Add `update_avatar/2`: fetch User, apply `avatar_changeset`, `Repo.update`, return `{:ok, account}`  
   Add `search_users/1`: ILIKE on nickname, all roles, order by nickname, limit 20
 
-- [ ] **`apps/api/lib/milos_training/identity/ports/user_store.ex`**  
+- [x] **`apps/api/lib/milos_training/identity/ports/user_store.ex`**  
   Add callbacks: `update_profile/2`, `update_avatar/2`, `search_users/1`
 
-- [ ] **`apps/api/lib/milos_training/identity/user_store.ex`**  
+- [x] **`apps/api/lib/milos_training/identity/user_store.ex`**  
   Add `@impl true` delegations for `update_profile/2`, `update_avatar/2`, `search_users/1`
 
-- [ ] **`apps/api/lib/milos_training/identity.ex`**  
+- [x] **`apps/api/lib/milos_training/identity.ex`**  
   Add: `defdelegate update_profile(user_id, params), to: UserStore`  
   Add: `defdelegate update_avatar(user_id, avatar_url), to: UserStore`  
   Add: `defdelegate search_users(query), to: FindUser, as: :search_all`  
   (Or keep `search_users` as a direct UserStore delegation if no FindUser query module needed)
 
-- [ ] **`apps/api/lib/milos_training/infrastructure/storage/minio_storage.ex`**  
+- [x] **`apps/api/lib/milos_training/infrastructure/storage/minio_storage.ex`**  
   Add `presigned_avatar_upload_url/1(user_id)`: generates PUT presigned URL + public URL  
   Add `avatar_ex_aws_config/0`: same as `ex_aws_config/0` but uses `minio_avatar_bucket`  
   Add `avatar_public_url/1(key)`: `#{minio_public_endpoint || minio_endpoint}/#{avatar_bucket}/#{key}`
 
-- [ ] **`apps/api/lib/milos_training/notifications/domain/push_message_builder.ex`**  
+- [x] **`apps/api/lib/milos_training/notifications/domain/push_message_builder.ex`**  
   Add explicit clause BEFORE catch-all:
   ```elixir
   def build("chat_message", payload) do
@@ -209,24 +209,24 @@ Controllers use `OpenApiSpex.ControllerSpecs` with `operation/2`. Export with `m
   end
   ```
 
-- [ ] **`apps/api/lib/milos_training/notifications/ports/notification_store.ex`**  
+- [x] **`apps/api/lib/milos_training/notifications/ports/notification_store.ex`**  
   Add callback: `propagate_nickname_change(String.t(), String.t()) :: :ok`
 
-- [ ] **`apps/api/lib/milos_training/notifications/notification_store.ex`**  
+- [x] **`apps/api/lib/milos_training/notifications/notification_store.ex`**  
   Add `@impl true` delegation: `def propagate_nickname_change(old, new), do: adapter().propagate_nickname_change(old, new)`
 
-- [ ] **`apps/api/lib/milos_training/notifications.ex`**  
+- [x] **`apps/api/lib/milos_training/notifications.ex`**  
   Add: `def propagate_nickname_change(old_nickname, new_nickname), do: NotificationStore.propagate_nickname_change(old_nickname, new_nickname)`
 
-- [ ] **`apps/api/lib/milos_training/infrastructure/notifications/ecto_notification_store.ex`**  
+- [x] **`apps/api/lib/milos_training/infrastructure/notifications/ecto_notification_store.ex`**  
   Implement `propagate_nickname_change/2` with two `Repo.query!` calls using `jsonb_set` + `to_jsonb($1::text)`
 
-- [ ] **`apps/api/lib/milos_training_web/controllers/messaging_controller.ex`**  
+- [x] **`apps/api/lib/milos_training_web/controllers/messaging_controller.ex`**  
   In the thread list action: collect all participant `user_id`s → call `Identity.list_by_ids/1` → build `%{user_id => account}` lookup map  
   Update `serialize_participant/1` to `serialize_participant/2` with the lookup map, adding `nickname` field  
   Update OpenAPI schema: add `nickname: %Schema{type: :string, nullable: true}` to participant schema
 
-- [ ] **`apps/api/lib/milos_training_web/controllers/fallback_controller.ex`**  
+- [x] **`apps/api/lib/milos_training_web/controllers/fallback_controller.ex`**  
   Add before the catch-all:
   ```elixir
   def call(conn, {:error, :invalid_current_password}) do
@@ -234,11 +234,11 @@ Controllers use `OpenApiSpex.ControllerSpecs` with `operation/2`. Export with `m
   end
   ```
 
-- [ ] **`apps/api/lib/milos_training_web/controllers/auth_controller.ex`**  
+- [x] **`apps/api/lib/milos_training_web/controllers/auth_controller.ex`**  
   Add `avatar_url: user.avatar_url` to `me` action response  
   Update `operation(:me)` OpenAPI schema: add `avatar_url` property (type string, nullable true)
 
-- [ ] **`apps/api/lib/milos_training_web/router.ex`**  
+- [x] **`apps/api/lib/milos_training_web/router.ex`**  
   In the `/api/me` scope (authenticated), add:
   ```elixir
   patch("/profile", MeController, :update_profile)
@@ -248,21 +248,21 @@ Controllers use `OpenApiSpex.ControllerSpecs` with `operation/2`. Export with `m
 
 ### Infrastructure
 
-- [ ] **`docker-compose.override.yml`**  
+- [x] **`docker-compose.override.yml`**  
   Add to `api` service environment: `MINIO_AVATAR_BUCKET: ${MINIO_AVATAR_BUCKET:-milos-avatars}`
 
-- [ ] **`.env.example`**  
+- [x] **`.env.example`**  
   Add: `MINIO_AVATAR_BUCKET=milos-avatars`
 
 ### After backend changes
 
 - [ ] **Run `cd apps/api && mix ecto.migrate`** to apply the new migration
 - [ ] **Run `cd apps/api && mix format && mix credo --strict`** to validate
-- [ ] **Run `cd apps/web && npm run generate:api`** to regenerate `schema.ts` and `openapi.json` from Elixir OpenAPI specs
+- [ ] **Run `cd apps/web && npm run generate:api`** to regenerate `schema.ts` and `openapi.json` from Elixir OpenAPI specs — generated files are present, but the 2026-07-15 validation run could not regenerate them because the backend Mix task is blocked by the local Elixir `1.17.2` vs required `~> 1.18` mismatch.
 
 ### Frontend — New Files
 
-- [ ] **`apps/web/src/api/profile.ts`**  
+- [x] **`apps/web/src/api/profile.ts`**  
   ```typescript
   export type ProfileUpdate = { nickname?: string; current_password?: string; password?: string; avatar_url?: string; }
   export async function updateProfile(token, payload): Promise<{user: {id, nickname, role, avatar_url?}}>
@@ -270,19 +270,19 @@ Controllers use `OpenApiSpex.ControllerSpecs` with `operation/2`. Export with `m
   export async function searchAllUsers(token, query): Promise<Array<{id, nickname, role}>>
   ```
 
-- [ ] **`apps/web/src/components/panels/WellbeingFormPanel.tsx`**  
+- [x] **`apps/web/src/components/panels/WellbeingFormPanel.tsx`**  
   Dark-theme side panel with ONLY the form from `my-wellbeing.tsx` (no injury list)  
   Title: "Training Readiness" (not "Wellbeing")  
   Uses CSS vars: `--panel-muted`, `--border`, `--text`, `--muted`, etc.
 
-- [ ] **`apps/web/src/components/panels/ReviewFormPanel.tsx`**  
+- [x] **`apps/web/src/components/panels/ReviewFormPanel.tsx`**  
   Dark-theme side panel with ONLY the review form (extracted from `my-reviews.tsx`)  
   No reviews list shown
 
-- [ ] **`apps/web/src/app/profile/page.tsx`**  
+- [x] **`apps/web/src/app/profile/page.tsx`**  
   Route wrapper: `<AuthGuard><ProfilePage /></AuthGuard>`, `export const dynamic = "force-dynamic"`
 
-- [ ] **`apps/web/src/components/ProfilePage.tsx`**  
+- [x] **`apps/web/src/components/ProfilePage.tsx`**  
   3 collapsible sections (same pattern as `admin-settings.tsx`):  
   - **Personal Info**: nickname change + password change (current password required)  
   - **Avatar**: presigned MinIO upload → PUT to upload_url → PATCH /api/me/profile with avatar_url  
@@ -291,40 +291,40 @@ Controllers use `OpenApiSpex.ControllerSpecs` with `operation/2`. Export with `m
 
 ### Frontend — Modified Files
 
-- [ ] **`apps/web/src/api/messaging.ts`**  
+- [x] **`apps/web/src/api/messaging.ts`**  
   Add `nickname?: string | null` to `ChatParticipant` interface  
   Change `searchUsers` function from calling `/admin/search?q=...` to calling `/me/search/users?q=...`  
   Return type now `Array<{id: string; nickname: string; role: string}>` (simpler, no pagination)
 
-- [ ] **`apps/web/src/components/chat/DirectMessagesPanel.tsx`**  
+- [x] **`apps/web/src/components/chat/DirectMessagesPanel.tsx`**  
   Thread list: `other?.nickname ?? "Direct message"` (was `other?.user_id`)  
   Avatar initials: `other?.nickname?.[0]?.toUpperCase()` (was `other?.user_id?.[0]`)  
   Search bar: uses updated `searchUsers` (now calls `/me/search/users`)  
   Sort search results: existing threads first (by recency), then alphabetically  
 
-- [ ] **`apps/web/src/components/notifications/NotificationBell.tsx`**  
+- [x] **`apps/web/src/components/notifications/NotificationBell.tsx`**  
   Improve `chat_message` notification display:  
   When `notification.context_type === "assignment"`: show "New message in your workout thread"  
   Otherwise: show `notification.payload.body || "You received a new message"`
 
-- [ ] **`apps/web/src/components/TopNav.tsx`**  
+- [x] **`apps/web/src/components/TopNav.tsx`**  
   Remove from `NAV_LINKS`: `{ href: "/reviews", ... }` and `{ href: "/wellbeing", ... }`  
   Add "Profile" link in user dropdown menu (before "Billing"): `<Link href="/profile">Profile</Link>`
 
-- [ ] **`apps/web/src/components/my-reviews.tsx`**  
+- [x] **`apps/web/src/components/my-reviews.tsx`**  
   Extract `ReviewForm` component (the form only, currently embedded)  
   Extract `ReviewList` component (the list only)  
   Keep `MyReviews` default export combining both (backward compatible for `/reviews` page if it exists)  
   Export `ReviewForm` and `ReviewList` as named exports
 
-- [ ] **`apps/web/src/components/landing-page.tsx`**  
+- [x] **`apps/web/src/components/landing-page.tsx`**  
   Add 2 new state vars: `trainingReadinessOpen`, `reviewPanelOpen`  
   Add 2 buttons (non-admin only — check `currentUser.role !== "admin"`):  
     - "Training Readiness" → sets `trainingReadinessOpen(true)` → renders `<WellbeingFormPanel />`  
     - "Leave a Review" → sets `reviewPanelOpen(true)` → renders `<ReviewFormPanel />`  
   Import `WellbeingFormPanel`, `ReviewFormPanel`
 
-- [ ] **`apps/web/src/components/admin-settings.tsx`**  
+- [x] **`apps/web/src/components/admin-settings.tsx`**  
   Fix 3 ESLint `react-hooks/set-state-in-effect` errors:  
   Wrap setState calls inside useEffect in `queueMicrotask(() => { setState(...); setInitialized(true); })`  
   Affected locations: ~line 270 (`setForm` + `setInitialized`), ~line 405 (`setLevels` + `setInitialized`)
@@ -333,13 +333,21 @@ Controllers use `OpenApiSpex.ControllerSpecs` with `operation/2`. Export with `m
 
 ## 6. Validation Checklist (after implementation)
 
-- [ ] `cd apps/api && mix format`
-- [ ] `cd apps/api && mix credo --strict`
-- [ ] `cd apps/api && mix test`
-- [ ] `cd apps/web && npm run generate:api` (regenerate schema.ts from updated Elixir specs)
-- [ ] `cd apps/web && npx tsc --noEmit` (TypeScript typecheck)
-- [ ] `cd apps/web && npx next lint` (ESLint — expect 0 errors including admin-settings.tsx)
-- [ ] Manual test: create MinIO bucket `milos-avatars` as public-read before testing avatar upload
+- [x] `cd apps/api && mix format`
+- [x] `cd apps/api && mix credo --strict`
+- [x] `cd apps/api && mix test` — run locally as `DB_PORT=5434 mix test` because Docker Compose publishes Postgres on host port `5434`.
+- [x] `cd apps/web && npm run generate:api` (regenerate schema.ts from updated Elixir specs)
+- [x] `cd apps/web && npx tsc --noEmit` (TypeScript typecheck)
+- [x] `cd apps/web && npm run lint` (ESLint — replaces `npx next lint`; this Next.js install no longer supports `next lint`)
+- [ ] Manual test: create MinIO bucket `milos-avatars` as public-read before testing avatar upload — not run in this validation pass.
+
+### Validation Notes — 2026-07-15
+
+- Added project-local `.tool-versions` with `elixir 1.18.4-otp-27`, matching `apps/api/mix.exs` and CI. This resolves the previous fallback to the home default `1.17.2`.
+- Added Credo as a dev/test dependency plus a baseline `.credo.exs`; `mix credo --strict` now runs and reports no issues.
+- `npm run generate:api`, `npx tsc --noEmit`, and `npm run lint` all complete successfully.
+- Full backend suite passes with local Compose Postgres on port `5434`: `339 tests, 0 failures`.
+- Fixed validation failures uncovered by the suite: stale date fixtures, same-day perseverance scoring, and missing default handling for execution `exercise_modifications`.
 
 ---
 

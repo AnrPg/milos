@@ -21,7 +21,7 @@ Restructure the admin information architecture around these primary top navigati
 5. Personal Coaching
 6. Workouts
 7. Analytics & Marketing
-8. Messages
+8. Chat
 
 `App configurations` replaces the visible Settings concept but is not a primary top navigation item. It is presented subtly inside Dashboard, preferably as a settings icon that reveals the full label on hover or focus.
 
@@ -43,7 +43,7 @@ The Marketing subsection of `Analytics & Marketing` links to the existing operat
 - Referrals -> `/admin/finance?tab=referrals`
 - Packages -> `/admin/finance?tab=packages`
 
-On small screens, the Dashboard button remains the main admin navigation hub with its current dropdown behavior. The preferred visible mobile destinations are Dashboard, Classes, Personal Coaching, and Messages; other destinations remain reachable from Dashboard's compact navigation.
+On small screens, the Dashboard button remains the main admin navigation hub with its current dropdown behavior. The preferred visible mobile destinations are Dashboard, Classes, Personal Coaching, and Chat; other destinations remain reachable from Dashboard's compact navigation.
 
 ## Rationale
 
@@ -56,9 +56,9 @@ This IA separates the admin workspace by job:
 - Personal Coaching is individualized programming operations.
 - Workouts is reusable workout content management.
 - Analytics & Marketing is reporting, engagement, challenges, and marketing surfaces.
-- Messages is communication.
+- Chat is communication.
 
-The split prevents Finance from mixing daily operator tasks with broad analytical reporting. It also prevents Users from becoming a replacement for every domain workspace: Users shows a person-centered view and deep links into domain actions where appropriate, while Finance, Classes, Personal Coaching, Workouts, Analytics & Marketing, and Messages remain the operational homes for their respective domains.
+The split prevents Finance from mixing daily operator tasks with broad analytical reporting. It also prevents Users from becoming a replacement for every domain workspace: Users shows a person-centered view and deep links into domain actions where appropriate, while Finance, Classes, Personal Coaching, Workouts, Analytics & Marketing, and Chat remain the operational homes for their respective domains.
 
 Keeping Classes and Personal Coaching structurally unchanged reduces implementation risk and preserves established design patterns. Moving Challenges under Analytics & Marketing matches the decision to treat challenges as engagement and marketing mechanics rather than a core content or scheduling entity.
 
@@ -68,7 +68,7 @@ Using query parameters for Promotions, Referrals, and Packages deep links keeps 
 
 Keeping the existing Finance dashboard structure was rejected because analytical metrics such as active memberships and revenue trends obscure the operational finance workflow. Those metrics belong in Analytics & Marketing.
 
-Making Challenges a top-level navigation item was rejected because challenges are important but not a primary entity on the same level as Users, Finance, Classes, Personal Coaching, Workouts, Analytics & Marketing, or Messages.
+Making Challenges a top-level navigation item was rejected because challenges are important but not a primary entity on the same level as Users, Finance, Classes, Personal Coaching, Workouts, Analytics & Marketing, or Chat.
 
 Putting Challenges under Workouts was rejected because the final product direction treats challenges as marketing, engagement, and gamification, not simply workout content.
 
@@ -97,8 +97,8 @@ Generated TypeScript API files must be regenerated from OpenAPI and never manual
 Phase 1 (navigation shell and IA relabelling) started on 2026-07-15.
 
 - Replaced the admin top-level labels with Dashboard, Users, Finance, Classes,
-  Personal Coaching, Workouts, Analytics & Marketing, and Messages. Dashboard,
-  Classes, Personal Coaching, and Messages remain visible at narrow widths;
+  Personal Coaching, Workouts, Analytics & Marketing, and Chat. Dashboard,
+  Classes, Personal Coaching, and Chat remain visible at narrow widths;
   the other destinations remain available through the Dashboard navigation hub.
 - Reworked the Dashboard dropdown and page navigation hub around operations,
   content, and Analytics & Marketing. Challenges is nested under Analytics &
@@ -188,7 +188,7 @@ Phase 3 (Users directory and profile dossier) completed on 2026-07-15.
   reused from the established coaching drill-down instead of implementing a
   second assignment interpretation.
 - Messaging returns thread references, participant IDs, counts, and the latest
-  message summary. The dossier links to the existing Messages workspace for
+  message summary. The dossier links to the existing Chat workspace for
   full conversation operations rather than duplicating thread management.
 - The frontend loads each focused section independently with TanStack Query, so
   the profile shell can render immediately and unavailable role sections do not
@@ -197,7 +197,7 @@ Phase 3 (Users directory and profile dossier) completed on 2026-07-15.
   explicit empty states.
 - Role changes continue through the existing `UpdateUserRole` application
   service and contract. Operational actions deep-link to their owning Finance,
-  Classes, Personal Coaching, Workouts, Analytics, and Messages surfaces.
+  Classes, Personal Coaching, Workouts, Analytics, and Chat surfaces.
 - Regenerated OpenAPI JSON and TypeScript schemas after defining the focused
   contracts. Domain, application, controller, authorization, not-found, and
   OpenAPI tests cover the dossier boundary.

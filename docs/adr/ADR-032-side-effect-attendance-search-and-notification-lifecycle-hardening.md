@@ -126,3 +126,13 @@ available.
 
 The admin analytics page now renders KPI cards, bounded breakdown lists, and
 operational status fields instead of raw JSON/debug blocks.
+
+## Durable Effects and Health Amendment — 2026-07-15
+
+All important post-commit effects use a transactional outbox and idempotent Oban
+dispatcher. Domain/context commands record facts and effect intents atomically;
+notification, analytics, cache invalidation, search indexing, entitlement
+release, and realtime publication retry independently with observable terminal
+failure state. Readiness reports PostgreSQL, Redis, Oban, Meilisearch, and MinIO
+separately; liveness reports only process health and cannot claim dependency
+health while degraded.

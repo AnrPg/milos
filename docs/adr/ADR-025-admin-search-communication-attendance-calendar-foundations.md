@@ -59,3 +59,13 @@ Calendar feeds need stable URLs that work in Google Calendar, Apple Calendar, Ou
 - Regenerated OpenAPI JSON and generated TypeScript schema after adding calendar endpoints.
 - Focused backend tests passed for admin search, analytics communication/attendance, calendar feed, and finance controller search path. Frontend TypeScript and lint passed, with one pre-existing lint warning in `admin-finance.tsx`.
 - Follow-up: Meilisearch indexing should move from query-time rebuild to event/job-driven incremental updates once source-fact events are stable at every Identity/Finance/Wellbeing/Feedback/Communication write boundary.
+
+## Communication Integrity Amendment — 2026-07-15
+
+Contextual messaging membership is authorized by Workouts/Scheduling public
+APIs in a cross-context application service. Thread/participant creation is
+transactional, direct participant pairs have a canonical unique database key,
+read pointers are same-thread and monotonic, and pagination is bounded and
+cursor-consistent. Messaging emits durable side-effect intents to the outbox;
+notification, analytics, cache, search, and realtime adapters no longer run
+inside the bounded-context command.

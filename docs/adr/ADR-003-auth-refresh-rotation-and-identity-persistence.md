@@ -58,3 +58,17 @@ remains self-contained.
 Phase 1 now includes a protected `GET /api/auth/me` endpoint to verify JWT
 enforcement and an admin-only `PATCH /api/admin/users/:id/role` endpoint to
 complete the role-management deliverable from the implementation plan.
+
+## Security Amendment — 2026-07-15
+
+Browser refresh credentials are no longer application-readable persistence.
+They are rotating `HttpOnly`, `SameSite=Strict` cookies, `Secure` outside local
+development, and scoped to the authentication path. Access tokens are held in
+memory and restored after reload through a refresh-cookie bootstrap request.
+
+Every access and refresh token carries the persisted Identity security version.
+Password changes and sign-out-all-devices increment that version atomically;
+authenticated pipelines compare the claim with the loaded account so revocation
+applies to existing access tokens as well as refresh tokens. Redis JTI revocation
+remains the one-token logout mechanism and security-version revocation is the
+session-family mechanism.

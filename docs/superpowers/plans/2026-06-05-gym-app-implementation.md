@@ -10,6 +10,18 @@
 
 **Design Doc:** `docs/superpowers/specs/2026-06-05-gym-app-design.md` — READ THIS FIRST BEFORE EVERY PHASE.
 
+## Maintenance Status (2026-07-15)
+
+This file is the historical phase plan, not the current delivery tracker. Phases 0–9
+have shipped and their unchecked boxes preserve the original TDD recipe; they do not
+mean the feature is absent. Post-plan evolution is governed by ADR-015 onward, the
+design document's expanded bounded-context catalogue, and `docs/technical_debt.md`.
+
+Current hardening adds transactional Oban handoffs, refresh-cookie session families,
+versioned/offline execution reconciliation, adapter ports, an architecture gate, and
+full CI delivery gates. Where an old phase instruction conflicts with an accepted ADR,
+the accepted ADR is authoritative and this plan must be amended in the same change.
+
 ---
 
 ## Commit Philosophy (apply throughout ALL phases)

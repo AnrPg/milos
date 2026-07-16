@@ -103,3 +103,11 @@ subscriptions do not change their semantics.
 - Added per-editor `editor_session_id` metadata to draft autosaves so the workout
   editor can sync across tabs without causing self-triggered autosave/refetch
   loops in the originating tab.
+
+## Dependency-Direction Amendment — 2026-07-15
+
+Application services publish realtime intents through an application-owned
+port. The Phoenix Endpoint adapter lives in Interface/Infrastructure and is
+configured at runtime. Application and bounded-context code must not compile
+against `MilosTrainingWeb.*`; architecture checks enforce this dependency
+direction in CI.

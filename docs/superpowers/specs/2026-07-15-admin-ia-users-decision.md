@@ -4,7 +4,7 @@ Status: Approved for implementation
 
 ## Purpose
 
-This decision captures the final product and information architecture decisions for the admin workspace restructuring, the new Users section, and the placement of Finance, Analytics and Marketing, Challenges, Classes, Personal Coaching, Workouts, Messages, and App configurations.
+This decision captures the final product and information architecture decisions for the admin workspace restructuring, the new Users section, and the placement of Finance, Analytics and Marketing, Challenges, Classes, Personal Coaching, Workouts, Chat, and App configurations.
 
 This is a detailed product decision record, not a terse summary. It is meant to be the reference for implementation, QA, and future discussion. It keeps only the final decisions from the discussion. Earlier alternatives that were superseded are intentionally omitted.
 
@@ -44,7 +44,7 @@ The admin top navigation will expose these primary destinations:
 5. Personal Coaching
 6. Workouts
 7. Analytics & Marketing
-8. Messages
+8. Chat
 
 `App configurations` is not a primary top navigation item. It should be a subtle utility inside Dashboard, ideally represented by a small settings icon that reveals the full label on hover or focus.
 
@@ -61,7 +61,7 @@ Each primary destination has a distinct responsibility:
 | Personal Coaching | Existing athlete programming/coaching operations, renamed only |
 | Workouts | Workout content library, creation, editing, and publishing |
 | Analytics & Marketing | Aggregate reporting, marketing/gamification, challenges |
-| Messages | Communication center |
+| Chat | Communication center |
 
 Navigation labels should use these names consistently in desktop nav, mobile nav, dashboard shortcuts, and page headers where the page is owned by the destination.
 
@@ -74,7 +74,7 @@ Preferred visible mobile destinations:
 1. Dashboard
 2. Classes
 3. Personal Coaching
-4. Messages
+4. Chat
 
 All other admin destinations should remain reachable through the Dashboard dropdown or equivalent compact navigation affordance.
 
@@ -252,7 +252,7 @@ Recommended profile sections:
 6. Health / incidents
 7. Coaching context
 8. Class participation
-9. Messages
+9. Chat
 10. Admin actions
 
 #### Overview
@@ -350,16 +350,16 @@ For members, class participation should emphasize:
 
 For athletes and admins, show data only if applicable.
 
-#### Messages
+#### Chat
 
-Messages should show communication context and thread references:
+Chat should show communication context and thread references:
 
 - direct messages
 - class-related threads
 - assignment/workout threads
 - unread or pending communication state
 
-The Messages workspace remains the full communication center.
+The Chat workspace remains the full communication center.
 
 #### Admin Actions
 
@@ -638,7 +638,7 @@ Expected route semantics:
 | Personal Coaching | Existing coaching/assigned-workouts admin page is relabelled |
 | Workouts | Existing admin workouts route remains primary |
 | Analytics & Marketing | Analytics route expands or is relabelled |
-| Messages | Existing/admin messages route remains communication center |
+| Chat | Existing/admin chat route remains communication center |
 | App configurations | Existing settings functionality is relabelled and subtly placed |
 
 Redirects or aliases should be used when route names change but old routes are likely to exist in code, tests, or user bookmarks.

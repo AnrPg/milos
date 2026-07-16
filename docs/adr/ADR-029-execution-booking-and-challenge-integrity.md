@@ -78,7 +78,7 @@ Completion processing becomes eventually consistent but durable, with Oban
 retrying failures. Tests that intentionally disable Oban use synchronous
 processing to preserve deterministic behavior.
 
-ADR-011's decision to hard-delete workout executions is superseded by this ADR.
+ADR-046's decision to hard-delete workout executions is superseded by this ADR.
 Scheduling slots and assignments remain deleted with the workout, while
 execution history remains.
 
@@ -103,3 +103,11 @@ insert directly as approved. No timeout job or pending state is created.
 Seasonal challenge creation validates and inserts within a serializable
 transaction and retries serialization conflicts. Existing schedule-policy
 tests continue to cover the maximum-three overlap rule.
+
+## Failure-Atomicity Amendment — 2026-07-15
+
+Booking resolution and withdrawal persist their Scheduling state transition and
+a Finance-release outbox event in one database transaction. Finance processing
+is idempotent and retryable; a temporary downstream failure cannot permanently
+consume a visit after Scheduling has released it. Execution progress adopts the
+versioned aggregate and semantic validation protocol described by ADR-009.

@@ -122,3 +122,20 @@ completed workouts until the view is refreshed.
 - Streak windows and monthly shield replenishment are now anchored to the
   athlete's signup date so weekly and monthly progression is evaluated
   relative to each user's lifecycle instead of fixed calendar Mondays.
+- Landing-page density refinements on 2026-07-15 remain entirely within the
+  existing read model: member and athlete challenge panels render only when
+  `active_challenges` contains a current challenge, while leaderboard opt-in
+  state controls whether the full ranking card or a compact hover/focus entry
+  point is shown. No persistence, cache, or API contract changes were needed.
+- Workout-history type filters are derived from the completed executions in
+  the landing payload and appear only when at least two distinct workout types
+  are available. Pantheon cards reuse the existing PR history query and PR
+  update modal on both the landing page and the full Pantheon route.
+
+## Read-Model Efficiency Amendment — 2026-07-15
+
+The landing application service consumes context-owned batch query APIs and a
+dedicated projection port; it does not import Ecto, Repo, or schemas. Direct
+thread message summaries are fetched in one bounded query rather than one query
+per thread. Quote selection uses a precomputed/random-key strategy rather than
+`ORDER BY RANDOM()` so growth does not introduce a full-table sort.

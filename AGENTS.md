@@ -54,11 +54,12 @@ Infrastructure →  Ecto Repos, MeilisearchClient, PushDispatcher, RedisCache
 
 ### Rule 2 — Phoenix Contexts as Bounded Contexts
 
-Contexts: `Identity` · `Scheduling` · `Workouts` · `Execution` · `Gamification` · `Coaching` · `Notifications`
+Contexts: `Identity` · `Scheduling` · `Workouts` · `Execution` · `Gamification` · `Coaching` · `Notifications` · `Finance` · `Analytics` · `Feedback` · `Wellbeing` · `Messaging` · `Pantheon`
 
 - No context may call another context's internal modules or schemas.
 - Cross-context communication: Phoenix PubSub events OR context public API functions only.
 - An Application Service orchestrates cross-context operations (never a controller).
+- `mix milos.architecture` is the mandatory compile-dependency boundary gate.
 
 ### Rule 3 — Light CQRS Within Each Context
 
@@ -325,3 +326,33 @@ If you encounter any of the following, **STOP and ask the human** before proceed
 - A database migration change would be destructive (drop column, rename, change type)
 - A feature requires a new external dependency not already in the plan
 - You are about to push to a remote repository
+
+
+## vexp <!-- vexp v2.0.31 -->
+
+**MANDATORY: use `run_pipeline` - do NOT grep or glob the codebase.**
+vexp returns pre-indexed, graph-ranked context in a single call.
+
+### Workflow
+1. `run_pipeline` with your task description - ALWAYS FIRST (replaces all other tools)
+2. Make targeted changes based on the context returned
+3. `run_pipeline` again only if you need more context
+
+### Available MCP tools
+- `run_pipeline` - **PRIMARY TOOL**. Runs capsule + impact + memory in 1 call.
+  Auto-detects intent. Includes file content. Example: `run_pipeline({ "task": "fix auth bug" })`
+- `get_skeleton` - compact file structure
+- `index_status` - indexing status
+- `expand_vexp_ref` - expand V-REF placeholders in v2 output
+
+### Agentic search
+- Do NOT use built-in file search, grep, or codebase indexing - always call `run_pipeline` first
+- If you spawn sub-agents or background tasks, pass them the context from `run_pipeline`
+  rather than letting them search the codebase independently
+
+### Smart Features
+Intent auto-detection, hybrid ranking, session memory, auto-expanding budget.
+
+### Multi-Repo
+`run_pipeline` auto-queries all indexed repos. Use `repos: ["alias"]` to scope. Run `index_status` to see aliases.
+<!-- /vexp -->

@@ -360,7 +360,7 @@ After the existing `<CollapsibleSection>` blocks, add:
 cd apps/web && npx next dev
 ```
 
-Navigate to `/profile`, expand "Training Schedule", select up to 3 days, click Save, verify success message appears.
+Navigate to `/profile`, expand "Training Schedule", select up to 5 days, click Save, verify success message appears.
 
 - [ ] **Step 4: Commit**
 

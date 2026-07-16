@@ -97,3 +97,17 @@ landing page rather than the raw auth console.
 Development bootstrap now ensures an admin account exists through the seed
 script so the implemented admin workout-management routes are directly
 reachable in the browser without manual database intervention.
+
+## Production Security Amendment — 2026-07-15
+
+The earlier local token-persistence choice is superseded by ADR-003's cookie
+refresh and in-memory access-token protocol. Production web responses use a
+per-request nonce Content Security Policy, authenticated caches are private,
+versioned and TTL-bounded, and authorization failures evict matching cached
+responses. MinIO has explicit internal and public endpoints, matching runtime
+credentials, health-gated startup, and a separately routed public media origin.
+
+Container publication is part of the verified delivery graph: immutable commit
+tags may be pushed only after backend tests/static checks, frontend checks,
+generated-contract diffing, migration rollback verification, and image builds
+for the same commit succeed.

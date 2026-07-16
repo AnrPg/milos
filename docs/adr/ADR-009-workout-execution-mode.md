@@ -153,6 +153,21 @@ Phoenix Channels could broadcast timer state for group classes. Deferred — the
 - Score capture now accepts free-form score text where needed and no longer allows silently skipping a scoreable transition.
 - The post-workout completion screen now exits to the landing page via a stable route instead of browser-history back navigation.
 - Scoreable early-complete transitions now lock the timer before opening score capture, and interval-based timer segments clamp their final round to the authored remaining duration.
+
+## Concurrency and Offline Amendment — 2026-07-15
+
+`workout_executions` is a versioned aggregate. Progress commands require an
+expected lock version, semantic validation against the materialized timer
+sequence, and a stable idempotency operation ID. Conflicts return 409 instead of
+overwriting a newer snapshot. Only check-offs may be optimistic; navigation,
+pause, resume, score transitions, and completion are committed to client state
+after server acknowledgement.
+
+Offline execution uses an ordered IndexedDB mutation log. Reconnection fetches
+the authoritative execution, discards already-applied operation IDs, and rebases
+remaining check-off intent onto the newest version. The service worker never
+serves an authenticated cached response after an origin 401/403 and applies a
+bounded TTL to offline reads.
 - Execution progress is now persisted as a server-backed state model, not just checked IDs: `status`, `current_segment_index`, `segment_started_at_utc`, `paused_elapsed_ms`, and `resume_countdown_ends_at_utc` are stored in `workout_executions`, rebroadcast over channels, and used for reload recovery and multi-tab synchronization.
 - Members now share the same authenticated execution and timer-sequence API surface as athletes/admins, matching the documented Phase 4 audience for `/workouts`.
 - Execution starts now require a concrete `master_workout_id`, invalid timer-sequence scale requests return an explicit validation error, and completed executions reject further progress/note mutation to preserve the audit trail.

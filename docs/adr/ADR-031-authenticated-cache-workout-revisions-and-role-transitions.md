@@ -131,3 +131,12 @@ Implemented without destructive schema changes:
 
 No follow-up debt was deferred from these findings. The broader handwritten
 Phase 8 frontend client migration remains tracked separately as TD-021.
+
+## Authenticated Cache Amendment — 2026-07-15
+
+Authenticated browser cache entries include user identity, security version,
+contract version, creation time, and expiry. The service worker treats origin
+401/403 as authoritative, deletes the affected entry, and never falls back to a
+stale authorized payload. Logout, role transition, password change, and
+sign-out-all broadcast cache-eviction instructions across tabs and service
+workers.

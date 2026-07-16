@@ -1,5 +1,29 @@
 # Technical Debt Ledger
 
+## Status Registry
+
+The registry is authoritative for lifecycle state; the detailed ledger below retains
+the original wording and dates for traceability.
+
+| ID | Status |
+|---|---|
+| TD-001–TD-005 | Open |
+| TD-006 | Resolved |
+| TD-007–TD-008 | Open |
+| TD-009 | Resolved |
+| TD-010 | Open |
+| TD-011 | In progress |
+| TD-012–TD-013 | Open |
+| TD-014–TD-015 | In progress |
+| TD-016–TD-018 | Resolved |
+| TD-019 | Open |
+| TD-020 | Resolved |
+| TD-021–TD-023 | Open |
+| TD-024–TD-030 | Resolved |
+| TD-031 | Open |
+
+## Detailed Ledger
+
 | ID | Phase | Description | Reason deferred | Priority | Added |
 |---|---|---|---|---|---|
 | TD-001 | Phase 0 | Stripe payment gateway integration | Manual-only in v1 per spec | Medium | 2026-06-05 |
@@ -9,7 +33,7 @@
 | TD-005 | Phase 3 | Admin cannot delete a slot that already has bookings; backend blocks deletion instead of offering a confirm-and-cancel/archive flow | Phase 3 chose safe non-destructive behavior first to avoid silently dropping booking history or member state | Medium | 2026-06-08 |
 | TD-006 | Phase 7 | Landing-page membership card has no live data source yet and remains hidden unless membership fields are added in a later phase | Membership persistence and admin financial tooling have not been implemented yet, so Phase 7 could only ship the optional UI slot and read-model placeholder | Medium | 2026-06-09 |
 | TD-007 | Phase 7 | `custom` seasonal challenges currently use a generic per-completion increment instead of a richer admin-defined progression model | Phase 7 prioritized the automatic challenge pipeline for workout-count, workout-type, and PR-based criteria first so the end-to-end gamification loop could ship without inventing a premature manual progression subsystem | Medium | 2026-06-09 |
-| TD-006 | Phase 6 | Phase 7 gamification read/write modules are partially present in the repo before their schema rollout is complete, so workout-completion side effects currently degrade with a warning instead of executing full gamification updates | Phase 6 hardened the event handler to avoid crashing notification-adjacent flows, but the full gamification tables/materialized views still need to land as one coherent phase | High | 2026-06-09 |
+| TD-030 | Phase 6 | Phase 7 gamification read/write modules are partially present in the repo before their schema rollout is complete, so workout-completion side effects currently degrade with a warning instead of executing full gamification updates | Phase 6 hardened the event handler to avoid crashing notification-adjacent flows, but the full gamification tables/materialized views still need to land as one coherent phase | High | 2026-06-09 |
 | TD-008 | Phase 4 | HRR sections still cannot auto-measure true heart-rate-drop scores without external sensor input, so the execution fallback score uses elapsed time unless the athlete overrides it manually | Phase 4 now persists semantic progress and fallback scores across formats, but the current product has no live heart-rate device integration to supply a trustworthy `hr_drop` metric automatically | Medium | 2026-06-10 |
 | TD-009 | Phase 8 | Resolved 2026-06-13 by ADR-025: signed per-user `.ics` feeds now expose webcal subscribe, HTTPS copy-link, and one-off download flows with per-platform help text | Kept in ledger for traceability of the calendar/iCal export gap | Low | 2026-06-10 |
 | TD-010 | Phase 8 | Finance remains manually operated: scheduled renewal generation, payment reminders, invoice PDFs, and external payment collection are not implemented | Invoice, renewal, allocation, and entitlement rules now exist; delivery automation and payment-provider integration remain additive work | Medium | 2026-06-11 |
@@ -32,3 +56,4 @@
 | TD-027 | Personal Coaching / Workout Assignment | Resolved 2026-07-15 by ADR-039: quick assignment embeds the existing draft/autosave/publish canvas and immediately selects the published library workout without navigation. | Kept for traceability of assignment context switching. | Low | 2026-07-15 |
 | TD-028 | Admin Dashboard | Resolved 2026-07-15 by ADR-038: operational heroes are compact and collapse after three seconds with a reveal control (homepage excepted); dashboard logout was removed and KPIs use a circular control-panel treatment. | Kept for traceability of persistent hero density. | Low | 2026-07-15 |
 | TD-029 | Notifications / Browser Push | Resolved 2026-07-15 by ADR-038: non-cacheable server capability is refreshed each session/panel open, missing setup has role-aware guidance, and users enable/disable subscriptions per browser/device. | Kept for traceability of stale and non-actionable push capability UI. | Low | 2026-07-15 |
+| TD-031 | Observability | Provision production dashboards and alert thresholds for the emitted OTLP traces, structured telemetry summaries, readiness failures, outbox age, auth anomalies, cache invalidation, upload rejections, and Oban failures | The application now emits the required signals and can export traces, but concrete dashboards/alert destinations depend on the owner's collector/monitoring stack | High | 2026-07-16 |

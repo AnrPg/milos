@@ -74,7 +74,19 @@ MilosTraining.Gamification   → user_stats, achievements, streaks, PRs,
 MilosTraining.Coaching       → admin_athlete_notes, analytics aggregates
 MilosTraining.Notifications  → push_subscriptions, notification records,
                         push dispatch
+MilosTraining.Finance        → packages, memberships, invoices, credits,
+                        entitlements, referrals
+MilosTraining.Analytics      → durable product events and operational projections
+MilosTraining.Feedback       → reviews, questionnaires, moderation lifecycle
+MilosTraining.Wellbeing      → injury reports, healing history, training limitations
+MilosTraining.Messaging      → direct/contextual threads, participants, messages
+MilosTraining.Pantheon       → personal records and score history
 ```
+
+These post-MVP contexts are authoritative, not auxiliary folders. They follow the
+same public-API-only cross-context rule as the original seven contexts. The
+`MilosTraining.Application.*` namespace is an orchestration layer and is not itself
+a bounded context.
 
 **Enforcement rules:**
 - `Scheduling` must NOT call `MilosTraining.Gamification.Repo` or any Gamification schema directly.
@@ -144,6 +156,11 @@ MilosTraining.Application.WriteAthleteNote
 - It does NOT contain business logic — that lives in Domain modules.
 - It does NOT contain DB queries — those live in Query modules.
 - Failure in a non-critical step (e.g., push notification) must NOT roll back the primary transaction.
+- Application and Domain compile dependencies are checked by `mix milos.architecture`;
+  the same gate rejects controller imports of context internals and infrastructure.
+- Durable cross-context effects use a transactional Oban handoff owned by the
+  context write adapter. Application services pass plain delivery data, never an
+  infrastructure job module or changeset.
 
 ---
 

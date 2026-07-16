@@ -1,6 +1,9 @@
-# ADR-011: Workout Hard Deletion Across Dependent Contexts
+# ADR-046: Workout Hard Deletion Across Dependent Contexts (Historical Renumbering)
 Date: 2026-06-09
 Status: Superseded in part by ADR-029
+
+> Renumbered from the duplicate ADR-011 identifier on 2026-07-15. The original
+> decision date and content are retained; only its unique catalogue identity changed.
 
 ## Context
 The product design for `/admin/workouts` explicitly includes deleting existing
