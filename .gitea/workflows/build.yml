@@ -6,7 +6,7 @@ on:
 jobs:
   verify:
     name: Verify source
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     services:
       postgres:
         image: postgres:16-alpine
@@ -50,7 +50,7 @@ jobs:
 
   version:
     name: Pick tag
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       tag: ${{ steps.v.outputs.tag }}
     steps:
@@ -60,7 +60,7 @@ jobs:
   build:
     name: Build ${{ matrix.image }}
     needs: [verify, version]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
