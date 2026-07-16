@@ -1,5 +1,6 @@
 const WORKOUT_CACHE_PREFIX = "milos-workout-runtime-v2-user-";
 const LEGACY_WORKOUT_CACHE = "milos-workout-runtime-v1";
+const AUTHENTICATED_CACHE_TTL_MS = 15 * 60 * 1000;
 let activeUserId = null;
 
 function workoutCacheName(userId) {
@@ -18,6 +19,23 @@ async function clearWorkoutCaches() {
       )
       .map((cacheName) => caches.delete(cacheName)),
   );
+}
+
+async function cacheableResponse(response) {
+  const headers = new Headers(response.headers);
+  headers.set("x-milos-cached-at", String(Date.now()));
+  const body = await response.clone().blob();
+
+  return new Response(body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
+function freshCachedResponse(response) {
+  const cachedAt = Number(response?.headers.get("x-milos-cached-at") ?? 0);
+  return cachedAt > 0 && Date.now() - cachedAt <= AUTHENTICATED_CACHE_TTL_MS;
 }
 
 function shouldCacheWorkoutRequest(request) {
@@ -39,8 +57,8 @@ function shouldCacheWorkoutRequest(request) {
   );
 }
 
-self.addEventListener("install", (event) => {
-  event.waitUntil(self.skipWaiting());
+self.addEventListener("install", () => {
+  // Keep an updated worker waiting until the user accepts the in-app update prompt.
 });
 
 self.addEventListener("activate", (event) => {
@@ -51,6 +69,16 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("message", (event) => {
   const message = event.data;
+
+  if (message?.type === "SKIP_WAITING") {
+    event.waitUntil(self.skipWaiting());
+    return;
+  }
+
+  if (message?.type === "CLEAR_WORKOUT_CACHE") {
+    event.waitUntil(clearWorkoutCaches());
+    return;
+  }
 
   if (!message || message.type !== "SET_WORKOUT_CACHE_USER") {
     return;
@@ -81,25 +109,22 @@ self.addEventListener("fetch", (event) => {
       const cache = await caches.open(workoutCacheName(requestUserId));
       const cached = await cache.match(event.request);
 
-      const networkPromise = fetch(event.request)
-        .then((response) => {
-          if (response.ok && activeUserId === requestUserId) {
-            void cache.put(event.request, response.clone());
-          }
+      try {
+        const response = await fetch(event.request);
 
+        if (response.status === 401 || response.status === 403) {
+          await cache.delete(event.request);
           return response;
-        })
-        .catch(() => null);
+        }
 
-      if (cached) {
-        void networkPromise;
-        return cached;
-      }
+        if (response.ok && activeUserId === requestUserId) {
+          await cache.put(event.request, await cacheableResponse(response));
+        }
 
-      const networkResponse = await networkPromise;
-
-      if (networkResponse) {
-        return networkResponse;
+        return response;
+      } catch {
+        if (cached && freshCachedResponse(cached)) return cached;
+        if (cached) await cache.delete(event.request);
       }
 
       return new Response(JSON.stringify({ error: "Offline" }), {

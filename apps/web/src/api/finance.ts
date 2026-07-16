@@ -30,6 +30,21 @@ export async function updateFinancePackage(token: string, packageId: string, bod
   });
 }
 
+export async function retireFinancePackage(
+  token: string,
+  packageId: string,
+  replacementPackageByRole: Record<string, string>,
+) {
+  return apiRequest<{ package: FinanceRecord; reassigned_count: number; affected_by_role: Record<string, number> }>(
+    `/admin/finance/packages/${packageId}/retire`,
+    {
+      method: "PATCH",
+      token,
+      body: { replacement_package_by_role: replacementPackageByRole },
+    },
+  );
+}
+
 export type EntitlementBackfillReport = {
   dry_run: boolean;
   ready: boolean;

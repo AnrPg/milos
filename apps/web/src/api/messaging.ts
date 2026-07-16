@@ -1,37 +1,22 @@
 import { apiRequest } from "@/api/client";
+import type { paths } from "@/api/generated/schema";
 
-export type MessageType = "chat" | "coaching_note" | "system";
+type ThreadsResponse =
+  paths["/api/threads"]["get"]["responses"]["200"]["content"]["application/json"];
+type MessagesResponse =
+  paths["/api/threads/{id}/messages"]["get"]["responses"]["200"]["content"]["application/json"];
+type MarkReadResponse =
+  paths["/api/threads/{id}/read"]["post"]["responses"]["200"]["content"]["application/json"];
 
-export interface ChatParticipant {
-  id: string;
-  user_id: string;
-  nickname?: string | null;
-  last_read_message_id: string | null;
-  joined_at?: string;
-}
-
-export interface ChatThread {
-  id: string;
-  context_type: "direct" | "assignment" | "class_slot";
-  context_id: string | null;
-  inserted_at: string;
-  participants: ChatParticipant[];
-}
-
-export interface ChatMessage {
-  id: string;
-  thread_id: string;
-  sender_id: string;
-  body: string;
-  message_type: MessageType;
-  inserted_at: string;
-}
-
-export type ThreadContextType = "direct" | "assignment" | "class_slot";
+export type ChatThread = ThreadsResponse["threads"][number];
+export type ChatParticipant = ChatThread["participants"][number];
+export type ChatMessage = MessagesResponse["messages"][number];
+export type MessageType = ChatMessage["message_type"];
+export type ThreadContextType = ChatThread["context_type"];
 
 export async function fetchThreads(token: string, contextType?: ThreadContextType) {
   const qs = contextType ? `?context_type=${contextType}` : "";
-  return apiRequest<{ threads: ChatThread[] }>(`/threads${qs}`, { token });
+  return apiRequest<ThreadsResponse>(`/threads${qs}`, { token });
 }
 
 export async function createDirectThread(token: string, participantId: string) {
@@ -57,7 +42,7 @@ export async function getOrCreateContextThread(
 export async function fetchThreadMessages(
   token: string,
   threadId: string,
-  params: { limit?: number; cursor_inserted_at?: string } = {},
+  params: { limit?: number; before_id?: string } = {},
 ) {
   const qs = new URLSearchParams(
     Object.entries(params)
@@ -85,10 +70,10 @@ export async function sendMessage(
 }
 
 export async function markThreadRead(token: string, threadId: string, lastMessageId: string) {
-  return apiRequest<{ read: boolean }>(`/threads/${threadId}/read`, {
+  return apiRequest<MarkReadResponse>(`/threads/${threadId}/read`, {
     method: "POST",
     token,
-    body: { last_message_id: lastMessageId },
+    body: { message_id: lastMessageId },
   });
 }
 

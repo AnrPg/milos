@@ -4,7 +4,7 @@ services:
       context: ./apps/api
       dockerfile: Dockerfile.dev
       args:
-        API_DEV_BASE_IMAGE: ${API_DEV_BASE_IMAGE:-milos-api:latest}
+        API_DEV_BASE_IMAGE: ${API_DEV_BASE_IMAGE:-elixir:1.18.4-otp-27-alpine}
     command: sh -lc "mix deps.get && mix ecto.create && mix ecto.migrate && mix run priv/repo/seeds.exs"
     volumes:
       - ./apps/api:/app
@@ -33,7 +33,7 @@ services:
       context: ./apps/api
       dockerfile: Dockerfile.dev
       args:
-        API_DEV_BASE_IMAGE: ${API_DEV_BASE_IMAGE:-milos-api:latest}
+        API_DEV_BASE_IMAGE: ${API_DEV_BASE_IMAGE:-elixir:1.18.4-otp-27-alpine}
     command: sh -lc "mix deps.get && exec mix phx.server"
     volumes:
       - ./apps/api:/app

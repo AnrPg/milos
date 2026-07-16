@@ -13,6 +13,12 @@ services:
       GUARDIAN_SECRET_KEY: ${GUARDIAN_SECRET_KEY:?set GUARDIAN_SECRET_KEY in your environment or .env}
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-dev-meili-master-key}
       MEILI_URL: http://meilisearch:7700
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-http://media.localhost:18080}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-milos_minio}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-milos-minio-change-me}
+      MINIO_BUCKET: ${MINIO_BUCKET:-milos-invoices}
+      MINIO_AVATAR_BUCKET: ${MINIO_AVATAR_BUCKET:-milos-avatars}
       PHX_HOST: ${PHX_HOST:-localhost}
       PHX_SERVER: "true"
       PORT: 4000
@@ -26,6 +32,8 @@ services:
       redis:
         condition: service_healthy
       meilisearch:
+        condition: service_healthy
+      minio:
         condition: service_healthy
     networks: [app]
     healthcheck:

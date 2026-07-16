@@ -559,6 +559,14 @@
                     "minimum": 0,
                     "type": "integer"
                   },
+                  "expected_version": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "operation_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
                   "paused_elapsed_ms": {
                     "minimum": 0,
                     "type": "integer"
@@ -574,6 +582,54 @@
                       "type": "integer"
                     },
                     "type": "object"
+                  },
+                  "section_scores": {
+                    "items": {
+                      "properties": {
+                        "kind": {
+                          "maxLength": 16,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "score_type": {
+                          "maxLength": 32,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "section_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "source": {
+                          "maxLength": 16,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "unit": {
+                          "maxLength": 32,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "value": {
+                          "oneOf": [
+                            {
+                              "maxLength": 100,
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "section_id",
+                        "value"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 100,
+                    "type": "array"
                   },
                   "segment_cycle_counts": {
                     "additionalProperties": {
@@ -600,6 +656,8 @@
                   }
                 },
                 "required": [
+                  "expected_version",
+                  "operation_id",
                   "checked_exercise_ids",
                   "current_segment_index",
                   "status",
@@ -642,6 +700,16 @@
               }
             },
             "description": "Error"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Stale execution version"
           }
         },
         "security": [
@@ -1087,6 +1155,22 @@
         ]
       }
     },
+    "/api/auth/logout": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AuthController.logout",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Signed out"
+          }
+        },
+        "summary": "Sign out the current browser session",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
     "/api/admin/finance/invoices/{id}/void": {
       "patch": {
         "callbacks": {},
@@ -1202,20 +1286,16 @@
                   "properties": {
                     "access_token": {
                       "type": "string"
-                    },
-                    "refresh_token": {
-                      "type": "string"
                     }
                   },
                   "required": [
-                    "access_token",
-                    "refresh_token"
+                    "access_token"
                   ],
                   "type": "object"
                 }
               }
             },
-            "description": "Auth tokens"
+            "description": "Access session"
           },
           "401": {
             "content": {
@@ -3428,20 +3508,16 @@
                   "properties": {
                     "access_token": {
                       "type": "string"
-                    },
-                    "refresh_token": {
-                      "type": "string"
                     }
                   },
                   "required": [
-                    "access_token",
-                    "refresh_token"
+                    "access_token"
                   ],
                   "type": "object"
                 }
               }
             },
-            "description": "Auth tokens"
+            "description": "Access session"
           },
           "422": {
             "content": {
@@ -3721,13 +3797,13 @@
             "application/json": {
               "schema": {
                 "properties": {
-                  "avatar_url": {
+                  "avatar_key": {
                     "nullable": true,
                     "type": "string"
                   }
                 },
                 "required": [
-                  "avatar_url"
+                  "avatar_key"
                 ],
                 "type": "object"
               }
@@ -3777,7 +3853,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Update current user avatar URL",
+        "summary": "Finalize or clear the current user's avatar",
         "tags": [
           "Me"
         ]
@@ -5109,6 +5185,23 @@
                     "nickname": {
                       "type": "string"
                     },
+                    "preferred_locale": {
+                      "enum": [
+                        "en",
+                        "el",
+                        "ar",
+                        "ru",
+                        "de",
+                        "es",
+                        "pt-PT",
+                        "he",
+                        "it",
+                        "bg",
+                        "nl",
+                        "fr"
+                      ],
+                      "type": "string"
+                    },
                     "role": {
                       "type": "string"
                     }
@@ -5116,7 +5209,8 @@
                   "required": [
                     "id",
                     "nickname",
-                    "role"
+                    "role",
+                    "preferred_locale"
                   ],
                   "type": "object"
                 }
@@ -5371,16 +5465,33 @@
                                   "type": "string"
                                 }
                               },
+                              "required": [
+                                "id",
+                                "user_id",
+                                "nickname",
+                                "last_read_message_id"
+                              ],
                               "type": "object"
                             },
                             "type": "array"
                           }
                         },
+                        "required": [
+                          "id",
+                          "context_type",
+                          "context_id",
+                          "created_by_id",
+                          "inserted_at",
+                          "participants"
+                        ],
                         "type": "object"
                       },
                       "type": "array"
                     }
                   },
+                  "required": [
+                    "threads"
+                  ],
                   "type": "object"
                 }
               }
@@ -5485,14 +5596,31 @@
                                 "type": "string"
                               }
                             },
+                            "required": [
+                              "id",
+                              "user_id",
+                              "nickname",
+                              "last_read_message_id"
+                            ],
                             "type": "object"
                           },
                           "type": "array"
                         }
                       },
+                      "required": [
+                        "id",
+                        "context_type",
+                        "context_id",
+                        "created_by_id",
+                        "inserted_at",
+                        "participants"
+                      ],
                       "type": "object"
                     }
                   },
+                  "required": [
+                    "thread"
+                  ],
                   "type": "object"
                 }
               }
@@ -5516,25 +5644,6 @@
         "callbacks": {},
         "operationId": "MilosTrainingWeb.AuthController.refresh",
         "parameters": [],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "refresh_token": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "refresh_token"
-                ],
-                "type": "object"
-              }
-            }
-          },
-          "description": "Refresh params",
-          "required": true
-        },
         "responses": {
           "200": {
             "content": {
@@ -5543,20 +5652,16 @@
                   "properties": {
                     "access_token": {
                       "type": "string"
-                    },
-                    "refresh_token": {
-                      "type": "string"
                     }
                   },
                   "required": [
-                    "access_token",
-                    "refresh_token"
+                    "access_token"
                   ],
                   "type": "object"
                 }
               }
             },
-            "description": "Auth tokens"
+            "description": "Access session"
           },
           "401": {
             "content": {
@@ -6222,6 +6327,19 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "properties": {
+                    "message_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "read": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "read",
+                    "message_id"
+                  ],
                   "type": "object"
                 }
               }
@@ -10200,10 +10318,6 @@
             "application/json": {
               "schema": {
                 "properties": {
-                  "avatar_url": {
-                    "nullable": true,
-                    "type": "string"
-                  },
                   "current_password": {
                     "type": "string"
                   },
@@ -10214,6 +10328,23 @@
                   },
                   "password": {
                     "minLength": 8,
+                    "type": "string"
+                  },
+                  "preferred_locale": {
+                    "enum": [
+                      "en",
+                      "el",
+                      "ar",
+                      "ru",
+                      "de",
+                      "es",
+                      "pt-PT",
+                      "he",
+                      "it",
+                      "bg",
+                      "nl",
+                      "fr"
+                    ],
                     "type": "string"
                   }
                 },
@@ -10240,6 +10371,9 @@
                           "type": "string"
                         },
                         "nickname": {
+                          "type": "string"
+                        },
+                        "preferred_locale": {
                           "type": "string"
                         },
                         "role": {
@@ -10271,7 +10405,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Update current user profile (nickname, password, avatar_url)",
+        "summary": "Update current user profile and language preference",
         "tags": [
           "Me"
         ]
@@ -11039,17 +11173,52 @@
         "callbacks": {},
         "operationId": "MilosTrainingWeb.MeController.avatar_upload_url",
         "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "byte_size": {
+                    "maximum": 5242880,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "content_type": {
+                    "enum": [
+                      "image/jpeg",
+                      "image/png",
+                      "image/webp"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "content_type",
+                  "byte_size"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
                   "properties": {
+                    "expires_in": {
+                      "type": "integer"
+                    },
                     "key": {
                       "type": "string"
                     },
-                    "public_url": {
-                      "type": "string"
+                    "max_bytes": {
+                      "type": "integer"
+                    },
+                    "required_headers": {
+                      "type": "object"
                     },
                     "upload_url": {
                       "type": "string"
@@ -11067,7 +11236,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Get a presigned URL for avatar upload",
+        "summary": "Create a constrained presigned avatar upload",
         "tags": [
           "Me"
         ]
@@ -11089,16 +11258,6 @@
               }
             },
             "description": "Effective entitlement"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Finance profile not found"
           }
         },
         "security": [
@@ -11109,6 +11268,75 @@
         "summary": "Get the current user's effective package benefits and allowance usage",
         "tags": [
           "Member Finance"
+        ]
+      }
+    },
+    "/api/admin/finance/packages/{id}/retire": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFinanceController.retire_package",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "replacement_package_by_role": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "athlete": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "member": {
+                        "format": "uuid",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "replacement_package_by_role"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Retired package reconciliation"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Retire a package and atomically reconcile its effective subscribers",
+        "tags": [
+          "Admin Finance"
         ]
       }
     },
@@ -11623,6 +11851,27 @@
         ]
       }
     },
+    "/api/auth/sign-out-all": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AuthController.sign_out_all",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "All sessions invalidated"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Invalidate every session for the authenticated user",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
     "/api/admin/bookings/{id}/approve": {
       "patch": {
         "callbacks": {},
@@ -11705,6 +11954,8 @@
             "required": false,
             "schema": {
               "default": 50,
+              "maximum": 100,
+              "minimum": 1,
               "type": "integer"
             }
           },
@@ -11755,16 +12006,27 @@
                             "type": "string"
                           }
                         },
+                        "required": [
+                          "id",
+                          "thread_id",
+                          "sender_id",
+                          "body",
+                          "message_type",
+                          "inserted_at"
+                        ],
                         "type": "object"
                       },
                       "type": "array"
                     }
                   },
+                  "required": [
+                    "messages"
+                  ],
                   "type": "object"
                 }
               }
             },
-            "description": "Messages"
+            "description": "Chat messages"
           },
           "403": {
             "content": {
@@ -11865,9 +12127,20 @@
                           "type": "string"
                         }
                       },
+                      "required": [
+                        "id",
+                        "thread_id",
+                        "sender_id",
+                        "body",
+                        "message_type",
+                        "inserted_at"
+                      ],
                       "type": "object"
                     }
                   },
+                  "required": [
+                    "message"
+                  ],
                   "type": "object"
                 }
               }
@@ -12002,14 +12275,29 @@
                           "example": "ok",
                           "type": "string"
                         },
+                        "jobs": {
+                          "example": "ok",
+                          "type": "string"
+                        },
+                        "object_storage": {
+                          "example": "ok",
+                          "type": "string"
+                        },
                         "redis": {
+                          "example": "ok",
+                          "type": "string"
+                        },
+                        "search": {
                           "example": "ok",
                           "type": "string"
                         }
                       },
                       "required": [
                         "database",
-                        "redis"
+                        "redis",
+                        "jobs",
+                        "search",
+                        "object_storage"
                       ],
                       "type": "object"
                     },
@@ -12044,14 +12332,29 @@
                           "example": "error",
                           "type": "string"
                         },
+                        "jobs": {
+                          "example": "error",
+                          "type": "string"
+                        },
+                        "object_storage": {
+                          "example": "error",
+                          "type": "string"
+                        },
                         "redis": {
+                          "example": "error",
+                          "type": "string"
+                        },
+                        "search": {
                           "example": "error",
                           "type": "string"
                         }
                       },
                       "required": [
                         "database",
-                        "redis"
+                        "redis",
+                        "jobs",
+                        "search",
+                        "object_storage"
                       ],
                       "type": "object"
                     },
@@ -12151,14 +12454,31 @@
                                 "type": "string"
                               }
                             },
+                            "required": [
+                              "id",
+                              "user_id",
+                              "nickname",
+                              "last_read_message_id"
+                            ],
                             "type": "object"
                           },
                           "type": "array"
                         }
                       },
+                      "required": [
+                        "id",
+                        "context_type",
+                        "context_id",
+                        "created_by_id",
+                        "inserted_at",
+                        "participants"
+                      ],
                       "type": "object"
                     }
                   },
+                  "required": [
+                    "thread"
+                  ],
                   "type": "object"
                 }
               }

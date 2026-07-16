@@ -50,7 +50,10 @@ export function joinChannelWithPush(
   token: string,
   topic: string,
   handlers: Record<string, (payload: unknown) => void>,
-): { push: (event: string, payload: Record<string, unknown>) => void; leave: () => void } {
+): {
+  push: <T>(event: string, payload: Record<string, unknown>) => Promise<T>;
+  leave: () => void;
+} {
   const socket = ensureSocket(token);
   const channel = socket.channel(topic, {});
 
@@ -63,13 +66,35 @@ export function joinChannelWithPush(
   channel.join();
 
   return {
-    push: (event: string, payload: Record<string, unknown>) => {
-      channel.push(event, payload);
-    },
+    push: <T>(event: string, payload: Record<string, unknown>) =>
+      new Promise<T>((resolve, reject) => {
+        channel
+          .push(event, payload)
+          .receive("ok", (response) => resolve(response as T))
+          .receive("error", (response) => reject(new ChannelPushError(event, response)))
+          .receive("timeout", () => reject(new ChannelPushError(event, { reason: "timeout" })));
+      }),
     leave: () => {
       channel.leave();
     },
   };
+}
+
+export class ChannelPushError extends Error {
+  readonly event: string;
+  readonly response: unknown;
+
+  constructor(event: string, response: unknown) {
+    const reason =
+      typeof response === "object" && response !== null && "reason" in response
+        ? String(response.reason)
+        : "realtime command failed";
+
+    super(reason);
+    this.name = "ChannelPushError";
+    this.event = event;
+    this.response = response;
+  }
 }
 
 export function subscribeToTopic(

@@ -13,6 +13,7 @@ export type ExecutionStatus = "idle" | "active" | "paused" | "completed";
 
 type ExecutionState = {
   executionId: string | null;
+  lockVersion: number;
   workoutId: string | null;
   scaleSlug: string | null;
   segments: TimerSegment[];
@@ -29,6 +30,7 @@ type ExecutionState = {
   exerciseNotes: ExerciseNote[];
   initExecution: (params: {
     executionId: string;
+    lockVersion?: number;
     workoutId: string | null;
     scaleSlug: string | null;
     segments: TimerSegment[];
@@ -67,6 +69,7 @@ type ExecutionState = {
 
 const initialState = {
   executionId: null,
+  lockVersion: 1,
   workoutId: null,
   scaleSlug: null,
   segments: [],
@@ -108,6 +111,7 @@ export const useExecutionStore = create<ExecutionState>()(
 
       initExecution: ({
         executionId,
+        lockVersion = 1,
         workoutId,
         scaleSlug,
         segments,
@@ -126,6 +130,7 @@ export const useExecutionStore = create<ExecutionState>()(
         set({
           ...initialState,
           executionId,
+          lockVersion,
           workoutId,
           scaleSlug,
           segments,
@@ -145,6 +150,7 @@ export const useExecutionStore = create<ExecutionState>()(
       hydrateFromExecution: (execution, segments) =>
         set((state) => ({
           executionId: execution.id,
+          lockVersion: execution.lock_version,
           workoutId: execution.master_workout_id,
           scaleSlug: execution.scale_level_slug,
           segments: segments ?? state.segments,
@@ -321,6 +327,8 @@ export const useExecutionStore = create<ExecutionState>()(
         }
 
         return {
+          expected_version: state.lockVersion,
+          operation_id: crypto.randomUUID(),
           checked_exercise_ids: state.checkedExerciseIds,
           current_segment_index: state.currentSegmentIndex,
           status: state.status === "paused" ? "paused" : "active",
@@ -332,6 +340,7 @@ export const useExecutionStore = create<ExecutionState>()(
           total_elapsed_ms: state.totalElapsedMs + currentElapsedMs,
           section_elapsed_ms: effectiveSectionElapsedMs,
           segment_cycle_counts: state.segmentCycleCounts,
+          section_scores: state.sectionScores,
           resume_countdown_ends_at_utc: state.resumeCountdownEndsAt
             ? new Date(state.resumeCountdownEndsAt).toISOString()
             : null,
@@ -345,6 +354,7 @@ export const useExecutionStore = create<ExecutionState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         executionId: state.executionId,
+        lockVersion: state.lockVersion,
         workoutId: state.workoutId,
         scaleSlug: state.scaleSlug,
         segments: state.segments,

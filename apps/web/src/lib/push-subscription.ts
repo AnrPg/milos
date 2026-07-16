@@ -25,6 +25,21 @@ export async function setWorkoutCacheUser(userId: string | null) {
   worker?.postMessage({ type: "SET_WORKOUT_CACHE_USER", userId });
 }
 
+export async function clearWorkoutCache() {
+  if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
+    return;
+  }
+
+  const registration = await registerAppServiceWorker();
+  const worker =
+    navigator.serviceWorker.controller ??
+    registration?.active ??
+    registration?.waiting ??
+    registration?.installing;
+
+  worker?.postMessage({ type: "CLEAR_WORKOUT_CACHE" });
+}
+
 export async function clearBrowserPushSubscription(accessToken?: string | null) {
   if (
     typeof window === "undefined" ||

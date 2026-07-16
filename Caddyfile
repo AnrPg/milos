@@ -3,15 +3,22 @@
 }
 
 {$SITE_ADDRESS:http://localhost} {
+	header {
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	}
+	@secure protocol https
+	header @secure Strict-Transport-Security "max-age=31536000; includeSubDomains"
 	reverse_proxy /api/* api:4000 {
 		header_up Host {host}
-		header_up X-Forwarded-Host {host}
-		header_up X-Forwarded-Proto {scheme}
 	}
 	reverse_proxy /socket/* api:4000 {
 		header_up Host {host}
-		header_up X-Forwarded-Host {host}
-		header_up X-Forwarded-Proto {scheme}
 	}
 	reverse_proxy web:3000
+}
+
+{$MEDIA_SITE_ADDRESS:http://media.localhost} {
+	reverse_proxy minio:9000
 }

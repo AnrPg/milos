@@ -1,4 +1,7 @@
+
+import {getUiTranslations} from "@/i18n/ui-server";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { QueryProvider } from "@/components/query-provider";
@@ -11,10 +14,18 @@ import { APP_THEMES, cssVariablesForTheme, DEFAULT_THEME_SLUG, THEME_STORAGE_KEY
 import { isAppLocale, localeDirection } from "@/i18n/locales";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "Milos Training",
-  description: "Gym scheduling, athlete programming, and workout execution.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const i18n = await getUiTranslations();
+  return {
+    title: i18n("milosTraining5b1a1c1"),
+    description: i18n("gymSchedulingAthleteProgrammingAndWorkoutExecution7f2b88a"),
+    manifest: "/manifest.webmanifest",
+    icons: {
+      icon: "/icon.svg",
+      apple: "/icon.svg",
+    },
+  };
+}
 
 const initialThemeVariablesBySlug = Object.fromEntries(
   Object.values(APP_THEMES).map((theme) => [theme.slug, cssVariablesForTheme(theme)]),
@@ -48,6 +59,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   const resolvedLocale = await getLocale();
   const locale = isAppLocale(resolvedLocale) ? resolvedLocale : "en";
   const messages = await getMessages();
@@ -60,7 +72,11 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
+        <script
+          nonce={nonce}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: themeBootstrapScript }}
+        />
       </head>
       <body className="min-h-full flex flex-col" style={{ background: "var(--bg)" }}>
         <NextIntlClientProvider locale={locale} messages={messages}>

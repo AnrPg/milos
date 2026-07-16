@@ -226,6 +226,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sign out the current browser session */
+        post: operations["MilosTrainingWeb.AuthController.logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/finance/invoices/{id}/void": {
         parameters: {
             query?: never;
@@ -686,7 +703,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Update current user avatar URL */
+        /** Finalize or clear the current user's avatar */
         patch: operations["MilosTrainingWeb.MeController.update_avatar"];
         trace?: never;
     };
@@ -1860,7 +1877,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Update current user profile (nickname, password, avatar_url) */
+        /** Update current user profile and language preference */
         patch: operations["MilosTrainingWeb.MeController.update_profile"];
         trace?: never;
     };
@@ -2010,7 +2027,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Get a presigned URL for avatar upload */
+        /** Create a constrained presigned avatar upload */
         post: operations["MilosTrainingWeb.MeController.avatar_upload_url"];
         delete?: never;
         options?: never;
@@ -2033,6 +2050,23 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/admin/finance/packages/{id}/retire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Retire a package and atomically reconcile its effective subscribers */
+        patch: operations["MilosTrainingWeb.AdminFinanceController.retire_package"];
         trace?: never;
     };
     "/api/admin/athletes/{id}/drill-down": {
@@ -2064,6 +2098,23 @@ export interface paths {
         put?: never;
         /** Create an empty workout draft */
         post: operations["MilosTrainingWeb.AdminWorkoutController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/sign-out-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Invalidate every session for the authenticated user */
+        post: operations["MilosTrainingWeb.AuthController.sign_out_all"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2437,12 +2488,24 @@ export interface operations {
                 "application/json": {
                     checked_exercise_ids: string[];
                     current_segment_index: number;
+                    expected_version: number;
+                    /** Format: uuid */
+                    operation_id: string;
                     paused_elapsed_ms: number;
                     /** Format: date-time */
                     resume_countdown_ends_at_utc?: string | null;
                     section_elapsed_ms?: {
                         [key: string]: number;
                     };
+                    section_scores?: {
+                        kind?: string | null;
+                        score_type?: string | null;
+                        /** Format: uuid */
+                        section_id: string;
+                        source?: string | null;
+                        unit?: string | null;
+                        value: string | number;
+                    }[];
                     segment_cycle_counts?: {
                         [key: string]: number;
                     };
@@ -2475,6 +2538,15 @@ export interface operations {
             };
             /** @description Error */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Stale execution version */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2697,6 +2769,24 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AuthController.logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signed out */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     "MilosTrainingWeb.AdminFinanceController.void_invoice": {
         parameters: {
             query?: never;
@@ -2766,7 +2856,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Auth tokens */
+            /** @description Access session */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -2774,7 +2864,6 @@ export interface operations {
                 content: {
                     "application/json": {
                         access_token: string;
-                        refresh_token: string;
                     };
                 };
             };
@@ -3758,7 +3847,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Auth tokens */
+            /** @description Access session */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -3766,7 +3855,6 @@ export interface operations {
                 content: {
                     "application/json": {
                         access_token: string;
-                        refresh_token: string;
                     };
                 };
             };
@@ -3927,7 +4015,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    avatar_url: string | null;
+                    avatar_key: string | null;
                 };
             };
         };
@@ -4721,25 +4809,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        threads?: {
+                        threads: {
                             /** Format: uuid */
-                            context_id?: string | null;
+                            context_id: string | null;
                             /** @enum {string} */
-                            context_type?: "direct" | "assignment" | "class_slot";
+                            context_type: "direct" | "assignment" | "class_slot";
                             /** Format: uuid */
-                            created_by_id?: string;
+                            created_by_id: string;
                             /** Format: uuid */
-                            id?: string;
+                            id: string;
                             /** Format: date-time */
-                            inserted_at?: string;
-                            participants?: {
+                            inserted_at: string;
+                            participants: {
                                 /** Format: uuid */
-                                id?: string;
+                                id: string;
                                 /** Format: uuid */
-                                last_read_message_id?: string | null;
-                                nickname?: string | null;
+                                last_read_message_id: string | null;
+                                nickname: string | null;
                                 /** Format: uuid */
-                                user_id?: string;
+                                user_id: string;
                             }[];
                         }[];
                     };
@@ -4777,25 +4865,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        thread?: {
+                        thread: {
                             /** Format: uuid */
-                            context_id?: string | null;
+                            context_id: string | null;
                             /** @enum {string} */
-                            context_type?: "direct" | "assignment" | "class_slot";
+                            context_type: "direct" | "assignment" | "class_slot";
                             /** Format: uuid */
-                            created_by_id?: string;
+                            created_by_id: string;
                             /** Format: uuid */
-                            id?: string;
+                            id: string;
                             /** Format: date-time */
-                            inserted_at?: string;
-                            participants?: {
+                            inserted_at: string;
+                            participants: {
                                 /** Format: uuid */
-                                id?: string;
+                                id: string;
                                 /** Format: uuid */
-                                last_read_message_id?: string | null;
-                                nickname?: string | null;
+                                last_read_message_id: string | null;
+                                nickname: string | null;
                                 /** Format: uuid */
-                                user_id?: string;
+                                user_id: string;
                             }[];
                         };
                     };
@@ -4810,16 +4898,9 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        /** @description Refresh params */
-        requestBody: {
-            content: {
-                "application/json": {
-                    refresh_token: string;
-                };
-            };
-        };
+        requestBody?: never;
         responses: {
-            /** @description Auth tokens */
+            /** @description Access session */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -4827,7 +4908,6 @@ export interface operations {
                 content: {
                     "application/json": {
                         access_token: string;
-                        refresh_token: string;
                     };
                 };
             };
@@ -5181,7 +5261,11 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        /** Format: uuid */
+                        message_id: string;
+                        read: boolean;
+                    };
                 };
             };
             /** @description Forbidden */
@@ -7192,7 +7276,6 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    avatar_url?: string | null;
                     current_password?: string;
                     nickname?: string;
                     password?: string;
@@ -7604,7 +7687,15 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    byte_size: number;
+                    /** @enum {string} */
+                    content_type: "image/jpeg" | "image/png" | "image/webp";
+                };
+            };
+        };
         responses: {
             /** @description Upload URL */
             200: {
@@ -7613,8 +7704,10 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        expires_in?: number;
                         key?: string;
-                        public_url?: string;
+                        max_bytes?: number;
+                        required_headers?: Record<string, never>;
                         upload_url?: string;
                     };
                 };
@@ -7641,13 +7734,39 @@ export interface operations {
                     };
                 };
             };
-            /** @description Finance profile not found */
-            404: {
+        };
+    };
+    "MilosTrainingWeb.AdminFinanceController.retire_package": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    replacement_package_by_role: {
+                        /** Format: uuid */
+                        athlete?: string;
+                        /** Format: uuid */
+                        member?: string;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Retired package reconciliation */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };
@@ -7855,6 +7974,24 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AuthController.sign_out_all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description All sessions invalidated */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     "MilosTrainingWeb.AdminScheduleController.approve_booking": {
         parameters: {
             query?: never;
@@ -7901,25 +8038,25 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Messages */
+            /** @description Chat messages */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        messages?: {
-                            body?: string;
+                        messages: {
+                            body: string;
                             /** Format: uuid */
-                            id?: string;
+                            id: string;
                             /** Format: date-time */
-                            inserted_at?: string;
+                            inserted_at: string;
                             /** @enum {string} */
-                            message_type?: "chat" | "coaching_note" | "system";
+                            message_type: "chat" | "coaching_note" | "system";
                             /** Format: uuid */
-                            sender_id?: string;
+                            sender_id: string;
                             /** Format: uuid */
-                            thread_id?: string;
+                            thread_id: string;
                         }[];
                     };
                 };
@@ -7964,18 +8101,18 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        message?: {
-                            body?: string;
+                        message: {
+                            body: string;
                             /** Format: uuid */
-                            id?: string;
+                            id: string;
                             /** Format: date-time */
-                            inserted_at?: string;
+                            inserted_at: string;
                             /** @enum {string} */
-                            message_type?: "chat" | "coaching_note" | "system";
+                            message_type: "chat" | "coaching_note" | "system";
                             /** Format: uuid */
-                            sender_id?: string;
+                            sender_id: string;
                             /** Format: uuid */
-                            thread_id?: string;
+                            thread_id: string;
                         };
                     };
                 };
@@ -8060,7 +8197,13 @@ export interface operations {
                             /** @example ok */
                             database: string;
                             /** @example ok */
+                            jobs: string;
+                            /** @example ok */
+                            object_storage: string;
+                            /** @example ok */
                             redis: string;
+                            /** @example ok */
+                            search: string;
                         };
                         /** @example ok */
                         status: string;
@@ -8080,7 +8223,13 @@ export interface operations {
                             /** @example error */
                             database: string;
                             /** @example error */
+                            jobs: string;
+                            /** @example error */
+                            object_storage: string;
+                            /** @example error */
                             redis: string;
+                            /** @example error */
+                            search: string;
                         };
                         /** @example error */
                         status: string;
@@ -8109,25 +8258,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        thread?: {
+                        thread: {
                             /** Format: uuid */
-                            context_id?: string | null;
+                            context_id: string | null;
                             /** @enum {string} */
-                            context_type?: "direct" | "assignment" | "class_slot";
+                            context_type: "direct" | "assignment" | "class_slot";
                             /** Format: uuid */
-                            created_by_id?: string;
+                            created_by_id: string;
                             /** Format: uuid */
-                            id?: string;
+                            id: string;
                             /** Format: date-time */
-                            inserted_at?: string;
-                            participants?: {
+                            inserted_at: string;
+                            participants: {
                                 /** Format: uuid */
-                                id?: string;
+                                id: string;
                                 /** Format: uuid */
-                                last_read_message_id?: string | null;
-                                nickname?: string | null;
+                                last_read_message_id: string | null;
+                                nickname: string | null;
                                 /** Format: uuid */
-                                user_id?: string;
+                                user_id: string;
                             }[];
                         };
                     };

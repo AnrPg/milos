@@ -1,12 +1,9 @@
-import { clearStoredSession, readStoredSession, writeStoredSession } from "@/lib/session-storage";
-
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
 export const SESSION_UPDATED_EVENT = "milos:session-updated";
 export const SESSION_EXPIRED_EVENT = "milos:session-expired";
 
 type SessionTokens = {
   access_token: string;
-  refresh_token: string;
 };
 
 type SessionSnapshot = {
@@ -43,6 +40,52 @@ type ApiRequestOptions = {
 };
 
 let refreshPromise: Promise<string | null> | null = null;
+let sessionUser: unknown | null = null;
+let latestSharedAccessToken: string | null = null;
+let sessionChannel: BroadcastChannel | null = null;
+
+function getSessionChannel() {
+  if (typeof window === "undefined" || !("BroadcastChannel" in window)) return null;
+  if (sessionChannel) return sessionChannel;
+
+  sessionChannel = new BroadcastChannel("milos-session-v1");
+  sessionChannel.addEventListener("message", (event: MessageEvent<{ access_token?: string; signed_out?: boolean }>) => {
+    if (event.data?.signed_out) {
+      latestSharedAccessToken = null;
+      broadcastSessionUpdate({ tokens: null, currentUser: null });
+      return;
+    }
+    const accessToken = event.data?.access_token;
+    if (!accessToken) return;
+    latestSharedAccessToken = accessToken;
+    broadcastSessionUpdate({ tokens: { access_token: accessToken }, currentUser: sessionUser });
+  });
+  return sessionChannel;
+}
+
+export function broadcastSessionSignOut() {
+  latestSharedAccessToken = null;
+  getSessionChannel()?.postMessage({ signed_out: true });
+}
+
+export function setApiSessionUser(user: unknown | null) {
+  sessionUser = user;
+}
+
+function tokenExpiresSoon(token: string, leewaySeconds = 30): boolean {
+  const [, payload] = token.split(".");
+  if (!payload || typeof window === "undefined") return false;
+
+  try {
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(normalized.length + ((4 - (normalized.length % 4)) % 4), "=");
+    const claims = JSON.parse(window.atob(padded)) as { exp?: unknown };
+
+    return typeof claims.exp === "number" && claims.exp <= Math.floor(Date.now() / 1000) + leewaySeconds;
+  } catch {
+    return false;
+  }
+}
 
 function broadcastSessionUpdate(snapshot: SessionSnapshot) {
   if (typeof window === "undefined") return;
@@ -67,55 +110,43 @@ function broadcastSessionExpired(detail: SessionExpiredDetail) {
 async function refreshAccessToken(): Promise<string | null> {
   if (refreshPromise) return refreshPromise;
 
-  refreshPromise = (async () => {
-    const stored = readStoredSession();
-
-    if (!stored?.tokens.refresh_token) {
-      clearStoredSession();
-      broadcastSessionExpired({ reason: "missing_refresh_token" });
-      broadcastSessionUpdate({ tokens: null, currentUser: null });
-      return null;
+  const performRefresh = async () => {
+    if (latestSharedAccessToken && !tokenExpiresSoon(latestSharedAccessToken, 60)) {
+      return latestSharedAccessToken;
     }
-
-    const attemptedRefreshToken = stored.tokens.refresh_token;
 
     const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refresh_token: attemptedRefreshToken }),
+      credentials: "same-origin",
     });
 
     if (!response.ok) {
-      const latest = readStoredSession();
-
-      if (latest?.tokens.refresh_token && latest.tokens.refresh_token !== attemptedRefreshToken) {
-        broadcastSessionUpdate({
-          tokens: latest.tokens,
-          currentUser: latest.currentUser,
-        });
-
-        return latest.tokens.access_token;
-      }
-
-      clearStoredSession();
       broadcastSessionExpired({ reason: "refresh_failed" });
       broadcastSessionUpdate({ tokens: null, currentUser: null });
       return null;
     }
 
     const refreshedTokens = (await response.json()) as SessionTokens;
-
-    writeStoredSession({
-      tokens: refreshedTokens,
-      currentUser: stored.currentUser,
-    });
+    latestSharedAccessToken = refreshedTokens.access_token;
+    getSessionChannel()?.postMessage(refreshedTokens);
 
     broadcastSessionUpdate({
       tokens: refreshedTokens,
-      currentUser: stored.currentUser,
+      currentUser: sessionUser,
     });
 
     return refreshedTokens.access_token;
+  };
+
+  refreshPromise = (async () => {
+    if (typeof navigator !== "undefined" && navigator.locks) {
+      return await navigator.locks.request("milos-refresh-cookie", async () => {
+        return await performRefresh();
+      });
+    }
+
+    return await performRefresh();
   })();
 
   try {
@@ -130,16 +161,23 @@ export async function apiRequest<T>(
   options: ApiRequestOptions = {},
   allowRefresh = true,
 ): Promise<T> {
+  getSessionChannel();
+  const token =
+    allowRefresh && options.token && tokenExpiresSoon(options.token)
+      ? (await refreshAccessToken()) ?? options.token
+      : options.token;
+
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method: options.method ?? "GET",
     headers: {
       "Content-Type": "application/json",
-      ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
+    credentials: "same-origin",
   });
 
-  if (response.status === 401 && allowRefresh && options.token) {
+  if (response.status === 401 && allowRefresh && token) {
     const refreshedToken = await refreshAccessToken();
 
     if (refreshedToken) {

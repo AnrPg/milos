@@ -21,7 +21,7 @@ interface UseChatReturn {
   messages: ChatMessage[];
   typingUsers: TypingUser[];
   isLoading: boolean;
-  sendMessage: (body: string, messageType?: string) => void;
+  sendMessage: (body: string, messageType?: string) => Promise<ChatMessage>;
   sendTypingStart: () => void;
   sendTypingStop: () => void;
 }
@@ -34,9 +34,9 @@ export function useChat({ threadId, accessToken, currentUserId }: UseChatOptions
 
   const channelRef = useRef<ReturnType<typeof joinChannelWithPush> | null>(null);
 
-  function invalidateUnreadCount() {
+  const invalidateUnreadCount = useCallback(() => {
     void queryClient.invalidateQueries({ queryKey: ["messages", "unread"] });
-  }
+  }, [queryClient]);
 
   // Load initial history via REST and mark existing messages as read
   useEffect(() => {
@@ -66,7 +66,7 @@ export function useChat({ threadId, accessToken, currentUserId }: UseChatOptions
     return () => {
       cancelled = true;
     };
-  }, [threadId, accessToken]);
+  }, [threadId, accessToken, invalidateUnreadCount]);
 
   // Connect Phoenix Channel
   useEffect(() => {
@@ -106,18 +106,21 @@ export function useChat({ threadId, accessToken, currentUserId }: UseChatOptions
       channel.leave();
       channelRef.current = null;
     };
-  }, [threadId, accessToken, currentUserId]);
+  }, [threadId, accessToken, currentUserId, invalidateUnreadCount]);
 
-  const sendMessage = useCallback((body: string, messageType = "chat") => {
-    channelRef.current?.push("send_message", { body, message_type: messageType });
+  const sendMessage = useCallback(async (body: string, messageType = "chat") => {
+    const channel = channelRef.current;
+    if (!channel) throw new Error("Chat is disconnected. Your message was not sent.");
+
+    return channel.push<ChatMessage>("send_message", { body, message_type: messageType });
   }, []);
 
   const sendTypingStart = useCallback(() => {
-    channelRef.current?.push("typing_start", {});
+    void channelRef.current?.push<{ typing: boolean }>("typing_start", {}).catch(() => undefined);
   }, []);
 
   const sendTypingStop = useCallback(() => {
-    channelRef.current?.push("typing_stop", {});
+    void channelRef.current?.push<{ typing: boolean }>("typing_stop", {}).catch(() => undefined);
   }, []);
 
   return { messages, typingUsers, isLoading, sendMessage, sendTypingStart, sendTypingStop };

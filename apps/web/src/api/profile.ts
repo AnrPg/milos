@@ -4,7 +4,6 @@ export type ProfileUpdate = {
   nickname?: string;
   current_password?: string;
   password?: string;
-  avatar_url?: string | null;
   preferred_locale?: string;
 };
 
@@ -24,18 +23,28 @@ export async function updateProfile(token: string, payload: ProfileUpdate) {
   });
 }
 
-export async function getAvatarUploadUrl(token: string) {
-  return apiRequest<{ upload_url: string; public_url: string; key: string }>(
+export async function getAvatarUploadUrl(token: string, file: File) {
+  return apiRequest<{
+    upload_url: string;
+    key: string;
+    required_headers: Record<string, string>;
+    expires_in: number;
+    max_bytes: number;
+  }>(
     "/me/avatar/upload-url",
-    { method: "POST", token },
+    {
+      method: "POST",
+      token,
+      body: { content_type: file.type, byte_size: file.size },
+    },
   );
 }
 
-export async function updateAvatar(token: string, avatar_url: string | null) {
+export async function updateAvatar(token: string, avatarKey: string | null) {
   return apiRequest<{ user: { id: string; avatar_url: string | null } }>("/me/avatar", {
     method: "PATCH",
     token,
-    body: { avatar_url },
+    body: { avatar_key: avatarKey },
   });
 }
 

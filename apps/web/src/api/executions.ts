@@ -73,6 +73,7 @@ export type WorkoutExecution = {
     updated_at?: string;
   }>;
   exercise_modifications: ExerciseModification[];
+  lock_version: number;
   inserted_at: string;
 };
 
@@ -109,6 +110,8 @@ export type ExerciseNote = {
 };
 
 export type ExecutionProgressPayload = {
+  expected_version: number;
+  operation_id: string;
   checked_exercise_ids: string[];
   current_segment_index: number;
   status: "active" | "paused";
@@ -118,6 +121,7 @@ export type ExecutionProgressPayload = {
   total_elapsed_ms: number;
   section_elapsed_ms: Record<string, number>;
   segment_cycle_counts: Record<string, number>;
+  section_scores: SectionScore[];
 };
 
 export async function startExecution(

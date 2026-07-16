@@ -9,10 +9,6 @@ export type LoginRequest =
   NonNullable<
     paths["/api/auth/login"]["post"]["requestBody"]
   >["content"]["application/json"];
-export type RefreshRequest =
-  NonNullable<
-    paths["/api/auth/refresh"]["post"]["requestBody"]
-  >["content"]["application/json"];
 export type AuthTokens =
   paths["/api/auth/login"]["post"]["responses"]["200"]["content"]["application/json"];
 export type CurrentUser =
@@ -26,8 +22,16 @@ export function loginUser(payload: LoginRequest) {
   return apiRequest<AuthTokens>("/auth/login", { method: "POST", body: payload });
 }
 
-export function refreshSession(payload: RefreshRequest) {
-  return apiRequest<AuthTokens>("/auth/refresh", { method: "POST", body: payload });
+export function refreshSession() {
+  return apiRequest<AuthTokens>("/auth/refresh", { method: "POST" }, false);
+}
+
+export function logoutSession() {
+  return apiRequest<void>("/auth/logout", { method: "POST" }, false);
+}
+
+export function signOutAllDevices(token: string) {
+  return apiRequest<void>("/auth/sign-out-all", { method: "POST", token }, false);
 }
 
 export function fetchCurrentUser(token: string) {
