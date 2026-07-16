@@ -4,13 +4,10 @@ on:
   push:
 
 jobs:
-  verify:
-    name: Verify source
+  api-verify:
+    name: Verify API
     runs-on: ubuntu-latest
-    env:
-      # Gitea/act self-hosted runners do not always expose the GitHub runner
-      # ImageOS value that setup-beam uses to select OTP builds.
-      ImageOS: ubuntu22
+    container: elixir:1.18.4-otp-27
     services:
       postgres:
         image: postgres:16-alpine
@@ -25,36 +22,37 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v4
-      - name: Force setup-beam ImageOS
-        run: echo "ImageOS=ubuntu22" >> "$GITHUB_ENV"
-      - name: Verify runner OpenSSL ABI
+      - name: Verify BEAM OpenSSL ABI
         run: |
-          echo "ImageOS=${ImageOS:-unset}"
           . /etc/os-release
           echo "PRETTY_NAME=$PRETTY_NAME"
+          elixir -v
           openssl version -a
           ldconfig -p | grep -E 'libcrypto\.so\.(3|1\.1)' || true
-      - uses: erlef/setup-beam@v1
-        env:
-          ImageOS: ubuntu22
-        with:
-          elixir-version: "1.18.4"
-          otp-version: "27.0.1"
-          version-type: strict
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: apps/web/package-lock.json
+      - run: mix local.hex --force
+        working-directory: apps/api
+      - run: mix local.rebar --force
+        working-directory: apps/api
       - run: mix deps.get
         working-directory: apps/api
       - run: mix precommit
         working-directory: apps/api
         env:
-          DB_HOST: localhost
+          DB_HOST: postgres
           DB_NAME: milos_training_test
           DB_PASSWORD: postgres
           DB_USER: postgres
+
+  web-verify:
+    name: Verify web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
         working-directory: apps/web
       - run: npm run check
@@ -75,7 +73,7 @@ jobs:
 
   build:
     name: Build ${{ matrix.image }}
-    needs: [verify, version]
+    needs: [api-verify, web-verify, version]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
