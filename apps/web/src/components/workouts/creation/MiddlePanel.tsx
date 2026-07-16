@@ -11,7 +11,7 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import type { ScaleLevel } from "@/api/workouts";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import type { DraftSection } from "@/types/workout";
-import { getFormatInstruction, type DraftExercise } from "@/types/workout";
+import { getFormatInstruction, getFormatLabels, type DraftExercise } from "@/types/workout";
 
 import { ExerciseCard } from "./ExerciseCard";
 import { FormatTooltip } from "./FormatTooltip";
@@ -28,6 +28,7 @@ type ExerciseGroup = {
 
 export function MiddlePanel({ scaleLevels }: Props) {
   const i18n = useUiTranslations();
+  const formatLabels = getFormatLabels(i18n);
   const { sections, selectedSectionId, addExercise, setMobileView, updateSection } = useWorkoutCreationStore();
 
   const selectedSection = sections.find((section) => section.localId === selectedSectionId);
@@ -75,8 +76,8 @@ export function MiddlePanel({ scaleLevels }: Props) {
           ?? (selectedSection.formatParams.interval_seconds as number)
           ?? 60;
         const durLabel = dur >= 60
-          ? (Math.floor(dur / 60)) + "min" + (dur % 60 > 0 ? `${dur % 60}s` : "")
-          : (dur) + "s";
+          ? i18n("minutesSecondsDuration", {minutes: Math.floor(dur / 60), seconds: dur % 60})
+          : i18n("secondsShort", {value: dur});
         groups.push({ label: i18n("roundec7b598") + (min) + " · " + (durLabel), color: "var(--accent)", exercises: exs });
       }
 
@@ -88,7 +89,7 @@ export function MiddlePanel({ scaleLevels }: Props) {
     }
 
     return null;
-  }, [selectedSection]);
+  }, [i18n, selectedSection]);
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden" style={{ background: "var(--bg)" }}>
@@ -103,12 +104,12 @@ export function MiddlePanel({ scaleLevels }: Props) {
             </h2>
             <FormatTooltip format={selectedSection.format}>
               <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-                {selectedSection.format.replaceAll("_", " ")}
+                {formatLabels[selectedSection.format]}
               </span>
             </FormatTooltip>
           </div>
           {(() => {
-            const instr = getFormatInstruction(selectedSection.format, selectedSection.formatParams);
+            const instr = getFormatInstruction(i18n, selectedSection.format, selectedSection.formatParams);
             return instr ? (
               <div className="mt-0.5 text-xs" style={{ color: "var(--dim)" }}>
                 {instr}

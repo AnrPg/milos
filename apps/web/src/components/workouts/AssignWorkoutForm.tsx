@@ -68,7 +68,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
     return () => {
       cancelled = true;
     };
-  }, [router, signOut, tokens?.access_token, workoutId]);
+  }, [i18n, router, signOut, tokens?.access_token, workoutId]);
 
   useEffect(() => {
     if (!tokens?.access_token) return;
@@ -100,7 +100,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
       cancelled = true;
       window.clearTimeout(timeoutId);
     };
-  }, [query, router, signOut, tokens?.access_token]);
+  }, [i18n, query, router, signOut, tokens?.access_token]);
 
   async function submitAssignment() {
     if (!tokens?.access_token) return;
@@ -243,13 +243,13 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
               />
             </label>
 
-            <div className="mt-5 max-h-[20rem] space-y-3 overflow-y-auto pr-1">
+            <div className="mt-5 max-h-[20rem] space-y-3 overflow-y-auto pe-1">
               {athletes.map((athlete) => {
                 const selected = selectedIds.includes(athlete.id);
                 return (
                   <button
                     key={athlete.id}
-                    className="flex w-full items-center justify-between rounded-[1.2rem] px-4 py-3 text-left transition-colors"
+                    className="flex w-full items-center justify-between rounded-[1.2rem] px-4 py-3 text-start transition-colors"
                     style={
                       selected
                         ? { background: "var(--primary)", color: "var(--bg)" }

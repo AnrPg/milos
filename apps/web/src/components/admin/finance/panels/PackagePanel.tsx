@@ -4,6 +4,8 @@
 
 
 
+
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -30,9 +32,9 @@ function field(record: FinanceRecord | null | undefined, key: string, fallback =
   return String(value);
 }
 
-function money(cents: unknown) {
+function money(uiLocale: string, cents: unknown) {
   const amount = typeof cents === "number" ? cents : Number(cents ?? 0);
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" }).format(amount / 100);
+  return new Intl.NumberFormat(uiLocale, { style: "currency", currency: "EUR" }).format(amount / 100);
 }
 
 export function PackagePanel({
@@ -44,6 +46,7 @@ export function PackagePanel({
   packages: FinanceRecord[];
   onClose: () => void;
 }) {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
@@ -272,8 +275,8 @@ export function PackagePanel({
           <Stat label={i18n("name709a232")} value={field(pkg, "name")} />
           <Stat label={i18n("family4efb6cb")} value={field(pkg, "family")} />
           <Stat label={i18n("billingPeriodda59f5a")} value={field(pkg, "billing_period")} />
-          <Stat label={i18n("basePrice708f3d8")} value={money(pkg.base_price_cents)} />
-          <Stat label={i18n("statusbae7d5b")} value={pkg.active !== false ? i18n("activea733b80") : "Inactive"} />
+          <Stat label={i18n("basePrice708f3d8")} value={money(uiLocale, pkg.base_price_cents)} />
+          <Stat label={i18n("statusbae7d5b")} value={pkg.active !== false ? i18n("activea733b80") : i18n("inactive09af574")} />
           <EntitlementSummary params={pkg.params} />
           {Array.isArray(pkg.tags) && (pkg.tags as string[]).length > 0 && (
             <div>

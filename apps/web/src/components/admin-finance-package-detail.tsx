@@ -185,7 +185,7 @@ function Input({
   required?: boolean;
   type?: string;
 }) {
-  const i18n = useUiTranslations();
+  
   return (
     <label className="block space-y-1 text-sm font-semibold">
       <span>{label}</span>

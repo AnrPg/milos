@@ -77,7 +77,7 @@ export function InlineAssignPackage({ currentCode, packages, pending, onAssign }
 
       {open && (
         <div
-          className="absolute left-0 top-full z-50 mt-1 min-w-[180px] rounded-xl p-3 shadow-xl"
+          className="absolute start-0 top-full z-50 mt-1 min-w-[180px] rounded-xl p-3 shadow-xl"
           style={{
             background: "var(--bg)",
             border: "1px solid var(--border-strong)",

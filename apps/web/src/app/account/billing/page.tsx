@@ -4,6 +4,8 @@
 
 
 
+
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 
@@ -14,18 +16,18 @@ import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
-function formatCents(cents: number | null | undefined, currency = "EUR") {
+function formatCents(uiLocale: string, cents: number | null | undefined, currency = "EUR") {
   if (cents == null) return "—";
-  return new Intl.NumberFormat("en-EU", {
+  return new Intl.NumberFormat(uiLocale, {
     style: "currency",
     currency: (currency as string) || "EUR",
     minimumFractionDigits: 2,
   }).format(cents / 100);
 }
 
-function formatDate(value: string | null | undefined) {
+function formatDate(uiLocale: string, value: string | null | undefined) {
   if (!value) return "—";
-  return new Date(value).toLocaleDateString("en-GB", {
+  return new Date(value).toLocaleDateString(uiLocale, {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -69,6 +71,7 @@ function PackageSidePanel({
   packages: Record<string, unknown>[];
   onClose: () => void;
 }) {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const ref = useRef<HTMLDivElement>(null);
 
@@ -93,7 +96,7 @@ function PackageSidePanel({
         className="flex flex-col h-full overflow-y-auto w-full max-w-sm"
         style={{
           background: "var(--panel-muted)",
-          borderLeft: "1px solid var(--border)",
+          borderInlineStart: "1px solid var(--border)",
           padding: "2rem 1.5rem",
           gap: "1.25rem",
         }}
@@ -154,7 +157,7 @@ function PackageSidePanel({
                 )}
                 {price != null && (
                   <span className="text-sm font-medium" style={{ color: "var(--text-soft)" }}>
-                    {formatCents(price, currency)}
+                    {formatCents(uiLocale, price, currency)}
                     {billing ? ` / ${billing}` : ""}
                   </span>
                 )}
@@ -175,6 +178,7 @@ function PackageSidePanel({
 // ─── invoice row ──────────────────────────────────────────────────────────────
 
 function BalanceDueBadge({ cents }: { cents: number }) {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   if (cents <= 0) return null;
   return (
@@ -185,7 +189,7 @@ function BalanceDueBadge({ cents }: { cents: number }) {
         color: "var(--danger)",
       }}
     >
-      {formatCents(cents)} {i18n("due30cdf73")}
+      {formatCents(uiLocale, cents)} {i18n("due30cdf73")}
     </span>
   );
 }
@@ -197,6 +201,7 @@ function InvoiceRow({
   invoice: Record<string, unknown>;
   token: string;
 }) {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const [downloading, setDownloading] = useState(false);
   const invoiceId = String(invoice.id);
@@ -221,25 +226,25 @@ function InvoiceRow({
 
   return (
     <tr style={{ borderBottom: "1px solid var(--border)" }}>
-      <td className="py-3 pr-4 text-sm font-mono" style={{ color: "var(--text-soft)" }}>
+      <td className="py-3 pe-4 text-sm font-mono" style={{ color: "var(--text-soft)" }}>
         {String(invoice.invoice_number ?? "—")}
       </td>
-      <td className="py-3 pr-4 text-sm" style={{ color: "var(--text)" }}>
-        {formatCents(
+      <td className="py-3 pe-4 text-sm" style={{ color: "var(--text)" }}>
+        {formatCents(uiLocale, 
           typeof invoice.total_cents === "number" ? invoice.total_cents : null,
           String(invoice.currency ?? i18n("eurd06e073")),
         )}
       </td>
-      <td className="py-3 pr-4">
+      <td className="py-3 pe-4">
         <div className="flex items-center gap-2 flex-wrap">
           <StatusBadge status={String(invoice.status ?? "")} />
           <BalanceDueBadge cents={balanceDueCents} />
         </div>
       </td>
-      <td className="py-3 pr-4 text-sm" style={{ color: "var(--dim)" }}>
-        {formatDate(invoice.due_date as string | null)}
+      <td className="py-3 pe-4 text-sm" style={{ color: "var(--dim)" }}>
+        {formatDate(uiLocale, invoice.due_date as string | null)}
       </td>
-      <td className="py-3 text-right">
+      <td className="py-3 text-end">
         {hasFile ? (
           <button
             type="button"
@@ -263,6 +268,7 @@ function InvoiceRow({
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function BillingPage() {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const { tokens } = useSession();
   const accessToken = tokens?.access_token ?? null;
@@ -302,7 +308,7 @@ export default function BillingPage() {
     return () => {
       cancelled = true;
     };
-  }, [accessToken]);
+  }, [accessToken, i18n]);
 
   useEffect(() => {
     if (!accessToken) return;
@@ -387,11 +393,11 @@ export default function BillingPage() {
                     {activeSub.billing_period_snapshot
                       ? i18n("billed763fe55") + (String(activeSub.billing_period_snapshot))
                       : ""}
-                    {activeSub.ends_on ? i18n("renews241920c") + (formatDate(activeSub.ends_on as string)) : ""}
+                    {activeSub.ends_on ? i18n("renews241920c") + (formatDate(uiLocale, activeSub.ends_on as string)) : ""}
                   </span>
                   {typeof activeSub.price_cents_snapshot === "number" && (
                     <span className="text-sm" style={{ color: "var(--text-soft)" }}>
-                      {formatCents(activeSub.price_cents_snapshot)}
+                      {formatCents(uiLocale, activeSub.price_cents_snapshot)}
                     </span>
                   )}
                 </div>
@@ -430,16 +436,16 @@ export default function BillingPage() {
                 <div className="flex items-end justify-between">
                   <div className="flex flex-col gap-0.5">
                     <span className="text-2xl font-semibold" style={{ color: "var(--text)" }}>
-                      {formatCents(finance!.credit_balance)}
+                      {formatCents(uiLocale, finance!.credit_balance)}
                     </span>
                     <span className="text-xs" style={{ color: "var(--dim)" }}>
                       {i18n("availableBalanceadba401")}
                     </span>
                   </div>
                   {totalReferralCents > 0 && (
-                    <div className="text-right">
+                    <div className="text-end">
                       <span className="text-sm font-medium" style={{ color: "var(--success)" }}>
-                        +{formatCents(totalReferralCents)}
+                        +{formatCents(uiLocale, totalReferralCents)}
                       </span>
                       <p className="text-xs" style={{ color: "var(--dim)" }}>
                         {i18n("fromReferralsb7146e6")}
@@ -459,7 +465,7 @@ export default function BillingPage() {
                         <span>{String(entry.description ?? i18n("referralReward6fc3bba"))}</span>
                         <span style={{ color: (entry.amount_cents as number) > 0 ? "var(--success)" : "var(--danger)" }}>
                           {(entry.amount_cents as number) > 0 ? "+" : ""}
-                          {formatCents(entry.amount_cents as number)}
+                          {formatCents(uiLocale, entry.amount_cents as number)}
                         </span>
                       </div>
                     ))}
@@ -488,7 +494,7 @@ export default function BillingPage() {
                         {[i18n("numberb7baa1d"), i18n("amount43dc853"), i18n("statusbae7d5b"), i18n("due145caf2"), ""].map((h) => (
                           <th
                             key={h}
-                            className="py-2.5 pr-4 text-left text-[11px] font-medium uppercase tracking-wide first:pl-5 last:pr-5 last:text-right"
+                            className="py-2.5 pe-4 text-start text-[11px] font-medium uppercase tracking-wide first:ps-5 last:pe-5 last:text-end"
                             style={{ color: "var(--dim)" }}
                           >
                             {h}
@@ -525,7 +531,7 @@ export default function BillingPage() {
                     >
                       <div className="flex flex-col gap-0.5">
                         <span className="text-sm" style={{ color: "var(--text)" }}>
-                          {formatCents(
+                          {formatCents(uiLocale, 
                             typeof payment.amount_cents === "number" ? payment.amount_cents : null,
                             String(payment.currency ?? i18n("eurd06e073")),
                           )}
@@ -534,7 +540,7 @@ export default function BillingPage() {
                           {payment.payment_method
                             ? String(payment.payment_method).replace(/_/g, " ")
                             : i18n("paymentb41a92b")}
-                          {payment.paid_on ? "· " + (formatDate(payment.paid_on as string)) : ""}
+                          {payment.paid_on ? "· " + (formatDate(uiLocale, payment.paid_on as string)) : ""}
                         </span>
                       </div>
                       {payment.payment_status ? (
@@ -560,6 +566,7 @@ export default function BillingPage() {
 }
 
 function EntitlementCard({ entitlement }: { entitlement: EffectiveEntitlement | null }) {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   if (!entitlement?.plan) return null;
   const allowanceEntries = Object.entries(entitlement.allowances);
@@ -577,7 +584,7 @@ function EntitlementCard({ entitlement }: { entitlement: EffectiveEntitlement | 
           <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}>
             <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{key.replaceAll("_", " ")}</p>
             <p className="mt-1 text-2xl font-semibold" style={{ color: "var(--primary)" }}>{String(usage.remaining)}</p>
-            <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("remainingOf8553660")} {String(usage.limit)} {i18n("resets5de1b0d")} {formatDate(usage.period_end)}</p>
+            <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("remainingOf8553660")} {String(usage.limit)} {i18n("resets5de1b0d")} {formatDate(uiLocale, usage.period_end)}</p>
             {usage.extensions > 0 ? <p className="mt-1 text-xs" style={{ color: "var(--success)" }}>{i18n("includes820531f")}{usage.extensions} {i18n("personalExtension95a8d48")}</p> : null}
           </div>
         ) : null)}

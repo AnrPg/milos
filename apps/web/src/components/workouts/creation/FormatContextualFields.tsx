@@ -107,7 +107,7 @@ export function FormatContextualFields({ format, params, onChange }: Props) {
             <label className="shrink-0 text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
               {field.label}
               {field.optional ? (
-                <span className="ml-1 font-normal italic normal-case" style={{ color: "var(--dim)" }}>
+                <span className="ms-1 font-normal italic normal-case" style={{ color: "var(--dim)" }}>
                   {i18n("optional48a7b88")}
                 </span>
               ) : null}
@@ -125,7 +125,7 @@ export function FormatContextualFields({ format, params, onChange }: Props) {
                     type="number"
                     value={value ?? ""}
                     onChange={(event) => handleChange(field.key, event.target.value)}
-                    className="w-20 rounded-lg px-2 py-1 text-right text-sm outline-none"
+                    className="w-20 rounded-lg px-2 py-1 text-end text-sm outline-none"
                     style={{
                       background: "var(--bg)",
                       border: "1px solid var(--dim)",

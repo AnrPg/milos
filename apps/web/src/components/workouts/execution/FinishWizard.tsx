@@ -184,7 +184,7 @@ function ScoreEntryStep({
                 <input
                   type="number"
                   inputMode="decimal"
-                  className="w-24 rounded-xl px-3 py-2 text-right text-sm font-bold outline-none"
+                  className="w-24 rounded-xl px-3 py-2 text-end text-sm font-bold outline-none"
                   style={{
                     background: "var(--bg)",
                     border: `1px solid ${editedScores[sec.section_id] ? "var(--primary)" : "var(--border)"}`,
@@ -397,8 +397,8 @@ function ModificationsEditorStep({
                         hasPrescription ? (ex.prescription_value) + " " + (ex.prescription_unit ?? "").trim() : null,
                         hasLoad
                           ? ex.load_mode === "pct_1rm"
-                            ? (ex.load_value) + "% RM"
-                            : (ex.load_value) + " kg"
+                            ? (ex.load_value) + i18n("percentOneRepMaxUnit")
+                            : (ex.load_value) + " " + i18n("kilogramsUnit")
                           : null,
                       ]
                         .filter(Boolean)
@@ -473,7 +473,7 @@ function ModificationsEditorStep({
                   {hasLoad && (
                     <div className="flex items-center gap-2">
                       <span className="text-xs w-20 shrink-0" style={{ color: "var(--dim)" }}>
-                        {ex.load_mode === "pct_1rm" ? i18n("rma904756") : "kg"}
+                        {ex.load_mode === "pct_1rm" ? i18n("percentOneRepMaxUnit") : i18n("kilogramsUnit")}
                       </span>
                       <input
                         type="number"
@@ -641,7 +641,7 @@ function ConfirmStep({
                     {exerciseMap[mod.exercise_id] ?? mod.exercise_id}
                   </span>
                   <span
-                    className="text-xs font-semibold shrink-0 ml-2"
+                    className="text-xs font-semibold shrink-0 ms-2"
                     style={{
                       color:
                         mod.type === "skipped"

@@ -4,7 +4,9 @@
 
 
 
+
 import {useUiTranslations} from "@/i18n/ui";
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -62,26 +64,6 @@ const TIER_ICON: Record<BadgeTier, string> = {
   master: "⭐",
 };
 
-function getBadgeDescription(badgeKey: string): string {
-  if (badgeKey.startsWith("workouts_")) {
-    const n = badgeKey.split("_")[1];
-    return `Completed ${n} workouts`;
-  }
-  if (badgeKey.startsWith("prs_")) {
-    const n = badgeKey.split("_")[1];
-    return `Logged ${n} personal records`;
-  }
-  if (badgeKey.startsWith("streak_")) {
-    const n = badgeKey.split("_")[1];
-    return `Maintained a ${n}-day training streak`;
-  }
-  if (badgeKey.endsWith("_mastery")) {
-    const type = badgeKey.replace("_mastery", "").replace(/_/g, " ");
-    return `Achieved mastery in ${type}`;
-  }
-  return "Training milestone achieved";
-}
-
 
 // ── Count-up animation hook ───────────────────────────────────────────────────
 
@@ -123,7 +105,8 @@ function useCountUp(target: number, durationMs = 1200): number {
 
 function AdminHero({ metrics }: { metrics: AdminMetrics }) {
   const i18n = useUiTranslations();
-  const euros = (metrics.total_outstanding_cents / 100).toLocaleString("el-GR", {
+  const uiLocale = useUiLocale();
+  const euros = (metrics.total_outstanding_cents / 100).toLocaleString(uiLocale, {
     style: "currency",
     currency: "EUR",
     maximumFractionDigits: 0,
@@ -246,18 +229,35 @@ function MemberHero({
   quote: TrainingQuote | null | undefined;
 }) {
   const i18n = useUiTranslations();
+
+  function getBadgeDescription(badgeKey: string): string {
+    if (badgeKey.startsWith("workouts_")) {
+      const n = badgeKey.split("_")[1];
+      return i18n("completedValue0Workoutsde3ccd4", {value0: n});
+    }
+    if (badgeKey.startsWith("prs_")) {
+      const n = badgeKey.split("_")[1];
+      return i18n("loggedValue0PersonalRecords6eb75e4", {value0: n});
+    }
+    if (badgeKey.startsWith("streak_")) {
+      const n = badgeKey.split("_")[1];
+      return i18n("maintainedAValue0DayTrainingStreak0dbf33c", {value0: n});
+    }
+    if (badgeKey.endsWith("_mastery")) {
+      const type = badgeKey.replace("_mastery", "").replace(/_/g, " ");
+      return i18n("achievedMasteryInValue01e7e1ec", {value0: type});
+    }
+    return i18n("trainingMilestoneAchieved56dc32b");
+  }
+
   const animatedStreak = useCountUp(streak);
 
-  const tieredBadges = useMemo(
-    () =>
-      badges.map((b, i) => ({
-        ...b,
-        tier: getBadgeTier(b.badge_key),
-        description: getBadgeDescription(b.badge_key),
-        isNewest: i === 0,
-      })),
-    [badges],
-  );
+  const tieredBadges = badges.map((b, i) => ({
+    ...b,
+    tier: getBadgeTier(b.badge_key),
+    description: getBadgeDescription(b.badge_key),
+    isNewest: i === 0,
+  }));
 
   const greeting = useState(() => {
     const h = new Date().getHours();
@@ -677,7 +677,7 @@ export function LandingPage() {
               </button>
             ) : null}
             <article
-              className={"rounded-[2.2rem] p-6 " + (collapseLeaderboard ? "pointer-events-none invisible absolute right-0 top-0 w-[min(28rem,calc(100vw-3rem))] opacity-0 shadow-2xl transition-all duration-200 group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100" : "")}
+              className={"rounded-[2.2rem] p-6 " + (collapseLeaderboard ? "pointer-events-none invisible absolute end-0 top-0 w-[min(28rem,calc(100vw-3rem))] opacity-0 shadow-2xl transition-all duration-200 group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100" : "")}
               style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
             >
               <div className="flex items-start justify-between gap-4">
@@ -814,7 +814,7 @@ export function LandingPage() {
 
             const hasCustomDateRange = historyDateFrom !== "" || historyDateTo !== "";
             const customFrom = historyDateFrom ? new Date(historyDateFrom) : null;
-            const customTo = historyDateTo ? new Date(historyDateTo + i18n("t235959a8ac406")) : null;
+            const customTo = historyDateTo ? new Date(historyDateTo + "T23:59:59") : null;
 
             const datePresetHasData = (preset: "week" | "month") =>
               landing.recent_executions.some((ex) => {
@@ -1053,7 +1053,7 @@ export function LandingPage() {
                     filtered.map((execution) => (
                       <button
                         key={execution.id}
-                        className={"rounded-[1.5rem] text-left transition-transform hover:-translate-y-0.5 " + (historyView === "list" ? "flex items-center gap-4 px-4 py-3" : "px-4 py-4")}
+                        className={"rounded-[1.5rem] text-start transition-transform hover:-translate-y-0.5 " + (historyView === "list" ? "flex items-center gap-4 px-4 py-3" : "px-4 py-4")}
                         style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
                         onClick={() => setSelectedExecutionId(execution.id)}
                         type="button"
@@ -1067,7 +1067,7 @@ export function LandingPage() {
                             {execution.scale_level_slug ? "· " + (execution.scale_level_slug) : ""}
                           </p>
                         </div>
-                        <div className={historyView === "list" ? "shrink-0 text-right" : "mt-3"}>
+                        <div className={historyView === "list" ? "shrink-0 text-end" : "mt-3"}>
                           <p className="text-sm" style={{ color: "var(--muted)" }}>
                             {execution.completed_at_utc
                               ? new Date(execution.completed_at_utc).toLocaleDateString()
@@ -1223,7 +1223,7 @@ export function LandingPage() {
                           <div
                             key={note.id ?? (note.exercise_id) + "-" + (note.selected_text)}
                             className="rounded px-3 py-2"
-                            style={{ background: "color-mix(in srgb, var(--primary) 8%, transparent)", borderLeft: "4px solid color-mix(in srgb, var(--primary) 50%, transparent)" }}
+                            style={{ background: "color-mix(in srgb, var(--primary) 8%, transparent)", borderInlineStart: "4px solid color-mix(in srgb, var(--primary) 50%, transparent)" }}
                           >
                             <p className="text-sm font-medium" style={{ color: "var(--text)" }}>{note.selected_text}</p>
                             {note.note_text ? <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>{note.note_text}</p> : null}

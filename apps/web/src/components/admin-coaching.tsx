@@ -186,7 +186,7 @@ export function AdminCoaching() {
                 athletes.map((athlete) => (
                   <button
                     key={athlete.id}
-                    className="w-full rounded-2xl border px-4 py-3 text-left transition-colors"
+                    className="w-full rounded-2xl border px-4 py-3 text-start transition-colors"
                     style={{
                       background: selectedAthleteId === athlete.id ? "color-mix(in srgb, var(--primary) 8%, transparent)" : "transparent",
                       borderColor: selectedAthleteId === athlete.id ? "color-mix(in srgb, var(--primary) 28%, transparent)" : "var(--border)",

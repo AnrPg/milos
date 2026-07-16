@@ -1,7 +1,6 @@
 "use client";
 
 
-import {useUiTranslations} from "@/i18n/ui";
 import { useRef, useState } from "react";
 
 import { useTranslations } from "next-intl";
@@ -24,7 +23,7 @@ function toggle(values: string[], id: string) {
 }
 
 export function TypeFilterChips({ classTypes, value, onChange }: TypeFilterChipsProps) {
-  const i18n = useUiTranslations();
+  
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const [pending, setPending] = useState(value);
   const t = useTranslations("Schedule");

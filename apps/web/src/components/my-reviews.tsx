@@ -14,23 +14,6 @@ import { fetchMyReviews, submitReview } from "@/api/reviews";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 
-export function recentWorkoutTargets(executions: WorkoutExecution[]) {
-  const byWorkout = new Map<string, { id: string; label: string }>();
-
-  executions.forEach((execution) => {
-    if (!execution.master_workout_id || byWorkout.has(execution.master_workout_id)) return;
-
-    byWorkout.set(execution.master_workout_id, {
-      id: execution.master_workout_id,
-      label:
-        execution.workout_title ??
-        `${execution.workout_type ?? "Workout"} · ${String(execution.started_at_utc).slice(0, 10)}`,
-    });
-  });
-
-  return Array.from(byWorkout.values()).slice(0, 20);
-}
-
 export function isCompletedExecution(execution: WorkoutExecution) {
   return execution.status === "completed" || Boolean(execution.completed_at_utc);
 }
@@ -41,14 +24,30 @@ function ErrorText({ error }: { error: unknown }) {
 }
 
 export function ReviewForm() {
+  function recentWorkoutTargets(executions: WorkoutExecution[]) {
+    const byWorkout = new Map<string, { id: string; label: string }>();
+  
+    executions.forEach((execution) => {
+      if (!execution.master_workout_id || byWorkout.has(execution.master_workout_id)) return;
+  
+      byWorkout.set(execution.master_workout_id, {
+        id: execution.master_workout_id,
+        label:
+          execution.workout_title ??
+          `${execution.workout_type ?? i18n("workoutFallback")} · ${String(execution.started_at_utc).slice(0, 10)}`,
+      });
+    });
+  
+    return Array.from(byWorkout.values()).slice(0, 20);
+  }
+
+  const i18n = useUiTranslations();
   const QUESTIONS = [
     { key: "ability_match", text: i18n("howWellDidThisWorkoutMatchYourCurrenta5bb0aa") },
     { key: "useful_part", text: i18n("whichPartFeltMostUsefulOrEnjoyable3b972ae") },
     { key: "hard_part", text: i18n("whichPartFeltTooHardPainfulConfusingOrced1e04") },
     { key: "next_adjustment", text: i18n("whatShouldYourCoachAdjustNextTimea76c965") },
   ];
-
-  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const [targetType, setTargetType] = useState("workout");
   const [targetId, setTargetId] = useState("");
@@ -227,7 +226,7 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
           className="rounded-2xl border border-[var(--border)] bg-[var(--panel)] p-5"
         >
           <p className="font-bold">{String(review.target_type)}</p>
-          <p className="text-sm text-[var(--muted)]">{i18n("rating6437b7b")} {String(review.rating ?? "n/a")}</p>
+          <p className="text-sm text-[var(--muted)]">{i18n("rating6437b7b")} {String(review.rating ?? "—")}</p>
           {review.body ? <p className="mt-2 text-sm">{String(review.body)}</p> : null}
         </article>
       ))}

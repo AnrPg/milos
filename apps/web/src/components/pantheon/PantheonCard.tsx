@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -20,15 +21,6 @@ export function formatScore(score: number, unit: PRUnit): string {
   }
   return Number.isInteger(score) ? String(score) : score.toFixed(2);
 }
-
-const UNIT_LABELS: Record<PRUnit, string> = {
-  mins_secs: "min:sec",
-  reps: "reps",
-  sets: "sets",
-  kcals: "kcal",
-  m: "m",
-  kg: "kg",
-};
 
 // Palette hues: primary/purple, amber, green, teal, pink, red, indigo, gold
 const PALETTE_HUES = [260, 40, 155, 200, 320, 10, 280, 55];
@@ -73,7 +65,7 @@ const PARTICLE_KEYFRAMES = `
 `;
 
 function Particles({ prId }: { prId: string }) {
-  const i18n = useUiTranslations();
+  
   const particles = buildParticles(prId, 15);
   return (
     <>
@@ -110,6 +102,7 @@ function PRHistoryTooltip({
   children: React.ReactNode;
 }) {
   const i18n = useUiTranslations();
+  const uiLocale = useUiLocale();
   const { tokens } = useSession();
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState<TooltipPos>({ top: 0, left: 0 });
@@ -228,7 +221,7 @@ function PRHistoryTooltip({
                     {formatScore(Number(entry.score), unit)}
                   </span>
                   <span className="text-[10px]" style={{ color: "var(--dim)" }}>
-                    {new Date(entry.beaten_on).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                    {new Date(entry.beaten_on).toLocaleDateString(uiLocale, { month: "short", day: "numeric" })}
                   </span>
                 </div>
               ))}
@@ -253,9 +246,13 @@ function CompactCard({
   onShare?: (pr: PRRecord) => void;
 }) {
   const i18n = useUiTranslations();
+  const uiLocale = useUiLocale();
   const scoreStr = formatScore(Number(pr.current_score), pr.unit);
-  const unitLabel = UNIT_LABELS[pr.unit] ?? pr.unit;
-  const dateStr = new Date(pr.beaten_on).toLocaleDateString(undefined, {
+  const unitLabel = {
+    mins_secs: i18n("minutesSecondsUnit"), reps: i18n("repetitionsUnit"), sets: i18n("setsd6c8220"),
+    kcals: i18n("kilocaloriesUnit"), m: i18n("metersUnit"), kg: i18n("kilogramsUnit"),
+  }[pr.unit] ?? pr.unit;
+  const dateStr = new Date(pr.beaten_on).toLocaleDateString(uiLocale, {
     month: "short", day: "numeric", year: "numeric",
   });
 
@@ -284,7 +281,7 @@ function CompactCard({
             event.stopPropagation();
             onShare(pr);
           }}
-          className="absolute top-3 right-3 rounded-lg px-2 py-1 text-[10px] font-semibold opacity-50 hover:opacity-90 transition-opacity"
+          className="absolute top-3 end-3 rounded-lg px-2 py-1 text-[10px] font-semibold opacity-50 hover:opacity-90 transition-opacity"
           style={{ background: "var(--border)", color: "var(--dim)" }}
           title={i18n("sharePrf54c0df")}
         >
@@ -294,7 +291,7 @@ function CompactCard({
 
       <PRHistoryTooltip prId={pr.id} unit={pr.unit}>
         <div>
-          <p className="text-sm font-semibold truncate pr-8" style={{ color: "var(--text)" }}>{pr.name}</p>
+          <p className="text-sm font-semibold truncate pe-8" style={{ color: "var(--text)" }}>{pr.name}</p>
           <div className="mt-1.5 flex items-baseline gap-1.5">
             <span className="text-2xl font-bold tabular-nums" style={{ color: "var(--primary)" }}>{scoreStr}</span>
             <span className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>{unitLabel}</span>
@@ -318,9 +315,13 @@ function FullCard({
   onShare?: (pr: PRRecord) => void;
 }) {
   const i18n = useUiTranslations();
+  const uiLocale = useUiLocale();
   const scoreStr = formatScore(Number(pr.current_score), pr.unit);
-  const unitLabel = UNIT_LABELS[pr.unit] ?? pr.unit;
-  const dateStr = new Date(pr.beaten_on).toLocaleDateString(undefined, {
+  const unitLabel = {
+    mins_secs: i18n("minutesSecondsUnit"), reps: i18n("repetitionsUnit"), sets: i18n("setsd6c8220"),
+    kcals: i18n("kilocaloriesUnit"), m: i18n("metersUnit"), kg: i18n("kilogramsUnit"),
+  }[pr.unit] ?? pr.unit;
+  const dateStr = new Date(pr.beaten_on).toLocaleDateString(uiLocale, {
     month: "short", day: "numeric", year: "numeric",
   });
 
@@ -350,7 +351,7 @@ function FullCard({
             event.stopPropagation();
             onShare(pr);
           }}
-          className="absolute top-4 right-4 rounded-xl px-3 py-1.5 text-sm font-semibold"
+          className="absolute top-4 end-4 rounded-xl px-3 py-1.5 text-sm font-semibold"
           style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           title={i18n("sharePrf54c0df")}
         >
@@ -360,7 +361,7 @@ function FullCard({
 
       {/* PR data — padded right to avoid overlap with Share button */}
       <PRHistoryTooltip prId={pr.id} unit={pr.unit}>
-        <div className="min-w-0 pr-28">
+        <div className="min-w-0 pe-28">
           <p className="font-semibold truncate" style={{ color: "var(--text)" }}>{pr.name}</p>
           <div className="mt-1.5 flex items-baseline gap-1.5">
             <span className="text-3xl font-bold tabular-nums" style={{ color: "var(--primary)" }}>{scoreStr}</span>
@@ -374,7 +375,7 @@ function FullCard({
 
       {/* Edit + Delete — bottom right, side-by-side */}
       {(onEdit || onDelete) && (
-        <div className="absolute bottom-4 right-4 flex gap-2">
+        <div className="absolute bottom-4 end-4 flex gap-2">
           {onEdit && (
             <button
               type="button"

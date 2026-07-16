@@ -61,6 +61,7 @@ function eventRewardPillStyle(
 }
 
 export function ReferralsTab() {
+  const i18n = useUiTranslations();
   function eventRewardStatusText(
     event: FinanceRecord | null | undefined,
     reward: FinanceRecord | null | undefined,
@@ -87,8 +88,6 @@ export function ReferralsTab() {
     if (status === "approved") return i18n("readyToApprove015c1c8");
     return i18n("pendingReview6a80f44");
   }
-
-  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
   const queryClient = useQueryClient();
@@ -674,7 +673,7 @@ function ListRow({
   last: boolean;
   onClick?: () => void;
 }) {
-  const i18n = useUiTranslations();
+  
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     if (!onClick) return;
     if (event.key === "Enter" || event.key === " ") {
@@ -685,7 +684,7 @@ function ListRow({
 
   return (
     <div
-      className="flex w-full flex-wrap items-center justify-between gap-4 px-6 py-4 text-left transition-colors"
+      className="flex w-full flex-wrap items-center justify-between gap-4 px-6 py-4 text-start transition-colors"
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
       style={{
@@ -764,7 +763,7 @@ function PanelInput({
   onChange: (value: string) => void;
   type?: string;
 }) {
-  const i18n = useUiTranslations();
+  
   return (
     <input
       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
@@ -804,7 +803,7 @@ function PanelActions({ children }: { children: React.ReactNode }) {
 }
 
 function DetailGrid({ rows }: { rows: Array<[string, string]> }) {
-  const i18n = useUiTranslations();
+  
   return (
     <div className="overflow-hidden rounded-[1.25rem]" style={{ border: "1px solid var(--border)" }}>
       {rows.map(([label, value], index) => (
@@ -824,7 +823,7 @@ function DetailGrid({ rows }: { rows: Array<[string, string]> }) {
 }
 
 function Notice({ children, tone = "warning" }: { children: React.ReactNode; tone?: "neutral" | "warning" }) {
-  const i18n = useUiTranslations();
+  
   const style =
     tone === "neutral"
       ? { background: "color-mix(in srgb, var(--muted) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--muted) 18%, transparent)", color: "var(--text-soft)" }

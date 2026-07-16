@@ -277,7 +277,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                         <button
                           key={value}
                           type="button"
-                          className="rounded-2xl p-4 text-left transition-all"
+                          className="rounded-2xl p-4 text-start transition-all"
                           style={{
                             background: selected
                               ? "color-mix(in srgb, var(--primary) 12%, transparent)"

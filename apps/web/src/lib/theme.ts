@@ -50,8 +50,8 @@ export type AppTheme = {
 export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
   ember: {
     slug: "ember",
-    label: "Ember",
-    description: "Warm charcoal, clay accents, and high-contrast workout tones.",
+    label: "theme_ember_label",
+    description: "theme_ember_description",
     colors: {
       background: "var(--bg)",
       panel: "var(--panel)",
@@ -87,8 +87,8 @@ export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
   },
   sage: {
     slug: "sage",
-    label: "Sage",
-    description: "Deep green base with brass and coral accents.",
+    label: "theme_sage_label",
+    description: "theme_sage_description",
     colors: {
       background: "#07100D",
       panel: "#0F1A16",
@@ -124,8 +124,8 @@ export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
   },
   steel: {
     slug: "steel",
-    label: "Steel",
-    description: "Neutral graphite with cyan, amber, and signal red accents.",
+    label: "theme_steel_label",
+    description: "theme_steel_description",
     colors: {
       background: "#080B0E",
       panel: "#10151A",
@@ -161,8 +161,8 @@ export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
   },
   aurora: {
     slug: "aurora",
-    label: "Aurora",
-    description: "Deep navy with electric mint, violet, and hot-coral energy.",
+    label: "theme_aurora_label",
+    description: "theme_aurora_description",
     colors: {
       background: "#050814",
       panel: "#0B1024",
@@ -198,8 +198,8 @@ export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
   },
   royal: {
     slug: "royal",
-    label: "Royal",
-    description: "Midnight indigo, regal purple, gold highlights, and ruby warnings.",
+    label: "theme_royal_label",
+    description: "theme_royal_description",
     colors: {
       background: "#0A0618",
       panel: "#130D26",
@@ -235,8 +235,8 @@ export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
   },
   volt: {
     slug: "volt",
-    label: "Volt",
-    description: "Blackout surfaces with acid lime, cyan, and magenta contrast.",
+    label: "theme_volt_label",
+    description: "theme_volt_description",
     colors: {
       background: "#030504",
       panel: "#0A0F0D",
@@ -272,8 +272,8 @@ export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
   },
   noir: {
     slug: "noir",
-    label: "Noir",
-    description: "Monochrome training floor with champagne, teal, and crimson accents.",
+    label: "theme_noir_label",
+    description: "theme_noir_description",
     colors: {
       background: "#050505",
       panel: "#101010",
@@ -309,8 +309,8 @@ export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
   },
   daybreak: {
     slug: "daybreak",
-    label: "Daybreak",
-    description: "Warm light theme with cream panels, ink text, and sunrise orange.",
+    label: "theme_daybreak_label",
+    description: "theme_daybreak_description",
     colors: {
       background: "#FFF7ED",
       panel: "#FFFFFF",
@@ -346,8 +346,8 @@ export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
   },
   paper: {
     slug: "paper",
-    label: "Paper",
-    description: "Clean editorial light mode with graphite text and blue-violet action.",
+    label: "theme_paper_label",
+    description: "theme_paper_description",
     colors: {
       background: "#F7F7F4",
       panel: "#FFFFFF",
@@ -383,8 +383,8 @@ export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
   },
   lagoon: {
     slug: "lagoon",
-    label: "Lagoon",
-    description: "Fresh light aqua palette with deep teal, coral, and lemon accents.",
+    label: "theme_lagoon_label",
+    description: "theme_lagoon_description",
     colors: {
       background: "#ECFEFF",
       panel: "#F8FFFF",
@@ -420,8 +420,8 @@ export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
   },
   sunset: {
     slug: "sunset",
-    label: "Sunset",
-    description: "Bold light mode with peach surfaces, plum text, and punchy coral.",
+    label: "theme_sunset_label",
+    description: "theme_sunset_description",
     colors: {
       background: "#FFF1F2",
       panel: "#FFFFFF",

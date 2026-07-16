@@ -99,7 +99,7 @@ function ExerciseDragPreview({ exercise, section }: { exercise: DraftExercise; s
         ) : null}
         {hasLoad ? (
           <span className="shrink-0 text-sm" style={{ color: "var(--muted)" }}>
-            {exercise.loadValue} {exercise.loadMode === "pct_1rm" ? "%RM" : "kg"}
+            {exercise.loadValue} {exercise.loadMode === "pct_1rm" ? i18n("percentOneRepMaxUnit") : i18n("kilogramsUnit")}
           </span>
         ) : ctx.showLoad && exercise.loadMode === "bw" ? (
           <span className="shrink-0 text-sm" style={{ color: "var(--muted)" }}>{i18n("bw4d64743")}</span>
@@ -205,7 +205,7 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
     useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 5 } }),
   );
 
-  // Custom collision: for exercise drags, use the left-center point of the draggable
+  // Custom collision: for exercise drags, use the start-center point of the draggable
   // rect to detect hover over section chips in the LeftPanel. This lets the section
   // open as soon as the card's leading edge crosses into the chip — before the pointer
   // physically reaches the LeftPanel. For everything else, fall back to pointer-within
@@ -526,7 +526,7 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
       <button
         type="button"
         onClick={() => setShowShortcuts(true)}
-        className={(embedded ? "absolute" : "fixed") + " bottom-4 right-4 z-40 hidden h-8 w-8 items-center justify-center rounded-full text-sm font-bold md:flex"}
+        className={(embedded ? "absolute" : "fixed") + " bottom-4 end-4 z-40 hidden h-8 w-8 items-center justify-center rounded-full text-sm font-bold md:flex"}
         style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--muted)" }}
         title={i18n("keyboardShortcuts72933ee")}
       >

@@ -92,7 +92,7 @@ export function AnalyticsMarketingHub() {
                 {section.description}
               </p>
               <p className="mt-5 text-sm font-semibold" style={{ color: "var(--text)" }}>
-                {i18n("opencf9b770")} <span className="transition-transform group-hover:translate-x-1">→</span>
+                {i18n("opencf9b770")} <span className="inline-block transition-transform group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1">→</span>
               </p>
             </Link>
           ))}

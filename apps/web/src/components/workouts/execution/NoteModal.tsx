@@ -32,6 +32,7 @@ export function NoteModal({
   onSave,
   onClose,
 }: Props) {
+  const i18n = useUiTranslations();
   const NOTE_TAGS = [
     i18n("easy00f0313"),
     i18n("hard20a8991"),
@@ -42,8 +43,6 @@ export function NoteModal({
     i18n("formBreakc3f3464"),
     i18n("paina036597"),
   ];
-
-  const i18n = useUiTranslations();
   const [selectedTags, setSelectedTags] = useState<string[]>(existingNote?.tags ?? []);
   const [noteText, setNoteText] = useState(existingNote?.note_text ?? "");
   const [isSaving, setIsSaving] = useState(false);

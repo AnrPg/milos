@@ -75,11 +75,7 @@ export function EntitlementEditor({
   value: EntitlementDraft;
   onChange: (value: EntitlementDraft) => void;
 }) {
-  const PERIODS = [
-    ["calendar_week", i18n("calendarWeek154e2bc")],
-    ["calendar_month", i18n("calendarMonth1622c7f")],
-    ["subscription_period", i18n("subscriptionPeriod22e7508")],
-  ] as const;
+  const i18n = useUiTranslations();
 
   const CAPABILITIES = [
     ["book_classes", i18n("bookClasses0d3cc7b")],
@@ -95,8 +91,6 @@ export function EntitlementEditor({
     ["personal_programming", i18n("personalProgramming0517f6d")],
     ["coach_messaging", i18n("coachMessagingf3902dc")],
   ] as const;
-
-  const i18n = useUiTranslations();
   function toggle(key: "channels" | "capabilities", option: string) {
     const values = value[key];
     onChange({
@@ -160,6 +154,11 @@ function ChoiceGroup({ label, options, selected, onToggle }: { label: string; op
 
 function AllowanceField({ label, limit, period, onLimit, onPeriod }: { label: string; limit: string; period: string; onLimit: (value: string) => void; onPeriod: (value: string) => void }) {
   const i18n = useUiTranslations();
+  const PERIODS = [
+      ["calendar_week", i18n("calendarWeek154e2bc")],
+      ["calendar_month", i18n("calendarMonth1622c7f")],
+      ["subscription_period", i18n("subscriptionPeriod22e7508")],
+    ] as const;
   return (
     <div className="space-y-2 rounded-xl p-3" style={{ background: "var(--bg-soft)" }}>
       <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{label}</p>

@@ -5,6 +5,8 @@
 
 
 
+
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -39,13 +41,13 @@ function saveCategories(cats: AlertCategory[]) {
   } catch {}
 }
 
-function money(cents: unknown) {
+function money(uiLocale: string, cents: unknown) {
   const amount = typeof cents === "number" ? cents : Number(cents ?? 0);
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" }).format(amount / 100);
+  return new Intl.NumberFormat(uiLocale, { style: "currency", currency: "EUR" }).format(amount / 100);
 }
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+function formatDate(locale: string, iso: string) {
+  return new Date(iso).toLocaleDateString(locale, { month: "short", day: "numeric" });
 }
 
 function isActiveChallenge(c: AdminChallengeRecord) {
@@ -60,7 +62,7 @@ function AdminMetricChip({ label, value, href, danger = false, loading = false }
   danger?: boolean;
   loading?: boolean;
 }) {
-  const i18n = useUiTranslations();
+  
   return (
     <Link
       href={href}
@@ -86,6 +88,7 @@ function AdminMetricChip({ label, value, href, danger = false, loading = false }
 
 function AdminChallengeCard({ challenge }: { challenge: AdminChallengeRecord }) {
   const i18n = useUiTranslations();
+  const uiLocale = useUiLocale();
   const pct = Math.round(challenge.progress_summary.completion_rate * 100);
   return (
     <article
@@ -99,7 +102,7 @@ function AdminChallengeCard({ challenge }: { challenge: AdminChallengeRecord }) 
             <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>{challenge.description}</p>
           )}
           <p className="mt-1.5 text-xs" style={{ color: "var(--muted)" }}>
-            {formatDate(challenge.starts_at)} – {formatDate(challenge.ends_at)}
+            {formatDate(uiLocale, challenge.starts_at)} – {formatDate(uiLocale, challenge.ends_at)}
           </p>
         </div>
         <span
@@ -127,6 +130,7 @@ function AdminChallengeCard({ challenge }: { challenge: AdminChallengeRecord }) 
 }
 
 export function AdminDashboard() {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const NAV_GROUPS: Array<{ label: string; items: Array<{ label: string; href: string }> }> = [
     {
@@ -232,15 +236,15 @@ export function AdminDashboard() {
   // ── KPI rows ──────────────────────────────────────────────────────────────
   const financeKpis: Array<[string, string, boolean, string]> = [
     [i18n("activeMembersa17ecbe"), String(totals.active_memberships ?? 0), false, "/admin/finance"],
-    [i18n("revenueMtd3ffc292"), money(totals.paid_revenue_cents), false, "/admin/metrics/finance"],
+    [i18n("revenueMtd3ffc292"), money(uiLocale, totals.paid_revenue_cents), false, "/admin/metrics/finance"],
     [i18n("expiring30d1d039ba"), String(totals.expiring_memberships ?? 0), Number(totals.expiring_memberships ?? 0) > 0, "/admin/finance?tab=queues"],
-    [i18n("overdueInvoices747a2d8"), money(totals.overdue_invoice_balance_cents), Number(totals.overdue_invoice_balance_cents ?? 0) > 0, "/admin/finance?tab=queues"],
+    [i18n("overdueInvoices747a2d8"), money(uiLocale, totals.overdue_invoice_balance_cents), Number(totals.overdue_invoice_balance_cents ?? 0) > 0, "/admin/finance?tab=queues"],
   ];
 
   const operationalKpis: Array<[string, string, boolean, string]> = [
     [i18n("classesTodayd01b776"), String(adminMetrics?.classes_today ?? 0), false, "/admin/class-schedule"],
     [i18n("pendingApprovals6ac383a"), String(adminMetrics?.pending_referral_approvals ?? 0), Number(adminMetrics?.pending_referral_approvals ?? 0) > 0, "/admin/finance?tab=referrals"],
-    [i18n("totalOutstandingefd930a"), money(adminMetrics?.total_outstanding_cents ?? 0), Number(adminMetrics?.total_outstanding_cents ?? 0) > 0, "/admin/finance"],
+    [i18n("totalOutstandingefd930a"), money(uiLocale, adminMetrics?.total_outstanding_cents ?? 0), Number(adminMetrics?.total_outstanding_cents ?? 0) > 0, "/admin/finance"],
     [i18n("members1cb449c"), String(adminMetrics?.member_count ?? 0), false, "/admin/users"],
   ];
 
@@ -314,7 +318,7 @@ export function AdminDashboard() {
             style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
           >
             <span aria-hidden="true">⚙</span>
-            <span className="max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-200 group-hover:ml-2 group-hover:max-w-40 group-hover:opacity-100 group-focus-visible:ml-2 group-focus-visible:max-w-40 group-focus-visible:opacity-100">
+            <span className="max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-200 group-hover:ms-2 group-hover:max-w-40 group-hover:opacity-100 group-focus-visible:ms-2 group-focus-visible:max-w-40 group-focus-visible:opacity-100">
               {i18n("appConfigurationse0effaa")}
             </span>
           </Link>
@@ -332,7 +336,7 @@ export function AdminDashboard() {
                 {greeting}, {currentUser?.nickname}.
               </h1>
               <p className="mt-2 text-sm leading-6" style={{ color: "var(--muted)" }}>
-                {new Date().toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+                {new Date().toLocaleDateString(uiLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
               </p>
             </div>
             <div className="flex flex-wrap gap-3">

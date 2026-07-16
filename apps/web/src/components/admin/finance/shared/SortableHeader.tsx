@@ -41,7 +41,7 @@ export function SortableHeader({ column, label, sort, hasFilter, onSort, filterS
 
   return (
     <th
-      className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em]"
+      className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-[0.18em]"
       style={{ color: "var(--dim)", background: "var(--panel)", whiteSpace: "nowrap" }}
     >
       <div ref={ref} className="group relative flex items-center gap-1">
@@ -77,7 +77,7 @@ export function SortableHeader({ column, label, sort, hasFilter, onSort, filterS
 
         {filterOpen && (
           <div
-            className="absolute left-0 top-full z-50 mt-1 min-w-[200px] rounded-xl p-3 shadow-xl"
+            className="absolute start-0 top-full z-50 mt-1 min-w-[200px] rounded-xl p-3 shadow-xl"
             style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)" }}
           >
             {filterSlot}

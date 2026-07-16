@@ -4,6 +4,8 @@
 
 
 
+
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -22,6 +24,7 @@ import { TransientHero } from "@/components/TransientHero";
 type Tab = "members" | "packages" | "promotions" | "referrals" | "queues";
 
 export function FinanceOperations() {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const TABS: Array<{ id: Tab; label: string }> = [
     { id: "members", label: i18n("members1cb449c") },
@@ -130,8 +133,8 @@ export function FinanceOperations() {
             ))
           )}
           {Number(totals.overdue_invoice_balance_cents ?? 0) > 0 ? (
-            <span className="ml-auto shrink-0 whitespace-nowrap px-2 text-xs font-semibold" style={{ color: "var(--muted)" }}>
-              {i18n("overdueBalanced6ec7a8")} {money(totals.overdue_invoice_balance_cents)}
+            <span className="ms-auto shrink-0 whitespace-nowrap px-2 text-xs font-semibold" style={{ color: "var(--muted)" }}>
+              {i18n("overdueBalanced6ec7a8")} {money(uiLocale, totals.overdue_invoice_balance_cents)}
             </span>
           ) : null}
         </section>
@@ -167,7 +170,7 @@ export function FinanceOperations() {
   );
 }
 
-function money(cents: unknown) {
+function money(uiLocale: string, cents: unknown) {
   const amount = typeof cents === "number" ? cents : Number(cents ?? 0);
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" }).format(amount / 100);
+  return new Intl.NumberFormat(uiLocale, { style: "currency", currency: "EUR" }).format(amount / 100);
 }

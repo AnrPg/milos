@@ -8,8 +8,8 @@ import {useUiTranslations} from "@/i18n/ui";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import {
   AUTO_SCORE_MAP,
-  EMOM_SCORING_MODE_DESCRIPTIONS,
-  EMOM_SCORING_MODE_LABELS,
+  getEmomScoringModeDescriptions,
+  getEmomScoringModeLabels,
   type DraftSection,
   type EmomScoringMode,
   type ScoreType,
@@ -27,6 +27,8 @@ type Props = {
 
 export function SectionConfig({ section }: Props) {
   const i18n = useUiTranslations();
+  const emomScoringModeLabels = getEmomScoringModeLabels(i18n);
+  const emomScoringModeDescriptions = getEmomScoringModeDescriptions(i18n);
   const { updateSection, setFormat, setFormatParams, deleteSection, setEmomScoringMode, setEmomAmrapScoringStyle } = useWorkoutCreationStore();
 
   const autoScore = AUTO_SCORE_MAP[section.format];
@@ -139,7 +141,7 @@ export function SectionConfig({ section }: Props) {
                     +
                   </button>
                   {rounds !== null ? (
-                    <span className="ml-1 text-xs" style={{ color: "var(--dim)" }}>
+                    <span className="ms-1 text-xs" style={{ color: "var(--dim)" }}>
                       → {rounds} {i18n("roundf0590a6")}{rounds !== 1 ? i18n("sa0f1490") : ""}
                     </span>
                   ) : null}
@@ -210,7 +212,7 @@ export function SectionConfig({ section }: Props) {
       <div>
         <label className="mb-1 block text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
           {i18n("restAfterSectione73a6eb")}
-          <span className="ml-1 font-normal italic normal-case" style={{ color: "var(--dim)" }}>{i18n("optional48a7b88")}</span>
+          <span className="ms-1 font-normal italic normal-case" style={{ color: "var(--dim)" }}>{i18n("optional48a7b88")}</span>
         </label>
         <TimeInput
           value={section.restAfterSeconds}
@@ -251,7 +253,7 @@ export function SectionConfig({ section }: Props) {
                 key={mode}
                 type="button"
                 onClick={() => setEmomScoringMode(section.localId, mode)}
-                className="flex flex-col gap-0.5 rounded-xl px-3 py-2 text-left transition-colors"
+                className="flex flex-col gap-0.5 rounded-xl px-3 py-2 text-start transition-colors"
                 style={
                   section.emomScoringMode === mode
                     ? {
@@ -266,9 +268,9 @@ export function SectionConfig({ section }: Props) {
                       }
                 }
               >
-                <span className="text-xs font-bold">{EMOM_SCORING_MODE_LABELS[mode]}</span>
+                <span className="text-xs font-bold">{emomScoringModeLabels[mode]}</span>
                 <span className="text-xs leading-tight" style={{ color: "var(--dim)" }}>
-                  {EMOM_SCORING_MODE_DESCRIPTIONS[mode]}
+                  {emomScoringModeDescriptions[mode]}
                 </span>
               </button>
             ))}
@@ -337,7 +339,7 @@ export function SectionConfig({ section }: Props) {
                 max_windows: Math.max(1, Number(event.target.value) || 1),
               })
             }
-            className="w-20 rounded-lg px-2 py-1 text-right text-sm outline-none"
+            className="w-20 rounded-lg px-2 py-1 text-end text-sm outline-none"
             style={{
               background: "var(--bg)",
               border: "1px solid var(--dim)",

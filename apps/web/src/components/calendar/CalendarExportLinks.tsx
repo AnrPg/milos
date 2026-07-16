@@ -44,7 +44,7 @@ export function CalendarExportLinks({ token, compact = false }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [token]);
+  }, [i18n, token]);
 
   const sameOriginLinks = useMemo(() => {
     if (!links || typeof window === "undefined") return links;

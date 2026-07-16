@@ -55,7 +55,7 @@ type SessionExpiredState = {
 const SessionContext = createContext<SessionContextValue | null>(null);
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
-  const i18n = useUiTranslations();
+  
   const tSession = useTranslations("Session");
   const tCommon = useTranslations("Common");
   const [status, setStatus] = useState<SessionStatus>("loading");
@@ -75,7 +75,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     void setWorkoutCacheUser(user.id);
     setTokens(nextTokens);
     setCurrentUser(user);
-    setStatus(i18n("authenticated8fda38c"));
+    setStatus("authenticated");
     setSessionExpired(null);
     setApiSessionUser(user);
 
@@ -91,7 +91,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     void setWorkoutCacheUser(null);
     setTokens(null);
     setCurrentUser(null);
-    setStatus(i18n("guest35675e6"));
+    setStatus("guest");
     setApiSessionUser(null);
 
     void clearBrowserPushSubscription(accessTokenForCleanup);
@@ -149,7 +149,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         if (cancelled) return;
         commitSession(refreshedTokens, user);
       } catch {
-        if (!cancelled) setStatus(i18n("guest35675e6"));
+        if (!cancelled) setStatus("guest");
       }
     }
 
@@ -262,7 +262,7 @@ function SessionExpiredDialog({
   requiredLabel: string;
   openLoginLabel: string;
 }) {
-  const i18n = useUiTranslations();
+  
   const dialogRef = useModalFocusTrap<HTMLDivElement>(onDismiss);
 
   return (

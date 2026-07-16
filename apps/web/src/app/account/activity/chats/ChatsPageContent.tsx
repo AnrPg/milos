@@ -31,6 +31,7 @@ const ROLE_TABS: Record<string, Tab[]> = {
 };
 
 export function ChatsPageContent() {
+  const i18n = useUiTranslations();
   const TAB_SOURCE_BADGE: Record<Tab, string> = {
     direct: i18n("directbc81524"),
     assignment: i18n("workout39463a5"),
@@ -42,8 +43,6 @@ export function ChatsPageContent() {
     assignment: i18n("workout39463a5"),
     class_slot: i18n("class41ff354"),
   };
-
-  const i18n = useUiTranslations();
   const searchParams = useSearchParams();
   const { tokens, currentUser } = useSession();
   const accessToken = tokens?.access_token ?? null;
@@ -205,7 +204,7 @@ export function ChatsPageContent() {
                   key={thread.id}
                   type="button"
                   onClick={() => void openThread(thread)}
-                  className="flex flex-col gap-1 px-4 py-3 text-left border-b transition-colors hover:bg-[var(--border)]"
+                  className="flex flex-col gap-1 px-4 py-3 text-start border-b transition-colors hover:bg-[var(--border)]"
                   style={{
                     borderColor: "var(--border)",
                     background: selectedThread?.id === thread.id ? "var(--border)" : "transparent",

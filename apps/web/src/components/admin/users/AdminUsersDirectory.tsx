@@ -15,14 +15,13 @@ import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 
 export function AdminUsersDirectory() {
+  const i18n = useUiTranslations();
   const FILTERS = [
     ["all", i18n("all6a72085")],
     ["member", i18n("members1cb449c")],
     ["athlete", i18n("athletesda22204")],
     ["admin", i18n("adminsed6b524")],
   ] as const;
-
-  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const [role, setRole] = useState<(typeof FILTERS)[number][0]>("all");
   const [query, setQuery] = useState("");

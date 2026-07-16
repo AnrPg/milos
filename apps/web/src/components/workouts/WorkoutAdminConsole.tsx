@@ -57,7 +57,7 @@ export function WorkoutAdminConsole() {
 
       setError(loadError instanceof Error ? loadError.message : i18n("failedToLoadAdminWorkoutData3641095"));
     }
-  }, [currentUser, router, signOut, status, tokens]);
+  }, [currentUser, i18n, router, signOut, status, tokens]);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -339,11 +339,11 @@ export function WorkoutAdminConsole() {
               onClick={() => setPreviewWorkoutId(null)}
             />
             <aside
-              className="fixed right-0 top-0 z-50 flex h-full flex-col overflow-hidden"
+              className="fixed end-0 top-0 z-50 flex h-full flex-col overflow-hidden"
               style={{
                 width: "min(480px, 90vw)",
                 background: "var(--panel)",
-                borderLeft: "1px solid var(--border)",
+                borderInlineStart: "1px solid var(--border)",
                 boxShadow: "-8px 0 32px rgba(0,0,0,0.18)",
               }}
             >

@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDrag } from "@use-gesture/react";
@@ -45,13 +46,13 @@ function startOfWeek(d: Date): Date {
   return date;
 }
 
-function formatDayLabel(iso: string): string {
+function formatDayLabel(locale: string, iso: string): string {
   const d = new Date(`${iso}T00:00:00`);
-  return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+  return d.toLocaleDateString(locale, { weekday: "short", month: "short", day: "numeric" });
 }
 
-function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+function formatTime(locale: string, iso: string): string {
+  return new Date(iso).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
 }
 
 function scaleTone(label: string) {
@@ -82,6 +83,7 @@ function scaleTone(label: string) {
 
 function WorkoutsPageContent() {
   const i18n = useUiTranslations();
+  const uiLocale = useUiLocale();
   const router = useRouter();
   const { tokens } = useSession();
   const initExecution = useExecutionStore((s) => s.initExecution);
@@ -114,7 +116,7 @@ function WorkoutsPageContent() {
         return;
       }
 
-      shiftWeek(mx > 0 ? -7 : 7);
+      shiftWeek((mx > 0) === (document.documentElement.dir !== "rtl") ? -7 : 7);
     },
     { axis: "x", filterTaps: true },
   );
@@ -211,7 +213,7 @@ function WorkoutsPageContent() {
     return () => {
       cancelled = true;
     };
-  }, [accessToken, selectedClassType, step, weekStart]);
+  }, [accessToken, i18n, selectedClassType, step, weekStart]);
 
   useEffect(() => {
     let cleanup: (() => void) | undefined;
@@ -362,9 +364,9 @@ function WorkoutsPageContent() {
                         ? (exercise.prescription_value) + " " + (exercise.prescription_unit ?? "").trim()
                         : null,
                       exercise.load_value
-                        ? (exercise.load_value) + " " + (exercise.load_mode === "pct_1rm" ? "% RM" : "kg")
+                        ? (exercise.load_value) + " " + (exercise.load_mode === "pct_1rm" ? i18n("rma904756") : "kg")
                         : exercise.load_mode === "bw"
-                          ? "Bodyweight"
+                          ? i18n("bodyweight")
                           : null,
                     ]
                       .filter(Boolean)
@@ -450,11 +452,11 @@ function WorkoutsPageContent() {
                 {selectedClassType?.name}
               </div>
               <div className="text-sm font-semibold">
-                {weekStart.toLocaleDateString(undefined, { month: "short", day: "numeric" })} –{" "}
+                {weekStart.toLocaleDateString(uiLocale, { month: "short", day: "numeric" })} –{" "}
                 {(() => {
                   const end = new Date(weekStart);
                   end.setDate(end.getDate() + 6);
-                  return end.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+                  return end.toLocaleDateString(uiLocale, { month: "short", day: "numeric" });
                 })()}
               </div>
             </div>
@@ -464,14 +466,14 @@ function WorkoutsPageContent() {
                 className="h-9 w-9 rounded-full border text-lg"
                 style={{ borderColor: "var(--border)", color: "var(--muted)" }}
               >
-                ←
+                <span className="inline-block rtl:rotate-180">←</span>
               </button>
               <button
                 onClick={() => shiftWeek(7)}
                 className="h-9 w-9 rounded-full border text-lg"
                 style={{ borderColor: "var(--border)", color: "var(--muted)" }}
               >
-                →
+                <span className="inline-block rtl:rotate-180">→</span>
               </button>
             </div>
           </div>
@@ -516,7 +518,7 @@ function WorkoutsPageContent() {
                   >
                     <div className="mb-4 flex items-baseline justify-between">
                       <h2 className="text-sm font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--text-soft)" }}>
-                        {formatDayLabel(date)}
+                        {formatDayLabel(uiLocale, date)}
                       </h2>
                       <span className="text-xs" style={{ color: "var(--muted)" }}>
                         {daySlots.length} {i18n("option14eb14e")}{daySlots.length === 1 ? "" : i18n("sa0f1490")}
@@ -547,7 +549,7 @@ function WorkoutsPageContent() {
                                     {slot.workout?.title ?? i18n("untitledWorkout579b8a6")}
                                   </div>
                                   <div className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
-                                    {formatTime(slot.scheduled_at)} · {slot.spots_remaining} {i18n("spotsLeftd65a24f")}
+                                    {formatTime(uiLocale, slot.scheduled_at)} · {slot.spots_remaining} {i18n("spotsLeftd65a24f")}
                                   </div>
                                 </div>
                               </div>
@@ -624,7 +626,7 @@ function WorkoutsPageContent() {
               </div>
               <h1 className="mt-2 text-3xl font-bold">{selectedWorkout.title}</h1>
               <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
-                {formatDayLabel(selectedSlot.scheduled_at.split("T")[0])} · {formatTime(selectedSlot.scheduled_at)}
+                {formatDayLabel(uiLocale, selectedSlot.scheduled_at.split("T")[0])} · {formatTime(uiLocale, selectedSlot.scheduled_at)}
               </p>
             </div>
 
@@ -659,7 +661,7 @@ function WorkoutsPageContent() {
 }
 
 export default function WorkoutsPage() {
-  const i18n = useUiTranslations();
+  
   return (
     <AuthGuard roles={["member", "admin"]}>
       <WorkoutsPageContent />

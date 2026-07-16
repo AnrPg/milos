@@ -60,7 +60,7 @@ export function LeftPanel({ onSectionSelected, mobile = false, showAllSections =
     return (
       <div
         className="flex w-10 shrink-0 cursor-pointer flex-col items-center justify-center"
-        style={{ background: "var(--panel)", borderRight: "1px solid var(--dim)" }}
+        style={{ background: "var(--panel)", borderInlineEnd: "1px solid var(--dim)" }}
         onClick={() => setLeftCollapsed(false)}
       >
         <span
@@ -84,7 +84,7 @@ export function LeftPanel({ onSectionSelected, mobile = false, showAllSections =
     <div
       ref={panelRef}
       className={"flex " + (mobile ? "w-full" : "w-64 shrink-0") + " flex-col overflow-hidden"}
-      style={{ background: "var(--panel)", borderRight: mobile ? "none" : "1px solid var(--dim)" }}
+      style={{ background: "var(--panel)", borderInlineEnd: mobile ? "none" : "1px solid var(--dim)" }}
     >
       <div className="flex shrink-0 items-center justify-between px-4 py-3">
         <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>

@@ -2,6 +2,7 @@
 
 
 
+
 import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useState, type ReactNode } from "react";
 
@@ -46,7 +47,7 @@ export function TransientHero({
         ) : (
           <div className="flex items-center justify-between gap-3">
             <h1 className="min-w-0 truncate text-lg font-semibold tracking-tight sm:text-xl" style={{ color: "var(--primary)" }}>
-              {collapsedTitle ?? titleFromLabel(resolvedLabel, "Page")}
+              {collapsedTitle ?? titleFromLabel(resolvedLabel, i18n("pagefb06270"))}
             </h1>
             <button
               type="button"

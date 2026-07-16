@@ -103,7 +103,7 @@ export function ModificationModal({ step, onSave, onClose }: Props) {
           </h3>
           {step.stepLabel && (
             <p className="text-sm" style={{ color: "var(--primary)" }}>
-              {step.stepLabel}
+              {i18n("setLabel")} {step.stepLabel}
             </p>
           )}
         </div>
@@ -134,8 +134,8 @@ export function ModificationModal({ step, onSave, onClose }: Props) {
             <div>
               <label className="block text-xs font-semibold mb-1" style={{ color: "var(--muted)" }}>
                 {exercise.prescription_unit
-                  ? (exercise.prescription_unit) + " (prescribed: " + (exercise.prescription_value) + ")"
-                  : i18n("repsValuePrescribedf99f0c8") + (exercise.prescription_value) + ")"}
+                  ? i18n("prescribedValue", {unit: exercise.prescription_unit, value: exercise.prescription_value ?? 0})
+                  : i18n("repetitionsPrescribedValue", {value: exercise.prescription_value ?? 0})}
               </label>
               <input
                 type="number"

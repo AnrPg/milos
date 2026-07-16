@@ -4,6 +4,8 @@
 
 
 
+
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import Link from "next/link";
 import { useState } from "react";
@@ -14,6 +16,7 @@ import { fetchFinanceSummary } from "@/api/finance";
 import { useSession } from "@/components/session-provider";
 
 export function AdminHome() {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const { currentUser, signOut, tokens } = useSession();
   const [activeTab, setActiveTab] = useState<"finance" | "coaching">("finance");
@@ -89,7 +92,7 @@ export function AdminHome() {
               cards={[
                 [i18n("activeMemberships0d117fb"), financeTotals.active_memberships],
                 [i18n("expiringSoon74bbe75"), financeTotals.expiring_memberships],
-                [i18n("paidRevenue64c34e5"), cents(financeTotals.paid_revenue_cents)],
+                [i18n("paidRevenue64c34e5"), cents(uiLocale, financeTotals.paid_revenue_cents)],
               ]}
               links={[
                 [i18n("financeConsole35f368f"), "/admin/finance"],
@@ -189,7 +192,7 @@ function displayValue(value: unknown) {
   return String(value);
 }
 
-function cents(value: unknown) {
+function cents(uiLocale: string, value: unknown) {
   const amount = typeof value === "number" ? value : Number(value ?? 0);
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "EUR" }).format(amount / 100);
+  return new Intl.NumberFormat(uiLocale, { style: "currency", currency: "EUR" }).format(amount / 100);
 }

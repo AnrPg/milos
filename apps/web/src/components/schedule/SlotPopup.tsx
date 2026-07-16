@@ -27,7 +27,6 @@ function formatDateTime(locale: string, isoString: string) {
 
 function formatDeadline(locale: string, scheduledAt: string, timeoutMinutes: number) {
   const deadline = new Date(new Date(scheduledAt).getTime() - timeoutMinutes * 60 * 1000);
-  const relative = `${timeoutMinutes >= 60 ? `${timeoutMinutes / 60}h` : `${timeoutMinutes}m`} before start`;
   const exact = new Intl.DateTimeFormat(locale, {
     weekday: "short",
     day: "2-digit",
@@ -36,7 +35,11 @@ function formatDeadline(locale: string, scheduledAt: string, timeoutMinutes: num
     hour: "2-digit",
     minute: "2-digit",
   }).format(deadline);
-  return { relative, exact };
+  return { exact };
+}
+
+function timeoutMinutesLabel(timeoutMinutes: number) {
+  return timeoutMinutes >= 60 ? `${timeoutMinutes / 60}h` : `${timeoutMinutes}m`;
 }
 
 type SlotPopupProps = {
@@ -142,6 +145,9 @@ export function SlotPopup({
           : i18n("bookingIsUnavailableForThisSlot8a07037");
 
   const deadline = formatDeadline(locale, slot.scheduled_at, slot.booking_timeout_minutes);
+  const deadlineRelative = i18n("beforeStart", {
+    duration: timeoutMinutesLabel(slot.booking_timeout_minutes),
+  });
   const typeColor = workoutTypeColor(slot.class_type.slug);
 
   return (
@@ -241,7 +247,7 @@ export function SlotPopup({
                   {i18n("bookByb152b3b")}
                 </p>
                 <p className="mt-2 text-sm font-semibold" style={{ color: "var(--text)" }}>
-                  {deadline.relative}
+                  {deadlineRelative}
                 </p>
                 <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>({deadline.exact})</p>
               </div>
@@ -258,7 +264,7 @@ export function SlotPopup({
                 className="rounded-full px-3 py-1 text-xs font-semibold"
                 style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--muted)" }}
               >
-                {i18n("bookByb152b3b")} {deadline.relative}
+                {i18n("bookByb152b3b")} {deadlineRelative}
               </span>
               {slot.auto_approve ? null : (
                 <span

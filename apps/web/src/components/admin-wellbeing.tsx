@@ -228,7 +228,7 @@ function Field({
   required?: boolean;
   type?: string;
 }) {
-  const i18n = useUiTranslations();
+  
   return (
     <label>
       <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--muted)]">{label}</span>

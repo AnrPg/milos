@@ -16,7 +16,7 @@ type InlineCellProps = {
 };
 
 export function InlineCell({ value, display, type = "text", onSave, placeholder, dimmed, warn }: InlineCellProps) {
-  const i18n = useUiTranslations();
+  
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -57,7 +57,7 @@ export function InlineCell({ value, display, type = "text", onSave, placeholder,
 
   return (
     <button
-      className="rounded-[0.8rem] px-2 py-1 text-left text-sm transition-colors hover:opacity-80"
+      className="rounded-[0.8rem] px-2 py-1 text-start text-sm transition-colors hover:opacity-80"
       style={{
         color: warn ? "var(--primary-strong)" : dimmed ? "var(--dim)" : "var(--text)",
         background: "transparent",

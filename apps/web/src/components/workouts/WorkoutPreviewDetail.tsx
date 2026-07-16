@@ -4,6 +4,7 @@
 
 
 
+
 import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 
@@ -67,43 +68,6 @@ type ResolvedExercise = PreviewExercise & {
   variationSlug?: string;
 };
 
-function formatPrescription(exercise: PreviewExercise): string {
-  const parts: string[] = [];
-
-  if (exercise.sets && exercise.sets > 1) {
-    parts.push(`${exercise.sets}×`);
-  }
-
-  if (exercise.prescription_value) {
-    const unit =
-      exercise.prescription_unit === "secs"
-        ? "sec"
-        : exercise.prescription_unit === "kcal"
-          ? "kcal"
-          : "reps";
-    parts.push(`${exercise.prescription_value} ${unit}`);
-  }
-
-  if (exercise.load_value && exercise.load_mode !== "bw") {
-    const suffix = exercise.load_mode === "pct_1rm" ? "% 1RM" : "kg";
-    parts.push(`@ ${exercise.load_value}${suffix}`);
-  } else if (exercise.load_mode === "bw") {
-    parts.push("BW");
-  }
-
-  return parts.join(" ").trim();
-}
-
-function formatExtras(exercise: PreviewExercise): string[] {
-  const extras: string[] = [];
-  if (exercise.tempo) extras.push(`Tempo ${exercise.tempo}`);
-  if (exercise.rest_seconds) extras.push(`Rest ${exercise.rest_seconds}s`);
-  if (exercise.hr_zone) extras.push(`HR Z${exercise.hr_zone}`);
-  if (exercise.pacing) extras.push(`Pace ${exercise.pacing}s/rep`);
-  if (exercise.cluster_rest_seconds) extras.push(`Cluster ${exercise.cluster_rest_seconds}s`);
-  return extras;
-}
-
 function resolveExercise(exercise: PreviewExercise, activeScale: string | null): ResolvedExercise | null {
   if (!activeScale) {
     return { ...exercise, varied: false };
@@ -155,18 +119,46 @@ function sectionScaleOptions(section: PreviewSection) {
   });
 }
 
-function formatTimerLabel(timerConfig: Record<string, unknown> | null | undefined): string | null {
-  if (!timerConfig) return null;
-  const type = timerConfig.type as string | undefined;
-  if (!type || type === "untimed") return null;
-  if (type === "amrap" && timerConfig.duration_seconds) return `AMRAP ${Math.round((timerConfig.duration_seconds as number) / 60)}min`;
-  if (type === "emom" && timerConfig.duration_seconds) return `EMOM ${Math.round((timerConfig.duration_seconds as number) / 60)}min`;
-  if (type === "for_time") return "For Time";
-  return type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
 function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
   const i18n = useUiTranslations();
+
+  function formatExtras(exercise: PreviewExercise): string[] {
+    const extras: string[] = [];
+    if (exercise.tempo) extras.push(i18n("tempoValue0e842308", {value0: exercise.tempo}));
+    if (exercise.rest_seconds) extras.push(i18n("restValue0S0cde064", {value0: exercise.rest_seconds}));
+    if (exercise.hr_zone) extras.push(i18n("hrZValue0defc7f9", {value0: exercise.hr_zone}));
+    if (exercise.pacing) extras.push(i18n("paceValue0SRep5b31b72", {value0: exercise.pacing}));
+    if (exercise.cluster_rest_seconds) extras.push(i18n("clusterValue0S3514326", {value0: exercise.cluster_rest_seconds}));
+    return extras;
+  }
+
+  function formatPrescription(exercise: PreviewExercise): string {
+    const parts: string[] = [];
+  
+    if (exercise.sets && exercise.sets > 1) {
+      parts.push(`${exercise.sets}×`);
+    }
+  
+    if (exercise.prescription_value) {
+      const unit =
+        exercise.prescription_unit === "secs"
+          ? i18n("sec920a25e")
+          : exercise.prescription_unit === "kcal"
+            ? "kcal"
+            : i18n("repetitionsUnit");
+      parts.push(i18n("value0Value1dca59cc", {value0: exercise.prescription_value, value1: unit}));
+    }
+  
+    if (exercise.load_value && exercise.load_mode !== "bw") {
+      const suffix = exercise.load_mode === "pct_1rm" ? i18n("percentOneRepMaxUnit") : i18n("kilogramsUnit");
+      parts.push(i18n("value0Value1bd98b64", {value0: exercise.load_value, value1: suffix}));
+    } else if (exercise.load_mode === "bw") {
+      parts.push(i18n("bw4d64743"));
+    }
+  
+    return parts.join(" ").trim();
+  }
+
   const prescription = formatPrescription(exercise);
   const extras = formatExtras(exercise);
   const variationColor = scaleLevelVar(exercise.variationSlug ?? exercise.variationLabel);
@@ -187,7 +179,7 @@ function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
           </span>
           {exercise.varied ? (
             <span
-              className="ml-2 rounded-full px-2 py-0.5 align-middle text-[10px] font-bold uppercase tracking-[0.16em]"
+              className="ms-2 rounded-full px-2 py-0.5 align-middle text-[10px] font-bold uppercase tracking-[0.16em]"
               style={{ background: translucent(variationColor, 18), color: variationColor }}
             >
               {exercise.variationLabel ?? i18n("variation15920a4")}
@@ -227,6 +219,17 @@ export function WorkoutPreviewDetail({
   hideScaleChips = false,
 }: Props) {
   const i18n = useUiTranslations();
+
+  function formatTimerLabel(timerConfig: Record<string, unknown> | null | undefined): string | null {
+    if (!timerConfig) return null;
+    const type = timerConfig.type as string | undefined;
+    if (!type || type === "untimed") return null;
+    if (type === "amrap" && timerConfig.duration_seconds) return i18n("amrapValue0Minf963ab5", {value0: Math.round((timerConfig.duration_seconds as number) / 60)});
+    if (type === "emom" && timerConfig.duration_seconds) return i18n("emomValue0Min517ea41", {value0: Math.round((timerConfig.duration_seconds as number) / 60)});
+    if (type === "for_time") return i18n("forTimea8ed8eb");
+    return type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
   const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
     if (!initiallyExpanded) return new Set();
     return new Set(sections.map((s, i) => s.id ?? String(i)));
@@ -274,7 +277,7 @@ export function WorkoutPreviewDetail({
           >
             <button
               aria-expanded={expanded}
-              className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+              className="flex w-full items-center justify-between gap-3 px-4 py-3 text-start"
               style={{ background: "var(--panel)" }}
               onClick={() => toggleSection(key)}
               type="button"

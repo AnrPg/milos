@@ -66,19 +66,21 @@ export type ScoreType =
 
 export type EmomScoringMode = "for_time" | "for_quality" | "amrap" | "to_failure";
 
-export const EMOM_SCORING_MODE_LABELS: Record<EmomScoringMode, string> = {
-  for_time: "For Time",
-  for_quality: "For Quality",
-  amrap: "AMRAP",
-  to_failure: "To Failure",
-};
+type UiTranslate = (key: string, values?: Record<string, string | number>) => string;
 
-export const EMOM_SCORING_MODE_DESCRIPTIONS: Record<EmomScoringMode, string> = {
-  for_time: "Sprint each window. Score = accumulated work time (lower is better).",
-  for_quality: "Prioritize perfect form. Score = Pass / Fail.",
-  amrap: "Max reps each window. Score = total cumulative reps.",
-  to_failure: "Fixed reps each window, keep going until you fail. Score = windows survived.",
-};
+export function getEmomScoringModeLabels(i18n: UiTranslate): Record<EmomScoringMode, string> {
+  return {
+    for_time: i18n("emomModeForTime"), for_quality: i18n("emomModeForQuality"),
+    amrap: i18n("emomModeAmrap"), to_failure: i18n("emomModeToFailure"),
+  };
+}
+
+export function getEmomScoringModeDescriptions(i18n: UiTranslate): Record<EmomScoringMode, string> {
+  return {
+    for_time: i18n("emomModeForTimeDescription"), for_quality: i18n("emomModeForQualityDescription"),
+    amrap: i18n("emomModeAmrapDescription"), to_failure: i18n("emomModeToFailureDescription"),
+  };
+}
 
 export const EMOM_SCORING_MODE_SCORE_TYPE: Record<EmomScoringMode, ScoreType> = {
   for_time: "accumulated_work_time",
@@ -165,168 +167,57 @@ export const AUTO_SCORE_MAP: Partial<Record<SectionFormat, ScoreType>> = {
   hrr: "hr_drop",
 };
 
-export const FORMAT_GROUPS: { label: string; formats: SectionFormat[] }[] = [
+const FORMAT_GROUP_DEFINITIONS: { labelKey: string; formats: SectionFormat[] }[] = [
   {
-    label: "Basic",
+    labelKey: "formatGroupBasic",
     formats: ["untimed", "for_time", "train_to_exhaustion", "kcal_target"],
   },
   {
-    label: "Interval",
+    labelKey: "formatGroupInterval",
     formats: ["emom", "complex_emom", "even_odd", "billat"],
   },
   {
-    label: "Sustained Cardio",
+    labelKey: "formatGroupSustainedCardio",
     formats: ["amrap", "edt", "death_by"],
   },
   {
-    label: "Set-Based",
+    labelKey: "formatGroupSetBased",
     formats: ["tabata", "custom_hiit", "cluster", "hrr"],
   },
   {
-    label: "Progressive",
+    labelKey: "formatGroupProgressive",
     formats: ["ladder_ascending", "ladder_descending", "pyramid"],
   },
-  { label: "Rest", formats: ["rest"] },
+  { labelKey: "formatGroupRest", formats: ["rest"] },
 ];
 
-export const FORMAT_LABELS: Record<SectionFormat, string> = {
-  untimed: "Untimed",
-  for_time: "For Time",
-  train_to_exhaustion: "Train to Exhaustion",
-  kcal_target: "Kcal Target",
-  emom: "EMOM",
-  complex_emom: "Complex EMOM",
-  even_odd: "Even / Odd",
-  billat: "Billat",
-  amrap: "AMRAP",
-  edt: "EDT",
-  death_by: "Death By",
-  tabata: "Tabata",
-  custom_hiit: "Custom HIIT",
-  cluster: "Cluster",
-  hrr: "HRR",
-  ladder_ascending: "Ladder Ascending",
-  ladder_descending: "Ladder Descending",
-  pyramid: "Pyramid",
-  rest: "Rest",
-};
+export function getFormatGroups(i18n: UiTranslate) {
+  return FORMAT_GROUP_DEFINITIONS.map(({labelKey, formats}) => ({label: i18n(labelKey), formats}));
+}
 
-export const FORMAT_TOOLTIPS: Record<
-  SectionFormat,
-  {
-    bestFor: string;
-    trains: string;
-    how: string;
-    score?: string;
-  }
-> = {
-  untimed: {
-    bestFor: "Strength, skill work, warm-ups",
-    trains: "Technique, strength",
-    how: "No time constraint. Quality over speed.",
-  },
-  for_time: {
-    bestFor: "High-intensity WODs",
-    trains: "Speed, conditioning",
-    how: "Complete all reps or rounds as fast as possible.",
-    score: "Time",
-  },
-  train_to_exhaustion: {
-    bestFor: "Hypertrophy, muscular endurance",
-    trains: "Muscular endurance",
-    how: "Push each set to technical failure.",
-    score: "Total reps",
-  },
-  kcal_target: {
-    bestFor: "Cardio machines",
-    trains: "Aerobic capacity",
-    how: "Reach the calorie target as fast as possible.",
-    score: "Kcal",
-  },
-  emom: {
-    bestFor: "Interval training with defined objectives",
-    trains: "Power output, pacing, endurance, or technique",
-    how: "Same movement every interval. Choose a mode: For Time (sprint + rest), For Quality (form focus), AMRAP (max reps), or To Failure (survive as many windows as possible).",
-    score: "Accumulated work time / Pass-Fail / Total reps / Windows survived",
-  },
-  complex_emom: {
-    bestFor: "Mixed modality circuit training",
-    trains: "Varied skills, pacing, multi-modal conditioning",
-    how: "2+ movements rotating each interval window. Choose: For Time, For Quality, AMRAP (grand total or lowest window), or To Failure.",
-    score: "Accumulated work time / Pass-Fail / Total reps or lowest window / Stations cleared",
-  },
-  even_odd: {
-    bestFor: "Paired movement training",
-    trains: "Alternating skills",
-    how: "Even minutes and odd minutes run different tasks.",
-  },
-  billat: {
-    bestFor: "VO2max development",
-    trains: "Aerobic power",
-    how: "Repeated max-effort intervals with equal rest.",
-  },
-  amrap: {
-    bestFor: "Benchmark WODs, capacity testing",
-    trains: "Conditioning, mental toughness",
-    how: "Accumulate as many rounds and reps as possible.",
-    score: "Rounds + reps",
-  },
-  edt: {
-    bestFor: "Volume accumulation",
-    trains: "Muscular endurance",
-    how: "Accumulate as many reps as possible in the time window.",
-    score: "Reps",
-  },
-  death_by: {
-    bestFor: "Progressive overload, competition",
-    trains: "Endurance, max capacity",
-    how: "Add reps every round until the round cannot be completed.",
-    score: "Total reps",
-  },
-  tabata: {
-    bestFor: "HIIT conditioning",
-    trains: "Anaerobic capacity",
-    how: "Short work and rest intervals for fixed rounds.",
-  },
-  custom_hiit: {
-    bestFor: "Custom interval protocols",
-    trains: "Anaerobic and aerobic mix",
-    how: "Custom work and rest ratio for fixed rounds.",
-  },
-  cluster: {
-    bestFor: "Heavy strength, cluster sets",
-    trains: "Maximal strength",
-    how: "Short intra-set rest between each rep cluster.",
-  },
-  hrr: {
-    bestFor: "Heart rate-guided recovery",
-    trains: "Cardiovascular recovery",
-    how: "Rest until heart rate drops to the target zone.",
-    score: "HR drop rate",
-  },
-  ladder_ascending: {
-    bestFor: "Progressive loading",
-    trains: "Strength endurance",
-    how: "Start at base reps and add step reps every round.",
-  },
-  ladder_descending: {
-    bestFor: "Countdown workouts",
-    trains: "Speed, conditioning",
-    how: "Start high and subtract reps every round.",
-    score: "Time",
-  },
-  pyramid: {
-    bestFor: "Volume and intensity balance",
-    trains: "Strength, endurance",
-    how: "Reps climb to a peak and then descend.",
-    score: "Time",
-  },
-  rest: {
-    bestFor: "Programmed recovery",
-    trains: "Recovery",
-    how: "Passive rest for the given duration.",
-  },
-};
+const ALL_SECTION_FORMATS: SectionFormat[] = [
+  "untimed", "for_time", "train_to_exhaustion", "kcal_target", "emom", "complex_emom", "even_odd",
+  "billat", "amrap", "edt", "death_by", "tabata", "custom_hiit", "cluster", "hrr",
+  "ladder_ascending", "ladder_descending", "pyramid", "rest",
+];
+
+export function getFormatLabels(i18n: UiTranslate): Record<SectionFormat, string> {
+  return Object.fromEntries(ALL_SECTION_FORMATS.map((format) => [format, i18n(`formatLabel_${format}`)])) as Record<SectionFormat, string>;
+}
+
+const FORMAT_TOOLTIP_SCORE_FORMATS = new Set<SectionFormat>([
+  "for_time", "train_to_exhaustion", "kcal_target", "emom", "complex_emom", "amrap", "edt",
+  "death_by", "hrr", "ladder_descending", "pyramid",
+]);
+
+export function getFormatTooltips(i18n: UiTranslate) {
+  return Object.fromEntries(ALL_SECTION_FORMATS.map((format) => [format, {
+    bestFor: i18n(`formatTooltip_${format}_bestFor`),
+    trains: i18n(`formatTooltip_${format}_trains`),
+    how: i18n(`formatTooltip_${format}_how`),
+    ...(FORMAT_TOOLTIP_SCORE_FORMATS.has(format) ? {score: i18n(`formatTooltip_${format}_score`)} : {}),
+  }])) as Record<SectionFormat, {bestFor: string; trains: string; how: string; score?: string}>;
+}
 
 type FormatFieldDef = {
   key: string;
@@ -416,18 +307,18 @@ export const FORMAT_EXERCISE_CONTEXT: Record<SectionFormat, ExerciseFormatContex
   emom:                { showSets: false, showPrescription: true,  showLoad: true,  intervalMode: "none" },
   complex_emom:        { showSets: false, showPrescription: true,  showLoad: true,  intervalMode: "minute" },
   even_odd:            { showSets: false, showPrescription: true,  showLoad: true,  intervalMode: "odd_even" },
-  billat:              { showSets: false, showPrescription: true,  prescriptionSuffix: "max", showLoad: true,  intervalMode: "none" },
+  billat:              { showSets: false, showPrescription: true,  prescriptionSuffix: "prescriptionSuffixMax", showLoad: true,  intervalMode: "none" },
   amrap:               { showSets: false, showPrescription: true,  showLoad: true,  intervalMode: "none" },
   // Starting reps; athlete reduces as fatigue accumulates through the PR zone
-  edt:                 { showSets: false, showPrescription: true,  prescriptionSuffix: "starting", showLoad: true,  intervalMode: "none" },
+  edt:                 { showSets: false, showPrescription: true,  prescriptionSuffix: "prescriptionSuffixStarting", showLoad: true,  intervalMode: "none" },
   // Death By: each exercise has its own start + step (like a per-exercise ladder)
   death_by:            { showSets: false, showPrescription: true,  ladderPrescription: true, showLoad: true,  intervalMode: "none" },
-  tabata:              { showSets: false, showPrescription: true,  prescriptionSuffix: "per interval", showLoad: true,  intervalMode: "none" },
-  custom_hiit:         { showSets: false, showPrescription: true,  prescriptionSuffix: "per interval", showLoad: true,  intervalMode: "none" },
+  tabata:              { showSets: false, showPrescription: true,  prescriptionSuffix: "prescriptionSuffixPerInterval", showLoad: true,  intervalMode: "none" },
+  custom_hiit:         { showSets: false, showPrescription: true,  prescriptionSuffix: "prescriptionSuffixPerInterval", showLoad: true,  intervalMode: "none" },
   // showClusters exposes the second prescription dimension: clusters per set
   cluster:             { showSets: true,  showPrescription: true,  showClusters: true, showLoad: true, intervalMode: "none" },
   // HR ceiling/floor are section-level; per-exercise shows effort intensity
-  hrr:                 { showSets: false, showPrescription: true,  prescriptionHint: "until HR ceiling", showLoad: true,  intervalMode: "none" },
+  hrr:                 { showSets: false, showPrescription: true,  prescriptionHint: "prescriptionHintUntilHrCeiling", showLoad: true,  intervalMode: "none" },
   ladder_ascending:    { showSets: false, showPrescription: true,  ladderPrescription: true, showLoad: true, intervalMode: "none" },
   ladder_descending:   { showSets: false, showPrescription: true,  ladderPrescription: true, showLoad: true, intervalMode: "none" },
   // Pyramid reuses ladderPrescription to show peak + step inline
@@ -458,74 +349,76 @@ export function makeDefaultExercise(): DraftExercise {
   };
 }
 
-function fmins(secs: number | null | undefined): string {
+function fmins(i18n: UiTranslate, secs: number | null | undefined): string {
   if (!secs) return "—";
   const m = Math.floor(secs / 60);
   const s = secs % 60;
-  return s > 0 ? `${m}:${String(s).padStart(2, "0")}` : `${m}min`;
+  return s > 0 ? i18n("minutesSecondsShort", {minutes: m, seconds: String(s).padStart(2, "0")}) : i18n("minutesShort", {value: m});
 }
 
-function fsecs(secs: number | null | undefined): string {
-  return secs ? `${secs}s` : "—";
+function fsecs(i18n: UiTranslate, secs: number | null | undefined): string {
+  return secs ? i18n("secondsShort", {value: secs}) : "—";
 }
 
-export function getFormatInstruction(format: SectionFormat, params: FormatParams): string {
+export function getFormatInstruction(i18n: UiTranslate, format: SectionFormat, params: FormatParams): string {
   switch (format) {
     case "untimed":
       return "";
     case "for_time":
       return params.time_cap_seconds
-        ? `Complete for time · cap ${fmins(params.time_cap_seconds)}`
-        : "Complete for time";
+        ? i18n("instructionForTimeWithCap", {cap: fmins(i18n, params.time_cap_seconds)})
+        : i18n("instructionForTime");
     case "train_to_exhaustion":
       return params.rest_seconds
-        ? `Sets to failure · ${fsecs(params.rest_seconds)} rest between sets`
-        : "Sets to failure";
+        ? i18n("instructionFailureWithRest", {rest: fsecs(i18n, params.rest_seconds)})
+        : i18n("instructionFailure");
     case "kcal_target":
       return params.kcal_target
-        ? `Machine to ${params.kcal_target}kcal${params.time_cap_seconds ? ` · cap ${fmins(params.time_cap_seconds)}` : ""}`
-        : "Machine calorie target";
+        ? i18n(params.time_cap_seconds ? "instructionCaloriesWithCap" : "instructionCalories", {
+            calories: params.kcal_target, cap: fmins(i18n, params.time_cap_seconds),
+          })
+        : i18n("instructionCaloriesTarget");
     case "emom":
-      return `EMOM ${fmins(params.duration_seconds)} · every ${fsecs(params.interval_seconds)}`;
+      return i18n("instructionEmom", {duration: fmins(i18n, params.duration_seconds), interval: fsecs(i18n, params.interval_seconds)});
     case "complex_emom": {
       const perMinuteKeys = Object.keys(params)
         .filter((k) => /^interval_seconds_\d+$/.test(k))
         .sort((a, b) => Number(a.replace("interval_seconds_", "")) - Number(b.replace("interval_seconds_", "")));
       if (perMinuteKeys.length === 0) {
-        return `Complex EMOM ${fmins(params.duration_seconds)} · ${fsecs(params.interval_seconds)} intervals`;
+        return i18n("instructionComplexEmom", {duration: fmins(i18n, params.duration_seconds), interval: fsecs(i18n, params.interval_seconds)});
       }
       const minuteParts = perMinuteKeys.map((k) => {
         const min = k.replace("interval_seconds_", "");
-        return `Min${min}: ${fsecs(params[k])}`;
+        return i18n("instructionMinuteInterval", {minute: min, interval: fsecs(i18n, params[k])});
       });
-      return `Complex EMOM ${fmins(params.duration_seconds)} · ${minuteParts.join(", ")}`;
+      return i18n("instructionComplexEmomVariable", {duration: fmins(i18n, params.duration_seconds), intervals: minuteParts.join(", ")});
     }
     case "even_odd":
-      return `E/O EMOM ${fmins(params.duration_seconds)} · alternate odd/even minutes`;
+      return i18n("instructionEvenOddEmom", {duration: fmins(i18n, params.duration_seconds)});
     case "billat":
-      return `${params.cycles ?? 8}× ${fsecs(params.work_seconds)} @vVO2max / ${fsecs(params.rest_seconds)} @50%`;
+      return i18n("instructionBillat", {cycles: params.cycles ?? 8, work: fsecs(i18n, params.work_seconds), rest: fsecs(i18n, params.rest_seconds)});
     case "amrap":
-      return `AMRAP ${fmins(params.duration_seconds)}`;
+      return i18n("instructionAmrap", {duration: fmins(i18n, params.duration_seconds)});
     case "edt":
-      return `EDT ${fmins(params.duration_seconds)} · accumulate max reps, reduce as needed`;
+      return i18n("instructionEdt", {duration: fmins(i18n, params.duration_seconds)});
     case "death_by":
-      return `EMOM · +N/round per exercise until failure${params.max_rounds ? ` · max ${params.max_rounds} rounds` : ""}`;
+      return i18n(params.max_rounds ? "instructionDeathByWithMax" : "instructionDeathBy", {rounds: params.max_rounds ?? 0});
     case "tabata":
-      return `Tabata · ${fsecs(params.work_seconds)} on / ${fsecs(params.rest_seconds)} off × ${params.rounds ?? 8} rounds`;
+      return i18n("instructionTabata", {work: fsecs(i18n, params.work_seconds), rest: fsecs(i18n, params.rest_seconds), rounds: params.rounds ?? 8});
     case "custom_hiit":
-      return `${fsecs(params.work_seconds)} on / ${fsecs(params.rest_seconds)} off × ${params.rounds ?? 10} rounds`;
+      return i18n("instructionCustomHiit", {work: fsecs(i18n, params.work_seconds), rest: fsecs(i18n, params.rest_seconds), rounds: params.rounds ?? 10});
     case "cluster":
       return params.intra_rest_seconds
-        ? `Cluster sets · ${fsecs(params.intra_rest_seconds)} intra-set rest`
-        : "Cluster sets";
+        ? i18n("instructionClusterWithRest", {rest: fsecs(i18n, params.intra_rest_seconds)})
+        : i18n("instructionCluster");
     case "hrr":
-      return `Work → rest to ${params.hr_floor_bpm ?? 130}bpm · resume at ${params.hr_ceiling_bpm ?? 175}bpm${params.cycles ? ` · ${params.cycles} cycles` : ""}`;
+      return i18n(params.cycles ? "instructionHrrWithCycles" : "instructionHrr", {floor: params.hr_floor_bpm ?? 130, ceiling: params.hr_ceiling_bpm ?? 175, cycles: params.cycles ?? 0});
     case "ladder_ascending":
-      return `Ladder ↑${params.time_cap_seconds ? ` · cap ${fmins(params.time_cap_seconds)}` : ""}`;
+      return i18n(params.time_cap_seconds ? "instructionLadderAscendingWithCap" : "instructionLadderAscending", {cap: fmins(i18n, params.time_cap_seconds)});
     case "ladder_descending":
-      return `Ladder ↓ (for time)${params.time_cap_seconds ? ` · cap ${fmins(params.time_cap_seconds)}` : ""}`;
+      return i18n(params.time_cap_seconds ? "instructionLadderDescendingWithCap" : "instructionLadderDescending", {cap: fmins(i18n, params.time_cap_seconds)});
     case "pyramid":
-      return `Pyramid — up to peak then back down${params.time_cap_seconds ? ` · cap ${fmins(params.time_cap_seconds)}` : ""}`;
+      return i18n(params.time_cap_seconds ? "instructionPyramidWithCap" : "instructionPyramid", {cap: fmins(i18n, params.time_cap_seconds)});
     case "rest":
       return "";
   }

@@ -6,6 +6,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import { useCallback, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -41,8 +42,6 @@ function expiresWarn(expiresOn: string): boolean {
   const diff = new Date(expiresOn).getTime() - Date.now();
   return diff > 0 && diff < 30 * 24 * 60 * 60 * 1000;
 }
-
-const EUR = new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" });
 
 // ── Reusable filter UI helpers ────────────────────────────────────────────────
 
@@ -533,6 +532,8 @@ function MemberRow({
   onOpenReferralWizard: () => void;
 }) {
   const i18n = useUiTranslations();
+  const uiLocale = useUiLocale();
+  const eur = new Intl.NumberFormat(uiLocale, { style: "currency", currency: "EUR" });
   const membershipStatusOptions = [
     { value: "active", label: i18n("activea733b80"), accent: true },
     { value: "trial", label: i18n("trial5f7537c") },
@@ -568,9 +569,9 @@ function MemberRow({
   return (
     <tr style={{ borderBottom: borderStyle }}>
       {/* Nickname — sticky, opens detail panel */}
-      <td className="sticky left-0 z-10 px-4 py-3" style={{ background: "var(--panel)" }}>
+      <td className="sticky start-0 z-10 px-4 py-3" style={{ background: "var(--panel)" }}>
         <button
-          className="text-sm font-semibold text-left hover:opacity-70 transition-opacity"
+          className="text-sm font-semibold text-start hover:opacity-70 transition-opacity"
           style={{ color: "var(--text)" }}
           onClick={onOpenPanel}
           type="button"
@@ -644,7 +645,7 @@ function MemberRow({
       <td className="px-4 py-3" style={{ whiteSpace: "nowrap" }}>
         {lastPaidCents !== null ? (
           <span className="text-xs font-semibold" style={{ color: "var(--text-soft)" }}>
-            {EUR.format(lastPaidCents / 100)}
+            {eur.format(lastPaidCents / 100)}
           </span>
         ) : (
           <span className="text-xs" style={{ color: "var(--dim)" }}>—</span>
@@ -658,7 +659,7 @@ function MemberRow({
             className="text-xs font-semibold"
             style={{ color: creditCents > 0 ? "var(--success)" : "var(--primary-strong)" }}
           >
-            {EUR.format(creditCents / 100)}
+            {eur.format(creditCents / 100)}
           </span>
         ) : (
           <span className="text-xs" style={{ color: "var(--dim)" }}>—</span>
@@ -675,7 +676,7 @@ function MemberRow({
               color: "var(--danger)",
             }}
           >
-            {EUR.format(outstandingCents / 100)} {i18n("due30cdf73")}
+            {eur.format(outstandingCents / 100)} {i18n("due30cdf73")}
           </span>
         ) : (
           <span className="text-xs" style={{ color: "var(--dim)" }}>—</span>

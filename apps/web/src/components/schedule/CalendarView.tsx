@@ -4,6 +4,7 @@
 
 
 
+
 import {useUiTranslations} from "@/i18n/ui";
 import type { ScheduleSlot } from "@/api/schedule";
 import { useLocale } from "next-intl";
@@ -216,6 +217,14 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
 
 function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact: boolean; onSelectSlot: (slot: ScheduleSlot) => void }) {
   const i18n = useUiTranslations();
+
+  function slotStatusLabel(slot: ScheduleSlot, isPast: boolean) {
+    if (slot.current_user_booking) return slot.current_user_booking.status;
+    if (isPast) return i18n("ended90303d8");
+    if (slot.spots_remaining === 0) return i18n("full10b28a8");
+    return i18n("value0SpotsLeft3ff0ef6", {value0: slot.spots_remaining});
+  }
+
   const locale = useLocale();
   const isPast = new Date(slot.scheduled_at) <= new Date();
   const isUnavailable = !slot.current_user_booking && (slot.spots_remaining === 0 || isPast);
@@ -280,11 +289,4 @@ function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact
       </div>
     </button>
   );
-}
-
-function slotStatusLabel(slot: ScheduleSlot, isPast: boolean) {
-  if (slot.current_user_booking) return slot.current_user_booking.status;
-  if (isPast) return "Ended";
-  if (slot.spots_remaining === 0) return "Full";
-  return `${slot.spots_remaining} spots left`;
 }

@@ -5,6 +5,8 @@
 
 
 
+
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
@@ -27,12 +29,12 @@ function metricText(record: Record<string, unknown>, key: string) {
   return typeof value === "string" && value.length > 0 ? value : "unknown";
 }
 
-function formatCount(value: number) {
-  return new Intl.NumberFormat("en-US").format(value);
+function formatCount(uiLocale: string, value: number) {
+  return new Intl.NumberFormat(uiLocale).format(value);
 }
 
-function formatMoney(cents: number) {
-  return new Intl.NumberFormat("en-US", {
+function formatMoney(uiLocale: string, cents: number) {
+  return new Intl.NumberFormat(uiLocale, {
     style: "currency",
     currency: "EUR",
     maximumFractionDigits: 0,
@@ -76,6 +78,7 @@ function KpiCard({
 }
 
 function BreakdownList({ title, rows }: { title: string; rows: [string, unknown][] }) {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const numericRows = rows.filter(([, value]) => typeof value === "number") as [string, number][];
   const max = Math.max(...numericRows.map(([, value]) => value), 1);
@@ -89,7 +92,7 @@ function BreakdownList({ title, rows }: { title: string; rows: [string, unknown]
             <div key={label}>
               <div className="flex items-center justify-between gap-3 text-sm">
                 <span className="capitalize text-[var(--text-soft)]">{label.replaceAll("_", " ")}</span>
-                <span className="font-bold text-[var(--text)]">{formatCount(value)}</span>
+                <span className="font-bold text-[var(--text)]">{formatCount(uiLocale, value)}</span>
               </div>
               <div className="mt-2 h-2 rounded-full bg-[var(--panel-muted)]">
                 <div
@@ -110,6 +113,7 @@ function BreakdownList({ title, rows }: { title: string; rows: [string, unknown]
 type AnalyticsSection = "overview" | "training" | "coaching" | "engagement" | "health";
 
 export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSection }) {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const SECTION_COPY: Record<AnalyticsSection, { eyebrow: string; title: string; body: string }> = {
     overview: {
@@ -197,21 +201,21 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
         {section === "overview" ? <section className="grid gap-4 md:grid-cols-4">
           <KpiCard
             label={i18n("paidRevenue64c34e5")}
-            value={formatMoney(metricNumber(financeTotals, "paid_revenue_cents"))}
-            helper={(formatCount(metricNumber(dashboardFinance, "active_memberships"))) + i18n("activeMemberships6d55ee8")}
+            value={formatMoney(uiLocale, metricNumber(financeTotals, "paid_revenue_cents"))}
+            helper={(formatCount(uiLocale, metricNumber(dashboardFinance, "active_memberships"))) + i18n("activeMemberships6d55ee8")}
             href="/admin/metrics/finance"
           />
-          <KpiCard label={i18n("reviewsb83c4cd")} value={formatCount(metricNumber(feedback, "total"))} href="/admin/reviews" />
+          <KpiCard label={i18n("reviewsb83c4cd")} value={formatCount(uiLocale, metricNumber(feedback, "total"))} href="/admin/reviews" />
           <KpiCard
             label={i18n("activeInjuriesdaecfa6")}
-            value={formatCount(metricNumber(wellbeing, "active_count"))}
-            helper={(formatCount(metricNumber(wellbeing, "total"))) + i18n("totalReportsdfd4b9e")}
+            value={formatCount(uiLocale, metricNumber(wellbeing, "active_count"))}
+            helper={(formatCount(uiLocale, metricNumber(wellbeing, "total"))) + i18n("totalReportsdfd4b9e")}
             href="/admin/metrics/health"
           />
           <KpiCard
             label={i18n("notificationClicks02c5775")}
-            value={formatCount(metricNumber(notificationClicks, "total"))}
-            helper={(formatCount(metricNumber(events, "total"))) + i18n("trackedEvents398d5c2")}
+            value={formatCount(uiLocale, metricNumber(notificationClicks, "total"))}
+            helper={(formatCount(uiLocale, metricNumber(events, "total"))) + i18n("trackedEvents398d5c2")}
             href="/admin/metrics/engagement"
           />
         </section> : null}
@@ -219,22 +223,22 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
         {section === "training" ? <section id="training-analytics" className="scroll-mt-20 rounded-[1.6rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
           <h2 className="text-xl font-black">{i18n("teamWorkoutBreakdownLast30Days86ec3d2")}</h2>
           <div className="mt-4 grid gap-4 md:grid-cols-3">
-            <KpiCard label={i18n("teamCompletions2a732d2")} value={formatCount(metricNumber(teamWorkoutsAggregate, "team_count"))} />
+            <KpiCard label={i18n("teamCompletions2a732d2")} value={formatCount(uiLocale, metricNumber(teamWorkoutsAggregate, "team_count"))} />
             <KpiCard
               label={i18n("individualCompletions70ee9b2")}
-              value={formatCount(metricNumber(teamWorkoutsAggregate, "individual_count"))}
+              value={formatCount(uiLocale, metricNumber(teamWorkoutsAggregate, "individual_count"))}
             />
-            <KpiCard label={i18n("totalCompletionsfa16f4c")} value={formatCount(metricNumber(teamWorkoutsAggregate, "total_count"))} />
+            <KpiCard label={i18n("totalCompletionsfa16f4c")} value={formatCount(uiLocale, metricNumber(teamWorkoutsAggregate, "total_count"))} />
           </div>
           {Object.keys(teamWorkoutsByUser).length > 0 ? (
             <div className="mt-6 overflow-hidden rounded-2xl border border-[color:var(--border)]">
               <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-[var(--muted)]">{i18n("perUser3fcfda7")}</p>
-              <table className="w-full text-left text-sm">
+              <table className="w-full text-start text-sm">
                 <tbody>
                   {entries(teamWorkoutsByUser).slice(0, 8).map(([userId, count]) => (
                     <tr key={userId} className="border-t border-[color:var(--border)]">
                       <td className="p-3 font-mono text-xs text-[var(--muted)]">{userId}</td>
-                      <td className="p-3 text-right font-bold">{formatCount(Number(count))}</td>
+                      <td className="p-3 text-end font-bold">{formatCount(uiLocale, Number(count))}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -268,9 +272,9 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
             </Link>
           </div>
           <div className="mt-5 grid gap-4 md:grid-cols-3">
-            <KpiCard label={i18n("activeAthletes78e231e")} value={formatCount(metricNumber(coaching, "active_athletes"))} />
-            <KpiCard label={i18n("capturedEvents2551a14")} value={formatCount(metricNumber(dashboardCoaching, "event_count"))} />
-            <KpiCard label={i18n("reviewsb83c4cd")} value={formatCount(metricNumber(dashboardCoaching, "review_count"))} />
+            <KpiCard label={i18n("activeAthletes78e231e")} value={formatCount(uiLocale, metricNumber(coaching, "active_athletes"))} />
+            <KpiCard label={i18n("capturedEvents2551a14")} value={formatCount(uiLocale, metricNumber(dashboardCoaching, "event_count"))} />
+            <KpiCard label={i18n("reviewsb83c4cd")} value={formatCount(uiLocale, metricNumber(dashboardCoaching, "review_count"))} />
           </div>
         </section> : null}
 
@@ -285,9 +289,9 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
             </Link>
           </div>
           <div className="mt-5 grid gap-4 md:grid-cols-3">
-            <KpiCard label={i18n("activeInjuriesdaecfa6")} value={formatCount(metricNumber(wellbeing, "active_count"))} />
-            <KpiCard label={i18n("totalReports5654449")} value={formatCount(metricNumber(wellbeing, "total"))} />
-            <KpiCard label={i18n("recentInjuryFlags0692c0a")} value={formatCount(metricNumber(dashboardCoaching, "injury_count"))} />
+            <KpiCard label={i18n("activeInjuriesdaecfa6")} value={formatCount(uiLocale, metricNumber(wellbeing, "active_count"))} />
+            <KpiCard label={i18n("totalReports5654449")} value={formatCount(uiLocale, metricNumber(wellbeing, "total"))} />
+            <KpiCard label={i18n("recentInjuryFlags0692c0a")} value={formatCount(uiLocale, metricNumber(dashboardCoaching, "injury_count"))} />
           </div>
         </section> : null}
 
@@ -301,15 +305,15 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-[var(--muted)]">{i18n("lowRatingReviews928d645")}</dt>
-                <dd className="font-bold">{formatCount(metricNumber(crossContext, "low_rating_count"))}</dd>
+                <dd className="font-bold">{formatCount(uiLocale, metricNumber(crossContext, "low_rating_count"))}</dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-[var(--muted)]">{i18n("expiringMemberships522e6a4")}</dt>
-                <dd className="font-bold">{formatCount(metricNumber(dashboardFinance, "expiring_memberships"))}</dd>
+                <dd className="font-bold">{formatCount(uiLocale, metricNumber(dashboardFinance, "expiring_memberships"))}</dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-[var(--muted)]">{i18n("coachingActiveAthletese8bc87a")}</dt>
-                <dd className="font-bold">{formatCount(metricNumber(coaching, "active_athletes"))}</dd>
+                <dd className="font-bold">{formatCount(uiLocale, metricNumber(coaching, "active_athletes"))}</dd>
               </div>
             </dl>
           </article>

@@ -61,7 +61,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [signOut, tokens?.access_token, workoutId]);
+  }, [i18n, signOut, tokens?.access_token, workoutId]);
 
   useEffect(() => {
     if (!tokens?.access_token) return;
@@ -123,8 +123,8 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
 
       {/* Panel */}
       <div
-        className="fixed inset-y-0 right-0 z-50 flex w-full flex-col overflow-hidden md:max-w-[480px]"
-        style={{ background: "var(--bg)", borderLeft: "1px solid var(--border)" }}
+        className="fixed inset-y-0 end-0 z-50 flex w-full flex-col overflow-hidden md:max-w-[480px]"
+        style={{ background: "var(--bg)", borderInlineStart: "1px solid var(--border)" }}
       >
         {/* Sticky header */}
         <div
@@ -205,7 +205,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
               {i18n("athletesda22204")}
               {selectedIds.length > 0 ? (
                 <span
-                  className="ml-2 rounded-full px-1.5 py-0.5 text-[10px]"
+                  className="ms-2 rounded-full px-1.5 py-0.5 text-[10px]"
                   style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                 >
                   {selectedIds.length} {i18n("selected835f3b5")}
@@ -223,13 +223,13 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
               value={query}
             />
 
-            <div className="mt-3 max-h-56 space-y-2 overflow-y-auto pr-1">
+            <div className="mt-3 max-h-56 space-y-2 overflow-y-auto pe-1">
               {athletes.map((athlete) => {
                 const selected = selectedIds.includes(athlete.id);
                 return (
                   <button
                     key={athlete.id}
-                    className="flex w-full items-center justify-between rounded-[1rem] px-4 py-2.5 text-left text-sm transition-colors"
+                    className="flex w-full items-center justify-between rounded-[1rem] px-4 py-2.5 text-start text-sm transition-colors"
                     style={
                       selected
                         ? { background: "var(--primary)", color: "var(--bg)" }

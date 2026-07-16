@@ -142,8 +142,8 @@ export function AssignedWorkoutPanel({
 
       {/* Panel */}
       <div
-        className="fixed right-0 z-50 flex w-full flex-col overflow-hidden md:max-w-[480px]"
-        style={{ background: "var(--bg)", borderLeft: "1px solid var(--border)", top: "3.25rem", bottom: 0 }}
+        className="fixed end-0 z-50 flex w-full flex-col overflow-hidden md:max-w-[480px]"
+        style={{ background: "var(--bg)", borderInlineStart: "1px solid var(--border)", top: "3.25rem", bottom: 0 }}
       >
         {/* Sticky header */}
         <div
@@ -239,7 +239,7 @@ export function AssignedWorkoutPanel({
         <div className="flex-1 overflow-y-auto px-5 py-5 space-y-3">
           <section className="overflow-hidden rounded-[1.2rem]" style={{ border: "1px solid var(--border)" }}>
             <button
-              className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+              className="flex w-full items-center justify-between gap-3 px-4 py-3 text-start"
               style={{ background: "var(--panel-muted)" }}
               onClick={() => setActiveSection("details")}
               type="button"

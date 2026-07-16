@@ -8,7 +8,7 @@ import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 
 import type { ScaleLevel } from "@/api/workouts";
-import { FORMAT_EXERCISE_CONTEXT, FORMAT_LABELS, getFormatInstruction, type DraftExercise, type DraftSection, type LoadMode, type LoadProgression, type PrescriptionUnit } from "@/types/workout";
+import { FORMAT_EXERCISE_CONTEXT, getFormatInstruction, getFormatLabels, type DraftExercise, type DraftSection, type LoadMode, type LoadProgression, type PrescriptionUnit } from "@/types/workout";
 
 import { FormatTooltip } from "./FormatTooltip";
 
@@ -98,23 +98,24 @@ function resolveExercise(
 
 export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
   const i18n = useUiTranslations();
+  const formatLabels = getFormatLabels(i18n);
   const [collapsed, setCollapsed] = useState(false);
   const isEmpty = section.exercises.length === 0;
 
   const params = section.formatParams;
-  const formatInstruction = getFormatInstruction(section.format, params);
+  const formatInstruction = getFormatInstruction(i18n, section.format, params);
 
   return (
     <div className="mb-3">
-      <button onClick={() => setCollapsed((current) => !current)} className="w-full py-2 text-left">
+      <button onClick={() => setCollapsed((current) => !current)} className="w-full py-2 text-start">
         <div className="flex items-center justify-between gap-2">
           <div>
             <span className="text-sm font-bold" style={{ color: "var(--text)" }}>
               {section.name || i18n("unnamedSection109fa70")}
             </span>
             <FormatTooltip format={section.format}>
-              <span className="ml-2 text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-                {FORMAT_LABELS[section.format]}
+              <span className="ms-2 text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
+                {formatLabels[section.format]}
               </span>
             </FormatTooltip>
           </div>
@@ -137,7 +138,7 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
       </button>
 
       {!collapsed ? (
-        <div className="flex flex-col gap-1 pl-2">
+        <div className="flex flex-col gap-1 ps-2">
           {section.exercises.map((exercise) => {
             const resolved = resolveExercise(exercise, activeScale);
             const scaleLevel = activeScale ? scaleLevels.find((item) => item.slug === activeScale) : null;
@@ -171,18 +172,18 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
               loadStr = i18n("bw2c0410b");
             } else if (resolved.loadProgression) {
               const prog = resolved.loadProgression;
-              const unit = prog.startMode === "pct_1rm" ? "%RM" : "kg";
+              const unit = prog.startMode === "pct_1rm" ? i18n("percentOneRepMaxUnit") : i18n("kilogramsUnit");
               if (prog.mode === "linear") {
                 const end = prog.startValue + prog.stepValue * (resolved.sets - 1);
-                loadStr = "· " + (prog.startValue) + "→" + (end) + (unit) + " (+" + (prog.stepValue) + (unit) + "/set)";
+                loadStr = i18n("linearLoadProgression", {start: prog.startValue, end, unit, step: prog.stepValue});
               } else {
                 const vals = Array.from({ length: resolved.sets }, (_, i) =>
                   prog.perSetValues[i] ?? prog.startValue,
                 );
-                loadStr = "· " + (vals.join("/")) + (unit);
+                loadStr = i18n("perSetLoadProgression", {values: vals.join("/"), unit});
               }
             } else if (resolved.loadValue != null) {
-              loadStr = "· " + (resolved.loadValue) + " " + (resolved.loadMode === "pct_1rm" ? "%RM" : "kg");
+              loadStr = i18n("loadWithUnit", {value: resolved.loadValue, unit: resolved.loadMode === "pct_1rm" ? i18n("percentOneRepMaxUnit") : i18n("kilogramsUnit")});
             }
 
             let prescriptionText = "";
@@ -192,20 +193,20 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
               }
             } else if (ctx.ladderPrescription) {
               if (section.format === "pyramid") {
-                prescriptionText = "peak " + (resolved.prescriptionValue) + " " + (resolved.prescriptionUnit) + ", ±" + (step) + "/round";
+                prescriptionText = i18n("pyramidPrescription", {value: resolved.prescriptionValue, unit: resolved.prescriptionUnit, step});
               } else {
                 const dir = section.format === "ladder_descending" ? "−" : "+";
-                prescriptionText = "start " + (resolved.prescriptionValue) + " " + (resolved.prescriptionUnit) + ", " + (dir) + (step) + "/round";
+                prescriptionText = i18n("ladderPrescription", {value: resolved.prescriptionValue, unit: resolved.prescriptionUnit, direction: dir, step});
               }
             } else if (ctx.prescriptionHint) {
-              prescriptionText = (resolved.prescriptionUnit) + " — " + (ctx.prescriptionHint);
+              prescriptionText = (resolved.prescriptionUnit) + " — " + i18n(ctx.prescriptionHint);
             } else if (section.format === "cluster" && resolved.clustersPerSet) {
               prescriptionText = (resolved.sets) + " × " + (resolved.clustersPerSet) + i18n("clusters65add00") + (resolved.prescriptionValue) + " " + (resolved.prescriptionUnit);
             } else if (ctx.showSets) {
-              const suffix = ctx.prescriptionSuffix ? "(" + (ctx.prescriptionSuffix) + ")" : "";
+              const suffix = ctx.prescriptionSuffix ? "(" + i18n(ctx.prescriptionSuffix) + ")" : "";
               prescriptionText = (resolved.sets) + " × " + (resolved.prescriptionValue) + " " + (resolved.prescriptionUnit) + (suffix);
             } else {
-              const suffix = ctx.prescriptionSuffix ? "(" + (ctx.prescriptionSuffix) + ")" : "";
+              const suffix = ctx.prescriptionSuffix ? "(" + i18n(ctx.prescriptionSuffix) + ")" : "";
               prescriptionText = (resolved.prescriptionValue) + " " + (resolved.prescriptionUnit) + (suffix);
             }
 
@@ -249,7 +250,7 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
                   ) : null}
                 </div>
                 {advancedLines.length > 0 ? (
-                  <div className="mt-0.5 pl-2" style={{ color: "var(--dim)" }}>
+                  <div className="mt-0.5 ps-2" style={{ color: "var(--dim)" }}>
                     {advancedLines.join(" · ")}
                   </div>
                 ) : null}
@@ -265,9 +266,9 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
           style={{ color: "var(--dim)" }}
         >
           <div className="h-px flex-1" style={{ background: "var(--dim)", opacity: 0.4 }} />
-          <span>{i18n("restb79e5f4")} {section.restAfterSeconds >= 60
-            ? (Math.round(section.restAfterSeconds / 60)) + "min"
-            : (section.restAfterSeconds) + "s"}
+          <span>{i18n("restDuration", {duration: section.restAfterSeconds >= 60
+            ? i18n("minutesShort", {value: Math.round(section.restAfterSeconds / 60)})
+            : i18n("secondsShort", {value: section.restAfterSeconds})})}
           </span>
           <div className="h-px flex-1" style={{ background: "var(--dim)", opacity: 0.4 }} />
         </div>

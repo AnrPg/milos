@@ -51,6 +51,7 @@ type Props = {
 };
 
 export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props) {
+  const i18n = useUiTranslations();
   function publishValidationMessages({
     title,
     type,
@@ -103,8 +104,6 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
     flexibility: i18n("flexibility1ef8e6d"),
     recovery: i18n("recoveryea924f7"),
   };
-
-  const i18n = useUiTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { tokens } = useSession();
@@ -119,7 +118,7 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
   const isSubstitute = Boolean(substituteForAssignment ?? substituteForSlot);
 
   const ready = isPublishReady({ title, type, sections });
-  const summary = completionSummary(sections);
+  const summary = completionSummary(sections, i18n);
   const publishMessages = publishValidationMessages({ title, type, sections });
 
   const publishLabel = isReopen || isSubstitute ? i18n("applyChangesb8fb717") : i18n("publish5656400");
@@ -253,7 +252,7 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
 
         {!ready ? (
           <div
-            className="pointer-events-none absolute right-0 top-full z-50 mt-2 rounded-xl p-3 text-xs opacity-0 transition-opacity group-hover:opacity-100"
+            className="pointer-events-none absolute end-0 top-full z-50 mt-2 rounded-xl p-3 text-xs opacity-0 transition-opacity group-hover:opacity-100"
             style={{ background: "var(--card)", border: "1px solid var(--dim)", color: "var(--muted)" }}
           >
             {publishMessages.map((message) => (

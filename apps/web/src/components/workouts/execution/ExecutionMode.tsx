@@ -670,7 +670,7 @@ export function ExecutionMode() {
               color: "var(--muted)",
             }}
           >
-            ‹
+            <span className="inline-block rtl:rotate-180">‹</span>
           </button>
         )}
         <button

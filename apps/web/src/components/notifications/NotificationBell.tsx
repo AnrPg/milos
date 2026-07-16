@@ -6,6 +6,9 @@
 
 
 
+
+
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
@@ -22,8 +25,8 @@ import { useSession } from "@/components/session-provider";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { subscribeToTopic } from "@/lib/realtime";
 
-function formatTimestamp(isoString: string) {
-  return new Intl.DateTimeFormat("en-US", {
+function formatTimestamp(uiLocale: string, isoString: string) {
+  return new Intl.DateTimeFormat(uiLocale, {
     month: "short",
     day: "numeric",
     hour: "numeric",
@@ -76,6 +79,8 @@ function NotificationCard({
   targetUrl: string | null;
   onClick: () => void;
 }) {
+  const uiLocale = useUiLocale();
+  const i18n = useUiTranslations();
   function notificationBody(notification: NotificationRecord) {
     if (typeof notification.payload.body === "string") {
       return notification.payload.body;
@@ -202,41 +207,39 @@ function NotificationCard({
   function notificationTitle(type: string) {
     switch (type) {
       case "booking_pending":
-        return "New booking request";
+        return i18n("newBookingRequest457ca72");
       case "booking_approved":
-        return "Booking approved";
+        return i18n("bookingApproved61fe8f8");
       case "booking_rejected":
-        return "Booking rejected";
+        return i18n("bookingRejectede74f5ed");
       case "booking_timeout":
-        return "Booking timed out";
+        return i18n("bookingTimedOut2ac6827");
       case "workout_note":
-        return "Workout annotation";
+        return i18n("workoutAnnotation7b74f93");
       case "workout_changed":
-        return "Workout changed";
+        return i18n("workoutChanged8ae1481");
       case "workout_deleted":
-        return "Workout deleted by coach";
+        return i18n("workoutDeletedByCoachfb153d4");
       case "workout_rejected":
-        return "Workout rejected";
+        return i18n("workoutRejected14068a6");
       case "athlete_message":
-        return "Message from athlete";
+        return i18n("messageFromAthlete768702f");
       case "admin_note":
-        return "Coach note";
+        return i18n("coachNotee98376b");
       case "chat_message":
-        return "New message";
+        return i18n("newMessage1ed2e7b");
       case "challenge_completed":
-        return "Challenge completed";
+        return i18n("challengeCompletedec1f9a3");
       case "workout_moved":
-        return "Workout rescheduled";
+        return i18n("workoutRescheduledb1ead39");
       case "invoice_issued":
-        return "Invoice issued";
+        return i18n("invoiceIssued6a8d8fa");
       case "payment_reminder":
-        return "Outstanding balance";
+        return i18n("outstandingBalancee9fd5bb");
       default:
         return i18n("notificationc18f8f2");
     }
   }
-
-  const i18n = useUiTranslations();
   const clickable = Boolean(targetUrl);
 
   return (
@@ -281,7 +284,7 @@ function NotificationCard({
         ) : null}
       </div>
       <p className="mt-3 text-xs uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-        {formatTimestamp(notification.inserted_at)}
+        {formatTimestamp(uiLocale, notification.inserted_at)}
       </p>
     </article>
   );
@@ -422,17 +425,17 @@ export function NotificationBell() {
 
     switch (push.step) {
       case "fetch-config":
-        return "Checking push configuration...";
+        return i18n("checkingPushConfiguration4733bdc");
       case "register-worker":
-        return "Registering the browser service worker...";
+        return i18n("registeringTheBrowserServiceWorker6ef3f3d");
       case "browser-subscription":
         return push.state === "enabling"
-          ? "Creating a browser push subscription..."
-          : "Enable browser push for approvals, notes, and alerts.";
+          ? i18n("creatingABrowserPushSubscription1bac6ad")
+          : i18n("enableBrowserPushForApprovalsNotesAndAlerts4f4ec8d");
       case "server-save":
-        return "Saving this browser subscription to the server...";
+        return i18n("savingThisBrowserSubscriptionToTheServerd3589ad");
       case "server-verify":
-        return "Verifying that the server persisted this browser subscription...";
+        return i18n("verifyingThatTheServerPersistedThisBrowserSubscriptiona0178c5");
       default:
         return i18n("enableBrowserPushForApprovalsNotesAndAlerts4f4ec8d");
     }
@@ -450,7 +453,7 @@ export function NotificationBell() {
     }
     if (markAllRead.isPending) return i18n("updatingNotifications27106ac");
     return i18n("noNotificationsYet5537c60");
-  }, [markAllRead.isPending, notificationQuery.data, notificationQuery.isError, notificationQuery.isPending]);
+  }, [i18n, markAllRead.isPending, notificationQuery.data, notificationQuery.isError, notificationQuery.isPending]);
 
   if (status !== "authenticated" || !tokens?.access_token) return null;
 
@@ -510,8 +513,8 @@ export function NotificationBell() {
           role="presentation"
         >
           <aside
-            className="absolute right-0 top-0 h-full w-full max-w-md overflow-y-auto p-6 shadow-[-20px_0_60px_rgba(0,0,0,0.5)]"
-            style={{ background: "var(--panel)", borderLeft: "1px solid var(--border)" }}
+            className="absolute end-0 top-0 h-full w-full max-w-md overflow-y-auto p-6 shadow-[-20px_0_60px_rgba(0,0,0,0.5)] rtl:shadow-[20px_0_60px_rgba(0,0,0,0.5)]"
+            style={{ background: "var(--panel)", borderInlineStart: "1px solid var(--border)" }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4">
@@ -624,7 +627,7 @@ export function NotificationBell() {
                       {i18n("new6403f2b")}
                       {unreadNotifications.length > 0 ? (
                         <span
-                          className="ml-2 rounded-full px-1.5 py-0.5 text-[10px]"
+                          className="ms-2 rounded-full px-1.5 py-0.5 text-[10px]"
                           style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                         >
                           {unreadNotifications.length}

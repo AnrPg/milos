@@ -4,6 +4,8 @@
 
 
 
+
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -19,9 +21,9 @@ function field(record: FinanceRecord | null | undefined, key: string, fallback =
   return String(value);
 }
 
-function money(cents: unknown) {
+function money(uiLocale: string, cents: unknown) {
   const amount = typeof cents === "number" ? cents : Number(cents ?? 0);
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" }).format(amount / 100);
+  return new Intl.NumberFormat(uiLocale, { style: "currency", currency: "EUR" }).format(amount / 100);
 }
 
 function dateText(value: unknown) {
@@ -30,6 +32,7 @@ function dateText(value: unknown) {
 }
 
 export function QueuesTab() {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const CHIPS: Array<{ id: QueueKey; label: string }> = [
     { id: "expiring", label: i18n("expiringb98d672") },
@@ -79,7 +82,7 @@ export function QueuesTab() {
             {label}
             {rowsByKey[id].length > 0 && (
               <span
-                className="ml-2 rounded-full px-2 py-0.5 text-xs"
+                className="ms-2 rounded-full px-2 py-0.5 text-xs"
                 style={{
                   background: active === id ? "color-mix(in srgb, var(--bg) 15%, transparent)" : "color-mix(in srgb, var(--primary) 15%, transparent)",
                   color: active === id ? "var(--bg)" : "var(--primary)",
@@ -110,14 +113,14 @@ export function QueuesTab() {
             {active === "pending" && rows.map((row, i) => (
               <QueueRow key={field(row, "id", String(i))} last={i === rows.length - 1}>
                 <span style={{ color: "var(--text)" }}>{field(row, "nickname", field(row, "membership_id"))}</span>
-                <span style={{ color: "var(--muted)" }}>{money(row.amount_cents)}</span>
+                <span style={{ color: "var(--muted)" }}>{money(uiLocale, row.amount_cents)}</span>
               </QueueRow>
             ))}
 
             {active === "overdue" && rows.map((row, i) => (
               <QueueRow key={field(row, "id", String(i))} last={i === rows.length - 1}>
                 <span style={{ color: "var(--text)" }}>{field(row, "invoice_number")}</span>
-                <span style={{ color: "var(--primary-strong)" }}>{money(row.balance_due_cents)} {i18n("overdueba2fff4")}</span>
+                <span style={{ color: "var(--primary-strong)" }}>{money(uiLocale, row.balance_due_cents)} {i18n("overdueba2fff4")}</span>
               </QueueRow>
             ))}
 
@@ -142,7 +145,7 @@ export function QueuesTab() {
 }
 
 function QueueRow({ children, last }: { children: React.ReactNode; last: boolean }) {
-  const i18n = useUiTranslations();
+  
   return (
     <div
       className="flex items-center justify-between gap-4 px-6 py-4 text-sm"

@@ -4,6 +4,7 @@
 
 
 
+
 import {useUiTranslations} from "@/i18n/ui";
 import type { TimerSegment } from "@/api/executions";
 import { buildStepId } from "./progress";
@@ -30,7 +31,7 @@ export function buildChecklistSteps(segment: TimerSegment): ChecklistStep[] {
 
       return Array.from({ length: setCount }, (_, index) => ({
         stepId: buildStepId(segment, exercise, setCount, index + 1),
-        stepLabel: setCount > 1 ? `Set ${index + 1}/${setCount}` : null,
+        stepLabel: setCount > 1 ? `${index + 1}/${setCount}` : null,
         exerciseId: exercise.id,
         exercise,
       }));
@@ -115,7 +116,7 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
               </p>
               {currentStep?.stepLabel && (
                 <p className="mt-0.5 text-sm font-semibold" style={{ color: "var(--primary)" }}>
-                  {currentStep.stepLabel}
+                  {i18n("setLabel")} {currentStep.stepLabel}
                 </p>
               )}
               {(prescriptionLabel ?? loadLabel) && (
@@ -188,7 +189,7 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
                 </span>
                 <span className="text-sm line-through" style={{ color: "var(--muted)" }}>
                   {s.exercise.name}
-                  {s.stepLabel ? "· " + (s.stepLabel) : ""}
+                  {s.stepLabel ? i18n("value0Value1a19bd79", {value0: i18n("setLabel"), value1: s.stepLabel}) : ""}
                 </span>
               </div>
             ))}

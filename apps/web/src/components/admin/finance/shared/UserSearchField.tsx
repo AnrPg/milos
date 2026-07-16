@@ -126,7 +126,7 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
             <button
               type="button"
               onClick={clear}
-              className="ml-auto text-xs hover:opacity-70 transition-opacity"
+              className="ms-auto text-xs hover:opacity-70 transition-opacity"
               style={{ color: "var(--dim)" }}
             >
               ✕
@@ -157,7 +157,7 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
 
           {(results.length > 0 || loading) && (
             <div
-              className="absolute left-0 top-full z-50 mt-1 w-full rounded-xl overflow-hidden shadow-xl"
+              className="absolute start-0 top-full z-50 mt-1 w-full rounded-xl overflow-hidden shadow-xl"
               style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)" }}
             >
               {loading ? (
@@ -170,7 +170,7 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
                     key={field(u, "id")}
                     type="button"
                     onClick={() => select(u)}
-                    className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-[var(--border)] transition-colors"
+                    className="flex w-full items-center gap-2 px-3 py-2 text-start hover:bg-[var(--border)] transition-colors"
                   >
                     <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
                       {field(u, "nickname")}

@@ -4,6 +4,8 @@
 
 
 
+
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import Link from "next/link";
 import { useState } from "react";
@@ -51,9 +53,9 @@ function nestedRecord(record: FinanceRecord | null | undefined, key: string) {
   return value as FinanceRecord;
 }
 
-function money(cents: unknown) {
+function money(uiLocale: string, cents: unknown) {
   const amount = typeof cents === "number" ? cents : Number(cents ?? 0);
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" }).format(amount / 100);
+  return new Intl.NumberFormat(uiLocale, { style: "currency", currency: "EUR" }).format(amount / 100);
 }
 
 function dateText(value: unknown) {
@@ -67,6 +69,7 @@ function percent(value: unknown) {
 }
 
 export function AdminFinance() {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const { tokens } = useSession();
   const queryClient = useQueryClient();
@@ -331,12 +334,12 @@ export function AdminFinance() {
   const summaryCards: Array<[string, string]> = [
     [i18n("activeMemberships0d117fb"), String(totals.active_memberships ?? 0)],
     [i18n("expiringIn30Days3722a5d"), String(totals.expiring_memberships ?? 0)],
-    [i18n("paidRevenue64c34e5"), money(totals.paid_revenue_cents)],
-    [i18n("openCreditBalancec588f1f"), money(totals.credit_balance_cents)],
-    [i18n("outstandingInvoices700edaf"), money(totals.outstanding_invoice_balance_cents)],
-    [i18n("overdueInvoices747a2d8"), money(totals.overdue_invoice_balance_cents)],
+    [i18n("paidRevenue64c34e5"), money(uiLocale, totals.paid_revenue_cents)],
+    [i18n("openCreditBalancec588f1f"), money(uiLocale, totals.credit_balance_cents)],
+    [i18n("outstandingInvoices700edaf"), money(uiLocale, totals.outstanding_invoice_balance_cents)],
+    [i18n("overdueInvoices747a2d8"), money(uiLocale, totals.overdue_invoice_balance_cents)],
     [i18n("renewalConversion8c3f769"), percent(totals.renewal_conversion_percent)],
-    [i18n("invoiceCreditOffsets9fc1210"), money(totals.invoice_credit_offset_cents)],
+    [i18n("invoiceCreditOffsets9fc1210"), money(uiLocale, totals.invoice_credit_offset_cents)],
   ];
 
   return (
@@ -372,7 +375,7 @@ export function AdminFinance() {
                 <YAxis tickFormatter={(value) => "€" + (Number(value) / 100)} />
                 <Tooltip
                   labelFormatter={(value) => String(value).slice(0, 7)}
-                  formatter={(value) => money(value)}
+                  formatter={(value) => money(uiLocale, value)}
                 />
                 <Line
                   dataKey="paid_revenue_cents"
@@ -451,7 +454,7 @@ export function AdminFinance() {
                         {field(item, "code")} · {field(item, "family")} · {field(item, "billing_period")}
                       </p>
                     </div>
-                    <p className="font-black">{money(item.base_price_cents)}</p>
+                    <p className="font-black">{money(uiLocale, item.base_price_cents)}</p>
                   </div>
                 </Link>
               ))}
@@ -642,7 +645,7 @@ export function AdminFinance() {
                     <p className="font-bold">{field(program, "name")}</p>
                     <p className="text-sm text-[var(--muted)]">
                       {field(program, "reward_type")} · {field(program, "reward_value")} ·{" "}
-                      {program.active === false ? "inactive" : "active"}
+                      {program.active === false ? i18n("inactive09af574") : i18n("activea733b80")}
                     </p>
                   </div>
                 ))}
@@ -853,7 +856,7 @@ function Input({
   required?: boolean;
   type?: string;
 }) {
-  const i18n = useUiTranslations();
+  
   return (
     <label className="block space-y-1 text-sm font-semibold">
       <span>{label}</span>
@@ -968,6 +971,7 @@ function QueueList({
   secondary: string;
   moneySecondary?: boolean;
 }) {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   return (
     <div className="mb-5">
@@ -981,7 +985,7 @@ function QueueList({
               {secondary.includes("date") || secondary.includes("_on") || secondary.includes("_at")
                 ? dateText(row[secondary])
                 : moneySecondary
-                  ? money(row[secondary])
+                  ? money(uiLocale, row[secondary])
                   : field(row, secondary)}
             </p>
           </div>

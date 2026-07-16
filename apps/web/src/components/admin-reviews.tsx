@@ -73,7 +73,7 @@ export function AdminReviews() {
                       {String(snapshot.label ?? review.target_type)}
                     </p>
                     <p className="text-sm text-[var(--muted)]">
-                      {String(review.target_type)} {i18n("rating5852701")} {String(review.rating ?? "n/a")} · {String(review.sentiment)} · {String(review.status)}
+                      {String(review.target_type)} {i18n("rating5852701")} {String(review.rating ?? "—")} · {String(review.sentiment)} · {String(review.status)}
                     </p>
                     {review.target_id ? (
                       <p className="mt-1 text-xs text-[var(--dim)]">{i18n("target61ad50a")} {String(review.target_id)}</p>

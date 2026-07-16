@@ -9,13 +9,12 @@ import { AuthGuard } from "@/components/auth-guard";
 export const dynamic = "force-dynamic";
 
 export default function AdminMarketingPage() {
+  const i18n = useUiTranslations();
   const MARKETING_LINKS = [
     [i18n("promotions086e09b"), "/admin/finance?tab=promotions", i18n("createAndManagePromotionalOffers46d33bb")],
     [i18n("referrals2b0e3a3"), "/admin/finance?tab=referrals", i18n("reviewReferralActivityAndRewardActions8ea1271")],
     [i18n("packages0a99901"), "/admin/finance?tab=packages", i18n("manageThePackagesUsedByMembershipsAndEntitlementsb466c1f")],
   ] as const;
-
-  const i18n = useUiTranslations();
   return (
     <AuthGuard roles={["admin"]}>
       <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>

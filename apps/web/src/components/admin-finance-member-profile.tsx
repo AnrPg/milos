@@ -5,6 +5,8 @@
 
 
 
+
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -45,8 +47,8 @@ function dateField(record: FinanceRecord | null | undefined, key: string) {
   return field(record, key).slice(0, 10);
 }
 
-function money(cents: unknown) {
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" }).format(Number(cents ?? 0) / 100);
+function money(uiLocale: string, cents: unknown) {
+  return new Intl.NumberFormat(uiLocale, { style: "currency", currency: "EUR" }).format(Number(cents ?? 0) / 100);
 }
 
 function euroInputValue(cents: unknown) {
@@ -54,6 +56,7 @@ function euroInputValue(cents: unknown) {
 }
 
 export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const { tokens } = useSession();
   const queryClient = useQueryClient();
@@ -364,7 +367,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
             {i18n("statusbae7d5b")} {field(membership, "status", i18n("noMembershipb174349"))} {i18n("type3d87766")} {field(membership, "user_type_snapshot", "unknown")}
           </p>
           <div className="mt-5 inline-flex rounded-full bg-[var(--text)] px-5 py-3 text-sm font-black text-[var(--primary-contrast)]">
-            {i18n("availableCredit245f0e1")} {money(creditBalance)}
+            {i18n("availableCredit245f0e1")} {money(uiLocale, creditBalance)}
           </div>
           <div className="mt-3 inline-flex rounded-full bg-[color-mix(in_srgb,var(--success)_18%,transparent)] px-5 py-3 text-sm font-black text-[var(--success)]">
             {i18n("entitlement8994749")} {field(entitlement, "status", "inactive")} · {field(entitlement, "source", i18n("notEvaluated4bb5e31"))}
@@ -479,7 +482,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 options={payableInvoices.map((invoice) => field(invoice, "id"))}
                 optionLabel={(id) => {
                   const invoice = payableInvoices.find((item) => field(item, "id") === id);
-                  return (field(invoice, "invoice_number", id)) + i18n("due6e49fc0") + (money(invoice?.balance_due_cents));
+                  return (field(invoice, "invoice_number", id)) + i18n("due6e49fc0") + (money(uiLocale, invoice?.balance_due_cents));
                 }}
                 required={false}
                 onChange={(finance_invoice_id) => {
@@ -515,7 +518,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 options={packageSubscriptions.map((subscription) => field(subscription, "id"))}
                 optionLabel={(id) => {
                   const subscription = packageSubscriptions.find((item) => field(item, "id") === id);
-                  return (field(subscription, "package_code_snapshot", id)) + " · " + (money(subscription?.price_cents_snapshot));
+                  return (field(subscription, "package_code_snapshot", id)) + " · " + (money(uiLocale, subscription?.price_cents_snapshot));
                 }}
                 required={false}
                 onChange={(membership_package_subscription_id) => {
@@ -559,7 +562,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 options={renewableSubscriptions.map((subscription) => field(subscription, "id"))}
                 optionLabel={(id) => {
                   const subscription = renewableSubscriptions.find((item) => field(item, "id") === id);
-                  return (field(subscription, "package_code_snapshot", id)) + " · " + (money(subscription?.price_cents_snapshot));
+                  return (field(subscription, "package_code_snapshot", id)) + " · " + (money(uiLocale, subscription?.price_cents_snapshot));
                 }}
                 required={false}
                 onChange={(membership_package_subscription_id) =>
@@ -640,7 +643,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
               }}
             >
               <p className="rounded-2xl bg-[var(--panel)] p-4 text-sm font-bold text-[var(--muted)]">
-                {i18n("availableCreditcca6998")} {money(creditBalance)}
+                {i18n("availableCreditcca6998")} {money(uiLocale, creditBalance)}
               </p>
               <Select
                 label={i18n("paymentb41a92b")}
@@ -648,7 +651,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 options={creditablePayments.map((payment) => field(payment, "id"))}
                 optionLabel={(id) => {
                   const payment = creditablePayments.find((item) => field(item, "id") === id);
-                  return (money(payment?.amount_cents)) + " · " + (field(payment, "payment_status", "payment"));
+                  return (money(uiLocale, payment?.amount_cents)) + " · " + (field(payment, "payment_status", "payment"));
                 }}
                 disabled={creditablePayments.length === 0 || creditBalance <= 0}
                 onChange={(payment_id) => setApplyCreditForm({ ...applyCreditForm, payment_id })}
@@ -684,7 +687,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
               }}
             >
               <p className="rounded-2xl bg-[var(--panel)] p-4 text-sm font-bold text-[var(--muted)]">
-                {i18n("availableCreditcca6998")} {money(creditBalance)}
+                {i18n("availableCreditcca6998")} {money(uiLocale, creditBalance)}
               </p>
               <Select
                 label={i18n("invoicef9f3881")}
@@ -692,7 +695,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 options={invoices.map((invoice) => field(invoice, "id"))}
                 optionLabel={(id) => {
                   const invoice = invoices.find((item) => field(item, "id") === id);
-                  return (field(invoice, "invoice_number", id)) + i18n("due6e49fc0") + (money(invoice?.balance_due_cents));
+                  return (field(invoice, "invoice_number", id)) + i18n("due6e49fc0") + (money(uiLocale, invoice?.balance_due_cents));
                 }}
                 disabled={invoices.length === 0 || creditBalance <= 0}
                 onChange={(invoice_id) => setApplyInvoiceCreditForm({ ...applyInvoiceCreditForm, invoice_id })}
@@ -733,7 +736,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 options={reversiblePayments.map((payment) => field(payment, "id"))}
                 optionLabel={(id) => {
                   const payment = reversiblePayments.find((item) => field(item, "id") === id);
-                  return (money(payment?.net_amount_cents)) + i18n("remainingd475cb2") + (field(payment, "payment_method", "payment"));
+                  return (money(uiLocale, payment?.net_amount_cents)) + i18n("remainingd475cb2") + (field(payment, "payment_method", "payment"));
                 }}
                 disabled={reversiblePayments.length === 0}
                 onChange={(payment_id) => {
@@ -778,7 +781,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 options={reversibleCreditEntries.map((entry) => field(entry, "id"))}
                 optionLabel={(id) => {
                   const entry = reversibleCreditEntries.find((item) => field(item, "id") === id);
-                  return (money(entry?.remaining_reversible_cents)) + i18n("remainingd475cb2") + (field(entry, "entry_type", "credit"));
+                  return (money(uiLocale, entry?.remaining_reversible_cents)) + i18n("remainingd475cb2") + (field(entry, "entry_type", "credit"));
                 }}
                 disabled={reversibleCreditEntries.length === 0}
                 onChange={(credit_ledger_entry_id) => {
@@ -853,7 +856,7 @@ function Input({
   required?: boolean;
   type?: string;
 }) {
-  const i18n = useUiTranslations();
+  
   return (
     <label className="block space-y-1 text-sm font-semibold">
       <span>{label}</span>
@@ -926,6 +929,7 @@ function InvoiceHistory({
   onVoid: (id: string) => void;
   onRefresh: () => void;
 }) {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   return (
     <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--panel)] p-6 xl:col-span-4">
@@ -942,7 +946,7 @@ function InvoiceHistory({
                 <div>
                   <p className="font-black">{field(row, "invoice_number", id)}</p>
                   <p className="text-sm text-[var(--muted)]">
-                    {status} {i18n("totald6cf831")} {money(row.total_cents)} {i18n("due6e49fc0")} {money(row.balance_due_cents)}
+                    {status} {i18n("totald6cf831")} {money(uiLocale, row.total_cents)} {i18n("due6e49fc0")} {money(uiLocale, row.balance_due_cents)}
                   </p>
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--primary)]">
                     {i18n("due30cdf73")} {field(row, "due_date", i18n("notSetef374c5"))}
@@ -1206,6 +1210,7 @@ function History({
   secondary: string;
   moneySecondary?: boolean;
 }) {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   return (
     <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--panel)] p-6">
@@ -1215,7 +1220,7 @@ function History({
         {rows.map((row) => (
           <div key={field(row, "id")} className="rounded-2xl border border-[var(--border)] p-4">
             <p className="font-bold">{field(row, primary)}</p>
-            <p className="text-sm text-[var(--muted)]">{moneySecondary ? money(row[secondary]) : field(row, secondary)}</p>
+            <p className="text-sm text-[var(--muted)]">{moneySecondary ? money(uiLocale, row[secondary]) : field(row, secondary)}</p>
           </div>
         ))}
       </div>

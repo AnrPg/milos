@@ -698,7 +698,7 @@ export function isPublishReady(state: Pick<DraftWorkoutState, "title" | "type" |
   return state.sections.every(isSectionComplete);
 }
 
-export function completionSummary(sections: DraftSection[]): string {
+export function completionSummary(sections: DraftSection[], translate: (key: string, values: Record<string, number>) => string): string {
   const complete = sections.filter(isSectionComplete).length;
-  return `${complete} of ${sections.length} sections complete`;
+  return translate("sectionCompletionSummary", {complete, total: sections.length});
 }

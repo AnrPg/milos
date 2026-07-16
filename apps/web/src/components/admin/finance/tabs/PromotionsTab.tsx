@@ -199,7 +199,7 @@ function CampaignRows({ campaigns, onOpen }: { campaigns: FinanceRecord[]; onOpe
   return campaigns.map((campaign, index) => (
     <button
       key={field(campaign, "id")}
-      className="flex w-full items-center justify-between gap-4 px-6 py-4 text-left transition-opacity hover:opacity-80"
+      className="flex w-full items-center justify-between gap-4 px-6 py-4 text-start transition-opacity hover:opacity-80"
       style={{ borderBottom: index < campaigns.length - 1 ? "1px solid var(--border)" : "none" }}
       onClick={() => onOpen(field(campaign, "id"))}
       type="button"

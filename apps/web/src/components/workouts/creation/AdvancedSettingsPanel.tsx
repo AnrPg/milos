@@ -96,7 +96,7 @@ export function AdvancedSettingsPanel({ exercise, section, sectionOptions = [] }
                             inputType === "number" ? Number.parseInt(event.target.value, 10) || 0 : event.target.value,
                           )
                         }
-                        className="w-16 rounded-lg px-2 py-1 text-right text-sm outline-none"
+                        className="w-16 rounded-lg px-2 py-1 text-end text-sm outline-none"
                         style={{
                           background: "var(--bg)",
                           border: "1px solid var(--dim)",

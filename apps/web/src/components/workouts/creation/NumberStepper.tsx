@@ -1,7 +1,6 @@
 "use client";
 
 
-import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 
 type Props = {
@@ -13,7 +12,7 @@ type Props = {
 };
 
 export function NumberStepper({ value, onChange, min = 1, max, width = "w-10" }: Props) {
-  const i18n = useUiTranslations();
+  
   const [showArrows, setShowArrows] = useState(false);
 
   function increment() {

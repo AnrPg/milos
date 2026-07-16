@@ -1,5 +1,4 @@
 
-import {getUiTranslations} from "@/i18n/ui-server";
 import { AuthGuard } from "@/components/auth-guard";
 import { ScheduleConsole } from "@/components/schedule/ScheduleConsole";
 
@@ -10,7 +9,7 @@ export default async function AdminSchedulePage({
 }: {
   searchParams: Promise<Record<string, string>>;
 }) {
-  const i18n = await getUiTranslations();
+  
   const params = await searchParams;
   const initialOpenSlotId = params.open_slot ?? null;
 

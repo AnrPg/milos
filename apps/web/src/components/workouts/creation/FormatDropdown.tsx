@@ -6,7 +6,7 @@
 import {useUiTranslations} from "@/i18n/ui";
 import { useCallback, useRef, useState } from "react";
 
-import { FORMAT_GROUPS, FORMAT_LABELS, FORMAT_TOOLTIPS, type SectionFormat } from "@/types/workout";
+import { getFormatGroups, getFormatLabels, getFormatTooltips, type SectionFormat } from "@/types/workout";
 
 type FormatDropdownProps = {
   value: SectionFormat;
@@ -23,6 +23,9 @@ type DropdownRect = {
 
 export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
   const i18n = useUiTranslations();
+  const formatGroups = getFormatGroups(i18n);
+  const formatLabels = getFormatLabels(i18n);
+  const formatTooltips = getFormatTooltips(i18n);
   const [open, setOpen] = useState(false);
   const [hoveredFormat, setHoveredFormat] = useState<SectionFormat | null>(null);
   const [dropdownRect, setDropdownRect] = useState<DropdownRect | null>(null);
@@ -59,7 +62,7 @@ export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
     close();
   }
 
-  const tooltip = hoveredFormat ? FORMAT_TOOLTIPS[hoveredFormat] : null;
+  const tooltip = hoveredFormat ? formatTooltips[hoveredFormat] : null;
 
   return (
     <div className="relative w-full">
@@ -74,7 +77,7 @@ export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
           color: "var(--text)",
         }}
       >
-        <span>{FORMAT_LABELS[value]}</span>
+        <span>{formatLabels[value]}</span>
         <span style={{ color: "var(--muted)" }}>{open ? "^" : "v"}</span>
       </button>
 
@@ -103,7 +106,7 @@ export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
                 boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
               }}
             >
-              {FORMAT_GROUPS.map((group) => (
+              {formatGroups.map((group) => (
                 <div key={group.label}>
                   <div
                     className="px-3 py-1 text-xs font-bold uppercase tracking-widest"
@@ -118,7 +121,7 @@ export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
                       onClick={() => handleSelect(format)}
                       onMouseEnter={() => setHoveredFormat(format)}
                       onMouseLeave={() => setHoveredFormat(null)}
-                      className="w-full px-3 py-2 text-left text-sm transition-colors"
+                      className="w-full px-3 py-2 text-start text-sm transition-colors"
                       style={{
                         background:
                           format === value
@@ -129,7 +132,7 @@ export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
                         color: format === value ? "var(--accent)" : "var(--text)",
                       }}
                     >
-                      {FORMAT_LABELS[format]}
+                      {formatLabels[format]}
                     </button>
                   ))}
                 </div>
@@ -139,7 +142,7 @@ export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
             {/* Tooltip — rendered as sibling so it never clips */}
             {tooltip ? (
               <div
-                className="pointer-events-none ml-2 w-[240px] shrink-0 self-start rounded-xl p-4 text-xs"
+                className="pointer-events-none ms-2 w-[240px] shrink-0 self-start rounded-xl p-4 text-xs"
                 style={{
                   background: "var(--panel)",
                   border: "1px solid var(--dim)",
@@ -147,7 +150,7 @@ export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
                   boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
                 }}
               >
-                <div className="mb-2 font-bold">{FORMAT_LABELS[hoveredFormat!]}</div>
+                <div className="mb-2 font-bold">{formatLabels[hoveredFormat!]}</div>
                 <div className="mb-1">
                   <span style={{ color: "var(--muted)" }}>{i18n("bestFor6d7ae87")} </span>
                   {tooltip.bestFor}

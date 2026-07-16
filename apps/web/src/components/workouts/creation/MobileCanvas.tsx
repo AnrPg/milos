@@ -24,7 +24,7 @@ export function MobileCanvas({ scaleLevels }: Props) {
       {mobileView === "exercises" ? (
         <button
           onClick={() => setMobileView("sections")}
-          className="px-4 py-2 text-left text-sm"
+          className="px-4 py-2 text-start text-sm"
           style={{ color: "var(--accent)" }}
         >
           {i18n("sectionsfcb5b85")}

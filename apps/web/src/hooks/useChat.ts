@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import {useUiTranslations} from "@/i18n/ui";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { type ChatMessage, fetchThreadMessages, markThreadRead } from "@/api/messaging";
@@ -27,6 +28,7 @@ interface UseChatReturn {
 }
 
 export function useChat({ threadId, accessToken, currentUserId }: UseChatOptions): UseChatReturn {
+  const i18n = useUiTranslations();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [typingUsers, setTypingUsers] = useState<TypingUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -110,10 +112,10 @@ export function useChat({ threadId, accessToken, currentUserId }: UseChatOptions
 
   const sendMessage = useCallback(async (body: string, messageType = "chat") => {
     const channel = channelRef.current;
-    if (!channel) throw new Error("Chat is disconnected. Your message was not sent.");
+    if (!channel) throw new Error(i18n("chatDisconnectedError"));
 
     return channel.push<ChatMessage>("send_message", { body, message_type: messageType });
-  }, []);
+  }, [i18n]);
 
   const sendTypingStart = useCallback(() => {
     void channelRef.current?.push<{ typing: boolean }>("typing_start", {}).catch(() => undefined);

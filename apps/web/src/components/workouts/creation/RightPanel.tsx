@@ -25,7 +25,7 @@ export function RightPanel({ scaleLevels, mobile = false }: Props) {
     return (
       <div
         className="flex w-10 shrink-0 cursor-pointer flex-col items-center justify-center"
-        style={{ background: "var(--panel)", borderLeft: "1px solid var(--dim)" }}
+        style={{ background: "var(--panel)", borderInlineStart: "1px solid var(--dim)" }}
         onClick={() => setRightCollapsed(false)}
       >
         <span
@@ -56,7 +56,7 @@ export function RightPanel({ scaleLevels, mobile = false }: Props) {
   return (
     <div
       className={"flex " + (mobile ? "w-full" : "w-72 shrink-0") + " flex-col overflow-hidden"}
-      style={{ background: "var(--panel)", borderLeft: mobile ? "none" : "1px solid var(--dim)" }}
+      style={{ background: "var(--panel)", borderInlineStart: mobile ? "none" : "1px solid var(--dim)" }}
     >
       <div className="flex shrink-0 items-center justify-between px-4 py-3">
         <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>

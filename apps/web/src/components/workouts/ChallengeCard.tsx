@@ -4,6 +4,7 @@
 
 
 
+
 import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -12,23 +13,24 @@ import { fetchChallengeLeaderboard, optInChallenge, optOutChallenge } from "@/ap
 import { useSession } from "@/components/session-provider";
 import type { ChallengeRecord, LastProgressEvent } from "@/api/landing";
 
-function progressEventText(event: LastProgressEvent): string {
-  if (event.events.length === 1) {
-    return `You gained +${event.total_points} pts ${event.events[0].label}`;
-  }
-  const breakdown = event.events.map((e) => `${e.label} (+${e.points})`).join(", ");
-  return `+${event.total_points} pts this workout: ${breakdown}`;
-}
-
-function completionsRemainingText(challenge: ChallengeRecord): string {
-  if (challenge.completed) return "Target reached!";
-  const rem = challenge.completions_remaining;
-  if (rem === 0) return "Almost there!";
-  return `${rem} completion${rem === 1 ? "" : "s"} to go`;
-}
-
 export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
   const i18n = useUiTranslations();
+
+  function completionsRemainingText(challenge: ChallengeRecord): string {
+    if (challenge.completed) return i18n("targetReacheddc27c47");
+    const rem = challenge.completions_remaining;
+    if (rem === 0) return i18n("almostThere74c7770");
+    return i18n("value0CompletionValue1ToGof27cad7", {value0: rem, value1: rem === 1 ? "" : "s"});
+  }
+
+  function progressEventText(event: LastProgressEvent): string {
+    if (event.events.length === 1) {
+      return i18n("youGainedValue0PtsValue1c0a206a", {value0: event.total_points, value1: event.events[0].label});
+    }
+    const breakdown = event.events.map((e) => i18n("value0Value1ea86a0c", {value0: e.label, value1: e.points})).join(", ");
+    return i18n("value0PtsThisWorkoutValue1ba46052", {value0: event.total_points, value1: breakdown});
+  }
+
   const { tokens } = useSession();
   const queryClient = useQueryClient();
   const [expanded, setExpanded] = useState(false);
@@ -234,7 +236,7 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
                               style={{ color: isMine ? "var(--warning)" : "var(--text)" }}
                             >
                               {entry.nickname ?? i18n("athleteaa86fd2")}
-                              {isMine ? "(you)" : ""}
+                              {isMine ? i18n("youMarker") : ""}
                             </span>
                             <span className="shrink-0 text-[11px]" style={{ color: "var(--muted)" }}>
                               {entry.progress} {i18n("pts4abdfc6")}

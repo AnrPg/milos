@@ -5,7 +5,9 @@
 
 
 
+
 import {useUiTranslations} from "@/i18n/ui";
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -105,29 +107,6 @@ function challengeStatus(challenge: Pick<AdminChallengeRecord, "starts_at" | "en
   return "active";
 }
 
-function criteriaSummary(challenge: Pick<AdminChallengeRecord, "criteria_type" | "criteria_value">) {
-  const cv = challenge.criteria_value;
-  const count = typeof cv.count === "number" ? cv.count : Number(cv.count ?? 0);
-
-  switch (challenge.criteria_type) {
-    case "workout_type_count":
-      return `${count} ${String(cv.type_filter ?? "targeted")} workouts`;
-    case "pr_count":
-      return `${count} PRs`;
-    case "custom": {
-      const rules = cv.rules as Array<Record<string, unknown>> | undefined;
-      if (rules && rules.length > 0) {
-        const maxPts = rules.reduce((sum, r) => sum + Number(r.points ?? 0), 0);
-        return `Reach ${count} pts · up to ${maxPts} pts per workout`;
-      }
-      const inc = Number(cv.increment_per_completion ?? 1);
-      return `Reach ${count} pts (+${inc} per completion)`;
-    }
-    default:
-      return `${count} workouts`;
-  }
-}
-
 function payloadFromForm(form: ChallengeFormState): SaveChallengePayload {
   const count = Number(form.targetCount || 0);
 
@@ -215,6 +194,7 @@ function RuleRowEditor({
   onChange: (updated: RuleFormRow) => void;
   onRemove: () => void;
 }) {
+  const i18n = useUiTranslations();
   const CONDITION_LABELS: Record<RuleCondition, string> = {
     workout_type: i18n("workoutType34a530c"),
     scale_level: i18n("scaleLeveld3d3921"),
@@ -223,8 +203,6 @@ function RuleRowEditor({
     rare_workout_type: i18n("rareWorkoutType3d74d5c"),
     team_workout_streak: i18n("teamWorkoutStreak7c8340a"),
   };
-
-  const i18n = useUiTranslations();
   const inputStyle = {
     background: "var(--panel-muted)",
     borderColor: "var(--border)",
@@ -322,7 +300,7 @@ function RuleRowEditor({
           </label>
         )}
 
-        <label className="flex items-center gap-1 text-xs ml-auto" style={{ color: "var(--muted)" }}>
+        <label className="flex items-center gap-1 text-xs ms-auto" style={{ color: "var(--muted)" }}>
           {i18n("pts9ba094e")}
           <input
             className="rounded-xl border px-2 py-2 text-xs w-16"
@@ -370,7 +348,31 @@ function metricCard(label: string, value: string | number) {
 }
 
 export function AdminChallenges() {
+  function criteriaSummary(challenge: Pick<AdminChallengeRecord, "criteria_type" | "criteria_value">) {
+    const cv = challenge.criteria_value;
+    const count = typeof cv.count === "number" ? cv.count : Number(cv.count ?? 0);
+  
+    switch (challenge.criteria_type) {
+      case "workout_type_count":
+        return i18n("value0Value1Workouts1b9ac0e", {value0: count, value1: String(cv.type_filter ?? "targeted")});
+      case "pr_count":
+        return i18n("value0Prs11cc809", {value0: count});
+      case "custom": {
+        const rules = cv.rules as Array<Record<string, unknown>> | undefined;
+        if (rules && rules.length > 0) {
+          const maxPts = rules.reduce((sum, r) => sum + Number(r.points ?? 0), 0);
+          return i18n("reachValue0PtsUpToValue1PtsPerb59c651", {value0: count, value1: maxPts});
+        }
+        const inc = Number(cv.increment_per_completion ?? 1);
+        return i18n("reachValue0PtsValue1PerCompletion80a4cb2", {value0: count, value1: inc});
+      }
+      default:
+        return i18n("value0Workoutse047dc5", {value0: count});
+    }
+  }
+
   const i18n = useUiTranslations();
+  const uiLocale = useUiLocale();
   const { tokens } = useSession();
   const [selectedChallengeId, setSelectedChallengeId] = useState<string | null>(null);
   const [form, setForm] = useState<ChallengeFormState>(() => emptyForm());
@@ -748,7 +750,7 @@ export function AdminChallenges() {
                     return (
                       <button
                         key={challenge.id}
-                        className="w-full rounded-[1.6rem] p-4 text-left transition-colors"
+                        className="w-full rounded-[1.6rem] p-4 text-start transition-colors"
                         style={
                           selected
                             ? { background: "var(--panel-raised)", border: "1px solid var(--primary)" }
@@ -873,18 +875,18 @@ export function AdminChallenges() {
                     <table className="min-w-full divide-y divide-[var(--border)] text-sm">
                       <thead style={{ background: "var(--panel-muted)", color: "var(--muted)" }}>
                         <tr>
-                          <th className="px-4 py-3 text-left font-semibold">{i18n("user9f8a238")}</th>
-                          <th className="px-4 py-3 text-left font-semibold">{i18n("rolec3f104d")}</th>
-                          <th className="px-4 py-3 text-left font-semibold">{i18n("progress1b90271")}</th>
-                          <th className="px-4 py-3 text-left font-semibold">{i18n("target61ad50a")}</th>
+                          <th className="px-4 py-3 text-start font-semibold">{i18n("user9f8a238")}</th>
+                          <th className="px-4 py-3 text-start font-semibold">{i18n("rolec3f104d")}</th>
+                          <th className="px-4 py-3 text-start font-semibold">{i18n("progress1b90271")}</th>
+                          <th className="px-4 py-3 text-start font-semibold">{i18n("target61ad50a")}</th>
                           {selectedChallenge?.criteria_type === "custom" ? (
                             <>
-                              <th className="px-4 py-3 text-left font-semibold">{i18n("donee9b450d")}</th>
-                              <th className="px-4 py-3 text-left font-semibold">{i18n("remainingcc632b5")}</th>
+                              <th className="px-4 py-3 text-start font-semibold">{i18n("donee9b450d")}</th>
+                              <th className="px-4 py-3 text-start font-semibold">{i18n("remainingcc632b5")}</th>
                             </>
                           ) : null}
-                          <th className="px-4 py-3 text-left font-semibold">{i18n("completion2ff2556")}</th>
-                          <th className="px-4 py-3 text-left font-semibold">{i18n("completedAt3cabb39")}</th>
+                          <th className="px-4 py-3 text-start font-semibold">{i18n("completion2ff2556")}</th>
+                          <th className="px-4 py-3 text-start font-semibold">{i18n("completedAt3cabb39")}</th>
                         </tr>
                       </thead>
                       <tbody style={{ background: "var(--panel)", color: "var(--text)" }}>
@@ -903,7 +905,7 @@ export function AdminChallenges() {
                             <tr key={participant.user_id} style={{ borderTop: "1px solid var(--border)" }}>
                               <td className="px-4 py-3">{participant.nickname || participant.user_id}</td>
                               <td className="px-4 py-3" style={{ color: "var(--muted)" }}>
-                                {participant.role || "unknown"}
+                                {participant.role || i18n("unknownbc7819b")}
                               </td>
                               <td className="px-4 py-3">{participant.progress}</td>
                               <td className="px-4 py-3">{participant.target}</td>
@@ -919,7 +921,7 @@ export function AdminChallenges() {
                                 style={{ color: participant.completed_at ? "var(--success)" : "var(--muted)" }}
                               >
                                 {participant.completed_at
-                                  ? new Intl.DateTimeFormat("en-US", {
+                                  ? new Intl.DateTimeFormat(uiLocale, {
                                       month: "short",
                                       day: "numeric",
                                       hour: "numeric",

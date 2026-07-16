@@ -108,14 +108,14 @@ function FieldInfo({
       </button>
       {active && (
         <span
-          className="absolute right-0 top-9 z-50 w-[min(22rem,calc(100vw-3rem))] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7)]"
+          className="absolute end-0 top-9 z-50 w-[min(22rem,calc(100vw-3rem))] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7)]"
           style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)" }}
         >
           <span
-            className="absolute -top-[7px] right-2.5 h-3 w-3 rotate-45"
-            style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)", borderBottom: "none", borderRight: "none" }}
+            className="absolute -top-[7px] end-2.5 h-3 w-3 rotate-45"
+            style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)", borderBottom: "none", borderInlineEnd: "none" }}
           />
-          <span className="block space-y-2 p-4 text-left text-xs normal-case leading-5 tracking-normal [&_p]:m-0" style={{ color: "var(--text-soft)" }}>
+          <span className="block space-y-2 p-4 text-start text-xs normal-case leading-5 tracking-normal [&_p]:m-0" style={{ color: "var(--text-soft)" }}>
             {children}
           </span>
         </span>
@@ -142,7 +142,7 @@ function CollapsibleSection({
   return (
     <section id={id} className="overflow-hidden rounded-[2.4rem]" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
       <button
-        className="flex w-full items-center justify-between gap-4 p-8 text-left"
+        className="flex w-full items-center justify-between gap-4 p-8 text-start"
         type="button"
         onClick={() => setOpen((v) => !v)}
       >
@@ -209,7 +209,7 @@ function AppearanceSection({ token }: { token: string }) {
             <button
               key={slug}
               type="button"
-              className="rounded-[1.2rem] border p-4 text-left transition-colors"
+              className="rounded-[1.2rem] border p-4 text-start transition-colors"
               style={{
                 background: selected
                   ? "color-mix(in srgb, var(--primary) 12%, var(--panel-muted))"
@@ -227,8 +227,8 @@ function AppearanceSection({ token }: { token: string }) {
                   />
                 ))}
               </span>
-              <span className="block text-sm font-semibold" style={{ color: "var(--text)" }}>{theme.label}</span>
-              <span className="mt-1 block text-xs leading-5" style={{ color: "var(--muted)" }}>{theme.description}</span>
+              <span className="block text-sm font-semibold" style={{ color: "var(--text)" }}>{i18n(theme.label)}</span>
+              <span className="mt-1 block text-xs leading-5" style={{ color: "var(--muted)" }}>{i18n(theme.description)}</span>
             </button>
           );
         })}

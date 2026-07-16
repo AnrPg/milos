@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import {useUiTranslations} from "@/i18n/ui";
 
 import {
   fetchPushNotificationConfig,
@@ -82,6 +83,7 @@ async function persistPushConfig(config: PushNotificationConfig) {
 }
 
 export function usePushNotifications(accessToken: string | null | undefined) {
+  const i18n = useUiTranslations();
   type PushSyncState =
     | "idle"
     | "checking"
@@ -129,7 +131,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
   const [step, setStep] = useState<PushSyncStep>("idle");
   const [error, setError] = useState<string | null>(null);
 
-  async function syncSubscription(token: string, allowSubscribe: boolean) {
+  const syncSubscription = useCallback(async (token: string, allowSubscribe: boolean) => {
     setError(null);
     setState(allowSubscribe ? "enabling" : "checking");
     setStep("fetch-config");
@@ -155,7 +157,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
       setEnabled(false);
       setState("error");
       setStep("register-worker");
-      setError("The service worker could not be registered in this browser.");
+      setError(i18n("pushServiceWorkerRegistrationError"));
       return false;
     }
 
@@ -172,7 +174,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
       if (!status.registered) {
         setEnabled(false);
         setState("error");
-        setError("The browser subscription was created, but the server did not confirm persistence.");
+        setError(i18n("pushSubscriptionPersistenceError"));
         return false;
       }
 
@@ -203,7 +205,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
     if (!status.registered) {
       setEnabled(false);
       setState("error");
-      setError("The browser subscription was created, but the server did not confirm persistence.");
+      setError(i18n("pushSubscriptionPersistenceError"));
       return false;
     }
 
@@ -211,7 +213,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
     setState("enabled");
     setStep("complete");
     return true;
-  }
+  }, [i18n]);
 
   useEffect(() => {
     if (!accessToken || !supported) return;
@@ -229,7 +231,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
         if (!cancelled) {
           setEnabled(false);
           setState("error");
-          setError(caught instanceof Error ? caught.message : "Unable to initialize browser push.");
+          setError(caught instanceof Error ? caught.message : i18n("pushInitializationError"));
         }
       }
     }
@@ -239,7 +241,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
     return () => {
       cancelled = true;
     };
-  }, [accessToken, supported]);
+  }, [accessToken, i18n, supported, syncSubscription]);
 
   useEffect(() => {
     if (!accessToken || !supported || !("serviceWorker" in navigator)) return;
@@ -253,7 +255,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
       ) {
         void syncSubscription(token, Notification.permission === "granted").catch((caught) => {
           setState("error");
-          setError(caught instanceof Error ? caught.message : "Unable to synchronize browser push.");
+          setError(caught instanceof Error ? caught.message : i18n("pushSynchronizationError"));
         });
       }
     }
@@ -263,7 +265,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
     return () => {
       navigator.serviceWorker.removeEventListener("message", handleWorkerMessage);
     };
-  }, [accessToken, supported]);
+  }, [accessToken, i18n, supported, syncSubscription]);
 
   async function enablePush() {
     if (!accessToken || !supported) return false;
@@ -286,7 +288,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
     } catch (caught) {
       setEnabled(false);
       setState("error");
-      setError(caught instanceof Error ? caught.message : "Unable to enable browser push.");
+      setError(caught instanceof Error ? caught.message : i18n("pushEnableError"));
       return false;
     } finally {
       setBusy(false);
@@ -307,7 +309,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
       return true;
     } catch (caught) {
       setState("error");
-      setError(caught instanceof Error ? caught.message : "Unable to disable browser push.");
+      setError(caught instanceof Error ? caught.message : i18n("pushDisableError"));
       return false;
     } finally {
       setBusy(false);
@@ -324,7 +326,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
     } catch (caught) {
       setEnabled(false);
       setState("error");
-      setError(caught instanceof Error ? caught.message : "Unable to refresh browser push status.");
+      setError(caught instanceof Error ? caught.message : i18n("pushRefreshError"));
       return false;
     }
   }

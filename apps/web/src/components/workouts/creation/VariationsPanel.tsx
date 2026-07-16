@@ -2,6 +2,7 @@
 
 
 
+
 import {useUiTranslations} from "@/i18n/ui";
 import type { ScaleLevel } from "@/api/workouts";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
@@ -11,11 +12,6 @@ import { UnitCycler } from "./UnitCycler";
 
 const PRESCRIPTION_UNITS: PrescriptionUnit[] = ["reps", "secs", "kcal"];
 const LOAD_MODES: LoadMode[] = ["absolute", "pct_1rm", "bw"];
-const LOAD_LABELS: Record<LoadMode, string> = {
-  absolute: "kg",
-  pct_1rm: "%RM",
-  bw: "BW",
-};
 
 type Props = {
   exercise: DraftExercise;
@@ -25,6 +21,12 @@ type Props = {
 
 export function VariationsPanel({ exercise, section, scaleLevels }: Props) {
   const i18n = useUiTranslations();
+  const LOAD_LABELS: Record<LoadMode, string> = {
+    absolute: i18n("kilogramsUnit"),
+    pct_1rm: i18n("percentOneRepMaxUnit"),
+    bw: i18n("bw4d64743"),
+  };
+
   const { addVariation, updateVariation, excludeVariation, restoreVariation } = useWorkoutCreationStore();
 
   const scalesWithoutVariation = scaleLevels.filter(
@@ -159,7 +161,7 @@ export function VariationsPanel({ exercise, section, scaleLevels }: Props) {
 
             <button
               onClick={() => excludeVariation(section.localId, exercise.localId, scaleLevel.slug)}
-              className="ml-auto text-sm transition-colors"
+              className="ms-auto text-sm transition-colors"
               style={{ color: "var(--dim)" }}
               title={i18n("excludeThisExerciseForThisScaleLevele23e9bd")}
             >

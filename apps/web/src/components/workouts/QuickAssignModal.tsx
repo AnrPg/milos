@@ -203,7 +203,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
                       return (
                         <button
                           key={workout.id}
-                          className="flex w-full items-start gap-3 rounded-[1.2rem] px-4 py-3 text-left transition-colors"
+                          className="flex w-full items-start gap-3 rounded-[1.2rem] px-4 py-3 text-start transition-colors"
                           style={
                             selected
                               ? { background: "color-mix(in srgb, var(--primary) 15%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 35%, transparent)" }
@@ -294,7 +294,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
                           }
                         >
                           <button
-                            className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left"
+                            className="flex min-w-0 flex-1 items-center justify-between gap-3 text-start"
                             onClick={() => toggleAthlete(athlete.id)}
                             type="button"
                           >

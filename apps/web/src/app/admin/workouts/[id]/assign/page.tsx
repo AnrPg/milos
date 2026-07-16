@@ -1,5 +1,4 @@
 
-import {getUiTranslations} from "@/i18n/ui-server";
 import { AuthGuard } from "@/components/auth-guard";
 import { AssignWorkoutForm } from "@/components/workouts/AssignWorkoutForm";
 
@@ -10,7 +9,7 @@ export default async function AssignWorkoutPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const i18n = await getUiTranslations();
+  
   const { id } = await params;
 
   return (

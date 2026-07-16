@@ -42,7 +42,7 @@ function Panel({ id, title, children, href, hrefLabel }: { id: string; title: st
         aria-expanded={open}
         aria-controls={(id) + "-content"}
         onClick={() => setOpen((value) => !value)}
-        className="flex w-full items-center justify-between gap-4 text-left"
+        className="flex w-full items-center justify-between gap-4 text-start"
       >
         <span className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--primary)" }}>{title}</span>
         <span className="text-sm font-semibold" style={{ color: "var(--dim)" }}>{open ? i18n("hide34d8b60") : i18n("showd97d1ee")}</span>
@@ -50,7 +50,7 @@ function Panel({ id, title, children, href, hrefLabel }: { id: string; title: st
       {open ? (
         <div id={(id) + "-content"} className="mt-4 text-sm leading-6" style={{ color: "var(--text-soft)" }}>
           {children}
-          {href ? <Link href={href} className="mt-4 inline-flex text-sm font-semibold" style={{ color: "var(--primary)" }}>{resolvedHrefLabel} →</Link> : null}
+          {href ? <Link href={href} className="mt-4 inline-flex items-center gap-1 text-sm font-semibold" style={{ color: "var(--primary)" }}>{resolvedHrefLabel} <span className="inline-block rtl:rotate-180">→</span></Link> : null}
         </div>
       ) : null}
     </article>
@@ -66,7 +66,7 @@ function date(value: unknown) {
 }
 
 function useDossierQuery<T>(token: string | undefined, userId: string, key: string, fn: (token: string, id: string) => Promise<T>, enabled = true) {
-  const i18n = useUiTranslations();
+  
   return useQuery({
     queryKey: ["admin", "users", userId, key],
     enabled: Boolean(token) && enabled,
@@ -166,7 +166,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
 
           {sections.has("finance") ? <Panel id="finance" title={i18n("entitlementsAllowancescac0ef7")} href="/admin/finance"><p className="text-2xl font-semibold" style={{ color: "var(--text)" }}>{finance.data?.summary?.credit_balance ?? 0} {i18n("credits66c22fa")}</p><p className="mt-2">{String(finance.data?.summary?.current_status?.state ?? i18n("loadingMembershipStatusa609a3f"))}</p>{token ? <AdminEntitlements token={token} userId={userId} entitlement={effectiveEntitlement} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
 
-          {sections.has("training_history") ? <Panel id="training_history" title={i18n("trainingHistorya512053")} href="/admin/workouts"><p>{training.data?.summary.completed_count ?? 0} {i18n("completedOf88964ae")} {training.data?.summary.execution_count ?? 0} {i18n("executions8319d6e")}</p><div className="mt-3 space-y-2">{executions.length ? executions.slice(0, 5).map((item) => <div key={item.id} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><span className="font-semibold">{item.workout_title}</span><span className="ml-2" style={{ color: "var(--muted)" }}>{item.status} · {date(item.started_at_utc)}</span></div>) : <Empty>{i18n("noWorkoutExecutionsRecorded0a0b1d0")}</Empty>}</div></Panel> : null}
+          {sections.has("training_history") ? <Panel id="training_history" title={i18n("trainingHistorya512053")} href="/admin/workouts"><p>{training.data?.summary.completed_count ?? 0} {i18n("completedOf88964ae")} {training.data?.summary.execution_count ?? 0} {i18n("executions8319d6e")}</p><div className="mt-3 space-y-2">{executions.length ? executions.slice(0, 5).map((item) => <div key={item.id} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><span className="font-semibold">{item.workout_title}</span><span className="ms-2" style={{ color: "var(--muted)" }}>{item.status} · {date(item.started_at_utc)}</span></div>) : <Empty>{i18n("noWorkoutExecutionsRecorded0a0b1d0")}</Empty>}</div></Panel> : null}
 
           {sections.has("prs") ? <Panel id="prs" title={i18n("personalRecords05223a0")}><div className="space-y-2">{prs.data?.prs.length ? prs.data.prs.map((pr) => <div key={pr.id} className="flex justify-between gap-4"><span>{pr.name}</span><strong>{String(pr.current_score)} {pr.unit}</strong></div>) : <Empty>{i18n("noPersonalRecordsRecorded22a0fce")}</Empty>}</div></Panel> : null}
 

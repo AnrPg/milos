@@ -5,6 +5,8 @@
 
 
 
+
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -31,9 +33,9 @@ function field(record: FinanceRecord | null | undefined, key: string, fallback =
   return String(value);
 }
 
-function money(cents: unknown) {
+function money(uiLocale: string, cents: unknown) {
   const amount = typeof cents === "number" ? cents : Number(cents ?? 0);
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" }).format(amount / 100);
+  return new Intl.NumberFormat(uiLocale, { style: "currency", currency: "EUR" }).format(amount / 100);
 }
 
 function statusColor(status: string): string {
@@ -54,6 +56,7 @@ export function MemberPanel({
   nickname: string;
   onClose: () => void;
 }) {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
@@ -207,7 +210,7 @@ export function MemberPanel({
                     <InfoRow label={i18n("statusbae7d5b")} value={field(profile.membership, "status")} color={statusColor(field(profile.membership, "status"))} />
                     <InfoRow label={i18n("expiresa99be3d")} value={field(profile.membership, "expires_on") || "—"} />
                     <InfoRow label={i18n("entitlement8994749")} value={field(profile.membership, "entitlement_status") || "—"} />
-                    <InfoRow label={i18n("creditBalance471f025")} value={money(profile.credit_balance)} />
+                    <InfoRow label={i18n("creditBalance471f025")} value={money(uiLocale, profile.credit_balance)} />
                   </>
                 ) : (
                   <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("noMembershipRecord741b5d9")}</p>
@@ -274,7 +277,7 @@ export function MemberPanel({
                       </span>
                     </div>
                     <p className="text-xs mt-0.5" style={{ color: "var(--dim)" }}>
-                      {field(sub, "billing_period_snapshot")} · {money(sub.price_cents_snapshot)} {i18n("ends74f5b4d")} {field(sub, "ends_on") || "—"}
+                      {field(sub, "billing_period_snapshot")} · {money(uiLocale, sub.price_cents_snapshot)} {i18n("ends74f5b4d")} {field(sub, "ends_on") || "—"}
                     </p>
                   </div>
                 ))}
@@ -335,7 +338,7 @@ export function MemberPanel({
                       <option value="">{i18n("noPackageLink7149c0f")}</option>
                       {packageSubscriptions.map((sub) => (
                         <option key={field(sub, "id")} value={field(sub, "id")}>
-                          {field(sub, "package_code_snapshot", i18n("package7431e3d"))} · {money(sub.price_cents_snapshot)}
+                          {field(sub, "package_code_snapshot", i18n("package7431e3d"))} · {money(uiLocale, sub.price_cents_snapshot)}
                         </option>
                       ))}
                     </select>
@@ -445,7 +448,7 @@ export function MemberPanel({
                       <option value="">{i18n("noInvoiceLink0b4810f")}</option>
                       {payableInvoices.map((invoice) => (
                         <option key={field(invoice, "id")} value={field(invoice, "id")}>
-                          {field(invoice, "invoice_number", i18n("invoicef9f3881"))} · {money(invoice.balance_due_cents)} {i18n("due30cdf73")}
+                          {field(invoice, "invoice_number", i18n("invoicef9f3881"))} · {money(uiLocale, invoice.balance_due_cents)} {i18n("due30cdf73")}
                         </option>
                       ))}
                     </select>
@@ -490,7 +493,7 @@ export function MemberPanel({
                     <div key={field(pay, "id")} className="rounded-[1.2rem] px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
                       <div className="flex items-center justify-between gap-3">
                         <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-                          {money(pay.amount_cents)}
+                          {money(uiLocale, pay.amount_cents)}
                         </span>
                         <span className="text-xs" style={{ color: "var(--muted)" }}>
                           {field(pay, "paid_on")}
@@ -517,7 +520,7 @@ export function MemberPanel({
                   {i18n("creditLedger88b2bbb")}{(profile.credit_ledger_entries as FinanceRecord[]).length})
                 </p>
                 <span className="text-sm font-semibold" style={{ color: "var(--success)" }}>
-                  {i18n("balance802dc02")} {money(profile.credit_balance)}
+                  {i18n("balance802dc02")} {money(uiLocale, profile.credit_balance)}
                 </span>
               </div>
 
@@ -529,7 +532,7 @@ export function MemberPanel({
                     <div key={field(entry, "id")} className="rounded-[1.2rem] px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
                       <div className="flex items-center justify-between gap-3">
                         <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-                          {money(entry.amount_cents)}
+                          {money(uiLocale, entry.amount_cents)}
                         </span>
                         <span className="text-xs font-semibold" style={{ color: statusColor(field(entry, "status")) }}>
                           {field(entry, "status")}
@@ -561,6 +564,7 @@ function InvoiceCard({
   token: string;
   onUploaded: () => void;
 }) {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const invoiceId = field(invoice, "id");
   const status = field(invoice, "status");
@@ -669,7 +673,7 @@ function InvoiceCard({
             {field(invoice, "invoice_number", invoiceId)}
           </p>
           <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-            {money(invoice.total_cents)}
+            {money(uiLocale, invoice.total_cents)}
           </span>
         </div>
         <div className="flex items-center gap-2">

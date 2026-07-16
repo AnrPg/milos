@@ -364,8 +364,8 @@ export function ReferralEventWizard({
                 form.membership_id
                   ? form.membership_id
                   : form.referred_user_id
-                    ? "No membership — assign above"
-                    : "Select referee first"
+                    ? i18n("referralNoMembership")
+                    : i18n("selectRefereeFirst")
               }
               warn={refereeHasNoMembership}
             />
@@ -560,7 +560,7 @@ function SummaryRow({ label, value, warn }: { label: string; value: string; warn
     <div className="flex items-start justify-between gap-4 text-sm">
       <span style={{ color: "var(--dim)" }}>{label}</span>
       <span
-        className="text-right font-semibold"
+        className="text-end font-semibold"
         style={{ color: warn ? "var(--primary-strong)" : "var(--text)" }}
       >
         {value || "—"}

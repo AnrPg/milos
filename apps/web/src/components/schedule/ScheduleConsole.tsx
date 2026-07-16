@@ -169,7 +169,7 @@ export function ScheduleConsole({
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (appliedMobileDefault.current) return;
-    if (!window.matchMedia(i18n("maxWidth767px397353b")).matches || days !== 7) return;
+    if (!window.matchMedia("(max-width: 767px)").matches || days !== 7) return;
 
     appliedMobileDefault.current = true;
     const frame = window.requestAnimationFrame(() => setDays(3));

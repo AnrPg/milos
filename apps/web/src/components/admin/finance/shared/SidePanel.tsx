@@ -38,8 +38,8 @@ export function SidePanel({
         onClick={onClose}
       />
       <div
-        className={"fixed right-0 z-50 flex w-full flex-col overflow-hidden " + (width)}
-        style={{ background: "var(--bg)", borderLeft: "1px solid var(--border)", top: "3.25rem", bottom: 0 }}
+        className={"fixed end-0 z-50 flex w-full flex-col overflow-hidden " + (width)}
+        style={{ background: "var(--bg)", borderInlineStart: "1px solid var(--border)", top: "3.25rem", bottom: 0 }}
       >
         <div
           className="sticky top-0 z-10 flex items-start justify-between gap-4 px-6 py-5"

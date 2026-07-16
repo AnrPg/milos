@@ -3,6 +3,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getPRHistory, type PRRecord, type PRUnit } from "@/api/gamification";
@@ -20,6 +21,7 @@ function formatScore(score: number, unit: PRUnit): string {
 
 export function PRHistoryModal({ pr, onClose }: { pr: PRRecord; onClose: () => void }) {
   const i18n = useUiTranslations();
+  const uiLocale = useUiLocale();
   const { tokens } = useSession();
 
   const historyQuery = useQuery({
@@ -68,7 +70,7 @@ export function PRHistoryModal({ pr, onClose }: { pr: PRRecord; onClose: () => v
                   {formatScore(Number(entry.score), pr.unit)} {pr.unit !== "mins_secs" ? pr.unit : ""}
                 </span>
                 <span className="text-xs" style={{ color: "var(--dim)" }}>
-                  {new Date(entry.beaten_on).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                  {new Date(entry.beaten_on).toLocaleDateString(uiLocale, { month: "short", day: "numeric", year: "numeric" })}
                 </span>
               </div>
             ))

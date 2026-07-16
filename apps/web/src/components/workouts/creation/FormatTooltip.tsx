@@ -5,7 +5,7 @@
 import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 
-import { FORMAT_LABELS, FORMAT_TOOLTIPS, type SectionFormat } from "@/types/workout";
+import { getFormatLabels, getFormatTooltips, type SectionFormat } from "@/types/workout";
 
 type Props = {
   format: SectionFormat;
@@ -14,8 +14,10 @@ type Props = {
 
 export function FormatTooltip({ format, children }: Props) {
   const i18n = useUiTranslations();
+  const formatLabels = getFormatLabels(i18n);
+  const formatTooltips = getFormatTooltips(i18n);
   const [state, setState] = useState({ visible: false, x: 0, y: 0 });
-  const tooltip = FORMAT_TOOLTIPS[format];
+  const tooltip = formatTooltips[format];
 
   function handleMouseMove(event: React.MouseEvent) {
     setState((prev) => ({ ...prev, x: event.clientX, y: event.clientY }));
@@ -48,7 +50,7 @@ export function FormatTooltip({ format, children }: Props) {
             boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
           }}
         >
-          <div className="mb-2 font-bold">{FORMAT_LABELS[format]}</div>
+          <div className="mb-2 font-bold">{formatLabels[format]}</div>
           <div className="mb-1">
             <span style={{ color: "var(--muted)" }}>{i18n("bestFor6d7ae87")} </span>
             {tooltip.bestFor}

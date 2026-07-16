@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -57,7 +58,7 @@ function ScoreTooltip({ scores }: { scores: SectionScore[] }) {
   if (scores.length === 0) return null;
   return (
     <div
-      className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 rounded-[1rem] px-3 py-2 shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
+      className="pointer-events-none absolute bottom-full start-1/2 z-50 mb-2 -translate-x-1/2 rounded-[1rem] px-3 py-2 shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
       style={{
         background: "var(--panel)",
         border: "1px solid var(--border-strong)",
@@ -89,14 +90,14 @@ function parseLocalDate(iso: string): Date {
   return new Date(y, m - 1, d);
 }
 
-function formatShortDate(isoDate: string) {
-  return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(
+function formatShortDate(locale: string, isoDate: string) {
+  return new Intl.DateTimeFormat(locale, { month: "short", day: "numeric" }).format(
     parseLocalDate(isoDate),
   );
 }
 
-function formatMonthLabel(date: Date) {
-  return new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric" }).format(date);
+function formatMonthLabel(locale: string, date: Date) {
+  return new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(date);
 }
 
 function startOfLocalMonth(date: Date): Date {
@@ -118,7 +119,7 @@ function monthGridMondays(refDate: Date): string[] {
 }
 
 function DayHeader({ isoDate, compact, todayIso }: { isoDate: string; compact: boolean; todayIso: string }) {
-  const i18n = useUiTranslations();
+  
   const d = parseLocalDate(isoDate);
   const weekday = new Intl.DateTimeFormat(undefined, { weekday: compact ? "short" : "long" }).format(d);
   const month = new Intl.DateTimeFormat(undefined, { month: "short" }).format(d);
@@ -175,7 +176,7 @@ function DraggableCard({
     >
       <span
         ref={(el) => setActivatorNodeRef(el)}
-        className="absolute right-2 top-2 z-10 select-none rounded p-1 text-base leading-none"
+        className="absolute end-2 top-2 z-10 select-none rounded p-1 text-base leading-none"
         style={{ color: "var(--dim)", cursor: "grab", touchAction: "none" }}
         {...listeners}
         {...attributes}
@@ -199,7 +200,7 @@ function DroppableDay({
   className?: string;
   children: React.ReactNode;
 }) {
-  const i18n = useUiTranslations();
+  
   const { setNodeRef, isOver } = useDroppable({ id: date });
   return (
     <div
@@ -223,7 +224,7 @@ function DraggableMonthChip({
   assignment: AssignedWorkoutRecord;
   disabled?: boolean;
 }) {
-  const i18n = useUiTranslations();
+  
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: assignment.id,
     data: { assignment },
@@ -255,7 +256,7 @@ function DraggableMonthChip({
         {isDone ? " ✓" : ""}
       </div>
       {isDone && hasScores ? (
-        <div className="invisible absolute bottom-full left-1/2 z-50 mb-1 -translate-x-1/2 group-hover:visible">
+        <div className="invisible absolute bottom-full start-1/2 z-50 mb-1 -translate-x-1/2 group-hover:visible">
           <ScoreTooltip scores={assignment.execution_scores!} />
         </div>
       ) : null}
@@ -327,7 +328,7 @@ function DroppableMonthCell({
 }
 
 function DragGhostCard({ assignment }: { assignment: AssignedWorkoutRecord }) {
-  const i18n = useUiTranslations();
+  
   return (
     <div
       className="rounded-[1.4rem] p-4 shadow-xl"
@@ -358,6 +359,7 @@ export function AssignedWorkoutsConsole({
   pageTitle?: string;
 } = {}) {
   const i18n = useUiTranslations();
+  const uiLocale = useUiLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { currentUser, tokens, signOut } = useSession();
@@ -466,7 +468,7 @@ export function AssignedWorkoutsConsole({
     } finally {
       setLoading(false);
     }
-  }, [accessToken, signOut, weekStartsToFetch]);
+  }, [accessToken, i18n, signOut, weekStartsToFetch]);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -547,7 +549,7 @@ export function AssignedWorkoutsConsole({
 
     // Assignment not in loaded week — navigate to the week containing the target date
     if (!loading && openParamDate) {
-      const targetDate = new Date(openParamDate + i18n("t0000004b5772d"));
+      const targetDate = new Date(openParamDate + "T00:00:00");
       if (!isNaN(targetDate.getTime())) {
         autoOpenedRef.current = openParamId;
         const frame = window.requestAnimationFrame(() => setRefDate(targetDate));
@@ -596,9 +598,9 @@ export function AssignedWorkoutsConsole({
   }, [filteredAssignments, visibleDates]);
 
   const periodLabel = useMemo(() => {
-    if (viewMode === "month") return formatMonthLabel(refDate);
-    return (formatShortDate(visibleDates[0])) + " – " + (formatShortDate(visibleDates[visibleDates.length - 1]));
-  }, [refDate, viewMode, visibleDates]);
+    if (viewMode === "month") return formatMonthLabel(uiLocale, refDate);
+    return (formatShortDate(uiLocale, visibleDates[0])) + " – " + (formatShortDate(uiLocale, visibleDates[visibleDates.length - 1]));
+  }, [refDate, uiLocale, viewMode, visibleDates]);
 
   function navigate(direction: 1 | -1) {
     setLoading(true);
@@ -911,13 +913,13 @@ export function AssignedWorkoutsConsole({
                       style={{ background: "var(--panel-muted)", border: `1px solid ${isWeekDone ? "color-mix(in srgb, var(--success) 25%, var(--border))" : "var(--border)"}`, borderRadius: "0.8rem", position: "relative" }}
                     >
                       {isWeekDone && (a.execution_scores?.length ?? 0) > 0 ? (
-                        <div className="invisible absolute bottom-full left-1/2 z-50 mb-1.5 -translate-x-1/2 group-hover:visible">
+                        <div className="invisible absolute bottom-full start-1/2 z-50 mb-1.5 -translate-x-1/2 group-hover:visible">
                           <ScoreTooltip scores={a.execution_scores!} />
                         </div>
                       ) : null}
                       <div className="flex items-start gap-1">
                         <button
-                          className="min-w-0 flex-1 truncate rounded-[0.8rem] px-2 py-1.5 text-left transition-opacity hover:opacity-80"
+                          className="min-w-0 flex-1 truncate rounded-[0.8rem] px-2 py-1.5 text-start transition-opacity hover:opacity-80"
                           onClick={() => {
                             setLoading(true);
                             setError(null);
@@ -1076,7 +1078,7 @@ export function AssignedWorkoutsConsole({
                     }}
                   >
                     <button
-                      className="w-full text-left"
+                      className="w-full text-start"
                       onClick={() => setPanelAssignment(assignment)}
                       type="button"
                     >
@@ -1100,7 +1102,7 @@ export function AssignedWorkoutsConsole({
                             {i18n("donea821d15")}
                           </span>
                           {(assignment.execution_scores?.length ?? 0) > 0 ? (
-                            <div className="invisible absolute bottom-full left-1/2 z-50 mb-1.5 -translate-x-1/2 group-hover:visible">
+                            <div className="invisible absolute bottom-full start-1/2 z-50 mb-1.5 -translate-x-1/2 group-hover:visible">
                               <ScoreTooltip scores={assignment.execution_scores!} />
                             </div>
                           ) : null}
@@ -1229,13 +1231,13 @@ export function AssignedWorkoutsConsole({
                           />
                         </label>
 
-                        <div className="max-h-48 space-y-2 overflow-y-auto pr-1">
+                        <div className="max-h-48 space-y-2 overflow-y-auto pe-1">
                           {athletes.map((athlete) => {
                             const selected = editAthleteIds.includes(athlete.id);
                             return (
                               <button
                                 key={(assignment.id) + "-" + (athlete.id)}
-                                className="flex w-full items-center justify-between rounded-[0.9rem] px-3 py-2 text-left text-sm transition-colors"
+                                className="flex w-full items-center justify-between rounded-[0.9rem] px-3 py-2 text-start text-sm transition-colors"
                                 style={
                                   selected
                                     ? { background: "var(--primary)", color: "var(--bg)" }
@@ -1405,7 +1407,7 @@ export function AssignedWorkoutsConsole({
                 />
                 {filterDropdownOpen && filterAthletes.length > 0 ? (
                   <div
-                    className="absolute left-0 top-full z-30 mt-1 w-64 rounded-[1rem] py-1 shadow-xl"
+                    className="absolute start-0 top-full z-30 mt-1 w-64 rounded-[1rem] py-1 shadow-xl"
                     style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
                   >
                     {filterAthletes.map((athlete) => {
@@ -1413,7 +1415,7 @@ export function AssignedWorkoutsConsole({
                       return (
                         <button
                           key={athlete.id}
-                          className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm transition-colors"
+                          className="flex w-full items-center gap-2 px-4 py-2 text-start text-sm transition-colors"
                           style={{ color: selected ? "var(--primary)" : "var(--text)" }}
                           onMouseDown={(e) => e.preventDefault()}
                           onClick={() => {
@@ -1454,7 +1456,7 @@ export function AssignedWorkoutsConsole({
                       >
                         {athlete.nickname}
                         <button
-                          className="ml-0.5 opacity-70 hover:opacity-100"
+                          className="ms-0.5 opacity-70 hover:opacity-100"
                           onClick={() => setFilterAthleteIds((c) => c.filter((fid) => fid !== id))}
                           type="button"
                         >

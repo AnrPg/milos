@@ -4,6 +4,7 @@
 
 
 
+
 import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
@@ -20,7 +21,6 @@ import { VariationsPanel } from "./VariationsPanel";
 
 const PRESCRIPTION_UNITS: PrescriptionUnit[] = ["reps", "secs", "kcal"];
 const LOAD_MODES: LoadMode[] = ["absolute", "pct_1rm", "bw"];
-const LOAD_LABELS: Record<LoadMode, string> = { absolute: "kg", pct_1rm: "%RM", bw: "BW" };
 
 type Props = {
   exercise: DraftExercise;
@@ -31,6 +31,8 @@ type Props = {
 
 export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }: Props) {
   const i18n = useUiTranslations();
+  const LOAD_LABELS: Record<LoadMode, string> = { absolute: i18n("kilogramsUnit"), pct_1rm: i18n("percentOneRepMaxUnit"), bw: i18n("bw4d64743") };
+
   const { updateExercise, toggleVariationsPanel, toggleAdvancedPanel } = useWorkoutCreationStore();
   const [noteOpen, setNoteOpen] = useState(() => Boolean(exercise.note));
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -148,7 +150,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
       const stepSign = isPyramid ? "±" : isDescending ? "−" : "+";
       return (
         <div className="flex shrink-0 items-center gap-1">
-          <span className="text-xs" style={{ color: "var(--dim)" }}>{isPyramid ? "peak" : "start"}</span>
+          <span className="text-xs" style={{ color: "var(--dim)" }}>{isPyramid ? i18n("peakLabel") : i18n("start952f375")}</span>
           <NumberStepper
             value={exercise.prescriptionValue}
             onChange={(value) => update({ prescriptionValue: value })}
@@ -179,7 +181,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
             onChange={(unit) => update({ prescriptionUnit: unit })}
           />
           <span className="text-xs italic" style={{ color: "var(--dim)" }}>
-            {ctx.prescriptionHint}
+            {i18n(ctx.prescriptionHint)}
           </span>
         </div>
       );
@@ -206,7 +208,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
         />
         {ctx.prescriptionSuffix ? (
           <span className="text-xs italic" style={{ color: "var(--dim)" }}>
-            {ctx.prescriptionSuffix}
+            {i18n(ctx.prescriptionSuffix)}
           </span>
         ) : null}
       </div>
@@ -384,7 +386,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
           <button
             type="button"
             onClick={() => update({ loadProgression: null })}
-            className="ml-auto text-xs"
+            className="ms-auto text-xs"
             style={{ color: "var(--dim)" }}
           >
             {i18n("removee963907")}

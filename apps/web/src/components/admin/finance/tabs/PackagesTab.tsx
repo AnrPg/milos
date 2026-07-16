@@ -4,6 +4,8 @@
 
 
 
+
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -27,9 +29,9 @@ function field(record: FinanceRecord | null | undefined, key: string, fallback =
   return String(value);
 }
 
-function money(cents: unknown) {
+function money(uiLocale: string, cents: unknown) {
   const amount = typeof cents === "number" ? cents : Number(cents ?? 0);
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" }).format(amount / 100);
+  return new Intl.NumberFormat(uiLocale, { style: "currency", currency: "EUR" }).format(amount / 100);
 }
 
 const BLANK_FORM = { code: "", name: "", family: "unlimited", billing_period: "monthly", price: "", tags: "" };
@@ -234,11 +236,12 @@ export function PackagesTab() {
 }
 
 function PackageRows({ packages, onOpen }: { packages: FinanceRecord[]; onOpen: (id: string) => void }) {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   return packages.map((pkg, index) => (
     <button
       key={field(pkg, "id")}
-      className="flex w-full items-center justify-between gap-4 px-6 py-4 text-left transition-opacity hover:opacity-80"
+      className="flex w-full items-center justify-between gap-4 px-6 py-4 text-start transition-opacity hover:opacity-80"
       style={{ borderBottom: index < packages.length - 1 ? "1px solid var(--border)" : "none" }}
       onClick={() => onOpen(field(pkg, "id"))}
       type="button"
@@ -253,7 +256,7 @@ function PackageRows({ packages, onOpen }: { packages: FinanceRecord[]; onOpen: 
       </div>
       <div className="flex items-center gap-4">
         <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-          {money(pkg.base_price_cents)}
+          {money(uiLocale, pkg.base_price_cents)}
         </span>
         <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--border)", color: pkg.active === false ? "var(--dim)" : "var(--success)" }}>
           {pkg.active === false ? i18n("inactive09af574") : i18n("activea733b80")}

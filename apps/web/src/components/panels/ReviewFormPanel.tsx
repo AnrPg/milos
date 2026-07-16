@@ -8,8 +8,8 @@ export function ReviewFormPanel({ onClose }: { onClose: () => void }) {
   const i18n = useUiTranslations();
   return (
     <div
-      className="fixed inset-y-0 right-0 z-50 flex flex-col"
-      style={{ width: "440px", background: "var(--panel)", borderLeft: "1px solid var(--border)" }}
+      className="fixed inset-y-0 end-0 z-50 flex flex-col"
+      style={{ width: "440px", background: "var(--panel)", borderInlineStart: "1px solid var(--border)" }}
     >
       <div
         className="flex items-center justify-between px-5 py-4 border-b"

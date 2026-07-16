@@ -127,7 +127,7 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      className="fixed right-4 top-14 z-[60] rounded-[1.5rem] shadow-2xl flex flex-col overflow-hidden"
+      className="fixed end-4 top-14 z-[60] rounded-[1.5rem] shadow-2xl flex flex-col overflow-hidden"
       style={{
         width: "340px",
         height: "520px",
@@ -184,7 +184,7 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
                   key={u.id}
                   type="button"
                   onClick={() => void startNewThread(u)}
-                  className="flex items-center gap-3 w-full px-4 py-3 text-left transition-colors"
+                  className="flex items-center gap-3 w-full px-4 py-3 text-start transition-colors"
                   style={{ background: "transparent" }}
                 >
                   <div
@@ -222,7 +222,7 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
                     <button
                       type="button"
                       onClick={() => openThread(thread)}
-                      className="flex items-center gap-3 flex-1 px-4 py-3 text-left transition-colors min-w-0 pr-10"
+                      className="flex items-center gap-3 flex-1 px-4 py-3 text-start transition-colors min-w-0 pe-10"
                     >
                       <div
                         className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
@@ -242,7 +242,7 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); hideThread(currentUserId ?? "", thread.id); }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-60 hover:!opacity-100 rounded-lg p-1 transition-opacity text-sm leading-none"
+                      className="absolute end-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-60 hover:!opacity-100 rounded-lg p-1 transition-opacity text-sm leading-none"
                       style={{ color: "var(--dim)" }}
                       title={i18n("hideConversationdfb77ca")}
                     >

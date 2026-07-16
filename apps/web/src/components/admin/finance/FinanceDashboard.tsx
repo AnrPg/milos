@@ -4,6 +4,8 @@
 
 
 
+
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
@@ -21,9 +23,9 @@ import { fetchFinanceQueues, fetchFinanceSummary, type FinanceRecord } from "@/a
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 
-function money(cents: unknown) {
+function money(uiLocale: string, cents: unknown) {
   const amount = typeof cents === "number" ? cents : Number(cents ?? 0);
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" }).format(amount / 100);
+  return new Intl.NumberFormat(uiLocale, { style: "currency", currency: "EUR" }).format(amount / 100);
 }
 
 function percent(value: unknown) {
@@ -48,6 +50,7 @@ function daysOverdue(dateStr: string | null | undefined): number {
 }
 
 export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: boolean }) {
+  const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const { tokens } = useSession();
   const token = tokens?.access_token;
@@ -72,12 +75,12 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
   const kpis: Array<[string, string, string]> = [
     [i18n("activeMemberships0d117fb"), String(totals.active_memberships ?? 0), "/admin/finance"],
     [i18n("expiring30Daysbfdf986"), String(totals.expiring_memberships ?? 0), "/admin/finance?tab=queues"],
-    [i18n("revenueMtd3ffc292"), money(totals.paid_revenue_cents), "/admin/metrics/finance"],
-    [i18n("creditBalance471f025"), money(totals.credit_balance_cents), "/admin/finance"],
-    [i18n("pendingInvoices12d9ca8"), money(totals.outstanding_invoice_balance_cents), "/admin/finance?tab=queues"],
-    [i18n("overdueInvoices747a2d8"), money(totals.overdue_invoice_balance_cents), "/admin/finance?tab=queues"],
+    [i18n("revenueMtd3ffc292"), money(uiLocale, totals.paid_revenue_cents), "/admin/metrics/finance"],
+    [i18n("creditBalance471f025"), money(uiLocale, totals.credit_balance_cents), "/admin/finance"],
+    [i18n("pendingInvoices12d9ca8"), money(uiLocale, totals.outstanding_invoice_balance_cents), "/admin/finance?tab=queues"],
+    [i18n("overdueInvoices747a2d8"), money(uiLocale, totals.overdue_invoice_balance_cents), "/admin/finance?tab=queues"],
     [i18n("renewalRatef4370c2"), percent(totals.renewal_conversion_percent), "/admin/metrics/finance"],
-    [i18n("invoiceCreditOffsets9fc1210"), money(totals.invoice_credit_offset_cents), "/admin/metrics/finance"],
+    [i18n("invoiceCreditOffsets9fc1210"), money(uiLocale, totals.invoice_credit_offset_cents), "/admin/metrics/finance"],
   ];
 
   const loading = summaryQuery.isLoading;
@@ -159,7 +162,7 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
                   labelStyle={{ color: "var(--muted)" }}
                   itemStyle={{ color: "var(--text)" }}
                   labelFormatter={(v) => String(v).slice(0, 7)}
-                  formatter={(v) => money(v)}
+                  formatter={(v) => money(uiLocale, v)}
                 />
                 <Line dataKey="paid_revenue_cents" name="Paid" stroke="var(--primary)" strokeWidth={2.5} dot={false} />
                 <Line dataKey="pending_revenue_cents" name="Pending" stroke="var(--dim)" strokeWidth={1.5} strokeDasharray="5 4" dot={false} />
@@ -189,7 +192,7 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
               <>
                 <span style={{ color: "var(--text)" }}>{field(row, "invoice_number")}</span>
                 <span style={{ color: "var(--primary-strong)" }}>
-                  {money(row.balance_due_cents)} · {daysOverdue(row.due_date as string)} {i18n("days5548ae4")}
+                  {money(uiLocale, row.balance_due_cents)} · {daysOverdue(row.due_date as string)} {i18n("days5548ae4")}
                 </span>
               </>
             )}
@@ -201,7 +204,7 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
             renderRow={(row) => (
               <>
                 <span style={{ color: "var(--text)" }}>{field(row, "nickname", field(row, "membership_id"))}</span>
-                <span style={{ color: "var(--muted)" }}>{money(row.amount_cents)}</span>
+                <span style={{ color: "var(--muted)" }}>{money(uiLocale, row.amount_cents)}</span>
               </>
             )}
           />

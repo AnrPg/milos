@@ -162,7 +162,7 @@ export function PRShareModal({ pr, onClose }: { pr: PRRecord; onClose: () => voi
               />
               {searching && (
                 <span
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-xs"
+                  className="absolute end-4 top-1/2 -translate-y-1/2 text-xs"
                   style={{ color: "var(--dim)" }}
                 >
                   …
@@ -181,7 +181,7 @@ export function PRShareModal({ pr, onClose }: { pr: PRRecord; onClose: () => voi
                     key={u.id}
                     type="button"
                     onClick={() => toggleUser(u)}
-                    className="flex w-full items-center justify-between px-4 py-3 text-left text-sm transition-colors hover:bg-[var(--panel-muted)]"
+                    className="flex w-full items-center justify-between px-4 py-3 text-start text-sm transition-colors hover:bg-[var(--panel-muted)]"
                     style={{
                       borderTop: i > 0 ? "1px solid var(--border)" : undefined,
                       color: "var(--text)",

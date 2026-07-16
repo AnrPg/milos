@@ -30,8 +30,9 @@ export function ScoreModal({
   const scoreType = segment.score_config?.type ?? "time";
   const unit = segment.score_config?.unit ?? "";
   const label = segment.score_config?.label ?? i18n("score489f487");
+  const passLabel = i18n("passd7cd56f");
 
-  const defaultValue = scoreType === "pass_fail" ? i18n("passd7cd56f") : "";
+  const defaultValue = scoreType === "pass_fail" ? passLabel : "";
   const [value, setValue] = useState(
     existingScore?.value != null ? String(existingScore.value) : defaultValue,
   );
@@ -87,7 +88,7 @@ export function ScoreModal({
 
         {scoreType === "pass_fail" ? (
           <div className="flex gap-3">
-            {([i18n("passd7cd56f"), i18n("fail2758e32")] as const).map((option) => (
+            {([passLabel, i18n("fail2758e32")] as const).map((option) => (
               <button
                 key={option}
                 type="button"
@@ -95,7 +96,7 @@ export function ScoreModal({
                 className="flex-1 rounded-2xl py-4 text-lg font-bold transition-colors"
                 style={
                   value === option
-                    ? option === "Pass"
+                    ? option === passLabel
                       ? {
                           background: "color-mix(in srgb, var(--success) 20%, transparent)",
                           border: "2px solid var(--success)",
@@ -135,7 +136,7 @@ export function ScoreModal({
               }}
             />
             {unit && (
-              <div className="mt-1 text-right text-xs" style={{ color: "var(--muted)" }}>
+              <div className="mt-1 text-end text-xs" style={{ color: "var(--muted)" }}>
                 {unit}
               </div>
             )}

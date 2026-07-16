@@ -83,7 +83,7 @@ export function Combobox({
         />
       ) : (
         <button
-          className="w-full rounded-[0.9rem] px-3 py-2 text-left text-sm"
+          className="w-full rounded-[0.9rem] px-3 py-2 text-start text-sm"
           style={{ background: "var(--panel)", border: "1px solid var(--border)", color: selectedOption ? "var(--text)" : "var(--dim)" }}
           onClick={handleOpen}
           type="button"
@@ -94,7 +94,7 @@ export function Combobox({
 
       {open ? (
         <div
-          className="absolute left-0 top-full z-30 mt-1 w-full rounded-[1rem] py-1 shadow-xl"
+          className="absolute start-0 top-full z-30 mt-1 w-full rounded-[1rem] py-1 shadow-xl"
           style={{ background: "var(--panel)", border: "1px solid var(--border)", maxHeight: "14rem", overflowY: "auto" }}
         >
           {loading ? (
@@ -105,7 +105,7 @@ export function Combobox({
             options.map((option) => (
               <button
                 key={option.value}
-                className="flex w-full flex-col px-4 py-2 text-left transition-colors hover:opacity-80"
+                className="flex w-full flex-col px-4 py-2 text-start transition-colors hover:opacity-80"
                 style={{ color: option.value === value ? "var(--primary)" : "var(--text)" }}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleSelect(option)}
@@ -120,7 +120,7 @@ export function Combobox({
           )}
           {nullable && value ? (
             <button
-              className="w-full border-t px-4 py-2 text-left text-sm font-semibold"
+              className="w-full border-t px-4 py-2 text-start text-sm font-semibold"
               style={{ borderColor: "var(--border)", color: "var(--primary-strong)" }}
               onMouseDown={(e) => e.preventDefault()}
               onClick={handleClear}
