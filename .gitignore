@@ -23,6 +23,9 @@ apps/web/.env*.local
 # Local tooling — machine-specific, not shared
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
+.repomap.tags.cache.v1/
+.vexp/
+.vscode/
 .playwright-mcp/
 docs/HANDOFF_CODEX.md
 
