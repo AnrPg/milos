@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useLocale, useTranslations } from "next-intl";
 
 import { SESSION_UPDATED_EVENT } from "@/api/client";
 import { fetchMyReviews } from "@/api/reviews";
@@ -10,6 +11,13 @@ import { fetchGamificationPreferences, updateGamificationPreferences } from "@/a
 import { ReviewList } from "@/components/my-reviews";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
+import {
+  isAppLocale,
+  LOCALE_NAMES,
+  persistLocaleCookie,
+  SUPPORTED_LOCALES,
+  type AppLocale,
+} from "@/i18n/locales";
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 
@@ -35,7 +43,7 @@ function CollapsibleSection({
       style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
     >
       <button
-        className="flex w-full items-center justify-between gap-4 p-8 text-left"
+        className="flex w-full items-center justify-between gap-4 p-8 text-start"
         type="button"
         onClick={() => setOpen((v) => !v)}
       >
@@ -95,9 +103,12 @@ type CurrentUserWithAvatar = {
   nickname: string;
   role: string;
   avatar_url?: string | null;
+  preferred_locale: string;
 };
 
 export function ProfilePage() {
+  const locale = useLocale();
+  const tProfile = useTranslations("Profile");
   const { tokens, currentUser } = useSession();
   const user = currentUser as CurrentUserWithAvatar | null;
 
@@ -107,6 +118,8 @@ export function ProfilePage() {
   const [personalError, setPersonalError] = useState<string | null>(null);
   const [personalSuccess, setPersonalSuccess] = useState<string | null>(null);
   const [personalPending, setPersonalPending] = useState(false);
+  const [languagePending, setLanguagePending] = useState(false);
+  const [languageError, setLanguageError] = useState<string | null>(null);
 
   const [avatarPending, setAvatarPending] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
@@ -227,19 +240,74 @@ export function ProfilePage() {
     }
   }
 
+  async function handleLanguageChange(nextLocale: AppLocale) {
+    if (!tokens || nextLocale === user?.preferred_locale) return;
+
+    setLanguageError(null);
+    setLanguagePending(true);
+
+    try {
+      const result = await updateProfile(tokens.access_token, { preferred_locale: nextLocale });
+      broadcastUserUpdate(result.user);
+      persistLocaleCookie(nextLocale);
+      window.location.reload();
+    } catch {
+      setLanguageError(tProfile("languageError"));
+      setLanguagePending(false);
+    }
+  }
+
   return (
     <main className="min-h-screen px-6 py-10 md:px-10" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-3xl space-y-4">
         <TransientHero label="profile introduction">
         <div className="mb-4">
           <p className="text-xs font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
-            Profile
+            {tProfile("eyebrow")}
           </p>
           <h1 className="mt-1 text-3xl font-black" style={{ color: "var(--text)" }}>
-            Your account
+            {tProfile("title")}
           </h1>
         </div>
         </TransientHero>
+
+        <CollapsibleSection
+          id="language-region"
+          title={tProfile("languageTitle")}
+          description={tProfile("languageDescription")}
+          defaultOpen
+        >
+          <FieldGroup label={tProfile("languageLabel")}>
+            <select
+              aria-label={tProfile("languageLabel")}
+              className="w-full rounded-xl px-4 py-2.5 text-sm outline-none"
+              disabled={languagePending}
+              value={isAppLocale(user?.preferred_locale) ? user.preferred_locale : locale}
+              onChange={(event) => void handleLanguageChange(event.target.value as AppLocale)}
+              style={{
+                background: "var(--panel-muted)",
+                border: "1px solid var(--border)",
+                color: "var(--text)",
+              }}
+            >
+              {SUPPORTED_LOCALES.map((supportedLocale) => (
+                <option key={supportedLocale} value={supportedLocale}>
+                  {LOCALE_NAMES[supportedLocale]}
+                </option>
+              ))}
+            </select>
+          </FieldGroup>
+          {languagePending ? (
+            <p className="mt-3 text-sm" style={{ color: "var(--muted)" }}>
+              {tProfile("languageSaved")}
+            </p>
+          ) : null}
+          {languageError ? (
+            <p className="mt-3 text-sm font-semibold" style={{ color: "var(--danger)" }}>
+              {languageError}
+            </p>
+          ) : null}
+        </CollapsibleSection>
 
         <CollapsibleSection
           id="personal"

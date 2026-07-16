@@ -4609,6 +4609,8 @@ export interface operations {
                         /** Format: uuid */
                         id: string;
                         nickname: string;
+                        /** @enum {string} */
+                        preferred_locale: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
                         role: string;
                     };
                 };
@@ -7194,6 +7196,8 @@ export interface operations {
                     current_password?: string;
                     nickname?: string;
                     password?: string;
+                    /** @enum {string} */
+                    preferred_locale?: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
                 };
             };
         };
@@ -7210,6 +7214,7 @@ export interface operations {
                             /** Format: uuid */
                             id?: string;
                             nickname?: string;
+                            preferred_locale?: string;
                             role?: string;
                         };
                     };

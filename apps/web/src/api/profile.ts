@@ -5,6 +5,7 @@ export type ProfileUpdate = {
   current_password?: string;
   password?: string;
   avatar_url?: string | null;
+  preferred_locale?: string;
 };
 
 export type ProfileUser = {
@@ -12,6 +13,7 @@ export type ProfileUser = {
   nickname: string;
   role: string;
   avatar_url?: string | null;
+  preferred_locale: string;
 };
 
 export async function updateProfile(token: string, payload: ProfileUpdate) {

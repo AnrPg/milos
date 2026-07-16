@@ -26,6 +26,7 @@ import {
 } from "@/lib/session-storage";
 import { resetRealtimeSocket } from "@/lib/realtime";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
+import { isAppLocale, persistLocaleCookie } from "@/i18n/locales";
 
 type SessionStatus = "loading" | "guest" | "authenticated";
 
@@ -82,6 +83,12 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
     if (options.persist !== false) {
       writeStoredSession({ tokens: nextTokens, currentUser: user });
+    }
+
+    if (isAppLocale(user.preferred_locale)) {
+      const localeChanged = document.documentElement.lang !== user.preferred_locale;
+      persistLocaleCookie(user.preferred_locale);
+      if (localeChanged) window.location.reload();
     }
   }
 

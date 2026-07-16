@@ -54,6 +54,15 @@ body {
   font-family: "Avenir Next", "Segoe UI", sans-serif;
 }
 
+html[dir="rtl"] body {
+  text-align: start;
+}
+
+/* User-authored and mixed-script values opt into first-strong direction. */
+[data-user-text] {
+  unicode-bidi: plaintext;
+}
+
 /* Remove native spin buttons from number inputs — custom stepper handles this */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
