@@ -7,6 +7,10 @@ jobs:
   verify:
     name: Verify source
     runs-on: ubuntu-22.04
+    env:
+      # Gitea/act self-hosted runners do not always expose the GitHub runner
+      # ImageOS value that setup-beam uses to select OTP builds.
+      ImageOS: ubuntu22
     services:
       postgres:
         image: postgres:16-alpine
@@ -21,10 +25,18 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v4
+      - name: Verify runner OpenSSL ABI
+        run: |
+          echo "ImageOS=${ImageOS:-unset}"
+          . /etc/os-release
+          echo "PRETTY_NAME=$PRETTY_NAME"
+          openssl version -a
+          ldconfig -p | grep -E 'libcrypto\.so\.(3|1\.1)' || true
       - uses: erlef/setup-beam@v1
         with:
           elixir-version: "1.18.4"
-          otp-version: "27.0"
+          otp-version: "27.0.1"
+          version-type: strict
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
