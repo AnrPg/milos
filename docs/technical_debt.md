@@ -21,6 +21,7 @@ the original wording and dates for traceability.
 | TD-021–TD-023 | Open |
 | TD-024–TD-030 | Resolved |
 | TD-031 | Open |
+| TD-032 | Open |
 
 ## Detailed Ledger
 
@@ -57,3 +58,4 @@ the original wording and dates for traceability.
 | TD-028 | Admin Dashboard | Resolved 2026-07-15 by ADR-038: operational heroes are compact and collapse after three seconds with a reveal control (homepage excepted); dashboard logout was removed and KPIs use a circular control-panel treatment. | Kept for traceability of persistent hero density. | Low | 2026-07-15 |
 | TD-029 | Notifications / Browser Push | Resolved 2026-07-15 by ADR-038: non-cacheable server capability is refreshed each session/panel open, missing setup has role-aware guidance, and users enable/disable subscriptions per browser/device. | Kept for traceability of stale and non-actionable push capability UI. | Low | 2026-07-15 |
 | TD-031 | Observability | Provision production dashboards and alert thresholds for the emitted OTLP traces, structured telemetry summaries, readiness failures, outbox age, auth anomalies, cache invalidation, upload rejections, and Oban failures | The application now emits the required signals and can export traces, but concrete dashboards/alert destinations depend on the owner's collector/monitoring stack | High | 2026-07-16 |
+| TD-032 | Localization Phase 3 live verification | Local MinIO avatar URLs use `http://localhost:19000`, while the production CSP permits the proxied media origin, so local live-test avatar images are blocked by CSP | Align local object-storage public URLs with the media proxy origin instead of weakening the production CSP as part of deployment-environment cleanup | Medium | 2026-07-16 |
