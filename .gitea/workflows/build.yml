@@ -64,10 +64,10 @@ jobs:
         working-directory: apps/api
       - run: npm run check
         working-directory: apps/web
-      - run: npx playwright install chromium
-        working-directory: apps/web
       - run: npm run test:e2e
         working-directory: apps/web
+        env:
+          PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH: /usr/bin/google-chrome
 
   version:
     name: Pick tag

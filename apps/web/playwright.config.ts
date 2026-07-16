@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const port = Number(process.env.PLAYWRIGHT_PORT ?? 18301);
+const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+const launchOptions = executablePath ? { executablePath } : undefined;
 
 export default defineConfig({
   testDir: "./e2e",
@@ -22,11 +24,11 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: { ...devices["Desktop Chrome"], launchOptions },
     },
     {
       name: "mobile-chrome",
-      use: { ...devices["Pixel 7"] },
+      use: { ...devices["Pixel 7"], launchOptions },
     },
   ],
 });
