@@ -25,6 +25,8 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v4
+      - name: Force setup-beam ImageOS
+        run: echo "ImageOS=ubuntu22" >> "$GITHUB_ENV"
       - name: Verify runner OpenSSL ABI
         run: |
           echo "ImageOS=${ImageOS:-unset}"
@@ -33,6 +35,8 @@ jobs:
           openssl version -a
           ldconfig -p | grep -E 'libcrypto\.so\.(3|1\.1)' || true
       - uses: erlef/setup-beam@v1
+        env:
+          ImageOS: ubuntu22
         with:
           elixir-version: "1.18.4"
           otp-version: "27.0.1"
