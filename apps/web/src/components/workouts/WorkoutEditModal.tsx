@@ -1,5 +1,9 @@
 "use client";
 
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -32,11 +36,12 @@ export function WorkoutEditModal({
   context,
   onClose,
 }: Props) {
+  const i18n = useUiTranslations();
   const router = useRouter();
   const [busy, setBusy] = useState<"reopen" | "duplicate" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const firstButtonRef = useRef<HTMLButtonElement>(null);
-  const headingId = `workout-edit-modal-${workoutId}`;
+  const headingId = "workout-edit-modal-" + (workoutId);
 
   useEffect(() => {
     firstButtonRef.current?.focus();
@@ -49,7 +54,7 @@ export function WorkoutEditModal({
       await reopenWorkout(accessToken, workoutId);
       router.push(`/admin/workouts/new?draft=${workoutId}&is_reopen=true`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to reopen workout.");
+      setError(err instanceof Error ? err.message : i18n("failedToReopenWorkoutf279a52"));
       setBusy(null);
     }
   }
@@ -67,13 +72,13 @@ export function WorkoutEditModal({
       const draft = await duplicateWorkout(accessToken, workoutId, dupeContext);
       const substituteParam =
         context.kind === "assignment"
-          ? `&substitute_for_assignment=${context.sourceId}`
+          ? "&substitute_for_assignment=" + (context.sourceId)
           : context.kind === "slot"
-            ? `&substitute_for_slot=${context.sourceId}`
+            ? "&substitute_for_slot=" + (context.sourceId)
             : "";
       router.push(`/admin/workouts/new?draft=${draft.id}${substituteParam}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to duplicate workout.");
+      setError(err instanceof Error ? err.message : i18n("failedToDuplicateWorkouta77970b"));
       setBusy(null);
     }
   }
@@ -81,9 +86,9 @@ export function WorkoutEditModal({
   const isContextual = context.kind === "assignment" || context.kind === "slot";
   const sourceLabel =
     context.kind === "assignment"
-      ? "this assignment only"
+      ? i18n("thisAssignmentOnly07f1bdc")
       : context.kind === "slot"
-        ? "this class only"
+        ? i18n("thisClassOnly936c54b")
         : null;
 
   return (
@@ -103,7 +108,7 @@ export function WorkoutEditModal({
           onClick={(e) => e.stopPropagation()}
         >
           <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}>
-            {isContextual ? "Edit published workout" : "Editing live workout"}
+            {isContextual ? i18n("editPublishedWorkout6237097") : i18n("editingLiveWorkout405d607")}
           </p>
 
           <h2 id={headingId} className="mt-2 text-xl font-bold" style={{ color: "var(--text)" }}>
@@ -112,8 +117,8 @@ export function WorkoutEditModal({
 
           <p className="mt-3 text-sm leading-6" style={{ color: "var(--muted)" }}>
             {isContextual
-              ? "This workout is published and may be assigned to other athletes or scheduled in other class slots. Choose how to proceed:"
-              : "This workout is live. Editing and re-publishing will immediately update all athlete assignments and scheduled classes that reference it. Affected users will be notified."}
+              ? i18n("thisWorkoutIsPublishedAndMayBeAssigned9cf5e5b")
+              : i18n("thisWorkoutIsLiveEditingAndRePublishing953b61a")}
           </p>
 
           {error ? (
@@ -132,8 +137,8 @@ export function WorkoutEditModal({
                   type="button"
                 >
                   {busy === "duplicate"
-                    ? "Duplicating…"
-                    : `Duplicate and edit for ${sourceLabel}`}
+                    ? i18n("duplicating7d74a9e")
+                    : i18n("duplicateAndEditFora53d360") + (sourceLabel)}
                 </button>
 
                 <button
@@ -143,7 +148,7 @@ export function WorkoutEditModal({
                   onClick={() => void handleReopen()}
                   type="button"
                 >
-                  {busy === "reopen" ? "Opening…" : "Proceed to edit globally"}
+                  {busy === "reopen" ? i18n("openingb1b8530") : i18n("proceedToEditGlobally5ecabfa")}
                 </button>
               </>
             ) : (
@@ -155,7 +160,7 @@ export function WorkoutEditModal({
                 onClick={() => void handleReopen()}
                 type="button"
               >
-                {busy === "reopen" ? "Opening…" : "Edit globally"}
+                {busy === "reopen" ? i18n("openingb1b8530") : i18n("editGloballyac84ca5")}
               </button>
             )}
 
@@ -166,7 +171,7 @@ export function WorkoutEditModal({
               onClick={onClose}
               type="button"
             >
-              Cancel
+              {i18n("cancel77dfd21")}
             </button>
           </div>
         </div>

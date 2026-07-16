@@ -1,18 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
+import { useId, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createPR, updatePR, type PRRecord, type PRUnit } from "@/api/gamification";
 import { useSession } from "@/components/session-provider";
-
-const UNITS: { value: PRUnit; label: string }[] = [
-  { value: "kg", label: "kg" },
-  { value: "reps", label: "Reps" },
-  { value: "mins_secs", label: "Time" },
-  { value: "m", label: "Meters" },
-  { value: "kcals", label: "Kcal" },
-  { value: "sets", label: "Sets" },
-];
+import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
 function todayIso() {
   return new Date().toISOString().slice(0, 10);
@@ -50,9 +48,20 @@ export function PRFormModal({
   pr?: PRRecord | null;
   onClose: () => void;
 }) {
+  const i18n = useUiTranslations();
+  const UNITS: { value: PRUnit; label: string }[] = [
+    { value: "kg", label: i18n("kg1389845") },
+    { value: "reps", label: i18n("reps702045f") },
+    { value: "mins_secs", label: i18n("time6c82e6d") },
+    { value: "m", label: i18n("meters6ad427c") },
+    { value: "kcals", label: i18n("kcalb78ae8a") },
+    { value: "sets", label: i18n("sets2ab262f") },
+  ];
   const { tokens } = useSession();
   const queryClient = useQueryClient();
   const isEdit = Boolean(pr);
+  const titleId = useId();
+  const dialogRef = useModalFocusTrap<HTMLDivElement>(onClose);
 
   const [name, setName] = useState(pr?.name ?? "");
   const [score, setScore] = useState(pr ? String(pr.current_score) : "");
@@ -66,15 +75,9 @@ export function PRFormModal({
   const [beatenOn, setBeatenOn] = useState(pr?.beaten_on ?? todayIso());
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [onClose]);
-
   const mutation = useMutation({
     mutationFn: async () => {
-      if (!tokens) throw new Error("Not authenticated");
+      if (!tokens) throw new Error(i18n("notAuthenticated0c91acb"));
       const current_score =
         unit === "mins_secs" ? timeFieldsToSeconds(timeFields) : parseFloat(score);
       const params = {
@@ -95,7 +98,7 @@ export function PRFormModal({
       onClose();
     },
     onError: (err) => {
-      setError(err instanceof Error ? err.message : "Failed to save.");
+      setError(err instanceof Error ? err.message : i18n("failedToSave3d4146c"));
     },
   });
 
@@ -117,24 +120,29 @@ export function PRFormModal({
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
-        className="w-full max-w-md rounded-[2rem] p-6"
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className="w-full max-w-md rounded-[2rem] p-6 outline-none"
         style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
       >
-        <h2 className="text-xl font-semibold" style={{ color: "var(--text)" }}>
-          {isEdit ? "Edit PR" : "New PR"}
+        <h2 id={titleId} className="text-xl font-semibold" style={{ color: "var(--text)" }}>
+          {isEdit ? i18n("updatePr71b8cf3") : i18n("newPr1c0d9f2")}
         </h2>
 
         <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-1.5">
             <label className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
-              Exercise name
+              {i18n("exerciseName9a5c1af")}
             </label>
             <input
               className="w-full rounded-xl px-4 py-2.5 text-sm outline-none"
               style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Back Squat 1RM"
+              placeholder={i18n("eGBackSquat1rm675304b")}
               required
               autoFocus
             />
@@ -142,7 +150,7 @@ export function PRFormModal({
 
           <div className="space-y-1.5">
             <label className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
-              Unit
+              {i18n("unitf6b935a")}
             </label>
             <select
               className="w-full rounded-xl px-4 py-2.5 text-sm outline-none"
@@ -164,15 +172,15 @@ export function PRFormModal({
           {unit === "mins_secs" ? (
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
-                Time
+                {i18n("time6c82e6d")}
               </label>
               <div className="grid grid-cols-4 gap-2">
                 {(
                   [
-                    { key: "hours", placeholder: "0", label: "h" },
-                    { key: "minutes", placeholder: "0", label: "min" },
-                    { key: "seconds", placeholder: "0", label: "sec" },
-                    { key: "milliseconds", placeholder: "0", label: "ms" },
+                    { key: "hours", placeholder: "0", label: i18n("h27d5482") },
+                    { key: "minutes", placeholder: "0", label: i18n("minb6c935d") },
+                    { key: "seconds", placeholder: "0", label: i18n("sec920a25e") },
+                    { key: "milliseconds", placeholder: "0", label: i18n("ms26cc321") },
                   ] as const
                 ).map(({ key, placeholder, label }) => (
                   <div key={key} className="flex flex-col items-center gap-1">
@@ -197,7 +205,7 @@ export function PRFormModal({
           ) : (
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
-                Score
+                {i18n("score489f487")}
               </label>
               <input
                 className="w-full rounded-xl px-4 py-2.5 text-sm outline-none"
@@ -215,7 +223,7 @@ export function PRFormModal({
 
           <div className="space-y-1.5">
             <label className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
-              Date achieved
+              {i18n("dateAchieved8e4464d")}
             </label>
             <input
               className="w-full rounded-xl px-4 py-2.5 text-sm outline-none"
@@ -235,7 +243,7 @@ export function PRFormModal({
               className="rounded"
             />
             <span className="text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
-              Higher score is better
+              {i18n("higherScoreIsBetter33060b7")}
             </span>
           </label>
 
@@ -250,7 +258,7 @@ export function PRFormModal({
               className="flex-1 rounded-xl py-2.5 text-sm font-semibold disabled:opacity-50"
               style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
-              {mutation.isPending ? "Saving…" : isEdit ? "Update PR" : "Add PR"}
+              {mutation.isPending ? i18n("saving56a2285") : isEdit ? i18n("updatePr71b8cf3") : i18n("addPr24c8c6f")}
             </button>
             <button
               type="button"
@@ -258,7 +266,7 @@ export function PRFormModal({
               className="rounded-xl px-5 py-2.5 text-sm font-semibold"
               style={{ background: "var(--border)", color: "var(--text-soft)" }}
             >
-              Cancel
+              {i18n("cancel77dfd21")}
             </button>
           </div>
         </form>

@@ -1,5 +1,9 @@
 "use client";
 
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useState } from "react";
 
 type Props = {
@@ -8,6 +12,7 @@ type Props = {
 };
 
 export function TimeInput({ value, onChange }: Props) {
+  const i18n = useUiTranslations();
   const [minuteText, setMinuteText] = useState("");
   const [secondText, setSecondText] = useState("");
 
@@ -40,7 +45,7 @@ export function TimeInput({ value, onChange }: Props) {
     onChange((normalizedMinutes * 60) + normalizedSeconds);
   }
 
-  const inputClass = "w-10 rounded-lg bg-transparent px-1 py-1 text-center text-sm outline-none";
+  const inputClass = i18n("w10RoundedLgBgTransparentPx1ac1970b");
   const inputStyle = {
     background: "var(--bg)",
     border: "1px solid var(--dim)",
@@ -62,7 +67,7 @@ export function TimeInput({ value, onChange }: Props) {
         style={inputStyle}
         min={0}
       />
-      <span className="text-xs" style={{ color: "var(--muted)" }}>m</span>
+      <span className="text-xs" style={{ color: "var(--muted)" }}>{i18n("m6b0d31c")}</span>
       <input
         type="number"
         value={secondText}
@@ -82,7 +87,7 @@ export function TimeInput({ value, onChange }: Props) {
         min={0}
         max={59}
       />
-      <span className="text-xs" style={{ color: "var(--muted)" }}>s</span>
+      <span className="text-xs" style={{ color: "var(--muted)" }}>{i18n("sa0f1490")}</span>
     </div>
   );
 }

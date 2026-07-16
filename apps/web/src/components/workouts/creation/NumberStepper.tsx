@@ -1,5 +1,7 @@
 "use client";
 
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 
 type Props = {
@@ -11,6 +13,7 @@ type Props = {
 };
 
 export function NumberStepper({ value, onChange, min = 1, max, width = "w-10" }: Props) {
+  const i18n = useUiTranslations();
   const [showArrows, setShowArrows] = useState(false);
 
   function increment() {
@@ -61,7 +64,7 @@ export function NumberStepper({ value, onChange, min = 1, max, width = "w-10" }:
         onChange={(event) => onChange(Math.max(min, Number.parseInt(event.target.value, 10) || min))}
         onFocus={() => setShowArrows(true)}
         onBlur={() => setShowArrows(false)}
-        className={`${width} bg-transparent text-center text-sm font-semibold outline-none`}
+        className={(width) + " bg-transparent text-center text-sm font-semibold outline-none"}
         style={{ color: "var(--text)" }}
         min={min}
         max={max}

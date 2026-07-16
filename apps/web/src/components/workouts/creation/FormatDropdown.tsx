@@ -1,5 +1,9 @@
 "use client";
 
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useCallback, useRef, useState } from "react";
 
 import { FORMAT_GROUPS, FORMAT_LABELS, FORMAT_TOOLTIPS, type SectionFormat } from "@/types/workout";
@@ -18,6 +22,7 @@ type DropdownRect = {
 };
 
 export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
+  const i18n = useUiTranslations();
   const [open, setOpen] = useState(false);
   const [hoveredFormat, setHoveredFormat] = useState<SectionFormat | null>(null);
   const [dropdownRect, setDropdownRect] = useState<DropdownRect | null>(null);
@@ -144,20 +149,20 @@ export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
               >
                 <div className="mb-2 font-bold">{FORMAT_LABELS[hoveredFormat!]}</div>
                 <div className="mb-1">
-                  <span style={{ color: "var(--muted)" }}>Best for </span>
+                  <span style={{ color: "var(--muted)" }}>{i18n("bestFor6d7ae87")} </span>
                   {tooltip.bestFor}
                 </div>
                 <div className="mb-1">
-                  <span style={{ color: "var(--muted)" }}>Trains </span>
+                  <span style={{ color: "var(--muted)" }}>{i18n("trainsd629bf5")} </span>
                   {tooltip.trains}
                 </div>
                 <div className="mb-1">
-                  <span style={{ color: "var(--muted)" }}>How </span>
+                  <span style={{ color: "var(--muted)" }}>{i18n("how0c81abc")} </span>
                   {tooltip.how}
                 </div>
                 {tooltip.score ? (
                   <div>
-                    <span style={{ color: "var(--muted)" }}>Score </span>
+                    <span style={{ color: "var(--muted)" }}>{i18n("score489f487")} </span>
                     {tooltip.score}
                   </div>
                 ) : null}

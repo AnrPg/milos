@@ -1,11 +1,16 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
-import { backfillFinanceEntitlements, createFinancePackage, fetchFinancePackages, type EntitlementBackfillReport, type FinanceRecord } from "@/api/finance";
+import { createFinancePackage, fetchFinancePackages, type FinanceRecord } from "@/api/finance";
 import { useSession } from "@/components/session-provider";
 import { PackagePanel } from "@/components/admin/finance/panels/PackagePanel";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
@@ -30,6 +35,7 @@ function money(cents: unknown) {
 const BLANK_FORM = { code: "", name: "", family: "unlimited", billing_period: "monthly", price: "", tags: "" };
 
 export function PackagesTab() {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
   const queryClient = useQueryClient();
@@ -56,10 +62,10 @@ export function PackagesTab() {
   });
 
   const packages = packagesQuery.data?.packages ?? [];
+  const activePackages = packages.filter((pkg) => pkg.active !== false);
+  const inactivePackages = packages.filter((pkg) => pkg.active === false);
   const [form, setForm] = useState(BLANK_FORM);
   const [entitlement, setEntitlement] = useState<EntitlementDraft>(DEFAULT_ENTITLEMENT);
-  const [legacyPackages, setLegacyPackages] = useState({ member: "", athlete: "" });
-  const [backfillReport, setBackfillReport] = useState<EntitlementBackfillReport | null>(null);
 
   const createMutation = useMutation({
     mutationFn: () =>
@@ -80,20 +86,12 @@ export function PackagesTab() {
       await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "packages"] });
     },
   });
-  const backfillMutation = useMutation({
-    mutationFn: (dryRun: boolean) => backfillFinanceEntitlements(token, {
-      dry_run: dryRun,
-      package_by_role: Object.fromEntries(Object.entries(legacyPackages).filter(([, value]) => value)),
-    }),
-    onSuccess: setBackfillReport,
-  });
-
   return (
     <div className="space-y-4">
       {/* Header row */}
       <div className="flex items-center justify-between gap-4">
         <p className="text-sm font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
-          {packages.length} package{packages.length !== 1 ? "s" : ""}
+          {activePackages.length} {i18n("activePackagecafcf18")}{activePackages.length !== 1 ? i18n("sa0f1490") : ""}
         </p>
         <button
           className="rounded-full px-4 py-2 text-sm font-semibold"
@@ -101,68 +99,37 @@ export function PackagesTab() {
           onClick={() => setParam("new", "true")}
           type="button"
         >
-          + New package
+          {i18n("newPackage909820b")}
         </button>
       </div>
 
-      <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div><h3 className="text-sm font-semibold" style={{ color: "var(--text)" }}>Legacy entitlement rollout</h3><p className="mt-1 max-w-2xl text-xs leading-5" style={{ color: "var(--dim)" }}>Map legacy members and athletes to approved versioned packages. Dry-run classifies every account; apply creates only missing profiles/subscriptions and is safe to repeat.</p></div>
-          <div className="flex gap-2"><button type="button" disabled={backfillMutation.isPending} onClick={() => backfillMutation.mutate(true)} className="rounded-full px-3 py-2 text-xs font-semibold" style={{ background: "var(--border)" }}>Check readiness</button><button type="button" disabled={backfillMutation.isPending || (!legacyPackages.member && !legacyPackages.athlete)} onClick={() => backfillMutation.mutate(false)} className="rounded-full px-3 py-2 text-xs font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--bg)" }}>Apply backfill</button></div>
-        </div>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">{(["member", "athlete"] as const).map((role) => <label key={role} className="space-y-1"><span className="text-xs font-semibold" style={{ color: "var(--text-soft)" }}>Legacy {role} package</span><select className="w-full rounded-xl px-3 py-2 text-sm" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }} value={legacyPackages[role]} onChange={(event) => setLegacyPackages({ ...legacyPackages, [role]: event.target.value })}><option value="">Not mapped</option>{packages.filter((pkg) => pkg.active !== false).map((pkg) => <option key={field(pkg, "id")} value={field(pkg, "id")}>{field(pkg, "name", field(pkg, "code"))}</option>)}</select></label>)}</div>
-        {backfillReport ? <p className="mt-3 text-xs" style={{ color: backfillReport.ready ? "var(--success)" : "var(--warning)" }}>{backfillReport.ready ? "Ready for strict enforcement." : "Backfill still required."} {Object.entries(backfillReport.counts).map(([key, value]) => `${key.replaceAll("_", " ")}: ${value}`).join(" · ")}</p> : null}
-        {backfillMutation.isError ? <p className="mt-3 text-xs" style={{ color: "var(--danger)" }}>Readiness/backfill failed. Confirm both selected packages contain valid entitlement contracts.</p> : null}
-      </section>
-
       {/* Package list */}
-      <div className="rounded-[2rem] overflow-hidden" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+      <div className="overflow-hidden rounded-[2rem]" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
         {packagesQuery.isLoading ? (
-          <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>Loading…</p>
-        ) : packages.length === 0 ? (
-          <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>No packages yet.</p>
+          <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
+        ) : activePackages.length === 0 ? (
+          <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>{i18n("noActivePackages84ac1e8")}</p>
         ) : (
-          packages.map((pkg, i) => (
-            <button
-              key={field(pkg, "id")}
-              className="flex w-full items-center justify-between gap-4 px-6 py-4 text-left transition-opacity hover:opacity-80"
-              style={{ borderBottom: i < packages.length - 1 ? "1px solid var(--border)" : "none" }}
-              onClick={() => setParam("package", field(pkg, "id"))}
-              type="button"
-            >
-              <div>
-                <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-                  {field(pkg, "name", field(pkg, "code"))}
-                </p>
-                <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
-                  {field(pkg, "code")} · {field(pkg, "family")} · {field(pkg, "billing_period")}
-                </p>
-              </div>
-              <div className="flex items-center gap-4">
-                <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-                  {money(pkg.base_price_cents)}
-                </span>
-                <span
-                  className="rounded-full px-3 py-1 text-xs font-semibold"
-                  style={
-                    pkg.active !== false
-                      ? { background: "color-mix(in srgb, var(--success) 12%, transparent)", color: "var(--success)" }
-                      : { background: "var(--border)", color: "var(--dim)" }
-                  }
-                >
-                  {pkg.active !== false ? "Active" : "Inactive"}
-                </span>
-                <span style={{ color: "var(--dim)" }}>→</span>
-              </div>
-            </button>
-          ))
+          <PackageRows packages={activePackages} onOpen={(id) => setParam("package", id)} />
         )}
       </div>
+
+      {inactivePackages.length > 0 ? (
+        <details className="overflow-hidden rounded-2xl" style={{ border: "1px solid var(--border)" }}>
+          <summary className="cursor-pointer px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+            {i18n("archivedPackages6f2dd9a")} {inactivePackages.length}
+          </summary>
+          <div style={{ background: "var(--panel)", borderTop: "1px solid var(--border)" }}>
+            <PackageRows packages={inactivePackages} onOpen={(id) => setParam("package", id)} />
+          </div>
+        </details>
+      ) : null}
 
       {/* Side panel: package detail */}
       {openPackageId ? (
         <PackagePanel
           packageId={openPackageId}
+          packages={packages}
           onClose={() => setParam("package", null)}
         />
       ) : null}
@@ -170,8 +137,8 @@ export function PackagesTab() {
       {/* Side panel: new package */}
       {showNew ? (
         <SidePanel
-          title="New membership package"
-          subtitle="Packages"
+          title={i18n("newMembershipPackagef93a8cb")}
+          subtitle={i18n("packages0a99901")}
           onClose={() => setParam("new", null)}
           footer={
             <div className="flex gap-3">
@@ -182,7 +149,7 @@ export function PackagesTab() {
                 onClick={() => createMutation.mutate()}
                 type="button"
               >
-                {createMutation.isPending ? "Creating…" : "Create package"}
+                {createMutation.isPending ? i18n("creating94d7d8e") : i18n("createPackagebd56259")}
               </button>
               <button
                 className="rounded-full px-5 py-2 text-sm font-semibold"
@@ -190,13 +157,13 @@ export function PackagesTab() {
                 onClick={() => setParam("new", null)}
                 type="button"
               >
-                Cancel
+                {i18n("cancel77dfd21")}
               </button>
             </div>
           }
         >
           <div className="space-y-4">
-            <PanelField label="Package code">
+            <PanelField label={i18n("packageCode4e5df5f")}>
               <input
                 className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                 style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -204,7 +171,7 @@ export function PackagesTab() {
                 onChange={(e) => setForm({ ...form, code: e.target.value })}
               />
             </PanelField>
-            <PanelField label="Name">
+            <PanelField label={i18n("name709a232")}>
               <input
                 className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                 style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -213,7 +180,7 @@ export function PackagesTab() {
               />
             </PanelField>
             <div className="grid gap-4 md:grid-cols-2">
-              <PanelField label="Family">
+              <PanelField label={i18n("family4efb6cb")}>
                 <select
                   className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                   style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -225,7 +192,7 @@ export function PackagesTab() {
                   ))}
                 </select>
               </PanelField>
-              <PanelField label="Billing period">
+              <PanelField label={i18n("billingPeriodda59f5a")}>
                 <select
                   className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                   style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -238,7 +205,7 @@ export function PackagesTab() {
                 </select>
               </PanelField>
             </div>
-            <PanelField label="Price (EUR)">
+            <PanelField label={i18n("priceEur6e2ef14")}>
               <input
                 className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                 style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -247,7 +214,7 @@ export function PackagesTab() {
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
               />
             </PanelField>
-            <PanelField label="Tags (comma-separated)">
+            <PanelField label={i18n("tagsCommaSeparated32bf672")}>
               <input
                 className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                 style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -264,6 +231,37 @@ export function PackagesTab() {
       ) : null}
     </div>
   );
+}
+
+function PackageRows({ packages, onOpen }: { packages: FinanceRecord[]; onOpen: (id: string) => void }) {
+  const i18n = useUiTranslations();
+  return packages.map((pkg, index) => (
+    <button
+      key={field(pkg, "id")}
+      className="flex w-full items-center justify-between gap-4 px-6 py-4 text-left transition-opacity hover:opacity-80"
+      style={{ borderBottom: index < packages.length - 1 ? "1px solid var(--border)" : "none" }}
+      onClick={() => onOpen(field(pkg, "id"))}
+      type="button"
+    >
+      <div>
+        <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+          {field(pkg, "name", field(pkg, "code"))}
+        </p>
+        <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
+          {field(pkg, "code")} · {field(pkg, "family")} · {field(pkg, "billing_period")}
+        </p>
+      </div>
+      <div className="flex items-center gap-4">
+        <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+          {money(pkg.base_price_cents)}
+        </span>
+        <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--border)", color: pkg.active === false ? "var(--dim)" : "var(--success)" }}>
+          {pkg.active === false ? i18n("inactive09af574") : i18n("activea733b80")}
+        </span>
+        <span style={{ color: "var(--dim)" }}>→</span>
+      </div>
+    </button>
+  ));
 }
 
 function PanelField({ label, children }: { label: string; children: React.ReactNode }) {

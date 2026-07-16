@@ -1,5 +1,9 @@
 "use client";
 
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 
 export type ComboboxOption = {
@@ -25,6 +29,7 @@ export function Combobox({
   nullable?: boolean;
   loading?: boolean;
 }) {
+  const i18n = useUiTranslations();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -71,7 +76,7 @@ export function Combobox({
           autoFocus
           className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
           style={{ background: "var(--panel)", border: "1px solid var(--primary)", color: "var(--text)" }}
-          placeholder="Search…"
+          placeholder={i18n("searchf54fbca")}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onBlur={handleBlur}
@@ -83,7 +88,7 @@ export function Combobox({
           onClick={handleOpen}
           type="button"
         >
-          {selectedOption ? selectedOption.label : (placeholder ?? "Select…")}
+          {selectedOption ? selectedOption.label : (placeholder ?? i18n("select349ac8f"))}
         </button>
       )}
 
@@ -93,9 +98,9 @@ export function Combobox({
           style={{ background: "var(--panel)", border: "1px solid var(--border)", maxHeight: "14rem", overflowY: "auto" }}
         >
           {loading ? (
-            <p className="px-4 py-3 text-sm" style={{ color: "var(--dim)" }}>Searching…</p>
+            <p className="px-4 py-3 text-sm" style={{ color: "var(--dim)" }}>{i18n("searching1a6a5ba")}</p>
           ) : options.length === 0 ? (
-            <p className="px-4 py-3 text-sm" style={{ color: "var(--dim)" }}>No results.</p>
+            <p className="px-4 py-3 text-sm" style={{ color: "var(--dim)" }}>{i18n("noResults0035403")}</p>
           ) : (
             options.map((option) => (
               <button
@@ -121,7 +126,7 @@ export function Combobox({
               onClick={handleClear}
               type="button"
             >
-              Clear selection
+              {i18n("clearSelection247fd63")}
             </button>
           ) : null}
         </div>

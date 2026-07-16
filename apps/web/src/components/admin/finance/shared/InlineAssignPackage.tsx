@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 import type { FinanceRecord } from "@/api/finance";
 
@@ -12,6 +17,7 @@ interface Props {
 }
 
 export function InlineAssignPackage({ currentCode, packages, pending, onAssign }: Props) {
+  const i18n = useUiTranslations();
   const [open, setOpen] = useState(false);
   const [selectedId, setSelectedId] = useState("");
   const ref = useRef<HTMLDivElement>(null);
@@ -49,7 +55,7 @@ export function InlineAssignPackage({ currentCode, packages, pending, onAssign }
           onClick={() => setOpen((v) => !v)}
           className="group flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition-opacity hover:opacity-70"
           style={{ background: "var(--border)", color: "var(--text-soft)" }}
-          title="Change package"
+          title={i18n("changePackage8621cbc")}
         >
           {currentCode}
           <span className="opacity-0 group-hover:opacity-60 transition-opacity text-[10px]">✎</span>
@@ -65,14 +71,19 @@ export function InlineAssignPackage({ currentCode, packages, pending, onAssign }
             background: "transparent",
           }}
         >
-          + Assign
+          {i18n("assign23afc22")}
         </button>
       )}
 
       {open && (
         <div
           className="absolute left-0 top-full z-50 mt-1 min-w-[180px] rounded-xl p-3 shadow-xl"
-          style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)" }}
+          style={{
+            background: "var(--bg)",
+            border: "1px solid var(--border-strong)",
+            boxShadow: "0 18px 48px rgba(0, 0, 0, 0.6)",
+            opacity: 1,
+          }}
         >
           <select
             value={selectedId}
@@ -80,7 +91,7 @@ export function InlineAssignPackage({ currentCode, packages, pending, onAssign }
             className="w-full rounded-lg px-2 py-1.5 text-xs mb-2"
             style={{ background: "var(--panel)", color: "var(--text-soft)", border: "1px solid var(--border-strong)" }}
           >
-            <option value="">Select package…</option>
+            <option value="">{i18n("selectPackage02bf832")}</option>
             {packages.map((pkg) => (
               <option
                 key={String(pkg.id)}
@@ -88,8 +99,8 @@ export function InlineAssignPackage({ currentCode, packages, pending, onAssign }
                 disabled={pkg.active === false}
               >
                 {String(pkg.name || pkg.code)}
-                {pkg.code ? ` (${String(pkg.code)})` : ""}
-                {pkg.active === false ? " — Inactive" : ""}
+                {pkg.code ? "(" + (String(pkg.code)) + ")" : ""}
+                {pkg.active === false ? i18n("inactive0e9b582") : ""}
               </option>
             ))}
           </select>
@@ -100,7 +111,7 @@ export function InlineAssignPackage({ currentCode, packages, pending, onAssign }
             className="w-full rounded-lg px-3 py-1.5 text-xs font-semibold transition-opacity disabled:opacity-40"
             style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
-            Assign
+            {i18n("assign2444928")}
           </button>
         </div>
       )}

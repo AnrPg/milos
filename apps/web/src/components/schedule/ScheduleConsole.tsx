@@ -1,5 +1,9 @@
 "use client";
 
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -71,6 +75,7 @@ export function ScheduleConsole({
   pageTitle?: string;
   heroTimeoutMs?: number;
 } = {}) {
+  const i18n = useUiTranslations();
   const t = useTranslations("Schedule");
   const common = useTranslations("Common");
   const locale = useLocale();
@@ -164,7 +169,7 @@ export function ScheduleConsole({
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (appliedMobileDefault.current) return;
-    if (!window.matchMedia("(max-width: 767px)").matches || days !== 7) return;
+    if (!window.matchMedia(i18n("maxWidth767px397353b")).matches || days !== 7) return;
 
     appliedMobileDefault.current = true;
     const frame = window.requestAnimationFrame(() => setDays(3));
@@ -323,9 +328,9 @@ export function ScheduleConsole({
                 ariaLabel={t("calendarView")}
                 onChange={setDays}
                 options={[
-                  { value: 3, label: "3d", accessibleLabel: t("threeDayView") },
-                  { value: 7, label: "7d", accessibleLabel: t("weekView") },
-                  { value: 30, label: "Mo", accessibleLabel: t("monthView") },
+                  { value: 3, label: i18n("message3d34f9efc"), accessibleLabel: t("threeDayView") },
+                  { value: 7, label: i18n("message7dfd4a4c2"), accessibleLabel: t("weekView") },
+                  { value: 30, label: i18n("mo91e885d"), accessibleLabel: t("monthView") },
                 ]}
                 value={days}
               />

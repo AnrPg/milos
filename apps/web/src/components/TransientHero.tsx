@@ -1,5 +1,8 @@
 "use client";
 
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useState, type ReactNode } from "react";
 
 type Props = {
@@ -10,18 +13,21 @@ type Props = {
   timeoutMs?: number;
 };
 
-function titleFromLabel(label: string) {
-  const title = label.replace(/\s+introduction$/i, "").trim() || "Page";
+function titleFromLabel(label: string, fallback: string) {
+  const title = label.replace(/\s+introduction$/i, "").trim() || fallback;
   return title.charAt(0).toUpperCase() + title.slice(1);
 }
 
 export function TransientHero({
   children,
   collapsedTitle,
-  label = "page introduction",
-  showIntroLabel = "Show intro",
+  label,
+  showIntroLabel,
   timeoutMs,
 }: Props) {
+  const i18n = useUiTranslations();
+  const resolvedLabel = label ?? i18n("pageIntroduction924d4b4");
+  const resolvedShowIntroLabel = showIntroLabel ?? i18n("showIntro481366c");
   const [visible, setVisible] = useState(true);
   const [previewVisible, setPreviewVisible] = useState(false);
 
@@ -36,11 +42,11 @@ export function TransientHero({
     return (
       <div onMouseLeave={() => setPreviewVisible(false)}>
         {previewVisible ? (
-          <div aria-label={label}>{children}</div>
+          <div aria-label={resolvedLabel}>{children}</div>
         ) : (
           <div className="flex items-center justify-between gap-3">
             <h1 className="min-w-0 truncate text-lg font-semibold tracking-tight sm:text-xl" style={{ color: "var(--primary)" }}>
-              {collapsedTitle ?? titleFromLabel(label)}
+              {collapsedTitle ?? titleFromLabel(resolvedLabel, "Page")}
             </h1>
             <button
               type="button"
@@ -53,9 +59,9 @@ export function TransientHero({
               onMouseEnter={() => setPreviewVisible(true)}
               className="rounded-full px-3 py-1.5 text-[11px] font-semibold"
               style={{ border: "1px solid var(--border)", color: "var(--dim)" }}
-              aria-label={`Show ${label}`}
+              aria-label={i18n("showd97d1ee") + resolvedLabel}
             >
-              {showIntroLabel}
+              {resolvedShowIntroLabel}
             </button>
           </div>
         )}
@@ -63,5 +69,5 @@ export function TransientHero({
     );
   }
 
-  return <div aria-label={label}>{children}</div>;
+  return <div aria-label={resolvedLabel}>{children}</div>;
 }

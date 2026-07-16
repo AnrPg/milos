@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useLocale } from "next-intl";
 
@@ -57,6 +62,7 @@ export function SlotPopup({
   onRejectBooking,
   onCancelBooking,
 }: SlotPopupProps) {
+  const i18n = useUiTranslations();
   const locale = useLocale();
   const isPast = new Date(slot.scheduled_at) <= new Date();
   const canBook = !isAdmin && !slot.current_user_booking && slot.spots_remaining > 0 && !isPast;
@@ -99,7 +105,7 @@ export function SlotPopup({
       setMessageSent(true);
       setMessageText("");
     } catch (err) {
-      setMessageError(err instanceof Error ? err.message : "Failed to send message.");
+      setMessageError(err instanceof Error ? err.message : i18n("failedToSendMessage0f22ccd"));
     } finally {
       setMessageSending(false);
     }
@@ -107,7 +113,7 @@ export function SlotPopup({
 
   async function handleCancelBooking() {
     if (!slot.current_user_booking) return;
-    if (!window.confirm("Cancel your booking for this class?")) return;
+    if (!window.confirm(i18n("cancelYourBookingForThisClass0c2112f"))) return;
     setCancelling(true);
     setCancelError(null);
     try {
@@ -116,9 +122,9 @@ export function SlotPopup({
       onClose();
     } catch (err) {
       if (err instanceof ApiError && err.status === 422) {
-        setCancelError("This booking can no longer be cancelled.");
+        setCancelError(i18n("thisBookingCanNoLongerBeCancelled0dbc8ac"));
       } else {
-        setCancelError(err instanceof Error ? err.message : "Failed to cancel booking.");
+        setCancelError(err instanceof Error ? err.message : i18n("failedToCancelBooking2cd9432"));
       }
     } finally {
       setCancelling(false);
@@ -130,10 +136,10 @@ export function SlotPopup({
     : slot.current_user_booking
       ? null
       : isPast
-        ? "This class has already started."
+        ? i18n("thisClassHasAlreadyStarteda7aa12f")
         : slot.spots_remaining === 0
-          ? "This class is currently full."
-          : "Booking is unavailable for this slot.";
+          ? i18n("thisClassIsCurrentlyFullfc75983")
+          : i18n("bookingIsUnavailableForThisSlot8a07037");
 
   const deadline = formatDeadline(locale, slot.scheduled_at, slot.booking_timeout_minutes);
   const typeColor = workoutTypeColor(slot.class_type.slug);
@@ -167,7 +173,7 @@ export function SlotPopup({
             onClick={onClose}
             type="button"
           >
-            Close ✕
+            {i18n("closefeb3e25")}
           </button>
         </div>
 
@@ -175,7 +181,7 @@ export function SlotPopup({
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <h2 className="text-3xl font-semibold" style={{ color: "var(--text)" }}>
-                {slot.workout?.title ?? "Scheduled class"}
+                {slot.workout?.title ?? i18n("scheduledClass571cba0")}
               </h2>
               <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
                 {formatDateTime(locale, slot.scheduled_at)}
@@ -190,7 +196,7 @@ export function SlotPopup({
               }}
               onClick={() =>
                 downloadIcsEvent({
-                  title: slot.workout?.title ?? "Scheduled class",
+                  title: slot.workout?.title ?? i18n("scheduledClass571cba0"),
                   date: slot.scheduled_at.slice(0, 10),
                   datetime: slot.scheduled_at,
                   durationMinutes: 60,
@@ -198,7 +204,7 @@ export function SlotPopup({
               }
               type="button"
             >
-              + Add to Calendar
+              {i18n("addToCalendar33cead7")}
             </button>
           </div>
 
@@ -210,7 +216,7 @@ export function SlotPopup({
                 style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
               >
                 <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
-                  Capacity
+                  {i18n("capacity45bd908")}
                 </p>
                 <p className="mt-2 text-2xl font-semibold" style={{ color: "var(--text)" }}>
                   {slot.approved_booking_count}/{slot.capacity}
@@ -221,10 +227,10 @@ export function SlotPopup({
                 style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
               >
                 <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
-                  Approval
+                  {i18n("approval8cc047a")}
                 </p>
                 <p className="mt-2 text-base font-semibold" style={{ color: "var(--text)" }}>
-                  {slot.auto_approve ? "Auto" : "Manual"}
+                  {slot.auto_approve ? i18n("autoc614ba7") : i18n("manual4e836fd")}
                 </p>
               </div>
               <div
@@ -232,7 +238,7 @@ export function SlotPopup({
                 style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
               >
                 <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
-                  Book by
+                  {i18n("bookByb152b3b")}
                 </p>
                 <p className="mt-2 text-sm font-semibold" style={{ color: "var(--text)" }}>
                   {deadline.relative}
@@ -246,20 +252,20 @@ export function SlotPopup({
                 className="rounded-full px-3 py-1 text-xs font-semibold"
                 style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--muted)" }}
               >
-                {slot.spots_remaining} spot{slot.spots_remaining !== 1 ? "s" : ""} left
+                {slot.spots_remaining} {i18n("spot9f4b527")}{slot.spots_remaining !== 1 ? i18n("sa0f1490") : ""} {i18n("left12c0f1f")}
               </span>
               <span
                 className="rounded-full px-3 py-1 text-xs font-semibold"
                 style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--muted)" }}
               >
-                Book by {deadline.relative}
+                {i18n("bookByb152b3b")} {deadline.relative}
               </span>
               {slot.auto_approve ? null : (
                 <span
                   className="rounded-full px-3 py-1 text-xs font-semibold"
                   style={{ background: "color-mix(in srgb, var(--warning) 14%, transparent)", border: "1px solid color-mix(in srgb, var(--warning) 30%, transparent)", color: "var(--warning)" }}
                 >
-                  Requires approval
+                  {i18n("requiresApproval4ecb6f5")}
                 </span>
               )}
             </div>
@@ -275,10 +281,10 @@ export function SlotPopup({
               }}
             >
               <p className="font-semibold" style={{ color: "var(--warning)" }}>
-                Waiting for coach approval
+                {i18n("waitingForCoachApproval123b28c")}
               </p>
               <p className="mt-1" style={{ color: "var(--muted)" }}>
-                Your spot is reserved — you&apos;ll get a notification once approved.
+                {i18n("yourSpotIsReservedYouLlGetA5f8a9e3")}
               </p>
             </div>
           ) : null}
@@ -292,7 +298,7 @@ export function SlotPopup({
                 border: "1px solid color-mix(in srgb, var(--success) 30%, transparent)",
               }}
             >
-              <p className="font-semibold" style={{ color: "var(--success)" }}>You&apos;re confirmed ✓</p>
+              <p className="font-semibold" style={{ color: "var(--success)" }}>{i18n("youReConfirmed433ef6b")}</p>
               {slot.current_user_booking.admin_message ? (
                 <p className="mt-1" style={{ color: "var(--muted)" }}>
                   {slot.current_user_booking.admin_message}
@@ -320,7 +326,7 @@ export function SlotPopup({
                 onClick={() => void handleCancelBooking()}
                 type="button"
               >
-                {cancelling ? "Cancelling…" : "Cancel booking"}
+                {cancelling ? i18n("cancellingcee1848") : i18n("cancelBookingc6085eb")}
               </button>
             </div>
           ) : null}
@@ -332,7 +338,7 @@ export function SlotPopup({
           >
             <div className="mb-4 flex items-center justify-between gap-3">
               <h3 className="text-lg font-semibold" style={{ color: "var(--text)" }}>
-                Workout
+                {i18n("workout39463a5")}
               </h3>
               {isAdmin ? (
                 <div className="flex gap-2">
@@ -342,7 +348,7 @@ export function SlotPopup({
                     onClick={onEdit}
                     type="button"
                   >
-                    Edit slot
+                    {i18n("editSlot4754d1f")}
                   </button>
                   {slot.workout ? (
                     <button
@@ -351,7 +357,7 @@ export function SlotPopup({
                       onClick={() => setEditWorkoutOpen(true)}
                       type="button"
                     >
-                      Edit workout
+                      {i18n("editWorkoutd299ce5")}
                     </button>
                   ) : null}
                 </div>
@@ -371,7 +377,7 @@ export function SlotPopup({
                   }}
                   onClick={() => setActiveScale(null)}
                 >
-                  Base
+                  {i18n("base077fe9c")}
                 </button>
                 {allScales.map((scale) => (
                   <button
@@ -399,7 +405,7 @@ export function SlotPopup({
               />
             ) : (
               <p className="text-sm" style={{ color: "var(--dim)" }}>
-                No workout assigned to this slot.
+                {i18n("noWorkoutAssignedToThisSlotac3ec23")}
               </p>
             )}
 
@@ -410,7 +416,7 @@ export function SlotPopup({
                 onClick={onBook}
                 type="button"
               >
-                Book this class
+                {i18n("bookThisClass4d08b11")}
               </button>
             ) : unavailableReason ? (
               <p
@@ -429,10 +435,10 @@ export function SlotPopup({
               style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
             >
               <h3 className="mb-1 text-base font-semibold" style={{ color: "var(--text)" }}>
-                Message your coach
+                {i18n("messageYourCoachc0c790e")}
               </h3>
               <p className="mb-4 text-xs" style={{ color: "var(--dim)" }}>
-                Ask a question or leave a note about this class.
+                {i18n("askAQuestionOrLeaveANoteAbout63a1bde")}
               </p>
               {messageSent ? (
                 <div
@@ -445,10 +451,10 @@ export function SlotPopup({
                   <span style={{ color: "var(--success)" }}>✓</span>
                   <div>
                     <p className="text-sm font-semibold" style={{ color: "var(--success)" }}>
-                      Message sent
+                      {i18n("messageSent9cf1b68")}
                     </p>
                     <p className="mt-0.5 text-xs" style={{ color: "var(--muted)" }}>
-                      Your coach will see it before the class.
+                      {i18n("yourCoachWillSeeItBeforeTheClassa812936")}
                     </p>
                   </div>
                 </div>
@@ -461,7 +467,7 @@ export function SlotPopup({
                     <textarea
                       className="flex-1 resize-none bg-transparent text-sm outline-none"
                       style={{ color: "var(--text)", minHeight: "64px" }}
-                      placeholder="Type your message…"
+                      placeholder={i18n("typeYourMessage6733d4f")}
                       value={messageText}
                       onChange={(e) => setMessageText(e.target.value)}
                       maxLength={1000}
@@ -473,7 +479,7 @@ export function SlotPopup({
                       onClick={() => void handleSendMessage()}
                       type="button"
                     >
-                      {messageSending ? "…" : "Send"}
+                      {messageSending ? "…" : i18n("send9bc2575")}
                     </button>
                   </div>
                   {messageError ? (
@@ -491,12 +497,12 @@ export function SlotPopup({
               style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
             >
               <h3 className="text-lg font-semibold" style={{ color: "var(--text)" }}>
-                Bookings
+                {i18n("bookings135229c")}
               </h3>
               <div className="mt-4 space-y-3">
                 {slot.bookings.length === 0 ? (
                   <p className="text-sm" style={{ color: "var(--dim)" }}>
-                    No bookings yet.
+                    {i18n("noBookingsYetdb81e7a")}
                   </p>
                 ) : null}
                 {slot.bookings.map((booking) => (
@@ -531,7 +537,7 @@ export function SlotPopup({
                             onClick={() => onApproveBooking(booking)}
                             type="button"
                           >
-                            Approve
+                            {i18n("approve7b2c7f1")}
                           </button>
                           <button
                             className="rounded-full px-3 py-2 text-xs font-semibold"
@@ -543,7 +549,7 @@ export function SlotPopup({
                             onClick={() => onRejectBooking(booking)}
                             type="button"
                           >
-                            Reject
+                            {i18n("reject2b03b59")}
                           </button>
                         </div>
                       ) : null}
@@ -561,7 +567,7 @@ export function SlotPopup({
           workoutId={slot.workout.id}
           workoutTitle={slot.workout.title}
           accessToken={accessToken}
-          context={{ kind: "slot", sourceId: slot.id, sourceLabel: `class on ${slot.scheduled_at}` }}
+          context={{ kind: "slot", sourceId: slot.id, sourceLabel: i18n("classOn5e673bd") + (slot.scheduled_at) }}
           onClose={() => setEditWorkoutOpen(false)}
         />
       ) : null}

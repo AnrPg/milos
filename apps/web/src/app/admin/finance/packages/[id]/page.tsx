@@ -1,3 +1,5 @@
+
+import {getUiTranslations} from "@/i18n/ui-server";
 import { AuthGuard } from "@/components/auth-guard";
 import { AdminFinancePackageDetail } from "@/components/admin-finance-package-detail";
 
@@ -8,6 +10,7 @@ export default async function AdminFinancePackagePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const i18n = await getUiTranslations();
   const { id } = await params;
 
   return (

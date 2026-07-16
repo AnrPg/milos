@@ -1,5 +1,8 @@
 "use client";
 
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
@@ -10,6 +13,7 @@ import { useSession } from "@/components/session-provider";
 import { useExecutionStore } from "@/stores/execution";
 
 function ExecutePageContent() {
+  const i18n = useUiTranslations();
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const { tokens } = useSession();
@@ -84,7 +88,7 @@ function ExecutePageContent() {
         className="flex min-h-screen items-center justify-center px-6 text-sm"
         style={{ background: "var(--bg)", color: "var(--muted)" }}
       >
-        Recovering workout session…
+        {i18n("recoveringWorkoutSessionc78ae35")}
       </div>
     );
   }

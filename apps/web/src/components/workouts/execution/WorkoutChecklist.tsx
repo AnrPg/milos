@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import type { TimerSegment } from "@/api/executions";
 import { buildStepId } from "./progress";
 
@@ -33,12 +38,13 @@ export function buildChecklistSteps(segment: TimerSegment): ChecklistStep[] {
 }
 
 export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModify }: Props) {
+  const i18n = useUiTranslations();
   const steps = buildChecklistSteps(segment);
 
   if (steps.length === 0) {
     return (
       <div className="py-6 text-center text-sm" style={{ color: "var(--muted)" }}>
-        Rest
+        {i18n("restb79e5f4")}
       </div>
     );
   }
@@ -54,15 +60,15 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
   const { exercise } = currentStep ?? steps[steps.length - 1]!;
 
   const prescriptionLabel = exercise.prescription_value
-    ? `${exercise.prescription_value} ${exercise.prescription_unit ?? ""}`.trim()
+    ? (exercise.prescription_value) + " " + (exercise.prescription_unit ?? "").trim()
     : null;
 
   const loadLabel = exercise.load_value
     ? exercise.load_mode === "pct_1rm"
-      ? `${exercise.load_value}% RM`
-      : `${exercise.load_value} kg`
+      ? (exercise.load_value) + i18n("rma904756")
+      : (exercise.load_value) + " kg"
     : exercise.load_mode === "bw"
-      ? "BW"
+      ? i18n("bw4d64743")
       : null;
 
   const allDone = doneCount === steps.length;
@@ -71,9 +77,9 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between text-xs" style={{ color: "var(--dim)" }}>
         <span>
-          Step {Math.min(doneCount + 1, steps.length)} of {steps.length}
+          {i18n("stepdc416e1")} {Math.min(doneCount + 1, steps.length)} {i18n("ofde04fa0")} {steps.length}
         </span>
-        <span>{doneCount}/{steps.length} done</span>
+        <span>{doneCount}/{steps.length} {i18n("donee5fd9cf")}</span>
       </div>
 
       {allDone ? (
@@ -83,7 +89,7 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
         >
           <div className="text-3xl mb-2">✓</div>
           <p className="text-sm font-semibold" style={{ color: "var(--success, var(--primary))" }}>
-            All steps done
+            {i18n("allStepsDone226c28e")}
           </p>
         </div>
       ) : (
@@ -96,7 +102,9 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              currentStep && onToggle(currentStep.stepId, steps);
+              if (currentStep) {
+                onToggle(currentStep.stepId, steps);
+              }
             }
           }}
         >
@@ -142,16 +150,18 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
               }}
               onClick={(e) => {
                 e.stopPropagation();
-                currentStep && onModify(currentStep);
+                if (currentStep) {
+                  onModify(currentStep);
+                }
               }}
             >
-              Modify
+              {i18n("modify9fe408e")}
             </button>
           </div>
 
           <div className="mt-4 pt-4" style={{ borderTop: "1px solid var(--border)" }}>
             <p className="text-xs text-center" style={{ color: "var(--dim)" }}>
-              Tap anywhere to mark as done
+              {i18n("tapAnywhereToMarkAsDonedc97e9b")}
             </p>
           </div>
         </div>
@@ -178,7 +188,7 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
                 </span>
                 <span className="text-sm line-through" style={{ color: "var(--muted)" }}>
                   {s.exercise.name}
-                  {s.stepLabel ? ` · ${s.stepLabel}` : ""}
+                  {s.stepLabel ? "· " + (s.stepLabel) : ""}
                 </span>
               </div>
             ))}

@@ -1,14 +1,19 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect } from "react";
 
-const SHORTCUTS = [
-  { keys: "Alt + E", description: "Add exercise to selected section" },
-  { keys: "Alt + N", description: "Add new section" },
-  { keys: "?", description: "Show this shortcuts panel" },
-];
-
 export function ShortcutsModal({ onClose }: { onClose: () => void }) {
+  const i18n = useUiTranslations();
+  const SHORTCUTS = [
+    { keys: i18n("altE997c3b7"), description: i18n("addExerciseToSelectedSection23b8456") },
+    { keys: i18n("altNb530fec"), description: i18n("addNewSectione0512f7") },
+    { keys: "?", description: i18n("showThisShortcutsPanel838be9e") },
+  ];
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -29,7 +34,7 @@ export function ShortcutsModal({ onClose }: { onClose: () => void }) {
       >
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>
-            Keyboard Shortcuts
+            {i18n("keyboardShortcutsb465751")}
           </h2>
           <button type="button" onClick={onClose} style={{ color: "var(--dim)" }}>✕</button>
         </div>

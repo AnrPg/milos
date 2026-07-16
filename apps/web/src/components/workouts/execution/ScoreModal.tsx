@@ -1,9 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
+import React, { useId, useState } from "react";
 
 import type { SectionScore } from "@/api/executions";
 import type { TimerSegment } from "@/api/executions";
+import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
 type Props = {
   segment: TimerSegment;
@@ -20,14 +26,17 @@ export function ScoreModal({
   onClose,
   isSaving = false,
 }: Props) {
+  const i18n = useUiTranslations();
   const scoreType = segment.score_config?.type ?? "time";
   const unit = segment.score_config?.unit ?? "";
-  const label = segment.score_config?.label ?? "Score";
+  const label = segment.score_config?.label ?? i18n("score489f487");
 
-  const defaultValue = scoreType === "pass_fail" ? "Pass" : "";
+  const defaultValue = scoreType === "pass_fail" ? i18n("passd7cd56f") : "";
   const [value, setValue] = useState(
     existingScore?.value != null ? String(existingScore.value) : defaultValue,
   );
+  const dialogRef = useModalFocusTrap<HTMLDivElement>(onClose);
+  const titleId = useId();
 
   function handleSave() {
     if (isSaving) return;
@@ -41,16 +50,21 @@ export function ScoreModal({
 
   const placeholder =
     scoreType === "time"
-      ? "mm:ss or seconds"
+      ? i18n("mmSsOrSeconds8fe060d")
       : scoreType === "reps"
-        ? "e.g. 15"
+        ? i18n("eG153cfcdb3")
         : scoreType === "load"
-          ? "e.g. 80 kg"
-          : "e.g. 4 rounds + 3 reps";
+          ? i18n("eG80Kgde59a3f")
+          : i18n("eG4Rounds3Reps688d025");
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center">
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
         className="absolute inset-0"
         style={{ background: "rgba(0,0,0,0.7)" }}
       />
@@ -64,16 +78,16 @@ export function ScoreModal({
         >
           {segment.section_name}
         </div>
-        <div className="mb-4 text-lg font-bold" style={{ color: "var(--text)" }}>
+        <div id={titleId} className="mb-4 text-lg font-bold" style={{ color: "var(--text)" }}>
           {label}
         </div>
         <p className="mb-3 text-xs" style={{ color: "var(--muted)" }}>
-          The measured score is prefilled. Change it only if you want to override it.
+          {i18n("theMeasuredScoreIsPrefilledChangeItOnly56e1bc0")}
         </p>
 
         {scoreType === "pass_fail" ? (
           <div className="flex gap-3">
-            {(["Pass", "Fail"] as const).map((option) => (
+            {([i18n("passd7cd56f"), i18n("fail2758e32")] as const).map((option) => (
               <button
                 key={option}
                 type="button"
@@ -139,7 +153,7 @@ export function ScoreModal({
               color: "var(--muted)",
             }}
           >
-            Back
+            {i18n("backb52b36b")}
           </button>
           <button
             onClick={handleSave}
@@ -147,7 +161,7 @@ export function ScoreModal({
             className="flex-1 rounded-xl py-2.5 text-sm font-semibold disabled:opacity-30"
             style={{ background: "var(--accent, var(--primary))", color: "var(--text)" }}
           >
-            {isSaving ? "Saving…" : "Save"}
+            {isSaving ? i18n("saving56a2285") : i18n("saveefc007a")}
           </button>
         </div>
       </div>

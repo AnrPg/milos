@@ -1,5 +1,7 @@
 "use client";
 
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useTranslations } from "next-intl";
 
 type BookingModalProps = {
@@ -27,6 +29,7 @@ export function BookingModal({
   onCancel,
   onConfirm,
 }: BookingModalProps) {
+  const i18n = useUiTranslations();
   const t = useTranslations("Schedule");
   const common = useTranslations("Common");
 

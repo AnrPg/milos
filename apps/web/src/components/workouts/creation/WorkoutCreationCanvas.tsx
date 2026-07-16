@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -37,15 +42,16 @@ const AUTOSAVE_DELAY_MS = 1500;
 // ── Drag preview components ───────────────────────────────────────────────────
 
 function ExerciseDragPreview({ exercise, section }: { exercise: DraftExercise; section: DraftSection }) {
+  const i18n = useUiTranslations();
   const ctx = FORMAT_EXERCISE_CONTEXT[section.format];
 
   const intervalLabel =
     ctx.intervalMode === "odd_even"
-      ? exercise.intervalAssignment === 1 ? "Odd"
-        : exercise.intervalAssignment === 2 ? "Even"
+      ? exercise.intervalAssignment === 1 ? i18n("odddc28f5f")
+        : exercise.intervalAssignment === 2 ? i18n("even9e767ad")
         : null
       : ctx.intervalMode === "minute" && exercise.intervalAssignment !== null
-        ? `Min ${exercise.intervalAssignment}`
+        ? i18n("min7eb0cee") + (exercise.intervalAssignment)
         : null;
 
   const hasLoad = ctx.showLoad && exercise.loadMode !== "bw" && exercise.loadValue != null;
@@ -78,7 +84,7 @@ function ExerciseDragPreview({ exercise, section }: { exercise: DraftExercise; s
             <span className="shrink-0 text-sm font-semibold" style={{ color: "var(--text)" }}>
               {exercise.sets}
             </span>
-            <span className="shrink-0 text-sm" style={{ color: "var(--muted)" }}>sets</span>
+            <span className="shrink-0 text-sm" style={{ color: "var(--muted)" }}>{i18n("setsd6c8220")}</span>
           </>
         ) : null}
         {ctx.showPrescription ? (
@@ -96,7 +102,7 @@ function ExerciseDragPreview({ exercise, section }: { exercise: DraftExercise; s
             {exercise.loadValue} {exercise.loadMode === "pct_1rm" ? "%RM" : "kg"}
           </span>
         ) : ctx.showLoad && exercise.loadMode === "bw" ? (
-          <span className="shrink-0 text-sm" style={{ color: "var(--muted)" }}>BW</span>
+          <span className="shrink-0 text-sm" style={{ color: "var(--muted)" }}>{i18n("bw4d64743")}</span>
         ) : null}
       </div>
     </div>
@@ -104,6 +110,7 @@ function ExerciseDragPreview({ exercise, section }: { exercise: DraftExercise; s
 }
 
 function SectionDragPreview({ name }: { name: string }) {
+  const i18n = useUiTranslations();
   return (
     <div
       className="rounded-2xl px-4 py-2.5 text-sm font-semibold"
@@ -115,7 +122,7 @@ function SectionDragPreview({ name }: { name: string }) {
         opacity: 0.93,
       }}
     >
-      {name || "Unnamed section"}
+      {name || i18n("unnamedSection109fa70")}
     </div>
   );
 }
@@ -138,6 +145,7 @@ type Props = {
 };
 
 export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished }: Props) {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -175,7 +183,7 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
   const [editorSessionId] = useState(() =>
     typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
       ? crypto.randomUUID()
-      : `editor-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      : "editor-" + (Date.now()) + "-" + (Math.random().toString(16).slice(2)),
   );
   const editorSessionIdRef = useRef(editorSessionId);
 
@@ -184,7 +192,7 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
 
     function onPointerMove(e: PointerEvent) {
       if (overlayRef.current) {
-        overlayRef.current.style.transform = `translate(${e.clientX + 10}px, ${e.clientY - 18}px)`;
+        overlayRef.current.style.transform = "translate(" + (e.clientX + 10) + "px, " + (e.clientY - 18) + "px)";
       }
     }
 
@@ -518,9 +526,9 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
       <button
         type="button"
         onClick={() => setShowShortcuts(true)}
-        className={`${embedded ? "absolute" : "fixed"} bottom-4 right-4 z-40 hidden h-8 w-8 items-center justify-center rounded-full text-sm font-bold md:flex`}
+        className={(embedded ? "absolute" : "fixed") + " bottom-4 right-4 z-40 hidden h-8 w-8 items-center justify-center rounded-full text-sm font-bold md:flex"}
         style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--muted)" }}
-        title="Keyboard shortcuts (?)"
+        title={i18n("keyboardShortcuts72933ee")}
       >
         ?
       </button>
@@ -536,7 +544,7 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
                 position: "fixed",
                 top: 0,
                 left: 0,
-                transform: `translate(${overlayInitPos.x}px, ${overlayInitPos.y}px)`,
+                transform: "translate(" + (overlayInitPos.x) + "px, " + (overlayInitPos.y) + "px)",
                 zIndex: 9999,
                 pointerEvents: "none",
                 width: activeDrag.width,

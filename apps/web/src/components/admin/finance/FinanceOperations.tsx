@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
@@ -16,15 +21,15 @@ import { TransientHero } from "@/components/TransientHero";
 
 type Tab = "members" | "packages" | "promotions" | "referrals" | "queues";
 
-const TABS: Array<{ id: Tab; label: string }> = [
-  { id: "members", label: "Members" },
-  { id: "packages", label: "Packages" },
-  { id: "promotions", label: "Promotions" },
-  { id: "referrals", label: "Referrals" },
-  { id: "queues", label: "Queues" },
-];
-
 export function FinanceOperations() {
+  const i18n = useUiTranslations();
+  const TABS: Array<{ id: Tab; label: string }> = [
+    { id: "members", label: i18n("members1cb449c") },
+    { id: "packages", label: i18n("packages0a99901") },
+    { id: "promotions", label: i18n("promotions086e09b") },
+    { id: "referrals", label: i18n("referrals2b0e3a3") },
+    { id: "queues", label: i18n("queues83dbc32") },
+  ];
   const router = useRouter();
   const searchParams = useSearchParams();
   const { tokens } = useSession();
@@ -48,17 +53,17 @@ export function FinanceOperations() {
   const queues = (queuesQuery.data?.queues ?? {}) as Record<string, FinanceRecord[]>;
   const attentionItems = [
     {
-      label: "Overdue invoices",
+      label: i18n("overdueInvoices747a2d8"),
       count: (queues.overdue_invoices ?? []).length,
       href: "/admin/finance?tab=queues",
     },
     {
-      label: "Pending payments",
+      label: i18n("pendingPaymentsb4ebfb2"),
       count: (queues.pending_payments ?? []).length,
       href: "/admin/finance?tab=queues",
     },
     {
-      label: "Referral rewards",
+      label: i18n("referralRewards22d6a91"),
       count: (queues.pending_referral_rewards ?? []).length,
       href: "/admin/finance?tab=referrals",
     },
@@ -77,16 +82,16 @@ export function FinanceOperations() {
       <div className="mx-auto max-w-7xl space-y-8">
 
         {/* Hero */}
-        <TransientHero label="finance operations introduction">
+        <TransientHero label={i18n("financeOperationsIntroduction1d3b6fc")} timeoutMs={3000}>
         <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>Finance</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>{i18n("finance1b48d3f")}</p>
               <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-                Finance operations
+                {i18n("financeOperations60f9e5a")}
               </h1>
               <p className="mt-2 text-sm leading-6" style={{ color: "var(--muted)" }}>
-                Manage members, packages, promotions, referrals, and operational queues.
+                {i18n("manageMembersPackagesPromotionsReferralsAndOperationalQueues9eab02d")}
               </p>
             </div>
             <Link
@@ -94,24 +99,24 @@ export function FinanceOperations() {
               className="rounded-2xl px-5 py-3 text-sm font-semibold text-center self-start"
               style={{ background: "var(--border)", border: "1px solid var(--border-strong)", color: "var(--text-soft)" }}
             >
-              Finance analytics →
+              {i18n("financeAnalytics271fe3b")}
             </Link>
           </div>
         </section>
         </TransientHero>
 
         <section
-          aria-label="Urgent finance attention"
+          aria-label={i18n("urgentFinanceAttention8b067dd")}
           className="flex items-center gap-2 overflow-x-auto rounded-full px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
         >
           <span className="shrink-0 px-2 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-            Attention
+            {i18n("attention74e0b9c")}
           </span>
           {summaryQuery.isLoading || queuesQuery.isLoading ? (
-            <span className="whitespace-nowrap px-2 text-sm" style={{ color: "var(--muted)" }}>Loading…</span>
+            <span className="whitespace-nowrap px-2 text-sm" style={{ color: "var(--muted)" }}>{i18n("loading33ce417")}</span>
           ) : attentionItems.length === 0 ? (
-            <span className="whitespace-nowrap px-2 text-sm" style={{ color: "var(--muted)" }}>No urgent finance items.</span>
+            <span className="whitespace-nowrap px-2 text-sm" style={{ color: "var(--muted)" }}>{i18n("noUrgentFinanceItemsb14485e")}</span>
           ) : (
             attentionItems.map((item) => (
               <Link
@@ -126,7 +131,7 @@ export function FinanceOperations() {
           )}
           {Number(totals.overdue_invoice_balance_cents ?? 0) > 0 ? (
             <span className="ml-auto shrink-0 whitespace-nowrap px-2 text-xs font-semibold" style={{ color: "var(--muted)" }}>
-              Overdue balance {money(totals.overdue_invoice_balance_cents)}
+              {i18n("overdueBalanced6ec7a8")} {money(totals.overdue_invoice_balance_cents)}
             </span>
           ) : null}
         </section>

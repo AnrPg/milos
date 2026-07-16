@@ -1,5 +1,9 @@
 "use client";
 
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, type ReactNode } from "react";
 
 export function SidePanel({
@@ -17,6 +21,7 @@ export function SidePanel({
   footer?: ReactNode;
   width?: string;
 }) {
+  const i18n = useUiTranslations();
   useEffect(() => {
     function handleKey(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
@@ -33,7 +38,7 @@ export function SidePanel({
         onClick={onClose}
       />
       <div
-        className={`fixed right-0 z-50 flex w-full flex-col overflow-hidden ${width}`}
+        className={"fixed right-0 z-50 flex w-full flex-col overflow-hidden " + (width)}
         style={{ background: "var(--bg)", borderLeft: "1px solid var(--border)", top: "3.25rem", bottom: 0 }}
       >
         <div
@@ -42,7 +47,7 @@ export function SidePanel({
         >
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>
-              {subtitle ?? "Detail"}
+              {subtitle ?? i18n("detail7c9a7c0")}
             </p>
             <h2 className="mt-2 text-xl font-semibold tracking-tight" style={{ color: "var(--text)" }}>
               {title}
@@ -54,7 +59,7 @@ export function SidePanel({
             onClick={onClose}
             type="button"
           >
-            Close
+            {i18n("closebbfa773")}
           </button>
         </div>
 

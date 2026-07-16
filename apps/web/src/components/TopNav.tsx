@@ -1,9 +1,15 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 import { fetchMyFinance } from "@/api/my-finance";
 import { fetchUnreadCount } from "@/api/messaging";
@@ -16,80 +22,78 @@ const CANVAS_PATHS = ["/admin/workouts/new", "/login"];
 
 type UserRole = "member" | "athlete" | "admin";
 
-type NavLink = { href: string; label: string; roles: UserRole[] };
+type NavLink = { href: string; labelKey: string; roles: UserRole[] };
+type AdminNavLink = { href: string; labelKey: string; mobileVisible: boolean };
 
 const NAV_LINKS: NavLink[] = [
-  { href: "/schedule", label: "Schedule", roles: ["member"] },
-  { href: "/admin/class-schedule", label: "Class Schedule", roles: ["admin"] },
-  { href: "/my-workouts", label: "My Workouts", roles: ["athlete"] },
-  { href: "/my-workouts/pantheon", label: "Pantheon", roles: ["athlete", "member"] },
-  { href: "/admin/coaching-assignments", label: "Coaching Assignments", roles: ["admin"] },
-  { href: "/account/billing", label: "Billing", roles: ["member", "athlete"] },
+  { href: "/schedule", labelKey: "schedule", roles: ["member"] },
+  { href: "/my-workouts", labelKey: "myWorkouts", roles: ["athlete"] },
+  { href: "/my-workouts/pantheon", labelKey: "pantheon", roles: ["athlete", "member"] },
+  { href: "/account/billing", labelKey: "billing", roles: ["member", "athlete"] },
+];
+
+const ADMIN_NAV_LINKS: AdminNavLink[] = [
+  { href: "/admin/users", labelKey: "users", mobileVisible: false },
+  { href: "/admin/finance", labelKey: "finance", mobileVisible: false },
+  { href: "/admin/class-schedule", labelKey: "classes", mobileVisible: true },
+  { href: "/admin/coaching-assignments", labelKey: "personalCoaching", mobileVisible: true },
+  { href: "/admin/workouts", labelKey: "workouts", mobileVisible: false },
+  { href: "/admin/metrics", labelKey: "analyticsMarketing", mobileVisible: false },
 ];
 
 type DashboardCategory = {
-  label: string;
-  items: { href: string; label: string; description: string }[];
+  labelKey: string;
+  items: { href: string; labelKey?: string; label?: string; description: string }[];
 };
 
-const DASHBOARD_CATEGORIES: DashboardCategory[] = [
-  {
-    label: "Programme",
-    items: [
-      { href: "/admin/workouts", label: "Workouts", description: "Master workout definitions" },
-      { href: "/admin/class-schedule", label: "Class Schedule", description: "Slots, bookings & attendance" },
-      { href: "/admin/coaching-assignments", label: "Coaching Assignments", description: "Athlete programming board" },
-      { href: "/admin/challenges", label: "Challenges", description: "Seasonal training goals" },
-    ],
-  },
-  {
-    label: "Revenue",
-    items: [
-      { href: "/admin/finance", label: "Finance Dashboard", description: "Revenue metrics & trends" },
-      { href: "/admin/finance/operations", label: "Finance Operations", description: "Invoices, payments & credits" },
-    ],
-  },
-  {
-    label: "Analytics",
-    items: [
-      { href: "/admin/metrics", label: "Metrics", description: "Events, revenue & engagement" },
-      { href: "/admin/reviews", label: "Reviews", description: "Workout feedback queue" },
-      { href: "/admin/wellbeing", label: "Wellbeing", description: "Injury flags & follow-up" },
-    ],
-  },
-  {
-    label: "Settings",
-    items: [
-      { href: "/admin/settings", label: "Settings", description: "Appearance, gamification & level taxonomy" },
-    ],
-  },
-];
-
 function pathActive(pathname: string, href: string) {
-  if (href === "/admin") {
-    return (
-      pathname === "/admin" ||
-      (pathname.startsWith("/admin") &&
-        !pathname.startsWith("/admin/class-schedule") &&
-        !pathname.startsWith("/admin/coaching-assignments") &&
-        !pathname.startsWith("/admin/finance") &&
-        !pathname.startsWith("/admin/metrics") &&
-        !pathname.startsWith("/admin/settings") &&
-        !pathname.startsWith("/admin/workouts"))
+  if (href === "/admin") return pathname === "/admin";
+  if (href === "/admin/metrics") {
+    return ["/admin/metrics", "/admin/challenges", "/admin/reviews", "/admin/wellbeing"].some(
+      (path) => pathname.startsWith(path),
     );
   }
   return pathname.startsWith(href);
 }
 
 function DashboardDropdown({ pathname }: { pathname: string }) {
+  const i18n = useUiTranslations();
+  const DASHBOARD_CATEGORIES: DashboardCategory[] = [
+    {
+      labelKey: "operations",
+      items: [
+        { href: "/admin/users", labelKey: "users", description: i18n("directoryAndPersonProfiles103196f") },
+        { href: "/admin/finance", labelKey: "finance", description: i18n("invoicesPaymentsAndCredits3671159") },
+        { href: "/admin/class-schedule", labelKey: "classes", description: i18n("slotsBookingsAndAttendanced9c2596") },
+        { href: "/admin/coaching-assignments", labelKey: "personalCoaching", description: i18n("athleteProgrammingBoard954ac27") },
+      ],
+    },
+    {
+      labelKey: "contentGrowth",
+      items: [
+        { href: "/admin/workouts", labelKey: "workouts", description: i18n("masterWorkoutDefinitions09554e6") },
+        { href: "/admin/metrics", labelKey: "analyticsMarketing", description: i18n("reportingEngagementAndGrowth37e1707") },
+        { href: "/admin/challenges", label: i18n("challengesff38765"), description: i18n("seasonalEngagementCampaignsd11b07e") },
+      ],
+    },
+    {
+      labelKey: "utility",
+      items: [
+        { href: "/admin/settings", labelKey: "appConfigurations", description: i18n("appearanceRulesAndLevelTaxonomyc970499") },
+      ],
+    },
+  ];
+
+  const t = useTranslations("Navigation");
   const [open, setOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
-  const isAdminActive =
-    pathname.startsWith("/admin") &&
-    !pathname.startsWith("/admin/class-schedule") &&
-    !pathname.startsWith("/admin/coaching-assignments");
+  const isAdminActive = pathname === "/admin";
+  const openMenu = () => {
+    setOpen(true);
+    setActiveCategory((current) => current ?? DASHBOARD_CATEGORIES[0]?.labelKey ?? null);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -104,49 +108,60 @@ function DashboardDropdown({ pathname }: { pathname: string }) {
   }, [open]);
 
   return (
-    <div ref={ref} className="relative">
-      <Link
-        href="/admin"
-        className="rounded-full px-3 py-1 text-sm font-semibold transition-colors"
-        style={{
-          background: isAdminActive ? "var(--border)" : "transparent",
-          color: isAdminActive ? "var(--text)" : "var(--dim)",
-        }}
-        onMouseEnter={() => setOpen(true)}
+    <div ref={ref} className="relative shrink-0" onFocus={openMenu} onMouseEnter={openMenu}>
+      <div
+        className="flex items-center rounded-full"
+        style={{ background: isAdminActive ? "var(--border)" : "transparent" }}
       >
-        Dashboard
-      </Link>
+        <Link
+          href="/admin"
+          className="whitespace-nowrap py-1 ps-2 text-xs font-semibold transition-colors sm:px-3 sm:text-sm"
+          style={{ color: isAdminActive ? "var(--text)" : "var(--dim)" }}
+        >
+          {t("dashboard")}
+        </Link>
+        <button
+          aria-expanded={open}
+          aria-label={t("openDashboard")}
+          className="px-1.5 py-1 text-xs sm:pe-2"
+          style={{ color: isAdminActive ? "var(--text)" : "var(--dim)" }}
+          onClick={() => setOpen((value) => !value)}
+          type="button"
+        >
+          ▾
+        </button>
+      </div>
 
       {open ? (
         <div
-          className="absolute left-0 top-full mt-1 flex rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7)]"
+          className="absolute start-0 top-full mt-1 flex max-w-[calc(100vw-1rem)] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7)]"
           style={{ background: "var(--panel)", border: "1px solid var(--border)", zIndex: 100 }}
           onMouseLeave={() => { setOpen(false); setActiveCategory(null); }}
         >
           {/* Category list */}
-          <div className="w-40 border-r py-1.5" style={{ borderColor: "var(--border)" }}>
+          <div className="w-32 border-e py-1.5 sm:w-40" style={{ borderColor: "var(--border)" }}>
             {DASHBOARD_CATEGORIES.map((cat) => (
               <button
-                key={cat.label}
-                className="flex w-full items-center justify-between gap-2 px-4 py-2 text-left text-xs font-semibold transition-colors"
+                key={cat.labelKey}
+                className="flex w-full items-center justify-between gap-2 px-4 py-2 text-start text-xs font-semibold transition-colors"
                 style={{
-                  color: activeCategory === cat.label ? "var(--text)" : "var(--muted)",
-                  background: activeCategory === cat.label ? "color-mix(in srgb, var(--text) 5%, transparent)" : "transparent",
+                  color: activeCategory === cat.labelKey ? "var(--text)" : "var(--muted)",
+                  background: activeCategory === cat.labelKey ? "color-mix(in srgb, var(--text) 5%, transparent)" : "transparent",
                 }}
-                onMouseEnter={() => setActiveCategory(cat.label)}
-                onClick={() => setActiveCategory(cat.label)}
+                onMouseEnter={() => setActiveCategory(cat.labelKey)}
+                onClick={() => setActiveCategory(cat.labelKey)}
                 type="button"
               >
-                {cat.label}
-                <span style={{ color: "var(--dim)" }}>›</span>
+                {t(cat.labelKey)}
+                <span className="rtl:rotate-180" style={{ color: "var(--dim)" }}>›</span>
               </button>
             ))}
           </div>
 
           {/* Sub-items */}
           {activeCategory ? (
-            <div className="w-56 py-1.5">
-              {DASHBOARD_CATEGORIES.find((c) => c.label === activeCategory)?.items.map((item) => (
+            <div className="w-48 py-1.5 sm:w-56">
+              {DASHBOARD_CATEGORIES.find((c) => c.labelKey === activeCategory)?.items.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
@@ -154,7 +169,7 @@ function DashboardDropdown({ pathname }: { pathname: string }) {
                   onClick={() => { setOpen(false); setActiveCategory(null); }}
                 >
                   <p className="text-sm font-semibold" style={{ color: pathname.startsWith(item.href) ? "var(--primary)" : "var(--text)" }}>
-                    {item.label}
+                    {item.labelKey ? t(item.labelKey) : item.label}
                   </p>
                   <p className="mt-0.5 text-xs" style={{ color: "var(--dim)" }}>{item.description}</p>
                 </Link>
@@ -168,12 +183,15 @@ function DashboardDropdown({ pathname }: { pathname: string }) {
 }
 
 export function TopNav() {
+  const i18n = useUiTranslations();
+  const t = useTranslations("Navigation");
   const pathname = usePathname();
-  const { tokens, currentUser, signOut } = useSession();
+  const { status, tokens, currentUser, signOut } = useSession();
   const queryClient = useQueryClient();
   const [menuOpen, setMenuOpen] = useState(false);
   const [msgOpen, setMsgOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const authenticated = status === "authenticated" && Boolean(tokens?.access_token) && Boolean(currentUser);
 
   const role = (currentUser?.role ?? "") as UserRole;
   const initials = currentUser?.nickname
@@ -183,7 +201,7 @@ export function TopNav() {
 
   const financeQuery = useQuery({
     queryKey: ["my", "finance"],
-    enabled: Boolean(tokens?.access_token) && role !== "admin",
+    enabled: authenticated && role !== "admin",
     queryFn: () => fetchMyFinance(tokens!.access_token),
     staleTime: 2 * 60 * 1000,
   });
@@ -191,10 +209,10 @@ export function TopNav() {
 
   const unreadQuery = useQuery({
     queryKey: ["messages", "unread"],
-    enabled: Boolean(tokens?.access_token),
+    enabled: authenticated,
     queryFn: () => fetchUnreadCount(tokens!.access_token),
     staleTime: 15 * 1000,
-    refetchInterval: 30 * 1000,
+    refetchInterval: authenticated ? 30 * 1000 : false,
   });
   const unreadCount = unreadQuery.data?.unread_count ?? 0;
 
@@ -202,7 +220,7 @@ export function TopNav() {
   useEffect(() => {
     if (!tokens?.access_token || !currentUser?.id) return;
     return subscribeToTopic(tokens.access_token, `notifications:${currentUser.id}`, {
-      "notifications:changed": () => {
+      notifications_changed: () => {
         void queryClient.invalidateQueries({ queryKey: ["messages", "unread"] });
       },
     });
@@ -233,143 +251,168 @@ export function TopNav() {
         height: "3.25rem",
       }}
     >
-      <div className="mx-auto flex w-full max-w-7xl items-center gap-4 px-5">
+      <div className="flex w-full items-center gap-2 px-2 sm:gap-4 sm:px-5">
         <Link
           href="/"
-          className="shrink-0 text-xs font-bold uppercase tracking-[0.28em]"
+          className="hidden shrink-0 text-xs font-bold uppercase tracking-[0.28em] sm:block"
           style={{ color: "var(--text)" }}
         >
-          Milos
+          {i18n("milose9defa8")}
         </Link>
 
-        <nav className="flex flex-1 items-center gap-1">
+        <nav className="flex min-w-0 flex-1 items-center gap-0.5 overflow-hidden sm:gap-1">
           {role === "admin" ? <DashboardDropdown pathname={pathname} /> : null}
-          {NAV_LINKS.filter((link) => link.roles.includes(role)).map((link) => {
-            const active = pathActive(pathname, link.href);
-            const showBalanceBadge = link.href === "/account/billing" && outstandingCents > 0;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="relative rounded-full px-3 py-1 text-sm font-semibold transition-colors"
-                style={{
-                  background: active ? "var(--border)" : "transparent",
-                  color: active ? "var(--text)" : "var(--dim)",
-                }}
-              >
-                {link.label}
-                {showBalanceBadge && (
-                  <span
-                    className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold"
-                    style={{ background: "var(--danger)", color: "#fff" }}
-                  >
-                    !
-                  </span>
-                )}
-              </Link>
-            );
-          })}
+          <div className="flex min-w-0 items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-1">
+            {role === "admin"
+              ? ADMIN_NAV_LINKS.map((link) => {
+                  const active = pathActive(pathname, link.href);
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={(link.mobileVisible ? "" : "hidden md:block") + " whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold transition-colors sm:px-3 sm:text-sm"}
+                      style={{
+                        background: active ? "var(--border)" : "transparent",
+                        color: active ? "var(--text)" : "var(--dim)",
+                      }}
+                    >
+                      {t(link.labelKey)}
+                    </Link>
+                  );
+                })
+              : null}
+            {NAV_LINKS.filter((link) => link.roles.includes(role)).map((link) => {
+              const active = pathActive(pathname, link.href);
+              const showBalanceBadge = link.href === "/account/billing" && outstandingCents > 0;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="relative whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold transition-colors sm:px-3 sm:text-sm"
+                  style={{
+                    background: active ? "var(--border)" : "transparent",
+                    color: active ? "var(--text)" : "var(--dim)",
+                  }}
+                >
+                  {t(link.labelKey)}
+                  {showBalanceBadge ? (
+                    <span
+                      className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold"
+                      style={{ background: "var(--danger)", color: "#fff" }}
+                    >
+                      !
+                    </span>
+                  ) : null}
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
 
-          {/* Messages button — opens dropdown panel, does not navigate */}
-          <div className="relative">
+        <div className="ms-auto flex shrink-0 items-center gap-1 sm:gap-2">
+          <NotificationBell />
+
+          <div className="relative shrink-0">
             <button
               type="button"
-              className="relative rounded-full px-3 py-1 text-sm font-semibold transition-colors"
+              className="relative whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold transition-colors sm:px-3 sm:text-sm"
               style={{
                 background: msgOpen ? "var(--border)" : "transparent",
                 color: msgOpen ? "var(--text)" : "var(--dim)",
               }}
-              onClick={() => setMsgOpen((v) => !v)}
+              onClick={() => setMsgOpen((value) => !value)}
             >
-              Messages
-              {unreadCount > 0 && (
+              {t("chat")}
+              {unreadCount > 0 ? (
                 <span
-                  className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold"
+                  className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold"
                   style={{ background: "var(--primary)", color: "var(--bg)" }}
                 >
                   {unreadCount > 99 ? "99+" : unreadCount}
                 </span>
-              )}
+              ) : null}
             </button>
             {msgOpen ? <DirectMessagesPanel onClose={() => setMsgOpen(false)} /> : null}
           </div>
 
-        </nav>
-
-        <NotificationBell />
-
-        <div ref={menuRef} className="relative shrink-0">
-          <button
-            className="flex items-center gap-2 rounded-full py-1 pl-1 pr-3 text-sm font-semibold transition-colors"
-            style={{ background: "var(--panel)", color: "var(--text)" }}
-            onClick={() => setMenuOpen((v) => !v)}
-            type="button"
-          >
-            {avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={avatarUrl}
-                alt={currentUser?.nickname ?? ""}
-                className="h-7 w-7 rounded-full object-cover"
-              />
-            ) : (
-              <span
-                className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
-                style={{ background: "var(--primary)", color: "var(--bg)" }}
-              >
-                {initials}
-              </span>
-            )}
-            <span className="hidden max-w-[7rem] truncate sm:block" style={{ color: "var(--text-soft)" }}>
-              {currentUser.nickname}
-            </span>
-            <span className="text-[10px]" style={{ color: "var(--dim)" }}>▾</span>
-          </button>
-
-          {menuOpen ? (
-            <div
-              className="absolute right-0 top-full mt-2 w-44 overflow-hidden rounded-2xl py-1 shadow-[0_16px_60px_rgba(0,0,0,0.6)]"
-              style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+          <div ref={menuRef} className="relative shrink-0">
+            <button
+              className="flex items-center gap-2 rounded-full py-1 ps-1 pe-3 text-sm font-semibold transition-colors"
+              style={{ background: "var(--panel)", color: "var(--text)" }}
+              onClick={() => setMenuOpen((value) => !value)}
+              type="button"
             >
-              <div className="border-b px-4 py-3" style={{ borderColor: "var(--border)" }}>
-                <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
-                  Signed in as
-                </p>
-                <p className="mt-1 truncate text-sm font-semibold" style={{ color: "var(--text)" }}>
-                  {currentUser.nickname}
-                </p>
-                <p className="mt-0.5 text-xs uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                  {currentUser.role}
-                </p>
-              </div>
-              <Link
-                href="/profile"
-                className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[var(--border)]"
-                style={{ color: "var(--text-soft)" }}
-                onClick={() => setMenuOpen(false)}
+              {avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={avatarUrl}
+                  alt={currentUser.nickname}
+                  className="h-7 w-7 rounded-full object-cover"
+                />
+              ) : (
+                <span
+                  className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
+                  style={{ background: "var(--primary)", color: "var(--bg)" }}
+                >
+                  {initials}
+                </span>
+              )}
+              <span className="hidden max-w-[7rem] truncate sm:block" style={{ color: "var(--text-soft)" }}>
+                {currentUser.nickname}
+              </span>
+              <span className="text-[10px]" style={{ color: "var(--dim)" }}>
+                ▾
+              </span>
+            </button>
+
+            {menuOpen ? (
+              <div
+                className="absolute end-0 top-full mt-2 w-44 overflow-hidden rounded-2xl py-1 shadow-[0_16px_60px_rgba(0,0,0,0.6)]"
+                style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
               >
-                Profile
-              </Link>
-              {role !== "admin" && (
+                <div className="border-b px-4 py-3" style={{ borderColor: "var(--border)" }}>
+                  <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
+                    {i18n("signedInAsa02107c")}
+                  </p>
+                  <p className="mt-1 truncate text-sm font-semibold" style={{ color: "var(--text)" }}>
+                    {currentUser.nickname}
+                  </p>
+                  <p className="mt-0.5 text-xs uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+                    {currentUser.role}
+                  </p>
+                </div>
                 <Link
-                  href="/account/billing"
+                  href="/profile"
                   className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[var(--border)]"
                   style={{ color: "var(--text-soft)" }}
                   onClick={() => setMenuOpen(false)}
                 >
-                  Billing
+                  {t("profile")}
                 </Link>
-              )}
-              <button
-                className="w-full px-4 py-2.5 text-left text-sm font-semibold transition-colors hover:bg-[var(--border)]"
-                style={{ color: "var(--primary)" }}
-                onClick={() => { signOut(); setMenuOpen(false); }}
-                type="button"
-              >
-                Sign out
-              </button>
-            </div>
-          ) : null}
+                {role !== "admin" ? (
+                  <Link
+                    href="/account/billing"
+                    className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[var(--border)]"
+                    style={{ color: "var(--text-soft)" }}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {t("billing")}
+                  </Link>
+                ) : null}
+                <button
+                  className="w-full px-4 py-2.5 text-start text-sm font-semibold transition-colors hover:bg-[var(--border)]"
+                  style={{ color: "var(--primary)" }}
+                  onClick={() => {
+                    signOut();
+                    setMenuOpen(false);
+                  }}
+                  type="button"
+                >
+                  {i18n("signOutdc1649a")}
+                </button>
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
     </header>

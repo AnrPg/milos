@@ -1,5 +1,11 @@
 "use client";
 
+
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -47,39 +53,6 @@ function isActiveChallenge(c: AdminChallengeRecord) {
   return new Date(c.starts_at).getTime() <= now && new Date(c.ends_at).getTime() >= now;
 }
 
-const NAV_GROUPS: Array<{ label: string; items: Array<{ label: string; href: string }> }> = [
-  {
-    label: "Programme",
-    items: [
-      { label: "Workouts", href: "/admin/workouts" },
-      { label: "Class Schedule", href: "/admin/class-schedule" },
-      { label: "Coaching Assignments", href: "/admin/coaching-assignments" },
-      { label: "Challenges", href: "/admin/challenges" },
-    ],
-  },
-  {
-    label: "Revenue",
-    items: [
-      { label: "Finance Dashboard", href: "/admin/finance" },
-      { label: "Finance Operations", href: "/admin/finance/operations" },
-    ],
-  },
-  {
-    label: "Analytics",
-    items: [
-      { label: "Metrics", href: "/admin/metrics" },
-      { label: "Reviews", href: "/admin/reviews" },
-      { label: "Wellbeing", href: "/admin/wellbeing" },
-    ],
-  },
-  {
-    label: "Settings",
-    items: [
-      { label: "Settings", href: "/admin/settings" },
-    ],
-  },
-];
-
 function AdminMetricChip({ label, value, href, danger = false, loading = false }: {
   label: string;
   value: string;
@@ -87,6 +60,7 @@ function AdminMetricChip({ label, value, href, danger = false, loading = false }
   danger?: boolean;
   loading?: boolean;
 }) {
+  const i18n = useUiTranslations();
   return (
     <Link
       href={href}
@@ -111,6 +85,7 @@ function AdminMetricChip({ label, value, href, danger = false, loading = false }
 }
 
 function AdminChallengeCard({ challenge }: { challenge: AdminChallengeRecord }) {
+  const i18n = useUiTranslations();
   const pct = Math.round(challenge.progress_summary.completion_rate * 100);
   return (
     <article
@@ -138,20 +113,47 @@ function AdminChallengeCard({ challenge }: { challenge: AdminChallengeRecord }) 
       <div className="mt-4 h-1.5 overflow-hidden rounded-full" style={{ background: "var(--border)" }}>
         <div
           className="h-full rounded-full"
-          style={{ width: `${pct}%`, background: pct === 100 ? "var(--success)" : "var(--primary)" }}
+          style={{ width: (pct) + "%", background: pct === 100 ? "var(--success)" : "var(--primary)" }}
         />
       </div>
 
       <div className="mt-3 flex gap-4 text-xs" style={{ color: "var(--muted)" }}>
-        <span>{challenge.progress_summary.participants} participants</span>
-        <span>{challenge.progress_summary.completed} completed</span>
-        <span>{pct}% completion rate</span>
+        <span>{challenge.progress_summary.participants} {i18n("participantsa94a46c")}</span>
+        <span>{challenge.progress_summary.completed} {i18n("completed231e564")}</span>
+        <span>{pct}{i18n("completionRateca84af1")}</span>
       </div>
     </article>
   );
 }
 
 export function AdminDashboard() {
+  const i18n = useUiTranslations();
+  const NAV_GROUPS: Array<{ label: string; items: Array<{ label: string; href: string }> }> = [
+    {
+      label: i18n("operationsa1fdaa6"),
+      items: [
+        { label: i18n("users57f2b18"), href: "/admin/users" },
+        { label: i18n("finance1b48d3f"), href: "/admin/finance" },
+        { label: i18n("classesed1846a"), href: "/admin/class-schedule" },
+        { label: i18n("personalCoaching6accdcd"), href: "/admin/coaching-assignments" },
+      ],
+    },
+    {
+      label: i18n("content4f9be05"),
+      items: [
+        { label: i18n("workoutsccb58b2"), href: "/admin/workouts" },
+      ],
+    },
+    {
+      label: i18n("analyticsMarketinga05588a"),
+      items: [
+        { label: i18n("overview0efc2e6"), href: "/admin/metrics" },
+        { label: i18n("challengesff38765"), href: "/admin/challenges" },
+        { label: i18n("reviewsb83c4cd"), href: "/admin/reviews" },
+        { label: i18n("healthIncidentsb8da1fe"), href: "/admin/wellbeing" },
+      ],
+    },
+  ];
   const { currentUser, tokens } = useSession();
   const [configOpen, setConfigOpen] = useState(false);
   const [activeCategories, setActiveCategories] = useState<AlertCategory[]>(DEFAULT_CATEGORIES);
@@ -229,54 +231,54 @@ export function AdminDashboard() {
 
   // ── KPI rows ──────────────────────────────────────────────────────────────
   const financeKpis: Array<[string, string, boolean, string]> = [
-    ["Active members", String(totals.active_memberships ?? 0), false, "/admin/finance"],
-    ["Revenue MTD", money(totals.paid_revenue_cents), false, "/admin/finance"],
-    ["Expiring ≤30d", String(totals.expiring_memberships ?? 0), Number(totals.expiring_memberships ?? 0) > 0, "/admin/finance/operations?tab=queues"],
-    ["Overdue invoices", money(totals.overdue_invoice_balance_cents), Number(totals.overdue_invoice_balance_cents ?? 0) > 0, "/admin/finance/operations?tab=queues"],
+    [i18n("activeMembersa17ecbe"), String(totals.active_memberships ?? 0), false, "/admin/finance"],
+    [i18n("revenueMtd3ffc292"), money(totals.paid_revenue_cents), false, "/admin/metrics/finance"],
+    [i18n("expiring30d1d039ba"), String(totals.expiring_memberships ?? 0), Number(totals.expiring_memberships ?? 0) > 0, "/admin/finance?tab=queues"],
+    [i18n("overdueInvoices747a2d8"), money(totals.overdue_invoice_balance_cents), Number(totals.overdue_invoice_balance_cents ?? 0) > 0, "/admin/finance?tab=queues"],
   ];
 
   const operationalKpis: Array<[string, string, boolean, string]> = [
-    ["Classes today", String(adminMetrics?.classes_today ?? 0), false, "/admin/class-schedule"],
-    ["Pending approvals", String(adminMetrics?.pending_referral_approvals ?? 0), Number(adminMetrics?.pending_referral_approvals ?? 0) > 0, "/admin/finance/operations?tab=referrals"],
-    ["Total outstanding", money(adminMetrics?.total_outstanding_cents ?? 0), Number(adminMetrics?.total_outstanding_cents ?? 0) > 0, "/admin/finance/operations"],
-    ["Members", String(adminMetrics?.member_count ?? 0), false, "/admin/finance"],
+    [i18n("classesTodayd01b776"), String(adminMetrics?.classes_today ?? 0), false, "/admin/class-schedule"],
+    [i18n("pendingApprovals6ac383a"), String(adminMetrics?.pending_referral_approvals ?? 0), Number(adminMetrics?.pending_referral_approvals ?? 0) > 0, "/admin/finance?tab=referrals"],
+    [i18n("totalOutstandingefd930a"), money(adminMetrics?.total_outstanding_cents ?? 0), Number(adminMetrics?.total_outstanding_cents ?? 0) > 0, "/admin/finance"],
+    [i18n("members1cb449c"), String(adminMetrics?.member_count ?? 0), false, "/admin/users"],
   ];
 
   // ── Alerts ─────────────────────────────────────────────────────────────────
   const financeAlerts: Array<{ text: string; href: string }> = [
     ...(Number(totals.expiring_memberships ?? 0) > 0
-      ? [{ text: `${String(totals.expiring_memberships)} memberships expiring within 30 days`, href: "/admin/finance/operations?tab=queues" }]
+      ? [{ text: (String(totals.expiring_memberships)) + i18n("membershipsExpiringWithin30Daysae431f3"), href: "/admin/finance?tab=queues" }]
       : []),
     ...((queues.overdue_invoices ?? []).length > 0
-      ? [{ text: `${String((queues.overdue_invoices ?? []).length)} overdue invoices`, href: "/admin/finance/operations?tab=queues" }]
+      ? [{ text: (String((queues.overdue_invoices ?? []).length)) + i18n("overdueInvoicesab09bd9"), href: "/admin/finance?tab=queues" }]
       : []),
     ...((queues.pending_payments ?? []).length > 0
-      ? [{ text: `${String((queues.pending_payments ?? []).length)} pending payments`, href: "/admin/finance/operations?tab=queues" }]
+      ? [{ text: (String((queues.pending_payments ?? []).length)) + i18n("pendingPayments200b7ff"), href: "/admin/finance?tab=queues" }]
       : []),
     ...((queues.pending_referral_rewards ?? []).length > 0
-      ? [{ text: `${String((queues.pending_referral_rewards ?? []).length)} pending referral rewards`, href: "/admin/finance/operations?tab=referrals" }]
+      ? [{ text: (String((queues.pending_referral_rewards ?? []).length)) + i18n("pendingReferralRewards94485f1"), href: "/admin/finance?tab=referrals" }]
       : []),
   ];
 
   const coachingAlerts: Array<{ text: string; href: string }> = [
     ...(Number(coaching.injury_count ?? 0) > 0
-      ? [{ text: `${String(coaching.injury_count)} injury flags since last visit`, href: "/admin/wellbeing" }]
+      ? [{ text: (String(coaching.injury_count)) + i18n("injuryFlagsSinceLastVisit507e216"), href: "/admin/wellbeing" }]
       : []),
     ...(Number(coaching.review_count ?? 0) > 0
-      ? [{ text: `${String(coaching.review_count)} unread workout reviews`, href: "/admin/reviews" }]
+      ? [{ text: (String(coaching.review_count)) + i18n("unreadWorkoutReviews43cac80"), href: "/admin/reviews" }]
       : []),
   ];
 
   const trainingAlerts: Array<{ text: string; href: string }> = [
     ...(pendingBookingsCount > 0
-      ? [{ text: `${String(pendingBookingsCount)} pending booking approvals`, href: "/admin/class-schedule" }]
+      ? [{ text: (String(pendingBookingsCount)) + i18n("pendingBookingApprovals7ec01ae"), href: "/admin/class-schedule" }]
       : []),
   ];
 
   const allAlerts: Record<AlertCategory, { label: string; items: Array<{ text: string; href: string }> }> = {
-    finance: { label: "Finance", items: financeAlerts },
-    coaching: { label: "Coaching", items: coachingAlerts },
-    training: { label: "Training", items: trainingAlerts },
+    finance: { label: i18n("finance1b48d3f"), items: financeAlerts },
+    coaching: { label: i18n("coachingfd8b79f"), items: coachingAlerts },
+    training: { label: i18n("trainingb6fe7f5"), items: trainingAlerts },
   };
 
   const hasAnyAlert = activeCategories.some((cat) => allAlerts[cat].items.length > 0);
@@ -290,7 +292,7 @@ export function AdminDashboard() {
   }
 
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const greeting = hour < 12 ? i18n("goodMorning0f76892") : hour < 18 ? i18n("goodAfternoon13fd0a3") : i18n("goodEvening6a4f54e");
 
   return (
     <main
@@ -303,13 +305,28 @@ export function AdminDashboard() {
     >
       <div className="mx-auto max-w-6xl space-y-8">
 
+        <div className="flex justify-end">
+          <Link
+            aria-label={i18n("appConfigurationse0effaa")}
+            href="/admin/settings"
+            title={i18n("appConfigurationse0effaa")}
+            className="group flex items-center overflow-hidden rounded-full px-3 py-2 text-sm font-semibold"
+            style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+          >
+            <span aria-hidden="true">⚙</span>
+            <span className="max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-200 group-hover:ml-2 group-hover:max-w-40 group-hover:opacity-100 group-focus-visible:ml-2 group-focus-visible:max-w-40 group-focus-visible:opacity-100">
+              {i18n("appConfigurationse0effaa")}
+            </span>
+          </Link>
+        </div>
+
         {/* Hero */}
-        <TransientHero label="administrator dashboard introduction">
+        <TransientHero collapsedTitle={i18n("dashboardd87f47b")} label={i18n("administratorDashboardIntroduction1341bd6")} timeoutMs={3000}>
         <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
-                Admin
+                {i18n("admin4e7afeb")}
               </p>
               <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
                 {greeting}, {currentUser?.nickname}.
@@ -320,18 +337,18 @@ export function AdminDashboard() {
             </div>
             <div className="flex flex-wrap gap-3">
               <Link
-                href="/admin/finance/operations"
+                href="/admin/finance"
                 className="rounded-2xl px-5 py-3 text-sm font-semibold text-center"
                 style={{ background: "var(--text)", color: "var(--bg)" }}
               >
-                Finance Operations
+                {i18n("finance1b48d3f")}
               </Link>
               <Link
                 href="/admin/class-schedule"
                 className="rounded-2xl px-5 py-3 text-sm font-semibold text-center"
                 style={{ background: "var(--border)", border: "1px solid var(--border-strong)", color: "var(--text-soft)" }}
               >
-                Class Schedule
+                {i18n("classesed1846a")}
               </Link>
             </div>
           </div>
@@ -356,11 +373,11 @@ export function AdminDashboard() {
         <section className="rounded-[2.2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>Seasonal Challenges</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>{i18n("seasonalChallengesfd69ec6")}</p>
               <h2 className="mt-2 text-xl font-semibold tracking-tight" style={{ color: "var(--text)" }}>
                 {activeChallenges.length === 0 && !challengesQuery.isLoading
-                  ? "No active challenges"
-                  : `${activeChallenges.length} active`}
+                  ? i18n("noActiveChallenges1856c6d")
+                  : (activeChallenges.length) + " active"}
               </h2>
             </div>
             <Link
@@ -368,7 +385,7 @@ export function AdminDashboard() {
               className="rounded-full px-4 py-2 text-sm font-semibold"
               style={{ background: "var(--border)", border: "1px solid var(--border-strong)", color: "var(--text-soft)" }}
             >
-              Manage →
+              {i18n("managebfa0df1")}
             </Link>
           </div>
 
@@ -380,7 +397,7 @@ export function AdminDashboard() {
             </div>
           ) : activeChallenges.length === 0 ? (
             <p className="mt-5 rounded-2xl px-4 py-5 text-sm" style={{ background: "var(--panel-muted)", color: "var(--dim)" }}>
-              No active seasonal challenges. Create one to start tracking member progress.
+              {i18n("noActiveSeasonalChallengesCreateOneToStarte83a1e1")}
             </p>
           ) : (
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -395,9 +412,9 @@ export function AdminDashboard() {
         <section className="rounded-[2.2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>Needs attention</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>{i18n("needsAttentiona126722")}</p>
               {!hasAnyAlert && !financeQuery.isLoading && (
-                <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>No urgent items. All clear.</p>
+                <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>{i18n("noUrgentItemsAllClearbc87c03")}</p>
               )}
             </div>
             <button
@@ -406,14 +423,14 @@ export function AdminDashboard() {
               onClick={() => setConfigOpen((v) => !v)}
               type="button"
             >
-              {configOpen ? "Done" : "Configure ✦"}
+              {configOpen ? i18n("donee9b450d") : i18n("configure09054e5")}
             </button>
           </div>
 
           {configOpen && (
             <div className="mt-4 flex flex-wrap gap-3 rounded-[1.4rem] p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
               <p className="w-full text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                Show alert categories
+                {i18n("showAlertCategoriesfc2cff7")}
               </p>
               {(["finance", "coaching", "training"] as AlertCategory[]).map((cat) => (
                 <button

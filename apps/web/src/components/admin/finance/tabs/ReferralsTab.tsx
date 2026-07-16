@@ -1,5 +1,11 @@
 "use client";
 
+
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -42,33 +48,6 @@ function displayName(record: FinanceRecord | null | undefined, labelKey: string,
   return field(record, labelKey, field(record, idKey).slice(0, 8));
 }
 
-function rewardStatusText(status: string) {
-  if (status === "applied") return "Approved";
-  if (status === "rejected") return "Rejected";
-  if (status === "approved") return "Ready to approve";
-  return "Pending review";
-}
-
-function eventStatusText(status: string) {
-  if (status === "approved" || status === "applied") return "Referral confirmed";
-  if (status === "rejected") return "Referral rejected";
-  return "Referral pending";
-}
-
-function rewardDescriptor(reward: FinanceRecord | null | undefined) {
-  if (!reward) return "Not issued";
-  return `${field(reward, "reward_type")} · ${field(reward, "reward_value")}`;
-}
-
-function eventRewardStatusText(
-  event: FinanceRecord | null | undefined,
-  reward: FinanceRecord | null | undefined,
-) {
-  if (reward) return `Reward ${rewardStatusText(field(reward, "status")).toLowerCase()}`;
-  if (field(event, "status") === "rejected") return "No reward";
-  return "Reward not issued";
-}
-
 function eventRewardPillStyle(
   event: FinanceRecord | null | undefined,
   reward: FinanceRecord | null | undefined,
@@ -82,6 +61,34 @@ function eventRewardPillStyle(
 }
 
 export function ReferralsTab() {
+  function eventRewardStatusText(
+    event: FinanceRecord | null | undefined,
+    reward: FinanceRecord | null | undefined,
+  ) {
+    if (reward) return i18n("rewardValue0fe3fe24", {value0: rewardStatusText(field(reward, "status")).toLowerCase()});
+    if (field(event, "status") === "rejected") return i18n("noRewardea1b591");
+    return i18n("rewardNotIssued0b729d0");
+  }
+
+  function rewardDescriptor(reward: FinanceRecord | null | undefined) {
+    if (!reward) return i18n("notIssuedff7515d");
+    return i18n("value0Value1f5d96de", {value0: field(reward, "reward_type"), value1: field(reward, "reward_value")});
+  }
+
+  function eventStatusText(status: string) {
+    if (status === "approved" || status === "applied") return i18n("referralConfirmedc89581c");
+    if (status === "rejected") return i18n("referralRejectedcb117b3");
+    return i18n("referralPendingb025170");
+  }
+
+  function rewardStatusText(status: string) {
+    if (status === "applied") return i18n("approved41b81eb");
+    if (status === "rejected") return i18n("rejected27eeb7a");
+    if (status === "approved") return i18n("readyToApprove015c1c8");
+    return i18n("pendingReview6a80f44");
+  }
+
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
   const queryClient = useQueryClient();
@@ -201,15 +208,15 @@ export function ReferralsTab() {
 
       {/* Programs */}
       <Section
-        title="Programs"
+        title={i18n("programsab14d0a")}
         count={programs.length}
         onNew={() => setParam({ new: "program" })}
-        newLabel="+ New program"
+        newLabel={i18n("newProgram03c5865")}
       >
         {programsQuery.isLoading ? (
-          <EmptyRow>Loading…</EmptyRow>
+          <EmptyRow>{i18n("loading33ce417")}</EmptyRow>
         ) : programs.length === 0 ? (
-          <EmptyRow>No referral programs yet.</EmptyRow>
+          <EmptyRow>{i18n("noReferralProgramsYet8445c6c")}</EmptyRow>
         ) : (
           programs.map((p, i) => (
             <ListRow
@@ -224,7 +231,7 @@ export function ReferralsTab() {
                 <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{field(p, "name")}</p>
                 <p className="mt-0.5 text-xs" style={{ color: "var(--dim)" }}>
                   {field(p, "reward_type")} · {field(p, "reward_value")} ·{" "}
-                  {p.active !== false ? "Active" : "Inactive"}
+                  {p.active !== false ? i18n("activea733b80") : i18n("inactive09af574")}
                 </p>
               </div>
               <StatusBadge active={p.active !== false} />
@@ -235,15 +242,15 @@ export function ReferralsTab() {
 
       {/* Events */}
       <Section
-        title="Events"
+        title={i18n("eventsc5497bc")}
         count={events.length}
         onNew={() => setParam({ "new-event": "true" })}
-        newLabel="+ New event"
+        newLabel={i18n("newEvent7d0b5a7")}
       >
         {eventsQuery.isLoading ? (
-          <EmptyRow>Loading…</EmptyRow>
+          <EmptyRow>{i18n("loading33ce417")}</EmptyRow>
         ) : events.length === 0 ? (
-          <EmptyRow>No referral events yet.</EmptyRow>
+          <EmptyRow>{i18n("noReferralEventsYeta4b3417")}</EmptyRow>
         ) : (
           events.map((e, i) => {
             const eventReward = rewards.find((reward) => field(reward, "referral_event_id") === field(e, "id"));
@@ -266,7 +273,7 @@ export function ReferralsTab() {
                   {field(e, "status") === "pending" && (
                     <>
                       <StatusButton
-                        label="Approve"
+                        label={i18n("approve7b2c7f1")}
                         pending={updateEventMutation.isPending}
                         onClick={(event) => {
                           event.stopPropagation();
@@ -274,7 +281,7 @@ export function ReferralsTab() {
                         }}
                       />
                       <StatusButton
-                        label="Reject"
+                        label={i18n("reject2b03b59")}
                         pending={updateEventMutation.isPending}
                         danger
                         onClick={(event) => {
@@ -297,11 +304,11 @@ export function ReferralsTab() {
       </Section>
 
       {/* Rewards */}
-      <Section title="Rewards" count={rewards.length}>
+      <Section title={i18n("rewards2f4f4b7")} count={rewards.length}>
         {rewardsQuery.isLoading ? (
-          <EmptyRow>Loading…</EmptyRow>
+          <EmptyRow>{i18n("loading33ce417")}</EmptyRow>
         ) : rewards.length === 0 ? (
-          <EmptyRow>No rewards yet. Approve a referral event to issue rewards.</EmptyRow>
+          <EmptyRow>{i18n("noRewardsYetApproveAReferralEventTo2747e6d")}</EmptyRow>
         ) : (
           rewards.map((r, i) => (
             <ListRow
@@ -319,8 +326,8 @@ export function ReferralsTab() {
               </div>
               <div className="flex flex-wrap gap-2">
                 {[
-                  ["Approve", "applied"],
-                  ["Reject", "rejected"],
+                  [i18n("approve7b2c7f1"), "applied"],
+                  [i18n("reject2b03b59"), "rejected"],
                 ].map(([label, status]) => (
                   <StatusButton
                     key={status}
@@ -343,8 +350,8 @@ export function ReferralsTab() {
       {/* New Program side panel */}
       {showNewProgram ? (
         <SidePanel
-          title="New referral program"
-          subtitle="Referrals"
+          title={i18n("newReferralProgram2db259d")}
+          subtitle={i18n("referrals2b0e3a3")}
           onClose={() => setParam({ new: null })}
           footer={
             <div className="flex gap-3">
@@ -355,7 +362,7 @@ export function ReferralsTab() {
                 onClick={() => createProgramMutation.mutate()}
                 type="button"
               >
-                {createProgramMutation.isPending ? "Creating…" : "Create program"}
+                {createProgramMutation.isPending ? i18n("creating94d7d8e") : i18n("createProgram63a76cb")}
               </button>
               <button
                 className="rounded-full px-5 py-2 text-sm font-semibold"
@@ -363,13 +370,13 @@ export function ReferralsTab() {
                 onClick={() => setParam({ new: null })}
                 type="button"
               >
-                Cancel
+                {i18n("cancel77dfd21")}
               </button>
             </div>
           }
         >
           <div className="space-y-4">
-            <PanelField label="Program name">
+            <PanelField label={i18n("programName699413c")}>
               <input
                 className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                 style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -377,7 +384,7 @@ export function ReferralsTab() {
                 onChange={(e) => setProgramForm({ ...programForm, name: e.target.value })}
               />
             </PanelField>
-            <PanelField label="Description">
+            <PanelField label={i18n("description55f8ebc")}>
               <input
                 className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                 style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -386,7 +393,7 @@ export function ReferralsTab() {
               />
             </PanelField>
             <div className="grid gap-3 md:grid-cols-2">
-              <PanelField label="Reward type">
+              <PanelField label={i18n("rewardType9e0f28d")}>
                 <select
                   className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                   style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -398,7 +405,7 @@ export function ReferralsTab() {
                   ))}
                 </select>
               </PanelField>
-              <PanelField label="Reward value">
+              <PanelField label={i18n("rewardValue8cb933f")}>
                 <input
                   className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                   style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -414,7 +421,7 @@ export function ReferralsTab() {
                 checked={programForm.active}
                 onChange={(e) => setProgramForm({ ...programForm, active: e.target.checked })}
               />
-              Active
+              {i18n("activea733b80")}
             </label>
             {createProgramMutation.error instanceof Error && (
               <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{createProgramMutation.error.message}</p>
@@ -433,19 +440,19 @@ export function ReferralsTab() {
 
       {selectedProgram ? (
         <SidePanel
-          title={field(selectedProgram, "name", "Referral program")}
-          subtitle="Program details"
+          title={field(selectedProgram, "name", i18n("referralProgramecbeeaa"))}
+          subtitle={i18n("programDetailsd84f443")}
           onClose={() => setParam({ "referral-program": null })}
           footer={
             <PanelActions>
               <StatusButton
-                label={updateProgramMutation.isPending ? "Saving..." : "Save changes"}
+                label={updateProgramMutation.isPending ? i18n("savingae7e887") : i18n("saveChanges179359b")}
                 pending={updateProgramMutation.isPending}
                 disabled={!activeProgramEditForm.name}
                 onClick={() => updateProgramMutation.mutate()}
               />
               <StatusButton
-                label="Reset"
+                label={i18n("reset44c57ab")}
                 pending={false}
                 onClick={() => setProgramEditForm(programFormFromRecord(selectedProgram))}
               />
@@ -453,27 +460,27 @@ export function ReferralsTab() {
           }
         >
           <div className="space-y-4">
-            <PanelField label="Program name">
+            <PanelField label={i18n("programName699413c")}>
               <PanelInput
                 value={activeProgramEditForm.name}
                 onChange={(value) => setProgramEditForm({ ...activeProgramEditForm, name: value })}
               />
             </PanelField>
-            <PanelField label="Description">
+            <PanelField label={i18n("description55f8ebc")}>
               <PanelInput
                 value={activeProgramEditForm.description}
                 onChange={(value) => setProgramEditForm({ ...activeProgramEditForm, description: value })}
               />
             </PanelField>
             <div className="grid gap-3 md:grid-cols-2">
-              <PanelField label="Reward type">
+              <PanelField label={i18n("rewardType9e0f28d")}>
                 <PanelSelect
                   value={programEditForm.reward_type}
                   options={["credit", "discount", "free_period", "manual"]}
                   onChange={(value) => setProgramEditForm({ ...activeProgramEditForm, reward_type: value })}
                 />
               </PanelField>
-              <PanelField label="Reward value">
+              <PanelField label={i18n("rewardValue8cb933f")}>
                 <PanelInput
                   type="number"
                   value={activeProgramEditForm.reward_value}
@@ -487,13 +494,13 @@ export function ReferralsTab() {
                 checked={activeProgramEditForm.active}
                 onChange={(event) => setProgramEditForm({ ...activeProgramEditForm, active: event.target.checked })}
               />
-              Active
+              {i18n("activea733b80")}
             </label>
             <DetailGrid
               rows={[
-                ["Program ID", field(selectedProgram, "id")],
-                ["Created", dateText(selectedProgram.inserted_at)],
-                ["Updated", dateText(selectedProgram.updated_at)],
+                [i18n("programIdc984ecc"), field(selectedProgram, "id")],
+                [i18n("createdaccf40c"), dateText(selectedProgram.inserted_at)],
+                [i18n("updatedf2f8570"), dateText(selectedProgram.updated_at)],
               ]}
             />
             {updateProgramMutation.error instanceof Error ? (
@@ -506,19 +513,19 @@ export function ReferralsTab() {
       {selectedEvent ? (
         <SidePanel
           title={field(selectedEvent, "label")}
-          subtitle="Referral event"
+          subtitle={i18n("referralEvent73927b9")}
           onClose={() => setParam({ "referral-event": null })}
           footer={
             <PanelActions>
               {field(selectedEvent, "status") === "pending" ? (
                 <>
                   <StatusButton
-                    label="Approve"
+                    label={i18n("approve7b2c7f1")}
                     pending={updateEventMutation.isPending}
                     onClick={() => updateEventMutation.mutate({ id: field(selectedEvent, "id"), status: "approved" })}
                   />
                   <StatusButton
-                    label="Reject"
+                    label={i18n("reject2b03b59")}
                     pending={updateEventMutation.isPending}
                     danger
                     onClick={() => updateEventMutation.mutate({ id: field(selectedEvent, "id"), status: "rejected" })}
@@ -527,14 +534,14 @@ export function ReferralsTab() {
               ) : null}
               {field(selectedEvent, "status") === "approved" && !selectedEventReward ? (
                 <StatusButton
-                  label="Create reward"
+                  label={i18n("createReward4da5168")}
                   pending={createRewardMutation.isPending}
                   onClick={() => createRewardMutation.mutate({ event: selectedEvent, program: selectedEventProgram })}
                 />
               ) : null}
               {selectedEventReward ? (
                 <StatusButton
-                  label="Open reward"
+                  label={i18n("openReward6901aa0")}
                   pending={false}
                   onClick={() =>
                     setParam({
@@ -549,18 +556,18 @@ export function ReferralsTab() {
         >
           <DetailGrid
             rows={[
-              ["Event ID", field(selectedEvent, "id")],
-              ["Referral status", eventStatusText(field(selectedEvent, "status"))],
-              ["Reward", rewardDescriptor(selectedEventReward)],
-              ["Reward status", eventRewardStatusText(selectedEvent, selectedEventReward)],
-              ["Program", field(selectedEventProgram, "name", field(selectedEvent, "referral_program_id"))],
-              ["Referrer", displayName(selectedEvent, "referrer_nickname", "referrer_user_id")],
-              ["Referred", displayName(selectedEvent, "referred_nickname", "referred_user_id")],
-              ["Membership", field(selectedEvent, "membership_id")],
-              ["Signup source", field(selectedEvent, "signup_source_snapshot", "referral")],
-              ["Notes", field(selectedEvent, "notes", "No notes")],
-              ["Created", dateText(selectedEvent.inserted_at)],
-              ["Updated", dateText(selectedEvent.updated_at)],
+              [i18n("eventId894b1c7"), field(selectedEvent, "id")],
+              [i18n("referralStatus7ca410b"), eventStatusText(field(selectedEvent, "status"))],
+              [i18n("rewardc7d7652"), rewardDescriptor(selectedEventReward)],
+              [i18n("rewardStatus239f42a"), eventRewardStatusText(selectedEvent, selectedEventReward)],
+              [i18n("program9d68007"), field(selectedEventProgram, "name", field(selectedEvent, "referral_program_id"))],
+              [i18n("referrer548b0b9"), displayName(selectedEvent, "referrer_nickname", "referrer_user_id")],
+              [i18n("referred57fcdbd"), displayName(selectedEvent, "referred_nickname", "referred_user_id")],
+              [i18n("membership53bc967"), field(selectedEvent, "membership_id")],
+              [i18n("signupSource69d3a02"), field(selectedEvent, "signup_source_snapshot", "referral")],
+              [i18n("notes7044004"), field(selectedEvent, "notes", i18n("noNotesf03eb1d"))],
+              [i18n("createdaccf40c"), dateText(selectedEvent.inserted_at)],
+              [i18n("updatedf2f8570"), dateText(selectedEvent.updated_at)],
             ]}
           />
           {createRewardMutation.error instanceof Error ? (
@@ -571,14 +578,14 @@ export function ReferralsTab() {
 
       {selectedReward ? (
         <SidePanel
-          title={`${field(selectedReward, "reward_type")} · ${field(selectedReward, "reward_value")}`}
-          subtitle="Referral reward"
+          title={(field(selectedReward, "reward_type")) + " · " + (field(selectedReward, "reward_value"))}
+          subtitle={i18n("referralReward6fc3bba")}
           onClose={() => setParam({ "referral-reward": null })}
           footer={
             <PanelActions>
               {[
-                ["Approve", "applied"],
-                ["Reject", "rejected"],
+                [i18n("approve7b2c7f1"), "applied"],
+                [i18n("reject2b03b59"), "rejected"],
               ].map(([label, status]) => (
                 <StatusButton
                   key={status}
@@ -594,22 +601,21 @@ export function ReferralsTab() {
         >
           <DetailGrid
             rows={[
-              ["Reward ID", field(selectedReward, "id")],
-              ["Status", rewardStatusText(field(selectedReward, "status"))],
-              ["Referral", field(selectedReward, "referral_label", field(selectedReward, "referral_event_id"))],
-              ["Recipient", displayName(selectedReward, "recipient_nickname", "recipient_user_id")],
-              ["Membership", field(selectedReward, "membership_id")],
-              ["Reward type", field(selectedReward, "reward_type")],
-              ["Reward value", field(selectedReward, "reward_value")],
-              ["Applied at", dateText(selectedReward.applied_at)],
-              ["Created", dateText(selectedReward.inserted_at)],
-              ["Updated", dateText(selectedReward.updated_at)],
+              [i18n("rewardId10149f1"), field(selectedReward, "id")],
+              [i18n("statusbae7d5b"), rewardStatusText(field(selectedReward, "status"))],
+              [i18n("referral1c6984f"), field(selectedReward, "referral_label", field(selectedReward, "referral_event_id"))],
+              [i18n("recipient9034326"), displayName(selectedReward, "recipient_nickname", "recipient_user_id")],
+              [i18n("membership53bc967"), field(selectedReward, "membership_id")],
+              [i18n("rewardType9e0f28d"), field(selectedReward, "reward_type")],
+              [i18n("rewardValue8cb933f"), field(selectedReward, "reward_value")],
+              [i18n("appliedAtfa96f18"), dateText(selectedReward.applied_at)],
+              [i18n("createdaccf40c"), dateText(selectedReward.inserted_at)],
+              [i18n("updatedf2f8570"), dateText(selectedReward.updated_at)],
             ]}
           />
           {field(selectedReward, "status") === "pending" || field(selectedReward, "status") === "approved" ? (
             <Notice tone="neutral">
-              Approving this reward completes fulfillment. Credit rewards create a credit ledger grant for the
-              recipient; manual, discount, and free-period rewards are recorded as fulfilled.
+              {i18n("approvingThisRewardCompletesFulfillmentCreditRewardsCreate3ae3973")}
             </Notice>
           ) : null}
           {updateRewardMutation.error instanceof Error ? (
@@ -668,6 +674,7 @@ function ListRow({
   last: boolean;
   onClick?: () => void;
 }) {
+  const i18n = useUiTranslations();
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     if (!onClick) return;
     if (event.key === "Enter" || event.key === " ") {
@@ -698,12 +705,13 @@ function EmptyRow({ children }: { children: React.ReactNode }) {
 }
 
 function StatusBadge({ active }: { active: boolean }) {
+  const i18n = useUiTranslations();
   return (
     <span
       className="rounded-full px-3 py-1 text-xs font-semibold"
       style={active ? { background: "color-mix(in srgb, var(--success) 12%, transparent)", color: "var(--success)" } : { background: "var(--border)", color: "var(--dim)" }}
     >
-      {active ? "Active" : "Inactive"}
+      {active ? i18n("activea733b80") : i18n("inactive09af574")}
     </span>
   );
 }
@@ -756,6 +764,7 @@ function PanelInput({
   onChange: (value: string) => void;
   type?: string;
 }) {
+  const i18n = useUiTranslations();
   return (
     <input
       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
@@ -795,11 +804,12 @@ function PanelActions({ children }: { children: React.ReactNode }) {
 }
 
 function DetailGrid({ rows }: { rows: Array<[string, string]> }) {
+  const i18n = useUiTranslations();
   return (
     <div className="overflow-hidden rounded-[1.25rem]" style={{ border: "1px solid var(--border)" }}>
       {rows.map(([label, value], index) => (
         <div
-          key={`${label}-${index}`}
+          key={(label) + "-" + (index)}
           className="grid gap-2 px-4 py-3 text-sm md:grid-cols-[150px_1fr]"
           style={{ borderBottom: index === rows.length - 1 ? "none" : "1px solid var(--border)" }}
         >
@@ -814,6 +824,7 @@ function DetailGrid({ rows }: { rows: Array<[string, string]> }) {
 }
 
 function Notice({ children, tone = "warning" }: { children: React.ReactNode; tone?: "neutral" | "warning" }) {
+  const i18n = useUiTranslations();
   const style =
     tone === "neutral"
       ? { background: "color-mix(in srgb, var(--muted) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--muted) 18%, transparent)", color: "var(--text-soft)" }

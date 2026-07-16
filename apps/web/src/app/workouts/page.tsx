@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDrag } from "@use-gesture/react";
@@ -76,6 +81,7 @@ function scaleTone(label: string) {
 }
 
 function WorkoutsPageContent() {
+  const i18n = useUiTranslations();
   const router = useRouter();
   const { tokens } = useSession();
   const initExecution = useExecutionStore((s) => s.initExecution);
@@ -166,10 +172,10 @@ function WorkoutsPageContent() {
           const materialized = await fetchMaterializedWorkout(accessToken, workoutId);
 
           const options: WorkoutOption[] = [
-            { slug: null, label: "Base", workout: materialized.workout },
+            { slug: null, label: i18n("base077fe9c"), workout: materialized.workout },
             ...materialized.scales.map((scaleWorkout) => ({
               slug: scaleWorkout.scale_level?.slug ?? null,
-              label: scaleWorkout.scale_level?.label ?? "Scale",
+              label: scaleWorkout.scale_level?.label ?? i18n("scalea29f025"),
               workout: scaleWorkout,
             })),
           ];
@@ -194,7 +200,7 @@ function WorkoutsPageContent() {
       if (cancelled) return;
       setSlots([]);
       setWorkoutOptionsById({});
-      setError("Could not load workouts for this week.");
+      setError(i18n("couldNotLoadWorkoutsForThisWeek40a04ec"));
     } finally {
       if (!cancelled) {
         setLoadingSlots(false);
@@ -225,7 +231,7 @@ function WorkoutsPageContent() {
     if (step !== "week" || !accessToken) return;
 
     return subscribeToTopic(accessToken, "schedule:lobby", {
-      "schedule:refresh": () => {
+      schedule_refresh: () => {
         void loadWeek();
       },
     });
@@ -297,7 +303,7 @@ function WorkoutsPageContent() {
 
       router.push(`/workouts/${execution.id}/execute`);
     } catch {
-      setError("Workout could not be started.");
+      setError(i18n("workoutCouldNotBeStartedc7410d6"));
       setLaunching(false);
     }
   }
@@ -315,7 +321,7 @@ function WorkoutsPageContent() {
       <div className="space-y-4">
         {workout.sections.map((section) => (
           <section
-            key={section.id ?? `${String(section.name ?? "Section")}-${section.order}`}
+            key={section.id ?? (String(section.name ?? i18n("sectionf2c6b56"))) + "-" + (section.order)}
             className="rounded-3xl border p-5"
             style={{
               background: "color-mix(in srgb, var(--panel) 78%, transparent)",
@@ -341,7 +347,7 @@ function WorkoutsPageContent() {
             <div className="mt-4 space-y-3">
               {section.exercises.map((exercise) => (
                 <div
-                  key={exercise.id ?? `${exercise.name}-${exercise.order}`}
+                  key={exercise.id ?? (exercise.name) + "-" + (exercise.order)}
                   className="rounded-2xl border px-4 py-3"
                   style={{
                     background: "color-mix(in srgb, var(--panel-muted) 78%, transparent)",
@@ -351,18 +357,18 @@ function WorkoutsPageContent() {
                   <div className="text-sm font-semibold">{exercise.name}</div>
                   <div className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
                     {[
-                      exercise.sets ? `${exercise.sets} sets` : null,
+                      exercise.sets ? (exercise.sets) + " sets" : null,
                       exercise.prescription_value
-                        ? `${exercise.prescription_value} ${exercise.prescription_unit ?? ""}`.trim()
+                        ? (exercise.prescription_value) + " " + (exercise.prescription_unit ?? "").trim()
                         : null,
                       exercise.load_value
-                        ? `${exercise.load_value} ${exercise.load_mode === "pct_1rm" ? "% RM" : "kg"}`
+                        ? (exercise.load_value) + " " + (exercise.load_mode === "pct_1rm" ? "% RM" : "kg")
                         : exercise.load_mode === "bw"
                           ? "Bodyweight"
                           : null,
                     ]
                       .filter(Boolean)
-                      .join(" · ") || "Custom execution details"}
+                      .join(" · ") || i18n("customExecutionDetailsb430ba9")}
                   </div>
                 </div>
               ))}
@@ -380,11 +386,11 @@ function WorkoutsPageContent() {
         style={{ background: "var(--bg)", color: "var(--text)" }}
       >
         <div className="mx-auto max-w-lg">
-          <TransientHero label="workout selection introduction">
+          <TransientHero label={i18n("workoutSelectionIntroductionb11d827")}>
             <div className="mb-5">
-              <h1 className="text-2xl font-bold">Start Workout</h1>
+              <h1 className="text-2xl font-bold">{i18n("startWorkoutd1072dd")}</h1>
               <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
-                Pick a class type, then choose a day and scale before launching.
+                {i18n("pickAClassTypeThenChooseADayd4c9a74")}
               </p>
             </div>
           </TransientHero>
@@ -410,7 +416,7 @@ function WorkoutsPageContent() {
                 <span className="text-sm font-semibold">{classType.name}</span>
               </button>
             ))}
-            {classTypes.length === 0 ? <p className="col-span-2 text-sm" style={{ color: "var(--muted)" }}>No active class types are available.</p> : null}
+            {classTypes.length === 0 ? <p className="col-span-2 text-sm" style={{ color: "var(--muted)" }}>{i18n("noActiveClassTypesAreAvailable16b92ac")}</p> : null}
           </div>
         </div>
       </div>
@@ -437,7 +443,7 @@ function WorkoutsPageContent() {
               className="text-sm"
               style={{ color: "var(--muted)" }}
             >
-              ‹ Back
+              {i18n("backdc381ae")}
             </button>
             <div className="text-center">
               <div className="text-xs uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
@@ -487,11 +493,11 @@ function WorkoutsPageContent() {
 
           {loadingSlots ? (
             <div className="py-12 text-center text-sm" style={{ color: "var(--muted)" }}>
-              Loading week view…
+              {i18n("loadingWeekView9b97e58")}
             </div>
           ) : slots.length === 0 ? (
             <div className="py-12 text-center text-sm" style={{ color: "var(--muted)" }}>
-              No {selectedClassType?.name} classes are available this week.
+              {i18n("no816c52f")} {selectedClassType?.name} {i18n("classesAreAvailableThisWeek291e151")}
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -513,13 +519,13 @@ function WorkoutsPageContent() {
                         {formatDayLabel(date)}
                       </h2>
                       <span className="text-xs" style={{ color: "var(--muted)" }}>
-                        {daySlots.length} option{daySlots.length === 1 ? "" : "s"}
+                        {daySlots.length} {i18n("option14eb14e")}{daySlots.length === 1 ? "" : i18n("sa0f1490")}
                       </span>
                     </div>
 
                     {daySlots.length === 0 ? (
                       <div className="rounded-2xl border border-dashed px-4 py-8 text-center text-sm" style={{ borderColor: "color-mix(in srgb, var(--border-strong) 90%, transparent)", color: "var(--muted)" }}>
-                        Rest day
+                        {i18n("restDaye3a72d7")}
                       </div>
                     ) : (
                       <div className="space-y-4">
@@ -538,10 +544,10 @@ function WorkoutsPageContent() {
                               <div className="flex items-center justify-between gap-3">
                                 <div>
                                   <div className="text-sm font-semibold">
-                                    {slot.workout?.title ?? "Untitled Workout"}
+                                    {slot.workout?.title ?? i18n("untitledWorkout579b8a6")}
                                   </div>
                                   <div className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
-                                    {formatTime(slot.scheduled_at)} · {slot.spots_remaining} spots left
+                                    {formatTime(slot.scheduled_at)} · {slot.spots_remaining} {i18n("spotsLeftd65a24f")}
                                   </div>
                                 </div>
                               </div>
@@ -553,7 +559,7 @@ function WorkoutsPageContent() {
 
                                     return (
                                       <button
-                                        key={`${slot.id}-${option.slug ?? "base"}`}
+                                        key={(slot.id) + "-" + (option.slug ?? "base")}
                                         onClick={() => selectWorkout(slot, option)}
                                         className="rounded-full border px-3 py-1.5 text-xs font-semibold transition-transform hover:-translate-y-0.5"
                                         style={{
@@ -568,7 +574,7 @@ function WorkoutsPageContent() {
                                   })
                                 ) : (
                                   <span className="text-xs" style={{ color: "var(--muted)" }}>
-                                    {loadingOptions ? "Loading scale boxes…" : "Workout options unavailable"}
+                                    {loadingOptions ? i18n("loadingScaleBoxes8f8f4e0") : i18n("workoutOptionsUnavailable3c866ef")}
                                   </span>
                                 )}
                               </div>
@@ -600,7 +606,7 @@ function WorkoutsPageContent() {
           className="mb-5 text-sm"
           style={{ color: "var(--muted)" }}
         >
-          ‹ Back to week view
+          {i18n("backToWeekView1d615a5")}
         </button>
 
         <div
@@ -614,7 +620,7 @@ function WorkoutsPageContent() {
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <div className="text-xs uppercase tracking-[0.2em]" style={{ color: "var(--primary-strong)" }}>
-                {selectedWorkout.scale_level?.label ?? "Base"}
+                {selectedWorkout.scale_level?.label ?? i18n("base077fe9c")}
               </div>
               <h1 className="mt-2 text-3xl font-bold">{selectedWorkout.title}</h1>
               <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
@@ -628,7 +634,7 @@ function WorkoutsPageContent() {
               className="rounded-full px-6 py-3 text-sm font-bold disabled:opacity-40"
               style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
-              {launching ? "Starting…" : "Start Workout"}
+              {launching ? i18n("startinge5f5809") : i18n("startWorkoutd1072dd")}
             </button>
           </div>
         </div>
@@ -653,6 +659,7 @@ function WorkoutsPageContent() {
 }
 
 export default function WorkoutsPage() {
+  const i18n = useUiTranslations();
   return (
     <AuthGuard roles={["member", "admin"]}>
       <WorkoutsPageContent />

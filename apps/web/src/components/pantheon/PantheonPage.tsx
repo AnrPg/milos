@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { listPRs, deletePR, type PRRecord } from "@/api/gamification";
@@ -10,6 +15,7 @@ import { PRFormModal } from "./PRFormModal";
 import { PRShareModal } from "./PRShareModal";
 
 export function PantheonPage() {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const queryClient = useQueryClient();
 
@@ -35,7 +41,7 @@ export function PantheonPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      if (!tokens) throw new Error("Not authenticated");
+      if (!tokens) throw new Error(i18n("notAuthenticated0c91acb"));
       return deletePR(tokens.access_token, id);
     },
     onSuccess: () => {
@@ -52,13 +58,13 @@ export function PantheonPage() {
       <div className="mx-auto max-w-4xl space-y-8">
         {/* Header */}
         <div className="flex items-end justify-between gap-4 flex-wrap">
-          <TransientHero label="personal records introduction">
+          <TransientHero label={i18n("personalRecordsIntroduction54be35f")}>
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
-              Hall of Fame
+              {i18n("hallOfFamee10f949")}
             </p>
             <h1 className="mt-1 text-3xl font-black" style={{ color: "var(--text)" }}>
-              Personal Records
+              {i18n("personalRecords4769a96")}
             </h1>
           </div>
           </TransientHero>
@@ -68,7 +74,7 @@ export function PantheonPage() {
             className="rounded-2xl px-5 py-3 text-sm font-semibold"
             style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
-            + New PR
+            {i18n("newPrbfecbc9")}
           </button>
         </div>
 
@@ -76,18 +82,18 @@ export function PantheonPage() {
         <input
           className="w-full rounded-2xl px-5 py-3 text-sm outline-none"
           style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-          placeholder="Search PRs…"
+          placeholder={i18n("searchPrscd652ea")}
           value={search}
           onChange={(e) => handleSearchChange(e.target.value)}
         />
 
         {/* PR list */}
         {prsQuery.isPending ? (
-          <p className="text-sm" style={{ color: "var(--dim)" }}>Loading…</p>
+          <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
         ) : prs.length === 0 ? (
           <div className="rounded-[2rem] px-6 py-10 text-center" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
             <p className="text-sm" style={{ color: "var(--dim)" }}>
-              {debouncedSearch ? "No PRs match your search." : "No personal records yet. Add your first one!"}
+              {debouncedSearch ? i18n("noPrsMatchYourSearchf6466a7") : i18n("noPersonalRecordsYetAddYourFirstOne84b071a")}
             </p>
           </div>
         ) : (
@@ -113,9 +119,9 @@ export function PantheonPage() {
           onClick={(e) => { if (e.target === e.currentTarget) setDeleteConfirm(null); }}
         >
           <div className="w-full max-w-sm rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            <h3 className="text-lg font-semibold" style={{ color: "var(--text)" }}>Delete PR?</h3>
+            <h3 className="text-lg font-semibold" style={{ color: "var(--text)" }}>{i18n("deletePr50a5f9b")}</h3>
             <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
-              &quot;{deleteConfirm.name}&quot; will be permanently removed, including its history.
+              &quot;{deleteConfirm.name}{i18n("willBePermanentlyRemovedIncludingItsHistory54afba1")}
             </p>
             <div className="mt-5 flex gap-3">
               <button
@@ -125,7 +131,7 @@ export function PantheonPage() {
                 className="flex-1 rounded-xl py-2.5 text-sm font-semibold disabled:opacity-50"
                 style={{ background: "var(--danger, var(--primary))", color: "#fff" }}
               >
-                {deleteMutation.isPending ? "Deleting…" : "Delete"}
+                {deleteMutation.isPending ? i18n("deletingc7ac551") : i18n("deletef6fdbe4")}
               </button>
               <button
                 type="button"
@@ -133,7 +139,7 @@ export function PantheonPage() {
                 className="flex-1 rounded-xl py-2.5 text-sm font-semibold"
                 style={{ background: "var(--border)", color: "var(--text-soft)" }}
               >
-                Cancel
+                {i18n("cancel77dfd21")}
               </button>
             </div>
           </div>

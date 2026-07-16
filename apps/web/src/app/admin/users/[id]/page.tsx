@@ -1,9 +1,12 @@
+
+import {getUiTranslations} from "@/i18n/ui-server";
 import { AuthGuard } from "@/components/auth-guard";
 import { AdminUserProfile } from "@/components/admin/users/AdminUserProfile";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminUserProfilePage({ params }: { params: Promise<{ id: string }> }) {
+  const i18n = await getUiTranslations();
   const { id } = await params;
 
   return (

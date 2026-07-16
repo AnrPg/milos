@@ -1,8 +1,15 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
+import React, { useId, useMemo, useState } from "react";
 
 import type { ExerciseNote } from "@/api/executions";
+import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
 type Props = {
   exerciseId: string;
@@ -15,17 +22,6 @@ type Props = {
   onClose: () => void;
 };
 
-const NOTE_TAGS = [
-  "Easy",
-  "Hard",
-  "Heavy",
-  "Light",
-  "PR",
-  "Struggled",
-  "Form break",
-  "Pain",
-];
-
 export function NoteModal({
   exerciseId,
   exerciseName,
@@ -36,9 +32,23 @@ export function NoteModal({
   onSave,
   onClose,
 }: Props) {
+  const NOTE_TAGS = [
+    i18n("easy00f0313"),
+    i18n("hard20a8991"),
+    i18n("heavy84d7adf"),
+    i18n("lighta36ef8a"),
+    i18n("pr55af204"),
+    i18n("struggled6e26a47"),
+    i18n("formBreakc3f3464"),
+    i18n("paina036597"),
+  ];
+
+  const i18n = useUiTranslations();
   const [selectedTags, setSelectedTags] = useState<string[]>(existingNote?.tags ?? []);
   const [noteText, setNoteText] = useState(existingNote?.note_text ?? "");
   const [isSaving, setIsSaving] = useState(false);
+  const dialogRef = useModalFocusTrap<HTMLDivElement>(onClose);
+  const titleId = useId();
 
   const selectionLabel = useMemo(() => selectedText.trim(), [selectedText]);
 
@@ -74,6 +84,11 @@ export function NoteModal({
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center">
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
         className="absolute inset-0"
         style={{ background: "rgba(0,0,0,0.7)" }}
         onClick={onClose}
@@ -86,9 +101,9 @@ export function NoteModal({
           className="mb-1 text-xs font-semibold uppercase tracking-widest"
           style={{ color: "var(--muted)" }}
         >
-          Annotation
+          {i18n("annotationde3b78b")}
         </div>
-        <div className="mb-2 text-base font-bold" style={{ color: "var(--text)" }}>
+        <div id={titleId} className="mb-2 text-base font-bold" style={{ color: "var(--text)" }}>
           {exerciseName}
         </div>
         <div
@@ -121,7 +136,7 @@ export function NoteModal({
         </div>
 
         <textarea
-          placeholder="Optional free text…"
+          placeholder={i18n("optionalFreeText398e72d")}
           rows={4}
           value={noteText}
           onChange={(event) => setNoteText(event.target.value)}
@@ -145,7 +160,7 @@ export function NoteModal({
             }}
             type="button"
           >
-            Cancel
+            {i18n("cancel77dfd21")}
           </button>
           <button
             onClick={handleSave}
@@ -154,7 +169,7 @@ export function NoteModal({
             style={{ background: "var(--accent, var(--primary))", color: "var(--text)" }}
             type="button"
           >
-            {isSaving ? "Saving…" : existingNote ? "Update" : "Save"}
+            {isSaving ? i18n("saving56a2285") : existingNote ? i18n("updatefb91e24") : i18n("saveefc007a")}
           </button>
         </div>
       </div>

@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 import { createDirectThread, searchUsers, sendMessage } from "@/api/messaging";
 import { sharePR, type PRRecord } from "@/api/gamification";
@@ -8,6 +13,7 @@ import { useSession } from "@/components/session-provider";
 type UserResult = { id: string; nickname: string; role: string };
 
 export function PRShareModal({ pr, onClose }: { pr: PRRecord; onClose: () => void }) {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const [message, setMessage] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -29,7 +35,7 @@ export function PRShareModal({ pr, onClose }: { pr: PRRecord; onClose: () => voi
     if (!tokens?.access_token) return;
     sharePR(tokens.access_token, pr.id)
       .then((r) => setMessage(r.message))
-      .catch(() => setMessage(`🏆 ${pr.name}: ${pr.current_score} ${pr.unit}`));
+      .catch(() => setMessage("🏆 " + (pr.name) + ": " + (pr.current_score) + " " + (pr.unit)));
   }, [tokens?.access_token, pr]);
 
   function handleQueryChange(q: string) {
@@ -71,7 +77,7 @@ export function PRShareModal({ pr, onClose }: { pr: PRRecord; onClose: () => voi
       );
       setSent(true);
     } catch {
-      setError("Failed to send to some recipients. Try again.");
+      setError(i18n("failedToSendToSomeRecipientsTryAgain89e1632"));
     } finally {
       setSending(false);
     }
@@ -90,7 +96,7 @@ export function PRShareModal({ pr, onClose }: { pr: PRRecord; onClose: () => voi
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
-              Share PR
+              {i18n("sharePrf54c0df")}
             </p>
             <h2 className="mt-1 text-lg font-semibold" style={{ color: "var(--text)" }}>{pr.name}</h2>
           </div>
@@ -110,7 +116,7 @@ export function PRShareModal({ pr, onClose }: { pr: PRRecord; onClose: () => voi
         {sent ? (
           <div className="space-y-3">
             <p className="text-sm font-semibold text-center py-4" style={{ color: "var(--success, var(--primary))" }}>
-              🎉 Sent to {selected.length} {selected.length === 1 ? "person" : "people"}!
+              {i18n("sentTo47ddf70")} {selected.length} {selected.length === 1 ? "person" : "people"}!
             </p>
             <button
               type="button"
@@ -118,7 +124,7 @@ export function PRShareModal({ pr, onClose }: { pr: PRRecord; onClose: () => voi
               className="w-full rounded-2xl py-3 text-sm font-semibold"
               style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
-              Done
+              {i18n("donee9b450d")}
             </button>
           </div>
         ) : (
@@ -149,7 +155,7 @@ export function PRShareModal({ pr, onClose }: { pr: PRRecord; onClose: () => voi
                   border: "1px solid var(--border)",
                   color: "var(--text)",
                 }}
-                placeholder="Search people to send to…"
+                placeholder={i18n("searchPeopleToSendTocb4501a")}
                 value={query}
                 onChange={(e) => handleQueryChange(e.target.value)}
                 autoFocus
@@ -202,10 +208,10 @@ export function PRShareModal({ pr, onClose }: { pr: PRRecord; onClose: () => voi
               style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
               {sending
-                ? "Sending…"
+                ? i18n("sendingcf76551")
                 : selected.length === 0
-                  ? "Select at least one person"
-                  : `Send to ${selected.length} ${selected.length === 1 ? "person" : "people"}`}
+                  ? i18n("selectAtLeastOnePerson1e6c16e")
+                  : i18n("sendTob98cc23") + (selected.length) + " " + (selected.length === 1 ? "person" : "people")}
             </button>
           </>
         )}

@@ -7,7 +7,13 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
-    "i18n:check": "node scripts/validate-messages.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "type-check": "tsc --noEmit",
+    "check:contract": "npm run generate:api && git diff --exit-code -- src/api/generated/openapi.json src/api/generated/schema.ts",
+    "check": "npm run lint && npm run type-check && npm run test && npm run check:contract && npm run build",
+    "i18n:check": "node scripts/validate-messages.mjs && node scripts/check-hardcoded-ui-copy.mjs",
     "generate:api": "cd ../api && mix milos.export_openapi ../web/src/api/generated/openapi.json && cd ../web && openapi-typescript src/api/generated/openapi.json -o src/api/generated/schema.ts"
   },
   "dependencies": {
@@ -25,14 +31,21 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
+    "jsdom": "^29.1.1",
+    "msw": "^2.15.0",
     "openapi-typescript": "^7.13.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }

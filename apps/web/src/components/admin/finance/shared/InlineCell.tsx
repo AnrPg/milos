@@ -1,5 +1,8 @@
 "use client";
 
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 
 type InlineCellProps = {
@@ -13,6 +16,7 @@ type InlineCellProps = {
 };
 
 export function InlineCell({ value, display, type = "text", onSave, placeholder, dimmed, warn }: InlineCellProps) {
+  const i18n = useUiTranslations();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -80,6 +84,7 @@ export function InlineToggle({
   options: Array<{ value: string; label: string; accent?: boolean }>;
   onSave: (value: string) => void;
 }) {
+  const i18n = useUiTranslations();
   const current = options.find((o) => o.value === value) ?? options[0];
   const next = options[(options.indexOf(current) + 1) % options.length];
 
@@ -93,7 +98,7 @@ export function InlineToggle({
       }}
       onClick={() => onSave(next.value)}
       type="button"
-      title={`Click to set: ${next.label}`}
+      title={i18n("clickToSet1c43780") + (next.label)}
     >
       {current.label}
     </button>

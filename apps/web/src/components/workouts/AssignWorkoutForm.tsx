@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -15,6 +20,7 @@ type AssignWorkoutFormProps = {
 };
 
 export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
+  const i18n = useUiTranslations();
   const router = useRouter();
   const { tokens, signOut } = useSession();
   const [workout, setWorkout] = useState<WorkoutRecord | null>(null);
@@ -40,7 +46,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
         setWorkout(nextWorkout);
         setError(
           nextWorkout.status && nextWorkout.status !== "published"
-            ? "Only published workouts can be assigned to athletes."
+            ? i18n("onlyPublishedWorkoutsCanBeAssignedToAthletes12a81f1")
             : null,
         );
       })
@@ -53,7 +59,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
           return;
         }
 
-        setError(requestError instanceof Error ? requestError.message : "Could not load assignment data.");
+        setError(requestError instanceof Error ? requestError.message : i18n("couldNotLoadAssignmentDataea4b017"));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -83,7 +89,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
             return;
           }
 
-          setError(requestError instanceof Error ? requestError.message : "Could not load athletes.");
+          setError(requestError instanceof Error ? requestError.message : i18n("couldNotLoadAthletesb7948e1"));
         })
         .finally(() => {
           if (!cancelled) setAthletesLoading(false);
@@ -112,7 +118,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
 
       router.push("/my-workouts");
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Could not assign workout.");
+      setError(requestError instanceof Error ? requestError.message : i18n("couldNotAssignWorkout58ad222"));
     } finally {
       setSaving(false);
     }
@@ -122,7 +128,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
     if (!tokens?.access_token || !workout) return;
 
     const confirmed = window.confirm(
-      `Delete "${workout.title}" permanently?\n\nThis hard delete removes the workout definition, assigned workouts, related schedule slots and bookings, and execution history. Affected athletes and booked members will be notified that the coach changed their workout.`,
+      i18n("delete63346e8") + (workout.title) + i18n("permanentlyThisHardDeleteRemovesTheWorkoutDefinitionbb6e054"),
     );
 
     if (!confirmed) return;
@@ -134,7 +140,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
       await deleteWorkout(tokens.access_token, workout.id);
       router.push("/admin/workouts");
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Could not delete workout.");
+      setError(requestError instanceof Error ? requestError.message : i18n("couldNotDeleteWorkout234fe2c"));
       setDeleting(false);
     }
   }
@@ -145,12 +151,12 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
         <section className="rounded-[2.4rem] p-8" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="max-w-3xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">Assign Workout</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">{i18n("assignWorkout08abff8")}</p>
               <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>
-                Send a published workout to one or more athletes.
+                {i18n("sendAPublishedWorkoutToOneOrMorefde1785")}
               </h1>
               <p className="mt-4 text-base leading-7" style={{ color: "var(--muted)" }}>
-                Choose athletes, pick a date, and attach any programming notes for the assignment.
+                {i18n("chooseAthletesPickADateAndAttachAnyfc98201")}
               </p>
             </div>
 
@@ -163,7 +169,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
                   onClick={() => void handleDeleteWorkout()}
                   type="button"
                 >
-                  {deleting ? "Deleting..." : "Delete workout"}
+                  {deleting ? i18n("deletinge16cac6") : i18n("deleteWorkout6aa765c")}
                 </button>
               ) : null}
               <Link
@@ -171,7 +177,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
                 style={{ background: "var(--border)", color: "var(--text-soft)" }}
                 href="/admin/workouts"
               >
-                Back to workouts
+                {i18n("backToWorkoutsdc51930")}
               </Link>
             </div>
           </div>
@@ -185,20 +191,20 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
 
         <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
           <article className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            <p className="text-sm font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>Workout</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{i18n("workout39463a5")}</p>
             {loading || !workout ? (
-              <p className="mt-4 text-sm" style={{ color: "var(--dim)" }}>Loading workout...</p>
+              <p className="mt-4 text-sm" style={{ color: "var(--dim)" }}>{i18n("loadingWorkoutaf4002f")}</p>
             ) : (
               <>
                 <h2 className="mt-3 text-2xl font-semibold" style={{ color: "var(--text)" }}>{workout.title}</h2>
                 <p className="mt-2 text-sm uppercase tracking-[0.18em] text-[var(--primary)]">{workout.type}</p>
                 <div className="mt-5 space-y-3">
                   {workout.sections.map((section) => (
-                    <div key={section.id ?? `${workout.id}-${section.order}`} className="rounded-[1.3rem] p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
+                    <div key={section.id ?? (workout.id) + "-" + (section.order)} className="rounded-[1.3rem] p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
                       <div className="flex items-center justify-between gap-4">
                         <p className="font-semibold" style={{ color: "var(--text)" }}>{section.name}</p>
                         <span className="text-xs uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                          {section.exercises.length} exercises
+                          {section.exercises.length} {i18n("exercises0ee6e81")}
                         </span>
                       </div>
                       <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
@@ -213,7 +219,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
 
           <article className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
             <label className="block">
-              <span className="text-sm font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>Date</span>
+              <span className="text-sm font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{i18n("dateeb9a4bc")}</span>
               <input
                 className="mt-3 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
                 style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -224,7 +230,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
             </label>
 
             <label className="mt-5 block">
-              <span className="text-sm font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>Athlete search</span>
+              <span className="text-sm font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{i18n("athleteSearch22491bf")}</span>
               <input
                 className="mt-3 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
                 style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -232,7 +238,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
                   setAthletesLoading(true);
                   setQuery(event.target.value);
                 }}
-                placeholder="Search by nickname"
+                placeholder={i18n("searchByNicknameac5a7b7")}
                 value={query}
               />
             </label>
@@ -260,25 +266,25 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
                   >
                     <span className="font-semibold">{athlete.nickname}</span>
                     <span className="text-xs uppercase tracking-[0.18em]">
-                      {selected ? "Selected" : "Tap to add"}
+                      {selected ? i18n("selected9a976fc") : i18n("tapToAdd22c76fc")}
                     </span>
                   </button>
                 );
               })}
               {!athletesLoading && athletes.length === 0 ? (
                 <p className="rounded-[1.2rem] px-4 py-5 text-sm" style={{ border: "1px dashed var(--border)", color: "var(--dim)" }}>
-                  No athletes matched that search.
+                  {i18n("noAthletesMatchedThatSearchd4f2c56")}
                 </p>
               ) : null}
             </div>
 
             <label className="mt-5 block">
-              <span className="text-sm font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>Admin notes</span>
+              <span className="text-sm font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{i18n("adminNotesdff73a2")}</span>
               <textarea
                 className="mt-3 min-h-28 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
                 style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                 onChange={(event) => setAdminNotes(event.target.value)}
-                placeholder="Optional programming context or cues"
+                placeholder={i18n("optionalProgrammingContextOrCuesa25eaae")}
                 value={adminNotes}
               />
             </label>
@@ -291,10 +297,10 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
                 onClick={() => void submitAssignment()}
                 type="button"
               >
-                {saving ? "Assigning..." : "Assign workout"}
+                {saving ? i18n("assigningb89e1dc") : i18n("assignWorkout3e28a99")}
               </button>
               <p className="text-sm" style={{ color: "var(--dim)" }}>
-                {selectedIds.length} athlete{selectedIds.length === 1 ? "" : "s"} selected
+                {selectedIds.length} {i18n("athlete2822571")}{selectedIds.length === 1 ? "" : i18n("sa0f1490")} {i18n("selected835f3b5")}
               </p>
             </div>
           </article>

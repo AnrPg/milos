@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
@@ -25,19 +30,20 @@ const ROLE_TABS: Record<string, Tab[]> = {
   member: ["direct", "class_slot"],
 };
 
-const TAB_LABELS: Record<Tab, string> = {
-  direct: "Direct Messages",
-  assignment: "Workout",
-  class_slot: "Class",
-};
-
-const TAB_SOURCE_BADGE: Record<Tab, string> = {
-  direct: "Direct",
-  assignment: "Workout",
-  class_slot: "Class",
-};
-
 export function ChatsPageContent() {
+  const TAB_SOURCE_BADGE: Record<Tab, string> = {
+    direct: i18n("directbc81524"),
+    assignment: i18n("workout39463a5"),
+    class_slot: i18n("class41ff354"),
+  };
+
+  const TAB_LABELS: Record<Tab, string> = {
+    direct: i18n("directChat3892e2c"),
+    assignment: i18n("workout39463a5"),
+    class_slot: i18n("class41ff354"),
+  };
+
+  const i18n = useUiTranslations();
   const searchParams = useSearchParams();
   const { tokens, currentUser } = useSession();
   const accessToken = tokens?.access_token ?? null;
@@ -113,11 +119,11 @@ export function ChatsPageContent() {
   function threadDisplayName(thread: ChatThread): string {
     if (thread.context_type === "direct") {
       const other = thread.participants.find((p) => p.user_id !== currentUserId);
-      return other?.nickname ?? "Direct message";
+      return other?.nickname ?? i18n("directMessagefc7f864");
     }
-    if (thread.context_type === "assignment") return `Workout thread`;
-    if (thread.context_type === "class_slot") return `Class thread`;
-    return "Thread";
+    if (thread.context_type === "assignment") return i18n("workoutThreada03f1e1");
+    if (thread.context_type === "class_slot") return i18n("classThreadf030236");
+    return i18n("thread7863f75");
   }
 
   function participantNicknameMap(thread: ChatThread): Record<string, string> {
@@ -156,7 +162,7 @@ export function ChatsPageContent() {
     <div className="flex flex-col h-full min-h-screen" style={{ background: "var(--bg)" }}>
       <div className="max-w-4xl mx-auto w-full px-4 py-8 flex flex-col gap-6">
         <h1 className="text-xl font-semibold" style={{ color: "var(--text)" }}>
-          Conversation History
+          {i18n("conversationHistory0f18fb3")}
         </h1>
 
         <div
@@ -187,11 +193,11 @@ export function ChatsPageContent() {
           >
             {loadingThreads ? (
               <p className="text-sm p-4" style={{ color: "var(--dim)" }}>
-                Loading…
+                {i18n("loading33ce417")}
               </p>
             ) : threads.filter((t) => !isThreadHidden(currentUserId ?? "", t.id)).length === 0 ? (
               <p className="text-sm p-4" style={{ color: "var(--dim)" }}>
-                No conversations.
+                {i18n("noConversations06b83a9")}
               </p>
             ) : (
               threads.filter((t) => !isThreadHidden(currentUserId ?? "", t.id)).map((thread) => (
@@ -269,13 +275,13 @@ export function ChatsPageContent() {
             {!selectedThread ? (
               <div className="flex items-center justify-center flex-1">
                 <p className="text-sm" style={{ color: "var(--dim)" }}>
-                  Select a conversation to view messages.
+                  {i18n("selectAConversationToViewMessagesaf2cf2c")}
                 </p>
               </div>
             ) : loadingMessages ? (
               <div className="flex items-center justify-center flex-1">
                 <p className="text-sm" style={{ color: "var(--dim)" }}>
-                  Loading…
+                  {i18n("loading33ce417")}
                 </p>
               </div>
             ) : (

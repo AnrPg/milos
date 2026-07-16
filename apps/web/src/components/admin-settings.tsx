@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -33,6 +38,7 @@ function SaveBar({
   onSave: () => void;
   onReset: () => void;
 }) {
+  const i18n = useUiTranslations();
   const msg = error instanceof Error ? error.message : null;
   return (
     <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -43,7 +49,7 @@ function SaveBar({
         type="button"
         onClick={onSave}
       >
-        {pending ? "Saving…" : "Save"}
+        {pending ? i18n("saving56a2285") : i18n("saveefc007a")}
       </button>
       {dirty && (
         <button
@@ -52,11 +58,11 @@ function SaveBar({
           type="button"
           onClick={onReset}
         >
-          Reset
+          {i18n("reset44c57ab")}
         </button>
       )}
       {msg && <p className="text-sm" style={{ color: "var(--danger)" }}>{msg}</p>}
-      {success && !dirty && <p className="text-sm" style={{ color: "var(--success)" }}>Saved.</p>}
+      {success && !dirty && <p className="text-sm" style={{ color: "var(--success)" }}>{i18n("saved9d4af69")}</p>}
     </div>
   );
 }
@@ -72,6 +78,7 @@ function FieldInfo({
   onToggle: () => void;
   children: React.ReactNode;
 }) {
+  const i18n = useUiTranslations();
   const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -97,7 +104,7 @@ function FieldInfo({
         type="button"
         onClick={(e) => { e.preventDefault(); onToggle(); }}
       >
-        i
+        {i18n("i042dc45")}
       </button>
       {active && (
         <span
@@ -161,6 +168,7 @@ function CollapsibleSection({
 // ── Appearance section ───────────────────────────────────────────────────────
 
 function AppearanceSection({ token }: { token: string }) {
+  const i18n = useUiTranslations();
   const queryClient = useQueryClient();
   const [themeSlug, setThemeSlug] = useState<ThemeSlug>("ember");
   const [initialized, setInitialized] = useState(false);
@@ -254,6 +262,7 @@ function formFromSettings(s: GamificationSettings): GamificationFormState {
 }
 
 function GamificationSection({ token }: { token: string }) {
+  const i18n = useUiTranslations();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<GamificationFormState>({
     weeklyWorkoutTarget: "2",
@@ -302,15 +311,15 @@ function GamificationSection({ token }: { token: string }) {
       <label className="relative block space-y-2 rounded-[1.4rem] p-3">
         <span className="flex items-center justify-between gap-3">
           <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-            Weekly workout target
+            {i18n("weeklyWorkoutTarget8106ea7")}
           </span>
           <FieldInfo
             active={activeHelp === "weekly"}
-            label="Weekly workout target info"
+            label={i18n("weeklyWorkoutTargetInfo19b03c8")}
             onToggle={() => setActiveHelp(activeHelp === "weekly" ? null : "weekly")}
           >
-            <p>How many completed workouts a user needs per week for that week to count toward their streak.</p>
-            <p>Valid values: integer ≥ 1. Default: 2.</p>
+            <p>{i18n("howManyCompletedWorkoutsAUserNeedsPere99943b")}</p>
+            <p>{i18n("validValuesInteger1Default281502ef")}</p>
           </FieldInfo>
         </span>
         <input
@@ -327,14 +336,14 @@ function GamificationSection({ token }: { token: string }) {
       <label className="relative block space-y-2 rounded-[1.4rem] p-3">
         <span className="flex items-center justify-between gap-3">
           <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-            Streak shield reset day
+            {i18n("streakShieldResetDayd22b9ea")}
           </span>
           <FieldInfo
             active={activeHelp === "shield"}
-            label="Streak shield reset day info"
+            label={i18n("streakShieldResetDayInfo10555c2")}
             onToggle={() => setActiveHelp(activeHelp === "shield" ? null : "shield")}
           >
-            <p>Day of month when each user gets their monthly streak shield restored. Valid: 1–28, or blank for signup-relative reset.</p>
+            <p>{i18n("dayOfMonthWhenEachUserGetsTheir605b967")}</p>
           </FieldInfo>
         </span>
         <input
@@ -342,7 +351,7 @@ function GamificationSection({ token }: { token: string }) {
           inputMode="numeric"
           max={28}
           min={1}
-          placeholder="Use signup-relative monthly reset"
+          placeholder={i18n("useSignupRelativeMonthlyReseta55c3a9")}
           style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
           type="number"
           value={form.streakShieldResetDay}
@@ -363,18 +372,18 @@ function GamificationSection({ token }: { token: string }) {
         <span>
           <span className="flex items-center justify-between gap-3">
             <span className="block text-sm font-semibold" style={{ color: "var(--text)" }}>
-              Enable leaderboard globally
+              {i18n("enableLeaderboardGloballyc5e326f")}
             </span>
             <FieldInfo
               active={activeHelp === "leaderboard"}
-              label="Enable leaderboard globally info"
+              label={i18n("enableLeaderboardGloballyInfo62095ee")}
               onToggle={() => setActiveHelp(activeHelp === "leaderboard" ? null : "leaderboard")}
             >
-              <p>Master switch for leaderboard visibility. When disabled, member opt-in has no effect. Admins always keep visibility.</p>
+              <p>{i18n("masterSwitchForLeaderboardVisibilityWhenDisabledMemberd58f09d")}</p>
             </FieldInfo>
           </span>
           <span className="mt-1 block text-sm leading-6" style={{ color: "var(--muted)" }}>
-            When disabled, member and athlete opt-in has no effect. Admin users still keep visibility for moderation and operational review.
+            {i18n("whenDisabledMemberAndAthleteOptInHas1370e13")}
           </span>
         </span>
       </label>
@@ -394,6 +403,7 @@ function GamificationSection({ token }: { token: string }) {
 // ── Level Taxonomy section ───────────────────────────────────────────────────
 
 function LevelTaxonomySection({ token }: { token: string }) {
+  const i18n = useUiTranslations();
   const queryClient = useQueryClient();
   const [levels, setLevels] = useState<ScaleLevel[]>([]);
   const [initialized, setInitialized] = useState(false);
@@ -426,7 +436,7 @@ function LevelTaxonomySection({ token }: { token: string }) {
   return (
     <div className="space-y-4">
       {levelsQuery.isLoading && (
-        <p className="text-sm" style={{ color: "var(--dim)" }}>Loading…</p>
+        <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
       )}
 
       <div className="space-y-3">
@@ -438,7 +448,7 @@ function LevelTaxonomySection({ token }: { token: string }) {
           >
             <input
               className="rounded-2xl px-4 py-3 text-sm outline-none"
-              placeholder="slug"
+              placeholder={i18n("slug6300777")}
               style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
               value={level.slug}
               onChange={(e) =>
@@ -449,7 +459,7 @@ function LevelTaxonomySection({ token }: { token: string }) {
             />
             <input
               className="rounded-2xl px-4 py-3 text-sm outline-none"
-              placeholder="Display label"
+              placeholder={i18n("displayLabeld747868")}
               style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
               value={level.label}
               onChange={(e) =>
@@ -466,7 +476,7 @@ function LevelTaxonomySection({ token }: { token: string }) {
                 setLevels((cur) => (cur.length === 1 ? cur : cur.filter((_, i) => i !== index)))
               }
             >
-              Remove
+              {i18n("removee963907")}
             </button>
           </div>
         ))}
@@ -483,7 +493,7 @@ function LevelTaxonomySection({ token }: { token: string }) {
           ])
         }
       >
-        + Add level
+        {i18n("addLeveld2d215f")}
       </button>
 
       <SaveBar
@@ -507,6 +517,7 @@ function financeFormFromSettings(s: FinanceSettings) {
 }
 
 function FinanceSection({ token }: { token: string }) {
+  const i18n = useUiTranslations();
   const queryClient = useQueryClient();
   const [form, setForm] = useState({ paymentReminderIntervalDays: "7" });
   const [initialized, setInitialized] = useState(false);
@@ -548,11 +559,10 @@ function FinanceSection({ token }: { token: string }) {
           style={{ color: "var(--muted)" }}
           htmlFor="reminder-interval"
         >
-          Reminder interval (days)
+          {i18n("reminderIntervalDaysee3ba34")}
         </label>
         <p className="text-xs leading-5" style={{ color: "var(--dim)" }}>
-          How often (in days) a member with an outstanding balance receives a payment reminder
-          notification. The reminder repeats until the balance is fully settled.
+          {i18n("howOftenInDaysAMemberWithAn710fa76")}
         </p>
         <input
           id="reminder-interval"
@@ -582,6 +592,7 @@ function FinanceSection({ token }: { token: string }) {
 }
 
 export function AdminSettingsHub() {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const token = tokens?.access_token;
 
@@ -589,16 +600,16 @@ export function AdminSettingsHub() {
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-5xl space-y-6">
 
-        <TransientHero label="application settings introduction">
+        <TransientHero label={i18n("applicationSettingsIntroduction8f2e9b7")} timeoutMs={3000}>
         <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
-            App configurations
+            {i18n("appConfigurationse0effaa")}
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-            App configurations.
+            {i18n("appConfigurations1e15749")}
           </h1>
           <p className="mt-2 max-w-3xl text-sm leading-6" style={{ color: "var(--muted)" }}>
-            Global settings for appearance, engagement rules, and workout level definitions. Changes apply immediately across the app.
+            {i18n("globalSettingsForAppearanceEngagementRulesAndWorkout915168c")}
           </p>
         </section>
         </TransientHero>
@@ -607,46 +618,46 @@ export function AdminSettingsHub() {
           <>
             <CollapsibleSection
               id="appearance"
-              title="Appearance"
-              description="App colour palette"
+              title={i18n("appearance41def7a")}
+              description={i18n("appColourPalette9dc5de5")}
             >
               <AppearanceSection token={token} />
             </CollapsibleSection>
 
             <CollapsibleSection
               id="gamification"
-              title="Gamification"
-              description="Streaks, streak shields & leaderboard"
+              title={i18n("gamificatione32e404")}
+              description={i18n("streaksStreakShieldsLeaderboardaa8cd0c")}
             >
               <GamificationSection token={token} />
             </CollapsibleSection>
 
             <CollapsibleSection
               id="finance"
-              title="Finance"
-              description="Payment reminders"
+              title={i18n("finance1b48d3f")}
+              description={i18n("paymentReminders64c6e44")}
             >
               <FinanceSection token={token} />
             </CollapsibleSection>
 
             <CollapsibleSection
               id="class-types"
-              title="Class Types"
-              description="Schedule classification and filters"
+              title={i18n("classTypes9704233")}
+              description={i18n("scheduleClassificationAndFiltersc6f2df8")}
             >
               <ClassTypeSettings token={token} />
             </CollapsibleSection>
 
             <CollapsibleSection
               id="level-taxonomy"
-              title="Level Taxonomy"
-              description="Global workout level definitions inherited by all workouts"
+              title={i18n("levelTaxonomyd6fdd60")}
+              description={i18n("globalWorkoutLevelDefinitionsInheritedByAllWorkoutsd5fbba7")}
             >
               <LevelTaxonomySection token={token} />
             </CollapsibleSection>
           </>
         ) : (
-          <p className="text-sm" style={{ color: "var(--dim)" }}>Loading…</p>
+          <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
         )}
 
       </div>

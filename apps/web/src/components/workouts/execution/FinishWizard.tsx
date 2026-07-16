@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import React, { useState } from "react";
 import type { TimerSegment } from "@/api/executions";
 import type { ExerciseModification } from "@/api/executions";
@@ -53,6 +58,7 @@ function ScoreEntryStep({
   onNext: (edited: SectionScore[]) => void;
   onSkip: () => void;
 }) {
+  const i18n = useUiTranslations();
   const scoreableSections = React.useMemo(() => {
     const seen = new Set<string>();
     const result: Array<{
@@ -113,10 +119,10 @@ function ScoreEntryStep({
       >
         <div className="text-5xl">🏁</div>
         <p className="text-xl font-bold text-center" style={{ color: "var(--text)" }}>
-          No scored sections
+          {i18n("noScoredSections03f16d5")}
         </p>
         <p className="text-sm text-center max-w-xs" style={{ color: "var(--muted)" }}>
-          This workout has no sections that track a score.
+          {i18n("thisWorkoutHasNoSectionsThatTrackAad42c8f")}
         </p>
         <button
           type="button"
@@ -124,7 +130,7 @@ function ScoreEntryStep({
           className="w-full max-w-xs rounded-2xl py-3.5 text-base font-semibold"
           style={{ background: "var(--primary)", color: "var(--primary-contrast, #fff)" }}
         >
-          Next →
+          {i18n("next2f04eb1")}
         </button>
       </div>
     );
@@ -136,20 +142,20 @@ function ScoreEntryStep({
         <div>
           {onBack && (
             <button type="button" onClick={onBack} className="text-sm" style={{ color: "var(--dim)" }}>
-              ← Back
+              {i18n("backc32ae9f")}
             </button>
           )}
         </div>
         <button type="button" onClick={onSkip} className="text-sm font-semibold" style={{ color: "var(--dim)" }}>
-          Skip →
+          {i18n("skip10b7bbe")}
         </button>
       </div>
 
       <div className="flex flex-col items-center gap-2 pt-4 pb-6 px-6">
         <div className="text-4xl">🏁</div>
-        <h2 className="text-xl font-bold text-center">Log your scores</h2>
+        <h2 className="text-xl font-bold text-center">{i18n("logYourScoresaeffd3b")}</h2>
         <p className="text-sm text-center max-w-xs" style={{ color: "var(--muted)" }}>
-          Enter your result for each scored section. Pre-filled values are auto-computed.
+          {i18n("enterYourResultForEachScoredSectionPrefb25b9b")}
         </p>
       </div>
 
@@ -208,7 +214,7 @@ function ScoreEntryStep({
           className="w-full rounded-2xl py-3.5 text-base font-semibold"
           style={{ background: "var(--primary)", color: "var(--primary-contrast, #fff)" }}
         >
-          Next →
+          {i18n("next2f04eb1")}
         </button>
       </div>
     </div>
@@ -323,6 +329,7 @@ function ModificationsEditorStep({
   onNext: (mods: ExerciseModification[]) => void;
   onSkip: () => void;
 }) {
+  const i18n = useUiTranslations();
   const exercises = React.useMemo(() => collectExercises(segments), [segments]);
   const [modState, setModState] = useState<Record<string, ModState>>(() =>
     buildInitialModState(exercises, initialMods),
@@ -346,18 +353,18 @@ function ModificationsEditorStep({
     <div className="flex h-screen flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
       <div className="flex items-center justify-between px-5 pt-8 pb-2">
         <button type="button" onClick={onBack} className="text-sm" style={{ color: "var(--dim)" }}>
-          ← Back
+          {i18n("backc32ae9f")}
         </button>
         <button type="button" onClick={onSkip} className="text-sm font-semibold" style={{ color: "var(--dim)" }}>
-          Skip →
+          {i18n("skip10b7bbe")}
         </button>
       </div>
 
       <div className="flex flex-col items-center gap-2 pt-4 pb-6 px-6">
         <div className="text-4xl">📝</div>
-        <h2 className="text-xl font-bold text-center">Any modifications?</h2>
+        <h2 className="text-xl font-bold text-center">{i18n("anyModifications97c3e24")}</h2>
         <p className="text-sm text-center max-w-xs" style={{ color: "var(--muted)" }}>
-          Flag exercises you skipped or changed. Pre-filled from changes during execution.
+          {i18n("flagExercisesYouSkippedOrChangedPreFilledc1fea5a")}
         </p>
       </div>
 
@@ -386,12 +393,12 @@ function ModificationsEditorStep({
                   {(hasSets || hasPrescription || hasLoad) && (
                     <p className="text-xs mt-0.5" style={{ color: "var(--dim)" }}>
                       {[
-                        hasSets ? `${ex.sets} sets` : null,
-                        hasPrescription ? `${ex.prescription_value} ${ex.prescription_unit ?? ""}`.trim() : null,
+                        hasSets ? (ex.sets) + " sets" : null,
+                        hasPrescription ? (ex.prescription_value) + " " + (ex.prescription_unit ?? "").trim() : null,
                         hasLoad
                           ? ex.load_mode === "pct_1rm"
-                            ? `${ex.load_value}% RM`
-                            : `${ex.load_value} kg`
+                            ? (ex.load_value) + "% RM"
+                            : (ex.load_value) + " kg"
                           : null,
                       ]
                         .filter(Boolean)
@@ -417,7 +424,7 @@ function ModificationsEditorStep({
                     border: "1px solid var(--border)",
                   }}
                 >
-                  {s.active ? (s.skipped ? "Skipped" : "Modified ✓") : "Mark"}
+                  {s.active ? (s.skipped ? i18n("skipped5a000ad") : i18n("modifiede744110")) : i18n("mark31e9697")}
                 </button>
               </div>
 
@@ -426,7 +433,7 @@ function ModificationsEditorStep({
                   {hasSets && (
                     <div className="flex items-center gap-2">
                       <span className="text-xs w-20 shrink-0" style={{ color: "var(--dim)" }}>
-                        Sets
+                        {i18n("sets2ab262f")}
                       </span>
                       <input
                         type="number"
@@ -446,7 +453,7 @@ function ModificationsEditorStep({
                   {hasPrescription && (
                     <div className="flex items-center gap-2">
                       <span className="text-xs w-20 shrink-0" style={{ color: "var(--dim)" }}>
-                        {ex.prescription_unit ?? "Reps"}
+                        {ex.prescription_unit ?? i18n("reps702045f")}
                       </span>
                       <input
                         type="number"
@@ -466,7 +473,7 @@ function ModificationsEditorStep({
                   {hasLoad && (
                     <div className="flex items-center gap-2">
                       <span className="text-xs w-20 shrink-0" style={{ color: "var(--dim)" }}>
-                        {ex.load_mode === "pct_1rm" ? "% RM" : "kg"}
+                        {ex.load_mode === "pct_1rm" ? i18n("rma904756") : "kg"}
                       </span>
                       <input
                         type="number"
@@ -499,7 +506,7 @@ function ModificationsEditorStep({
                         border: "1px solid color-mix(in srgb, var(--danger, var(--primary)) 22%, transparent)",
                       }}
                     >
-                      I skipped this completely
+                      {i18n("iSkippedThisCompletely17f47b6")}
                     </button>
                   )}
                   {s.skipped && (
@@ -513,7 +520,7 @@ function ModificationsEditorStep({
                         border: "1px solid var(--border)",
                       }}
                     >
-                      Undo skip
+                      {i18n("undoSkip7bc61ef")}
                     </button>
                   )}
                 </div>
@@ -530,7 +537,7 @@ function ModificationsEditorStep({
           className="w-full rounded-2xl py-3.5 text-base font-semibold"
           style={{ background: "var(--primary)", color: "var(--primary-contrast, #fff)" }}
         >
-          Next →
+          {i18n("next2f04eb1")}
         </button>
       </div>
     </div>
@@ -556,6 +563,7 @@ function ConfirmStep({
   onBack: () => void;
   onSave: () => void;
 }) {
+  const i18n = useUiTranslations();
   const exerciseMap = React.useMemo(() => {
     const map: Record<string, string> = {};
     for (const seg of segments) {
@@ -573,14 +581,14 @@ function ConfirmStep({
     >
       <div className="flex items-center px-5 pt-8 pb-2">
         <button type="button" onClick={onBack} className="text-sm" style={{ color: "var(--dim)" }}>
-          ← Back
+          {i18n("backc32ae9f")}
         </button>
       </div>
 
       <div className="flex flex-col items-center gap-2 pt-4 pb-6 px-6">
         <div className="text-5xl">🏆</div>
         <div className="text-2xl font-bold text-center" style={{ color: "var(--text)" }}>
-          Ready to save?
+          {i18n("readyToSave3fab096")}
         </div>
       </div>
 
@@ -591,7 +599,7 @@ function ConfirmStep({
               className="text-xs font-semibold uppercase tracking-[0.18em] mb-2 px-1"
               style={{ color: "var(--dim)" }}
             >
-              Scores
+              {i18n("scores126cb93")}
             </p>
             <div className="space-y-2">
               {scores.map((score) => (
@@ -620,12 +628,12 @@ function ConfirmStep({
               className="text-xs font-semibold uppercase tracking-[0.18em] mb-2 px-1"
               style={{ color: "var(--dim)" }}
             >
-              Modifications
+              {i18n("modifications405f450")}
             </p>
             <div className="space-y-2">
               {modifications.map((mod, i) => (
                 <div
-                  key={`${mod.exercise_id}-${i}`}
+                  key={(mod.exercise_id) + "-" + (i)}
                   className="flex justify-between items-center rounded-xl px-4 py-2.5"
                   style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
                 >
@@ -641,7 +649,7 @@ function ConfirmStep({
                           : "var(--warning)",
                     }}
                   >
-                    {mod.type === "skipped" ? "Skipped" : "Modified"}
+                    {mod.type === "skipped" ? i18n("skipped5a000ad") : i18n("modified19a532c")}
                   </span>
                 </div>
               ))}
@@ -651,7 +659,7 @@ function ConfirmStep({
 
         {scores.length === 0 && modifications.length === 0 && (
           <p className="text-center text-sm py-8" style={{ color: "var(--dim)" }}>
-            No scores or modifications logged.
+            {i18n("noScoresOrModificationsLogged685c678")}
           </p>
         )}
       </div>
@@ -670,7 +678,7 @@ function ConfirmStep({
           className="w-full rounded-2xl py-3.5 text-base font-semibold disabled:opacity-50"
           style={{ background: "var(--primary)", color: "var(--primary-contrast, #fff)" }}
         >
-          {isSaving ? "Saving…" : "Save & Done"}
+          {isSaving ? i18n("saving56a2285") : i18n("saveDone3614269")}
         </button>
       </div>
     </div>

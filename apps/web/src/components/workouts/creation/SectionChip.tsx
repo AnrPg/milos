@@ -1,5 +1,8 @@
 "use client";
 
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
@@ -13,6 +16,7 @@ type SectionChipProps = {
 };
 
 export function SectionChip({ section, isSelected, onSelect }: SectionChipProps) {
+  const i18n = useUiTranslations();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging, isOver } = useSortable({
     id: section.localId,
     data: { type: "section" },
@@ -48,7 +52,7 @@ export function SectionChip({ section, isSelected, onSelect }: SectionChipProps)
       </span>
 
       <span className="min-w-0 flex-1 truncate text-sm font-semibold">
-        {section.name || "Unnamed section"}
+        {section.name || i18n("unnamedSection109fa70")}
       </span>
 
       <span

@@ -1,5 +1,12 @@
 "use client";
 
+
+
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -22,43 +29,6 @@ function formatTimestamp(isoString: string) {
     hour: "numeric",
     minute: "2-digit",
   }).format(new Date(isoString));
-}
-
-function notificationTitle(type: string) {
-  switch (type) {
-    case "booking_pending":
-      return "New booking request";
-    case "booking_approved":
-      return "Booking approved";
-    case "booking_rejected":
-      return "Booking rejected";
-    case "booking_timeout":
-      return "Booking timed out";
-    case "workout_note":
-      return "Workout annotation";
-    case "workout_changed":
-      return "Workout changed";
-    case "workout_deleted":
-      return "Workout deleted by coach";
-    case "workout_rejected":
-      return "Workout rejected";
-    case "athlete_message":
-      return "Message from athlete";
-    case "admin_note":
-      return "Coach note";
-    case "chat_message":
-      return "New message";
-    case "challenge_completed":
-      return "Challenge completed";
-    case "workout_moved":
-      return "Workout rescheduled";
-    case "invoice_issued":
-      return "Invoice issued";
-    case "payment_reminder":
-      return "Outstanding balance";
-    default:
-      return "Notification";
-  }
 }
 
 function payloadUrl(notification: NotificationRecord) {
@@ -97,129 +67,6 @@ function notificationTargetUrl(notification: NotificationRecord, role: string | 
   return rawUrl;
 }
 
-function titleFromPayload(notification: NotificationRecord) {
-  if (typeof notification.payload.title === "string") return notification.payload.title;
-
-  if (notification.type === "chat_message") {
-    const contextType =
-      typeof notification.payload.context_type === "string" ? notification.payload.context_type : null;
-    if (contextType === "assignment" || contextType === "class_slot") {
-      return "New message in workout thread";
-    }
-  }
-
-  return notificationTitle(notification.type);
-}
-
-function notificationBody(notification: NotificationRecord) {
-  if (typeof notification.payload.body === "string") {
-    return notification.payload.body;
-  }
-
-  if (notification.type === "workout_note") {
-    const notePayload =
-      typeof notification.payload.note === "object" && notification.payload.note !== null
-        ? (notification.payload.note as Record<string, unknown>)
-        : notification.payload;
-    const selectedText =
-      typeof notePayload.selected_text === "string" ? notePayload.selected_text : null;
-    const noteText = typeof notePayload.note_text === "string" ? notePayload.note_text : null;
-    const tags = Array.isArray(notePayload.tags)
-      ? notePayload.tags.filter((tag): tag is string => typeof tag === "string")
-      : [];
-
-    const parts = [];
-    if (selectedText) parts.push(`"${selectedText}"`);
-    if (tags.length > 0) parts.push(tags.join(", "));
-    if (noteText) parts.push(noteText);
-
-    return parts.length > 0 ? parts.join(" · ") : "Workout annotation submitted.";
-  }
-
-  if (notification.type === "admin_note") {
-    return typeof notification.payload.body === "string"
-      ? notification.payload.body
-      : "Your coach added a new note.";
-  }
-
-  if (notification.type === "workout_changed") {
-    if (typeof notification.payload?.body === "string") return notification.payload.body;
-    const changeType = notification.payload?.change_type;
-    if (changeType === "datetime_changed") return "The scheduled time for this workout was changed.";
-    if (changeType === "sections_updated") return "Your coach updated the exercises in this workout.";
-    return "Your coach changed a scheduled workout.";
-  }
-
-  if (notification.type === "workout_deleted") {
-    return typeof notification.payload.body === "string"
-      ? notification.payload.body
-      : "A scheduled workout was removed.";
-  }
-
-  if (notification.type === "workout_rejected") {
-    const nickname =
-      typeof notification.payload.athlete_nickname === "string"
-        ? notification.payload.athlete_nickname
-        : "An athlete";
-    const title =
-      typeof notification.payload.workout_title === "string"
-        ? ` — ${notification.payload.workout_title}`
-        : "";
-    return `${nickname} rejected their assigned workout${title}.`;
-  }
-
-  if (notification.type === "athlete_message") {
-    const sender =
-      typeof notification.payload.sender_nickname === "string"
-        ? notification.payload.sender_nickname
-        : "An athlete";
-    const body =
-      typeof notification.payload.body === "string" ? notification.payload.body : "";
-    return body ? `${sender}: ${body}` : `${sender} sent you a message.`;
-  }
-
-  if (notification.type === "chat_message") {
-    const sender =
-      typeof notification.payload.sender_nickname === "string"
-        ? notification.payload.sender_nickname
-        : null;
-    const body =
-      typeof notification.payload.body === "string" ? notification.payload.body : "";
-    const contextType =
-      typeof notification.payload.context_type === "string" ? notification.payload.context_type : null;
-    const isWorkoutThread = contextType === "assignment" || contextType === "class_slot";
-
-    if (sender && body) {
-      return isWorkoutThread ? `${sender} in your workout thread: ${body}` : `${sender}: ${body}`;
-    }
-    if (body) return body;
-    return isWorkoutThread ? "New message in your workout thread." : "You received a new message.";
-  }
-
-  if (notification.type === "challenge_completed") {
-    if (typeof notification.payload.badge_label === "string") return notification.payload.badge_label;
-    if (typeof notification.payload.title === "string") return notification.payload.title;
-    return "You completed a challenge.";
-  }
-
-  if (notification.type === "workout_moved") {
-    return typeof notification.payload.body === "string"
-      ? notification.payload.body
-      : "An athlete rescheduled their workout.";
-  }
-
-  const classType =
-    typeof notification.payload.class_type_name === "string" ? notification.payload.class_type_name : null;
-  const adminMessage =
-    typeof notification.payload.admin_message === "string" ? notification.payload.admin_message : null;
-
-  const parts = [];
-  if (classType) parts.push(classType);
-  if (adminMessage) parts.push(adminMessage);
-
-  return parts.length > 0 ? parts.join(" · ") : "Open the schedule to review the latest booking state.";
-}
-
 function NotificationCard({
   notification,
   targetUrl,
@@ -229,6 +76,167 @@ function NotificationCard({
   targetUrl: string | null;
   onClick: () => void;
 }) {
+  function notificationBody(notification: NotificationRecord) {
+    if (typeof notification.payload.body === "string") {
+      return notification.payload.body;
+    }
+  
+    if (notification.type === "workout_note") {
+      const notePayload =
+        typeof notification.payload.note === "object" && notification.payload.note !== null
+          ? (notification.payload.note as Record<string, unknown>)
+          : notification.payload;
+      const selectedText =
+        typeof notePayload.selected_text === "string" ? notePayload.selected_text : null;
+      const noteText = typeof notePayload.note_text === "string" ? notePayload.note_text : null;
+      const tags = Array.isArray(notePayload.tags)
+        ? notePayload.tags.filter((tag): tag is string => typeof tag === "string")
+        : [];
+  
+      const parts = [];
+      if (selectedText) parts.push(`"${selectedText}"`);
+      if (tags.length > 0) parts.push(tags.join(", "));
+      if (noteText) parts.push(noteText);
+  
+      return parts.length > 0 ? parts.join(" · ") : i18n("workoutAnnotationSubmittedd0b2f39");
+    }
+  
+    if (notification.type === "admin_note") {
+      return typeof notification.payload.body === "string"
+        ? notification.payload.body
+        : i18n("yourCoachAddedANewNote3eec2b4");
+    }
+  
+    if (notification.type === "workout_changed") {
+      if (typeof notification.payload?.body === "string") return notification.payload.body;
+      const changeType = notification.payload?.change_type;
+      if (changeType === "datetime_changed") return i18n("theScheduledTimeForThisWorkoutWasChanged2d953b3");
+      if (changeType === "sections_updated") return i18n("yourCoachUpdatedTheExercisesInThisWorkout1c9eed2");
+      return i18n("yourCoachChangedAScheduledWorkoutf8cf1d6");
+    }
+  
+    if (notification.type === "workout_deleted") {
+      return typeof notification.payload.body === "string"
+        ? notification.payload.body
+        : i18n("aScheduledWorkoutWasRemovedc3ae9af");
+    }
+  
+    if (notification.type === "workout_rejected") {
+      const nickname =
+        typeof notification.payload.athlete_nickname === "string"
+          ? notification.payload.athlete_nickname
+          : i18n("anAthlete8f35f1a");
+      const title =
+        typeof notification.payload.workout_title === "string"
+          ? i18n("value0f05883f", {value0: notification.payload.workout_title})
+          : "";
+      return i18n("value0RejectedTheirAssignedWorkoutValue15517fe5", {value0: nickname, value1: title});
+    }
+  
+    if (notification.type === "athlete_message") {
+      const sender =
+        typeof notification.payload.sender_nickname === "string"
+          ? notification.payload.sender_nickname
+          : i18n("anAthlete8f35f1a");
+      const body =
+        typeof notification.payload.body === "string" ? notification.payload.body : "";
+      return body ? i18n("value0Value10f13dbb", {value0: sender, value1: body}) : i18n("value0SentYouAMessage7c89010", {value0: sender});
+    }
+  
+    if (notification.type === "chat_message") {
+      const sender =
+        typeof notification.payload.sender_nickname === "string"
+          ? notification.payload.sender_nickname
+          : null;
+      const body =
+        typeof notification.payload.body === "string" ? notification.payload.body : "";
+      const contextType =
+        typeof notification.payload.context_type === "string" ? notification.payload.context_type : null;
+      const isWorkoutThread = contextType === "assignment" || contextType === "class_slot";
+  
+      if (sender && body) {
+        return isWorkoutThread ? i18n("value0InYourWorkoutThreadValue1c868809", {value0: sender, value1: body}) : i18n("value0Value10f13dbb", {value0: sender, value1: body});
+      }
+      if (body) return body;
+      return isWorkoutThread ? i18n("newMessageInYourWorkoutThreada646c0d") : i18n("youReceivedANewMessage465e15f");
+    }
+  
+    if (notification.type === "challenge_completed") {
+      if (typeof notification.payload.badge_label === "string") return notification.payload.badge_label;
+      if (typeof notification.payload.title === "string") return notification.payload.title;
+      return i18n("youCompletedAChallengedc085e6");
+    }
+  
+    if (notification.type === "workout_moved") {
+      return typeof notification.payload.body === "string"
+        ? notification.payload.body
+        : i18n("anAthleteRescheduledTheirWorkoutfe39f42");
+    }
+  
+    const classType =
+      typeof notification.payload.class_type_name === "string" ? notification.payload.class_type_name : null;
+    const adminMessage =
+      typeof notification.payload.admin_message === "string" ? notification.payload.admin_message : null;
+  
+    const parts = [];
+    if (classType) parts.push(classType);
+    if (adminMessage) parts.push(adminMessage);
+  
+    return parts.length > 0 ? parts.join(" · ") : i18n("openTheScheduleToReviewTheLatestBooking36c10aa");
+  }
+
+  function titleFromPayload(notification: NotificationRecord) {
+    if (typeof notification.payload.title === "string") return notification.payload.title;
+  
+    if (notification.type === "chat_message") {
+      const contextType =
+        typeof notification.payload.context_type === "string" ? notification.payload.context_type : null;
+      if (contextType === "assignment" || contextType === "class_slot") {
+        return i18n("newMessageInWorkoutThreadbf823a6");
+      }
+    }
+  
+    return notificationTitle(notification.type);
+  }
+
+  function notificationTitle(type: string) {
+    switch (type) {
+      case "booking_pending":
+        return "New booking request";
+      case "booking_approved":
+        return "Booking approved";
+      case "booking_rejected":
+        return "Booking rejected";
+      case "booking_timeout":
+        return "Booking timed out";
+      case "workout_note":
+        return "Workout annotation";
+      case "workout_changed":
+        return "Workout changed";
+      case "workout_deleted":
+        return "Workout deleted by coach";
+      case "workout_rejected":
+        return "Workout rejected";
+      case "athlete_message":
+        return "Message from athlete";
+      case "admin_note":
+        return "Coach note";
+      case "chat_message":
+        return "New message";
+      case "challenge_completed":
+        return "Challenge completed";
+      case "workout_moved":
+        return "Workout rescheduled";
+      case "invoice_issued":
+        return "Invoice issued";
+      case "payment_reminder":
+        return "Outstanding balance";
+      default:
+        return i18n("notificationc18f8f2");
+    }
+  }
+
+  const i18n = useUiTranslations();
   const clickable = Boolean(targetUrl);
 
   return (
@@ -268,7 +276,7 @@ function NotificationCard({
             className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]"
             style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
-            New
+            {i18n("new6403f2b")}
           </span>
         ) : null}
       </div>
@@ -281,13 +289,6 @@ function NotificationCard({
 
 type FilterTab = "all" | "workouts" | "bookings" | "messages";
 
-const FILTER_TABS: { key: FilterTab; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "workouts", label: "Workouts" },
-  { key: "bookings", label: "Bookings" },
-  { key: "messages", label: "Messages" },
-];
-
 const FILTER_TYPES: Record<FilterTab, string[] | null> = {
   all: null,
   workouts: ["workout_note", "workout_changed", "workout_deleted", "workout_rejected", "workout_moved", "admin_note"],
@@ -296,6 +297,13 @@ const FILTER_TYPES: Record<FilterTab, string[] | null> = {
 };
 
 export function NotificationBell() {
+  const i18n = useUiTranslations();
+  const FILTER_TABS: { key: FilterTab; label: string }[] = [
+    { key: "all", label: i18n("all6a72085") },
+    { key: "workouts", label: i18n("workoutsccb58b2") },
+    { key: "bookings", label: i18n("bookings135229c") },
+    { key: "messages", label: i18n("chat2ced57f") },
+  ];
   const pageSize = 20;
   const router = useRouter();
   const { status, tokens, currentUser } = useSession();
@@ -310,7 +318,7 @@ export function NotificationBell() {
     initialPageParam: null as string | null,
     queryFn: async ({ pageParam }) => {
       if (!tokens?.access_token) {
-        throw new Error("Authentication required.");
+        throw new Error(i18n("authenticationRequired9e44e0b"));
       }
 
       return fetchNotifications(tokens.access_token, {
@@ -323,7 +331,7 @@ export function NotificationBell() {
   const markAllRead = useMutation({
     mutationFn: async () => {
       if (!tokens?.access_token) {
-        throw new Error("Authentication required.");
+        throw new Error(i18n("authenticationRequired9e44e0b"));
       }
 
       return markAllNotificationsRead(tokens.access_token);
@@ -335,7 +343,7 @@ export function NotificationBell() {
   const markClicked = useMutation({
     mutationFn: async ({ notificationId, url }: { notificationId: string; url: string }) => {
       if (!tokens?.access_token) {
-        throw new Error("Authentication required.");
+        throw new Error(i18n("authenticationRequired9e44e0b"));
       }
 
       return markNotificationClicked(tokens.access_token, notificationId, url);
@@ -378,7 +386,7 @@ export function NotificationBell() {
   useEffect(() => {
     if (status !== "authenticated" || !tokens?.access_token || !currentUser?.id) return;
 
-    return subscribeToTopic(tokens.access_token, `notifications:${currentUser.id}`, {
+    return subscribeToTopic(tokens.access_token, "notifications:" + (currentUser.id), {
       "notifications:changed": () => {
         void queryClient.invalidateQueries({ queryKey: ["notifications", currentUser.id] });
       },
@@ -405,11 +413,11 @@ export function NotificationBell() {
     }
 
     if (push.configured === false) {
-      return "Browser push is not configured on the server yet.";
+      return i18n("browserPushIsNotConfiguredOnTheServerbf1bd61");
     }
 
     if (push.permission === "denied" || push.state === "blocked") {
-      return "Browser push is blocked in your browser settings.";
+      return i18n("browserPushIsBlockedInYourBrowserSettings0301fc4");
     }
 
     switch (push.step) {
@@ -426,22 +434,22 @@ export function NotificationBell() {
       case "server-verify":
         return "Verifying that the server persisted this browser subscription...";
       default:
-        return "Enable browser push for approvals, notes, and alerts.";
+        return i18n("enableBrowserPushForApprovalsNotesAndAlerts4f4ec8d");
     }
   })();
   const pushStatusTone = push.error || push.configured === false ? "var(--primary)" : "var(--muted)";
   const pushButtonLabel = push.busy
     ? push.step === "server-save"
-      ? "Saving..."
-      : "Enabling..."
-    : "Enable";
+      ? i18n("savingae7e887")
+      : i18n("enabling2b8e03e")
+    : i18n("enable20063ad");
   const emptyMessage = useMemo(() => {
-    if (notificationQuery.isPending) return "Loading notifications...";
+    if (notificationQuery.isPending) return i18n("loadingNotificationsf5e60c3");
     if (notificationQuery.isError && !notificationQuery.data) {
-      return "Notifications are temporarily unavailable.";
+      return i18n("notificationsAreTemporarilyUnavailable9a64342");
     }
-    if (markAllRead.isPending) return "Updating notifications...";
-    return "No notifications yet.";
+    if (markAllRead.isPending) return i18n("updatingNotifications27106ac");
+    return i18n("noNotificationsYet5537c60");
   }, [markAllRead.isPending, notificationQuery.data, notificationQuery.isError, notificationQuery.isPending]);
 
   if (status !== "authenticated" || !tokens?.access_token) return null;
@@ -477,7 +485,7 @@ export function NotificationBell() {
     <>
       <button
         aria-expanded={open}
-        aria-label="Open notifications"
+        aria-label={i18n("openNotificationsac4735e")}
         className="flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition-colors"
         style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
         onClick={openPanel}
@@ -508,8 +516,8 @@ export function NotificationBell() {
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">Notifications</p>
-                <h2 className="mt-3 text-2xl font-semibold" style={{ color: "var(--text)" }}>Inbox</h2>
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">{i18n("notifications753a22b")}</p>
+                <h2 className="mt-3 text-2xl font-semibold" style={{ color: "var(--text)" }}>{i18n("inbox44caf74")}</h2>
               </div>
               <button
                 className="rounded-full px-3 py-2 text-sm font-semibold transition-colors"
@@ -517,7 +525,7 @@ export function NotificationBell() {
                 onClick={() => setOpen(false)}
                 type="button"
               >
-                Close
+                {i18n("closebbfa773")}
               </button>
             </div>
 
@@ -547,10 +555,10 @@ export function NotificationBell() {
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-sm font-semibold" style={{ color: push.enabled ? "var(--success)" : pushStatusTone }}>
-                      {push.enabled ? "Browser push is on for this device." : pushStatusMessage}
+                      {push.enabled ? i18n("browserPushIsOnForThisDevicea620272") : pushStatusMessage}
                     </p>
                     <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
-                      This choice applies only to this browser and device.
+                      {i18n("thisChoiceAppliesOnlyToThisBrowserAnd0ca4181")}
                     </p>
                   </div>
                   {push.enabled ? (
@@ -561,7 +569,7 @@ export function NotificationBell() {
                       onClick={() => void push.disablePush()}
                       type="button"
                     >
-                      {push.busy ? "Disabling…" : "Disable"}
+                      {push.busy ? i18n("disabling3bf14ec") : i18n("disable9a7d4e0")}
                     </button>
                   ) : push.permission !== "denied" && push.configured !== false ? (
                     <button
@@ -580,19 +588,19 @@ export function NotificationBell() {
                       onClick={() => setPushHelpOpen((current) => !current)}
                       type="button"
                     >
-                      {currentUser?.role === "admin" ? "Setup" : "What now?"}
+                      {currentUser?.role === "admin" ? i18n("setupcdd7bb2") : i18n("whatNowe1cd551")}
                     </button>
                   )}
                 </div>
                 {pushHelpOpen && push.configured === false ? (
                   <div className="mt-3 rounded-xl p-3 text-xs leading-5" style={{ background: "var(--panel)", color: "var(--muted)" }}>
                     {currentUser?.role === "admin"
-                      ? "Generate a VAPID key pair, set WEB_PUSH_PUBLIC_KEY, WEB_PUSH_PRIVATE_KEY, and WEB_PUSH_SUBJECT on the API service, then restart it. This status is checked again whenever the inbox opens."
-                      : "The gym server has not enabled browser push yet. In-app notifications still work; ask an administrator to configure Web Push."}
+                      ? i18n("generateAVapidKeyPairSetWebPushdabd06b")
+                      : i18n("theGymServerHasNotEnabledBrowserPushe7cec31")}
                   </div>
                 ) : pushHelpOpen && push.permission === "denied" ? (
                   <div className="mt-3 rounded-xl p-3 text-xs leading-5" style={{ background: "var(--panel)", color: "var(--muted)" }}>
-                    Open this site&apos;s permissions in your browser settings, allow notifications, then reopen the inbox. Browsers do not let the app reverse a denied permission itself.
+                    {i18n("openThisSiteSPermissionsInYourBrowserdb34d1a")}
                   </div>
                 ) : null}
               </div>
@@ -613,7 +621,7 @@ export function NotificationBell() {
                 <section>
                   <div className="mb-3 flex items-center justify-between gap-3">
                     <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
-                      New
+                      {i18n("new6403f2b")}
                       {unreadNotifications.length > 0 ? (
                         <span
                           className="ml-2 rounded-full px-1.5 py-0.5 text-[10px]"
@@ -631,13 +639,13 @@ export function NotificationBell() {
                         onClick={() => void handleMarkAllRead()}
                         type="button"
                       >
-                        Mark all read
+                        {i18n("markAllRead8958e22")}
                       </button>
                     ) : null}
                   </div>
                   {unreadNotifications.length === 0 ? (
                     <p className="rounded-[1.4rem] px-4 py-3 text-sm" style={{ border: "1px solid var(--border)", color: "var(--dim)" }}>
-                      You&apos;re all caught up.
+                      {i18n("youReAllCaughtUp3d39c46")}
                     </p>
                   ) : (
                     <div className="space-y-3">
@@ -663,7 +671,7 @@ export function NotificationBell() {
                     type="button"
                   >
                     <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
-                      Read ({readNotifications.length})
+                      {i18n("read4de891c")}{readNotifications.length})
                     </p>
                     <span className="text-xs" style={{ color: "var(--dim)" }}>
                       {readSectionOpen ? "▲" : "▼"}
@@ -692,7 +700,7 @@ export function NotificationBell() {
                   onClick={() => void notificationQuery.fetchNextPage()}
                   type="button"
                 >
-                  {notificationQuery.isFetchingNextPage ? "Loading older notifications..." : "Load older notifications"}
+                  {notificationQuery.isFetchingNextPage ? i18n("loadingOlderNotifications927e059") : i18n("loadOlderNotifications3447adb")}
                 </button>
               ) : null}
             </div>

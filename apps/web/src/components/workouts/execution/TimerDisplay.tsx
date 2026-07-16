@@ -1,5 +1,8 @@
 "use client";
 
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import React from "react";
 
 import type { TimerSegment } from "@/api/executions";
@@ -25,6 +28,7 @@ function formatTime(totalSeconds: number): string {
 }
 
 export function TimerDisplay({ segment, elapsed, remaining, isExpired }: Props) {
+  const i18n = useUiTranslations();
   const isNoTimer = segment.kind === "no_timer" || segment.kind === "manual";
 
   const displayValue = isNoTimer
@@ -82,7 +86,7 @@ export function TimerDisplay({ segment, elapsed, remaining, isExpired }: Props) 
           className="text-3xl font-semibold"
           style={{ color: "var(--muted)" }}
         >
-          {segment.kind === "manual" ? "Manual" : "—"}
+          {segment.kind === "manual" ? i18n("manual4e836fd") : "—"}
         </div>
       )}
 
@@ -90,7 +94,7 @@ export function TimerDisplay({ segment, elapsed, remaining, isExpired }: Props) 
       <div className="text-xs" style={{ color: "var(--dim)" }}>
         {segment.format}
         {segment.kind === "countup" && segment.duration_seconds
-          ? ` · Cap ${formatTime(segment.duration_seconds)}`
+          ? i18n("capa8fba29") + (formatTime(segment.duration_seconds))
           : ""}
       </div>
     </div>

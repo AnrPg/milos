@@ -1,5 +1,7 @@
 "use client";
 
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useRef, useState } from "react";
 
 import { useTranslations } from "next-intl";
@@ -22,6 +24,7 @@ function toggle(values: string[], id: string) {
 }
 
 export function TypeFilterChips({ classTypes, value, onChange }: TypeFilterChipsProps) {
+  const i18n = useUiTranslations();
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const [pending, setPending] = useState(value);
   const t = useTranslations("Schedule");
@@ -58,7 +61,7 @@ export function TypeFilterChips({ classTypes, value, onChange }: TypeFilterChips
                   ? { background: color, borderColor: color, color: "var(--bg)" }
                   : { background: "transparent", borderColor: "var(--border)", color: "var(--dim)" }
               }
-              title={`${type.name}${type.archived_at ? ` (${t("archived")})` : ""}`}
+              title={(type.name) + (type.archived_at ? ` (${t("archived")})` : "")}
               type="button"
             >
               {type.name}

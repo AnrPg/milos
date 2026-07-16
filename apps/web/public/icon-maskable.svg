@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Milos Training">
+  <rect width="512" height="512" fill="#0b0d10"/>
+  <circle cx="256" cy="256" r="184" fill="#151a20"/>
+  <path d="M128 210h40v92h-40zm216 0h40v92h-40zM96 228h24v56H96zm296 0h24v56h-24zM176 246h160v20H176z" fill="#c9ff45"/>
+  <path d="M218 164h76l26 56h-44l-20-28-20 28h-44zm-26 128h44l20 28 20-28h44l-26 56h-76z" fill="#f8fafc"/>
+</svg>

@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import Link from "next/link";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -52,7 +57,7 @@ function money(cents: unknown) {
 }
 
 function dateText(value: unknown) {
-  if (!value) return "not set";
+  if (!value) return "—";
   return String(value).slice(0, 10);
 }
 
@@ -62,6 +67,7 @@ function percent(value: unknown) {
 }
 
 export function AdminFinance() {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const queryClient = useQueryClient();
   const token = tokens?.access_token;
@@ -323,25 +329,24 @@ export function AdminFinance() {
   );
 
   const summaryCards: Array<[string, string]> = [
-    ["Active memberships", String(totals.active_memberships ?? 0)],
-    ["Expiring in 30 days", String(totals.expiring_memberships ?? 0)],
-    ["Paid revenue", money(totals.paid_revenue_cents)],
-    ["Open credit balance", money(totals.credit_balance_cents)],
-    ["Outstanding invoices", money(totals.outstanding_invoice_balance_cents)],
-    ["Overdue invoices", money(totals.overdue_invoice_balance_cents)],
-    ["Renewal conversion", percent(totals.renewal_conversion_percent)],
-    ["Invoice credit offsets", money(totals.invoice_credit_offset_cents)],
+    [i18n("activeMemberships0d117fb"), String(totals.active_memberships ?? 0)],
+    [i18n("expiringIn30Days3722a5d"), String(totals.expiring_memberships ?? 0)],
+    [i18n("paidRevenue64c34e5"), money(totals.paid_revenue_cents)],
+    [i18n("openCreditBalancec588f1f"), money(totals.credit_balance_cents)],
+    [i18n("outstandingInvoices700edaf"), money(totals.outstanding_invoice_balance_cents)],
+    [i18n("overdueInvoices747a2d8"), money(totals.overdue_invoice_balance_cents)],
+    [i18n("renewalConversion8c3f769"), percent(totals.renewal_conversion_percent)],
+    [i18n("invoiceCreditOffsets9fc1210"), money(totals.invoice_credit_offset_cents)],
   ];
 
   return (
     <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-7xl space-y-8">
         <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--panel)] p-8">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">Finance operations</p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">Membership revenue cockpit</h1>
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">{i18n("financeOperations60f9e5a")}</p>
+          <h1 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">{i18n("membershipRevenueCockpit0b90204")}</h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--muted)]">
-            Manage packages, member finance profiles, manual payments, promotions, referral rewards, and operational
-            queues from one admin surface.
+            {i18n("managePackagesMemberFinanceProfilesManualPaymentsPromotions366ce90")}
           </p>
         </section>
 
@@ -355,7 +360,7 @@ export function AdminFinance() {
         </section>
 
         <section className="border-y border-[var(--border)] bg-[var(--panel)] px-4 py-6 md:px-6">
-          <h2 className="text-xl font-black">Monthly revenue</h2>
+          <h2 className="text-xl font-black">{i18n("monthlyRevenue93e061c")}</h2>
           <div className="mt-4 h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={monthlyRevenue}>
@@ -364,7 +369,7 @@ export function AdminFinance() {
                   dataKey="period_start"
                   tickFormatter={(value) => String(value).slice(0, 7)}
                 />
-                <YAxis tickFormatter={(value) => `€${Number(value) / 100}`} />
+                <YAxis tickFormatter={(value) => "€" + (Number(value) / 100)} />
                 <Tooltip
                   labelFormatter={(value) => String(value).slice(0, 7)}
                   formatter={(value) => money(value)}
@@ -397,42 +402,42 @@ export function AdminFinance() {
               createPackageMutation.mutate();
             }}
           >
-            <h2 className="text-xl font-black">Create membership package</h2>
-            <Input label="Package code" value={packageForm.code} onChange={(code) => setPackageForm({ ...packageForm, code })} />
-            <Input label="Name" value={packageForm.name} onChange={(name) => setPackageForm({ ...packageForm, name })} />
+            <h2 className="text-xl font-black">{i18n("createMembershipPackage3b5ed69")}</h2>
+            <Input label={i18n("packageCode4e5df5f")} value={packageForm.code} onChange={(code) => setPackageForm({ ...packageForm, code })} />
+            <Input label={i18n("name709a232")} value={packageForm.name} onChange={(name) => setPackageForm({ ...packageForm, name })} />
             <div className="grid gap-3 md:grid-cols-2">
               <Select
-                label="Family"
+                label={i18n("family4efb6cb")}
                 value={packageForm.family}
                 options={["unlimited", "limited-visits", "personal-programming", "hybrid"]}
                 onChange={(family) => setPackageForm({ ...packageForm, family })}
               />
               <Select
-                label="Billing period"
+                label={i18n("billingPeriodda59f5a")}
                 value={packageForm.billing_period}
                 options={["monthly", "quarterly", "annual", "custom"]}
                 onChange={(billing_period) => setPackageForm({ ...packageForm, billing_period })}
               />
             </div>
             <Input
-              label="Price in EUR"
+              label={i18n("priceInEur0e33182")}
               type="number"
               value={packageForm.price}
               onChange={(price) => setPackageForm({ ...packageForm, price })}
             />
             <Input
-              label="Tags, comma-separated"
+              label={i18n("tagsCommaSeparated7bfd75e")}
               value={packageForm.tags}
               required={false}
               onChange={(tags) => setPackageForm({ ...packageForm, tags })}
             />
-            <SubmitButton pending={createPackageMutation.isPending}>Create package</SubmitButton>
+            <SubmitButton pending={createPackageMutation.isPending}>{i18n("createPackagebd56259")}</SubmitButton>
             <ErrorText error={createPackageMutation.error} />
           </form>
 
-          <Panel title="Membership packages">
+          <Panel title={i18n("membershipPackages3cd69ce")}>
             <div className="grid gap-3">
-              {packages.length === 0 ? <EmptyState>No packages yet.</EmptyState> : null}
+              {packages.length === 0 ? <EmptyState>{i18n("noPackagesYet0b70a95")}</EmptyState> : null}
               {packages.map((item) => (
                 <Link
                   key={field(item, "id")}
@@ -455,17 +460,17 @@ export function AdminFinance() {
         </section>
 
         <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-          <Panel title="Member finance profiles">
-            <Input label="Search users" required={false} value={search} onChange={setSearch} />
+          <Panel title={i18n("memberFinanceProfilesf78cebd")}>
+            <Input label={i18n("searchUsers1bd6226")} required={false} value={search} onChange={setSearch} />
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               {!searchReady ? (
                 <p className="rounded-2xl border border-[var(--border)] p-4 text-sm text-[var(--muted)] md:col-span-2">
-                  Enter a name to load matching finance profiles.
+                  {i18n("enterANameToLoadMatchingFinanceProfiles0fe97fa")}
                 </p>
               ) : null}
               {searchReady && !searchQuery.isLoading && users.length === 0 ? (
                 <p className="rounded-2xl border border-[var(--border)] p-4 text-sm text-[var(--muted)] md:col-span-2">
-                  No matching members found.
+                  {i18n("noMatchingMembersFound65841d7")}
                 </p>
               ) : null}
               {users.slice(0, 10).map((user) => {
@@ -478,10 +483,10 @@ export function AdminFinance() {
                   >
                     <p className="font-bold">{field(user, "nickname")}</p>
                     <p className="text-sm text-[var(--muted)]">
-                      {field(user, "identity_role")} · {field(membership, "status", "no membership")}
+                      {field(user, "identity_role")} · {field(membership, "status", i18n("noMembershipb174349"))}
                     </p>
                     <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-[var(--primary)]">
-                      {field(membership, "package_code", "open profile")}
+                      {field(membership, "package_code", i18n("openProfile7db8d6d"))}
                     </p>
                   </Link>
                 );
@@ -489,7 +494,7 @@ export function AdminFinance() {
             </div>
           </Panel>
 
-          <Panel title="Promotion campaigns and codes">
+          <Panel title={i18n("promotionCampaignsAndCodesa7ca161")}>
             <form
               className="space-y-3"
               onSubmit={(event) => {
@@ -497,23 +502,23 @@ export function AdminFinance() {
                 createCampaignMutation.mutate();
               }}
             >
-              <Input label="Campaign name" value={campaignForm.name} onChange={(name) => setCampaignForm({ ...campaignForm, name })} />
+              <Input label={i18n("campaignNameaa5d0e7")} value={campaignForm.name} onChange={(name) => setCampaignForm({ ...campaignForm, name })} />
               <Input
-                label="Description"
+                label={i18n("description55f8ebc")}
                 required={false}
                 value={campaignForm.description}
                 onChange={(description) => setCampaignForm({ ...campaignForm, description })}
               />
               <div className="grid gap-3 md:grid-cols-2">
                 <Input
-                  label="Starts on"
+                  label={i18n("startsOn6d888f7")}
                   required={false}
                   type="date"
                   value={campaignForm.starts_on}
                   onChange={(starts_on) => setCampaignForm({ ...campaignForm, starts_on })}
                 />
                 <Input
-                  label="Ends on"
+                  label={i18n("endsOn5c262f3")}
                   required={false}
                   type="date"
                   value={campaignForm.ends_on}
@@ -522,10 +527,10 @@ export function AdminFinance() {
               </div>
               <Checkbox
                 checked={campaignForm.active}
-                label="Campaign active"
+                label={i18n("campaignActive11ce462")}
                 onChange={(active) => setCampaignForm({ ...campaignForm, active })}
               />
-              <SubmitButton pending={createCampaignMutation.isPending}>Create campaign</SubmitButton>
+              <SubmitButton pending={createCampaignMutation.isPending}>{i18n("createCampaign59812bb")}</SubmitButton>
               <ErrorText error={createCampaignMutation.error} />
             </form>
 
@@ -537,29 +542,29 @@ export function AdminFinance() {
               }}
             >
               <Select
-                label="Campaign"
+                label={i18n("campaign69390e1")}
                 value={codeForm.campaign_id}
                 options={campaigns.map((campaign) => field(campaign, "id"))}
                 optionLabel={(id) => field(campaigns.find((campaign) => field(campaign, "id") === id), "name", id)}
                 onChange={(campaign_id) => setCodeForm({ ...codeForm, campaign_id })}
               />
-              <Input label="Code" value={codeForm.code} onChange={(code) => setCodeForm({ ...codeForm, code })} />
+              <Input label={i18n("codeadac693")} value={codeForm.code} onChange={(code) => setCodeForm({ ...codeForm, code })} />
               <div className="grid gap-3 md:grid-cols-2">
                 <Select
-                  label="Discount type"
+                  label={i18n("discountTypec5137dd")}
                   value={codeForm.discount_type}
                   options={["percent", "fixed_amount", "free_period", "manual"]}
                   onChange={(discount_type) => setCodeForm({ ...codeForm, discount_type })}
                 />
                 <Input
-                  label="Discount value"
+                  label={i18n("discountValuecfbd2d5")}
                   type="number"
                   value={codeForm.discount_value}
                   onChange={(discount_value) => setCodeForm({ ...codeForm, discount_value })}
                 />
               </div>
               <Input
-                label="Maximum redemptions"
+                label={i18n("maximumRedemptions86769db")}
                 required={false}
                 type="number"
                 value={codeForm.max_redemptions}
@@ -567,25 +572,25 @@ export function AdminFinance() {
               />
               <Checkbox
                 checked={codeForm.active}
-                label="Code active"
+                label={i18n("codeActivee55ce6f")}
                 onChange={(active) => setCodeForm({ ...codeForm, active })}
               />
-              <SubmitButton pending={createCodeMutation.isPending}>Create code</SubmitButton>
+              <SubmitButton pending={createCodeMutation.isPending}>{i18n("createCodecdeaf88")}</SubmitButton>
               <ErrorText error={createCodeMutation.error} />
             </form>
           </Panel>
         </section>
 
         <section className="grid gap-6 xl:grid-cols-2">
-          <Panel title="Operational queues">
-            <QueueList title="Expiring memberships" rows={queues.expiring_memberships ?? []} primary="user_id" secondary="expires_on" />
-            <QueueList title="Pending payments" rows={queues.pending_payments ?? []} primary="membership_id" secondary="amount_cents" moneySecondary />
-            <QueueList title="Overdue invoices" rows={queues.overdue_invoices ?? []} primary="invoice_number" secondary="balance_due_cents" moneySecondary />
-            <QueueList title="Pending referral rewards" rows={queues.pending_referral_rewards ?? []} primary="recipient_user_id" secondary="reward_value" />
-            <QueueList title="Promo redemptions" rows={queues.promotion_redemptions ?? []} primary="membership_id" secondary="discount_value_snapshot" />
+          <Panel title={i18n("operationalQueuesc2120a9")}>
+            <QueueList title={i18n("expiringMemberships522e6a4")} rows={queues.expiring_memberships ?? []} primary="user_id" secondary="expires_on" />
+            <QueueList title={i18n("pendingPaymentsb4ebfb2")} rows={queues.pending_payments ?? []} primary="membership_id" secondary="amount_cents" moneySecondary />
+            <QueueList title={i18n("overdueInvoices747a2d8")} rows={queues.overdue_invoices ?? []} primary="invoice_number" secondary="balance_due_cents" moneySecondary />
+            <QueueList title={i18n("pendingReferralRewards110afb2")} rows={queues.pending_referral_rewards ?? []} primary="recipient_user_id" secondary="reward_value" />
+            <QueueList title={i18n("promoRedemptions7408919")} rows={queues.promotion_redemptions ?? []} primary="membership_id" secondary="discount_value_snapshot" />
           </Panel>
 
-          <Panel title="Referral lifecycle management">
+          <Panel title={i18n("referralLifecycleManagementd2d3c90")}>
             <div className="mb-6 grid gap-5 border-b border-[var(--border)] pb-5 lg:grid-cols-[1fr_1.2fr]">
               <form
                 className="space-y-3"
@@ -594,27 +599,27 @@ export function AdminFinance() {
                   createReferralProgramMutation.mutate();
                 }}
               >
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">Create referral program</p>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">{i18n("createReferralProgram80d2646")}</p>
                 <Input
-                  label="Program name"
+                  label={i18n("programName699413c")}
                   value={referralProgramForm.name}
                   onChange={(name) => setReferralProgramForm({ ...referralProgramForm, name })}
                 />
                 <Input
-                  label="Description"
+                  label={i18n("description55f8ebc")}
                   required={false}
                   value={referralProgramForm.description}
                   onChange={(description) => setReferralProgramForm({ ...referralProgramForm, description })}
                 />
                 <div className="grid gap-3 md:grid-cols-2">
                   <Select
-                    label="Reward type"
+                    label={i18n("rewardType9e0f28d")}
                     value={referralProgramForm.reward_type}
                     options={["credit", "discount", "free_period", "manual"]}
                     onChange={(reward_type) => setReferralProgramForm({ ...referralProgramForm, reward_type })}
                   />
                   <Input
-                    label="Reward value"
+                    label={i18n("rewardValue8cb933f")}
                     type="number"
                     value={referralProgramForm.reward_value}
                     onChange={(reward_value) => setReferralProgramForm({ ...referralProgramForm, reward_value })}
@@ -622,16 +627,16 @@ export function AdminFinance() {
                 </div>
                 <Checkbox
                   checked={referralProgramForm.active}
-                  label="Program active"
+                  label={i18n("programActive51f4e1a")}
                   onChange={(active) => setReferralProgramForm({ ...referralProgramForm, active })}
                 />
-                <SubmitButton pending={createReferralProgramMutation.isPending}>Create program</SubmitButton>
+                <SubmitButton pending={createReferralProgramMutation.isPending}>{i18n("createProgram63a76cb")}</SubmitButton>
                 <ErrorText error={createReferralProgramMutation.error} />
               </form>
 
               <div className="grid content-start gap-3">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">Programs</p>
-                {referralPrograms.length === 0 ? <EmptyState>No referral programs yet.</EmptyState> : null}
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">{i18n("programsab14d0a")}</p>
+                {referralPrograms.length === 0 ? <EmptyState>{i18n("noReferralProgramsYet8445c6c")}</EmptyState> : null}
                 {referralPrograms.map((program) => (
                   <div key={field(program, "id")} className="rounded-2xl border border-[var(--border)] p-4">
                     <p className="font-bold">{field(program, "name")}</p>
@@ -652,9 +657,9 @@ export function AdminFinance() {
                   createReferralEventMutation.mutate();
                 }}
               >
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">Create referral event</p>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">{i18n("createReferralEventc3c4f63")}</p>
                 <Select
-                  label="Referral program"
+                  label={i18n("referralProgramecbeeaa")}
                   value={referralEventForm.referral_program_id}
                   options={referralPrograms
                     .filter((program) => program.active !== false)
@@ -667,37 +672,37 @@ export function AdminFinance() {
                   }
                 />
                 <Input
-                  label="Search users (referrer &amp; referred)"
+                  label={i18n("searchUsersReferrerReferred4bb924e")}
                   required={false}
                   value={referralUserSearch}
                   onChange={setReferralUserSearch}
                 />
                 {referralUserSearchReady && referralUserSearchQuery.isLoading ? (
-                  <p className="text-xs text-[var(--muted)]">Searching…</p>
+                  <p className="text-xs text-[var(--muted)]">{i18n("searching1a6a5ba")}</p>
                 ) : null}
                 {referralUserSearchReady && !referralUserSearchQuery.isLoading && referralSearchUsers.length === 0 ? (
-                  <p className="text-xs text-[var(--muted)]">No members or athletes found.</p>
+                  <p className="text-xs text-[var(--muted)]">{i18n("noMembersOrAthletesFounde70afd0")}</p>
                 ) : null}
                 <Select
-                  label="Referrer"
+                  label={i18n("referrer548b0b9")}
                   value={referralEventForm.referrer_user_id}
                   options={referralSearchUsers.map((user) => field(user, "id"))}
                   optionLabel={(id) => {
                     const user = referralSearchUsers.find((item) => field(item, "id") === id);
-                    return `${field(user, "nickname", id)} · ${field(user, "identity_role")}`;
+                    return (field(user, "nickname", id)) + " · " + (field(user, "identity_role"));
                   }}
                   onChange={(referrer_user_id) =>
                     setReferralEventForm({ ...referralEventForm, referrer_user_id })
                   }
                 />
                 <Select
-                  label="Referred member"
+                  label={i18n("referredMember9883a2f")}
                   value={referralEventForm.referred_user_id}
                   options={referralSearchUsers.map((user) => field(user, "id"))}
                   optionLabel={(id) => {
                     const user = referralSearchUsers.find((item) => field(item, "id") === id);
                     const membership = nestedRecord(user, "membership");
-                    return `${field(user, "nickname", id)} · ${field(user, "identity_role")} · ${field(membership, "status", "no membership")}`;
+                    return (field(user, "nickname", id)) + " · " + (field(user, "identity_role")) + " · " + (field(membership, "status", i18n("noMembershipb174349")));
                   }}
                   onChange={(referred_user_id) => {
                     const user = referralSearchUsers.find((item) => field(item, "id") === referred_user_id);
@@ -710,21 +715,21 @@ export function AdminFinance() {
                   }}
                 />
                 <p className="rounded-2xl bg-[var(--panel)] p-4 text-sm font-bold text-[var(--muted)]">
-                  Required referred membership: {field(selectedReferredMembership, "id", "select a referred member")}
+                  {i18n("requiredReferredMembership751aa8e")} {field(selectedReferredMembership, "id", i18n("selectAReferredMember7be027f"))}
                 </p>
                 {!referralUserSearchReady ? (
                   <p className="text-xs font-semibold text-[var(--muted)]">
-                    Type at least 2 characters to find registered users.
+                    {i18n("typeAtLeast2CharactersToFindRegisteredf0c72cf")}
                   </p>
                 ) : null}
                 <Input
-                  label="Notes"
+                  label={i18n("notes7044004")}
                   required={false}
                   value={referralEventForm.notes}
                   onChange={(notes) => setReferralEventForm({ ...referralEventForm, notes })}
                 />
                 <SubmitButton pending={createReferralEventMutation.isPending} disabled={!canCreateReferralEvent}>
-                  Create referral
+                  {i18n("createReferral459dc41")}
                 </SubmitButton>
                 <ErrorText error={createReferralEventMutation.error} />
               </form>
@@ -736,36 +741,36 @@ export function AdminFinance() {
                   createReferralRewardMutation.mutate();
                 }}
               >
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">Create reward</p>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">{i18n("createReward4da5168")}</p>
                 <Select
-                  label="Approved referral event"
+                  label={i18n("approvedReferralEvent94e137a")}
                   value={referralRewardForm.referral_event_id}
                   options={rewardableReferralEvents.map((event) => field(event, "id"))}
                   optionLabel={(id) => {
                     const event = rewardableReferralEvents.find((item) => field(item, "id") === id);
-                    return `${field(event, "referrer_user_id", id)} -> ${field(event, "referred_user_id", id)}`;
+                    return (field(event, "referrer_user_id", id)) + " -> " + (field(event, "referred_user_id", id));
                   }}
                   onChange={(referral_event_id) => setReferralRewardForm({ ...referralRewardForm, referral_event_id })}
                 />
                 <p className="rounded-2xl bg-[var(--panel)] p-4 text-sm font-bold text-[var(--muted)]">
-                  Policy: {field(selectedRewardProgram, "reward_type", "select an event")} ·{" "}
+                  {i18n("policyd5a7012")} {field(selectedRewardProgram, "reward_type", i18n("selectAnEvent30b452a"))} ·{" "}
                   {field(selectedRewardProgram, "reward_value", "0")}
                 </p>
-                <SubmitButton pending={createReferralRewardMutation.isPending}>Create reward</SubmitButton>
+                <SubmitButton pending={createReferralRewardMutation.isPending}>{i18n("createReward4da5168")}</SubmitButton>
                 <ErrorText error={createReferralRewardMutation.error} />
               </form>
             </div>
 
             <div className="mb-6 grid gap-3 border-b border-[var(--border)] pb-5">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">Referral events</p>
-              {referralEvents.length === 0 ? <EmptyState>No referral events yet.</EmptyState> : null}
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">{i18n("referralEvents8bcf3f4")}</p>
+              {referralEvents.length === 0 ? <EmptyState>{i18n("noReferralEventsYeta4b3417")}</EmptyState> : null}
               {referralEvents.slice(0, 8).map((event) => (
                 <div key={field(event, "id")} className="rounded-2xl border border-[var(--border)] p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <p className="font-bold">Event · {field(event, "status")}</p>
+                      <p className="font-bold">{i18n("eventa4e3090")} {field(event, "status")}</p>
                       <p className="text-sm text-[var(--muted)]">
-                        Referrer {field(event, "referrer_user_id")} · Referred {field(event, "referred_user_id")}
+                        {i18n("referrer548b0b9")} {field(event, "referrer_user_id")} {i18n("referred0d4f978")} {field(event, "referred_user_id")}
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -788,8 +793,8 @@ export function AdminFinance() {
             </div>
 
             <div className="grid gap-3">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">Referral rewards</p>
-              {rewards.length === 0 ? <EmptyState>No referral rewards yet.</EmptyState> : null}
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">{i18n("referralRewards22d6a91")}</p>
+              {rewards.length === 0 ? <EmptyState>{i18n("noReferralRewardsYetf260f84")}</EmptyState> : null}
               {rewards.slice(0, 12).map((reward) => (
                 <div key={field(reward, "id")} className="rounded-2xl border border-[var(--border)] p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
@@ -798,7 +803,7 @@ export function AdminFinance() {
                         {field(reward, "reward_type")} · {field(reward, "status")}
                       </p>
                       <p className="text-sm text-[var(--muted)]">
-                        Recipient {field(reward, "recipient_user_id")} · Value {field(reward, "reward_value")}
+                        {i18n("recipient9034326")} {field(reward, "recipient_user_id")} {i18n("valuef18ab8d")} {field(reward, "reward_value")}
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -848,6 +853,7 @@ function Input({
   required?: boolean;
   type?: string;
 }) {
+  const i18n = useUiTranslations();
   return (
     <label className="block space-y-1 text-sm font-semibold">
       <span>{label}</span>
@@ -875,6 +881,7 @@ function Select({
   onChange: (value: string) => void;
   optionLabel?: (value: string) => string;
 }) {
+  const i18n = useUiTranslations();
   return (
     <label className="block space-y-1 text-sm font-semibold">
       <span>{label}</span>
@@ -885,7 +892,7 @@ function Select({
         onChange={(event) => onChange(event.target.value)}
       >
         <option value="" disabled>
-          Select {label.toLowerCase()}
+          {i18n("select8598222")} {label.toLowerCase()}
         </option>
         {options.map((option) => (
           <option key={option} value={option}>
@@ -927,13 +934,14 @@ function SubmitButton({
   disabled?: boolean;
   children: React.ReactNode;
 }) {
+  const i18n = useUiTranslations();
   return (
     <button
       className="rounded-full bg-[var(--text)] px-5 py-3 text-sm font-bold text-[var(--primary-contrast)] disabled:opacity-50"
       disabled={pending || disabled}
       type="submit"
     >
-      {pending ? "Saving..." : children}
+      {pending ? i18n("savingae7e887") : children}
     </button>
   );
 }
@@ -960,11 +968,12 @@ function QueueList({
   secondary: string;
   moneySecondary?: boolean;
 }) {
+  const i18n = useUiTranslations();
   return (
     <div className="mb-5">
       <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">{title}</p>
       <div className="mt-2 grid gap-2">
-        {rows.length === 0 ? <EmptyState>No items.</EmptyState> : null}
+        {rows.length === 0 ? <EmptyState>{i18n("noItems83d7e52")}</EmptyState> : null}
         {rows.slice(0, 5).map((row) => (
           <div key={field(row, "id")} className="rounded-2xl border border-[var(--border)] p-3 text-sm">
             <p className="font-bold">{field(row, primary)}</p>

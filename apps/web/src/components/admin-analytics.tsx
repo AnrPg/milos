@@ -1,5 +1,11 @@
 "use client";
 
+
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
@@ -43,21 +49,34 @@ function KpiCard({
   label,
   value,
   helper,
+  href,
 }: {
   label: string;
   value: string;
   helper?: string;
+  href?: string;
 }) {
-  return (
-    <div className="rounded-[1.5rem] border border-[color:var(--border)] bg-[var(--panel)] p-5">
+  const content = (
+    <>
       <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">{label}</p>
       <p className="mt-3 text-3xl font-black">{value}</p>
       {helper ? <p className="mt-2 text-xs leading-5 text-[var(--muted)]">{helper}</p> : null}
+    </>
+  );
+
+  return href ? (
+    <Link href={href} className="rounded-[1.5rem] border border-[color:var(--border)] bg-[var(--panel)] p-5 transition-transform hover:-translate-y-0.5">
+      {content}
+    </Link>
+  ) : (
+    <div className="rounded-[1.5rem] border border-[color:var(--border)] bg-[var(--panel)] p-5">
+      {content}
     </div>
   );
 }
 
 function BreakdownList({ title, rows }: { title: string; rows: [string, unknown][] }) {
+  const i18n = useUiTranslations();
   const numericRows = rows.filter(([, value]) => typeof value === "number") as [string, number][];
   const max = Math.max(...numericRows.map(([, value]) => value), 1);
 
@@ -75,20 +94,50 @@ function BreakdownList({ title, rows }: { title: string; rows: [string, unknown]
               <div className="mt-2 h-2 rounded-full bg-[var(--panel-muted)]">
                 <div
                   className="h-2 rounded-full bg-[var(--success)]"
-                  style={{ width: `${Math.max((value / max) * 100, value > 0 ? 8 : 0)}%` }}
+                  style={{ width: (Math.max((value / max) * 100, value > 0 ? 8 : 0)) + "%" }}
                 />
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <p className="mt-4 text-sm text-[var(--muted)]">No captured facts in this reporting window.</p>
+        <p className="mt-4 text-sm text-[var(--muted)]">{i18n("noCapturedFactsInThisReportingWindowdc344c7")}</p>
       )}
     </article>
   );
 }
 
-export function AdminAnalytics() {
+type AnalyticsSection = "overview" | "training" | "coaching" | "engagement" | "health";
+
+export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSection }) {
+  const i18n = useUiTranslations();
+  const SECTION_COPY: Record<AnalyticsSection, { eyebrow: string; title: string; body: string }> = {
+    overview: {
+      eyebrow: i18n("analyticsMarketinga05588a"),
+      title: i18n("overview0efc2e6"),
+      body: i18n("crossDomainSignalsFromPersistedFactsEmptyValues1643637"),
+    },
+    training: {
+      eyebrow: i18n("trainingAnalytics2c25dde"),
+      title: i18n("trainingPerformancea32baa9"),
+      body: i18n("attendanceCompletionsWorkoutTypeAndTeamWorkoutTrendscbfd912"),
+    },
+    coaching: {
+      eyebrow: i18n("coachingAnalyticsb6ddda1"),
+      title: i18n("athleteActivityAndFollowUp5a9fe9c"),
+      body: i18n("coachingActivityAdherenceSignalsAssignmentCompletionReviewsAnd09689b3"),
+    },
+    engagement: {
+      eyebrow: i18n("userEngagement72f61cf"),
+      title: i18n("interactionSignalsff55586"),
+      body: i18n("reviewsCommunicationNotificationDeliveryClicksAndOtherInteraction6acad47"),
+    },
+    health: {
+      eyebrow: i18n("healthIncidentsb8da1fe"),
+      title: i18n("injuryAndLimitationSignalsfc3b586"),
+      body: i18n("aggregateInjuryLimitationSeverityActiveReportsAndUnresolvedc765d16"),
+    },
+  };
   const { tokens } = useSession();
 
   const summaryQuery = useQuery({
@@ -117,24 +166,24 @@ export function AdminAnalytics() {
   const communication = asRecord(analytics.communication);
   const notificationClicks = asRecord(analytics.notification_clicks);
   const reviewByRating = asRecord(feedback.by_rating);
+  const copy = SECTION_COPY[section];
 
   return (
     <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-6xl space-y-8">
-        <TransientHero label="analytics introduction">
+        <TransientHero collapsedTitle={copy.eyebrow} label={i18n("analyticsIntroductiond80c96b")} timeoutMs={3000}>
         <section className="rounded-[2rem] border border-[color:var(--border)] bg-[var(--panel)] p-5">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">Analytics &amp; Marketing</p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight md:text-4xl">Analytics &amp; Marketing</h1>
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">{copy.eyebrow}</p>
+          <h1 className="mt-2 text-3xl font-black tracking-tight md:text-4xl">{copy.title}</h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--muted)]">
-            Review finance, coaching, feedback, wellbeing, attendance, communication, and notification engagement from
-            persisted facts. Empty values mean no matching facts were captured in the selected window.
+            {copy.body}
           </p>
           <Link
             className="mt-5 inline-flex rounded-full px-4 py-2 text-sm font-semibold"
             href="/admin/metrics"
             style={{ background: "var(--panel-muted)", color: "var(--text-soft)" }}
           >
-            ← Analytics &amp; Marketing
+            {i18n("analyticsMarketing0ecf7f0")}
           </Link>
         </section>
         </TransientHero>
@@ -145,38 +194,41 @@ export function AdminAnalytics() {
           </p>
         ) : null}
 
-        <section className="grid gap-4 md:grid-cols-4">
+        {section === "overview" ? <section className="grid gap-4 md:grid-cols-4">
           <KpiCard
-            label="Paid revenue"
+            label={i18n("paidRevenue64c34e5")}
             value={formatMoney(metricNumber(financeTotals, "paid_revenue_cents"))}
-            helper={`${formatCount(metricNumber(dashboardFinance, "active_memberships"))} active memberships`}
+            helper={(formatCount(metricNumber(dashboardFinance, "active_memberships"))) + i18n("activeMemberships6d55ee8")}
+            href="/admin/metrics/finance"
           />
-          <KpiCard label="Reviews" value={formatCount(metricNumber(feedback, "total"))} />
+          <KpiCard label={i18n("reviewsb83c4cd")} value={formatCount(metricNumber(feedback, "total"))} href="/admin/reviews" />
           <KpiCard
-            label="Active injuries"
+            label={i18n("activeInjuriesdaecfa6")}
             value={formatCount(metricNumber(wellbeing, "active_count"))}
-            helper={`${formatCount(metricNumber(wellbeing, "total"))} total reports`}
+            helper={(formatCount(metricNumber(wellbeing, "total"))) + i18n("totalReportsdfd4b9e")}
+            href="/admin/metrics/health"
           />
           <KpiCard
-            label="Notification clicks"
+            label={i18n("notificationClicks02c5775")}
             value={formatCount(metricNumber(notificationClicks, "total"))}
-            helper={`${formatCount(metricNumber(events, "total"))} tracked events`}
+            helper={(formatCount(metricNumber(events, "total"))) + i18n("trackedEvents398d5c2")}
+            href="/admin/metrics/engagement"
           />
-        </section>
+        </section> : null}
 
-        <section id="training-analytics" className="scroll-mt-20 rounded-[1.6rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
-          <h2 className="text-xl font-black">Team workout breakdown (last 30 days)</h2>
+        {section === "training" ? <section id="training-analytics" className="scroll-mt-20 rounded-[1.6rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
+          <h2 className="text-xl font-black">{i18n("teamWorkoutBreakdownLast30Days86ec3d2")}</h2>
           <div className="mt-4 grid gap-4 md:grid-cols-3">
-            <KpiCard label="Team completions" value={formatCount(metricNumber(teamWorkoutsAggregate, "team_count"))} />
+            <KpiCard label={i18n("teamCompletions2a732d2")} value={formatCount(metricNumber(teamWorkoutsAggregate, "team_count"))} />
             <KpiCard
-              label="Individual completions"
+              label={i18n("individualCompletions70ee9b2")}
               value={formatCount(metricNumber(teamWorkoutsAggregate, "individual_count"))}
             />
-            <KpiCard label="Total completions" value={formatCount(metricNumber(teamWorkoutsAggregate, "total_count"))} />
+            <KpiCard label={i18n("totalCompletionsfa16f4c")} value={formatCount(metricNumber(teamWorkoutsAggregate, "total_count"))} />
           </div>
           {Object.keys(teamWorkoutsByUser).length > 0 ? (
             <div className="mt-6 overflow-hidden rounded-2xl border border-[color:var(--border)]">
-              <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-[var(--muted)]">Per user</p>
+              <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-[var(--muted)]">{i18n("perUser3fcfda7")}</p>
               <table className="w-full text-left text-sm">
                 <tbody>
                   {entries(teamWorkoutsByUser).slice(0, 8).map(([userId, count]) => (
@@ -190,78 +242,78 @@ export function AdminAnalytics() {
             </div>
           ) : null}
           <div className="mt-6">
-            <BreakdownList title="Attendance" rows={entries(asRecord(attendance.by_status))} />
+            <BreakdownList title={i18n("attendanceb689313")} rows={entries(asRecord(attendance.by_status))} />
           </div>
-        </section>
+        </section> : null}
 
-        <section id="user-engagement" className="scroll-mt-20 grid gap-4 lg:grid-cols-2">
+        {section === "engagement" ? <section id="user-engagement" className="scroll-mt-20 grid gap-4 lg:grid-cols-2">
           <div className="lg:col-span-2">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--primary)]">User Engagement</p>
-            <h2 className="mt-2 text-xl font-black">Interaction and communication signals</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--primary)]">{i18n("userEngagement72f61cf")}</p>
+            <h2 className="mt-2 text-xl font-black">{i18n("interactionAndCommunicationSignals18b657a")}</h2>
           </div>
-          <BreakdownList title="Event mix" rows={entries(asRecord(events.by_name))} />
-          <BreakdownList title="Push delivery" rows={entries(asRecord(pushDispatch.by_status))} />
-          <BreakdownList title="Communication" rows={entries(asRecord(communication.by_direction))} />
-          <BreakdownList title="Review ratings" rows={entries(reviewByRating)} />
-        </section>
+          <BreakdownList title={i18n("eventMix09a541e")} rows={entries(asRecord(events.by_name))} />
+          <BreakdownList title={i18n("pushDelivery52c03a7")} rows={entries(asRecord(pushDispatch.by_status))} />
+          <BreakdownList title={i18n("communicationade0d50")} rows={entries(asRecord(communication.by_direction))} />
+          <BreakdownList title={i18n("reviewRatingsd575ce1")} rows={entries(reviewByRating)} />
+        </section> : null}
 
-        <section id="coaching-analytics" className="scroll-mt-20 rounded-[1.6rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
+        {section === "coaching" ? <section id="coaching-analytics" className="scroll-mt-20 rounded-[1.6rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--primary)]">Coaching Analytics</p>
-              <h2 className="mt-2 text-xl font-black">Athlete activity and follow-up</h2>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--primary)]">{i18n("coachingAnalyticsb6ddda1")}</p>
+              <h2 className="mt-2 text-xl font-black">{i18n("athleteActivityAndFollowUp5a9fe9c")}</h2>
             </div>
             <Link className="text-sm font-bold text-[var(--primary)]" href="/admin/coaching-assignments">
-              Open Personal Coaching →
+              {i18n("openPersonalCoachingf4be893")}
             </Link>
           </div>
           <div className="mt-5 grid gap-4 md:grid-cols-3">
-            <KpiCard label="Active athletes" value={formatCount(metricNumber(coaching, "active_athletes"))} />
-            <KpiCard label="Captured events" value={formatCount(metricNumber(dashboardCoaching, "event_count"))} />
-            <KpiCard label="Reviews" value={formatCount(metricNumber(dashboardCoaching, "review_count"))} />
+            <KpiCard label={i18n("activeAthletes78e231e")} value={formatCount(metricNumber(coaching, "active_athletes"))} />
+            <KpiCard label={i18n("capturedEvents2551a14")} value={formatCount(metricNumber(dashboardCoaching, "event_count"))} />
+            <KpiCard label={i18n("reviewsb83c4cd")} value={formatCount(metricNumber(dashboardCoaching, "review_count"))} />
           </div>
-        </section>
+        </section> : null}
 
-        <section id="health-incidents" className="scroll-mt-20 rounded-[1.6rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
+        {section === "health" ? <section id="health-incidents" className="scroll-mt-20 rounded-[1.6rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--primary)]">Health / Incidents</p>
-              <h2 className="mt-2 text-xl font-black">Injury and limitation signals</h2>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--primary)]">{i18n("healthIncidentsb8da1fe")}</p>
+              <h2 className="mt-2 text-xl font-black">{i18n("injuryAndLimitationSignalsfc3b586")}</h2>
             </div>
             <Link className="text-sm font-bold text-[var(--primary)]" href="/admin/wellbeing">
-              Open incident records →
+              {i18n("openIncidentRecords7447df1")}
             </Link>
           </div>
           <div className="mt-5 grid gap-4 md:grid-cols-3">
-            <KpiCard label="Active injuries" value={formatCount(metricNumber(wellbeing, "active_count"))} />
-            <KpiCard label="Total reports" value={formatCount(metricNumber(wellbeing, "total"))} />
-            <KpiCard label="Recent injury flags" value={formatCount(metricNumber(dashboardCoaching, "injury_count"))} />
+            <KpiCard label={i18n("activeInjuriesdaecfa6")} value={formatCount(metricNumber(wellbeing, "active_count"))} />
+            <KpiCard label={i18n("totalReports5654449")} value={formatCount(metricNumber(wellbeing, "total"))} />
+            <KpiCard label={i18n("recentInjuryFlags0692c0a")} value={formatCount(metricNumber(dashboardCoaching, "injury_count"))} />
           </div>
-        </section>
+        </section> : null}
 
-        <section className="grid gap-4 lg:grid-cols-2">
+        {section === "overview" ? <section className="grid gap-4 lg:grid-cols-2">
           <article className="rounded-[1.6rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
-            <h2 className="text-xl font-black">Operational status</h2>
+            <h2 className="text-xl font-black">{i18n("operationalStatus1fdea4e")}</h2>
             <dl className="mt-5 space-y-4 text-sm">
               <div className="flex justify-between gap-4">
-                <dt className="text-[var(--muted)]">Finance aggregate</dt>
+                <dt className="text-[var(--muted)]">{i18n("financeAggregated28a516")}</dt>
                 <dd className="font-bold capitalize">{metricText(dashboardFinance, "aggregate_status")}</dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-[var(--muted)]">Low-rating reviews</dt>
+                <dt className="text-[var(--muted)]">{i18n("lowRatingReviews928d645")}</dt>
                 <dd className="font-bold">{formatCount(metricNumber(crossContext, "low_rating_count"))}</dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-[var(--muted)]">Expiring memberships</dt>
+                <dt className="text-[var(--muted)]">{i18n("expiringMemberships522e6a4")}</dt>
                 <dd className="font-bold">{formatCount(metricNumber(dashboardFinance, "expiring_memberships"))}</dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-[var(--muted)]">Coaching active athletes</dt>
+                <dt className="text-[var(--muted)]">{i18n("coachingActiveAthletese8bc87a")}</dt>
                 <dd className="font-bold">{formatCount(metricNumber(coaching, "active_athletes"))}</dd>
               </div>
             </dl>
           </article>
-        </section>
+        </section> : null}
       </div>
     </main>
   );

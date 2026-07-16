@@ -1,5 +1,8 @@
 "use client";
 
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import type { ScaleLevel } from "@/api/workouts";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import type { DraftExercise, DraftSection, LoadMode, PrescriptionUnit } from "@/types/workout";
@@ -21,6 +24,7 @@ type Props = {
 };
 
 export function VariationsPanel({ exercise, section, scaleLevels }: Props) {
+  const i18n = useUiTranslations();
   const { addVariation, updateVariation, excludeVariation, restoreVariation } = useWorkoutCreationStore();
 
   const scalesWithoutVariation = scaleLevels.filter(
@@ -31,7 +35,7 @@ export function VariationsPanel({ exercise, section, scaleLevels }: Props) {
     <div className="border-t px-4 pb-4" style={{ borderColor: "var(--dim)" }}>
       <div className="flex items-center justify-between py-2">
         <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-          Scale Variations
+          {i18n("scaleVariationsb4decb5")}
         </span>
         {scalesWithoutVariation.length > 0 ? (
           <div className="flex flex-wrap gap-1">
@@ -60,14 +64,14 @@ export function VariationsPanel({ exercise, section, scaleLevels }: Props) {
                 {scaleLevel.label}
               </span>
               <span className="flex-1 text-xs italic" style={{ color: "var(--dim)" }}>
-                Excluded for this scale
+                {i18n("excludedForThisScalecb1b1ce")}
               </span>
               <button
                 onClick={() => restoreVariation(section.localId, exercise.localId, scaleLevel.slug)}
                 className="text-xs"
                 style={{ color: "var(--muted)" }}
               >
-                Restore
+                {i18n("restore3cbe6d6")}
               </button>
             </div>
           );
@@ -104,7 +108,7 @@ export function VariationsPanel({ exercise, section, scaleLevels }: Props) {
               min={1}
             />
             <span className="text-xs" style={{ color: "var(--muted)" }}>
-              sets
+              {i18n("setsd6c8220")}
             </span>
 
             <input
@@ -157,7 +161,7 @@ export function VariationsPanel({ exercise, section, scaleLevels }: Props) {
               onClick={() => excludeVariation(section.localId, exercise.localId, scaleLevel.slug)}
               className="ml-auto text-sm transition-colors"
               style={{ color: "var(--dim)" }}
-              title="Exclude this exercise for this scale level"
+              title={i18n("excludeThisExerciseForThisScaleLevele23e9bd")}
             >
               ⊘
             </button>
@@ -167,7 +171,7 @@ export function VariationsPanel({ exercise, section, scaleLevels }: Props) {
 
       {exercise.variations.length === 0 ? (
         <p className="py-2 text-xs" style={{ color: "var(--dim)" }}>
-          No scale variations defined. All athletes use the base prescription.
+          {i18n("noScaleVariationsDefinedAllAthletesUseThe6a8612c")}
         </p>
       ) : null}
     </div>

@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import type { ScheduleSlot } from "@/api/schedule";
 import { useLocale } from "next-intl";
 import { buildScheduleWindow, localDateKey, monthKey, parseLocalDate, type ScheduleDays } from "@/components/schedule/calendar-window";
@@ -34,6 +39,7 @@ function formatTime(locale: string, isoString: string) {
 const todayKey = localDateKey(new Date());
 
 export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, onCreateSlot }: CalendarViewProps) {
+  const i18n = useUiTranslations();
   const locale = useLocale();
   const { currentMonthKey, visibleDates, monthLabel } = buildScheduleWindow(startDate, days);
   const slotMap = visibleDates.reduce<Record<string, ScheduleSlot[]>>((acc, date) => {
@@ -118,7 +124,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
                   );
                 })}
                 {daySlots.length > 3 ? (
-                  <p className="mt-0.5 text-[9px]" style={{ color: "var(--dim)" }}>+{daySlots.length - 3} more</p>
+                  <p className="mt-0.5 text-[9px]" style={{ color: "var(--dim)" }}>+{daySlots.length - 3} {i18n("moree7c95b4")}</p>
                 ) : null}
               </section>
             );
@@ -132,7 +138,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
   return (
     <div className="overflow-x-auto pb-2">
       <div
-        className={`grid min-w-full gap-4 ${days === 3 ? "md:grid-cols-3" : "md:grid-cols-7"}`}
+        className={"grid min-w-full gap-4 " + (days === 3 ? "md:grid-cols-3" : "md:grid-cols-7")}
       >
         {visibleDates.map((date) => {
           const daySlots = slotMap[date] ?? [];
@@ -174,7 +180,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
                       onClick={() => onCreateSlot(date)}
                       type="button"
                     >
-                      + Slot
+                      {i18n("slotd16d457")}
                     </button>
                   ) : null}
               </div>
@@ -188,11 +194,11 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
                       onClick={() => onCreateSlot(date)}
                       type="button"
                     >
-                      Add the first class slot for this day.
+                      {i18n("addTheFirstClassSlotForThisDaydf937ac")}
                     </button>
                   ) : (
                     <p className="rounded-[1.2rem] px-4 py-6 text-sm" style={{ border: "1px dashed var(--border)", color: "var(--border-strong)" }}>
-                      No classes scheduled for this day.
+                      {i18n("noClassesScheduledForThisDay28542bf")}
                     </p>
                   )
                 ) : null}
@@ -209,6 +215,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
 }
 
 function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact: boolean; onSelectSlot: (slot: ScheduleSlot) => void }) {
+  const i18n = useUiTranslations();
   const locale = useLocale();
   const isPast = new Date(slot.scheduled_at) <= new Date();
   const isUnavailable = !slot.current_user_booking && (slot.spots_remaining === 0 || isPast);
@@ -251,7 +258,7 @@ function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact
             {new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" }).format(new Date(slot.scheduled_at))}
           </p>
           <p className="mt-1 text-sm" style={{ color: isUnavailable ? "var(--border-strong)" : "var(--muted)" }}>
-          {slot.workout?.title ?? "Workout preview unavailable"}
+          {slot.workout?.title ?? i18n("workoutPreviewUnavailable473ec36")}
           </p>
         </div>
         <span
@@ -266,7 +273,7 @@ function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact
       </div>
 
       <div className="mt-3 flex items-center justify-between text-xs" style={{ color: "var(--dim)" }}>
-        <span>{slot.approved_booking_count}/{slot.capacity} booked</span>
+        <span>{slot.approved_booking_count}/{slot.capacity} {i18n("booked67fbe17")}</span>
         <span style={{ color: slot.current_user_booking ? "var(--primary)" : isUnavailable ? "var(--border-strong)" : "var(--dim)" }}>
           {slotStatusLabel(slot, isPast)}
         </span>

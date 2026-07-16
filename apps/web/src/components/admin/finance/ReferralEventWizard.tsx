@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -38,6 +43,7 @@ export function ReferralEventWizard({
   prefillReferrerUser,
   onClose,
 }: WizardProps) {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
   const queryClient = useQueryClient();
@@ -165,12 +171,12 @@ export function ReferralEventWizard({
     setInlinePackageId("");
   }
 
-  const stepLabel = step === 1 ? "Record referral" : step === 2 ? "Review & decide" : "Issue reward";
+  const stepLabel = step === 1 ? i18n("recordReferral8f024c9") : step === 2 ? i18n("reviewDecide3cb5459") : i18n("issueRewarde61aced");
 
   return (
     <SidePanel
-      title="New referral event"
-      subtitle={`Step ${step} of 3 — ${stepLabel}`}
+      title={i18n("newReferralEvent6bb8253")}
+      subtitle={i18n("stepdc416e1") + (step) + i18n("of3e3d985f") + (stepLabel)}
       onClose={onClose}
     >
       {/* Step indicator */}
@@ -193,7 +199,7 @@ export function ReferralEventWizard({
               className="text-xs font-semibold uppercase tracking-[0.18em]"
               style={{ color: "var(--dim)" }}
             >
-              Referral program
+              {i18n("referralProgramecbeeaa")}
             </span>
             <select
               className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
@@ -213,7 +219,7 @@ export function ReferralEventWizard({
 
           {/* Referrer search — locked when opened from the members table "+" button */}
           <UserSearchField
-            label="Referrer"
+            label={i18n("referrer548b0b9")}
             value={form.referrer_user_id}
             prefillUser={prefillReferrerUser}
             token={token}
@@ -225,7 +231,7 @@ export function ReferralEventWizard({
           {/* Referee search */}
           <div className="space-y-2">
             <UserSearchField
-              label="Referee"
+              label={i18n("referee5da9b33")}
               value={form.referred_user_id}
               token={token}
               onChange={handleRefereeChange}
@@ -242,7 +248,7 @@ export function ReferralEventWizard({
                 }}
               >
                 <p className="text-xs font-semibold" style={{ color: "var(--primary-strong)" }}>
-                  ⚠ This user has no membership.
+                  {i18n("thisUserHasNoMembership2569632")}
                 </p>
 
                 {!showMembershipSetup ? (
@@ -252,7 +258,7 @@ export function ReferralEventWizard({
                     className="text-xs font-semibold hover:opacity-70 transition-opacity"
                     style={{ color: "var(--primary)" }}
                   >
-                    Assign a package to continue →
+                    {i18n("assignAPackageToContinuec2f9fa5")}
                   </button>
                 ) : (
                   <div className="space-y-2">
@@ -266,7 +272,7 @@ export function ReferralEventWizard({
                         border: "1px solid var(--border-strong)",
                       }}
                     >
-                      <option value="">Select package…</option>
+                      <option value="">{i18n("selectPackage02bf832")}</option>
                       {packages.map((pkg) => (
                         <option
                           key={String(pkg.id)}
@@ -274,8 +280,8 @@ export function ReferralEventWizard({
                           disabled={pkg.active === false}
                         >
                           {field(pkg, "name", field(pkg, "code"))}
-                          {field(pkg, "code") ? ` (${field(pkg, "code")})` : ""}
-                          {pkg.active === false ? " — Inactive" : ""}
+                          {field(pkg, "code") ? "(" + (field(pkg, "code")) + ")" : ""}
+                          {pkg.active === false ? i18n("inactive0e9b582") : ""}
                         </option>
                       ))}
                     </select>
@@ -288,7 +294,7 @@ export function ReferralEventWizard({
                         className="flex-1 rounded-lg py-1.5 text-xs font-semibold disabled:opacity-40"
                         style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                       >
-                        {assignMembershipMutation.isPending ? "Assigning…" : "Assign & continue"}
+                        {assignMembershipMutation.isPending ? i18n("assigning4d16a1a") : i18n("assignContinue7bfbc41")}
                       </button>
                       <button
                         type="button"
@@ -299,7 +305,7 @@ export function ReferralEventWizard({
                         className="rounded-lg px-3 py-1.5 text-xs"
                         style={{ background: "var(--border)", color: "var(--dim)" }}
                       >
-                        Cancel
+                        {i18n("cancel77dfd21")}
                       </button>
                     </div>
 
@@ -320,7 +326,7 @@ export function ReferralEventWizard({
               className="text-xs font-semibold uppercase tracking-[0.18em]"
               style={{ color: "var(--dim)" }}
             >
-              Notes (optional)
+              {i18n("notesOptional4d56ca9")}
             </span>
             <textarea
               className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none resize-none"
@@ -337,23 +343,23 @@ export function ReferralEventWizard({
             style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
           >
             <SummaryRow
-              label="Referrer"
+              label={i18n("referrer548b0b9")}
               value={
                 referrerUser
                   ? field(referrerUser, "nickname")
-                  : form.referrer_user_id || "Not selected"
+                  : form.referrer_user_id || i18n("notSelected183079f")
               }
             />
             <SummaryRow
-              label="Referee"
+              label={i18n("referee5da9b33")}
               value={
                 refereeUser
                   ? field(refereeUser, "nickname")
-                  : form.referred_user_id || "Not selected"
+                  : form.referred_user_id || i18n("notSelected183079f")
               }
             />
             <SummaryRow
-              label="Membership"
+              label={i18n("membership53bc967")}
               value={
                 form.membership_id
                   ? form.membership_id
@@ -375,7 +381,7 @@ export function ReferralEventWizard({
             onClick={() => createEventMutation.mutate()}
             type="button"
           >
-            {createEventMutation.isPending ? "Recording…" : "Record referral → Step 2"}
+            {createEventMutation.isPending ? i18n("recording72f9eb4") : i18n("recordReferralStep21a166e0")}
           </button>
           {createEventMutation.error instanceof Error && (
             <p className="text-sm" style={{ color: "var(--primary-strong)" }}>
@@ -396,24 +402,23 @@ export function ReferralEventWizard({
               className="text-xs font-semibold uppercase tracking-[0.18em]"
               style={{ color: "var(--dim)" }}
             >
-              Referral summary
+              {i18n("referralSummary9cd1831")}
             </p>
-            <SummaryRow label="Program" value={field(selectedProgram, "name")} />
+            <SummaryRow label={i18n("program9d68007")} value={field(selectedProgram, "name")} />
             <SummaryRow
-              label="Referrer"
+              label={i18n("referrer548b0b9")}
               value={referrerUser ? field(referrerUser, "nickname") : form.referrer_user_id}
             />
             <SummaryRow
-              label="Referred"
+              label={i18n("referred57fcdbd")}
               value={refereeUser ? field(refereeUser, "nickname") : form.referred_user_id}
             />
-            <SummaryRow label="Membership" value={form.membership_id} />
-            {form.notes && <SummaryRow label="Notes" value={form.notes} />}
+            <SummaryRow label={i18n("membership53bc967")} value={form.membership_id} />
+            {form.notes && <SummaryRow label={i18n("notes7044004")} value={form.notes} />}
           </div>
 
           <p className="text-sm leading-6" style={{ color: "var(--muted)" }}>
-            Approving records this referral as valid and enables reward issuance. Rejecting marks it
-            as permanently invalid — no reward can ever be issued for this event.
+            {i18n("approvingRecordsThisReferralAsValidAndEnablesd66970e")}
           </p>
 
           <div className="flex gap-3">
@@ -424,7 +429,7 @@ export function ReferralEventWizard({
               onClick={() => approveEventMutation.mutate()}
               type="button"
             >
-              {approveEventMutation.isPending ? "Approving…" : "Approve → Step 3"}
+              {approveEventMutation.isPending ? i18n("approving26fb03f") : i18n("approveStep3b5cd569")}
             </button>
             <button
               className="flex-1 rounded-full py-3 text-sm font-semibold disabled:opacity-50"
@@ -437,7 +442,7 @@ export function ReferralEventWizard({
               onClick={() => rejectEventMutation.mutate()}
               type="button"
             >
-              {rejectEventMutation.isPending ? "Rejecting…" : "Reject (terminal)"}
+              {rejectEventMutation.isPending ? i18n("rejecting812b8d2") : i18n("rejectTerminal4dd8241")}
             </button>
           </div>
           {(approveEventMutation.error ?? rejectEventMutation.error) instanceof Error && (
@@ -462,12 +467,11 @@ export function ReferralEventWizard({
               className="text-xs font-semibold uppercase tracking-[0.18em]"
               style={{ color: "var(--success)" }}
             >
-              Event approved — configure reward
+              {i18n("eventApprovedConfigureRewarda2659ea")}
             </p>
             <p className="text-sm" style={{ color: "var(--muted)" }}>
-              Defaults from{" "}
-              <span style={{ color: "var(--text)" }}>{field(selectedProgram, "name")}</span>.
-              You can adjust before issuing.
+              {i18n("defaultsFromfa3e989")}{" "}
+              <span style={{ color: "var(--text)" }}>{field(selectedProgram, "name")}</span>{i18n("youCanAdjustBeforeIssuing8ba2699")}
             </p>
           </div>
 
@@ -478,7 +482,7 @@ export function ReferralEventWizard({
                 className="text-xs font-semibold uppercase tracking-[0.18em]"
                 style={{ color: "var(--dim)" }}
               >
-                Reward type
+                {i18n("rewardType9e0f28d")}
               </span>
               <select
                 className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
@@ -486,10 +490,10 @@ export function ReferralEventWizard({
                 value={rewardForm.reward_type}
                 onChange={(e) => setRewardForm({ ...rewardForm, reward_type: e.target.value })}
               >
-                <option value="credit">Credit</option>
-                <option value="discount">Discount</option>
-                <option value="free_period">Free period</option>
-                <option value="manual">Manual</option>
+                <option value="credit">{i18n("credit8a45d33")}</option>
+                <option value="discount">{i18n("discountb524936")}</option>
+                <option value="free_period">{i18n("freePeriod55f6fa0")}</option>
+                <option value="manual">{i18n("manual4e836fd")}</option>
               </select>
             </label>
 
@@ -500,10 +504,10 @@ export function ReferralEventWizard({
                   style={{ color: "var(--dim)" }}
                 >
                   {rewardForm.reward_type === "credit"
-                    ? "Amount (cents)"
+                    ? i18n("amountCents0a0d9fc")
                     : rewardForm.reward_type === "discount"
-                      ? "Discount (cents)"
-                      : "Days"}
+                      ? i18n("discountCentsda869a3")
+                      : i18n("daysf6bb0f4")}
                 </span>
                 <input
                   type="number"
@@ -518,8 +522,7 @@ export function ReferralEventWizard({
           </div>
 
           <p className="text-sm leading-6" style={{ color: "var(--muted)" }}>
-            Issue the reward now, or skip and create it later from the Rewards section. Skipping does
-            not affect the approved event.
+            {i18n("issueTheRewardNowOrSkipAndCreate614170f")}
           </p>
 
           <div className="flex gap-3">
@@ -530,7 +533,7 @@ export function ReferralEventWizard({
               onClick={() => createRewardMutation.mutate()}
               type="button"
             >
-              {createRewardMutation.isPending ? "Creating…" : "Create reward"}
+              {createRewardMutation.isPending ? i18n("creating94d7d8e") : i18n("createReward4da5168")}
             </button>
             <button
               className="flex-1 rounded-full py-3 text-sm font-semibold"
@@ -538,7 +541,7 @@ export function ReferralEventWizard({
               onClick={onClose}
               type="button"
             >
-              Skip for now
+              {i18n("skipForNow6fc0960")}
             </button>
           </div>
           {createRewardMutation.error instanceof Error && (

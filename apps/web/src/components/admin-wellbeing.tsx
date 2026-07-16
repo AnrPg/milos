@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -8,6 +13,7 @@ import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 
 export function AdminWellbeing() {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const queryClient = useQueryClient();
   const [offset, setOffset] = useState(0);
@@ -72,13 +78,12 @@ export function AdminWellbeing() {
   return (
     <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-5xl space-y-6">
-        <TransientHero label="wellbeing administration introduction">
+        <TransientHero label={i18n("wellbeingAdministrationIntroductionf721cc4")} timeoutMs={3000}>
         <section className="rounded-[2rem] border border-[color:var(--border)] bg-[var(--panel)] p-5">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">Wellbeing admin</p>
-          <h1 className="mt-2 text-3xl font-black">Injury and limitation history</h1>
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">{i18n("wellbeingAdminef7f328")}</p>
+          <h1 className="mt-2 text-3xl font-black">{i18n("injuryAndLimitationHistory76a0775")}</h1>
           <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-            Staff can see injury status, body-area tags, severity, and healing history for analytics and coaching
-            safety workflows.
+            {i18n("staffCanSeeInjuryStatusBodyAreaTags5ea970b")}
           </p>
         </section>
         </TransientHero>
@@ -86,8 +91,8 @@ export function AdminWellbeing() {
         <section className="rounded-[2rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--primary)]">Report injury</p>
-              <h2 className="mt-2 text-2xl font-black">Create a staff-managed report</h2>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--primary)]">{i18n("reportInjuryea0dc21")}</p>
+              <h2 className="mt-2 text-2xl font-black">{i18n("createAStaffManagedReport8d86448")}</h2>
             </div>
           </div>
           <form
@@ -98,43 +103,43 @@ export function AdminWellbeing() {
             }}
           >
             <Field
-              label="Member/Athlete User ID"
+              label={i18n("memberAthleteUserIde2ce583")}
               value={form.user_id}
               onChange={(user_id) => setForm({ ...form, user_id })}
               required
             />
             <Field
-              label="Body area"
+              label={i18n("bodyAreaa785bb3")}
               value={form.body_area}
               onChange={(body_area) => setForm({ ...form, body_area })}
               required
             />
             <SelectField
-              label="Severity"
+              label={i18n("severityde314fa")}
               value={form.severity}
               options={["mild", "moderate", "severe"]}
               onChange={(severity) => setForm({ ...form, severity })}
             />
             <SelectField
-              label="Visibility"
+              label={i18n("visibility7d9ff4f")}
               value={form.visibility}
               options={["user_and_admin", "admin_only"]}
               onChange={(visibility) => setForm({ ...form, visibility })}
             />
             <Field
-              label="Started on"
+              label={i18n("startedOn9bbd73f")}
               type="date"
               value={form.started_on}
               onChange={(started_on) => setForm({ ...form, started_on })}
             />
             <Field
-              label="Description"
+              label={i18n("description55f8ebc")}
               value={form.description}
               onChange={(description) => setForm({ ...form, description })}
             />
             <label className="md:col-span-2">
               <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--muted)]">
-                Training limitations
+                {i18n("trainingLimitationsec788e9")}
               </span>
               <textarea
                 className="mt-2 min-h-24 w-full rounded-2xl border border-[color:var(--border)] bg-[var(--panel-muted)] px-4 py-3 text-sm outline-none"
@@ -148,17 +153,17 @@ export function AdminWellbeing() {
                 disabled={reportMutation.isPending || !form.user_id.trim()}
                 type="submit"
               >
-                {reportMutation.isPending ? "Saving..." : "Save injury report"}
+                {reportMutation.isPending ? i18n("savingae7e887") : i18n("saveInjuryReport0a1caa0")}
               </button>
               {reportMutation.error ? (
-                <p className="mt-3 text-sm font-semibold text-[var(--danger)]">Could not save injury report.</p>
+                <p className="mt-3 text-sm font-semibold text-[var(--danger)]">{i18n("couldNotSaveInjuryReport5ec35fc")}</p>
               ) : null}
             </div>
           </form>
         </section>
 
         <section className="grid gap-4">
-          {injuries.length === 0 ? <p className="rounded-2xl bg-[var(--panel)] p-5 text-sm">No injury reports yet.</p> : null}
+          {injuries.length === 0 ? <p className="rounded-2xl bg-[var(--panel)] p-5 text-sm">{i18n("noInjuryReportsYet11437b3")}</p> : null}
           {injuries.map((injury) => (
             <article key={String(injury.id)} className="rounded-[1.5rem] border border-[color:var(--border)] bg-[var(--panel)] p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
@@ -167,7 +172,7 @@ export function AdminWellbeing() {
                     {String(injury.body_area)} · {String(injury.severity)}
                   </p>
                   <p className="text-sm text-[var(--muted)]">
-                    Status {String(injury.status)} · User {String(injury.user_id)} · {String(injury.visibility)}
+                    {i18n("statusbae7d5b")} {String(injury.status)} {i18n("userefbb4ac")} {String(injury.user_id)} · {String(injury.visibility)}
                   </p>
                 </div>
                 {injury.status === "active" ? (
@@ -177,7 +182,7 @@ export function AdminWellbeing() {
                     onClick={() => healMutation.mutate(String(injury.id))}
                     type="button"
                   >
-                    Mark healed
+                    {i18n("markHealed65e6ef9")}
                   </button>
                 ) : null}
               </div>
@@ -194,7 +199,7 @@ export function AdminWellbeing() {
             type="button"
             onClick={() => setOffset(Math.max(offset - pageSize, 0))}
           >
-            Previous
+            {i18n("previous50f9428")}
           </button>
           <button
             className="rounded-full border border-[color:var(--border)] px-4 py-2 text-sm font-bold text-[var(--primary)] disabled:opacity-40"
@@ -202,7 +207,7 @@ export function AdminWellbeing() {
             type="button"
             onClick={() => setOffset(offset + pageSize)}
           >
-            Next
+            {i18n("nextbc98198")}
           </button>
         </div>
       </div>
@@ -223,6 +228,7 @@ function Field({
   required?: boolean;
   type?: string;
 }) {
+  const i18n = useUiTranslations();
   return (
     <label>
       <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--muted)]">{label}</span>

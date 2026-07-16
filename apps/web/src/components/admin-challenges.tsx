@@ -1,5 +1,11 @@
 "use client";
 
+
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -35,15 +41,6 @@ type RuleFormRow = {
   min_count: string;
   points: string;
   label: string;
-};
-
-const CONDITION_LABELS: Record<RuleCondition, string> = {
-  workout_type: "Workout type",
-  scale_level: "Scale level",
-  pr_beaten: "PR beaten",
-  weekly_consistency: "Weekly consistency",
-  rare_workout_type: "Rare workout type",
-  team_workout_streak: "Team workout streak",
 };
 
 function defaultRuleRow(): RuleFormRow {
@@ -218,6 +215,16 @@ function RuleRowEditor({
   onChange: (updated: RuleFormRow) => void;
   onRemove: () => void;
 }) {
+  const CONDITION_LABELS: Record<RuleCondition, string> = {
+    workout_type: i18n("workoutType34a530c"),
+    scale_level: i18n("scaleLeveld3d3921"),
+    pr_beaten: i18n("prBeaten0fa47b8"),
+    weekly_consistency: i18n("weeklyConsistency251cdee"),
+    rare_workout_type: i18n("rareWorkoutType3d74d5c"),
+    team_workout_streak: i18n("teamWorkoutStreak7c8340a"),
+  };
+
+  const i18n = useUiTranslations();
   const inputStyle = {
     background: "var(--panel-muted)",
     borderColor: "var(--border)",
@@ -262,7 +269,7 @@ function RuleRowEditor({
           <input
             className="rounded-xl border px-3 py-2 text-xs w-24"
             style={inputStyle}
-            placeholder="slug"
+            placeholder={i18n("slug6300777")}
             value={row.slug}
             onChange={(e) => onChange({ ...row, slug: e.target.value })}
           />
@@ -311,12 +318,12 @@ function RuleRowEditor({
               value={row.min_count}
               onChange={(e) => onChange({ ...row, min_count: e.target.value })}
             />
-            workouts
+            {i18n("workouts974125d")}
           </label>
         )}
 
         <label className="flex items-center gap-1 text-xs ml-auto" style={{ color: "var(--muted)" }}>
-          pts:
+          {i18n("pts9ba094e")}
           <input
             className="rounded-xl border px-2 py-2 text-xs w-16"
             style={inputStyle}
@@ -341,7 +348,7 @@ function RuleRowEditor({
       <input
         className="w-full rounded-xl border px-3 py-2 text-xs"
         style={{ ...inputStyle, color: "var(--muted)" }}
-        placeholder="Label (e.g. for beating a PR)"
+        placeholder={i18n("labelEGForBeatingAPrce71028")}
         value={row.label}
         onChange={(e) => onChange({ ...row, label: e.target.value })}
       />
@@ -363,6 +370,7 @@ function metricCard(label: string, value: string | number) {
 }
 
 export function AdminChallenges() {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const [selectedChallengeId, setSelectedChallengeId] = useState<string | null>(null);
   const [form, setForm] = useState<ChallengeFormState>(() => emptyForm());
@@ -371,7 +379,7 @@ export function AdminChallenges() {
     queryKey: ["admin", "challenges"],
     enabled: Boolean(tokens?.access_token),
     queryFn: async () => {
-      if (!tokens?.access_token) throw new Error("Authentication required.");
+      if (!tokens?.access_token) throw new Error(i18n("authenticationRequired9e44e0b"));
       return fetchAdminChallenges(tokens.access_token);
     },
   });
@@ -380,14 +388,14 @@ export function AdminChallenges() {
     queryKey: ["admin", "challenges", selectedChallengeId],
     enabled: Boolean(tokens?.access_token && selectedChallengeId),
     queryFn: async () => {
-      if (!tokens?.access_token || !selectedChallengeId) throw new Error("Challenge selection required.");
+      if (!tokens?.access_token || !selectedChallengeId) throw new Error(i18n("challengeSelectionRequired13ef24b"));
       return fetchAdminChallenge(tokens.access_token, selectedChallengeId);
     },
   });
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      if (!tokens?.access_token) throw new Error("Authentication required.");
+      if (!tokens?.access_token) throw new Error(i18n("authenticationRequired9e44e0b"));
 
       const payload = payloadFromForm(form);
 
@@ -428,23 +436,22 @@ export function AdminChallenges() {
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-7xl space-y-8">
-        <TransientHero label="challenge management introduction">
+        <TransientHero label={i18n("challengeManagementIntroduction7702a15")} timeoutMs={3000}>
         <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="max-w-4xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">Admin Challenges</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">{i18n("adminChallenges67e0d16")}</p>
               <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-                Seasonal challenge management.
+                {i18n("seasonalChallengeManagement522b160")}
               </h1>
               <p className="mt-2 text-sm leading-6" style={{ color: "var(--muted)" }}>
-                Create and edit seasonal challenges, inspect live participation, and review how members and
-                athletes are progressing against each target.
+                {i18n("createAndEditSeasonalChallengesInspectLiveParticipation96025e7")}
               </p>
             </div>
 
             <div className="rounded-[1.4rem] px-5 py-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
               <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                Active today
+                {i18n("activeToday9f14dee")}
               </p>
               <p className="mt-2 text-2xl font-semibold" style={{ color: "var(--text)" }}>
                 {activeCount} / 3
@@ -459,10 +466,10 @@ export function AdminChallenges() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>
-                  {editing ? "Edit challenge" : "Create challenge"}
+                  {editing ? i18n("editChallenge9e06136") : i18n("createChallengea12c2ce")}
                 </p>
                 <h2 className="mt-2 text-2xl font-semibold" style={{ color: "var(--text)" }}>
-                  {editing ? "Update the active definition." : "Define a new seasonal challenge."}
+                  {editing ? i18n("updateTheActiveDefinition98d94cb") : i18n("defineANewSeasonalChallenge47ea252")}
                 </h2>
               </div>
 
@@ -473,7 +480,7 @@ export function AdminChallenges() {
                   onClick={startCreateMode}
                   type="button"
                 >
-                  New challenge
+                  {i18n("newChallenge98b5e6d")}
                 </button>
               ) : null}
             </div>
@@ -481,7 +488,7 @@ export function AdminChallenges() {
             <div className="mt-6 space-y-4">
               <label className="block space-y-2">
                 <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                  Title
+                  {i18n("title768e0c1")}
                 </span>
                 <input
                   className="w-full rounded-2xl border px-4 py-3 text-sm"
@@ -493,7 +500,7 @@ export function AdminChallenges() {
 
               <label className="block space-y-2">
                 <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                  Description
+                  {i18n("description55f8ebc")}
                 </span>
                 <textarea
                   className="min-h-28 w-full rounded-2xl border px-4 py-3 text-sm"
@@ -506,7 +513,7 @@ export function AdminChallenges() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block space-y-2">
                   <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                    Criteria type
+                    {i18n("criteriaTypedf7b95e")}
                   </span>
                   <select
                     className="w-full rounded-2xl border px-4 py-3 text-sm"
@@ -514,16 +521,16 @@ export function AdminChallenges() {
                     value={form.criteriaType}
                     onChange={(event) => updateForm("criteriaType", event.target.value as CriteriaType)}
                   >
-                    <option value="workout_count">Workout count</option>
-                    <option value="workout_type_count">Workout type count</option>
-                    <option value="pr_count">PR count</option>
-                    <option value="custom">Custom</option>
+                    <option value="workout_count">{i18n("workoutCountc0c4093")}</option>
+                    <option value="workout_type_count">{i18n("workoutTypeCount2e4362c")}</option>
+                    <option value="pr_count">{i18n("prCount5527d5d")}</option>
+                    <option value="custom">{i18n("custom081ae3f")}</option>
                   </select>
                 </label>
 
                 <label className="block space-y-2">
                   <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                    Target count
+                    {i18n("targetCountef87dbf")}
                   </span>
                   <input
                     className="w-full rounded-2xl border px-4 py-3 text-sm"
@@ -538,7 +545,7 @@ export function AdminChallenges() {
               {form.criteriaType === "workout_type_count" ? (
                 <label className="block space-y-2">
                   <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                    Workout type filter
+                    {i18n("workoutTypeFiltercfb5c8d")}
                   </span>
                   <select
                     className="w-full rounded-2xl border px-4 py-3 text-sm"
@@ -562,7 +569,7 @@ export function AdminChallenges() {
                       className="text-xs font-semibold uppercase tracking-[0.18em]"
                       style={{ color: "var(--dim)" }}
                     >
-                      Points Rules
+                      {i18n("pointsRules6075014")}
                     </span>
                     <button
                       type="button"
@@ -570,7 +577,7 @@ export function AdminChallenges() {
                       style={{ background: "var(--border)", color: "var(--text-soft)" }}
                       onClick={() => updateForm("rules", [...form.rules, defaultRuleRow()])}
                     >
-                      + Add rule
+                      {i18n("addRule5a8edc3")}
                     </button>
                   </div>
 
@@ -581,7 +588,7 @@ export function AdminChallenges() {
                           className="text-xs font-semibold uppercase tracking-[0.18em]"
                           style={{ color: "var(--dim)" }}
                         >
-                          Increment per completion
+                          {i18n("incrementPerCompletion9b4256e")}
                         </span>
                         <input
                           className="w-full rounded-2xl border px-4 py-3 text-sm"
@@ -598,12 +605,12 @@ export function AdminChallenges() {
                           className="text-xs font-semibold uppercase tracking-[0.18em]"
                           style={{ color: "var(--dim)" }}
                         >
-                          Points label (optional)
+                          {i18n("pointsLabelOptional2362394")}
                         </span>
                         <input
                           className="w-full rounded-2xl border px-4 py-3 text-sm"
                           style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
-                          placeholder="e.g. for completing any workout"
+                          placeholder={i18n("eGForCompletingAnyWorkout8cf1db0")}
                           value={form.incrementLabel}
                           onChange={(e) => updateForm("incrementLabel", e.target.value)}
                         />
@@ -637,7 +644,7 @@ export function AdminChallenges() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block space-y-2">
                   <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                    Badge label
+                    {i18n("badgeLabeld74ab69")}
                   </span>
                   <input
                     className="w-full rounded-2xl border px-4 py-3 text-sm"
@@ -649,13 +656,13 @@ export function AdminChallenges() {
 
                 <div className="space-y-2">
                   <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                    Badge key preview
+                    {i18n("badgeKeyPreviewc86e06d")}
                   </span>
                   <div
                     className="rounded-2xl border px-4 py-3 text-sm"
                     style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
                   >
-                    {`challenge_${slugify(form.badgeLabel || form.title || "new_challenge")}`}
+                    {"challenge_" + (slugify(form.badgeLabel || form.title || "new_challenge"))}
                   </div>
                 </div>
               </div>
@@ -663,7 +670,7 @@ export function AdminChallenges() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block space-y-2">
                   <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                    Starts
+                    {i18n("startsfc612a2")}
                   </span>
                   <input
                     className="w-full rounded-2xl border px-4 py-3 text-sm"
@@ -676,7 +683,7 @@ export function AdminChallenges() {
 
                 <label className="block space-y-2">
                   <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                    Ends
+                    {i18n("ends91856dc")}
                   </span>
                   <input
                     className="w-full rounded-2xl border px-4 py-3 text-sm"
@@ -696,7 +703,7 @@ export function AdminChallenges() {
                   onClick={() => void saveMutation.mutateAsync()}
                   type="button"
                 >
-                  {saveMutation.isPending ? "Saving..." : editing ? "Save changes" : "Create challenge"}
+                  {saveMutation.isPending ? i18n("savingae7e887") : editing ? i18n("saveChanges179359b") : i18n("createChallengea12c2ce")}
                 </button>
                 <span className="text-sm" style={{ color: "var(--muted)" }}>
                   {criteriaSummary(payloadFromForm(form))}
@@ -705,7 +712,7 @@ export function AdminChallenges() {
 
               {saveMutation.isError ? (
                 <p className="text-sm" style={{ color: "var(--primary)" }}>
-                  {saveMutation.error instanceof Error ? saveMutation.error.message : "Challenge could not be saved."}
+                  {saveMutation.error instanceof Error ? saveMutation.error.message : i18n("challengeCouldNotBeSavedec78ef0")}
                 </p>
               ) : null}
             </div>
@@ -716,10 +723,10 @@ export function AdminChallenges() {
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>
-                    Challenge roster
+                    {i18n("challengeRosterf464e7f")}
                   </p>
                   <h2 className="mt-2 text-2xl font-semibold" style={{ color: "var(--text)" }}>
-                    Existing challenges
+                    {i18n("existingChallengesf1277f2")}
                   </h2>
                 </div>
               </div>
@@ -727,11 +734,11 @@ export function AdminChallenges() {
               <div className="mt-5 space-y-4">
                 {challengesQuery.isPending ? (
                   <p className="text-sm" style={{ color: "var(--muted)" }}>
-                    Loading challenges...
+                    {i18n("loadingChallengescfd3c00")}
                   </p>
                 ) : challenges.length === 0 ? (
                   <p className="rounded-2xl px-4 py-5 text-sm" style={{ background: "var(--panel-muted)", color: "var(--muted)" }}>
-                    No seasonal challenges created yet.
+                    {i18n("noSeasonalChallengesCreatedYet606b1c2")}
                   </p>
                 ) : (
                   challenges.map((challenge) => {
@@ -763,7 +770,7 @@ export function AdminChallenges() {
                               {challenge.title}
                             </p>
                             <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
-                              {challenge.description || "No description"}
+                              {challenge.description || i18n("noDescriptionf354c94")}
                             </p>
                           </div>
                           <span
@@ -790,7 +797,7 @@ export function AdminChallenges() {
                         <div className="mt-4 grid gap-3 sm:grid-cols-4">
                           <div>
                             <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                              Participants
+                              {i18n("participantscd56e08")}
                             </p>
                             <p className="mt-1 text-sm font-semibold" style={{ color: "var(--text)" }}>
                               {challenge.progress_summary.participants}
@@ -798,7 +805,7 @@ export function AdminChallenges() {
                           </div>
                           <div>
                             <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                              Completed
+                              {i18n("completed1798b3b")}
                             </p>
                             <p className="mt-1 text-sm font-semibold" style={{ color: "var(--text)" }}>
                               {challenge.progress_summary.completed}
@@ -806,7 +813,7 @@ export function AdminChallenges() {
                           </div>
                           <div>
                             <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                              Avg progress
+                              {i18n("avgProgress026284f")}
                             </p>
                             <p className="mt-1 text-sm font-semibold" style={{ color: "var(--text)" }}>
                               {challenge.progress_summary.average_progress}
@@ -814,7 +821,7 @@ export function AdminChallenges() {
                           </div>
                           <div>
                             <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                              Completion rate
+                              {i18n("completionRatea360083")}
                             </p>
                             <p className="mt-1 text-sm font-semibold" style={{ color: "var(--text)" }}>
                               {(challenge.progress_summary.completion_rate * 100).toFixed(0)}%
@@ -832,52 +839,52 @@ export function AdminChallenges() {
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>
-                    Participation
+                    {i18n("participation74d2f1b")}
                   </p>
                   <h2 className="mt-2 text-2xl font-semibold" style={{ color: "var(--text)" }}>
-                    {selectedChallenge ? selectedChallenge.title : "Select a challenge"}
+                    {selectedChallenge ? selectedChallenge.title : i18n("selectAChallengeb534934")}
                   </h2>
                 </div>
                 {selectedChallenge ? (
                   <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", color: "var(--primary)" }}>
-                    Target {selectedChallenge.progress_summary.target}
+                    {i18n("target61ad50a")} {selectedChallenge.progress_summary.target}
                   </span>
                 ) : null}
               </div>
 
               {detailQuery.isPending && selectedChallengeId ? (
                 <p className="mt-5 text-sm" style={{ color: "var(--muted)" }}>
-                  Loading challenge detail...
+                  {i18n("loadingChallengeDetail675cf58")}
                 </p>
               ) : !selectedChallenge ? (
                 <p className="mt-5 rounded-2xl px-4 py-5 text-sm" style={{ background: "var(--panel-muted)", color: "var(--muted)" }}>
-                  Choose a challenge from the roster to inspect member and athlete progress.
+                  {i18n("chooseAChallengeFromTheRosterToInspect8e88bfd")}
                 </p>
               ) : (
                 <>
                   <div className="mt-5 grid gap-3 sm:grid-cols-4">
-                    {metricCard("Participants", selectedChallenge.progress_summary.participants)}
-                    {metricCard("Completed", selectedChallenge.progress_summary.completed)}
-                    {metricCard("Avg progress", selectedChallenge.progress_summary.average_progress)}
-                    {metricCard("Completion rate", `${(selectedChallenge.progress_summary.completion_rate * 100).toFixed(0)}%`)}
+                    {metricCard(i18n("participantscd56e08"), selectedChallenge.progress_summary.participants)}
+                    {metricCard(i18n("completed1798b3b"), selectedChallenge.progress_summary.completed)}
+                    {metricCard(i18n("avgProgress026284f"), selectedChallenge.progress_summary.average_progress)}
+                    {metricCard(i18n("completionRatea360083"), ((selectedChallenge.progress_summary.completion_rate * 100).toFixed(0)) + "%")}
                   </div>
 
                   <div className="mt-5 overflow-x-auto rounded-[1.4rem]" style={{ border: "1px solid var(--border)" }}>
                     <table className="min-w-full divide-y divide-[var(--border)] text-sm">
                       <thead style={{ background: "var(--panel-muted)", color: "var(--muted)" }}>
                         <tr>
-                          <th className="px-4 py-3 text-left font-semibold">User</th>
-                          <th className="px-4 py-3 text-left font-semibold">Role</th>
-                          <th className="px-4 py-3 text-left font-semibold">Progress</th>
-                          <th className="px-4 py-3 text-left font-semibold">Target</th>
+                          <th className="px-4 py-3 text-left font-semibold">{i18n("user9f8a238")}</th>
+                          <th className="px-4 py-3 text-left font-semibold">{i18n("rolec3f104d")}</th>
+                          <th className="px-4 py-3 text-left font-semibold">{i18n("progress1b90271")}</th>
+                          <th className="px-4 py-3 text-left font-semibold">{i18n("target61ad50a")}</th>
                           {selectedChallenge?.criteria_type === "custom" ? (
                             <>
-                              <th className="px-4 py-3 text-left font-semibold">Done</th>
-                              <th className="px-4 py-3 text-left font-semibold">Remaining</th>
+                              <th className="px-4 py-3 text-left font-semibold">{i18n("donee9b450d")}</th>
+                              <th className="px-4 py-3 text-left font-semibold">{i18n("remainingcc632b5")}</th>
                             </>
                           ) : null}
-                          <th className="px-4 py-3 text-left font-semibold">Completion</th>
-                          <th className="px-4 py-3 text-left font-semibold">Completed at</th>
+                          <th className="px-4 py-3 text-left font-semibold">{i18n("completion2ff2556")}</th>
+                          <th className="px-4 py-3 text-left font-semibold">{i18n("completedAt3cabb39")}</th>
                         </tr>
                       </thead>
                       <tbody style={{ background: "var(--panel)", color: "var(--text)" }}>
@@ -888,7 +895,7 @@ export function AdminChallenges() {
                               colSpan={selectedChallenge?.criteria_type === "custom" ? 8 : 6}
                               style={{ color: "var(--muted)" }}
                             >
-                              No members or athletes have registered progress for this challenge yet.
+                              {i18n("noMembersOrAthletesHaveRegisteredProgressFor68f49f1")}
                             </td>
                           </tr>
                         ) : (
@@ -918,7 +925,7 @@ export function AdminChallenges() {
                                       hour: "numeric",
                                       minute: "2-digit",
                                     }).format(new Date(participant.completed_at))
-                                  : "In progress"}
+                                  : i18n("inProgressb6bd42e")}
                               </td>
                             </tr>
                           ))

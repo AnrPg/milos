@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useState } from "react";
 
 import { ApiError } from "@/api/client";
@@ -15,6 +20,7 @@ type Props = {
 };
 
 export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
+  const i18n = useUiTranslations();
   const { tokens, signOut } = useSession();
   const [workout, setWorkout] = useState<WorkoutRecord | null>(null);
   const [athletes, setAthletes] = useState<AthleteOption[]>([]);
@@ -37,7 +43,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
         if (cancelled) return;
         setWorkout(nextWorkout);
         if (nextWorkout.status && nextWorkout.status !== "published") {
-          setError("Only published workouts can be assigned to athletes.");
+          setError(i18n("onlyPublishedWorkoutsCanBeAssignedToAthletes12a81f1"));
         }
       })
       .catch((requestError) => {
@@ -46,7 +52,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
           signOut();
           return;
         }
-        setError(requestError instanceof Error ? requestError.message : "Could not load workout.");
+        setError(requestError instanceof Error ? requestError.message : i18n("couldNotLoadWorkout548f9e9"));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -98,7 +104,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
       onAssigned();
       onClose();
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Could not assign workout.");
+      setError(requestError instanceof Error ? requestError.message : i18n("couldNotAssignWorkout58ad222"));
     } finally {
       setSaving(false);
     }
@@ -127,10 +133,10 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
         >
           <div className="min-w-0">
             <p className="truncate text-xs font-semibold uppercase tracking-[0.2em] text-[var(--primary)]">
-              Assign workout
+              {i18n("assignWorkout3e28a99")}
             </p>
             <h2 className="mt-0.5 truncate text-base font-bold" style={{ color: "var(--text)" }}>
-              {loading ? "Loading…" : (workout?.title ?? "Untitled workout")}
+              {loading ? i18n("loading33ce417") : (workout?.title ?? i18n("untitledWorkouta1885a5"))}
             </h2>
           </div>
           <button
@@ -139,7 +145,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
             onClick={onClose}
             type="button"
           >
-            Close ✕
+            {i18n("closefeb3e25")}
           </button>
         </div>
 
@@ -166,12 +172,12 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
               <div className="space-y-1">
                 {workout.sections.map((section) => (
                   <div
-                    key={section.id ?? `${workout.id}-${section.order}`}
+                    key={section.id ?? (workout.id) + "-" + (section.order)}
                     className="flex items-center justify-between gap-3"
                   >
                     <span className="text-sm" style={{ color: "var(--text)" }}>{section.name}</span>
                     <span className="text-xs" style={{ color: "var(--dim)" }}>
-                      {section.exercises.length} exercises
+                      {section.exercises.length} {i18n("exercises0ee6e81")}
                     </span>
                   </div>
                 ))}
@@ -182,7 +188,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
           {/* Date */}
           <label className="block">
             <span className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
-              Date
+              {i18n("dateeb9a4bc")}
             </span>
             <input
               className="mt-2 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
@@ -196,13 +202,13 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
           {/* Athlete search */}
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
-              Athletes
+              {i18n("athletesda22204")}
               {selectedIds.length > 0 ? (
                 <span
                   className="ml-2 rounded-full px-1.5 py-0.5 text-[10px]"
                   style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                 >
-                  {selectedIds.length} selected
+                  {selectedIds.length} {i18n("selected835f3b5")}
                 </span>
               ) : null}
             </p>
@@ -213,7 +219,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
                 setAthletesLoading(true);
                 setQuery(e.target.value);
               }}
-              placeholder="Search by nickname"
+              placeholder={i18n("searchByNicknameac5a7b7")}
               value={query}
             />
 
@@ -240,7 +246,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
                   >
                     <span className="font-semibold">{athlete.nickname}</span>
                     <span className="text-xs uppercase tracking-[0.18em]">
-                      {selected ? "Selected" : "Add"}
+                      {selected ? i18n("selected9a976fc") : i18n("add61cc55a")}
                     </span>
                   </button>
                 );
@@ -250,7 +256,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
                   className="rounded-[1rem] px-4 py-4 text-sm"
                   style={{ border: "1px dashed var(--border)", color: "var(--dim)" }}
                 >
-                  No athletes matched that search.
+                  {i18n("noAthletesMatchedThatSearchd4f2c56")}
                 </p>
               ) : null}
             </div>
@@ -259,7 +265,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
           {/* Admin notes */}
           <label className="block">
             <span className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
-              Admin notes
+              {i18n("adminNotesdff73a2")}
             </span>
             <textarea
               className="mt-2 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
@@ -271,7 +277,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
                 resize: "vertical",
               }}
               onChange={(e) => setAdminNotes(e.target.value)}
-              placeholder="Optional programming context or cues"
+              placeholder={i18n("optionalProgrammingContextOrCuesa25eaae")}
               value={adminNotes}
             />
           </label>
@@ -290,10 +296,10 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
             type="button"
           >
             {saving
-              ? "Assigning…"
+              ? i18n("assigning4d16a1a")
               : selectedIds.length === 0
-                ? "Select athletes to assign"
-                : `Assign to ${selectedIds.length} athlete${selectedIds.length === 1 ? "" : "s"}`}
+                ? i18n("selectAthletesToAssign1666500")
+                : i18n("assignTocc79072") + (selectedIds.length) + " athlete" + (selectedIds.length === 1 ? "" : "s")}
           </button>
         </div>
       </div>

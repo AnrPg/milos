@@ -1,5 +1,8 @@
 "use client";
 
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getPRHistory, type PRRecord, type PRUnit } from "@/api/gamification";
@@ -16,6 +19,7 @@ function formatScore(score: number, unit: PRUnit): string {
 }
 
 export function PRHistoryModal({ pr, onClose }: { pr: PRRecord; onClose: () => void }) {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
 
   const historyQuery = useQuery({
@@ -42,7 +46,7 @@ export function PRHistoryModal({ pr, onClose }: { pr: PRRecord; onClose: () => v
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>PR History</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{i18n("prHistoryf17c6df")}</p>
             <h2 className="mt-1 text-xl font-semibold" style={{ color: "var(--text)" }}>{pr.name}</h2>
           </div>
           <button type="button" onClick={onClose} className="text-xl font-light shrink-0" style={{ color: "var(--dim)" }}>✕</button>
@@ -50,9 +54,9 @@ export function PRHistoryModal({ pr, onClose }: { pr: PRRecord; onClose: () => v
 
         <div className="mt-5 space-y-2">
           {historyQuery.isPending ? (
-            <p className="text-sm" style={{ color: "var(--dim)" }}>Loading…</p>
+            <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
           ) : historyQuery.data?.length === 0 ? (
-            <p className="text-sm" style={{ color: "var(--dim)" }}>No history recorded yet.</p>
+            <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("noHistoryRecordedYetebab110")}</p>
           ) : (
             historyQuery.data?.map((entry) => (
               <div

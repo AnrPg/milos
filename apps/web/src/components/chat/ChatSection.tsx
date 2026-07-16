@@ -1,5 +1,9 @@
 "use client";
 
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 
 import { getOrCreateContextThread, type ChatThread, type MessageType } from "@/api/messaging";
@@ -25,6 +29,7 @@ export function ChatSection({
   readOnly = false,
   participantNicknames = {},
 }: ChatSectionProps) {
+  const i18n = useUiTranslations();
   const { tokens, currentUser } = useSession();
   const accessToken = tokens?.access_token ?? null;
   const currentUserId = currentUser?.id ?? null;
@@ -88,7 +93,7 @@ export function ChatSection({
         style={{ background: "var(--panel-muted)" }}
       >
         <span className="text-sm font-medium" style={{ color: "var(--text-soft)" }}>
-          Conversation
+          {i18n("conversation2a20c75")}
         </span>
         <span style={{ color: "var(--dim)" }}>{isExpanded ? "▲" : "▼"}</span>
       </button>
@@ -101,7 +106,7 @@ export function ChatSection({
           >
             {(threadLoading || isLoading) && (
               <p className="text-xs text-center" style={{ color: "var(--dim)" }}>
-                Loading…
+                {i18n("loading33ce417")}
               </p>
             )}
             {messages.map((msg) => (
@@ -125,7 +130,7 @@ export function ChatSection({
                 type="text"
                 className="flex-1 rounded-[1rem] px-3 py-2 text-sm outline-none"
                 style={{ background: "var(--card)", color: "var(--text)", border: "1px solid var(--border-strong)" }}
-                placeholder="Write a message…"
+                placeholder={i18n("writeAMessage24bf2a3")}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onFocus={sendTypingStart}
@@ -144,7 +149,7 @@ export function ChatSection({
                 className="rounded-full px-3 py-2 text-xs font-semibold"
                 style={{ background: "var(--primary)", color: "var(--primary-contrast)", opacity: input.trim() ? 1 : 0.4 }}
               >
-                Send
+                {i18n("send9bc2575")}
               </button>
             </div>
           )}

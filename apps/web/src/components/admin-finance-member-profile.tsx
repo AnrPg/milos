@@ -1,5 +1,11 @@
 "use client";
 
+
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -48,6 +54,7 @@ function euroInputValue(cents: unknown) {
 }
 
 export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const queryClient = useQueryClient();
   const token = tokens?.access_token;
@@ -348,24 +355,24 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
     <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-6xl space-y-6">
         <Link className="text-sm font-bold text-[var(--primary)]" href="/admin/finance">
-          Back to finance
+          {i18n("backToFinance2de0820")}
         </Link>
         <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--panel)] p-8">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">Member finance profile</p>
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">{i18n("memberFinanceProfile6f16152")}</p>
           <h1 className="mt-3 break-all text-3xl font-black md:text-4xl">{userId}</h1>
           <p className="mt-2 text-sm text-[var(--muted)]">
-            Status {field(membership, "status", "no membership")} · Type {field(membership, "user_type_snapshot", "unknown")}
+            {i18n("statusbae7d5b")} {field(membership, "status", i18n("noMembershipb174349"))} {i18n("type3d87766")} {field(membership, "user_type_snapshot", "unknown")}
           </p>
           <div className="mt-5 inline-flex rounded-full bg-[var(--text)] px-5 py-3 text-sm font-black text-[var(--primary-contrast)]">
-            Available credit {money(creditBalance)}
+            {i18n("availableCredit245f0e1")} {money(creditBalance)}
           </div>
           <div className="mt-3 inline-flex rounded-full bg-[color-mix(in_srgb,var(--success)_18%,transparent)] px-5 py-3 text-sm font-black text-[var(--success)]">
-            Entitlement {field(entitlement, "status", "inactive")} · {field(entitlement, "source", "not evaluated")}
+            {i18n("entitlement8994749")} {field(entitlement, "status", "inactive")} · {field(entitlement, "source", i18n("notEvaluated4bb5e31"))}
           </div>
         </section>
 
         <section className="grid gap-6 xl:grid-cols-2">
-          <Panel title="Membership profile">
+          <Panel title={i18n("membershipProfile57ffeba")}>
             <form
               className="space-y-3"
               onSubmit={(event) => {
@@ -374,7 +381,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
               }}
             >
               <Select
-                label="User type"
+                label={i18n("userType0bea7a8")}
                 value={membershipForm.user_type_snapshot}
                 options={["member", "athlete"]}
                 onChange={(user_type_snapshot) =>
@@ -382,27 +389,27 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 }
               />
               <Select
-                label="Status"
+                label={i18n("statusbae7d5b")}
                 value={membershipForm.status}
                 options={["active", "expiring", "expired", "cancelled", "paused", "trial", "comped"]}
                 onChange={(status) => setMembershipOverrides({ ...membershipOverrides, status })}
               />
               <Select
-                label="Signup source"
+                label={i18n("signupSource69d3a02")}
                 value={membershipForm.signup_source}
                 options={["direct", "referral", "promo", "admin_created", "migrated", "imported"]}
                 onChange={(signup_source) => setMembershipOverrides({ ...membershipOverrides, signup_source })}
               />
               <div className="grid gap-3 md:grid-cols-2">
                 <Input
-                  label="Starts on"
+                  label={i18n("startsOn6d888f7")}
                   required={false}
                   type="date"
                   value={membershipForm.starts_on}
                   onChange={(starts_on) => setMembershipOverrides({ ...membershipOverrides, starts_on })}
                 />
                 <Input
-                  label="Expires on"
+                  label={i18n("expiresOn549cabe")}
                   required={false}
                   type="date"
                   value={membershipForm.expires_on}
@@ -410,17 +417,17 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 />
               </div>
               <Input
-                label="Notes"
+                label={i18n("notes7044004")}
                 required={false}
                 value={membershipForm.notes}
                 onChange={(notes) => setMembershipOverrides({ ...membershipOverrides, notes })}
               />
-              <SubmitButton pending={updateMembershipMutation.isPending}>Save membership</SubmitButton>
+              <SubmitButton pending={updateMembershipMutation.isPending}>{i18n("saveMembership592a509")}</SubmitButton>
               <ErrorText error={updateMembershipMutation.error} />
             </form>
           </Panel>
 
-          <Panel title="Assign package">
+          <Panel title={i18n("assignPackage37b3330")}>
             <form
               className="space-y-3"
               onSubmit={(event) => {
@@ -429,22 +436,22 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
               }}
             >
               <Select
-                label="Package"
+                label={i18n("package7431e3d")}
                 value={assignmentForm.membership_package_id}
                 options={activePackages.map((item) => field(item, "id"))}
                 optionLabel={(id) => field(activePackages.find((item) => field(item, "id") === id), "name", id)}
                 onChange={(membership_package_id) => setAssignmentForm({ ...assignmentForm, membership_package_id })}
               />
               <div className="grid gap-3 md:grid-cols-2">
-                <Input label="Starts on" required={false} type="date" value={assignmentForm.starts_on} onChange={(starts_on) => setAssignmentForm({ ...assignmentForm, starts_on })} />
-                <Input label="Ends on" required={false} type="date" value={assignmentForm.ends_on} onChange={(ends_on) => setAssignmentForm({ ...assignmentForm, ends_on })} />
+                <Input label={i18n("startsOn6d888f7")} required={false} type="date" value={assignmentForm.starts_on} onChange={(starts_on) => setAssignmentForm({ ...assignmentForm, starts_on })} />
+                <Input label={i18n("endsOn5c262f3")} required={false} type="date" value={assignmentForm.ends_on} onChange={(ends_on) => setAssignmentForm({ ...assignmentForm, ends_on })} />
               </div>
-              <SubmitButton pending={assignPackageMutation.isPending}>Assign package</SubmitButton>
+              <SubmitButton pending={assignPackageMutation.isPending}>{i18n("assignPackage37b3330")}</SubmitButton>
               <ErrorText error={assignPackageMutation.error} />
             </form>
           </Panel>
 
-          <Panel title="Record payment">
+          <Panel title={i18n("recordPayment86e5632")}>
             <form
               className="space-y-3"
               onSubmit={(event) => {
@@ -452,27 +459,27 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 recordPaymentMutation.mutate();
               }}
             >
-              <Input label="Amount in EUR" type="number" value={paymentForm.amount} onChange={(amount) => setPaymentForm({ ...paymentForm, amount })} />
+              <Input label={i18n("amountInEure238d40")} type="number" value={paymentForm.amount} onChange={(amount) => setPaymentForm({ ...paymentForm, amount })} />
               <Select
-                label="Payment method"
+                label={i18n("paymentMethod0e55fb3")}
                 value={paymentForm.payment_method}
                 options={["cash", "bank_transfer", "card_manual", "other"]}
                 onChange={(payment_method) => setPaymentForm({ ...paymentForm, payment_method })}
               />
               <Select
-                label="Payment status"
+                label={i18n("paymentStatus9dfea40")}
                 value={paymentForm.payment_status}
                 options={["paid", "pending", "refunded", "failed", "waived"]}
                 onChange={(payment_status) => setPaymentForm({ ...paymentForm, payment_status })}
               />
-              <Input label="Paid on" required={false} type="date" value={paymentForm.paid_on} onChange={(paid_on) => setPaymentForm({ ...paymentForm, paid_on })} />
+              <Input label={i18n("paidOnfca3213")} required={false} type="date" value={paymentForm.paid_on} onChange={(paid_on) => setPaymentForm({ ...paymentForm, paid_on })} />
               <Select
-                label="Invoice"
+                label={i18n("invoicef9f3881")}
                 value={paymentForm.finance_invoice_id}
                 options={payableInvoices.map((invoice) => field(invoice, "id"))}
                 optionLabel={(id) => {
                   const invoice = payableInvoices.find((item) => field(item, "id") === id);
-                  return `${field(invoice, "invoice_number", id)} · due ${money(invoice?.balance_due_cents)}`;
+                  return (field(invoice, "invoice_number", id)) + i18n("due6e49fc0") + (money(invoice?.balance_due_cents));
                 }}
                 required={false}
                 onChange={(finance_invoice_id) => {
@@ -487,13 +494,13 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                   });
                 }}
               />
-              <Input label="Notes" required={false} value={paymentForm.notes} onChange={(notes) => setPaymentForm({ ...paymentForm, notes })} />
-              <SubmitButton pending={recordPaymentMutation.isPending}>Record payment</SubmitButton>
+              <Input label={i18n("notes7044004")} required={false} value={paymentForm.notes} onChange={(notes) => setPaymentForm({ ...paymentForm, notes })} />
+              <SubmitButton pending={recordPaymentMutation.isPending}>{i18n("recordPayment86e5632")}</SubmitButton>
               <ErrorText error={recordPaymentMutation.error} />
             </form>
           </Panel>
 
-          <Panel title="Create invoice">
+          <Panel title={i18n("createInvoicea0567cf")}>
             <form
               className="space-y-3"
               onSubmit={(event) => {
@@ -501,14 +508,14 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 createInvoiceMutation.mutate();
               }}
             >
-              <Input label="Amount in EUR" type="number" value={invoiceForm.amount} onChange={(amount) => setInvoiceForm({ ...invoiceForm, amount })} />
+              <Input label={i18n("amountInEure238d40")} type="number" value={invoiceForm.amount} onChange={(amount) => setInvoiceForm({ ...invoiceForm, amount })} />
               <Select
-                label="Package subscription"
+                label={i18n("packageSubscriptionbf929b7")}
                 value={invoiceForm.membership_package_subscription_id}
                 options={packageSubscriptions.map((subscription) => field(subscription, "id"))}
                 optionLabel={(id) => {
                   const subscription = packageSubscriptions.find((item) => field(item, "id") === id);
-                  return `${field(subscription, "package_code_snapshot", id)} · ${money(subscription?.price_cents_snapshot)}`;
+                  return (field(subscription, "package_code_snapshot", id)) + " · " + (money(subscription?.price_cents_snapshot));
                 }}
                 required={false}
                 onChange={(membership_package_subscription_id) => {
@@ -523,22 +530,22 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                     ...invoiceForm,
                     membership_package_subscription_id,
                     amount: priceCents !== null ? euroInputValue(priceCents) : invoiceForm.amount,
-                    description: code ? `Package: ${code}` : invoiceForm.description,
+                    description: code ? i18n("package5544677") + (code) : invoiceForm.description,
                   });
                 }}
               />
-              <Input label="Description" value={invoiceForm.description} onChange={(description) => setInvoiceForm({ ...invoiceForm, description })} />
-              <Input label="Due date" required={false} type="date" value={invoiceForm.due_date} onChange={(due_date) => setInvoiceForm({ ...invoiceForm, due_date })} />
+              <Input label={i18n("description55f8ebc")} value={invoiceForm.description} onChange={(description) => setInvoiceForm({ ...invoiceForm, description })} />
+              <Input label={i18n("dueDate4c1aeeb")} required={false} type="date" value={invoiceForm.due_date} onChange={(due_date) => setInvoiceForm({ ...invoiceForm, due_date })} />
               <div className="grid gap-3 md:grid-cols-2">
-                <Input label="Service starts" required={false} type="date" value={invoiceForm.service_period_start} onChange={(service_period_start) => setInvoiceForm({ ...invoiceForm, service_period_start })} />
-                <Input label="Service ends" required={false} type="date" value={invoiceForm.service_period_end} onChange={(service_period_end) => setInvoiceForm({ ...invoiceForm, service_period_end })} />
+                <Input label={i18n("serviceStarts2bacd5f")} required={false} type="date" value={invoiceForm.service_period_start} onChange={(service_period_start) => setInvoiceForm({ ...invoiceForm, service_period_start })} />
+                <Input label={i18n("serviceEnds3f37b6c")} required={false} type="date" value={invoiceForm.service_period_end} onChange={(service_period_end) => setInvoiceForm({ ...invoiceForm, service_period_end })} />
               </div>
-              <SubmitButton pending={createInvoiceMutation.isPending}>Create draft invoice</SubmitButton>
+              <SubmitButton pending={createInvoiceMutation.isPending}>{i18n("createDraftInvoice1ef1fa2")}</SubmitButton>
               <ErrorText error={createInvoiceMutation.error} />
             </form>
           </Panel>
 
-          <Panel title="Generate renewal invoice">
+          <Panel title={i18n("generateRenewalInvoice9242ec6")}>
             <form
               className="space-y-3"
               onSubmit={(event) => {
@@ -547,27 +554,27 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
               }}
             >
               <Select
-                label="Package subscription"
+                label={i18n("packageSubscriptionbf929b7")}
                 value={renewalForm.membership_package_subscription_id}
                 options={renewableSubscriptions.map((subscription) => field(subscription, "id"))}
                 optionLabel={(id) => {
                   const subscription = renewableSubscriptions.find((item) => field(item, "id") === id);
-                  return `${field(subscription, "package_code_snapshot", id)} · ${money(subscription?.price_cents_snapshot)}`;
+                  return (field(subscription, "package_code_snapshot", id)) + " · " + (money(subscription?.price_cents_snapshot));
                 }}
                 required={false}
                 onChange={(membership_package_subscription_id) =>
                   setRenewalForm({ ...renewalForm, membership_package_subscription_id })
                 }
               />
-              <Input label="Period starts" required={false} type="date" value={renewalForm.service_period_start} onChange={(service_period_start) => setRenewalForm({ ...renewalForm, service_period_start })} />
-              <Input label="Custom period ends" required={customRenewal} type="date" value={renewalForm.service_period_end} onChange={(service_period_end) => setRenewalForm({ ...renewalForm, service_period_end })} />
-              <Input label="Due date" required={false} type="date" value={renewalForm.due_date} onChange={(due_date) => setRenewalForm({ ...renewalForm, due_date })} />
-              <SubmitButton pending={renewalInvoiceMutation.isPending}>Generate renewal invoice</SubmitButton>
+              <Input label={i18n("periodStarts631c384")} required={false} type="date" value={renewalForm.service_period_start} onChange={(service_period_start) => setRenewalForm({ ...renewalForm, service_period_start })} />
+              <Input label={i18n("customPeriodEndsece7b1c")} required={customRenewal} type="date" value={renewalForm.service_period_end} onChange={(service_period_end) => setRenewalForm({ ...renewalForm, service_period_end })} />
+              <Input label={i18n("dueDate4c1aeeb")} required={false} type="date" value={renewalForm.due_date} onChange={(due_date) => setRenewalForm({ ...renewalForm, due_date })} />
+              <SubmitButton pending={renewalInvoiceMutation.isPending}>{i18n("generateRenewalInvoice9242ec6")}</SubmitButton>
               <ErrorText error={renewalInvoiceMutation.error} />
             </form>
           </Panel>
 
-          <Panel title="Redeem promotion">
+          <Panel title={i18n("redeemPromotiona0fb02e")}>
             <form
               className="space-y-3"
               onSubmit={(event) => {
@@ -576,7 +583,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
               }}
             >
               <Select
-                label="Campaign"
+                label={i18n("campaign69390e1")}
                 value={redemptionForm.promotion_campaign_id}
                 options={campaigns.map((campaign) => field(campaign, "id"))}
                 optionLabel={(id) => field(campaigns.find((campaign) => field(campaign, "id") === id), "name", id)}
@@ -585,7 +592,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 }
               />
               <Select
-                label="Promotion code"
+                label={i18n("promotionCode392b639")}
                 value={redemptionForm.promotion_code}
                 options={codes.map((code) => field(code, "code"))}
                 optionLabel={(code) => code}
@@ -593,13 +600,13 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 onChange={(promotion_code) => setRedemptionForm({ ...redemptionForm, promotion_code })}
               />
               <SubmitButton pending={redeemMutation.isPending} disabled={!redemptionForm.promotion_code}>
-                Redeem promotion
+                {i18n("redeemPromotiona0fb02e")}
               </SubmitButton>
               <ErrorText error={redeemMutation.error} />
             </form>
           </Panel>
 
-          <Panel title="Grant manual credit">
+          <Panel title={i18n("grantManualCreditfa7b548")}>
             <form
               className="space-y-3"
               onSubmit={(event) => {
@@ -608,23 +615,23 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
               }}
             >
               <Input
-                label="Credit amount in EUR"
+                label={i18n("creditAmountInEur4d8a0bf")}
                 type="number"
                 value={creditForm.amount}
                 onChange={(amount) => setCreditForm({ ...creditForm, amount })}
               />
               <Input
-                label="Description"
+                label={i18n("description55f8ebc")}
                 required={false}
                 value={creditForm.description}
                 onChange={(description) => setCreditForm({ ...creditForm, description })}
               />
-              <SubmitButton pending={createCreditMutation.isPending}>Grant credit</SubmitButton>
+              <SubmitButton pending={createCreditMutation.isPending}>{i18n("grantCredit5abca43")}</SubmitButton>
               <ErrorText error={createCreditMutation.error} />
             </form>
           </Panel>
 
-          <Panel title="Apply credit to payment">
+          <Panel title={i18n("applyCreditToPaymente722003")}>
             <form
               className="space-y-3"
               onSubmit={(event) => {
@@ -633,27 +640,27 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
               }}
             >
               <p className="rounded-2xl bg-[var(--panel)] p-4 text-sm font-bold text-[var(--muted)]">
-                Available credit: {money(creditBalance)}
+                {i18n("availableCreditcca6998")} {money(creditBalance)}
               </p>
               <Select
-                label="Payment"
+                label={i18n("paymentb41a92b")}
                 value={applyCreditForm.payment_id}
                 options={creditablePayments.map((payment) => field(payment, "id"))}
                 optionLabel={(id) => {
                   const payment = creditablePayments.find((item) => field(item, "id") === id);
-                  return `${money(payment?.amount_cents)} · ${field(payment, "payment_status", "payment")}`;
+                  return (money(payment?.amount_cents)) + " · " + (field(payment, "payment_status", "payment"));
                 }}
                 disabled={creditablePayments.length === 0 || creditBalance <= 0}
                 onChange={(payment_id) => setApplyCreditForm({ ...applyCreditForm, payment_id })}
               />
               <Input
-                label="Credit amount in EUR"
+                label={i18n("creditAmountInEur4d8a0bf")}
                 type="number"
                 value={applyCreditForm.amount}
                 onChange={(amount) => setApplyCreditForm({ ...applyCreditForm, amount })}
               />
               <Input
-                label="Description"
+                label={i18n("description55f8ebc")}
                 required={false}
                 value={applyCreditForm.description}
                 onChange={(description) => setApplyCreditForm({ ...applyCreditForm, description })}
@@ -662,13 +669,13 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 pending={applyCreditMutation.isPending}
                 disabled={!applyCreditForm.payment_id || creditBalance <= 0}
               >
-                Apply credit
+                {i18n("applyCredita939533")}
               </SubmitButton>
               <ErrorText error={applyCreditMutation.error} />
             </form>
           </Panel>
 
-          <Panel title="Apply credit to invoice">
+          <Panel title={i18n("applyCreditToInvoicef94ae1a")}>
             <form
               className="space-y-3"
               onSubmit={(event) => {
@@ -677,27 +684,27 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
               }}
             >
               <p className="rounded-2xl bg-[var(--panel)] p-4 text-sm font-bold text-[var(--muted)]">
-                Available credit: {money(creditBalance)}
+                {i18n("availableCreditcca6998")} {money(creditBalance)}
               </p>
               <Select
-                label="Invoice"
+                label={i18n("invoicef9f3881")}
                 value={applyInvoiceCreditForm.invoice_id}
                 options={invoices.map((invoice) => field(invoice, "id"))}
                 optionLabel={(id) => {
                   const invoice = invoices.find((item) => field(item, "id") === id);
-                  return `${field(invoice, "invoice_number", id)} · due ${money(invoice?.balance_due_cents)}`;
+                  return (field(invoice, "invoice_number", id)) + i18n("due6e49fc0") + (money(invoice?.balance_due_cents));
                 }}
                 disabled={invoices.length === 0 || creditBalance <= 0}
                 onChange={(invoice_id) => setApplyInvoiceCreditForm({ ...applyInvoiceCreditForm, invoice_id })}
               />
               <Input
-                label="Credit amount in EUR"
+                label={i18n("creditAmountInEur4d8a0bf")}
                 type="number"
                 value={applyInvoiceCreditForm.amount}
                 onChange={(amount) => setApplyInvoiceCreditForm({ ...applyInvoiceCreditForm, amount })}
               />
               <Input
-                label="Description"
+                label={i18n("description55f8ebc")}
                 required={false}
                 value={applyInvoiceCreditForm.description}
                 onChange={(description) => setApplyInvoiceCreditForm({ ...applyInvoiceCreditForm, description })}
@@ -706,13 +713,13 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 pending={applyInvoiceCreditMutation.isPending}
                 disabled={!applyInvoiceCreditForm.invoice_id || creditBalance <= 0}
               >
-                Apply credit to invoice
+                {i18n("applyCreditToInvoicef94ae1a")}
               </SubmitButton>
               <ErrorText error={applyInvoiceCreditMutation.error} />
             </form>
           </Panel>
 
-          <Panel title="Refund or reverse payment">
+          <Panel title={i18n("refundOrReversePayment9d232b2")}>
             <form
               className="space-y-3"
               onSubmit={(event) => {
@@ -721,12 +728,12 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
               }}
             >
               <Select
-                label="Payment"
+                label={i18n("paymentb41a92b")}
                 value={paymentReversalForm.payment_id}
                 options={reversiblePayments.map((payment) => field(payment, "id"))}
                 optionLabel={(id) => {
                   const payment = reversiblePayments.find((item) => field(item, "id") === id);
-                  return `${money(payment?.net_amount_cents)} remaining · ${field(payment, "payment_method", "payment")}`;
+                  return (money(payment?.net_amount_cents)) + i18n("remainingd475cb2") + (field(payment, "payment_method", "payment"));
                 }}
                 disabled={reversiblePayments.length === 0}
                 onChange={(payment_id) => {
@@ -739,25 +746,25 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 }}
               />
               <Input
-                label="Refund amount in EUR"
+                label={i18n("refundAmountInEuraa86270")}
                 type="number"
                 value={paymentReversalForm.amount}
                 onChange={(amount) => setPaymentReversalForm({ ...paymentReversalForm, amount })}
               />
               <Input
-                label="Reason"
+                label={i18n("reasonf219cc0")}
                 required={false}
                 value={paymentReversalForm.reason}
                 onChange={(reason) => setPaymentReversalForm({ ...paymentReversalForm, reason })}
               />
               <SubmitButton pending={reversePaymentMutation.isPending} disabled={!paymentReversalForm.payment_id}>
-                Record refund
+                {i18n("recordRefundc86cbda")}
               </SubmitButton>
               <ErrorText error={reversePaymentMutation.error} />
             </form>
           </Panel>
 
-          <Panel title="Restore applied credit">
+          <Panel title={i18n("restoreAppliedCredit2444b29")}>
             <form
               className="space-y-3"
               onSubmit={(event) => {
@@ -766,12 +773,12 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
               }}
             >
               <Select
-                label="Credit entry"
+                label={i18n("creditEntryb1266d7")}
                 value={creditReversalForm.credit_ledger_entry_id}
                 options={reversibleCreditEntries.map((entry) => field(entry, "id"))}
                 optionLabel={(id) => {
                   const entry = reversibleCreditEntries.find((item) => field(item, "id") === id);
-                  return `${money(entry?.remaining_reversible_cents)} remaining · ${field(entry, "entry_type", "credit")}`;
+                  return (money(entry?.remaining_reversible_cents)) + i18n("remainingd475cb2") + (field(entry, "entry_type", "credit"));
                 }}
                 disabled={reversibleCreditEntries.length === 0}
                 onChange={(credit_ledger_entry_id) => {
@@ -784,19 +791,19 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 }}
               />
               <Input
-                label="Credit to restore in EUR"
+                label={i18n("creditToRestoreInEurdf3aed1")}
                 type="number"
                 value={creditReversalForm.amount}
                 onChange={(amount) => setCreditReversalForm({ ...creditReversalForm, amount })}
               />
               <Input
-                label="Reason"
+                label={i18n("reasonf219cc0")}
                 required={false}
                 value={creditReversalForm.reason}
                 onChange={(reason) => setCreditReversalForm({ ...creditReversalForm, reason })}
               />
               <SubmitButton pending={reverseCreditMutation.isPending} disabled={!creditReversalForm.credit_ledger_entry_id}>
-                Restore credit
+                {i18n("restoreCredit479133c")}
               </SubmitButton>
               <ErrorText error={reverseCreditMutation.error} />
             </form>
@@ -813,11 +820,11 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
             onVoid={(id) => voidInvoiceMutation.mutate(id)}
             onRefresh={invalidateMember}
           />
-          <History title="Package subscriptions" rows={memberQuery.data?.package_subscriptions ?? []} primary="package_code_snapshot" secondary="status" />
-          <History title="Payments" rows={memberQuery.data?.payments ?? []} primary="payment_status" secondary="amount_cents" moneySecondary />
-          <History title="Payment reversals" rows={memberQuery.data?.payment_reversals ?? []} primary="reversal_type" secondary="amount_cents" moneySecondary />
-          <History title="Promo redemptions" rows={memberQuery.data?.promotion_redemptions ?? []} primary="discount_type_snapshot" secondary="discount_value_snapshot" />
-          <History title="Credit ledger" rows={creditLedgerEntries} primary="entry_type" secondary="amount_cents" moneySecondary />
+          <History title={i18n("packageSubscriptions09a33f1")} rows={memberQuery.data?.package_subscriptions ?? []} primary="package_code_snapshot" secondary="status" />
+          <History title={i18n("payments44357ae")} rows={memberQuery.data?.payments ?? []} primary="payment_status" secondary="amount_cents" moneySecondary />
+          <History title={i18n("paymentReversals0f3a7be")} rows={memberQuery.data?.payment_reversals ?? []} primary="reversal_type" secondary="amount_cents" moneySecondary />
+          <History title={i18n("promoRedemptions7408919")} rows={memberQuery.data?.promotion_redemptions ?? []} primary="discount_type_snapshot" secondary="discount_value_snapshot" />
+          <History title={i18n("creditLedgerc2e8688")} rows={creditLedgerEntries} primary="entry_type" secondary="amount_cents" moneySecondary />
         </section>
       </div>
     </main>
@@ -846,6 +853,7 @@ function Input({
   required?: boolean;
   type?: string;
 }) {
+  const i18n = useUiTranslations();
   return (
     <label className="block space-y-1 text-sm font-semibold">
       <span>{label}</span>
@@ -877,6 +885,7 @@ function Select({
   disabled?: boolean;
   required?: boolean;
 }) {
+  const i18n = useUiTranslations();
   return (
     <label className="block space-y-1 text-sm font-semibold">
       <span>{label}</span>
@@ -888,7 +897,7 @@ function Select({
         onChange={(event) => onChange(event.target.value)}
       >
         <option value="" disabled={required}>
-          {required ? `Select ${label.toLowerCase()}` : `No ${label.toLowerCase()}`}
+          {required ? i18n("select8598222") + (label.toLowerCase()) : i18n("no816c52f") + (label.toLowerCase())}
         </option>
         {options.map((option) => (
           <option key={option} value={option}>
@@ -917,11 +926,12 @@ function InvoiceHistory({
   onVoid: (id: string) => void;
   onRefresh: () => void;
 }) {
+  const i18n = useUiTranslations();
   return (
     <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--panel)] p-6 xl:col-span-4">
-      <h2 className="text-xl font-black">Invoices</h2>
+      <h2 className="text-xl font-black">{i18n("invoices35f8f37")}</h2>
       <div className="mt-4 grid gap-3 md:grid-cols-2">
-        {rows.length === 0 ? <p className="text-sm text-[var(--muted)]">No invoices.</p> : null}
+        {rows.length === 0 ? <p className="text-sm text-[var(--muted)]">{i18n("noInvoicesacd181b")}</p> : null}
         {rows.map((row) => {
           const id = field(row, "id");
           const status = field(row, "status");
@@ -932,10 +942,10 @@ function InvoiceHistory({
                 <div>
                   <p className="font-black">{field(row, "invoice_number", id)}</p>
                   <p className="text-sm text-[var(--muted)]">
-                    {status} · total {money(row.total_cents)} · due {money(row.balance_due_cents)}
+                    {status} {i18n("totald6cf831")} {money(row.total_cents)} {i18n("due6e49fc0")} {money(row.balance_due_cents)}
                   </p>
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--primary)]">
-                    due {field(row, "due_date", "not set")}
+                    {i18n("due30cdf73")} {field(row, "due_date", i18n("notSetef374c5"))}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -946,7 +956,7 @@ function InvoiceHistory({
                       type="button"
                       onClick={() => onIssue(id)}
                     >
-                      Issue
+                      {i18n("issue73781a1")}
                     </button>
                   ) : null}
                   {status !== "void" && status !== "paid" ? (
@@ -956,7 +966,7 @@ function InvoiceHistory({
                       type="button"
                       onClick={() => onVoid(id)}
                     >
-                      Void
+                      {i18n("void207c7c0")}
                     </button>
                   ) : null}
                 </div>
@@ -979,6 +989,7 @@ function InvoiceFileActions({
   token: string;
   onRefresh: () => void;
 }) {
+  const i18n = useUiTranslations();
   const invoiceId = field(invoice, "id");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -1009,10 +1020,10 @@ function InvoiceFileActions({
         headers: { "Content-Type": content_type },
         body: file,
       });
-      if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
+      if (!res.ok) throw new Error(i18n("uploadFailed7c67e1c") + (res.status));
       onRefresh();
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : "Upload failed");
+      setUploadError(err instanceof Error ? err.message : i18n("uploadFailedad0d060"));
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -1046,7 +1057,7 @@ function InvoiceFileActions({
       setEditing(false);
       onRefresh();
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : "Save failed");
+      setSaveError(err instanceof Error ? err.message : i18n("saveFailed0a44446"));
     } finally {
       setSaving(false);
     }
@@ -1060,18 +1071,18 @@ function InvoiceFileActions({
           {field(invoice, "notes") ? (
             <p className="text-sm font-semibold text-[var(--text)]">{field(invoice, "notes")}</p>
           ) : (
-            <p className="text-xs italic text-[var(--dim)]">No description</p>
+            <p className="text-xs italic text-[var(--dim)]">{i18n("noDescriptionf354c94")}</p>
           )}
           <div className="flex items-center justify-between">
             <p className="text-xs font-medium text-[var(--primary)]">
-              Due: {field(invoice, "due_date") || "not set"}
+              {i18n("due7513f96")} {field(invoice, "due_date") || i18n("notSetef374c5")}
             </p>
             <button
               type="button"
               onClick={() => { setEditing(true); setSaveError(null); }}
               className="text-xs text-[var(--muted)] hover:text-[var(--text)] transition-colors"
             >
-              Edit
+              {i18n("edit5301648")}
             </button>
           </div>
         </div>
@@ -1082,19 +1093,19 @@ function InvoiceFileActions({
         <div className="rounded-xl bg-[var(--panel)] border border-[var(--border)] px-3 py-3 space-y-2">
           <div className="space-y-1">
             <label className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--muted)]">
-              Description
+              {i18n("description55f8ebc")}
             </label>
             <input
               type="text"
               value={editNotes}
               onChange={(e) => setEditNotes(e.target.value)}
-              placeholder="Invoice description…"
+              placeholder={i18n("invoiceDescription4d26246")}
               className="w-full rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-1.5 text-sm text-[var(--text)]"
             />
           </div>
           <div className="space-y-1">
             <label className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--muted)]">
-              Due date
+              {i18n("dueDate4c1aeeb")}
             </label>
             <input
               type="date"
@@ -1111,14 +1122,14 @@ function InvoiceFileActions({
               disabled={saving}
               className="rounded-full bg-[var(--text)] px-4 py-1.5 text-xs font-bold text-[var(--primary-contrast)] disabled:opacity-50"
             >
-              {saving ? "Saving…" : "Save"}
+              {saving ? i18n("saving56a2285") : i18n("saveefc007a")}
             </button>
             <button
               type="button"
               onClick={() => setEditing(false)}
               className="rounded-full border border-[var(--border)] px-4 py-1.5 text-xs font-semibold text-[var(--muted)] hover:bg-[var(--bg)]"
             >
-              Cancel
+              {i18n("cancel77dfd21")}
             </button>
           </div>
         </div>
@@ -1134,7 +1145,7 @@ function InvoiceFileActions({
             disabled={uploading}
             className="rounded-full border border-[var(--border)] bg-[var(--bg)] px-3 py-1 text-xs font-semibold text-[var(--muted)] hover:bg-[var(--border)] disabled:opacity-50 transition-colors"
           >
-            {uploading ? "Uploading…" : hasFile ? "Replace file" : "Upload file"}
+            {uploading ? i18n("uploadingd921a79") : hasFile ? i18n("replaceFile6d45b8c") : i18n("uploadFile503a3d8")}
           </button>
           {hasFile && (
             <button
@@ -1143,7 +1154,7 @@ function InvoiceFileActions({
               disabled={downloading}
               className="rounded-full border border-[var(--primary)] bg-[var(--panel)] px-3 py-1 text-xs font-semibold text-[var(--primary)] hover:bg-[color-mix(in_srgb,var(--primary)_12%,transparent)] disabled:opacity-50 transition-colors"
             >
-              {downloading ? "…" : "Download"}
+              {downloading ? "…" : i18n("downloada479c9c")}
             </button>
           )}
           {invoiceParams.file_name && (
@@ -1165,13 +1176,14 @@ function SubmitButton({
   disabled?: boolean;
   children: React.ReactNode;
 }) {
+  const i18n = useUiTranslations();
   return (
     <button
       className="rounded-full bg-[var(--text)] px-5 py-3 text-sm font-bold text-[var(--primary-contrast)] disabled:opacity-50"
       disabled={pending || disabled}
       type="submit"
     >
-      {pending ? "Saving..." : children}
+      {pending ? i18n("savingae7e887") : children}
     </button>
   );
 }
@@ -1194,11 +1206,12 @@ function History({
   secondary: string;
   moneySecondary?: boolean;
 }) {
+  const i18n = useUiTranslations();
   return (
     <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--panel)] p-6">
       <h2 className="text-xl font-black">{title}</h2>
       <div className="mt-4 grid gap-3">
-        {rows.length === 0 ? <p className="text-sm text-[var(--muted)]">No records.</p> : null}
+        {rows.length === 0 ? <p className="text-sm text-[var(--muted)]">{i18n("noRecords2cd2e01")}</p> : null}
         {rows.map((row) => (
           <div key={field(row, "id")} className="rounded-2xl border border-[var(--border)] p-4">
             <p className="font-bold">{field(row, primary)}</p>

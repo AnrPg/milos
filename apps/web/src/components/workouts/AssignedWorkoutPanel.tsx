@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 
 import { ApiError } from "@/api/client";
@@ -40,6 +45,7 @@ export function AssignedWorkoutPanel({
   onRescheduled,
   launching,
 }: Props) {
+  const i18n = useUiTranslations();
   const [activeSection, setActiveSection] = useState<"details" | "conversation">("details");
   const [rejecting, setRejecting] = useState(false);
   const [rejectError, setRejectError] = useState<string | null>(null);
@@ -69,7 +75,7 @@ export function AssignedWorkoutPanel({
   const sections = assignment.workout.sections as PreviewSection[];
 
   async function handleDelete() {
-    if (!window.confirm("Delete this workout assignment? This cannot be undone.")) return;
+    if (!window.confirm(i18n("deleteThisWorkoutAssignmentThisCannotBeUndone9bbe00a"))) return;
     setDeleting(true);
     setDeleteError(null);
     try {
@@ -77,14 +83,14 @@ export function AssignedWorkoutPanel({
       onDeleted?.(assignment.id);
       onClose();
     } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : "Failed to delete assignment.");
+      setDeleteError(err instanceof Error ? err.message : i18n("failedToDeleteAssignmentde15c58"));
     } finally {
       setDeleting(false);
     }
   }
 
   async function handleReject() {
-    if (!window.confirm("Reject this workout? Your coach will be notified.")) return;
+    if (!window.confirm(i18n("rejectThisWorkoutYourCoachWillBeNotifiedc5e945d"))) return;
 
     setRejecting(true);
     setRejectError(null);
@@ -95,9 +101,9 @@ export function AssignedWorkoutPanel({
       onClose();
     } catch (err) {
       if (err instanceof ApiError && err.status === 422) {
-        setRejectError("This workout is already rejected.");
+        setRejectError(i18n("thisWorkoutIsAlreadyRejected9605eb6"));
       } else {
-        setRejectError(err instanceof Error ? err.message : "Failed to reject workout.");
+        setRejectError(err instanceof Error ? err.message : i18n("failedToRejectWorkout6939c34"));
       }
     } finally {
       setRejecting(false);
@@ -119,7 +125,7 @@ export function AssignedWorkoutPanel({
       onRescheduled?.(updated);
       onClose();
     } catch (err) {
-      setRescheduleError(err instanceof Error ? err.message : "Could not reschedule.");
+      setRescheduleError(err instanceof Error ? err.message : i18n("couldNotReschedulefaa6dd2"));
     } finally {
       setRescheduleSaving(false);
     }
@@ -161,7 +167,7 @@ export function AssignedWorkoutPanel({
                   className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
                   style={{ background: "color-mix(in srgb, var(--warning) 15%, transparent)", color: "var(--warning)", border: "1px solid color-mix(in srgb, var(--warning) 35%, transparent)" }}
                 >
-                  Team
+                  {i18n("team2188872")}
                 </span>
               ) : null}
             </div>
@@ -183,7 +189,7 @@ export function AssignedWorkoutPanel({
                   onClick={() => setActiveScale(null)}
                   type="button"
                 >
-                  Base
+                  {i18n("base077fe9c")}
                 </button>
                 {scaleLevels.map((sl) => (
                   <button
@@ -210,7 +216,7 @@ export function AssignedWorkoutPanel({
               onClick={onClose}
               type="button"
             >
-              Close ✕
+              {i18n("closefeb3e25")}
             </button>
             <button
               className="rounded-full px-3 py-1 text-[10px] font-semibold transition-colors"
@@ -224,7 +230,7 @@ export function AssignedWorkoutPanel({
               }
               type="button"
             >
-              + Calendar
+              {i18n("calendar4e44752")}
             </button>
           </div>
         </div>
@@ -239,7 +245,7 @@ export function AssignedWorkoutPanel({
               type="button"
             >
               <span className="text-sm font-medium" style={{ color: "var(--text)" }}>
-                Workout Details
+                {i18n("workoutDetails9366821")}
               </span>
               <span style={{ color: "var(--dim)" }}>{activeSection === "details" ? "▲" : "▼"}</span>
             </button>
@@ -252,7 +258,7 @@ export function AssignedWorkoutPanel({
                     className="mb-3 text-xs font-semibold uppercase tracking-[0.2em]"
                     style={{ color: "var(--dim)" }}
                   >
-                    Workout
+                    {i18n("workout39463a5")}
                   </p>
                   <WorkoutPreviewDetail
                     sections={sections}
@@ -269,7 +275,7 @@ export function AssignedWorkoutPanel({
                     style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 15%, transparent)", color: "var(--primary-strong)" }}
                   >
                     <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: "var(--primary)" }}>
-                      Coach note
+                      {i18n("coachNotee98376b")}
                     </p>
                     {assignment.admin_notes}
                   </section>
@@ -281,7 +287,7 @@ export function AssignedWorkoutPanel({
               {(assignment.athletes ?? []).length > 0 ? (
                 <div>
                   <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
-                    Assigned athletes
+                    {i18n("assignedAthletes3f6c5e6")}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {(assignment.athletes ?? []).map((athlete) => (
@@ -299,7 +305,7 @@ export function AssignedWorkoutPanel({
 
               <div>
                 <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
-                  Scheduled for
+                  {i18n("scheduledFor4cbbcd5")}
                 </p>
                 <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
                   {assignment.scheduled_for}
@@ -314,7 +320,7 @@ export function AssignedWorkoutPanel({
                     onClick={() => onEditWorkout(assignment)}
                     type="button"
                   >
-                    Edit workout
+                    {i18n("editWorkoutd299ce5")}
                   </button>
                 ) : null}
                 <button
@@ -324,7 +330,7 @@ export function AssignedWorkoutPanel({
                   onClick={() => void handleDelete()}
                   type="button"
                 >
-                  {deleting ? "Deleting…" : "Delete assignment"}
+                  {deleting ? i18n("deletingc7ac551") : i18n("deleteAssignmentd46dbbc")}
                 </button>
               </div>
               {deleteError ? (
@@ -348,7 +354,7 @@ export function AssignedWorkoutPanel({
                           onClick={() => void handleReject()}
                           type="button"
                         >
-                          {rejecting ? "Rejecting…" : "Reject workout"}
+                          {rejecting ? i18n("rejecting812b8d2") : i18n("rejectWorkouta584840")}
                         </button>
                         <button
                           className="flex-1 rounded-full px-4 py-2 text-sm font-semibold"
@@ -359,7 +365,7 @@ export function AssignedWorkoutPanel({
                           }}
                           type="button"
                         >
-                          Reschedule
+                          {i18n("reschedule34b2dc9")}
                         </button>
                       </div>
                     ) : (
@@ -383,7 +389,7 @@ export function AssignedWorkoutPanel({
                             onClick={() => void handleReschedule()}
                             type="button"
                           >
-                            {rescheduleSaving ? "Saving…" : "Confirm"}
+                            {rescheduleSaving ? i18n("saving56a2285") : i18n("confirm04a2122")}
                           </button>
                           <button
                             className="rounded-full px-4 py-2 text-sm font-semibold"
@@ -391,7 +397,7 @@ export function AssignedWorkoutPanel({
                             onClick={() => setRescheduling(false)}
                             type="button"
                           >
-                            Cancel
+                            {i18n("cancel77dfd21")}
                           </button>
                         </div>
                       </div>
@@ -406,7 +412,7 @@ export function AssignedWorkoutPanel({
                       className="mb-3 text-xs font-semibold uppercase tracking-[0.2em]"
                       style={{ color: "var(--dim)" }}
                     >
-                      Your scores
+                      {i18n("yourScores842c2ab")}
                     </p>
                     <div className="space-y-2">
                       {(assignment.execution_scores ?? []).map((score, index) => (
@@ -419,7 +425,7 @@ export function AssignedWorkoutPanel({
                             {score.section_name ?? score.section_id}
                           </span>
                           <span className="text-sm font-semibold" style={{ color: "var(--success)" }}>
-                            {score.value}{score.unit ? ` ${score.unit}` : ""}
+                            {score.value}{score.unit ? (score.unit) : ""}
                           </span>
                         </div>
                       ))}
@@ -460,7 +466,7 @@ export function AssignedWorkoutPanel({
               onClick={() => onStartWorkout(assignment)}
               type="button"
             >
-              {launching ? "Starting…" : "Redo Workout"}
+              {launching ? i18n("startinge5f5809") : i18n("redoWorkout0f2cad2")}
             </button>
           ) : (
             <button
@@ -470,7 +476,7 @@ export function AssignedWorkoutPanel({
               onClick={() => onStartWorkout(assignment)}
               type="button"
             >
-              {launching ? "Starting…" : "Start Workout"}
+              {launching ? i18n("startinge5f5809") : i18n("startWorkoutd1072dd")}
             </button>
           )}
           </div>

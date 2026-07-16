@@ -1,7 +1,13 @@
 "use client";
 
-import { useState } from "react";
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
+import { useId, useState } from "react";
 import type { ExerciseModification } from "@/api/executions";
+import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import type { ChecklistStep } from "./WorkoutChecklist";
 
 type Props = {
@@ -11,6 +17,7 @@ type Props = {
 };
 
 export function ModificationModal({ step, onSave, onClose }: Props) {
+  const i18n = useUiTranslations();
   const { exercise } = step;
 
   const hasPrescription =
@@ -27,6 +34,8 @@ export function ModificationModal({ step, onSave, onClose }: Props) {
   const [actualSets, setActualSets] = useState(
     hasSets ? String(exercise.sets) : "",
   );
+  const dialogRef = useModalFocusTrap<HTMLDivElement>(onClose);
+  const titleId = useId();
 
   function handleSkip() {
     onSave({
@@ -73,6 +82,11 @@ export function ModificationModal({ step, onSave, onClose }: Props) {
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
         className="w-full max-w-lg rounded-t-3xl p-6 pb-10"
         style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
         onClick={(e) => e.stopPropagation()}
@@ -82,9 +96,9 @@ export function ModificationModal({ step, onSave, onClose }: Props) {
             className="text-xs font-semibold uppercase tracking-[0.2em]"
             style={{ color: "var(--dim)" }}
           >
-            Modify step
+            {i18n("modifyStepbc84bb7")}
           </p>
-          <h3 className="mt-1 text-lg font-bold" style={{ color: "var(--text)" }}>
+          <h3 id={titleId} className="mt-1 text-lg font-bold" style={{ color: "var(--text)" }}>
             {exercise.name}
           </h3>
           {step.stepLabel && (
@@ -98,7 +112,7 @@ export function ModificationModal({ step, onSave, onClose }: Props) {
           {hasSets && (
             <div>
               <label className="block text-xs font-semibold mb-1" style={{ color: "var(--muted)" }}>
-                Sets (prescribed: {exercise.sets})
+                {i18n("setsPrescribed68f6881")} {exercise.sets})
               </label>
               <input
                 type="number"
@@ -120,8 +134,8 @@ export function ModificationModal({ step, onSave, onClose }: Props) {
             <div>
               <label className="block text-xs font-semibold mb-1" style={{ color: "var(--muted)" }}>
                 {exercise.prescription_unit
-                  ? `${exercise.prescription_unit} (prescribed: ${exercise.prescription_value})`
-                  : `Reps / value (prescribed: ${exercise.prescription_value})`}
+                  ? (exercise.prescription_unit) + " (prescribed: " + (exercise.prescription_value) + ")"
+                  : i18n("repsValuePrescribedf99f0c8") + (exercise.prescription_value) + ")"}
               </label>
               <input
                 type="number"
@@ -143,8 +157,8 @@ export function ModificationModal({ step, onSave, onClose }: Props) {
             <div>
               <label className="block text-xs font-semibold mb-1" style={{ color: "var(--muted)" }}>
                 {exercise.load_mode === "pct_1rm"
-                  ? `Load % RM (prescribed: ${exercise.load_value}%)`
-                  : `Load kg (prescribed: ${exercise.load_value} kg)`}
+                  ? i18n("loadRmPrescribed659bd8a") + (exercise.load_value) + "%)"
+                  : i18n("loadKgPrescribed1134141") + (exercise.load_value) + " kg)"}
               </label>
               <input
                 type="number"
@@ -164,7 +178,7 @@ export function ModificationModal({ step, onSave, onClose }: Props) {
 
           {!hasPrescription && !hasLoad && !hasSets && (
             <p className="text-sm py-2" style={{ color: "var(--dim)" }}>
-              No prescribed values for this exercise. Use the skip button if you didn't do it.
+              {i18n("noPrescribedValuesForThisExerciseUseThe2d5dd0b")}
             </p>
           )}
         </div>
@@ -176,7 +190,7 @@ export function ModificationModal({ step, onSave, onClose }: Props) {
             className="w-full rounded-2xl py-3.5 text-base font-semibold"
             style={{ background: "var(--primary)", color: "var(--primary-contrast, #fff)" }}
           >
-            Save changes
+            {i18n("saveChanges179359b")}
           </button>
           <button
             type="button"
@@ -188,7 +202,7 @@ export function ModificationModal({ step, onSave, onClose }: Props) {
               border: "1px solid color-mix(in srgb, var(--danger, var(--primary)) 25%, transparent)",
             }}
           >
-            I skipped this step completely
+            {i18n("iSkippedThisStepCompletely6410954")}
           </button>
           <button
             type="button"
@@ -196,7 +210,7 @@ export function ModificationModal({ step, onSave, onClose }: Props) {
             className="w-full rounded-2xl py-3 text-sm font-semibold"
             style={{ color: "var(--dim)" }}
           >
-            Cancel
+            {i18n("cancel77dfd21")}
           </button>
         </div>
       </div>

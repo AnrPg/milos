@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useMemo } from "react";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
@@ -22,6 +27,7 @@ type ExerciseGroup = {
 };
 
 export function MiddlePanel({ scaleLevels }: Props) {
+  const i18n = useUiTranslations();
   const { sections, selectedSectionId, addExercise, setMobileView, updateSection } = useWorkoutCreationStore();
 
   const selectedSection = sections.find((section) => section.localId === selectedSectionId);
@@ -36,9 +42,9 @@ export function MiddlePanel({ scaleLevels }: Props) {
       const even = exercises.filter((e) => e.intervalAssignment === 2);
       const both = exercises.filter((e) => e.intervalAssignment !== 1 && e.intervalAssignment !== 2);
       return [
-        { label: "Odd Minutes · 60s", color: "var(--accent)", exercises: odd },
-        { label: "Even Minutes · 60s", color: "var(--lime)", exercises: even },
-        ...(both.length > 0 ? [{ label: "Both / Unassigned", color: "var(--dim)", exercises: both }] : []),
+        { label: i18n("oddMinutes60s3073e4b"), color: "var(--accent)", exercises: odd },
+        { label: i18n("evenMinutes60sde09c9b"), color: "var(--lime)", exercises: even },
+        ...(both.length > 0 ? [{ label: i18n("bothUnassigned36e7301"), color: "var(--dim)", exercises: both }] : []),
       ];
     }
 
@@ -65,17 +71,17 @@ export function MiddlePanel({ scaleLevels }: Props) {
       const groups: ExerciseGroup[] = [];
       for (let min = 1; min <= totalMinutes; min++) {
         const exs = byMinute.get(min) ?? [];
-        const dur = (selectedSection.formatParams[`interval_seconds_${min}`] as number)
+        const dur = (selectedSection.formatParams["interval_seconds_" + (min)] as number)
           ?? (selectedSection.formatParams.interval_seconds as number)
           ?? 60;
         const durLabel = dur >= 60
-          ? `${Math.floor(dur / 60)}min${dur % 60 > 0 ? `${dur % 60}s` : ""}`
-          : `${dur}s`;
-        groups.push({ label: `Round ${min} · ${durLabel}`, color: "var(--accent)", exercises: exs });
+          ? (Math.floor(dur / 60)) + "min" + (dur % 60 > 0 ? `${dur % 60}s` : "")
+          : (dur) + "s";
+        groups.push({ label: i18n("roundec7b598") + (min) + " · " + (durLabel), color: "var(--accent)", exercises: exs });
       }
 
       if (unassigned.length > 0) {
-        groups.push({ label: "Unassigned", color: "var(--dim)", exercises: unassigned });
+        groups.push({ label: i18n("unassignede57016e"), color: "var(--dim)", exercises: unassigned });
       }
 
       return groups;
@@ -93,7 +99,7 @@ export function MiddlePanel({ scaleLevels }: Props) {
         >
           <div className="flex items-center gap-3">
             <h2 className="text-xl font-extrabold" style={{ color: "var(--text)" }}>
-              {selectedSection.name || "Unnamed section"}
+              {selectedSection.name || i18n("unnamedSection109fa70")}
             </h2>
             <FormatTooltip format={selectedSection.format}>
               <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
@@ -111,7 +117,7 @@ export function MiddlePanel({ scaleLevels }: Props) {
           })()}
           <textarea
             rows={1}
-            placeholder="Section note (optional)…"
+            placeholder={i18n("sectionNoteOptional5ec0d68")}
             className="mt-1 w-full resize-none bg-transparent text-xs outline-none"
             style={{ color: "var(--muted)" }}
             value={selectedSection.note ?? ""}
@@ -124,7 +130,7 @@ export function MiddlePanel({ scaleLevels }: Props) {
           style={{ borderColor: "var(--dim)" }}
         >
           <h2 className="text-lg font-bold" style={{ color: "var(--muted)" }}>
-            Select a section to add exercises
+            {i18n("selectASectionToAddExercisese9ab874")}
           </h2>
         </div>
       )}
@@ -133,20 +139,20 @@ export function MiddlePanel({ scaleLevels }: Props) {
         {!selectedSection ? (
           <div className="flex flex-1 items-center justify-center">
             <p className="text-sm" style={{ color: "var(--dim)" }}>
-              Select or add a section first
+              {i18n("selectOrAddASectionFirstc66d608")}
             </p>
           </div>
         ) : selectedSection.exercises.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-3">
             <p className="text-sm" style={{ color: "var(--dim)" }}>
-              No exercises yet
+              {i18n("noExercisesYet71ff283")}
             </p>
             <button
               onClick={() => addExercise(selectedSection.localId)}
               className="rounded-2xl px-5 py-2 text-sm font-semibold"
               style={{ background: "var(--accent)", color: "var(--bg)" }}
             >
-              + Add exercise
+              {i18n("addExercise7d65b0e")}
             </button>
           </div>
         ) : (
@@ -206,7 +212,7 @@ export function MiddlePanel({ scaleLevels }: Props) {
               className="self-start rounded-2xl px-4 py-2 text-sm font-semibold"
               style={{ border: "1px dashed var(--dim)", color: "var(--muted)" }}
             >
-              + Add exercise
+              {i18n("addExercise7d65b0e")}
             </button>
           </>
         )}

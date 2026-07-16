@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -25,6 +30,7 @@ type Props = {
 };
 
 export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }: Props) {
+  const i18n = useUiTranslations();
   const { updateExercise, toggleVariationsPanel, toggleAdvancedPanel } = useWorkoutCreationStore();
   const [noteOpen, setNoteOpen] = useState(() => Boolean(exercise.note));
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -47,7 +53,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
         return (p.interval_seconds as number) || null;
       case "complex_emom": {
         const perMin = exercise.intervalAssignment !== null
-          ? (p[`interval_seconds_${exercise.intervalAssignment}`] as number) || null
+          ? (p["interval_seconds_" + (exercise.intervalAssignment)] as number) || null
           : null;
         return perMin ?? ((p.interval_seconds as number) || null);
       }
@@ -74,8 +80,8 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
   function renderIntervalBadge() {
     if (ctx.intervalMode === "odd_even") {
       const label =
-        exercise.intervalAssignment === 1 ? "Odd" :
-        exercise.intervalAssignment === 2 ? "Even" : "Both";
+        exercise.intervalAssignment === 1 ? i18n("odddc28f5f") :
+        exercise.intervalAssignment === 2 ? i18n("even9e767ad") : i18n("both1f46983");
       const color =
         exercise.intervalAssignment === 1 ? "var(--accent)" :
         exercise.intervalAssignment === 2 ? "var(--lime)" : "var(--dim)";
@@ -91,7 +97,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
           }}
           className="shrink-0 rounded-lg px-2 py-0.5 text-xs font-bold"
           style={{ border: `1px solid ${color}`, color }}
-          title="Click to cycle: Both → Odd → Even"
+          title={i18n("clickToCycleBothOddEvene64f8b1")}
         >
           {label}
         </button>
@@ -102,7 +108,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
       return (
         <div className="flex shrink-0 items-center gap-0.5">
           <span className="text-xs" style={{ color: "var(--muted)" }}>
-            Min
+            {i18n("min7eb0cee")}
           </span>
           <input
             type="number"
@@ -131,7 +137,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
   function renderPrescription() {
     if (!ctx.showPrescription) {
       if (section.format === "train_to_exhaustion") {
-        return <span className="shrink-0 text-xs italic" style={{ color: "var(--dim)" }}>to failure</span>;
+        return <span className="shrink-0 text-xs italic" style={{ color: "var(--dim)" }}>{i18n("toFailure1632d91")}</span>;
       }
       return null;
     }
@@ -159,7 +165,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
             onChange={(value) => update({ prescriptionStep: value })}
             min={1}
           />
-          <span className="text-xs" style={{ color: "var(--dim)" }}>/round</span>
+          <span className="text-xs" style={{ color: "var(--dim)" }}>{i18n("round36fd5b1")}</span>
         </div>
       );
     }
@@ -218,7 +224,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
           onChange={(value) => update({ clustersPerSet: value })}
           min={1}
         />
-        <span className="text-xs" style={{ color: "var(--muted)" }}>clusters</span>
+        <span className="text-xs" style={{ color: "var(--muted)" }}>{i18n("clustersbc84c52")}</span>
       </div>
     );
   }
@@ -239,7 +245,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
               color: "var(--accent)",
             }}
           >
-            ∿ prog
+            {i18n("prog095e542")}
           </span>
           {/* still allow switching load type */}
           <UnitCycler
@@ -296,7 +302,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
       <div className="border-t px-4 py-3" style={{ borderColor: "var(--dim)" }}>
         <div className="flex flex-wrap items-center gap-3">
           <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-            Load Progression
+            {i18n("loadProgression1c3f8ed")}
           </span>
           <button
             type="button"
@@ -312,14 +318,14 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
             className="rounded-lg px-2 py-0.5 text-xs font-semibold"
             style={{ background: "var(--bg)", border: "1px solid var(--dim)", color: "var(--muted)" }}
           >
-            {prog.mode === "linear" ? "Linear" : "Per Set"} ⟳
+            {prog.mode === "linear" ? i18n("linearaf502f2") : i18n("perSet1e0dfe5")} ⟳
           </button>
 
           {prog.mode === "linear" ? (
             <>
               <div className="flex items-center gap-1">
                 <span className="text-xs" style={{ color: "var(--muted)" }}>
-                  Start
+                  {i18n("start952f375")}
                 </span>
                 <NumberStepper
                   value={prog.startValue}
@@ -343,7 +349,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
                   min={0}
                 />
                 <span className="text-xs" style={{ color: "var(--muted)" }}>
-                  / set
+                  {i18n("set71c16be")}
                 </span>
               </div>
             </>
@@ -352,7 +358,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
               {Array.from({ length: exercise.sets }, (_, i) => (
                 <div key={i} className="flex items-center gap-0.5">
                   <span className="text-xs" style={{ color: "var(--dim)" }}>
-                    S{i + 1}
+                    {i18n("s02aa629")}{i + 1}
                   </span>
                   <NumberStepper
                     value={prog.perSetValues[i] ?? prog.startValue}
@@ -381,7 +387,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
             className="ml-auto text-xs"
             style={{ color: "var(--dim)" }}
           >
-            Remove
+            {i18n("removee963907")}
           </button>
         </div>
       </div>
@@ -415,7 +421,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
             type="text"
             value={exercise.name}
             onChange={(event) => update({ name: event.target.value })}
-            placeholder="Exercise name"
+            placeholder={i18n("exerciseName9a5c1af")}
             className="min-w-[10rem] flex-1 bg-transparent text-base font-bold outline-none"
             style={{ color: "var(--text)" }}
           />
@@ -428,7 +434,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
                 min={1}
               />
               <span className="text-sm" style={{ color: "var(--muted)" }}>
-                sets
+                {i18n("setsd6c8220")}
               </span>
             </div>
           ) : null}
@@ -455,7 +461,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
               }
               className="shrink-0 text-xs"
               style={{ color: "var(--dim)" }}
-              title="Set progressive load across sets"
+              title={i18n("setProgressiveLoadAcrossSetsb3a6402")}
             >
               ∿
             </button>
@@ -473,7 +479,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
               color: exercise.variationsOpen ? "var(--accent)" : "var(--muted)",
             }}
           >
-            Vars {exercise.variationsOpen ? "▲" : "▾"}
+            {i18n("varsb9069e3")} {exercise.variationsOpen ? "▲" : "▾"}
           </button>
 
           <button
@@ -489,7 +495,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
               border: `1px solid ${noteOpen ? "var(--info)" : "var(--dim)"}`,
               color: noteOpen ? "var(--info)" : "var(--muted)",
             }}
-            title="Coach note for this exercise"
+            title={i18n("coachNoteForThisExerciseb05bf2d")}
           >
             📝
           </button>
@@ -516,7 +522,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
           <div className="border-t px-4 py-2" style={{ borderColor: "var(--dim)" }}>
             <textarea
               rows={2}
-              placeholder="Coach note for this exercise…"
+              placeholder={i18n("coachNoteForThisExercisecab745f")}
               className="w-full resize-none bg-transparent text-xs outline-none"
               style={{ color: "var(--text)" }}
               value={exercise.note ?? ""}

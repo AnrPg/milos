@@ -1,5 +1,9 @@
 "use client";
 
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef } from "react";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
@@ -15,6 +19,7 @@ type Props = {
 };
 
 export function LeftPanel({ onSectionSelected, mobile = false, showAllSections = false }: Props) {
+  const i18n = useUiTranslations();
   const {
     sections,
     selectedSectionId,
@@ -66,7 +71,7 @@ export function LeftPanel({ onSectionSelected, mobile = false, showAllSections =
             color: "var(--muted)",
           }}
         >
-          Sections
+          {i18n("sections7ff5a6d")}
         </span>
         <span className="mt-2 text-xs" style={{ color: "var(--muted)" }}>
           &gt;
@@ -78,12 +83,12 @@ export function LeftPanel({ onSectionSelected, mobile = false, showAllSections =
   return (
     <div
       ref={panelRef}
-      className={`flex ${mobile ? "w-full" : "w-64 shrink-0"} flex-col overflow-hidden`}
+      className={"flex " + (mobile ? "w-full" : "w-64 shrink-0") + " flex-col overflow-hidden"}
       style={{ background: "var(--panel)", borderRight: mobile ? "none" : "1px solid var(--dim)" }}
     >
       <div className="flex shrink-0 items-center justify-between px-4 py-3">
         <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-          Sections
+          {i18n("sections7ff5a6d")}
         </span>
         {!mobile ? (
           <button onClick={() => setLeftCollapsed(true)} className="text-xs" style={{ color: "var(--dim)" }}>
@@ -128,7 +133,7 @@ export function LeftPanel({ onSectionSelected, mobile = false, showAllSections =
             color: "var(--muted)",
           }}
         >
-          + Add section
+          {i18n("addSection416bc54")}
         </button>
       </div>
 

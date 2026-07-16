@@ -1,3 +1,6 @@
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import type { ChatMessage } from "@/api/messaging";
 
 interface MessageBubbleProps {
@@ -7,6 +10,7 @@ interface MessageBubbleProps {
 }
 
 export function MessageBubble({ message, isOwnMessage, senderNickname }: MessageBubbleProps) {
+  const i18n = useUiTranslations();
   const isCoachingNote = message.message_type === "coaching_note";
   const time = new Date(message.inserted_at).toLocaleTimeString([], {
     hour: "2-digit",
@@ -15,7 +19,7 @@ export function MessageBubble({ message, isOwnMessage, senderNickname }: Message
 
   return (
     <div
-      className={`flex flex-col gap-0.5 max-w-[78%] ${isOwnMessage ? "self-end items-end" : "self-start items-start"}`}
+      className={"flex flex-col gap-0.5 max-w-[78%] " + (isOwnMessage ? "self-end items-end" : "self-start items-start")}
     >
       {senderNickname && !isOwnMessage && (
         <span className="text-[10px] font-medium px-1" style={{ color: "var(--muted)" }}>
@@ -35,7 +39,7 @@ export function MessageBubble({ message, isOwnMessage, senderNickname }: Message
             className="block text-[10px] font-semibold uppercase tracking-widest mb-1"
             style={{ color: isOwnMessage ? "var(--primary-contrast)" : "var(--primary-strong)" }}
           >
-            Coaching note
+            {i18n("coachingNote7e2c608")}
           </span>
         )}
         {message.body}

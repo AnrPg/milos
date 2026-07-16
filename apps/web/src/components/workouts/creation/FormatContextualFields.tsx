@@ -1,5 +1,9 @@
 "use client";
 
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { FORMAT_FIELD_DEFS, type FormatParams, type SectionFormat } from "@/types/workout";
 
 import { TimeInput } from "./TimeInput";
@@ -11,67 +15,6 @@ type FieldLabel = {
   optional?: boolean;
 };
 
-const FORMAT_FIELD_LABELS: Partial<Record<SectionFormat, FieldLabel[]>> = {
-  for_time: [{ key: "time_cap_seconds", label: "Time Cap", unit: "secs", optional: true }],
-  train_to_exhaustion: [{ key: "rest_seconds", label: "Rest between sets", unit: "secs", optional: true }],
-  kcal_target: [
-    { key: "kcal_target", label: "Target", unit: "kcal" },
-    { key: "time_cap_seconds", label: "Time Cap", unit: "secs", optional: true },
-  ],
-  emom: [
-    { key: "duration_seconds", label: "Total Duration", unit: "secs" },
-    { key: "interval_seconds", label: "Interval", unit: "secs" },
-  ],
-  complex_emom: [
-    { key: "duration_seconds", label: "Total Duration", unit: "secs" },
-    { key: "interval_seconds", label: "Interval", unit: "secs" },
-  ],
-  even_odd: [{ key: "duration_seconds", label: "Total Duration", unit: "secs" }],
-  billat: [
-    { key: "work_seconds", label: "Work", unit: "secs" },
-    { key: "rest_seconds", label: "Rest", unit: "secs" },
-    { key: "cycles", label: "Cycles", unit: "" },
-  ],
-  amrap: [{ key: "duration_seconds", label: "Duration", unit: "secs" }],
-  edt: [
-    { key: "duration_seconds", label: "Duration", unit: "secs" },
-    { key: "pr_zone_rounds", label: "PR Zone Rounds", unit: "", optional: true },
-  ],
-  death_by: [
-    { key: "max_rounds", label: "Max Rounds", unit: "rounds", optional: true },
-  ],
-  tabata: [
-    { key: "work_seconds", label: "Work", unit: "secs" },
-    { key: "rest_seconds", label: "Rest", unit: "secs" },
-    { key: "rounds", label: "Rounds", unit: "" },
-  ],
-  custom_hiit: [
-    { key: "work_seconds", label: "Work", unit: "secs" },
-    { key: "rest_seconds", label: "Rest", unit: "secs" },
-    { key: "rounds", label: "Rounds", unit: "" },
-  ],
-  cluster: [
-    { key: "intra_rest_seconds", label: "Intra-set Rest", unit: "secs" },
-  ],
-  hrr: [
-    { key: "hr_ceiling_bpm", label: "HR Ceiling (stop work)", unit: "bpm" },
-    { key: "hr_floor_bpm", label: "HR Floor (resume work)", unit: "bpm" },
-    { key: "cycles", label: "Cycles", unit: "", optional: true },
-    { key: "effort_cap_seconds", label: "Effort Cap", unit: "secs", optional: true },
-  ],
-  ladder_ascending: [
-    { key: "time_cap_seconds", label: "Time Cap", unit: "secs", optional: true },
-  ],
-  ladder_descending: [
-    { key: "min_reps", label: "Min Reps", unit: "", optional: true },
-    { key: "time_cap_seconds", label: "Time Cap", unit: "secs", optional: true },
-  ],
-  pyramid: [
-    { key: "time_cap_seconds", label: "Time Cap", unit: "secs", optional: true },
-  ],
-  rest: [{ key: "duration_seconds", label: "Duration", unit: "secs" }],
-};
-
 type Props = {
   format: SectionFormat;
   params: FormatParams;
@@ -79,6 +22,68 @@ type Props = {
 };
 
 export function FormatContextualFields({ format, params, onChange }: Props) {
+  const i18n = useUiTranslations();
+  const FORMAT_FIELD_LABELS: Partial<Record<SectionFormat, FieldLabel[]>> = {
+    for_time: [{ key: "time_cap_seconds", label: i18n("timeCap42f692a"), unit: "secs", optional: true }],
+    train_to_exhaustion: [{ key: "rest_seconds", label: i18n("restBetweenSets882ab69"), unit: "secs", optional: true }],
+    kcal_target: [
+      { key: "kcal_target", label: i18n("target61ad50a"), unit: "kcal" },
+      { key: "time_cap_seconds", label: i18n("timeCap42f692a"), unit: "secs", optional: true },
+    ],
+    emom: [
+      { key: "duration_seconds", label: i18n("totalDuration886186d"), unit: "secs" },
+      { key: "interval_seconds", label: i18n("interval011efcd"), unit: "secs" },
+    ],
+    complex_emom: [
+      { key: "duration_seconds", label: i18n("totalDuration886186d"), unit: "secs" },
+      { key: "interval_seconds", label: i18n("interval011efcd"), unit: "secs" },
+    ],
+    even_odd: [{ key: "duration_seconds", label: i18n("totalDuration886186d"), unit: "secs" }],
+    billat: [
+      { key: "work_seconds", label: i18n("work00040ba"), unit: "secs" },
+      { key: "rest_seconds", label: i18n("restb79e5f4"), unit: "secs" },
+      { key: "cycles", label: i18n("cycles97f064a"), unit: "" },
+    ],
+    amrap: [{ key: "duration_seconds", label: i18n("duration1370004"), unit: "secs" }],
+    edt: [
+      { key: "duration_seconds", label: i18n("duration1370004"), unit: "secs" },
+      { key: "pr_zone_rounds", label: i18n("prZoneRounds9799ad4"), unit: "", optional: true },
+    ],
+    death_by: [
+      { key: "max_rounds", label: i18n("maxRoundsc005103"), unit: "rounds", optional: true },
+    ],
+    tabata: [
+      { key: "work_seconds", label: i18n("work00040ba"), unit: "secs" },
+      { key: "rest_seconds", label: i18n("restb79e5f4"), unit: "secs" },
+      { key: "rounds", label: i18n("roundsceeac4a"), unit: "" },
+    ],
+    custom_hiit: [
+      { key: "work_seconds", label: i18n("work00040ba"), unit: "secs" },
+      { key: "rest_seconds", label: i18n("restb79e5f4"), unit: "secs" },
+      { key: "rounds", label: i18n("roundsceeac4a"), unit: "" },
+    ],
+    cluster: [
+      { key: "intra_rest_seconds", label: i18n("intraSetRest46c5759"), unit: "secs" },
+    ],
+    hrr: [
+      { key: "hr_ceiling_bpm", label: i18n("hrCeilingStopWork3e9d698"), unit: "bpm" },
+      { key: "hr_floor_bpm", label: i18n("hrFloorResumeWork82d77a0"), unit: "bpm" },
+      { key: "cycles", label: i18n("cycles97f064a"), unit: "", optional: true },
+      { key: "effort_cap_seconds", label: i18n("effortCapf1d0911"), unit: "secs", optional: true },
+    ],
+    ladder_ascending: [
+      { key: "time_cap_seconds", label: i18n("timeCap42f692a"), unit: "secs", optional: true },
+    ],
+    ladder_descending: [
+      { key: "min_reps", label: i18n("minReps96a7464"), unit: "", optional: true },
+      { key: "time_cap_seconds", label: i18n("timeCap42f692a"), unit: "secs", optional: true },
+    ],
+    pyramid: [
+      { key: "time_cap_seconds", label: i18n("timeCap42f692a"), unit: "secs", optional: true },
+    ],
+    rest: [{ key: "duration_seconds", label: i18n("duration1370004"), unit: "secs" }],
+  };
+
   const labelDefs = FORMAT_FIELD_LABELS[format];
   const fieldDefs = FORMAT_FIELD_DEFS[format];
 
@@ -103,7 +108,7 @@ export function FormatContextualFields({ format, params, onChange }: Props) {
               {field.label}
               {field.optional ? (
                 <span className="ml-1 font-normal italic normal-case" style={{ color: "var(--dim)" }}>
-                  optional
+                  {i18n("optional48a7b88")}
                 </span>
               ) : null}
             </label>

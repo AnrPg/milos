@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 
 import { scaleLevelVar, translucent } from "@/lib/theme";
@@ -161,6 +166,7 @@ function formatTimerLabel(timerConfig: Record<string, unknown> | null | undefine
 }
 
 function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
+  const i18n = useUiTranslations();
   const prescription = formatPrescription(exercise);
   const extras = formatExtras(exercise);
   const variationColor = scaleLevelVar(exercise.variationSlug ?? exercise.variationLabel);
@@ -184,7 +190,7 @@ function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
               className="ml-2 rounded-full px-2 py-0.5 align-middle text-[10px] font-bold uppercase tracking-[0.16em]"
               style={{ background: translucent(variationColor, 18), color: variationColor }}
             >
-              {exercise.variationLabel ?? "Variation"}
+              {exercise.variationLabel ?? i18n("variation15920a4")}
             </span>
           ) : null}
         </div>
@@ -220,6 +226,7 @@ export function WorkoutPreviewDetail({
   activeScaleOverride,
   hideScaleChips = false,
 }: Props) {
+  const i18n = useUiTranslations();
   const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
     if (!initiallyExpanded) return new Set();
     return new Set(sections.map((s, i) => s.id ?? String(i)));
@@ -241,7 +248,7 @@ export function WorkoutPreviewDetail({
   if (sections.length === 0) {
     return (
       <p className="text-sm" style={{ color: "var(--dim)" }}>
-        No exercises configured.
+        {i18n("noExercisesConfigured0becaba")}
       </p>
     );
   }
@@ -289,13 +296,13 @@ export function WorkoutPreviewDetail({
                     className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em]"
                     style={{ background: "color-mix(in srgb, var(--info) 12%, transparent)", color: "var(--info)" }}
                   >
-                    Scored
+                    {i18n("scoredc6702fe")}
                   </span>
                 ) : null}
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <span className="text-xs font-semibold" style={{ color: "var(--dim)" }}>
-                  {section.exercises.length} exercise{section.exercises.length !== 1 ? "s" : ""}
+                  {section.exercises.length} {i18n("exerciseeb70d1f")}{section.exercises.length !== 1 ? i18n("sa0f1490") : ""}
                 </span>
                 <span className="text-xs" style={{ color: "var(--dim)" }}>
                   {expanded ? "▲" : "▼"}
@@ -318,7 +325,7 @@ export function WorkoutPreviewDetail({
                   onClick={(e) => { e.stopPropagation(); setSectionScales((current) => ({ ...current, [key]: null })); }}
                   type="button"
                 >
-                  Base
+                  {i18n("base077fe9c")}
                 </button>
                 {scaleOptions.map((scale, si) => {
                   const color = scaleLevelVar(scale.slug || scale.label || String(si));
@@ -356,7 +363,7 @@ export function WorkoutPreviewDetail({
                 {visibleExercises.length > 0 ? (
                   <ul className="space-y-2">
                     {visibleExercises.map((exercise, ei) => (
-                      <ExerciseRow key={exercise.id ?? `${key}-${ei}`} exercise={exercise} />
+                      <ExerciseRow key={exercise.id ?? (key) + "-" + (ei)} exercise={exercise} />
                     ))}
                   </ul>
                 ) : (
@@ -364,7 +371,7 @@ export function WorkoutPreviewDetail({
                     className="rounded-[1rem] px-4 py-3 text-sm"
                     style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--dim)" }}
                   >
-                    No exercises for this scale.
+                    {i18n("noExercisesForThisScale94e9906")}
                   </p>
                 )}
               </div>

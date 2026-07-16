@@ -1,5 +1,9 @@
 "use client";
 
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
@@ -22,6 +26,7 @@ function asList(v: unknown): unknown[] {
 }
 
 function DrillDownPanel({ drillDown }: { drillDown: AthleteDrillDown }) {
+  const i18n = useUiTranslations();
   const d = asRecord(drillDown);
   const assignments = asList(d.assignments);
   const executions = asList(d.executions);
@@ -34,9 +39,9 @@ function DrillDownPanel({ drillDown }: { drillDown: AthleteDrillDown }) {
       {/* Scores / streak row */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          ["Streak", String(asRecord(scores).streak_weeks ?? "—")],
-          ["Completions", String(asRecord(scores).total_completions ?? "—")],
-          ["Assignments", String(assignments.length)],
+          [i18n("streakac4792c"), String(asRecord(scores).streak_weeks ?? "—")],
+          [i18n("completions1edd778"), String(asRecord(scores).total_completions ?? "—")],
+          [i18n("assignments057d58c"), String(assignments.length)],
         ].map(([label, value]) => (
           <div key={label} className="rounded-[1.2rem] p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
             <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{label}</p>
@@ -48,7 +53,7 @@ function DrillDownPanel({ drillDown }: { drillDown: AthleteDrillDown }) {
       {/* Attention flags */}
       {Object.keys(attention).length > 0 ? (
         <div className="rounded-[1.4rem] p-4 space-y-1" style={{ background: "color-mix(in srgb, var(--primary) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)" }}>
-          <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--primary)" }}>Attention flags</p>
+          <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--primary)" }}>{i18n("attentionFlags86e76f6")}</p>
           {Object.entries(attention).map(([key, val]) => val ? (
             <p key={key} className="text-xs" style={{ color: "var(--primary-strong)" }}>
               {key.replace(/_/g, " ")}: {String(val)}
@@ -61,7 +66,7 @@ function DrillDownPanel({ drillDown }: { drillDown: AthleteDrillDown }) {
       {executions.length > 0 ? (
         <div className="space-y-2">
           <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-            Recent executions ({executions.length})
+            {i18n("recentExecutionsa05fd99")}{executions.length})
           </p>
           <div className="max-h-48 space-y-1.5 overflow-auto">
             {executions.slice(0, 8).map((ex, i) => {
@@ -69,7 +74,7 @@ function DrillDownPanel({ drillDown }: { drillDown: AthleteDrillDown }) {
               return (
                 <div key={i} className="flex items-center justify-between gap-3 rounded-[1rem] px-3 py-2" style={{ background: "var(--panel-muted)" }}>
                   <span className="text-xs font-semibold" style={{ color: "var(--text)" }}>
-                    {String(e.workout_title || e.status || "Execution")}
+                    {String(e.workout_title || e.status || i18n("execution6d525b7"))}
                   </span>
                   <span className="text-[10px]" style={{ color: "var(--dim)" }}>
                     {String(e.completed_at_utc || e.started_at_utc || "").slice(0, 10)}
@@ -85,7 +90,7 @@ function DrillDownPanel({ drillDown }: { drillDown: AthleteDrillDown }) {
       {notes.length > 0 ? (
         <div className="space-y-2">
           <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-            Notes ({notes.length})
+            {i18n("notesd1b1569")}{notes.length})
           </p>
           <div className="max-h-40 space-y-1.5 overflow-auto">
             {notes.map((n, i) => {
@@ -107,6 +112,7 @@ function DrillDownPanel({ drillDown }: { drillDown: AthleteDrillDown }) {
 }
 
 export function AdminCoaching() {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const [selectedAthleteId, setSelectedAthleteId] = useState("");
   const [noteBody, setNoteBody] = useState("");
@@ -116,7 +122,7 @@ export function AdminCoaching() {
     queryKey: ["admin", "athletes"],
     enabled: Boolean(tokens?.access_token),
     queryFn: async () => {
-      if (!tokens?.access_token) throw new Error("Authentication required.");
+      if (!tokens?.access_token) throw new Error(i18n("authenticationRequired9e44e0b"));
       return fetchAthletes(tokens.access_token);
     },
   });
@@ -125,14 +131,14 @@ export function AdminCoaching() {
     queryKey: ["admin", "athlete-drill-down", selectedAthleteId],
     enabled: Boolean(tokens?.access_token && selectedAthleteId && showDrillDown),
     queryFn: async () => {
-      if (!tokens?.access_token) throw new Error("Authentication required.");
+      if (!tokens?.access_token) throw new Error(i18n("authenticationRequired9e44e0b"));
       return fetchAthleteDrillDown(tokens.access_token, selectedAthleteId);
     },
   });
 
   const writeNote = useMutation({
     mutationFn: async () => {
-      if (!tokens?.access_token || !selectedAthleteId) throw new Error("Athlete selection required.");
+      if (!tokens?.access_token || !selectedAthleteId) throw new Error(i18n("athleteSelectionRequired7fd21d5"));
       return writeAthleteNote(tokens.access_token, selectedAthleteId, noteBody);
     },
     onSuccess: () => {
@@ -146,21 +152,21 @@ export function AdminCoaching() {
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-6xl space-y-8">
-        <TransientHero label="coaching workspace introduction">
+        <TransientHero label={i18n("coachingWorkspaceIntroductionb33101c")} timeoutMs={3000}>
         <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">Admin coaching</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">{i18n("adminCoaching44254ed")}</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-            Athlete coaching workspace
+            {i18n("athleteCoachingWorkspaceae374b0")}
           </h1>
           <p className="mt-2 max-w-3xl text-sm leading-6" style={{ color: "var(--muted)" }}>
-            Select an athlete to view their drill-down (assignments, execution history, scores, attention flags) and write coaching notes.
+            {i18n("selectAnAthleteToViewTheirDrillDownc3ad98f")}
           </p>
           <Link
             className="mt-6 inline-flex rounded-full px-4 py-2 text-sm font-semibold"
             href="/admin"
             style={{ background: "var(--border)", color: "var(--text-soft)" }}
           >
-            Back to admin home
+            {i18n("backToAdminHome941355d")}
           </Link>
         </section>
         </TransientHero>
@@ -169,13 +175,13 @@ export function AdminCoaching() {
           {/* Athlete list */}
           <section className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
             <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>
-              Athletes ({athletes.length})
+              {i18n("athletesadb6fcf")}{athletes.length})
             </p>
             <div className="mt-4 space-y-2">
               {athletesQuery.isPending ? (
-                <p className="text-sm" style={{ color: "var(--muted)" }}>Loading athletes…</p>
+                <p className="text-sm" style={{ color: "var(--muted)" }}>{i18n("loadingAthletesbdd5068")}</p>
               ) : athletes.length === 0 ? (
-                <p className="text-sm" style={{ color: "var(--muted)" }}>No athletes registered yet.</p>
+                <p className="text-sm" style={{ color: "var(--muted)" }}>{i18n("noAthletesRegisteredYet9b65780")}</p>
               ) : (
                 athletes.map((athlete) => (
                   <button
@@ -212,7 +218,7 @@ export function AdminCoaching() {
                       <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}>
                         {selectedAthlete.nickname}
                       </p>
-                      <h2 className="mt-1 text-xl font-semibold" style={{ color: "var(--text)" }}>Athlete drill-down</h2>
+                      <h2 className="mt-1 text-xl font-semibold" style={{ color: "var(--text)" }}>{i18n("athleteDrillDown0f0a44f")}</h2>
                     </div>
                     <button
                       className="rounded-full px-4 py-2 text-xs font-semibold transition-colors"
@@ -224,14 +230,14 @@ export function AdminCoaching() {
                       onClick={() => setShowDrillDown((v) => !v)}
                       type="button"
                     >
-                      {showDrillDown ? "Hide" : "Load drill-down"}
+                      {showDrillDown ? i18n("hide34d8b60") : i18n("loadDrillDown13990a6")}
                     </button>
                   </div>
 
                   {showDrillDown ? (
                     <div className="mt-5">
                       {drillDownQuery.isPending ? (
-                        <p className="text-sm" style={{ color: "var(--dim)" }}>Loading…</p>
+                        <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
                       ) : drillDownQuery.error instanceof Error ? (
                         <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{drillDownQuery.error.message}</p>
                       ) : drillDownQuery.data?.drill_down ? (
@@ -244,17 +250,17 @@ export function AdminCoaching() {
                 {/* Note form */}
                 <section className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
                   <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
-                    Coaching notes
+                    {i18n("coachingNotes5c7da9f")}
                   </p>
                   <h2 className="mt-1 text-xl font-semibold" style={{ color: "var(--text)" }}>
-                    Send note to {selectedAthlete.nickname}
+                    {i18n("sendNoteTof1db90e")} {selectedAthlete.nickname}
                   </h2>
 
                   <div className="mt-4 space-y-3">
                     <textarea
                       className="min-h-24 w-full rounded-2xl border px-4 py-3 text-sm"
                       style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
-                      placeholder="Write a coaching note…"
+                      placeholder={i18n("writeACoachingNotebd3ca38")}
                       value={noteBody}
                       onChange={(e) => setNoteBody(e.target.value)}
                     />
@@ -266,14 +272,14 @@ export function AdminCoaching() {
                         disabled={noteBody.trim().length === 0 || writeNote.isPending}
                         onClick={() => void writeNote.mutateAsync()}
                       >
-                        {writeNote.isPending ? "Sending…" : "Send note"}
+                        {writeNote.isPending ? i18n("sendingcf76551") : i18n("sendNote0bab5df")}
                       </button>
                       {writeNote.isSuccess ? (
-                        <p className="text-sm" style={{ color: "var(--success)" }}>Note saved.</p>
+                        <p className="text-sm" style={{ color: "var(--success)" }}>{i18n("noteSaved5311c22")}</p>
                       ) : null}
                       {writeNote.isError ? (
                         <p className="text-sm" style={{ color: "var(--primary)" }}>
-                          {writeNote.error instanceof Error ? writeNote.error.message : "Unable to save note."}
+                          {writeNote.error instanceof Error ? writeNote.error.message : i18n("unableToSaveNote8506e1a")}
                         </p>
                       ) : null}
                     </div>
@@ -282,7 +288,7 @@ export function AdminCoaching() {
               </>
             ) : (
               <div className="flex items-center justify-center rounded-[2rem] p-12" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-                <p className="text-sm" style={{ color: "var(--dim)" }}>Select an athlete to begin</p>
+                <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("selectAnAthleteToBegin2722ba1")}</p>
               </div>
             )}
           </div>

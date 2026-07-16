@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -19,6 +24,7 @@ type ArchiveMapping = {
 };
 
 export function ClassTypeSettings({ token }: { token: string }) {
+  const i18n = useUiTranslations();
   const queryClient = useQueryClient();
   const [newName, setNewName] = useState("");
   const [editing, setEditing] = useState<ClassTypeRecord | null>(null);
@@ -42,12 +48,12 @@ export function ClassTypeSettings({ token }: { token: string }) {
       setError(null);
       await refresh();
     },
-    onError: (cause) => setError(cause instanceof Error ? cause.message : "Could not create class type."),
+    onError: (cause) => setError(cause instanceof Error ? cause.message : i18n("couldNotCreateClassTyped413603")),
   });
 
   const updateMutation = useMutation({
     mutationFn: () => {
-      if (!editing) throw new Error("Choose a class type to edit.");
+      if (!editing) throw new Error(i18n("chooseAClassTypeToEdit268bb46"));
       return updateClassType(token, editing.id, { name: editName.trim(), sort_order: editing.sort_order });
     },
     onSuccess: async () => {
@@ -56,7 +62,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
       setError(null);
       await refresh();
     },
-    onError: (cause) => setError(cause instanceof Error ? cause.message : "Could not update class type."),
+    onError: (cause) => setError(cause instanceof Error ? cause.message : i18n("couldNotUpdateClassType039b007")),
   });
 
   const archiveMutation = useMutation({
@@ -81,7 +87,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
       setError(null);
       await refresh();
     },
-    onError: (cause) => setError(cause instanceof Error ? cause.message : "Could not archive class type."),
+    onError: (cause) => setError(cause instanceof Error ? cause.message : i18n("couldNotArchiveClassType0cf6334")),
   });
 
   const allTypes = query.data ?? [];
@@ -94,7 +100,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
         <input
           className="min-w-0 flex-1 rounded-2xl px-4 py-3 text-sm outline-none"
           onChange={(event) => setNewName(event.target.value)}
-          placeholder="New class type name"
+          placeholder={i18n("newClassTypeName6a25273")}
           style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
           value={newName}
         />
@@ -105,11 +111,11 @@ export function ClassTypeSettings({ token }: { token: string }) {
           style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           type="button"
         >
-          {createMutation.isPending ? "Adding…" : "+ Add class type"}
+          {createMutation.isPending ? i18n("addingffb2e62") : i18n("addClassType6446375")}
         </button>
       </div>
 
-      {query.isLoading ? <p className="text-sm" style={{ color: "var(--dim)" }}>Loading class types…</p> : null}
+      {query.isLoading ? <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loadingClassTypesacb2cdf")}</p> : null}
 
       <div className="space-y-2">
         {activeTypes.map((type) => (
@@ -143,7 +149,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
                     style={{ background: "var(--text)", color: "var(--bg)" }}
                     type="button"
                   >
-                    Save
+                    {i18n("saveefc007a")}
                   </button>
                   <button
                     className="rounded-full px-4 py-2 text-xs font-semibold"
@@ -151,7 +157,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
                     style={{ background: "var(--border)", color: "var(--muted)" }}
                     type="button"
                   >
-                    Cancel
+                    {i18n("cancel77dfd21")}
                   </button>
                 </>
               ) : (
@@ -162,7 +168,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
                     style={{ background: "var(--border)", color: "var(--text-soft)" }}
                     type="button"
                   >
-                    Rename
+                    {i18n("renamed3f4cb8")}
                   </button>
                   <button
                     className="rounded-full px-4 py-2 text-xs font-semibold disabled:opacity-50"
@@ -171,7 +177,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
                     style={{ background: "color-mix(in srgb, var(--danger) 12%, transparent)", color: "var(--danger)" }}
                     type="button"
                   >
-                    Remove
+                    {i18n("removee963907")}
                   </button>
                 </>
               )}
@@ -183,13 +189,13 @@ export function ClassTypeSettings({ token }: { token: string }) {
       {archivedTypes.length > 0 ? (
         <details className="rounded-[1.3rem] p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
           <summary className="cursor-pointer text-sm font-semibold" style={{ color: "var(--muted)" }}>
-            Archived class types ({archivedTypes.length})
+            {i18n("archivedClassTypes8e68083")}{archivedTypes.length})
           </summary>
           <div className="mt-3 space-y-2">
             {archivedTypes.map((type) => (
               <div className="flex items-center justify-between gap-3 text-sm" key={type.id}>
                 <span style={{ color: "var(--dim)" }}>{type.name}</span>
-                <span className="text-xs" style={{ color: "var(--border-strong)" }}>Historical only</span>
+                <span className="text-xs" style={{ color: "var(--border-strong)" }}>{i18n("historicalOnly95b4b26")}</span>
               </div>
             ))}
           </div>
@@ -201,10 +207,10 @@ export function ClassTypeSettings({ token }: { token: string }) {
       {archiveMapping ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.68)" }}>
           <div className="w-full max-w-lg rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border-strong)" }}>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--danger)" }}>Replacement required</p>
-            <h3 className="mt-2 text-xl font-semibold" style={{ color: "var(--text)" }}>Map future classes before removal</h3>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--danger)" }}>{i18n("replacementRequireda658534")}</p>
+            <h3 className="mt-2 text-xl font-semibold" style={{ color: "var(--text)" }}>{i18n("mapFutureClassesBeforeRemoval544f152")}</h3>
             <p className="mt-3 text-sm leading-6" style={{ color: "var(--muted)" }}>
-              {archiveMapping.futureCount} future class{archiveMapping.futureCount === 1 ? "" : "es"} use {archiveMapping.source.name}. Past and current classes will retain it for history and analytics.
+              {archiveMapping.futureCount} {i18n("futureClass2a2682f")}{archiveMapping.futureCount === 1 ? "" : "es"} {i18n("use04489a1")} {archiveMapping.source.name}{i18n("pastAndCurrentClassesWillRetainItFor19acc8f")}
             </p>
             <select
               className="mt-5 w-full rounded-2xl px-4 py-3 text-sm outline-none"
@@ -212,7 +218,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
               style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
               value={archiveMapping.replacementId}
             >
-              <option value="">Choose replacement class type</option>
+              <option value="">{i18n("chooseReplacementClassType8eef42c")}</option>
               {activeTypes.filter((type) => type.id !== archiveMapping.source.id).map((type) => (
                 <option key={type.id} value={type.id}>{type.name}</option>
               ))}
@@ -224,7 +230,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
                 style={{ background: "var(--border)", color: "var(--text-soft)" }}
                 type="button"
               >
-                Cancel
+                {i18n("cancel77dfd21")}
               </button>
               <button
                 className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
@@ -233,7 +239,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
                 style={{ background: "var(--danger)", color: "white" }}
                 type="button"
               >
-                {archiveMutation.isPending ? "Mapping…" : "Map and remove"}
+                {archiveMutation.isPending ? i18n("mapping2712740") : i18n("mapAndRemove79dd58a")}
               </button>
             </div>
           </div>

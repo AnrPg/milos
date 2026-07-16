@@ -1,5 +1,11 @@
 "use client";
 
+
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -34,14 +40,15 @@ function ErrorText({ error }: { error: unknown }) {
   return <p className="text-sm font-semibold text-[var(--danger)]">{error.message}</p>;
 }
 
-const QUESTIONS = [
-  { key: "ability_match", text: "How well did this workout match your current ability today?" },
-  { key: "useful_part", text: "Which part felt most useful or enjoyable?" },
-  { key: "hard_part", text: "Which part felt too hard, painful, confusing, or unnecessary?" },
-  { key: "next_adjustment", text: "What should your coach adjust next time?" },
-];
-
 export function ReviewForm() {
+  const QUESTIONS = [
+    { key: "ability_match", text: i18n("howWellDidThisWorkoutMatchYourCurrenta5bb0aa") },
+    { key: "useful_part", text: i18n("whichPartFeltMostUsefulOrEnjoyable3b972ae") },
+    { key: "hard_part", text: i18n("whichPartFeltTooHardPainfulConfusingOrced1e04") },
+    { key: "next_adjustment", text: i18n("whatShouldYourCoachAdjustNextTimea76c965") },
+  ];
+
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const [targetType, setTargetType] = useState("workout");
   const [targetId, setTargetId] = useState("");
@@ -113,14 +120,14 @@ export function ReviewForm() {
             setTargetId("");
           }}
         >
-          <option value="workout">Workout</option>
-          <option value="execution">Execution</option>
-          <option value="gym_parameter">Gym parameter</option>
-          <option value="coaching_parameter">Private coaching</option>
-          <option value="exercise">Exercise</option>
-          <option value="class_slot">Class slot</option>
-          <option value="membership_package">Membership package</option>
-          <option value="general">General</option>
+          <option value="workout">{i18n("workout39463a5")}</option>
+          <option value="execution">{i18n("execution6d525b7")}</option>
+          <option value="gym_parameter">{i18n("gymParameter9409159")}</option>
+          <option value="coaching_parameter">{i18n("privateCoaching23ca6ba")}</option>
+          <option value="exercise">{i18n("exercise20863c8")}</option>
+          <option value="class_slot">{i18n("classSlotb47fa4b")}</option>
+          <option value="membership_package">{i18n("membershipPackage12e8323")}</option>
+          <option value="general">{i18n("general9239ee2")}</option>
         </select>
         <input
           className="rounded-2xl border px-4 py-3"
@@ -163,7 +170,7 @@ export function ReviewForm() {
       {targetRequiresId && !["workout", "execution"].includes(targetType) ? (
         <input
           className="w-full rounded-2xl border px-4 py-3"
-          placeholder="Target ID"
+          placeholder={i18n("targetId00960a1")}
           required
           value={targetId}
           onChange={(event) => setTargetId(event.target.value)}
@@ -188,7 +195,7 @@ export function ReviewForm() {
         disabled={submitMutation.isPending || (targetRequiresId && !selectedTargetId.trim())}
         type="submit"
       >
-        {submitMutation.isPending ? "Submitting..." : "Submit review"}
+        {submitMutation.isPending ? i18n("submitting46a1a69") : i18n("submitReview44cddb4")}
       </button>
       <ErrorText error={submitMutation.error} />
     </form>
@@ -203,10 +210,11 @@ type Review = {
 };
 
 export function ReviewList({ reviews }: { reviews: Review[] }) {
+  const i18n = useUiTranslations();
   if (reviews.length === 0) {
     return (
       <p className="text-sm" style={{ color: "var(--muted)" }}>
-        No reviews submitted yet.
+        {i18n("noReviewsSubmittedYetb92a50f")}
       </p>
     );
   }
@@ -219,7 +227,7 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
           className="rounded-2xl border border-[var(--border)] bg-[var(--panel)] p-5"
         >
           <p className="font-bold">{String(review.target_type)}</p>
-          <p className="text-sm text-[var(--muted)]">Rating {String(review.rating ?? "n/a")}</p>
+          <p className="text-sm text-[var(--muted)]">{i18n("rating6437b7b")} {String(review.rating ?? "n/a")}</p>
           {review.body ? <p className="mt-2 text-sm">{String(review.body)}</p> : null}
         </article>
       ))}
@@ -228,6 +236,7 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
 }
 
 export function MyReviews() {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
 
   const reviewsQuery = useQuery({
@@ -239,12 +248,12 @@ export function MyReviews() {
   return (
     <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-4xl space-y-6">
-        <TransientHero label="reviews introduction">
+        <TransientHero label={i18n("reviewsIntroductiondca29ac")}>
         <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--panel)] p-5">
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">
-            My reviews
+            {i18n("myReviewsa153d4b")}
           </p>
-          <h1 className="mt-2 text-3xl font-black">Leave feedback without losing history.</h1>
+          <h1 className="mt-2 text-3xl font-black">{i18n("leaveFeedbackWithoutLosingHistorye4bc120")}</h1>
         </section>
         </TransientHero>
 

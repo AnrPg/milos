@@ -1,12 +1,18 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 
 import { SESSION_UPDATED_EVENT } from "@/api/client";
+import { signOutAllDevices } from "@/api/auth";
 import { fetchMyReviews } from "@/api/reviews";
-import { getAvatarUploadUrl, updateProfile } from "@/api/profile";
+import { getAvatarUploadUrl, updateAvatar, updateProfile } from "@/api/profile";
 import { fetchGamificationPreferences, updateGamificationPreferences } from "@/api/gamification";
 import { ReviewList } from "@/components/my-reviews";
 import { useSession } from "@/components/session-provider";
@@ -18,8 +24,6 @@ import {
   SUPPORTED_LOCALES,
   type AppLocale,
 } from "@/i18n/locales";
-
-const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 
 function CollapsibleSection({
   id,
@@ -107,9 +111,15 @@ type CurrentUserWithAvatar = {
 };
 
 export function ProfilePage() {
+  const i18n = useUiTranslations();
   const locale = useLocale();
+  const dayLabels = Array.from({ length: 7 }, (_, dayOffset) =>
+    new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "UTC" }).format(
+      new Date(Date.UTC(2024, 0, 7 + dayOffset)),
+    ),
+  );
   const tProfile = useTranslations("Profile");
-  const { tokens, currentUser } = useSession();
+  const { tokens, currentUser, signOut } = useSession();
   const user = currentUser as CurrentUserWithAvatar | null;
 
   const [nicknameValue, setNicknameValue] = useState(user?.nickname ?? "");
@@ -120,6 +130,8 @@ export function ProfilePage() {
   const [personalPending, setPersonalPending] = useState(false);
   const [languagePending, setLanguagePending] = useState(false);
   const [languageError, setLanguageError] = useState<string | null>(null);
+  const [securityPending, setSecurityPending] = useState(false);
+  const [securityError, setSecurityError] = useState<string | null>(null);
 
   const [avatarPending, setAvatarPending] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
@@ -145,7 +157,7 @@ export function ProfilePage() {
 
   const updatePrefsMutation = useMutation({
     mutationFn: async (days: number[]) => {
-      if (!tokens) throw new Error("Not authenticated");
+      if (!tokens) throw new Error(i18n("notAuthenticated0c91acb"));
       return updateGamificationPreferences(tokens.access_token, { off_days: days });
     },
     onSuccess: (data) => {
@@ -166,7 +178,7 @@ export function ProfilePage() {
     updatePrefsMutation.mutate(next);
   }
 
-  function broadcastUserUpdate(updatedUser: CurrentUserWithAvatar) {
+  function broadcastUserUpdate(updatedUser: Partial<CurrentUserWithAvatar> & { id: string }) {
     if (!tokens) return;
     window.dispatchEvent(
       new CustomEvent(SESSION_UPDATED_EVENT, {
@@ -197,7 +209,7 @@ export function ProfilePage() {
       }
 
       if (Object.keys(payload).length === 0) {
-        setPersonalSuccess("Nothing to update.");
+        setPersonalSuccess(i18n("nothingToUpdate928017b"));
         return;
       }
 
@@ -206,11 +218,29 @@ export function ProfilePage() {
       setNicknameValue(result.user.nickname);
       setCurrentPassword("");
       setNewPassword("");
-      setPersonalSuccess("Profile updated.");
+      if (payload.password) {
+        signOut();
+      } else {
+        setPersonalSuccess(i18n("profileUpdatedbcf7629"));
+      }
     } catch (err) {
-      setPersonalError(err instanceof Error ? err.message : "Update failed.");
+      setPersonalError(err instanceof Error ? err.message : i18n("updateFailed19a9955"));
     } finally {
       setPersonalPending(false);
+    }
+  }
+
+  async function handleSignOutAllDevices() {
+    if (!tokens) return;
+    setSecurityError(null);
+    setSecurityPending(true);
+
+    try {
+      await signOutAllDevices(tokens.access_token);
+      signOut();
+    } catch (error) {
+      setSecurityError(error instanceof Error ? error.message : i18n("couldNotRevokeSessions41a1176"));
+      setSecurityPending(false);
     }
   }
 
@@ -220,21 +250,22 @@ export function ProfilePage() {
     setAvatarPending(true);
 
     try {
-      const { upload_url, public_url } = await getAvatarUploadUrl(tokens.access_token);
+      const { upload_url, key, required_headers } =
+        await getAvatarUploadUrl(tokens.access_token, file);
 
       const uploadRes = await fetch(upload_url, {
         method: "PUT",
         body: file,
-        headers: { "Content-Type": file.type || "image/jpeg" },
+        headers: required_headers,
       });
 
-      if (!uploadRes.ok) throw new Error("Upload to storage failed.");
+      if (!uploadRes.ok) throw new Error(i18n("uploadToStorageFailed1daa4c3"));
 
-      const result = await updateProfile(tokens.access_token, { avatar_url: public_url });
+      const result = await updateAvatar(tokens.access_token, key);
       broadcastUserUpdate(result.user);
-      setAvatarPreview(public_url);
+      setAvatarPreview(result.user.avatar_url);
     } catch (err) {
-      setAvatarError(err instanceof Error ? err.message : "Avatar upload failed.");
+      setAvatarError(err instanceof Error ? err.message : i18n("avatarUploadFailed8d620ac"));
     } finally {
       setAvatarPending(false);
     }
@@ -260,7 +291,7 @@ export function ProfilePage() {
   return (
     <main className="min-h-screen px-6 py-10 md:px-10" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-3xl space-y-4">
-        <TransientHero label="profile introduction">
+        <TransientHero label={i18n("profileIntroductioncf30917")}>
         <div className="mb-4">
           <p className="text-xs font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
             {tProfile("eyebrow")}
@@ -310,17 +341,39 @@ export function ProfilePage() {
         </CollapsibleSection>
 
         <CollapsibleSection
+          id="security"
+          title={i18n("securityf25ce1b")}
+          description={i18n("activeSessionsAndAccountProtection4aeac5f")}
+        >
+          <div className="space-y-4">
+            <p className="text-sm leading-6" style={{ color: "var(--muted)" }}>
+              {i18n("revokeEveryRefreshSessionIncludingThisBrowserYoudd5d38f")}
+            </p>
+            <button
+              type="button"
+              disabled={securityPending}
+              onClick={() => void handleSignOutAllDevices()}
+              className="rounded-xl px-5 py-2.5 text-sm font-semibold disabled:opacity-50"
+              style={{ background: "var(--danger)", color: "white" }}
+            >
+              {securityPending ? i18n("revokingSessions8eee998") : i18n("signOutAllDevicesf14a071")}
+            </button>
+            {securityError ? <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{securityError}</p> : null}
+          </div>
+        </CollapsibleSection>
+
+        <CollapsibleSection
           id="personal"
-          title="Personal Info"
-          description="Nickname and password"
+          title={i18n("personalInfo87a403c")}
+          description={i18n("nicknameAndPassword3e84316")}
           defaultOpen
         >
           <form className="space-y-5" onSubmit={(e) => void handlePersonalSave(e)}>
-            <FieldGroup label="Nickname">
+            <FieldGroup label={i18n("nicknamece2bd99")}>
               <TextInput
                 value={nicknameValue}
                 onChange={(e) => setNicknameValue(e.target.value)}
-                placeholder="Your nickname"
+                placeholder={i18n("yourNicknameb5c8b4b")}
                 minLength={3}
                 maxLength={30}
                 pattern="[a-zA-Z0-9_]+"
@@ -329,24 +382,24 @@ export function ProfilePage() {
 
             <div className="border-t pt-5" style={{ borderColor: "var(--border)" }}>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] mb-4" style={{ color: "var(--muted)" }}>
-                Change password (leave blank to keep current)
+                {i18n("changePasswordLeaveBlankToKeepCurrent6e6fc07")}
               </p>
               <div className="space-y-3">
-                <FieldGroup label="Current password">
+                <FieldGroup label={i18n("currentPassword19dff4d")}>
                   <TextInput
                     type="password"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder="Enter current password"
+                    placeholder={i18n("enterCurrentPassword149b393")}
                     autoComplete="current-password"
                   />
                 </FieldGroup>
-                <FieldGroup label="New password">
+                <FieldGroup label={i18n("newPasswordd850ee1")}>
                   <TextInput
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="At least 8 characters"
+                    placeholder={i18n("atLeast8Characters1fe494b")}
                     minLength={8}
                     autoComplete="new-password"
                   />
@@ -371,24 +424,24 @@ export function ProfilePage() {
               className="rounded-xl px-6 py-2.5 text-sm font-semibold disabled:opacity-50"
               style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
-              {personalPending ? "Saving…" : "Save changes"}
+              {personalPending ? i18n("saving56a2285") : i18n("saveChanges179359b")}
             </button>
           </form>
         </CollapsibleSection>
 
         <CollapsibleSection
           id="training-schedule"
-          title="Training Schedule"
-          description="Mark your weekly rest days (up to 3)"
+          title={i18n("trainingSchedule80e51e2")}
+          description={i18n("markYourWeeklyRestDaysUpTo5ee5b72a")}
         >
           <div className="space-y-5">
             <p className="text-sm" style={{ color: "var(--muted)" }}>
-              Off-days are transparent to your streak — missing a scheduled rest day won&apos;t break it.
+              {i18n("offDaysAreTransparentToYourStreakMissingb808660")}
             </p>
             <div className="flex flex-wrap gap-2">
-              {DAY_LABELS.map((label, dow) => {
+              {dayLabels.map((label, dow) => {
                 const selected = offDays.includes(dow);
-                const disabled = !selected && offDays.length >= 3;
+                const disabled = !selected && offDays.length >= 5;
                 return (
                   <button
                     key={dow}
@@ -411,25 +464,25 @@ export function ProfilePage() {
             </div>
             {updatePrefsMutation.isError && (
               <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>
-                Failed to save. Please try again.
+                {i18n("failedToSavePleaseTryAgainb68b7e7")}
               </p>
             )}
           </div>
         </CollapsibleSection>
 
-        <CollapsibleSection id="avatar" title="Avatar" description="Profile picture">
+        <CollapsibleSection id="avatar" title={i18n("avatar7631b26")} description={i18n("profilePictureaeb8371")}>
           <div className="space-y-5">
             {avatarPreview && (
               <div className="flex items-center gap-4">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={avatarPreview}
-                  alt="Avatar preview"
+                  alt={i18n("avatarPreview9d0ac09")}
                   className="h-20 w-20 rounded-full object-cover"
                   style={{ border: "2px solid var(--border)" }}
                 />
                 <p className="text-sm" style={{ color: "var(--muted)" }}>
-                  Current avatar
+                  {i18n("currentAvatar8634e3c")}
                 </p>
               </div>
             )}
@@ -456,7 +509,7 @@ export function ProfilePage() {
                 color: "var(--text)",
               }}
             >
-              {avatarPending ? "Uploading…" : avatarPreview ? "Change avatar" : "Upload avatar"}
+              {avatarPending ? i18n("uploadingd921a79") : avatarPreview ? i18n("changeAvatar60f2e98") : i18n("uploadAvatareb634e9")}
             </button>
 
             {avatarError && (
@@ -469,16 +522,16 @@ export function ProfilePage() {
 
         <CollapsibleSection
           id="account-activity"
-          title="Account Activity"
-          description="Your reviews and history"
+          title={i18n("accountActivity2263296")}
+          description={i18n("yourReviewsAndHistory4a3fb33")}
         >
           <div className="space-y-4">
             <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--muted)" }}>
-              My Reviews History
+              {i18n("myReviewsHistorycdeb034")}
             </p>
             {reviewsQuery.isLoading ? (
               <p className="text-sm" style={{ color: "var(--dim)" }}>
-                Loading reviews…
+                {i18n("loadingReviews1c4171c")}
               </p>
             ) : (
               <ReviewList reviews={(reviewsQuery.data?.reviews ?? []) as Parameters<typeof ReviewList>[0]["reviews"]} />

@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -15,6 +20,7 @@ type ReviewAnswer = {
 };
 
 export function AdminReviews() {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const [offset, setOffset] = useState(0);
   const [tagDrafts, setTagDrafts] = useState<Record<string, string>>({});
@@ -38,19 +44,18 @@ export function AdminReviews() {
   return (
     <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-5xl space-y-6">
-        <TransientHero label="feedback administration introduction">
+        <TransientHero label={i18n("feedbackAdministrationIntroduction1d7858c")} timeoutMs={3000}>
         <section className="rounded-[2rem] border border-[color:var(--border)] bg-[var(--panel)] p-5">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">Feedback admin</p>
-          <h1 className="mt-2 text-3xl font-black">Reviews and satisfaction signals</h1>
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">{i18n("feedbackAdmind2508e3")}</p>
+          <h1 className="mt-2 text-3xl font-black">{i18n("reviewsAndSatisfactionSignalsd3cab61")}</h1>
           <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-            MVP moderation view for workout, exercise, gym, and coaching reviews. Analytics will consume the same
-            persisted records.
+            {i18n("mvpModerationViewForWorkoutExerciseGymAnd18da3ff")}
           </p>
         </section>
         </TransientHero>
 
         <section className="grid gap-4">
-          {reviews.length === 0 ? <p className="rounded-2xl bg-[var(--panel)]/5 p-5 text-sm">No reviews yet.</p> : null}
+          {reviews.length === 0 ? <p className="rounded-2xl bg-[var(--panel)]/5 p-5 text-sm">{i18n("noReviewsYet739e4b6")}</p> : null}
           {reviews.map((review) => {
             const answers = Array.isArray(review.answers) ? (review.answers as ReviewAnswer[]) : [];
             const reviewId = String(review.id);
@@ -68,10 +73,10 @@ export function AdminReviews() {
                       {String(snapshot.label ?? review.target_type)}
                     </p>
                     <p className="text-sm text-[var(--muted)]">
-                      {String(review.target_type)} · Rating {String(review.rating ?? "n/a")} · {String(review.sentiment)} · {String(review.status)}
+                      {String(review.target_type)} {i18n("rating5852701")} {String(review.rating ?? "n/a")} · {String(review.sentiment)} · {String(review.status)}
                     </p>
                     {review.target_id ? (
-                      <p className="mt-1 text-xs text-[var(--dim)]">Target {String(review.target_id)}</p>
+                      <p className="mt-1 text-xs text-[var(--dim)]">{i18n("target61ad50a")} {String(review.target_id)}</p>
                     ) : null}
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -80,20 +85,20 @@ export function AdminReviews() {
                       type="button"
                       onClick={() => statusMutation.mutate({ id: reviewId, status: "reviewed", tags: splitTags(tagDraft) })}
                     >
-                      Mark reviewed
+                      {i18n("markReviewed277c924")}
                     </button>
                     <button
                       className="rounded-full border border-[var(--primary)] px-4 py-2 text-sm font-bold text-[var(--primary)]"
                       type="button"
                       onClick={() => statusMutation.mutate({ id: reviewId, status: "needs_follow_up", tags: splitTags(tagDraft) })}
                     >
-                      Needs follow-up
+                      {i18n("needsFollowUp067fefc")}
                     </button>
                   </div>
                 </div>
                 <input
                   className="mt-4 w-full rounded-xl border border-[color:var(--border)] bg-[var(--bg)] px-3 py-2 text-sm text-[var(--text)] outline-none"
-                  placeholder="triage tags"
+                  placeholder={i18n("triageTags6d6b330")}
                   value={tagDraft}
                   onChange={(event) => setTagDrafts({ ...tagDrafts, [reviewId]: event.target.value })}
                 />
@@ -102,18 +107,18 @@ export function AdminReviews() {
                   <div className="mt-4 grid gap-3">
                     {answers.map((answer, index) => (
                       <div
-                        key={`${String(review.id)}-${index}`}
+                        key={(String(review.id)) + "-" + (index)}
                         className="rounded-[1rem] border border-[color:var(--border)] bg-[var(--bg)] p-4"
                       >
                         <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--primary)]">
-                          {String(answer.question_key ?? `answer_${index + 1}`)}
+                          {String(answer.question_key ?? "answer_" + (index + 1))}
                         </p>
                         <p className="mt-2 text-sm font-semibold text-[var(--text)]">
-                          {String(answer.question_text ?? "Question")}
+                          {String(answer.question_text ?? i18n("question002ff59"))}
                         </p>
                         <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
                           {String(answer.answer_text ?? "")}
-                          {answer.rating_value ? ` · ${String(answer.rating_value)}/5` : ""}
+                          {answer.rating_value ? "· " + (String(answer.rating_value)) + "/5" : ""}
                         </p>
                       </div>
                     ))}
@@ -130,7 +135,7 @@ export function AdminReviews() {
             type="button"
             onClick={() => setOffset(Math.max(offset - pageSize, 0))}
           >
-            Previous
+            {i18n("previous50f9428")}
           </button>
           <button
             className="rounded-full border border-[color:var(--border)] px-4 py-2 text-sm font-bold disabled:opacity-40"
@@ -138,7 +143,7 @@ export function AdminReviews() {
             type="button"
             onClick={() => setOffset(offset + pageSize)}
           >
-            Next
+            {i18n("nextbc98198")}
           </button>
         </div>
       </div>

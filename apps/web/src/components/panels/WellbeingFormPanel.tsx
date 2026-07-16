@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 
@@ -7,6 +12,7 @@ import { reportInjury } from "@/api/wellbeing";
 import { useSession } from "@/components/session-provider";
 
 export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const [bodyArea, setBodyArea] = useState("");
   const [severity, setSeverity] = useState("mild");
@@ -38,10 +44,10 @@ export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
       >
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}>
-            Training Readiness
+            {i18n("trainingReadiness9672bfd")}
           </p>
           <p className="text-sm mt-0.5" style={{ color: "var(--muted)" }}>
-            Report discomfort or limitations
+            {i18n("reportDiscomfortOrLimitations5e07927")}
           </p>
         </div>
         <button
@@ -58,7 +64,7 @@ export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
         {submitted ? (
           <div className="py-8 text-center">
             <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-              Submitted. Thank you.
+              {i18n("submittedThankYoud1876c0")}
             </p>
             <button
               type="button"
@@ -66,7 +72,7 @@ export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
               style={{ color: "var(--primary)" }}
               onClick={() => setSubmitted(false)}
             >
-              Report another
+              {i18n("reportAnothere0c66a7")}
             </button>
           </div>
         ) : (
@@ -79,7 +85,7 @@ export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
           >
             <div>
               <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--muted)" }}>
-                Body area
+                {i18n("bodyAreaa785bb3")}
               </label>
               <input
                 className="w-full rounded-xl px-3 py-2.5 text-sm outline-none"
@@ -88,7 +94,7 @@ export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
                   border: "1px solid var(--border)",
                   color: "var(--text)",
                 }}
-                placeholder="e.g. right shoulder"
+                placeholder={i18n("eGRightShouldercaf6c58")}
                 required
                 value={bodyArea}
                 onChange={(e) => setBodyArea(e.target.value)}
@@ -97,7 +103,7 @@ export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
 
             <div>
               <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--muted)" }}>
-                Severity
+                {i18n("severityde314fa")}
               </label>
               <select
                 className="w-full rounded-xl px-3 py-2.5 text-sm outline-none"
@@ -109,15 +115,15 @@ export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
                 value={severity}
                 onChange={(e) => setSeverity(e.target.value)}
               >
-                <option value="mild">Mild — can train with care</option>
-                <option value="moderate">Moderate — limited training</option>
-                <option value="severe">Severe — cannot train</option>
+                <option value="mild">{i18n("mildCanTrainWithCare8b2bbe3")}</option>
+                <option value="moderate">{i18n("moderateLimitedTraining5358133")}</option>
+                <option value="severe">{i18n("severeCannotTrainf98a85c")}</option>
               </select>
             </div>
 
             <div>
               <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--muted)" }}>
-                Training limitations (optional)
+                {i18n("trainingLimitationsOptional201e2b9")}
               </label>
               <textarea
                 className="w-full rounded-xl px-3 py-2.5 text-sm outline-none resize-none"
@@ -127,7 +133,7 @@ export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
                   color: "var(--text)",
                   minHeight: "80px",
                 }}
-                placeholder="Describe what movements hurt or are not possible…"
+                placeholder={i18n("describeWhatMovementsHurtOrAreNotPossiblef5b6d6e")}
                 value={limitations}
                 onChange={(e) => setLimitations(e.target.value)}
               />
@@ -149,7 +155,7 @@ export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
                 opacity: reportMutation.isPending || !bodyArea.trim() ? 0.5 : 1,
               }}
             >
-              {reportMutation.isPending ? "Reporting…" : "Submit report"}
+              {reportMutation.isPending ? i18n("reportingadbd903") : i18n("submitReporta668129")}
             </button>
           </form>
         )}

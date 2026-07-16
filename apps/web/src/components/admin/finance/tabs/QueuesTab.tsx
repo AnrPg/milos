@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -7,14 +12,6 @@ import { fetchFinanceQueues, type FinanceRecord } from "@/api/finance";
 import { useSession } from "@/components/session-provider";
 
 type QueueKey = "expiring" | "pending" | "overdue" | "rewards" | "promos";
-
-const CHIPS: Array<{ id: QueueKey; label: string }> = [
-  { id: "expiring", label: "Expiring" },
-  { id: "pending", label: "Pending Payments" },
-  { id: "overdue", label: "Overdue Invoices" },
-  { id: "rewards", label: "Pending Rewards" },
-  { id: "promos", label: "Promo Redemptions" },
-];
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -33,6 +30,14 @@ function dateText(value: unknown) {
 }
 
 export function QueuesTab() {
+  const i18n = useUiTranslations();
+  const CHIPS: Array<{ id: QueueKey; label: string }> = [
+    { id: "expiring", label: i18n("expiringb98d672") },
+    { id: "pending", label: i18n("pendingPayments9126c11") },
+    { id: "overdue", label: i18n("overdueInvoices739b616") },
+    { id: "rewards", label: i18n("pendingRewardse6d6885") },
+    { id: "promos", label: i18n("promoRedemptions2388269") },
+  ];
   const { tokens } = useSession();
   const token = tokens?.access_token;
   const [active, setActive] = useState<QueueKey>("expiring");
@@ -90,15 +95,15 @@ export function QueuesTab() {
       {/* Queue list */}
       <div className="rounded-[2rem] overflow-hidden" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
         {queuesQuery.isLoading ? (
-          <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>Loading queue…</p>
+          <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>{i18n("loadingQueuea1e2a39")}</p>
         ) : rows.length === 0 ? (
-          <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>No items in this queue.</p>
+          <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>{i18n("noItemsInThisQueuec992fc9")}</p>
         ) : (
           <div>
             {active === "expiring" && rows.map((row, i) => (
               <QueueRow key={field(row, "id", String(i))} last={i === rows.length - 1}>
                 <span style={{ color: "var(--text)" }}>{field(row, "nickname", field(row, "user_id"))}</span>
-                <span style={{ color: "var(--muted)" }}>Expires {dateText(row.expires_on)}</span>
+                <span style={{ color: "var(--muted)" }}>{i18n("expiresa99be3d")} {dateText(row.expires_on)}</span>
               </QueueRow>
             ))}
 
@@ -112,7 +117,7 @@ export function QueuesTab() {
             {active === "overdue" && rows.map((row, i) => (
               <QueueRow key={field(row, "id", String(i))} last={i === rows.length - 1}>
                 <span style={{ color: "var(--text)" }}>{field(row, "invoice_number")}</span>
-                <span style={{ color: "var(--primary-strong)" }}>{money(row.balance_due_cents)} overdue</span>
+                <span style={{ color: "var(--primary-strong)" }}>{money(row.balance_due_cents)} {i18n("overdueba2fff4")}</span>
               </QueueRow>
             ))}
 
@@ -126,7 +131,7 @@ export function QueuesTab() {
             {active === "promos" && rows.map((row, i) => (
               <QueueRow key={field(row, "id", String(i))} last={i === rows.length - 1}>
                 <span style={{ color: "var(--text)" }}>{field(row, "membership_id")}</span>
-                <span style={{ color: "var(--muted)" }}>Discount {field(row, "discount_value_snapshot")}</span>
+                <span style={{ color: "var(--muted)" }}>{i18n("discountb524936")} {field(row, "discount_value_snapshot")}</span>
               </QueueRow>
             ))}
           </div>
@@ -137,6 +142,7 @@ export function QueuesTab() {
 }
 
 function QueueRow({ children, last }: { children: React.ReactNode; last: boolean }) {
+  const i18n = useUiTranslations();
   return (
     <div
       className="flex items-center justify-between gap-4 px-6 py-4 text-sm"

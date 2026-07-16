@@ -1,25 +1,17 @@
 "use client";
 
+
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import type { DraftExercise, DraftSection } from "@/types/workout";
 
 import { TimeInput } from "./TimeInput";
 
 type SettingKey = keyof DraftExercise["advanced"];
-
-const SETTINGS: Array<{
-  key: SettingKey;
-  label: string;
-  unit: string;
-  inputType: "number" | "text";
-}> = [
-  { key: "hrZone", label: "Heart Rate Zone", unit: "Zone", inputType: "number" },
-  { key: "tempo", label: "Tempo", unit: "", inputType: "text" },
-  { key: "restSeconds", label: "Rest Between Sets", unit: "secs", inputType: "number" },
-  { key: "clusterRestSeconds", label: "Cluster Sets Intra-Rest", unit: "secs", inputType: "number" },
-  { key: "restPauseSeconds", label: "Rest-Pause", unit: "secs", inputType: "number" },
-  { key: "pacing", label: "Pacing", unit: "/km", inputType: "number" },
-];
 
 type Props = {
   exercise: DraftExercise;
@@ -28,6 +20,20 @@ type Props = {
 };
 
 export function AdvancedSettingsPanel({ exercise, section, sectionOptions = [] }: Props) {
+  const i18n = useUiTranslations();
+  const SETTINGS: Array<{
+    key: SettingKey;
+    label: string;
+    unit: string;
+    inputType: "number" | "text";
+  }> = [
+    { key: "hrZone", label: i18n("heartRateZonec0085b9"), unit: "Zone", inputType: "number" },
+    { key: "tempo", label: i18n("tempo899658e"), unit: "", inputType: "text" },
+    { key: "restSeconds", label: i18n("restBetweenSets39fb31b"), unit: "secs", inputType: "number" },
+    { key: "clusterRestSeconds", label: i18n("clusterSetsIntraRestfc8fbe2"), unit: "secs", inputType: "number" },
+    { key: "restPauseSeconds", label: i18n("restPause62e1845"), unit: "secs", inputType: "number" },
+    { key: "pacing", label: i18n("pacing43ab6ce"), unit: "/km", inputType: "number" },
+  ];
   const { toggleAdvancedPanel, toggleAdvancedSetting, updateAdvancedValue, deleteExercise, moveExercise } =
     useWorkoutCreationStore();
 
@@ -35,14 +41,14 @@ export function AdvancedSettingsPanel({ exercise, section, sectionOptions = [] }
     <div className="border-t px-4 pb-4" style={{ borderColor: "var(--accent)" }}>
       <div className="flex items-center justify-between py-2">
         <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-          Advanced Settings
+          {i18n("advancedSettingsc8fef35")}
         </span>
         <button
           onClick={() => toggleAdvancedPanel(section.localId, exercise.localId)}
           className="text-xs"
           style={{ color: "var(--muted)" }}
         >
-          Close
+          {i18n("closebbfa773")}
         </button>
       </div>
 
@@ -114,7 +120,7 @@ export function AdvancedSettingsPanel({ exercise, section, sectionOptions = [] }
       {sectionOptions.length > 0 ? (
         <div className="mt-4 flex items-center gap-3">
           <span className="text-sm" style={{ color: "var(--muted)" }}>
-            Move to section
+            {i18n("moveToSection98d183e")}
           </span>
           <select
             defaultValue=""
@@ -127,12 +133,12 @@ export function AdvancedSettingsPanel({ exercise, section, sectionOptions = [] }
             className="rounded-xl px-3 py-2 text-sm outline-none"
             style={{ background: "var(--bg)", border: "1px solid var(--dim)", color: "var(--text)" }}
           >
-            <option value="">Select</option>
+            <option value="">{i18n("select8598222")}</option>
             {sectionOptions
               .filter((option) => option.id !== section.localId)
               .map((option) => (
                 <option key={option.id} value={option.id}>
-                  {option.name || "Unnamed section"}
+                  {option.name || i18n("unnamedSection109fa70")}
                 </option>
               ))}
           </select>
@@ -144,7 +150,7 @@ export function AdvancedSettingsPanel({ exercise, section, sectionOptions = [] }
         className="mt-4 text-xs font-semibold"
         style={{ color: "var(--red)" }}
       >
-        Remove exercise
+        {i18n("removeExercise4c52294")}
       </button>
     </div>
   );

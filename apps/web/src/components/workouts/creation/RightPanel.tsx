@@ -1,5 +1,9 @@
 "use client";
 
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 
 import type { ScaleLevel } from "@/api/workouts";
@@ -13,6 +17,7 @@ type Props = {
 };
 
 export function RightPanel({ scaleLevels, mobile = false }: Props) {
+  const i18n = useUiTranslations();
   const { sections, rightCollapsed, setRightCollapsed } = useWorkoutCreationStore();
   const [activeScale, setActiveScale] = useState<string | null>(null);
 
@@ -31,7 +36,7 @@ export function RightPanel({ scaleLevels, mobile = false }: Props) {
             color: "var(--muted)",
           }}
         >
-          Preview
+          {i18n("previewf1fbb2b")}
         </span>
         <span className="mt-2 text-xs" style={{ color: "var(--muted)" }}>
           &lt;
@@ -50,12 +55,12 @@ export function RightPanel({ scaleLevels, mobile = false }: Props) {
 
   return (
     <div
-      className={`flex ${mobile ? "w-full" : "w-72 shrink-0"} flex-col overflow-hidden`}
+      className={"flex " + (mobile ? "w-full" : "w-72 shrink-0") + " flex-col overflow-hidden"}
       style={{ background: "var(--panel)", borderLeft: mobile ? "none" : "1px solid var(--dim)" }}
     >
       <div className="flex shrink-0 items-center justify-between px-4 py-3">
         <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-          Preview
+          {i18n("previewf1fbb2b")}
         </span>
         {!mobile ? (
           <button onClick={() => setRightCollapsed(true)} className="text-xs" style={{ color: "var(--dim)" }}>
@@ -73,7 +78,7 @@ export function RightPanel({ scaleLevels, mobile = false }: Props) {
             color: activeScale === null ? "var(--bg)" : "var(--muted)",
           }}
         >
-          Base
+          {i18n("base077fe9c")}
         </button>
         {activeScales.map((scaleLevel) => (
           <button
@@ -93,7 +98,7 @@ export function RightPanel({ scaleLevels, mobile = false }: Props) {
       <div className="flex-1 overflow-y-auto px-4">
         {sections.length === 0 ? (
           <p className="py-4 text-center text-xs" style={{ color: "var(--dim)" }}>
-            Add sections to see preview
+            {i18n("addSectionsToSeePreviewef9458d")}
           </p>
         ) : (
           sections.map((section) => (

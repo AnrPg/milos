@@ -1,5 +1,11 @@
 "use client";
 
+
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useCallback, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -35,15 +41,6 @@ function expiresWarn(expiresOn: string): boolean {
   const diff = new Date(expiresOn).getTime() - Date.now();
   return diff > 0 && diff < 30 * 24 * 60 * 60 * 1000;
 }
-
-const MEMBERSHIP_STATUS_OPTIONS = [
-  { value: "active", label: "Active", accent: true },
-  { value: "trial", label: "Trial" },
-  { value: "expiring", label: "Expiring" },
-  { value: "expired", label: "Expired" },
-  { value: "comped", label: "Comped" },
-  { value: "paused", label: "Paused" },
-];
 
 const EUR = new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" });
 
@@ -113,6 +110,7 @@ function MultiCheck({
 // ── MembersTab ────────────────────────────────────────────────────────────────
 
 export function MembersTab() {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
   const queryClient = useQueryClient();
@@ -248,7 +246,7 @@ export function MembersTab() {
   if (membersQuery.isLoading) {
     return (
       <p className="px-6 py-10 text-sm" style={{ color: "var(--dim)" }}>
-        Loading members…
+        {i18n("loadingMembers402901a")}
       </p>
     );
   }
@@ -263,8 +261,8 @@ export function MembersTab() {
           style={{ color: "var(--dim)" }}
         >
           {filteredMembers.length === members.length
-            ? `${members.length} member${members.length !== 1 ? "s" : ""}`
-            : `${filteredMembers.length} / ${members.length} members`}
+            ? (members.length) + " member" + (members.length !== 1 ? "s" : "")
+            : (filteredMembers.length) + " / " + (members.length) + " members"}
         </p>
         {hasActiveFilters && (
           <button
@@ -273,7 +271,7 @@ export function MembersTab() {
             className="text-xs hover:opacity-70 transition-opacity"
             style={{ color: "var(--primary)" }}
           >
-            Clear filters
+            {i18n("clearFilters4122267")}
           </button>
         )}
       </div>
@@ -289,14 +287,14 @@ export function MembersTab() {
                 {/* Nickname — sticky */}
                 <SortableHeader
                   column="nickname"
-                  label="Nickname"
+                  label={i18n("nicknamece2bd99")}
                   sort={sort}
                   hasFilter={Boolean(filters.nickname)}
                   onSort={() => cycleSort("nickname")}
                   filterSlot={
                     <input
                       type="text"
-                      placeholder="Search…"
+                      placeholder={i18n("searchf54fbca")}
                       value={(filters.nickname as { kind: "text"; value: string } | undefined)?.value ?? ""}
                       onChange={(e) =>
                         e.target.value
@@ -310,7 +308,7 @@ export function MembersTab() {
                 />
                 <SortableHeader
                   column="type"
-                  label="Type"
+                  label={i18n("type3deb745")}
                   sort={sort}
                   hasFilter={Boolean(filters.type)}
                   onSort={() => cycleSort("type")}
@@ -328,7 +326,7 @@ export function MembersTab() {
                 />
                 <SortableHeader
                   column="status"
-                  label="Status"
+                  label={i18n("statusbae7d5b")}
                   sort={sort}
                   hasFilter={Boolean(filters.status)}
                   onSort={() => cycleSort("status")}
@@ -346,14 +344,14 @@ export function MembersTab() {
                 />
                 <SortableHeader
                   column="plan"
-                  label="Plan"
+                  label={i18n("planae2f98a")}
                   sort={sort}
                   hasFilter={Boolean(filters.plan)}
                   onSort={() => cycleSort("plan")}
                   filterSlot={
                     <MultiCheck
                       options={[
-                        { label: "None", value: "__none__" },
+                        { label: i18n("none6eef664"), value: "__none__" },
                         ...uniquePlanCodes.map((v) => ({ label: v, value: v })),
                       ]}
                       values={(filters.plan as { kind: "multi"; values: string[] } | undefined)?.values ?? []}
@@ -367,47 +365,47 @@ export function MembersTab() {
                 />
                 <SortableHeader
                   column="expires"
-                  label="Expires"
+                  label={i18n("expiresa99be3d")}
                   sort={sort}
                   hasFilter={Boolean(filters.expires)}
                   onSort={() => cycleSort("expires")}
                   filterSlot={datePresetFilter("expires", [
-                    { label: "Expired", value: "expired" },
-                    { label: "Next 30d", value: "next_30d" },
-                    { label: "No expiry", value: "no_expiry" },
+                    { label: i18n("expireda689a99"), value: "expired" },
+                    { label: i18n("next30d1a7b0bd"), value: "next_30d" },
+                    { label: i18n("noExpiry39d436a"), value: "no_expiry" },
                   ])}
                 />
                 <SortableHeader
                   column="last_paid"
-                  label="Last paid"
+                  label={i18n("lastPaid05b910a")}
                   sort={sort}
                   hasFilter={Boolean(filters.last_paid)}
                   onSort={() => cycleSort("last_paid")}
                   filterSlot={datePresetFilter("last_paid", [
-                    { label: "Never", value: "never" },
-                    { label: "Last 30d", value: "last_30d" },
-                    { label: "Last 90d", value: "last_90d" },
+                    { label: i18n("never80c3052"), value: "never" },
+                    { label: i18n("last30d5ef79d5"), value: "last_30d" },
+                    { label: i18n("last90d8c9f9e6"), value: "last_90d" },
                   ])}
                 />
                 <SortableHeader
                   column="amount"
-                  label="Amount"
+                  label={i18n("amount43dc853")}
                   sort={sort}
                   hasFilter={Boolean(filters.amount)}
                   onSort={() => cycleSort("amount")}
-                  filterSlot={presenceFilter("amount", "Has payment", "No payment")}
+                  filterSlot={presenceFilter("amount", i18n("hasPaymentd3b5c9e"), i18n("noPayment63104bf"))}
                 />
                 <SortableHeader
                   column="credits"
-                  label="Credits"
+                  label={i18n("creditsbfac50d")}
                   sort={sort}
                   hasFilter={Boolean(filters.credits)}
                   onSort={() => cycleSort("credits")}
                   filterSlot={
                     <PillGroup
                       options={[
-                        { label: "Has credits", value: "positive" },
-                        { label: "Owes credits", value: "negative" },
+                        { label: i18n("hasCredits2c1970f"), value: "positive" },
+                        { label: i18n("owesCredits8f977d5"), value: "negative" },
                       ]}
                       value={(filters.credits as { kind: "sign"; value: string } | undefined)?.value ?? ""}
                       onSelect={(v) =>
@@ -420,35 +418,35 @@ export function MembersTab() {
                 />
                 <SortableHeader
                   column="balance_due"
-                  label="Balance Due"
+                  label={i18n("balanceDue5a6bd4c")}
                   sort={sort}
                   hasFilter={Boolean(filters.balance_due)}
                   onSort={() => cycleSort("balance_due")}
-                  filterSlot={presenceFilter("balance_due", "Has balance due", "Settled")}
+                  filterSlot={presenceFilter("balance_due", i18n("hasBalanceDue2379e94"), i18n("settled7fb3a9b"))}
                 />
                 <SortableHeader
                   column="notes"
-                  label="Notes"
+                  label={i18n("notes7044004")}
                   sort={sort}
                   hasFilter={Boolean(filters.notes)}
                   onSort={() => cycleSort("notes")}
-                  filterSlot={presenceFilter("notes", "Has notes", "Empty")}
+                  filterSlot={presenceFilter("notes", i18n("hasNotesf0af50f"), i18n("empty3159fe4"))}
                 />
                 <SortableHeader
                   column="referred_by"
-                  label="Referred By"
+                  label={i18n("referredByb47f784")}
                   sort={sort}
                   hasFilter={Boolean(filters.referred_by)}
                   onSort={() => cycleSort("referred_by")}
-                  filterSlot={presenceFilter("referred_by", "Has referrer", "None")}
+                  filterSlot={presenceFilter("referred_by", i18n("hasReferrer0bf42e5"), i18n("none6eef664"))}
                 />
                 <SortableHeader
                   column="referrals"
-                  label="Referrals"
+                  label={i18n("referrals2b0e3a3")}
                   sort={sort}
                   hasFilter={Boolean(filters.referrals)}
                   onSort={() => cycleSort("referrals")}
-                  filterSlot={presenceFilter("referrals", "Made referrals", "None")}
+                  filterSlot={presenceFilter("referrals", i18n("madeReferralsbe27ef7"), i18n("none6eef664"))}
                 />
               </tr>
             </thead>
@@ -456,7 +454,7 @@ export function MembersTab() {
               {filteredMembers.length === 0 ? (
                 <tr>
                   <td colSpan={12} className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>
-                    {members.length === 0 ? "No members yet." : "No members match the active filters."}
+                    {members.length === 0 ? i18n("noMembersYetea27c45") : i18n("noMembersMatchTheActiveFilters14acbb5")}
                   </td>
                 </tr>
               ) : (
@@ -534,6 +532,15 @@ function MemberRow({
   onOpenPanel: () => void;
   onOpenReferralWizard: () => void;
 }) {
+  const i18n = useUiTranslations();
+  const membershipStatusOptions = [
+    { value: "active", label: i18n("activea733b80"), accent: true },
+    { value: "trial", label: i18n("trial5f7537c") },
+    { value: "expiring", label: i18n("expiringb98d672") },
+    { value: "expired", label: i18n("expireda689a99") },
+    { value: "comped", label: i18n("comped1945ffe") },
+    { value: "paused", label: i18n("pausedc7dfb6f") },
+  ];
   const membership = member.membership as FinanceRecord | null | undefined;
   const activeSub = member.active_package_subscription as FinanceRecord | null | undefined;
   const referralsMade = (member.referrals_made_user_ids as string[]) ?? [];
@@ -594,7 +601,7 @@ function MemberRow({
       <td className="px-4 py-3" style={{ whiteSpace: "nowrap" }}>
         <InlineToggle
           value={membershipStatus}
-          options={MEMBERSHIP_STATUS_OPTIONS}
+          options={membershipStatusOptions}
           onSave={(status) => onSave({ status })}
         />
       </td>
@@ -616,7 +623,7 @@ function MemberRow({
           value={expiresOn}
           type="date"
           onSave={(expires_on) => onSave({ expires_on })}
-          placeholder="No expiry"
+          placeholder={i18n("noExpiry39d436a")}
           warn={expiresWarn(expiresOn)}
           dimmed={!expiresOn}
         />
@@ -668,7 +675,7 @@ function MemberRow({
               color: "var(--danger)",
             }}
           >
-            {EUR.format(outstandingCents / 100)} due
+            {EUR.format(outstandingCents / 100)} {i18n("due30cdf73")}
           </span>
         ) : (
           <span className="text-xs" style={{ color: "var(--dim)" }}>—</span>
@@ -681,7 +688,7 @@ function MemberRow({
           value={notes}
           type="text"
           onSave={(n) => onSave({ notes: n })}
-          placeholder="Add note…"
+          placeholder={i18n("addNotee26fd6a")}
           dimmed={!notes}
         />
       </td>
@@ -690,7 +697,7 @@ function MemberRow({
       <td className="px-4 py-3" style={{ whiteSpace: "nowrap" }}>
         <Combobox
           value={referredById}
-          placeholder="None"
+          placeholder={i18n("none6eef664")}
           options={userOptions}
           onSearch={onUserSearch}
           onChange={(id) => onSave({ referred_by_user_id: id || null })}
@@ -718,7 +725,7 @@ function MemberRow({
             onClick={onOpenReferralWizard}
             disabled={updatePending}
             type="button"
-            title="Record new referral"
+            title={i18n("recordNewReferrald9838d4")}
           >
             +
           </button>

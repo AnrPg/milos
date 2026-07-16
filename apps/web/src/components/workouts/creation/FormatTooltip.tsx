@@ -1,5 +1,8 @@
 "use client";
 
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 
 import { FORMAT_LABELS, FORMAT_TOOLTIPS, type SectionFormat } from "@/types/workout";
@@ -10,6 +13,7 @@ type Props = {
 };
 
 export function FormatTooltip({ format, children }: Props) {
+  const i18n = useUiTranslations();
   const [state, setState] = useState({ visible: false, x: 0, y: 0 });
   const tooltip = FORMAT_TOOLTIPS[format];
 
@@ -46,20 +50,20 @@ export function FormatTooltip({ format, children }: Props) {
         >
           <div className="mb-2 font-bold">{FORMAT_LABELS[format]}</div>
           <div className="mb-1">
-            <span style={{ color: "var(--muted)" }}>Best for </span>
+            <span style={{ color: "var(--muted)" }}>{i18n("bestFor6d7ae87")} </span>
             {tooltip.bestFor}
           </div>
           <div className="mb-1">
-            <span style={{ color: "var(--muted)" }}>Trains </span>
+            <span style={{ color: "var(--muted)" }}>{i18n("trainsd629bf5")} </span>
             {tooltip.trains}
           </div>
           <div className="mb-1">
-            <span style={{ color: "var(--muted)" }}>How </span>
+            <span style={{ color: "var(--muted)" }}>{i18n("how0c81abc")} </span>
             {tooltip.how}
           </div>
           {tooltip.score ? (
             <div>
-              <span style={{ color: "var(--muted)" }}>Score </span>
+              <span style={{ color: "var(--muted)" }}>{i18n("score489f487")} </span>
               {tooltip.score}
             </div>
           ) : null}

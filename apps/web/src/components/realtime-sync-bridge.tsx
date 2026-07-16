@@ -1,5 +1,7 @@
 "use client";
 
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useEffectEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -8,6 +10,7 @@ import { subscribeToTopic } from "@/lib/realtime";
 import { emitUserSync, normalizeUserSyncDetail } from "@/lib/user-sync";
 
 export function RealtimeSyncBridge() {
+  const i18n = useUiTranslations();
   const { currentUser, tokens } = useSession();
   const queryClient = useQueryClient();
 
@@ -70,7 +73,7 @@ export function RealtimeSyncBridge() {
       return;
     }
 
-    return subscribeToTopic(tokens.access_token, `sync:${currentUser.id}`, {
+    return subscribeToTopic(tokens.access_token, "sync:" + (currentUser.id), {
       "sync:refresh": handleRefresh,
     });
   }, [currentUser?.id, tokens?.access_token]);

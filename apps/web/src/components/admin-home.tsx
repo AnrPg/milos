@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import Link from "next/link";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -9,6 +14,7 @@ import { fetchFinanceSummary } from "@/api/finance";
 import { useSession } from "@/components/session-provider";
 
 export function AdminHome() {
+  const i18n = useUiTranslations();
   const { currentUser, signOut, tokens } = useSession();
   const [activeTab, setActiveTab] = useState<"finance" | "coaching">("finance");
 
@@ -34,12 +40,12 @@ export function AdminHome() {
         <section className="rounded-[2.4rem] p-8" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">Admin dashboard</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">{i18n("adminDashboard25031b2")}</p>
               <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>
-                Finance and coaching
+                {i18n("financeAndCoaching8e4276c")}
               </h1>
               <p className="mt-4 text-base leading-7" style={{ color: "var(--muted)" }}>
-                Signed in as{" "}
+                {i18n("signedInAsa02107c")}{" "}
                 <span className="font-semibold" style={{ color: "var(--text-soft)" }}>
                   {currentUser?.nickname}
                 </span>
@@ -52,7 +58,7 @@ export function AdminHome() {
               onClick={signOut}
               type="button"
             >
-              Log out
+              {i18n("logOut6e78c91")}
             </button>
           </div>
         </section>
@@ -60,8 +66,8 @@ export function AdminHome() {
         <section className="rounded-[2.4rem] p-4" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="grid gap-2 rounded-[1.8rem] p-2 md:grid-cols-2" style={{ background: "var(--panel-muted)" }}>
             {[
-              ["finance", "Finance"],
-              ["coaching", "Coaching"],
+              ["finance", i18n("finance1b48d3f")],
+              ["coaching", i18n("coachingfd8b79f")],
             ].map(([key, label]) => (
               <button
                 key={key}
@@ -81,28 +87,28 @@ export function AdminHome() {
           {activeTab === "finance" ? (
             <DashboardTab
               cards={[
-                ["Active memberships", financeTotals.active_memberships],
-                ["Expiring soon", financeTotals.expiring_memberships],
-                ["Paid revenue", cents(financeTotals.paid_revenue_cents)],
+                [i18n("activeMemberships0d117fb"), financeTotals.active_memberships],
+                [i18n("expiringSoon74bbe75"), financeTotals.expiring_memberships],
+                [i18n("paidRevenue64c34e5"), cents(financeTotals.paid_revenue_cents)],
               ]}
               links={[
-                ["Finance console", "/admin/finance"],
-                ["Metrics", "/admin/metrics"],
-                ["Search", "/admin/finance"],
+                [i18n("financeConsole35f368f"), "/admin/finance"],
+                [i18n("metricsddf6a1f"), "/admin/metrics"],
+                [i18n("searchbce0641"), "/admin/finance"],
               ]}
               pending={financeQuery.isLoading}
             />
           ) : (
             <DashboardTab
               cards={[
-                ["Events captured", coachingDashboard.event_count],
-                ["Reviews", coachingDashboard.review_count],
-                ["Injuries", coachingDashboard.injury_count],
+                [i18n("eventsCaptured5288ab8"), coachingDashboard.event_count],
+                [i18n("reviewsb83c4cd"), coachingDashboard.review_count],
+                [i18n("injuries698c06d"), coachingDashboard.injury_count],
               ]}
               links={[
-                ["Coaching notes", "/admin/coaching"],
-                ["Reviews", "/admin/reviews"],
-                ["Wellbeing", "/admin/wellbeing"],
+                [i18n("coachingNotes5c7da9f"), "/admin/coaching"],
+                [i18n("reviewsb83c4cd"), "/admin/reviews"],
+                [i18n("wellbeinga85b236"), "/admin/wellbeing"],
               ]}
               pending={analyticsQuery.isLoading}
             />
@@ -111,17 +117,17 @@ export function AdminHome() {
 
         <section className="grid gap-4 md:grid-cols-4">
           {[
-            { label: "Workout list", route: "/admin/workouts", href: "/admin/workouts" },
-            { label: "Workout creation", route: "/admin/workouts/new", href: "/admin/workouts/new" },
-            { label: "Schedule", route: "/admin/schedule", href: "/admin/schedule" },
-            { label: "Challenges", route: "/admin/challenges", href: "/admin/challenges" },
-            { label: "Settings", route: "/admin/settings", href: "/admin/settings" },
-            { label: "Coaching", route: "/admin/coaching", href: "/admin/coaching" },
-            { label: "Metrics", route: "/admin/metrics", href: "/admin/metrics" },
-            { label: "Finance", route: "/admin/finance", href: "/admin/finance" },
-            { label: "Reviews", route: "/admin/reviews", href: "/admin/reviews" },
-            { label: "Wellbeing", route: "/admin/wellbeing", href: "/admin/wellbeing" },
-            { label: "Athlete week view", route: "/my-workouts", href: "/my-workouts" },
+            { label: i18n("workoutList1f538d5"), route: "/admin/workouts", href: "/admin/workouts" },
+            { label: i18n("workoutCreation3d2fe38"), route: "/admin/workouts/new", href: "/admin/workouts/new" },
+            { label: i18n("schedule0a8adac"), route: "/admin/schedule", href: "/admin/schedule" },
+            { label: i18n("challengesff38765"), route: "/admin/challenges", href: "/admin/challenges" },
+            { label: i18n("settingsc7f73bb"), route: "/admin/settings", href: "/admin/settings" },
+            { label: i18n("coachingfd8b79f"), route: "/admin/coaching", href: "/admin/coaching" },
+            { label: i18n("metricsddf6a1f"), route: "/admin/metrics", href: "/admin/metrics" },
+            { label: i18n("finance1b48d3f"), route: "/admin/finance", href: "/admin/finance" },
+            { label: i18n("reviewsb83c4cd"), route: "/admin/reviews", href: "/admin/reviews" },
+            { label: i18n("wellbeinga85b236"), route: "/admin/wellbeing", href: "/admin/wellbeing" },
+            { label: i18n("athleteWeekViewfc0f571"), route: "/my-workouts", href: "/my-workouts" },
           ].map(({ label, route, href }) => (
             <Link
               key={href}

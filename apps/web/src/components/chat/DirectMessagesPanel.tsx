@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -23,6 +28,7 @@ interface SearchResult {
 type PanelView = "list" | "thread";
 
 export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
+  const i18n = useUiTranslations();
   const { tokens, currentUser } = useSession();
   const accessToken = tokens?.access_token ?? null;
   const currentUserId = currentUser?.id ?? null;
@@ -35,6 +41,8 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [input, setInput] = useState("");
+  const [sendError, setSendError] = useState<string | null>(null);
+  const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -94,10 +102,22 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
     openThread(thread);
   };
 
-  const handleSend = () => {
-    if (!input.trim()) return;
-    sendMessage(input.trim());
-    setInput("");
+  const handleSend = async () => {
+    const draft = input.trim();
+    if (!draft || isSending) return;
+
+    setIsSending(true);
+    setSendError(null);
+
+    try {
+      await sendMessage(draft);
+      setInput((current) => (current.trim() === draft ? "" : current));
+      sendTypingStop();
+    } catch (error) {
+      setSendError(error instanceof Error ? error.message : i18n("messageCouldNotBeSent7aa3b0a"));
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const otherParticipant = (thread: ChatThread) =>
@@ -127,11 +147,11 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
             className="text-sm font-medium flex items-center gap-1"
             style={{ color: "var(--text-soft)" }}
           >
-            ← Messages
+            {i18n("chat67305ee")}
           </button>
         ) : (
           <span className="text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
-            Messages
+            {i18n("chat2ced57f")}
           </span>
         )}
         <button
@@ -149,7 +169,7 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
           <div className="px-3 py-2 border-b" style={{ borderColor: "var(--border)" }}>
             <input
               type="text"
-              placeholder="Search or start a conversation…"
+              placeholder={i18n("searchOrStartAConversationabb1d82")}
               className="w-full rounded-[1rem] px-3 py-2 text-sm outline-none"
               style={{ background: "var(--card)", color: "var(--text)", border: "1px solid var(--border-strong)" }}
               value={searchQuery}
@@ -188,7 +208,7 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
               ))
             ) : visibleThreads.length === 0 ? (
               <p className="text-sm text-center p-4" style={{ color: "var(--dim)" }}>
-                No conversations yet. Search to start one.
+                {i18n("noConversationsYetSearchToStartOne1a91cf7")}
               </p>
             ) : (
               visibleThreads.map((thread) => {
@@ -215,7 +235,7 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate" style={{ color: "var(--text)" }}>
-                          {other?.nickname ?? "Direct message"}
+                          {other?.nickname ?? i18n("directMessagefc7f864")}
                         </p>
                       </div>
                     </button>
@@ -224,7 +244,7 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
                       onClick={(e) => { e.stopPropagation(); hideThread(currentUserId ?? "", thread.id); }}
                       className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-60 hover:!opacity-100 rounded-lg p-1 transition-opacity text-sm leading-none"
                       style={{ color: "var(--dim)" }}
-                      title="Hide conversation"
+                      title={i18n("hideConversationdfb77ca")}
                     >
                       🗑️
                     </button>
@@ -251,38 +271,48 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
           </div>
 
           <div
-            className="flex items-center gap-2 p-3 border-t"
+            className="p-3 border-t"
             style={{ background: "var(--panel-muted)", borderColor: "var(--border)" }}
           >
-            <input
-              type="text"
-              className="flex-1 rounded-[1rem] px-3 py-2 text-sm outline-none"
-              style={{ background: "var(--card)", color: "var(--text)", border: "1px solid var(--border-strong)" }}
-              placeholder="Write a message…"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onFocus={sendTypingStart}
-              onBlur={sendTypingStop}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-            />
-            <button
-              type="button"
-              onClick={handleSend}
-              disabled={!input.trim()}
-              className="rounded-full px-3 py-2 text-xs font-semibold"
-              style={{
-                background: "var(--primary)",
-                color: "var(--primary-contrast)",
-                opacity: input.trim() ? 1 : 0.4,
-              }}
-            >
-              Send
-            </button>
+            {sendError && (
+              <p role="alert" className="mb-2 text-xs" style={{ color: "var(--danger)" }}>
+                {sendError} {i18n("yourDraftIsStillHereReconnectAndRetry617338d")}
+              </p>
+            )}
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                className="flex-1 rounded-[1rem] px-3 py-2 text-sm outline-none"
+                style={{ background: "var(--card)", color: "var(--text)", border: "1px solid var(--border-strong)" }}
+                placeholder={i18n("writeAMessage24bf2a3")}
+                value={input}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  setSendError(null);
+                }}
+                onFocus={sendTypingStart}
+                onBlur={sendTypingStop}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    void handleSend();
+                  }
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => void handleSend()}
+                disabled={!input.trim() || isSending}
+                className="rounded-full px-3 py-2 text-xs font-semibold"
+                style={{
+                  background: "var(--primary)",
+                  color: "var(--primary-contrast)",
+                  opacity: input.trim() && !isSending ? 1 : 0.4,
+                }}
+              >
+                {isSending ? i18n("sendingcf76551") : i18n("send9bc2575")}
+              </button>
+            </div>
           </div>
         </>
       )}

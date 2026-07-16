@@ -1,5 +1,8 @@
 "use client";
 
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 import { fetchAdminSearch, type FinanceRecord } from "@/api/finance";
 
@@ -20,6 +23,7 @@ function field(record: FinanceRecord | null | undefined, key: string): string {
 }
 
 export function UserSearchField({ label, value, prefillUser, token, onChange, excludeUserId, locked }: Props) {
+  const i18n = useUiTranslations();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<FinanceRecord[]>([]);
   const [selectedUser, setSelectedUser] = useState<FinanceRecord | null>(null);
@@ -134,7 +138,7 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
           className="rounded-xl px-3 py-2 w-full"
           style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)", color: "var(--dim)" }}
         >
-          <span className="text-sm italic">Not selected</span>
+          <span className="text-sm italic">{i18n("notSelected183079f")}</span>
         </div>
       ) : (
         <div className="relative">
@@ -142,7 +146,7 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by nickname…"
+            placeholder={i18n("searchByNickname9335870")}
             className="w-full rounded-xl px-3 py-2 text-sm"
             style={{
               background: "var(--panel-muted)",
@@ -158,7 +162,7 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
             >
               {loading ? (
                 <p className="px-3 py-2 text-xs" style={{ color: "var(--dim)" }}>
-                  Searching…
+                  {i18n("searching1a6a5ba")}
                 </p>
               ) : (
                 results.map((u) => (

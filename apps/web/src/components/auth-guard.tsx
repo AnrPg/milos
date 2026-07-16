@@ -1,5 +1,7 @@
 "use client";
 
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -18,6 +20,7 @@ function isAllowedRole(value: string): value is AllowedRole {
 }
 
 export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
+  const i18n = useUiTranslations();
   const router = useRouter();
   const pathname = usePathname();
   const { status, currentUser } = useSession();
@@ -45,7 +48,7 @@ export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[var(--bg)] px-6">
         <p className="text-sm font-medium uppercase tracking-[0.24em] text-black/45">
-          Restoring session...
+          {i18n("restoringSession5a59aa5")}
         </p>
       </main>
     );

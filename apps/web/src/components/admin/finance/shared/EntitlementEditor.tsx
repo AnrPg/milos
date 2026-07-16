@@ -1,5 +1,11 @@
 "use client";
 
+
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 export type EntitlementDraft = {
   channels: string[];
   capabilities: string[];
@@ -18,39 +24,23 @@ export const DEFAULT_ENTITLEMENT: EntitlementDraft = {
   coachingTouchpointPeriod: "calendar_month",
 };
 
-const CHANNELS = [
-  ["in_person", "In-person classes"],
-  ["workout_library", "Workout library"],
-  ["personal_programming", "Personal programming"],
-  ["coach_messaging", "Coach messaging"],
-] as const;
-
-const CAPABILITIES = [
-  ["book_classes", "Book classes"],
-  ["execute_class_workouts", "Execute class workouts"],
-  ["execute_library_workouts", "Execute library workouts"],
-  ["execute_assigned_workouts", "Execute assigned workouts"],
-  ["receive_coaching_touchpoints", "Receive coaching touchpoints"],
-] as const;
-
-const PERIODS = [
-  ["calendar_week", "Calendar week"],
-  ["calendar_month", "Calendar month"],
-  ["subscription_period", "Subscription period"],
-] as const;
-
 export function entitlementParams(draft: EntitlementDraft) {
+  const allowances: Record<string, ReturnType<typeof allowance>> = {
+    class_visits: allowance(draft.classVisitLimit, draft.classVisitPeriod),
+  };
+
+  if (draft.capabilities.includes("receive_coaching_touchpoints")) {
+    allowances.coaching_touchpoints = allowance(
+      draft.coachingTouchpointLimit,
+      draft.coachingTouchpointPeriod,
+    );
+  }
+
   return {
     entitlement_version: 1,
     channels: draft.channels,
     capabilities: draft.capabilities,
-    allowances: {
-      class_visits: allowance(draft.classVisitLimit, draft.classVisitPeriod),
-      coaching_touchpoints: allowance(
-        draft.coachingTouchpointLimit,
-        draft.coachingTouchpointPeriod,
-      ),
-    },
+    allowances,
   };
 }
 
@@ -85,6 +75,28 @@ export function EntitlementEditor({
   value: EntitlementDraft;
   onChange: (value: EntitlementDraft) => void;
 }) {
+  const PERIODS = [
+    ["calendar_week", i18n("calendarWeek154e2bc")],
+    ["calendar_month", i18n("calendarMonth1622c7f")],
+    ["subscription_period", i18n("subscriptionPeriod22e7508")],
+  ] as const;
+
+  const CAPABILITIES = [
+    ["book_classes", i18n("bookClasses0d3cc7b")],
+    ["execute_class_workouts", i18n("executeClassWorkouts842686e")],
+    ["execute_library_workouts", i18n("executeLibraryWorkouts6a80faa")],
+    ["execute_assigned_workouts", i18n("executeAssignedWorkouts8b32393")],
+    ["receive_coaching_touchpoints", i18n("receiveCoachingTouchpointscadf91e")],
+  ] as const;
+
+  const CHANNELS = [
+    ["in_person", i18n("inPersonClasses867d7ae")],
+    ["workout_library", i18n("workoutLibrarya039091")],
+    ["personal_programming", i18n("personalProgramming0517f6d")],
+    ["coach_messaging", i18n("coachMessagingf3902dc")],
+  ] as const;
+
+  const i18n = useUiTranslations();
   function toggle(key: "channels" | "capabilities", option: string) {
     const values = value[key];
     onChange({
@@ -98,29 +110,33 @@ export function EntitlementEditor({
   return (
     <fieldset className="space-y-4 rounded-2xl p-4" style={{ border: "1px solid var(--border)" }}>
       <legend className="px-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--primary)" }}>
-        Entitlements
+        {i18n("entitlements7de7578")}
       </legend>
       <p className="text-xs leading-5" style={{ color: "var(--dim)" }}>
-        Channels describe what the package delivers. Capabilities describe what the user may do.
-        Allowances define the measurable units and their reset boundary.
+        {i18n("channelsDescribeWhatThePackageDeliversCapabilitiesDescribe99a636b")}
       </p>
-      <ChoiceGroup label="Delivery channels" options={CHANNELS} selected={value.channels} onToggle={(item) => toggle("channels", item)} />
-      <ChoiceGroup label="Capabilities" options={CAPABILITIES} selected={value.capabilities} onToggle={(item) => toggle("capabilities", item)} />
+      <p className="text-xs leading-5" style={{ color: "var(--dim)" }}>
+        {i18n("coachMessagingEnablesTheCoachingCommunicationChannelOrdinary9919f8f")}
+      </p>
+      <ChoiceGroup label={i18n("deliveryChannelsc3e34c4")} options={CHANNELS} selected={value.channels} onToggle={(item) => toggle("channels", item)} />
+      <ChoiceGroup label={i18n("capabilitiesca09c54")} options={CAPABILITIES} selected={value.capabilities} onToggle={(item) => toggle("capabilities", item)} />
       <div className="grid gap-4 md:grid-cols-2">
         <AllowanceField
-          label="Class visits"
+          label={i18n("classVisits142b3b0")}
           limit={value.classVisitLimit}
           period={value.classVisitPeriod}
           onLimit={(classVisitLimit) => onChange({ ...value, classVisitLimit })}
           onPeriod={(classVisitPeriod) => onChange({ ...value, classVisitPeriod })}
         />
-        <AllowanceField
-          label="Coaching touchpoints"
-          limit={value.coachingTouchpointLimit}
-          period={value.coachingTouchpointPeriod}
-          onLimit={(coachingTouchpointLimit) => onChange({ ...value, coachingTouchpointLimit })}
-          onPeriod={(coachingTouchpointPeriod) => onChange({ ...value, coachingTouchpointPeriod })}
-        />
+        {value.capabilities.includes("receive_coaching_touchpoints") ? (
+          <AllowanceField
+            label={i18n("coachingTouchpoints23bfcb6")}
+            limit={value.coachingTouchpointLimit}
+            period={value.coachingTouchpointPeriod}
+            onLimit={(coachingTouchpointLimit) => onChange({ ...value, coachingTouchpointLimit })}
+            onPeriod={(coachingTouchpointPeriod) => onChange({ ...value, coachingTouchpointPeriod })}
+          />
+        ) : null}
       </div>
     </fieldset>
   );
@@ -143,19 +159,20 @@ function ChoiceGroup({ label, options, selected, onToggle }: { label: string; op
 }
 
 function AllowanceField({ label, limit, period, onLimit, onPeriod }: { label: string; limit: string; period: string; onLimit: (value: string) => void; onPeriod: (value: string) => void }) {
+  const i18n = useUiTranslations();
   return (
     <div className="space-y-2 rounded-xl p-3" style={{ background: "var(--bg-soft)" }}>
       <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{label}</p>
       <input
-        aria-label={`${label} limit`}
+        aria-label={(label) + " limit"}
         className="w-full rounded-lg px-3 py-2 text-sm"
         style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
         value={limit}
         onChange={(event) => onLimit(event.target.value)}
-        placeholder="Number or unlimited"
+        placeholder={i18n("numberOrUnlimitedcc5e462")}
       />
       <select
-        aria-label={`${label} reset period`}
+        aria-label={(label) + i18n("resetPeriod98cb89c")}
         className="w-full rounded-lg px-3 py-2 text-sm"
         style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
         value={period}

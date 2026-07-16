@@ -1,5 +1,8 @@
 "use client";
 
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { ColumnKey, SortState } from "@/components/admin/finance/hooks/useSortFilter";
 
@@ -13,6 +16,7 @@ interface Props {
 }
 
 export function SortableHeader({ column, label, sort, hasFilter, onSort, filterSlot }: Props) {
+  const i18n = useUiTranslations();
   const [filterOpen, setFilterOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const isActive = sort.column === column;
@@ -61,7 +65,7 @@ export function SortableHeader({ column, label, sort, hasFilter, onSort, filterS
             color: hasFilter ? "var(--primary)" : "var(--dim)",
             opacity: hasFilter ? 1 : undefined,
           }}
-          title="Filter"
+          title={i18n("filterd7decf1")}
         >
           <span
             className={hasFilter ? "opacity-100" : "opacity-0 group-hover:opacity-60"}

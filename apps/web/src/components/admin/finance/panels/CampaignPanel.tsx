@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -32,6 +37,7 @@ export function CampaignPanel({
   campaign: FinanceRecord;
   onClose: () => void;
 }) {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
   const queryClient = useQueryClient();
@@ -66,7 +72,7 @@ export function CampaignPanel({
   return (
     <SidePanel
       title={field(campaign, "name")}
-      subtitle="Campaign"
+      subtitle={i18n("campaign69390e1")}
       onClose={onClose}
     >
       {/* Campaign info */}
@@ -76,10 +82,10 @@ export function CampaignPanel({
         )}
         <div className="flex flex-wrap gap-4 text-xs">
           <span style={{ color: "var(--dim)" }}>
-            Starts: <span style={{ color: "var(--text-soft)" }}>{field(campaign, "starts_on") || "—"}</span>
+            {i18n("starts83eef1d")} <span style={{ color: "var(--text-soft)" }}>{field(campaign, "starts_on") || "—"}</span>
           </span>
           <span style={{ color: "var(--dim)" }}>
-            Ends: <span style={{ color: "var(--text-soft)" }}>{field(campaign, "ends_on") || "—"}</span>
+            {i18n("ends06e9778")} <span style={{ color: "var(--text-soft)" }}>{field(campaign, "ends_on") || "—"}</span>
           </span>
           <span
             className="rounded-full px-3 py-1 font-semibold"
@@ -89,7 +95,7 @@ export function CampaignPanel({
                 : { background: "var(--border)", color: "var(--dim)" }
             }
           >
-            {campaign.active !== false ? "Active" : "Inactive"}
+            {campaign.active !== false ? i18n("activea733b80") : i18n("inactive09af574")}
           </span>
         </div>
       </div>
@@ -98,7 +104,7 @@ export function CampaignPanel({
       <div>
         <div className="flex items-center justify-between gap-4 mb-3">
           <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-            Promo codes ({codes.length})
+            {i18n("promoCodes13b7ca0")}{codes.length})
           </p>
           <button
             className="rounded-full px-3 py-1 text-xs font-semibold"
@@ -106,13 +112,13 @@ export function CampaignPanel({
             onClick={() => setShowCodeForm((v) => !v)}
             type="button"
           >
-            {showCodeForm ? "Cancel" : "+ New code"}
+            {showCodeForm ? i18n("cancel77dfd21") : i18n("newCodeb1a906d")}
           </button>
         </div>
 
         {showCodeForm && (
           <div className="mb-4 space-y-3 rounded-[1.5rem] p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
-            <PanelField label="Code">
+            <PanelField label={i18n("codeadac693")}>
               <input
                 className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                 style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -121,7 +127,7 @@ export function CampaignPanel({
               />
             </PanelField>
             <div className="grid gap-3 md:grid-cols-2">
-              <PanelField label="Discount type">
+              <PanelField label={i18n("discountTypec5137dd")}>
                 <select
                   className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                   style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -133,7 +139,7 @@ export function CampaignPanel({
                   ))}
                 </select>
               </PanelField>
-              <PanelField label="Discount value">
+              <PanelField label={i18n("discountValuecfbd2d5")}>
                 <input
                   className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                   style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -143,7 +149,7 @@ export function CampaignPanel({
                 />
               </PanelField>
             </div>
-            <PanelField label="Max redemptions (optional)">
+            <PanelField label={i18n("maxRedemptionsOptional9c39e71")}>
               <input
                 className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                 style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -158,7 +164,7 @@ export function CampaignPanel({
                 checked={codeForm.active}
                 onChange={(e) => setCodeForm({ ...codeForm, active: e.target.checked })}
               />
-              Active
+              {i18n("activea733b80")}
             </label>
             <button
               className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
@@ -167,7 +173,7 @@ export function CampaignPanel({
               onClick={() => createCodeMutation.mutate()}
               type="button"
             >
-              {createCodeMutation.isPending ? "Creating…" : "Create code"}
+              {createCodeMutation.isPending ? i18n("creating94d7d8e") : i18n("createCodecdeaf88")}
             </button>
             {createCodeMutation.error instanceof Error && (
               <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{createCodeMutation.error.message}</p>
@@ -176,10 +182,10 @@ export function CampaignPanel({
         )}
 
         {codesQuery.isLoading ? (
-          <p className="text-sm" style={{ color: "var(--dim)" }}>Loading codes…</p>
+          <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loadingCodes328cf85")}</p>
         ) : codes.length === 0 ? (
           <p className="rounded-[1.2rem] px-4 py-4 text-sm" style={{ background: "var(--panel-muted)", color: "var(--dim)" }}>
-            No codes yet.
+            {i18n("noCodesYetbe15d6c")}
           </p>
         ) : (
           <div className="space-y-2">
@@ -195,12 +201,12 @@ export function CampaignPanel({
                         : { background: "var(--border)", color: "var(--dim)" }
                     }
                   >
-                    {code.active !== false ? "Active" : "Inactive"}
+                    {code.active !== false ? i18n("activea733b80") : i18n("inactive09af574")}
                   </span>
                 </div>
                 <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
                   {field(code, "discount_type")} · {field(code, "discount_value")}
-                  {code.max_redemptions ? ` · max ${field(code, "max_redemptions")} uses` : ""}
+                  {code.max_redemptions ? i18n("max8004fdc") + (field(code, "max_redemptions")) + " uses" : ""}
                 </p>
               </div>
             ))}

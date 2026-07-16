@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import React, { useEffect, useEffectEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -8,6 +13,7 @@ import {
   completeExecution as completeExecutionRequest,
   type ExerciseModification,
   type ExerciseNote,
+  type ExecutionProgressPayload,
   type TimerSegment,
   updateExecutionProgress,
   type WorkoutExecution,
@@ -15,6 +21,11 @@ import {
 import { useSession } from "@/components/session-provider";
 import { useWorkoutTimer } from "@/hooks/useWorkoutTimer";
 import { subscribeToTopic } from "@/lib/realtime";
+import {
+  isOfflineFailure,
+  queueOfflineCheckoff,
+  reconcileOfflineCheckoffs,
+} from "@/lib/offline-execution-queue";
 import { useExecutionStore } from "@/stores/execution";
 
 import { FinishWizard } from "./FinishWizard";
@@ -92,6 +103,7 @@ function isExecutionPayload(value: unknown): value is { execution: WorkoutExecut
 }
 
 export function ExecutionMode() {
+  const i18n = useUiTranslations();
   const router = useRouter();
   const { tokens } = useSession();
 
@@ -118,7 +130,6 @@ export function ExecutionMode() {
     upsertScore,
     upsertNote,
     hydrateFromExecution,
-    buildProgressPayload,
     completeExecution,
     reset,
   } = useExecutionStore();
@@ -157,36 +168,23 @@ export function ExecutionMode() {
     return Math.max(0, Math.ceil((resumeCountdownEndsAt - countdownNow) / 1000));
   }, [countdownNow, resumeCountdownEndsAt]);
 
-  async function persistProgressFromStore() {
-    return persistProgressSnapshot({
-      currentSegment,
-      currentElapsedMs: elapsed * 1000,
-    });
-  }
+  async function persistProposedMutation(
+    mutate: () => void,
+    snapshot: { currentSegment: TimerSegment | null; currentElapsedMs: number },
+  ) {
+    if (!tokens?.access_token || !executionId) return null;
 
-  async function persistProgressSnapshot(snapshot: {
-    currentSegment: TimerSegment | null;
-    currentElapsedMs: number;
-  }) {
-    if (!tokens?.access_token || !executionId) {
-      return null;
-    }
+    const before = useExecutionStore.getState();
+    mutate();
+    const payload = useExecutionStore.getState().buildProgressPayload(snapshot);
+    useExecutionStore.setState(before, true);
 
-    const payload = buildProgressPayload(snapshot);
-    if (!payload) {
-      return null;
-    }
+    if (!payload) return null;
 
     const execution = await updateExecutionProgress(tokens.access_token, executionId, payload);
     hydrateFromExecution(execution);
     return execution;
   }
-
-  const persistProgressFromStoreEvent = useEffectEvent(() => {
-    void persistProgressFromStore().catch(() => {
-      setFeedback("Workout progress could not be synced. Try again.");
-    });
-  });
 
   async function doFinish(
     finalSectionScores: typeof sectionScores,
@@ -224,7 +222,7 @@ export function ExecutionMode() {
       completeExecution();
       return true;
     } catch {
-      setFeedback("Workout completion could not be saved. Try again.");
+      setFeedback(i18n("workoutCompletionCouldNotBeSavedTryAgaindce610c"));
       return false;
     } finally {
       setIsSaving(false);
@@ -252,35 +250,40 @@ export function ExecutionMode() {
   async function confirmPendingFinish(editedScores: typeof sectionScores, modifications: ExerciseModification[]) {
     if (!pendingFinish) return;
     const { checkedExerciseIds: ids, includeCurrentElapsed, elapsedSnapshot } = pendingFinish;
-    setPendingFinish(null);
-    if (modifications.length > 0 && tokens?.access_token && executionId) {
-      await addExecutionModifications(tokens.access_token, executionId, modifications);
+
+    try {
+      if (modifications.length > 0 && tokens?.access_token && executionId) {
+        const execution =
+          await addExecutionModifications(tokens.access_token, executionId, modifications);
+        hydrateFromExecution(execution);
+      }
+
+      const completed = await doFinish(editedScores, ids, includeCurrentElapsed, elapsedSnapshot);
+      if (completed) setPendingFinish(null);
+    } catch {
+      setFeedback(i18n("workoutChangesCouldNotBeSavedReviewThemaa17dac"));
     }
-    await doFinish(editedScores, ids, includeCurrentElapsed, elapsedSnapshot);
   }
 
   async function movePastCurrentSegment(
     finalSectionScores = sectionScores,
     finalCheckedExerciseIds = checkedExerciseIds,
   ) {
-    if (currentSegment) {
-      commitSegmentElapsed(currentSegment.section_id, elapsed * 1000);
-    }
-
     if (isLastSegment) {
       return handleFinish(finalSectionScores, finalCheckedExerciseIds, false);
     }
 
-    advanceSegment(Date.now());
-
     try {
-      await persistProgressSnapshot({
-        currentSegment: null,
-        currentElapsedMs: 0,
-      });
+      await persistProposedMutation(
+        () => {
+          if (currentSegment) commitSegmentElapsed(currentSegment.section_id, elapsed * 1000);
+          advanceSegment(Date.now());
+        },
+        { currentSegment: null, currentElapsedMs: 0 },
+      );
       return true;
     } catch {
-      setFeedback("Workout progress could not be saved. Try again.");
+      setFeedback(i18n("workoutProgressCouldNotBeSavedTryAgain654eacf"));
       return false;
     }
   }
@@ -289,12 +292,15 @@ export function ExecutionMode() {
     setScoreTransitionLocked(true);
 
     if (status === "active") {
-      pauseTimer(Date.now());
-
       try {
-        await persistProgressFromStore();
+        await persistProposedMutation(
+          () => pauseTimer(Date.now()),
+          { currentSegment, currentElapsedMs: elapsed * 1000 },
+        );
       } catch {
-        setFeedback("Timer state could not be synced. Your score can still be entered.");
+        setFeedback(i18n("timerStateCouldNotBeSyncedTryAgainef30d57"));
+        setScoreTransitionLocked(false);
+        return;
       }
     }
 
@@ -335,19 +341,27 @@ export function ExecutionMode() {
     return () => window.clearInterval(intervalId);
   }, [resumeCountdownEndsAt]);
 
+  const resumeAfterCountdown = useEffectEvent(() => {
+    void persistProposedMutation(
+      () => resumeTimer(Date.now()),
+      { currentSegment, currentElapsedMs: 0 },
+    ).catch(() => {
+      setFeedback(i18n("resumeCouldNotBeSyncedTryAgaindef7342"));
+    });
+  });
+
   useEffect(() => {
     if (!resumeCountdownEndsAt || countdownNow < resumeCountdownEndsAt) {
       return;
     }
 
-    resumeTimer(Date.now());
-    persistProgressFromStoreEvent();
-  }, [countdownNow, resumeCountdownEndsAt, resumeTimer]);
+    resumeAfterCountdown();
+  }, [countdownNow, resumeCountdownEndsAt]);
 
   useEffect(() => {
     if (!tokens?.access_token || !executionId) return;
 
-    return subscribeToTopic(tokens.access_token, `execution:${executionId}`, {
+    return subscribeToTopic(tokens.access_token, "execution:" + (executionId), {
       "execution:progress_updated": (payload) => {
         if (isExecutionPayload(payload)) {
           hydrateFromExecution(payload.execution);
@@ -373,20 +387,39 @@ export function ExecutionMode() {
     });
   }, [completeExecution, executionId, hydrateFromExecution, tokens?.access_token, upsertNote]);
 
-  function handlePause() {
-    pauseTimer(Date.now());
+  useEffect(() => {
+    if (!tokens?.access_token || !executionId) return;
 
-    void persistProgressFromStore().catch(() => {
-      setFeedback("Pause could not be synced. Try again.");
+    const reconcile = () => {
+      void reconcileOfflineCheckoffs(
+        tokens.access_token,
+        executionId,
+        hydrateFromExecution,
+      ).catch(() => undefined);
+    };
+
+    reconcile();
+    window.addEventListener("online", reconcile);
+    return () => window.removeEventListener("online", reconcile);
+  }, [executionId, hydrateFromExecution, tokens?.access_token]);
+
+  function handlePause() {
+    void persistProposedMutation(
+      () => pauseTimer(Date.now()),
+      { currentSegment, currentElapsedMs: elapsed * 1000 },
+    ).catch(() => {
+      setFeedback(i18n("pauseCouldNotBeSyncedTryAgain5a0fece"));
     });
   }
 
   function handleResume() {
     const endsAt = Date.now() + 3_000;
-    startResumeCountdown(endsAt);
 
-    void persistProgressFromStore().catch(() => {
-      setFeedback("Resume countdown could not be synced. Try again.");
+    void persistProposedMutation(
+      () => startResumeCountdown(endsAt),
+      { currentSegment, currentElapsedMs: 0 },
+    ).catch(() => {
+      setFeedback(i18n("resumeCountdownCouldNotBeSyncedTryAgainf2572b6"));
     });
   }
 
@@ -414,6 +447,9 @@ export function ExecutionMode() {
 
     setCheckedExerciseIds(next);
 
+    let lastConfirmedExecution: WorkoutExecution | null = null;
+    let attemptedPayload: ExecutionProgressPayload | null = null;
+
     try {
       const payload = useExecutionStore.getState().buildProgressPayload({
         currentSegment,
@@ -421,14 +457,17 @@ export function ExecutionMode() {
       });
 
       if (!payload) {
-        throw new Error("Missing execution payload");
+        throw new Error(i18n("missingExecutionPayload5f49431"));
       }
+
+      attemptedPayload = payload;
 
       const execution = await updateExecutionProgress(tokens.access_token, executionId, {
         ...payload,
         checked_exercise_ids: next,
       });
 
+      lastConfirmedExecution = execution;
       hydrateFromExecution(execution);
 
       if (!previous.includes(stepId) && isSegmentComplete) {
@@ -444,7 +483,7 @@ export function ExecutionMode() {
           });
 
           if (!rolledPayload) {
-            throw new Error("Missing rolled-forward execution payload");
+            throw new Error(i18n("missingRolledForwardExecutionPayload9410f3a"));
           }
 
           const rolledExecution = await updateExecutionProgress(tokens.access_token, executionId, {
@@ -452,6 +491,7 @@ export function ExecutionMode() {
             checked_exercise_ids: rolledForward,
           });
 
+          lastConfirmedExecution = rolledExecution;
           hydrateFromExecution(rolledExecution);
           return;
         }
@@ -462,9 +502,20 @@ export function ExecutionMode() {
           await movePastCurrentSegment(sectionScores, execution.checked_exercise_ids);
         }
       }
-    } catch {
-    setCheckedExerciseIds(previous);
-      setFeedback("Check-off could not be saved. Your last change was rolled back.");
+    } catch (error) {
+      if (!lastConfirmedExecution && attemptedPayload && isOfflineFailure(error)) {
+        await queueOfflineCheckoff(executionId, attemptedPayload, previous, next);
+        setFeedback(i18n("savedOfflineThisCheckOffWillSyncAutomatically2fcff20"));
+        return;
+      }
+
+      if (lastConfirmedExecution) {
+        hydrateFromExecution(lastConfirmedExecution);
+        setFeedback(i18n("theRepeatCycleWasNotSavedRestoredThef0c5693"));
+      } else {
+        setCheckedExerciseIds(previous);
+        setFeedback(i18n("checkOffCouldNotBeSavedYourLast2441073"));
+      }
     }
   }
 
@@ -475,7 +526,7 @@ export function ExecutionMode() {
         style={{ background: "var(--bg)", color: "var(--text)" }}
       >
         <div className="text-5xl">🏁</div>
-        <div className="text-2xl font-bold">Workout Complete</div>
+        <div className="text-2xl font-bold">{i18n("workoutComplete40f1693")}</div>
         {sectionScores.length > 0 && (
           <div className="w-full max-w-sm space-y-2">
             {sectionScores.map((score, index) => (
@@ -507,7 +558,7 @@ export function ExecutionMode() {
           className="rounded-2xl px-8 py-3 text-base font-semibold"
           style={{ background: "var(--accent, var(--primary))", color: "var(--text)" }}
         >
-          Done
+          {i18n("donee9b450d")}
         </button>
       </div>
     );
@@ -542,7 +593,7 @@ export function ExecutionMode() {
           className="rounded-xl p-2 text-sm"
           style={{ color: "var(--muted)" }}
         >
-          ‹ Pause
+          {i18n("pausecd21a1b")}
         </button>
         <div className="text-sm font-semibold" style={{ color: "var(--muted)" }}>
           {currentSegmentIndex + 1} / {segments.length}
@@ -559,7 +610,7 @@ export function ExecutionMode() {
           className="rounded-xl px-3 py-1.5 text-sm font-semibold disabled:opacity-30"
           style={{ color: "var(--accent, var(--primary))" }}
         >
-          Finish
+          {i18n("finishb74bdee")}
         </button>
       </div>
 
@@ -605,9 +656,11 @@ export function ExecutionMode() {
         {currentSegmentIndex > 0 && (
           <button
             onClick={() => {
-              jumpToSegment(currentSegmentIndex - 1, Date.now());
-              void persistProgressFromStore().catch(() => {
-                setFeedback("Navigation could not be synced. Try again.");
+              void persistProposedMutation(
+                () => jumpToSegment(currentSegmentIndex - 1, Date.now()),
+                { currentSegment, currentElapsedMs: elapsed * 1000 },
+              ).catch(() => {
+                setFeedback(i18n("navigationCouldNotBeSyncedTryAgaina8045ae"));
               });
             }}
             className="h-12 w-12 rounded-full text-xl"
@@ -636,7 +689,7 @@ export function ExecutionMode() {
           className="flex h-12 flex-1 items-center justify-center rounded-full text-base font-bold disabled:opacity-30"
           style={{ background: "var(--accent, var(--primary))", color: "var(--text)" }}
         >
-          {isSaving ? "Saving…" : isLastSegment ? "Finish" : "Next →"}
+          {isSaving ? i18n("saving56a2285") : isLastSegment ? i18n("finishb74bdee") : i18n("next2f04eb1")}
         </button>
       </div>
 
@@ -646,14 +699,14 @@ export function ExecutionMode() {
           style={{ background: "color-mix(in srgb, var(--bg) 92%, transparent)" }}
         >
           <div className="text-4xl font-bold" style={{ color: "var(--text)" }}>
-            Paused
+            {i18n("pausedc7dfb6f")}
           </div>
           <button
             onClick={handleResume}
             className="rounded-2xl px-10 py-4 text-xl font-bold"
             style={{ background: "var(--accent, var(--primary))", color: "var(--text)" }}
           >
-            Resume
+            {i18n("resumeb3bd0b5")}
           </button>
         </div>
       )}
@@ -710,8 +763,8 @@ export function ExecutionMode() {
           })()}
           isSaving={isSaving}
           onSave={async (score) => {
-            const nextScores = mergeSectionScore(sectionScores, score);
-            upsertScore(score);
+            const finalScore = { ...score, source: "manual", kind: "final" };
+            const nextScores = mergeSectionScore(sectionScores, finalScore);
 
             if (isLastSegment) {
               const completed = await handleFinish(nextScores);
@@ -724,14 +777,18 @@ export function ExecutionMode() {
               return;
             }
 
-            setScoreTransitionLocked(false);
-            setShowScoreModal(false);
-            advanceSegment(Date.now());
-
             try {
-              await persistProgressFromStore();
+              await persistProposedMutation(
+                () => {
+                  upsertScore(finalScore);
+                  advanceSegment(Date.now());
+                },
+                { currentSegment: null, currentElapsedMs: 0 },
+              );
+              setScoreTransitionLocked(false);
+              setShowScoreModal(false);
             } catch {
-              setFeedback("Workout progress could not be saved. Try again.");
+              setFeedback(i18n("scoreAndNavigationCouldNotBeSavedYourfab62fd"));
             }
           }}
           onClose={() => {

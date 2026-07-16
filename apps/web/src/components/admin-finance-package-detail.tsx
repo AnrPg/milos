@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import Link from "next/link";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -14,6 +19,7 @@ function value(record: FinanceRecord | undefined, key: string, fallback = "") {
 }
 
 export function AdminFinancePackageDetail({ packageId }: { packageId: string }) {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const queryClient = useQueryClient();
   const token = tokens?.access_token;
@@ -69,13 +75,13 @@ export function AdminFinancePackageDetail({ packageId }: { packageId: string }) 
     <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-4xl space-y-6">
         <Link className="text-sm font-bold text-[var(--primary)]" href="/admin/finance">
-          Back to finance
+          {i18n("backToFinance2de0820")}
         </Link>
         <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--panel)] p-8">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">Package detail</p>
-          <h1 className="mt-3 text-4xl font-black">{value(packageRecord, "name", "Membership package")}</h1>
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">{i18n("packageDetailb134a53")}</p>
+          <h1 className="mt-3 text-4xl font-black">{value(packageRecord, "name", i18n("membershipPackage12e8323"))}</h1>
           <p className="mt-2 text-sm text-[var(--muted)]">
-            Code {value(packageRecord, "code")} · {value(packageRecord, "family")} · {value(packageRecord, "billing_period")}
+            {i18n("codeadac693")} {value(packageRecord, "code")} · {value(packageRecord, "family")} · {value(packageRecord, "billing_period")}
           </p>
         </section>
 
@@ -86,35 +92,35 @@ export function AdminFinancePackageDetail({ packageId }: { packageId: string }) 
             updateMutation.mutate();
           }}
         >
-          <h2 className="text-xl font-black">Edit package</h2>
-          <Input label="Name" value={form.name} onChange={(name) => setFormOverrides({ ...formOverrides, name })} />
+          <h2 className="text-xl font-black">{i18n("editPackage77c0543")}</h2>
+          <Input label={i18n("name709a232")} value={form.name} onChange={(name) => setFormOverrides({ ...formOverrides, name })} />
           <Input
-            label="Description"
+            label={i18n("description55f8ebc")}
             required={false}
             value={form.description}
             onChange={(description) => setFormOverrides({ ...formOverrides, description })}
           />
           <div className="grid gap-3 md:grid-cols-2">
             <Input
-              label="Family"
+              label={i18n("family4efb6cb")}
               value={form.family}
               onChange={(family) => setFormOverrides({ ...formOverrides, family })}
             />
             <Select
-              label="Billing period"
+              label={i18n("billingPeriodda59f5a")}
               value={form.billing_period}
               options={["monthly", "quarterly", "annual", "custom"]}
               onChange={(billing_period) => setFormOverrides({ ...formOverrides, billing_period })}
             />
           </div>
           <Input
-            label="Base price in EUR"
+            label={i18n("basePriceInEur4b30144")}
             type="number"
             value={form.base_price}
             onChange={(base_price) => setFormOverrides({ ...formOverrides, base_price })}
           />
           <Input
-            label="Tags"
+            label={i18n("tags848eed0")}
             required={false}
             value={form.tags}
             onChange={(tags) => setFormOverrides({ ...formOverrides, tags })}
@@ -125,10 +131,10 @@ export function AdminFinancePackageDetail({ packageId }: { packageId: string }) 
               type="checkbox"
               onChange={(event) => setFormOverrides({ ...formOverrides, active: event.target.checked })}
             />
-            Active package
+            {i18n("activePackagebd72220")}
           </label>
           <button className="rounded-full bg-[var(--text)] px-5 py-3 text-sm font-bold text-[var(--primary-contrast)]" disabled={updateMutation.isPending} type="submit">
-            {updateMutation.isPending ? "Saving..." : "Save package"}
+            {updateMutation.isPending ? i18n("savingae7e887") : i18n("savePackaged6e81a9")}
           </button>
           {updateMutation.error instanceof Error ? <p className="text-sm text-[var(--danger)]">{updateMutation.error.message}</p> : null}
         </form>
@@ -179,6 +185,7 @@ function Input({
   required?: boolean;
   type?: string;
 }) {
+  const i18n = useUiTranslations();
   return (
     <label className="block space-y-1 text-sm font-semibold">
       <span>{label}</span>

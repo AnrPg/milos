@@ -1,12 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
+import { useEffect, useId, useState } from "react";
 
 import { assignWorkout, listAthletes, type AthleteOption } from "@/api/assigned-workouts";
 import { listAdminWorkouts, type WorkoutRecord } from "@/api/workouts";
 import { workoutTypeColor } from "@/lib/workout-colors";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import { WorkoutCreationCanvas } from "@/components/workouts/creation/WorkoutCreationCanvas";
+import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
 type Props = {
   accessToken: string;
@@ -16,6 +22,9 @@ type Props = {
 };
 
 export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned }: Props) {
+  const i18n = useUiTranslations();
+  const titleId = useId();
+  const dialogRef = useModalFocusTrap<HTMLDivElement>(onClose);
   const [step, setStep] = useState<"workout" | "athletes">("workout");
   const [allWorkouts, setAllWorkouts] = useState<WorkoutRecord[]>([]);
   const [workoutsLoading, setWorkoutsLoading] = useState(true);
@@ -25,7 +34,8 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
   const [athleteQuery, setAthleteQuery] = useState("");
   const [selectedAthleteIds, setSelectedAthleteIds] = useState<string[]>([]);
   const [scheduledFor, setScheduledFor] = useState(defaultDate);
-  const [adminNotes, setAdminNotes] = useState("");
+  const [athleteNotes, setAthleteNotes] = useState<Record<string, string>>({});
+  const [openNoteAthleteIds, setOpenNoteAthleteIds] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [creatingWorkout, setCreatingWorkout] = useState(false);
@@ -76,6 +86,31 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
     ? allWorkouts.filter((w) => w.title.toLowerCase().includes(workoutQuery.toLowerCase()))
     : allWorkouts;
 
+  function toggleAthlete(athleteId: string) {
+    setSelectedAthleteIds((current) => {
+      if (current.includes(athleteId)) {
+        setOpenNoteAthleteIds((openIds) => openIds.filter((id) => id !== athleteId));
+        return current.filter((id) => id !== athleteId);
+      }
+
+      return [...current, athleteId];
+    });
+  }
+
+  function assignmentNotes() {
+    const notes = selectedAthleteIds
+      .map((athleteId) => {
+        const note = athleteNotes[athleteId]?.trim();
+        if (!note) return null;
+
+        const athlete = athletes.find((item) => item.id === athleteId);
+        return (athlete?.nickname ?? i18n("athleteaa86fd2")) + ": " + (note);
+      })
+      .filter(Boolean);
+
+    return notes.length > 0 ? notes.join("\n\n") : undefined;
+  }
+
   async function handleAssign() {
     if (!selectedWorkout || selectedAthleteIds.length === 0) return;
     setSaving(true);
@@ -85,11 +120,11 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
         master_workout_id: selectedWorkout.id,
         athlete_ids: selectedAthleteIds,
         scheduled_for: scheduledFor,
-        admin_notes: adminNotes.trim() || undefined,
+        admin_notes: assignmentNotes(),
       });
       onAssigned();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not assign workout.");
+      setError(err instanceof Error ? err.message : i18n("couldNotAssignWorkout58ad222"));
     } finally {
       setSaving(false);
     }
@@ -104,10 +139,12 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
         role="presentation"
       >
         <div
+          ref={dialogRef}
           role="dialog"
           aria-modal="true"
-          aria-label="Assign workout"
-          className="flex w-full max-w-lg flex-col rounded-[2rem] overflow-hidden"
+          aria-labelledby={titleId}
+          tabIndex={-1}
+          className="flex w-full max-w-lg flex-col overflow-hidden rounded-[2rem] outline-none"
           style={{ background: "var(--panel)", border: "1px solid var(--border)", maxHeight: "90vh" }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -115,10 +152,10 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
           <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: "1px solid var(--border)" }}>
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}>
-                {step === "workout" ? "Step 1 of 2" : "Step 2 of 2"}
+                {step === "workout" ? i18n("step1Of20b5d808") : i18n("step2Of22510514")}
               </p>
-              <h2 className="mt-1 text-lg font-bold" style={{ color: "var(--text)" }}>
-                {step === "workout" ? "Choose a workout" : "Assign to athletes"}
+              <h2 id={titleId} className="mt-1 text-lg font-bold" style={{ color: "var(--text)" }}>
+                {step === "workout" ? i18n("chooseAWorkoutd02066c") : i18n("assignToAthletesafa315d")}
               </h2>
             </div>
             <button
@@ -127,7 +164,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
               onClick={onClose}
               type="button"
             >
-              Cancel
+              {i18n("cancel77dfd21")}
             </button>
           </div>
 
@@ -140,7 +177,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
                     autoFocus
                     className="min-w-0 flex-1 rounded-[1rem] px-4 py-3 text-sm outline-none"
                     style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-                    placeholder="Search workouts…"
+                    placeholder={i18n("searchWorkouts4be8edc")}
                     value={workoutQuery}
                     onChange={(e) => setWorkoutQuery(e.target.value)}
                   />
@@ -149,16 +186,16 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
                     onClick={openWorkoutCreator}
                     className="shrink-0 rounded-[1rem] px-4 text-sm font-bold"
                     style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-                    aria-label="Create a workout without leaving assignment"
+                    aria-label={i18n("createAWorkoutWithoutLeavingAssignment5dafefa")}
                   >
-                    + New
+                    {i18n("newb53f9d0")}
                   </button>
                 </div>
 
                 {workoutsLoading ? (
-                  <p className="text-sm" style={{ color: "var(--dim)" }}>Loading…</p>
+                  <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
                 ) : filteredWorkouts.length === 0 ? (
-                  <p className="text-sm" style={{ color: "var(--dim)" }}>No published workouts found.</p>
+                  <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("noPublishedWorkoutsFound6285b56")}</p>
                 ) : (
                   <div className="space-y-2">
                     {filteredWorkouts.map((workout) => {
@@ -214,13 +251,13 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
                       onClick={() => setStep("workout")}
                       type="button"
                     >
-                      Change
+                      {i18n("change64fbd99")}
                     </button>
                   </div>
                 ) : null}
 
                 <label className="block">
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>Date</span>
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{i18n("dateeb9a4bc")}</span>
                   <input
                     className="mt-2 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
                     style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -231,12 +268,12 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
                 </label>
 
                 <label className="block">
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>Athlete search</span>
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{i18n("athleteSearch22491bf")}</span>
                   <input
                     autoFocus
                     className="mt-2 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
                     style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-                    placeholder="Filter athletes…"
+                    placeholder={i18n("filterAthletes7579f90")}
                     value={athleteQuery}
                     onChange={(e) => setAthleteQuery(e.target.value)}
                   />
@@ -245,48 +282,71 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
                 <div className="max-h-48 space-y-2 overflow-y-auto">
                   {athletes.map((athlete) => {
                     const selected = selectedAthleteIds.includes(athlete.id);
+                    const noteOpen = openNoteAthleteIds.includes(athlete.id);
                     return (
-                      <button
-                        key={athlete.id}
-                        className="flex w-full items-center justify-between rounded-[1.1rem] px-4 py-2.5 text-sm transition-colors"
-                        style={
-                          selected
-                            ? { background: "var(--primary)", color: "var(--bg)" }
-                            : { background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text-soft)" }
-                        }
-                        onClick={() =>
-                          setSelectedAthleteIds((current) =>
-                            current.includes(athlete.id)
-                              ? current.filter((id) => id !== athlete.id)
-                              : [...current, athlete.id],
-                          )
-                        }
-                        type="button"
-                      >
-                        <span className="font-semibold">{athlete.nickname}</span>
-                        <span className="text-[11px] uppercase tracking-[0.18em]">
-                          {selected ? "Selected" : "Add"}
-                        </span>
-                      </button>
+                      <div key={athlete.id} className="rounded-[1.1rem]">
+                        <div
+                          className="flex w-full items-center gap-2 rounded-[1.1rem] px-4 py-2.5 text-sm transition-colors"
+                          style={
+                            selected
+                              ? { background: "var(--primary)", color: "var(--bg)" }
+                              : { background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text-soft)" }
+                          }
+                        >
+                          <button
+                            className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left"
+                            onClick={() => toggleAthlete(athlete.id)}
+                            type="button"
+                          >
+                            <span className="truncate font-semibold">{athlete.nickname}</span>
+                            <span className="text-[11px] uppercase tracking-[0.18em]">
+                              {selected ? i18n("selected9a976fc") : i18n("add61cc55a")}
+                            </span>
+                          </button>
+                          {selected ? (
+                            <button
+                              className="rounded-full px-2 py-1 text-[10px] font-bold"
+                              style={{
+                                background: "color-mix(in srgb, var(--bg) 12%, transparent)",
+                                border: "1px solid color-mix(in srgb, var(--bg) 18%, transparent)",
+                                color: "var(--bg)",
+                              }}
+                              onClick={() =>
+                                setOpenNoteAthleteIds((current) =>
+                                  current.includes(athlete.id)
+                                    ? current.filter((id) => id !== athlete.id)
+                                    : [...current, athlete.id],
+                                )
+                              }
+                              type="button"
+                            >
+                              {noteOpen ? i18n("hideNote84df0c5") : i18n("notecf79ada")}
+                            </button>
+                          ) : null}
+                        </div>
+                        {selected && noteOpen ? (
+                          <textarea
+                            className="mt-2 min-h-20 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
+                            style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)", resize: "vertical" }}
+                            placeholder={i18n("coachNoteFor3d1b8c2") + (athlete.nickname) + "..."}
+                            value={athleteNotes[athlete.id] ?? ""}
+                            onChange={(event) =>
+                              setAthleteNotes((current) => ({
+                                ...current,
+                                [athlete.id]: event.target.value,
+                              }))
+                            }
+                          />
+                        ) : null}
+                      </div>
                     );
                   })}
                   {athletes.length === 0 && !athleteQuery ? (
-                    <p className="text-xs" style={{ color: "var(--dim)" }}>Type to search athletes…</p>
+                    <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("typeToSearchAthletes771b6d4")}</p>
                   ) : athletes.length === 0 ? (
-                    <p className="text-xs" style={{ color: "var(--dim)" }}>No athletes found.</p>
+                    <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("noAthletesFound97fe277")}</p>
                   ) : null}
                 </div>
-
-                <label className="block">
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>Coach note (optional)</span>
-                  <textarea
-                    className="mt-2 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
-                    style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)", minHeight: "4rem", resize: "vertical" }}
-                    placeholder="Programming context or cues…"
-                    value={adminNotes}
-                    onChange={(e) => setAdminNotes(e.target.value)}
-                  />
-                </label>
 
                 {error ? (
                   <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{error}</p>
@@ -305,7 +365,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
                 onClick={() => setStep("athletes")}
                 type="button"
               >
-                Next — assign to athletes
+                {i18n("nextAssignToAthletesc7320c9")}
               </button>
             ) : (
               <button
@@ -315,7 +375,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
                 onClick={() => void handleAssign()}
                 type="button"
               >
-                {saving ? "Assigning…" : `Assign to ${selectedAthleteIds.length} athlete${selectedAthleteIds.length !== 1 ? "s" : ""}`}
+                {saving ? i18n("assigning4d16a1a") : i18n("assignTocc79072") + (selectedAthleteIds.length) + " athlete" + (selectedAthleteIds.length !== 1 ? "s" : "")}
               </button>
             )}
           </div>
@@ -327,7 +387,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
           style={{ background: "rgba(0,0,0,0.82)" }}
           role="dialog"
           aria-modal="true"
-          aria-label="Create workout"
+          aria-label={i18n("createWorkoutc7c6baa")}
         >
           <div
             className="w-full max-w-[96rem] overflow-hidden rounded-[1.5rem]"

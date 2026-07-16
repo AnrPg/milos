@@ -1,5 +1,7 @@
 "use client";
 
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -9,6 +11,7 @@ import { applyTheme, DEFAULT_THEME_SLUG, THEME_STORAGE_KEY } from "@/lib/theme";
 export const THEME_UPDATED_EVENT = "milos:theme-updated";
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const i18n = useUiTranslations();
   const themeQuery = useQuery({
     queryKey: ["public", "theme"],
     queryFn: fetchPublicTheme,

@@ -1,8 +1,11 @@
 "use client";
 
+
+import {useUiTranslations} from "@/i18n/ui";
 import { ReviewForm } from "@/components/my-reviews";
 
 export function ReviewFormPanel({ onClose }: { onClose: () => void }) {
+  const i18n = useUiTranslations();
   return (
     <div
       className="fixed inset-y-0 right-0 z-50 flex flex-col"
@@ -17,10 +20,10 @@ export function ReviewFormPanel({ onClose }: { onClose: () => void }) {
             className="text-xs font-bold uppercase tracking-[0.22em]"
             style={{ color: "var(--primary)" }}
           >
-            Leave a Review
+            {i18n("leaveAReview5e65b65")}
           </p>
           <p className="text-sm mt-0.5" style={{ color: "var(--muted)" }}>
-            Share your feedback with your coach
+            {i18n("shareYourFeedbackWithYourCoacha24d2a8")}
           </p>
         </div>
         <button

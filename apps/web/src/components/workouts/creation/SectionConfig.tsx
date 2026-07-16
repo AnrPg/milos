@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import {
   AUTO_SCORE_MAP,
@@ -21,6 +26,7 @@ type Props = {
 };
 
 export function SectionConfig({ section }: Props) {
+  const i18n = useUiTranslations();
   const { updateSection, setFormat, setFormatParams, deleteSection, setEmomScoringMode, setEmomAmrapScoringStyle } = useWorkoutCreationStore();
 
   const autoScore = AUTO_SCORE_MAP[section.format];
@@ -38,22 +44,22 @@ export function SectionConfig({ section }: Props) {
     <div className="flex flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
         <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-          Section Config
+          {i18n("sectionConfigc77acc9")}
         </span>
         <button onClick={() => deleteSection(section.localId)} className="text-xs" style={{ color: "var(--red)" }}>
-          Delete
+          {i18n("deletef6fdbe4")}
         </button>
       </div>
 
       <div>
         <label className="mb-1 block text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-          Name
+          {i18n("name709a232")}
         </label>
         <input
           type="text"
           value={section.name}
           onChange={(event) => updateSection(section.localId, { name: event.target.value })}
-          placeholder="e.g. Main Set"
+          placeholder={i18n("eGMainSet8e9364b")}
           className="w-full rounded-xl px-3 py-2 text-sm outline-none"
           style={{ background: "var(--bg)", border: "1px solid var(--dim)", color: "var(--text)" }}
         />
@@ -61,7 +67,7 @@ export function SectionConfig({ section }: Props) {
 
       <div>
         <label className="mb-1 block text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-          Format
+          {i18n("format041a5de")}
         </label>
         <FormatDropdown value={section.format} onChange={(format) => setFormat(section.localId, format)} />
         <FormatContextualFields
@@ -79,7 +85,7 @@ export function SectionConfig({ section }: Props) {
 
           let cycleDuration = 0;
           for (let min = 1; min <= totalMinutes; min++) {
-            cycleDuration += ((section.formatParams[`interval_seconds_${min}`] as number)
+            cycleDuration += ((section.formatParams["interval_seconds_" + (min)] as number)
               ?? (section.formatParams.interval_seconds as number)
               ?? 60);
           }
@@ -93,14 +99,14 @@ export function SectionConfig({ section }: Props) {
           function toMMSS(secs: number): string {
             const m = Math.floor(secs / 60);
             const s = secs % 60;
-            return m > 0 ? (s > 0 ? `${m}:${String(s).padStart(2, "0")}` : `${m}min`) : `${secs}s`;
+            return m > 0 ? (s > 0 ? (m) + ":" + (String(s).padStart(2, "0")) : (m) + "min") : (secs) + "s";
           }
 
           return (
             <div className="mt-3 flex flex-col gap-3">
               <div>
                 <label className="mb-2 block text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-                  Minutes in Cycle
+                  {i18n("minutesInCyclef0d977c")}
                 </label>
                 <div className="flex items-center gap-2">
                   <button
@@ -134,7 +140,7 @@ export function SectionConfig({ section }: Props) {
                   </button>
                   {rounds !== null ? (
                     <span className="ml-1 text-xs" style={{ color: "var(--dim)" }}>
-                      → {rounds} round{rounds !== 1 ? "s" : ""}
+                      → {rounds} {i18n("roundf0590a6")}{rounds !== 1 ? i18n("sa0f1490") : ""}
                     </span>
                   ) : null}
                 </div>
@@ -143,20 +149,20 @@ export function SectionConfig({ section }: Props) {
               {totalMinutes > 0 ? (
                 <div>
                   <label className="mb-2 block text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-                    Per-Minute Duration
+                    {i18n("perMinuteDurationad23aaf")}
                   </label>
                   <div className="flex flex-col gap-2">
                     {Array.from({ length: totalMinutes }, (_, i) => i + 1).map((min) => (
                       <div key={min} className="flex items-center justify-between gap-2">
-                        <span className="text-xs" style={{ color: "var(--muted)" }}>Min {min}</span>
+                        <span className="text-xs" style={{ color: "var(--muted)" }}>{i18n("min7eb0cee")} {min}</span>
                         <TimeInput
-                          value={((section.formatParams[`interval_seconds_${min}`] as number)
+                          value={((section.formatParams["interval_seconds_" + (min)] as number)
                             ?? (section.formatParams.interval_seconds as number)
                             ?? 60)}
                           onChange={(secs) =>
                             setFormatParams(section.localId, {
                               ...section.formatParams,
-                              [`interval_seconds_${min}`]: secs,
+                              ["interval_seconds_" + (min)]: secs,
                             })
                           }
                         />
@@ -176,7 +182,7 @@ export function SectionConfig({ section }: Props) {
                   }}
                 >
                   <span>
-                    {remainder}s leftover — {toMMSS(suggestedDuration)} fits exactly
+                    {remainder}{i18n("sLeftover34f149a")} {toMMSS(suggestedDuration)} {i18n("fitsExactly1b0f633")}
                   </span>
                   <button
                     type="button"
@@ -192,7 +198,7 @@ export function SectionConfig({ section }: Props) {
                       border: "1px solid var(--warning)",
                     }}
                   >
-                    Fix
+                    {i18n("fix99a4231")}
                   </button>
                 </div>
               ) : null}
@@ -203,8 +209,8 @@ export function SectionConfig({ section }: Props) {
 
       <div>
         <label className="mb-1 block text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-          Rest After Section
-          <span className="ml-1 font-normal italic normal-case" style={{ color: "var(--dim)" }}>optional</span>
+          {i18n("restAfterSectione73a6eb")}
+          <span className="ml-1 font-normal italic normal-case" style={{ color: "var(--dim)" }}>{i18n("optional48a7b88")}</span>
         </label>
         <TimeInput
           value={section.restAfterSeconds}
@@ -226,7 +232,7 @@ export function SectionConfig({ section }: Props) {
             />
           </button>
           <span className="text-sm" style={{ color: "var(--text)" }}>
-            Scoreable
+            {i18n("scoreablebfd005b")}
           </span>
         </div>
       ) : null}
@@ -237,7 +243,7 @@ export function SectionConfig({ section }: Props) {
             className="mb-2 block text-xs font-bold uppercase tracking-widest"
             style={{ color: "var(--muted)" }}
           >
-            Scoring Mode
+            {i18n("scoringMode57990d6")}
           </label>
           <div className="flex flex-col gap-2">
             {(["for_time", "for_quality", "amrap", "to_failure"] as EmomScoringMode[]).map((mode) => (
@@ -276,7 +282,7 @@ export function SectionConfig({ section }: Props) {
             className="mb-2 block text-xs font-bold uppercase tracking-widest"
             style={{ color: "var(--muted)" }}
           >
-            AMRAP Scoring Style
+            {i18n("amrapScoringStyle74cfd2e")}
           </label>
           <div className="flex gap-2">
             {(["grand_total", "lowest_window"] as const).map((style) => (
@@ -300,14 +306,14 @@ export function SectionConfig({ section }: Props) {
                       }
                 }
               >
-                {style === "grand_total" ? "Grand Total" : "Lowest Window"}
+                {style === "grand_total" ? i18n("grandTotal91faafb") : i18n("lowestWindow21d5f57")}
               </button>
             ))}
           </div>
           <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
             {section.emomAmrapScoringStyle === "lowest_window"
-              ? "Score = your worst window. Punishes inconsistent pacing."
-              : "Score = sum of all reps across all windows."}
+              ? i18n("scoreYourWorstWindowPunishesInconsistentPacing8f3e1e7")
+              : i18n("scoreSumOfAllRepsAcrossAllWindows3ed731a")}
           </p>
         </div>
       ) : null}
@@ -318,7 +324,7 @@ export function SectionConfig({ section }: Props) {
             className="shrink-0 text-xs font-bold uppercase tracking-widest"
             style={{ color: "var(--muted)" }}
           >
-            Max Windows
+            {i18n("maxWindowsa070016")}
           </label>
           <input
             type="number"
@@ -344,7 +350,7 @@ export function SectionConfig({ section }: Props) {
       {showScorePicker ? (
         <div>
           <label className="mb-1 block text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-            Score Type
+            {i18n("scoreType138d04a")}
           </label>
           <select
             value={section.scoreType ?? ""}
@@ -352,7 +358,7 @@ export function SectionConfig({ section }: Props) {
             className="w-full rounded-xl px-3 py-2 text-sm outline-none"
             style={{ background: "var(--bg)", border: "1px solid var(--dim)", color: "var(--text)" }}
           >
-            <option value="">Select score type</option>
+            <option value="">{i18n("selectScoreType1fe0e66")}</option>
             {SCORE_TYPES.map((scoreType) => (
               <option key={scoreType} value={scoreType}>
                 {scoreType}

@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -18,6 +23,7 @@ import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
 
 export function WorkoutAdminConsole() {
+  const i18n = useUiTranslations();
   const router = useRouter();
   const { currentUser, signOut, status, tokens } = useSession();
   const [workouts, setWorkouts] = useState<WorkoutRecord[]>([]);
@@ -49,7 +55,7 @@ export function WorkoutAdminConsole() {
         return;
       }
 
-      setError(loadError instanceof Error ? loadError.message : "Failed to load admin workout data.");
+      setError(loadError instanceof Error ? loadError.message : i18n("failedToLoadAdminWorkoutData3641095"));
     }
   }, [currentUser, router, signOut, status, tokens]);
 
@@ -103,7 +109,7 @@ export function WorkoutAdminConsole() {
 
         setError(actionError.message);
       } else {
-        setError(actionError instanceof Error ? actionError.message : "Unexpected request failure");
+        setError(actionError instanceof Error ? actionError.message : i18n("unexpectedRequestFailurea7ffd06"));
       }
     } finally {
       setBusyAction(null);
@@ -114,31 +120,31 @@ export function WorkoutAdminConsole() {
     if (!tokens?.access_token) return;
 
     const confirmed = window.confirm(
-      `Delete "${workout.title || "this workout"}" permanently?\n\nThis hard delete removes the workout definition, assigned workouts, related schedule slots and bookings, and execution history. Affected athletes and booked members will be notified that the coach changed their workout.`,
+      i18n("delete63346e8") + (workout.title || i18n("thisWorkoutd8375a8")) + i18n("permanentlyThisHardDeleteRemovesTheWorkoutDefinitionbb6e054"),
     );
 
     if (!confirmed) return;
 
-    await runAction(`delete-${workout.id}`, async () => {
+    await runAction("delete-" + (workout.id), async () => {
       await deleteWorkout(tokens.access_token, workout.id);
       setWorkouts((current) => current.filter((item) => item.id !== workout.id));
-      setMessage(`Deleted "${workout.title || "workout"}".`);
+      setMessage(i18n("deleted98c055d") + (workout.title || "workout") + "\".");
     });
   }
 
   return (
     <main className="min-h-screen px-6 py-8 md:px-10 md:py-12" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-7xl space-y-8">
-        <TransientHero label="workout management introduction">
+        <TransientHero label={i18n("workoutManagementIntroduction675e60c")} timeoutMs={3000}>
         <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">Workouts</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">{i18n("workoutsccb58b2")}</p>
               <h1 className="mt-2 max-w-3xl text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-                Workout content management.
+                {i18n("workoutContentManagementb5ce5ce")}
               </h1>
               <p className="mt-4 max-w-3xl text-base leading-7" style={{ color: "var(--muted)" }}>
-                Author and manage master workout definitions. Workouts can be assigned to athletes individually or used across class schedule slots.
+                {i18n("authorAndManageMasterWorkoutDefinitionsWorkoutsCan27f3d56")}
               </p>
             </div>
           </div>
@@ -149,21 +155,21 @@ export function WorkoutAdminConsole() {
               style={{ background: "var(--text)", color: "var(--bg)" }}
               href="/admin/workouts"
             >
-              Workout list
+              {i18n("workoutList1f538d5")}
             </Link>
             <Link
               className="rounded-full px-4 py-2 transition-colors"
               style={{ background: "var(--border)", color: "var(--text-soft)" }}
               href="/admin/workouts/new"
             >
-              New workout
+              {i18n("newWorkout5fc6e4c")}
             </Link>
             <Link
               className="rounded-full px-4 py-2 transition-colors"
               style={{ background: "transparent", border: "1px solid var(--border)", color: "var(--dim)" }}
               href="/admin/settings#level-taxonomy"
             >
-              Level Taxonomy ↗
+              {i18n("levelTaxonomy893f642")}
             </Link>
           </div>
         </section>
@@ -186,8 +192,8 @@ export function WorkoutAdminConsole() {
             <section className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>Master Workouts</p>
-                  <h2 className="mt-2 text-2xl font-semibold" style={{ color: "var(--text)" }}>Saved workout definitions</h2>
+                  <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>{i18n("masterWorkoutsd9ed039")}</p>
+                  <h2 className="mt-2 text-2xl font-semibold" style={{ color: "var(--text)" }}>{i18n("savedWorkoutDefinitions0b771a2")}</h2>
                 </div>
 
                 <Link
@@ -195,7 +201,7 @@ export function WorkoutAdminConsole() {
                   style={{ background: "var(--text)", color: "var(--bg)" }}
                   href="/admin/workouts/new"
                 >
-                  New workout
+                  {i18n("newWorkout5fc6e4c")}
                 </Link>
               </div>
 
@@ -205,22 +211,22 @@ export function WorkoutAdminConsole() {
                     <div className="flex items-center justify-between gap-4">
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="text-lg font-semibold" style={{ color: "var(--text)" }}>{workout.title || "Untitled workout"}</p>
+                          <p className="text-lg font-semibold" style={{ color: "var(--text)" }}>{workout.title || i18n("untitledWorkouta1885a5")}</p>
                           {workout.status === "draft" ? (
                             <span className="rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-widest" style={{ background: "color-mix(in srgb, var(--warning) 12%, transparent)", color: "var(--warning)" }}>
-                              Draft
+                              {i18n("draft23d33e2")}
                             </span>
                           ) : null}
                           {workout.is_team_workout ? (
                             <span className="rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-widest" style={{ background: "color-mix(in srgb, var(--warning) 12%, transparent)", color: "var(--warning)", border: "1px solid color-mix(in srgb, var(--warning) 30%, transparent)" }}>
-                              Team
+                              {i18n("team2188872")}
                             </span>
                           ) : null}
                         </div>
                         <p className="mt-1 text-sm uppercase tracking-[0.18em] text-[var(--primary)]">{workout.type}</p>
                       </div>
                       <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--muted)" }}>
-                        {(workout.sections ?? []).length} section{(workout.sections ?? []).length === 1 ? "" : "s"}
+                        {(workout.sections ?? []).length} {i18n("section20182fb")}{(workout.sections ?? []).length === 1 ? "" : i18n("sa0f1490")}
                       </span>
                     </div>
 
@@ -232,7 +238,7 @@ export function WorkoutAdminConsole() {
                           href={`/admin/workouts/new?draft=${workout.id}`}
                           onClick={(e) => e.stopPropagation()}
                         >
-                          Continue editing
+                          {i18n("continueEditingb101465")}
                         </Link>
                       ) : null}
 
@@ -244,7 +250,7 @@ export function WorkoutAdminConsole() {
                             onClick={(e) => { e.stopPropagation(); setAssignTarget(workout); }}
                             type="button"
                           >
-                            Assign to athletes
+                            {i18n("assignToAthletesafa315d")}
                           </button>
                           <button
                             className="rounded-full px-3 py-1 text-xs font-semibold"
@@ -252,7 +258,7 @@ export function WorkoutAdminConsole() {
                             onClick={(e) => { e.stopPropagation(); setEditTarget(workout); }}
                             type="button"
                           >
-                            Edit
+                            {i18n("edit5301648")}
                           </button>
                         </>
                       ) : null}
@@ -264,13 +270,13 @@ export function WorkoutAdminConsole() {
                         onClick={(e) => { e.stopPropagation(); void handleDeleteWorkout(workout); }}
                         type="button"
                       >
-                        {busyAction === `delete-${workout.id}` ? "Deleting..." : "Delete"}
+                        {busyAction === `delete-${workout.id}` ? i18n("deletinge16cac6") : i18n("deletef6fdbe4")}
                       </button>
 
                       {workout.available_scale_levels.length > 0 ? (
                         workout.available_scale_levels.map((scaleLevel) => (
                           <span
-                            key={`${workout.id}-${scaleLevel.slug}`}
+                            key={(workout.id) + "-" + (scaleLevel.slug)}
                             className="rounded-full px-3 py-1 text-xs font-semibold"
                             style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", color: "var(--primary)" }}
                           >
@@ -279,16 +285,16 @@ export function WorkoutAdminConsole() {
                         ))
                       ) : (
                         <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--dim)" }}>
-                          Base only
+                          {i18n("baseOnly061c4ff")}
                         </span>
                       )}
                     </div>
 
                     <div className="mt-4 space-y-2 text-sm" style={{ color: "var(--muted)" }}>
                       {(workout.sections ?? []).map((section) => (
-                        <div key={`${workout.id}-${section.order}`} className="flex items-center justify-between gap-4">
+                        <div key={(workout.id) + "-" + (section.order)} className="flex items-center justify-between gap-4">
                           <span>{section.name}</span>
-                          <span style={{ color: "var(--dim)" }}>{section.exercises.length} exercises</span>
+                          <span style={{ color: "var(--dim)" }}>{section.exercises.length} {i18n("exercises0ee6e81")}</span>
                         </div>
                       ))}
                     </div>
@@ -304,7 +310,7 @@ export function WorkoutAdminConsole() {
         <WorkoutEditModal
           key={editTarget.id}
           workoutId={editTarget.id}
-          workoutTitle={editTarget.title ?? "Untitled workout"}
+          workoutTitle={editTarget.title ?? i18n("untitledWorkouta1885a5")}
           accessToken={tokens.access_token}
           context={{ kind: "global" }}
           onClose={() => setEditTarget(null)}
@@ -344,9 +350,9 @@ export function WorkoutAdminConsole() {
               <div className="flex shrink-0 items-start justify-between gap-4 border-b px-6 py-5" style={{ borderColor: "var(--border)" }}>
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}>{pw.type}</p>
-                  <h2 className="mt-1 text-xl font-semibold" style={{ color: "var(--text)" }}>{pw.title || "Untitled workout"}</h2>
+                  <h2 className="mt-1 text-xl font-semibold" style={{ color: "var(--text)" }}>{pw.title || i18n("untitledWorkouta1885a5")}</h2>
                   <p className="mt-1 text-sm" style={{ color: "var(--dim)" }}>
-                    {pw.sections.length} section{pw.sections.length === 1 ? "" : "s"} · {pw.available_scale_levels.length > 0 ? `${pw.available_scale_levels.length} scale level${pw.available_scale_levels.length === 1 ? "" : "s"}` : "Base only"}
+                    {pw.sections.length} {i18n("section20182fb")}{pw.sections.length === 1 ? "" : i18n("sa0f1490")} · {pw.available_scale_levels.length > 0 ? (pw.available_scale_levels.length) + i18n("scaleLevelc12ac35") + (pw.available_scale_levels.length === 1 ? "" : "s") : i18n("baseOnly061c4ff")}
                   </p>
                 </div>
                 <button
@@ -355,7 +361,7 @@ export function WorkoutAdminConsole() {
                   onClick={() => setPreviewWorkoutId(null)}
                   type="button"
                 >
-                  Close
+                  {i18n("closebbfa773")}
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto px-6 py-5">

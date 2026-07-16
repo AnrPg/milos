@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -48,6 +53,7 @@ function formatScoreValue(score: SectionScore): string {
 }
 
 function ScoreTooltip({ scores }: { scores: SectionScore[] }) {
+  const i18n = useUiTranslations();
   if (scores.length === 0) return null;
   return (
     <div
@@ -60,13 +66,13 @@ function ScoreTooltip({ scores }: { scores: SectionScore[] }) {
       }}
     >
       <p className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-        Scores
+        {i18n("scores126cb93")}
       </p>
       <div className="space-y-1">
         {scores.map((s, i) => (
           <div key={i} className="flex items-baseline justify-between gap-2">
             <span className="truncate text-[10px]" style={{ color: "var(--muted)" }}>
-              {s.section_name ?? `Section ${i + 1}`}
+              {s.section_name ?? i18n("sectionf2c6b56") + (i + 1)}
             </span>
             <span className="shrink-0 text-[11px] font-semibold" style={{ color: "var(--success)" }}>
               {formatScoreValue(s)}
@@ -112,6 +118,7 @@ function monthGridMondays(refDate: Date): string[] {
 }
 
 function DayHeader({ isoDate, compact, todayIso }: { isoDate: string; compact: boolean; todayIso: string }) {
+  const i18n = useUiTranslations();
   const d = parseLocalDate(isoDate);
   const weekday = new Intl.DateTimeFormat(undefined, { weekday: compact ? "short" : "long" }).format(d);
   const month = new Intl.DateTimeFormat(undefined, { month: "short" }).format(d);
@@ -153,6 +160,7 @@ function DraggableCard({
   style?: React.CSSProperties;
   children: React.ReactNode;
 }) {
+  const i18n = useUiTranslations();
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, isDragging } = useDraggable({
     id: assignment.id,
     data: { assignment },
@@ -173,7 +181,7 @@ function DraggableCard({
         {...attributes}
         role="button"
         tabIndex={-1}
-        aria-label="Drag to reschedule"
+        aria-label={i18n("dragToRescheduleb5f3f05")}
       >
         ⠿
       </span>
@@ -191,6 +199,7 @@ function DroppableDay({
   className?: string;
   children: React.ReactNode;
 }) {
+  const i18n = useUiTranslations();
   const { setNodeRef, isOver } = useDroppable({ id: date });
   return (
     <div
@@ -214,6 +223,7 @@ function DraggableMonthChip({
   assignment: AssignedWorkoutRecord;
   disabled?: boolean;
 }) {
+  const i18n = useUiTranslations();
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: assignment.id,
     data: { assignment },
@@ -270,6 +280,7 @@ function DroppableMonthCell({
   onNavigate: () => void;
   todayIso: string;
 }) {
+  const i18n = useUiTranslations();
   const { setNodeRef, isOver } = useDroppable({ id: date });
 
   return (
@@ -308,7 +319,7 @@ function DroppableMonthCell({
       ))}
       {assignments.length > 2 ? (
         <p className="mt-0.5 text-[9px]" style={{ color: "var(--dim)" }}>
-          +{assignments.length - 2} more
+          +{assignments.length - 2} {i18n("moree7c95b4")}
         </p>
       ) : null}
     </div>
@@ -316,6 +327,7 @@ function DroppableMonthCell({
 }
 
 function DragGhostCard({ assignment }: { assignment: AssignedWorkoutRecord }) {
+  const i18n = useUiTranslations();
   return (
     <div
       className="rounded-[1.4rem] p-4 shadow-xl"
@@ -345,6 +357,7 @@ export function AssignedWorkoutsConsole({
   initialOpenAssignmentId?: string | null;
   pageTitle?: string;
 } = {}) {
+  const i18n = useUiTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { currentUser, tokens, signOut } = useSession();
@@ -448,7 +461,7 @@ export function AssignedWorkoutsConsole({
       setError(
         requestError instanceof Error
           ? requestError.message
-          : "Could not load assigned workouts.",
+          : i18n("couldNotLoadAssignedWorkouts4216f7d"),
       );
     } finally {
       setLoading(false);
@@ -534,7 +547,7 @@ export function AssignedWorkoutsConsole({
 
     // Assignment not in loaded week — navigate to the week containing the target date
     if (!loading && openParamDate) {
-      const targetDate = new Date(openParamDate + "T00:00:00");
+      const targetDate = new Date(openParamDate + i18n("t0000004b5772d"));
       if (!isNaN(targetDate.getTime())) {
         autoOpenedRef.current = openParamId;
         const frame = window.requestAnimationFrame(() => setRefDate(targetDate));
@@ -584,7 +597,7 @@ export function AssignedWorkoutsConsole({
 
   const periodLabel = useMemo(() => {
     if (viewMode === "month") return formatMonthLabel(refDate);
-    return `${formatShortDate(visibleDates[0])} – ${formatShortDate(visibleDates[visibleDates.length - 1])}`;
+    return (formatShortDate(visibleDates[0])) + " – " + (formatShortDate(visibleDates[visibleDates.length - 1]));
   }, [refDate, viewMode, visibleDates]);
 
   function navigate(direction: 1 | -1) {
@@ -630,12 +643,12 @@ export function AssignedWorkoutsConsole({
       setRequestedDates((current) =>
         current.includes(requestDate) ? current : [...current, requestDate],
       );
-      setRequestStatus(`Request sent for ${requestDate}.`);
+      setRequestStatus(i18n("requestSentFor0b1804b") + (requestDate) + ".");
       setRequestingDate(null);
       setRequestNote("");
     } catch (requestError) {
       setRequestError(
-        requestError instanceof Error ? requestError.message : "Could not send request.",
+        requestError instanceof Error ? requestError.message : i18n("couldNotSendRequest3be3d2f"),
       );
     } finally {
       setRequestSaving(false);
@@ -690,7 +703,7 @@ export function AssignedWorkoutsConsole({
       cancelEdit();
     } catch (requestError) {
       setError(
-        requestError instanceof Error ? requestError.message : "Could not update assignment.",
+        requestError instanceof Error ? requestError.message : i18n("couldNotUpdateAssignmenta301a8e"),
       );
     } finally {
       setSavingEdit(false);
@@ -707,7 +720,7 @@ export function AssignedWorkoutsConsole({
       if (editingId === assignmentId) cancelEdit();
     } catch (requestError) {
       setError(
-        requestError instanceof Error ? requestError.message : "Could not delete assignment.",
+        requestError instanceof Error ? requestError.message : i18n("couldNotDeleteAssignment3704beb"),
       );
     } finally {
       setDeletingId(null);
@@ -766,7 +779,7 @@ export function AssignedWorkoutsConsole({
       }
 
       setError(
-        requestError instanceof Error ? requestError.message : "Could not start workout execution.",
+        requestError instanceof Error ? requestError.message : i18n("couldNotStartWorkoutExecution78f6030"),
       );
     } finally {
       setLaunchingId(null);
@@ -787,7 +800,7 @@ export function AssignedWorkoutsConsole({
     if (!assignment || assignment.scheduled_for === newDate) return;
 
     if (newDate < todayIso) {
-      setError("Cannot reschedule a workout to a past date.");
+      setError(i18n("cannotRescheduleAWorkoutToAPastDate49dd0f2"));
       return;
     }
 
@@ -813,7 +826,7 @@ export function AssignedWorkoutsConsole({
         setAllAssignments((current) =>
           current.map((a) => (a.id === assignment.id ? assignment : a)),
         );
-        setError("Could not reschedule workout.");
+        setError(i18n("couldNotRescheduleWorkoute94cc0c"));
       }
     })();
   }
@@ -824,7 +837,7 @@ export function AssignedWorkoutsConsole({
     return (
       <section>
         <div className="mb-1 grid grid-cols-7 gap-1">
-          {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((label) => (
+          {[i18n("mon24b2a09"), i18n("tue529541b"), i18n("wed23408b1"), i18n("thu3593ccd"), i18n("fribbd6e32"), i18n("sat6b782d4"), i18n("sun48c98ca")].map((label) => (
             <div
               key={label}
               className="py-1 text-center text-[10px] font-semibold uppercase tracking-[0.16em]"
@@ -918,7 +931,7 @@ export function AssignedWorkoutsConsole({
                               {a.workout.title}
                             </p>
                             {a.workout.is_team_workout ? (
-                              <span className="shrink-0 rounded px-1 text-[8px] font-bold" style={{ background: "color-mix(in srgb, var(--warning) 20%, transparent)", color: "var(--warning)" }}>T</span>
+                              <span className="shrink-0 rounded px-1 text-[8px] font-bold" style={{ background: "color-mix(in srgb, var(--warning) 20%, transparent)", color: "var(--warning)" }}>{i18n("tc2c53d6")}</span>
                             ) : null}
                           </div>
                           <p
@@ -935,10 +948,10 @@ export function AssignedWorkoutsConsole({
                             e.stopPropagation();
                             downloadIcsEvent({ title: a.workout.title, date });
                           }}
-                          title="Add to calendar"
+                          title={i18n("addToCalendar4f05cd6")}
                           type="button"
                         >
-                          +cal
+                          {i18n("cal183eee3")}
                         </button>
                       </div>
                     </DraggableCard>
@@ -978,7 +991,7 @@ export function AssignedWorkoutsConsole({
                     style={{ border: "1px dashed var(--border)", color: "var(--dim)" }}
                   >
                     <div className="flex flex-col gap-3">
-                      <p>No workout assigned.</p>
+                      <p>{i18n("noWorkoutAssigned9553f04")}</p>
                       {!isAdmin && date >= todayIso ? (
                         requestingDate === date ? (
                           <div className="space-y-2">
@@ -993,7 +1006,7 @@ export function AssignedWorkoutsConsole({
                             <textarea
                               className="min-h-16 w-full rounded-[0.8rem] px-3 py-2 text-xs outline-none"
                               style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-                              placeholder="Optional note"
+                              placeholder={i18n("optionalNote9873e59")}
                               value={requestNote}
                               onChange={(event) => setRequestNote(event.target.value)}
                               maxLength={500}
@@ -1009,7 +1022,7 @@ export function AssignedWorkoutsConsole({
                                 onClick={() => void submitWorkoutRequest()}
                                 type="button"
                               >
-                                {requestSaving ? "Sending…" : "Send"}
+                                {requestSaving ? i18n("sendingcf76551") : i18n("send9bc2575")}
                               </button>
                               <button
                                 className="rounded-full px-3 py-1.5 text-xs font-semibold"
@@ -1017,13 +1030,13 @@ export function AssignedWorkoutsConsole({
                                 onClick={cancelWorkoutRequest}
                                 type="button"
                               >
-                                Cancel
+                                {i18n("cancel77dfd21")}
                               </button>
                             </div>
                           </div>
                         ) : requestedDates.includes(date) ? (
                           <p className="text-[11px]" style={{ color: "var(--dim)" }}>
-                            Request sent.
+                            {i18n("requestSentab95f1c")}
                           </p>
                         ) : (
                           <button
@@ -1032,7 +1045,7 @@ export function AssignedWorkoutsConsole({
                             onClick={() => beginWorkoutRequest(date)}
                             type="button"
                           >
-                            Request workout
+                            {i18n("requestWorkout5ed523e")}
                           </button>
                         )
                       ) : null}
@@ -1073,18 +1086,18 @@ export function AssignedWorkoutsConsole({
                         </p>
                         {assignment.workout.is_team_workout ? (
                           <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold" style={{ background: "color-mix(in srgb, var(--warning) 15%, transparent)", color: "var(--warning)", border: "1px solid color-mix(in srgb, var(--warning) 30%, transparent)" }}>
-                            Team
+                            {i18n("team2188872")}
                           </span>
                         ) : null}
                       </div>
                       {isRejected ? (
                         <span className="mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "color-mix(in srgb, var(--danger) 18%, transparent)", color: "var(--danger)" }}>
-                          Rejected by you
+                          {i18n("rejectedByYou89c7171")}
                         </span>
                       ) : isPastDone ? (
                         <div className="relative mt-1 inline-block">
                           <span className="inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "color-mix(in srgb, var(--success) 15%, transparent)", color: "var(--success)" }}>
-                            Done ✓
+                            {i18n("donea821d15")}
                           </span>
                           {(assignment.execution_scores?.length ?? 0) > 0 ? (
                             <div className="invisible absolute bottom-full left-1/2 z-50 mb-1.5 -translate-x-1/2 group-hover:visible">
@@ -1097,9 +1110,9 @@ export function AssignedWorkoutsConsole({
                         {assignment.workout.title}
                       </h2>
                       <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
-                        {assignment.workout.sections.length} section{assignment.workout.sections.length !== 1 ? "s" : ""}
+                        {assignment.workout.sections.length} {i18n("section20182fb")}{assignment.workout.sections.length !== 1 ? i18n("sa0f1490") : ""}
                         {" · "}
-                        {assignment.workout.sections.reduce((n, s) => n + s.exercises.length, 0)} exercises
+                        {assignment.workout.sections.reduce((n, s) => n + s.exercises.length, 0)} {i18n("exercises0ee6e81")}
                       </p>
                     </button>
 
@@ -1107,7 +1120,7 @@ export function AssignedWorkoutsConsole({
                       <div className="mt-2.5 flex flex-wrap gap-1.5">
                         {(assignment.athletes ?? []).map((athlete) => (
                           <span
-                            key={`${assignment.id}-${athlete.id}`}
+                            key={(assignment.id) + "-" + (athlete.id)}
                             className="rounded-full px-2 py-0.5 text-[10px] font-semibold"
                             style={{ background: "var(--primary)", color: "var(--bg)" }}
                           >
@@ -1136,7 +1149,7 @@ export function AssignedWorkoutsConsole({
                         }}
                         type="button"
                       >
-                        + Add to calendar
+                        {i18n("addToCalendareee5400")}
                       </button>
                     </div>
 
@@ -1152,7 +1165,7 @@ export function AssignedWorkoutsConsole({
                           onClick={() => beginEdit(assignment)}
                           type="button"
                         >
-                          Edit
+                          {i18n("edit5301648")}
                         </button>
                         <button
                           className="rounded-full px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
@@ -1165,7 +1178,7 @@ export function AssignedWorkoutsConsole({
                           onClick={() => void removeAssignment(assignment.id)}
                           type="button"
                         >
-                          {deletingId === assignment.id ? "…" : "Delete"}
+                          {deletingId === assignment.id ? "…" : i18n("deletef6fdbe4")}
                         </button>
                         <button
                           className="rounded-full px-3 py-1.5 text-xs font-semibold transition-colors"
@@ -1177,7 +1190,7 @@ export function AssignedWorkoutsConsole({
                           onClick={() => setEditWorkoutTarget(assignment)}
                           type="button"
                         >
-                          Edit workout
+                          {i18n("editWorkoutd299ce5")}
                         </button>
                       </div>
                     ) : null}
@@ -1189,7 +1202,7 @@ export function AssignedWorkoutsConsole({
                       >
                         <label className="block">
                           <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                            Date
+                            {i18n("dateeb9a4bc")}
                           </span>
                           <input
                             className="mt-2 w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
@@ -1202,7 +1215,7 @@ export function AssignedWorkoutsConsole({
 
                         <label className="block">
                           <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                            Athlete search
+                            {i18n("athleteSearch22491bf")}
                           </span>
                           <input
                             className="mt-2 w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
@@ -1211,7 +1224,7 @@ export function AssignedWorkoutsConsole({
                               setAthletesLoading(true);
                               setEditQuery(event.target.value);
                             }}
-                            placeholder="Filter athletes"
+                            placeholder={i18n("filterAthletes5e06f04")}
                             value={editQuery}
                           />
                         </label>
@@ -1221,7 +1234,7 @@ export function AssignedWorkoutsConsole({
                             const selected = editAthleteIds.includes(athlete.id);
                             return (
                               <button
-                                key={`${assignment.id}-${athlete.id}`}
+                                key={(assignment.id) + "-" + (athlete.id)}
                                 className="flex w-full items-center justify-between rounded-[0.9rem] px-3 py-2 text-left text-sm transition-colors"
                                 style={
                                   selected
@@ -1239,7 +1252,7 @@ export function AssignedWorkoutsConsole({
                               >
                                 <span>{athlete.nickname}</span>
                                 <span className="text-[11px] uppercase tracking-[0.18em]">
-                                  {selected ? "Selected" : "Add"}
+                                  {selected ? i18n("selected9a976fc") : i18n("add61cc55a")}
                                 </span>
                               </button>
                             );
@@ -1249,14 +1262,14 @@ export function AssignedWorkoutsConsole({
                               className="rounded-[0.9rem] px-3 py-4 text-sm"
                               style={{ border: "1px dashed var(--border)", color: "var(--dim)" }}
                             >
-                              No athletes matched that search.
+                              {i18n("noAthletesMatchedThatSearchd4f2c56")}
                             </p>
                           ) : null}
                         </div>
 
                         <label className="block">
                           <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                            Admin notes
+                            {i18n("adminNotesdff73a2")}
                           </span>
                           <textarea
                             className="mt-2 min-h-24 w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
@@ -1274,7 +1287,7 @@ export function AssignedWorkoutsConsole({
                             onClick={() => void saveEdit(assignment.id)}
                             type="button"
                           >
-                            {savingEdit ? "Saving…" : "Save changes"}
+                            {savingEdit ? i18n("saving56a2285") : i18n("saveChanges179359b")}
                           </button>
                           <button
                             className="rounded-full px-3 py-2 text-sm font-medium transition-colors"
@@ -1282,7 +1295,7 @@ export function AssignedWorkoutsConsole({
                             onClick={cancelEdit}
                             type="button"
                           >
-                            Cancel
+                            {i18n("cancel77dfd21")}
                           </button>
                         </div>
                       </div>
@@ -1302,16 +1315,16 @@ export function AssignedWorkoutsConsole({
     <main className="min-h-screen px-4 py-8 md:px-8 md:py-12" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-7xl space-y-6">
         <TransientHero
-          collapsedTitle={pageTitle ?? (isAdmin ? "Workout Board" : "My Workouts")}
-          label="workout calendar introduction"
+          collapsedTitle={pageTitle ?? (isAdmin ? i18n("workoutBoardc309600") : i18n("myWorkouts89fd2fd"))}
+          label={i18n("workoutCalendarIntroduction1a3befd")}
           timeoutMs={3000}
         >
           <section className="rounded-[2rem] px-6 py-4" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">
-              {isAdmin ? "Personal Coaching" : "Workout Calendar"}
+              {isAdmin ? i18n("personalCoaching6accdcd") : i18n("workoutCalendarf82cdf2")}
             </p>
             <h1 className="mt-1 text-2xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
-              {pageTitle ?? (isAdmin ? "Workout Board" : "My Workouts")}
+              {pageTitle ?? (isAdmin ? i18n("workoutBoardc309600") : i18n("myWorkouts89fd2fd"))}
             </h1>
           </section>
         </TransientHero>
@@ -1320,7 +1333,7 @@ export function AssignedWorkoutsConsole({
           <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>
-                Calendar window
+                {i18n("calendarWindow067b1fb")}
               </p>
               <h2 className="mt-1 text-xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
                 {periodLabel}
@@ -1329,16 +1342,16 @@ export function AssignedWorkoutsConsole({
 
             <div className="flex flex-wrap items-center gap-3">
               <ViewModeSelector
-                ariaLabel="Calendar view"
+                ariaLabel={i18n("calendarView2b4d458")}
                 onChange={(mode) => {
                   setLoading(true);
                   setError(null);
                   setViewMode(mode);
                 }}
                 options={[
-                  { value: "3day", label: "3d", accessibleLabel: "Three-day view" },
-                  { value: "week", label: "7d", accessibleLabel: "Week view" },
-                  { value: "month", label: "Mo", accessibleLabel: "Month view" },
+                  { value: "3day", label: i18n("message3d34f9efc"), accessibleLabel: i18n("threeDayView69e5393") },
+                  { value: "week", label: i18n("message7dfd4a4c2"), accessibleLabel: i18n("weekView650551c") },
+                  { value: "month", label: i18n("mo91e885d"), accessibleLabel: i18n("monthViewc8772b5") },
                 ] satisfies Array<{ value: ViewMode; label: string; accessibleLabel: string }>}
                 value={viewMode}
               />
@@ -1350,7 +1363,7 @@ export function AssignedWorkoutsConsole({
                   onClick={() => navigate(-1)}
                   type="button"
                 >
-                  Prev
+                  {i18n("preve96fea5")}
                 </button>
                 <button
                   className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
@@ -1358,7 +1371,7 @@ export function AssignedWorkoutsConsole({
                   onClick={goToToday}
                   type="button"
                 >
-                  Today
+                  {i18n("today24345a1")}
                 </button>
                 <button
                   className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
@@ -1366,7 +1379,7 @@ export function AssignedWorkoutsConsole({
                   onClick={() => navigate(1)}
                   type="button"
                 >
-                  Next
+                  {i18n("nextbc98198")}
                 </button>
               </div>
             </div>
@@ -1381,7 +1394,7 @@ export function AssignedWorkoutsConsole({
                 <input
                   className="rounded-full px-4 py-2 text-sm outline-none"
                   style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)", minWidth: "14rem" }}
-                  placeholder="Filter by athlete…"
+                  placeholder={i18n("filterByAthletea7eb7e6")}
                   value={filterQuery}
                   onFocus={() => setFilterDropdownOpen(true)}
                   onBlur={() => window.setTimeout(() => setFilterDropdownOpen(false), 150)}
@@ -1456,7 +1469,7 @@ export function AssignedWorkoutsConsole({
                     onClick={() => { setFilterAthleteIds([]); setFilterQuery(""); }}
                     type="button"
                   >
-                    Clear filter
+                    {i18n("clearFilterb667d6f")}
                   </button>
                 </>
               ) : null}
@@ -1468,7 +1481,7 @@ export function AssignedWorkoutsConsole({
               onClick={() => setShowQuickAssign(true)}
               type="button"
             >
-              Assign workout
+              {i18n("assignWorkout3e28a99")}
             </button>
           </section>
         ) : null}
@@ -1500,7 +1513,7 @@ export function AssignedWorkoutsConsole({
             className="rounded-[1.8rem] px-5 py-4 text-sm"
             style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--dim)" }}
           >
-            Loading…
+            {i18n("loading33ce417")}
           </section>
         ) : null}
 
@@ -1563,7 +1576,7 @@ export function AssignedWorkoutsConsole({
           context={{
             kind: "assignment",
             sourceId: editWorkoutTarget.id,
-            sourceLabel: `assignment on ${editWorkoutTarget.scheduled_for}`,
+            sourceLabel: i18n("assignmentOn11220d0") + (editWorkoutTarget.scheduled_for),
           }}
           onClose={() => setEditWorkoutTarget(null)}
         />

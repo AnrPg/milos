@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -24,12 +29,13 @@ function flatFieldErrors(errors: Record<string, unknown> | undefined): FieldErro
   );
 }
 
-export function AuthConsole() {
+export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
+  const i18n = useUiTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { signIn, signUp, status, tokens } = useSession();
 
-  const [mode, setMode] = useState<Mode>("login");
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [registerForm, setRegisterForm] = useState<RegisterRequest>(initialRegister);
   const [loginForm, setLoginForm] = useState<LoginRequest>(initialLogin);
   const [error, setError] = useState<string | null>(null);
@@ -52,10 +58,10 @@ export function AuthConsole() {
     if (mode !== "register") return;
     const nickname = registerForm.nickname.trim();
     if (nickname.length < 3) {
-      setNicknameStatus("idle");
+      queueMicrotask(() => setNicknameStatus("idle"));
       return;
     }
-    setNicknameStatus("checking");
+    queueMicrotask(() => setNicknameStatus("checking"));
     const timer = setTimeout(async () => {
       try {
         const { available } = await checkNicknameAvailable(nickname);
@@ -77,9 +83,9 @@ export function AuthConsole() {
 
     void (async () => {
       try {
-        const { upload_url, public_url } = await getAvatarUploadUrl(token);
-        await fetch(upload_url, { method: "PUT", body: file, headers: { "Content-Type": file.type } });
-        await updateAvatar(token, public_url);
+        const { upload_url, key, required_headers } = await getAvatarUploadUrl(token, file);
+        await fetch(upload_url, { method: "PUT", body: file, headers: required_headers });
+        await updateAvatar(token, key);
       } catch {
         // non-blocking: user is signed in even if avatar upload fails
       }
@@ -104,7 +110,7 @@ export function AuthConsole() {
         setError(err.message);
         setFieldErrors(flatFieldErrors(err.payload.errors));
       } else {
-        setError(err instanceof Error ? err.message : "Unexpected request failure");
+        setError(err instanceof Error ? err.message : i18n("unexpectedRequestFailurea7ffd06"));
       }
     } finally {
       setBusyAction(null);
@@ -141,7 +147,7 @@ export function AuthConsole() {
                 onClick={() => setMode("register")}
                 type="button"
               >
-                Register
+                {i18n("registerd672995")}
               </button>
               <button
                 className="rounded-full px-5 py-2 transition-colors"
@@ -153,9 +159,18 @@ export function AuthConsole() {
                 onClick={() => setMode("login")}
                 type="button"
               >
-                Login
+                {i18n("login4e5a289")}
               </button>
             </div>
+          </div>
+
+          <div className="mb-6 text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}>
+              {i18n("milosTraining5b1a1c1")}
+            </p>
+            <h1 className="mt-2 text-2xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
+              {mode === "register" ? i18n("createYourAccount4046b58") : i18n("signInada2e9e")}
+            </h1>
           </div>
 
           <div className="space-y-4">
@@ -171,7 +186,7 @@ export function AuthConsole() {
                   >
                     {avatarPreview ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={avatarPreview} alt="Avatar preview" className="h-full w-full object-cover" />
+                      <img src={avatarPreview} alt={i18n("avatarPreview9d0ac09")} className="h-full w-full object-cover" />
                     ) : (
                       <span className="text-2xl" style={{ color: "var(--dim)" }}>+</span>
                     )}
@@ -182,7 +197,7 @@ export function AuthConsole() {
                     style={{ color: "var(--primary)" }}
                     onClick={() => fileInputRef.current?.click()}
                   >
-                    {avatarPreview ? "Change photo" : "Upload photo"}
+                    {avatarPreview ? i18n("changePhotoed5690c") : i18n("uploadPhoto69abef7")}
                   </button>
                   <input
                     ref={fileInputRef}
@@ -196,15 +211,15 @@ export function AuthConsole() {
                 {/* Nickname */}
                 <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
                   <div className="flex items-center justify-between">
-                    <span>Nickname</span>
+                    <span>{i18n("nicknamece2bd99")}</span>
                     {nicknameStatus === "checking" && (
-                      <span className="text-xs" style={{ color: "var(--dim)" }}>Checking…</span>
+                      <span className="text-xs" style={{ color: "var(--dim)" }}>{i18n("checking820d600")}</span>
                     )}
                     {nicknameStatus === "available" && (
-                      <span className="text-xs font-semibold" style={{ color: "var(--success, #4ade80)" }}>✓ Available</span>
+                      <span className="text-xs font-semibold" style={{ color: "var(--success, #4ade80)" }}>{i18n("availableaeed20b")}</span>
                     )}
                     {nicknameStatus === "taken" && (
-                      <span className="text-xs font-semibold" style={{ color: "var(--primary-strong)" }}>✗ Already taken</span>
+                      <span className="text-xs font-semibold" style={{ color: "var(--primary-strong)" }}>{i18n("alreadyTakena92fd32")}</span>
                     )}
                   </div>
                   <input
@@ -215,7 +230,7 @@ export function AuthConsole() {
                       color: "var(--text)",
                     }}
                     value={registerForm.nickname}
-                    placeholder="Choose a unique nickname"
+                    placeholder={i18n("chooseAUniqueNickname4b5894d")}
                     onChange={(e) =>
                       setRegisterForm((f) => ({ ...f, nickname: e.target.value }))
                     }
@@ -229,13 +244,13 @@ export function AuthConsole() {
 
                 {/* Password */}
                 <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
-                  Password
+                  {i18n("password8be3c94")}
                   <input
                     className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
                     style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
                     type="password"
                     value={registerForm.password}
-                    placeholder="At least 8 characters"
+                    placeholder={i18n("atLeast8Characters1fe494b")}
                     onChange={(e) =>
                       setRegisterForm((f) => ({ ...f, password: e.target.value }))
                     }
@@ -249,12 +264,12 @@ export function AuthConsole() {
 
                 {/* Role cards */}
                 <div>
-                  <p className="mb-2 text-sm font-medium" style={{ color: "var(--text-soft)" }}>I am a…</p>
+                  <p className="mb-2 text-sm font-medium" style={{ color: "var(--text-soft)" }}>{i18n("iAmA5191365")}</p>
                   <div className="grid grid-cols-2 gap-3">
                     {(
                       [
-                        { value: "member", label: "Gym Member", description: "Train with a structured programme" },
-                        { value: "athlete", label: "Autonomous Athlete", description: "Self-directed training" },
+                        { value: "member", label: i18n("gymMemberfeecab7"), description: i18n("trainWithAStructuredProgrammeeca768c") },
+                        { value: "athlete", label: i18n("autonomousAthlete89280a4"), description: i18n("selfDirectedTraininge36a9cb") },
                       ] as const
                     ).map(({ value, label, description }) => {
                       const selected = registerForm.role === value;
@@ -297,14 +312,14 @@ export function AuthConsole() {
                   onClick={() => runAction("register", async () => { await signUp(registerForm); })}
                   type="button"
                 >
-                  {busyAction === "register" ? "Creating account…" : "Create account"}
+                  {busyAction === "register" ? i18n("creatingAccountbaab5b8") : i18n("createAccountaaf3744")}
                 </button>
               </>
             ) : (
               <>
                 {/* Nickname */}
                 <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
-                  Nickname
+                  {i18n("nicknamece2bd99")}
                   <input
                     className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
                     style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -315,7 +330,7 @@ export function AuthConsole() {
 
                 {/* Password */}
                 <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
-                  Password
+                  {i18n("password8be3c94")}
                   <input
                     className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
                     style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -332,7 +347,7 @@ export function AuthConsole() {
                   onClick={() => runAction("login", async () => { await signIn(loginForm); })}
                   type="button"
                 >
-                  {busyAction === "login" ? "Signing in…" : "Sign in"}
+                  {busyAction === "login" ? i18n("signingInc66b2ad") : i18n("signInada2e9e")}
                 </button>
               </>
             )}

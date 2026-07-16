@@ -1,5 +1,9 @@
 "use client";
 
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import type { ScaleLevel } from "@/api/workouts";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 
@@ -12,6 +16,7 @@ type Props = {
 };
 
 export function MobileCanvas({ scaleLevels }: Props) {
+  const i18n = useUiTranslations();
   const { mobileView, setMobileView } = useWorkoutCreationStore();
 
   return (
@@ -22,7 +27,7 @@ export function MobileCanvas({ scaleLevels }: Props) {
           className="px-4 py-2 text-left text-sm"
           style={{ color: "var(--accent)" }}
         >
-          ‹ Sections
+          {i18n("sectionsfcb5b85")}
         </button>
       ) : null}
 
@@ -42,7 +47,7 @@ export function MobileCanvas({ scaleLevels }: Props) {
             className="flex-1 py-3 text-xs font-bold uppercase tracking-widest"
             style={{ color: mobileView === view ? "var(--accent)" : "var(--dim)" }}
           >
-            {view}
+            {view === "sections" ? i18n("sectionsfcb5b85") : i18n("exercises0ee6e81")}
           </button>
         ))}
         <button
@@ -50,7 +55,7 @@ export function MobileCanvas({ scaleLevels }: Props) {
           className="flex-1 py-3 text-xs font-bold uppercase tracking-widest"
           style={{ color: mobileView === "preview" ? "var(--lime)" : "var(--dim)" }}
         >
-          Preview
+          {i18n("previewf1fbb2b")}
         </button>
       </div>
     </div>

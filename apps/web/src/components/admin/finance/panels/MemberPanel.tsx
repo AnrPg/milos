@@ -1,5 +1,11 @@
 "use client";
 
+
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -48,6 +54,7 @@ export function MemberPanel({
   nickname: string;
   onClose: () => void;
 }) {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
   const queryClient = useQueryClient();
@@ -149,16 +156,16 @@ export function MemberPanel({
   });
 
   const SECTIONS: { key: Section; label: string }[] = [
-    { key: "overview", label: "Overview" },
-    { key: "invoices", label: "Invoices" },
-    { key: "payments", label: "Payments" },
-    { key: "credits", label: "Credits" },
+    { key: "overview", label: i18n("overview0efc2e6") },
+    { key: "invoices", label: i18n("invoices35f8f37") },
+    { key: "payments", label: i18n("payments44357ae") },
+    { key: "credits", label: i18n("creditsbfac50d") },
   ];
 
   return (
     <SidePanel
       title={nickname}
-      subtitle="Member finance profile"
+      subtitle={i18n("memberFinanceProfile6f16152")}
       onClose={onClose}
     >
       {/* Section pills */}
@@ -184,7 +191,7 @@ export function MemberPanel({
       </div>
 
       {profileQuery.isLoading && (
-        <p className="text-sm" style={{ color: "var(--dim)" }}>Loading…</p>
+        <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
       )}
 
       {profile && (
@@ -194,16 +201,16 @@ export function MemberPanel({
             <div className="space-y-4">
               {/* Membership summary card */}
               <div className="rounded-[1.5rem] p-4 space-y-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>Membership</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{i18n("membership53bc967")}</p>
                 {profile.membership ? (
                   <>
-                    <InfoRow label="Status" value={field(profile.membership, "status")} color={statusColor(field(profile.membership, "status"))} />
-                    <InfoRow label="Expires" value={field(profile.membership, "expires_on") || "—"} />
-                    <InfoRow label="Entitlement" value={field(profile.membership, "entitlement_status") || "—"} />
-                    <InfoRow label="Credit balance" value={money(profile.credit_balance)} />
+                    <InfoRow label={i18n("statusbae7d5b")} value={field(profile.membership, "status")} color={statusColor(field(profile.membership, "status"))} />
+                    <InfoRow label={i18n("expiresa99be3d")} value={field(profile.membership, "expires_on") || "—"} />
+                    <InfoRow label={i18n("entitlement8994749")} value={field(profile.membership, "entitlement_status") || "—"} />
+                    <InfoRow label={i18n("creditBalance471f025")} value={money(profile.credit_balance)} />
                   </>
                 ) : (
-                  <p className="text-sm" style={{ color: "var(--dim)" }}>No membership record.</p>
+                  <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("noMembershipRecord741b5d9")}</p>
                 )}
               </div>
 
@@ -211,7 +218,7 @@ export function MemberPanel({
               <div className="rounded-[1.5rem] p-4 space-y-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                    Packages ({(profile.package_subscriptions as FinanceRecord[]).length})
+                    {i18n("packagesd584275")}{(profile.package_subscriptions as FinanceRecord[]).length})
                   </p>
                   <button
                     className="rounded-full px-3 py-1 text-xs font-semibold"
@@ -219,7 +226,7 @@ export function MemberPanel({
                     onClick={() => setShowAssignForm((v) => !v)}
                     type="button"
                   >
-                    {showAssignForm ? "Cancel" : "+ Assign package"}
+                    {showAssignForm ? i18n("cancel77dfd21") : i18n("assignPackage90e07f6")}
                   </button>
                 </div>
 
@@ -231,7 +238,7 @@ export function MemberPanel({
                       value={selectedPackageId}
                       onChange={(e) => setSelectedPackageId(e.target.value)}
                     >
-                      <option value="">Select package…</option>
+                      <option value="">{i18n("selectPackage02bf832")}</option>
                       {packages.filter((p) => p.active !== false).map((p) => (
                         <option key={field(p, "id")} value={field(p, "id")}>
                           {field(p, "name", field(p, "code"))}
@@ -245,7 +252,7 @@ export function MemberPanel({
                       onClick={() => assignPackageMutation.mutate()}
                       type="button"
                     >
-                      {assignPackageMutation.isPending ? "Assigning…" : "Assign"}
+                      {assignPackageMutation.isPending ? i18n("assigning4d16a1a") : i18n("assign2444928")}
                     </button>
                     {assignPackageMutation.error instanceof Error && (
                       <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{assignPackageMutation.error.message}</p>
@@ -267,7 +274,7 @@ export function MemberPanel({
                       </span>
                     </div>
                     <p className="text-xs mt-0.5" style={{ color: "var(--dim)" }}>
-                      {field(sub, "billing_period_snapshot")} · {money(sub.price_cents_snapshot)} · ends {field(sub, "ends_on") || "—"}
+                      {field(sub, "billing_period_snapshot")} · {money(sub.price_cents_snapshot)} {i18n("ends74f5b4d")} {field(sub, "ends_on") || "—"}
                     </p>
                   </div>
                 ))}
@@ -280,7 +287,7 @@ export function MemberPanel({
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                  Invoices ({(profile.invoices as FinanceRecord[]).length})
+                  {i18n("invoices523da66")}{(profile.invoices as FinanceRecord[]).length})
                 </p>
                 <button
                   className="rounded-full px-3 py-1 text-xs font-semibold"
@@ -288,13 +295,13 @@ export function MemberPanel({
                   onClick={() => setShowInvoiceForm((v) => !v)}
                   type="button"
                 >
-                  {showInvoiceForm ? "Cancel" : "+ New invoice"}
+                  {showInvoiceForm ? i18n("cancel77dfd21") : i18n("newInvoicefa5b135")}
                 </button>
               </div>
 
               {showInvoiceForm && (
                 <div className="rounded-[1.5rem] p-4 space-y-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
-                  <FormField label="Amount (EUR)">
+                  <FormField label={i18n("amountEur2dc6463")}>
                     <input
                       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                       style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -303,7 +310,7 @@ export function MemberPanel({
                       onChange={(e) => setInvoiceForm({ ...invoiceForm, amount_cents: e.target.value })}
                     />
                   </FormField>
-                  <FormField label="Package subscription (optional)">
+                  <FormField label={i18n("packageSubscriptionOptional9d7a12d")}>
                     <select
                       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                       style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -321,19 +328,19 @@ export function MemberPanel({
                           ...invoiceForm,
                           membership_package_subscription_id,
                           amount_cents: priceCents !== null ? String(priceCents / 100) : invoiceForm.amount_cents,
-                          description: code ? `Package: ${code}` : invoiceForm.description,
+                          description: code ? i18n("package5544677") + (code) : invoiceForm.description,
                         });
                       }}
                     >
-                      <option value="">No package link</option>
+                      <option value="">{i18n("noPackageLink7149c0f")}</option>
                       {packageSubscriptions.map((sub) => (
                         <option key={field(sub, "id")} value={field(sub, "id")}>
-                          {field(sub, "package_code_snapshot", "Package")} · {money(sub.price_cents_snapshot)}
+                          {field(sub, "package_code_snapshot", i18n("package7431e3d"))} · {money(sub.price_cents_snapshot)}
                         </option>
                       ))}
                     </select>
                   </FormField>
-                  <FormField label="Description">
+                  <FormField label={i18n("description55f8ebc")}>
                     <input
                       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                       style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -341,7 +348,7 @@ export function MemberPanel({
                       onChange={(e) => setInvoiceForm({ ...invoiceForm, description: e.target.value })}
                     />
                   </FormField>
-                  <FormField label="Due date">
+                  <FormField label={i18n("dueDate4c1aeeb")}>
                     <input
                       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                       style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -360,7 +367,7 @@ export function MemberPanel({
                     onClick={() => createInvoiceMutation.mutate()}
                     type="button"
                   >
-                    {createInvoiceMutation.isPending ? "Creating…" : "Create invoice"}
+                    {createInvoiceMutation.isPending ? i18n("creating94d7d8e") : i18n("createInvoicea0567cf")}
                   </button>
                   {createInvoiceMutation.error instanceof Error && (
                     <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{createInvoiceMutation.error.message}</p>
@@ -369,7 +376,7 @@ export function MemberPanel({
               )}
 
               {(profile.invoices as FinanceRecord[]).length === 0 ? (
-                <p className="text-sm" style={{ color: "var(--dim)" }}>No invoices yet.</p>
+                <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("noInvoicesYet7da80f3")}</p>
               ) : (
                 <div className="space-y-2">
                   {(profile.invoices as FinanceRecord[]).map((inv) => (
@@ -394,7 +401,7 @@ export function MemberPanel({
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                  Payments ({(profile.payments as FinanceRecord[]).length})
+                  {i18n("payments89038de")}{(profile.payments as FinanceRecord[]).length})
                 </p>
                 <button
                   className="rounded-full px-3 py-1 text-xs font-semibold"
@@ -402,13 +409,13 @@ export function MemberPanel({
                   onClick={() => setShowPaymentForm((v) => !v)}
                   type="button"
                 >
-                  {showPaymentForm ? "Cancel" : "+ Record payment"}
+                  {showPaymentForm ? i18n("cancel77dfd21") : i18n("recordPayment3830944")}
                 </button>
               </div>
 
               {showPaymentForm && (
                 <div className="rounded-[1.5rem] p-4 space-y-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
-                  <FormField label="Amount (EUR)">
+                  <FormField label={i18n("amountEur2dc6463")}>
                     <input
                       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                       style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -417,7 +424,7 @@ export function MemberPanel({
                       onChange={(e) => setPaymentForm({ ...paymentForm, amount_cents: e.target.value })}
                     />
                   </FormField>
-                  <FormField label="Invoice (optional)">
+                  <FormField label={i18n("invoiceOptionalaef614c")}>
                     <select
                       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                       style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -435,15 +442,15 @@ export function MemberPanel({
                         });
                       }}
                     >
-                      <option value="">No invoice link</option>
+                      <option value="">{i18n("noInvoiceLink0b4810f")}</option>
                       {payableInvoices.map((invoice) => (
                         <option key={field(invoice, "id")} value={field(invoice, "id")}>
-                          {field(invoice, "invoice_number", "Invoice")} · {money(invoice.balance_due_cents)} due
+                          {field(invoice, "invoice_number", i18n("invoicef9f3881"))} · {money(invoice.balance_due_cents)} {i18n("due30cdf73")}
                         </option>
                       ))}
                     </select>
                   </FormField>
-                  <FormField label="Paid on">
+                  <FormField label={i18n("paidOnfca3213")}>
                     <input
                       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                       style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -452,7 +459,7 @@ export function MemberPanel({
                       onChange={(e) => setPaymentForm({ ...paymentForm, paid_on: e.target.value })}
                     />
                   </FormField>
-                  <FormField label="Notes (optional)">
+                  <FormField label={i18n("notesOptional4d56ca9")}>
                     <input
                       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                       style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -467,7 +474,7 @@ export function MemberPanel({
                     onClick={() => recordPaymentMutation.mutate()}
                     type="button"
                   >
-                    {recordPaymentMutation.isPending ? "Recording…" : "Record payment"}
+                    {recordPaymentMutation.isPending ? i18n("recording72f9eb4") : i18n("recordPayment86e5632")}
                   </button>
                   {recordPaymentMutation.error instanceof Error && (
                     <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{recordPaymentMutation.error.message}</p>
@@ -476,7 +483,7 @@ export function MemberPanel({
               )}
 
               {(profile.payments as FinanceRecord[]).length === 0 ? (
-                <p className="text-sm" style={{ color: "var(--dim)" }}>No payments recorded.</p>
+                <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("noPaymentsRecordedc84cf39")}</p>
               ) : (
                 <div className="space-y-2">
                   {(profile.payments as FinanceRecord[]).map((pay) => (
@@ -488,7 +495,7 @@ export function MemberPanel({
                         <span className="text-xs" style={{ color: "var(--muted)" }}>
                           {field(pay, "paid_on")}
                           {field(pay, "finance_invoice_id")
-                            ? ` · Linked to invoice ${invoiceNumberById.get(field(pay, "finance_invoice_id")) ?? field(pay, "finance_invoice_id")}`
+                            ? i18n("linkedToInvoice541dca8") + (invoiceNumberById.get(field(pay, "finance_invoice_id")) ?? field(pay, "finance_invoice_id"))
                             : ""}
                         </span>
                       </div>
@@ -507,15 +514,15 @@ export function MemberPanel({
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                  Credit ledger ({(profile.credit_ledger_entries as FinanceRecord[]).length})
+                  {i18n("creditLedger88b2bbb")}{(profile.credit_ledger_entries as FinanceRecord[]).length})
                 </p>
                 <span className="text-sm font-semibold" style={{ color: "var(--success)" }}>
-                  Balance: {money(profile.credit_balance)}
+                  {i18n("balance802dc02")} {money(profile.credit_balance)}
                 </span>
               </div>
 
               {(profile.credit_ledger_entries as FinanceRecord[]).length === 0 ? (
-                <p className="text-sm" style={{ color: "var(--dim)" }}>No credit entries.</p>
+                <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("noCreditEntries0c8905b")}</p>
               ) : (
                 <div className="space-y-2">
                   {(profile.credit_ledger_entries as FinanceRecord[]).map((entry) => (
@@ -554,6 +561,7 @@ function InvoiceCard({
   token: string;
   onUploaded: () => void;
 }) {
+  const i18n = useUiTranslations();
   const invoiceId = field(invoice, "id");
   const status = field(invoice, "status");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -580,7 +588,7 @@ function InvoiceCard({
   }
 
   async function handleVoid() {
-    if (!confirm("Void this invoice? This cannot be undone.")) return;
+    if (!confirm(i18n("voidThisInvoiceThisCannotBeUndone571b60e"))) return;
     setActioning(true);
     try {
       await voidFinanceInvoice(token, invoiceId);
@@ -607,10 +615,10 @@ function InvoiceCard({
         headers: { "Content-Type": content_type },
         body: file,
       });
-      if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
+      if (!res.ok) throw new Error(i18n("uploadFailed7c67e1c") + (res.status));
       onUploaded();
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : "Upload failed");
+      setUploadError(err instanceof Error ? err.message : i18n("uploadFailedad0d060"));
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -644,7 +652,7 @@ function InvoiceCard({
       setEditing(false);
       onUploaded();
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : "Save failed");
+      setSaveError(err instanceof Error ? err.message : i18n("saveFailed0a44446"));
     } finally {
       setSaving(false);
     }
@@ -680,7 +688,7 @@ function InvoiceCard({
               className="rounded-full px-2 py-0.5 text-xs font-semibold disabled:opacity-50 transition-opacity hover:opacity-80"
               style={{ background: "color-mix(in srgb, var(--success) 15%, transparent)", color: "var(--success)", border: "1px solid color-mix(in srgb, var(--success) 30%, transparent)" }}
             >
-              {actioning ? "…" : "Issue"}
+              {actioning ? "…" : i18n("issue73781a1")}
             </button>
           )}
 
@@ -692,7 +700,7 @@ function InvoiceCard({
               className="rounded-full px-2 py-0.5 text-xs font-semibold disabled:opacity-50 transition-opacity hover:opacity-80"
               style={{ background: "color-mix(in srgb, var(--primary-strong) 10%, transparent)", color: "var(--primary-strong)", border: "1px solid color-mix(in srgb, var(--primary-strong) 25%, transparent)" }}
             >
-              Void
+              {i18n("void207c7c0")}
             </button>
           )}
 
@@ -705,7 +713,7 @@ function InvoiceCard({
             className="text-xs hover:opacity-70 transition-opacity"
             style={{ color: "var(--dim)" }}
           >
-            {editing ? "Cancel" : "Edit"}
+            {editing ? i18n("cancel77dfd21") : i18n("edit5301648")}
           </button>
         </div>
       </div>
@@ -718,10 +726,10 @@ function InvoiceCard({
               {field(invoice, "notes")}
             </p>
           ) : (
-            <p className="text-xs italic" style={{ color: "var(--dim)" }}>No description</p>
+            <p className="text-xs italic" style={{ color: "var(--dim)" }}>{i18n("noDescriptionf354c94")}</p>
           )}
           <p className="text-xs" style={{ color: "var(--dim)" }}>
-            Due: {field(invoice, "due_date") || "—"}
+            {i18n("due7513f96")} {field(invoice, "due_date") || "—"}
           </p>
         </div>
       )}
@@ -731,20 +739,20 @@ function InvoiceCard({
         <div className="space-y-2 pt-1">
           <div className="space-y-1">
             <label className="text-xs font-semibold uppercase tracking-[0.15em]" style={{ color: "var(--dim)" }}>
-              Description
+              {i18n("description55f8ebc")}
             </label>
             <input
               type="text"
               value={editNotes}
               onChange={(e) => setEditNotes(e.target.value)}
-              placeholder="Invoice description…"
+              placeholder={i18n("invoiceDescription4d26246")}
               className="w-full rounded-xl px-3 py-1.5 text-sm"
               style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)", color: "var(--text)" }}
             />
           </div>
           <div className="space-y-1">
             <label className="text-xs font-semibold uppercase tracking-[0.15em]" style={{ color: "var(--dim)" }}>
-              Due date
+              {i18n("dueDate4c1aeeb")}
             </label>
             <input
               type="date"
@@ -762,7 +770,7 @@ function InvoiceCard({
             className="rounded-full px-3 py-1 text-xs font-semibold disabled:opacity-50 transition-opacity hover:opacity-80"
             style={{ background: "color-mix(in srgb, var(--success) 15%, transparent)", color: "var(--success)", border: "1px solid color-mix(in srgb, var(--success) 30%, transparent)" }}
           >
-            {saving ? "Saving…" : "Save"}
+            {saving ? i18n("saving56a2285") : i18n("saveefc007a")}
           </button>
         </div>
       )}
@@ -783,7 +791,7 @@ function InvoiceCard({
           className="rounded-full px-2.5 py-1 text-xs font-semibold disabled:opacity-50 transition-opacity hover:opacity-70"
           style={{ background: "var(--border)", color: "var(--text-soft)", border: "1px solid var(--border-strong)" }}
         >
-          {uploading ? "Uploading…" : hasFile ? "Replace file" : "Upload file"}
+          {uploading ? i18n("uploadingd921a79") : hasFile ? i18n("replaceFile6d45b8c") : i18n("uploadFile503a3d8")}
         </button>
 
         {hasFile && (
@@ -794,7 +802,7 @@ function InvoiceCard({
             className="rounded-full px-2.5 py-1 text-xs font-semibold disabled:opacity-50 transition-opacity hover:opacity-70"
             style={{ background: "color-mix(in srgb, var(--success) 10%, transparent)", color: "var(--success)", border: "1px solid color-mix(in srgb, var(--success) 25%, transparent)" }}
           >
-            {downloading ? "…" : "Download"}
+            {downloading ? "…" : i18n("downloada479c9c")}
           </button>
         )}
 

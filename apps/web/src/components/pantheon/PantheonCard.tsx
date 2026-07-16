@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -68,6 +73,7 @@ const PARTICLE_KEYFRAMES = `
 `;
 
 function Particles({ prId }: { prId: string }) {
+  const i18n = useUiTranslations();
   const particles = buildParticles(prId, 15);
   return (
     <>
@@ -82,7 +88,7 @@ function Particles({ prId }: { prId: string }) {
             height: p.size,
             background: p.color,
             opacity: 0,
-            animation: `particle-rise ${p.dur} ${p.delay} ease-out infinite`,
+            animation: "particle-rise " + (p.dur) + " " + (p.delay) + " ease-out infinite",
           }}
         />
       ))}
@@ -92,7 +98,7 @@ function Particles({ prId }: { prId: string }) {
 
 // ── Tooltip ────────────────────────────────────────────────────────────────
 
-interface TooltipPos { top: number; left: number; placement: "top" | "bottom" }
+interface TooltipPos { top: number; left: number }
 
 function PRHistoryTooltip({
   prId,
@@ -103,15 +109,18 @@ function PRHistoryTooltip({
   unit: PRUnit;
   children: React.ReactNode;
 }) {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const [open, setOpen] = useState(false);
-  const [pos, setPos] = useState<TooltipPos>({ top: 0, left: 0, placement: "top" });
+  const [pos, setPos] = useState<TooltipPos>({ top: 0, left: 0 });
   const triggerRef = useRef<HTMLDivElement>(null);
   const openTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    queueMicrotask(() => setMounted(true));
+  }, []);
 
   const historyQuery = useQuery({
     queryKey: ["prs", prId, "history"],
@@ -120,23 +129,37 @@ function PRHistoryTooltip({
     staleTime: 60_000,
   });
 
-  const computePos = useCallback(() => {
-    if (!triggerRef.current) return;
-    const rect = triggerRef.current.getBoundingClientRect();
-    const GAP = 8;
-    const TOOLTIP_H = 140;
-    const spaceAbove = rect.top;
-    const placement: "top" | "bottom" = spaceAbove >= TOOLTIP_H + GAP ? "top" : "bottom";
-    const top = placement === "top"
-      ? rect.top + window.scrollY - TOOLTIP_H - GAP
-      : rect.bottom + window.scrollY + GAP;
-    const left = Math.max(8, Math.min(rect.left + window.scrollX, window.innerWidth - 336));
-    setPos({ top, left, placement });
+  const computePos = useCallback((clientX: number, clientY: number) => {
+    const GAP = 12;
+    const TOOLTIP_W = 300;
+    const TOOLTIP_H = 220;
+    const viewportPad = 8;
+
+    const opensRight = clientX + GAP + TOOLTIP_W <= window.innerWidth - viewportPad;
+    const opensDown = clientY + GAP + TOOLTIP_H <= window.innerHeight - viewportPad;
+
+    const left = opensRight
+      ? clientX + window.scrollX + GAP
+      : clientX + window.scrollX - TOOLTIP_W - GAP;
+    const top = opensDown
+      ? clientY + window.scrollY + GAP
+      : clientY + window.scrollY - TOOLTIP_H - GAP;
+
+    setPos({
+      left: Math.max(window.scrollX + viewportPad, left),
+      top: Math.max(window.scrollY + viewportPad, top),
+    });
   }, []);
 
-  const handleEnter = () => {
+  const handleEnter = (event: React.MouseEvent<HTMLDivElement>) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
-    openTimer.current = setTimeout(() => { computePos(); setOpen(true); }, 200);
+    const { clientX, clientY } = event;
+    openTimer.current = setTimeout(() => { computePos(clientX, clientY); setOpen(true); }, 200);
+  };
+
+  const handleMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!open) return;
+    computePos(event.clientX, event.clientY);
   };
 
   const handleLeave = () => {
@@ -149,12 +172,19 @@ function PRHistoryTooltip({
     if (closeTimer.current) clearTimeout(closeTimer.current);
   }, []);
 
+  const historyEntries = historyQuery.data
+    ? [...historyQuery.data].sort(
+      (a, b) => new Date(b.beaten_on).getTime() - new Date(a.beaten_on).getTime(),
+    )
+    : [];
+
   return (
     <>
       <div
         ref={triggerRef}
-        className="cursor-default"
+        className="cursor-inherit"
         onMouseEnter={handleEnter}
+        onMouseMove={handleMove}
         onMouseLeave={handleLeave}
       >
         {children}
@@ -162,7 +192,9 @@ function PRHistoryTooltip({
 
       {mounted && open && createPortal(
         <div
-          onMouseEnter={handleEnter}
+          onMouseEnter={() => {
+            if (closeTimer.current) clearTimeout(closeTimer.current);
+          }}
           onMouseLeave={handleLeave}
           style={{
             position: "absolute",
@@ -178,18 +210,18 @@ function PRHistoryTooltip({
           }}
         >
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: "var(--dim)" }}>
-            Score history
+            {i18n("scoreHistorydb246b2")}
           </p>
           {historyQuery.isPending ? (
-            <p className="text-xs" style={{ color: "var(--dim)" }}>Loading…</p>
-          ) : !historyQuery.data || historyQuery.data.length === 0 ? (
-            <p className="text-xs" style={{ color: "var(--dim)" }}>No history yet.</p>
+            <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
+          ) : historyEntries.length === 0 ? (
+            <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("noHistoryYet933f417")}</p>
           ) : (
-            <div className="flex flex-wrap gap-2">
-              {historyQuery.data.slice(0, 10).map((entry) => (
+            <div className="flex flex-col gap-2">
+              {historyEntries.slice(0, 10).map((entry) => (
                 <div
                   key={entry.id}
-                  className="flex items-center gap-1.5 rounded-lg px-2.5 py-1"
+                  className="flex items-center justify-between gap-3 rounded-lg px-2.5 py-1"
                   style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
                 >
                   <span className="text-xs font-bold tabular-nums" style={{ color: "var(--primary)" }}>
@@ -213,11 +245,14 @@ function PRHistoryTooltip({
 
 function CompactCard({
   pr,
+  onEdit,
   onShare,
 }: {
   pr: PRRecord;
+  onEdit?: (pr: PRRecord) => void;
   onShare?: (pr: PRRecord) => void;
 }) {
+  const i18n = useUiTranslations();
   const scoreStr = formatScore(Number(pr.current_score), pr.unit);
   const unitLabel = UNIT_LABELS[pr.unit] ?? pr.unit;
   const dateStr = new Date(pr.beaten_on).toLocaleDateString(undefined, {
@@ -226,29 +261,47 @@ function CompactCard({
 
   return (
     <div
-      className="relative overflow-hidden rounded-[1.5rem] px-5 py-4"
+      className={"relative overflow-hidden rounded-[1.5rem] px-5 py-4 " + (onEdit ? "cursor-pointer transition-transform hover:-translate-y-0.5" : "")}
       style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
+      onClick={() => onEdit?.(pr)}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (onEdit && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          onEdit(pr);
+        }
+      }}
+      role={onEdit ? "button" : undefined}
+      tabIndex={onEdit ? 0 : undefined}
+      aria-label={onEdit ? i18n("updatefb91e24") + (pr.name) + i18n("personalRecord3b9dbf2") : undefined}
     >
       <Particles prId={pr.id} />
 
       {onShare && (
         <button
           type="button"
-          onClick={() => onShare(pr)}
+          onClick={(event) => {
+            event.stopPropagation();
+            onShare(pr);
+          }}
           className="absolute top-3 right-3 rounded-lg px-2 py-1 text-[10px] font-semibold opacity-50 hover:opacity-90 transition-opacity"
           style={{ background: "var(--border)", color: "var(--dim)" }}
-          title="Share PR"
+          title={i18n("sharePrf54c0df")}
         >
           🔗
         </button>
       )}
 
-      <p className="text-sm font-semibold truncate pr-8" style={{ color: "var(--text)" }}>{pr.name}</p>
-      <div className="mt-1.5 flex items-baseline gap-1.5">
-        <span className="text-2xl font-bold tabular-nums" style={{ color: "var(--primary)" }}>{scoreStr}</span>
-        <span className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>{unitLabel}</span>
-      </div>
-      <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>{dateStr}</p>
+      <PRHistoryTooltip prId={pr.id} unit={pr.unit}>
+        <div>
+          <p className="text-sm font-semibold truncate pr-8" style={{ color: "var(--text)" }}>{pr.name}</p>
+          <div className="mt-1.5 flex items-baseline gap-1.5">
+            <span className="text-2xl font-bold tabular-nums" style={{ color: "var(--primary)" }}>{scoreStr}</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>{unitLabel}</span>
+          </div>
+          <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>{dateStr}</p>
+        </div>
+      </PRHistoryTooltip>
     </div>
   );
 }
@@ -264,6 +317,7 @@ function FullCard({
   onDelete?: (pr: PRRecord) => void;
   onShare?: (pr: PRRecord) => void;
 }) {
+  const i18n = useUiTranslations();
   const scoreStr = formatScore(Number(pr.current_score), pr.unit);
   const unitLabel = UNIT_LABELS[pr.unit] ?? pr.unit;
   const dateStr = new Date(pr.beaten_on).toLocaleDateString(undefined, {
@@ -272,8 +326,19 @@ function FullCard({
 
   return (
     <div
-      className="relative overflow-hidden rounded-[1.8rem] p-5 pb-14"
+      className={"relative overflow-hidden rounded-[1.8rem] p-5 pb-14 " + (onEdit ? "cursor-pointer transition-transform hover:-translate-y-0.5" : "")}
       style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
+      onClick={() => onEdit?.(pr)}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (onEdit && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          onEdit(pr);
+        }
+      }}
+      role={onEdit ? "button" : undefined}
+      tabIndex={onEdit ? 0 : undefined}
+      aria-label={onEdit ? i18n("updatefb91e24") + (pr.name) + i18n("personalRecord3b9dbf2") : undefined}
     >
       <Particles prId={pr.id} />
 
@@ -281,12 +346,15 @@ function FullCard({
       {onShare && (
         <button
           type="button"
-          onClick={() => onShare(pr)}
+          onClick={(event) => {
+            event.stopPropagation();
+            onShare(pr);
+          }}
           className="absolute top-4 right-4 rounded-xl px-3 py-1.5 text-sm font-semibold"
           style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-          title="Share PR"
+          title={i18n("sharePrf54c0df")}
         >
-          Share 🔗
+          {i18n("share02e24e8")}
         </button>
       )}
 
@@ -299,7 +367,7 @@ function FullCard({
             <span className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>{unitLabel}</span>
           </div>
           <p className="mt-1.5 text-xs" style={{ color: "var(--dim)" }}>
-            {pr.higher_is_better ? "Higher is better" : "Lower is better"} · {dateStr}
+            {pr.higher_is_better ? i18n("higherIsBetter7aab104") : i18n("lowerIsBettercf052ba")} · {dateStr}
           </p>
         </div>
       </PRHistoryTooltip>
@@ -310,21 +378,27 @@ function FullCard({
           {onEdit && (
             <button
               type="button"
-              onClick={() => onEdit(pr)}
+              onClick={(event) => {
+                event.stopPropagation();
+                onEdit(pr);
+              }}
               className="rounded-xl w-9 h-9 flex items-center justify-center text-base"
               style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
-              title="Edit"
+              title={i18n("updatePr71b8cf3")}
             >
-              ✏️
+              🔄
             </button>
           )}
           {onDelete && (
             <button
               type="button"
-              onClick={() => onDelete(pr)}
+              onClick={(event) => {
+                event.stopPropagation();
+                onDelete(pr);
+              }}
               className="rounded-xl w-9 h-9 flex items-center justify-center text-base"
               style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
-              title="Delete"
+              title={i18n("deletef6fdbe4")}
             >
               🗑️
             </button>
@@ -348,6 +422,6 @@ export function PantheonCard({
   onDelete?: (pr: PRRecord) => void;
   onShare?: (pr: PRRecord) => void;
 }) {
-  if (compact) return <CompactCard pr={pr} onShare={onShare} />;
+  if (compact) return <CompactCard pr={pr} onEdit={onEdit} onShare={onShare} />;
   return <FullCard pr={pr} onEdit={onEdit} onDelete={onDelete} onShare={onShare} />;
 }

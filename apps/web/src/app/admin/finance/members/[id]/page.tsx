@@ -1,3 +1,5 @@
+
+import {getUiTranslations} from "@/i18n/ui-server";
 import { AuthGuard } from "@/components/auth-guard";
 import { AdminFinanceMemberProfile } from "@/components/admin-finance-member-profile";
 
@@ -8,6 +10,7 @@ export default async function AdminFinanceMemberPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const i18n = await getUiTranslations();
   const { id } = await params;
 
   return (

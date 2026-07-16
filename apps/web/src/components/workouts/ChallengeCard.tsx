@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -23,6 +28,7 @@ function completionsRemainingText(challenge: ChallengeRecord): string {
 }
 
 export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const queryClient = useQueryClient();
   const [expanded, setExpanded] = useState(false);
@@ -31,14 +37,14 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
     queryKey: ["challenges", challenge.id, "leaderboard"],
     enabled: expanded && Boolean(tokens?.access_token) && challenge.is_opted_in,
     queryFn: () => {
-      if (!tokens?.access_token) throw new Error("Not authenticated");
+      if (!tokens?.access_token) throw new Error(i18n("notAuthenticated0c91acb"));
       return fetchChallengeLeaderboard(tokens.access_token, challenge.id);
     },
   });
 
   const optInMutation = useMutation({
     mutationFn: async () => {
-      if (!tokens?.access_token) throw new Error("Not authenticated");
+      if (!tokens?.access_token) throw new Error(i18n("notAuthenticated0c91acb"));
       return optInChallenge(tokens.access_token, challenge.id);
     },
     onSuccess: () => {
@@ -51,7 +57,7 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
 
   const optOutMutation = useMutation({
     mutationFn: async () => {
-      if (!tokens?.access_token) throw new Error("Not authenticated");
+      if (!tokens?.access_token) throw new Error(i18n("notAuthenticated0c91acb"));
       return optOutChallenge(tokens.access_token, challenge.id);
     },
     onSuccess: () => {
@@ -92,7 +98,7 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
                 border: "1px solid color-mix(in srgb, var(--success) 30%, transparent)",
               }}
             >
-              {pastTarget && challenge.is_opted_in ? "🏆 In Hall of Fame" : "Target reached!"}
+              {pastTarget && challenge.is_opted_in ? i18n("inHallOfFame048726d") : i18n("targetReacheddc27c47")}
             </span>
           ) : null}
           <span
@@ -108,7 +114,7 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
         <div
           className="h-full rounded-full transition-all"
           style={{
-            width: `${progressPct}%`,
+            width: (progressPct) + "%",
             background: challenge.completed ? "var(--success)" : "var(--primary)",
           }}
         />
@@ -120,9 +126,9 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
       >
         <span>
           {challenge.progress}/{challenge.target}
-          {isCustom ? " pts" : ""}
+          {isCustom ? i18n("pts4abdfc6") : ""}
           {pastTarget && challenge.is_opted_in
-            ? ` · ${challenge.progress - challenge.target} pts bonus`
+            ? "· " + (challenge.progress - challenge.target) + i18n("ptsBonus2c2dc1b")
             : ""}
         </span>
         <span style={{ color: challenge.completed ? "var(--success)" : "var(--muted)" }}>
@@ -160,7 +166,7 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
                 }
               }}
             >
-              {challenge.is_opted_in ? "Leave Hall of Fame" : "Join Hall of Fame"}
+              {challenge.is_opted_in ? i18n("leaveHallOfFame6c5f448") : i18n("joinHallOfFamed29b192")}
             </button>
 
             {challenge.is_opted_in ? (
@@ -170,7 +176,7 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
                 style={{ color: "var(--dim)" }}
                 onClick={() => setExpanded((v) => !v)}
               >
-                {expanded ? "▲ Hide" : "▼ Hall of Fame"}
+                {expanded ? i18n("hide6c29ab8") : i18n("hallOfFame695c438")}
               </button>
             ) : null}
           </div>
@@ -181,15 +187,15 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
                 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em]"
                 style={{ color: "var(--dim)" }}
               >
-                🏆 Hall of Fame
+                {i18n("hallOfFame6203a65")}
               </p>
               {leaderboardQuery.isPending ? (
                 <p className="text-xs" style={{ color: "var(--dim)" }}>
-                  Loading…
+                  {i18n("loading33ce417")}
                 </p>
               ) : leaderboardQuery.data?.participants.length === 0 ? (
                 <p className="text-xs" style={{ color: "var(--dim)" }}>
-                  No entries yet — be the first!
+                  {i18n("noEntriesYetBeTheFirsta56781b")}
                 </p>
               ) : (
                 <div className="space-y-1">
@@ -227,11 +233,11 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
                               className="truncate text-xs font-medium"
                               style={{ color: isMine ? "var(--warning)" : "var(--text)" }}
                             >
-                              {entry.nickname ?? "Athlete"}
-                              {isMine ? " (you)" : ""}
+                              {entry.nickname ?? i18n("athleteaa86fd2")}
+                              {isMine ? "(you)" : ""}
                             </span>
                             <span className="shrink-0 text-[11px]" style={{ color: "var(--muted)" }}>
-                              {entry.progress} pts
+                              {entry.progress} {i18n("pts4abdfc6")}
                             </span>
                           </div>
                           <div
@@ -241,7 +247,7 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
                             <div
                               className="h-full rounded-full"
                               style={{
-                                width: `${barPct}%`,
+                                width: (barPct) + "%",
                                 background: entry.completed_at ? "var(--success)" : "var(--primary)",
                               }}
                             />

@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -43,6 +48,7 @@ function daysOverdue(dateStr: string | null | undefined): number {
 }
 
 export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: boolean }) {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const token = tokens?.access_token;
   const enabled = Boolean(token);
@@ -63,15 +69,15 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
   const monthlyRevenue = (summaryQuery.data?.monthly_revenue ?? []) as FinanceRecord[];
   const queues = (queuesQuery.data?.queues ?? {}) as Record<string, FinanceRecord[]>;
 
-  const kpis: Array<[string, string]> = [
-    ["Active memberships", String(totals.active_memberships ?? 0)],
-    ["Expiring ≤30 days", String(totals.expiring_memberships ?? 0)],
-    ["Revenue MTD", money(totals.paid_revenue_cents)],
-    ["Credit balance", money(totals.credit_balance_cents)],
-    ["Pending invoices", money(totals.outstanding_invoice_balance_cents)],
-    ["Overdue invoices", money(totals.overdue_invoice_balance_cents)],
-    ["Renewal rate", percent(totals.renewal_conversion_percent)],
-    ["Invoice credit offsets", money(totals.invoice_credit_offset_cents)],
+  const kpis: Array<[string, string, string]> = [
+    [i18n("activeMemberships0d117fb"), String(totals.active_memberships ?? 0), "/admin/finance"],
+    [i18n("expiring30Daysbfdf986"), String(totals.expiring_memberships ?? 0), "/admin/finance?tab=queues"],
+    [i18n("revenueMtd3ffc292"), money(totals.paid_revenue_cents), "/admin/metrics/finance"],
+    [i18n("creditBalance471f025"), money(totals.credit_balance_cents), "/admin/finance"],
+    [i18n("pendingInvoices12d9ca8"), money(totals.outstanding_invoice_balance_cents), "/admin/finance?tab=queues"],
+    [i18n("overdueInvoices747a2d8"), money(totals.overdue_invoice_balance_cents), "/admin/finance?tab=queues"],
+    [i18n("renewalRatef4370c2"), percent(totals.renewal_conversion_percent), "/admin/metrics/finance"],
+    [i18n("invoiceCreditOffsets9fc1210"), money(totals.invoice_credit_offset_cents), "/admin/metrics/finance"],
   ];
 
   const loading = summaryQuery.isLoading;
@@ -81,20 +87,20 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
       <div className="mx-auto max-w-6xl space-y-8">
 
         {/* Hero */}
-        <TransientHero label="finance dashboard introduction">
+        <TransientHero label={i18n("financeDashboardIntroduction7e0cc12")} timeoutMs={3000}>
         <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
-                {analyticsMode ? "Finance Analytics" : "Revenue"}
+                {analyticsMode ? i18n("financeAnalytics107dfa1") : i18n("revenue35cf82f")}
               </p>
               <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-                Membership revenue overview
+                {i18n("membershipRevenueOverview8e92aee")}
               </h1>
               <p className="mt-2 text-sm leading-6" style={{ color: "var(--muted)" }}>
                 {analyticsMode
-                  ? "Membership, revenue, renewal, and package signals. Use Finance for management actions."
-                  : "Read-only financial snapshot. Use Finance Operations for management actions."}
+                  ? i18n("membershipRevenueRenewalAndPackageSignalsUseFinance9e261ff")
+                  : i18n("readOnlyFinancialSnapshotUseFinanceOperationsFor5173cce")}
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -103,14 +109,14 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
                 className="rounded-2xl px-5 py-3 text-sm font-semibold text-center"
                 style={{ background: "var(--text)", color: "var(--bg)" }}
               >
-                Open Finance Operations →
+                {i18n("openFinanceOperationscffd9ab")}
               </Link>
               <Link
                 href={analyticsMode ? "/admin/metrics" : "/admin"}
                 className="rounded-2xl px-5 py-3 text-sm font-semibold text-center"
                 style={{ background: "var(--border)", border: "1px solid var(--border-strong)", color: "var(--text-soft)" }}
               >
-                {analyticsMode ? "← Analytics & Marketing" : "← Dashboard"}
+                {analyticsMode ? i18n("analyticsMarketing0ecf7f0") : i18n("dashboard79e4071")}
               </Link>
             </div>
           </div>
@@ -119,20 +125,20 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
 
         {/* KPIs */}
         <section className="grid gap-4 md:grid-cols-4">
-          {kpis.map(([label, value]) => (
-            <article key={label} className="rounded-[1.9rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+          {kpis.map(([label, value, href]) => (
+            <Link key={label} href={href} className="rounded-[1.9rem] p-5 transition-transform hover:-translate-y-0.5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
               <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{label}</p>
               <p className="mt-3 text-2xl font-semibold tracking-tight" style={{ color: "var(--text)" }}>
                 {loading ? "…" : value}
               </p>
-            </article>
+            </Link>
           ))}
         </section>
 
         {/* Chart */}
         <section className="rounded-[2.2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-          <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>Monthly revenue</p>
-          <h2 className="mt-2 text-xl font-semibold tracking-tight" style={{ color: "var(--text)" }}>Paid vs pending</h2>
+          <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>{i18n("monthlyRevenue93e061c")}</p>
+          <h2 className="mt-2 text-xl font-semibold tracking-tight" style={{ color: "var(--text)" }}>{i18n("paidVsPending81799fc")}</h2>
           <div className="mt-6 h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={monthlyRevenue}>
@@ -144,7 +150,7 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
                   tick={{ fill: "var(--dim)", fontSize: 11 }}
                 />
                 <YAxis
-                  tickFormatter={(v) => `€${Number(v) / 100}`}
+                  tickFormatter={(v) => "€" + (Number(v) / 100)}
                   stroke="var(--dim)"
                   tick={{ fill: "var(--dim)", fontSize: 11 }}
                 />
@@ -165,7 +171,7 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
         {/* Queue panels 2x2 */}
         <section className="grid gap-6 md:grid-cols-2">
           <QueuePanel
-            title="Expiring Soon"
+            title={i18n("expiringSoon50b61e0")}
             href="/admin/finance?tab=queues"
             rows={queues.expiring_memberships ?? []}
             renderRow={(row) => (
@@ -176,20 +182,20 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
             )}
           />
           <QueuePanel
-            title="Overdue Invoices"
+            title={i18n("overdueInvoices739b616")}
             href="/admin/finance?tab=queues"
             rows={queues.overdue_invoices ?? []}
             renderRow={(row) => (
               <>
                 <span style={{ color: "var(--text)" }}>{field(row, "invoice_number")}</span>
                 <span style={{ color: "var(--primary-strong)" }}>
-                  {money(row.balance_due_cents)} · {daysOverdue(row.due_date as string)} days
+                  {money(row.balance_due_cents)} · {daysOverdue(row.due_date as string)} {i18n("days5548ae4")}
                 </span>
               </>
             )}
           />
           <QueuePanel
-            title="Pending Payments"
+            title={i18n("pendingPayments9126c11")}
             href="/admin/finance?tab=queues"
             rows={queues.pending_payments ?? []}
             renderRow={(row) => (
@@ -200,7 +206,7 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
             )}
           />
           <QueuePanel
-            title="Pending Rewards"
+            title={i18n("pendingRewardse6d6885")}
             href="/admin/finance?tab=referrals"
             rows={queues.pending_referral_rewards ?? []}
             renderRow={(row) => (
@@ -228,6 +234,7 @@ function QueuePanel({
   rows: FinanceRecord[];
   renderRow: (row: FinanceRecord) => React.ReactNode;
 }) {
+  const i18n = useUiTranslations();
   return (
     <div className="rounded-[2rem] overflow-hidden" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
       <div
@@ -240,12 +247,12 @@ function QueuePanel({
           className="text-xs font-semibold"
           style={{ color: "var(--primary)" }}
         >
-          Finance Ops →
+          {i18n("financeOps623df71")}
         </Link>
       </div>
       <div style={{ maxHeight: "18rem", overflowY: "auto" }}>
         {rows.length === 0 ? (
-          <p className="px-5 py-4 text-sm" style={{ color: "var(--dim)" }}>No items.</p>
+          <p className="px-5 py-4 text-sm" style={{ color: "var(--dim)" }}>{i18n("noItems83d7e52")}</p>
         ) : (
           rows.map((row, i) => (
             <div

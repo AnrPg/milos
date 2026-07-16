@@ -1,5 +1,10 @@
 "use client";
 
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 
 import { fetchMyEntitlement, fetchMyFinance, getMyInvoiceDownloadUrl, type EffectiveEntitlement, type MyFinanceData } from "@/api/my-finance";
@@ -64,6 +69,7 @@ function PackageSidePanel({
   packages: Record<string, unknown>[];
   onClose: () => void;
 }) {
+  const i18n = useUiTranslations();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -94,7 +100,7 @@ function PackageSidePanel({
       >
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold" style={{ color: "var(--text)" }}>
-            Available Packages
+            {i18n("availablePackages48a5129")}
           </h2>
           <button
             type="button"
@@ -102,21 +108,21 @@ function PackageSidePanel({
             className="text-sm"
             style={{ color: "var(--dim)" }}
           >
-            ✕ Close
+            {i18n("closebf5d9ce")}
           </button>
         </div>
 
         {packages.length === 0 ? (
           <p className="text-sm" style={{ color: "var(--dim)" }}>
-            No packages available.
+            {i18n("noPackagesAvailable14160fb")}
           </p>
         ) : (
           packages.map((pkg) => {
-            const name = String(pkg.name ?? pkg.code ?? "Package");
+            const name = String(pkg.name ?? pkg.code ?? i18n("package7431e3d"));
             const family = pkg.family ? String(pkg.family) : null;
             const billing = pkg.billing_period ? String(pkg.billing_period) : null;
             const price = typeof pkg.base_price_cents === "number" ? pkg.base_price_cents : null;
-            const currency = String(pkg.currency ?? "EUR");
+            const currency = String(pkg.currency ?? i18n("eurd06e073"));
             const description = pkg.description ? String(pkg.description) : null;
             const active = pkg.active === true;
 
@@ -136,14 +142,14 @@ function PackageSidePanel({
                   </span>
                   {!active && (
                     <span className="text-[10px] font-medium" style={{ color: "var(--dim)" }}>
-                      Unavailable
+                      {i18n("unavailable2c9c1f7")}
                     </span>
                   )}
                 </div>
                 {family && (
                   <span className="text-xs" style={{ color: "var(--dim)" }}>
                     {family}
-                    {billing ? ` · ${billing}` : ""}
+                    {billing ? "· " + (billing) : ""}
                   </span>
                 )}
                 {price != null && (
@@ -169,6 +175,7 @@ function PackageSidePanel({
 // ─── invoice row ──────────────────────────────────────────────────────────────
 
 function BalanceDueBadge({ cents }: { cents: number }) {
+  const i18n = useUiTranslations();
   if (cents <= 0) return null;
   return (
     <span
@@ -178,7 +185,7 @@ function BalanceDueBadge({ cents }: { cents: number }) {
         color: "var(--danger)",
       }}
     >
-      {formatCents(cents)} due
+      {formatCents(cents)} {i18n("due30cdf73")}
     </span>
   );
 }
@@ -190,6 +197,7 @@ function InvoiceRow({
   invoice: Record<string, unknown>;
   token: string;
 }) {
+  const i18n = useUiTranslations();
   const [downloading, setDownloading] = useState(false);
   const invoiceId = String(invoice.id);
   const hasFile = Boolean(
@@ -219,7 +227,7 @@ function InvoiceRow({
       <td className="py-3 pr-4 text-sm" style={{ color: "var(--text)" }}>
         {formatCents(
           typeof invoice.total_cents === "number" ? invoice.total_cents : null,
-          String(invoice.currency ?? "EUR"),
+          String(invoice.currency ?? i18n("eurd06e073")),
         )}
       </td>
       <td className="py-3 pr-4">
@@ -240,7 +248,7 @@ function InvoiceRow({
             className="text-xs font-medium transition-opacity"
             style={{ color: "var(--primary-strong)", opacity: downloading ? 0.5 : 1 }}
           >
-            {downloading ? "…" : "Download"}
+            {downloading ? "…" : i18n("downloada479c9c")}
           </button>
         ) : (
           <span className="text-xs" style={{ color: "var(--border-strong)" }}>
@@ -255,6 +263,7 @@ function InvoiceRow({
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function BillingPage() {
+  const i18n = useUiTranslations();
   const { tokens } = useSession();
   const accessToken = tokens?.access_token ?? null;
 
@@ -285,7 +294,7 @@ export default function BillingPage() {
       })
       .catch(() => {
         if (!cancelled) {
-          setError("Could not load billing information.");
+          setError(i18n("couldNotLoadBillingInformation2cc574e"));
           setLoading(false);
         }
       });
@@ -326,9 +335,9 @@ export default function BillingPage() {
 
         {/* header */}
         <div className="flex items-center justify-between">
-          <TransientHero label="billing introduction">
+          <TransientHero label={i18n("billingIntroduction58b604b")}>
             <h1 className="text-xl font-semibold" style={{ color: "var(--text)" }}>
-              Billing
+              {i18n("billingabaec45")}
             </h1>
           </TransientHero>
           <button
@@ -337,13 +346,13 @@ export default function BillingPage() {
             className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
             style={{ background: "var(--border)", color: "var(--text-soft)" }}
           >
-            View packages
+            {i18n("viewPackagesdeefc55")}
           </button>
         </div>
 
         {loading && (
           <p className="text-sm" style={{ color: "var(--dim)" }}>
-            Loading…
+            {i18n("loading33ce417")}
           </p>
         )}
 
@@ -362,7 +371,7 @@ export default function BillingPage() {
             >
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium" style={{ color: "var(--text-soft)" }}>
-                  Membership
+                  {i18n("membership53bc967")}
                 </span>
                 {membership?.entitlement_status ? (
                   <StatusBadge status={String(membership.entitlement_status)} />
@@ -376,9 +385,9 @@ export default function BillingPage() {
                   </span>
                   <span className="text-xs" style={{ color: "var(--dim)" }}>
                     {activeSub.billing_period_snapshot
-                      ? `Billed ${String(activeSub.billing_period_snapshot)}`
+                      ? i18n("billed763fe55") + (String(activeSub.billing_period_snapshot))
                       : ""}
-                    {activeSub.ends_on ? ` · renews ${formatDate(activeSub.ends_on as string)}` : ""}
+                    {activeSub.ends_on ? i18n("renews241920c") + (formatDate(activeSub.ends_on as string)) : ""}
                   </span>
                   {typeof activeSub.price_cents_snapshot === "number" && (
                     <span className="text-sm" style={{ color: "var(--text-soft)" }}>
@@ -388,7 +397,7 @@ export default function BillingPage() {
                 </div>
               ) : (
                 <p className="text-sm" style={{ color: "var(--dim)" }}>
-                  No active package subscription.
+                  {i18n("noActivePackageSubscription568b2b2")}
                 </p>
               )}
 
@@ -398,7 +407,7 @@ export default function BillingPage() {
                   style={{ background: "var(--border)" }}
                 >
                   <span className="text-xs" style={{ color: "var(--dim)" }}>
-                    Campaign code
+                    {i18n("campaignCode4099073")}
                   </span>
                   <span className="text-xs font-mono font-semibold" style={{ color: "var(--warning)" }}>
                     {String((latestPromo.promotion_code as Record<string, unknown> | null)?.code ?? latestPromo.code ?? latestPromo.promotion_code_id ?? "—")}
@@ -416,7 +425,7 @@ export default function BillingPage() {
                 style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
               >
                 <span className="text-sm font-medium" style={{ color: "var(--text-soft)" }}>
-                  Credits
+                  {i18n("creditsbfac50d")}
                 </span>
                 <div className="flex items-end justify-between">
                   <div className="flex flex-col gap-0.5">
@@ -424,7 +433,7 @@ export default function BillingPage() {
                       {formatCents(finance!.credit_balance)}
                     </span>
                     <span className="text-xs" style={{ color: "var(--dim)" }}>
-                      Available balance
+                      {i18n("availableBalanceadba401")}
                     </span>
                   </div>
                   {totalReferralCents > 0 && (
@@ -433,7 +442,7 @@ export default function BillingPage() {
                         +{formatCents(totalReferralCents)}
                       </span>
                       <p className="text-xs" style={{ color: "var(--dim)" }}>
-                        from referrals
+                        {i18n("fromReferralsb7146e6")}
                       </p>
                     </div>
                   )}
@@ -447,7 +456,7 @@ export default function BillingPage() {
                         className="flex items-center justify-between text-xs"
                         style={{ color: "var(--dim)" }}
                       >
-                        <span>{String(entry.description ?? "Referral reward")}</span>
+                        <span>{String(entry.description ?? i18n("referralReward6fc3bba"))}</span>
                         <span style={{ color: (entry.amount_cents as number) > 0 ? "var(--success)" : "var(--danger)" }}>
                           {(entry.amount_cents as number) > 0 ? "+" : ""}
                           {formatCents(entry.amount_cents as number)}
@@ -462,11 +471,11 @@ export default function BillingPage() {
             {/* invoices */}
             <div className="flex flex-col gap-3">
               <span className="text-sm font-medium" style={{ color: "var(--text-soft)" }}>
-                Invoices
+                {i18n("invoices35f8f37")}
               </span>
               {finance!.invoices.length === 0 ? (
                 <p className="text-sm" style={{ color: "var(--dim)" }}>
-                  No invoices yet.
+                  {i18n("noInvoicesYet7da80f3")}
                 </p>
               ) : (
                 <div
@@ -476,7 +485,7 @@ export default function BillingPage() {
                   <table className="w-full min-w-[42rem]" style={{ borderCollapse: "collapse" }}>
                     <thead>
                       <tr style={{ borderBottom: "1px solid var(--border)" }}>
-                        {["Number", "Amount", "Status", "Due", ""].map((h) => (
+                        {[i18n("numberb7baa1d"), i18n("amount43dc853"), i18n("statusbae7d5b"), i18n("due145caf2"), ""].map((h) => (
                           <th
                             key={h}
                             className="py-2.5 pr-4 text-left text-[11px] font-medium uppercase tracking-wide first:pl-5 last:pr-5 last:text-right"
@@ -505,7 +514,7 @@ export default function BillingPage() {
             {finance!.payments.length > 0 && (
               <div className="flex flex-col gap-3">
                 <span className="text-sm font-medium" style={{ color: "var(--text-soft)" }}>
-                  Payment history
+                  {i18n("paymentHistory618b513")}
                 </span>
                 <div className="flex flex-col gap-1">
                   {(finance!.payments as Record<string, unknown>[]).map((payment) => (
@@ -518,14 +527,14 @@ export default function BillingPage() {
                         <span className="text-sm" style={{ color: "var(--text)" }}>
                           {formatCents(
                             typeof payment.amount_cents === "number" ? payment.amount_cents : null,
-                            String(payment.currency ?? "EUR"),
+                            String(payment.currency ?? i18n("eurd06e073")),
                           )}
                         </span>
                         <span className="text-xs" style={{ color: "var(--dim)" }}>
                           {payment.payment_method
                             ? String(payment.payment_method).replace(/_/g, " ")
-                            : "Payment"}
-                          {payment.paid_on ? ` · ${formatDate(payment.paid_on as string)}` : ""}
+                            : i18n("paymentb41a92b")}
+                          {payment.paid_on ? "· " + (formatDate(payment.paid_on as string)) : ""}
                         </span>
                       </div>
                       {payment.payment_status ? (
@@ -551,12 +560,13 @@ export default function BillingPage() {
 }
 
 function EntitlementCard({ entitlement }: { entitlement: EffectiveEntitlement | null }) {
+  const i18n = useUiTranslations();
   if (!entitlement?.plan) return null;
   const allowanceEntries = Object.entries(entitlement.allowances);
   return (
     <section className="rounded-2xl p-5" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-sm font-medium" style={{ color: "var(--text-soft)" }}>Your package benefits</h2>
+        <h2 className="text-sm font-medium" style={{ color: "var(--text-soft)" }}>{i18n("yourPackageBenefitsb75c7f4")}</h2>
         <StatusBadge status={entitlement.status} />
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
@@ -567,8 +577,8 @@ function EntitlementCard({ entitlement }: { entitlement: EffectiveEntitlement | 
           <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}>
             <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{key.replaceAll("_", " ")}</p>
             <p className="mt-1 text-2xl font-semibold" style={{ color: "var(--primary)" }}>{String(usage.remaining)}</p>
-            <p className="text-xs" style={{ color: "var(--dim)" }}>remaining of {String(usage.limit)} · resets {formatDate(usage.period_end)}</p>
-            {usage.extensions > 0 ? <p className="mt-1 text-xs" style={{ color: "var(--success)" }}>Includes +{usage.extensions} personal extension</p> : null}
+            <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("remainingOf8553660")} {String(usage.limit)} {i18n("resets5de1b0d")} {formatDate(usage.period_end)}</p>
+            {usage.extensions > 0 ? <p className="mt-1 text-xs" style={{ color: "var(--success)" }}>{i18n("includes820531f")}{usage.extensions} {i18n("personalExtension95a8d48")}</p> : null}
           </div>
         ) : null)}
       </div>

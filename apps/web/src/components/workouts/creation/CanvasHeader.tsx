@@ -1,5 +1,11 @@
 "use client";
 
+
+
+
+
+
+import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -17,24 +23,16 @@ const WORKOUT_TYPES: WorkoutType[] = [
   "recovery",
 ];
 
-const TYPE_LABELS: Record<WorkoutType, string> = {
-  crossfit: "CrossFit",
-  strength: "Strength",
-  gymnastics: "Gymnastics",
-  aerobics: "Aerobics",
-  flexibility: "Flexibility",
-  recovery: "Recovery",
-};
-
 function SaveStatusIndicator() {
+  const i18n = useUiTranslations();
   const status = useWorkoutCreationStore((state) => state.saveStatus);
 
   if (status === "idle") return null;
 
   const map = {
-    saving: { icon: "↻", text: "Saving…", color: "var(--muted)" },
-    saved: { icon: "✓", text: "Draft saved", color: "var(--lime)" },
-    error: { icon: "⚠", text: "Draft not saved", color: "var(--amber)" },
+    saving: { icon: "↻", text: i18n("saving56a2285"), color: "var(--muted)" },
+    saved: { icon: "✓", text: i18n("draftSaveda706abd"), color: "var(--lime)" },
+    error: { icon: "⚠", text: i18n("draftNotSavedfc5e9a6"), color: "var(--amber)" },
   } as const;
 
   const { icon, text, color } = map[status];
@@ -46,50 +44,6 @@ function SaveStatusIndicator() {
   );
 }
 
-function publishValidationMessages({
-  title,
-  type,
-  sections,
-}: Pick<ReturnType<typeof useWorkoutCreationStore.getState>, "title" | "type" | "sections">) {
-  const messages: string[] = [];
-
-  if (!title.trim()) messages.push("Missing workout title");
-  if (!type) messages.push("Missing workout type");
-  if (sections.length === 0) messages.push("Add at least one section");
-
-  sections.forEach((section, sectionIndex) => {
-    const ctx = FORMAT_EXERCISE_CONTEXT[section.format];
-    const sectionLabel = section.name.trim() || `Section ${sectionIndex + 1}`;
-    const needsExercises = section.format !== "rest" && section.format !== "kcal_target";
-
-    if (!section.name.trim()) {
-      messages.push(`${sectionLabel}: add a section name`);
-    }
-
-    if (needsExercises && section.exercises.length === 0) {
-      messages.push(`${sectionLabel}: add at least one exercise`);
-    }
-
-    section.exercises.forEach((exercise, exerciseIndex) => {
-      const exerciseLabel = exercise.name.trim() || `Exercise ${exerciseIndex + 1}`;
-
-      if (!exercise.name.trim()) {
-        messages.push(`${sectionLabel}: ${exerciseLabel} needs a name`);
-      }
-
-      if (ctx.showSets && exercise.sets <= 0) {
-        messages.push(`${sectionLabel}: ${exerciseLabel} needs sets`);
-      }
-
-      if (ctx.showPrescription && !ctx.prescriptionHint && !ctx.ladderPrescription && exercise.prescriptionValue <= 0) {
-        messages.push(`${sectionLabel}: ${exerciseLabel} needs a prescription`);
-      }
-    });
-  });
-
-  return messages;
-}
-
 type Props = {
   embedded?: boolean;
   onCancel?: () => void;
@@ -97,6 +51,60 @@ type Props = {
 };
 
 export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props) {
+  function publishValidationMessages({
+    title,
+    type,
+    sections,
+  }: Pick<ReturnType<typeof useWorkoutCreationStore.getState>, "title" | "type" | "sections">) {
+    const messages: string[] = [];
+  
+    if (!title.trim()) messages.push(i18n("missingWorkoutTitlebb8efa0"));
+    if (!type) messages.push(i18n("missingWorkoutTypedd14f84"));
+    if (sections.length === 0) messages.push(i18n("addAtLeastOneSectioncf462d3"));
+  
+    sections.forEach((section, sectionIndex) => {
+      const ctx = FORMAT_EXERCISE_CONTEXT[section.format];
+      const sectionLabel = section.name.trim() || i18n("sectionValue0dd4f8fb", {value0: sectionIndex + 1});
+      const needsExercises = section.format !== "rest" && section.format !== "kcal_target";
+  
+      if (!section.name.trim()) {
+        messages.push(i18n("value0AddASectionName252e49c", {value0: sectionLabel}));
+      }
+  
+      if (needsExercises && section.exercises.length === 0) {
+        messages.push(i18n("value0AddAtLeastOneExercise3ce2e7a", {value0: sectionLabel}));
+      }
+  
+      section.exercises.forEach((exercise, exerciseIndex) => {
+        const exerciseLabel = exercise.name.trim() || i18n("exerciseValue08ca6dce", {value0: exerciseIndex + 1});
+  
+        if (!exercise.name.trim()) {
+          messages.push(i18n("value0Value1NeedsANamedc0e3ad", {value0: sectionLabel, value1: exerciseLabel}));
+        }
+  
+        if (ctx.showSets && exercise.sets <= 0) {
+          messages.push(i18n("value0Value1NeedsSets042ee99", {value0: sectionLabel, value1: exerciseLabel}));
+        }
+  
+        if (ctx.showPrescription && !ctx.prescriptionHint && !ctx.ladderPrescription && exercise.prescriptionValue <= 0) {
+          messages.push(i18n("value0Value1NeedsAPrescription96c7234", {value0: sectionLabel, value1: exerciseLabel}));
+        }
+      });
+    });
+  
+    return messages;
+  }
+
+  const TYPE_LABELS: Record<WorkoutType, string> = {
+    crossfit: i18n("crossfit8970db8"),
+    strength: i18n("strength24d3e4f"),
+    gymnastics: i18n("gymnastics1df8712"),
+    aerobics: i18n("aerobics9def223"),
+    flexibility: i18n("flexibility1ef8e6d"),
+    recovery: i18n("recoveryea924f7"),
+  };
+
+  const i18n = useUiTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { tokens } = useSession();
@@ -114,7 +122,7 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
   const summary = completionSummary(sections);
   const publishMessages = publishValidationMessages({ title, type, sections });
 
-  const publishLabel = isReopen || isSubstitute ? "Apply changes" : "Publish";
+  const publishLabel = isReopen || isSubstitute ? i18n("applyChangesb8fb717") : i18n("publish5656400");
 
   async function handlePublish() {
     if (!draftId || !tokens?.access_token || !ready) return;
@@ -139,7 +147,7 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
         router.push("/admin/workouts");
       }
     } catch (error: unknown) {
-      setPublishError(error instanceof Error ? error.message : "Publish failed");
+      setPublishError(error instanceof Error ? error.message : i18n("publishFailed0b74ccb"));
       setPublishing(false);
     }
   }
@@ -151,13 +159,13 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
     >
       {isReopen && !isSubstitute ? (
         <div className="px-6 py-2 text-xs font-semibold" style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", color: "var(--primary)", borderBottom: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)" }}>
-          Editing a live workout — changes will affect all assignments and classes when published
+          {i18n("editingALiveWorkoutChangesWillAffectAllc8fde80")}
         </div>
       ) : isSubstitute ? (
         <div className="px-6 py-2 text-xs font-semibold" style={{ background: "color-mix(in srgb, var(--success) 8%, transparent)", color: "var(--success)", borderBottom: "1px solid color-mix(in srgb, var(--success) 15%, transparent)" }}>
           {substituteForAssignment
-            ? "Publishing will replace the workout for this assignment only"
-            : "Publishing will replace the workout for this class slot only"}
+            ? i18n("publishingWillReplaceTheWorkoutForThisAssignmentcddcb5d")
+            : i18n("publishingWillReplaceTheWorkoutForThisClass0ebb854")}
         </div>
       ) : null}
       <div className="flex flex-wrap items-center gap-3 px-4 py-3 sm:px-6">
@@ -169,7 +177,7 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
         type="text"
         value={title}
         onChange={(event) => setTitle(event.target.value)}
-        placeholder="Workout title"
+        placeholder={i18n("workoutTitle631fc08")}
         className="min-w-0 flex-1 border-b border-transparent bg-transparent text-lg font-extrabold outline-none transition-colors focus:border-current"
         style={{ color: "var(--text)", maxWidth: 320 }}
       />
@@ -185,7 +193,7 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
         }}
       >
         <option value="" disabled>
-          Type
+          {i18n("type3deb745")}
         </option>
         {WORKOUT_TYPES.map((workoutType) => (
           <option key={workoutType} value={workoutType}>
@@ -203,9 +211,9 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
           color: isTeamWorkout ? "var(--warning)" : "var(--muted)",
           border: isTeamWorkout ? "1px solid color-mix(in srgb, var(--warning) 40%, transparent)" : "1px solid var(--dim)",
         }}
-        title="Team workout (executed in pairs or groups)"
+        title={i18n("teamWorkoutExecutedInPairsOrGroupscf09c62")}
       >
-        Team
+        {i18n("team2188872")}
       </button>
 
       <div className="flex-1" />
@@ -217,7 +225,7 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
           className="rounded-full px-4 py-2 text-xs font-bold"
           style={{ border: "1px solid var(--dim)", color: "var(--muted)" }}
         >
-          Keep draft & close
+          {i18n("keepDraftClosec5fea46")}
         </button>
       ) : null}
 
@@ -240,7 +248,7 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
             cursor: ready ? "pointer" : "not-allowed",
           }}
         >
-          {publishing ? `${publishLabel}…` : publishLabel}
+          {publishing ? (publishLabel) + "…" : publishLabel}
         </button>
 
         {!ready ? (
