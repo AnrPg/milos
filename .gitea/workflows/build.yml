@@ -7,41 +7,51 @@ jobs:
   api-verify:
     name: Verify API
     runs-on: ubuntu-latest
-    container: elixir:1.18.4-otp-27
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_DB: milos_training_test
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-        options: >-
-          --health-cmd "pg_isready -U postgres -d milos_training_test"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    env:
+      CI_NETWORK: milos-ci-${{ github.run_id }}-${{ github.run_attempt }}
+      CI_POSTGRES: milos-ci-postgres-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - uses: actions/checkout@v4
-      - name: Verify BEAM OpenSSL ABI
+      - name: Start API database
         run: |
-          . /etc/os-release
-          echo "PRETTY_NAME=$PRETTY_NAME"
-          elixir -v
-          openssl version -a
-          ldconfig -p | grep -E 'libcrypto\.so\.(3|1\.1)' || true
-      - run: mix local.hex --force
-        working-directory: apps/api
-      - run: mix local.rebar --force
-        working-directory: apps/api
-      - run: mix deps.get
-        working-directory: apps/api
-      - run: mix precommit
-        working-directory: apps/api
-        env:
-          DB_HOST: postgres
-          DB_NAME: milos_training_test
-          DB_PASSWORD: postgres
-          DB_USER: postgres
+          docker network create "$CI_NETWORK"
+          docker run -d \
+            --name "$CI_POSTGRES" \
+            --network "$CI_NETWORK" \
+            -e POSTGRES_DB=milos_training_test \
+            -e POSTGRES_PASSWORD=postgres \
+            -e POSTGRES_USER=postgres \
+            postgres:16-alpine
+          until docker exec "$CI_POSTGRES" pg_isready -U postgres -d milos_training_test; do
+            sleep 2
+          done
+      - name: Run API checks
+        run: |
+          docker run --rm \
+            --network "$CI_NETWORK" \
+            -v "$PWD:/workspace" \
+            -w /workspace/apps/api \
+            -e DB_HOST="$CI_POSTGRES" \
+            -e DB_NAME=milos_training_test \
+            -e DB_PASSWORD=postgres \
+            -e DB_USER=postgres \
+            elixir:1.18.4-otp-27 \
+            sh -lc '
+              . /etc/os-release
+              echo "PRETTY_NAME=$PRETTY_NAME"
+              elixir -v
+              openssl version -a
+              ldconfig -p | grep -E "libcrypto\.so\.(3|1\.1)" || true
+              mix local.hex --force
+              mix local.rebar --force
+              mix deps.get
+              mix precommit
+            '
+      - name: Stop API database
+        if: always()
+        run: |
+          docker rm -f "$CI_POSTGRES" || true
+          docker network rm "$CI_NETWORK" || true
 
   web-verify:
     name: Verify web
