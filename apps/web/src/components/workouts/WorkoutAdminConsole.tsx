@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -21,6 +22,7 @@ import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { AssignWorkoutPanel } from "@/components/workouts/AssignWorkoutPanel";
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
+import { SemanticLabel } from "@/components/semantic-label";
 
 export function WorkoutAdminConsole() {
   const i18n = useUiTranslations();
@@ -55,7 +57,7 @@ export function WorkoutAdminConsole() {
         return;
       }
 
-      setError(loadError instanceof Error ? loadError.message : i18n("failedToLoadAdminWorkoutData3641095"));
+      setError(loadError instanceof Error ? localizeError(loadError, i18n) : i18n("failedToLoadAdminWorkoutData3641095"));
     }
   }, [currentUser, i18n, router, signOut, status, tokens]);
 
@@ -107,9 +109,9 @@ export function WorkoutAdminConsole() {
           return;
         }
 
-        setError(actionError.message);
+        setError(localizeError(actionError, i18n));
       } else {
-        setError(actionError instanceof Error ? actionError.message : i18n("unexpectedRequestFailurea7ffd06"));
+        setError(actionError instanceof Error ? localizeError(actionError, i18n) : i18n("unexpectedRequestFailurea7ffd06"));
       }
     } finally {
       setBusyAction(null);
@@ -223,7 +225,7 @@ export function WorkoutAdminConsole() {
                             </span>
                           ) : null}
                         </div>
-                        <p className="mt-1 text-sm uppercase tracking-[0.18em] text-[var(--primary)]">{workout.type}</p>
+                        <p className="mt-1 text-sm uppercase tracking-[0.18em] text-[var(--primary)]"><SemanticLabel value={workout.type} /></p>
                       </div>
                       <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--muted)" }}>
                         {(workout.sections ?? []).length} {i18n("section20182fb")}{(workout.sections ?? []).length === 1 ? "" : i18n("sa0f1490")}
@@ -349,10 +351,10 @@ export function WorkoutAdminConsole() {
             >
               <div className="flex shrink-0 items-start justify-between gap-4 border-b px-6 py-5" style={{ borderColor: "var(--border)" }}>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}>{pw.type}</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}><SemanticLabel value={pw.type} /></p>
                   <h2 className="mt-1 text-xl font-semibold" style={{ color: "var(--text)" }}>{pw.title || i18n("untitledWorkouta1885a5")}</h2>
                   <p className="mt-1 text-sm" style={{ color: "var(--dim)" }}>
-                    {pw.sections.length} {i18n("section20182fb")}{pw.sections.length === 1 ? "" : i18n("sa0f1490")} · {pw.available_scale_levels.length > 0 ? (pw.available_scale_levels.length) + i18n("scaleLevelc12ac35") + (pw.available_scale_levels.length === 1 ? "" : "s") : i18n("baseOnly061c4ff")}
+                    {pw.sections.length} {i18n("section20182fb")}{pw.sections.length === 1 ? "" : i18n("sa0f1490")} · {pw.available_scale_levels.length > 0 ? i18n("scaleLevelCount", {count: pw.available_scale_levels.length}) : i18n("baseOnly061c4ff")}
                   </p>
                 </div>
                 <button

@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import {useUiLocale} from "@/i18n/use-ui-locale";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
@@ -32,6 +33,7 @@ const ROLE_TABS: Record<string, Tab[]> = {
 
 export function ChatsPageContent() {
   const i18n = useUiTranslations();
+  const uiLocale = useUiLocale();
   const TAB_SOURCE_BADGE: Record<Tab, string> = {
     direct: i18n("directbc81524"),
     assignment: i18n("workout39463a5"),
@@ -233,7 +235,7 @@ export function ChatsPageContent() {
                     {threadDisplayName(thread)}
                   </span>
                   <span className="text-[10px]" style={{ color: "var(--dim)" }}>
-                    {new Date(thread.inserted_at).toLocaleDateString()}
+                    {new Date(thread.inserted_at).toLocaleDateString(uiLocale)}
                   </span>
                 </button>
               ))

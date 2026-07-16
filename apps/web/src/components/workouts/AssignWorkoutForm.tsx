@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -14,6 +15,7 @@ import { assignWorkout, listAthletes, type AthleteOption } from "@/api/assigned-
 import { deleteWorkout, fetchAdminWorkout, type WorkoutRecord } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { formatLocalDate } from "@/lib/local-date";
+import { SemanticLabel } from "@/components/semantic-label";
 
 type AssignWorkoutFormProps = {
   workoutId: string;
@@ -59,7 +61,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
           return;
         }
 
-        setError(requestError instanceof Error ? requestError.message : i18n("couldNotLoadAssignmentDataea4b017"));
+        setError(requestError instanceof Error ? localizeError(requestError, i18n) : i18n("couldNotLoadAssignmentDataea4b017"));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -89,7 +91,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
             return;
           }
 
-          setError(requestError instanceof Error ? requestError.message : i18n("couldNotLoadAthletesb7948e1"));
+          setError(requestError instanceof Error ? localizeError(requestError, i18n) : i18n("couldNotLoadAthletesb7948e1"));
         })
         .finally(() => {
           if (!cancelled) setAthletesLoading(false);
@@ -118,7 +120,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
 
       router.push("/my-workouts");
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : i18n("couldNotAssignWorkout58ad222"));
+      setError(requestError instanceof Error ? localizeError(requestError, i18n) : i18n("couldNotAssignWorkout58ad222"));
     } finally {
       setSaving(false);
     }
@@ -140,7 +142,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
       await deleteWorkout(tokens.access_token, workout.id);
       router.push("/admin/workouts");
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : i18n("couldNotDeleteWorkout234fe2c"));
+      setError(requestError instanceof Error ? localizeError(requestError, i18n) : i18n("couldNotDeleteWorkout234fe2c"));
       setDeleting(false);
     }
   }
@@ -197,7 +199,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
             ) : (
               <>
                 <h2 className="mt-3 text-2xl font-semibold" style={{ color: "var(--text)" }}>{workout.title}</h2>
-                <p className="mt-2 text-sm uppercase tracking-[0.18em] text-[var(--primary)]">{workout.type}</p>
+                <p className="mt-2 text-sm uppercase tracking-[0.18em] text-[var(--primary)]"><SemanticLabel value={workout.type} /></p>
                 <div className="mt-5 space-y-3">
                   {workout.sections.map((section) => (
                     <div key={section.id ?? (workout.id) + "-" + (section.order)} className="rounded-[1.3rem] p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>

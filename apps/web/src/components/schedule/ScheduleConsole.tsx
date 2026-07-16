@@ -4,6 +4,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -119,12 +120,12 @@ export function ScheduleConsole({
       setClassTypes(window.class_types);
       return window.slots;
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : t("failedToLoadSchedule"));
+      setError(loadError instanceof Error ? localizeError(loadError, i18n) : t("failedToLoadSchedule"));
       return null;
     } finally {
       setLoading(false);
     }
-  }, [calendarWindow.queryEndAt, calendarWindow.queryStartAt, classTypeIds, days, t, tokens]);
+  }, [calendarWindow.queryEndAt, calendarWindow.queryStartAt, classTypeIds, days, i18n, t, tokens]);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -204,7 +205,7 @@ export function ScheduleConsole({
       setSelectedSlot(null);
       await loadSchedule();
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : t("failedToCreateBooking"));
+      setError(requestError instanceof Error ? localizeError(requestError, i18n) : t("failedToCreateBooking"));
     } finally {
       setBusy(false);
     }
@@ -231,7 +232,7 @@ export function ScheduleConsole({
         if (refreshed) setSelectedSlot(refreshed);
       }
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : t("failedToResolveBooking"));
+      setError(requestError instanceof Error ? localizeError(requestError, i18n) : t("failedToResolveBooking"));
     } finally {
       setBusy(false);
     }
@@ -252,7 +253,7 @@ export function ScheduleConsole({
       setEditor(null);
       await loadSchedule();
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : t("failedToSaveSlot"));
+      setError(requestError instanceof Error ? localizeError(requestError, i18n) : t("failedToSaveSlot"));
     } finally {
       setBusy(false);
     }
@@ -275,7 +276,7 @@ export function ScheduleConsole({
       await loadSchedule();
     } catch (requestError) {
       const message =
-        requestError instanceof ApiError ? requestError.message : t("failedToDeleteSlot");
+        requestError instanceof ApiError ? localizeError(requestError, i18n) : t("failedToDeleteSlot");
       setError(message);
     } finally {
       setBusy(false);

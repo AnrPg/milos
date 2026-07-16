@@ -8,6 +8,9 @@ import {useUiTranslations} from "@/i18n/ui";
 import React, { useState } from "react";
 import type { TimerSegment } from "@/api/executions";
 import type { ExerciseModification } from "@/api/executions";
+import { SemanticLabel } from "@/components/semantic-label";
+import { LocalizedScore } from "@/components/localized-score";
+import { semanticLabel } from "@/i18n/presentation";
 
 type SectionScore = {
   section_id: string;
@@ -176,7 +179,7 @@ function ScoreEntryStep({
                     className="text-[10px] uppercase tracking-[0.16em] mt-0.5"
                     style={{ color: "var(--dim)" }}
                   >
-                    {sec.score_type.replace(/_/g, " ")}
+                    <SemanticLabel value={sec.score_type} />
                   </p>
                 )}
               </div>
@@ -198,7 +201,7 @@ function ScoreEntryStep({
                 />
                 {sec.unit && (
                   <span className="text-xs shrink-0" style={{ color: "var(--muted)" }}>
-                    {sec.unit}
+                    <SemanticLabel value={sec.unit} />
                   </span>
                 )}
               </div>
@@ -393,8 +396,8 @@ function ModificationsEditorStep({
                   {(hasSets || hasPrescription || hasLoad) && (
                     <p className="text-xs mt-0.5" style={{ color: "var(--dim)" }}>
                       {[
-                        hasSets ? (ex.sets) + " sets" : null,
-                        hasPrescription ? (ex.prescription_value) + " " + (ex.prescription_unit ?? "").trim() : null,
+                        hasSets ? (ex.sets) + " " + semanticLabel("sets", i18n) : null,
+                        hasPrescription ? (ex.prescription_value) + " " + semanticLabel(ex.prescription_unit ?? "reps", i18n) : null,
                         hasLoad
                           ? ex.load_mode === "pct_1rm"
                             ? (ex.load_value) + i18n("percentOneRepMaxUnit")
@@ -453,7 +456,7 @@ function ModificationsEditorStep({
                   {hasPrescription && (
                     <div className="flex items-center gap-2">
                       <span className="text-xs w-20 shrink-0" style={{ color: "var(--dim)" }}>
-                        {ex.prescription_unit ?? i18n("reps702045f")}
+                        <SemanticLabel value={ex.prescription_unit ?? "reps"} />
                       </span>
                       <input
                         type="number"
@@ -614,7 +617,7 @@ function ConfirmStep({
                       score.section_id}
                   </span>
                   <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-                    {score.value} {score.unit ?? ""}
+                    <LocalizedScore value={score.value} scoreType={score.score_type} unit={score.unit} />
                   </span>
                 </div>
               ))}

@@ -6,6 +6,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { semanticLabel } from "@/i18n/presentation";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import type { DraftExercise, DraftSection } from "@/types/workout";
 
@@ -27,12 +28,12 @@ export function AdvancedSettingsPanel({ exercise, section, sectionOptions = [] }
     unit: string;
     inputType: "number" | "text";
   }> = [
-    { key: "hrZone", label: i18n("heartRateZonec0085b9"), unit: "Zone", inputType: "number" },
+    { key: "hrZone", label: i18n("heartRateZonec0085b9"), unit: "zone", inputType: "number" },
     { key: "tempo", label: i18n("tempo899658e"), unit: "", inputType: "text" },
     { key: "restSeconds", label: i18n("restBetweenSets39fb31b"), unit: "secs", inputType: "number" },
     { key: "clusterRestSeconds", label: i18n("clusterSetsIntraRestfc8fbe2"), unit: "secs", inputType: "number" },
     { key: "restPauseSeconds", label: i18n("restPause62e1845"), unit: "secs", inputType: "number" },
-    { key: "pacing", label: i18n("pacing43ab6ce"), unit: "/km", inputType: "number" },
+    { key: "pacing", label: i18n("pacing43ab6ce"), unit: "per_kilometre", inputType: "number" },
   ];
   const { toggleAdvancedPanel, toggleAdvancedSetting, updateAdvancedValue, deleteExercise, moveExercise } =
     useWorkoutCreationStore();
@@ -105,7 +106,7 @@ export function AdvancedSettingsPanel({ exercise, section, sectionOptions = [] }
                       />
                       {unit ? (
                         <span className="text-sm" style={{ color: "var(--muted)" }}>
-                          {unit}
+                          {semanticLabel(unit, i18n)}
                         </span>
                       ) : null}
                     </>

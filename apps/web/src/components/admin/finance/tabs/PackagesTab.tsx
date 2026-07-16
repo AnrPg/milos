@@ -7,6 +7,7 @@
 
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError, semanticLabel } from "@/i18n/presentation";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -14,6 +15,7 @@ import { useCallback } from "react";
 
 import { createFinancePackage, fetchFinancePackages, type FinanceRecord } from "@/api/finance";
 import { useSession } from "@/components/session-provider";
+import { SemanticLabel } from "@/components/semantic-label";
 import { PackagePanel } from "@/components/admin/finance/panels/PackagePanel";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
 import {
@@ -190,7 +192,7 @@ export function PackagesTab() {
                   onChange={(e) => setForm({ ...form, family: e.target.value })}
                 >
                   {["unlimited", "limited-visits", "personal-programming", "hybrid"].map((v) => (
-                    <option key={v} value={v}>{v}</option>
+                    <option key={v} value={v}>{semanticLabel(v, i18n)}</option>
                   ))}
                 </select>
               </PanelField>
@@ -202,7 +204,7 @@ export function PackagesTab() {
                   onChange={(e) => setForm({ ...form, billing_period: e.target.value })}
                 >
                   {["monthly", "quarterly", "annual", "custom"].map((v) => (
-                    <option key={v} value={v}>{v}</option>
+                    <option key={v} value={v}>{semanticLabel(v, i18n)}</option>
                   ))}
                 </select>
               </PanelField>
@@ -226,7 +228,7 @@ export function PackagesTab() {
             </PanelField>
             <EntitlementEditor value={entitlement} onChange={setEntitlement} />
             {createMutation.error instanceof Error && (
-              <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{createMutation.error.message}</p>
+              <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(createMutation.error, i18n)}</p>
             )}
           </div>
         </SidePanel>
@@ -251,7 +253,7 @@ function PackageRows({ packages, onOpen }: { packages: FinanceRecord[]; onOpen: 
           {field(pkg, "name", field(pkg, "code"))}
         </p>
         <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
-          {field(pkg, "code")} · {field(pkg, "family")} · {field(pkg, "billing_period")}
+          {field(pkg, "code")} · <SemanticLabel value={field(pkg, "family")} /> · <SemanticLabel value={field(pkg, "billing_period")} />
         </p>
       </div>
       <div className="flex items-center gap-4">

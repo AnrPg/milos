@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useEffect, useMemo, useState } from "react";
 
 import {
@@ -38,7 +39,7 @@ export function CalendarExportLinks({ token, compact = false }: Props) {
         }
       })
       .catch((requestError) => {
-        if (!cancelled) setError(requestError instanceof Error ? requestError.message : i18n("calendarLinksUnavailabledc879c1"));
+        if (!cancelled) setError(requestError instanceof Error ? localizeError(requestError, i18n) : i18n("calendarLinksUnavailabledc879c1"));
       });
 
     return () => {
@@ -79,7 +80,7 @@ export function CalendarExportLinks({ token, compact = false }: Props) {
       setLinks(payload);
       setCopied(false);
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : i18n("calendarLinksUnavailabledc879c1"));
+      setError(requestError instanceof Error ? localizeError(requestError, i18n) : i18n("calendarLinksUnavailabledc879c1"));
     } finally {
       setRegenerating(false);
     }

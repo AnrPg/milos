@@ -60,6 +60,20 @@ function restorePlaceholders(message, names) {
   return message.replace(/\{(\d+)\}/g, (_, index) => `{${names[Number(index)]}}`);
 }
 
+function normalizeIcuPlural(message, source) {
+  const sourceMatch = source.match(/\{([A-Za-z_][\w]*),\s*plural,/);
+  if (!sourceMatch) return message;
+
+  const translatedMatch = message.match(
+    /^(.*)\{[^,،{}]+[,،]\s*[^,،{}]+[,،]\s*[^{]*\{([^{}]*)\}\s*[^{]*\{([^{}]*)\}\s*\}$/s,
+  );
+  if (!translatedMatch) {
+    throw new Error(`could not restore ICU plural structure: ${message}`);
+  }
+
+  return `${translatedMatch[1]}{${sourceMatch[1]}, plural, one {${translatedMatch[2]}} other {${translatedMatch[3]}}}`;
+}
+
 async function translateBatch(locale, batch, batchIndex) {
   const markers = batch.slice(0, -1).map((_, index) => `\uE000${batchIndex}_${index}\uE001`);
   const input = batch.map(([, message], index) => index < markers.length ? `${message}\n${markers[index]}\n` : message).join("");
@@ -125,6 +139,11 @@ for (const [catalogLocale, translationLocale] of Object.entries(targets)) {
     }
     completed += batch.length;
     process.stdout.write(`\r${catalogLocale}: ${completed}/${entries.length}`);
+  }
+  for (const [key, source] of entries) {
+    if (typeof source === "string" && source.includes(", plural,")) {
+      setPath(catalog, key, normalizeIcuPlural(getPath(catalog, key), source));
+    }
   }
   fs.writeFileSync(filename, `${JSON.stringify(catalog, null, 2)}\n`);
   process.stdout.write("\n");

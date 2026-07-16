@@ -10,6 +10,7 @@ import React, { useId, useState } from "react";
 import type { SectionScore } from "@/api/executions";
 import type { TimerSegment } from "@/api/executions";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
+import { SemanticLabel } from "@/components/semantic-label";
 
 type Props = {
   segment: TimerSegment;
@@ -137,7 +138,7 @@ export function ScoreModal({
             />
             {unit && (
               <div className="mt-1 text-end text-xs" style={{ color: "var(--muted)" }}>
-                {unit}
+                <SemanticLabel value={unit} />
               </div>
             )}
           </>

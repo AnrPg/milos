@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -19,13 +20,16 @@ type FieldErrors = Record<string, string[]>;
 const initialRegister: RegisterRequest = { nickname: "", password: "", role: "member" };
 const initialLogin: LoginRequest = { nickname: "", password: "" };
 
-function flatFieldErrors(errors: Record<string, unknown> | undefined): FieldErrors {
+function flatFieldErrors(
+  errors: Record<string, unknown> | undefined,
+  message: string,
+): FieldErrors {
   if (!errors) return {};
   return Object.fromEntries(
     Object.entries(errors).filter((entry): entry is [string, string[]] => {
       const [, messages] = entry;
       return Array.isArray(messages) && messages.every((m) => typeof m === "string");
-    }),
+    }).map(([field, messages]) => [field, messages.map(() => message)]),
   );
 }
 
@@ -107,10 +111,10 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
       await effect();
     } catch (err) {
       if (err instanceof ApiError) {
-        setError(err.message);
-        setFieldErrors(flatFieldErrors(err.payload.errors));
+        setError(localizeError(err, i18n));
+        setFieldErrors(flatFieldErrors(err.payload.errors, i18n("apiValidationField")));
       } else {
-        setError(err instanceof Error ? err.message : i18n("unexpectedRequestFailurea7ffd06"));
+        setError(err instanceof Error ? localizeError(err, i18n) : i18n("unexpectedRequestFailurea7ffd06"));
       }
     } finally {
       setBusyAction(null);

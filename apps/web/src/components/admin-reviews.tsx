@@ -11,6 +11,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { fetchAdminReviews, updateReviewStatus } from "@/api/reviews";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
+import { SemanticLabel } from "@/components/semantic-label";
 
 type ReviewAnswer = {
   question_key?: unknown;
@@ -70,10 +71,10 @@ export function AdminReviews() {
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="font-bold">
-                      {String(snapshot.label ?? review.target_type)}
+                      {snapshot.label ? String(snapshot.label) : <SemanticLabel value={review.target_type} />}
                     </p>
                     <p className="text-sm text-[var(--muted)]">
-                      {String(review.target_type)} {i18n("rating5852701")} {String(review.rating ?? "—")} · {String(review.sentiment)} · {String(review.status)}
+                      <SemanticLabel value={review.target_type} /> {i18n("rating5852701")} {String(review.rating ?? "—")} · <SemanticLabel value={review.sentiment} /> · <SemanticLabel value={review.status} />
                     </p>
                     {review.target_id ? (
                       <p className="mt-1 text-xs text-[var(--dim)]">{i18n("target61ad50a")} {String(review.target_id)}</p>

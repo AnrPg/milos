@@ -20,6 +20,7 @@ import {
 } from "recharts";
 
 import { fetchFinanceQueues, fetchFinanceSummary, type FinanceRecord } from "@/api/finance";
+import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 
@@ -215,7 +216,7 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
             renderRow={(row) => (
               <>
                 <span style={{ color: "var(--text)" }}>{field(row, "nickname", field(row, "recipient_user_id"))}</span>
-                <span style={{ color: "var(--muted)" }}>{field(row, "reward_type")} · {field(row, "reward_value")}</span>
+                <span style={{ color: "var(--muted)" }}><SemanticLabel value={field(row, "reward_type")} /> · {field(row, "reward_value")}</span>
               </>
             )}
           />

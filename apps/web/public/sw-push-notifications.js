@@ -11,6 +11,8 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title ?? "Milos Training", {
       body: data.body ?? "",
+      lang: data.locale ?? "en",
+      dir: data.locale === "ar" || data.locale === "he" ? "rtl" : "ltr",
       icon: "/globe.svg",
       badge: "/globe.svg",
       data: { url: data.url, notification_id: notificationId },

@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -185,7 +186,7 @@ export function PromotionsTab() {
               {i18n("activea733b80")}
             </label>
             {createMutation.error instanceof Error && (
-              <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{createMutation.error.message}</p>
+              <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(createMutation.error, i18n)}</p>
             )}
           </div>
         </SidePanel>

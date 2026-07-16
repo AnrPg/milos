@@ -381,7 +381,7 @@ export function AdminDashboard() {
               <h2 className="mt-2 text-xl font-semibold tracking-tight" style={{ color: "var(--text)" }}>
                 {activeChallenges.length === 0 && !challengesQuery.isLoading
                   ? i18n("noActiveChallenges1856c6d")
-                  : (activeChallenges.length) + " active"}
+                  : i18n("activeChallengeCount", {count: activeChallenges.length})}
               </h2>
             </div>
             <Link

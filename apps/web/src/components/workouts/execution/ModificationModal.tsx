@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { semanticLabel } from "@/i18n/presentation";
 import { useId, useState } from "react";
 import type { ExerciseModification } from "@/api/executions";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
@@ -134,7 +135,7 @@ export function ModificationModal({ step, onSave, onClose }: Props) {
             <div>
               <label className="block text-xs font-semibold mb-1" style={{ color: "var(--muted)" }}>
                 {exercise.prescription_unit
-                  ? i18n("prescribedValue", {unit: exercise.prescription_unit, value: exercise.prescription_value ?? 0})
+                  ? i18n("prescribedValue", {unit: semanticLabel(exercise.prescription_unit, i18n), value: exercise.prescription_value ?? 0})
                   : i18n("repetitionsPrescribedValue", {value: exercise.prescription_value ?? 0})}
               </label>
               <input
@@ -158,7 +159,7 @@ export function ModificationModal({ step, onSave, onClose }: Props) {
               <label className="block text-xs font-semibold mb-1" style={{ color: "var(--muted)" }}>
                 {exercise.load_mode === "pct_1rm"
                   ? i18n("loadRmPrescribed659bd8a") + (exercise.load_value) + "%)"
-                  : i18n("loadKgPrescribed1134141") + (exercise.load_value) + " kg)"}
+                  : i18n("loadKgPrescribed1134141") + (exercise.load_value) + " " + semanticLabel("kg", i18n) + ")"}
               </label>
               <input
                 type="number"

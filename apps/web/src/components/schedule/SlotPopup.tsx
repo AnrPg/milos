@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useState } from "react";
 import { useLocale } from "next-intl";
 
@@ -14,6 +15,7 @@ import { downloadIcsEvent } from "@/lib/ics";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { workoutTypeColor } from "@/lib/workout-colors";
+import { SemanticLabel } from "@/components/semantic-label";
 
 function formatDateTime(locale: string, isoString: string) {
   return new Intl.DateTimeFormat(locale, {
@@ -108,7 +110,7 @@ export function SlotPopup({
       setMessageSent(true);
       setMessageText("");
     } catch (err) {
-      setMessageError(err instanceof Error ? err.message : i18n("failedToSendMessage0f22ccd"));
+      setMessageError(err instanceof Error ? localizeError(err, i18n) : i18n("failedToSendMessage0f22ccd"));
     } finally {
       setMessageSending(false);
     }
@@ -127,7 +129,7 @@ export function SlotPopup({
       if (err instanceof ApiError && err.status === 422) {
         setCancelError(i18n("thisBookingCanNoLongerBeCancelled0dbc8ac"));
       } else {
-        setCancelError(err instanceof Error ? err.message : i18n("failedToCancelBooking2cd9432"));
+        setCancelError(err instanceof Error ? localizeError(err, i18n) : i18n("failedToCancelBooking2cd9432"));
       }
     } finally {
       setCancelling(false);
@@ -526,7 +528,7 @@ export function SlotPopup({
                           className="mt-1 text-xs uppercase tracking-[0.18em]"
                           style={{ color: "var(--dim)" }}
                         >
-                          {booking.status}
+                          <SemanticLabel value={booking.status} />
                         </p>
                         {booking.admin_message ? (
                           <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>

@@ -5,12 +5,14 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import Link from "next/link";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { fetchFinancePackage, updateFinancePackage, type FinanceRecord } from "@/api/finance";
 import { useSession } from "@/components/session-provider";
+import { SemanticLabel } from "@/components/semantic-label";
 
 function value(record: FinanceRecord | undefined, key: string, fallback = "") {
   const field = record?.[key];
@@ -81,7 +83,7 @@ export function AdminFinancePackageDetail({ packageId }: { packageId: string }) 
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">{i18n("packageDetailb134a53")}</p>
           <h1 className="mt-3 text-4xl font-black">{value(packageRecord, "name", i18n("membershipPackage12e8323"))}</h1>
           <p className="mt-2 text-sm text-[var(--muted)]">
-            {i18n("codeadac693")} {value(packageRecord, "code")} · {value(packageRecord, "family")} · {value(packageRecord, "billing_period")}
+            {i18n("codeadac693")} {value(packageRecord, "code")} · <SemanticLabel value={value(packageRecord, "family")} /> · <SemanticLabel value={value(packageRecord, "billing_period")} />
           </p>
         </section>
 
@@ -136,7 +138,7 @@ export function AdminFinancePackageDetail({ packageId }: { packageId: string }) 
           <button className="rounded-full bg-[var(--text)] px-5 py-3 text-sm font-bold text-[var(--primary-contrast)]" disabled={updateMutation.isPending} type="submit">
             {updateMutation.isPending ? i18n("savingae7e887") : i18n("savePackaged6e81a9")}
           </button>
-          {updateMutation.error instanceof Error ? <p className="text-sm text-[var(--danger)]">{updateMutation.error.message}</p> : null}
+          {updateMutation.error instanceof Error ? <p className="text-sm text-[var(--danger)]">{localizeError(updateMutation.error, i18n)}</p> : null}
         </form>
       </div>
     </main>

@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getPRHistory, type PRRecord, type PRUnit } from "@/api/gamification";
 import { useSession } from "@/components/session-provider";
+import { SemanticLabel } from "@/components/semantic-label";
 
 function formatScore(score: number, unit: PRUnit): string {
   if (unit === "mins_secs") {
@@ -67,7 +68,7 @@ export function PRHistoryModal({ pr, onClose }: { pr: PRRecord; onClose: () => v
                 style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
               >
                 <span className="text-sm font-semibold tabular-nums" style={{ color: "var(--primary)" }}>
-                  {formatScore(Number(entry.score), pr.unit)} {pr.unit !== "mins_secs" ? pr.unit : ""}
+                  {formatScore(Number(entry.score), pr.unit)} {pr.unit !== "mins_secs" ? <SemanticLabel value={pr.unit} /> : ""}
                 </span>
                 <span className="text-xs" style={{ color: "var(--dim)" }}>
                   {new Date(entry.beaten_on).toLocaleDateString(uiLocale, { month: "short", day: "numeric", year: "numeric" })}

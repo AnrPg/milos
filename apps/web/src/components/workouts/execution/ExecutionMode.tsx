@@ -39,6 +39,7 @@ import {
 } from "./progress";
 import { TimerDisplay } from "./TimerDisplay";
 import { type ChecklistStep, WorkoutChecklist } from "./WorkoutChecklist";
+import { LocalizedScore } from "@/components/localized-score";
 
 function mergeSectionScore(
   scores: {
@@ -544,7 +545,7 @@ export function ExecutionMode() {
                     score.section_id}
                 </span>
                 <span className="text-sm font-semibold">
-                  {score.value} {score.unit ?? ""}
+                  <LocalizedScore value={score.value} scoreType={score.score_type} unit={score.unit} />
                 </span>
               </div>
             ))}

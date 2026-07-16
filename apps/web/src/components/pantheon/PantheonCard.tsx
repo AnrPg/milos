@@ -11,6 +11,7 @@ import { createPortal } from "react-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getPRHistory, type PRRecord, type PRUnit } from "@/api/gamification";
 import { useSession } from "@/components/session-provider";
+import { semanticLabel } from "@/i18n/presentation";
 
 export function formatScore(score: number, unit: PRUnit): string {
   if (unit === "mins_secs") {
@@ -248,10 +249,7 @@ function CompactCard({
   const i18n = useUiTranslations();
   const uiLocale = useUiLocale();
   const scoreStr = formatScore(Number(pr.current_score), pr.unit);
-  const unitLabel = {
-    mins_secs: i18n("minutesSecondsUnit"), reps: i18n("repetitionsUnit"), sets: i18n("setsd6c8220"),
-    kcals: i18n("kilocaloriesUnit"), m: i18n("metersUnit"), kg: i18n("kilogramsUnit"),
-  }[pr.unit] ?? pr.unit;
+  const unitLabel = semanticLabel(pr.unit, i18n);
   const dateStr = new Date(pr.beaten_on).toLocaleDateString(uiLocale, {
     month: "short", day: "numeric", year: "numeric",
   });
@@ -317,10 +315,7 @@ function FullCard({
   const i18n = useUiTranslations();
   const uiLocale = useUiLocale();
   const scoreStr = formatScore(Number(pr.current_score), pr.unit);
-  const unitLabel = {
-    mins_secs: i18n("minutesSecondsUnit"), reps: i18n("repetitionsUnit"), sets: i18n("setsd6c8220"),
-    kcals: i18n("kilocaloriesUnit"), m: i18n("metersUnit"), kg: i18n("kilogramsUnit"),
-  }[pr.unit] ?? pr.unit;
+  const unitLabel = semanticLabel(pr.unit, i18n);
   const dateStr = new Date(pr.beaten_on).toLocaleDateString(uiLocale, {
     month: "short", day: "numeric", year: "numeric",
   });

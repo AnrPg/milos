@@ -126,7 +126,7 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
               </span>
             ) : null}
             <span className="text-xs" style={{ color: "var(--muted)" }}>
-              {collapsed ? ">" : "v"}
+              {collapsed ? "›" : "⌄"}
             </span>
           </div>
         </div>

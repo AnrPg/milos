@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -48,7 +49,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
       setError(null);
       await refresh();
     },
-    onError: (cause) => setError(cause instanceof Error ? cause.message : i18n("couldNotCreateClassTyped413603")),
+    onError: (cause) => setError(cause instanceof Error ? localizeError(cause, i18n) : i18n("couldNotCreateClassTyped413603")),
   });
 
   const updateMutation = useMutation({
@@ -62,7 +63,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
       setError(null);
       await refresh();
     },
-    onError: (cause) => setError(cause instanceof Error ? cause.message : i18n("couldNotUpdateClassType039b007")),
+    onError: (cause) => setError(cause instanceof Error ? localizeError(cause, i18n) : i18n("couldNotUpdateClassType039b007")),
   });
 
   const archiveMutation = useMutation({
@@ -87,7 +88,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
       setError(null);
       await refresh();
     },
-    onError: (cause) => setError(cause instanceof Error ? cause.message : i18n("couldNotArchiveClassType0cf6334")),
+    onError: (cause) => setError(cause instanceof Error ? localizeError(cause, i18n) : i18n("couldNotArchiveClassType0cf6334")),
   });
 
   const allTypes = query.data ?? [];

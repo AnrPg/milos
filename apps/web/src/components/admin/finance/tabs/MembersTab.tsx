@@ -22,6 +22,8 @@ import {
 import { useSession } from "@/components/session-provider";
 import { InlineCell, InlineToggle } from "@/components/admin/finance/shared/InlineCell";
 import { Combobox, type ComboboxOption } from "@/components/admin/finance/shared/Combobox";
+import { SemanticLabel } from "@/components/semantic-label";
+import { semanticLabel } from "@/i18n/presentation";
 import { MemberPanel } from "@/components/admin/finance/panels/MemberPanel";
 import { ReferralEventWizard } from "@/components/admin/finance/ReferralEventWizard";
 import { InlineAssignPackage } from "@/components/admin/finance/shared/InlineAssignPackage";
@@ -184,7 +186,7 @@ export function MembersTab() {
     return filtered.slice(0, 30).map((u) => ({
       value: field(u, "id"),
       label: field(u, "nickname"),
-      sublabel: field(u, "identity_role"),
+      sublabel: semanticLabel(field(u, "identity_role"), i18n),
     }));
   }
 
@@ -260,8 +262,8 @@ export function MembersTab() {
           style={{ color: "var(--dim)" }}
         >
           {filteredMembers.length === members.length
-            ? (members.length) + " member" + (members.length !== 1 ? "s" : "")
-            : (filteredMembers.length) + " / " + (members.length) + " members"}
+            ? i18n("memberCount", {count: members.length})
+            : i18n("filteredMemberCount", {filtered: filteredMembers.length, total: members.length})}
         </p>
         {hasActiveFilters && (
           <button
@@ -591,7 +593,7 @@ function MemberRow({
               color: userType === "athlete" ? "var(--primary)" : "var(--muted)",
             }}
           >
-            {userType}
+            <SemanticLabel value={userType} />
           </span>
         ) : (
           <span className="text-xs" style={{ color: "var(--dim)" }}>—</span>

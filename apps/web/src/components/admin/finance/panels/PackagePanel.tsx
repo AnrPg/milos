@@ -7,6 +7,8 @@
 
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError, semanticLabel } from "@/i18n/presentation";
+import { SemanticLabel } from "@/components/semantic-label";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -216,7 +218,7 @@ export function PackagePanel({
                 onChange={(e) => setForm({ ...form, family: e.target.value })}
               >
                 {["unlimited", "limited-visits", "personal-programming", "hybrid"].map((v) => (
-                  <option key={v} value={v}>{v}</option>
+                  <option key={v} value={v}>{semanticLabel(v, i18n)}</option>
                 ))}
               </select>
             </Field>
@@ -228,7 +230,7 @@ export function PackagePanel({
                 onChange={(e) => setForm({ ...form, billing_period: e.target.value })}
               >
                 {["monthly", "quarterly", "annual", "custom"].map((v) => (
-                  <option key={v} value={v}>{v}</option>
+                  <option key={v} value={v}>{semanticLabel(v, i18n)}</option>
                 ))}
               </select>
             </Field>
@@ -263,7 +265,7 @@ export function PackagePanel({
             {i18n("activea733b80")}
           </label>
           {updateMutation.error instanceof Error && (
-            <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{updateMutation.error.message}</p>
+            <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(updateMutation.error, i18n)}</p>
           )}
           {impactQuery.isError ? (
             <p className="text-sm" style={{ color: "var(--danger)" }}>{i18n("couldNotCheckCurrentSubscribersThePackageWilldd8ac35")}</p>
@@ -273,8 +275,8 @@ export function PackagePanel({
         <div className="space-y-4">
           <Stat label={i18n("codeadac693")} value={field(pkg, "code")} />
           <Stat label={i18n("name709a232")} value={field(pkg, "name")} />
-          <Stat label={i18n("family4efb6cb")} value={field(pkg, "family")} />
-          <Stat label={i18n("billingPeriodda59f5a")} value={field(pkg, "billing_period")} />
+          <Stat label={i18n("family4efb6cb")} value={<SemanticLabel value={field(pkg, "family")} />} />
+          <Stat label={i18n("billingPeriodda59f5a")} value={<SemanticLabel value={field(pkg, "billing_period")} />} />
           <Stat label={i18n("basePrice708f3d8")} value={money(uiLocale, pkg.base_price_cents)} />
           <Stat label={i18n("statusbae7d5b")} value={pkg.active !== false ? i18n("activea733b80") : i18n("inactive09af574")} />
           <EntitlementSummary params={pkg.params} />
@@ -296,12 +298,12 @@ export function PackagePanel({
             <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--warning)" }}>{i18n("requiredReconciliationd3a0ead")}</p>
             <h3 id="package-retirement-title" className="mt-2 text-xl font-semibold" style={{ color: "var(--text)" }}>{i18n("moveCurrentSubscribersBeforeRetiringThisPackage8116b72")}</h3>
             <p className="mt-2 text-sm leading-6" style={{ color: "var(--dim)" }}>
-              {affectedMembers.length} {i18n("currentSubscriber5f16e61")}{affectedMembers.length === 1 ? " is" : i18n("sAre81c69ca")} {i18n("usingThisPackageChooseAnActiveReplacementFor1114469")}
+              {i18n("packageSubscribersRequireReplacement", {count: affectedMembers.length})}
             </p>
             <div className="mt-5 space-y-3">
               {affectedRoles.map((role) => (
                 <label key={role} className="block space-y-1">
-                  <span className="text-xs font-semibold capitalize" style={{ color: "var(--text-soft)" }}>{role} {i18n("replacement898d79a")} {affectedByRole[role]} {i18n("user12dea96")}{affectedByRole[role] === 1 ? "" : i18n("sa0f1490")}</span>
+                  <span className="text-xs font-semibold capitalize" style={{ color: "var(--text-soft)" }}><SemanticLabel value={role} /> {i18n("replacement898d79a")} {affectedByRole[role]} {i18n("user12dea96")}{affectedByRole[role] === 1 ? "" : i18n("sa0f1490")}</span>
                   <select
                     className="w-full rounded-xl px-3 py-2 text-sm"
                     style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -319,7 +321,7 @@ export function PackagePanel({
               ))}
             </div>
             {replacementOptions.length === 0 ? <p className="mt-3 text-sm" style={{ color: "var(--danger)" }}>{i18n("createAnotherActivePackageBeforeRetiringThisOne619ea88")}</p> : null}
-            {retireMutation.error instanceof Error ? <p className="mt-3 text-sm" style={{ color: "var(--danger)" }}>{retireMutation.error.message}</p> : null}
+            {retireMutation.error instanceof Error ? <p className="mt-3 text-sm" style={{ color: "var(--danger)" }}>{localizeError(retireMutation.error, i18n)}</p> : null}
             <div className="mt-6 flex flex-wrap gap-3">
               <button
                 type="button"
@@ -350,7 +352,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div>
       <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{label}</p>
@@ -365,11 +367,11 @@ function EntitlementSummary({ params }: { params: unknown }) {
   return (
     <div className="space-y-2 rounded-xl p-4" style={{ background: "var(--bg-soft)" }}>
       <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{i18n("entitlements7de7578")}</p>
-      <p className="text-sm"><strong>{i18n("channelsb727b80")}</strong> {draft.channels.join(", ") || i18n("none6eef664")}</p>
-      <p className="text-sm"><strong>{i18n("capabilities92761fd")}</strong> {draft.capabilities.join(", ") || i18n("none6eef664")}</p>
-      <p className="text-sm"><strong>{i18n("classVisits6c6fff6")}</strong> {draft.classVisitLimit} / {draft.classVisitPeriod.replaceAll("_", " ")}</p>
+      <p className="text-sm"><strong>{i18n("channelsb727b80")}</strong> {draft.channels.length ? draft.channels.map((value, index) => <span key={value}>{index ? ", " : ""}<SemanticLabel value={value} /></span>) : i18n("none6eef664")}</p>
+      <p className="text-sm"><strong>{i18n("capabilities92761fd")}</strong> {draft.capabilities.length ? draft.capabilities.map((value, index) => <span key={value}>{index ? ", " : ""}<SemanticLabel value={value} /></span>) : i18n("none6eef664")}</p>
+      <p className="text-sm"><strong>{i18n("classVisits6c6fff6")}</strong> {draft.classVisitLimit} / <SemanticLabel value={draft.classVisitPeriod} /></p>
       {draft.capabilities.includes("receive_coaching_touchpoints") ? (
-        <p className="text-sm"><strong>{i18n("coachingTouchpoints4a9fb40")}</strong> {draft.coachingTouchpointLimit} / {draft.coachingTouchpointPeriod.replaceAll("_", " ")}</p>
+        <p className="text-sm"><strong>{i18n("coachingTouchpoints4a9fb40")}</strong> {draft.coachingTouchpointLimit} / <SemanticLabel value={draft.coachingTouchpointPeriod} /></p>
       ) : null}
     </div>
   );

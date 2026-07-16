@@ -5,10 +5,12 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { formatScore } from "@/i18n/presentation";
 import { useEffect, useRef, useState } from "react";
 import { createDirectThread, searchUsers, sendMessage } from "@/api/messaging";
 import { sharePR, type PRRecord } from "@/api/gamification";
 import { useSession } from "@/components/session-provider";
+import { SemanticLabel } from "@/components/semantic-label";
 
 type UserResult = { id: string; nickname: string; role: string };
 
@@ -35,8 +37,8 @@ export function PRShareModal({ pr, onClose }: { pr: PRRecord; onClose: () => voi
     if (!tokens?.access_token) return;
     sharePR(tokens.access_token, pr.id)
       .then((r) => setMessage(r.message))
-      .catch(() => setMessage("🏆 " + (pr.name) + ": " + (pr.current_score) + " " + (pr.unit)));
-  }, [tokens?.access_token, pr]);
+      .catch(() => setMessage(i18n("prShareFallback", {name: pr.name, score: formatScore(pr.current_score, undefined, pr.unit, i18n)})));
+  }, [i18n, tokens?.access_token, pr]);
 
   function handleQueryChange(q: string) {
     setQuery(q);
@@ -116,7 +118,7 @@ export function PRShareModal({ pr, onClose }: { pr: PRRecord; onClose: () => voi
         {sent ? (
           <div className="space-y-3">
             <p className="text-sm font-semibold text-center py-4" style={{ color: "var(--success, var(--primary))" }}>
-              {i18n("sentTo47ddf70")} {selected.length} {selected.length === 1 ? "person" : "people"}!
+              {i18n("sentToPeople", {count: selected.length})}
             </p>
             <button
               type="button"
@@ -188,7 +190,7 @@ export function PRShareModal({ pr, onClose }: { pr: PRRecord; onClose: () => voi
                     }}
                   >
                     <span className="font-semibold">{u.nickname}</span>
-                    <span className="text-xs capitalize" style={{ color: "var(--dim)" }}>{u.role}</span>
+                    <span className="text-xs capitalize" style={{ color: "var(--dim)" }}><SemanticLabel value={u.role} /></span>
                   </button>
                 ))}
               </div>
@@ -211,7 +213,7 @@ export function PRShareModal({ pr, onClose }: { pr: PRRecord; onClose: () => voi
                 ? i18n("sendingcf76551")
                 : selected.length === 0
                   ? i18n("selectAtLeastOnePerson1e6c16e")
-                  : i18n("sendTob98cc23") + (selected.length) + " " + (selected.length === 1 ? "person" : "people")}
+                  : i18n("sendToPeople", {count: selected.length})}
             </button>
           </>
         )}

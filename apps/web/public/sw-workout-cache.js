@@ -127,7 +127,7 @@ self.addEventListener("fetch", (event) => {
         if (cached) await cache.delete(event.request);
       }
 
-      return new Response(JSON.stringify({ error: "Offline" }), {
+      return new Response(JSON.stringify({ code: "offline", error: "Offline" }), {
         status: 503,
         headers: { "Content-Type": "application/json" },
       });

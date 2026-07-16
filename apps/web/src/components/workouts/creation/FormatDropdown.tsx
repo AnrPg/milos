@@ -78,7 +78,7 @@ export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
         }}
       >
         <span>{formatLabels[value]}</span>
-        <span style={{ color: "var(--muted)" }}>{open ? "^" : "v"}</span>
+        <span style={{ color: "var(--muted)" }}>{open ? "▴" : "▾"}</span>
       </button>
 
       {open && dropdownRect ? (

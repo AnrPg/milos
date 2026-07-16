@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError, semanticLabel } from "@/i18n/presentation";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -15,6 +16,7 @@ import {
 } from "@/api/finance";
 import { useSession } from "@/components/session-provider";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
+import { SemanticLabel } from "@/components/semantic-label";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -135,7 +137,7 @@ export function CampaignPanel({
                   onChange={(e) => setCodeForm({ ...codeForm, discount_type: e.target.value })}
                 >
                   {["percent", "fixed_amount", "free_period", "manual"].map((v) => (
-                    <option key={v} value={v}>{v}</option>
+                    <option key={v} value={v}>{semanticLabel(v, i18n)}</option>
                   ))}
                 </select>
               </PanelField>
@@ -176,7 +178,7 @@ export function CampaignPanel({
               {createCodeMutation.isPending ? i18n("creating94d7d8e") : i18n("createCodecdeaf88")}
             </button>
             {createCodeMutation.error instanceof Error && (
-              <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{createCodeMutation.error.message}</p>
+              <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(createCodeMutation.error, i18n)}</p>
             )}
           </div>
         )}
@@ -205,8 +207,8 @@ export function CampaignPanel({
                   </span>
                 </div>
                 <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
-                  {field(code, "discount_type")} · {field(code, "discount_value")}
-                  {code.max_redemptions ? i18n("max8004fdc") + (field(code, "max_redemptions")) + " uses" : ""}
+                  <SemanticLabel value={field(code, "discount_type")} /> · {field(code, "discount_value")}
+                  {code.max_redemptions ? i18n("maximumUses", {count: Number(field(code, "max_redemptions"))}) : ""}
                 </p>
               </div>
             ))}

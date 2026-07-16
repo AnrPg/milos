@@ -6,6 +6,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { semanticLabel } from "@/i18n/presentation";
 import { useState } from "react";
 
 import { scaleLevelVar, translucent } from "@/lib/theme";
@@ -140,12 +141,7 @@ function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
     }
   
     if (exercise.prescription_value) {
-      const unit =
-        exercise.prescription_unit === "secs"
-          ? i18n("sec920a25e")
-          : exercise.prescription_unit === "kcal"
-            ? "kcal"
-            : i18n("repetitionsUnit");
+      const unit = semanticLabel(exercise.prescription_unit ?? "reps", i18n);
       parts.push(i18n("value0Value1dca59cc", {value0: exercise.prescription_value, value1: unit}));
     }
   
@@ -227,7 +223,7 @@ export function WorkoutPreviewDetail({
     if (type === "amrap" && timerConfig.duration_seconds) return i18n("amrapValue0Minf963ab5", {value0: Math.round((timerConfig.duration_seconds as number) / 60)});
     if (type === "emom" && timerConfig.duration_seconds) return i18n("emomValue0Min517ea41", {value0: Math.round((timerConfig.duration_seconds as number) / 60)});
     if (type === "for_time") return i18n("forTimea8ed8eb");
-    return type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    return semanticLabel(type, i18n);
   }
 
   const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {

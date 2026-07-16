@@ -7,6 +7,7 @@ import {useUiTranslations} from "@/i18n/ui";
 import { FORMAT_FIELD_DEFS, type FormatParams, type SectionFormat } from "@/types/workout";
 
 import { TimeInput } from "./TimeInput";
+import { SemanticLabel } from "@/components/semantic-label";
 
 type FieldLabel = {
   key: string;
@@ -134,7 +135,7 @@ export function FormatContextualFields({ format, params, onChange }: Props) {
                   />
                   {field.unit ? (
                     <span className="shrink-0 text-sm" style={{ color: "var(--muted)" }}>
-                      {field.unit}
+                      <SemanticLabel value={field.unit} />
                     </span>
                   ) : null}
                 </>

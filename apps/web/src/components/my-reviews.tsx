@@ -6,6 +6,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -13,14 +14,16 @@ import { listMyExecutions, type WorkoutExecution } from "@/api/executions";
 import { fetchMyReviews, submitReview } from "@/api/reviews";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
+import { SemanticLabel } from "@/components/semantic-label";
 
 export function isCompletedExecution(execution: WorkoutExecution) {
   return execution.status === "completed" || Boolean(execution.completed_at_utc);
 }
 
 function ErrorText({ error }: { error: unknown }) {
+  const i18n = useUiTranslations();
   if (!(error instanceof Error)) return null;
-  return <p className="text-sm font-semibold text-[var(--danger)]">{error.message}</p>;
+  return <p className="text-sm font-semibold text-[var(--danger)]">{localizeError(error, i18n)}</p>;
 }
 
 export function ReviewForm() {
@@ -161,7 +164,7 @@ export function ReviewForm() {
           {executionTargets.map((execution) => (
             <option key={execution.id} value={execution.id}>
               {execution.workout_title ?? execution.master_workout_id ?? execution.id} ·{" "}
-              {String(execution.status)}
+              <SemanticLabel value={execution.status} />
             </option>
           ))}
         </select>
@@ -225,7 +228,7 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
           key={String(review.id)}
           className="rounded-2xl border border-[var(--border)] bg-[var(--panel)] p-5"
         >
-          <p className="font-bold">{String(review.target_type)}</p>
+          <p className="font-bold"><SemanticLabel value={review.target_type} /></p>
           <p className="text-sm text-[var(--muted)]">{i18n("rating6437b7b")} {String(review.rating ?? "—")}</p>
           {review.body ? <p className="mt-2 text-sm">{String(review.body)}</p> : null}
         </article>

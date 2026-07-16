@@ -7,6 +7,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError, semanticLabel } from "@/i18n/presentation";
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -21,6 +22,7 @@ import {
 } from "@/api/challenges";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
+import { SemanticLabel } from "@/components/semantic-label";
 import { addLocalDays, formatLocalDate } from "@/lib/local-date";
 
 type CriteriaType = SaveChallengePayload["criteria_type"];
@@ -354,7 +356,7 @@ export function AdminChallenges() {
   
     switch (challenge.criteria_type) {
       case "workout_type_count":
-        return i18n("value0Value1Workouts1b9ac0e", {value0: count, value1: String(cv.type_filter ?? "targeted")});
+        return i18n("value0Value1Workouts1b9ac0e", {value0: count, value1: semanticLabel(cv.type_filter ?? "targeted", i18n)});
       case "pr_count":
         return i18n("value0Prs11cc809", {value0: count});
       case "custom": {
@@ -714,7 +716,7 @@ export function AdminChallenges() {
 
               {saveMutation.isError ? (
                 <p className="text-sm" style={{ color: "var(--primary)" }}>
-                  {saveMutation.error instanceof Error ? saveMutation.error.message : i18n("challengeCouldNotBeSavedec78ef0")}
+                  {saveMutation.error instanceof Error ? localizeError(saveMutation.error, i18n) : i18n("challengeCouldNotBeSavedec78ef0")}
                 </p>
               ) : null}
             </div>
@@ -792,7 +794,7 @@ export function AdminChallenges() {
                                     : "var(--muted)",
                             }}
                           >
-                            {status}
+                            <SemanticLabel value={status} />
                           </span>
                         </div>
 
@@ -905,7 +907,7 @@ export function AdminChallenges() {
                             <tr key={participant.user_id} style={{ borderTop: "1px solid var(--border)" }}>
                               <td className="px-4 py-3">{participant.nickname || participant.user_id}</td>
                               <td className="px-4 py-3" style={{ color: "var(--muted)" }}>
-                                {participant.role || i18n("unknownbc7819b")}
+                                {participant.role ? <SemanticLabel value={participant.role} /> : i18n("unknownbc7819b")}
                               </td>
                               <td className="px-4 py-3">{participant.progress}</td>
                               <td className="px-4 py-3">{participant.target}</td>

@@ -11,6 +11,8 @@ import {
   type PushSubscriptionPayload,
 } from "@/api/notifications";
 import { clearBrowserPushSubscription, registerAppServiceWorker } from "@/lib/push-subscription";
+import { ApiError } from "@/api/client";
+import { localizeError } from "@/i18n/presentation";
 
 const PUSH_CONFIG_CACHE = "milos-push-config-v1";
 const PUSH_CONFIG_REQUEST = "/__milos_push_config__";
@@ -231,7 +233,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
         if (!cancelled) {
           setEnabled(false);
           setState("error");
-          setError(caught instanceof Error ? caught.message : i18n("pushInitializationError"));
+          setError(caught instanceof ApiError ? localizeError(caught, i18n) : i18n("pushInitializationError"));
         }
       }
     }
@@ -255,7 +257,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
       ) {
         void syncSubscription(token, Notification.permission === "granted").catch((caught) => {
           setState("error");
-          setError(caught instanceof Error ? caught.message : i18n("pushSynchronizationError"));
+          setError(caught instanceof ApiError ? localizeError(caught, i18n) : i18n("pushSynchronizationError"));
         });
       }
     }
@@ -288,7 +290,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
     } catch (caught) {
       setEnabled(false);
       setState("error");
-      setError(caught instanceof Error ? caught.message : i18n("pushEnableError"));
+      setError(caught instanceof ApiError ? localizeError(caught, i18n) : i18n("pushEnableError"));
       return false;
     } finally {
       setBusy(false);
@@ -309,7 +311,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
       return true;
     } catch (caught) {
       setState("error");
-      setError(caught instanceof Error ? caught.message : i18n("pushDisableError"));
+      setError(caught instanceof ApiError ? localizeError(caught, i18n) : i18n("pushDisableError"));
       return false;
     } finally {
       setBusy(false);
@@ -326,7 +328,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
     } catch (caught) {
       setEnabled(false);
       setState("error");
-      setError(caught instanceof Error ? caught.message : i18n("pushRefreshError"));
+      setError(caught instanceof ApiError ? localizeError(caught, i18n) : i18n("pushRefreshError"));
       return false;
     }
   }

@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
@@ -224,7 +225,7 @@ export function ProfilePage() {
         setPersonalSuccess(i18n("profileUpdatedbcf7629"));
       }
     } catch (err) {
-      setPersonalError(err instanceof Error ? err.message : i18n("updateFailed19a9955"));
+      setPersonalError(err instanceof Error ? localizeError(err, i18n) : i18n("updateFailed19a9955"));
     } finally {
       setPersonalPending(false);
     }
@@ -239,7 +240,7 @@ export function ProfilePage() {
       await signOutAllDevices(tokens.access_token);
       signOut();
     } catch (error) {
-      setSecurityError(error instanceof Error ? error.message : i18n("couldNotRevokeSessions41a1176"));
+      setSecurityError(error instanceof Error ? localizeError(error, i18n) : i18n("couldNotRevokeSessions41a1176"));
       setSecurityPending(false);
     }
   }
@@ -265,7 +266,7 @@ export function ProfilePage() {
       broadcastUserUpdate(result.user);
       setAvatarPreview(result.user.avatar_url);
     } catch (err) {
-      setAvatarError(err instanceof Error ? err.message : i18n("avatarUploadFailed8d620ac"));
+      setAvatarError(err instanceof Error ? localizeError(err, i18n) : i18n("avatarUploadFailed8d620ac"));
     } finally {
       setAvatarPending(false);
     }

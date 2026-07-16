@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 
@@ -141,7 +142,7 @@ export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
 
             {reportMutation.error instanceof Error && (
               <p className="text-xs font-semibold" style={{ color: "var(--danger)" }}>
-                {reportMutation.error.message}
+                {localizeError(reportMutation.error, i18n)}
               </p>
             )}
 

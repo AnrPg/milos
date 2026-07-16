@@ -13,6 +13,8 @@ import { useState } from "react";
 import { fetchAdminUsers } from "@/api/admin-users";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
+import { SemanticLabel } from "@/components/semantic-label";
+import { localizeError } from "@/i18n/presentation";
 
 export function AdminUsersDirectory() {
   const i18n = useUiTranslations();
@@ -78,7 +80,8 @@ export function AdminUsersDirectory() {
 
         <section className="grid gap-3">
           {usersQuery.isLoading ? <p className="p-5 text-sm" style={{ color: "var(--muted)" }}>{i18n("loadingUsersb6443c9")}</p> : null}
-          {!usersQuery.isLoading && users.length === 0 ? <p className="rounded-2xl p-5 text-sm" style={{ background: "var(--panel)", color: "var(--muted)" }}>{i18n("noUsersMatchThisView93693f5")}</p> : null}
+          {usersQuery.isError ? <p className="rounded-2xl p-5 text-sm" role="alert" style={{ background: "var(--panel)", color: "var(--danger)" }}>{localizeError(usersQuery.error, i18n)}</p> : null}
+          {!usersQuery.isLoading && !usersQuery.isError && users.length === 0 ? <p className="rounded-2xl p-5 text-sm" style={{ background: "var(--panel)", color: "var(--muted)" }}>{i18n("noUsersMatchThisView93693f5")}</p> : null}
           {users.map((user) => (
             <Link
               key={user.id}
@@ -88,10 +91,10 @@ export function AdminUsersDirectory() {
             >
               <div>
                 <p className="font-semibold" style={{ color: "var(--text)" }}>{user.nickname}</p>
-                <p className="mt-1 text-xs uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>{user.role}</p>
+                <p className="mt-1 text-xs uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}><SemanticLabel value={user.role} /></p>
               </div>
-              <span className="text-sm" style={{ color: "var(--muted)" }}>{user.account_status}</span>
-              <span className="text-sm" style={{ color: "var(--muted)" }}>{user.finance_status ?? i18n("noFinanceProfilef804f44")}</span>
+              <span className="text-sm" style={{ color: "var(--muted)" }}><SemanticLabel value={user.account_status} /></span>
+              <span className="text-sm" style={{ color: "var(--muted)" }}>{user.finance_status ? <SemanticLabel value={user.finance_status} /> : i18n("noFinanceProfilef804f44")}</span>
               <span className="text-sm font-semibold" style={{ color: "var(--primary)" }}>{i18n("open6f4789b")}</span>
             </Link>
           ))}

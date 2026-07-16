@@ -8,12 +8,14 @@
 
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
 import { fetchAdminAnalyticsSummary } from "@/api/analytics";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
+import { SemanticLabel } from "@/components/semantic-label";
 
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
@@ -91,7 +93,7 @@ function BreakdownList({ title, rows }: { title: string; rows: [string, unknown]
           {numericRows.map(([label, value]) => (
             <div key={label}>
               <div className="flex items-center justify-between gap-3 text-sm">
-                <span className="capitalize text-[var(--text-soft)]">{label.replaceAll("_", " ")}</span>
+                <span className="capitalize text-[var(--text-soft)]"><SemanticLabel value={label} /></span>
                 <span className="font-bold text-[var(--text)]">{formatCount(uiLocale, value)}</span>
               </div>
               <div className="mt-2 h-2 rounded-full bg-[var(--panel-muted)]">
@@ -194,7 +196,7 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
 
         {summaryQuery.error instanceof Error ? (
           <p className="rounded-2xl border border-[color:var(--danger)] bg-[color-mix(in_srgb,var(--danger)_15%,transparent)] p-4 text-sm text-[var(--danger)]">
-            {summaryQuery.error.message}
+            {localizeError(summaryQuery.error, i18n)}
           </p>
         ) : null}
 
@@ -301,7 +303,7 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
             <dl className="mt-5 space-y-4 text-sm">
               <div className="flex justify-between gap-4">
                 <dt className="text-[var(--muted)]">{i18n("financeAggregated28a516")}</dt>
-                <dd className="font-bold capitalize">{metricText(dashboardFinance, "aggregate_status")}</dd>
+                <dd className="font-bold capitalize"><SemanticLabel value={metricText(dashboardFinance, "aggregate_status")} /></dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-[var(--muted)]">{i18n("lowRatingReviews928d645")}</dt>

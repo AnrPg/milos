@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useState } from "react";
 
 import { ApiError } from "@/api/client";
@@ -19,6 +20,8 @@ import { ChatSection } from "@/components/chat/ChatSection";
 import { WorkoutPreviewDetail, type PreviewSection } from "@/components/workouts/WorkoutPreviewDetail";
 import { workoutTypeColor } from "@/lib/workout-colors";
 import { downloadIcsEvent } from "@/lib/ics";
+import { SemanticLabel } from "@/components/semantic-label";
+import { LocalizedScore } from "@/components/localized-score";
 
 type Props = {
   assignment: AssignedWorkoutRecord;
@@ -83,7 +86,7 @@ export function AssignedWorkoutPanel({
       onDeleted?.(assignment.id);
       onClose();
     } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : i18n("failedToDeleteAssignmentde15c58"));
+      setDeleteError(err instanceof Error ? localizeError(err, i18n) : i18n("failedToDeleteAssignmentde15c58"));
     } finally {
       setDeleting(false);
     }
@@ -103,7 +106,7 @@ export function AssignedWorkoutPanel({
       if (err instanceof ApiError && err.status === 422) {
         setRejectError(i18n("thisWorkoutIsAlreadyRejected9605eb6"));
       } else {
-        setRejectError(err instanceof Error ? err.message : i18n("failedToRejectWorkout6939c34"));
+        setRejectError(err instanceof Error ? localizeError(err, i18n) : i18n("failedToRejectWorkout6939c34"));
       }
     } finally {
       setRejecting(false);
@@ -125,7 +128,7 @@ export function AssignedWorkoutPanel({
       onRescheduled?.(updated);
       onClose();
     } catch (err) {
-      setRescheduleError(err instanceof Error ? err.message : i18n("couldNotReschedulefaa6dd2"));
+      setRescheduleError(err instanceof Error ? localizeError(err, i18n) : i18n("couldNotReschedulefaa6dd2"));
     } finally {
       setRescheduleSaving(false);
     }
@@ -160,7 +163,7 @@ export function AssignedWorkoutPanel({
                 className="truncate text-xs font-semibold uppercase tracking-[0.2em]"
                 style={{ color: workoutTypeColor(assignment.workout.type) }}
               >
-                {assignment.workout.type}
+                <SemanticLabel value={assignment.workout.type} />
               </p>
               {assignment.workout.is_team_workout ? (
                 <span
@@ -425,7 +428,7 @@ export function AssignedWorkoutPanel({
                             {score.section_name ?? score.section_id}
                           </span>
                           <span className="text-sm font-semibold" style={{ color: "var(--success)" }}>
-                            {score.value}{score.unit ? (score.unit) : ""}
+                            <LocalizedScore value={score.value} scoreType={score.score_type} unit={score.unit} />
                           </span>
                         </div>
                       ))}

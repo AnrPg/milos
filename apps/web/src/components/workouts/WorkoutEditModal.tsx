@@ -4,6 +4,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -54,7 +55,7 @@ export function WorkoutEditModal({
       await reopenWorkout(accessToken, workoutId);
       router.push(`/admin/workouts/new?draft=${workoutId}&is_reopen=true`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : i18n("failedToReopenWorkoutf279a52"));
+      setError(err instanceof Error ? localizeError(err, i18n) : i18n("failedToReopenWorkoutf279a52"));
       setBusy(null);
     }
   }
@@ -78,7 +79,7 @@ export function WorkoutEditModal({
             : "";
       router.push(`/admin/workouts/new?draft=${draft.id}${substituteParam}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : i18n("failedToDuplicateWorkouta77970b"));
+      setError(err instanceof Error ? localizeError(err, i18n) : i18n("failedToDuplicateWorkouta77970b"));
       setBusy(null);
     }
   }

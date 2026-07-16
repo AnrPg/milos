@@ -8,6 +8,8 @@
 
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
+import { SemanticLabel } from "@/components/semantic-label";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -364,13 +366,13 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">{i18n("memberFinanceProfile6f16152")}</p>
           <h1 className="mt-3 break-all text-3xl font-black md:text-4xl">{userId}</h1>
           <p className="mt-2 text-sm text-[var(--muted)]">
-            {i18n("statusbae7d5b")} {field(membership, "status", i18n("noMembershipb174349"))} {i18n("type3d87766")} {field(membership, "user_type_snapshot", "unknown")}
+            {i18n("statusbae7d5b")} {membership ? <SemanticLabel value={field(membership, "status")} /> : i18n("noMembershipb174349")} {i18n("type3d87766")} <SemanticLabel value={field(membership, "user_type_snapshot", "unknown")} />
           </p>
           <div className="mt-5 inline-flex rounded-full bg-[var(--text)] px-5 py-3 text-sm font-black text-[var(--primary-contrast)]">
             {i18n("availableCredit245f0e1")} {money(uiLocale, creditBalance)}
           </div>
           <div className="mt-3 inline-flex rounded-full bg-[color-mix(in_srgb,var(--success)_18%,transparent)] px-5 py-3 text-sm font-black text-[var(--success)]">
-            {i18n("entitlement8994749")} {field(entitlement, "status", "inactive")} · {field(entitlement, "source", i18n("notEvaluated4bb5e31"))}
+            {i18n("entitlement8994749")} <SemanticLabel value={field(entitlement, "status", "inactive")} /> · {entitlement ? <SemanticLabel value={field(entitlement, "source")} /> : i18n("notEvaluated4bb5e31")}
           </div>
         </section>
 
@@ -946,7 +948,7 @@ function InvoiceHistory({
                 <div>
                   <p className="font-black">{field(row, "invoice_number", id)}</p>
                   <p className="text-sm text-[var(--muted)]">
-                    {status} {i18n("totald6cf831")} {money(uiLocale, row.total_cents)} {i18n("due6e49fc0")} {money(uiLocale, row.balance_due_cents)}
+                    <SemanticLabel value={status} /> {i18n("totald6cf831")} {money(uiLocale, row.total_cents)} {i18n("due6e49fc0")} {money(uiLocale, row.balance_due_cents)}
                   </p>
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--primary)]">
                     {i18n("due30cdf73")} {field(row, "due_date", i18n("notSetef374c5"))}
@@ -1027,7 +1029,7 @@ function InvoiceFileActions({
       if (!res.ok) throw new Error(i18n("uploadFailed7c67e1c") + (res.status));
       onRefresh();
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : i18n("uploadFailedad0d060"));
+      setUploadError(err instanceof Error ? localizeError(err, i18n) : i18n("uploadFailedad0d060"));
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -1061,7 +1063,7 @@ function InvoiceFileActions({
       setEditing(false);
       onRefresh();
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : i18n("saveFailed0a44446"));
+      setSaveError(err instanceof Error ? localizeError(err, i18n) : i18n("saveFailed0a44446"));
     } finally {
       setSaving(false);
     }
@@ -1193,8 +1195,9 @@ function SubmitButton({
 }
 
 function ErrorText({ error }: { error: unknown }) {
+  const i18n = useUiTranslations();
   if (!(error instanceof Error)) return null;
-  return <p className="text-sm font-semibold text-[var(--danger)]">{error.message}</p>;
+  return <p className="text-sm font-semibold text-[var(--danger)]">{localizeError(error, i18n)}</p>;
 }
 
 function History({

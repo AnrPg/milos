@@ -8,6 +8,8 @@
 
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError, semanticLabel } from "@/i18n/presentation";
+import { SemanticLabel } from "@/components/semantic-label";
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -207,9 +209,9 @@ export function MemberPanel({
                 <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{i18n("membership53bc967")}</p>
                 {profile.membership ? (
                   <>
-                    <InfoRow label={i18n("statusbae7d5b")} value={field(profile.membership, "status")} color={statusColor(field(profile.membership, "status"))} />
+                    <InfoRow label={i18n("statusbae7d5b")} value={semanticLabel(field(profile.membership, "status"), i18n)} color={statusColor(field(profile.membership, "status"))} />
                     <InfoRow label={i18n("expiresa99be3d")} value={field(profile.membership, "expires_on") || "—"} />
-                    <InfoRow label={i18n("entitlement8994749")} value={field(profile.membership, "entitlement_status") || "—"} />
+                    <InfoRow label={i18n("entitlement8994749")} value={field(profile.membership, "entitlement_status") ? semanticLabel(field(profile.membership, "entitlement_status"), i18n) : "—"} />
                     <InfoRow label={i18n("creditBalance471f025")} value={money(uiLocale, profile.credit_balance)} />
                   </>
                 ) : (
@@ -258,7 +260,7 @@ export function MemberPanel({
                       {assignPackageMutation.isPending ? i18n("assigning4d16a1a") : i18n("assign2444928")}
                     </button>
                     {assignPackageMutation.error instanceof Error && (
-                      <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{assignPackageMutation.error.message}</p>
+                      <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{localizeError(assignPackageMutation.error, i18n)}</p>
                     )}
                   </div>
                 )}
@@ -273,7 +275,7 @@ export function MemberPanel({
                         className="rounded-full px-2 py-0.5 text-xs font-semibold"
                         style={{ color: statusColor(field(sub, "status")), background: "color-mix(in srgb, var(--bg) 30%, transparent)" }}
                       >
-                        {field(sub, "status")}
+                        <SemanticLabel value={field(sub, "status")} />
                       </span>
                     </div>
                     <p className="text-xs mt-0.5" style={{ color: "var(--dim)" }}>
@@ -373,7 +375,7 @@ export function MemberPanel({
                     {createInvoiceMutation.isPending ? i18n("creating94d7d8e") : i18n("createInvoicea0567cf")}
                   </button>
                   {createInvoiceMutation.error instanceof Error && (
-                    <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{createInvoiceMutation.error.message}</p>
+                    <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{localizeError(createInvoiceMutation.error, i18n)}</p>
                   )}
                 </div>
               )}
@@ -480,7 +482,7 @@ export function MemberPanel({
                     {recordPaymentMutation.isPending ? i18n("recording72f9eb4") : i18n("recordPayment86e5632")}
                   </button>
                   {recordPaymentMutation.error instanceof Error && (
-                    <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{recordPaymentMutation.error.message}</p>
+                    <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{localizeError(recordPaymentMutation.error, i18n)}</p>
                   )}
                 </div>
               )}
@@ -535,7 +537,7 @@ export function MemberPanel({
                           {money(uiLocale, entry.amount_cents)}
                         </span>
                         <span className="text-xs font-semibold" style={{ color: statusColor(field(entry, "status")) }}>
-                          {field(entry, "status")}
+                          <SemanticLabel value={field(entry, "status")} />
                         </span>
                       </div>
                       {field(entry, "description") && (
@@ -622,7 +624,7 @@ function InvoiceCard({
       if (!res.ok) throw new Error(i18n("uploadFailed7c67e1c") + (res.status));
       onUploaded();
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : i18n("uploadFailedad0d060"));
+      setUploadError(err instanceof Error ? localizeError(err, i18n) : i18n("uploadFailedad0d060"));
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -656,7 +658,7 @@ function InvoiceCard({
       setEditing(false);
       onUploaded();
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : i18n("saveFailed0a44446"));
+      setSaveError(err instanceof Error ? localizeError(err, i18n) : i18n("saveFailed0a44446"));
     } finally {
       setSaving(false);
     }
@@ -681,7 +683,7 @@ function InvoiceCard({
             className="text-xs font-semibold"
             style={{ color: statusColor(status) }}
           >
-            {status}
+            <SemanticLabel value={status} />
           </span>
 
           {status === "draft" && (

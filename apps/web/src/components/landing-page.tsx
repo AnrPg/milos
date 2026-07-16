@@ -6,6 +6,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError, semanticLabel } from "@/i18n/presentation";
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
@@ -26,6 +27,8 @@ import { HelpIcon, InfoModal } from "@/components/InfoModal";
 import { ReviewFormPanel } from "@/components/panels/ReviewFormPanel";
 import { WellbeingFormPanel } from "@/components/panels/WellbeingFormPanel";
 import { useSession } from "@/components/session-provider";
+import { SemanticLabel } from "@/components/semantic-label";
+import { LocalizedScore } from "@/components/localized-score";
 
 // ── Badge helpers ─────────────────────────────────────────────────────────────
 
@@ -244,7 +247,7 @@ function MemberHero({
       return i18n("maintainedAValue0DayTrainingStreak0dbf33c", {value0: n});
     }
     if (badgeKey.endsWith("_mastery")) {
-      const type = badgeKey.replace("_mastery", "").replace(/_/g, " ");
+      const type = semanticLabel(badgeKey.replace("_mastery", ""), i18n);
       return i18n("achievedMasteryInValue01e7e1ec", {value0: type});
     }
     return i18n("trainingMilestoneAchieved56dc32b");
@@ -408,6 +411,7 @@ function MemberHero({
 
 export function LandingPage() {
   const i18n = useUiTranslations();
+  const uiLocale = useUiLocale();
   const { currentUser, rotate, tokens } = useSession();
   const [leaderboardMode, setLeaderboardMode] = useState<"weekly" | "monthly">("weekly");
   const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null);
@@ -495,7 +499,7 @@ export function LandingPage() {
   if (landingQuery.isError || !landing) {
     const message =
       landingQuery.error instanceof Error
-        ? landingQuery.error.message
+        ? localizeError(landingQuery.error, i18n)
         : i18n("theLandingPageCouldNotBeLoaded0cdbfb4");
 
     return (
@@ -795,7 +799,7 @@ export function LandingPage() {
                     <div key={note.id} className="rounded-[1.5rem] px-4 py-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
                       <p className="text-sm leading-6" style={{ color: "var(--text-soft)" }}>{note.body}</p>
                       <p className="mt-3 text-xs uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                        {new Date(note.inserted_at).toLocaleString()}
+                        {new Date(note.inserted_at).toLocaleString(uiLocale)}
                       </p>
                     </div>
                   ))
@@ -964,7 +968,7 @@ export function LandingPage() {
                                 border: isActive ? "1px solid var(--primary)" : "1px solid var(--border)",
                               }}
                             >
-                              {type.replace("_", " ")}
+                              <SemanticLabel value={type} />
                             </button>
                           );
                         })}
@@ -1063,14 +1067,14 @@ export function LandingPage() {
                             {execution.workout_title ?? i18n("workout39463a5")}
                           </p>
                           <p className="mt-1 text-xs uppercase tracking-[0.18em]" style={{ color: "var(--primary)" }}>
-                            {(execution.workout_type ?? "session").replace("_", " ")}
-                            {execution.scale_level_slug ? "· " + (execution.scale_level_slug) : ""}
+                            <SemanticLabel value={execution.workout_type ?? "session"} />
+                            {execution.scale_level_slug ? <>· <SemanticLabel value={execution.scale_level_slug} /></> : ""}
                           </p>
                         </div>
                         <div className={historyView === "list" ? "shrink-0 text-end" : "mt-3"}>
                           <p className="text-sm" style={{ color: "var(--muted)" }}>
                             {execution.completed_at_utc
-                              ? new Date(execution.completed_at_utc).toLocaleDateString()
+                              ? new Date(execution.completed_at_utc).toLocaleDateString(uiLocale)
                               : i18n("inProgressb6bd42e")}
                           </p>
                           <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
@@ -1181,16 +1185,16 @@ export function LandingPage() {
                   <div className="grid gap-3 sm:grid-cols-3">
                     <div className="rounded-2xl px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
                       <p className="text-xs uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{i18n("type3deb745")}</p>
-                      <p className="mt-2 text-sm font-semibold" style={{ color: "var(--text)" }}>{selectedExecution.workout_type ?? i18n("unknownbc7819b")}</p>
+                      <p className="mt-2 text-sm font-semibold" style={{ color: "var(--text)" }}>{selectedExecution.workout_type ? <SemanticLabel value={selectedExecution.workout_type} /> : i18n("unknownbc7819b")}</p>
                     </div>
                     <div className="rounded-2xl px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
                       <p className="text-xs uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{i18n("scalea29f025")}</p>
-                      <p className="mt-2 text-sm font-semibold" style={{ color: "var(--text)" }}>{selectedExecution.scale_level_slug ?? i18n("base077fe9c")}</p>
+                      <p className="mt-2 text-sm font-semibold" style={{ color: "var(--text)" }}><SemanticLabel value={selectedExecution.scale_level_slug ?? "base"} /></p>
                     </div>
                     <div className="rounded-2xl px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
                       <p className="text-xs uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{i18n("completed1798b3b")}</p>
                       <p className="mt-2 text-sm font-semibold" style={{ color: "var(--text)" }}>
-                        {selectedExecution.completed_at_utc ? new Date(selectedExecution.completed_at_utc).toLocaleString() : i18n("inProgressb6bd42e")}
+                        {selectedExecution.completed_at_utc ? new Date(selectedExecution.completed_at_utc).toLocaleString(uiLocale) : i18n("inProgressb6bd42e")}
                       </p>
                     </div>
                   </div>
@@ -1206,7 +1210,7 @@ export function LandingPage() {
                             <span className="font-semibold" style={{ color: "var(--text)" }}>
                               {score.section_name ?? score.section_id}
                             </span>
-                            : {String(score.value)} {score.unit ?? ""}
+                            : <LocalizedScore value={score.value} scoreType={score.score_type} unit={score.unit} />
                           </div>
                         ))
                       )}
@@ -1238,7 +1242,7 @@ export function LandingPage() {
                 </div>
               ) : (
                 <p className="mt-6 text-sm" style={{ color: "var(--primary-strong)" }}>
-                  {selectedExecutionQuery.error instanceof Error ? selectedExecutionQuery.error.message : i18n("executionDetailsCouldNotBeLoaded30a9f0a")}
+                  {selectedExecutionQuery.error instanceof Error ? localizeError(selectedExecutionQuery.error, i18n) : i18n("executionDetailsCouldNotBeLoaded30a9f0a")}
                 </p>
               )}
             </div>

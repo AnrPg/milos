@@ -5,12 +5,14 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { fetchMyInjuries, markMyInjuryHealed, reportInjury } from "@/api/wellbeing";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
+import { SemanticLabel } from "@/components/semantic-label";
 
 export function MyWellbeing() {
   const i18n = useUiTranslations();
@@ -91,9 +93,9 @@ export function MyWellbeing() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <p className="font-bold">
-                    {String(injury.body_area)} · {String(injury.severity)}
+                    {String(injury.body_area)} · <SemanticLabel value={injury.severity} />
                   </p>
-                  <p className="text-sm text-[var(--muted)]">{i18n("statusbae7d5b")} {String(injury.status)}</p>
+                  <p className="text-sm text-[var(--muted)]">{i18n("statusbae7d5b")} <SemanticLabel value={injury.status} /></p>
                 </div>
                 {injury.status === "active" ? (
                   <button
@@ -115,6 +117,7 @@ export function MyWellbeing() {
 }
 
 function ErrorText({ error }: { error: unknown }) {
+  const i18n = useUiTranslations();
   if (!(error instanceof Error)) return null;
-  return <p className="text-sm font-semibold text-[var(--danger)]">{error.message}</p>;
+  return <p className="text-sm font-semibold text-[var(--danger)]">{localizeError(error, i18n)}</p>;
 }

@@ -11,6 +11,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminMarkInjuryHealed, adminReportInjury, fetchAdminInjuries } from "@/api/wellbeing";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
+import { SemanticLabel } from "@/components/semantic-label";
+import { semanticLabel } from "@/i18n/presentation";
 
 export function AdminWellbeing() {
   const i18n = useUiTranslations();
@@ -169,10 +171,10 @@ export function AdminWellbeing() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <p className="font-bold">
-                    {String(injury.body_area)} · {String(injury.severity)}
+                    {String(injury.body_area)} · <SemanticLabel value={injury.severity} />
                   </p>
                   <p className="text-sm text-[var(--muted)]">
-                    {i18n("statusbae7d5b")} {String(injury.status)} {i18n("userefbb4ac")} {String(injury.user_id)} · {String(injury.visibility)}
+                    {i18n("statusbae7d5b")} <SemanticLabel value={injury.status} /> {i18n("userefbb4ac")} {String(injury.user_id)} · <SemanticLabel value={injury.visibility} />
                   </p>
                 </div>
                 {injury.status === "active" ? (
@@ -254,6 +256,7 @@ function SelectField({
   options: string[];
   onChange: (value: string) => void;
 }) {
+  const i18n = useUiTranslations();
   return (
     <label>
       <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--muted)]">{label}</span>
@@ -264,7 +267,7 @@ function SelectField({
       >
         {options.map((option) => (
           <option key={option} value={option}>
-            {option.replace(/_/g, " ")}
+            {semanticLabel(option, i18n)}
           </option>
         ))}
       </select>

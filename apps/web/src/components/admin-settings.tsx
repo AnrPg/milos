@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -39,7 +40,7 @@ function SaveBar({
   onReset: () => void;
 }) {
   const i18n = useUiTranslations();
-  const msg = error instanceof Error ? error.message : null;
+  const msg = error instanceof Error ? localizeError(error, i18n) : null;
   return (
     <div className="flex flex-wrap items-center gap-3 pt-2">
       <button

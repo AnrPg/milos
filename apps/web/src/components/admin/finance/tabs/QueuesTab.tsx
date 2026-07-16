@@ -11,6 +11,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { fetchFinanceQueues, type FinanceRecord } from "@/api/finance";
+import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
 
 type QueueKey = "expiring" | "pending" | "overdue" | "rewards" | "promos";
@@ -127,7 +128,7 @@ export function QueuesTab() {
             {active === "rewards" && rows.map((row, i) => (
               <QueueRow key={field(row, "id", String(i))} last={i === rows.length - 1}>
                 <span style={{ color: "var(--text)" }}>{field(row, "nickname", field(row, "recipient_user_id"))}</span>
-                <span style={{ color: "var(--muted)" }}>{field(row, "reward_type")} · {field(row, "reward_value")}</span>
+                <span style={{ color: "var(--muted)" }}><SemanticLabel value={field(row, "reward_type")} /> · {field(row, "reward_value")}</span>
               </QueueRow>
             ))}
 

@@ -163,7 +163,7 @@ function AllowanceField({ label, limit, period, onLimit, onPeriod }: { label: st
     <div className="space-y-2 rounded-xl p-3" style={{ background: "var(--bg-soft)" }}>
       <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{label}</p>
       <input
-        aria-label={(label) + " limit"}
+        aria-label={i18n("allowanceLimitLabel", {label})}
         className="w-full rounded-lg px-3 py-2 text-sm"
         style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
         value={limit}

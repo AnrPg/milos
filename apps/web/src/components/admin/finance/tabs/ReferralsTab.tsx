@@ -6,6 +6,8 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError, semanticLabel } from "@/i18n/presentation";
+import { SemanticLabel } from "@/components/semantic-label";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -73,7 +75,7 @@ export function ReferralsTab() {
 
   function rewardDescriptor(reward: FinanceRecord | null | undefined) {
     if (!reward) return i18n("notIssuedff7515d");
-    return i18n("value0Value1f5d96de", {value0: field(reward, "reward_type"), value1: field(reward, "reward_value")});
+    return i18n("value0Value1f5d96de", {value0: semanticLabel(field(reward, "reward_type"), i18n), value1: field(reward, "reward_value")});
   }
 
   function eventStatusText(status: string) {
@@ -229,7 +231,7 @@ export function ReferralsTab() {
               <div>
                 <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{field(p, "name")}</p>
                 <p className="mt-0.5 text-xs" style={{ color: "var(--dim)" }}>
-                  {field(p, "reward_type")} · {field(p, "reward_value")} ·{" "}
+                  <SemanticLabel value={field(p, "reward_type")} /> · {field(p, "reward_value")} ·{" "}
                   {p.active !== false ? i18n("activea733b80") : i18n("inactive09af574")}
                 </p>
               </div>
@@ -317,7 +319,7 @@ export function ReferralsTab() {
             >
               <div>
                 <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-                  {field(r, "reward_type")} · {field(r, "reward_value")}
+                  <SemanticLabel value={field(r, "reward_type")} /> · {field(r, "reward_value")}
                 </p>
                 <p className="mt-0.5 text-xs" style={{ color: "var(--dim)" }}>
                   {displayName(r, "recipient_nickname", "recipient_user_id")} · {rewardStatusText(field(r, "status"))}
@@ -400,7 +402,7 @@ export function ReferralsTab() {
                   onChange={(e) => setProgramForm({ ...programForm, reward_type: e.target.value })}
                 >
                   {["credit", "discount", "free_period", "manual"].map((v) => (
-                    <option key={v} value={v}>{v}</option>
+                    <option key={v} value={v}>{semanticLabel(v, i18n)}</option>
                   ))}
                 </select>
               </PanelField>
@@ -423,7 +425,7 @@ export function ReferralsTab() {
               {i18n("activea733b80")}
             </label>
             {createProgramMutation.error instanceof Error && (
-              <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{createProgramMutation.error.message}</p>
+              <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(createProgramMutation.error, i18n)}</p>
             )}
           </div>
         </SidePanel>
@@ -503,7 +505,7 @@ export function ReferralsTab() {
               ]}
             />
             {updateProgramMutation.error instanceof Error ? (
-              <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{updateProgramMutation.error.message}</p>
+              <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(updateProgramMutation.error, i18n)}</p>
             ) : null}
           </div>
         </SidePanel>
@@ -570,14 +572,14 @@ export function ReferralsTab() {
             ]}
           />
           {createRewardMutation.error instanceof Error ? (
-            <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{createRewardMutation.error.message}</p>
+            <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(createRewardMutation.error, i18n)}</p>
           ) : null}
         </SidePanel>
       ) : null}
 
       {selectedReward ? (
         <SidePanel
-          title={(field(selectedReward, "reward_type")) + " · " + (field(selectedReward, "reward_value"))}
+          title={`${semanticLabel(field(selectedReward, "reward_type"), i18n)} · ${field(selectedReward, "reward_value")}`}
           subtitle={i18n("referralReward6fc3bba")}
           onClose={() => setParam({ "referral-reward": null })}
           footer={
@@ -605,7 +607,7 @@ export function ReferralsTab() {
               [i18n("referral1c6984f"), field(selectedReward, "referral_label", field(selectedReward, "referral_event_id"))],
               [i18n("recipient9034326"), displayName(selectedReward, "recipient_nickname", "recipient_user_id")],
               [i18n("membership53bc967"), field(selectedReward, "membership_id")],
-              [i18n("rewardType9e0f28d"), field(selectedReward, "reward_type")],
+              [i18n("rewardType9e0f28d"), semanticLabel(field(selectedReward, "reward_type"), i18n)],
               [i18n("rewardValue8cb933f"), field(selectedReward, "reward_value")],
               [i18n("appliedAtfa96f18"), dateText(selectedReward.applied_at)],
               [i18n("createdaccf40c"), dateText(selectedReward.inserted_at)],
@@ -618,7 +620,7 @@ export function ReferralsTab() {
             </Notice>
           ) : null}
           {updateRewardMutation.error instanceof Error ? (
-            <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{updateRewardMutation.error.message}</p>
+            <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(updateRewardMutation.error, i18n)}</p>
           ) : null}
         </SidePanel>
       ) : null}
@@ -784,6 +786,7 @@ function PanelSelect({
   options: string[];
   onChange: (value: string) => void;
 }) {
+  const i18n = useUiTranslations();
   return (
     <select
       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
@@ -792,7 +795,7 @@ function PanelSelect({
       onChange={(event) => onChange(event.target.value)}
     >
       {options.map((option) => (
-        <option key={option} value={option}>{option}</option>
+        <option key={option} value={option}>{semanticLabel(option, i18n)}</option>
       ))}
     </select>
   );

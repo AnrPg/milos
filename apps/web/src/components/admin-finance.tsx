@@ -7,6 +7,8 @@
 
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError, semanticLabel } from "@/i18n/presentation";
+import { SemanticLabel } from "@/components/semantic-label";
 import Link from "next/link";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -451,7 +453,7 @@ export function AdminFinance() {
                     <div>
                       <p className="font-bold">{field(item, "name", field(item, "code"))}</p>
                       <p className="text-sm text-[var(--muted)]">
-                        {field(item, "code")} · {field(item, "family")} · {field(item, "billing_period")}
+                        {field(item, "code")} · <SemanticLabel value={field(item, "family")} /> · <SemanticLabel value={field(item, "billing_period")} />
                       </p>
                     </div>
                     <p className="font-black">{money(uiLocale, item.base_price_cents)}</p>
@@ -486,7 +488,7 @@ export function AdminFinance() {
                   >
                     <p className="font-bold">{field(user, "nickname")}</p>
                     <p className="text-sm text-[var(--muted)]">
-                      {field(user, "identity_role")} · {field(membership, "status", i18n("noMembershipb174349"))}
+                      <SemanticLabel value={field(user, "identity_role")} /> · {membership ? <SemanticLabel value={field(membership, "status")} /> : i18n("noMembershipb174349")}
                     </p>
                     <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-[var(--primary)]">
                       {field(membership, "package_code", i18n("openProfile7db8d6d"))}
@@ -644,7 +646,7 @@ export function AdminFinance() {
                   <div key={field(program, "id")} className="rounded-2xl border border-[var(--border)] p-4">
                     <p className="font-bold">{field(program, "name")}</p>
                     <p className="text-sm text-[var(--muted)]">
-                      {field(program, "reward_type")} · {field(program, "reward_value")} ·{" "}
+                      <SemanticLabel value={field(program, "reward_type")} /> · {field(program, "reward_value")} ·{" "}
                       {program.active === false ? i18n("inactive09af574") : i18n("activea733b80")}
                     </p>
                   </div>
@@ -692,7 +694,7 @@ export function AdminFinance() {
                   options={referralSearchUsers.map((user) => field(user, "id"))}
                   optionLabel={(id) => {
                     const user = referralSearchUsers.find((item) => field(item, "id") === id);
-                    return (field(user, "nickname", id)) + " · " + (field(user, "identity_role"));
+                    return `${field(user, "nickname", id)} · ${semanticLabel(field(user, "identity_role"), i18n)}`;
                   }}
                   onChange={(referrer_user_id) =>
                     setReferralEventForm({ ...referralEventForm, referrer_user_id })
@@ -705,7 +707,7 @@ export function AdminFinance() {
                   optionLabel={(id) => {
                     const user = referralSearchUsers.find((item) => field(item, "id") === id);
                     const membership = nestedRecord(user, "membership");
-                    return (field(user, "nickname", id)) + " · " + (field(user, "identity_role")) + " · " + (field(membership, "status", i18n("noMembershipb174349")));
+                    return `${field(user, "nickname", id)} · ${semanticLabel(field(user, "identity_role"), i18n)} · ${membership ? semanticLabel(field(membership, "status"), i18n) : i18n("noMembershipb174349")}`;
                   }}
                   onChange={(referred_user_id) => {
                     const user = referralSearchUsers.find((item) => field(item, "id") === referred_user_id);
@@ -756,7 +758,7 @@ export function AdminFinance() {
                   onChange={(referral_event_id) => setReferralRewardForm({ ...referralRewardForm, referral_event_id })}
                 />
                 <p className="rounded-2xl bg-[var(--panel)] p-4 text-sm font-bold text-[var(--muted)]">
-                  {i18n("policyd5a7012")} {field(selectedRewardProgram, "reward_type", i18n("selectAnEvent30b452a"))} ·{" "}
+                  {i18n("policyd5a7012")} {selectedRewardProgram ? <SemanticLabel value={field(selectedRewardProgram, "reward_type")} /> : i18n("selectAnEvent30b452a")} ·{" "}
                   {field(selectedRewardProgram, "reward_value", "0")}
                 </p>
                 <SubmitButton pending={createReferralRewardMutation.isPending}>{i18n("createReward4da5168")}</SubmitButton>
@@ -771,7 +773,7 @@ export function AdminFinance() {
                 <div key={field(event, "id")} className="rounded-2xl border border-[var(--border)] p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <p className="font-bold">{i18n("eventa4e3090")} {field(event, "status")}</p>
+                      <p className="font-bold">{i18n("eventa4e3090")} <SemanticLabel value={field(event, "status")} /></p>
                       <p className="text-sm text-[var(--muted)]">
                         {i18n("referrer548b0b9")} {field(event, "referrer_user_id")} {i18n("referred0d4f978")} {field(event, "referred_user_id")}
                       </p>
@@ -785,7 +787,7 @@ export function AdminFinance() {
                           type="button"
                           onClick={() => updateReferralEventMutation.mutate({ id: field(event, "id"), status })}
                         >
-                          {status}
+                          <SemanticLabel value={status} />
                         </button>
                       ))}
                     </div>
@@ -803,7 +805,7 @@ export function AdminFinance() {
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <p className="font-bold">
-                        {field(reward, "reward_type")} · {field(reward, "status")}
+                        <SemanticLabel value={field(reward, "reward_type")} /> · <SemanticLabel value={field(reward, "status")} />
                       </p>
                       <p className="text-sm text-[var(--muted)]">
                         {i18n("recipient9034326")} {field(reward, "recipient_user_id")} {i18n("valuef18ab8d")} {field(reward, "reward_value")}
@@ -818,7 +820,7 @@ export function AdminFinance() {
                           type="button"
                           onClick={() => updateRewardMutation.mutate({ id: field(reward, "id"), status })}
                         >
-                          {status}
+                          <SemanticLabel value={status} />
                         </button>
                       ))}
                     </div>
@@ -950,8 +952,9 @@ function SubmitButton({
 }
 
 function ErrorText({ error }: { error: unknown }) {
+  const i18n = useUiTranslations();
   if (!(error instanceof Error)) return null;
-  return <p className="text-sm font-semibold text-[var(--danger)]">{error.message}</p>;
+  return <p className="text-sm font-semibold text-[var(--danger)]">{localizeError(error, i18n)}</p>;
 }
 
 function EmptyState({ children }: { children: React.ReactNode }) {

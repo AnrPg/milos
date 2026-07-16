@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -18,6 +19,7 @@ import { useChat } from "@/hooks/useChat";
 import { useUiPrefs } from "@/stores/ui-prefs";
 import { MessageBubble } from "./MessageBubble";
 import { TypingIndicator } from "./TypingIndicator";
+import { SemanticLabel } from "@/components/semantic-label";
 
 interface SearchResult {
   id: string;
@@ -114,7 +116,7 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
       setInput((current) => (current.trim() === draft ? "" : current));
       sendTypingStop();
     } catch (error) {
-      setSendError(error instanceof Error ? error.message : i18n("messageCouldNotBeSent7aa3b0a"));
+      setSendError(error instanceof Error ? localizeError(error, i18n) : i18n("messageCouldNotBeSent7aa3b0a"));
     } finally {
       setIsSending(false);
     }
@@ -201,7 +203,7 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
                       {u.nickname}
                     </p>
                     <p className="text-xs" style={{ color: "var(--dim)" }}>
-                      {u.role}
+                      <SemanticLabel value={u.role} />
                     </p>
                   </div>
                 </button>

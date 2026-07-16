@@ -6,6 +6,7 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import {useUiLocale} from "@/i18n/use-ui-locale";
+import { semanticLabel } from "@/i18n/presentation";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDrag } from "@use-gesture/react";
@@ -21,6 +22,7 @@ import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { subscribeToTopic } from "@/lib/realtime";
 import { useExecutionStore } from "@/stores/execution";
+import { SemanticLabel } from "@/components/semantic-label";
 
 type Step = "type" | "week" | "preview";
 
@@ -341,7 +343,7 @@ function WorkoutsPageContent() {
                     color: "var(--primary)",
                   }}
                 >
-                  {String(section.timer_config.type).replaceAll("_", " ")}
+                  <SemanticLabel value={section.timer_config.type} />
                 </span>
               ) : null}
             </div>
@@ -359,12 +361,12 @@ function WorkoutsPageContent() {
                   <div className="text-sm font-semibold">{exercise.name}</div>
                   <div className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
                     {[
-                      exercise.sets ? (exercise.sets) + " sets" : null,
+                      exercise.sets ? (exercise.sets) + " " + semanticLabel("sets", i18n) : null,
                       exercise.prescription_value
-                        ? (exercise.prescription_value) + " " + (exercise.prescription_unit ?? "").trim()
+                        ? (exercise.prescription_value) + " " + semanticLabel(exercise.prescription_unit ?? "reps", i18n)
                         : null,
                       exercise.load_value
-                        ? (exercise.load_value) + " " + (exercise.load_mode === "pct_1rm" ? i18n("rma904756") : "kg")
+                        ? (exercise.load_value) + " " + (exercise.load_mode === "pct_1rm" ? i18n("rma904756") : semanticLabel("kg", i18n))
                         : exercise.load_mode === "bw"
                           ? i18n("bodyweight")
                           : null,

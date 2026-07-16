@@ -38,7 +38,7 @@ const technicalProperties = new Set([
   "accept", "action", "accent", "apple", "background", "border", "borderBottom", "borderLeft",
   "borderRight", "borderTop", "borderColor", "borderRadius", "className", "color", "content",
   "currency", "dateStyle", "day", "event", "format", "height", "hour", "href", "icon", "id",
-  "inputType", "kind", "localeMatcher", "manifest", "margin", "method", "minute", "month", "name",
+  "inputType", "key", "kind", "localeMatcher", "manifest", "margin", "method", "minute", "month", "name",
   "padding", "pattern", "rel", "role", "scope", "second", "slug", "source", "status", "style",
   "target", "timeStyle", "type", "unit", "value", "variant", "weekday", "width", "year",
 ]);
@@ -133,6 +133,18 @@ function isStyleText(node) {
   return false;
 }
 
+function isComposedJsxCopy(node) {
+  if (!/^\s*[A-Za-z]+[)!]?\s*$/.test(node.text)) return false;
+  if (!ts.isBinaryExpression(node.parent) && !ts.isConditionalExpression(node.parent)) return false;
+
+  let current = node.parent;
+  while (current && !ts.isFunctionLike(current)) {
+    if (ts.isJsxExpression(current)) return true;
+    current = current.parent;
+  }
+  return false;
+}
+
 const failures = [];
 
 for (const filename of sourceFiles(sourceRoot)) {
@@ -195,7 +207,7 @@ for (const filename of sourceFiles(sourceRoot)) {
       (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node))
       && !reportedNodes.has(node)
       && hasWords(node.text)
-      && looksLikeDisplayCopy(node.text)
+      && (looksLikeDisplayCopy(node.text) || isComposedJsxCopy(node))
       && !isStyleText(node)
       && !isTechnicalValue(node.text)
       && !isTechnicalContext(node, sourceFile)

@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -311,7 +312,7 @@ export function ReferralEventWizard({
 
                     {assignMembershipMutation.error instanceof Error && (
                       <p className="text-xs" style={{ color: "var(--primary-strong)" }}>
-                        {assignMembershipMutation.error.message}
+                        {localizeError(assignMembershipMutation.error, i18n)}
                       </p>
                     )}
                   </div>
@@ -385,7 +386,7 @@ export function ReferralEventWizard({
           </button>
           {createEventMutation.error instanceof Error && (
             <p className="text-sm" style={{ color: "var(--primary-strong)" }}>
-              {createEventMutation.error.message}
+              {localizeError(createEventMutation.error, i18n)}
             </p>
           )}
         </div>
@@ -447,7 +448,7 @@ export function ReferralEventWizard({
           </div>
           {(approveEventMutation.error ?? rejectEventMutation.error) instanceof Error && (
             <p className="text-sm" style={{ color: "var(--primary-strong)" }}>
-              {((approveEventMutation.error ?? rejectEventMutation.error) as Error).message}
+              {localizeError(approveEventMutation.error ?? rejectEventMutation.error, i18n)}
             </p>
           )}
         </div>
@@ -546,7 +547,7 @@ export function ReferralEventWizard({
           </div>
           {createRewardMutation.error instanceof Error && (
             <p className="text-sm" style={{ color: "var(--primary-strong)" }}>
-              {createRewardMutation.error.message}
+              {localizeError(createRewardMutation.error, i18n)}
             </p>
           )}
         </div>

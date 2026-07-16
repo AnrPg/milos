@@ -17,6 +17,7 @@ import { DirectMessagesPanel } from "@/components/chat/DirectMessagesPanel";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useSession } from "@/components/session-provider";
 import { subscribeToTopic } from "@/lib/realtime";
+import { SemanticLabel } from "@/components/semantic-label";
 
 const CANVAS_PATHS = ["/admin/workouts/new", "/login"];
 
@@ -378,7 +379,7 @@ export function TopNav() {
                     {currentUser.nickname}
                   </p>
                   <p className="mt-0.5 text-xs uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                    {currentUser.role}
+                    <SemanticLabel value={currentUser.role} />
                   </p>
                 </div>
                 <Link

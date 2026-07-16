@@ -6,6 +6,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { semanticLabel } from "@/i18n/presentation";
 import type { TimerSegment } from "@/api/executions";
 import { buildStepId } from "./progress";
 
@@ -61,13 +62,13 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
   const { exercise } = currentStep ?? steps[steps.length - 1]!;
 
   const prescriptionLabel = exercise.prescription_value
-    ? (exercise.prescription_value) + " " + (exercise.prescription_unit ?? "").trim()
+    ? (exercise.prescription_value) + " " + semanticLabel(exercise.prescription_unit ?? "reps", i18n)
     : null;
 
   const loadLabel = exercise.load_value
     ? exercise.load_mode === "pct_1rm"
       ? (exercise.load_value) + i18n("rma904756")
-      : (exercise.load_value) + " kg"
+      : (exercise.load_value) + " " + semanticLabel("kg", i18n)
     : exercise.load_mode === "bw"
       ? i18n("bw4d64743")
       : null;

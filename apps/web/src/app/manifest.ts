@@ -1,10 +1,18 @@
 import type { MetadataRoute } from "next";
+import { getLocale, getTranslations } from "next-intl/server";
 
-export default function manifest(): MetadataRoute.Manifest {
+import { DEFAULT_LOCALE, isAppLocale, localeDirection } from "@/i18n/locales";
+
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const requestedLocale = await getLocale();
+  const locale = isAppLocale(requestedLocale) ? requestedLocale : DEFAULT_LOCALE;
+  const translate = await getTranslations("Ui");
   return {
     name: "Milos Training",
     short_name: "Milos",
-    description: "Gym scheduling, athlete programming, and workout execution.",
+    description: translate("manifestDescription"),
+    lang: locale,
+    dir: localeDirection(locale),
     start_url: "/",
     display: "standalone",
     background_color: "#0b0d10",

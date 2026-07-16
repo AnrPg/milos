@@ -6,6 +6,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -146,7 +147,7 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
         router.push("/admin/workouts");
       }
     } catch (error: unknown) {
-      setPublishError(error instanceof Error ? error.message : i18n("publishFailed0b74ccb"));
+      setPublishError(error instanceof Error ? localizeError(error, i18n) : i18n("publishFailed0b74ccb"));
       setPublishing(false);
     }
   }

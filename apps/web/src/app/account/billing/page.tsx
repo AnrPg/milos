@@ -13,6 +13,7 @@ import { fetchMyEntitlement, fetchMyFinance, getMyInvoiceDownloadUrl, type Effec
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
+import { SemanticLabel } from "@/components/semantic-label";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -57,7 +58,7 @@ function StatusBadge({ status }: { status: string }) {
         className="inline-block w-1.5 h-1.5 rounded-full"
         style={{ background: color }}
       />
-      {status.replace(/_/g, " ")}
+      <SemanticLabel value={status} />
     </span>
   );
 }
@@ -538,7 +539,7 @@ export default function BillingPage() {
                         </span>
                         <span className="text-xs" style={{ color: "var(--dim)" }}>
                           {payment.payment_method
-                            ? String(payment.payment_method).replace(/_/g, " ")
+                            ? <SemanticLabel value={String(payment.payment_method)} />
                             : i18n("paymentb41a92b")}
                           {payment.paid_on ? "· " + (formatDate(uiLocale, payment.paid_on as string)) : ""}
                         </span>
@@ -577,12 +578,12 @@ function EntitlementCard({ entitlement }: { entitlement: EffectiveEntitlement | 
         <StatusBadge status={entitlement.status} />
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
-        {entitlement.plan.channels.map((channel) => <span key={channel} className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }}>{channel.replaceAll("_", " ")}</span>)}
+        {entitlement.plan.channels.map((channel) => <span key={channel} className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }}><SemanticLabel value={channel} /></span>)}
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {allowanceEntries.map(([key, usage]) => usage ? (
           <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}>
-            <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{key.replaceAll("_", " ")}</p>
+            <p className="text-sm font-semibold" style={{ color: "var(--text)" }}><SemanticLabel value={key} /></p>
             <p className="mt-1 text-2xl font-semibold" style={{ color: "var(--primary)" }}>{String(usage.remaining)}</p>
             <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("remainingOf8553660")} {String(usage.limit)} {i18n("resets5de1b0d")} {formatDate(uiLocale, usage.period_end)}</p>
             {usage.extensions > 0 ? <p className="mt-1 text-xs" style={{ color: "var(--success)" }}>{i18n("includes820531f")}{usage.extensions} {i18n("personalExtension95a8d48")}</p> : null}

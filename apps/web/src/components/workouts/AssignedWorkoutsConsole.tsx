@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -44,14 +45,10 @@ import { downloadIcsEvent } from "@/lib/ics";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { workoutTypeColor } from "@/lib/workout-colors";
 import { useExecutionStore } from "@/stores/execution";
+import { SemanticLabel } from "@/components/semantic-label";
+import { LocalizedScore } from "@/components/localized-score";
 
 type ViewMode = "3day" | "week" | "month";
-
-function formatScoreValue(score: SectionScore): string {
-  const val = typeof score.value === "number" ? score.value : String(score.value);
-  if (score.unit) return `${val} ${score.unit}`;
-  return String(val);
-}
 
 function ScoreTooltip({ scores }: { scores: SectionScore[] }) {
   const i18n = useUiTranslations();
@@ -76,7 +73,7 @@ function ScoreTooltip({ scores }: { scores: SectionScore[] }) {
               {s.section_name ?? i18n("sectionf2c6b56") + (i + 1)}
             </span>
             <span className="shrink-0 text-[11px] font-semibold" style={{ color: "var(--success)" }}>
-              {formatScoreValue(s)}
+              <LocalizedScore value={s.value} scoreType={s.score_type} unit={s.unit} />
             </span>
           </div>
         ))}
@@ -119,10 +116,10 @@ function monthGridMondays(refDate: Date): string[] {
 }
 
 function DayHeader({ isoDate, compact, todayIso }: { isoDate: string; compact: boolean; todayIso: string }) {
-  
+  const uiLocale = useUiLocale();
   const d = parseLocalDate(isoDate);
-  const weekday = new Intl.DateTimeFormat(undefined, { weekday: compact ? "short" : "long" }).format(d);
-  const month = new Intl.DateTimeFormat(undefined, { month: "short" }).format(d);
+  const weekday = new Intl.DateTimeFormat(uiLocale, { weekday: compact ? "short" : "long" }).format(d);
+  const month = new Intl.DateTimeFormat(uiLocale, { month: "short" }).format(d);
   const day = d.getDate();
   const isToday = isoDate === todayIso;
 
@@ -340,7 +337,7 @@ function DragGhostCard({ assignment }: { assignment: AssignedWorkoutRecord }) {
       }}
     >
       <p className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: workoutTypeColor(assignment.workout.type) }}>
-        {assignment.workout.type}
+        <SemanticLabel value={assignment.workout.type} />
       </p>
       <p className="mt-1 truncate text-sm font-semibold" style={{ color: "var(--text)" }}>
         {assignment.workout.title}
@@ -462,7 +459,7 @@ export function AssignedWorkoutsConsole({
 
       setError(
         requestError instanceof Error
-          ? requestError.message
+          ? localizeError(requestError, i18n)
           : i18n("couldNotLoadAssignedWorkouts4216f7d"),
       );
     } finally {
@@ -650,7 +647,7 @@ export function AssignedWorkoutsConsole({
       setRequestNote("");
     } catch (requestError) {
       setRequestError(
-        requestError instanceof Error ? requestError.message : i18n("couldNotSendRequest3be3d2f"),
+        requestError instanceof Error ? localizeError(requestError, i18n) : i18n("couldNotSendRequest3be3d2f"),
       );
     } finally {
       setRequestSaving(false);
@@ -705,7 +702,7 @@ export function AssignedWorkoutsConsole({
       cancelEdit();
     } catch (requestError) {
       setError(
-        requestError instanceof Error ? requestError.message : i18n("couldNotUpdateAssignmenta301a8e"),
+        requestError instanceof Error ? localizeError(requestError, i18n) : i18n("couldNotUpdateAssignmenta301a8e"),
       );
     } finally {
       setSavingEdit(false);
@@ -722,7 +719,7 @@ export function AssignedWorkoutsConsole({
       if (editingId === assignmentId) cancelEdit();
     } catch (requestError) {
       setError(
-        requestError instanceof Error ? requestError.message : i18n("couldNotDeleteAssignment3704beb"),
+        requestError instanceof Error ? localizeError(requestError, i18n) : i18n("couldNotDeleteAssignment3704beb"),
       );
     } finally {
       setDeletingId(null);
@@ -781,7 +778,7 @@ export function AssignedWorkoutsConsole({
       }
 
       setError(
-        requestError instanceof Error ? requestError.message : i18n("couldNotStartWorkoutExecution78f6030"),
+        requestError instanceof Error ? localizeError(requestError, i18n) : i18n("couldNotStartWorkoutExecution78f6030"),
       );
     } finally {
       setLaunchingId(null);
@@ -940,7 +937,7 @@ export function AssignedWorkoutsConsole({
                             className="text-[9px] uppercase tracking-[0.12em]"
                             style={{ color: workoutTypeColor(a.workout.type) }}
                           >
-                            {a.workout.type}
+                            <SemanticLabel value={a.workout.type} />
                           </p>
                         </button>
                         <button
@@ -1084,7 +1081,7 @@ export function AssignedWorkoutsConsole({
                     >
                       <div className="flex items-center gap-2">
                         <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: isRejected ? "var(--dim)" : workoutTypeColor(assignment.workout.type) }}>
-                          {assignment.workout.type}
+                          <SemanticLabel value={assignment.workout.type} />
                         </p>
                         {assignment.workout.is_team_workout ? (
                           <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold" style={{ background: "color-mix(in srgb, var(--warning) 15%, transparent)", color: "var(--warning)", border: "1px solid color-mix(in srgb, var(--warning) 30%, transparent)" }}>

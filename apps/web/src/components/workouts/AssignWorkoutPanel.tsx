@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useEffect, useState } from "react";
 
 import { ApiError } from "@/api/client";
@@ -12,6 +13,7 @@ import { assignWorkout, listAthletes, type AthleteOption } from "@/api/assigned-
 import { fetchAdminWorkout, type WorkoutRecord } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { formatLocalDate } from "@/lib/local-date";
+import { SemanticLabel } from "@/components/semantic-label";
 
 type Props = {
   workoutId: string;
@@ -52,7 +54,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
           signOut();
           return;
         }
-        setError(requestError instanceof Error ? requestError.message : i18n("couldNotLoadWorkout548f9e9"));
+        setError(requestError instanceof Error ? localizeError(requestError, i18n) : i18n("couldNotLoadWorkout548f9e9"));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -104,7 +106,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
       onAssigned();
       onClose();
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : i18n("couldNotAssignWorkout58ad222"));
+      setError(requestError instanceof Error ? localizeError(requestError, i18n) : i18n("couldNotAssignWorkout58ad222"));
     } finally {
       setSaving(false);
     }
@@ -167,7 +169,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
               style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
             >
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--primary)]">
-                {workout.type}
+                <SemanticLabel value={workout.type} />
               </p>
               <div className="space-y-1">
                 {workout.sections.map((section) => (
@@ -299,7 +301,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
               ? i18n("assigning4d16a1a")
               : selectedIds.length === 0
                 ? i18n("selectAthletesToAssign1666500")
-                : i18n("assignTocc79072") + (selectedIds.length) + " athlete" + (selectedIds.length === 1 ? "" : "s")}
+                : i18n("assignToAthletes", {count: selectedIds.length})}
           </button>
         </div>
       </div>

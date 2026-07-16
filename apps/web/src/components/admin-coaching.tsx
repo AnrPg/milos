@@ -4,6 +4,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
@@ -16,6 +17,7 @@ import {
 } from "@/api/admin";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
+import { SemanticLabel } from "@/components/semantic-label";
 
 function asRecord(v: unknown): Record<string, unknown> {
   return v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
@@ -56,7 +58,7 @@ function DrillDownPanel({ drillDown }: { drillDown: AthleteDrillDown }) {
           <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--primary)" }}>{i18n("attentionFlags86e76f6")}</p>
           {Object.entries(attention).map(([key, val]) => val ? (
             <p key={key} className="text-xs" style={{ color: "var(--primary-strong)" }}>
-              {key.replace(/_/g, " ")}: {String(val)}
+              <SemanticLabel value={key} />: {String(val)}
             </p>
           ) : null)}
         </div>
@@ -74,7 +76,7 @@ function DrillDownPanel({ drillDown }: { drillDown: AthleteDrillDown }) {
               return (
                 <div key={i} className="flex items-center justify-between gap-3 rounded-[1rem] px-3 py-2" style={{ background: "var(--panel-muted)" }}>
                   <span className="text-xs font-semibold" style={{ color: "var(--text)" }}>
-                    {String(e.workout_title || e.status || i18n("execution6d525b7"))}
+                    {e.workout_title ? String(e.workout_title) : e.status ? <SemanticLabel value={e.status} /> : i18n("execution6d525b7")}
                   </span>
                   <span className="text-[10px]" style={{ color: "var(--dim)" }}>
                     {String(e.completed_at_utc || e.started_at_utc || "").slice(0, 10)}
@@ -199,7 +201,7 @@ export function AdminCoaching() {
                   >
                     <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{athlete.nickname}</p>
                     <p className="mt-0.5 text-xs uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>
-                      {athlete.role}
+                      <SemanticLabel value={athlete.role} />
                     </p>
                   </button>
                 ))
@@ -239,7 +241,7 @@ export function AdminCoaching() {
                       {drillDownQuery.isPending ? (
                         <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
                       ) : drillDownQuery.error instanceof Error ? (
-                        <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{drillDownQuery.error.message}</p>
+                        <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(drillDownQuery.error, i18n)}</p>
                       ) : drillDownQuery.data?.drill_down ? (
                         <DrillDownPanel drillDown={drillDownQuery.data.drill_down} />
                       ) : null}
@@ -279,7 +281,7 @@ export function AdminCoaching() {
                       ) : null}
                       {writeNote.isError ? (
                         <p className="text-sm" style={{ color: "var(--primary)" }}>
-                          {writeNote.error instanceof Error ? writeNote.error.message : i18n("unableToSaveNote8506e1a")}
+                          {writeNote.error instanceof Error ? localizeError(writeNote.error, i18n) : i18n("unableToSaveNote8506e1a")}
                         </p>
                       ) : null}
                     </div>

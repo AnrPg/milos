@@ -6,6 +6,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useId, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createPR, updatePR, type PRRecord, type PRUnit } from "@/api/gamification";
@@ -98,7 +99,7 @@ export function PRFormModal({
       onClose();
     },
     onError: (err) => {
-      setError(err instanceof Error ? err.message : i18n("failedToSave3d4146c"));
+      setError(err instanceof Error ? localizeError(err, i18n) : i18n("failedToSave3d4146c"));
     },
   });
 

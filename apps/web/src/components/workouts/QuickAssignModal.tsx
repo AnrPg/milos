@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { localizeError } from "@/i18n/presentation";
 import { useEffect, useId, useState } from "react";
 
 import { assignWorkout, listAthletes, type AthleteOption } from "@/api/assigned-workouts";
@@ -13,6 +14,7 @@ import { workoutTypeColor } from "@/lib/workout-colors";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import { WorkoutCreationCanvas } from "@/components/workouts/creation/WorkoutCreationCanvas";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
+import { SemanticLabel } from "@/components/semantic-label";
 
 type Props = {
   accessToken: string;
@@ -124,7 +126,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
       });
       onAssigned();
     } catch (err) {
-      setError(err instanceof Error ? err.message : i18n("couldNotAssignWorkout58ad222"));
+      setError(err instanceof Error ? localizeError(err, i18n) : i18n("couldNotAssignWorkout58ad222"));
     } finally {
       setSaving(false);
     }
@@ -220,7 +222,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
                               className="mt-0.5 text-[10px] uppercase tracking-[0.14em]"
                               style={{ color: workoutTypeColor(workout.type) }}
                             >
-                              {workout.type}
+                              <SemanticLabel value={workout.type} />
                             </p>
                           </div>
                           {selected ? (
@@ -242,7 +244,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
                     <div>
                       <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{selectedWorkout.title}</p>
                       <p className="text-[10px] uppercase tracking-[0.14em]" style={{ color: workoutTypeColor(selectedWorkout.type) }}>
-                        {selectedWorkout.type}
+                        <SemanticLabel value={selectedWorkout.type} />
                       </p>
                     </div>
                     <button
@@ -375,7 +377,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
                 onClick={() => void handleAssign()}
                 type="button"
               >
-                {saving ? i18n("assigning4d16a1a") : i18n("assignTocc79072") + (selectedAthleteIds.length) + " athlete" + (selectedAthleteIds.length !== 1 ? "s" : "")}
+                {saving ? i18n("assigning4d16a1a") : i18n("assignToAthletes", {count: selectedAthleteIds.length})}
               </button>
             )}
           </div>

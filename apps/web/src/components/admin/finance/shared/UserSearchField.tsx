@@ -5,6 +5,7 @@
 import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 import { fetchAdminSearch, type FinanceRecord } from "@/api/finance";
+import { SemanticLabel } from "@/components/semantic-label";
 
 interface Props {
   label: string;
@@ -120,7 +121,7 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
                 field(selectedUser, "identity_role") === "athlete" ? "var(--primary)" : "var(--muted)",
             }}
           >
-            {field(selectedUser, "identity_role")}
+            <SemanticLabel value={field(selectedUser, "identity_role")} />
           </span>
           {!locked && (
             <button
@@ -176,7 +177,7 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
                       {field(u, "nickname")}
                     </span>
                     <span className="text-xs" style={{ color: "var(--dim)" }}>
-                      {field(u, "identity_role")}
+                      <SemanticLabel value={field(u, "identity_role")} />
                     </span>
                   </button>
                 ))
