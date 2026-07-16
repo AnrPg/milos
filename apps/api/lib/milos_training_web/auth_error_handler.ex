@@ -5,6 +5,6 @@ defmodule MilosTrainingWeb.AuthErrorHandler do
   def auth_error(conn, {_type, _reason}, _opts) do
     conn
     |> put_status(:unauthorized)
-    |> json(%{error: "Unauthorized"})
+    |> json(%{code: "unauthorized", error: "Unauthorized"})
   end
 end

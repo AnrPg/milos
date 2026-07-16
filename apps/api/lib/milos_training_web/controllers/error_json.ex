@@ -16,6 +16,19 @@ defmodule MilosTrainingWeb.ErrorJSON do
   # the template name. For example, "404.json" becomes
   # "Not Found".
   def render(template, _assigns) do
-    %{errors: %{detail: Phoenix.Controller.status_message_from_template(template)}}
+    status = Phoenix.Controller.status_message_from_template(template)
+
+    %{
+      code: template |> String.trim_trailing(".json") |> status_code(),
+      error: status
+    }
   end
+
+  defp status_code("401"), do: "unauthorized"
+  defp status_code("403"), do: "forbidden"
+  defp status_code("404"), do: "not_found"
+  defp status_code("422"), do: "validation_failed"
+  defp status_code("429"), do: "rate_limited"
+  defp status_code(code) when code in ["500", "502", "503", "504"], do: "unexpected_server_error"
+  defp status_code(_code), do: "request_failed"
 end

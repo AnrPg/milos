@@ -18,13 +18,13 @@ defmodule MilosTrainingWeb.Plugs.RateLimit do
       {:error, count} when is_integer(count) ->
         conn
         |> put_status(:too_many_requests)
-        |> json(%{error: "Too many requests"})
+        |> json(%{code: "rate_limited", error: "Too many requests"})
         |> halt()
 
       {:error, _reason} ->
         conn
         |> put_status(:service_unavailable)
-        |> json(%{error: "Rate limiter unavailable"})
+        |> json(%{code: "rate_limiter_unavailable", error: "Rate limiter unavailable"})
         |> halt()
     end
   end

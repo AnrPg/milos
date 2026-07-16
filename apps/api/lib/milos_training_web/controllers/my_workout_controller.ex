@@ -179,7 +179,10 @@ defmodule MilosTrainingWeb.MyWorkoutController do
       {:error, _reason} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> json(%{error: "Invalid workout assignment request"})
+        |> json(%{
+          code: "invalid_workout_assignment",
+          error: "Invalid workout assignment request"
+        })
     end
   end
 end

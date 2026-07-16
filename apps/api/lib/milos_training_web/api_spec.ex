@@ -1,5 +1,5 @@
 defmodule MilosTrainingWeb.ApiSpec do
-  alias OpenApiSpex.{Components, Info, OpenApi, Paths, SecurityScheme, Server}
+  alias OpenApiSpex.{Components, Info, OpenApi, Paths, Schema, SecurityScheme, Server}
 
   @spec spec() :: OpenApi.t()
   def spec do
@@ -13,6 +13,26 @@ defmodule MilosTrainingWeb.ApiSpec do
         %Server{url: "/"}
       ],
       components: %Components{
+        schemas: %{
+          "SemanticError" => %Schema{
+            type: :object,
+            description: "Stable machine-readable API failure with English compatibility copy.",
+            properties: %{
+              code: %Schema{type: :string},
+              error: %Schema{type: :string},
+              params: %Schema{type: :object, additionalProperties: true}
+            },
+            required: [:code, :error]
+          },
+          "ValidationError" => %Schema{
+            type: :object,
+            properties: %{
+              code: %Schema{type: :string, enum: ["validation_failed"]},
+              errors: %Schema{type: :object, additionalProperties: true}
+            },
+            required: [:code, :errors]
+          }
+        },
         securitySchemes: %{
           "bearerAuth" => %SecurityScheme{
             type: "http",

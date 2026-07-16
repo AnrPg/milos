@@ -14,7 +14,7 @@ defmodule MilosTrainingWeb.Plugs.RequireRole do
       is_nil(user) ->
         conn
         |> put_status(:unauthorized)
-        |> json(%{error: "Unauthorized"})
+        |> json(%{code: "unauthorized", error: "Unauthorized"})
         |> halt()
 
       user.role in allowed_roles ->
@@ -23,7 +23,7 @@ defmodule MilosTrainingWeb.Plugs.RequireRole do
       true ->
         conn
         |> put_status(:forbidden)
-        |> json(%{error: "Forbidden"})
+        |> json(%{code: "forbidden", error: "Forbidden"})
         |> halt()
     end
   end
