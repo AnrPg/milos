@@ -4,7 +4,7 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
   import Ecto.Query
 
   alias Ecto.Multi
-  alias MilosTraining.Execution.WorkoutExecution
+  alias MilosTraining.Execution.{ProgressOperation, WorkoutExecution}
   alias MilosTraining.Repo
 
   @impl true
@@ -89,19 +89,30 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
 
   @impl true
   def update_execution(id, params) do
-    case Repo.get(WorkoutExecution, id) do
-      nil ->
-        {:error, :not_found}
-
-      %WorkoutExecution{} = execution ->
-        execution
-        |> WorkoutExecution.progress_changeset(params)
-        |> Repo.update()
-        |> case do
-          {:ok, updated} -> {:ok, normalize(updated)}
-          {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
+    result =
+      Repo.transaction(fn ->
+        case Repo.get(WorkoutExecution, id) do
+          nil -> Repo.rollback(:not_found)
+          execution -> persist_versioned_update(execution, params)
         end
+      end)
+
+    case result do
+      {:ok, execution} -> {:ok, execution}
+      {:error, :stale_execution} -> recover_idempotent_retry(id, params)
+      {:error, reason} -> {:error, reason}
     end
+  end
+
+  @impl true
+  def progress_operation_applied?(execution_id, user_id, operation_id) do
+    ProgressOperation
+    |> where(
+      [operation],
+      operation.execution_id == ^execution_id and operation.user_id == ^user_id and
+        operation.operation_id == ^operation_id
+    )
+    |> Repo.exists?()
   end
 
   @impl true
@@ -158,7 +169,60 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
       checked_exercise_ids: execution.checked_exercise_ids || [],
       section_scores: execution.section_scores || [],
       exercise_notes: execution.exercise_notes || [],
+      lock_version: execution.lock_version,
       inserted_at: execution.inserted_at
     }
+  end
+
+  defp persist_versioned_update(execution, params) do
+    expected_version =
+      params[:expected_version] || params["expected_version"] || execution.lock_version
+
+    if execution.lock_version == expected_version do
+      case execution
+           |> WorkoutExecution.progress_changeset(params)
+           |> Repo.update(stale_error_field: :lock_version) do
+        {:ok, updated} ->
+          persist_progress_operation(updated, params, expected_version)
+          normalize(updated)
+
+        {:error, %{errors: [lock_version: _error]}} ->
+          Repo.rollback(:stale_execution)
+
+        {:error, %Ecto.Changeset{} = changeset} ->
+          Repo.rollback(changeset)
+      end
+    else
+      Repo.rollback(:stale_execution)
+    end
+  end
+
+  defp persist_progress_operation(updated, params, expected_version) do
+    case params[:operation_id] || params["operation_id"] do
+      nil ->
+        :ok
+
+      operation_id ->
+        %ProgressOperation{}
+        |> ProgressOperation.changeset(%{
+          operation_id: operation_id,
+          execution_id: updated.id,
+          user_id: updated.user_id,
+          base_version: expected_version,
+          result_version: updated.lock_version
+        })
+        |> Repo.insert!()
+    end
+  end
+
+  defp recover_idempotent_retry(id, params) do
+    user_id = params[:user_id] || params["user_id"]
+    operation_id = params[:operation_id] || params["operation_id"]
+
+    if user_id && operation_id && progress_operation_applied?(id, user_id, operation_id) do
+      {:ok, get_execution(id)}
+    else
+      {:error, :stale_execution}
+    end
   end
 end

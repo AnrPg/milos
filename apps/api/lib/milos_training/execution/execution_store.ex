@@ -2,11 +2,7 @@ defmodule MilosTraining.Execution.ExecutionStore do
   @behaviour MilosTraining.Execution.Ports.ExecutionStore
 
   defp adapter do
-    Application.get_env(
-      :milos_training,
-      :execution_store,
-      MilosTraining.Infrastructure.Execution.EctoExecutionStore
-    )
+    Application.fetch_env!(:milos_training, :execution_store)
   end
 
   @impl true
@@ -27,4 +23,8 @@ defmodule MilosTraining.Execution.ExecutionStore do
 
   @impl true
   def list_executions_for_user(user_id), do: adapter().list_executions_for_user(user_id)
+
+  @impl true
+  def progress_operation_applied?(execution_id, user_id, operation_id),
+    do: adapter().progress_operation_applied?(execution_id, user_id, operation_id)
 end

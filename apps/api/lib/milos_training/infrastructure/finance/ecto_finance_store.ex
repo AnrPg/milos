@@ -49,16 +49,105 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def update_package(id, params) do
-    case Repo.get(MembershipPackage, id) do
-      nil ->
-        {:error, :not_found}
+    Repo.transaction(fn ->
+      package =
+        MembershipPackage
+        |> where([candidate], candidate.id == ^id)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
 
-      %MembershipPackage{} = package ->
-        package
-        |> MembershipPackage.changeset(params)
-        |> Repo.update()
-        |> normalize_result(&normalize_package/1)
-    end
+      if is_nil(package), do: Repo.rollback(:not_found)
+
+      retiring? = package.active && requested_inactive?(params)
+
+      if retiring? && effective_subscriptions_for_package(package.id) != [],
+        do: Repo.rollback(:package_retirement_reconciliation_required)
+
+      package
+      |> MembershipPackage.changeset(params)
+      |> Repo.update()
+      |> case do
+        {:ok, updated} -> normalize_package(updated)
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+  end
+
+  @impl true
+  def retire_package(id, replacement_package_by_role) do
+    replacements = string_key_map(replacement_package_by_role || %{})
+
+    Repo.transaction(fn ->
+      source =
+        MembershipPackage
+        |> where([package], package.id == ^id)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      if is_nil(source), do: Repo.rollback(:not_found)
+
+      subscriptions = effective_subscriptions_for_package(source.id)
+
+      memberships =
+        Map.new(subscriptions, &{&1.membership_id, locked_membership(&1.membership_id)})
+
+      affected_roles =
+        memberships
+        |> Map.values()
+        |> Enum.map(& &1.user_type_snapshot)
+        |> Enum.uniq()
+
+      replacement_packages =
+        Map.new(affected_roles, fn role ->
+          replacement_id = replacements[role]
+          replacement = replacement_id && Repo.get(MembershipPackage, replacement_id)
+
+          if is_nil(replacement_id), do: Repo.rollback({:package_replacement_required, role})
+
+          if is_nil(replacement) or replacement.active == false or replacement.id == source.id,
+            do: Repo.rollback(:invalid_package_replacement)
+
+          {role, replacement}
+        end)
+
+      Enum.each(subscriptions, fn subscription ->
+        membership = Map.fetch!(memberships, subscription.membership_id)
+        replacement = Map.fetch!(replacement_packages, membership.user_type_snapshot)
+
+        subscription
+        |> MembershipPackageSubscription.changeset(%{"status" => "cancelled"})
+        |> Repo.update!()
+
+        %MembershipPackageSubscription{}
+        |> MembershipPackageSubscription.changeset(%{
+          "membership_id" => membership.id,
+          "membership_package_id" => replacement.id,
+          "status" => "active",
+          "starts_on" => Date.utc_today(),
+          "ends_on" => subscription.ends_on,
+          "package_code_snapshot" => replacement.code,
+          "package_family_snapshot" => replacement.family,
+          "billing_period_snapshot" => replacement.billing_period,
+          "price_cents_snapshot" => replacement.base_price_cents,
+          "params_snapshot" => replacement.params || %{}
+        })
+        |> Repo.insert!()
+
+        refresh_entitlement_snapshot(membership.id)
+      end)
+
+      retired =
+        source
+        |> MembershipPackage.changeset(%{"active" => false})
+        |> Repo.update!()
+
+      %{
+        package: normalize_package(retired),
+        reassigned_count: length(subscriptions),
+        affected_by_role:
+          Enum.frequencies(Enum.map(Map.values(memberships), & &1.user_type_snapshot))
+      }
+    end)
   end
 
   @impl true
@@ -2220,6 +2309,30 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     |> Enum.map(&normalize_subscription/1)
   end
 
+  defp effective_subscriptions_for_package(package_id) do
+    today = Date.utc_today()
+
+    MembershipPackageSubscription
+    |> where([subscription], subscription.membership_package_id == ^package_id)
+    |> where([subscription], subscription.status == "active")
+    |> where([subscription], is_nil(subscription.starts_on) or subscription.starts_on <= ^today)
+    |> where([subscription], is_nil(subscription.ends_on) or subscription.ends_on >= ^today)
+    |> order_by([subscription], desc: subscription.starts_on, desc: subscription.inserted_at)
+    |> lock("FOR UPDATE")
+    |> Repo.all()
+    |> Enum.uniq_by(& &1.membership_id)
+    |> Enum.filter(fn subscription ->
+      case renewal_subscription(subscription.membership_id, nil) do
+        %{id: id} -> id == subscription.id
+        nil -> false
+      end
+    end)
+  end
+
+  defp requested_inactive?(params) when is_map(params) do
+    Map.get(params, "active", Map.get(params, :active)) == false
+  end
+
   defp member_search_summaries([]), do: %{}
 
   defp member_search_summaries(memberships) do
@@ -2523,7 +2636,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       MembershipLifecycle.derive_status(
         params["status"],
         params["starts_on"],
-        params["expires_on"]
+        params["expires_on"],
+        Date.utc_today()
       )
     )
   end

@@ -12,6 +12,14 @@ config :milos_training,
   generators: [timestamp_type: :utc_datetime],
   env: config_env()
 
+config :opentelemetry,
+  span_processor: :batch,
+  traces_exporter: :none
+
+config :opentelemetry_exporter,
+  otlp_protocol: :http_protobuf,
+  otlp_compression: :gzip
+
 config :milos_training, Oban,
   repo: MilosTraining.Repo,
   plugins: [
@@ -42,6 +50,38 @@ config :milos_training, :start_oban, true
 config :milos_training, :redis_url, System.get_env("REDIS_URL", "redis://localhost:6379")
 config :milos_training, :readiness_checker, MilosTraining.Infrastructure.Readiness.Live
 config :milos_training, :identity_user_store, MilosTraining.Infrastructure.Identity.EctoUserStore
+config :milos_training, :coaching_store, MilosTraining.Infrastructure.Coaching.EctoCoachingStore
+
+config :milos_training,
+       :execution_store,
+       MilosTraining.Infrastructure.Execution.EctoExecutionStore
+
+config :milos_training, :finance_store, MilosTraining.Infrastructure.Finance.EctoFinanceStore
+config :milos_training, :workout_store, MilosTraining.Infrastructure.Workouts.EctoWorkoutStore
+
+config :milos_training,
+       :gamification_store,
+       MilosTraining.Infrastructure.Gamification.EctoGamificationStore
+
+config :milos_training,
+       :scheduling_store,
+       MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore
+
+config :milos_training, :pr_store, MilosTraining.Infrastructure.Pantheon.EctoPRStore
+
+config :milos_training,
+       :push_subscription_store,
+       MilosTraining.Infrastructure.Notifications.EctoPushSubscriptionStore
+
+config :milos_training,
+       :notification_store,
+       MilosTraining.Infrastructure.Notifications.EctoNotificationStore
+
+config :milos_training, :feedback_store, MilosTraining.Infrastructure.Feedback.EctoFeedbackStore
+
+config :milos_training,
+       :wellbeing_store,
+       MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore
 
 config :milos_training,
        :messaging_thread_store,
@@ -50,6 +90,24 @@ config :milos_training,
 config :milos_training,
        :messaging_message_store,
        MilosTraining.Infrastructure.Messaging.EctoMessageStore
+
+config :milos_training, :avatar_storage, MilosTraining.Infrastructure.Storage.MinioStorage
+config :milos_training, :document_storage, MilosTraining.Infrastructure.Storage.MinioStorage
+config :milos_training, :landing_cache, MilosTraining.Infrastructure.Cache.LandingCache
+
+config :milos_training,
+       :pr_search_index,
+       MilosTraining.Infrastructure.Search.MeilisearchPRIndex
+
+config :milos_training,
+       :signed_token,
+       MilosTraining.Infrastructure.Security.PhoenixSignedToken
+
+config :milos_training, :public_base_url, "http://localhost:4000"
+
+config :milos_training,
+       :realtime_publisher,
+       MilosTraining.Infrastructure.Realtime.PhoenixRealtimePublisher
 
 config :milos_training,
        :admin_member_search_index,
@@ -97,8 +155,8 @@ config :milos_training, MilosTraining.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configures Elixir's Logger
 config :logger, :default_formatter,
-  format: "$time $metadata[$level] $message\n",
-  metadata: [:request_id]
+  format: "timestamp=$time level=$level $metadata message=\"$message\"\n",
+  metadata: [:request_id, :user_id, :user_role, :job_id, :oban_job_id]
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason

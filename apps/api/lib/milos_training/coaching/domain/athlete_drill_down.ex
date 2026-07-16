@@ -4,7 +4,7 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDown do
   @active_window_days 14
   @recent_window_days 30
 
-  def build(athlete, assignments, executions, notes, today \\ Date.utc_today()) do
+  def build(athlete, assignments, executions, notes, %Date{} = today) do
     assignments = Enum.map(assignments || [], &normalize_assignment(&1, today))
     executions = Enum.map(executions || [], &normalize_execution/1)
     notes = Enum.map(notes || [], &normalize_admin_note/1)

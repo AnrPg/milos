@@ -2,11 +2,7 @@ defmodule MilosTraining.Notifications.NotificationStore do
   @behaviour MilosTraining.Notifications.Ports.NotificationStore
 
   defp adapter do
-    Application.get_env(
-      :milos_training,
-      :notification_store,
-      MilosTraining.Infrastructure.Notifications.EctoNotificationStore
-    )
+    Application.fetch_env!(:milos_training, :notification_store)
   end
 
   @impl true

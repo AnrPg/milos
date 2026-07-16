@@ -15,13 +15,12 @@ defmodule MilosTraining.Application.SendMessage do
     with {:ok, thread} <- Messaging.get_thread(params.thread_id, sender_id),
          recipients <- coaching_recipients(thread, sender_id),
          {:ok, reservations} <- reserve_touchpoints(recipients, delivery_id),
-         {:ok, message} <- send_or_release(params, reservations),
-         :ok <- finalize_touchpoints(reservations, message, delivery_id) do
+         {:ok, message} <- send_or_release(params, reservations, delivery_id) do
       {:ok, message}
     end
   end
 
-  def call(_sender, params), do: Messaging.send_message(params)
+  def call(_sender, params), do: Messaging.send_message(params, %{reservations: []})
 
   defp coaching_recipients(thread, sender_id) do
     ids =
@@ -57,8 +56,25 @@ defmodule MilosTraining.Application.SendMessage do
     end)
   end
 
-  defp send_or_release(params, reservations) do
-    case Messaging.send_message(params) do
+  defp send_or_release(params, reservations, delivery_id) do
+    delivery = %{
+      reservations:
+        Enum.flat_map(reservations, fn
+          {_recipient_id, %{id: nil}} ->
+            []
+
+          {recipient_id, %{id: reservation_id}} ->
+            [
+              %{
+                recipient_id: recipient_id,
+                reservation_id: reservation_id,
+                delivery_id: delivery_id
+              }
+            ]
+        end)
+    }
+
+    case Messaging.send_message(params, delivery) do
       {:ok, message} ->
         {:ok, message}
 
@@ -66,24 +82,6 @@ defmodule MilosTraining.Application.SendMessage do
         release(reservations, "Coaching note was not created")
         {:error, reason}
     end
-  end
-
-  defp finalize_touchpoints(reservations, message, delivery_id) do
-    Enum.reduce_while(reservations, :ok, fn
-      {_recipient_id, %{id: nil}}, :ok ->
-        {:cont, :ok}
-
-      {recipient_id, %{id: reservation_id}}, :ok ->
-        case Finance.finalize_entitlement(reservation_id, %{
-               source_id: message.id,
-               reason: "Coach check-in delivered",
-               idempotency_key: "coach-check-in-finalized:#{delivery_id}:#{recipient_id}",
-               metadata: %{"message_id" => message.id}
-             }) do
-          {:ok, _entry} -> {:cont, :ok}
-          {:error, reason} -> {:halt, {:error, reason}}
-        end
-    end)
   end
 
   defp release(reservations, reason) do

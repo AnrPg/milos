@@ -2,11 +2,7 @@ defmodule MilosTraining.Gamification.GamificationStore do
   @behaviour MilosTraining.Gamification.Ports.GamificationStore
 
   defp adapter do
-    Application.get_env(
-      :milos_training,
-      :gamification_store,
-      MilosTraining.Infrastructure.Gamification.EctoGamificationStore
-    )
+    Application.fetch_env!(:milos_training, :gamification_store)
   end
 
   @impl true
@@ -20,6 +16,10 @@ defmodule MilosTraining.Gamification.GamificationStore do
 
   @impl true
   def upsert_user_stats(params), do: adapter().upsert_user_stats(params)
+
+  @impl true
+  def increment_advancement(user_id, occurred_at),
+    do: adapter().increment_advancement(user_id, occurred_at)
 
   @impl true
   def create_achievement(params), do: adapter().create_achievement(params)

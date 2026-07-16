@@ -33,8 +33,8 @@ defmodule MilosTraining.Gamification.UserGamificationPreferences do
     end
   end
 
-  defp validate_length_of_off_days(changeset, days) when length(days) > 3 do
-    add_error(changeset, :off_days, "cannot have more than 3 off days per week")
+  defp validate_length_of_off_days(changeset, days) when length(days) > 5 do
+    add_error(changeset, :off_days, "cannot have more than 5 off days per week")
   end
 
   defp validate_length_of_off_days(changeset, _days), do: changeset

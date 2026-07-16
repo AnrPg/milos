@@ -1,4 +1,6 @@
 defmodule MilosTraining.Workouts do
+  alias MilosTraining.Workouts.Domain.WorkoutType
+
   alias MilosTraining.Workouts.Commands.{
     ArchiveAthleteAssignments,
     AssignWorkout,
@@ -53,6 +55,7 @@ defmodule MilosTraining.Workouts do
   defdelegate list_scale_levels, to: ListScaleLevels, as: :all
   defdelegate replace_scale_levels(levels), to: ReplaceScaleLevels, as: :call
   defdelegate materialize_workout(id), to: MaterializeWorkout, as: :by_id
+  def supported_workout_types, do: WorkoutType.values()
 
   def reject_assignment_for_athlete(assignment_id, athlete_id),
     do:

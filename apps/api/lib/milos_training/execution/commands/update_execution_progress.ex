@@ -1,5 +1,5 @@
 defmodule MilosTraining.Execution.Commands.UpdateExecutionProgress do
-  alias MilosTraining.Execution.Domain.ProgressSnapshotter
+  alias MilosTraining.Execution.Domain.{ProgressSnapshotter, ProgressValidator}
   alias MilosTraining.Execution.ExecutionStore
 
   @allowed_statuses ["active", "paused"]
@@ -7,10 +7,65 @@ defmodule MilosTraining.Execution.Commands.UpdateExecutionProgress do
   def call(execution_id, user_id, params) do
     with {:ok, execution} <- fetch_owned_execution(execution_id, user_id),
          :ok <- ensure_mutable(execution),
-         {:ok, progress_params} <- normalize_progress_params(params, execution) do
-      ExecutionStore.update_execution(execution.id, progress_params)
+         {:ok, operation_id} <- normalize_operation_id(params),
+         {:ok, expected_version} <- normalize_expected_version(params),
+         result <-
+           maybe_apply_operation(
+             execution,
+             user_id,
+             operation_id,
+             expected_version,
+             params
+           ) do
+      result
     end
   end
+
+  defp maybe_apply_operation(execution, user_id, operation_id, expected_version, params) do
+    if ExecutionStore.progress_operation_applied?(execution.id, user_id, operation_id) do
+      {:ok, execution}
+    else
+      with :ok <- ensure_current_version(execution, expected_version),
+           {:ok, progress_params} <- normalize_progress_params(params, execution),
+           :ok <-
+             ProgressValidator.validate(
+               progress_params,
+               Map.get(params, :segments, Map.get(params, "segments", [])),
+               execution
+             ) do
+        ExecutionStore.update_execution(
+          execution.id,
+          progress_params
+          |> Map.put(:expected_version, expected_version)
+          |> Map.put(:operation_id, operation_id)
+          |> Map.put(:user_id, user_id)
+        )
+      end
+    end
+  end
+
+  defp normalize_operation_id(params) do
+    case params[:operation_id] || params["operation_id"] do
+      value when is_binary(value) ->
+        case Ecto.UUID.cast(value) do
+          {:ok, uuid} -> {:ok, uuid}
+          :error -> {:error, :bad_request}
+        end
+
+      _other ->
+        {:error, :bad_request}
+    end
+  end
+
+  defp normalize_expected_version(params) do
+    case params[:expected_version] || params["expected_version"] do
+      value when is_integer(value) and value >= 1 -> {:ok, value}
+      _other -> {:error, :bad_request}
+    end
+  end
+
+  defp ensure_current_version(%{lock_version: version}, version), do: :ok
+  defp ensure_current_version(_execution, _expected_version), do: {:error, :stale_execution}
 
   defp fetch_owned_execution(execution_id, user_id) do
     case ExecutionStore.get_execution(execution_id) do
@@ -34,11 +89,12 @@ defmodule MilosTraining.Execution.Commands.UpdateExecutionProgress do
          {:ok, section_elapsed_ms} <- normalize_int_map(params, execution, :section_elapsed_ms),
          {:ok, segment_cycle_counts} <-
            normalize_int_map(params, execution, :segment_cycle_counts),
+         {:ok, requested_section_scores} <- normalize_section_scores(params, execution),
          {:ok, segment_started_at_utc} <-
            normalize_segment_started_at_utc(params, execution, status),
          {:ok, resume_countdown_ends_at_utc} <-
            normalize_resume_countdown_ends_at_utc(params, execution, status) do
-      section_scores =
+      automatic_scores =
         params
         |> Map.get(:segments, Map.get(params, "segments", []))
         |> ProgressSnapshotter.progress_snapshots(%{
@@ -46,6 +102,8 @@ defmodule MilosTraining.Execution.Commands.UpdateExecutionProgress do
           section_elapsed_ms: section_elapsed_ms,
           segment_cycle_counts: segment_cycle_counts
         })
+
+      section_scores = merge_manual_scores(automatic_scores, requested_section_scores)
 
       {:ok,
        %{
@@ -62,6 +120,29 @@ defmodule MilosTraining.Execution.Commands.UpdateExecutionProgress do
        }}
     end
   end
+
+  defp normalize_section_scores(params, execution) do
+    candidate =
+      Map.get(
+        params,
+        :section_scores,
+        Map.get(params, "section_scores", execution.section_scores || [])
+      )
+
+    if is_list(candidate), do: {:ok, candidate}, else: {:error, :bad_request}
+  end
+
+  defp merge_manual_scores(automatic, requested) do
+    manual =
+      Enum.filter(requested, fn score ->
+        field(score, :kind) == "final" or field(score, :source) == "manual"
+      end)
+
+    manual_ids = MapSet.new(manual, &field(&1, :section_id))
+    Enum.reject(automatic, &MapSet.member?(manual_ids, field(&1, :section_id))) ++ manual
+  end
+
+  defp field(map, key), do: Map.get(map, key, Map.get(map, Atom.to_string(key)))
 
   defp normalize_checked_exercise_ids(params) do
     checked_exercise_ids = params[:checked_exercise_ids] || params["checked_exercise_ids"] || []

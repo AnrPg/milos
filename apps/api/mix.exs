@@ -8,6 +8,7 @@ defmodule MilosTraining.MixProject do
       elixir: "~> 1.18",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
+      listeners: [Phoenix.CodeReloader],
       aliases: aliases(),
       deps: deps()
     ]
@@ -16,7 +17,13 @@ defmodule MilosTraining.MixProject do
   def application do
     [
       mod: {MilosTraining.Application, []},
-      extra_applications: [:logger, :runtime_tools, :os_mon]
+      extra_applications: [
+        :logger,
+        :runtime_tools,
+        :os_mon,
+        :opentelemetry_exporter,
+        :opentelemetry
+      ]
     ]
   end
 
@@ -41,6 +48,12 @@ defmodule MilosTraining.MixProject do
       {:castore, "~> 1.0"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
+      {:opentelemetry, "~> 1.5"},
+      {:opentelemetry_api, "~> 1.4"},
+      {:opentelemetry_exporter, "~> 1.8"},
+      {:opentelemetry_phoenix, "~> 2.0"},
+      {:opentelemetry_ecto, "~> 1.2"},
+      {:opentelemetry_bandit, "~> 0.2"},
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
       {:open_api_spex, "~> 3.18"},
@@ -54,7 +67,8 @@ defmodule MilosTraining.MixProject do
       {:bandit, "~> 1.5"},
       {:ex_aws, "~> 2.5"},
       {:ex_aws_s3, "~> 2.5"},
-      {:hackney, "~> 4.5"}
+      {:hackney, "~> 4.5"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -64,7 +78,14 @@ defmodule MilosTraining.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      precommit: ["compile --warning-as-errors", "deps.unlock --unused", "format", "test"]
+      precommit: [
+        "compile --warning-as-errors",
+        "milos.architecture",
+        "credo --strict",
+        "deps.unlock --check-unused",
+        "format --check-formatted",
+        "test"
+      ]
     ]
   end
 end

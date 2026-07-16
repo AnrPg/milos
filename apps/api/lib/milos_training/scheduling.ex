@@ -79,8 +79,10 @@ defmodule MilosTraining.Scheduling do
 
   defdelegate approve_booking(id, admin_message), to: ApproveBooking, as: :call
   defdelegate reject_booking(id, admin_message), to: RejectBooking, as: :call
+  defdelegate reject_booking(id, admin_message, reconciliation), to: RejectBooking, as: :call
   defdelegate attach_timeout_job(booking_id, job_id), to: AttachTimeoutJob, as: :call
   defdelegate withdraw_booking(id), to: WithdrawBooking, as: :call
+  defdelegate withdraw_booking(id, reconciliation), to: WithdrawBooking, as: :call
 
   defdelegate cancel_active_future_bookings_for_user(user_id),
     to: CancelUserBookingsForRoleTransition,

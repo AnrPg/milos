@@ -11,7 +11,10 @@ defmodule MilosTraining.Messaging.Application.MarkRead do
 
       thread ->
         with :ok <- ThreadPolicy.can_read?(user_id, thread) do
-          ThreadStore.mark_read(thread_id, user_id, message_id)
+          with {:ok, effective_message_id} <-
+                 ThreadStore.mark_read(thread_id, user_id, message_id) do
+            {:ok, %{read: true, message_id: effective_message_id}}
+          end
         end
     end
   end

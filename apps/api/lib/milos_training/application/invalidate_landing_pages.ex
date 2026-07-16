@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.InvalidateLandingPages do
   alias MilosTraining.Application.BroadcastUserSync
   alias MilosTraining.Identity
-  alias MilosTraining.Infrastructure.Cache.LandingCache
+  alias MilosTraining.Application.LandingCache
 
   def for_user(user_id) do
     for_users([user_id])

@@ -2,17 +2,15 @@ defmodule MilosTraining.Finance.FinanceStore do
   @behaviour MilosTraining.Finance.Ports.FinanceStore
 
   defp adapter do
-    Application.get_env(
-      :milos_training,
-      :finance_store,
-      MilosTraining.Infrastructure.Finance.EctoFinanceStore
-    )
+    Application.fetch_env!(:milos_training, :finance_store)
   end
 
   @impl true
   def create_package(params), do: adapter().create_package(params)
   @impl true
   def update_package(id, params), do: adapter().update_package(id, params)
+  @impl true
+  def retire_package(id, replacements), do: adapter().retire_package(id, replacements)
   @impl true
   def list_packages, do: adapter().list_packages()
   @impl true

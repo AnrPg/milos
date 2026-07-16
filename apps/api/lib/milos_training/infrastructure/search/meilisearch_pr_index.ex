@@ -1,8 +1,36 @@
 defmodule MilosTraining.Infrastructure.Search.MeilisearchPRIndex do
+  @behaviour MilosTraining.Application.Ports.PRSearchIndex
+
   require Logger
+
+  alias MilosTraining.Workers.SyncPRSearchJob
+  alias MilosTraining.Repo
 
   @filterable_attributes ["user_id"]
   @searchable_attributes ["name"]
+
+  @impl true
+  def enqueue_upsert(pr) do
+    pr
+    |> serialize()
+    |> then(&SyncPRSearchJob.new(%{"operation" => "upsert", "pr" => &1}))
+    |> Repo.insert()
+    |> case do
+      {:ok, _job} -> :ok
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  @impl true
+  def enqueue_delete(id) do
+    %{"operation" => "delete", "id" => id}
+    |> SyncPRSearchJob.new()
+    |> Repo.insert()
+    |> case do
+      {:ok, _job} -> :ok
+      {:error, reason} -> {:error, reason}
+    end
+  end
 
   def upsert_document(pr) do
     with :ok <- ensure_settings() do
@@ -32,6 +60,7 @@ defmodule MilosTraining.Infrastructure.Search.MeilisearchPRIndex do
     end
   end
 
+  @impl true
   def search(user_id, query) do
     body = %{
       q: query,
@@ -65,9 +94,9 @@ defmodule MilosTraining.Infrastructure.Search.MeilisearchPRIndex do
 
   defp serialize(pr) do
     %{
-      id: pr.id,
-      user_id: pr.user_id,
-      name: pr.name
+      id: pr[:id] || pr["id"],
+      user_id: pr[:user_id] || pr["user_id"],
+      name: pr[:name] || pr["name"]
     }
   end
 

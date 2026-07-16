@@ -424,6 +424,15 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
+  def reject_booking_with_reconciliation(id, admin_message, reconciliation) do
+    resolve_booking(
+      id,
+      %{status: :rejected, admin_message: admin_message},
+      reconciliation
+    )
+  end
+
+  @impl true
   def attach_timeout_job(booking_id, job_id) do
     case Repo.get(Booking, booking_id) do
       nil ->
@@ -454,6 +463,37 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
 
       %Booking{} ->
         {:error, :booking_not_withdrawable}
+    end
+  end
+
+  @impl true
+  def withdraw_booking_with_reconciliation(id, reconciliation) do
+    Repo.transaction(fn ->
+      case Repo.get(Booking, id) do
+        nil ->
+          Repo.rollback(:not_found)
+
+        %Booking{status: status} when status not in [:pending, :approved] ->
+          Repo.rollback(:booking_not_withdrawable)
+
+        %Booking{} = booking ->
+          normalized = booking |> preload_booking() |> normalize_booking()
+
+          with {:ok, _job} <- insert_reconciliation_job(reconciliation),
+               {:ok, _deleted} <- Repo.delete(booking) do
+            normalized
+          else
+            {:error, reason} -> Repo.rollback(reason)
+          end
+      end
+    end)
+    |> case do
+      {:ok, booking} ->
+        maybe_cancel_timeout_job(booking.timeout_job_id)
+        {:ok, booking}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
@@ -497,10 +537,19 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       else: :ok
   end
 
-  defp resolve_booking(id, params) do
-    case Repo.transaction(fn -> resolve_booking_transaction(id, params) end) do
+  defp resolve_booking(id, params, reconciliation \\ nil) do
+    case Repo.transaction(fn ->
+           with {:ok, booking} <- resolve_booking_transaction(id, params),
+                {:ok, _job} <- insert_reconciliation_job(reconciliation) do
+             {:ok, booking}
+           else
+             {:error, reason} -> Repo.rollback(reason)
+           end
+         end) do
       {:ok, {:ok, %Booking{} = booking}} ->
-        {:ok, booking |> preload_booking() |> normalize_booking()}
+        normalized = booking |> preload_booking() |> normalize_booking()
+        maybe_cancel_timeout_job(normalized.timeout_job_id)
+        {:ok, normalized}
 
       {:error, :not_found} ->
         {:error, :not_found}
@@ -514,6 +563,14 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:error, changeset}
     end
+  end
+
+  defp insert_reconciliation_job(nil), do: {:ok, :not_required}
+
+  defp insert_reconciliation_job(args) do
+    args
+    |> MilosTraining.Workers.ReconcileBookingReleaseJob.new()
+    |> Repo.insert()
   end
 
   defp cancel_booking_timeout_jobs(bookings) do

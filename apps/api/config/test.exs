@@ -38,6 +38,7 @@ config :phoenix, :plug_init_mode, :runtime
 
 config :milos_training, :start_redix, false
 config :milos_training, :start_oban, false
+config :milos_training, :start_storage_reconciler, false
 config :milos_training, :rate_limiter, MilosTraining.Infrastructure.Security.MemoryRateLimiter
 config :milos_training, :token_store, MilosTraining.Infrastructure.Security.MemoryTokenStore
 config :milos_training, :token_issuer, MilosTraining.Infrastructure.Auth.GuardianTokenIssuer

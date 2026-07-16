@@ -7,8 +7,7 @@ defmodule MilosTraining.Application.ResolveBooking do
 
     with booking when not is_nil(booking) <- Scheduling.get_booking(booking_id),
          {:ok, updated_booking} <- run_resolution(action, booking_id, admin_message) do
-      maybe_cancel_timeout(booking.timeout_job_id)
-      reconcile_visit(action, updated_booking)
+      maybe_reconcile_now(action, updated_booking)
       MilosTraining.Notifications.dispatch_event(:booking_resolved, updated_booking)
       broadcast_resolution(updated_booking)
       {:ok, updated_booking}
@@ -26,36 +25,47 @@ defmodule MilosTraining.Application.ResolveBooking do
     do: run_resolution(:approve, booking_id, admin_message)
 
   defp run_resolution(:reject, booking_id, admin_message),
-    do: Scheduling.reject_booking(booking_id, admin_message)
+    do:
+      Scheduling.reject_booking(
+        booking_id,
+        admin_message,
+        reconciliation("Booking rejected", "booking-rejected", booking_id)
+      )
 
   defp run_resolution("reject", booking_id, admin_message),
     do: run_resolution(:reject, booking_id, admin_message)
 
   defp run_resolution(_, _booking_id, _admin_message), do: :error
 
-  defp reconcile_visit(action, booking) when action in [:reject, "reject"] do
-    Finance.release_entitlement_source(
-      booking.user_id,
-      "scheduling",
-      booking.scheduled_class_id,
-      :class_visits,
-      %{
-        reason: "Booking rejected",
-        idempotency_key: "booking-rejected:#{booking.id}"
-      }
-    )
+  defp reconciliation(reason, idempotency_prefix, booking_id) do
+    booking = Scheduling.get_booking(booking_id)
+
+    %{
+      booking_id: booking.id,
+      user_id: booking.user_id,
+      scheduled_class_id: booking.scheduled_class_id,
+      reason: reason,
+      idempotency_key: "#{idempotency_prefix}:#{booking.id}"
+    }
   end
 
-  defp reconcile_visit(_action, _booking), do: :ok
+  defp maybe_reconcile_now(action, booking) when action in [:reject, "reject"] do
+    _result =
+      Finance.release_entitlement_source(
+        booking.user_id,
+        "scheduling",
+        booking.scheduled_class_id,
+        :class_visits,
+        %{
+          reason: "Booking rejected",
+          idempotency_key: "booking-rejected:#{booking.id}"
+        }
+      )
 
-  defp maybe_cancel_timeout(nil), do: :ok
-
-  defp maybe_cancel_timeout(job_id) do
-    case Oban.cancel_job(job_id) do
-      {:ok, _job} -> :ok
-      _ -> :ok
-    end
+    :ok
   end
+
+  defp maybe_reconcile_now(_action, _booking), do: :ok
 
   defp broadcast_resolution(booking) do
     Phoenix.PubSub.broadcast(

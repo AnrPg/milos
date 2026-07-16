@@ -7,8 +7,11 @@ defmodule MilosTraining.Messaging.Ports.ThreadStore do
   @callback find_context_thread(atom(), Ecto.UUID.t()) :: Thread.t() | nil
   @callback list_threads_for_user(Ecto.UUID.t(), atom() | nil) :: [Thread.t()]
   @callback create_thread(map()) :: {:ok, Thread.t()} | {:error, Ecto.Changeset.t()}
+  @callback get_or_create_thread(map(), [Ecto.UUID.t()]) ::
+              {:ok, Thread.t()} | {:error, Ecto.Changeset.t() | term()}
   @callback add_participant(Ecto.UUID.t(), Ecto.UUID.t()) ::
               {:ok, MilosTraining.Messaging.Participant.t()} | {:error, Ecto.Changeset.t()}
-  @callback mark_read(Ecto.UUID.t(), Ecto.UUID.t(), Ecto.UUID.t()) :: :ok
+  @callback mark_read(Ecto.UUID.t(), Ecto.UUID.t(), Ecto.UUID.t()) ::
+              {:ok, Ecto.UUID.t()} | {:error, :not_found | :invalid_message}
   @callback count_unread_threads(Ecto.UUID.t()) :: non_neg_integer()
 end

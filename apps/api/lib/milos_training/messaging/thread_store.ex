@@ -16,6 +16,10 @@ defmodule MilosTraining.Messaging.ThreadStore do
   @impl true
   def create_thread(attrs), do: impl().create_thread(attrs)
   @impl true
+  def get_or_create_thread(attrs, participant_ids),
+    do: impl().get_or_create_thread(attrs, participant_ids)
+
+  @impl true
   def add_participant(thread_id, user_id), do: impl().add_participant(thread_id, user_id)
   @impl true
   def mark_read(thread_id, user_id, message_id),
@@ -25,10 +29,6 @@ defmodule MilosTraining.Messaging.ThreadStore do
   def count_unread_threads(user_id), do: impl().count_unread_threads(user_id)
 
   defp impl do
-    Application.get_env(
-      :milos_training,
-      :messaging_thread_store,
-      MilosTraining.Infrastructure.Messaging.EctoThreadStore
-    )
+    Application.fetch_env!(:milos_training, :messaging_thread_store)
   end
 end

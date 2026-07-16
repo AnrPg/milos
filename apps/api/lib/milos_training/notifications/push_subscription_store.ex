@@ -2,11 +2,7 @@ defmodule MilosTraining.Notifications.PushSubscriptionStore do
   @behaviour MilosTraining.Notifications.Ports.PushSubscriptionStore
 
   defp adapter do
-    Application.get_env(
-      :milos_training,
-      :push_subscription_store,
-      MilosTraining.Infrastructure.Notifications.EctoPushSubscriptionStore
-    )
+    Application.fetch_env!(:milos_training, :push_subscription_store)
   end
 
   @impl true

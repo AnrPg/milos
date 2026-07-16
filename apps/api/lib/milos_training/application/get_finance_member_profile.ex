@@ -15,7 +15,8 @@ defmodule MilosTraining.Application.GetFinanceMemberProfile do
             profile -> profile
           end
 
-        {:ok, Map.put(profile, :drill_down, MemberDrillDown.build(user, profile))}
+        {:ok,
+         Map.put(profile, :drill_down, MemberDrillDown.build(user, profile, Date.utc_today()))}
     end
   end
 

@@ -6,7 +6,7 @@ defmodule MilosTraining.Scheduling.Domain.BookingPolicy do
 
   def can_book?(slot, opts) do
     user_id = Keyword.fetch!(opts, :user_id)
-    now = Keyword.get(opts, :now, DateTime.utc_now())
+    now = Keyword.fetch!(opts, :now)
 
     cond do
       slot_full?(slot) ->

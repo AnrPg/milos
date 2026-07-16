@@ -1,4 +1,5 @@
 defmodule MilosTraining.Infrastructure.Cache.LandingCache do
+  @behaviour MilosTraining.Application.Ports.LandingCache
   @ttl_seconds 60
 
   def get_or_fetch(user_id, fetch_fun) when is_function(fetch_fun, 0) do

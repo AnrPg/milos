@@ -7,6 +7,8 @@ defmodule MilosTraining.Application do
 
   @impl true
   def start(_type, _args) do
+    setup_open_telemetry()
+
     children =
       [
         MilosTrainingWeb.Telemetry,
@@ -17,6 +19,7 @@ defmodule MilosTraining.Application do
       ]
       |> maybe_add_oban()
       |> maybe_add_redix()
+      |> maybe_add_storage_reconciler()
       |> add_endpoint()
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -50,4 +53,18 @@ defmodule MilosTraining.Application do
   end
 
   defp add_endpoint(children), do: children ++ [MilosTrainingWeb.Endpoint]
+
+  defp maybe_add_storage_reconciler(children) do
+    if Application.get_env(:milos_training, :start_storage_reconciler, true) do
+      children ++ [MilosTraining.Infrastructure.Storage.BucketReconciler]
+    else
+      children
+    end
+  end
+
+  defp setup_open_telemetry do
+    OpentelemetryBandit.setup()
+    OpentelemetryPhoenix.setup(adapter: :bandit, liveview: false)
+    OpentelemetryEcto.setup([:milos_training, :repo], db_statement: :disabled)
+  end
 end

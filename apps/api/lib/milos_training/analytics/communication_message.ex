@@ -45,7 +45,12 @@ defmodule MilosTraining.Analytics.CommunicationMessage do
       :body,
       :sent_at
     ])
-    |> validate_inclusion(:direction, ["user_to_admin", "admin_to_user", "admin_to_admin"])
+    |> validate_inclusion(:direction, [
+      "user_to_admin",
+      "admin_to_user",
+      "admin_to_admin",
+      "user_to_user"
+    ])
     |> validate_inclusion(:channel, ["in_app", "push", "email", "sms", "manual"])
     |> foreign_key_constraint(:thread_id)
     |> foreign_key_constraint(:sender_id)

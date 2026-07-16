@@ -50,7 +50,11 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
         Repo.rollback(:not_found)
       end
 
-      changeset = User.role_changeset(user, %{role: role})
+      changeset =
+        user
+        |> User.role_changeset(%{role: role})
+        |> maybe_revoke_sessions_after_role_change()
+
       next_role = Ecto.Changeset.get_field(changeset, :role)
 
       if user.role == :admin and next_role != :admin and length(admins) <= 1 do
@@ -173,6 +177,7 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
         user
         |> User.profile_changeset(params)
         |> maybe_put_password_hash()
+        |> maybe_revoke_sessions_after_password_change()
         |> Repo.update()
         |> wrap_result()
     end
@@ -242,6 +247,29 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
     |> Kernel.||(0)
   end
 
+  @impl true
+  def bump_security_version(user_id) do
+    Repo.transaction(fn ->
+      case User |> where([user], user.id == ^user_id) |> lock("FOR UPDATE") |> Repo.one() do
+        nil ->
+          Repo.rollback(:not_found)
+
+        user ->
+          user
+          |> User.security_version_changeset((user.security_version || 1) + 1)
+          |> Repo.update()
+          |> case do
+            {:ok, updated} -> to_account(updated)
+            {:error, changeset} -> Repo.rollback(changeset)
+          end
+      end
+    end)
+    |> case do
+      {:ok, account} -> {:ok, account}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
   defp to_account(nil), do: nil
 
   defp to_account(%User{} = user) do
@@ -251,9 +279,34 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
       role: user.role,
       password_hash: user.password_hash,
       calendar_feed_token_version: user.calendar_feed_token_version || 1,
+      security_version: user.security_version || 1,
       avatar_url: user.avatar_url,
       preferred_locale: user.preferred_locale || "en",
       inserted_at: user.inserted_at
     }
+  end
+
+  defp maybe_revoke_sessions_after_password_change(changeset) do
+    if Ecto.Changeset.changed?(changeset, :password_hash) do
+      Ecto.Changeset.put_change(
+        changeset,
+        :security_version,
+        (changeset.data.security_version || 1) + 1
+      )
+    else
+      changeset
+    end
+  end
+
+  defp maybe_revoke_sessions_after_role_change(changeset) do
+    if Ecto.Changeset.changed?(changeset, :role) do
+      Ecto.Changeset.put_change(
+        changeset,
+        :security_version,
+        (changeset.data.security_version || 1) + 1
+      )
+    else
+      changeset
+    end
   end
 end

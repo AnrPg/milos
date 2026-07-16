@@ -23,11 +23,11 @@ defmodule MilosTraining.Gamification.Domain.PerseveranceCalculator do
         }
 
   @spec calculate([modification()], [integer()], Date.t()) :: float()
-  def calculate(exercise_modifications, off_days, current_date \\ Date.utc_today())
+  def calculate(exercise_modifications, off_days, current_date)
 
   def calculate([], _off_days, _current_date), do: 100.0
 
-  def calculate(exercise_modifications, off_days, current_date) do
+  def calculate(exercise_modifications, off_days, %Date{} = current_date) do
     off_day_set = MapSet.new(off_days)
 
     recent_training_days =
@@ -57,7 +57,7 @@ defmodule MilosTraining.Gamification.Domain.PerseveranceCalculator do
   end
 
   defp last_n_training_days(current_date, n, off_day_set) do
-    Stream.iterate(Date.add(current_date, -1), &Date.add(&1, -1))
+    Stream.iterate(current_date, &Date.add(&1, -1))
     |> Stream.reject(fn date ->
       day_of_week = Date.day_of_week(date, :sunday) - 1
       MapSet.member?(off_day_set, day_of_week)

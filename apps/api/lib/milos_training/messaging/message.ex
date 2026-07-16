@@ -12,6 +12,7 @@ defmodule MilosTraining.Messaging.Message do
     field :sender_id, :binary_id
     field :body, :string
     field :message_type, Ecto.Enum, values: @message_types, default: :chat
+    field :sequence_number, :integer, read_after_writes: true
 
     timestamps(updated_at: false)
   end
@@ -21,5 +22,7 @@ defmodule MilosTraining.Messaging.Message do
     |> cast(attrs, [:thread_id, :sender_id, :body, :message_type])
     |> validate_required([:thread_id, :sender_id, :body])
     |> validate_length(:body, min: 1, max: 5000)
+    |> foreign_key_constraint(:thread_id)
+    |> foreign_key_constraint(:sender_id)
   end
 end

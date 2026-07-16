@@ -4,7 +4,7 @@ defmodule MilosTraining.Gamification.Domain.StreakCalculator do
 
   def update(stats, opts) do
     completed_dates = Keyword.get(opts, :completed_dates, [])
-    current_date = Keyword.get(opts, :current_date, Date.utc_today())
+    current_date = Keyword.fetch!(opts, :current_date)
     target = Keyword.get(opts, :target, @default_target)
     anchor_date = Keyword.get(opts, :anchor_date)
     shield_reset_day = Keyword.get(opts, :shield_reset_day)
@@ -28,10 +28,6 @@ defmodule MilosTraining.Gamification.Domain.StreakCalculator do
     calculate(completed_dates, nil, opts)
   end
 
-  def calculate(completed_dates, anchor_date) do
-    calculate(completed_dates, anchor_date, [])
-  end
-
   def calculate([], _anchor_date, _opts) do
     %{
       current_streak: 0,
@@ -50,7 +46,7 @@ defmodule MilosTraining.Gamification.Domain.StreakCalculator do
   end
 
   def calculate(completed_dates, anchor_date, opts) do
-    current_date = Keyword.get(opts, :current_date, Date.utc_today())
+    current_date = Keyword.fetch!(opts, :current_date)
     target = Keyword.get(opts, :target, @default_target)
     shield_reset_day = Keyword.get(opts, :shield_reset_day)
     normalized_anchor_date = anchor_date || earliest_date(completed_dates)

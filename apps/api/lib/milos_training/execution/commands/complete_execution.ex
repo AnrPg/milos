@@ -1,5 +1,5 @@
 defmodule MilosTraining.Execution.Commands.CompleteExecution do
-  alias MilosTraining.Execution.Domain.ProgressSnapshotter
+  alias MilosTraining.Execution.Domain.{ProgressSnapshotter, ProgressValidator}
   alias MilosTraining.Execution.ExecutionStore
 
   def call(execution_id, user_id, params, opts \\ []) do
@@ -16,6 +16,22 @@ defmodule MilosTraining.Execution.Commands.CompleteExecution do
                normalize_int_map(params, execution, :segment_cycle_counts),
              segments <- Map.get(params, :segments, Map.get(params, "segments", [])),
              manual_scores <- params[:section_scores] || params["section_scores"] || [],
+             current_segment_index <-
+               params[:current_segment_index] || params["current_segment_index"] ||
+                 execution.current_segment_index || 0,
+             :ok <-
+               ProgressValidator.validate(
+                 %{
+                   checked_exercise_ids: checked_exercise_ids,
+                   current_segment_index: current_segment_index,
+                   paused_elapsed_ms: execution.paused_elapsed_ms || 0,
+                   total_elapsed_ms: total_elapsed_ms,
+                   section_elapsed_ms: section_elapsed_ms,
+                   segment_cycle_counts: segment_cycle_counts
+                 },
+                 segments,
+                 execution
+               ),
              :ok <- validate_manual_scores(params, segments, manual_scores) do
           section_scores =
             segments
@@ -32,9 +48,7 @@ defmodule MilosTraining.Execution.Commands.CompleteExecution do
             completed_at_utc: DateTime.utc_now(),
             completed_at_tz: params[:timezone] || params["timezone"] || "UTC",
             status: :completed,
-            current_segment_index:
-              params[:current_segment_index] || params["current_segment_index"] ||
-                execution.current_segment_index || 0,
+            current_segment_index: current_segment_index,
             segment_started_at_utc: nil,
             paused_elapsed_ms: execution.paused_elapsed_ms || 0,
             resume_countdown_ends_at_utc: nil,

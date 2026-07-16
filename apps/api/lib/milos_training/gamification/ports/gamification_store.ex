@@ -3,6 +3,7 @@ defmodule MilosTraining.Gamification.Ports.GamificationStore do
   @callback get_settings() :: map()
   @callback update_settings(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback upsert_user_stats(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
+  @callback increment_advancement(Ecto.UUID.t(), DateTime.t()) :: {:ok, map()} | {:error, term()}
   @callback create_achievement(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback list_user_achievements(Ecto.UUID.t()) :: [map()]
   @callback count_achievements_by_prefix(Ecto.UUID.t(), String.t()) :: non_neg_integer()

@@ -2,11 +2,7 @@ defmodule MilosTraining.Workouts.WorkoutStore do
   @behaviour MilosTraining.Workouts.Ports.WorkoutStore
 
   defp adapter do
-    Application.get_env(
-      :milos_training,
-      :workout_store,
-      MilosTraining.Infrastructure.Workouts.EctoWorkoutStore
-    )
+    Application.fetch_env!(:milos_training, :workout_store)
   end
 
   @impl true

@@ -1,22 +1,20 @@
 defmodule MilosTraining.Application.UpdatePR do
-  alias MilosTraining.Application.InvalidateLandingPages
-  alias MilosTraining.Gamification.GamificationStore
-  alias MilosTraining.Infrastructure.Search.MeilisearchPRIndex
-  alias MilosTraining.Pantheon.PRStore
+  alias MilosTraining.Application.{InvalidateLandingPages, PRSearchIndex}
+  alias MilosTraining.{Gamification, Pantheon}
 
   def call(id, user_id, params) do
-    case PRStore.get_pr_for_user(id, user_id) do
+    case Pantheon.get_record_for_user(id, user_id) do
       nil ->
         {:error, :not_found}
 
       existing_pr ->
-        case PRStore.update_pr(id, params) do
+        case Pantheon.update_record(id, params) do
           {:ok, updated_pr} ->
             if score_improved?(existing_pr, updated_pr) do
-              increment_advancement(user_id)
+              {:ok, _stats} = Gamification.increment_advancement(user_id, DateTime.utc_now())
             end
 
-            Task.start(fn -> MeilisearchPRIndex.upsert_document(updated_pr) end)
+            :ok = PRSearchIndex.enqueue_upsert(updated_pr)
             InvalidateLandingPages.for_users([user_id])
             {:ok, updated_pr}
 
@@ -35,16 +33,5 @@ defmodule MilosTraining.Application.UpdatePR do
     else
       new_score < old_score
     end
-  end
-
-  defp increment_advancement(user_id) do
-    existing = GamificationStore.get_user_stats(user_id) || %{advancement_count: 0}
-    current = existing[:advancement_count] || 0
-
-    GamificationStore.upsert_user_stats(%{
-      user_id: user_id,
-      advancement_count: current + 1,
-      updated_at: DateTime.utc_now()
-    })
   end
 end

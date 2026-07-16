@@ -42,6 +42,7 @@ defmodule MilosTrainingWeb.Endpoint do
     cookie_key: "request_logger"
 
   plug MilosTrainingWeb.Plugs.RestoreRemoteIp
+  plug MilosTrainingWeb.Plugs.ForceSslExceptHealth
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
   plug MilosTrainingWeb.Plugs.Cors

@@ -18,5 +18,6 @@ defmodule MilosTraining.Identity do
   defdelegate update_avatar(user_id, avatar_url), to: UserStore
   defdelegate search_users(query), to: UserStore
   defdelegate count_by_role(role), to: UserStore
+  defdelegate bump_security_version(user_id), to: UserStore
   defdelegate supported_locales(), to: Locale, as: :supported
 end

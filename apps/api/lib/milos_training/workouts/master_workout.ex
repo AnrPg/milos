@@ -6,7 +6,7 @@ defmodule MilosTraining.Workouts.MasterWorkout do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
-  @types [:crossfit, :strength, :gymnastics, :aerobics, :flexibility, :recovery]
+  @types MilosTraining.Workouts.Domain.WorkoutType.values()
   @statuses [:draft, :published]
 
   schema "master_workouts" do

@@ -8,11 +8,11 @@ defmodule MilosTraining.Gamification.Domain.MotivationCalculator do
   @weeks_to_check 10
 
   @spec calculate([Date.t()], non_neg_integer(), Date.t()) :: float()
-  def calculate(completed_dates, weekly_target, current_date \\ Date.utc_today())
+  def calculate(completed_dates, weekly_target, current_date)
 
   def calculate([], _target, _current_date), do: 0.0
 
-  def calculate(completed_dates, weekly_target, current_date) do
+  def calculate(completed_dates, weekly_target, %Date{} = current_date) do
     weeks_on_target =
       0..(@weeks_to_check - 1)
       |> Enum.count(fn weeks_ago ->

@@ -19,4 +19,6 @@ defmodule MilosTraining.Identity.Ports.UserStore do
               {:ok, Account.t()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
   @callback search_users(String.t() | nil) :: [Account.t()]
   @callback count_by_role(atom() | String.t()) :: non_neg_integer()
+  @callback bump_security_version(Ecto.UUID.t()) ::
+              {:ok, Account.t()} | {:error, :not_found | Ecto.Changeset.t()}
 end

@@ -3,7 +3,7 @@ defmodule MilosTraining.Finance.Domain.MembershipLifecycle do
   @date_driven_statuses ["active", "trial", "expiring", "expired"]
   @expiring_window_days 30
 
-  def derive_status(status, starts_on, expires_on, today \\ Date.utc_today()) do
+  def derive_status(status, starts_on, expires_on, %Date{} = today) do
     starts_on = parse_date(starts_on)
     expires_on = parse_date(expires_on)
 
@@ -14,7 +14,7 @@ defmodule MilosTraining.Finance.Domain.MembershipLifecycle do
       expires_on && Date.compare(expires_on, today) == :lt ->
         "expired"
 
-      status in @date_driven_statuses and expires_on &&
+      (status in @date_driven_statuses and expires_on) &&
           Date.diff(expires_on, today) <= @expiring_window_days ->
         "expiring"
 
@@ -26,7 +26,7 @@ defmodule MilosTraining.Finance.Domain.MembershipLifecycle do
     end
   end
 
-  def active_for_summary?(status, expires_on, today \\ Date.utc_today()) do
+  def active_for_summary?(status, expires_on, %Date{} = today) do
     expires_on = parse_date(expires_on)
 
     status in ["active", "trial", "expiring", "comped"] and

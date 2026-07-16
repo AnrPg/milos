@@ -1,7 +1,6 @@
 defmodule MilosTraining.Application.GetCalendarExportLinks do
-  alias MilosTraining.Application.CalendarFeedToken
+  alias MilosTraining.Application.{CalendarFeedToken, PublicURL}
   alias MilosTraining.Identity
-  alias MilosTrainingWeb.Endpoint
 
   def call(user, opts \\ []) do
     with {:ok, user} <- maybe_regenerate(user, Keyword.get(opts, :regenerate, false)) do
@@ -15,7 +14,7 @@ defmodule MilosTraining.Application.GetCalendarExportLinks do
   defp build_links(user) do
     token = CalendarFeedToken.sign(user)
     path = "/api/calendar/feed.ics?token=#{URI.encode_www_form(token)}"
-    https_url = Endpoint.url() <> path
+    https_url = PublicURL.base_url() <> path
     webcal_url = String.replace_prefix(https_url, "https://", "webcal://")
     webcal_url = String.replace_prefix(webcal_url, "http://", "webcal://")
 

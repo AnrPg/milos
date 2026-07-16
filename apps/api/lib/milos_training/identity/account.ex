@@ -8,6 +8,7 @@ defmodule MilosTraining.Identity.Account do
     :role,
     :password_hash,
     :calendar_feed_token_version,
+    :security_version,
     :avatar_url,
     :preferred_locale,
     :inserted_at

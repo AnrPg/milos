@@ -4,11 +4,11 @@ defmodule MilosTraining.Application.CalendarFeedToken do
   # links revokes previously leaked URLs without rotating the app secret.
   @salt "calendar-feed-v1"
 
+  alias MilosTraining.Application.SignedToken
   alias MilosTraining.Identity
-  alias MilosTrainingWeb.Endpoint
 
   def sign(user) do
-    Phoenix.Token.sign(Endpoint, @salt, %{
+    SignedToken.sign(@salt, %{
       "user_id" => user.id,
       "role" => to_string(user.role),
       "version" => user.calendar_feed_token_version || 1
@@ -17,7 +17,7 @@ defmodule MilosTraining.Application.CalendarFeedToken do
 
   def verify(token) when is_binary(token) do
     with {:ok, %{"user_id" => user_id, "version" => token_version}} <-
-           Phoenix.Token.verify(Endpoint, @salt, token, max_age: :infinity),
+           SignedToken.verify(@salt, token, max_age: :infinity),
          user when not is_nil(user) <- Identity.find_by_id(user_id) do
       if token_version == (user.calendar_feed_token_version || 1) do
         {:ok, user}

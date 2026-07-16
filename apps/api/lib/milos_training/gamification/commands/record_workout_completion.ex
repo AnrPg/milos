@@ -51,7 +51,7 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
 
     perseverance_score =
       PerseveranceCalculator.calculate(
-        current_execution.exercise_modifications || [],
+        Map.get(current_execution, :exercise_modifications, []),
         off_days,
         today
       )

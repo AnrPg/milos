@@ -2,15 +2,11 @@ defmodule MilosTraining.Application.GetLandingPage do
   alias MilosTraining.Application.{GetLeaderboardSnippet, ListWorkoutExecutions}
   alias MilosTraining.{Finance, Gamification, Identity, Messaging, Scheduling}
   alias MilosTraining.Gamification.Domain.{ChallengeCriteria, ChallengeProgress}
-  alias MilosTraining.Gamification.TrainingQuote
-  alias MilosTraining.Infrastructure.Cache.LandingCache
-  alias MilosTraining.Repo
-
-  import Ecto.Query
+  alias MilosTraining.Application.LandingCache
 
   def call(user) do
     cached = LandingCache.get_or_fetch(user.id, fn -> build_cached_payload(user) end)
-    quote = random_quote()
+    quote = training_quote(user)
     {:ok, Map.put(cached, "quote", quote)}
   end
 
@@ -152,11 +148,9 @@ defmodule MilosTraining.Application.GetLandingPage do
     }
   end
 
-  defp random_quote do
-    TrainingQuote
-    |> order_by(fragment("RANDOM()"))
-    |> limit(1)
-    |> Repo.one()
+  defp training_quote(user) do
+    Date.utc_today()
+    |> Gamification.get_training_quote(user.id)
     |> case do
       nil -> nil
       q -> %{"body" => q.body, "author" => q.author}
@@ -164,17 +158,7 @@ defmodule MilosTraining.Application.GetLandingPage do
   end
 
   defp coach_notes_payload(%{role: :athlete, id: user_id}) do
-    user_id
-    |> Messaging.list_threads_for_user(:direct)
-    |> Enum.flat_map(fn thread ->
-      case Messaging.list_messages(thread.id, %{limit: 50}) do
-        {:ok, messages} -> messages
-        _ -> []
-      end
-    end)
-    |> Enum.filter(&(&1.message_type == :coaching_note))
-    |> Enum.sort_by(& &1.inserted_at, {:desc, DateTime})
-    |> Enum.take(5)
+    Messaging.list_recent_coaching_notes(user_id, 5)
   end
 
   defp coach_notes_payload(_user), do: []

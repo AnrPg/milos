@@ -2,6 +2,7 @@ defmodule MilosTraining.Gamification do
   alias MilosTraining.Gamification.Commands.{
     CreateSeasonalChallenge,
     DeleteSeasonalChallenge,
+    IncrementAdvancement,
     RecordWorkoutCompletion,
     RefreshLeaderboard,
     SetLeaderboardOptIn,
@@ -17,6 +18,7 @@ defmodule MilosTraining.Gamification do
     GetChallenge,
     GetLeaderboard,
     GetSettings,
+    GetTrainingQuote,
     GetUserStats,
     LeaderboardOptedIn,
     ListChallenges,
@@ -37,6 +39,8 @@ defmodule MilosTraining.Gamification do
   defdelegate list_challenges(), to: ListChallenges, as: :call
   defdelegate leaderboard_opted_in?(user_id), to: LeaderboardOptedIn, as: :call
   defdelegate refresh_leaderboard(), to: RefreshLeaderboard, as: :call
+  defdelegate get_training_quote(date, subject_id), to: GetTrainingQuote, as: :for_subject
+  defdelegate increment_advancement(user_id, occurred_at), to: IncrementAdvancement, as: :call
 
   defdelegate get_user_preferences(user_id), to: GamificationStore
 

@@ -1,12 +1,11 @@
 defmodule MilosTraining.Application.DeletePR do
-  alias MilosTraining.Application.InvalidateLandingPages
-  alias MilosTraining.Infrastructure.Search.MeilisearchPRIndex
-  alias MilosTraining.Pantheon.PRStore
+  alias MilosTraining.Application.{InvalidateLandingPages, PRSearchIndex}
+  alias MilosTraining.Pantheon
 
   def call(id, user_id) do
-    case PRStore.delete_pr(id, user_id) do
+    case Pantheon.delete_record(id, user_id) do
       :ok ->
-        Task.start(fn -> MeilisearchPRIndex.delete_document(id) end)
+        :ok = PRSearchIndex.enqueue_delete(id)
         InvalidateLandingPages.for_users([user_id])
         :ok
 

@@ -3,7 +3,7 @@ defmodule MilosTraining.Finance.Domain.MemberDrillDown do
 
   @expiring_window_days 30
 
-  def build(user, profile, today \\ Date.utc_today()) do
+  def build(user, profile, %Date{} = today) do
     profile = normalize_profile(profile)
     membership = Map.get(profile, :membership)
     entitlement = Map.get(profile, :entitlement) || %{}

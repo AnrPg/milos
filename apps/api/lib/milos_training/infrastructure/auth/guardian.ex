@@ -18,10 +18,21 @@ defmodule MilosTraining.Infrastructure.Auth.Guardian do
       end
   end
 
-  def resource_from_claims(%{"sub" => id}) do
+  def resource_from_claims(%{"sub" => id} = claims) do
     case Identity.find_by_id(id) do
       nil -> {:error, :not_found}
-      user -> {:ok, user}
+      user -> validate_security_version(user, claims)
     end
   end
+
+  defp validate_security_version(user, %{"sv" => version})
+       when version == user.security_version,
+       do: {:ok, user}
+
+  defp validate_security_version(_user, %{"sv" => _version}), do: {:error, :invalid_token}
+
+  # Transitional compatibility for tokens issued before the security-version migration.
+  # They naturally expire within the access/refresh TTL and cannot bypass a version bump.
+  defp validate_security_version(%{security_version: 1} = user, _legacy_claims), do: {:ok, user}
+  defp validate_security_version(_user, _legacy_claims), do: {:error, :invalid_token}
 end

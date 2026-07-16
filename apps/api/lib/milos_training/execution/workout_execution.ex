@@ -29,6 +29,7 @@ defmodule MilosTraining.Execution.WorkoutExecution do
     field(:section_scores, {:array, :map}, default: [])
     field(:exercise_notes, {:array, :map}, default: [])
     field(:exercise_modifications, {:array, :map}, default: [])
+    field(:lock_version, :integer, default: 1)
 
     timestamps(updated_at: false)
   end
@@ -107,5 +108,6 @@ defmodule MilosTraining.Execution.WorkoutExecution do
     |> validate_number(:current_segment_index, greater_than_or_equal_to: 0)
     |> validate_number(:paused_elapsed_ms, greater_than_or_equal_to: 0)
     |> validate_number(:total_elapsed_ms, greater_than_or_equal_to: 0)
+    |> optimistic_lock(:lock_version)
   end
 end

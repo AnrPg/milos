@@ -1,8 +1,33 @@
 defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
   @moduledoc false
+  @behaviour MilosTraining.Application.Ports.DocumentStorage
+  @behaviour MilosTraining.Application.Ports.AvatarStorage
 
   @expires_seconds 900
+  @max_avatar_bytes 5 * 1_024 * 1_024
+  @allowed_avatar_types ~w(image/jpeg image/png image/webp)
 
+  def ensure_buckets do
+    {document_config, _document_url, document_bucket} = ex_aws_config()
+    {avatar_config, _avatar_url, avatar_bucket} = avatar_ex_aws_config()
+
+    with :ok <- ensure_bucket(document_config, document_bucket),
+         :ok <- ensure_bucket(avatar_config, avatar_bucket),
+         :ok <- ensure_avatar_read_policy(avatar_config, avatar_bucket) do
+      :ok
+    end
+  end
+
+  def health_status do
+    {config, _url_config, bucket} = ex_aws_config()
+
+    case bucket_probe_operation(bucket) |> ExAws.request(config) do
+      {:ok, _response} -> :ok
+      _other -> :error
+    end
+  end
+
+  @impl MilosTraining.Application.Ports.DocumentStorage
   def presigned_upload_url(key) do
     {storage_config, url_config, bucket} = ex_aws_config()
 
@@ -14,6 +39,7 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
     end
   end
 
+  @impl MilosTraining.Application.Ports.DocumentStorage
   def presigned_download_url(key) do
     {_storage_config, url_config, bucket} = ex_aws_config()
 
@@ -23,8 +49,10 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
     )
   end
 
-  def presigned_avatar_upload_url(user_id) do
-    key = "avatars/#{user_id}"
+  @impl true
+  def create_upload(user_id, content_type, byte_size) do
+    extension = extension_for(content_type)
+    key = "avatars/#{user_id}/#{Ecto.UUID.generate()}.#{extension}"
     {storage_config, url_config, bucket} = avatar_ex_aws_config()
 
     with :ok <- ensure_bucket(storage_config, bucket),
@@ -32,11 +60,47 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
          {:ok, url} <-
            ExAws.S3.presigned_url(url_config, :put, bucket, key,
              expires_in: @expires_seconds,
-             virtual_host: false
+             virtual_host: false,
+             headers: [{"content-type", content_type}, {"content-length", to_string(byte_size)}]
            ) do
-      {:ok, %{upload_url: url, public_url: avatar_public_url(bucket, key), key: key}}
+      {:ok,
+       %{
+         upload_url: url,
+         key: key,
+         required_headers: %{
+           "content-type" => content_type,
+           "content-length" => to_string(byte_size)
+         },
+         expires_in: @expires_seconds,
+         max_bytes: @max_avatar_bytes
+       }}
     end
   end
+
+  @impl true
+  def validate_uploaded(user_id, "avatars/" <> _rest = key) do
+    expected_prefix = "avatars/#{user_id}/"
+
+    if String.starts_with?(key, expected_prefix) do
+      {storage_config, _url_config, bucket} = avatar_ex_aws_config()
+
+      with {:ok, %{headers: headers}} <-
+             ExAws.S3.head_object(bucket, key) |> ExAws.request(storage_config),
+           {:ok, content_type, byte_size} <- avatar_metadata(headers),
+           true <- content_type in @allowed_avatar_types and byte_size <= @max_avatar_bytes do
+        {:ok, avatar_public_url(bucket, key)}
+      else
+        _ -> {:error, :invalid_avatar_upload}
+      end
+    else
+      {:error, :invalid_avatar_upload}
+    end
+  end
+
+  def validate_uploaded(_user_id, _key), do: {:error, :invalid_avatar_upload}
+
+  @doc false
+  def bucket_probe_operation(bucket), do: ExAws.S3.get_bucket_location(bucket)
 
   defp ex_aws_config do
     endpoint = Application.get_env(:milos_training, :minio_endpoint, "http://localhost:9000")
@@ -61,7 +125,7 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
   end
 
   defp ensure_bucket(config, bucket) do
-    case ExAws.S3.head_bucket(bucket) |> ExAws.request(config) do
+    case bucket_probe_operation(bucket) |> ExAws.request(config) do
       {:ok, _response} ->
         :ok
 
@@ -125,5 +189,19 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
 
   defp public_endpoint(endpoint) do
     Application.get_env(:milos_training, :minio_public_endpoint) || endpoint
+  end
+
+  defp extension_for("image/jpeg"), do: "jpg"
+  defp extension_for("image/png"), do: "png"
+  defp extension_for("image/webp"), do: "webp"
+
+  defp avatar_metadata(headers) do
+    normalized = Map.new(headers, fn {key, value} -> {String.downcase(key), value} end)
+    content_type = normalized["content-type"]
+
+    case Integer.parse(to_string(normalized["content-length"])) do
+      {byte_size, ""} when byte_size > 0 -> {:ok, content_type, byte_size}
+      _ -> {:error, :invalid_avatar_upload}
+    end
   end
 end

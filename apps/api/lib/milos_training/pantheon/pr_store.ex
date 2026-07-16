@@ -2,11 +2,7 @@ defmodule MilosTraining.Pantheon.PRStore do
   @behaviour MilosTraining.Pantheon.Ports.PRStore
 
   defp adapter do
-    Application.get_env(
-      :milos_training,
-      :pr_store,
-      MilosTraining.Infrastructure.Pantheon.EctoPRStore
-    )
+    Application.fetch_env!(:milos_training, :pr_store)
   end
 
   @impl true

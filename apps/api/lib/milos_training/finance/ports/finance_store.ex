@@ -1,6 +1,7 @@
 defmodule MilosTraining.Finance.Ports.FinanceStore do
   @callback create_package(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback update_package(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
+  @callback retire_package(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback list_packages() :: [map()]
   @callback get_package(Ecto.UUID.t()) :: map() | nil
   @callback upsert_membership(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}

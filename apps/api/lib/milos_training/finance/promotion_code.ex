@@ -29,7 +29,13 @@ defmodule MilosTraining.Finance.PromotionCode do
       :params
     ])
     |> update_change(:code, &normalize_code/1)
-    |> validate_required([:promotion_campaign_id, :code, :discount_type, :discount_value, :active])
+    |> validate_required([
+      :promotion_campaign_id,
+      :code,
+      :discount_type,
+      :discount_value,
+      :active
+    ])
     |> validate_inclusion(:discount_type, ["percent", "fixed_amount", "free_period", "manual"])
     |> validate_number(:discount_value, greater_than_or_equal_to: 0)
     |> validate_percent_limit()

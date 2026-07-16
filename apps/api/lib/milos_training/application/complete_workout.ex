@@ -120,7 +120,10 @@ defmodule MilosTraining.Application.CompleteWorkout do
 
   defp timer_sequence_for_execution(%{master_workout_id: nil}), do: {:ok, []}
 
-  defp timer_sequence_for_execution(%{master_workout_id: workout_id, scale_level_slug: scale_slug}) do
+  defp timer_sequence_for_execution(%{
+         master_workout_id: workout_id,
+         scale_level_slug: scale_slug
+       }) do
     case resolve_workout(workout_id, scale_slug) do
       nil -> {:ok, []}
       workout -> {:ok, Execution.build_timer_sequence(workout)}

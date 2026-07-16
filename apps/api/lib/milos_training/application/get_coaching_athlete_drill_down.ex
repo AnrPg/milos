@@ -34,16 +34,7 @@ defmodule MilosTraining.Application.GetCoachingAthleteDrillDown do
   end
 
   defp fetch_coaching_messages(athlete_id) do
-    athlete_id
-    |> Messaging.list_threads_for_user(:direct)
-    |> Enum.flat_map(fn thread ->
-      case Messaging.list_messages(thread.id, %{limit: 100}) do
-        {:ok, messages} -> messages
-        _ -> []
-      end
-    end)
-    |> Enum.filter(&(&1.message_type == :coaching_note))
-    |> Enum.sort_by(& &1.inserted_at, {:desc, DateTime})
+    Messaging.list_recent_coaching_notes(athlete_id, 50)
   end
 
   defp assignment_window(params) do

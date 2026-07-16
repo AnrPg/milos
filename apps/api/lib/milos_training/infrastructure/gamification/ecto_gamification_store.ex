@@ -75,6 +75,36 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
   end
 
   @impl true
+  def increment_advancement(user_id, occurred_at) do
+    defaults = %{
+      id: Ecto.UUID.generate(),
+      user_id: user_id,
+      current_streak: 0,
+      longest_streak: 0,
+      total_workouts: 0,
+      total_prs: 0,
+      current_streak_shields: 1,
+      consistency_score: 0.0,
+      motivation_score: 0.0,
+      perseverance_score: 0.0,
+      advancement_count: 1,
+      updated_at: occurred_at
+    }
+
+    Repo.insert_all(UserStat, [defaults],
+      conflict_target: [:user_id],
+      on_conflict: [inc: [advancement_count: 1], set: [updated_at: occurred_at]]
+    )
+
+    case get_user_stats(user_id) do
+      nil -> {:error, :advancement_not_recorded}
+      stats -> {:ok, stats}
+    end
+  rescue
+    error -> {:error, error}
+  end
+
+  @impl true
   def create_achievement(params) do
     case Repo.get_by(UserAchievement, user_id: params.user_id, badge_key: params.badge_key) do
       nil ->
@@ -514,11 +544,17 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
       Repo.get_by(UserGamificationPreferences, user_id: user_id) || %UserGamificationPreferences{}
 
     existing
-    |> UserGamificationPreferences.changeset(Map.put(params, :user_id, user_id))
+    |> UserGamificationPreferences.changeset(user_preferences_params(user_id, params))
     |> Repo.insert_or_update()
     |> case do
       {:ok, prefs} -> {:ok, %{off_days: prefs.off_days}}
       {:error, changeset} -> {:error, changeset}
     end
+  end
+
+  defp user_preferences_params(user_id, params) do
+    params
+    |> Map.new(fn {key, value} -> {to_string(key), value} end)
+    |> Map.put("user_id", user_id)
   end
 end

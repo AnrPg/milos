@@ -12,6 +12,7 @@ defmodule MilosTraining.Identity.User do
     field :password_hash, :string
     field :role, Ecto.Enum, values: RegistrationPolicy.roles()
     field :calendar_feed_token_version, :integer, default: 1
+    field :security_version, :integer, default: 1
     field :avatar_url, :string
     field :preferred_locale, :string, default: "en"
 
@@ -73,7 +74,7 @@ defmodule MilosTraining.Identity.User do
 
   def profile_changeset(user, params) do
     user
-    |> cast(params, [:nickname, :password, :avatar_url, :preferred_locale])
+    |> cast(params, [:nickname, :password, :preferred_locale])
     |> maybe_normalize_nickname()
     |> maybe_validate_nickname()
     |> maybe_validate_password()
@@ -90,5 +91,11 @@ defmodule MilosTraining.Identity.User do
     |> cast(params, [:calendar_feed_token_version])
     |> validate_required([:calendar_feed_token_version])
     |> validate_number(:calendar_feed_token_version, greater_than: 0)
+  end
+
+  def security_version_changeset(user, version) do
+    user
+    |> change(security_version: version)
+    |> validate_number(:security_version, greater_than: 0)
   end
 end

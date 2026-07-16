@@ -11,10 +11,6 @@ defmodule MilosTraining.Application.TokenStore do
   def consume(jti, ttl_ms), do: impl().consume(jti, ttl_ms)
 
   defp impl do
-    Application.get_env(
-      :milos_training,
-      :token_store,
-      MilosTraining.Infrastructure.Security.RedisTokenStore
-    )
+    Application.fetch_env!(:milos_training, :token_store)
   end
 end

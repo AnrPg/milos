@@ -34,11 +34,10 @@ defmodule MilosTraining.Identity.UserStore do
   @impl true
   def count_by_role(role), do: impl().count_by_role(role)
 
+  @impl true
+  def bump_security_version(user_id), do: impl().bump_security_version(user_id)
+
   defp impl do
-    Application.get_env(
-      :milos_training,
-      :identity_user_store,
-      MilosTraining.Infrastructure.Identity.EctoUserStore
-    )
+    Application.fetch_env!(:milos_training, :identity_user_store)
   end
 end

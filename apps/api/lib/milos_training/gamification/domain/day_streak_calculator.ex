@@ -10,7 +10,7 @@ defmodule MilosTraining.Gamification.Domain.DayStreakCalculator do
           current_streak: non_neg_integer(),
           longest_streak: non_neg_integer()
         }
-  def calculate(completed_dates, off_days, current_date \\ Date.utc_today()) do
+  def calculate(completed_dates, off_days, %Date{} = current_date) do
     completed_set = MapSet.new(completed_dates)
     off_day_set = MapSet.new(off_days)
 

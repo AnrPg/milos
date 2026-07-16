@@ -2,11 +2,7 @@ defmodule MilosTraining.Coaching.CoachingStore do
   @behaviour MilosTraining.Coaching.Ports.CoachingStore
 
   defp adapter do
-    Application.get_env(
-      :milos_training,
-      :coaching_store,
-      MilosTraining.Infrastructure.Coaching.EctoCoachingStore
-    )
+    Application.fetch_env!(:milos_training, :coaching_store)
   end
 
   @impl true

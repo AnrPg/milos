@@ -42,10 +42,14 @@ defmodule MilosTraining.Scheduling.Ports.SchedulingStore do
               {:ok, map()}
               | {:error, Ecto.Changeset.t()}
               | {:error, :not_found | :booking_not_pending}
+  @callback reject_booking_with_reconciliation(Ecto.UUID.t(), String.t() | nil, map()) ::
+              {:ok, map()} | {:error, term()}
   @callback attach_timeout_job(Ecto.UUID.t(), integer()) ::
               {:ok, map()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
   @callback withdraw_booking(Ecto.UUID.t()) ::
               {:ok, map()} | {:error, :not_found | :booking_not_withdrawable}
+  @callback withdraw_booking_with_reconciliation(Ecto.UUID.t(), map()) ::
+              {:ok, map()} | {:error, term()}
   @callback cancel_active_future_bookings_for_user(Ecto.UUID.t()) ::
               {:ok, [Ecto.UUID.t()]} | {:error, Ecto.Changeset.t()}
   @callback substitute_slot_workout(Ecto.UUID.t(), Ecto.UUID.t()) ::

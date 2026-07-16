@@ -2,11 +2,7 @@ defmodule MilosTraining.Scheduling.SchedulingStore do
   @behaviour MilosTraining.Scheduling.Ports.SchedulingStore
 
   defp adapter do
-    Application.get_env(
-      :milos_training,
-      :scheduling_store,
-      MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore
-    )
+    Application.fetch_env!(:milos_training, :scheduling_store)
   end
 
   @impl true
@@ -87,10 +83,18 @@ defmodule MilosTraining.Scheduling.SchedulingStore do
   def reject_booking(id, admin_message), do: adapter().reject_booking(id, admin_message)
 
   @impl true
+  def reject_booking_with_reconciliation(id, admin_message, reconciliation),
+    do: adapter().reject_booking_with_reconciliation(id, admin_message, reconciliation)
+
+  @impl true
   def attach_timeout_job(booking_id, job_id), do: adapter().attach_timeout_job(booking_id, job_id)
 
   @impl true
   def withdraw_booking(id), do: adapter().withdraw_booking(id)
+
+  @impl true
+  def withdraw_booking_with_reconciliation(id, reconciliation),
+    do: adapter().withdraw_booking_with_reconciliation(id, reconciliation)
 
   @impl true
   def cancel_active_future_bookings_for_user(user_id),

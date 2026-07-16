@@ -27,6 +27,7 @@ defmodule MilosTraining.Finance do
     RefreshAggregates,
     ReverseCreditLedgerEntry,
     ReversePayment,
+    RetirePackage,
     RevokeAllowanceGrant,
     UpdatePackage,
     UpdateReferralRewardStatus,
@@ -55,6 +56,7 @@ defmodule MilosTraining.Finance do
 
   defdelegate create_package(params), to: CreatePackage, as: :call
   defdelegate update_package(id, params), to: UpdatePackage, as: :call
+  defdelegate retire_package(id, replacement_package_by_role), to: RetirePackage, as: :call
   defdelegate list_packages(), to: ListPackages, as: :call
   defdelegate get_package(id), to: GetPackage, as: :call
   defdelegate upsert_membership(user_id, params), to: UpsertMembership, as: :call
