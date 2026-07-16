@@ -97,3 +97,18 @@ Implemented 2026-07-16.
   type-check`, `npm run lint`, `npm run test:e2e`, `mix compile
   --warnings-as-errors`, `mix milos.architecture`, and `mix credo --strict
   --format oneline`.
+- The 2026-07-16 continuation reran the quality-gate stack and corrected a
+  formatter regression in the notification event adapter. A non-breaking audit
+  refresh upgraded Redocly's transitive `js-yaml` to the patched line; the
+  incompatible Next/PostCSS remediation remains tracked as TD-019 instead of
+  applying npm's destructive downgrade suggestion.
+- The local media-origin mismatch recorded by TD-032 was re-audited against the
+  deployment topology. Caddy's `media.localhost` virtual host, Compose's public
+  MinIO endpoint, `.env.example`, and the nonce-based CSP now agree on
+  `http://media.localhost:18080`, closing the debt without broadening `img-src`.
+- TD-021's contract-client migration now covers Reviews and Wellbeing. Their
+  collection and item responses use shared, closed OpenAPI schemas with exact
+  enums, nullability, identifiers, nested answers, and timestamps. Generated
+  operation types now drive request bodies, filters, response records, and UI
+  enum state. Finance remains explicitly in progress because its broader read
+  models first need equivalent source-schema precision.

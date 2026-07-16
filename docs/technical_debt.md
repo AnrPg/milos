@@ -18,10 +18,11 @@ the original wording and dates for traceability.
 | TD-016–TD-018 | Resolved |
 | TD-019 | Open |
 | TD-020 | Resolved |
-| TD-021–TD-023 | Open |
+| TD-021 | In progress |
+| TD-022–TD-023 | Open |
 | TD-024–TD-030 | Resolved |
 | TD-031 | Open |
-| TD-032 | Open |
+| TD-032 | Resolved |
 
 ## Detailed Ledger
 
@@ -48,7 +49,7 @@ the original wording and dates for traceability.
 | TD-018 | Cross-cutting | Resolved 2026-06-13 by ADR-029: durable workout-completion projections now run through an atomic Oban handoff, and the global PubSub database handler was removed | Kept in ledger for traceability of the asynchronous teardown and durability gap | Low | 2026-06-12 |
 | TD-019 | Cross-cutting | Next.js currently brings a transitive PostCSS `<8.5.10` advisory (`GHSA-qx2v-qp2m-jg93`), reported as two moderate production vulnerabilities by npm audit | npm currently offers only `audit fix --force` with a breaking Next.js downgrade; wait for and apply a compatible patched Next.js/PostCSS release | Medium | 2026-06-12 |
 | TD-020 | Phase 8 | Resolved 2026-06-13 by ADR-025: Scheduling now owns `class_attendance_records`, while Analytics attendance remains a projection/read compatibility table | Kept in ledger for traceability of the attendance ownership migration | Low | 2026-06-12 |
-| TD-021 | Phase 8 | Phase 8 frontend API helpers still use handwritten `Record<string, unknown>` wrappers instead of generated operation types throughout Finance, Reviews, and Wellbeing | OpenAPI JSON and TypeScript schemas are regenerated, but replacing the handwritten clients touches many admin screens and should be done as a focused contract-client migration | Medium | 2026-06-12 |
+| TD-021 | Phase 8 | Partially resolved 2026-07-16: Reviews and Wellbeing now publish closed response schemas and their API helpers, filters, mutations, and UI state consume generated operation types; Finance still has broad handwritten records | The contract-first migration is complete for two bounded contexts, while Finance's much larger response surface requires its own schema-hardening pass | Medium | 2026-06-12 |
 | TD-022 | Phase 8 | Finance refund/reversal workflows do not yet generate refund receipts, external payment-provider reconciliation records, or accounting-export artifacts | The MVP is still manual-payment first; provider and accounting integrations should attach to the append-only reversal facts without changing the core schema | Medium | 2026-06-12 |
 | TD-023 | Cross-cutting | Notification semantic types are still duplicated across database constraints, Ecto enums, dispatchers, push message builders, and frontend rendering | ADR-032 aligned the `workout_moved` type, but a generated or shared notification-type contract should replace manual synchronization | Medium | 2026-06-13 |
 | TD-024 | Admin App Configurations | Resolved 2026-07-15 by ADR-037: Scheduling owns configurable class types with admin create/rename/archive, required explicit slot classification, and historicity-preserving future-class remapping. | Kept for traceability of the fixed class taxonomy gap. | Low | 2026-07-15 |
@@ -58,4 +59,4 @@ the original wording and dates for traceability.
 | TD-028 | Admin Dashboard | Resolved 2026-07-15 by ADR-038: operational heroes are compact and collapse after three seconds with a reveal control (homepage excepted); dashboard logout was removed and KPIs use a circular control-panel treatment. | Kept for traceability of persistent hero density. | Low | 2026-07-15 |
 | TD-029 | Notifications / Browser Push | Resolved 2026-07-15 by ADR-038: non-cacheable server capability is refreshed each session/panel open, missing setup has role-aware guidance, and users enable/disable subscriptions per browser/device. | Kept for traceability of stale and non-actionable push capability UI. | Low | 2026-07-15 |
 | TD-031 | Observability | Provision production dashboards and alert thresholds for the emitted OTLP traces, structured telemetry summaries, readiness failures, outbox age, auth anomalies, cache invalidation, upload rejections, and Oban failures | The application now emits the required signals and can export traces, but concrete dashboards/alert destinations depend on the owner's collector/monitoring stack | High | 2026-07-16 |
-| TD-032 | Localization Phase 3 live verification | Local MinIO avatar URLs use `http://localhost:19000`, while the production CSP permits the proxied media origin, so local live-test avatar images are blocked by CSP | Align local object-storage public URLs with the media proxy origin instead of weakening the production CSP as part of deployment-environment cleanup | Medium | 2026-07-16 |
+| TD-032 | Localization Phase 3 live verification | Resolved 2026-07-16: local and Compose deployments publish MinIO through Caddy at `http://media.localhost:18080`; presigned URLs, the web CSP, `.env.example`, and the media virtual host share that origin | Kept for traceability of the local avatar/CSP mismatch | Low | 2026-07-16 |
