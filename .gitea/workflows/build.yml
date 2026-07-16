@@ -65,7 +65,30 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
         working-directory: apps/web
-      - run: npm run check
+      - run: npm run lint
+        working-directory: apps/web
+      - run: npm run type-check
+        working-directory: apps/web
+      - run: npm run test
+        working-directory: apps/web
+      - name: Export OpenAPI contract
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace" \
+            -w /workspace/apps/api \
+            elixir:1.18.4-otp-27 \
+            sh -lc '
+              mix local.hex --force
+              mix local.rebar --force
+              mix deps.get
+              mix milos.export_openapi ../web/src/api/generated/openapi.json
+            '
+      - name: Verify generated API client
+        run: |
+          npx openapi-typescript src/api/generated/openapi.json -o src/api/generated/schema.ts
+          git diff --exit-code -- src/api/generated/openapi.json src/api/generated/schema.ts
+        working-directory: apps/web
+      - run: npm run build
         working-directory: apps/web
       - run: npx playwright install chromium
         working-directory: apps/web
