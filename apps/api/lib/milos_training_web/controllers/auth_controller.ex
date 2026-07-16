@@ -231,9 +231,13 @@ defmodule MilosTrainingWeb.AuthController do
              id: %Schema{type: :string, format: :uuid},
              nickname: %Schema{type: :string},
              role: %Schema{type: :string},
-             avatar_url: %Schema{type: :string, nullable: true}
+             avatar_url: %Schema{type: :string, nullable: true},
+             preferred_locale: %Schema{
+               type: :string,
+               enum: MilosTraining.Identity.supported_locales()
+             }
            },
-           required: [:id, :nickname, :role]
+           required: [:id, :nickname, :role, :preferred_locale]
          }},
       unauthorized:
         {"Unauthorized", "application/json",
@@ -289,7 +293,8 @@ defmodule MilosTrainingWeb.AuthController do
       id: user.id,
       nickname: user.nickname,
       role: to_string(user.role),
-      avatar_url: user.avatar_url
+      avatar_url: user.avatar_url,
+      preferred_locale: user.preferred_locale
     })
   end
 end

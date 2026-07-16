@@ -309,6 +309,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
       assert body["id"] == user.id
       assert body["nickname"] == "ares"
       assert body["role"] == "member"
+      assert body["preferred_locale"] == "en"
     end
   end
 

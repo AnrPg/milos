@@ -15,7 +15,7 @@ defmodule MilosTrainingWeb.MeController do
        [json_render_error_v2: true] when action in [:update_profile]
 
   operation(:update_profile,
-    summary: "Update current user profile (nickname, password, avatar_url)",
+    summary: "Update current user profile and language preference",
     request_body: %RequestBody{
       required: true,
       content: %{
@@ -26,7 +26,11 @@ defmodule MilosTrainingWeb.MeController do
               nickname: %Schema{type: :string, minLength: 3, maxLength: 30},
               current_password: %Schema{type: :string},
               password: %Schema{type: :string, minLength: 8},
-              avatar_url: %Schema{type: :string, nullable: true}
+              avatar_url: %Schema{type: :string, nullable: true},
+              preferred_locale: %Schema{
+                type: :string,
+                enum: MilosTraining.Identity.supported_locales()
+              }
             }
           }
         }
@@ -44,7 +48,8 @@ defmodule MilosTrainingWeb.MeController do
                  id: %Schema{type: :string, format: :uuid},
                  nickname: %Schema{type: :string},
                  role: %Schema{type: :string},
-                 avatar_url: %Schema{type: :string, nullable: true}
+                 avatar_url: %Schema{type: :string, nullable: true},
+                 preferred_locale: %Schema{type: :string}
                }
              }
            }
@@ -146,7 +151,8 @@ defmodule MilosTrainingWeb.MeController do
           id: updated_user.id,
           nickname: updated_user.nickname,
           role: to_string(updated_user.role),
-          avatar_url: updated_user.avatar_url
+          avatar_url: updated_user.avatar_url,
+          preferred_locale: updated_user.preferred_locale
         }
       })
     end
