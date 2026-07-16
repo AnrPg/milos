@@ -80,7 +80,37 @@ while the remaining work is tracked in the phase plan and subsequent ADR notes.
 
 ## Implementation Notes
 
-Phase 2 has begun with the schedule and booking slice as the first frontend
-catalog migration target. The slice is intentionally chosen because it exercises
-the calendar view, booking approval modal, slot editor, filter controls, and
-direction-sensitive layout in one coherent workflow.
+Phase 2 completed the frontend-owned copy migration across public, member,
+athlete, admin, workout-authoring, execution, finance, messaging, notification,
+gamification, review, wellbeing, and transient loading/error surfaces. The final
+catalog contains 1,938 messages in each of the twelve supported locales. The
+inventory had to expand beyond JSX: workout format metadata, theme descriptions,
+hook-generated errors, schedule namespace copy, and formatter helpers were also
+runtime UI sources and are now catalog backed.
+
+Implementation established three deterministic safeguards: exact key parity and
+non-empty values for every locale, ICU placeholder-name parity, and a TypeScript
+AST scan for hard-coded TSX display copy. The translation tooling protects ICU
+parameters with numeric sentinels during translation; this was added after the
+first automated pass revealed that translation providers may translate or drop
+placeholder names.
+
+Direction support was completed with logical Tailwind utilities and logical
+inline CSS properties, mirrored navigation glyphs, direction-aware swipe
+semantics, RTL drawer placement/shadows, and locale-aware date, time, weekday,
+number, and currency formatting. Technical strings such as media queries, MIME
+types, date-construction suffixes, storage keys, and API enums remain canonical
+and are explicitly excluded from translation.
+
+Live verification covered English and Greek LTR login flows, Arabic and Hebrew
+RTL login flows, and authenticated admin/member/athlete pages using signed local
+development access tokens. All checked pages rendered the expected `lang` and
+`dir`, had no horizontal viewport overflow, and raised no browser page errors.
+The local Argon2 NIF was unavailable, so authenticated verification used signed
+development tokens rather than the password login endpoint; authorization and
+real API reads remained active.
+
+Backend error semantics, machine-enum presentation, push/service-worker payloads,
+manifest metadata, and export-generated copy intentionally remain the Phase 3
+boundary. User-authored names, workout content, notes, and chat messages remain
+verbatim by design.
