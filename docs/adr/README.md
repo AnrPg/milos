@@ -17,8 +17,8 @@ must have an ADR. See `template.md` for the format.
 | ADR-009 | Workout execution mode | Accepted |
 | ADR-010 | Notification delivery and Web Push | Accepted |
 | ADR-011 | Gamification landing read model | Accepted |
-| ADR-011 | Workout hard deletion across dependent contexts | Accepted |
 | ADR-012 | Execution score snapshots and authoring audit timestamps | Accepted |
+| ADR-013 | Phase 8 UX improvements and production fixes | Accepted |
 | ADR-014 | User-scoped realtime sync for landing and assigned workouts | Accepted |
 | ADR-015 | Phase 8 finance, analytics, wellbeing, and feedback foundations | Accepted |
 | ADR-016 | Finance credit ledger and entitlements | Accepted |
@@ -41,7 +41,15 @@ must have an ADR. See `template.md` for the format.
 | ADR-033 | Global UI theme palette | Accepted |
 | ADR-034 | Finance invoice reference format | Accepted |
 | ADR-035 | Admin information architecture and user profiles | Accepted |
+| ADR-036 | Health check SSL exemption | Accepted |
 | ADR-037 | Configurable class type lifecycle | Accepted |
 | ADR-038 | Transient page heroes and per-device push choice | Accepted |
 | ADR-039 | Embedded workout authoring | Accepted |
 | ADR-040 | Package entitlements and allowance ledger | Accepted |
+| ADR-041 | Package retirement reconciliation | Accepted |
+| ADR-042 | Security, integrity, and offline reconciliation | Accepted |
+| ADR-043 | Compile-time hexagonal boundary enforcement | Accepted |
+| ADR-044 | Verifiable delivery, observability, and web quality gates | Accepted |
+| ADR-045 | Hybrid localization and RTL foundation | Accepted |
+| ADR-046 | Workout hard deletion across dependent contexts (historical renumbering) | Superseded in part by ADR-029 |
+| ADR-047 | Frontend catalog and RTL migration | Accepted |

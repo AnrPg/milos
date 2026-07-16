@@ -102,6 +102,12 @@ drafts until reviewed.
 
 ## Implementation Notes
 
+Phase 1 was closed out with the shared shell fully localized and the remaining
+top-navigation work intentionally absorbed into the same navigation slice after
+human approval. That kept the shell cohesive and avoided leaving a partially
+translated role switcher or menu fragment behind while Phase 2 picks up the
+feature-specific surfaces.
+
 Phase 1 established the locale foundation without introducing a shared runtime
 translation table. Identity now validates the fixed initial locale set in a
 pure domain module and persists `preferred_locale` with an `en` default and a
