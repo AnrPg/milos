@@ -16,7 +16,25 @@ const targets = {
   fr: "fr",
 };
 const english = JSON.parse(fs.readFileSync(path.join(messagesDir, "en.json"), "utf8"));
-const entries = Object.entries(english.Ui ?? {});
+function flatten(value, prefix = "") {
+  return Object.entries(value).flatMap(([key, child]) => {
+    const next = prefix ? `${prefix}.${key}` : key;
+    return child && typeof child === "object" && !Array.isArray(child) ? flatten(child, next) : [[next, child]];
+  });
+}
+
+function getPath(object, key) {
+  return key.split(".").reduce((current, part) => current?.[part], object);
+}
+
+function setPath(object, key, value) {
+  const parts = key.split(".");
+  const leaf = parts.pop();
+  const parent = parts.reduce((current, part) => current[part], object);
+  parent[leaf] = value;
+}
+
+const entries = flatten(english);
 const batchSize = 35;
 
 function chunks(values, size) {
@@ -25,6 +43,21 @@ function chunks(values, size) {
 
 function translatedText(payload) {
   return payload[0].map((segment) => segment[0]).join("");
+}
+
+function protectPlaceholders(message) {
+  const names = [...new Set([...message.matchAll(/\{\s*([A-Za-z_][\w]*)\s*\}/g)].map((match) => match[1]))];
+  return {
+    names,
+    message: message.replace(/\{\s*([A-Za-z_][\w]*)\s*\}/g, (_, name) => `{${names.indexOf(name)}}`),
+  };
+}
+
+function restorePlaceholders(message, names) {
+  if (!names.every((_, index) => message.includes(`{${index}}`))) {
+    throw new Error(`translated message dropped a protected placeholder: ${message}`);
+  }
+  return message.replace(/\{(\d+)\}/g, (_, index) => `{${names[Number(index)]}}`);
 }
 
 async function translateBatch(locale, batch, batchIndex) {
@@ -73,15 +106,21 @@ async function translateBatch(locale, batch, batchIndex) {
 for (const [catalogLocale, translationLocale] of Object.entries(targets)) {
   const filename = path.join(messagesDir, `${catalogLocale}.json`);
   const catalog = JSON.parse(fs.readFileSync(filename, "utf8"));
-  catalog.Ui ??= {};
 
   let completed = 0;
   for (const [batchIndex, batch] of chunks(entries, batchSize).entries()) {
-    const missing = batch.filter(([key]) => !catalog.Ui[key]);
+    const missing = batch.filter(([key, message]) =>
+      key.startsWith("Ui.") ? !getPath(catalog, key) : getPath(catalog, key) === message,
+    );
     if (missing.length > 0) {
-      const values = await translateBatch(translationLocale, missing, batchIndex);
+      const protectedMissing = missing.map(([key, message]) => [key, protectPlaceholders(message)]);
+      const values = await translateBatch(
+        translationLocale,
+        protectedMissing.map(([key, protectedMessage]) => [key, protectedMessage.message]),
+        batchIndex,
+      );
       missing.forEach(([key], index) => {
-        catalog.Ui[key] = values[index];
+        setPath(catalog, key, restorePlaceholders(values[index], protectedMissing[index][1].names));
       });
     }
     completed += batch.length;

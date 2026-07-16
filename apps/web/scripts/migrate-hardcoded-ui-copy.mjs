@@ -7,7 +7,7 @@ const sourceRoot = path.resolve("src");
 const englishCatalogPath = path.resolve("messages/en.json");
 const translatedAttributes = new Set(["alt", "aria-description", "aria-label", "aria-placeholder", "label", "placeholder", "title"]);
 const translatedProperties = new Set(["actionLabel", "ariaLabel", "description", "emptyLabel", "errorMessage", "eyebrow", "helperText", "label", "message", "placeholder", "subtitle", "title"]);
-const translatedCalls = new Set(["alert", "confirm", "prompt", "setError", "setMessage", "setStatus"]);
+const translatedCalls = new Set(["alert", "confirm", "prompt", "setError", "setMessage"]);
 const ignoredDirectories = new Set(["api", "types"]);
 
 function sourceFiles(directory) {
@@ -101,7 +101,7 @@ function isTechnicalContext(node, sourceFile) {
       ts.SyntaxKind.EqualsEqualsToken,
       ts.SyntaxKind.ExclamationEqualsToken,
     ].includes(current.operatorToken.kind)) return true;
-    if (ts.isCaseClause(current)) return true;
+    if (ts.isCaseClause(current) && current.expression === node) return true;
     if (ts.isJsxAttribute(current)) {
       const key = current.name.getText(sourceFile);
       if (technicalProperties.has(key) || key.startsWith("data-")) return true;

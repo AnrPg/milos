@@ -18,6 +18,12 @@ const reference = new Map(
 );
 const failures = [];
 
+function placeholders(message) {
+  return [...message.matchAll(/\{\s*([A-Za-z_][\w]*)\s*(?:[,}])/g)]
+    .map((match) => match[1])
+    .sort();
+}
+
 for (const locale of locales) {
   const filename = path.join(messagesDir, `${locale}.json`);
   if (!fs.existsSync(filename)) {
@@ -31,6 +37,12 @@ for (const locale of locales) {
     if (!entries.has(key)) failures.push(`${locale}: missing ${key}`);
     if (typeof entries.get(key) !== "string" || entries.get(key).trim() === "") {
       failures.push(`${locale}: ${key} must be a non-empty string`);
+    } else {
+      const expected = placeholders(reference.get(key));
+      const actual = placeholders(entries.get(key));
+      if (expected.join("\0") !== actual.join("\0")) {
+        failures.push(`${locale}: ${key} placeholders differ (expected ${expected.join(", ") || "none"}; found ${actual.join(", ") || "none"})`);
+      }
     }
   }
 
