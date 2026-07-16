@@ -2350,7 +2350,51 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        reviews: {
+                            answers: {
+                                answer_text: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                question_key: string;
+                                question_text: string;
+                                rating_value?: number | null;
+                                /** Format: uuid */
+                                review_id: string;
+                                /** Format: date-time */
+                                updated_at: string;
+                            }[];
+                            body?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            questionnaire_id?: string | null;
+                            rating?: number | null;
+                            /** @enum {string} */
+                            sentiment: "positive" | "neutral" | "negative" | "mixed";
+                            /** @enum {string} */
+                            status: "open" | "reviewed" | "archived" | "needs_follow_up";
+                            tags: string[];
+                            /** Format: uuid */
+                            target_id?: string | null;
+                            target_snapshot: {
+                                [key: string]: unknown;
+                            };
+                            /** @enum {string} */
+                            target_type: "workout" | "execution" | "exercise" | "class_slot" | "gym_parameter" | "coaching_parameter" | "membership_package" | "app" | "general";
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** @enum {string} */
+                            visibility: "admin_only" | "user_visible";
+                        }[];
                     };
                 };
             };
@@ -3012,7 +3056,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        injuries: {
+                            body_area: string;
+                            description?: string | null;
+                            /** Format: date */
+                            healed_on?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            reported_by_id: string;
+                            /** @enum {string} */
+                            reported_by_role: "self" | "admin";
+                            /** @enum {string} */
+                            severity: "mild" | "moderate" | "severe";
+                            /** Format: date */
+                            started_on?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "healed";
+                            tags: string[];
+                            training_limitations?: string | null;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** @enum {string} */
+                            visibility: "admin_only" | "user_and_admin";
+                        }[];
                     };
                 };
             };
@@ -4257,7 +4331,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        injuries: {
+                            body_area: string;
+                            description?: string | null;
+                            /** Format: date */
+                            healed_on?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            reported_by_id: string;
+                            /** @enum {string} */
+                            reported_by_role: "self" | "admin";
+                            /** @enum {string} */
+                            severity: "mild" | "moderate" | "severe";
+                            /** Format: date */
+                            started_on?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "healed";
+                            tags: string[];
+                            training_limitations?: string | null;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** @enum {string} */
+                            visibility: "admin_only" | "user_and_admin";
+                        }[];
                     };
                 };
             };
@@ -4295,7 +4399,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        injury: {
+                            body_area: string;
+                            description?: string | null;
+                            /** Format: date */
+                            healed_on?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            reported_by_id: string;
+                            /** @enum {string} */
+                            reported_by_role: "self" | "admin";
+                            /** @enum {string} */
+                            severity: "mild" | "moderate" | "severe";
+                            /** Format: date */
+                            started_on?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "healed";
+                            tags: string[];
+                            training_limitations?: string | null;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** @enum {string} */
+                            visibility: "admin_only" | "user_and_admin";
+                        };
                     };
                 };
             };
@@ -4418,7 +4552,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        injury: {
+                            body_area: string;
+                            description?: string | null;
+                            /** Format: date */
+                            healed_on?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            reported_by_id: string;
+                            /** @enum {string} */
+                            reported_by_role: "self" | "admin";
+                            /** @enum {string} */
+                            severity: "mild" | "moderate" | "severe";
+                            /** Format: date */
+                            started_on?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "healed";
+                            tags: string[];
+                            training_limitations?: string | null;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** @enum {string} */
+                            visibility: "admin_only" | "user_and_admin";
+                        };
                     };
                 };
             };
@@ -5047,7 +5211,51 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        review: {
+                            answers: {
+                                answer_text: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                question_key: string;
+                                question_text: string;
+                                rating_value?: number | null;
+                                /** Format: uuid */
+                                review_id: string;
+                                /** Format: date-time */
+                                updated_at: string;
+                            }[];
+                            body?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            questionnaire_id?: string | null;
+                            rating?: number | null;
+                            /** @enum {string} */
+                            sentiment: "positive" | "neutral" | "negative" | "mixed";
+                            /** @enum {string} */
+                            status: "open" | "reviewed" | "archived" | "needs_follow_up";
+                            tags: string[];
+                            /** Format: uuid */
+                            target_id?: string | null;
+                            target_snapshot: {
+                                [key: string]: unknown;
+                            };
+                            /** @enum {string} */
+                            target_type: "workout" | "execution" | "exercise" | "class_slot" | "gym_parameter" | "coaching_parameter" | "membership_package" | "app" | "general";
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** @enum {string} */
+                            visibility: "admin_only" | "user_visible";
+                        };
                     };
                 };
             };
@@ -5755,7 +5963,51 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        reviews: {
+                            answers: {
+                                answer_text: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                question_key: string;
+                                question_text: string;
+                                rating_value?: number | null;
+                                /** Format: uuid */
+                                review_id: string;
+                                /** Format: date-time */
+                                updated_at: string;
+                            }[];
+                            body?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            questionnaire_id?: string | null;
+                            rating?: number | null;
+                            /** @enum {string} */
+                            sentiment: "positive" | "neutral" | "negative" | "mixed";
+                            /** @enum {string} */
+                            status: "open" | "reviewed" | "archived" | "needs_follow_up";
+                            tags: string[];
+                            /** Format: uuid */
+                            target_id?: string | null;
+                            target_snapshot: {
+                                [key: string]: unknown;
+                            };
+                            /** @enum {string} */
+                            target_type: "workout" | "execution" | "exercise" | "class_slot" | "gym_parameter" | "coaching_parameter" | "membership_package" | "app" | "general";
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** @enum {string} */
+                            visibility: "admin_only" | "user_visible";
+                        }[];
                     };
                 };
             };
@@ -5798,7 +6050,51 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        review: {
+                            answers: {
+                                answer_text: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                question_key: string;
+                                question_text: string;
+                                rating_value?: number | null;
+                                /** Format: uuid */
+                                review_id: string;
+                                /** Format: date-time */
+                                updated_at: string;
+                            }[];
+                            body?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            questionnaire_id?: string | null;
+                            rating?: number | null;
+                            /** @enum {string} */
+                            sentiment: "positive" | "neutral" | "negative" | "mixed";
+                            /** @enum {string} */
+                            status: "open" | "reviewed" | "archived" | "needs_follow_up";
+                            tags: string[];
+                            /** Format: uuid */
+                            target_id?: string | null;
+                            target_snapshot: {
+                                [key: string]: unknown;
+                            };
+                            /** @enum {string} */
+                            target_type: "workout" | "execution" | "exercise" | "class_slot" | "gym_parameter" | "coaching_parameter" | "membership_package" | "app" | "general";
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** @enum {string} */
+                            visibility: "admin_only" | "user_visible";
+                        };
                     };
                 };
             };
@@ -6353,7 +6649,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        injury: {
+                            body_area: string;
+                            description?: string | null;
+                            /** Format: date */
+                            healed_on?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            reported_by_id: string;
+                            /** @enum {string} */
+                            reported_by_role: "self" | "admin";
+                            /** @enum {string} */
+                            severity: "mild" | "moderate" | "severe";
+                            /** Format: date */
+                            started_on?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "healed";
+                            tags: string[];
+                            training_limitations?: string | null;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** @enum {string} */
+                            visibility: "admin_only" | "user_and_admin";
+                        };
                     };
                 };
             };
@@ -7363,7 +7689,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        injury: {
+                            body_area: string;
+                            description?: string | null;
+                            /** Format: date */
+                            healed_on?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            reported_by_id: string;
+                            /** @enum {string} */
+                            reported_by_role: "self" | "admin";
+                            /** @enum {string} */
+                            severity: "mild" | "moderate" | "severe";
+                            /** Format: date */
+                            started_on?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "healed";
+                            tags: string[];
+                            training_limitations?: string | null;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** @enum {string} */
+                            visibility: "admin_only" | "user_and_admin";
+                        };
                     };
                 };
             };

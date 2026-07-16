@@ -254,7 +254,173 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
+                  "additionalProperties": false,
+                  "properties": {
+                    "reviews": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "answers": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "answer_text": {
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "inserted_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "question_key": {
+                                  "type": "string"
+                                },
+                                "question_text": {
+                                  "type": "string"
+                                },
+                                "rating_value": {
+                                  "maximum": 5,
+                                  "minimum": 1,
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "review_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "updated_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "review_id",
+                                "question_key",
+                                "question_text",
+                                "answer_text",
+                                "inserted_at",
+                                "updated_at"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "body": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "params": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "questionnaire_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "rating": {
+                            "maximum": 5,
+                            "minimum": 1,
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "sentiment": {
+                            "enum": [
+                              "positive",
+                              "neutral",
+                              "negative",
+                              "mixed"
+                            ],
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "open",
+                              "reviewed",
+                              "archived",
+                              "needs_follow_up"
+                            ],
+                            "type": "string"
+                          },
+                          "tags": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "target_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "target_snapshot": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "target_type": {
+                            "enum": [
+                              "workout",
+                              "execution",
+                              "exercise",
+                              "class_slot",
+                              "gym_parameter",
+                              "coaching_parameter",
+                              "membership_package",
+                              "app",
+                              "general"
+                            ],
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "visibility": {
+                            "enum": [
+                              "admin_only",
+                              "user_visible"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "user_id",
+                          "target_type",
+                          "target_snapshot",
+                          "sentiment",
+                          "visibility",
+                          "status",
+                          "tags",
+                          "params",
+                          "answers",
+                          "inserted_at",
+                          "updated_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "reviews"
+                  ],
                   "type": "object"
                 }
               }
@@ -1600,7 +1766,115 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
+                  "additionalProperties": false,
+                  "properties": {
+                    "injuries": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "body_area": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "healed_on": {
+                            "format": "date",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "params": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "reported_by_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "reported_by_role": {
+                            "enum": [
+                              "self",
+                              "admin"
+                            ],
+                            "type": "string"
+                          },
+                          "severity": {
+                            "enum": [
+                              "mild",
+                              "moderate",
+                              "severe"
+                            ],
+                            "type": "string"
+                          },
+                          "started_on": {
+                            "format": "date",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "active",
+                              "healed"
+                            ],
+                            "type": "string"
+                          },
+                          "tags": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "training_limitations": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "visibility": {
+                            "enum": [
+                              "admin_only",
+                              "user_and_admin"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "user_id",
+                          "reported_by_id",
+                          "reported_by_role",
+                          "body_area",
+                          "severity",
+                          "status",
+                          "tags",
+                          "visibility",
+                          "params",
+                          "inserted_at",
+                          "updated_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "injuries"
+                  ],
                   "type": "object"
                 }
               }
@@ -4277,7 +4551,115 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
+                  "additionalProperties": false,
+                  "properties": {
+                    "injuries": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "body_area": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "healed_on": {
+                            "format": "date",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "params": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "reported_by_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "reported_by_role": {
+                            "enum": [
+                              "self",
+                              "admin"
+                            ],
+                            "type": "string"
+                          },
+                          "severity": {
+                            "enum": [
+                              "mild",
+                              "moderate",
+                              "severe"
+                            ],
+                            "type": "string"
+                          },
+                          "started_on": {
+                            "format": "date",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "active",
+                              "healed"
+                            ],
+                            "type": "string"
+                          },
+                          "tags": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "training_limitations": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "visibility": {
+                            "enum": [
+                              "admin_only",
+                              "user_and_admin"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "user_id",
+                          "reported_by_id",
+                          "reported_by_role",
+                          "body_area",
+                          "severity",
+                          "status",
+                          "tags",
+                          "visibility",
+                          "params",
+                          "inserted_at",
+                          "updated_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "injuries"
+                  ],
                   "type": "object"
                 }
               }
@@ -4357,7 +4739,112 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
+                  "additionalProperties": false,
+                  "properties": {
+                    "injury": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "body_area": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "healed_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "params": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "reported_by_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reported_by_role": {
+                          "enum": [
+                            "self",
+                            "admin"
+                          ],
+                          "type": "string"
+                        },
+                        "severity": {
+                          "enum": [
+                            "mild",
+                            "moderate",
+                            "severe"
+                          ],
+                          "type": "string"
+                        },
+                        "started_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "healed"
+                          ],
+                          "type": "string"
+                        },
+                        "tags": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "training_limitations": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "visibility": {
+                          "enum": [
+                            "admin_only",
+                            "user_and_admin"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "reported_by_id",
+                        "reported_by_role",
+                        "body_area",
+                        "severity",
+                        "status",
+                        "tags",
+                        "visibility",
+                        "params",
+                        "inserted_at",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "injury"
+                  ],
                   "type": "object"
                 }
               }
@@ -4608,7 +5095,112 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
+                  "additionalProperties": false,
+                  "properties": {
+                    "injury": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "body_area": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "healed_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "params": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "reported_by_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reported_by_role": {
+                          "enum": [
+                            "self",
+                            "admin"
+                          ],
+                          "type": "string"
+                        },
+                        "severity": {
+                          "enum": [
+                            "mild",
+                            "moderate",
+                            "severe"
+                          ],
+                          "type": "string"
+                        },
+                        "started_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "healed"
+                          ],
+                          "type": "string"
+                        },
+                        "tags": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "training_limitations": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "visibility": {
+                          "enum": [
+                            "admin_only",
+                            "user_and_admin"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "reported_by_id",
+                        "reported_by_role",
+                        "body_area",
+                        "severity",
+                        "status",
+                        "tags",
+                        "visibility",
+                        "params",
+                        "inserted_at",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "injury"
+                  ],
                   "type": "object"
                 }
               }
@@ -5917,7 +6509,170 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
+                  "additionalProperties": false,
+                  "properties": {
+                    "review": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "answers": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "answer_text": {
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "inserted_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "question_key": {
+                                "type": "string"
+                              },
+                              "question_text": {
+                                "type": "string"
+                              },
+                              "rating_value": {
+                                "maximum": 5,
+                                "minimum": 1,
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "review_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "review_id",
+                              "question_key",
+                              "question_text",
+                              "answer_text",
+                              "inserted_at",
+                              "updated_at"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "body": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "params": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "questionnaire_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "rating": {
+                          "maximum": 5,
+                          "minimum": 1,
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "sentiment": {
+                          "enum": [
+                            "positive",
+                            "neutral",
+                            "negative",
+                            "mixed"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "open",
+                            "reviewed",
+                            "archived",
+                            "needs_follow_up"
+                          ],
+                          "type": "string"
+                        },
+                        "tags": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "target_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "target_snapshot": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "target_type": {
+                          "enum": [
+                            "workout",
+                            "execution",
+                            "exercise",
+                            "class_slot",
+                            "gym_parameter",
+                            "coaching_parameter",
+                            "membership_package",
+                            "app",
+                            "general"
+                          ],
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "visibility": {
+                          "enum": [
+                            "admin_only",
+                            "user_visible"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "target_type",
+                        "target_snapshot",
+                        "sentiment",
+                        "visibility",
+                        "status",
+                        "tags",
+                        "params",
+                        "answers",
+                        "inserted_at",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "review"
+                  ],
                   "type": "object"
                 }
               }
@@ -7350,7 +8105,173 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
+                  "additionalProperties": false,
+                  "properties": {
+                    "reviews": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "answers": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "answer_text": {
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "inserted_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "question_key": {
+                                  "type": "string"
+                                },
+                                "question_text": {
+                                  "type": "string"
+                                },
+                                "rating_value": {
+                                  "maximum": 5,
+                                  "minimum": 1,
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "review_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "updated_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "review_id",
+                                "question_key",
+                                "question_text",
+                                "answer_text",
+                                "inserted_at",
+                                "updated_at"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "body": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "params": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "questionnaire_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "rating": {
+                            "maximum": 5,
+                            "minimum": 1,
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "sentiment": {
+                            "enum": [
+                              "positive",
+                              "neutral",
+                              "negative",
+                              "mixed"
+                            ],
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "open",
+                              "reviewed",
+                              "archived",
+                              "needs_follow_up"
+                            ],
+                            "type": "string"
+                          },
+                          "tags": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "target_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "target_snapshot": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "target_type": {
+                            "enum": [
+                              "workout",
+                              "execution",
+                              "exercise",
+                              "class_slot",
+                              "gym_parameter",
+                              "coaching_parameter",
+                              "membership_package",
+                              "app",
+                              "general"
+                            ],
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "visibility": {
+                            "enum": [
+                              "admin_only",
+                              "user_visible"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "user_id",
+                          "target_type",
+                          "target_snapshot",
+                          "sentiment",
+                          "visibility",
+                          "status",
+                          "tags",
+                          "params",
+                          "answers",
+                          "inserted_at",
+                          "updated_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "reviews"
+                  ],
                   "type": "object"
                 }
               }
@@ -7471,7 +8392,170 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
+                  "additionalProperties": false,
+                  "properties": {
+                    "review": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "answers": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "answer_text": {
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "inserted_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "question_key": {
+                                "type": "string"
+                              },
+                              "question_text": {
+                                "type": "string"
+                              },
+                              "rating_value": {
+                                "maximum": 5,
+                                "minimum": 1,
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "review_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "review_id",
+                              "question_key",
+                              "question_text",
+                              "answer_text",
+                              "inserted_at",
+                              "updated_at"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "body": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "params": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "questionnaire_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "rating": {
+                          "maximum": 5,
+                          "minimum": 1,
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "sentiment": {
+                          "enum": [
+                            "positive",
+                            "neutral",
+                            "negative",
+                            "mixed"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "open",
+                            "reviewed",
+                            "archived",
+                            "needs_follow_up"
+                          ],
+                          "type": "string"
+                        },
+                        "tags": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "target_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "target_snapshot": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "target_type": {
+                          "enum": [
+                            "workout",
+                            "execution",
+                            "exercise",
+                            "class_slot",
+                            "gym_parameter",
+                            "coaching_parameter",
+                            "membership_package",
+                            "app",
+                            "general"
+                          ],
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "visibility": {
+                          "enum": [
+                            "admin_only",
+                            "user_visible"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "target_type",
+                        "target_snapshot",
+                        "sentiment",
+                        "visibility",
+                        "status",
+                        "tags",
+                        "params",
+                        "answers",
+                        "inserted_at",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "review"
+                  ],
                   "type": "object"
                 }
               }
@@ -8686,7 +9770,112 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
+                  "additionalProperties": false,
+                  "properties": {
+                    "injury": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "body_area": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "healed_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "params": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "reported_by_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reported_by_role": {
+                          "enum": [
+                            "self",
+                            "admin"
+                          ],
+                          "type": "string"
+                        },
+                        "severity": {
+                          "enum": [
+                            "mild",
+                            "moderate",
+                            "severe"
+                          ],
+                          "type": "string"
+                        },
+                        "started_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "healed"
+                          ],
+                          "type": "string"
+                        },
+                        "tags": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "training_limitations": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "visibility": {
+                          "enum": [
+                            "admin_only",
+                            "user_and_admin"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "reported_by_id",
+                        "reported_by_role",
+                        "body_area",
+                        "severity",
+                        "status",
+                        "tags",
+                        "visibility",
+                        "params",
+                        "inserted_at",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "injury"
+                  ],
                   "type": "object"
                 }
               }
@@ -10527,7 +11716,112 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
+                  "additionalProperties": false,
+                  "properties": {
+                    "injury": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "body_area": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "healed_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "params": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "reported_by_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reported_by_role": {
+                          "enum": [
+                            "self",
+                            "admin"
+                          ],
+                          "type": "string"
+                        },
+                        "severity": {
+                          "enum": [
+                            "mild",
+                            "moderate",
+                            "severe"
+                          ],
+                          "type": "string"
+                        },
+                        "started_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "healed"
+                          ],
+                          "type": "string"
+                        },
+                        "tags": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "training_limitations": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "visibility": {
+                          "enum": [
+                            "admin_only",
+                            "user_and_admin"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "reported_by_id",
+                        "reported_by_role",
+                        "body_area",
+                        "severity",
+                        "status",
+                        "tags",
+                        "visibility",
+                        "params",
+                        "inserted_at",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "injury"
+                  ],
                   "type": "object"
                 }
               }

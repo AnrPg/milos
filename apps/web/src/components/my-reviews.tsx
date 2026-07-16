@@ -11,7 +11,7 @@ import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { listMyExecutions, type WorkoutExecution } from "@/api/executions";
-import { fetchMyReviews, submitReview } from "@/api/reviews";
+import { fetchMyReviews, submitReview, type SubmitReviewRequest } from "@/api/reviews";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { SemanticLabel } from "@/components/semantic-label";
@@ -52,7 +52,8 @@ export function ReviewForm() {
     { key: "next_adjustment", text: i18n("whatShouldYourCoachAdjustNextTimea76c965") },
   ];
   const { tokens } = useSession();
-  const [targetType, setTargetType] = useState("workout");
+  const [targetType, setTargetType] =
+    useState<SubmitReviewRequest["target_type"]>("workout");
   const [targetId, setTargetId] = useState("");
   const [rating, setRating] = useState("5");
   const [answers, setAnswers] = useState<Record<string, string>>({
@@ -118,7 +119,7 @@ export function ReviewForm() {
           className="rounded-2xl border px-4 py-3"
           value={targetType}
           onChange={(event) => {
-            setTargetType(event.target.value);
+            setTargetType(event.target.value as SubmitReviewRequest["target_type"]);
             setTargetId("");
           }}
         >

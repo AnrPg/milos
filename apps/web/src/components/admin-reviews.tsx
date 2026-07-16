@@ -8,7 +8,11 @@ import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { fetchAdminReviews, updateReviewStatus } from "@/api/reviews";
+import {
+  fetchAdminReviews,
+  updateReviewStatus,
+  type UpdateReviewStatusRequest,
+} from "@/api/reviews";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { SemanticLabel } from "@/components/semantic-label";
@@ -31,11 +35,19 @@ export function AdminReviews() {
     queryKey: ["admin", "reviews", offset],
     enabled: Boolean(tokens?.access_token),
     queryFn: async () =>
-      fetchAdminReviews(tokens!.access_token, { limit: String(pageSize), offset: String(offset) }),
+      fetchAdminReviews(tokens!.access_token, { limit: pageSize, offset }),
   });
 
   const statusMutation = useMutation({
-    mutationFn: async ({ id, status, tags }: { id: string; status: string; tags?: string[] }) =>
+    mutationFn: async ({
+      id,
+      status,
+      tags,
+    }: {
+      id: string;
+      status: UpdateReviewStatusRequest["status"];
+      tags?: string[];
+    }) =>
       updateReviewStatus(tokens!.access_token, id, { status, tags }),
     onSuccess: () => reviewsQuery.refetch(),
   });

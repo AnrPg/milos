@@ -9,7 +9,12 @@ import { localizeError } from "@/i18n/presentation";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { fetchMyInjuries, markMyInjuryHealed, reportInjury } from "@/api/wellbeing";
+import {
+  fetchMyInjuries,
+  markMyInjuryHealed,
+  reportInjury,
+  type ReportInjuryRequest,
+} from "@/api/wellbeing";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { SemanticLabel } from "@/components/semantic-label";
@@ -18,7 +23,7 @@ export function MyWellbeing() {
   const i18n = useUiTranslations();
   const { tokens } = useSession();
   const [bodyArea, setBodyArea] = useState("");
-  const [severity, setSeverity] = useState("mild");
+  const [severity, setSeverity] = useState<ReportInjuryRequest["severity"]>("mild");
   const [limitations, setLimitations] = useState("");
 
   const injuriesQuery = useQuery({
@@ -70,7 +75,11 @@ export function MyWellbeing() {
             value={bodyArea}
             onChange={(event) => setBodyArea(event.target.value)}
           />
-          <select className="w-full rounded-2xl border px-4 py-3" value={severity} onChange={(event) => setSeverity(event.target.value)}>
+          <select
+            className="w-full rounded-2xl border px-4 py-3"
+            value={severity}
+            onChange={(event) => setSeverity(event.target.value as ReportInjuryRequest["severity"])}
+          >
             <option value="mild">{i18n("mild17538a9")}</option>
             <option value="moderate">{i18n("moderateea8b09c")}</option>
             <option value="severe">{i18n("severeb7c1535")}</option>

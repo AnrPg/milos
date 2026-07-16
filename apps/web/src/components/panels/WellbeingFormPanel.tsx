@@ -9,14 +9,14 @@ import { localizeError } from "@/i18n/presentation";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 
-import { reportInjury } from "@/api/wellbeing";
+import { reportInjury, type ReportInjuryRequest } from "@/api/wellbeing";
 import { useSession } from "@/components/session-provider";
 
 export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
   const i18n = useUiTranslations();
   const { tokens } = useSession();
   const [bodyArea, setBodyArea] = useState("");
-  const [severity, setSeverity] = useState("mild");
+  const [severity, setSeverity] = useState<ReportInjuryRequest["severity"]>("mild");
   const [limitations, setLimitations] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
@@ -114,7 +114,9 @@ export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
                   color: "var(--text)",
                 }}
                 value={severity}
-                onChange={(e) => setSeverity(e.target.value)}
+                onChange={(e) =>
+                  setSeverity(e.target.value as ReportInjuryRequest["severity"])
+                }
               >
                 <option value="mild">{i18n("mildCanTrainWithCare8b2bbe3")}</option>
                 <option value="moderate">{i18n("moderateLimitedTraining5358133")}</option>

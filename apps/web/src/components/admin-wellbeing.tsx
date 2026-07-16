@@ -8,7 +8,12 @@ import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { adminMarkInjuryHealed, adminReportInjury, fetchAdminInjuries } from "@/api/wellbeing";
+import {
+  adminMarkInjuryHealed,
+  adminReportInjury,
+  fetchAdminInjuries,
+  type AdminReportInjuryRequest,
+} from "@/api/wellbeing";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { SemanticLabel } from "@/components/semantic-label";
@@ -20,7 +25,15 @@ export function AdminWellbeing() {
   const queryClient = useQueryClient();
   const [offset, setOffset] = useState(0);
   const pageSize = 25;
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    user_id: string;
+    body_area: string;
+    severity: AdminReportInjuryRequest["severity"];
+    started_on: string;
+    description: string;
+    training_limitations: string;
+    visibility: NonNullable<AdminReportInjuryRequest["visibility"]>;
+  }>({
     user_id: "",
     body_area: "knee",
     severity: "mild",
@@ -34,7 +47,7 @@ export function AdminWellbeing() {
     queryKey: ["admin", "wellbeing", "injuries", offset],
     enabled: Boolean(tokens?.access_token),
     queryFn: async () =>
-      fetchAdminInjuries(tokens!.access_token, { limit: String(pageSize), offset: String(offset) }),
+      fetchAdminInjuries(tokens!.access_token, { limit: pageSize, offset }),
   });
 
   const injuries = injuriesQuery.data?.injuries ?? [];
@@ -120,13 +133,20 @@ export function AdminWellbeing() {
               label={i18n("severityde314fa")}
               value={form.severity}
               options={["mild", "moderate", "severe"]}
-              onChange={(severity) => setForm({ ...form, severity })}
+              onChange={(severity) =>
+                setForm({ ...form, severity: severity as AdminReportInjuryRequest["severity"] })
+              }
             />
             <SelectField
               label={i18n("visibility7d9ff4f")}
               value={form.visibility}
               options={["user_and_admin", "admin_only"]}
-              onChange={(visibility) => setForm({ ...form, visibility })}
+              onChange={(visibility) =>
+                setForm({
+                  ...form,
+                  visibility: visibility as NonNullable<AdminReportInjuryRequest["visibility"]>,
+                })
+              }
             />
             <Field
               label={i18n("startedOn9bbd73f")}
