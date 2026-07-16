@@ -7,88 +7,62 @@ jobs:
   api-verify:
     name: Verify API
     runs-on: ubuntu-latest
-    env:
-      CI_NETWORK: milos-ci-${{ github.run_id }}-${{ github.run_attempt }}
-      CI_POSTGRES: milos-ci-postgres-${{ github.run_id }}-${{ github.run_attempt }}
+    container: cimg/elixir:1.18.1-erlang-27.2.2-browsers
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: milos_training_test
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres -d milos_training_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
-      - name: Start API database
+      - name: Verify toolchain
         run: |
-          docker network create "$CI_NETWORK"
-          docker run -d \
-            --name "$CI_POSTGRES" \
-            --network "$CI_NETWORK" \
-            -e POSTGRES_DB=milos_training_test \
-            -e POSTGRES_PASSWORD=postgres \
-            -e POSTGRES_USER=postgres \
-            postgres:16-alpine
-          until docker exec "$CI_POSTGRES" pg_isready -U postgres -d milos_training_test; do
-            sleep 2
-          done
-      - name: Run API checks
-        run: |
-          docker run --rm \
-            --network "$CI_NETWORK" \
-            -v "$PWD:/workspace" \
-            -w /workspace/apps/api \
-            -e DB_HOST="$CI_POSTGRES" \
-            -e DB_NAME=milos_training_test \
-            -e DB_PASSWORD=postgres \
-            -e DB_USER=postgres \
-            elixir:1.18.4-otp-27 \
-            sh -lc '
-              . /etc/os-release
-              echo "PRETTY_NAME=$PRETTY_NAME"
-              elixir -v
-              openssl version -a
-              ldconfig -p | grep -E "libcrypto\.so\.(3|1\.1)" || true
-              mix local.hex --force
-              mix local.rebar --force
-              mix deps.get
-              mix precommit
-            '
-      - name: Stop API database
-        if: always()
-        run: |
-          docker rm -f "$CI_POSTGRES" || true
-          docker network rm "$CI_NETWORK" || true
+          node -v
+          npm -v
+          elixir -v
+          openssl version -a
+          ldconfig -p | grep -E 'libcrypto\.so\.(3|1\.1)' || true
+      - run: mix local.hex --force
+        working-directory: apps/api
+      - run: mix local.rebar --force
+        working-directory: apps/api
+      - run: mix deps.get
+        working-directory: apps/api
+      - run: mix precommit
+        working-directory: apps/api
+        env:
+          DB_HOST: postgres
+          DB_NAME: milos_training_test
+          DB_PASSWORD: postgres
+          DB_USER: postgres
 
   web-verify:
     name: Verify web
     runs-on: ubuntu-latest
+    container: cimg/elixir:1.18.1-erlang-27.2.2-browsers
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: apps/web/package-lock.json
+      - name: Verify toolchain
+        run: |
+          node -v
+          npm -v
+          elixir -v
       - run: npm ci
         working-directory: apps/web
-      - run: npm run lint
-        working-directory: apps/web
-      - run: npm run type-check
-        working-directory: apps/web
-      - run: npm run test
-        working-directory: apps/web
-      - name: Export OpenAPI contract
-        run: |
-          docker run --rm \
-            -v "$PWD:/workspace" \
-            -w /workspace/apps/api \
-            elixir:1.18.4-otp-27 \
-            sh -lc '
-              mix local.hex --force
-              mix local.rebar --force
-              mix deps.get
-              mix milos.export_openapi ../web/src/api/generated/openapi.json
-            '
-      - name: Verify generated API client
-        run: |
-          npx openapi-typescript src/api/generated/openapi.json -o src/api/generated/schema.ts
-          git diff --exit-code -- src/api/generated/openapi.json src/api/generated/schema.ts
-        working-directory: apps/web
-      - run: npm run build
+      - run: mix local.hex --force
+        working-directory: apps/api
+      - run: mix local.rebar --force
+        working-directory: apps/api
+      - run: mix deps.get
+        working-directory: apps/api
+      - run: npm run check
         working-directory: apps/web
       - run: npx playwright install chromium
         working-directory: apps/web
