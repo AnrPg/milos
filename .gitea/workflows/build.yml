@@ -4,6 +4,50 @@ on:
   push:
 
 jobs:
+  verify:
+    name: Verify source
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: milos_training_test
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres -d milos_training_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          elixir-version: "1.18.4"
+          otp-version: "27.0"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: mix deps.get
+        working-directory: apps/api
+      - run: mix precommit
+        working-directory: apps/api
+        env:
+          DB_HOST: localhost
+          DB_NAME: milos_training_test
+          DB_PASSWORD: postgres
+          DB_USER: postgres
+      - run: npm ci
+        working-directory: apps/web
+      - run: npm run check
+        working-directory: apps/web
+      - run: npx playwright install chromium
+        working-directory: apps/web
+      - run: npm run test:e2e
+        working-directory: apps/web
+
   version:
     name: Pick tag
     runs-on: ubuntu-latest
@@ -15,7 +59,7 @@ jobs:
 
   build:
     name: Build ${{ matrix.image }}
-    needs: version
+    needs: [verify, version]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -27,7 +71,7 @@ jobs:
             context: apps/web
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Create Kubeconfig
         run: |
           mkdir $HOME/.kube
@@ -48,4 +92,6 @@ jobs:
         with:
           context: ${{ matrix.context }}
           push: true
-          tags: oci.4kq.net/client-milos/${{ matrix.image }}:${{ needs.version.outputs.tag }}
+          tags: |
+            oci.4kq.net/client-milos/${{ matrix.image }}:${{ github.sha }}
+            oci.4kq.net/client-milos/${{ matrix.image }}:${{ needs.version.outputs.tag }}

@@ -27,7 +27,15 @@ jobs:
           otp-version: "27.0"
       - run: mix deps.get
         working-directory: apps/api
-      - run: mix test
+      - run: mix precommit
+        working-directory: apps/api
+        env:
+          DB_HOST: localhost
+          DB_NAME: milos_training_test
+          DB_PASSWORD: postgres
+          DB_USER: postgres
+      - name: Verify latest migration is reversible
+        run: mix ecto.rollback --step 1 && mix ecto.migrate
         working-directory: apps/api
         env:
           DB_HOST: localhost
@@ -56,5 +64,31 @@ jobs:
         working-directory: apps/api
       - run: npm run generate:api
         working-directory: apps/web
+      - run: git diff --exit-code -- src/api/generated/openapi.json src/api/generated/schema.ts
+        working-directory: apps/web
+      - run: npm run lint
+        working-directory: apps/web
+      - run: npm run type-check
+        working-directory: apps/web
+      - run: npm run test
+        working-directory: apps/web
+      - run: npm audit --audit-level=high
+        working-directory: apps/web
+      - run: npx playwright install chromium
+        working-directory: apps/web
+      - run: npm run test:e2e
+        working-directory: apps/web
       - run: npm run build
         working-directory: apps/web
+
+  image-build:
+    runs-on: self-hosted
+    needs: [api-test, web-test]
+    strategy:
+      matrix:
+        include:
+          - context: apps/api
+          - context: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build ${{ matrix.context }}
