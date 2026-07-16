@@ -252,6 +252,7 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
       password_hash: user.password_hash,
       calendar_feed_token_version: user.calendar_feed_token_version || 1,
       avatar_url: user.avatar_url,
+      preferred_locale: user.preferred_locale || "en",
       inserted_at: user.inserted_at
     }
   end

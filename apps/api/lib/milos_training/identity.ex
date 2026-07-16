@@ -1,5 +1,6 @@
 defmodule MilosTraining.Identity do
   alias MilosTraining.Identity.Commands.{RegisterUser, UpdateRole}
+  alias MilosTraining.Identity.Domain.Locale
   alias MilosTraining.Identity.Queries.FindUser
   alias MilosTraining.Identity.UserStore
 
@@ -17,4 +18,5 @@ defmodule MilosTraining.Identity do
   defdelegate update_avatar(user_id, avatar_url), to: UserStore
   defdelegate search_users(query), to: UserStore
   defdelegate count_by_role(role), to: UserStore
+  defdelegate supported_locales(), to: Locale, as: :supported
 end

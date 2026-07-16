@@ -1,7 +1,7 @@
 defmodule MilosTraining.Identity.User do
   use Ecto.Schema
   import Ecto.Changeset
-  alias MilosTraining.Identity.RegistrationPolicy
+  alias MilosTraining.Identity.{Domain.Locale, RegistrationPolicy}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -13,6 +13,7 @@ defmodule MilosTraining.Identity.User do
     field :role, Ecto.Enum, values: RegistrationPolicy.roles()
     field :calendar_feed_token_version, :integer, default: 1
     field :avatar_url, :string
+    field :preferred_locale, :string, default: "en"
 
     timestamps()
   end
@@ -72,10 +73,11 @@ defmodule MilosTraining.Identity.User do
 
   def profile_changeset(user, params) do
     user
-    |> cast(params, [:nickname, :password, :avatar_url])
+    |> cast(params, [:nickname, :password, :avatar_url, :preferred_locale])
     |> maybe_normalize_nickname()
     |> maybe_validate_nickname()
     |> maybe_validate_password()
+    |> validate_inclusion(:preferred_locale, Locale.supported(), message: "is not supported")
   end
 
   def avatar_changeset(user, params) do
