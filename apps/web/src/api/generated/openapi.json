@@ -1,7 +1,47 @@
 {
   "components": {
     "responses": {},
-    "schemas": {},
+    "schemas": {
+      "SemanticError": {
+        "description": "Stable machine-readable API failure with English compatibility copy.",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "code",
+          "error"
+        ],
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "code": {
+            "enum": [
+              "validation_failed"
+            ],
+            "type": "string"
+          },
+          "errors": {
+            "additionalProperties": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "code",
+          "errors"
+        ],
+        "type": "object"
+      }
+    },
     "securitySchemes": {
       "bearerAuth": {
         "bearerFormat": "JWT",

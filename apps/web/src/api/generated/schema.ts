@@ -2213,7 +2213,23 @@ export interface paths {
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: never;
+    schemas: {
+        /** @description Stable machine-readable API failure with English compatibility copy. */
+        SemanticError: {
+            code: string;
+            error: string;
+            params?: {
+                [key: string]: unknown;
+            };
+        };
+        ValidationError: {
+            /** @enum {string} */
+            code: "validation_failed";
+            errors: {
+                [key: string]: unknown;
+            };
+        };
+    };
     responses: never;
     parameters: never;
     requestBodies: never;
