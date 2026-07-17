@@ -19,10 +19,14 @@ import {
   updateAdminUserRole,
   type AdminUserDirectoryEntry,
   type AdminUserExecution,
+  type AdminUserFinance,
   type AdminUserPR,
 } from "@/api/admin-users";
+import type { PRSupportingMetrics } from "@/api/gamification";
 import type { EffectiveEntitlement } from "@/api/my-finance";
+import { visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
 import { LocalizedScore } from "@/components/localized-score";
+import { formatPRCardDetails } from "@/components/pantheon/pr-card-details";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
 import { semanticLabel } from "@/i18n/presentation";
@@ -32,7 +36,7 @@ import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 function Panel({ id, title, children, href, hrefLabel }: { id: string; title: string; children: React.ReactNode; href?: string; hrefLabel?: string }) {
   const i18n = useUiTranslations();
   const resolvedHrefLabel = hrefLabel ?? i18n("openWorkspace8b23311");
-  const [open, setOpen] = useState(id === "overview" || id === "admin_actions");
+  const [open, setOpen] = useState(id === "overview" || id === "finance" || id === "admin_actions");
 
   return (
     <article id={id} className="scroll-mt-20 rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
@@ -104,7 +108,7 @@ function StatGrid({ items }: { items: Array<[string, React.ReactNode]> }) {
   );
 }
 
-function DetailCard({ title, meta, value, children, href }: { title: React.ReactNode; meta?: React.ReactNode; value?: React.ReactNode; children?: React.ReactNode; href?: string }) {
+function DetailCard({ title, meta, value, children, href, plainChildren = false }: { title: React.ReactNode; meta?: React.ReactNode; value?: React.ReactNode; children?: React.ReactNode; href?: string; plainChildren?: boolean }) {
   const i18n = useUiTranslations();
 
   return (
@@ -117,7 +121,10 @@ function DetailCard({ title, meta, value, children, href }: { title: React.React
         {value ? <strong className="tabular-nums" style={{ color: "var(--primary)" }}>{value}</strong> : null}
       </div>
       {children ? (
-        <div className="mt-3 rounded-xl p-3 opacity-90 transition-opacity group-hover:opacity-100" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
+        <div
+          className={plainChildren ? "mt-2" : "mt-3 rounded-xl p-3 opacity-90 transition-opacity group-hover:opacity-100"}
+          style={plainChildren ? undefined : { background: "var(--panel-muted)", border: "1px solid var(--border)" }}
+        >
           {children}
         </div>
       ) : null}
@@ -132,24 +139,32 @@ function DetailCard({ title, meta, value, children, href }: { title: React.React
 
 function PRCard({ pr }: { pr: AdminUserPR }) {
   const i18n = useUiTranslations();
-  const metrics = Object.entries(pr.supporting_metrics ?? {});
+  const details = formatPRCardDetails((pr.supporting_metrics ?? {}) as PRSupportingMetrics, i18n);
 
   return (
     <DetailCard
       title={pr.name}
       meta={<>{pr.higher_is_better ? i18n("higherIsBetter7aab104") : i18n("lowerIsBettercf052ba")} · {date(pr.beaten_on)}</>}
       value={<LocalizedScore value={pr.current_score} unit={pr.unit} />}
+      plainChildren
     >
-      {metrics.length ? (
-        <div className="grid gap-2 sm:grid-cols-2">
-          {metrics.map(([key, value]) => (
-            <p key={key} className="text-xs"><span style={{ color: "var(--muted)" }}>{semanticLabel(key, i18n)}:</span> {valueText(value)}</p>
-          ))}
-        </div>
-      ) : (
-        <Empty>{i18n("noHistoryYet933f417")}</Empty>
-      )}
+      {details ? <p className="text-xs" style={{ color: "var(--text-soft)" }}>{details}</p> : null}
       {pr.notes ? <p className="mt-2 text-xs" style={{ color: "var(--muted)" }}>{pr.notes}</p> : null}
+      {pr.history.length ? (
+        <div className="mt-3 border-s-2 ps-3" style={{ borderColor: "var(--primary)" }}>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>{i18n("prHistoryf17c6df")}</p>
+          <div className="mt-1 space-y-1">
+            {pr.history.map((entry) => {
+              const historyDetails = formatPRCardDetails(entry.supporting_metrics as PRSupportingMetrics, i18n);
+              return (
+                <p key={entry.id} className="text-xs" style={{ color: "var(--muted)" }}>
+                  <LocalizedScore value={entry.score} unit={pr.unit} /> · {date(entry.beaten_on)}{historyDetails ? ` · ${historyDetails}` : ""}
+                </p>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
     </DetailCard>
   );
 }
@@ -223,6 +238,106 @@ function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: s
   );
 }
 
+function FinanceDetails({ finance }: { finance: AdminUserFinance }) {
+  const i18n = useUiTranslations();
+  const membership = finance.details.membership;
+  const subscriptions = finance.details.package_subscriptions;
+  const claims = finance.details.referral_claims;
+  const referredMembers = finance.details.referred_members;
+  const rewards = finance.details.referral_rewards;
+  const membershipStatus = valueText(membership?.status);
+
+  return (
+    <div className="mt-5 space-y-5">
+      <div>
+        <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("membership53bc967")}</p>
+        {membership ? (
+          <StatGrid items={[
+            [i18n("account85dfa32"), <SemanticLabel key="status" value={membershipStatus} />],
+            [i18n("startsOn6d888f7"), date(membership.starts_on)],
+            [i18n("expiresOn549cabe"), date(membership.expires_on)],
+            [i18n("signupSource69d3a02"), <SemanticLabel key="source" value={valueText(membership.signup_source)} />],
+          ]} />
+        ) : <Empty>{i18n("noMembershipRecord741b5d9")}</Empty>}
+      </div>
+
+      {subscriptions.length ? (
+        <div>
+          <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("packageSubscriptions09a33f1")}</p>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            {subscriptions.map((subscription) => (
+              <GenericRecordCard
+                key={valueText(subscription.id)}
+                title={valueText(subscription.package_code_snapshot)}
+                meta={<><SemanticLabel value={valueText(subscription.status)} /> · {date(subscription.starts_on)}–{date(subscription.ends_on)}</>}
+                value={money(subscription.price_cents_snapshot)}
+              />
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {claims.length ? (
+        <FinanceRecordList
+          title={i18n("referralEvents8bcf3f4")}
+          records={claims}
+          personKey="referrer_nickname"
+        />
+      ) : null}
+
+      {referredMembers.length ? (
+        <FinanceRecordList
+          title={i18n("madeReferralsbe27ef7")}
+          records={referredMembers}
+          personKey="referred_nickname"
+        />
+      ) : null}
+
+      {rewards.length ? (
+        <div>
+          <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("referralRewards22d6a91")}</p>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            {rewards.map((reward) => (
+              <GenericRecordCard
+                key={valueText(reward.id)}
+                title={<SemanticLabel value={valueText(reward.reward_type)} />}
+                meta={<><SemanticLabel value={valueText(reward.status)} /> · {date(reward.applied_at ?? reward.inserted_at)}</>}
+                value={valueText(reward.reward_value)}
+              />
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function FinanceRecordList({ title, records, personKey }: { title: string; records: Array<Record<string, unknown>>; personKey: string }) {
+  return (
+    <div>
+      <p className="font-semibold" style={{ color: "var(--text)" }}>{title}</p>
+      <div className="mt-2 grid gap-2 sm:grid-cols-2">
+        {records.map((record) => (
+          <GenericRecordCard
+            key={valueText(record.id)}
+            title={valueText(record[personKey])}
+            meta={<><SemanticLabel value={valueText(record.status)} /> · {date(record.inserted_at)}</>}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function money(value: unknown) {
+  const cents = Number(value);
+  return Number.isFinite(cents) ? `${(cents / 100).toFixed(2)} €` : "—";
+}
+
+function arrayCount(value: unknown) {
+  return Array.isArray(value) ? value.length : 0;
+}
+
 export function AdminUserProfile({ userId }: { userId: string }) {
   const i18n = useUiTranslations();
   const { tokens, currentUser } = useSession();
@@ -264,11 +379,41 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   if (profileQuery.isLoading) return <main className="min-h-screen p-10" style={{ background: "var(--bg)", color: "var(--muted)" }}>{i18n("loadingProfile548faad")}</main>;
   if (!profile) return <main className="min-h-screen p-10" style={{ background: "var(--bg)", color: "var(--danger)" }}>{i18n("userProfileCouldNotBeLoaded7bc2d73")}</main>;
 
-  const sections = new Set(profile.available_sections);
   const executions = training.data?.executions ?? [];
   const scores = training.data?.scores ?? [];
   const effectiveEntitlement = finance.data?.summary?.effective_entitlement;
   const canDelete = currentUser?.id !== userId;
+  const coachingDrillDown = coaching.data?.drill_down;
+  const coachingCount = coachingDrillDown
+    ? arrayCount(coachingDrillDown.assigned_workouts) +
+      arrayCount(coachingDrillDown.execution_history) +
+      arrayCount(coachingDrillDown.notes_context)
+    : 0;
+  const visibleSections = visibleAdminProfileSections(profile.available_sections, {
+    training_history: executions.length,
+    prs: prs.data?.prs.length ?? 0,
+    scores: scores.length,
+    health_incidents: incidents.data?.incidents.length ?? 0,
+    coaching_context: coachingCount,
+    class_participation: training.data?.class_participation.length ?? 0,
+    messages: messages.data?.threads.length ?? 0,
+  });
+  const sections = new Set(visibleSections);
+  const overviewItems: Array<[string, React.ReactNode]> = [
+    [i18n("rolec3f104d"), <SemanticLabel key="role" value={profile.identity.role} />],
+    [i18n("account85dfa32"), <SemanticLabel key="account" value={profile.account_status} />],
+    [i18n("joinedbbc56ef").replace("· ", ""), date(profile.identity.joined_at)],
+    [i18n("avatar7631b26"), profile.identity.avatar_url ? i18n("activea733b80") : "—"],
+  ];
+
+  if (sections.has("finance")) {
+    overviewItems.push(
+      [i18n("finance1b48d3f"), finance.data?.summary?.current_status?.state ? <SemanticLabel key="finance" value={String(finance.data.summary.current_status.state)} /> : "—"],
+      [i18n("credits66c22fa"), finance.data?.summary?.credit_balance ?? "—"],
+    );
+  }
+  if (executions.length) overviewItems.push([i18n("totalCompletionsfa16f4c"), training.data?.summary.completed_count ?? 0]);
+  if (incidents.data?.incidents.length) overviewItems.push([i18n("activeInjuriesdaecfa6"), incidents.data.summary.active]);
 
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
@@ -284,24 +429,15 @@ export function AdminUserProfile({ userId }: { userId: string }) {
         </section>
 
         <nav aria-label={i18n("profileSectionscd4815c")} className="flex flex-wrap gap-2">
-          {profile.available_sections.map((section) => <a key={section} href={`#${section}`} className="rounded-full px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-80" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>{semanticLabel(section, i18n)}</a>)}
+          {visibleSections.map((section) => <a key={section} href={`#${section}`} className="rounded-full px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-80" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>{semanticLabel(section, i18n)}</a>)}
         </nav>
 
         <section className="space-y-4">
           <Panel id="overview" title={i18n("overview0efc2e6")}>
-            <StatGrid items={[
-              [i18n("rolec3f104d"), <SemanticLabel key="role" value={profile.identity.role} />],
-              [i18n("account85dfa32"), <SemanticLabel key="account" value={profile.account_status} />],
-              [i18n("joinedbbc56ef").replace("· ", ""), date(profile.identity.joined_at)],
-              [i18n("avatar7631b26"), profile.identity.avatar_url ? i18n("activea733b80") : "—"],
-              [i18n("finance1b48d3f"), finance.data?.summary?.current_status?.state ? <SemanticLabel key="finance" value={String(finance.data.summary.current_status.state)} /> : "—"],
-              [i18n("credits66c22fa"), finance.data?.summary?.credit_balance ?? "—"],
-              [i18n("totalCompletionsfa16f4c"), training.data?.summary.completed_count ?? "—"],
-              [i18n("activeInjuriesdaecfa6"), incidents.data?.summary.active ?? "—"],
-            ]} />
+            <StatGrid items={overviewItems} />
           </Panel>
 
-          {sections.has("finance") ? <Panel id="finance" title={i18n("finance1b48d3f")} href="/admin/finance"><p className="text-2xl font-semibold" style={{ color: "var(--text)" }}>{finance.data?.summary?.credit_balance ?? 0} {i18n("credits66c22fa")}</p><p className="mt-2">{finance.data?.summary?.current_status?.state ? <SemanticLabel value={String(finance.data.summary.current_status.state)} /> : i18n("loadingMembershipStatusa609a3f")}</p>{token ? <AdminEntitlements token={token} userId={userId} entitlement={effectiveEntitlement} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
+          {sections.has("finance") ? <Panel id="finance" title={i18n("finance1b48d3f")} href="/admin/finance"><p className="text-2xl font-semibold" style={{ color: "var(--text)" }}>{finance.data?.summary?.credit_balance ?? 0} {i18n("credits66c22fa")}</p><p className="mt-2">{finance.data?.summary?.current_status?.state ? <SemanticLabel value={String(finance.data.summary.current_status.state)} /> : i18n("loadingMembershipStatusa609a3f")}</p>{finance.data ? <FinanceDetails finance={finance.data} /> : null}{token ? <AdminEntitlements token={token} userId={userId} entitlement={effectiveEntitlement} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
 
           {sections.has("training_history") ? <Panel id="training_history" title={i18n("trainingHistorya512053")} href="/admin/workouts"><p>{training.data?.summary.completed_count ?? 0} {i18n("completedOf88964ae")} {training.data?.summary.execution_count ?? 0} {i18n("executions8319d6e")}</p><div className="mt-3 grid gap-3">{executions.length ? executions.slice(0, 8).map((item) => <ExecutionCard key={item.id} item={item} href="/admin/workouts" />) : <Empty>{i18n("noWorkoutExecutionsRecorded0a0b1d0")}</Empty>}</div></Panel> : null}
 
@@ -311,7 +447,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
 
           {sections.has("health_incidents") ? <Panel id="health_incidents" title={i18n("healthIncidentse3ca869")} href="/admin/metrics#health-incidents"><p>{incidents.data?.summary.active ?? 0} {i18n("active4c71073")} {incidents.data?.summary.total ?? 0} {i18n("total5a537e2")}</p><div className="mt-3 grid gap-3">{incidents.data?.incidents.length ? incidents.data.incidents.map((incident) => <GenericRecordCard key={incident.id} title={incident.body_area} meta={<><SemanticLabel value={incident.severity} /> · <SemanticLabel value={incident.status} /> · {date(incident.started_on)}</>} detail={incident.training_limitations ? <p style={{ color: "var(--muted)" }}>{incident.training_limitations}</p> : null} href="/admin/metrics#health-incidents" />) : <Empty>{i18n("noHealthIncidentsRecorded91c9d4e")}</Empty>}</div></Panel> : null}
 
-          {sections.has("coaching_context") ? <Panel id="coaching_context" title={i18n("coachingContexteb3075d")} href="/admin/coaching-assignments"><div className="grid gap-3"><GenericRecordCard title={String((coaching.data?.drill_down?.recent_activity as Record<string, unknown> | undefined)?.state ?? i18n("loadingActivity4c959ab"))} meta={`${Array.isArray(coaching.data?.drill_down?.assigned_workouts) ? coaching.data.drill_down.assigned_workouts.length : 0} ${i18n("assignedWorkoutSInTheCoachingWindow2200dd4")}`} detail={<pre className="overflow-auto whitespace-pre-wrap text-xs" style={{ color: "var(--muted)" }}>{JSON.stringify(coaching.data?.drill_down?.attention_cues ?? [], null, 2)}</pre>} href="/admin/coaching-assignments" /></div></Panel> : null}
+          {sections.has("coaching_context") ? <Panel id="coaching_context" title={i18n("coachingContexteb3075d")} href="/admin/coaching-assignments"><p className="font-semibold" style={{ color: "var(--text)" }}><SemanticLabel value={String((coaching.data?.drill_down?.recent_activity as Record<string, unknown> | undefined)?.state ?? "unknown")} /></p><p className="mt-1" style={{ color: "var(--muted)" }}>{Array.isArray(coaching.data?.drill_down?.assigned_workouts) ? coaching.data.drill_down.assigned_workouts.length : 0} {i18n("assignedWorkoutSInTheCoachingWindow2200dd4")}</p></Panel> : null}
 
           {sections.has("class_participation") ? <Panel id="class_participation" title={i18n("classParticipation9ef4001")} href="/admin/class-schedule"><div className="grid gap-3">{training.data?.class_participation.length ? training.data.class_participation.map((item) => <ExecutionCard key={item.id} item={item} href="/admin/class-schedule" />) : <Empty>{i18n("noClassLinkedWorkoutExecutionsRecordedf8ca7a6")}</Empty>}</div></Panel> : null}
 

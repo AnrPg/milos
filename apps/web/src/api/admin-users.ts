@@ -35,6 +35,13 @@ export type AdminUserFinance = {
     outstanding_items: Array<Record<string, unknown>>;
     effective_entitlement: EffectiveEntitlement | null;
   };
+  details: {
+    membership: null | Record<string, unknown>;
+    package_subscriptions: Array<Record<string, unknown>>;
+    referral_claims: Array<Record<string, unknown>>;
+    referred_members: Array<Record<string, unknown>>;
+    referral_rewards: Array<Record<string, unknown>>;
+  };
   drill_down: Record<string, unknown> | null;
   operational_links: Record<string, string>;
 };
@@ -70,6 +77,14 @@ export type AdminUserPR = {
   supporting_metrics?: Record<string, string | number>;
   notes?: string | null;
   updated_at?: string | null;
+  history: Array<{
+    id: string;
+    score: number | string;
+    beaten_on: string;
+    supporting_metrics: Record<string, string | number>;
+    notes?: string | null;
+    inserted_at?: string | null;
+  }>;
 };
 
 export type AdminUserIncident = {
