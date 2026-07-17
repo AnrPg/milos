@@ -113,11 +113,6 @@ config :milos_training,
        :admin_member_search_index,
        MilosTraining.Infrastructure.Search.MeilisearchMemberIndex
 
-config :milos_training, :meilisearch,
-  url: System.get_env("MEILI_URL", "http://localhost:7700"),
-  api_key: System.get_env("MEILI_MASTER_KEY", "dev-meili-master-key"),
-  admin_member_index: System.get_env("MEILI_ADMIN_MEMBER_INDEX", "admin_members")
-
 config :milos_training,
        :identity_password_hasher,
        MilosTraining.Infrastructure.Auth.PasswordHasher

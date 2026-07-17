@@ -39,6 +39,25 @@ config :milos_training,
   minio_bucket: System.get_env("MINIO_BUCKET", "milos-invoices"),
   minio_avatar_bucket: System.get_env("MINIO_AVATAR_BUCKET", "milos-avatars")
 
+meili_url =
+  System.get_env("MEILI_URL") ||
+    if(config_env() == :prod,
+      do: raise("MEILI_URL is required"),
+      else: "http://localhost:7700"
+    )
+
+meili_api_key =
+  System.get_env("MEILI_MASTER_KEY") ||
+    if(config_env() == :prod,
+      do: raise("MEILI_MASTER_KEY is required"),
+      else: "dev-meili-master-key"
+    )
+
+config :milos_training, :meilisearch,
+  url: meili_url,
+  api_key: meili_api_key,
+  admin_member_index: System.get_env("MEILI_ADMIN_MEMBER_INDEX", "admin_members")
+
 otel_traces_endpoint = System.get_env("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT")
 otel_endpoint = otel_traces_endpoint || System.get_env("OTEL_EXPORTER_OTLP_ENDPOINT")
 
