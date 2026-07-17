@@ -23,6 +23,7 @@ the original wording and dates for traceability.
 | TD-024–TD-030 | Resolved |
 | TD-031 | Open |
 | TD-032 | Resolved |
+| TD-033 | Open |
 
 ## Detailed Ledger
 
@@ -60,3 +61,4 @@ the original wording and dates for traceability.
 | TD-029 | Notifications / Browser Push | Resolved 2026-07-15 by ADR-038: non-cacheable server capability is refreshed each session/panel open, missing setup has role-aware guidance, and users enable/disable subscriptions per browser/device. | Kept for traceability of stale and non-actionable push capability UI. | Low | 2026-07-15 |
 | TD-031 | Observability | Provision production dashboards and alert thresholds for the emitted OTLP traces, structured telemetry summaries, readiness failures, outbox age, auth anomalies, cache invalidation, upload rejections, and Oban failures | The application now emits the required signals and can export traces, but concrete dashboards/alert destinations depend on the owner's collector/monitoring stack | High | 2026-07-16 |
 | TD-032 | Localization Phase 3 live verification | Resolved 2026-07-16: local and Compose deployments publish MinIO through Caddy at `http://media.localhost:18080`; presigned URLs, the web CSP, `.env.example`, and the media virtual host share that origin | Kept for traceability of the local avatar/CSP mismatch | Low | 2026-07-16 |
+| TD-033 | Training Log | Add standalone training-log aggregate for class or offline workouts that were never started as `workout_executions` | ADR-050 hardens actual-workout patches on the existing execution aggregate first; non-execution logs need source selection, authorization, and completion/gamification semantics without overloading timer execution state | High | 2026-07-17 |
