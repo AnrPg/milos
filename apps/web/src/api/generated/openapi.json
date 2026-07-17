@@ -5743,30 +5743,78 @@
                   "modifications": {
                     "items": {
                       "properties": {
-                        "actual_mins": {
-                          "nullable": true,
-                          "type": "number"
-                        },
                         "actual_value": {
-                          "nullable": true,
-                          "type": "number"
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            }
+                          ]
+                        },
+                        "canonical_value": {
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            }
+                          ]
                         },
                         "exercise_id": {
+                          "nullable": true,
                           "type": "string"
+                        },
+                        "exercise_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "field": {
+                          "type": "string"
+                        },
+                        "interval_index": {
+                          "minimum": 1,
+                          "nullable": true,
+                          "type": "integer"
                         },
                         "note": {
                           "nullable": true,
                           "type": "string"
                         },
-                        "prescribed_mins": {
-                          "nullable": true,
-                          "type": "number"
+                        "patch_id": {
+                          "type": "string"
                         },
-                        "prescribed_value": {
+                        "round_index": {
+                          "minimum": 1,
                           "nullable": true,
-                          "type": "number"
+                          "type": "integer"
                         },
-                        "sets": {
+                        "row_index": {
+                          "minimum": 1,
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "section_id": {
+                          "type": "string"
+                        },
+                        "section_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "segment_key": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_index": {
+                          "minimum": 1,
                           "nullable": true,
                           "type": "integer"
                         },
@@ -5776,14 +5824,27 @@
                             "weight_changed",
                             "reps_changed",
                             "time_changed",
+                            "sets_changed",
+                            "exercise_substituted",
+                            "distance_changed",
+                            "calories_changed",
+                            "field_changed",
                             "other"
                           ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "unit": {
+                          "nullable": true,
                           "type": "string"
                         }
                       },
                       "required": [
-                        "exercise_id",
-                        "type"
+                        "patch_id",
+                        "section_id",
+                        "field",
+                        "canonical_value",
+                        "actual_value"
                       ],
                       "type": "object"
                     },
@@ -5827,7 +5888,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Log exercise modifications during execution",
+        "summary": "Log actual-workout modification patches",
         "tags": [
           "Execution"
         ]
@@ -7426,6 +7487,14 @@
                   },
                   "name": {
                     "type": "string"
+                  },
+                  "notes": {
+                    "maxLength": 2000,
+                    "type": "string"
+                  },
+                  "supporting_metrics": {
+                    "description": "Optional typed result context. Accepted keys: reps, sets, load_kg, duration_seconds, distance_m, calories, rounds, variation.",
+                    "type": "object"
                   },
                   "unit": {
                     "enum": [
@@ -9703,6 +9772,14 @@
                   },
                   "name": {
                     "type": "string"
+                  },
+                  "notes": {
+                    "maxLength": 2000,
+                    "type": "string"
+                  },
+                  "supporting_metrics": {
+                    "description": "Optional typed result context. Accepted keys: reps, sets, load_kg, duration_seconds, distance_m, calories, rounds, variation.",
+                    "type": "object"
                   },
                   "unit": {
                     "enum": [

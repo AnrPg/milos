@@ -941,7 +941,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Log exercise modifications during execution */
+        /** Log actual-workout modification patches */
         post: operations["MilosTrainingWeb.ExecutionController.add_modifications"];
         delete?: never;
         options?: never;
@@ -4830,15 +4830,23 @@ export interface operations {
             content: {
                 "application/json": {
                     modifications: {
-                        actual_mins?: number | null;
-                        actual_value?: number | null;
-                        exercise_id: string;
+                        actual_value: string | number | boolean;
+                        canonical_value: string | number | boolean;
+                        exercise_id?: string | null;
+                        exercise_name?: string | null;
+                        field: string;
+                        interval_index?: number | null;
                         note?: string | null;
-                        prescribed_mins?: number | null;
-                        prescribed_value?: number | null;
-                        sets?: number | null;
-                        /** @enum {string} */
-                        type: "skipped" | "weight_changed" | "reps_changed" | "time_changed" | "other";
+                        patch_id: string;
+                        round_index?: number | null;
+                        row_index?: number | null;
+                        section_id: string;
+                        section_name?: string | null;
+                        segment_key?: string | null;
+                        set_index?: number | null;
+                        /** @enum {string|null} */
+                        type?: "skipped" | "weight_changed" | "reps_changed" | "time_changed" | "sets_changed" | "exercise_substituted" | "distance_changed" | "calories_changed" | "field_changed" | "other" | null;
+                        unit?: string | null;
                     }[];
                 };
             };
@@ -5637,6 +5645,9 @@ export interface operations {
                     current_score?: number;
                     higher_is_better?: boolean;
                     name?: string;
+                    notes?: string;
+                    /** @description Optional typed result context. Accepted keys: reps, sets, load_kg, duration_seconds, distance_m, calories, rounds, variation. */
+                    supporting_metrics?: Record<string, never>;
                     /** @enum {string} */
                     unit?: "mins_secs" | "reps" | "sets" | "kcals" | "m" | "kg";
                 };
@@ -6605,6 +6616,9 @@ export interface operations {
                     current_score: number;
                     higher_is_better?: boolean;
                     name: string;
+                    notes?: string;
+                    /** @description Optional typed result context. Accepted keys: reps, sets, load_kg, duration_seconds, distance_m, calories, rounds, variation. */
+                    supporting_metrics?: Record<string, never>;
                     /** @enum {string} */
                     unit: "mins_secs" | "reps" | "sets" | "kcals" | "m" | "kg";
                 };
