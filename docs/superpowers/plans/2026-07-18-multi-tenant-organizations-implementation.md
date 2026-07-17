@@ -1,7 +1,8 @@
 # Multi-tenant Organizations Implementation Plan
 
-**Date:** 2026-07-18  
-**Status:** In progress  
+**Date:** 2026-07-18
+
+**Status:** In progress
 **Goal:** Convert Milos Training into a shared-schema, independently operated multi-tenant product with membership-scoped roles, one-time invitations, automatic tenant inference, and defense-in-depth isolation.
 
 ## Governing decisions
@@ -34,9 +35,9 @@
 
 ## Phase T1 — Organization primitives
 
-- [ ] Migration: create `organizations`, `organization_memberships`, `registration_invitations`, `organization_domains`, and `organization_settings`.
-- [ ] Domain tests: slug normalization, membership roles, invitation expiry limits, and state transitions.
-- [ ] Schemas and changesets for each aggregate.
+- [x] Migration: create `organizations`, `organization_memberships`, `registration_invitations`, `organization_domains`, and `organization_settings`.
+- [x] Domain tests: slug normalization, membership roles, invitation expiry limits, and state transitions.
+- [x] Schemas and changesets for each aggregate.
 - [ ] Organization store port and Ecto adapter.
 - [ ] Commands: create organization, add membership, issue/revoke invitation.
 - [ ] Queries: organization by ID/slug/domain, memberships, invitation by digest.
