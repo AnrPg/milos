@@ -523,7 +523,7 @@ function ModificationsEditorStep({
                                   <input
                                     autoFocus
                                     className="w-full rounded-xl px-3 py-2 text-sm font-bold outline-none"
-                                    inputMode={field.inputMode === "text" ? "text" : field.inputMode}
+                                    inputMode={field.inputMode}
                                     style={{
                                       background: "var(--bg)",
                                       border: "1px solid var(--primary)",
