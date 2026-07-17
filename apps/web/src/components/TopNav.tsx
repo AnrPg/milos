@@ -27,7 +27,7 @@ type NavLink = { href: string; labelKey: string; roles: UserRole[] };
 type AdminNavLink = { href: string; labelKey: string; mobileVisible: boolean };
 
 const NAV_LINKS: NavLink[] = [
-  { href: "/", labelKey: "home", roles: ["member", "athlete", "admin"] },
+  { href: "/", labelKey: "home", roles: ["member", "athlete"] },
   { href: "/schedule", labelKey: "schedule", roles: ["member"] },
   { href: "/my-workouts", labelKey: "myWorkouts", roles: ["athlete"] },
   { href: "/my-workouts/pantheon", labelKey: "pantheon", roles: ["athlete", "member"] },
@@ -35,6 +35,7 @@ const NAV_LINKS: NavLink[] = [
 ];
 
 const ADMIN_NAV_LINKS: AdminNavLink[] = [
+  { href: "/", labelKey: "home", mobileVisible: true },
   { href: "/admin/users", labelKey: "users", mobileVisible: false },
   { href: "/admin/finance", labelKey: "finance", mobileVisible: false },
   { href: "/admin/class-schedule", labelKey: "classes", mobileVisible: true },
