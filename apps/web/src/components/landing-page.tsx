@@ -784,30 +784,6 @@ export function LandingPage() {
           {/* ── Hall of Fame / Pantheon (non-admin) ────────────────────── */}
           {!isAdmin && <PantheonSection />}
 
-          {/* ── Coach notes (athlete only) ──────────────────────────────── */}
-          {currentUser?.role === "athlete" ? (
-            <section id="coach-notes" className="rounded-[2.2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-              <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>{i18n("coachNotes2ea7a97")}</p>
-              <h2 className="mt-3 text-2xl font-semibold tracking-tight" style={{ color: "var(--text)" }}>{i18n("latestGuidance58da2dc")}</h2>
-              <div className="mt-5 space-y-3">
-                {landing.coach_notes.length === 0 ? (
-                  <p className="rounded-2xl px-4 py-5 text-sm" style={{ background: "var(--panel-muted)", color: "var(--dim)" }}>
-                    {i18n("newCoachingNotesWillAppearHereWhenYour4f5275e")}
-                  </p>
-                ) : (
-                  landing.coach_notes.map((note) => (
-                    <div key={note.id} className="rounded-[1.5rem] px-4 py-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
-                      <p className="text-sm leading-6" style={{ color: "var(--text-soft)" }}>{note.body}</p>
-                      <p className="mt-3 text-xs uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                        {new Date(note.inserted_at).toLocaleString(uiLocale)}
-                      </p>
-                    </div>
-                  ))
-                )}
-              </div>
-            </section>
-          ) : null}
-
           {/* ── Workout history (non-admin) ─────────────────────────────── */}
           {!isAdmin && (() => {
             const now = new Date();
