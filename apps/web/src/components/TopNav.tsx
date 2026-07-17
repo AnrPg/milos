@@ -27,6 +27,7 @@ type NavLink = { href: string; labelKey: string; roles: UserRole[] };
 type AdminNavLink = { href: string; labelKey: string; mobileVisible: boolean };
 
 const NAV_LINKS: NavLink[] = [
+  { href: "/", labelKey: "home", roles: ["member", "athlete", "admin"] },
   { href: "/schedule", labelKey: "schedule", roles: ["member"] },
   { href: "/my-workouts", labelKey: "myWorkouts", roles: ["athlete"] },
   { href: "/my-workouts/pantheon", labelKey: "pantheon", roles: ["athlete", "member"] },
@@ -261,7 +262,7 @@ export function TopNav() {
           {i18n("milose9defa8")}
         </Link>
 
-        <nav className="flex min-w-0 flex-1 items-center gap-0.5 overflow-hidden sm:gap-1">
+        <nav className="flex min-w-0 flex-1 items-center gap-0.5 overflow-visible sm:gap-1">
           {role === "admin" ? <DashboardDropdown pathname={pathname} /> : null}
           <div className="flex min-w-0 items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-1">
             {role === "admin"
