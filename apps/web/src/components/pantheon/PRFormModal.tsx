@@ -9,7 +9,14 @@ import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { useId, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createPR, updatePR, type PRRecord, type PRUnit } from "@/api/gamification";
+import {
+  createPR,
+  updatePR,
+  type PRRecord,
+  type PRSupportingMetricKey,
+  type PRSupportingMetrics,
+  type PRUnit,
+} from "@/api/gamification";
 import { useSession } from "@/components/session-provider";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
@@ -18,6 +25,67 @@ function todayIso() {
 }
 
 type TimeFields = { hours: string; minutes: string; seconds: string; milliseconds: string };
+
+const NUMERIC_DETAIL_FIELDS: PRSupportingMetricKey[] = [
+  "reps",
+  "sets",
+  "load_kg",
+  "duration_seconds",
+  "distance_m",
+  "calories",
+  "rounds",
+];
+
+const DETAIL_OPTIONS: Record<PRUnit, PRSupportingMetricKey[]> = {
+  kg: ["reps", "sets", "duration_seconds", "distance_m", "calories", "rounds", "variation"],
+  reps: ["load_kg", "sets", "duration_seconds", "distance_m", "calories", "rounds", "variation"],
+  mins_secs: ["reps", "sets", "load_kg", "distance_m", "calories", "rounds", "variation"],
+  m: ["duration_seconds", "reps", "sets", "load_kg", "calories", "rounds", "variation"],
+  kcals: ["duration_seconds", "distance_m", "reps", "sets", "load_kg", "rounds", "variation"],
+  sets: ["reps", "load_kg", "duration_seconds", "distance_m", "calories", "rounds", "variation"],
+};
+
+function metricLabel(metric: PRSupportingMetricKey, i18n: ReturnType<typeof useUiTranslations>) {
+  switch (metric) {
+    case "reps": return i18n("reps702045f");
+    case "sets": return i18n("sets2ab262f");
+    case "load_kg": return `${i18n("semanticLoad")} (${i18n("kg1389845")})`;
+    case "duration_seconds": return `${i18n("time6c82e6d")} (${i18n("semanticSeconds")})`;
+    case "distance_m": return i18n("meters6ad427c");
+    case "calories": return i18n("semanticKilocalories");
+    case "rounds": return i18n("roundsceeac4a");
+    case "variation": return i18n("variation15920a4");
+  }
+}
+
+function metricInputType(metric: PRSupportingMetricKey) {
+  return NUMERIC_DETAIL_FIELDS.includes(metric) ? "number" : "text";
+}
+
+function rawMetrics(metrics: PRSupportingMetrics | undefined): Partial<Record<PRSupportingMetricKey, string>> {
+  return Object.fromEntries(
+    Object.entries(metrics ?? {}).map(([key, value]) => [key, String(value)]),
+  ) as Partial<Record<PRSupportingMetricKey, string>>;
+}
+
+function submitMetrics(raw: Partial<Record<PRSupportingMetricKey, string>>): PRSupportingMetrics {
+  return Object.entries(raw).reduce<PRSupportingMetrics>((metrics, [key, value]) => {
+    const metric = key as PRSupportingMetricKey;
+    const normalized = value.trim();
+    if (!normalized) return metrics;
+
+    if (NUMERIC_DETAIL_FIELDS.includes(metric)) {
+      const numeric = Number(normalized);
+      if (Number.isFinite(numeric)) {
+        metrics[metric as Exclude<PRSupportingMetricKey, "variation">] = numeric as never;
+      }
+    } else {
+      metrics[metric as "variation"] = normalized;
+    }
+
+    return metrics;
+  }, {});
+}
 
 function secondsToTimeFields(totalSeconds: number): TimeFields {
   const h = Math.floor(totalSeconds / 3600);
@@ -74,6 +142,9 @@ export function PRFormModal({
   );
   const [higherIsBetter, setHigherIsBetter] = useState(pr?.higher_is_better ?? false);
   const [beatenOn, setBeatenOn] = useState(pr?.beaten_on ?? todayIso());
+  const [details, setDetails] = useState<Partial<Record<PRSupportingMetricKey, string>>>(() => rawMetrics(pr?.supporting_metrics));
+  const [detailToAdd, setDetailToAdd] = useState<PRSupportingMetricKey | "">("");
+  const [notes, setNotes] = useState(pr?.notes ?? "");
   const [error, setError] = useState<string | null>(null);
 
   const mutation = useMutation({
@@ -87,6 +158,8 @@ export function PRFormModal({
         unit,
         higher_is_better: higherIsBetter,
         beaten_on: beatenOn,
+        supporting_metrics: submitMetrics(details),
+        notes: notes.trim() || null,
       };
       if (isEdit && pr) {
         return updatePR(tokens.access_token, pr.id, params);
@@ -234,6 +307,50 @@ export function PRFormModal({
               onChange={(e) => setBeatenOn(e.target.value)}
               required
             />
+          </div>
+
+          <div className="space-y-2">
+            {Object.keys(details).length > 0 && (
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {(Object.keys(details) as PRSupportingMetricKey[]).map((metric) => (
+                  <div key={metric} className="space-y-1">
+                    <label className="block text-xs font-semibold" style={{ color: "var(--muted)" }}>{metricLabel(metric, i18n)}</label>
+                    <div className="flex gap-1.5">
+                      <input
+                        className="min-w-0 flex-1 rounded-xl px-3 py-2.5 text-sm outline-none"
+                        style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+                        type={metricInputType(metric)}
+                        inputMode={metricInputType(metric) === "number" ? "decimal" : undefined}
+                        min={metricInputType(metric) === "number" ? "0" : undefined}
+                        step={metric === "reps" || metric === "sets" || metric === "rounds" ? "1" : "any"}
+                        value={details[metric] ?? ""}
+                        onChange={(event) => setDetails((current) => ({ ...current, [metric]: event.target.value }))}
+                      />
+                      <button type="button" onClick={() => setDetails((current) => {
+                        const next = { ...current };
+                        delete next[metric];
+                        return next;
+                      })} className="w-10 rounded-xl text-sm font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }} aria-label={i18n("deletef6fdbe4")} title={i18n("deletef6fdbe4")}>×</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {DETAIL_OPTIONS[unit].filter((metric) => !(metric in details)).length > 0 && (
+              <select className="w-full rounded-xl px-4 py-2.5 text-sm outline-none" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }} value={detailToAdd} onChange={(event) => {
+                const metric = event.target.value as PRSupportingMetricKey;
+                if (metric) setDetails((current) => ({ ...current, [metric]: "" }));
+                setDetailToAdd("");
+              }}>
+                <option value="">{`${i18n("add61cc55a")} ${i18n("detail7c9a7c0")}`}</option>
+                {DETAIL_OPTIONS[unit].filter((metric) => !(metric in details)).map((metric) => <option key={metric} value={metric}>{metricLabel(metric, i18n)}</option>)}
+              </select>
+            )}
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>{i18n("notesOptional4d56ca9")}</label>
+            <textarea className="min-h-24 w-full resize-y rounded-xl px-4 py-2.5 text-sm outline-none" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }} value={notes} onChange={(event) => setNotes(event.target.value)} maxLength={2000} />
           </div>
 
           <label className="flex items-center gap-3 cursor-pointer">

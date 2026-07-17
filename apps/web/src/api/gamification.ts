@@ -8,6 +8,27 @@ export type GamificationPreferences = {
 
 export type PRUnit = "mins_secs" | "reps" | "sets" | "kcals" | "m" | "kg";
 
+export type PRSupportingMetricKey =
+  | "reps"
+  | "sets"
+  | "load_kg"
+  | "duration_seconds"
+  | "distance_m"
+  | "calories"
+  | "rounds"
+  | "variation";
+
+export type PRSupportingMetrics = Partial<{
+  reps: number;
+  sets: number;
+  load_kg: number;
+  duration_seconds: number;
+  distance_m: number;
+  calories: number;
+  rounds: number;
+  variation: string;
+}>;
+
 export type PRRecord = {
   id: string;
   user_id: string;
@@ -16,6 +37,8 @@ export type PRRecord = {
   unit: PRUnit;
   higher_is_better: boolean;
   beaten_on: string;
+  supporting_metrics: PRSupportingMetrics;
+  notes: string | null;
   inserted_at: string;
   updated_at: string;
 };
@@ -25,6 +48,8 @@ export type PRHistoryEntry = {
   pr_record_id: string;
   score: number;
   beaten_on: string;
+  supporting_metrics: PRSupportingMetrics;
+  notes: string | null;
   inserted_at: string;
 };
 
@@ -65,6 +90,8 @@ export async function createPR(
     unit: PRUnit;
     higher_is_better?: boolean;
     beaten_on: string;
+    supporting_metrics?: PRSupportingMetrics;
+    notes?: string | null;
   },
 ): Promise<PRRecord> {
   const data = await apiRequest<{ pr: PRRecord }>("/prs", {
@@ -84,6 +111,8 @@ export async function updatePR(
     unit: PRUnit;
     higher_is_better: boolean;
     beaten_on: string;
+    supporting_metrics: PRSupportingMetrics;
+    notes: string | null;
   }>,
 ): Promise<PRRecord> {
   const data = await apiRequest<{ pr: PRRecord }>(`/prs/${id}`, {
