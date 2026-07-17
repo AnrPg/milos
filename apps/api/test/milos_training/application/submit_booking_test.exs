@@ -8,6 +8,7 @@ defmodule MilosTraining.Application.SubmitBookingTest do
   alias MilosTraining.Workers.BookingTimeoutJob
   alias Oban.Testing
 
+  import ExUnit.CaptureLog
   import MilosTraining.TestFixtures
 
   setup do
@@ -170,11 +171,17 @@ defmodule MilosTraining.Application.SubmitBookingTest do
     workout = workout_fixture(admin)
     slot = slot_fixture(workout, %{auto_approve: false})
 
-    assert {:ok, booking} = SubmitBooking.call(member.id, slot.id)
-    assert booking.status == :pending
+    log =
+      capture_log(fn ->
+        assert {:ok, booking} = SubmitBooking.call(member.id, slot.id)
+        assert booking.status == :pending
 
-    refreshed_slot = MilosTraining.Scheduling.get_slot(slot.id)
-    assert Enum.any?(refreshed_slot.bookings, &(&1.id == booking.id))
+        refreshed_slot = MilosTraining.Scheduling.get_slot(slot.id)
+        assert Enum.any?(refreshed_slot.bookings, &(&1.id == booking.id))
+      end)
+
+    assert log =~ "booking_notification_dispatch_failed"
+    assert log =~ "reason=:notification_store_down"
   end
 
   defmodule FailingDispatcher do

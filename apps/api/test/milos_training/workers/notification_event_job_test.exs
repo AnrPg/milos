@@ -3,6 +3,7 @@ defmodule MilosTraining.Workers.NotificationEventJobTest do
 
   alias MilosTraining.Workers.NotificationEventJob
 
+  import ExUnit.CaptureLog
   import MilosTraining.TestFixtures
 
   setup do
@@ -36,10 +37,16 @@ defmodule MilosTraining.Workers.NotificationEventJobTest do
       }
     }
 
-    assert {:error, {:notification_failed, :store_down}} =
-             NotificationEventJob.perform(%Oban.Job{
-               args: %{"event" => "booking_timed_out", "payload" => booking}
-             })
+    log =
+      capture_log(fn ->
+        assert {:error, {:notification_failed, :store_down}} =
+                 NotificationEventJob.perform(%Oban.Job{
+                   args: %{"event" => "booking_timed_out", "payload" => booking}
+                 })
+      end)
+
+    assert log =~ "booking notification delivery failed"
+    assert log =~ "reason={:notification_failed, :store_down}"
   end
 
   defmodule FailingNotificationStore do
