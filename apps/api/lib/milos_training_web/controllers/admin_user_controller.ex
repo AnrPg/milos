@@ -33,13 +33,31 @@ defmodule MilosTrainingWeb.AdminUserController do
   }
   @user_id %Schema{type: :string, format: :uuid}
   @summary_object %Schema{type: :object, additionalProperties: true}
+  @finance_details %Schema{
+    type: :object,
+    required: [
+      :membership,
+      :package_subscriptions,
+      :referral_claims,
+      :referred_members,
+      :referral_rewards
+    ],
+    properties: %{
+      membership: %Schema{type: :object, additionalProperties: true, nullable: true},
+      package_subscriptions: %Schema{type: :array, items: @summary_object},
+      referral_claims: %Schema{type: :array, items: @summary_object},
+      referred_members: %Schema{type: :array, items: @summary_object},
+      referral_rewards: %Schema{type: :array, items: @summary_object}
+    }
+  }
   @finance_response %Schema{
     type: :object,
-    required: [:user_id, :available, :summary, :drill_down, :operational_links],
+    required: [:user_id, :available, :summary, :details, :drill_down, :operational_links],
     properties: %{
       user_id: @user_id,
       available: %Schema{type: :boolean},
       summary: %Schema{type: :object, additionalProperties: true, nullable: true},
+      details: @finance_details,
       drill_down: %Schema{type: :object, additionalProperties: true, nullable: true},
       operational_links: %Schema{type: :object, additionalProperties: %Schema{type: :string}}
     }
@@ -66,6 +84,30 @@ defmodule MilosTrainingWeb.AdminUserController do
       threads: %Schema{type: :array, items: @summary_object},
       summary: @summary_object,
       operational_links: %Schema{type: :object, additionalProperties: %Schema{type: :string}}
+    }
+  }
+  @pr_response %Schema{
+    type: :object,
+    required: [:user_id, :prs],
+    properties: %{
+      user_id: @user_id,
+      prs: %Schema{
+        type: :array,
+        items: %Schema{
+          type: :object,
+          additionalProperties: true,
+          required: [:id, :name, :current_score, :unit, :higher_is_better, :beaten_on, :history],
+          properties: %{
+            id: @user_id,
+            name: %Schema{type: :string},
+            current_score: %Schema{type: :number},
+            unit: %Schema{type: :string},
+            higher_is_better: %Schema{type: :boolean},
+            beaten_on: %Schema{type: :string, format: :date},
+            history: %Schema{type: :array, items: @summary_object}
+          }
+        }
+      }
     }
   }
   @coaching_response %Schema{
@@ -186,7 +228,7 @@ defmodule MilosTrainingWeb.AdminUserController do
   operation(:prs,
     summary: "Get a user's personal records",
     parameters: [@id_parameter],
-    responses: [ok: {"Personal records", "application/json", @collection_response}]
+    responses: [ok: {"Personal records", "application/json", @pr_response}]
   )
 
   operation(:incidents,
