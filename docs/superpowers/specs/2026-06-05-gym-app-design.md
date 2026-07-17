@@ -81,6 +81,8 @@ MilosTraining.Feedback       → reviews, questionnaires, moderation lifecycle
 MilosTraining.Wellbeing      → injury reports, healing history, training limitations
 MilosTraining.Messaging      → direct/contextual threads, participants, messages
 MilosTraining.Pantheon       → personal records and score history
+MilosTraining.Organizations  → tenants, memberships, domains, settings,
+                        and one-time registration invitations
 ```
 
 These post-MVP contexts are authoritative, not auxiliary folders. They follow the
@@ -270,6 +272,11 @@ The following are explicitly forbidden. Any code introducing these requires huma
 
 ## 3. User Roles
 
+> **Multi-tenant amendment — 2026-07-18:** ADR-055 supersedes the original
+> global-role model below. Authentication principals are global, while roles
+> and authorization are scoped through organization memberships. The original
+> matrix remains the functional role definition within one organization.
+
 | Role | Description |
 |---|---|
 | **Admin** | Gym owner/trainer. Full access. Sees inline edit buttons on all standard pages. |
@@ -410,10 +417,10 @@ Admin → /admin → Tab 2
 
 ### Flow 8 — Registration
 ```
-New user → /register
+New user receives one-time invitation → /register?invite=<opaque token>
+  → Server infers organization and intended role from the invitation
   → Enters: nickname (unique) + password
-  → Selects role: "Gym Member" or "Athlete"
-  → Admin can change role any time from Dashboard
+  → Registration atomically consumes the invitation and creates membership
   → First login → Landing Page
 ```
 
@@ -425,9 +432,34 @@ New user → /register
 ```
 users
   id (uuid), nickname (string, unique), password_hash (string)
-  role: :admin | :member | :athlete
+  role: :admin | :member | :athlete  [transitional; superseded by membership role]
   leaderboard_opt_in (boolean, default: false)
   inserted_at, updated_at
+
+organizations
+  id (uuid), slug (string, unique), name (string)
+  status: :active | :suspended | :archived
+  inserted_at, updated_at
+
+organization_memberships
+  id (uuid), organization_id → organizations, user_id → users
+  role: :owner | :admin | :coach | :member | :athlete
+  status: :invited | :active | :suspended | :revoked
+  joined_at, inserted_at, updated_at
+
+registration_invitations
+  id (uuid), organization_id → organizations
+  token_digest (binary, unique), role, expires_at
+  issued_by_user_id → users, redeemed_by_user_id → users
+  redeemed_at, revoked_at, inserted_at, updated_at
+
+organization_domains
+  id (uuid), organization_id → organizations
+  host (string, unique), verified_at, primary
+
+organization_settings
+  id (uuid), organization_id → organizations (unique)
+  timezone, default_locale, invitation_lifetime_seconds, settings (jsonb)
 
 memberships
   id, user_id → users

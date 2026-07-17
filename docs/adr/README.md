@@ -59,4 +59,10 @@ must have an ADR. See `template.md` for the format.
 | ADR-051 | Separate notifications and messages presentation | Accepted |
 | ADR-052 | Structured PR results and supporting metrics | Accepted |
 | ADR-053 | Display usernames and device push controls | Accepted |
-| ADR-054 | Code-gated admin registration | Accepted |
+| ADR-054 | Code-gated admin registration | Superseded by ADR-057 for tenant onboarding |
+| ADR-055 | Organization tenancy and membership-scoped identity | Accepted |
+| ADR-056 | Shared-schema tenant isolation with PostgreSQL RLS | Accepted |
+| ADR-057 | Opaque one-time tenant invitations | Accepted |
+| ADR-058 | Tenant resolution and request context | Accepted |
+| ADR-059 | Tenant propagation beyond PostgreSQL | Accepted |
+| ADR-060 | Staged legacy-tenant backfill and enforcement rollout | Accepted |
