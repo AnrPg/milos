@@ -24,6 +24,7 @@ import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { SemanticLabel } from "@/components/semantic-label";
 import { addLocalDays, formatLocalDate } from "@/lib/local-date";
+import { HelpTooltip } from "@/components/HelpTooltip";
 
 type CriteriaType = SaveChallengePayload["criteria_type"];
 
@@ -336,12 +337,15 @@ function RuleRowEditor({
   );
 }
 
-function metricCard(label: string, value: string | number) {
+function metricCard(label: string, value: string | number, insight?: string) {
   return (
     <div className="rounded-[1.3rem] p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
-      <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-        {label}
-      </p>
+      <div className="flex items-center gap-2">
+        <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+          {label}
+        </p>
+        {insight ? <HelpTooltip label={label}>{insight}</HelpTooltip> : null}
+      </div>
       <p className="mt-2 text-xl font-semibold" style={{ color: "var(--text)" }}>
         {value}
       </p>
@@ -427,6 +431,7 @@ export function AdminChallenges() {
   const selectedChallenge = detailQuery.data?.challenge ?? null;
   const participants = detailQuery.data?.participants ?? [];
   const editing = Boolean(selectedChallengeId);
+  const challengeInsight = i18n("createAndEditSeasonalChallengesInspectLiveParticipation96025e7");
 
   function updateForm<K extends keyof ChallengeFormState>(key: K, value: ChallengeFormState[K]) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -454,9 +459,12 @@ export function AdminChallenges() {
             </div>
 
             <div className="rounded-[1.4rem] px-5 py-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
-              <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                {i18n("activeToday9f14dee")}
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+                  {i18n("activeToday9f14dee")}
+                </p>
+                <HelpTooltip label={i18n("activeToday9f14dee")}>{challengeInsight}</HelpTooltip>
+              </div>
               <p className="mt-2 text-2xl font-semibold" style={{ color: "var(--text)" }}>
                 {activeCount} / 3
               </p>
@@ -516,8 +524,9 @@ export function AdminChallenges() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block space-y-2">
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+                  <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                     {i18n("criteriaTypedf7b95e")}
+                    <HelpTooltip label={i18n("criteriaTypedf7b95e")}>{challengeInsight}</HelpTooltip>
                   </span>
                   <select
                     className="w-full rounded-2xl border px-4 py-3 text-sm"
@@ -533,8 +542,9 @@ export function AdminChallenges() {
                 </label>
 
                 <label className="block space-y-2">
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+                  <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                     {i18n("targetCountef87dbf")}
+                    <HelpTooltip label={i18n("targetCountef87dbf")}>{criteriaSummary(payloadFromForm(form))}</HelpTooltip>
                   </span>
                   <input
                     className="w-full rounded-2xl border px-4 py-3 text-sm"
@@ -570,10 +580,11 @@ export function AdminChallenges() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span
-                      className="text-xs font-semibold uppercase tracking-[0.18em]"
+                      className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em]"
                       style={{ color: "var(--dim)" }}
                     >
                       {i18n("pointsRules6075014")}
+                      <HelpTooltip label={i18n("pointsRules6075014")}>{criteriaSummary(payloadFromForm(form))}</HelpTooltip>
                     </span>
                     <button
                       type="button"
@@ -867,10 +878,10 @@ export function AdminChallenges() {
               ) : (
                 <>
                   <div className="mt-5 grid gap-3 sm:grid-cols-4">
-                    {metricCard(i18n("participantscd56e08"), selectedChallenge.progress_summary.participants)}
-                    {metricCard(i18n("completed1798b3b"), selectedChallenge.progress_summary.completed)}
-                    {metricCard(i18n("avgProgress026284f"), selectedChallenge.progress_summary.average_progress)}
-                    {metricCard(i18n("completionRatea360083"), ((selectedChallenge.progress_summary.completion_rate * 100).toFixed(0)) + "%")}
+                    {metricCard(i18n("participantscd56e08"), selectedChallenge.progress_summary.participants, challengeInsight)}
+                    {metricCard(i18n("completed1798b3b"), selectedChallenge.progress_summary.completed, challengeInsight)}
+                    {metricCard(i18n("avgProgress026284f"), selectedChallenge.progress_summary.average_progress, criteriaSummary(selectedChallenge))}
+                    {metricCard(i18n("completionRatea360083"), ((selectedChallenge.progress_summary.completion_rate * 100).toFixed(0)) + "%", criteriaSummary(selectedChallenge))}
                   </div>
 
                   <div className="mt-5 overflow-x-auto rounded-[1.4rem]" style={{ border: "1px solid var(--border)" }}>

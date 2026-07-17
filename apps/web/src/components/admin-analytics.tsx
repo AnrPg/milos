@@ -16,6 +16,7 @@ import { fetchAdminAnalyticsSummary } from "@/api/analytics";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { SemanticLabel } from "@/components/semantic-label";
+import { HelpTooltip } from "@/components/HelpTooltip";
 
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
@@ -53,16 +54,21 @@ function KpiCard({
   label,
   value,
   helper,
+  insight,
   href,
 }: {
   label: string;
   value: string;
   helper?: string;
+  insight?: string;
   href?: string;
 }) {
   const content = (
     <>
-      <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">{label}</p>
+      <div className="flex items-center gap-2">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">{label}</p>
+        {insight || helper ? <HelpTooltip label={label}>{insight ?? helper}</HelpTooltip> : null}
+      </div>
       <p className="mt-3 text-3xl font-black">{value}</p>
       {helper ? <p className="mt-2 text-xs leading-5 text-[var(--muted)]">{helper}</p> : null}
     </>
@@ -79,7 +85,7 @@ function KpiCard({
   );
 }
 
-function BreakdownList({ title, rows }: { title: string; rows: [string, unknown][] }) {
+function BreakdownList({ title, rows, insight }: { title: string; rows: [string, unknown][]; insight?: string }) {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const numericRows = rows.filter(([, value]) => typeof value === "number") as [string, number][];
@@ -87,7 +93,10 @@ function BreakdownList({ title, rows }: { title: string; rows: [string, unknown]
 
   return (
     <article className="rounded-[1.6rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
-      <h2 className="text-xl font-black">{title}</h2>
+      <div className="flex items-center gap-2">
+        <h2 className="text-xl font-black">{title}</h2>
+        {insight ? <HelpTooltip label={title}>{insight}</HelpTooltip> : null}
+      </div>
       {numericRows.length > 0 ? (
         <div className="mt-5 space-y-4">
           {numericRows.map(([label, value]) => (
@@ -207,17 +216,19 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
             helper={(formatCount(uiLocale, metricNumber(dashboardFinance, "active_memberships"))) + i18n("activeMemberships6d55ee8")}
             href="/admin/metrics/finance"
           />
-          <KpiCard label={i18n("reviewsb83c4cd")} value={formatCount(uiLocale, metricNumber(feedback, "total"))} href="/admin/reviews" />
+          <KpiCard label={i18n("reviewsb83c4cd")} value={formatCount(uiLocale, metricNumber(feedback, "total"))} insight={copy.body} href="/admin/reviews" />
           <KpiCard
             label={i18n("activeInjuriesdaecfa6")}
             value={formatCount(uiLocale, metricNumber(wellbeing, "active_count"))}
             helper={(formatCount(uiLocale, metricNumber(wellbeing, "total"))) + i18n("totalReportsdfd4b9e")}
+            insight={copy.body}
             href="/admin/metrics/health"
           />
           <KpiCard
             label={i18n("notificationClicks02c5775")}
             value={formatCount(uiLocale, metricNumber(notificationClicks, "total"))}
             helper={(formatCount(uiLocale, metricNumber(events, "total"))) + i18n("trackedEvents398d5c2")}
+            insight={copy.body}
             href="/admin/metrics/engagement"
           />
         </section> : null}
@@ -225,12 +236,13 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
         {section === "training" ? <section id="training-analytics" className="scroll-mt-20 rounded-[1.6rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
           <h2 className="text-xl font-black">{i18n("teamWorkoutBreakdownLast30Days86ec3d2")}</h2>
           <div className="mt-4 grid gap-4 md:grid-cols-3">
-            <KpiCard label={i18n("teamCompletions2a732d2")} value={formatCount(uiLocale, metricNumber(teamWorkoutsAggregate, "team_count"))} />
+            <KpiCard label={i18n("teamCompletions2a732d2")} value={formatCount(uiLocale, metricNumber(teamWorkoutsAggregate, "team_count"))} insight={copy.body} />
             <KpiCard
               label={i18n("individualCompletions70ee9b2")}
               value={formatCount(uiLocale, metricNumber(teamWorkoutsAggregate, "individual_count"))}
+              insight={copy.body}
             />
-            <KpiCard label={i18n("totalCompletionsfa16f4c")} value={formatCount(uiLocale, metricNumber(teamWorkoutsAggregate, "total_count"))} />
+            <KpiCard label={i18n("totalCompletionsfa16f4c")} value={formatCount(uiLocale, metricNumber(teamWorkoutsAggregate, "total_count"))} insight={copy.body} />
           </div>
           {Object.keys(teamWorkoutsByUser).length > 0 ? (
             <div className="mt-6 overflow-hidden rounded-2xl border border-[color:var(--border)]">
@@ -248,7 +260,7 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
             </div>
           ) : null}
           <div className="mt-6">
-            <BreakdownList title={i18n("attendanceb689313")} rows={entries(asRecord(attendance.by_status))} />
+            <BreakdownList title={i18n("attendanceb689313")} rows={entries(asRecord(attendance.by_status))} insight={copy.body} />
           </div>
         </section> : null}
 
@@ -257,10 +269,10 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--primary)]">{i18n("userEngagement72f61cf")}</p>
             <h2 className="mt-2 text-xl font-black">{i18n("interactionAndCommunicationSignals18b657a")}</h2>
           </div>
-          <BreakdownList title={i18n("eventMix09a541e")} rows={entries(asRecord(events.by_name))} />
-          <BreakdownList title={i18n("pushDelivery52c03a7")} rows={entries(asRecord(pushDispatch.by_status))} />
-          <BreakdownList title={i18n("communicationade0d50")} rows={entries(asRecord(communication.by_direction))} />
-          <BreakdownList title={i18n("reviewRatingsd575ce1")} rows={entries(reviewByRating)} />
+          <BreakdownList title={i18n("eventMix09a541e")} rows={entries(asRecord(events.by_name))} insight={copy.body} />
+          <BreakdownList title={i18n("pushDelivery52c03a7")} rows={entries(asRecord(pushDispatch.by_status))} insight={copy.body} />
+          <BreakdownList title={i18n("communicationade0d50")} rows={entries(asRecord(communication.by_direction))} insight={copy.body} />
+          <BreakdownList title={i18n("reviewRatingsd575ce1")} rows={entries(reviewByRating)} insight={copy.body} />
         </section> : null}
 
         {section === "coaching" ? <section id="coaching-analytics" className="scroll-mt-20 rounded-[1.6rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
@@ -274,9 +286,9 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
             </Link>
           </div>
           <div className="mt-5 grid gap-4 md:grid-cols-3">
-            <KpiCard label={i18n("activeAthletes78e231e")} value={formatCount(uiLocale, metricNumber(coaching, "active_athletes"))} />
-            <KpiCard label={i18n("capturedEvents2551a14")} value={formatCount(uiLocale, metricNumber(dashboardCoaching, "event_count"))} />
-            <KpiCard label={i18n("reviewsb83c4cd")} value={formatCount(uiLocale, metricNumber(dashboardCoaching, "review_count"))} />
+            <KpiCard label={i18n("activeAthletes78e231e")} value={formatCount(uiLocale, metricNumber(coaching, "active_athletes"))} insight={copy.body} />
+            <KpiCard label={i18n("capturedEvents2551a14")} value={formatCount(uiLocale, metricNumber(dashboardCoaching, "event_count"))} insight={copy.body} />
+            <KpiCard label={i18n("reviewsb83c4cd")} value={formatCount(uiLocale, metricNumber(dashboardCoaching, "review_count"))} insight={copy.body} />
           </div>
         </section> : null}
 
@@ -291,9 +303,9 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
             </Link>
           </div>
           <div className="mt-5 grid gap-4 md:grid-cols-3">
-            <KpiCard label={i18n("activeInjuriesdaecfa6")} value={formatCount(uiLocale, metricNumber(wellbeing, "active_count"))} />
-            <KpiCard label={i18n("totalReports5654449")} value={formatCount(uiLocale, metricNumber(wellbeing, "total"))} />
-            <KpiCard label={i18n("recentInjuryFlags0692c0a")} value={formatCount(uiLocale, metricNumber(dashboardCoaching, "injury_count"))} />
+            <KpiCard label={i18n("activeInjuriesdaecfa6")} value={formatCount(uiLocale, metricNumber(wellbeing, "active_count"))} insight={copy.body} />
+            <KpiCard label={i18n("totalReports5654449")} value={formatCount(uiLocale, metricNumber(wellbeing, "total"))} insight={copy.body} />
+            <KpiCard label={i18n("recentInjuryFlags0692c0a")} value={formatCount(uiLocale, metricNumber(dashboardCoaching, "injury_count"))} insight={copy.body} />
           </div>
         </section> : null}
 
