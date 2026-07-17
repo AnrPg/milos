@@ -57,3 +57,9 @@ The notification domain hides `chat_message` from every inbox read path while
 preserving the record for Web Push and realtime invalidation. Focused tests
 cover delivery-record persistence, notification exclusion, incoming-only
 message counts, and read-pointer decrement behavior.
+
+The Messages control now opens a full-height side drawer matching the
+Notifications interaction rather than a small navigation dropdown. Both direct
+and contextual composers use multiline textareas; Enter inserts a newline and
+only the explicit Send button submits. Message and notification presentation
+preserves authored whitespace, line breaks, and special characters.

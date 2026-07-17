@@ -27,7 +27,8 @@ export function MessageBubble({ message, isOwnMessage, senderNickname }: Message
         </span>
       )}
       <div
-        className="rounded-2xl px-3 py-2 text-sm leading-relaxed"
+        className="whitespace-pre-wrap break-words rounded-2xl px-3 py-2 text-sm leading-relaxed [overflow-wrap:anywhere]"
+        data-user-text
         style={
           isOwnMessage
             ? { background: "var(--primary)", color: "var(--primary-contrast)" }

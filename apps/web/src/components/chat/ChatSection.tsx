@@ -10,6 +10,7 @@ import { getOrCreateContextThread, type ChatThread, type MessageType } from "@/a
 import { useSession } from "@/components/session-provider";
 import { useChat } from "@/hooks/useChat";
 import { MessageBubble } from "./MessageBubble";
+import { MessageComposer } from "./MessageComposer";
 import { TypingIndicator } from "./TypingIndicator";
 
 interface ChatSectionProps {
@@ -80,7 +81,7 @@ export function ChatSection({
 
   const handleSend = () => {
     if (!input.trim()) return;
-    sendMessage(input.trim(), messageType);
+    sendMessage(input, messageType);
     setInput("");
   };
 
@@ -123,34 +124,18 @@ export function ChatSection({
 
           {!readOnly && (
             <div
-              className="flex items-center gap-2 p-3 border-t"
+              className="p-3 border-t"
               style={{ background: "var(--panel-muted)", borderColor: "var(--border)" }}
             >
-              <input
-                type="text"
-                className="flex-1 rounded-[1rem] px-3 py-2 text-sm outline-none"
-                style={{ background: "var(--card)", color: "var(--text)", border: "1px solid var(--border-strong)" }}
+              <MessageComposer
                 placeholder={i18n("writeAMessage24bf2a3")}
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={setInput}
                 onFocus={sendTypingStart}
                 onBlur={sendTypingStop}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSend();
-                  }
-                }}
+                onSend={handleSend}
+                sendLabel={i18n("send9bc2575")}
               />
-              <button
-                type="button"
-                onClick={handleSend}
-                disabled={!input.trim()}
-                className="rounded-full px-3 py-2 text-xs font-semibold"
-                style={{ background: "var(--primary)", color: "var(--primary-contrast)", opacity: input.trim() ? 1 : 0.4 }}
-              >
-                {i18n("send9bc2575")}
-              </button>
             </div>
           )}
         </div>

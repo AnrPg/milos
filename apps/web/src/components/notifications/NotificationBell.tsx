@@ -270,7 +270,11 @@ function NotificationCard({
           <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
             {titleFromPayload(notification)}
           </p>
-          <p className="mt-2 text-sm leading-6" style={{ color: "var(--muted)" }}>
+          <p
+            className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 [overflow-wrap:anywhere]"
+            data-user-text
+            style={{ color: "var(--muted)" }}
+          >
             {notificationBody(notification)}
           </p>
         </div>

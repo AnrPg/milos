@@ -18,6 +18,7 @@ import { useSession } from "@/components/session-provider";
 import { useChat } from "@/hooks/useChat";
 import { useUiPrefs } from "@/stores/ui-prefs";
 import { MessageBubble } from "./MessageBubble";
+import { MessageComposer } from "./MessageComposer";
 import { TypingIndicator } from "./TypingIndicator";
 import { SemanticLabel } from "@/components/semantic-label";
 
@@ -105,15 +106,15 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
   };
 
   const handleSend = async () => {
-    const draft = input.trim();
-    if (!draft || isSending) return;
+    const draft = input;
+    if (!draft.trim() || isSending) return;
 
     setIsSending(true);
     setSendError(null);
 
     try {
       await sendMessage(draft);
-      setInput((current) => (current.trim() === draft ? "" : current));
+      setInput((current) => (current === draft ? "" : current));
       sendTypingStop();
     } catch (error) {
       setSendError(error instanceof Error ? localizeError(error, i18n) : i18n("messageCouldNotBeSent7aa3b0a"));
@@ -129,14 +130,20 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      className="fixed end-4 top-14 z-[60] rounded-[1.5rem] shadow-2xl flex flex-col overflow-hidden"
-      style={{
-        width: "340px",
-        height: "520px",
-        background: "var(--panel-muted)",
-        border: "1px solid var(--border-strong)",
-      }}
+      className="fixed inset-0 z-[70]"
+      style={{ background: "rgba(0,0,0,0.55)" }}
+      onClick={onClose}
+      role="presentation"
     >
+      <aside
+        aria-label={i18n("chat2ced57f")}
+        className="absolute end-0 top-0 flex h-full w-full max-w-md flex-col overflow-hidden shadow-[-20px_0_60px_rgba(0,0,0,0.5)] rtl:shadow-[20px_0_60px_rgba(0,0,0,0.5)]"
+        style={{
+          background: "var(--panel-muted)",
+          borderInlineStart: "1px solid var(--border-strong)",
+        }}
+        onClick={(event) => event.stopPropagation()}
+      >
       {/* Header */}
       <div
         className="flex items-center justify-between px-4 py-3 border-b"
@@ -179,7 +186,7 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
             />
           </div>
 
-          <div className="flex-1 overflow-y-auto">
+          <div className="scroll-area flex-1 overflow-y-auto">
             {searchResults.length > 0 ? (
               searchResults.map((u) => (
                 <button
@@ -260,7 +267,7 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
 
       {view === "thread" && activeThread && (
         <>
-          <div className="flex-1 overflow-y-auto flex flex-col gap-2 p-4">
+          <div className="scroll-area flex-1 overflow-y-auto flex flex-col gap-2 p-4">
             {messages.map((msg) => (
               <MessageBubble
                 key={msg.id}
@@ -276,48 +283,25 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
             className="p-3 border-t"
             style={{ background: "var(--panel-muted)", borderColor: "var(--border)" }}
           >
-            {sendError && (
-              <p role="alert" className="mb-2 text-xs" style={{ color: "var(--danger)" }}>
-                {sendError} {i18n("yourDraftIsStillHereReconnectAndRetry617338d")}
-              </p>
-            )}
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                className="flex-1 rounded-[1rem] px-3 py-2 text-sm outline-none"
-                style={{ background: "var(--card)", color: "var(--text)", border: "1px solid var(--border-strong)" }}
+            <MessageComposer
+                error={sendError ? `${sendError} ${i18n("yourDraftIsStillHereReconnectAndRetry617338d")}` : null}
                 placeholder={i18n("writeAMessage24bf2a3")}
                 value={input}
-                onChange={(e) => {
-                  setInput(e.target.value);
+                onChange={(value) => {
+                  setInput(value);
                   setSendError(null);
                 }}
                 onFocus={sendTypingStart}
                 onBlur={sendTypingStop}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    void handleSend();
-                  }
-                }}
+                onSend={() => void handleSend()}
+                sendLabel={i18n("send9bc2575")}
+                sending={isSending}
+                sendingLabel={i18n("sendingcf76551")}
               />
-              <button
-                type="button"
-                onClick={() => void handleSend()}
-                disabled={!input.trim() || isSending}
-                className="rounded-full px-3 py-2 text-xs font-semibold"
-                style={{
-                  background: "var(--primary)",
-                  color: "var(--primary-contrast)",
-                  opacity: input.trim() && !isSending ? 1 : 0.4,
-                }}
-              >
-                {isSending ? i18n("sendingcf76551") : i18n("send9bc2575")}
-              </button>
-            </div>
           </div>
         </>
       )}
+      </aside>
     </div>
   );
 }
