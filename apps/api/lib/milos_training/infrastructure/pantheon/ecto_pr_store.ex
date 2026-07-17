@@ -4,6 +4,7 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
   import Ecto.Query
 
   alias MilosTraining.Pantheon.{PRHistory, PRRecord}
+  alias MilosTraining.Pantheon.Domain.PRHistoryPolicy
   alias MilosTraining.Repo
 
   @impl true
@@ -59,17 +60,15 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
 
       existing ->
         Repo.transaction(fn ->
-          old_score = existing.current_score
+          changeset = PRRecord.changeset(existing, params)
 
-          case PRRecord.changeset(existing, params) |> Repo.update() do
+          case Repo.update(changeset) do
             {:ok, updated} ->
-              new_score = updated.current_score
-
-              if Decimal.compare(new_score, old_score) != :eq do
+              if PRHistoryPolicy.snapshot_required?(changeset.changes) do
                 %PRHistory{}
                 |> PRHistory.changeset(%{
                   pr_record_id: id,
-                  score: old_score,
+                  score: existing.current_score,
                   beaten_on: existing.beaten_on,
                   supporting_metrics: existing.supporting_metrics,
                   notes: existing.notes

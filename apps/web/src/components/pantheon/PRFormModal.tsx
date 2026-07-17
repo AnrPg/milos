@@ -168,6 +168,7 @@ export function PRFormModal({
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["prs"] });
+      if (pr) void queryClient.invalidateQueries({ queryKey: ["prs", pr.id, "history"] });
       void queryClient.invalidateQueries({ queryKey: ["landing"] });
       onClose();
     },

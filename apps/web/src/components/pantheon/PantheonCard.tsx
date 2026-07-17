@@ -12,6 +12,8 @@ import { useQuery } from "@tanstack/react-query";
 import { getPRHistory, type PRRecord, type PRUnit } from "@/api/gamification";
 import { useSession } from "@/components/session-provider";
 import { semanticLabel } from "@/i18n/presentation";
+import { formatPRCardDetails } from "@/components/pantheon/pr-card-details";
+import { chronologicalPRHistory } from "@/components/pantheon/pr-history";
 
 export function formatScore(score: number, unit: PRUnit): string {
   if (unit === "mins_secs") {
@@ -94,12 +96,10 @@ function Particles({ prId }: { prId: string }) {
 interface TooltipPos { top: number; left: number }
 
 function PRHistoryTooltip({
-  prId,
-  unit,
+  pr,
   children,
 }: {
-  prId: string;
-  unit: PRUnit;
+  pr: PRRecord;
   children: React.ReactNode;
 }) {
   const i18n = useUiTranslations();
@@ -117,9 +117,9 @@ function PRHistoryTooltip({
   }, []);
 
   const historyQuery = useQuery({
-    queryKey: ["prs", prId, "history"],
+    queryKey: ["prs", pr.id, "history"],
     enabled: open && Boolean(tokens?.access_token),
-    queryFn: async () => getPRHistory(tokens!.access_token, prId),
+    queryFn: async () => getPRHistory(tokens!.access_token, pr.id),
     staleTime: 60_000,
   });
 
@@ -166,11 +166,7 @@ function PRHistoryTooltip({
     if (closeTimer.current) clearTimeout(closeTimer.current);
   }, []);
 
-  const historyEntries = historyQuery.data
-    ? [...historyQuery.data].sort(
-      (a, b) => new Date(b.beaten_on).getTime() - new Date(a.beaten_on).getTime(),
-    )
-    : [];
+  const historyEntries = chronologicalPRHistory(pr, historyQuery.data ?? []);
 
   return (
     <>
@@ -208,18 +204,16 @@ function PRHistoryTooltip({
           </p>
           {historyQuery.isPending ? (
             <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
-          ) : historyEntries.length === 0 ? (
-            <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("noHistoryYet933f417")}</p>
           ) : (
-            <div className="flex flex-col gap-2">
-              {historyEntries.slice(0, 10).map((entry) => (
+            <div className="flex max-h-64 flex-col gap-2 overflow-y-auto pe-1">
+              {historyEntries.map((entry) => (
                 <div
                   key={entry.id}
                   className="flex items-center justify-between gap-3 rounded-lg px-2.5 py-1"
                   style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
                 >
                   <span className="text-xs font-bold tabular-nums" style={{ color: "var(--primary)" }}>
-                    {formatScore(Number(entry.score), unit)}
+                    {formatScore(Number(entry.score), pr.unit)}
                   </span>
                   <span className="text-[10px]" style={{ color: "var(--dim)" }}>
                     {new Date(entry.beaten_on).toLocaleDateString(uiLocale, { month: "short", day: "numeric" })}
@@ -253,6 +247,7 @@ function CompactCard({
   const dateStr = new Date(pr.beaten_on).toLocaleDateString(uiLocale, {
     month: "short", day: "numeric", year: "numeric",
   });
+  const details = formatPRCardDetails(pr.supporting_metrics ?? {}, i18n);
 
   return (
     <div
@@ -287,7 +282,7 @@ function CompactCard({
         </button>
       )}
 
-      <PRHistoryTooltip prId={pr.id} unit={pr.unit}>
+      <PRHistoryTooltip pr={pr}>
         <div>
           <p className="text-sm font-semibold truncate pe-8" style={{ color: "var(--text)" }}>{pr.name}</p>
           <div className="mt-1.5 flex items-baseline gap-1.5">
@@ -295,6 +290,12 @@ function CompactCard({
             <span className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>{unitLabel}</span>
           </div>
           <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>{dateStr}</p>
+          {(details || pr.notes) && (
+            <div className="mt-2 border-s-2 ps-2" style={{ borderColor: "var(--primary)" }}>
+              {details && <p className="truncate text-[11px]" style={{ color: "var(--text-soft)" }}>{details}</p>}
+              {pr.notes && <p className="mt-0.5 truncate text-[11px]" style={{ color: "var(--muted)" }}>{pr.notes}</p>}
+            </div>
+          )}
         </div>
       </PRHistoryTooltip>
     </div>
@@ -319,6 +320,7 @@ function FullCard({
   const dateStr = new Date(pr.beaten_on).toLocaleDateString(uiLocale, {
     month: "short", day: "numeric", year: "numeric",
   });
+  const details = formatPRCardDetails(pr.supporting_metrics ?? {}, i18n);
 
   return (
     <div
@@ -355,7 +357,7 @@ function FullCard({
       )}
 
       {/* PR data — padded right to avoid overlap with Share button */}
-      <PRHistoryTooltip prId={pr.id} unit={pr.unit}>
+      <PRHistoryTooltip pr={pr}>
         <div className="min-w-0 pe-28">
           <p className="font-semibold truncate" style={{ color: "var(--text)" }}>{pr.name}</p>
           <div className="mt-1.5 flex items-baseline gap-1.5">
@@ -365,6 +367,12 @@ function FullCard({
           <p className="mt-1.5 text-xs" style={{ color: "var(--dim)" }}>
             {pr.higher_is_better ? i18n("higherIsBetter7aab104") : i18n("lowerIsBettercf052ba")} · {dateStr}
           </p>
+          {(details || pr.notes) && (
+            <div className="mt-3 border-s-2 ps-2" style={{ borderColor: "var(--primary)" }}>
+              {details && <p className="text-xs" style={{ color: "var(--text-soft)" }}>{details}</p>}
+              {pr.notes && <p className="mt-1 line-clamp-2 text-xs leading-5" style={{ color: "var(--muted)" }}>{pr.notes}</p>}
+            </div>
+          )}
         </div>
       </PRHistoryTooltip>
 
