@@ -33,7 +33,7 @@ defmodule MilosTrainingWeb.AuthController do
             type: :object,
             properties: %{
               nickname: %Schema{type: :string},
-              password: %Schema{type: :string},
+              password: %Schema{type: :string, minLength: 4},
               role: %Schema{type: :string, enum: ["member", "athlete"]}
             },
             required: [:nickname, :password, :role]
@@ -96,7 +96,7 @@ defmodule MilosTrainingWeb.AuthController do
             type: :object,
             properties: %{
               nickname: %Schema{type: :string},
-              password: %Schema{type: :string}
+              password: %Schema{type: :string, minLength: 4}
             },
             required: [:nickname, :password]
           }

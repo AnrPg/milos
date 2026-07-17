@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.AdminSearchUsers do
   alias MilosTraining.Application.{AdminMemberSearchDocuments, AdminMemberSearchIndex}
-  alias MilosTraining.{Finance, Identity}
+  alias MilosTraining.{Finance, Identity, Identity.RegistrationPolicy}
 
   def call(params) do
     query = normalize_query(params["q"] || params[:q])
@@ -92,9 +92,8 @@ defmodule MilosTraining.Application.AdminSearchUsers do
 
   defp filter_query(users, query) do
     Enum.filter(users, fn user ->
-      user.nickname
-      |> String.downcase()
-      |> String.contains?(query)
+      String.contains?(String.downcase(user.nickname), query) or
+        String.contains?(user.normalized_nickname || "", query)
     end)
   end
 
@@ -148,7 +147,7 @@ defmodule MilosTraining.Application.AdminSearchUsers do
 
   defp normalize_query(nil), do: nil
   defp normalize_query(""), do: nil
-  defp normalize_query(query), do: String.downcase(query)
+  defp normalize_query(query), do: RegistrationPolicy.normalize_nickname(query)
 
   defp normalize_filter(nil), do: nil
   defp normalize_filter(""), do: nil

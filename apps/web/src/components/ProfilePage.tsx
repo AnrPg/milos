@@ -18,6 +18,7 @@ import { fetchGamificationPreferences, updateGamificationPreferences } from "@/a
 import { ReviewList } from "@/components/my-reviews";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import {
   isAppLocale,
   LOCALE_NAMES,
@@ -122,6 +123,7 @@ export function ProfilePage() {
   const tProfile = useTranslations("Profile");
   const { tokens, currentUser, signOut } = useSession();
   const user = currentUser as CurrentUserWithAvatar | null;
+  const push = usePushNotifications(tokens?.access_token);
 
   const [nicknameValue, setNicknameValue] = useState(user?.nickname ?? "");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -347,6 +349,32 @@ export function ProfilePage() {
           description={i18n("activeSessionsAndAccountProtection4aeac5f")}
         >
           <div className="space-y-4">
+            {push.supported && push.enabled && (
+              <div className="rounded-2xl p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: "var(--success)" }}>
+                      {i18n("browserPushIsOnForThisDevicea620272")}
+                    </p>
+                    <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
+                      {i18n("thisChoiceAppliesOnlyToThisBrowserAnd0ca4181")}
+                    </p>
+                  </div>
+                  {push.enabled ? (
+                    <button
+                      type="button"
+                      disabled={push.busy}
+                      onClick={() => void push.disablePush()}
+                      className="shrink-0 rounded-xl px-4 py-2 text-sm font-semibold disabled:opacity-50"
+                      style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}
+                    >
+                      {push.busy ? i18n("disabling3bf14ec") : i18n("disable9a7d4e0")}
+                    </button>
+                  ) : null}
+                </div>
+                {push.error ? <p className="mt-3 text-xs font-semibold" style={{ color: "var(--danger)" }}>{push.error}</p> : null}
+              </div>
+            )}
             <p className="text-sm leading-6" style={{ color: "var(--muted)" }}>
               {i18n("revokeEveryRefreshSessionIncludingThisBrowserYoudd5d38f")}
             </p>
@@ -377,7 +405,6 @@ export function ProfilePage() {
                 placeholder={i18n("yourNicknameb5c8b4b")}
                 minLength={3}
                 maxLength={30}
-                pattern="[a-zA-Z0-9_]+"
               />
             </FieldGroup>
 
@@ -400,8 +427,8 @@ export function ProfilePage() {
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder={i18n("atLeast8Characters1fe494b")}
-                    minLength={8}
+                    placeholder={i18n("passwordRules0c63f14")}
+                    minLength={4}
                     autoComplete="new-password"
                   />
                 </FieldGroup>

@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.ListAdminUsers do
   @moduledoc false
 
-  alias MilosTraining.{Finance, Identity}
+  alias MilosTraining.{Finance, Identity, Identity.RegistrationPolicy}
 
   def call(params \\ %{}) do
     query = params |> field(:q) |> normalize_query()
@@ -61,11 +61,14 @@ defmodule MilosTraining.Application.ListAdminUsers do
   defp filter_query(users, nil), do: users
 
   defp filter_query(users, query) do
-    Enum.filter(users, &String.contains?(String.downcase(&1.nickname), query))
+    Enum.filter(users, fn user ->
+      String.contains?(String.downcase(user.nickname), query) or
+        String.contains?(user.normalized_nickname || "", query)
+    end)
   end
 
   defp normalize_query(value) when is_binary(value) do
-    case value |> String.trim() |> String.downcase() do
+    case value |> RegistrationPolicy.normalize_nickname() do
       "" -> nil
       query -> query
     end

@@ -58,3 +58,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-050 | Structured training log modification patches | Accepted |
 | ADR-051 | Separate notifications and messages presentation | Accepted |
 | ADR-052 | Structured PR results and supporting metrics | Accepted |
+| ADR-053 | Display usernames and device push controls | Accepted |

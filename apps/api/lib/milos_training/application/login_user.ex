@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.LoginUser do
-  alias MilosTraining.Identity
+  alias MilosTraining.{Identity, Identity.RegistrationPolicy}
   alias MilosTraining.Application.PasswordVerifier
   alias MilosTraining.Application.TokenIssuer
 
@@ -33,5 +33,5 @@ defmodule MilosTraining.Application.LoginUser do
   defp normalize_nickname(nil), do: nil
 
   defp normalize_nickname(nickname) when is_binary(nickname),
-    do: nickname |> String.trim() |> String.downcase()
+    do: RegistrationPolicy.normalize_nickname(nickname)
 end

@@ -22,11 +22,12 @@ defmodule MilosTraining.Identity.RegisterUserTest do
       assert "has already been taken" in errors_on(changeset).nickname
     end
 
-    test "normalizes nickname casing before uniqueness checks" do
+    test "preserves a display nickname while normalizing it before uniqueness checks" do
       {:ok, user} =
         RegisterUser.call(%{nickname: "Atlas", password: "S3cur3P@ss!", role: :member})
 
-      assert user.nickname == "atlas"
+      assert user.nickname == "Atlas"
+      assert user.normalized_nickname == "atlas"
 
       assert {:error, changeset} =
                RegisterUser.call(%{

@@ -5,6 +5,7 @@ defmodule MilosTraining.Identity.Account do
   defstruct [
     :id,
     :nickname,
+    :normalized_nickname,
     :role,
     :password_hash,
     :calendar_feed_token_version,

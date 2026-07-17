@@ -548,7 +548,7 @@ export function NotificationBell() {
               ))}
             </div>
 
-            {shouldShowPushControl ? (
+            {shouldShowPushControl && !push.enabled ? (
               <div
                 className="mt-5 rounded-[1.2rem] p-4"
                 style={{ border: "1px solid var(--border)", background: "var(--panel-muted)" }}

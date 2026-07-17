@@ -3,7 +3,13 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
 
   import Ecto.Query
 
-  alias MilosTraining.{Identity.Account, Identity.PasswordHasher, Identity.User, Repo}
+  alias MilosTraining.{
+    Identity.Account,
+    Identity.PasswordHasher,
+    Identity.RegistrationPolicy,
+    Identity.User,
+    Repo
+  }
 
   @impl true
   def create_user(params) do
@@ -16,16 +22,41 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
 
   @impl true
   def delete_user(user) do
-    case Repo.get(User, user.id) do
-      nil ->
+    Repo.transaction(fn ->
+      admins =
+        User
+        |> where([user], user.role == :admin)
+        |> order_by([user], asc: user.id)
+        |> lock("FOR UPDATE")
+        |> Repo.all()
+
+      case User |> where([user], user.id == ^user.id) |> lock("FOR UPDATE") |> Repo.one() do
+        nil ->
+          :ok
+
+        %User{role: :admin} when length(admins) <= 1 ->
+          Repo.rollback(:last_admin)
+
+        %User{} = schema ->
+          case Repo.delete(schema) do
+            {:ok, _deleted_user} -> :ok
+            {:error, reason} -> Repo.rollback(reason)
+          end
+      end
+    end)
+    |> case do
+      {:ok, :ok} ->
         :ok
 
-      %User{} = schema ->
-        case Repo.delete(schema) do
-          {:ok, _deleted_user} -> :ok
-          {:error, reason} -> {:error, reason}
-        end
+      {:error, :last_admin} ->
+        {:error, :last_admin}
+
+      {:error, reason} ->
+        {:error, reason}
     end
+  rescue
+    _error in Ecto.ConstraintError ->
+      {:error, :user_has_restricted_history}
   end
 
   @impl true
@@ -111,7 +142,7 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
   def get_by_nickname(nil), do: nil
 
   def get_by_nickname(nickname) do
-    Repo.get_by(User, nickname: nickname)
+    Repo.get_by(User, nickname: RegistrationPolicy.normalize_nickname(nickname))
     |> to_account()
   end
 
@@ -157,7 +188,7 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
   def search_athletes(""), do: list_by_role(:athlete)
 
   def search_athletes(query) do
-    pattern = "%#{query}%"
+    pattern = "%#{RegistrationPolicy.normalize_nickname(query)}%"
 
     User
     |> where([user], user.role == :athlete)
@@ -209,7 +240,7 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
   end
 
   def search_users(query) do
-    pattern = "%#{query}%"
+    pattern = "%#{RegistrationPolicy.normalize_nickname(query)}%"
 
     User
     |> where([u], ilike(u.nickname, ^pattern))
@@ -275,7 +306,8 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
   defp to_account(%User{} = user) do
     %Account{
       id: user.id,
-      nickname: user.nickname,
+      nickname: user.display_nickname || user.nickname,
+      normalized_nickname: user.nickname,
       role: user.role,
       password_hash: user.password_hash,
       calendar_feed_token_version: user.calendar_feed_token_version || 1,

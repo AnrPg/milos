@@ -10,6 +10,7 @@ defmodule MilosTraining.Identity.User do
     field :nickname, :string
     field :password, :string, virtual: true
     field :password_hash, :string
+    field :display_nickname, :string
     field :role, Ecto.Enum, values: RegistrationPolicy.roles()
     field :calendar_feed_token_version, :integer, default: 1
     field :security_version, :integer, default: 1
@@ -22,12 +23,11 @@ defmodule MilosTraining.Identity.User do
   def registration_changeset(user \\ %__MODULE__{}, params) do
     user
     |> cast(params, [:nickname, :password, :role])
-    |> update_change(:nickname, &RegistrationPolicy.normalize_nickname/1)
     |> validate_required([:nickname, :password, :role])
-    |> validate_length(:nickname, min: 3, max: 30)
-    |> validate_format(:nickname, ~r/^[a-zA-Z0-9_]+$/)
+    |> validate_nickname()
+    |> normalize_and_preserve_nickname()
     |> validate_inclusion(:role, RegistrationPolicy.self_register_roles())
-    |> validate_length(:password, min: 8)
+    |> validate_password()
     |> unique_constraint(:nickname)
   end
 
@@ -37,11 +37,9 @@ defmodule MilosTraining.Identity.User do
         changeset
 
       _v ->
-        Ecto.Changeset.update_change(
-          changeset,
-          :nickname,
-          &RegistrationPolicy.normalize_nickname/1
-        )
+        changeset
+        |> validate_nickname()
+        |> normalize_and_preserve_nickname()
     end
   end
 
@@ -52,8 +50,7 @@ defmodule MilosTraining.Identity.User do
 
       _v ->
         changeset
-        |> validate_length(:nickname, min: 3, max: 30)
-        |> validate_format(:nickname, ~r/^[a-zA-Z0-9_]+$/)
+        |> validate_nickname()
         |> unique_constraint(:nickname)
     end
   end
@@ -61,7 +58,7 @@ defmodule MilosTraining.Identity.User do
   defp maybe_validate_password(changeset) do
     case Ecto.Changeset.get_change(changeset, :password) do
       nil -> changeset
-      _v -> validate_length(changeset, :password, min: 8)
+      _v -> validate_password(changeset)
     end
   end
 
@@ -97,5 +94,33 @@ defmodule MilosTraining.Identity.User do
     user
     |> change(security_version: version)
     |> validate_number(:security_version, greater_than: 0)
+  end
+
+  defp validate_nickname(changeset) do
+    validate_change(changeset, :nickname, fn :nickname, nickname ->
+      if RegistrationPolicy.valid_nickname?(nickname),
+        do: [],
+        else: [nickname: "must be 3-30 letters, numbers, or underscores"]
+    end)
+  end
+
+  defp normalize_and_preserve_nickname(changeset) do
+    case Ecto.Changeset.get_change(changeset, :nickname) do
+      nickname when is_binary(nickname) ->
+        changeset
+        |> put_change(:display_nickname, nickname)
+        |> put_change(:nickname, RegistrationPolicy.normalize_nickname(nickname))
+
+      _ ->
+        changeset
+    end
+  end
+
+  defp validate_password(changeset) do
+    validate_change(changeset, :password, fn :password, password ->
+      if RegistrationPolicy.valid_password?(password),
+        do: [],
+        else: [password: "must be at least 4 characters and contain no whitespace"]
+    end)
   end
 end

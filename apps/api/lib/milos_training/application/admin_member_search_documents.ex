@@ -20,7 +20,8 @@ defmodule MilosTraining.Application.AdminMemberSearchDocuments do
       id: user.id,
       nickname: user.nickname,
       identity_role: to_string(user.role),
-      searchable_text: user.nickname,
+      searchable_text:
+        [user.nickname, user.normalized_nickname] |> Enum.reject(&is_nil/1) |> Enum.join(" "),
       membership_status: nil,
       user_type: nil,
       package_codes: [],
@@ -56,6 +57,7 @@ defmodule MilosTraining.Application.AdminMemberSearchDocuments do
 
     [
       user.nickname,
+      user.normalized_nickname,
       get_in(profile, [:membership, :status]),
       get_in(profile, [:membership, :user_type_snapshot])
       | subscription_field_values(subscriptions, :package_code_snapshot) ++

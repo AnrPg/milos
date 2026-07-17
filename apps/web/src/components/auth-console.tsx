@@ -33,6 +33,15 @@ function flatFieldErrors(
   );
 }
 
+function invalidCredentialFields(nickname: string, password: string, i18n: (key: string) => string): FieldErrors {
+  const errors: FieldErrors = {};
+
+  if (!/^[\p{L}0-9_]{3,30}$/u.test(nickname)) errors.nickname = [i18n("usernameRules4b5de12")];
+  if (password.length < 4 || /\s/u.test(password)) errors.password = [i18n("passwordRules0c63f14")];
+
+  return errors;
+}
+
 export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
   const i18n = useUiTranslations();
   const router = useRouter();
@@ -124,6 +133,14 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
   const nicknameErrors = fieldErrors.nickname ?? [];
   const passwordErrors = fieldErrors.password ?? [];
   const roleErrors = fieldErrors.role ?? [];
+  const nicknameInvalid = nicknameErrors.length > 0;
+  const passwordInvalid = passwordErrors.length > 0;
+
+  function validateCredentials(nickname: string, password: string) {
+    const errors = invalidCredentialFields(nickname, password, i18n);
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  }
 
   return (
     <main
@@ -230,17 +247,18 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                     className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
                     style={{
                       background: "var(--bg)",
-                      border: `1px solid ${nicknameStatus === "available" ? "var(--success, #4ade80)" : nicknameStatus === "taken" ? "var(--primary-strong)" : "var(--border)"}`,
+                      border: `1px solid ${nicknameInvalid ? "var(--danger)" : nicknameStatus === "available" ? "var(--success, #4ade80)" : nicknameStatus === "taken" ? "var(--primary-strong)" : "var(--border)"}`,
                       color: "var(--text)",
                     }}
                     value={registerForm.nickname}
                     placeholder={i18n("chooseAUniqueNickname4b5894d")}
+                    aria-invalid={nicknameInvalid}
                     onChange={(e) =>
                       setRegisterForm((f) => ({ ...f, nickname: e.target.value }))
                     }
                   />
                   {nicknameErrors.length > 0 && (
-                    <span className="mt-1.5 block text-xs" style={{ color: "var(--primary-strong)" }}>
+                    <span className="mt-1.5 block rounded-xl px-3 py-2 text-xs leading-5" role="alert" style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", color: "var(--danger)", border: "1px solid color-mix(in srgb, var(--danger) 35%, transparent)" }}>
                       {nicknameErrors.join(", ")}
                     </span>
                   )}
@@ -251,16 +269,17 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                   {i18n("password8be3c94")}
                   <input
                     className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
-                    style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
+                    style={{ background: "var(--bg)", border: `1px solid ${passwordInvalid ? "var(--danger)" : "var(--border)"}`, color: "var(--text)" }}
                     type="password"
                     value={registerForm.password}
-                    placeholder={i18n("atLeast8Characters1fe494b")}
+                    placeholder={i18n("passwordRules0c63f14")}
+                    aria-invalid={passwordInvalid}
                     onChange={(e) =>
                       setRegisterForm((f) => ({ ...f, password: e.target.value }))
                     }
                   />
                   {passwordErrors.length > 0 && (
-                    <span className="mt-1.5 block text-xs" style={{ color: "var(--primary-strong)" }}>
+                    <span className="mt-1.5 block rounded-xl px-3 py-2 text-xs leading-5" role="alert" style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", color: "var(--danger)", border: "1px solid color-mix(in srgb, var(--danger) 35%, transparent)" }}>
                       {passwordErrors.join(", ")}
                     </span>
                   )}
@@ -313,7 +332,10 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                   className="w-full rounded-2xl px-4 py-3 font-semibold disabled:opacity-60"
                   style={{ background: "var(--primary)", color: "var(--text)" }}
                   disabled={busyAction === "register"}
-                  onClick={() => runAction("register", async () => { await signUp(registerForm); })}
+                  onClick={() => {
+                    if (!validateCredentials(registerForm.nickname, registerForm.password)) return;
+                    void runAction("register", async () => { await signUp(registerForm); });
+                  }}
                   type="button"
                 >
                   {busyAction === "register" ? i18n("creatingAccountbaab5b8") : i18n("createAccountaaf3744")}
@@ -326,10 +348,16 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                   {i18n("nicknamece2bd99")}
                   <input
                     className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
-                    style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
+                    style={{ background: "var(--bg)", border: `1px solid ${nicknameInvalid ? "var(--danger)" : "var(--border)"}`, color: "var(--text)" }}
                     value={loginForm.nickname}
+                    aria-invalid={nicknameInvalid}
                     onChange={(e) => setLoginForm((f) => ({ ...f, nickname: e.target.value }))}
                   />
+                  {nicknameErrors.length > 0 && (
+                    <span className="mt-1.5 block rounded-xl px-3 py-2 text-xs leading-5" role="alert" style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", color: "var(--danger)", border: "1px solid color-mix(in srgb, var(--danger) 35%, transparent)" }}>
+                      {nicknameErrors.join(", ")}
+                    </span>
+                  )}
                 </label>
 
                 {/* Password */}
@@ -337,18 +365,27 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                   {i18n("password8be3c94")}
                   <input
                     className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
-                    style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
+                    style={{ background: "var(--bg)", border: `1px solid ${passwordInvalid ? "var(--danger)" : "var(--border)"}`, color: "var(--text)" }}
                     type="password"
                     value={loginForm.password}
+                    aria-invalid={passwordInvalid}
                     onChange={(e) => setLoginForm((f) => ({ ...f, password: e.target.value }))}
                   />
+                  {passwordErrors.length > 0 && (
+                    <span className="mt-1.5 block rounded-xl px-3 py-2 text-xs leading-5" role="alert" style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", color: "var(--danger)", border: "1px solid color-mix(in srgb, var(--danger) 35%, transparent)" }}>
+                      {passwordErrors.join(", ")}
+                    </span>
+                  )}
                 </label>
 
                 <button
                   className="w-full rounded-2xl px-4 py-3 font-semibold disabled:opacity-60"
                   style={{ background: "var(--primary)", color: "var(--text)" }}
                   disabled={busyAction === "login"}
-                  onClick={() => runAction("login", async () => { await signIn(loginForm); })}
+                  onClick={() => {
+                    if (!validateCredentials(loginForm.nickname, loginForm.password)) return;
+                    void runAction("login", async () => { await signIn(loginForm); });
+                  }}
                   type="button"
                 >
                   {busyAction === "login" ? i18n("signingInc66b2ad") : i18n("signInada2e9e")}
