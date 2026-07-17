@@ -123,6 +123,27 @@ export async function updatePR(
   return data.pr;
 }
 
+export async function editPR(
+  token: string,
+  id: string,
+  params: Partial<{
+    name: string;
+    current_score: number;
+    unit: PRUnit;
+    higher_is_better: boolean;
+    beaten_on: string;
+    supporting_metrics: PRSupportingMetrics;
+    notes: string | null;
+  }>,
+): Promise<PRRecord> {
+  const data = await apiRequest<{ pr: PRRecord }>(`/prs/${id}/edit`, {
+    method: "PATCH",
+    token,
+    body: params,
+  });
+  return data.pr;
+}
+
 export async function deletePR(token: string, id: string): Promise<void> {
   await apiRequest<void>(`/prs/${id}`, { method: "DELETE", token });
 }

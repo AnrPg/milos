@@ -11,6 +11,7 @@ import { useId, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createPR,
+  editPR,
   updatePR,
   type PRRecord,
   type PRSupportingMetricKey,
@@ -25,6 +26,7 @@ function todayIso() {
 }
 
 type TimeFields = { hours: string; minutes: string; seconds: string; milliseconds: string };
+type SaveMode = "create" | "update" | "edit";
 
 const NUMERIC_DETAIL_FIELDS: PRSupportingMetricKey[] = [
   "reps",
@@ -128,7 +130,7 @@ export function PRFormModal({
   ];
   const { tokens } = useSession();
   const queryClient = useQueryClient();
-  const isEdit = Boolean(pr);
+  const isExisting = Boolean(pr);
   const titleId = useId();
   const dialogRef = useModalFocusTrap<HTMLDivElement>(onClose);
 
@@ -148,7 +150,7 @@ export function PRFormModal({
   const [error, setError] = useState<string | null>(null);
 
   const mutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (mode: SaveMode) => {
       if (!tokens) throw new Error(i18n("notAuthenticated0c91acb"));
       const current_score =
         unit === "mins_secs" ? timeFieldsToSeconds(timeFields) : parseFloat(score);
@@ -161,7 +163,10 @@ export function PRFormModal({
         supporting_metrics: submitMetrics(details),
         notes: notes.trim() || null,
       };
-      if (isEdit && pr) {
+      if (mode === "edit" && pr) {
+        return editPR(tokens.access_token, pr.id, params);
+      }
+      if (mode === "update" && pr) {
         return updatePR(tokens.access_token, pr.id, params);
       }
       return createPR(tokens.access_token, params);
@@ -177,20 +182,24 @@ export function PRFormModal({
     },
   });
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  function save(mode: SaveMode) {
     const scoreValid =
       unit === "mins_secs"
         ? timeFieldsToSeconds(timeFields) > 0
         : Boolean(score);
-    if (!name.trim() || !scoreValid) return;
+    if (!name.trim() || !scoreValid || !beatenOn) return;
     setError(null);
-    mutation.mutate();
+    mutation.mutate(mode);
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    save(isExisting ? "update" : "create");
   }
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto overscroll-contain p-2 sm:p-4"
       style={{ background: "rgba(0,0,0,0.5)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
@@ -200,11 +209,11 @@ export function PRFormModal({
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className="w-full max-w-md rounded-[2rem] p-6 outline-none"
+        className="my-auto max-h-[calc(100dvh-1rem)] w-full max-w-md overflow-y-auto overscroll-contain rounded-[2rem] p-4 outline-none sm:max-h-[calc(100dvh-2rem)] sm:p-6"
         style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
       >
         <h2 id={titleId} className="text-xl font-semibold" style={{ color: "var(--text)" }}>
-          {isEdit ? i18n("updatePr71b8cf3") : i18n("newPr1c0d9f2")}
+          {isExisting ? i18n("updatePr71b8cf3") : i18n("newPr1c0d9f2")}
         </h2>
 
         <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
@@ -370,19 +379,40 @@ export function PRFormModal({
             <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{error}</p>
           )}
 
-          <div className="flex gap-3 pt-2">
+          <div
+            className="sticky bottom-0 grid grid-cols-2 gap-2 rounded-xl pt-2 sm:grid-cols-3"
+            style={{ background: "var(--panel)" }}
+          >
             <button
               type="submit"
               disabled={mutation.isPending}
-              className="flex-1 rounded-xl py-2.5 text-sm font-semibold disabled:opacity-50"
+              className="rounded-xl px-3 py-2.5 text-sm font-semibold disabled:opacity-50"
               style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
-              {mutation.isPending ? i18n("saving56a2285") : isEdit ? i18n("updatePr71b8cf3") : i18n("addPr24c8c6f")}
+              {mutation.isPending && mutation.variables !== "edit"
+                ? i18n("saving56a2285")
+                : isExisting
+                  ? i18n("updatePr71b8cf3")
+                  : i18n("addPr24c8c6f")}
             </button>
+            {isExisting && (
+              <button
+                type="button"
+                onClick={() => save("edit")}
+                disabled={mutation.isPending}
+                className="rounded-xl px-3 py-2.5 text-sm font-semibold disabled:opacity-50"
+                style={{ background: "var(--border)", color: "var(--text)" }}
+              >
+                {mutation.isPending && mutation.variables === "edit"
+                  ? i18n("saving56a2285")
+                  : i18n("edit5301648")}
+              </button>
+            )}
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl px-5 py-2.5 text-sm font-semibold"
+              disabled={mutation.isPending}
+              className="col-span-2 rounded-xl px-3 py-2.5 text-sm font-semibold disabled:opacity-50 sm:col-span-1"
               style={{ background: "var(--border)", color: "var(--text-soft)" }}
             >
               {i18n("cancel77dfd21")}
