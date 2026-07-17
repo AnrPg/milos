@@ -1,10 +1,11 @@
 defmodule MilosTraining.Identity do
-  alias MilosTraining.Identity.Commands.{RegisterUser, UpdateRole}
+  alias MilosTraining.Identity.Commands.{RegisterAdmin, RegisterUser, UpdateRole}
   alias MilosTraining.Identity.Domain.Locale
   alias MilosTraining.Identity.Queries.FindUser
   alias MilosTraining.Identity.UserStore
 
   defdelegate register(params), to: RegisterUser, as: :call
+  defdelegate register_admin(params), to: RegisterAdmin, as: :call
   defdelegate find_by_nickname(nickname), to: FindUser, as: :by_nickname
   defdelegate find_by_id(id), to: FindUser, as: :by_id
   defdelegate list_by_ids(ids), to: FindUser, as: :list_by_ids

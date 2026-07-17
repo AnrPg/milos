@@ -1,5 +1,9 @@
 import Config
 
+config :milos_training,
+       :admin_registration_code,
+       System.get_env("ADMIN_REGISTRATION_CODE", "DEY48keGE")
+
 if System.get_env("PHX_SERVER") do
   config :milos_training, MilosTrainingWeb.Endpoint, server: true
 end

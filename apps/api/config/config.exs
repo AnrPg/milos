@@ -122,6 +122,7 @@ config :milos_training, :token_store, MilosTraining.Infrastructure.Security.Redi
 config :milos_training, :token_issuer, MilosTraining.Infrastructure.Auth.GuardianTokenIssuer
 config :milos_training, :token_verifier, MilosTraining.Infrastructure.Auth.GuardianTokenVerifier
 config :milos_training, :password_verifier, MilosTraining.Infrastructure.Auth.Password
+config :milos_training, :admin_registration_code, "DEY48keGE"
 
 config :milos_training,
        :remote_ip,

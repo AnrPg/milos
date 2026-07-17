@@ -21,6 +21,15 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
   end
 
   @impl true
+  def create_admin_user(params) do
+    %User{}
+    |> User.admin_registration_changeset(params)
+    |> maybe_put_password_hash()
+    |> Repo.insert()
+    |> wrap_result()
+  end
+
+  @impl true
   def delete_user(user) do
     Repo.transaction(fn ->
       admins =

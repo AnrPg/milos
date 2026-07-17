@@ -31,6 +31,17 @@ defmodule MilosTraining.Identity.User do
     |> unique_constraint(:nickname)
   end
 
+  def admin_registration_changeset(user \\ %__MODULE__{}, params) do
+    user
+    |> cast(params, [:nickname, :password, :role])
+    |> validate_required([:nickname, :password, :role])
+    |> validate_nickname()
+    |> normalize_and_preserve_nickname()
+    |> validate_inclusion(:role, [:admin])
+    |> validate_password()
+    |> unique_constraint(:nickname)
+  end
+
   defp maybe_normalize_nickname(changeset) do
     case Ecto.Changeset.get_change(changeset, :nickname) do
       nil ->

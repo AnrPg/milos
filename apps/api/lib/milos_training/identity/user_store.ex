@@ -4,6 +4,8 @@ defmodule MilosTraining.Identity.UserStore do
   @impl true
   def create_user(params), do: impl().create_user(params)
   @impl true
+  def create_admin_user(params), do: impl().create_admin_user(params)
+  @impl true
   def delete_user(user), do: impl().delete_user(user)
   @impl true
   def update_user_role(user, role), do: impl().update_user_role(user, role)
