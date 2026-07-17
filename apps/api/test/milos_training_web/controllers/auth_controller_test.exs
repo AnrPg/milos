@@ -68,6 +68,41 @@ defmodule MilosTrainingWeb.AuthControllerTest do
     end
   end
 
+  describe "POST /api/auth/register-admin" do
+    test "creates an admin session when the registration code is exact", %{conn: conn} do
+      params = %{
+        nickname: "athena_admin",
+        password: "S3cur3P@ss!",
+        admin_code: "DEY48keGE"
+      }
+
+      conn =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/auth/register-admin", Jason.encode!(params))
+
+      assert %{"access_token" => _} = json_response(conn, 201)
+      assert conn.resp_cookies["milos_refresh"].http_only
+      assert Identity.find_by_nickname("athena_admin").role == :admin
+    end
+
+    test "rejects an incorrect registration code without creating an account", %{conn: conn} do
+      params = %{
+        nickname: "false_admin",
+        password: "S3cur3P@ss!",
+        admin_code: "incorrect"
+      }
+
+      conn =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/auth/register-admin", Jason.encode!(params))
+
+      assert %{"code" => "invalid_admin_registration_code"} = json_response(conn, 401)
+      assert Identity.find_by_nickname("false_admin") == nil
+    end
+  end
+
   describe "POST /api/auth/login" do
     setup do
       {:ok, _user} =

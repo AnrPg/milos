@@ -52,6 +52,7 @@ defmodule MilosTrainingWeb.Router do
 
     get("/nickname-available", AuthController, :nickname_available)
     post("/register", AuthController, :register)
+    post("/register-admin", AuthController, :register_admin)
     post("/login", AuthController, :login)
     post("/refresh", AuthController, :refresh)
     post("/logout", AuthController, :logout)

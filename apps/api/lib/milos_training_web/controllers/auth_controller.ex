@@ -7,6 +7,7 @@ defmodule MilosTrainingWeb.AuthController do
     LogoutSession,
     NicknameAvailability,
     RefreshToken,
+    RegisterAdmin,
     RegisterUser,
     SignOutAllDevices
   }
@@ -20,7 +21,7 @@ defmodule MilosTrainingWeb.AuthController do
 
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true]
-       when action in [:register, :login, :refresh, :nickname_available]
+       when action in [:register, :register_admin, :login, :refresh, :nickname_available]
 
   operation(:register,
     summary: "Register a new user",
@@ -143,6 +144,66 @@ defmodule MilosTrainingWeb.AuthController do
     ]
   )
 
+  operation(:register_admin,
+    summary: "Register a code-authorized admin user",
+    request_body: %RequestBody{
+      description: "Admin registration params",
+      required: true,
+      content: %{
+        "application/json" => %OpenApiSpex.MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{
+              nickname: %Schema{type: :string},
+              password: %Schema{type: :string, minLength: 4},
+              admin_code: %Schema{type: :string}
+            },
+            required: [:nickname, :password, :admin_code]
+          }
+        }
+      }
+    },
+    responses: [
+      created:
+        {"Access session", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{access_token: %Schema{type: :string}},
+           required: [:access_token]
+         }},
+      unauthorized:
+        {"Invalid admin registration code", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             code: %Schema{type: :string},
+             error: %Schema{type: :string}
+           },
+           required: [:code, :error]
+         }},
+      unprocessable_entity:
+        {"Validation errors", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             code: %Schema{type: :string},
+             errors: %Schema{
+               type: :object,
+               additionalProperties: %Schema{type: :array, items: %Schema{type: :string}}
+             }
+           },
+           required: [:code, :errors]
+         }},
+      too_many_requests:
+        {"Rate limited", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{error: %Schema{type: :string}},
+           required: [:error]
+         }}
+    ]
+  )
+
   operation(:refresh,
     summary: "Refresh an access token",
     responses: [
@@ -254,6 +315,19 @@ defmodule MilosTrainingWeb.AuthController do
 
   def register(conn, _params) do
     case RegisterUser.call(conn.body_params) do
+      {:ok, %{access_token: access_token, refresh_token: refresh_token}} ->
+        conn
+        |> put_refresh_cookie(refresh_token)
+        |> put_status(:created)
+        |> json(%{access_token: access_token})
+
+      error ->
+        error
+    end
+  end
+
+  def register_admin(conn, _params) do
+    case RegisterAdmin.call(conn.body_params) do
       {:ok, %{access_token: access_token, refresh_token: refresh_token}} ->
         conn
         |> put_refresh_cookie(refresh_token)

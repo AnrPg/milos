@@ -34,6 +34,15 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "invalid_credentials", error: "Invalid credentials"})
   end
 
+  def call(conn, {:error, :invalid_admin_registration_code}) do
+    conn
+    |> put_status(:unauthorized)
+    |> json(%{
+      code: "invalid_admin_registration_code",
+      error: "Invalid admin registration code"
+    })
+  end
+
   def call(conn, {:error, :invalid_refresh_token}) do
     conn
     |> put_status(:unauthorized)
