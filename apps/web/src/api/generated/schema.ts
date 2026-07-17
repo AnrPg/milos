@@ -2105,6 +2105,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/prs/{id}/edit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Correct the current PR result without adding history */
+        patch: operations["MilosTrainingWeb.PRController.edit"];
+        trace?: never;
+    };
     "/api/auth/sign-out-all": {
         parameters: {
             query?: never;
@@ -3576,21 +3593,21 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        incidents?: {
+                        prs: ({
+                            /** Format: date */
+                            beaten_on: string;
+                            current_score: number;
+                            higher_is_better: boolean;
+                            history: {
+                                [key: string]: unknown;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            unit: string;
+                        } & {
                             [key: string]: unknown;
-                        }[];
-                        operational_links?: {
-                            [key: string]: string;
-                        };
-                        prs?: {
-                            [key: string]: unknown;
-                        }[];
-                        summary?: {
-                            [key: string]: unknown;
-                        };
-                        threads?: {
-                            [key: string]: unknown;
-                        }[];
+                        })[];
                         /** Format: uuid */
                         user_id: string;
                     };
@@ -4086,6 +4103,23 @@ export interface operations {
                 content: {
                     "application/json": {
                         available: boolean;
+                        details: {
+                            membership: {
+                                [key: string]: unknown;
+                            } | null;
+                            package_subscriptions: {
+                                [key: string]: unknown;
+                            }[];
+                            referral_claims: {
+                                [key: string]: unknown;
+                            }[];
+                            referral_rewards: {
+                                [key: string]: unknown;
+                            }[];
+                            referred_members: {
+                                [key: string]: unknown;
+                            }[];
+                        };
                         drill_down: {
                             [key: string]: unknown;
                         } | null;
@@ -8446,6 +8480,63 @@ export interface operations {
                             [key: string]: unknown;
                         };
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PRController.edit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description PR Record ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description PR params */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** Format: date */
+                    beaten_on?: string;
+                    current_score?: number;
+                    higher_is_better?: boolean;
+                    name?: string;
+                    notes?: string;
+                    /** @description Optional typed result context. Accepted keys: reps, sets, load_kg, duration_seconds, distance_m, calories, rounds, variation. */
+                    supporting_metrics?: Record<string, never>;
+                    /** @enum {string} */
+                    unit?: "mins_secs" | "reps" | "sets" | "kcals" | "m" | "kg";
+                };
+            };
+        };
+        responses: {
+            /** @description PR */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };

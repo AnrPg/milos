@@ -3091,33 +3091,47 @@
               "application/json": {
                 "schema": {
                   "properties": {
-                    "incidents": {
-                      "items": {
-                        "additionalProperties": true,
-                        "type": "object"
-                      },
-                      "type": "array"
-                    },
-                    "operational_links": {
-                      "additionalProperties": {
-                        "type": "string"
-                      },
-                      "type": "object"
-                    },
                     "prs": {
                       "items": {
                         "additionalProperties": true,
-                        "type": "object"
-                      },
-                      "type": "array"
-                    },
-                    "summary": {
-                      "additionalProperties": true,
-                      "type": "object"
-                    },
-                    "threads": {
-                      "items": {
-                        "additionalProperties": true,
+                        "properties": {
+                          "beaten_on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "current_score": {
+                            "type": "number"
+                          },
+                          "higher_is_better": {
+                            "type": "boolean"
+                          },
+                          "history": {
+                            "items": {
+                              "additionalProperties": true,
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "unit": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "current_score",
+                          "unit",
+                          "higher_is_better",
+                          "beaten_on",
+                          "history"
+                        ],
                         "type": "object"
                       },
                       "type": "array"
@@ -3128,7 +3142,8 @@
                     }
                   },
                   "required": [
-                    "user_id"
+                    "user_id",
+                    "prs"
                   ],
                   "type": "object"
                 }
@@ -4102,6 +4117,51 @@
                     "available": {
                       "type": "boolean"
                     },
+                    "details": {
+                      "properties": {
+                        "membership": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "package_subscriptions": {
+                          "items": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "referral_claims": {
+                          "items": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "referral_rewards": {
+                          "items": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "referred_members": {
+                          "items": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "membership",
+                        "package_subscriptions",
+                        "referral_claims",
+                        "referred_members",
+                        "referral_rewards"
+                      ],
+                      "type": "object"
+                    },
                     "drill_down": {
                       "additionalProperties": true,
                       "nullable": true,
@@ -4127,6 +4187,7 @@
                     "user_id",
                     "available",
                     "summary",
+                    "details",
                     "drill_down",
                     "operational_links"
                   ],
@@ -13439,6 +13500,110 @@
         "summary": "Create an empty workout draft",
         "tags": [
           "Admin Workouts"
+        ]
+      }
+    },
+    "/api/prs/{id}/edit": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PRController.edit",
+        "parameters": [
+          {
+            "description": "PR Record ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "beaten_on": {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "current_score": {
+                    "type": "number"
+                  },
+                  "higher_is_better": {
+                    "type": "boolean"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "notes": {
+                    "maxLength": 2000,
+                    "type": "string"
+                  },
+                  "supporting_metrics": {
+                    "description": "Optional typed result context. Accepted keys: reps, sets, load_kg, duration_seconds, distance_m, calories, rounds, variation.",
+                    "type": "object"
+                  },
+                  "unit": {
+                    "enum": [
+                      "mins_secs",
+                      "reps",
+                      "sets",
+                      "kcals",
+                      "m",
+                      "kg"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "PR params",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "PR"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Correct the current PR result without adding history",
+        "tags": [
+          "Pantheon"
         ]
       }
     },
