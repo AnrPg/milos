@@ -1196,9 +1196,25 @@ export function LandingPage() {
                   <div>
                     <p className="text-sm font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{i18n("modificationsAndNotes8a73e2c")}</p>
                     <div className="mt-3 space-y-3">
-                      {selectedExecution.exercise_notes.length === 0 ? (
+                      {selectedExecution.exercise_modifications.length === 0 && selectedExecution.exercise_notes.length === 0 ? (
                         <p className="rounded-2xl px-4 py-4 text-sm" style={{ background: "var(--panel-muted)", color: "var(--dim)" }}>{i18n("noExerciseNotesWereSubmittedb9552b2")}</p>
-                      ) : (
+                      ) : null}
+                      {selectedExecution.exercise_modifications.map((modification) => (
+                        <div
+                          key={modification.patch_id ?? `${modification.segment_key}:${modification.exercise_id}:${modification.field}`}
+                          className="rounded px-3 py-2"
+                          style={{ background: "color-mix(in srgb, var(--warning) 10%, transparent)", borderInlineStart: "4px solid color-mix(in srgb, var(--warning) 55%, transparent)" }}
+                        >
+                          <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+                            {modification.exercise_name ?? modification.section_name ?? modification.section_id}
+                          </p>
+                          <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
+                            {modification.field}: {String(modification.canonical_value)} → {String(modification.actual_value)}
+                            {modification.set_index ? ` · ${i18n("setLabel")} ${modification.set_index}` : ""}
+                          </p>
+                        </div>
+                      ))}
+                      {selectedExecution.exercise_notes.length > 0 ? (
                         selectedExecution.exercise_notes.map((note) => (
                           <div
                             key={note.id ?? (note.exercise_id) + "-" + (note.selected_text)}
@@ -1212,7 +1228,7 @@ export function LandingPage() {
                             ) : null}
                           </div>
                         ))
-                      )}
+                      ) : null}
                     </div>
                   </div>
                 </div>
