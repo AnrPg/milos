@@ -169,6 +169,7 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
       checked_exercise_ids: execution.checked_exercise_ids || [],
       section_scores: execution.section_scores || [],
       exercise_notes: execution.exercise_notes || [],
+      exercise_modifications: execution.exercise_modifications || [],
       lock_version: execution.lock_version,
       inserted_at: execution.inserted_at
     }
