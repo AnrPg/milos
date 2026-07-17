@@ -12,6 +12,13 @@ defmodule MilosTraining.Organizations.Domain.InvitationPolicyTest do
     refute InvitationPolicy.valid_lifetime?(604_801)
   end
 
+  test "validates expiry against an explicit issuance time" do
+    assert InvitationPolicy.valid_expiry?(DateTime.add(@now, 300, :second), @now)
+    assert InvitationPolicy.valid_expiry?(DateTime.add(@now, 604_800, :second), @now)
+    refute InvitationPolicy.valid_expiry?(@now, @now)
+    refute InvitationPolicy.valid_expiry?(DateTime.add(@now, 604_801, :second), @now)
+  end
+
   test "derives active and expired state from an explicit clock" do
     assert InvitationPolicy.state(%{expires_at: ~U[2026-07-18 10:00:01.000000Z]}, @now) ==
              :active

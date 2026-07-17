@@ -10,6 +10,14 @@ defmodule MilosTraining.Organizations.Domain.InvitationPolicy do
 
   def valid_lifetime?(_seconds), do: false
 
+  def valid_expiry?(%DateTime{} = expires_at, %DateTime{} = issued_at) do
+    expires_at
+    |> DateTime.diff(issued_at, :second)
+    |> valid_lifetime?()
+  end
+
+  def valid_expiry?(_expires_at, _issued_at), do: false
+
   def state(invitation, now) when is_map(invitation) do
     cond do
       present?(Map.get(invitation, :revoked_at)) -> :revoked
