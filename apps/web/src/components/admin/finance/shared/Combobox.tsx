@@ -5,6 +5,7 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
+import { AnchoredOverlay } from "./AnchoredOverlay";
 
 export type ComboboxOption = {
   value: string;
@@ -33,6 +34,7 @@ export function Combobox({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const anchorRef = useRef<HTMLDivElement>(null);
 
   const selectedOption = options.find((o) => o.value === value);
 
@@ -70,7 +72,7 @@ export function Combobox({
   }
 
   return (
-    <div className="relative">
+    <div ref={anchorRef} className="relative min-w-48">
       {open ? (
         <input
           autoFocus
@@ -93,9 +95,11 @@ export function Combobox({
       )}
 
       {open ? (
-        <div
-          className="absolute start-0 top-full z-30 mt-1 w-full rounded-[1rem] py-1 shadow-xl"
-          style={{ background: "var(--panel)", border: "1px solid var(--border)", maxHeight: "14rem", overflowY: "auto" }}
+        <AnchoredOverlay
+          anchorRef={anchorRef}
+          minWidth={240}
+          className="scroll-area rounded-[1rem] py-1 shadow-xl"
+          style={{ background: "var(--panel-raised)", border: "1px solid var(--border-strong)", maxHeight: "18rem", overflowY: "auto" }}
         >
           {loading ? (
             <p className="px-4 py-3 text-sm" style={{ color: "var(--dim)" }}>{i18n("searching1a6a5ba")}</p>
@@ -129,7 +133,7 @@ export function Combobox({
               {i18n("clearSelection247fd63")}
             </button>
           ) : null}
-        </div>
+        </AnchoredOverlay>
       ) : null}
     </div>
   );

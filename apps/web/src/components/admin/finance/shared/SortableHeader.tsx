@@ -5,6 +5,7 @@
 import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { ColumnKey, SortState } from "@/components/admin/finance/hooks/useSortFilter";
+import { AnchoredOverlay } from "./AnchoredOverlay";
 
 interface Props {
   column: ColumnKey;
@@ -19,13 +20,15 @@ export function SortableHeader({ column, label, sort, hasFilter, onSort, filterS
   const i18n = useUiTranslations();
   const [filterOpen, setFilterOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
   const isActive = sort.column === column;
 
   useEffect(() => {
     if (!filterOpen) return;
 
     function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setFilterOpen(false);
+      const target = e.target as Node;
+      if (!ref.current?.contains(target) && !overlayRef.current?.contains(target)) setFilterOpen(false);
     }
     function handleKey(e: KeyboardEvent) {
       if (e.key === "Escape") setFilterOpen(false);
@@ -76,12 +79,15 @@ export function SortableHeader({ column, label, sort, hasFilter, onSort, filterS
         </button>
 
         {filterOpen && (
-          <div
-            className="absolute start-0 top-full z-50 mt-1 min-w-[200px] rounded-xl p-3 shadow-xl"
+          <AnchoredOverlay
+            anchorRef={ref}
+            overlayRef={overlayRef}
+            minWidth={220}
+            className="rounded-xl p-3 shadow-xl"
             style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)" }}
           >
             {filterSlot}
-          </div>
+          </AnchoredOverlay>
         )}
       </div>
     </th>

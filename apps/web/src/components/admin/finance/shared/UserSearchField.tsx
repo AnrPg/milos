@@ -6,6 +6,7 @@ import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 import { fetchAdminSearch, type FinanceRecord } from "@/api/finance";
 import { SemanticLabel } from "@/components/semantic-label";
+import { AnchoredOverlay } from "./AnchoredOverlay";
 
 interface Props {
   label: string;
@@ -30,6 +31,7 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
   const [selectedUser, setSelectedUser] = useState<FinanceRecord | null>(null);
   const [loading, setLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const anchorRef = useRef<HTMLDivElement>(null);
 
   // Prefill without API call
   useEffect(() => {
@@ -142,7 +144,7 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
           <span className="text-sm italic">{i18n("notSelected183079f")}</span>
         </div>
       ) : (
-        <div className="relative">
+        <div ref={anchorRef} className="relative min-w-60">
           <input
             type="text"
             value={query}
@@ -157,8 +159,10 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
           />
 
           {(results.length > 0 || loading) && (
-            <div
-              className="absolute start-0 top-full z-50 mt-1 w-full rounded-xl overflow-hidden shadow-xl"
+            <AnchoredOverlay
+              anchorRef={anchorRef}
+              minWidth={280}
+              className="scroll-area rounded-xl overflow-hidden shadow-xl"
               style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)" }}
             >
               {loading ? (
@@ -182,7 +186,7 @@ export function UserSearchField({ label, value, prefillUser, token, onChange, ex
                   </button>
                 ))
               )}
-            </div>
+            </AnchoredOverlay>
           )}
         </div>
       )}

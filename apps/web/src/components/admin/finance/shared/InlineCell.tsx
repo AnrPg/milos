@@ -4,6 +4,7 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
+import { AnchoredOverlay } from "./AnchoredOverlay";
 
 type InlineCellProps = {
   value: string;
@@ -130,6 +131,7 @@ function InlineDateEditor({
 }) {
   const i18n = useUiTranslations();
   const inputRef = useRef<HTMLInputElement>(null);
+  const anchorRef = useRef<HTMLDivElement>(null);
   const today = new Date();
   const parsed = parseDateParts(value);
   const [visibleMonth, setVisibleMonth] = useState(() => ({
@@ -162,7 +164,7 @@ function InlineDateEditor({
   }
 
   return (
-    <div className="relative min-w-[14rem]">
+    <div ref={anchorRef} className="relative min-w-[14rem]">
       <div
         className="flex items-center rounded-[0.8rem]"
         style={{ background: "var(--panel)", border: "1px solid var(--primary)", color: "var(--text)" }}
@@ -200,8 +202,10 @@ function InlineDateEditor({
         </button>
       </div>
 
-      <div
-        className="absolute start-0 top-full z-50 mt-2 w-64 rounded-[1.2rem] p-3 shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
+      <AnchoredOverlay
+        anchorRef={anchorRef}
+        width={272}
+        className="rounded-[1.2rem] p-3 shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
         style={{ background: "var(--panel)", border: "1px solid var(--border-strong)", color: "var(--text)" }}
       >
         <div className="flex items-center justify-between">
@@ -279,7 +283,7 @@ function InlineDateEditor({
             {i18n("today24345a1")}
           </button>
         </div>
-      </div>
+      </AnchoredOverlay>
     </div>
   );
 }

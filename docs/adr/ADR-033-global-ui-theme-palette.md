@@ -68,3 +68,9 @@ project export path using a temporary Mix build directory because the default
 Focused backend tests passed against the local Docker Postgres port. Full
 frontend lint still fails on pre-existing unrelated finance/search/session
 issues, while the Next build passed after these changes.
+
+The 2026-07-18 UI consistency pass extended the same theme tokens to browser
+scrollbars, native selects, select options, and date/time controls. Finance
+ledger menus, search results, filters, and the inline calendar now mount in a
+viewport-level anchored overlay so horizontal table scrolling cannot clip or
+shrink interactive surfaces.

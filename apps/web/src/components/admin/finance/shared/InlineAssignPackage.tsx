@@ -7,6 +7,7 @@
 import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 import type { FinanceRecord } from "@/api/finance";
+import { AnchoredOverlay } from "./AnchoredOverlay";
 
 interface Props {
   userId: string;
@@ -21,12 +22,14 @@ export function InlineAssignPackage({ currentCode, packages, pending, onAssign }
   const [open, setOpen] = useState(false);
   const [selectedId, setSelectedId] = useState("");
   const ref = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
 
     function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      const target = e.target as Node;
+      if (!ref.current?.contains(target) && !overlayRef.current?.contains(target)) setOpen(false);
     }
     function handleKey(e: KeyboardEvent) {
       if (e.key === "Escape") setOpen(false);
@@ -76,19 +79,21 @@ export function InlineAssignPackage({ currentCode, packages, pending, onAssign }
       )}
 
       {open && (
-        <div
-          className="absolute start-0 top-full z-50 mt-1 min-w-[180px] rounded-xl p-3 shadow-xl"
+        <AnchoredOverlay
+          anchorRef={ref}
+          overlayRef={overlayRef}
+          minWidth={240}
+          className="rounded-xl p-3 shadow-xl"
           style={{
-            background: "var(--bg)",
+            background: "var(--panel-raised)",
             border: "1px solid var(--border-strong)",
             boxShadow: "0 18px 48px rgba(0, 0, 0, 0.6)",
-            opacity: 1,
           }}
         >
           <select
             value={selectedId}
             onChange={(e) => setSelectedId(e.target.value)}
-            className="w-full rounded-lg px-2 py-1.5 text-xs mb-2"
+            className="mb-3 w-full rounded-lg px-3 py-2.5 text-sm"
             style={{ background: "var(--panel)", color: "var(--text-soft)", border: "1px solid var(--border-strong)" }}
           >
             <option value="">{i18n("selectPackage02bf832")}</option>
@@ -108,12 +113,12 @@ export function InlineAssignPackage({ currentCode, packages, pending, onAssign }
             type="button"
             onClick={handleAssign}
             disabled={!selectedId || pending}
-            className="w-full rounded-lg px-3 py-1.5 text-xs font-semibold transition-opacity disabled:opacity-40"
+            className="w-full rounded-lg px-3 py-2.5 text-sm font-semibold transition-opacity disabled:opacity-40"
             style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {i18n("assign2444928")}
           </button>
-        </div>
+        </AnchoredOverlay>
       )}
     </div>
   );

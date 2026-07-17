@@ -54,6 +54,70 @@ body {
   font-family: "Avenir Next", "Segoe UI", sans-serif;
 }
 
+html {
+  scrollbar-color: var(--border-strong) var(--panel-muted);
+  scrollbar-width: thin;
+}
+
+html[data-theme="daybreak"],
+html[data-theme="paper"],
+html[data-theme="lagoon"],
+html[data-theme="sunset"] {
+  color-scheme: light;
+}
+
+html:not([data-theme="daybreak"]):not([data-theme="paper"]):not([data-theme="lagoon"]):not([data-theme="sunset"]) {
+  color-scheme: dark;
+}
+
+* {
+  scrollbar-color: var(--border-strong) var(--panel-muted);
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 0.7rem;
+  height: 0.7rem;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--panel-muted);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border: 2px solid var(--panel-muted);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--dim);
+}
+
+select,
+input[type="date"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="time"] {
+  background-color: var(--panel-muted);
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+select option,
+select optgroup {
+  background: var(--panel);
+  color: var(--text);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+input[type="month"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.85;
+}
+
 html[dir="rtl"] body {
   text-align: start;
 }
