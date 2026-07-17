@@ -728,10 +728,11 @@ export function ExecutionMode() {
 
       {modifyTarget && (
         <ModificationModal
+          segment={currentSegment}
           step={modifyTarget}
           onSave={(mod) => {
             setInExecutionModifications((prev) => {
-              const without = prev.filter((m) => m.exercise_id !== mod.exercise_id);
+              const without = prev.filter((m) => (m.patch_id ?? "") !== (mod.patch_id ?? ""));
               return [...without, mod];
             });
             setModifyTarget(null);

@@ -7,17 +7,28 @@
 import {useUiTranslations} from "@/i18n/ui";
 import { semanticLabel } from "@/i18n/presentation";
 import { useId, useState } from "react";
-import type { ExerciseModification } from "@/api/executions";
+import type { ExerciseModification, TimerSegment } from "@/api/executions";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import type { ChecklistStep } from "./WorkoutChecklist";
 
 type Props = {
+  segment: TimerSegment;
   step: ChecklistStep;
   onSave: (mod: ExerciseModification) => void;
   onClose: () => void;
 };
 
-export function ModificationModal({ step, onSave, onClose }: Props) {
+function setIndexFromLabel(label: string | null) {
+  if (!label) return 1;
+  const parsed = Number(label.split("/")[0]);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+}
+
+function patchId(segment: TimerSegment, step: ChecklistStep, field: string) {
+  return [segment.segment_key, step.exerciseId, setIndexFromLabel(step.stepLabel), segment.round ?? 0, field].join(":");
+}
+
+export function ModificationModal({ segment, step, onSave, onClose }: Props) {
   const i18n = useUiTranslations();
   const { exercise } = step;
 
@@ -40,13 +51,18 @@ export function ModificationModal({ step, onSave, onClose }: Props) {
 
   function handleSkip() {
     onSave({
+      patch_id: patchId(segment, step, "skipped"),
+      field: "skipped",
+      section_id: segment.section_id,
+      section_name: segment.section_name,
+      segment_key: segment.segment_key,
       exercise_id: exercise.id,
+      exercise_name: exercise.name,
+      set_index: setIndexFromLabel(step.stepLabel),
+      round_index: segment.round,
+      canonical_value: false,
+      actual_value: true,
       type: "skipped",
-      prescribed_value: exercise.prescription_value ?? null,
-      actual_value: 0,
-      prescribed_mins: null,
-      actual_mins: null,
-      sets: exercise.sets ?? null,
     });
   }
 
@@ -64,15 +80,34 @@ export function ModificationModal({ step, onSave, onClose }: Props) {
       : repsChanged
         ? "reps_changed"
         : "other";
+    const field = loadChanged ? "load" : repsChanged ? "reps" : parsedActualSets !== exercise.sets ? "sets" : "prescription_value";
+    const canonicalValue =
+      field === "load"
+        ? exercise.load_value
+        : field === "sets"
+          ? exercise.sets
+          : exercise.prescription_value;
+    const actual =
+      field === "load"
+        ? parsedActualLoad
+        : field === "sets"
+          ? parsedActualSets
+          : parsedActualValue;
 
     onSave({
+      patch_id: patchId(segment, step, field),
+      field,
+      section_id: segment.section_id,
+      section_name: segment.section_name,
+      segment_key: segment.segment_key,
       exercise_id: exercise.id,
+      exercise_name: exercise.name,
+      set_index: setIndexFromLabel(step.stepLabel),
+      round_index: segment.round,
       type,
-      prescribed_value: exercise.prescription_value ?? null,
-      actual_value: parsedActualValue,
-      prescribed_mins: null,
-      actual_mins: null,
-      sets: parsedActualSets ?? exercise.sets ?? null,
+      canonical_value: canonicalValue ?? "",
+      actual_value: actual ?? "",
+      unit: field === "load" ? (exercise.load_mode === "pct_1rm" ? "%" : "kg") : exercise.prescription_unit ?? null,
     });
   }
 
