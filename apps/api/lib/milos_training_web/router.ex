@@ -310,6 +310,7 @@ defmodule MilosTrainingWeb.Router do
 
     get("/", PRController, :index)
     post("/", PRController, :create)
+    patch("/:id/edit", PRController, :edit)
     patch("/:id", PRController, :update)
     delete("/:id", PRController, :delete)
     get("/:id/history", PRController, :history)

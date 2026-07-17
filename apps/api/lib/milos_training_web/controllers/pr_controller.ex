@@ -5,6 +5,7 @@ defmodule MilosTrainingWeb.PRController do
   alias MilosTraining.Application.{
     CreatePR,
     DeletePR,
+    EditPR,
     GetPRHistory,
     ListUserPRs,
     SharePR,
@@ -104,6 +105,26 @@ defmodule MilosTrainingWeb.PRController do
     current_user = Guardian.Plug.current_resource(conn)
 
     with {:ok, pr} <- UpdatePR.call(id, current_user.id, params) do
+      json(conn, %{pr: pr})
+    end
+  end
+
+  operation(:edit,
+    summary: "Correct the current PR result without adding history",
+    parameters: [@id_param],
+    request_body:
+      {"PR params", "application/json", %Schema{type: :object, properties: @pr_fields}},
+    responses: [
+      ok: {"PR", "application/json", %Schema{type: :object}},
+      not_found: {"Error", "application/json", %Schema{type: :object}},
+      unprocessable_entity: {"Error", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def edit(conn, %{"id" => id} = params) do
+    current_user = Guardian.Plug.current_resource(conn)
+
+    with {:ok, pr} <- EditPR.call(id, current_user.id, params) do
       json(conn, %{pr: pr})
     end
   end

@@ -24,6 +24,9 @@ defmodule MilosTraining.Pantheon.PRStore do
   def update_pr(id, params), do: adapter().update_pr(id, params)
 
   @impl true
+  def edit_pr(id, params), do: adapter().edit_pr(id, params)
+
+  @impl true
   def delete_pr(id, user_id), do: adapter().delete_pr(id, user_id)
 
   @impl true

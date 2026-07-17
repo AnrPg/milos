@@ -86,6 +86,20 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
   end
 
   @impl true
+  def edit_pr(id, params) do
+    case Repo.get(PRRecord, id) do
+      nil ->
+        {:error, :not_found}
+
+      existing ->
+        existing
+        |> PRRecord.changeset(params)
+        |> Repo.update()
+        |> normalize_result(&normalize_pr/1)
+    end
+  end
+
+  @impl true
   def delete_pr(id, user_id) do
     case Repo.get_by(PRRecord, id: id, user_id: user_id) do
       nil ->
