@@ -32,6 +32,15 @@ defmodule MilosTrainingWeb.Plugs.ForceSslExceptHealth do
     end
   end
 
+  defp internal_probe?({0, 0, 0, 0, 0, 0xFFFF, ab, cd}) do
+    internal_probe?({
+      Bitwise.bsr(ab, 8),
+      Bitwise.band(ab, 0xFF),
+      Bitwise.bsr(cd, 8),
+      Bitwise.band(cd, 0xFF)
+    })
+  end
+
   defp internal_probe?({127, 0, 0, 1}), do: true
   defp internal_probe?({10, _, _, _}), do: true
   defp internal_probe?({172, second, _, _}) when second in 16..31, do: true

@@ -55,6 +55,26 @@ defmodule MilosTrainingWeb.HealthControllerTest do
     assert json_response(conn, 200)["status"] == "ok"
   end
 
+  test "does not redirect health checks arriving as IPv4-mapped IPv6 (Bandit dual-stack)", %{
+    conn: conn
+  } do
+    Application.put_env(
+      :milos_training,
+      :readiness_checker,
+      MilosTraining.TestSupport.FakeReadinessOk
+    )
+
+    Application.put_env(:milos_training, :force_ssl, hsts: true, rewrite_on: [:x_forwarded_proto])
+
+    # ::ffff:10.244.0.1 — how Bandit reports an IPv4 kubelet probe on an IPv6 socket
+    conn =
+      conn
+      |> Map.put(:remote_ip, {0, 0, 0, 0, 0, 0xFFFF, 0x0AF4, 0x0001})
+      |> get("/api/health")
+
+    assert json_response(conn, 200)["status"] == "ok"
+  end
+
   test "still redirects external health requests when SSL enforcement is enabled", %{conn: conn} do
     Application.put_env(:milos_training, :force_ssl, hsts: true, rewrite_on: [:x_forwarded_proto])
 
