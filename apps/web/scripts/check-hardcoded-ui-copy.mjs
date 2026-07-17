@@ -37,10 +37,10 @@ const translatedCalls = new Set([
 const technicalProperties = new Set([
   "accept", "action", "accent", "apple", "background", "border", "borderBottom", "borderLeft",
   "borderRight", "borderTop", "borderColor", "borderRadius", "className", "color", "content",
-  "currency", "dateStyle", "day", "event", "format", "height", "hour", "href", "icon", "id",
-  "inputType", "key", "kind", "localeMatcher", "manifest", "margin", "method", "minute", "month", "name",
+  "currency", "d", "dateStyle", "day", "event", "format", "height", "hour", "href", "icon", "id",
+  "inputMode", "inputType", "key", "kind", "localeMatcher", "manifest", "margin", "method", "minute", "month", "name",
   "padding", "pattern", "rel", "role", "scope", "second", "slug", "source", "status", "style",
-  "target", "timeStyle", "type", "unit", "value", "variant", "weekday", "width", "year",
+  "step", "target", "timeStyle", "type", "unit", "value", "variant", "weekday", "width", "year",
 ]);
 const technicalCalls = new Set([
   "addEventListener", "endsWith", "get", "getItem", "getPropertyValue", "includes", "join",
@@ -86,6 +86,7 @@ function isTechnicalValue(value) {
     || /^[a-z]{2}(?:-[A-Z]{2})?$/.test(trimmed)
     || /^[A-Z]{3}$/.test(trimmed)
     || /^T\d{2}:\d{2}:\d{2}$/.test(trimmed)
+    || /^yyyy-mm-dd$/.test(trimmed)
     || /^@keyframes\b/.test(trimmed)
     || /^\(\(\)\s*=>\s*\{/.test(trimmed)
     || /^\([\w-]+\s*:/.test(trimmed)
@@ -173,10 +174,14 @@ for (const filename of sourceFiles(sourceRoot)) {
 
     if (ts.isJsxAttribute(node) && translatedAttributes.has(node.name.getText(sourceFile))) {
       if (node.initializer && ts.isStringLiteral(node.initializer)) {
-        report(node.initializer, node.initializer.text, `attribute ${node.name.getText(sourceFile)}`);
+        if (!isTechnicalValue(node.initializer.text)) {
+          report(node.initializer, node.initializer.text, `attribute ${node.name.getText(sourceFile)}`);
+        }
       } else if (node.initializer && ts.isJsxExpression(node.initializer) && node.initializer.expression) {
         const value = literalValue(node.initializer.expression);
-        if (value !== null) report(node.initializer.expression, value, `attribute ${node.name.getText(sourceFile)}`);
+        if (value !== null && !isTechnicalValue(value)) {
+          report(node.initializer.expression, value, `attribute ${node.name.getText(sourceFile)}`);
+        }
       }
     }
 
