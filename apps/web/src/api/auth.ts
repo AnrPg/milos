@@ -9,6 +9,10 @@ export type LoginRequest =
   NonNullable<
     paths["/api/auth/login"]["post"]["requestBody"]
   >["content"]["application/json"];
+export type AdminRegisterRequest =
+  NonNullable<
+    paths["/api/auth/register-admin"]["post"]["requestBody"]
+  >["content"]["application/json"];
 export type AuthTokens =
   paths["/api/auth/login"]["post"]["responses"]["200"]["content"]["application/json"];
 export type CurrentUser =
@@ -16,6 +20,10 @@ export type CurrentUser =
 
 export function registerUser(payload: RegisterRequest) {
   return apiRequest<AuthTokens>("/auth/register", { method: "POST", body: payload });
+}
+
+export function registerAdminUser(payload: AdminRegisterRequest) {
+  return apiRequest<AuthTokens>("/auth/register-admin", { method: "POST", body: payload });
 }
 
 export function loginUser(payload: LoginRequest) {

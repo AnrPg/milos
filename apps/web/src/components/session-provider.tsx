@@ -12,7 +12,9 @@ import {
   loginUser,
   logoutSession,
   refreshSession,
+  registerAdminUser,
   registerUser,
+  type AdminRegisterRequest,
   type AuthTokens,
   type CurrentUser,
   type LoginRequest,
@@ -42,6 +44,7 @@ type SessionContextValue = {
   currentUser: CurrentUser | null;
   signIn: (payload: LoginRequest) => Promise<CurrentUser>;
   signUp: (payload: RegisterRequest) => Promise<CurrentUser>;
+  signUpAdmin: (payload: AdminRegisterRequest) => Promise<CurrentUser>;
   rotate: () => Promise<void>;
   signOut: () => void;
 };
@@ -110,6 +113,11 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   async function signUp(payload: RegisterRequest) {
     const issuedTokens = await registerUser(payload);
+    return establishSession(issuedTokens);
+  }
+
+  async function signUpAdmin(payload: AdminRegisterRequest) {
+    const issuedTokens = await registerAdminUser(payload);
     return establishSession(issuedTokens);
   }
 
@@ -239,6 +247,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         currentUser,
         signIn,
         signUp,
+        signUpAdmin,
         rotate,
         signOut,
       }}
