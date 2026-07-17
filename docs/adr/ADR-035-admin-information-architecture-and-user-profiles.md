@@ -207,3 +207,23 @@ full TypeScript check passed; the production Next.js build passed; and the
 built `/admin/users`, `/admin/users/:id`, `/admin/finance`, and `/admin/metrics`
 routes returned HTTP 200. The complete backend precommit suite was also run.
 No Phase 3 technical debt was deferred.
+
+The 2026-07-17 dossier refinement keeps the same focused-endpoint architecture
+while tightening person relevance and operator context:
+
+- Empty history-only sections are omitted from both the profile navigation and
+  body after their focused reads resolve. Finance and admin actions remain
+  visible because they are operational surfaces even when their source records
+  are empty.
+- The Finance dossier now returns and renders membership state, package
+  subscriptions, referral claims, referred members, and referral rewards in
+  addition to entitlement allowances and the existing Finance drill-down.
+- Pantheon PR history is included through the Pantheon public API. Admin PR
+  cards use the same compact supporting-metric text as Pantheon and show the
+  achieved date for every archived result.
+- The landing-page workout CTA is conditional: it resumes an active execution,
+  opens an approved booked class within two hours of its scheduled time, or
+  opens an athlete assignment due today. It is absent when none applies.
+- Admin Home now follows Dashboard directly in the top navigation.
+
+No new persistence, migration, dependency, or technical debt was introduced.

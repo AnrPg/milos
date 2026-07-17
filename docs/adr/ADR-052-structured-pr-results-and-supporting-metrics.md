@@ -67,13 +67,14 @@ current result's contextual details corrects that result in place.
 - Added a pure Pantheon domain validator that normalizes accepted metrics,
   including the controlled text fields `equipment` and `variation`, and rejects
   unknown, negative, malformed, or blank values before persistence.
-- PR updates archive the previous score with its date, metrics, and note when
-  the primary score changes. Partial API updates that do not supply metrics
-  retain the stored metrics.
+- The PR form now exposes two explicit persistence modes. **Update** records a
+  new achieved result and archives the previous score, date, metrics, and note;
+  **Edit** corrects the selected current result in place without creating a
+  history row. Both modes enforce ownership through Application services.
 - The form retains the primary-unit dropdown and provides a unit-aware Add
   detail selector for reps, sets, load, time, distance, calories, rounds, and
   variation. Notes do not appear on Pantheon cards; they appear in PR history.
-- The focused ExUnit test could not start because the local PostgreSQL test
-  database was unavailable at `localhost:5432`. The pure validator was checked
-  directly with `mix run --no-start`; compile, architecture, TypeScript, lint,
-  and OpenAPI generation passed.
+- The PR form is viewport-bounded and internally scrollable so all fields and
+  both persistence actions remain reachable on short and narrow screens.
+- Focused ExUnit and Vitest regressions verify the distinct Update/Edit history
+  semantics and the responsive dialog contract.
