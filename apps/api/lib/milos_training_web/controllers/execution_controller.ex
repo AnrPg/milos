@@ -308,7 +308,7 @@ defmodule MilosTrainingWeb.ExecutionController do
   end
 
   operation(:add_modifications,
-    summary: "Log exercise modifications during execution",
+    summary: "Log actual-workout modification patches",
     parameters: [@id_param],
     request_body:
       {"Modifications", "application/json",
@@ -320,18 +320,50 @@ defmodule MilosTrainingWeb.ExecutionController do
              type: :array,
              items: %Schema{
                type: :object,
-               required: [:exercise_id, :type],
+               required: [:patch_id, :section_id, :field, :canonical_value, :actual_value],
                properties: %{
-                 exercise_id: %Schema{type: :string},
+                 patch_id: %Schema{type: :string},
                  type: %Schema{
                    type: :string,
-                   enum: ["skipped", "weight_changed", "reps_changed", "time_changed", "other"]
+                   enum: [
+                     "skipped",
+                     "weight_changed",
+                     "reps_changed",
+                     "time_changed",
+                     "sets_changed",
+                     "exercise_substituted",
+                     "distance_changed",
+                     "calories_changed",
+                     "field_changed",
+                     "other"
+                   ],
+                   nullable: true
                  },
-                 prescribed_value: %Schema{type: :number, nullable: true},
-                 actual_value: %Schema{type: :number, nullable: true},
-                 prescribed_mins: %Schema{type: :number, nullable: true},
-                 actual_mins: %Schema{type: :number, nullable: true},
-                 sets: %Schema{type: :integer, nullable: true},
+                 field: %Schema{type: :string},
+                 section_id: %Schema{type: :string},
+                 section_name: %Schema{type: :string, nullable: true},
+                 segment_key: %Schema{type: :string, nullable: true},
+                 exercise_id: %Schema{type: :string, nullable: true},
+                 exercise_name: %Schema{type: :string, nullable: true},
+                 set_index: %Schema{type: :integer, minimum: 1, nullable: true},
+                 round_index: %Schema{type: :integer, minimum: 1, nullable: true},
+                 interval_index: %Schema{type: :integer, minimum: 1, nullable: true},
+                 row_index: %Schema{type: :integer, minimum: 1, nullable: true},
+                 canonical_value: %Schema{
+                   oneOf: [
+                     %Schema{type: :string},
+                     %Schema{type: :number},
+                     %Schema{type: :boolean}
+                   ]
+                 },
+                 actual_value: %Schema{
+                   oneOf: [
+                     %Schema{type: :string},
+                     %Schema{type: :number},
+                     %Schema{type: :boolean}
+                   ]
+                 },
+                 unit: %Schema{type: :string, nullable: true},
                  note: %Schema{type: :string, nullable: true}
                }
              }
