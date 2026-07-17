@@ -11,6 +11,7 @@ defmodule MilosTrainingWeb.AdminUserController do
     GetAdminUserPRs,
     GetAdminUserTrainingHistory,
     GrantUserAllowance,
+    DeleteAdminUser,
     ListAdminUsers,
     ListAthletes,
     RevokeUserAllowance,
@@ -321,6 +322,23 @@ defmodule MilosTrainingWeb.AdminUserController do
     ]
   )
 
+  operation(:delete,
+    summary: "Delete a user's account",
+    parameters: [@id_parameter],
+    responses: [
+      no_content: "Deleted",
+      not_found:
+        {"Not found", "application/json",
+         %Schema{type: :object, properties: %{error: %Schema{type: :string}}, required: [:error]}},
+      conflict:
+        {"Protected history", "application/json",
+         %Schema{type: :object, properties: %{error: %Schema{type: :string}}, required: [:error]}},
+      unprocessable_entity:
+        {"Deletion blocked", "application/json",
+         %Schema{type: :object, properties: %{error: %Schema{type: :string}}, required: [:error]}}
+    ]
+  )
+
   operation(:grant_allowance,
     summary: "Extend one user's named package allowance for a specific period",
     parameters: [@id_parameter],
@@ -341,6 +359,14 @@ defmodule MilosTrainingWeb.AdminUserController do
 
       error ->
         error
+    end
+  end
+
+  def delete(conn, params) do
+    admin = Guardian.Plug.current_resource(conn)
+
+    with {:ok, _deleted} <- DeleteAdminUser.call(params["id"] || params[:id], admin.id) do
+      send_resp(conn, :no_content, "")
     end
   end
 

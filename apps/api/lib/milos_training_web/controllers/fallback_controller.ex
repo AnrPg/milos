@@ -759,6 +759,21 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "last_admin", error: "Cannot demote the last admin"})
   end
 
+  def call(conn, {:error, :cannot_delete_self}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "cannot_delete_self", error: "Admins cannot delete their own account"})
+  end
+
+  def call(conn, {:error, :user_has_restricted_history}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "user_has_restricted_history",
+      error: "User has protected historical records and cannot be deleted"
+    })
+  end
+
   def call(conn, {:error, :workout_not_published}) do
     conn
     |> put_status(:unprocessable_entity)

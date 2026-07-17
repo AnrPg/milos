@@ -218,6 +218,31 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     assert revoked["entitlement"]["allowances"]["class_visits"]["extensions"] == 0
   end
 
+  test "admin can delete another user's account", %{conn: conn} do
+    admin = admin_fixture()
+    user = user_fixture(%{role: :athlete, nickname: "delete_target"})
+
+    response =
+      conn
+      |> put_bearer_token(admin)
+      |> delete("/api/admin/users/#{user.id}")
+
+    assert response.status == 204
+    assert MilosTraining.Identity.find_by_id(user.id) == nil
+  end
+
+  test "admin cannot delete their own account", %{conn: conn} do
+    admin = admin_fixture()
+
+    response =
+      conn
+      |> put_bearer_token(admin)
+      |> delete("/api/admin/users/#{admin.id}")
+      |> json_response(422)
+
+    assert response["code"] == "cannot_delete_self"
+  end
+
   defp get_as_admin(conn, admin, user_id, section) do
     conn
     |> put_bearer_token(admin)

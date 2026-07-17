@@ -1909,7 +1909,8 @@ export interface paths {
         get: operations["MilosTrainingWeb.AdminUserController.show"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Delete a user's account */
+        delete: operations["MilosTrainingWeb.AdminUserController.delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -7799,6 +7800,59 @@ export interface operations {
             };
             /** @description Not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminUserController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Protected history */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Deletion blocked */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

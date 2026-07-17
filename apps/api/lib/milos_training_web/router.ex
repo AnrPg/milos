@@ -88,6 +88,7 @@ defmodule MilosTrainingWeb.Router do
     get("/users/:id/messages", AdminUserController, :messages)
     get("/users/:id/coaching-context", AdminUserController, :coaching_context)
     post("/users/:id/allowance-extensions", AdminUserController, :grant_allowance)
+    delete("/users/:id", AdminUserController, :delete)
 
     post(
       "/users/:id/allowance-extensions/:entry_id/revoke",
