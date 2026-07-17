@@ -13,6 +13,8 @@ import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { fetchExecution } from "@/api/executions";
+import { fetchAssignedWorkoutWeek } from "@/api/assigned-workouts";
+import { fetchSchedule } from "@/api/schedule";
 import { PantheonSection } from "@/components/pantheon/PantheonSection";
 import { ChallengeCard } from "@/components/workouts/ChallengeCard";
 import {
@@ -29,6 +31,8 @@ import { WellbeingFormPanel } from "@/components/panels/WellbeingFormPanel";
 import { useSession } from "@/components/session-provider";
 import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
+import { formatLocalIsoDate } from "@/components/schedule/calendar-window";
+import { workoutCta } from "@/components/workout-cta";
 
 // ── Badge helpers ─────────────────────────────────────────────────────────────
 
@@ -427,6 +431,11 @@ export function LandingPage() {
   const [modalDateFrom, setModalDateFrom] = useState<string>("");
   const [modalDateTo, setModalDateTo] = useState<string>(new Date().toISOString().slice(0, 10));
   const queryClient = useQueryClient();
+  const ctaNow = useMemo(() => new Date(), []);
+  const ctaScheduleWindow = useMemo(() => ({
+    startAt: new Date(ctaNow.getTime() - 2 * 60 * 60 * 1_000).toISOString(),
+    endAt: new Date(ctaNow.getTime() + 3 * 24 * 60 * 60 * 1_000).toISOString(),
+  }), [ctaNow]);
 
   const landingQuery = useQuery({
     queryKey: ["landing"],
@@ -435,6 +444,26 @@ export function LandingPage() {
       if (!tokens?.access_token) throw new Error(i18n("authenticationRequired9e44e0b"));
       return fetchLandingPayload(tokens.access_token);
     },
+  });
+
+  const ctaScheduleQuery = useQuery({
+    queryKey: ["landing", "workout-cta", "schedule", ctaScheduleWindow.startAt],
+    enabled: Boolean(tokens?.access_token) && currentUser?.role === "member",
+    queryFn: () =>
+      fetchSchedule(tokens!.access_token, {
+        startAt: ctaScheduleWindow.startAt,
+        endAt: ctaScheduleWindow.endAt,
+        days: 3,
+        classTypeIds: [],
+      }),
+    staleTime: 60_000,
+  });
+
+  const ctaAssignmentsQuery = useQuery({
+    queryKey: ["landing", "workout-cta", "assignments", formatLocalIsoDate(ctaNow)],
+    enabled: Boolean(tokens?.access_token) && currentUser?.role === "athlete",
+    queryFn: () => fetchAssignedWorkoutWeek(tokens!.access_token, formatLocalIsoDate(ctaNow)),
+    staleTime: 60_000,
   });
 
   const toggleLeaderboard = useMutation({
@@ -543,9 +572,13 @@ export function LandingPage() {
   const hasActiveChallenges = landing.gamification.active_challenges.length > 0;
   const showChallenges = isAdmin || hasActiveChallenges;
   const collapseLeaderboard = !isAdmin && !leaderboardOptedIn;
-  const activeExecution = landing.recent_executions.find((execution) => execution.status !== "completed");
-  const logWorkoutHref = activeExecution ? `/workouts/${activeExecution.id}/execute` : "/workouts";
-  const logWorkoutLabel = activeExecution ? i18n("resumeWorkoutc6154f0") : i18n("logWorkout5fe879b");
+  const logWorkoutCta = workoutCta({
+    role: currentUser?.role,
+    now: ctaNow,
+    executions: landing.recent_executions,
+    scheduleSlots: ctaScheduleQuery.data?.slots ?? [],
+    assignments: ctaAssignmentsQuery.data?.assignments ?? [],
+  });
 
   return (
     <>
@@ -581,10 +614,10 @@ export function LandingPage() {
             />
           )}
 
-          {!isAdmin ? (
+          {!isAdmin && logWorkoutCta ? (
             <div className="sticky top-[4rem] z-30 flex justify-end">
               <Link
-                href={logWorkoutHref}
+                href={logWorkoutCta.href}
                 className="rounded-full px-5 py-3 text-sm font-bold shadow-[0_12px_30px_rgba(0,0,0,0.25)] transition-transform hover:-translate-y-0.5"
                 style={{
                   background: "var(--primary)",
@@ -592,7 +625,7 @@ export function LandingPage() {
                   border: "1px solid color-mix(in srgb, var(--primary) 70%, var(--text))",
                 }}
               >
-                {logWorkoutLabel}
+                {logWorkoutCta.label === "resume" ? i18n("resumeWorkoutc6154f0") : i18n("logWorkout5fe879b")}
               </Link>
             </div>
           ) : null}
