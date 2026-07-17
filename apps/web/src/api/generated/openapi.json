@@ -1470,6 +1470,7 @@
                     "type": "string"
                   },
                   "password": {
+                    "minLength": 4,
                     "type": "string"
                   }
                 },
@@ -3887,6 +3888,7 @@
                     "type": "string"
                   },
                   "password": {
+                    "minLength": 4,
                     "type": "string"
                   },
                   "role": {
@@ -11728,7 +11730,7 @@
                     "type": "string"
                   },
                   "password": {
-                    "minLength": 8,
+                    "minLength": 4,
                     "type": "string"
                   },
                   "preferred_locale": {
