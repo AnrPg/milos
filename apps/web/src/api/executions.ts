@@ -88,13 +88,31 @@ export type SectionScore = {
 };
 
 export type ExerciseModification = {
-  exercise_id: string;
-  type: "skipped" | "weight_changed" | "reps_changed" | "time_changed" | "other";
-  prescribed_value?: number | null;
-  actual_value?: number | null;
-  prescribed_mins?: number | null;
-  actual_mins?: number | null;
-  sets?: number | null;
+  patch_id?: string;
+  type?:
+    | "skipped"
+    | "weight_changed"
+    | "reps_changed"
+    | "time_changed"
+    | "sets_changed"
+    | "exercise_substituted"
+    | "distance_changed"
+    | "calories_changed"
+    | "field_changed"
+    | "other";
+  field: string;
+  section_id: string;
+  section_name?: string | null;
+  segment_key?: string | null;
+  exercise_id?: string | null;
+  exercise_name?: string | null;
+  set_index?: number | null;
+  round_index?: number | null;
+  interval_index?: number | null;
+  row_index?: number | null;
+  canonical_value: string | number | boolean;
+  actual_value: string | number | boolean;
+  unit?: string | null;
   note?: string | null;
   logged_at?: string;
 };
