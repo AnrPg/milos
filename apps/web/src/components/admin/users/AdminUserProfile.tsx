@@ -1,15 +1,12 @@
 "use client";
 
-
-
-
-
-import {useUiTranslations} from "@/i18n/ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import {
+  deleteAdminUser,
   fetchAdminUserCoachingContext,
   fetchAdminUserFinance,
   fetchAdminUserIncidents,
@@ -21,13 +18,16 @@ import {
   revokeAdminUserAllowance,
   updateAdminUserRole,
   type AdminUserDirectoryEntry,
+  type AdminUserExecution,
+  type AdminUserPR,
 } from "@/api/admin-users";
 import type { EffectiveEntitlement } from "@/api/my-finance";
-import { useSession } from "@/components/session-provider";
-import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
-import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
+import { SemanticLabel } from "@/components/semantic-label";
+import { useSession } from "@/components/session-provider";
 import { semanticLabel } from "@/i18n/presentation";
+import { useUiTranslations } from "@/i18n/ui";
+import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 
 function Panel({ id, title, children, href, hrefLabel }: { id: string; title: string; children: React.ReactNode; href?: string; hrefLabel?: string }) {
   const i18n = useUiTranslations();
@@ -39,7 +39,7 @@ function Panel({ id, title, children, href, hrefLabel }: { id: string; title: st
       <button
         type="button"
         aria-expanded={open}
-        aria-controls={(id) + "-content"}
+        aria-controls={`${id}-content`}
         onClick={() => setOpen((value) => !value)}
         className="flex w-full items-center justify-between gap-4 text-start"
       >
@@ -47,7 +47,7 @@ function Panel({ id, title, children, href, hrefLabel }: { id: string; title: st
         <span className="text-sm font-semibold" style={{ color: "var(--dim)" }}>{open ? i18n("hide34d8b60") : i18n("showd97d1ee")}</span>
       </button>
       {open ? (
-        <div id={(id) + "-content"} className="mt-4 text-sm leading-6" style={{ color: "var(--text-soft)" }}>
+        <div id={`${id}-content`} className="mt-4 text-sm leading-6" style={{ color: "var(--text-soft)" }}>
           {children}
           {href ? <Link href={href} className="mt-4 inline-flex items-center gap-1 text-sm font-semibold" style={{ color: "var(--primary)" }}>{resolvedHrefLabel} <span className="inline-block rtl:rotate-180">→</span></Link> : null}
         </div>
@@ -64,13 +64,128 @@ function date(value: unknown) {
   return typeof value === "string" ? value.slice(0, 10) : "—";
 }
 
+function valueText(value: unknown) {
+  if (value === null || value === undefined || value === "") return "—";
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return String(value);
+  return "—";
+}
+
 function useDossierQuery<T>(token: string | undefined, userId: string, key: string, fn: (token: string, id: string) => Promise<T>, enabled = true) {
-  
   return useQuery({
     queryKey: ["admin", "users", userId, key],
     enabled: Boolean(token) && enabled,
     queryFn: () => fn(token!, userId),
   });
+}
+
+function Avatar({ user }: { user: Pick<AdminUserDirectoryEntry, "nickname" | "avatar_url"> }) {
+  return (
+    <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[1.7rem] text-3xl font-semibold" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)", color: "var(--primary)" }}>
+      {user.avatar_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={user.avatar_url} alt="" className="h-full w-full object-cover" />
+      ) : (
+        <span>{user.nickname.slice(0, 1).toUpperCase()}</span>
+      )}
+    </div>
+  );
+}
+
+function StatGrid({ items }: { items: Array<[string, React.ReactNode]> }) {
+  return (
+    <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {items.map(([label, value]) => (
+        <div key={label} className="rounded-2xl p-4" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+          <dt className="text-xs uppercase tracking-[0.14em]" style={{ color: "var(--muted)" }}>{label}</dt>
+          <dd className="mt-1 font-semibold" style={{ color: "var(--text)" }}>{value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+function DetailCard({ title, meta, value, children, href }: { title: React.ReactNode; meta?: React.ReactNode; value?: React.ReactNode; children?: React.ReactNode; href?: string }) {
+  const i18n = useUiTranslations();
+
+  return (
+    <div className="group relative rounded-[1.4rem] p-4 transition-transform hover:-translate-y-0.5" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="truncate font-semibold" style={{ color: "var(--text)" }}>{title}</p>
+          {meta ? <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>{meta}</p> : null}
+        </div>
+        {value ? <strong className="tabular-nums" style={{ color: "var(--primary)" }}>{value}</strong> : null}
+      </div>
+      {children ? (
+        <div className="mt-3 rounded-xl p-3 opacity-90 transition-opacity group-hover:opacity-100" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
+          {children}
+        </div>
+      ) : null}
+      {href ? (
+        <Link href={href} aria-label={i18n("openWorkspace8b23311")} className="absolute bottom-3 end-3 rounded-xl px-2 py-1 text-xs font-semibold opacity-50 transition-opacity hover:opacity-100" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
+          ↗
+        </Link>
+      ) : null}
+    </div>
+  );
+}
+
+function PRCard({ pr }: { pr: AdminUserPR }) {
+  const i18n = useUiTranslations();
+  const metrics = Object.entries(pr.supporting_metrics ?? {});
+
+  return (
+    <DetailCard
+      title={pr.name}
+      meta={<>{pr.higher_is_better ? i18n("higherIsBetter7aab104") : i18n("lowerIsBettercf052ba")} · {date(pr.beaten_on)}</>}
+      value={<LocalizedScore value={pr.current_score} unit={pr.unit} />}
+    >
+      {metrics.length ? (
+        <div className="grid gap-2 sm:grid-cols-2">
+          {metrics.map(([key, value]) => (
+            <p key={key} className="text-xs"><span style={{ color: "var(--muted)" }}>{semanticLabel(key, i18n)}:</span> {valueText(value)}</p>
+          ))}
+        </div>
+      ) : (
+        <Empty>{i18n("noHistoryYet933f417")}</Empty>
+      )}
+      {pr.notes ? <p className="mt-2 text-xs" style={{ color: "var(--muted)" }}>{pr.notes}</p> : null}
+    </DetailCard>
+  );
+}
+
+function ExecutionCard({ item, href }: { item: AdminUserExecution; href?: string }) {
+  const i18n = useUiTranslations();
+
+  return (
+    <DetailCard
+      title={item.workout_title}
+      meta={<><SemanticLabel value={item.status} /> · <SemanticLabel value={item.source} /> · {date(item.started_at_utc)}</>}
+      value={item.total_elapsed_ms ? `${Math.round(item.total_elapsed_ms / 60000)}m` : undefined}
+      href={href}
+    >
+      {item.section_scores?.length ? (
+        <div className="grid gap-2 sm:grid-cols-2">
+          {item.section_scores.slice(0, 6).map((score, index) => (
+            <p key={`${item.id}-${index}`} className="text-xs">
+              <span style={{ color: "var(--muted)" }}>{valueText(score.section_name ?? score["section_name"])}:</span>{" "}
+              <LocalizedScore value={score.value ?? score["value"] ?? "—"} unit={valueText(score.unit ?? score["unit"])} />
+            </p>
+          ))}
+        </div>
+      ) : (
+        <Empty>{i18n("noScoredWorkoutSectionsRecordedcfa7742")}</Empty>
+      )}
+    </DetailCard>
+  );
+}
+
+function GenericRecordCard({ title, meta, detail, value, href }: { title: React.ReactNode; meta?: React.ReactNode; detail?: React.ReactNode; value?: React.ReactNode; href?: string }) {
+  return (
+    <DetailCard title={title} meta={meta} value={value} href={href}>
+      {detail}
+    </DetailCard>
+  );
 }
 
 function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: string; userId: string; entitlement: EffectiveEntitlement | null | undefined; onRefresh: () => Promise<unknown> }) {
@@ -86,22 +201,22 @@ function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: s
   return (
     <>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        {Object.entries(entitlement?.allowances ?? {}).map(([key, allowance]) => allowance ? <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><p className="font-semibold">{semanticLabel(key, i18n)}</p><p>{String(allowance.remaining)} {i18n("remainingOf8553660")} {String(allowance.limit)}{allowance.extensions > 0 ? i18n("personalExtensionCount", {count: allowance.extensions}) : ""}</p><p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("resetsAftere96e46e")} {date(allowance.period_end)}</p></div> : null)}
+        {Object.entries(entitlement?.allowances ?? {}).map(([key, allowance]) => allowance ? <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><p className="font-semibold">{semanticLabel(key, i18n)}</p><p>{String(allowance.remaining)} {i18n("remainingOf8553660")} {String(allowance.limit)}{allowance.extensions > 0 ? i18n("personalExtensionCount", { count: allowance.extensions }) : ""}</p><p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("resetsAftere96e46e")} {date(allowance.period_end)}</p></div> : null)}
       </div>
       <form className="mt-5 space-y-3 rounded-2xl p-4" style={{ border: "1px solid var(--border)" }} onSubmit={(event) => { event.preventDefault(); grant.mutate(); }}>
         <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("extendThisUserSAllowance6e08374")}</p>
         <div className="grid gap-3 sm:grid-cols-3">
-          <select value={form.allowance} onChange={(event) => setForm({ ...form, allowance: event.target.value as typeof form.allowance })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)" }}><option value="class_visits">{i18n("classVisits142b3b0")}</option><option value="coaching_touchpoints">{i18n("coachingTouchpoints23bfcb6")}</option></select>
-          <input aria-label={i18n("additionalUnits1d9dac0")} type="number" min={1} value={form.quantity} onChange={(event) => setForm({ ...form, quantity: Number(event.target.value) })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)" }} />
-          <select value={form.period} onChange={(event) => setForm({ ...form, period: event.target.value as typeof form.period })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)" }}><option value="calendar_week">{i18n("thisCalendarWeekb05ceca")}</option><option value="calendar_month">{i18n("thisCalendarMonthbb33495")}</option><option value="subscription_period">{i18n("subscriptionPeriod22e7508")}</option></select>
+          <select value={form.allowance} onChange={(event) => setForm({ ...form, allowance: event.target.value as typeof form.allowance })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}><option value="class_visits">{i18n("classVisits142b3b0")}</option><option value="coaching_touchpoints">{i18n("coachingTouchpoints23bfcb6")}</option></select>
+          <input aria-label={i18n("additionalUnits1d9dac0")} type="number" min={1} value={form.quantity} onChange={(event) => setForm({ ...form, quantity: Number(event.target.value) })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)" }} />
+          <select value={form.period} onChange={(event) => setForm({ ...form, period: event.target.value as typeof form.period })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}><option value="calendar_week">{i18n("thisCalendarWeekb05ceca")}</option><option value="calendar_month">{i18n("thisCalendarMonthbb33495")}</option><option value="subscription_period">{i18n("subscriptionPeriod22e7508")}</option></select>
         </div>
-        <textarea required minLength={3} placeholder={i18n("reasonForThisPersonalExtensionbe8ddf7")} value={form.reason} onChange={(event) => setForm({ ...form, reason: event.target.value })} className="min-h-20 w-full rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)" }} />
+        <textarea required minLength={3} placeholder={i18n("reasonForThisPersonalExtensionbe8ddf7")} value={form.reason} onChange={(event) => setForm({ ...form, reason: event.target.value })} className="min-h-20 w-full rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)" }} />
         <button disabled={grant.isPending || form.reason.trim().length < 3} className="rounded-full px-4 py-2 font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--bg)" }}>{grant.isPending ? i18n("extending80e2fcd") : i18n("extendAllowance2d3fd3a")}</button>
         {grant.isError ? <p style={{ color: "var(--danger)" }}>{i18n("theExtensionCouldNotBeRecorded8e3fe5d")}</p> : null}
       </form>
       <div className="mt-5 space-y-2">
         <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("personalExtensionHistory752eda5")}</p>
-        {entries.filter((entry) => entry.event_type === "adjustment" && entry.quantity_delta < 0).map((entry) => <div key={entry.id} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><div className="flex flex-wrap items-center justify-between gap-2"><div><strong>+{Math.abs(entry.quantity_delta)} {semanticLabel(entry.allowance_key, i18n)}</strong><p className="text-xs" style={{ color: "var(--muted)" }}>{entry.reason} · {date(entry.inserted_at)} {i18n("validThrough263dc88")} {date(entry.period_end)}</p></div>{revoked.has(entry.id) ? <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>{i18n("revoked85f17ac")}</span> : <button type="button" onClick={() => setRevokeTarget(entry.id)} className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{i18n("revoke0be7207")}</button>}</div>{revokeTarget === entry.id ? <form className="mt-3 flex flex-col gap-2 sm:flex-row" onSubmit={(event) => { event.preventDefault(); revoke.mutate(); }}><input required minLength={3} value={revokeReason} onChange={(event) => setRevokeReason(event.target.value)} placeholder={i18n("reasonForRevocationac5b98c")} className="min-w-0 flex-1 rounded-xl px-3 py-2" style={{ background: "var(--panel)" }} /><button disabled={revoke.isPending || revokeReason.trim().length < 3} className="rounded-full px-3 py-2 text-xs font-semibold disabled:opacity-50" style={{ background: "var(--danger)", color: "white" }}>{i18n("confirmRevocationc1a9d03")}</button></form> : null}</div>)}
+        {entries.filter((entry) => entry.event_type === "adjustment" && entry.quantity_delta < 0).map((entry) => <div key={entry.id} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><div className="flex flex-wrap items-center justify-between gap-2"><div><strong>+{Math.abs(entry.quantity_delta)} {semanticLabel(entry.allowance_key, i18n)}</strong><p className="text-xs" style={{ color: "var(--muted)" }}>{entry.reason} · {date(entry.inserted_at)} {i18n("validThrough263dc88")} {date(entry.period_end)}</p></div>{revoked.has(entry.id) ? <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>{i18n("revoked85f17ac")}</span> : <button type="button" onClick={() => setRevokeTarget(entry.id)} className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{i18n("revoke0be7207")}</button>}</div>{revokeTarget === entry.id ? <form className="mt-3 flex flex-col gap-2 sm:flex-row" onSubmit={(event) => { event.preventDefault(); revoke.mutate(); }}><input required minLength={3} value={revokeReason} onChange={(event) => setRevokeReason(event.target.value)} placeholder={i18n("reasonForRevocationac5b98c")} className="min-w-0 flex-1 rounded-xl px-3 py-2" style={{ background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border)" }} /><button disabled={revoke.isPending || revokeReason.trim().length < 3} className="rounded-full px-3 py-2 text-xs font-semibold disabled:opacity-50" style={{ background: "var(--danger)", color: "white" }}>{i18n("confirmRevocationc1a9d03")}</button></form> : null}</div>)}
         {entries.every((entry) => entry.event_type !== "adjustment" || entry.quantity_delta >= 0) ? <Empty>{i18n("noPersonalExtensionsRecorded558dcb3")}</Empty> : null}
       </div>
     </>
@@ -110,8 +225,9 @@ function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: s
 
 export function AdminUserProfile({ userId }: { userId: string }) {
   const i18n = useUiTranslations();
-  const { tokens } = useSession();
+  const { tokens, currentUser } = useSession();
   const token = tokens?.access_token;
+  const router = useRouter();
   const queryClient = useQueryClient();
   const profileQuery = useDossierQuery(token, userId, "profile", fetchAdminUserProfile);
   const profile = profileQuery.data?.user;
@@ -124,6 +240,13 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   const roleMutation = useMutation({
     mutationFn: (role: AdminUserDirectoryEntry["role"]) => updateAdminUserRole(token!, userId, role),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin", "users"] }),
+  });
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteAdminUser(token!, userId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+      router.push("/admin/users");
+    },
   });
 
   useEffect(() => {
@@ -145,41 +268,96 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   const executions = training.data?.executions ?? [];
   const scores = training.data?.scores ?? [];
   const effectiveEntitlement = finance.data?.summary?.effective_entitlement;
+  const canDelete = currentUser?.id !== userId;
 
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-6xl space-y-6">
-        <Link href="/admin/users" className="text-sm font-semibold" style={{ color: "var(--primary)" }}>{i18n("users206fc04")}</Link>
-        <section className="rounded-[2.4rem] p-8" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-          <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}><SemanticLabel value={profile.identity.role} /></p>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>{profile.identity.nickname}</h1>
-          <p className="mt-3 text-sm" style={{ color: "var(--muted)" }}><SemanticLabel value={profile.account_status} /> {i18n("joinedbbc56ef")} {date(profile.identity.joined_at)}</p>
+        <Link href="/admin/users" className="text-sm font-semibold" style={{ color: "var(--primary)" }}>← {i18n("users206fc04")}</Link>
+        <section className="flex flex-col gap-6 rounded-[2.4rem] p-8 md:flex-row md:items-center" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+          <Avatar user={profile.identity} />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}><SemanticLabel value={profile.identity.role} /></p>
+            <h1 className="mt-4 truncate text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>{profile.identity.nickname}</h1>
+            <p className="mt-3 text-sm" style={{ color: "var(--muted)" }}><SemanticLabel value={profile.account_status} /> {i18n("joinedbbc56ef")} {date(profile.identity.joined_at)}</p>
+          </div>
         </section>
 
-        <nav aria-label={i18n("profileSectionscd4815c")} className="flex gap-2 overflow-x-auto pb-1">
-          {profile.available_sections.map((section) => <a key={section} href={"#" + (section)} className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>{semanticLabel(section, i18n)}</a>)}
+        <nav aria-label={i18n("profileSectionscd4815c")} className="flex flex-wrap gap-2">
+          {profile.available_sections.map((section) => <a key={section} href={`#${section}`} className="rounded-full px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-80" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>{semanticLabel(section, i18n)}</a>)}
         </nav>
 
-        <section className="grid gap-4 md:grid-cols-2">
-          <Panel id="overview" title={i18n("overview0efc2e6")}><dl className="grid grid-cols-2 gap-3"><div><dt style={{ color: "var(--muted)" }}>{i18n("rolec3f104d")}</dt><dd className="font-semibold"><SemanticLabel value={profile.identity.role} /></dd></div><div><dt style={{ color: "var(--muted)" }}>{i18n("account85dfa32")}</dt><dd className="font-semibold"><SemanticLabel value={profile.account_status} /></dd></div></dl></Panel>
+        <section className="space-y-4">
+          <Panel id="overview" title={i18n("overview0efc2e6")}>
+            <StatGrid items={[
+              [i18n("rolec3f104d"), <SemanticLabel key="role" value={profile.identity.role} />],
+              [i18n("account85dfa32"), <SemanticLabel key="account" value={profile.account_status} />],
+              [i18n("joinedbbc56ef").replace("· ", ""), date(profile.identity.joined_at)],
+              [i18n("avatar7631b26"), profile.identity.avatar_url ? i18n("activea733b80") : "—"],
+              [i18n("finance1b48d3f"), finance.data?.summary?.current_status?.state ? <SemanticLabel key="finance" value={String(finance.data.summary.current_status.state)} /> : "—"],
+              [i18n("credits66c22fa"), finance.data?.summary?.credit_balance ?? "—"],
+              [i18n("totalCompletionsfa16f4c"), training.data?.summary.completed_count ?? "—"],
+              [i18n("activeInjuriesdaecfa6"), incidents.data?.summary.active ?? "—"],
+            ]} />
+          </Panel>
 
-          {sections.has("finance") ? <Panel id="finance" title={i18n("entitlementsAllowancescac0ef7")} href="/admin/finance"><p className="text-2xl font-semibold" style={{ color: "var(--text)" }}>{finance.data?.summary?.credit_balance ?? 0} {i18n("credits66c22fa")}</p><p className="mt-2">{finance.data?.summary?.current_status?.state ? <SemanticLabel value={finance.data.summary.current_status.state} /> : i18n("loadingMembershipStatusa609a3f")}</p>{token ? <AdminEntitlements token={token} userId={userId} entitlement={effectiveEntitlement} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
+          {sections.has("finance") ? <Panel id="finance" title={i18n("finance1b48d3f")} href="/admin/finance"><p className="text-2xl font-semibold" style={{ color: "var(--text)" }}>{finance.data?.summary?.credit_balance ?? 0} {i18n("credits66c22fa")}</p><p className="mt-2">{finance.data?.summary?.current_status?.state ? <SemanticLabel value={String(finance.data.summary.current_status.state)} /> : i18n("loadingMembershipStatusa609a3f")}</p>{token ? <AdminEntitlements token={token} userId={userId} entitlement={effectiveEntitlement} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
 
-          {sections.has("training_history") ? <Panel id="training_history" title={i18n("trainingHistorya512053")} href="/admin/workouts"><p>{training.data?.summary.completed_count ?? 0} {i18n("completedOf88964ae")} {training.data?.summary.execution_count ?? 0} {i18n("executions8319d6e")}</p><div className="mt-3 space-y-2">{executions.length ? executions.slice(0, 5).map((item) => <div key={item.id} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><span className="font-semibold">{item.workout_title}</span><span className="ms-2" style={{ color: "var(--muted)" }}><SemanticLabel value={item.status} /> · {date(item.started_at_utc)}</span></div>) : <Empty>{i18n("noWorkoutExecutionsRecorded0a0b1d0")}</Empty>}</div></Panel> : null}
+          {sections.has("training_history") ? <Panel id="training_history" title={i18n("trainingHistorya512053")} href="/admin/workouts"><p>{training.data?.summary.completed_count ?? 0} {i18n("completedOf88964ae")} {training.data?.summary.execution_count ?? 0} {i18n("executions8319d6e")}</p><div className="mt-3 grid gap-3">{executions.length ? executions.slice(0, 8).map((item) => <ExecutionCard key={item.id} item={item} href="/admin/workouts" />) : <Empty>{i18n("noWorkoutExecutionsRecorded0a0b1d0")}</Empty>}</div></Panel> : null}
 
-          {sections.has("prs") ? <Panel id="prs" title={i18n("personalRecords05223a0")}><div className="space-y-2">{prs.data?.prs.length ? prs.data.prs.map((pr) => <div key={pr.id} className="flex justify-between gap-4"><span>{pr.name}</span><strong><LocalizedScore value={pr.current_score} unit={pr.unit} /></strong></div>) : <Empty>{i18n("noPersonalRecordsRecorded22a0fce")}</Empty>}</div></Panel> : null}
+          {sections.has("prs") ? <Panel id="prs" title={i18n("personalRecords05223a0")}><div className="grid gap-3">{prs.data?.prs.length ? prs.data.prs.map((pr) => <PRCard key={pr.id} pr={pr} />) : <Empty>{i18n("noPersonalRecordsRecorded22a0fce")}</Empty>}</div></Panel> : null}
 
-          {sections.has("scores") ? <Panel id="scores" title={i18n("scores126cb93")}><div className="space-y-2">{scores.length ? scores.slice(0, 8).map((score, index) => <div key={(String(score.execution_id)) + "-" + (index)} className="flex justify-between gap-4"><span>{String(score.section_name ?? i18n("workoutSection881e276"))}</span><strong><LocalizedScore value={score.value ?? "—"} scoreType={score.score_type} unit={score.unit} /></strong></div>) : <Empty>{i18n("noScoredWorkoutSectionsRecordedcfa7742")}</Empty>}</div></Panel> : null}
+          {sections.has("scores") ? <Panel id="scores" title={i18n("scores126cb93")}><div className="grid gap-3">{scores.length ? scores.slice(0, 10).map((score, index) => <GenericRecordCard key={`${String(score.execution_id)}-${index}`} title={String(score.section_name ?? i18n("workoutSection881e276"))} meta={`${date(score.completed_at_utc)} · ${String(score.workout_title ?? "—")}`} value={<LocalizedScore value={score.value ?? "—"} unit={valueText(score.unit)} />} />) : <Empty>{i18n("noScoredWorkoutSectionsRecordedcfa7742")}</Empty>}</div></Panel> : null}
 
-          {sections.has("health_incidents") ? <Panel id="health_incidents" title={i18n("healthIncidentse3ca869")} href="/admin/metrics#health-incidents"><p>{incidents.data?.summary.active ?? 0} {i18n("active4c71073")} {incidents.data?.summary.total ?? 0} {i18n("total5a537e2")}</p><div className="mt-3 space-y-2">{incidents.data?.incidents.length ? incidents.data.incidents.map((incident) => <div key={incident.id}><strong>{incident.body_area}</strong> · <SemanticLabel value={incident.severity} /> · <SemanticLabel value={incident.status} />{incident.training_limitations ? <p style={{ color: "var(--muted)" }}>{incident.training_limitations}</p> : null}</div>) : <Empty>{i18n("noHealthIncidentsRecorded91c9d4e")}</Empty>}</div></Panel> : null}
+          {sections.has("health_incidents") ? <Panel id="health_incidents" title={i18n("healthIncidentse3ca869")} href="/admin/metrics#health-incidents"><p>{incidents.data?.summary.active ?? 0} {i18n("active4c71073")} {incidents.data?.summary.total ?? 0} {i18n("total5a537e2")}</p><div className="mt-3 grid gap-3">{incidents.data?.incidents.length ? incidents.data.incidents.map((incident) => <GenericRecordCard key={incident.id} title={incident.body_area} meta={<><SemanticLabel value={incident.severity} /> · <SemanticLabel value={incident.status} /> · {date(incident.started_on)}</>} detail={incident.training_limitations ? <p style={{ color: "var(--muted)" }}>{incident.training_limitations}</p> : null} href="/admin/metrics#health-incidents" />) : <Empty>{i18n("noHealthIncidentsRecorded91c9d4e")}</Empty>}</div></Panel> : null}
 
-          {sections.has("coaching_context") ? <Panel id="coaching_context" title={i18n("coachingContexteb3075d")} href="/admin/coaching-assignments"><p>{String((coaching.data?.drill_down?.recent_activity as Record<string, unknown> | undefined)?.state ?? i18n("loadingActivity4c959ab"))}</p><p className="mt-2">{Array.isArray(coaching.data?.drill_down?.assigned_workouts) ? coaching.data.drill_down.assigned_workouts.length : 0} {i18n("assignedWorkoutSInTheCoachingWindow2200dd4")}</p></Panel> : null}
+          {sections.has("coaching_context") ? <Panel id="coaching_context" title={i18n("coachingContexteb3075d")} href="/admin/coaching-assignments"><div className="grid gap-3"><GenericRecordCard title={String((coaching.data?.drill_down?.recent_activity as Record<string, unknown> | undefined)?.state ?? i18n("loadingActivity4c959ab"))} meta={`${Array.isArray(coaching.data?.drill_down?.assigned_workouts) ? coaching.data.drill_down.assigned_workouts.length : 0} ${i18n("assignedWorkoutSInTheCoachingWindow2200dd4")}`} detail={<pre className="overflow-auto whitespace-pre-wrap text-xs" style={{ color: "var(--muted)" }}>{JSON.stringify(coaching.data?.drill_down?.attention_cues ?? [], null, 2)}</pre>} href="/admin/coaching-assignments" /></div></Panel> : null}
 
-          {sections.has("class_participation") ? <Panel id="class_participation" title={i18n("classParticipation9ef4001")} href="/admin/class-schedule"><div className="space-y-2">{training.data?.class_participation.length ? training.data.class_participation.map((item) => <p key={item.id}>{item.workout_title} · {date(item.started_at_utc)}</p>) : <Empty>{i18n("noClassLinkedWorkoutExecutionsRecordedf8ca7a6")}</Empty>}</div></Panel> : null}
+          {sections.has("class_participation") ? <Panel id="class_participation" title={i18n("classParticipation9ef4001")} href="/admin/class-schedule"><div className="grid gap-3">{training.data?.class_participation.length ? training.data.class_participation.map((item) => <ExecutionCard key={item.id} item={item} href="/admin/class-schedule" />) : <Empty>{i18n("noClassLinkedWorkoutExecutionsRecordedf8ca7a6")}</Empty>}</div></Panel> : null}
 
-          {sections.has("messages") ? <Panel id="messages" title={i18n("chat2ced57f")} href="/account/activity/chats"><p>{messages.data?.summary.thread_count ?? 0} {i18n("threadS2bddeec")} {messages.data?.summary.unread_thread_count ?? 0} {i18n("unread1b9aebd")}</p><div className="mt-3 space-y-2">{messages.data?.threads.length ? messages.data.threads.slice(0, 4).map((thread) => <p key={thread.id}>{thread.latest_message?.body ?? i18n("emptyThreadfee51b1")}</p>) : <Empty>{i18n("noConversationsRecordedd525265")}</Empty>}</div></Panel> : null}
+          {sections.has("messages") ? <Panel id="messages" title={i18n("chat2ced57f")} href="/account/activity/chats"><p>{messages.data?.summary.thread_count ?? 0} {i18n("threadS2bddeec")} {messages.data?.summary.unread_thread_count ?? 0} {i18n("unread1b9aebd")}</p><div className="mt-3 grid gap-3">{messages.data?.threads.length ? messages.data.threads.slice(0, 6).map((thread) => <GenericRecordCard key={thread.id} title={<SemanticLabel value={thread.context_type} />} meta={`${thread.message_count} ${i18n("threadS2bddeec")} · ${date(thread.latest_message?.inserted_at)}`} detail={<p>{thread.latest_message?.body ?? i18n("emptyThreadfee51b1")}</p>} href="/account/activity/chats" />) : <Empty>{i18n("noConversationsRecordedd525265")}</Empty>}</div></Panel> : null}
 
-          {sections.has("admin_actions") ? <Panel id="admin_actions" title={i18n("adminActionsfa81c61")}><label className="block"><span className="block text-xs uppercase tracking-wider" style={{ color: "var(--muted)" }}>{i18n("accountRole39514a0")}</span><select value={profile.identity.role} disabled={roleMutation.isPending} onChange={(event) => roleMutation.mutate(event.target.value as AdminUserDirectoryEntry["role"])} className="mt-2 rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}><option value="member">{i18n("member6853c98")}</option><option value="athlete">{i18n("athleteaa86fd2")}</option><option value="admin">{i18n("admin4e7afeb")}</option></select></label>{roleMutation.isError ? <p className="mt-2" style={{ color: "var(--danger)" }}>{i18n("roleUpdateFailed493da52")}</p> : null}</Panel> : null}
+          {sections.has("admin_actions") ? (
+            <Panel id="admin_actions" title={i18n("adminActionsfa81c61")}>
+              <div className="space-y-5">
+                <div>
+                  <span className="block text-xs uppercase tracking-wider" style={{ color: "var(--muted)" }}>{i18n("accountRole39514a0")}</span>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {(["member", "athlete", "admin"] as const).map((role) => {
+                      const selected = profile.identity.role === role;
+                      return (
+                        <button
+                          key={role}
+                          type="button"
+                          disabled={roleMutation.isPending || selected}
+                          onClick={() => roleMutation.mutate(role)}
+                          className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-70"
+                          style={{ background: selected ? "var(--primary)" : "var(--bg-soft)", border: "1px solid var(--border)", color: selected ? "var(--bg)" : "var(--text-soft)" }}
+                        >
+                          <SemanticLabel value={role} />
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {roleMutation.isError ? <p className="mt-2" style={{ color: "var(--danger)" }}>{i18n("roleUpdateFailed493da52")}</p> : null}
+                </div>
+                <div className="rounded-2xl p-4" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+                  <button
+                    type="button"
+                    disabled={!canDelete || deleteMutation.isPending}
+                    onClick={() => {
+                      if (window.confirm(i18n("delete63346e8") + profile.identity.nickname + "\"?")) deleteMutation.mutate();
+                    }}
+                    className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-40"
+                    style={{ background: "var(--danger)", color: "white" }}
+                  >
+                    {deleteMutation.isPending ? i18n("loading33ce417") : i18n("deletef6fdbe4")}
+                  </button>
+                  {deleteMutation.isError ? <p className="mt-2 text-sm" style={{ color: "var(--danger)" }}>{i18n("userProfileCouldNotBeLoaded7bc2d73")}</p> : null}
+                </div>
+              </div>
+            </Panel>
+          ) : null}
         </section>
       </div>
     </main>

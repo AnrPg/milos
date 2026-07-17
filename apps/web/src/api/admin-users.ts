@@ -67,6 +67,9 @@ export type AdminUserPR = {
   unit: string;
   higher_is_better: boolean;
   beaten_on: string;
+  supporting_metrics?: Record<string, string | number>;
+  notes?: string | null;
+  updated_at?: string | null;
 };
 
 export type AdminUserIncident = {
@@ -131,6 +134,10 @@ export function updateAdminUserRole(token: string, userId: string, role: AdminUs
     method: "PATCH",
     body: { role },
   });
+}
+
+export function deleteAdminUser(token: string, userId: string) {
+  return apiRequest<void>(`/admin/users/${userId}`, { token, method: "DELETE" });
 }
 
 export function grantAdminUserAllowance(
