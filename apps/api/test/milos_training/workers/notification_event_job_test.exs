@@ -60,5 +60,8 @@ defmodule MilosTraining.Workers.NotificationEventJobTest do
     def mark_read(_user_id, _notification_id), do: false
     def delete_booking_pending_for_booking(_booking_id), do: :ok
     def propagate_nickname_change(_old_nickname, _new_nickname), do: :ok
+    def get_push_settings, do: %{}
+    def get_push_delivery_config, do: %{}
+    def update_push_settings(settings), do: {:ok, settings}
   end
 end

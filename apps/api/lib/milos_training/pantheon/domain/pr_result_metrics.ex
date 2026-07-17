@@ -3,7 +3,7 @@ defmodule MilosTraining.Pantheon.Domain.PRResultMetrics do
 
   @integer_fields ~w(reps sets rounds)
   @decimal_fields ~w(load_kg duration_seconds distance_m calories)
-  @text_fields ~w(variation)
+  @text_fields ~w(equipment variation)
   @allowed_fields @integer_fields ++ @decimal_fields ++ @text_fields
 
   def normalize(nil), do: {:ok, %{}}

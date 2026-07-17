@@ -19,8 +19,8 @@ value. Add an optional, controlled `supporting_metrics` map and optional
 private `notes` to both the current PR record and each historical PR result.
 
 The accepted supporting metrics are typed and finite: `reps`, `sets`,
-`load_kg`, `duration_seconds`, `distance_m`, `calories`, `rounds`, and
-`variation`. The UI presents meaningful options by primary unit through an
+`load_kg`, `duration_seconds`, `distance_m`, `calories`, `rounds`, `equipment`,
+and `variation`. The UI presents meaningful options by primary unit through an
 explicit Add details control; it never accepts arbitrary metric names.
 
 When an updated score replaces the current result, its prior score, date,
@@ -64,8 +64,9 @@ current result's contextual details corrects that result in place.
 - Added `supporting_metrics` JSON maps and private notes to both
   `user_pr_records` and `user_pr_history`. Existing rows receive an empty map
   by default.
-- Added a pure Pantheon domain validator that normalizes accepted metrics and
-  rejects unknown, negative, malformed, or blank values before persistence.
+- Added a pure Pantheon domain validator that normalizes accepted metrics,
+  including the controlled text fields `equipment` and `variation`, and rejects
+  unknown, negative, malformed, or blank values before persistence.
 - PR updates archive the previous score with its date, metrics, and note when
   the primary score changes. Partial API updates that do not supply metrics
   retain the stored metrics.

@@ -1,13 +1,14 @@
 defmodule MilosTrainingWeb.AdminCoachingControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
-  alias MilosTraining.{Messaging, Notifications}
+  alias MilosTraining.{Messaging, Notifications, Repo}
   alias MilosTraining.{Execution, Workouts}
+  alias MilosTraining.Notifications.Notification
   alias MilosTraining.Workers.DispatchMessageJob
 
   import MilosTraining.TestFixtures
 
-  test "admin can send a coaching note via messaging and trigger an athlete notification", %{
+  test "admin can send a coaching note and create a hidden chat delivery record", %{
     conn: conn
   } do
     admin = admin_fixture()
@@ -38,12 +39,16 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
                args: %{"message_id" => response["message"]["id"]}
              })
 
-    notifications = wait_for_notifications(athlete.id)
+    notification =
+      Repo.get_by!(Notification,
+        user_id: athlete.id,
+        type: :chat_message,
+        dedupe_key: "chat-message:#{response["message"]["id"]}"
+      )
 
-    assert Enum.any?(notifications, fn notification ->
-             notification.type in [:chat_message, "chat_message"] and
-               notification.payload["url"] == "/account/activity/chats?thread=#{thread.id}"
-           end)
+    assert notification.payload["url"] == "/account/activity/chats?thread=#{thread.id}"
+    assert Notifications.list_for_user(athlete.id) == []
+    assert Messaging.count_unread_threads(athlete.id) == 1
   end
 
   test "admin can fetch an athlete coaching drill-down", %{conn: conn} do
@@ -129,19 +134,4 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
     action_keys = Enum.map(response["drill_down"]["actions"], & &1["key"])
     assert "write_note" in action_keys
   end
-
-  defp wait_for_notifications(user_id, attempts \\ 10)
-
-  defp wait_for_notifications(user_id, attempts) when attempts > 0 do
-    notifications = Notifications.list_for_user(user_id)
-
-    if notifications == [] do
-      Process.sleep(50)
-      wait_for_notifications(user_id, attempts - 1)
-    else
-      notifications
-    end
-  end
-
-  defp wait_for_notifications(user_id, 0), do: Notifications.list_for_user(user_id)
 end
