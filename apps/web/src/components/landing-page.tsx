@@ -543,6 +543,9 @@ export function LandingPage() {
   const hasActiveChallenges = landing.gamification.active_challenges.length > 0;
   const showChallenges = isAdmin || hasActiveChallenges;
   const collapseLeaderboard = !isAdmin && !leaderboardOptedIn;
+  const activeExecution = landing.recent_executions.find((execution) => execution.status !== "completed");
+  const logWorkoutHref = activeExecution ? `/workouts/${activeExecution.id}/execute` : "/workouts";
+  const logWorkoutLabel = activeExecution ? i18n("resumeWorkoutc6154f0") : i18n("logWorkout5fe879b");
 
   return (
     <>
@@ -577,6 +580,22 @@ export function LandingPage() {
               quote={landing.quote}
             />
           )}
+
+          {!isAdmin ? (
+            <div className="sticky top-[4rem] z-30 flex justify-end">
+              <Link
+                href={logWorkoutHref}
+                className="rounded-full px-5 py-3 text-sm font-bold shadow-[0_12px_30px_rgba(0,0,0,0.25)] transition-transform hover:-translate-y-0.5"
+                style={{
+                  background: "var(--primary)",
+                  color: "var(--primary-contrast, var(--bg))",
+                  border: "1px solid color-mix(in srgb, var(--primary) 70%, var(--text))",
+                }}
+              >
+                {logWorkoutLabel}
+              </Link>
+            </div>
+          ) : null}
 
           {/* ── Stats strip (non-admin only) ────────────────────────────── */}
           {!isAdmin && stats && (
