@@ -19,7 +19,7 @@ import { useSession } from "@/components/session-provider";
 import { subscribeToTopic } from "@/lib/realtime";
 import { SemanticLabel } from "@/components/semantic-label";
 
-const CANVAS_PATHS = ["/admin/workouts/new", "/login"];
+const CANVAS_PATHS = ["/login"];
 
 type UserRole = "member" | "athlete" | "admin";
 
