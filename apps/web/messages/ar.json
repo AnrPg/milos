@@ -8,6 +8,7 @@
   },
   "Navigation": {
     "dashboard": "لوحة التحكم",
+    "home": "الرئيسية",
     "users": "المستخدمون",
     "finance": "المالية",
     "classes": "الحصص",
@@ -99,6 +100,10 @@
     "working": "عمل..."
   },
   "Ui": {
+    "exercise1091b7f": "تمرين",
+    "tapAnyPrescribedValueAndTypeWhatYouActuallyDidbb2b6a9": "اضغط على أي قيمة مقررة واكتب ما فعلته فعليًا.",
+    "resumeWorkoutc6154f0": "استئناف التمرين",
+    "logWorkout5fe879b": "تسجيل التمرين",
     "trainWithIntent94cee47": "تدريب مع النية",
     "milosTraining5b1a1c1": "تدريب ميلوس",
     "onePrivateSelfHostedHomeForGroupClasses89e3bcd": "منزل واحد خاص تتم استضافته ذاتيًا للفصول الجماعية والبرمجة الشخصية وتنفيذ التمارين الحية ومحادثات التدريب والتقدم الذي يخص الرياضي.",

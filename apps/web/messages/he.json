@@ -8,6 +8,7 @@
   },
   "Navigation": {
     "dashboard": "לוח בקרה",
+    "home": "בית",
     "users": "משתמשים",
     "finance": "כספים",
     "classes": "שיעורים",
@@ -99,6 +100,10 @@
     "working": "עובד..."
   },
   "Ui": {
+    "exercise1091b7f": "תרגיל",
+    "tapAnyPrescribedValueAndTypeWhatYouActuallyDidbb2b6a9": "הקש על ערך מתוכנן והקלד מה עשית בפועל.",
+    "resumeWorkoutc6154f0": "המשך אימון",
+    "logWorkout5fe879b": "רישום אימון",
     "trainWithIntent94cee47": "מתאמן עם כוונה",
     "milosTraining5b1a1c1": "אימון מילוס",
     "onePrivateSelfHostedHomeForGroupClasses89e3bcd": "בית פרטי אחד באירוח עצמי לשיעורים קבוצתיים, תכנות מותאם אישית, ביצוע אימון חי, שיחות אימון והתקדמות ששייכת לספורטאי.",

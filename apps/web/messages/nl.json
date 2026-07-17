@@ -8,6 +8,7 @@
   },
   "Navigation": {
     "dashboard": "Dashboard",
+    "home": "Home",
     "users": "Gebruikers",
     "finance": "Financiën",
     "classes": "Lessen",
@@ -99,6 +100,10 @@
     "working": "Werken..."
   },
   "Ui": {
+    "exercise1091b7f": "Oefening",
+    "tapAnyPrescribedValueAndTypeWhatYouActuallyDidbb2b6a9": "Tik op een voorgeschreven waarde en vul in wat je echt deed.",
+    "resumeWorkoutc6154f0": "Training hervatten",
+    "logWorkout5fe879b": "Training loggen",
     "trainWithIntent94cee47": "Train met opzet",
     "milosTraining5b1a1c1": "Milos-training",
     "onePrivateSelfHostedHomeForGroupClasses89e3bcd": "Eén privé, door uzelf gehost huis voor groepslessen, gepersonaliseerde programmering, uitvoering van live trainingen, coachinggesprekken en voortgang die toebehoort aan de atleet.",

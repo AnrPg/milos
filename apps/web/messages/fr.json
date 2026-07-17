@@ -8,6 +8,7 @@
   },
   "Navigation": {
     "dashboard": "Tableau de bord",
+    "home": "Accueil",
     "users": "Utilisateurs",
     "finance": "Finances",
     "classes": "Cours",
@@ -99,6 +100,10 @@
     "working": "Travailler..."
   },
   "Ui": {
+    "exercise1091b7f": "Exercice",
+    "tapAnyPrescribedValueAndTypeWhatYouActuallyDidbb2b6a9": "Touchez une valeur prescrite et saisissez ce que vous avez réellement fait.",
+    "resumeWorkoutc6154f0": "Reprendre l’entraînement",
+    "logWorkout5fe879b": "Journaliser l’entraînement",
     "trainWithIntent94cee47": "Entraînez-vous avec intention",
     "milosTraining5b1a1c1": "Formation Milos",
     "onePrivateSelfHostedHomeForGroupClasses89e3bcd": "Une maison privée auto-hébergée pour les cours de groupe, la programmation personnalisée, l'exécution d'entraînements en direct, les conversations de coaching et les progrès qui appartiennent à l'athlète.",

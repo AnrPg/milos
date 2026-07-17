@@ -8,6 +8,7 @@
   },
   "Navigation": {
     "dashboard": "Cruscotto",
+    "home": "Home",
     "users": "Utenti",
     "finance": "Finanze",
     "classes": "Corsi",
@@ -99,6 +100,10 @@
     "working": "Lavorando..."
   },
   "Ui": {
+    "exercise1091b7f": "Esercizio",
+    "tapAnyPrescribedValueAndTypeWhatYouActuallyDidbb2b6a9": "Tocca un valore prescritto e inserisci ciò che hai fatto davvero.",
+    "resumeWorkoutc6154f0": "Riprendi allenamento",
+    "logWorkout5fe879b": "Registra allenamento",
     "trainWithIntent94cee47": "Allenati con intento",
     "milosTraining5b1a1c1": "Allenamento di Milo",
     "onePrivateSelfHostedHomeForGroupClasses89e3bcd": "Una casa privata ospitata autonomamente per lezioni di gruppo, programmazione personalizzata, esecuzione di allenamenti dal vivo, conversazioni di coaching e progressi che appartengono all'atleta.",
