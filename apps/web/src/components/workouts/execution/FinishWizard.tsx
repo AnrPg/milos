@@ -22,30 +22,6 @@ type SectionScore = {
   kind?: string;
 };
 
-type ExerciseMeta = {
-  id: string;
-  name: string;
-  sets?: number | null;
-  prescription_value?: number | null;
-  prescription_unit?: string | null;
-  load_value?: number | null;
-  load_mode?: string | null;
-};
-
-function collectExercises(segments: TimerSegment[]): ExerciseMeta[] {
-  const seen = new Set<string>();
-  const result: ExerciseMeta[] = [];
-  for (const seg of segments) {
-    for (const ex of seg.exercises ?? []) {
-      if (!ex.excluded && !seen.has(ex.id)) {
-        seen.add(ex.id);
-        result.push(ex);
-      }
-    }
-  }
-  return result;
-}
-
 // ── Step 1: Score entry ───────────────────────────────────────────────────────
 
 function ScoreEntryStep({
@@ -224,99 +200,140 @@ function ScoreEntryStep({
   );
 }
 
-// ── Step 2: Modifications editor (pre-seeded, fully editable) ─────────────────
+// ── Step 2: Actual-workout patch editor ───────────────────────────────────────
 
-type ModState = {
-  active: boolean;
-  skipped: boolean;
-  actualSets: string;
-  actualValue: string;
-  actualLoad: string;
+type EditableField = {
+  field: string;
+  label: string;
+  canonicalValue: string | number | boolean;
+  unit?: string | null;
+  inputMode?: "numeric" | "decimal" | "text";
 };
 
-function buildInitialModState(
-  exercises: ExerciseMeta[],
-  initialMods: ExerciseModification[],
-): Record<string, ModState> {
-  const state: Record<string, ModState> = {};
-  for (const ex of exercises) {
-    const existing = initialMods.find((m) => m.exercise_id === ex.id);
-    state[ex.id] = existing
-      ? {
-          active: true,
-          skipped: existing.type === "skipped",
-          actualSets: existing.sets != null ? String(existing.sets) : (ex.sets != null ? String(ex.sets) : ""),
-          actualValue:
-            existing.actual_value != null
-              ? String(existing.actual_value)
-              : ex.prescription_value != null
-                ? String(ex.prescription_value)
-                : "",
-          actualLoad:
-            ex.load_value != null ? String(ex.load_value) : "",
-        }
-      : {
-          active: false,
-          skipped: false,
-          actualSets: ex.sets != null ? String(ex.sets) : "",
-          actualValue: ex.prescription_value != null ? String(ex.prescription_value) : "",
-          actualLoad: ex.load_value != null ? String(ex.load_value) : "",
-        };
-  }
-  return state;
+type ExpandedWorkoutRow = {
+  rowKey: string;
+  rowIndex: number;
+  sectionId: string;
+  sectionName: string;
+  segmentKey: string;
+  roundIndex: number | null;
+  setIndex: number | null;
+  exerciseId: string;
+  exerciseName: string;
+  fields: EditableField[];
+};
+
+function modificationKey(row: ExpandedWorkoutRow, field: string) {
+  return [row.segmentKey, row.exerciseId, row.setIndex ?? 0, row.roundIndex ?? 0, field].join(":");
 }
 
-function buildModifications(
-  exercises: ExerciseMeta[],
-  modState: Record<string, ModState>,
-): ExerciseModification[] {
-  const result: ExerciseModification[] = [];
-  for (const ex of exercises) {
-    const s = modState[ex.id];
-    if (!s?.active) continue;
+function fieldType(field: string): ExerciseModification["type"] {
+  if (field === "load") return "weight_changed";
+  if (field === "reps" || field === "prescription_value") return "reps_changed";
+  if (field === "sets") return "sets_changed";
+  if (field === "duration_seconds") return "time_changed";
+  if (field === "exercise_name") return "exercise_substituted";
+  if (field === "skipped") return "skipped";
+  return "field_changed";
+}
 
-    if (s.skipped) {
-      result.push({
-        exercise_id: ex.id,
-        type: "skipped",
-        prescribed_value: ex.prescription_value ?? null,
-        actual_value: 0,
-        prescribed_mins: null,
-        actual_mins: null,
-        sets: ex.sets ?? null,
-      });
-      continue;
-    }
-
-    const parsedActualValue = s.actualValue !== "" ? Number(s.actualValue) : null;
-    const parsedActualLoad = s.actualLoad !== "" ? Number(s.actualLoad) : null;
-    const parsedActualSets = s.actualSets !== "" ? Number(s.actualSets) : null;
-
-    const loadChanged =
-      ex.load_value != null &&
-      parsedActualLoad !== null &&
-      parsedActualLoad !== ex.load_value;
-    const repsChanged =
-      ex.prescription_value != null &&
-      parsedActualValue !== null &&
-      parsedActualValue !== ex.prescription_value;
-    const type: ExerciseModification["type"] = loadChanged
-      ? "weight_changed"
-      : repsChanged
-        ? "reps_changed"
-        : "other";
-
-    result.push({
-      exercise_id: ex.id,
-      type,
-      prescribed_value: ex.prescription_value ?? null,
-      actual_value: parsedActualValue,
-      prescribed_mins: null,
-      actual_mins: null,
-      sets: parsedActualSets ?? ex.sets ?? null,
-    });
+function parseActualValue(value: string, canonical: string | number | boolean) {
+  if (typeof canonical === "number") {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : value;
   }
-  return result;
+
+  if (typeof canonical === "boolean") {
+    return value === "true";
+  }
+
+  return value;
+}
+
+function buildExpandedRows(segments: TimerSegment[], i18n: ReturnType<typeof useUiTranslations>) {
+  const rows: ExpandedWorkoutRow[] = [];
+  let rowIndex = 1;
+
+  for (const segment of segments) {
+    for (const exercise of segment.exercises ?? []) {
+      if (exercise.excluded) continue;
+
+      const setCount = Math.max(1, exercise.sets ?? 1);
+
+      for (let setIndex = 1; setIndex <= setCount; setIndex += 1) {
+        const fields: EditableField[] = [
+          {
+            field: "exercise_name",
+            label: i18n("exercise1091b7f"),
+            canonicalValue: exercise.name,
+            inputMode: "text",
+          },
+        ];
+
+        if (exercise.prescription_value != null) {
+          fields.push({
+            field: "reps",
+            label: semanticLabel(exercise.prescription_unit ?? "reps", i18n),
+            canonicalValue: exercise.prescription_value,
+            unit: exercise.prescription_unit ?? "reps",
+            inputMode: "decimal",
+          });
+        }
+
+        if (exercise.load_value != null) {
+          fields.push({
+            field: "load",
+            label: exercise.load_mode === "pct_1rm" ? i18n("percentOneRepMaxUnit") : i18n("kilogramsUnit"),
+            canonicalValue: exercise.load_value,
+            unit: exercise.load_mode === "pct_1rm" ? "%" : "kg",
+            inputMode: "decimal",
+          });
+        }
+
+        rows.push({
+          rowKey: `${segment.segment_key}:${exercise.id}:${setIndex}`,
+          rowIndex,
+          sectionId: segment.section_id,
+          sectionName: segment.section_name,
+          segmentKey: segment.segment_key,
+          roundIndex: segment.round ?? null,
+          setIndex,
+          exerciseId: exercise.id,
+          exerciseName: exercise.name,
+          fields,
+        });
+        rowIndex += 1;
+      }
+    }
+  }
+
+  return rows;
+}
+
+function patchFromEdit(
+  row: ExpandedWorkoutRow,
+  field: EditableField,
+  rawActualValue: string,
+): ExerciseModification | null {
+  const actualValue = parseActualValue(rawActualValue, field.canonicalValue);
+  if (String(actualValue) === String(field.canonicalValue)) return null;
+
+  return {
+    patch_id: modificationKey(row, field.field),
+    type: fieldType(field.field),
+    field: field.field,
+    section_id: row.sectionId,
+    section_name: row.sectionName,
+    segment_key: row.segmentKey,
+    exercise_id: row.exerciseId,
+    exercise_name: row.exerciseName,
+    set_index: row.setIndex,
+    round_index: row.roundIndex,
+    row_index: row.rowIndex,
+    canonical_value: field.canonicalValue,
+    actual_value: actualValue,
+    unit: field.unit ?? null,
+  };
 }
 
 function ModificationsEditorStep({
@@ -333,23 +350,83 @@ function ModificationsEditorStep({
   onSkip: () => void;
 }) {
   const i18n = useUiTranslations();
-  const exercises = React.useMemo(() => collectExercises(segments), [segments]);
-  const [modState, setModState] = useState<Record<string, ModState>>(() =>
-    buildInitialModState(exercises, initialMods),
+  const rows = React.useMemo(() => buildExpandedRows(segments, i18n), [segments, i18n]);
+  const sections = React.useMemo(() => {
+    const grouped = new Map<string, ExpandedWorkoutRow[]>();
+    for (const row of rows) {
+      grouped.set(row.sectionId, [...(grouped.get(row.sectionId) ?? []), row]);
+    }
+    return Array.from(grouped.entries()).map(([sectionId, sectionRows]) => ({
+      sectionId,
+      sectionName: sectionRows[0]?.sectionName ?? sectionId,
+      rows: sectionRows,
+    }));
+  }, [rows]);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(sections.map((section) => [section.sectionId, true])),
   );
+  const [modsByKey, setModsByKey] = useState<Record<string, ExerciseModification>>(() =>
+    Object.fromEntries(initialMods.map((mod) => [mod.patch_id ?? `${mod.segment_key}:${mod.exercise_id}:${mod.field}`, mod])),
+  );
+  const [editing, setEditing] = useState<{
+    key: string;
+    row: ExpandedWorkoutRow;
+    field: EditableField;
+    value: string;
+  } | null>(null);
 
-  function updateState(id: string, patch: Partial<ModState>) {
-    setModState((prev) => ({ ...prev, [id]: { ...prev[id]!, ...patch } }));
+  function commitEdit() {
+    if (!editing) return;
+    const nextPatch = patchFromEdit(editing.row, editing.field, editing.value);
+    setModsByKey((prev) => {
+      const next = { ...prev };
+      if (nextPatch) {
+        next[editing.key] = nextPatch;
+      } else {
+        delete next[editing.key];
+      }
+      return next;
+    });
+    setEditing(null);
   }
 
-  function toggleActive(ex: ExerciseMeta) {
-    const current = modState[ex.id];
-    if (!current) return;
-    if (current.active) {
-      updateState(ex.id, { active: false, skipped: false });
+  function skipRow(row: ExpandedWorkoutRow) {
+    const patch: ExerciseModification = {
+      patch_id: modificationKey(row, "skipped"),
+      type: "skipped",
+      field: "skipped",
+      section_id: row.sectionId,
+      section_name: row.sectionName,
+      segment_key: row.segmentKey,
+      exercise_id: row.exerciseId,
+      exercise_name: row.exerciseName,
+      set_index: row.setIndex,
+      round_index: row.roundIndex,
+      row_index: row.rowIndex,
+      canonical_value: false,
+      actual_value: true,
+    };
+    setModsByKey((prev) => ({ ...prev, [patch.patch_id!]: patch }));
+  }
+
+  function displayValue(row: ExpandedWorkoutRow, field: EditableField) {
+    const key = modificationKey(row, field.field);
+    return modsByKey[key]?.actual_value ?? field.canonicalValue;
+  }
+
+  function currentModifications() {
+    if (!editing) return Object.values(modsByKey);
+
+    const next = { ...modsByKey };
+    const finalPatch = patchFromEdit(editing.row, editing.field, editing.value);
+
+    if (finalPatch) {
+      next[editing.key] = finalPatch;
     } else {
-      updateState(ex.id, { active: true, skipped: false });
+      delete next[editing.key];
     }
+
+    return Object.values(next);
   }
 
   return (
@@ -364,171 +441,127 @@ function ModificationsEditorStep({
       </div>
 
       <div className="flex flex-col items-center gap-2 pt-4 pb-6 px-6">
-        <div className="text-4xl">📝</div>
         <h2 className="text-xl font-bold text-center">{i18n("anyModifications97c3e24")}</h2>
         <p className="text-sm text-center max-w-xs" style={{ color: "var(--muted)" }}>
-          {i18n("flagExercisesYouSkippedOrChangedPreFilledc1fea5a")}
+          {i18n("tapAnyPrescribedValueAndTypeWhatYouActuallyDidbb2b6a9")}
         </p>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-2">
-        {exercises.map((ex) => {
-          const s = modState[ex.id];
-          if (!s) return null;
-          const hasPrescription = ex.prescription_value != null;
-          const hasLoad = ex.load_value != null;
-          const hasSets = (ex.sets ?? 0) > 1;
+      <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-3">
+        {sections.map((section) => {
+          const expanded = expandedSections[section.sectionId] ?? true;
+          const sectionModCount = Object.values(modsByKey).filter((mod) => mod.section_id === section.sectionId).length;
 
           return (
-            <div
-              key={ex.id}
-              className="rounded-2xl p-4"
-              style={{
-                background: "var(--panel)",
-                border: `1px solid ${s.active ? (s.skipped ? "color-mix(in srgb, var(--danger, var(--primary)) 40%, transparent)" : "var(--warning)") : "var(--border)"}`,
-              }}
+            <section
+              key={section.sectionId}
+              className="overflow-hidden rounded-2xl"
+              style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
             >
-              <div className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold truncate" style={{ color: "var(--text)" }}>
-                    {ex.name}
-                  </p>
-                  {(hasSets || hasPrescription || hasLoad) && (
-                    <p className="text-xs mt-0.5" style={{ color: "var(--dim)" }}>
-                      {[
-                        hasSets ? (ex.sets) + " " + semanticLabel("sets", i18n) : null,
-                        hasPrescription ? (ex.prescription_value) + " " + semanticLabel(ex.prescription_unit ?? "reps", i18n) : null,
-                        hasLoad
-                          ? ex.load_mode === "pct_1rm"
-                            ? (ex.load_value) + i18n("percentOneRepMaxUnit")
-                            : (ex.load_value) + " " + i18n("kilogramsUnit")
-                          : null,
-                      ]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </p>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => toggleActive(ex)}
-                  className="shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold"
-                  style={{
-                    background: s.active
-                      ? s.skipped
-                        ? "color-mix(in srgb, var(--danger, var(--primary)) 18%, transparent)"
-                        : "color-mix(in srgb, var(--warning) 18%, transparent)"
-                      : "var(--panel-muted)",
-                    color: s.active
-                      ? s.skipped
-                        ? "var(--danger, var(--primary))"
-                        : "var(--warning)"
-                      : "var(--dim)",
-                    border: "1px solid var(--border)",
-                  }}
-                >
-                  {s.active ? (s.skipped ? i18n("skipped5a000ad") : i18n("modifiede744110")) : i18n("mark31e9697")}
-                </button>
-              </div>
+              <button
+                type="button"
+                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-start"
+                onClick={() => setExpandedSections((prev) => ({ ...prev, [section.sectionId]: !expanded }))}
+              >
+                <span className="min-w-0 truncate text-sm font-bold" style={{ color: "var(--text)" }}>
+                  {section.sectionName}
+                </span>
+                <span className="shrink-0 text-xs font-semibold" style={{ color: sectionModCount ? "var(--warning)" : "var(--dim)" }}>
+                  {sectionModCount ? `${sectionModCount} ${i18n("modified19a532c")}` : expanded ? "−" : "+"}
+                </span>
+              </button>
 
-              {s.active && !s.skipped && (
-                <div className="mt-3 space-y-2">
-                  {hasSets && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs w-20 shrink-0" style={{ color: "var(--dim)" }}>
-                        {i18n("sets2ab262f")}
-                      </span>
-                      <input
-                        type="number"
-                        inputMode="numeric"
-                        className="flex-1 rounded-xl px-3 py-2 text-sm font-semibold outline-none"
-                        style={{
-                          background: "var(--panel-muted)",
-                          border: "1px solid var(--border)",
-                          color: "var(--text)",
-                        }}
-                        value={s.actualSets}
-                        placeholder={String(ex.sets)}
-                        onChange={(e) => updateState(ex.id, { actualSets: e.target.value })}
-                      />
-                    </div>
-                  )}
-                  {hasPrescription && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs w-20 shrink-0" style={{ color: "var(--dim)" }}>
-                        <SemanticLabel value={ex.prescription_unit ?? "reps"} />
-                      </span>
-                      <input
-                        type="number"
-                        inputMode="numeric"
-                        className="flex-1 rounded-xl px-3 py-2 text-sm font-semibold outline-none"
-                        style={{
-                          background: "var(--panel-muted)",
-                          border: "1px solid var(--border)",
-                          color: "var(--text)",
-                        }}
-                        value={s.actualValue}
-                        placeholder={String(ex.prescription_value)}
-                        onChange={(e) => updateState(ex.id, { actualValue: e.target.value })}
-                      />
-                    </div>
-                  )}
-                  {hasLoad && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs w-20 shrink-0" style={{ color: "var(--dim)" }}>
-                        {ex.load_mode === "pct_1rm" ? i18n("percentOneRepMaxUnit") : i18n("kilogramsUnit")}
-                      </span>
-                      <input
-                        type="number"
-                        inputMode="decimal"
-                        className="flex-1 rounded-xl px-3 py-2 text-sm font-semibold outline-none"
-                        style={{
-                          background: "var(--panel-muted)",
-                          border: "1px solid var(--border)",
-                          color: "var(--text)",
-                        }}
-                        value={s.actualLoad}
-                        placeholder={String(ex.load_value)}
-                        onChange={(e) => updateState(ex.id, { actualLoad: e.target.value })}
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
+              {expanded ? (
+                <div className="divide-y" style={{ borderColor: "var(--border)" }}>
+                  {section.rows.map((row) => {
+                    const skipped = Boolean(modsByKey[modificationKey(row, "skipped")]);
 
-              {s.active && (
-                <div className="mt-3 flex gap-2">
-                  {!s.skipped && (
-                    <button
-                      type="button"
-                      onClick={() => updateState(ex.id, { skipped: true })}
-                      className="rounded-xl px-3 py-1.5 text-xs font-semibold"
-                      style={{
-                        background: "color-mix(in srgb, var(--danger, var(--primary)) 10%, transparent)",
-                        color: "var(--danger, var(--primary))",
-                        border: "1px solid color-mix(in srgb, var(--danger, var(--primary)) 22%, transparent)",
-                      }}
-                    >
-                      {i18n("iSkippedThisCompletely17f47b6")}
-                    </button>
-                  )}
-                  {s.skipped && (
-                    <button
-                      type="button"
-                      onClick={() => updateState(ex.id, { skipped: false })}
-                      className="rounded-xl px-3 py-1.5 text-xs font-semibold"
-                      style={{
-                        background: "var(--panel-muted)",
-                        color: "var(--dim)",
-                        border: "1px solid var(--border)",
-                      }}
-                    >
-                      {i18n("undoSkip7bc61ef")}
-                    </button>
-                  )}
+                    return (
+                      <div key={row.rowKey} className="px-4 py-3">
+                        <div className="mb-2 flex items-center justify-between gap-3">
+                          <p className="min-w-0 truncate text-sm font-semibold" style={{ color: skipped ? "var(--danger, var(--primary))" : "var(--text)" }}>
+                            {row.setIndex ? `${i18n("setLabel")} ${row.setIndex} · ` : ""}
+                            {row.exerciseName}
+                          </p>
+                          <button
+                            type="button"
+                            className="shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold"
+                            style={{
+                              background: skipped ? "color-mix(in srgb, var(--danger, var(--primary)) 14%, transparent)" : "var(--panel-muted)",
+                              color: skipped ? "var(--danger, var(--primary))" : "var(--dim)",
+                              border: "1px solid var(--border)",
+                            }}
+                            onClick={() => {
+                              if (skipped) {
+                                setModsByKey((prev) => {
+                                  const next = { ...prev };
+                                  delete next[modificationKey(row, "skipped")];
+                                  return next;
+                                });
+                              } else {
+                                skipRow(row);
+                              }
+                            }}
+                          >
+                            {skipped ? i18n("undoSkip7bc61ef") : i18n("skipped5a000ad")}
+                          </button>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2">
+                          {row.fields.map((field) => {
+                            const key = modificationKey(row, field.field);
+                            const changed = Boolean(modsByKey[key]);
+                            const value = displayValue(row, field);
+                            const isEditing = editing?.key === key;
+
+                            return (
+                              <div key={field.field} className="min-w-[5.5rem]">
+                                <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>
+                                  {field.label}
+                                </p>
+                                {isEditing ? (
+                                  <input
+                                    autoFocus
+                                    className="w-full rounded-xl px-3 py-2 text-sm font-bold outline-none"
+                                    inputMode={field.inputMode === "text" ? "text" : field.inputMode}
+                                    style={{
+                                      background: "var(--bg)",
+                                      border: "1px solid var(--primary)",
+                                      color: "var(--text)",
+                                    }}
+                                    value={editing.value}
+                                    onChange={(event) => setEditing((prev) => prev ? { ...prev, value: event.target.value } : prev)}
+                                    onBlur={commitEdit}
+                                    onKeyDown={(event) => {
+                                      if (event.key === "Enter") commitEdit();
+                                      if (event.key === "Escape") setEditing(null);
+                                    }}
+                                  />
+                                ) : (
+                                  <button
+                                    type="button"
+                                    className="w-full rounded-xl px-3 py-2 text-start text-sm font-bold"
+                                    style={{
+                                      background: changed ? "color-mix(in srgb, var(--warning) 14%, transparent)" : "var(--panel-muted)",
+                                      border: `1px solid ${changed ? "var(--warning)" : "var(--border)"}`,
+                                      color: changed ? "var(--warning)" : "var(--text)",
+                                    }}
+                                    onClick={() => setEditing({ key, row, field, value: String(value) })}
+                                  >
+                                    {String(value)}
+                                    {field.unit ? <span className="ms-1 text-xs font-medium">{semanticLabel(field.unit, i18n)}</span> : null}
+                                  </button>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              )}
-            </div>
+              ) : null}
+            </section>
           );
         })}
       </div>
@@ -536,7 +569,9 @@ function ModificationsEditorStep({
       <div className="p-4 pt-0">
         <button
           type="button"
-          onClick={() => onNext(buildModifications(exercises, modState))}
+          onClick={() => {
+            onNext(currentModifications());
+          }}
           className="w-full rounded-2xl py-3.5 text-base font-semibold"
           style={{ background: "var(--primary)", color: "var(--primary-contrast, #fff)" }}
         >
@@ -636,12 +671,15 @@ function ConfirmStep({
             <div className="space-y-2">
               {modifications.map((mod, i) => (
                 <div
-                  key={(mod.exercise_id) + "-" + (i)}
+                  key={(mod.patch_id ?? mod.exercise_id ?? mod.section_id) + "-" + (i)}
                   className="flex justify-between items-center rounded-xl px-4 py-2.5"
                   style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
                 >
                   <span className="text-sm truncate" style={{ color: "var(--muted)" }}>
-                    {exerciseMap[mod.exercise_id] ?? mod.exercise_id}
+                    {mod.exercise_name ??
+                      (mod.exercise_id ? exerciseMap[mod.exercise_id] : null) ??
+                      mod.section_name ??
+                      mod.section_id}
                   </span>
                   <span
                     className="text-xs font-semibold shrink-0 ms-2"
@@ -652,7 +690,9 @@ function ConfirmStep({
                           : "var(--warning)",
                     }}
                   >
-                    {mod.type === "skipped" ? i18n("skipped5a000ad") : i18n("modified19a532c")}
+                    {mod.type === "skipped"
+                      ? i18n("skipped5a000ad")
+                      : `${mod.field}: ${String(mod.actual_value)}`}
                   </span>
                 </div>
               ))}
