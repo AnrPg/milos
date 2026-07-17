@@ -108,36 +108,36 @@ export function FinanceOperations() {
         </section>
         </TransientHero>
 
-        <section
-          aria-label={i18n("urgentFinanceAttention8b067dd")}
-          className="flex items-center gap-2 overflow-x-auto rounded-full px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-        >
-          <span className="shrink-0 px-2 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-            {i18n("attention74e0b9c")}
-          </span>
-          {summaryQuery.isLoading || queuesQuery.isLoading ? (
-            <span className="whitespace-nowrap px-2 text-sm" style={{ color: "var(--muted)" }}>{i18n("loading33ce417")}</span>
-          ) : attentionItems.length === 0 ? (
-            <span className="whitespace-nowrap px-2 text-sm" style={{ color: "var(--muted)" }}>{i18n("noUrgentFinanceItemsb14485e")}</span>
-          ) : (
-            attentionItems.map((item) => (
-              <Link
-                key={item.label}
-                className="shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-semibold"
-                href={item.href}
-                style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", color: "var(--danger)" }}
-              >
-                {item.label}: {item.count}
-              </Link>
-            ))
-          )}
-          {Number(totals.overdue_invoice_balance_cents ?? 0) > 0 ? (
-            <span className="ms-auto shrink-0 whitespace-nowrap px-2 text-xs font-semibold" style={{ color: "var(--muted)" }}>
-              {i18n("overdueBalanced6ec7a8")} {money(uiLocale, totals.overdue_invoice_balance_cents)}
+        {summaryQuery.isLoading || queuesQuery.isLoading || attentionItems.length > 0 ? (
+          <section
+            aria-label={i18n("urgentFinanceAttention8b067dd")}
+            className="flex items-center gap-2 overflow-x-auto rounded-full px-3 py-2"
+            style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+          >
+            <span className="shrink-0 px-2 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+              {i18n("attention74e0b9c")}
             </span>
-          ) : null}
-        </section>
+            {summaryQuery.isLoading || queuesQuery.isLoading ? (
+            <span className="whitespace-nowrap px-2 text-sm" style={{ color: "var(--muted)" }}>{i18n("loading33ce417")}</span>
+            ) : (
+              attentionItems.map((item) => (
+                <Link
+                  key={item.label}
+                  className="shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-semibold"
+                  href={item.href}
+                  style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", color: "var(--danger)" }}
+                >
+                  {item.label}: {item.count}
+                </Link>
+              ))
+            )}
+            {Number(totals.overdue_invoice_balance_cents ?? 0) > 0 ? (
+              <span className="ms-auto shrink-0 whitespace-nowrap px-2 text-xs font-semibold" style={{ color: "var(--muted)" }}>
+                {i18n("overdueBalanced6ec7a8")} {money(uiLocale, totals.overdue_invoice_balance_cents)}
+              </span>
+            ) : null}
+          </section>
+        ) : null}
 
         {/* Tab switcher */}
         <div className="flex rounded-full p-0.5 self-start" style={{ background: "var(--border)" }}>

@@ -76,7 +76,7 @@ export function PromotionsTab() {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <p className="text-sm font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
-          {activeCampaigns.length} {i18n("activeCampaign6f5bb84")}{activeCampaigns.length !== 1 ? i18n("sa0f1490") : ""}
+          {i18n("activeCampaignCount", {count: activeCampaigns.length})}
         </p>
         <button
           className="rounded-full px-4 py-2 text-sm font-semibold"

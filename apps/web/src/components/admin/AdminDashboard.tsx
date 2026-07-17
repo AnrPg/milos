@@ -286,6 +286,9 @@ export function AdminDashboard() {
   };
 
   const hasAnyAlert = activeCategories.some((cat) => allAlerts[cat].items.length > 0);
+  const hasAnyAvailableAlert = Object.values(allAlerts).some((group) => group.items.length > 0);
+  const alertsLoading =
+    financeQuery.isLoading || queuesQuery.isLoading || analyticsQuery.isLoading || scheduleQuery.isLoading;
 
   function toggleCategory(cat: AlertCategory) {
     const next = activeCategories.includes(cat)
@@ -413,11 +416,12 @@ export function AdminDashboard() {
         </section>
 
         {/* Needs Attention */}
+        {alertsLoading || hasAnyAvailableAlert ? (
         <section className="rounded-[2.2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>{i18n("needsAttentiona126722")}</p>
-              {!hasAnyAlert && !financeQuery.isLoading && (
+              {!hasAnyAlert && !alertsLoading && (
                 <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>{i18n("noUrgentItemsAllClearbc87c03")}</p>
               )}
             </div>
@@ -479,6 +483,7 @@ export function AdminDashboard() {
             })}
           </div>
         </section>
+        ) : null}
 
         {/* Nav Hub */}
         <section className="grid gap-6 lg:grid-cols-3">
