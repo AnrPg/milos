@@ -70,7 +70,9 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
                 |> PRHistory.changeset(%{
                   pr_record_id: id,
                   score: old_score,
-                  beaten_on: existing.beaten_on
+                  beaten_on: existing.beaten_on,
+                  supporting_metrics: existing.supporting_metrics,
+                  notes: existing.notes
                 })
                 |> Repo.insert!()
               end
@@ -121,6 +123,8 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
       unit: pr.unit,
       higher_is_better: pr.higher_is_better,
       beaten_on: Date.to_iso8601(pr.beaten_on),
+      supporting_metrics: pr.supporting_metrics || %{},
+      notes: pr.notes,
       inserted_at: DateTime.to_iso8601(pr.inserted_at),
       updated_at: DateTime.to_iso8601(pr.updated_at)
     }
@@ -132,6 +136,8 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
       pr_record_id: h.pr_record_id,
       score: Decimal.to_float(h.score),
       beaten_on: Date.to_iso8601(h.beaten_on),
+      supporting_metrics: h.supporting_metrics || %{},
+      notes: h.notes,
       inserted_at: DateTime.to_iso8601(h.inserted_at)
     }
   end

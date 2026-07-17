@@ -34,7 +34,13 @@ defmodule MilosTrainingWeb.PRController do
       enum: ["mins_secs", "reps", "sets", "kcals", "m", "kg"]
     },
     higher_is_better: %Schema{type: :boolean},
-    beaten_on: %Schema{type: :string, format: :date}
+    beaten_on: %Schema{type: :string, format: :date},
+    supporting_metrics: %Schema{
+      type: :object,
+      description:
+        "Optional typed result context. Accepted keys: reps, sets, load_kg, duration_seconds, distance_m, calories, rounds, variation."
+    },
+    notes: %Schema{type: :string, maxLength: 2000}
   }
 
   operation(:index,

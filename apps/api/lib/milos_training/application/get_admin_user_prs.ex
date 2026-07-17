@@ -19,6 +19,8 @@ defmodule MilosTraining.Application.GetAdminUserPRs do
       unit: pr.unit,
       higher_is_better: pr.higher_is_better,
       beaten_on: pr.beaten_on,
+      supporting_metrics: pr.supporting_metrics || %{},
+      notes: pr.notes,
       updated_at: pr.updated_at
     }
   end
