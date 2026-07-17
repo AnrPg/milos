@@ -213,15 +213,15 @@ export function TopNav() {
     enabled: authenticated,
     queryFn: () => fetchUnreadCount(tokens!.access_token),
     staleTime: 15 * 1000,
-    refetchInterval: authenticated ? 30 * 1000 : false,
   });
   const unreadCount = unreadQuery.data?.unread_count ?? 0;
 
-  // Subscribe to notification channel for live unread count updates
+  // Chat delivery records notify recipients only. The event refreshes the
+  // Messages badge without exposing the delivery record in Notifications.
   useEffect(() => {
     if (!tokens?.access_token || !currentUser?.id) return;
     return subscribeToTopic(tokens.access_token, `notifications:${currentUser.id}`, {
-      notifications_changed: () => {
+      "notifications:changed": () => {
         void queryClient.invalidateQueries({ queryKey: ["messages", "unread"] });
       },
     });

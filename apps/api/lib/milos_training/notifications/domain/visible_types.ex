@@ -1,5 +1,5 @@
 defmodule MilosTraining.Notifications.Domain.VisibleTypes do
-  @hidden_inbox_types ["workout_completed"]
+  @hidden_inbox_types ["chat_message", "workout_completed"]
 
   def hidden_inbox_types, do: @hidden_inbox_types
 

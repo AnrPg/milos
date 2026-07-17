@@ -290,13 +290,12 @@ function NotificationCard({
   );
 }
 
-type FilterTab = "all" | "workouts" | "bookings" | "messages";
+type FilterTab = "all" | "workouts" | "bookings";
 
 const FILTER_TYPES: Record<FilterTab, string[] | null> = {
   all: null,
   workouts: ["workout_note", "workout_changed", "workout_deleted", "workout_rejected", "workout_moved", "admin_note"],
   bookings: ["booking_pending", "booking_approved", "booking_rejected", "booking_timeout"],
-  messages: ["athlete_message", "chat_message"],
 };
 
 export function NotificationBell() {
@@ -305,7 +304,6 @@ export function NotificationBell() {
     { key: "all", label: i18n("all6a72085") },
     { key: "workouts", label: i18n("workoutsccb58b2") },
     { key: "bookings", label: i18n("bookings135229c") },
-    { key: "messages", label: i18n("chat2ced57f") },
   ];
   const pageSize = 20;
   const router = useRouter();

@@ -55,4 +55,5 @@ must have an ADR. See `template.md` for the format.
 | ADR-047 | Frontend catalog and RTL migration | Accepted |
 | ADR-048 | Semantic localization at system boundaries | Accepted |
 | ADR-049 | Admin-managed browser push configuration | Accepted |
+| ADR-051 | Separate notifications and messages presentation | Accepted |
 | ADR-052 | Structured PR results and supporting metrics | Accepted |

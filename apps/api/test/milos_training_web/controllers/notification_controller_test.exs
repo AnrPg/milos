@@ -42,6 +42,38 @@ defmodule MilosTrainingWeb.NotificationControllerTest do
     assert length(response["notifications"]) == 2
   end
 
+  test "excludes chat delivery records from Updates and its unread count", %{
+    conn: conn,
+    user: user
+  } do
+    {:ok, chat_delivery} =
+      Notifications.create_notification(%{
+        user_id: user.id,
+        type: :chat_message,
+        payload: %{
+          thread_id: Ecto.UUID.generate(),
+          message_id: Ecto.UUID.generate(),
+          body: "Shown in Messages only"
+        }
+      })
+
+    {:ok, update} =
+      Notifications.create_notification(%{
+        user_id: user.id,
+        type: :booking_approved,
+        payload: %{url: "/schedule"}
+      })
+
+    response =
+      conn
+      |> get("/api/notifications")
+      |> json_response(200)
+
+    assert chat_delivery.type == "chat_message"
+    assert response["unread_count"] == 1
+    assert Enum.map(response["notifications"], & &1["id"]) == [update.id]
+  end
+
   test "marks a single notification as read", %{conn: conn, user: user} do
     {:ok, notification} =
       Notifications.create_notification(%{
