@@ -2,6 +2,8 @@ defmodule MilosTrainingWeb.MyWorkoutControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
   alias MilosTraining.Execution
+  alias MilosTraining.Messaging
+  alias MilosTraining.Notifications
   alias MilosTraining.TestFixtures
   alias MilosTraining.Workouts
 
@@ -153,21 +155,16 @@ defmodule MilosTrainingWeb.MyWorkoutControllerTest do
     assert payload["requested_for"] == Date.to_iso8601(requested_for)
     assert payload["notified_admins"] >= 1
 
-    {:ok, thread} =
-      MilosTraining.Messaging.get_or_create_thread(%{
-        context_type: :direct,
-        actor_id: admin.id,
-        participant_id: athlete.id
-      })
+    assert Messaging.list_threads_for_user(admin.id) == []
 
-    {:ok, messages} = MilosTraining.Messaging.list_messages(thread.id, %{})
+    assert [notification] = Notifications.list_for_user(admin.id)
+    assert notification.type == "workout_assignment_requested"
+    assert notification.payload["athlete_id"] == athlete.id
+    assert notification.payload["requested_for"] == Date.to_iso8601(requested_for)
+    assert notification.payload["note"] == "Prefer strength."
 
-    assert Enum.any?(messages, fn message ->
-             message.sender_id == athlete.id and
-               message.body =~
-                 "requested a workout assignment for #{Date.to_iso8601(requested_for)}" and
-               message.body =~ "Prefer strength."
-           end)
+    assert notification.payload["url"] ==
+             "/admin/coaching-assignments?date=#{Date.to_iso8601(requested_for)}"
   end
 
   test "workout assignment request rejects past dates", %{conn: conn} do
