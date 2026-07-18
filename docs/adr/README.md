@@ -62,3 +62,5 @@ must have an ADR. See `template.md` for the format.
 | ADR-054 | Code-gated admin registration | Accepted |
 | ADR-061 | Semantic notifications and canonical deep links | Accepted |
 | ADR-062 | Entitlement guidance and notification consolidation | Accepted |
+| ADR-063 | Browser-safe avatar editing and dossier navigation | Accepted |
+| ADR-064 | Shared collapsible home history | Accepted |
