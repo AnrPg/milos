@@ -47,6 +47,13 @@ describe("localizeError", () => {
   });
 
   it.each([
+    ["avatar_storage_unavailable", "apiErrorAvatarStorageUnavailable"],
+    ["avatar_upload_missing", "apiErrorAvatarUploadMissing"],
+    ["avatar_upload_unverified", "apiErrorAvatarUploadUnverified"],
+    ["unsupported_avatar_type", "apiErrorUnsupportedAvatarType"],
+    ["avatar_upload_metadata_missing", "apiErrorAvatarUploadMetadataMissing"],
+    ["avatar_too_large", "apiErrorAvatarTooLarge"],
+    ["avatar_key_forbidden", "apiErrorAvatarKeyForbidden"],
     ["finance_profile_missing", "apiErrorSelfFinanceProfileMissing"],
     ["finance_entitlement_inactive", "apiErrorSelfFinanceEntitlementInactive"],
     ["finance_entitlement_blocked", "apiErrorSelfFinanceEntitlementBlocked"],
