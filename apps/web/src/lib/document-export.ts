@@ -1,8 +1,10 @@
 import type { WorkoutExecution } from "@/api/executions";
 import type { PRRecord } from "@/api/gamification";
 import type {
+  ScaleLevel,
   WorkoutExerciseRecord,
   WorkoutRecord,
+  WorkoutSectionRecord,
   WorkoutVariationRecord,
 } from "@/api/workouts";
 
@@ -146,7 +148,109 @@ function timerSummary(timer: Record<string, unknown> | null | undefined, labels:
   ]).join(" · ");
 }
 
+function objectValue(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
+function numberValue(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function draftScaleLevel(value: unknown, fallbackSlug: unknown, index: number): ScaleLevel {
+  const scale = objectValue(value);
+  const slug = typeof scale?.slug === "string"
+    ? scale.slug
+    : typeof fallbackSlug === "string" ? fallbackSlug : `scale-${index + 1}`;
+
+  return {
+    slug,
+    label: typeof scale?.label === "string" ? scale.label : slug,
+    sort_order: numberValue(scale?.sort_order) ?? index,
+    is_active: typeof scale?.is_active === "boolean" ? scale.is_active : true,
+  };
+}
+
+function draftVariation(value: unknown, index: number): WorkoutVariationRecord | null {
+  const variation = objectValue(value);
+  if (!variation) return null;
+
+  return {
+    description: typeof variation.description === "string" ? variation.description : null,
+    sets: numberValue(variation.sets),
+    exercise_name_override: typeof variation.exercise_name_override === "string"
+      ? variation.exercise_name_override
+      : null,
+    prescription_value: numberValue(variation.prescription_value),
+    prescription_unit: typeof variation.prescription_unit === "string"
+      ? variation.prescription_unit as WorkoutVariationRecord["prescription_unit"]
+      : null,
+    load_value: numberValue(variation.load_value),
+    load_mode: typeof variation.load_mode === "string"
+      ? variation.load_mode as WorkoutVariationRecord["load_mode"]
+      : null,
+    excluded: variation.excluded === true,
+    scale_level: draftScaleLevel(variation.scale_level, variation.scale_level_slug, index),
+  };
+}
+
+function draftExercise(value: unknown, index: number): WorkoutExerciseRecord | null {
+  const exercise = objectValue(value);
+  if (!exercise || typeof exercise.name !== "string") return null;
+
+  return {
+    name: exercise.name,
+    description: typeof exercise.description === "string" ? exercise.description : null,
+    sets: numberValue(exercise.sets),
+    prescription_value: numberValue(exercise.prescription_value),
+    prescription_unit: typeof exercise.prescription_unit === "string"
+      ? exercise.prescription_unit as WorkoutExerciseRecord["prescription_unit"]
+      : null,
+    load_value: numberValue(exercise.load_value),
+    load_mode: typeof exercise.load_mode === "string"
+      ? exercise.load_mode as WorkoutExerciseRecord["load_mode"]
+      : null,
+    order: numberValue(exercise.order) ?? index,
+    variations: Array.isArray(exercise.variations)
+      ? exercise.variations.map(draftVariation).filter((item): item is WorkoutVariationRecord => Boolean(item))
+      : [],
+  };
+}
+
+function exportWorkoutSections(workout: WorkoutRecord): WorkoutSectionRecord[] {
+  if (workout.sections.length > 0) return workout.sections;
+  const draft = objectValue(workout.draft_data);
+  if (!Array.isArray(draft?.sections)) return [];
+
+  return draft.sections.flatMap((value, index) => {
+    const section = objectValue(value);
+    if (!section || typeof section.name !== "string") return [];
+    const exercises = Array.isArray(section.exercises)
+      ? section.exercises.map(draftExercise).filter((item): item is WorkoutExerciseRecord => Boolean(item))
+      : [];
+
+    return [{
+      name: section.name,
+      order: numberValue(section.order) ?? index,
+      scoreable: section.scoreable === true,
+      score_config: objectValue(section.score_config),
+      timer_config: objectValue(section.timer_config),
+      exercises,
+    }];
+  });
+}
+
 export function buildWorkoutDocument(workout: WorkoutRecord, labels: ExportLabels): ExportDocument {
+  const sections = exportWorkoutSections(workout);
+  const scaleLevels = workout.available_scale_levels.length > 0
+    ? workout.available_scale_levels
+    : Array.from(new Map(
+        sections.flatMap((section) => section.exercises)
+          .flatMap((exercise) => exercise.variations)
+          .map((variation) => [variation.scale_level.slug, variation.scale_level]),
+      ).values());
+
   return {
     icon: "🏋️",
     category: labels.workout,
@@ -157,13 +261,13 @@ export function buildWorkoutDocument(workout: WorkoutRecord, labels: ExportLabel
       { label: labels.status, value: displayValue(workout.status ?? "published") },
       {
         label: labels.scales,
-        value: workout.available_scale_levels.length > 0
-          ? workout.available_scale_levels.map((scale) => scale.label).join(", ")
+        value: scaleLevels.length > 0
+          ? scaleLevels.map((scale) => scale.label).join(", ")
           : labels.baseOnly,
       },
-      { label: labels.sections, value: String(workout.sections.length) },
+      { label: labels.sections, value: String(sections.length) },
     ],
-    sections: workout.sections
+    sections: sections
       .slice()
       .sort((a, b) => a.order - b.order)
       .map((section) => ({

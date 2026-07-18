@@ -69,7 +69,7 @@ describe("document export adapters", () => {
           prescription_value: 10,
           prescription_unit: "reps",
           load_value: 40,
-          load_mode: "kg",
+          load_mode: "absolute",
           variations: [{
             scale_level: { slug: "rx", label: "Rx", sort_order: 1, is_active: true },
             prescription_value: 8,
@@ -82,6 +82,36 @@ describe("document export adapters", () => {
     expect(document.sections[0].title).toBe("Main");
     expect(document.sections[0].items[0].value).toContain("3 × 10 reps");
     expect(document.sections[0].items[0].details).toContain("Rx: 3 × 8 reps");
+  });
+
+  it("includes the editable section tree when an admin exports a draft workout", () => {
+    const document = buildWorkoutDocument({
+      id: "draft-1",
+      title: "Saturday Chipper",
+      type: "crossfit",
+      status: "draft",
+      available_scale_levels: [],
+      sections: [],
+      draft_data: {
+        sections: [{
+          name: "Chipper",
+          timer_config: { type: "for_time", duration_seconds: 1_200 },
+          scoreable: true,
+          exercises: [{
+            name: "Box jump",
+            sets: 5,
+            prescription_value: 12,
+            prescription_unit: "reps",
+            variations: [{ scale_level_slug: "scaled", prescription_value: 8 }],
+          }],
+        }],
+      },
+    }, labels);
+
+    expect(document.metadata).toContainEqual({ label: "Sections", value: "1" });
+    expect(document.sections[0].title).toBe("Chipper");
+    expect(document.sections[0].items[0].value).toBe("5 × 12 reps");
+    expect(document.sections[0].items[0].details).toContain("scaled: 5 × 8 reps");
   });
 
   it("includes execution scores, notes, and actual-vs-prescribed modifications", () => {
@@ -168,6 +198,9 @@ describe("document export adapters", () => {
 
     expect(new TextDecoder().decode(pdfBytes.slice(0, 5))).toBe("%PDF-");
     expect(await odtArchive.file("mimetype")?.async("string")).toBe("application/vnd.oasis.opendocument.text");
-    expect(await odtArchive.file("content.xml")?.async("string")).toContain("Deadlift");
+    const odtContent = await odtArchive.file("content.xml")?.async("string");
+    expect(odtContent).toContain("Deadlift");
+    expect(odtContent).toContain("🏆");
+    expect(odtContent).toContain('fo:color="#7C3AED"');
   });
 });
