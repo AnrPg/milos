@@ -21,21 +21,26 @@ browser and installed applications.
 ## Decision
 Introduce one reusable frontend Share / Export dialog backed by a canonical,
 presentation-ready document model. Source adapters map an authorized admin
-workout, the signed-in user's execution record, or the signed-in user's PR into
-that model. Format renderers then generate PDF, Markdown, text, ODT, or CSV
-locally in the browser.
+workout, the signed-in user's complete execution history, or the signed-in
+user's complete Pantheon list into that model. Format renderers then generate
+PDF, Markdown, text, ODT, or CSV locally in the browser.
 
-The dialog exposes one selected format and three delivery paths:
+PR and WOD card share controls are a separate in-app messaging workflow for one
+record. They do not open file-export controls.
+
+The dialog exposes exactly two selectors, one for format and one for delivery
+destination, followed by one Export action. Delivery behavior is:
 
 1. Download saves the generated file directly.
 2. Share uses the Web Share API with a real `File`, allowing installed email,
    Google Drive, OneDrive, iCloud Drive, and social share targets to receive it.
-3. Explicit destination shortcuts use the same file-capable system share sheet
-   when available. Where it is unavailable, email receives a localized plain-
-   text `mailto:` fallback and cloud-drive actions download the artifact before
-   opening the provider's upload surface. Social fallback downloads the same
-   selected-format artifact for manual attachment without creating a public
-   application URL.
+3. Explicit destinations use the same file-capable system share sheet when
+   available. Where it is unavailable, email receives the full rendered content
+   in a `mailto:` composer, cloud-drive actions open the provider's upload
+   surface before downloading the artifact, and social/other-app actions invoke a
+   text-capable system share with the complete rendered content. If no system
+   share API exists, that content is copied to the clipboard. Social fallback
+   never silently redirects to a local download.
 
 PDF generation uses `jspdf`. Standards-compliant ODT files use `jszip` to build
 the required OpenDocument package with an uncompressed first `mimetype` entry.
@@ -91,9 +96,10 @@ stable enough for spreadsheet import.
 
 ## Implementation Notes
 Implemented on 2026-07-18 with a single `ShareExportDialog` used by the admin
-workout library, the current user's WOD history, and the current user's
-Pantheon PR list. The Pantheon dialog retains its existing authenticated Milos
-direct-message recipient flow as a secondary section rather than replacing it.
+workout library, the current user's complete WOD history, and the current user's
+complete Pantheon PR list. A follow-up correction on the same date separated
+single-record card sharing into a compact authenticated Milos direct-message
+dialog and reduced collection export to two selectors plus one action.
 
 The canonical export model has source adapters for materialized workouts,
 editable workout drafts, executions, and PRs. Draft normalization is deliberately
@@ -103,11 +109,13 @@ use a violet, teal, pink, slate visual hierarchy, while Unicode-capable ODT,
 Markdown, and text outputs include contextual emoji. CSV remains BOM-prefixed,
 quoted, and hierarchy-flattened for spreadsheet interoperability.
 
-The Web Share path passes the generated `File` itself in the selected format.
-Provider shortcuts reuse that path when the browser supports file sharing. On
-unsupported browsers the exact artifact is downloaded before the mail composer
-or cloud upload surface opens; this is an explicit fallback because browsers do
-not permit one website to inject a local file into another provider's page.
+The Web Share path passes the generated `File` itself in the selected format and
+also supplies the complete rendered document as share text. Provider choices
+reuse that path when the browser supports file sharing. Unsupported social and
+general-app destinations share the complete text instead of downloading; email
+uses that text as its body. Cloud destinations open the chosen provider before
+starting the local download because browsers do not permit one website to inject
+a local file into another provider's page without a provider integration.
 
 Verification completed with 56 frontend tests, including real PDF signatures,
 ODT package/color/emoji assertions, draft-workout content, and selected-format
