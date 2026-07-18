@@ -1062,12 +1062,26 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         %{id: nil, decision: %{remaining: :not_metered}, observed?: true}
 
       {:error, reason} ->
-        Repo.rollback(reason)
+        case entitlement_denial_details(reason, policy_request) do
+          nil -> Repo.rollback(reason)
+          details -> Repo.rollback({reason, details})
+        end
 
       {:error, reason, details} ->
         Repo.rollback({reason, details})
     end
   end
+
+  defp entitlement_denial_details(:finance_channel_not_included, request),
+    do: %{channel: Map.get(request, :channel)}
+
+  defp entitlement_denial_details(:finance_capability_not_included, request),
+    do: %{capability: Map.get(request, :capability)}
+
+  defp entitlement_denial_details(:finance_allowance_not_included, request),
+    do: %{allowance: Map.get(request, :allowance)}
+
+  defp entitlement_denial_details(_reason, _request), do: nil
 
   defp authorize_missing_profile!(request) do
     case EntitlementPolicy.authorize(nil, request,

@@ -569,7 +569,18 @@ defmodule MilosTrainingWeb.FallbackController do
     |> put_status(:forbidden)
     |> json(%{
       code: "finance_channel_not_included",
-      error: "Package channel not included"
+      error: "Package channel not included",
+      params: %{channel: "the required service"}
+    })
+  end
+
+  def call(conn, {:error, :finance_channel_not_included, details}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "finance_channel_not_included",
+      error: "Package channel not included",
+      params: details
     })
   end
 
@@ -578,7 +589,18 @@ defmodule MilosTrainingWeb.FallbackController do
     |> put_status(:forbidden)
     |> json(%{
       code: "finance_capability_not_included",
-      error: "Package capability not included"
+      error: "Package capability not included",
+      params: %{capability: "the required benefit"}
+    })
+  end
+
+  def call(conn, {:error, :finance_capability_not_included, details}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "finance_capability_not_included",
+      error: "Package capability not included",
+      params: details
     })
   end
 
@@ -587,7 +609,18 @@ defmodule MilosTrainingWeb.FallbackController do
     |> put_status(:forbidden)
     |> json(%{
       code: "finance_allowance_not_included",
-      error: "Package allowance not included"
+      error: "Package allowance not included",
+      params: %{allowance: "the required usage"}
+    })
+  end
+
+  def call(conn, {:error, :finance_allowance_not_included, details}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "finance_allowance_not_included",
+      error: "Package allowance not included",
+      params: details
     })
   end
 

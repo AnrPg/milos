@@ -34,4 +34,25 @@ defmodule MilosTrainingWeb.FallbackControllerTest do
              "errors" => %{"nickname" => ["is required"]}
            }
   end
+
+  test "returns a client-correctable code for invalid assignment recipients", %{conn: conn} do
+    response =
+      conn
+      |> FallbackController.call({:error, :invalid_athletes})
+      |> json_response(422)
+
+    assert response["code"] == "invalid_athletes"
+  end
+
+  test "includes the exact missing package benefit in entitlement denials", %{conn: conn} do
+    response =
+      conn
+      |> FallbackController.call(
+        {:error, :finance_capability_not_included, %{capability: :execute_assigned_workouts}}
+      )
+      |> json_response(403)
+
+    assert response["code"] == "finance_capability_not_included"
+    assert response["params"] == %{"capability" => "execute_assigned_workouts"}
+  end
 end
