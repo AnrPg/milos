@@ -7,19 +7,23 @@ import type { ExportDocument, ExportFormat } from "@/lib/document-export";
 const copy: ShareExportCopy = {
   title: "Share or export",
   chooseFormat: "Choose a file format",
+  chooseDestination: "Export to",
   formatHelp: "The selected format is used for every action.",
   download: "Download file",
   share: "Share file",
+  export: "Export",
   email: "Email",
   googleDrive: "Google Drive",
   oneDrive: "OneDrive",
   iCloudDrive: "iCloud Drive",
   social: "Social apps",
+  otherApps: "Other apps",
   close: "Close",
   working: "Preparing file…",
   ready: "Your file is ready.",
   downloadedFallback: "The file was downloaded for manual attachment or upload.",
   shareUnavailable: "File sharing is unavailable in this browser.",
+  copiedFallback: "The full content was copied.",
   failed: "The file could not be generated.",
   formatPdf: "PDF",
   formatMarkdown: "Markdown",
@@ -54,8 +58,9 @@ describe("ShareExportDialog", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("radio", { name: "ODT" }));
-    fireEvent.click(screen.getByRole("button", { name: "Share file" }));
+    fireEvent.change(screen.getByRole("combobox", { name: "Choose a file format" }), { target: { value: "odt" } });
+    fireEvent.change(screen.getByRole("combobox", { name: "Export to" }), { target: { value: "system" } });
+    fireEvent.click(screen.getByRole("button", { name: "Export" }));
 
     await waitFor(() => expect(share).toHaveBeenCalledOnce());
     expect(generateFile).toHaveBeenCalledWith(document, "odt");
@@ -63,14 +68,32 @@ describe("ShareExportDialog", () => {
     expect(share.mock.calls[0][0].files[0].name).toBe("deadlift.odt");
   });
 
-  it("keeps every destination inside one accessible dialog", () => {
+  it("presents one format selector, one destination selector, and one export action", () => {
     render(<ShareExportDialog copy={copy} document={document} onClose={() => undefined} />);
 
     expect(screen.getByRole("dialog", { name: "Share or export" })).toBeVisible();
-    expect(screen.getByRole("button", { name: "Email" })).toBeVisible();
-    expect(screen.getByRole("button", { name: "Google Drive" })).toBeVisible();
-    expect(screen.getByRole("button", { name: "OneDrive" })).toBeVisible();
-    expect(screen.getByRole("button", { name: "iCloud Drive" })).toBeVisible();
-    expect(screen.getByRole("button", { name: "Social apps" })).toBeVisible();
+    expect(screen.getAllByRole("combobox")).toHaveLength(2);
+    expect(screen.getByRole("option", { name: "Email" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Google Drive" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Social apps" })).toBeInTheDocument();
+    expect(screen.getAllByRole("button")).toHaveLength(2);
+  });
+
+  it("shares the complete document text without downloading when social apps cannot receive files", async () => {
+    const share = vi.fn().mockResolvedValue(undefined);
+    const createObjectURL = vi.spyOn(URL, "createObjectURL");
+    Object.defineProperty(navigator, "canShare", { configurable: true, value: () => false });
+    Object.defineProperty(navigator, "share", { configurable: true, value: share });
+
+    render(<ShareExportDialog copy={copy} document={document} onClose={() => undefined} />);
+
+    fireEvent.change(screen.getByRole("combobox", { name: "Export to" }), { target: { value: "social" } });
+    fireEvent.click(screen.getByRole("button", { name: "Export" }));
+
+    await waitFor(() => expect(share).toHaveBeenCalledOnce());
+    expect(share.mock.calls[0][0].files).toBeUndefined();
+    expect(share.mock.calls[0][0].text).toContain("Deadlift");
+    expect(share.mock.calls[0][0].text).toContain("PERSONAL RECORD");
+    expect(createObjectURL).not.toHaveBeenCalled();
   });
 });

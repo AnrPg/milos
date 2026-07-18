@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildExecutionDocument,
+  buildExecutionHistoryDocument,
   buildPRDocument,
+  buildPRListDocument,
   buildWorkoutDocument,
   generateExportFile,
   renderCsv,
@@ -16,6 +18,7 @@ const labels: ExportLabels = {
   workout: "Workout",
   workoutHistory: "WOD History",
   personalRecord: "Personal Record",
+  personalRecords: "Personal Records",
   type: "Type",
   status: "Status",
   scale: "Scale",
@@ -173,6 +176,43 @@ describe("document export adapters", () => {
     expect(renderMarkdown(document)).toContain("**Score:** 140 kg");
     expect(renderCsv(document)).toContain('"Supporting details","Sets","2"');
     expect(renderCsv(document)).toContain('"Notes","","Smooth, no belt"');
+  });
+
+  it("exports the complete Pantheon collection in one document", () => {
+    const first = {
+      id: "p1", user_id: "u1", name: "Back squat", current_score: 140, unit: "kg" as const,
+      higher_is_better: true, beaten_on: "2026-07-18", supporting_metrics: {}, notes: null,
+      inserted_at: "2026-07-18T08:00:00Z", updated_at: "2026-07-18T08:00:00Z",
+    };
+    const document = buildPRListDocument([
+      first,
+      { ...first, id: "p2", name: "Deadlift", current_score: 180 },
+    ], labels, "en");
+
+    expect(document.title).toBe("Personal Records");
+    expect(renderText(document)).toContain("Back squat");
+    expect(renderText(document)).toContain("Deadlift");
+  });
+
+  it("exports the complete workout history in one document", () => {
+    const execution = {
+      id: "e1", user_id: "u1", master_workout_id: null, workout_title: "Fran", workout_type: "crossfit",
+      scale_level_slug: null, source: "self_selected", source_reference_id: null, status: "completed" as const,
+      started_at_utc: "2026-07-18T08:00:00Z", started_at_tz: "Europe/Athens",
+      completed_at_utc: "2026-07-18T08:07:30Z", completed_at_tz: "Europe/Athens",
+      current_segment_index: 1, segment_started_at_utc: null, paused_elapsed_ms: 0,
+      resume_countdown_ends_at_utc: null, total_elapsed_ms: 450_000, section_elapsed_ms: {},
+      segment_cycle_counts: {}, checked_exercise_ids: [], section_scores: [], exercise_notes: [],
+      exercise_modifications: [], lock_version: 1, inserted_at: "2026-07-18T08:00:00Z",
+    };
+    const document = buildExecutionHistoryDocument([
+      execution,
+      { ...execution, id: "e2", workout_title: "Helen" },
+    ], labels, "en");
+
+    expect(document.title).toBe("WOD History");
+    expect(renderText(document)).toContain("Fran");
+    expect(renderText(document)).toContain("Helen");
   });
 
   it("generates real PDF and ODT containers", async () => {

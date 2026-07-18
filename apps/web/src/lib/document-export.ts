@@ -15,6 +15,7 @@ export type ExportLabels = {
   workout: string;
   workoutHistory: string;
   personalRecord: string;
+  personalRecords: string;
   type: string;
   status: string;
   scale: string;
@@ -375,6 +376,60 @@ export function buildPRDocument(pr: PRRecord, labels: ExportLabels, locale: stri
       { label: labels.comparison, value: pr.higher_is_better ? labels.higherIsBetter : labels.lowerIsBetter },
     ],
     sections,
+    footer: labels.generatedBy,
+  };
+}
+
+export function buildPRListDocument(prs: PRRecord[], labels: ExportLabels, locale: string): ExportDocument {
+  return {
+    icon: "🏆",
+    category: labels.personalRecords,
+    title: labels.personalRecords,
+    metadata: [{ label: labels.personalRecord, value: String(prs.length) }],
+    sections: prs.map((pr) => {
+      const document = buildPRDocument(pr, labels, locale);
+      return {
+        icon: document.icon,
+        title: document.title,
+        items: [
+          ...document.metadata.map(({ label, value }) => ({ label, value })),
+          ...document.sections.flatMap((section) => section.items.map((item) => ({
+            label: item.label ?? section.title,
+            value: item.value,
+            details: item.details,
+          }))),
+        ],
+      };
+    }),
+    footer: labels.generatedBy,
+  };
+}
+
+export function buildExecutionHistoryDocument(
+  executions: WorkoutExecution[],
+  labels: ExportLabels,
+  locale: string,
+): ExportDocument {
+  return {
+    icon: "📚",
+    category: labels.workoutHistory,
+    title: labels.workoutHistory,
+    metadata: [{ label: labels.workout, value: String(executions.length) }],
+    sections: executions.map((execution) => {
+      const document = buildExecutionDocument(execution, labels, locale);
+      return {
+        icon: document.icon,
+        title: document.title,
+        items: [
+          ...document.metadata.map(({ label, value }) => ({ label, value })),
+          ...document.sections.flatMap((section) => section.items.map((item) => ({
+            label: item.label ?? section.title,
+            value: item.value,
+            details: item.details,
+          }))),
+        ],
+      };
+    }),
     footer: labels.generatedBy,
   };
 }
