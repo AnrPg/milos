@@ -148,8 +148,8 @@ export function ShareExportDialog({
 
       const providerUrl = PROVIDER_URLS[destination];
       if (providerUrl) {
-        downloadFile(file);
         window.open(providerUrl, "_blank", "noopener,noreferrer");
+        downloadFile(file);
         setStatus(`${copy.shareUnavailable} ${copy.downloadedFallback}`);
         return;
       }

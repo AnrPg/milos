@@ -96,4 +96,27 @@ describe("ShareExportDialog", () => {
     expect(share.mock.calls[0][0].text).toContain("PERSONAL RECORD");
     expect(createObjectURL).not.toHaveBeenCalled();
   });
+
+  it("opens cloud destinations before starting the manual fallback download", async () => {
+    const events: string[] = [];
+    const open = vi.spyOn(window, "open").mockImplementation(() => {
+      events.push("open");
+      return null;
+    });
+    vi.spyOn(URL, "createObjectURL").mockImplementation(() => {
+      events.push("download");
+      return "blob:export";
+    });
+    vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => undefined);
+    Object.defineProperty(navigator, "canShare", { configurable: true, value: () => false });
+    Object.defineProperty(navigator, "share", { configurable: true, value: undefined });
+
+    render(<ShareExportDialog copy={copy} document={document} onClose={() => undefined} />);
+
+    fireEvent.change(screen.getByRole("combobox", { name: "Export to" }), { target: { value: "google" } });
+    fireEvent.click(screen.getByRole("button", { name: "Export" }));
+
+    await waitFor(() => expect(open).toHaveBeenCalledWith("https://drive.google.com/drive/my-drive", "_blank", "noopener,noreferrer"));
+    expect(events).toEqual(["open", "download"]);
+  });
 });
