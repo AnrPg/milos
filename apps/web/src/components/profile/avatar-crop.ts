@@ -5,6 +5,32 @@ export type AvatarCrop = {
   height: number;
 };
 
+export const MAX_AVATAR_BYTES = 5 * 1_024 * 1_024;
+const SUPPORTED_AVATAR_SOURCE_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/bmp",
+  "image/avif",
+]);
+const SUPPORTED_AVATAR_SOURCE_EXTENSIONS = new Set([
+  "jpg",
+  "jpeg",
+  "png",
+  "webp",
+  "gif",
+  "bmp",
+  "avif",
+]);
+
+export function isSupportedAvatarSource(file: Pick<File, "name" | "type">) {
+  if (SUPPORTED_AVATAR_SOURCE_TYPES.has(file.type.toLowerCase())) return true;
+
+  const extension = file.name.split(".").pop()?.toLowerCase();
+  return extension ? SUPPORTED_AVATAR_SOURCE_EXTENSIONS.has(extension) : false;
+}
+
 export function calculateAvatarCrop(
   imageWidth: number,
   imageHeight: number,
@@ -78,7 +104,7 @@ export function drawAvatarCrop(
   context.restore();
 }
 
-export function canvasToAvatarFile(canvas: HTMLCanvasElement) {
+function canvasToBlob(canvas: HTMLCanvasElement, quality: number) {
   return new Promise<File>((resolve, reject) => {
     canvas.toBlob((blob) => {
       if (!blob) {
@@ -87,6 +113,15 @@ export function canvasToAvatarFile(canvas: HTMLCanvasElement) {
       }
 
       resolve(new File([blob], "avatar.jpg", { type: "image/jpeg" }));
-    }, "image/jpeg", 0.9);
+    }, "image/jpeg", quality);
   });
+}
+
+export async function canvasToAvatarFile(canvas: HTMLCanvasElement, maxBytes = MAX_AVATAR_BYTES) {
+  for (const quality of [0.9, 0.82, 0.74, 0.66, 0.58, 0.5]) {
+    const file = await canvasToBlob(canvas, quality);
+    if (file.size <= maxBytes) return file;
+  }
+
+  return canvasToBlob(canvas, 0.42);
 }

@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.RequestAvatarUpload do
   alias MilosTraining.Application.AvatarStorage
 
-  @allowed_types ~w(image/jpeg image/png image/webp)
+  @allowed_types ~w(image/jpeg image/png image/webp image/gif image/bmp image/avif)
   @max_bytes 5 * 1_024 * 1_024
 
   def call(user_id, params) do

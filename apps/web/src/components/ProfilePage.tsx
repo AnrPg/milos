@@ -17,6 +17,7 @@ import { getAvatarUploadUrl, updateAvatar, updateProfile } from "@/api/profile";
 import { fetchGamificationPreferences, updateGamificationPreferences } from "@/api/gamification";
 import { ReviewList } from "@/components/my-reviews";
 import { AvatarEditorModal } from "@/components/profile/AvatarEditorModal";
+import { isSupportedAvatarSource } from "@/components/profile/avatar-crop";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -279,12 +280,8 @@ export function ProfilePage() {
 
   function selectAvatarFile(file: File) {
     setAvatarError(null);
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    if (!isSupportedAvatarSource(file)) {
       setAvatarError(tProfile("avatarUnsupportedType"));
-      return;
-    }
-    if (file.size > 5 * 1_024 * 1_024) {
-      setAvatarError(tProfile("avatarTooLarge"));
       return;
     }
     setAvatarFile(file);
@@ -546,7 +543,7 @@ export function ProfilePage() {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/jpeg,image/png,image/webp"
+              accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/avif,.jpg,.jpeg,.png,.webp,.gif,.bmp,.avif"
               className="hidden"
               onChange={(e) => {
                 const file = e.target.files?.[0];

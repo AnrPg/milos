@@ -2,10 +2,11 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
   @moduledoc false
   @behaviour MilosTraining.Application.Ports.DocumentStorage
   @behaviour MilosTraining.Application.Ports.AvatarStorage
+  require Logger
 
   @expires_seconds 900
   @max_avatar_bytes 5 * 1_024 * 1_024
-  @allowed_avatar_types ~w(image/jpeg image/png image/webp)
+  @allowed_avatar_types ~w(image/jpeg image/png image/webp image/gif image/bmp image/avif)
 
   def ensure_buckets do
     {document_config, _document_url, document_bucket} = ex_aws_config()
@@ -81,13 +82,20 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
     if String.starts_with?(key, expected_prefix) do
       {storage_config, _url_config, bucket} = avatar_ex_aws_config()
 
-      with {:ok, %{headers: headers}} <-
-             avatar_probe_operation(bucket, key) |> ExAws.request(storage_config),
-           {:ok, content_type, byte_size} <- avatar_metadata(headers),
-           true <- content_type in @allowed_avatar_types and byte_size <= @max_avatar_bytes do
+      with {:ok, %{headers: headers, body: body}} <-
+             request_avatar_probe(storage_config, bucket, key),
+           {:ok, _content_type, byte_size} <- avatar_metadata(headers, body),
+           :ok <- validate_avatar_size(byte_size) do
         {:ok, avatar_public_url(bucket, key)}
       else
-        _ -> {:error, :invalid_avatar_upload}
+        error ->
+          Logger.warning("avatar upload validation failed",
+            reason: inspect(error),
+            bucket: bucket,
+            key_prefix: expected_prefix
+          )
+
+          {:error, :invalid_avatar_upload}
       end
     else
       {:error, :invalid_avatar_upload}
@@ -104,8 +112,18 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
 
   @doc false
   def avatar_probe_operation(bucket, key) do
-    ExAws.S3.get_object(bucket, key, range: "bytes=0-0")
+    ExAws.S3.get_object(bucket, key, range: "bytes=0-15")
   end
+
+  defp request_avatar_probe(config, bucket, key) do
+    avatar_probe_operation(bucket, key) |> ExAws.request(config)
+  end
+
+  defp validate_avatar_size(byte_size)
+       when is_integer(byte_size) and byte_size <= @max_avatar_bytes,
+       do: :ok
+
+  defp validate_avatar_size(byte_size), do: {:error, {:avatar_too_large, byte_size}}
 
   defp ex_aws_config do
     endpoint = Application.get_env(:milos_training, :minio_endpoint, "http://localhost:9000")
@@ -199,17 +217,61 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
   defp extension_for("image/jpeg"), do: "jpg"
   defp extension_for("image/png"), do: "png"
   defp extension_for("image/webp"), do: "webp"
+  defp extension_for("image/gif"), do: "gif"
+  defp extension_for("image/bmp"), do: "bmp"
+  defp extension_for("image/avif"), do: "avif"
 
-  defp avatar_metadata(headers) do
+  @doc false
+  def avatar_metadata(headers, body) do
     normalized = Map.new(headers, fn {key, value} -> {String.downcase(key), value} end)
-    content_type = normalized["content-type"]
+    content_type = normalized["content-type"] |> normalize_content_type()
+    detected_type = image_type_from_probe(body)
     byte_size = total_object_size(normalized)
 
-    case byte_size do
-      byte_size when is_integer(byte_size) and byte_size > 0 -> {:ok, content_type, byte_size}
-      _ -> {:error, :invalid_avatar_upload}
+    cond do
+      detected_type not in @allowed_avatar_types ->
+        {:error, :invalid_avatar_upload}
+
+      content_type in @allowed_avatar_types and is_integer(byte_size) and byte_size > 0 ->
+        {:ok, content_type, byte_size}
+
+      is_integer(byte_size) and byte_size > 0 ->
+        {:ok, detected_type, byte_size}
+
+      true ->
+        {:error, :invalid_avatar_upload}
     end
   end
+
+  defp normalize_content_type(nil), do: nil
+
+  defp normalize_content_type(content_type) do
+    content_type
+    |> to_string()
+    |> String.split(";", parts: 2)
+    |> hd()
+    |> String.trim()
+    |> String.downcase()
+  end
+
+  defp image_type_from_probe(<<0xFF, 0xD8, 0xFF, _rest::binary>>), do: "image/jpeg"
+
+  defp image_type_from_probe(<<0x89, "PNG", 0x0D, 0x0A, 0x1A, 0x0A, _rest::binary>>),
+    do: "image/png"
+
+  defp image_type_from_probe(<<"RIFF", _size::binary-size(4), "WEBP", _rest::binary>>),
+    do: "image/webp"
+
+  defp image_type_from_probe(<<"GIF8", _version::binary-size(2), _rest::binary>>), do: "image/gif"
+  defp image_type_from_probe(<<"BM", _rest::binary>>), do: "image/bmp"
+
+  defp image_type_from_probe(
+         <<_size::binary-size(4), "ftyp", brand::binary-size(4), _rest::binary>>
+       )
+       when brand in ["avif", "avis"],
+       do: "image/avif"
+
+  defp image_type_from_probe(_body), do: nil
 
   defp total_object_size(%{"content-range" => content_range}) do
     case Regex.run(~r{/([0-9]+)$}, to_string(content_range), capture: :all_but_first) do

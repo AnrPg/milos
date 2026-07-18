@@ -69,7 +69,14 @@ defmodule MilosTrainingWeb.MeController do
             properties: %{
               content_type: %Schema{
                 type: :string,
-                enum: ["image/jpeg", "image/png", "image/webp"]
+                enum: [
+                  "image/jpeg",
+                  "image/png",
+                  "image/webp",
+                  "image/gif",
+                  "image/bmp",
+                  "image/avif"
+                ]
               },
               byte_size: %Schema{type: :integer, minimum: 1, maximum: 5_242_880}
             }

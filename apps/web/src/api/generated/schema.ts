@@ -8287,7 +8287,7 @@ export interface operations {
                 "application/json": {
                     byte_size: number;
                     /** @enum {string} */
-                    content_type: "image/jpeg" | "image/png" | "image/webp";
+                    content_type: "image/jpeg" | "image/png" | "image/webp" | "image/gif" | "image/bmp" | "image/avif";
                 };
             };
         };

@@ -12966,7 +12966,10 @@
                     "enum": [
                       "image/jpeg",
                       "image/png",
-                      "image/webp"
+                      "image/webp",
+                      "image/gif",
+                      "image/bmp",
+                      "image/avif"
                     ],
                     "type": "string"
                   }
