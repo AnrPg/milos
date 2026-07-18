@@ -83,22 +83,24 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
       {storage_config, _url_config, bucket} = avatar_ex_aws_config()
 
       with {:ok, %{headers: headers, body: body}} <-
-             request_avatar_probe(storage_config, bucket, key),
+             request_avatar_probe(storage_config, bucket, key, avatar_public_url(bucket, key)),
            {:ok, _content_type, byte_size} <- avatar_metadata(headers, body),
            :ok <- validate_avatar_size(byte_size) do
         {:ok, avatar_public_url(bucket, key)}
       else
         error ->
+          reason = avatar_validation_reason(error)
+
           Logger.warning("avatar upload validation failed",
             reason: inspect(error),
             bucket: bucket,
             key_prefix: expected_prefix
           )
 
-          {:error, :invalid_avatar_upload}
+          {:error, reason}
       end
     else
-      {:error, :invalid_avatar_upload}
+      {:error, :avatar_key_forbidden}
     end
   end
 
@@ -115,8 +117,29 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
     ExAws.S3.get_object(bucket, key, range: "bytes=0-15")
   end
 
-  defp request_avatar_probe(config, bucket, key) do
-    avatar_probe_operation(bucket, key) |> ExAws.request(config)
+  defp request_avatar_probe(config, bucket, key, public_url) do
+    case avatar_probe_operation(bucket, key) |> ExAws.request(config) do
+      {:ok, _response} = result -> result
+      {:error, {:http_error, 404, _response}} = error -> error
+      {:error, _reason} -> request_public_avatar_probe(public_url)
+    end
+  end
+
+  defp request_public_avatar_probe(public_url) do
+    case Req.get(public_url,
+           headers: [{"range", "bytes=0-15"}],
+           retry: false,
+           receive_timeout: 5_000
+         ) do
+      {:ok, %{status: status, headers: headers, body: body}} when status in 200..299 ->
+        {:ok, %{headers: headers, body: body}}
+
+      {:ok, %{status: status} = response} ->
+        {:error, {:http_error, status, response}}
+
+      {:error, reason} ->
+        {:error, reason}
+    end
   end
 
   defp validate_avatar_size(byte_size)
@@ -124,6 +147,23 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
        do: :ok
 
   defp validate_avatar_size(byte_size), do: {:error, {:avatar_too_large, byte_size}}
+
+  defp avatar_validation_reason({:error, {:http_error, 404, _response}}),
+    do: :avatar_upload_missing
+
+  defp avatar_validation_reason({:error, {:http_error, 403, _response}}),
+    do: :avatar_upload_unverified
+
+  defp avatar_validation_reason({:error, :unsupported_avatar_type}), do: :unsupported_avatar_type
+
+  defp avatar_validation_reason({:error, :avatar_upload_metadata_missing}),
+    do: :avatar_upload_metadata_missing
+
+  defp avatar_validation_reason({:error, {:avatar_too_large, byte_size}}),
+    do: {:avatar_too_large, byte_size}
+
+  defp avatar_validation_reason({:error, _reason}), do: :avatar_storage_unavailable
+  defp avatar_validation_reason(_error), do: :avatar_storage_unavailable
 
   defp ex_aws_config do
     endpoint = Application.get_env(:milos_training, :minio_endpoint, "http://localhost:9000")
@@ -230,7 +270,7 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
 
     cond do
       detected_type not in @allowed_avatar_types ->
-        {:error, :invalid_avatar_upload}
+        {:error, :unsupported_avatar_type}
 
       content_type in @allowed_avatar_types and is_integer(byte_size) and byte_size > 0 ->
         {:ok, content_type, byte_size}
@@ -239,7 +279,7 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
         {:ok, detected_type, byte_size}
 
       true ->
-        {:error, :invalid_avatar_upload}
+        {:error, :avatar_upload_metadata_missing}
     end
   end
 

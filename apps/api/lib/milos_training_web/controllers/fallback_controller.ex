@@ -161,7 +161,72 @@ defmodule MilosTrainingWeb.FallbackController do
     |> put_status(:unprocessable_entity)
     |> json(%{
       code: "invalid_avatar_upload",
-      error: "Avatar must be a verified JPEG, PNG, or WebP up to 5 MiB"
+      error: "Use a JPG, JPEG, PNG, WebP, GIF, BMP, or AVIF image up to 5 MiB"
+    })
+  end
+
+  def call(conn, {:error, :avatar_upload_missing}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "avatar_upload_missing",
+      error: "The avatar upload was not found in storage. Upload the image again."
+    })
+  end
+
+  def call(conn, {:error, :avatar_upload_unverified}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "avatar_upload_unverified",
+      error: "Avatar storage rejected server verification for this upload."
+    })
+  end
+
+  def call(conn, {:error, :unsupported_avatar_type}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "unsupported_avatar_type",
+      error:
+        "The uploaded file is not a supported image. Use JPG, JPEG, PNG, WebP, GIF, BMP, or AVIF."
+    })
+  end
+
+  def call(conn, {:error, :avatar_upload_metadata_missing}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "avatar_upload_metadata_missing",
+      error: "The uploaded avatar is missing storage size metadata. Upload the image again."
+    })
+  end
+
+  def call(conn, {:error, {:avatar_too_large, byte_size}}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "avatar_too_large",
+      params: %{byte_size: byte_size, max_bytes: 5_242_880},
+      error: "The uploaded avatar is larger than 5 MiB."
+    })
+  end
+
+  def call(conn, {:error, :avatar_key_forbidden}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "avatar_key_forbidden",
+      error: "The avatar upload does not belong to the current user."
+    })
+  end
+
+  def call(conn, {:error, :avatar_storage_unavailable}) do
+    conn
+    |> put_status(:service_unavailable)
+    |> json(%{
+      code: "avatar_storage_unavailable",
+      error: "Avatar storage could not be reached for verification. Try again shortly."
     })
   end
 

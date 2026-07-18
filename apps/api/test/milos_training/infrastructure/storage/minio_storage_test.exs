@@ -49,13 +49,22 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorageTest do
              {:ok, "image/avif", 1024}
   end
 
-  test "avatar metadata rejects files whose bytes are not supported images" do
+  test "avatar metadata reports unsupported bytes separately from upload policy errors" do
     headers = [
       {"content-type", "image/jpeg"},
       {"content-range", "bytes 0-15/91713"}
     ]
 
     assert MinioStorage.avatar_metadata(headers, "not an image") ==
-             {:error, :invalid_avatar_upload}
+             {:error, :unsupported_avatar_type}
+  end
+
+  test "avatar metadata reports missing object size separately" do
+    headers = [
+      {"content-type", "image/jpeg"}
+    ]
+
+    assert MinioStorage.avatar_metadata(headers, <<0xFF, 0xD8, 0xFF, 0xE0, "jpeg-rest">>) ==
+             {:error, :avatar_upload_metadata_missing}
   end
 end
