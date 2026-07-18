@@ -102,3 +102,24 @@ msgstr "Zahlungserinnerung"
 
 msgid "You have an outstanding balance of %{amount} due."
 msgstr "Sie haben einen ausstehenden Betrag von %{amount}."
+
+msgid "Workout assignment requested"
+msgstr "Workout-Zuweisung angefragt"
+
+msgid "%{nickname} requested a workout assignment for %{requested_for}."
+msgstr "%{nickname} hat eine Workout-Zuweisung für den %{requested_for} angefragt."
+
+msgid "a requested date"
+msgstr "ein gewünschtes Datum"
+
+msgid "New review submitted"
+msgstr "Neue Bewertung eingereicht"
+
+msgid "general"
+msgstr "allgemein"
+
+msgid "A %{target_type} review was submitted with a %{rating}/5 rating."
+msgstr "Eine Bewertung für %{target_type} wurde mit %{rating}/5 eingereicht."
+
+msgid "A new %{target_type} review needs attention."
+msgstr "Eine neue Bewertung für %{target_type} erfordert Aufmerksamkeit."

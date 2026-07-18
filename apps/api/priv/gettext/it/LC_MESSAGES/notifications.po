@@ -102,3 +102,24 @@ msgstr "Promemoria di pagamento"
 
 msgid "You have an outstanding balance of %{amount} due."
 msgstr "Hai un saldo dovuto di %{amount} dovuto."
+
+msgid "Workout assignment requested"
+msgstr "Richiesta assegnazione allenamento"
+
+msgid "%{nickname} requested a workout assignment for %{requested_for}."
+msgstr "%{nickname} ha richiesto l'assegnazione di un allenamento per il %{requested_for}."
+
+msgid "a requested date"
+msgstr "una data richiesta"
+
+msgid "New review submitted"
+msgstr "Nuova recensione inviata"
+
+msgid "general"
+msgstr "generale"
+
+msgid "A %{target_type} review was submitted with a %{rating}/5 rating."
+msgstr "È stata inviata una recensione su %{target_type} con valutazione %{rating}/5."
+
+msgid "A new %{target_type} review needs attention."
+msgstr "Una nuova recensione su %{target_type} richiede attenzione."

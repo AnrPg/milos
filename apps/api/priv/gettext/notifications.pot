@@ -102,3 +102,24 @@ msgstr ""
 
 msgid "You have an outstanding balance of %{amount} due."
 msgstr ""
+
+msgid "Workout assignment requested"
+msgstr ""
+
+msgid "%{nickname} requested a workout assignment for %{requested_for}."
+msgstr ""
+
+msgid "a requested date"
+msgstr ""
+
+msgid "New review submitted"
+msgstr ""
+
+msgid "general"
+msgstr ""
+
+msgid "A %{target_type} review was submitted with a %{rating}/5 rating."
+msgstr ""
+
+msgid "A new %{target_type} review needs attention."
+msgstr ""

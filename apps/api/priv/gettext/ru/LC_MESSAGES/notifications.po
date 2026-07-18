@@ -102,3 +102,24 @@ msgstr "Напоминание об оплате"
 
 msgid "You have an outstanding balance of %{amount} due."
 msgstr "У вас есть задолженность в размере %{amount}."
+
+msgid "Workout assignment requested"
+msgstr "Запрошено назначение тренировки"
+
+msgid "%{nickname} requested a workout assignment for %{requested_for}."
+msgstr "%{nickname} запросил(а) назначение тренировки на %{requested_for}."
+
+msgid "a requested date"
+msgstr "запрошенная дата"
+
+msgid "New review submitted"
+msgstr "Отправлен новый отзыв"
+
+msgid "general"
+msgstr "общий"
+
+msgid "A %{target_type} review was submitted with a %{rating}/5 rating."
+msgstr "Отзыв о %{target_type} отправлен с оценкой %{rating}/5."
+
+msgid "A new %{target_type} review needs attention."
+msgstr "Новый отзыв о %{target_type} требует внимания."

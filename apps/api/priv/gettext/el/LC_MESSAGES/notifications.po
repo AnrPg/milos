@@ -102,3 +102,24 @@ msgstr "Υπενθύμιση πληρωμής"
 
 msgid "You have an outstanding balance of %{amount} due."
 msgstr "Έχετε ένα οφειλόμενο υπόλοιπο %{amount}."
+
+msgid "Workout assignment requested"
+msgstr "Ζητήθηκε ανάθεση προπόνησης"
+
+msgid "%{nickname} requested a workout assignment for %{requested_for}."
+msgstr "Ο/Η %{nickname} ζήτησε ανάθεση προπόνησης για τις %{requested_for}."
+
+msgid "a requested date"
+msgstr "μια ζητούμενη ημερομηνία"
+
+msgid "New review submitted"
+msgstr "Υποβλήθηκε νέα αξιολόγηση"
+
+msgid "general"
+msgstr "γενική"
+
+msgid "A %{target_type} review was submitted with a %{rating}/5 rating."
+msgstr "Υποβλήθηκε αξιολόγηση %{target_type} με βαθμολογία %{rating}/5."
+
+msgid "A new %{target_type} review needs attention."
+msgstr "Μια νέα αξιολόγηση %{target_type} χρειάζεται έλεγχο."

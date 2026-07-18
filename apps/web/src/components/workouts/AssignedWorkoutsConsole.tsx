@@ -394,7 +394,7 @@ export function AssignedWorkoutsConsole({
 
   const isAdmin = currentUser?.role === "admin";
 
-  const openParamId = searchParams.get("open");
+  const openParamId = searchParams.get("open_assignment") ?? searchParams.get("open");
   const openParamDate = searchParams.get("date");
   const autoOpenedRef = useRef<string | null>(null);
   const initialOpenHandledRef = useRef(false);
@@ -539,6 +539,7 @@ export function AssignedWorkoutsConsole({
       const frame = window.requestAnimationFrame(() => setPanelAssignment(target));
       const params = new URLSearchParams(searchParams.toString());
       params.delete("open");
+      params.delete("open_assignment");
       params.delete("date");
       router.replace(`?${params.toString()}`, { scroll: false });
       return () => window.cancelAnimationFrame(frame);
@@ -555,6 +556,16 @@ export function AssignedWorkoutsConsole({
       }
     }
   }, [openParamId, openParamDate, loading, allAssignments, searchParams, router]);
+
+  useEffect(() => {
+    if (openParamId || !openParamDate) return;
+
+    const targetDate = new Date(openParamDate + "T00:00:00");
+    if (isNaN(targetDate.getTime())) return;
+
+    const frame = window.requestAnimationFrame(() => setRefDate(targetDate));
+    return () => window.cancelAnimationFrame(frame);
+  }, [openParamDate, openParamId]);
 
   useEffect(() => {
     if (!initialOpenAssignmentId || initialOpenHandledRef.current || allAssignments.length === 0) return;

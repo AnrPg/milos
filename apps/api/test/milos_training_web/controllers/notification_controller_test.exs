@@ -165,8 +165,9 @@ defmodule MilosTrainingWeb.NotificationControllerTest do
       |> Notifications.list_for_user()
       |> Enum.map(& &1.payload["url"])
 
-    assert "/admin/coaching-assignments?open=#{assignment_id}&date=2026-06-17" in urls
-    assert "/admin/coaching-assignments?open=#{assignment_id}&date=2026-06-18" in urls
+    assert "/admin/coaching-assignments?open_assignment=#{assignment_id}&date=2026-06-17" in urls
+
+    assert "/admin/coaching-assignments?open_assignment=#{assignment_id}&date=2026-06-18" in urls
   end
 
   test "marks all visible unread notifications as read", %{conn: conn, user: user} do

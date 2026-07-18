@@ -102,3 +102,24 @@ msgstr "Betalingsherinnering"
 
 msgid "You have an outstanding balance of %{amount} due."
 msgstr "U heeft een openstaand saldo van %{amount}."
+
+msgid "Workout assignment requested"
+msgstr "Workouttoewijzing aangevraagd"
+
+msgid "%{nickname} requested a workout assignment for %{requested_for}."
+msgstr "%{nickname} heeft een workouttoewijzing aangevraagd voor %{requested_for}."
+
+msgid "a requested date"
+msgstr "een aangevraagde datum"
+
+msgid "New review submitted"
+msgstr "Nieuwe beoordeling ingediend"
+
+msgid "general"
+msgstr "algemeen"
+
+msgid "A %{target_type} review was submitted with a %{rating}/5 rating."
+msgstr "Er is een beoordeling voor %{target_type} ingediend met een score van %{rating}/5."
+
+msgid "A new %{target_type} review needs attention."
+msgstr "Een nieuwe beoordeling voor %{target_type} vereist aandacht."

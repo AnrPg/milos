@@ -24,6 +24,7 @@ import {
 import { useSession } from "@/components/session-provider";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { subscribeToTopic } from "@/lib/realtime";
+import { notificationTargetUrl } from "@/components/notifications/notification-links";
 
 function formatTimestamp(uiLocale: string, isoString: string) {
   return new Intl.DateTimeFormat(uiLocale, {
@@ -32,42 +33,6 @@ function formatTimestamp(uiLocale: string, isoString: string) {
     hour: "numeric",
     minute: "2-digit",
   }).format(new Date(isoString));
-}
-
-function payloadUrl(notification: NotificationRecord) {
-  return typeof notification.payload.url === "string" ? notification.payload.url : null;
-}
-
-function notificationTargetUrl(notification: NotificationRecord, role: string | null | undefined) {
-  const rawUrl = payloadUrl(notification);
-  const isAdmin = role === "admin" || role === "coach";
-
-  if (notification.type === "chat_message" && typeof notification.payload.thread_id === "string") {
-    return `/account/activity/chats?thread=${encodeURIComponent(notification.payload.thread_id)}`;
-  }
-
-  if (!rawUrl) return null;
-  if (!isAdmin) return rawUrl;
-
-  const [path, query = ""] = rawUrl.split("?");
-  const params = new URLSearchParams(query);
-
-  if (path === "/my-workouts") {
-    const assignmentId = params.get("open") ?? params.get("open_assignment");
-    if (!assignmentId) return "/admin/coaching-assignments";
-
-    const nextParams = new URLSearchParams({ open: assignmentId });
-    const date = params.get("date");
-    if (date) nextParams.set("date", date);
-    return `/admin/coaching-assignments?${nextParams.toString()}`;
-  }
-
-  if (path === "/schedule") {
-    const nextParams = params.toString();
-    return `/admin/schedule${nextParams ? `?${nextParams}` : ""}`;
-  }
-
-  return rawUrl;
 }
 
 function NotificationCard({
@@ -177,6 +142,32 @@ function NotificationCard({
         ? notification.payload.body
         : i18n("anAthleteRescheduledTheirWorkoutfe39f42");
     }
+
+    if (notification.type === "workout_assignment_requested") {
+      const nickname =
+        typeof notification.payload.athlete_nickname === "string"
+          ? notification.payload.athlete_nickname
+          : i18n("anAthlete8f35f1a");
+      const requestedFor =
+        typeof notification.payload.requested_for === "string"
+          ? notification.payload.requested_for
+          : "";
+      const note =
+        typeof notification.payload.note === "string" ? notification.payload.note : "";
+      return [nickname, requestedFor, note].filter(Boolean).join(" · ");
+    }
+
+    if (notification.type === "review_submitted") {
+      const rating =
+        typeof notification.payload.rating === "number"
+          ? `${notification.payload.rating}/5`
+          : null;
+      const targetType =
+        typeof notification.payload.target_type === "string"
+          ? notification.payload.target_type.replaceAll("_", " ")
+          : null;
+      return [targetType, rating].filter(Boolean).join(" · ") || i18n("notificationc18f8f2");
+    }
   
     const classType =
       typeof notification.payload.class_type_name === "string" ? notification.payload.class_type_name : null;
@@ -232,6 +223,10 @@ function NotificationCard({
         return i18n("challengeCompletedec1f9a3");
       case "workout_moved":
         return i18n("workoutRescheduledb1ead39");
+      case "workout_assignment_requested":
+        return i18n("notificationc18f8f2");
+      case "review_submitted":
+        return i18n("notificationc18f8f2");
       case "invoice_issued":
         return i18n("invoiceIssued6a8d8fa");
       case "payment_reminder":
@@ -298,7 +293,7 @@ type FilterTab = "all" | "workouts" | "bookings";
 
 const FILTER_TYPES: Record<FilterTab, string[] | null> = {
   all: null,
-  workouts: ["workout_note", "workout_changed", "workout_deleted", "workout_rejected", "workout_moved", "admin_note"],
+  workouts: ["workout_note", "workout_changed", "workout_deleted", "workout_rejected", "workout_moved", "workout_assignment_requested", "admin_note"],
   bookings: ["booking_pending", "booking_approved", "booking_rejected", "booking_timeout"],
 };
 
@@ -496,7 +491,7 @@ export function NotificationBell() {
         onClick={openPanel}
         type="button"
       >
-        <span>📥</span>
+        <span aria-hidden="true">🔔</span>
         {hasUnread ? (
           <span
             className="rounded-full px-1.5 py-0.5 text-[10px] font-bold"

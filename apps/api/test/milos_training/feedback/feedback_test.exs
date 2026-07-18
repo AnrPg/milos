@@ -2,7 +2,7 @@ defmodule MilosTraining.FeedbackTest do
   use MilosTraining.DataCase
 
   alias MilosTraining.Application.SubmitReview
-  alias MilosTraining.{Analytics, Execution, Feedback}
+  alias MilosTraining.{Analytics, Execution, Feedback, Notifications}
   alias MilosTraining.TestFixtures
 
   test "submits a review with questionnaire answers and updates status" do
@@ -183,6 +183,23 @@ defmodule MilosTraining.FeedbackTest do
     assert review.target_snapshot["target_type"] == "workout"
     assert review.target_snapshot["target_id"] == workout.id
     assert review.target_snapshot["label"] == "Trusted Snapshot Workout"
+  end
+
+  test "application submission creates an actionable admin review notification" do
+    admin = TestFixtures.admin_fixture()
+    user = TestFixtures.user_fixture()
+
+    assert {:ok, _review} =
+             SubmitReview.call(user.id, %{
+               target_type: "general",
+               rating: 4,
+               sentiment: "positive",
+               body: "The new class flow is much clearer."
+             })
+
+    assert [notification] = Notifications.list_for_user(admin.id)
+    assert notification.type == "review_submitted"
+    assert notification.payload["url"] == "/admin/reviews"
   end
 
   test "application review submission requires completed executions" do

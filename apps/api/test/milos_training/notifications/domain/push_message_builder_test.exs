@@ -30,6 +30,32 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilderTest do
     assert message.url == "/schedule"
   end
 
+  test "builds workout assignment request copy with personal coaching route" do
+    message =
+      PushMessageBuilder.build("workout_assignment_requested", %{
+        "athlete_nickname" => "Atlas",
+        "requested_for" => "2026-07-21",
+        "note" => "Strength focus"
+      })
+
+    assert message.title == "Workout assignment requested"
+    assert message.body =~ "Atlas"
+    assert message.body =~ "2026-07-21"
+    assert message.url == "/admin/coaching-assignments?date=2026-07-21"
+  end
+
+  test "builds review submission copy with admin reviews route" do
+    message =
+      PushMessageBuilder.build("review_submitted", %{
+        "rating" => 4,
+        "target_type" => "class_slot"
+      })
+
+    assert message.title == "New review submitted"
+    assert message.body =~ "4/5"
+    assert message.url == "/admin/reviews"
+  end
+
   test "renders system copy through the supplied locale function while preserving authored text" do
     localize = fn message, bindings ->
       "el:" <>

@@ -102,3 +102,24 @@ msgstr "תזכורת לתשלום"
 
 msgid "You have an outstanding balance of %{amount} due."
 msgstr "יש לך יתרת חוב של %{amount} לפירעון."
+
+msgid "Workout assignment requested"
+msgstr "התבקשה הקצאת אימון"
+
+msgid "%{nickname} requested a workout assignment for %{requested_for}."
+msgstr "%{nickname} ביקש/ה הקצאת אימון לתאריך %{requested_for}."
+
+msgid "a requested date"
+msgstr "תאריך מבוקש"
+
+msgid "New review submitted"
+msgstr "נשלחה ביקורת חדשה"
+
+msgid "general"
+msgstr "כללי"
+
+msgid "A %{target_type} review was submitted with a %{rating}/5 rating."
+msgstr "נשלחה ביקורת מסוג %{target_type} עם דירוג %{rating}/5."
+
+msgid "A new %{target_type} review needs attention."
+msgstr "ביקורת חדשה מסוג %{target_type} דורשת התייחסות."

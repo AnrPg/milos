@@ -102,3 +102,24 @@ msgstr "تذكير بالدفع"
 
 msgid "You have an outstanding balance of %{amount} due."
 msgstr "لديك رصيد مستحق بقيمة %{amount}."
+
+msgid "Workout assignment requested"
+msgstr "تم طلب تعيين تمرين"
+
+msgid "%{nickname} requested a workout assignment for %{requested_for}."
+msgstr "طلب %{nickname} تعيين تمرين بتاريخ %{requested_for}."
+
+msgid "a requested date"
+msgstr "تاريخ مطلوب"
+
+msgid "New review submitted"
+msgstr "تم إرسال مراجعة جديدة"
+
+msgid "general"
+msgstr "عامة"
+
+msgid "A %{target_type} review was submitted with a %{rating}/5 rating."
+msgstr "تم إرسال مراجعة من نوع %{target_type} بتقييم %{rating}/5."
+
+msgid "A new %{target_type} review needs attention."
+msgstr "تحتاج مراجعة جديدة من نوع %{target_type} إلى الاهتمام."
