@@ -20,4 +20,13 @@ describe("calculateAvatarCrop", () => {
       width: 768,
     });
   });
+
+  it("calculates the crop against rotated image bounds", () => {
+    expect(calculateAvatarCrop(1200, 800, 512, 1, 0, 0, 90)).toEqual({
+      dx: 0,
+      dy: -128,
+      height: 768,
+      width: 512,
+    });
+  });
 });
