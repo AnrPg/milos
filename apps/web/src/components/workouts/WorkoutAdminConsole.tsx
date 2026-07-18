@@ -23,9 +23,13 @@ import { AssignWorkoutPanel } from "@/components/workouts/AssignWorkoutPanel";
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
 import { SemanticLabel } from "@/components/semantic-label";
+import { ShareExportDialog } from "@/components/share-export/ShareExportDialog";
+import { useShareExport } from "@/components/share-export/useShareExport";
+import { buildWorkoutDocument } from "@/lib/document-export";
 
 export function WorkoutAdminConsole() {
   const i18n = useUiTranslations();
+  const shareExport = useShareExport();
   const router = useRouter();
   const { currentUser, signOut, status, tokens } = useSession();
   const [workouts, setWorkouts] = useState<WorkoutRecord[]>([]);
@@ -35,6 +39,7 @@ export function WorkoutAdminConsole() {
   const [editTarget, setEditTarget] = useState<WorkoutRecord | null>(null);
   const [assignTarget, setAssignTarget] = useState<WorkoutRecord | null>(null);
   const [previewWorkoutId, setPreviewWorkoutId] = useState<string | null>(null);
+  const [shareTarget, setShareTarget] = useState<WorkoutRecord | null>(null);
 
   function clearAdminData() {
     setWorkouts([]);
@@ -266,6 +271,15 @@ export function WorkoutAdminConsole() {
                       ) : null}
 
                       <button
+                        className="rounded-full px-3 py-1 text-xs font-semibold"
+                        style={{ background: "color-mix(in srgb, var(--success) 14%, transparent)", color: "var(--success)" }}
+                        onClick={(event) => { event.stopPropagation(); setShareTarget(workout); }}
+                        type="button"
+                      >
+                        📤 {shareExport.copy.title}
+                      </button>
+
+                      <button
                         className="rounded-full px-3 py-1 text-xs font-semibold disabled:opacity-50"
                         style={{ background: "color-mix(in srgb, var(--primary) 16%, transparent)", color: "var(--primary-strong)" }}
                         disabled={busyAction === `delete-${workout.id}`}
@@ -373,6 +387,14 @@ export function WorkoutAdminConsole() {
           </>
         );
       })() : null}
+
+      {shareTarget ? (
+        <ShareExportDialog
+          copy={shareExport.copy}
+          document={buildWorkoutDocument(shareTarget, shareExport.labels)}
+          onClose={() => setShareTarget(null)}
+        />
+      ) : null}
     </main>
   );
 }
