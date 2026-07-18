@@ -61,3 +61,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-053 | Display usernames and device push controls | Accepted |
 | ADR-054 | Code-gated admin registration | Accepted |
 | ADR-061 | Semantic notifications and canonical deep links | Accepted |
+| ADR-062 | Entitlement guidance and notification consolidation | Accepted |
