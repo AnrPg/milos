@@ -16,9 +16,19 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
 
   def build("booking_approved", payload, localize) do
     %{
-      title: localize.("Booking approved", %{}),
-      body: payload["body"] || booking_body(payload, localize),
+      title: localize.("Class bookings approved", %{}),
+      body:
+        payload["body"] ||
+          localize.("Your coach approved one or more class booking requests.", %{}),
       url: payload["url"] || "/schedule"
+    }
+  end
+
+  def build("workout_assigned", payload, localize) do
+    %{
+      title: localize.("New workouts assigned", %{}),
+      body: payload["body"] || localize.("Your coach assigned one or more workouts to you.", %{}),
+      url: payload["url"] || "/my-workouts"
     }
   end
 

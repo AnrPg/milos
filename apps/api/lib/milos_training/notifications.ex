@@ -116,6 +116,7 @@ defmodule MilosTraining.Notifications do
   def process_event("workout_rejected", payload), do: enqueue_workout_rejected(payload)
   def process_event("athlete_message_sent", payload), do: enqueue_athlete_message(payload)
   def process_event("workout_moved", payload), do: enqueue_workout_moved(payload)
+  def process_event("workout_assigned", payload), do: enqueue_workout_assigned(payload)
 
   def process_event("workout_assignment_requested", payload),
     do: enqueue_workout_assignment_requested(payload)
@@ -319,6 +320,28 @@ defmodule MilosTraining.Notifications do
     :ok
   end
 
+  def enqueue_workout_assigned(payload) when is_map(payload) do
+    assignment_id = field(payload, :assignment_id)
+    batch_at = field(payload, :notification_batch_at) || DateTime.utc_now()
+
+    payload
+    |> field(:athlete_ids)
+    |> List.wrap()
+    |> Enum.uniq()
+    |> Enum.reduce_while(:ok, fn athlete_id, :ok ->
+      result =
+        deliver_notification(athlete_id, :workout_assigned, %{
+          assignment_id: assignment_id,
+          workout_title: field(payload, :workout_title),
+          scheduled_for: field(payload, :scheduled_for),
+          dedupe_key: NotificationDedupe.batch_key(athlete_id, :workout_assigned, batch_at),
+          url: "/my-workouts"
+        })
+
+      if delivered?(result), do: {:cont, :ok}, else: {:halt, result}
+    end)
+  end
+
   def enqueue_workout_assignment_requested(payload) when is_map(payload) do
     request_id = field(payload, :request_id)
     athlete_id = field(payload, :athlete_id)
@@ -456,7 +479,7 @@ defmodule MilosTraining.Notifications do
     scheduled_class = nested_map(booking, :scheduled_class)
     class_type = scheduled_class && nested_map(scheduled_class, :class_type)
 
-    %{
+    payload = %{
       booking_id: field(booking, :id),
       scheduled_class_id: field(booking, :scheduled_class_id),
       scheduled_at: scheduled_class && field(scheduled_class, :scheduled_at),
@@ -468,6 +491,14 @@ defmodule MilosTraining.Notifications do
       dedupe_key: NotificationDedupe.booking_key(user_id, type, field(booking, :id)),
       url: "/schedule"
     }
+
+    if type == :booking_approved do
+      batch_at = field(booking, :notification_batch_at) || DateTime.utc_now()
+
+      Map.put(payload, :dedupe_key, NotificationDedupe.batch_key(user_id, type, batch_at))
+    else
+      payload
+    end
   end
 
   defp deliver_notification(user_id, type, payload) do

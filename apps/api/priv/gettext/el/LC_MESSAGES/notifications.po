@@ -123,3 +123,15 @@ msgstr "Υποβλήθηκε αξιολόγηση %{target_type} με βαθμο
 
 msgid "A new %{target_type} review needs attention."
 msgstr "Μια νέα αξιολόγηση %{target_type} χρειάζεται έλεγχο."
+
+msgid "Class bookings approved"
+msgstr "Εγκρίθηκαν κρατήσεις μαθημάτων"
+
+msgid "Your coach approved one or more class booking requests."
+msgstr "Ο προπονητής σας ενέκρινε ένα ή περισσότερα αιτήματα κράτησης μαθημάτων."
+
+msgid "New workouts assigned"
+msgstr "Ανατέθηκαν νέες προπονήσεις"
+
+msgid "Your coach assigned one or more workouts to you."
+msgstr "Ο προπονητής σας ανέθεσε μία ή περισσότερες προπονήσεις."

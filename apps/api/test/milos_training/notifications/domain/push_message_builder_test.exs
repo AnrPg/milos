@@ -25,9 +25,17 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilderTest do
         "class_type_name" => "CrossFit Foundations"
       })
 
-    assert message.title == "Booking approved"
-    assert message.body =~ "CrossFit Foundations"
+    assert message.title == "Class bookings approved"
+    assert message.body =~ "one or more"
     assert message.url == "/schedule"
+  end
+
+  test "builds consolidated workout assignment copy with athlete route" do
+    message = PushMessageBuilder.build("workout_assigned", %{})
+
+    assert message.title == "New workouts assigned"
+    assert message.body =~ "one or more"
+    assert message.url == "/my-workouts"
   end
 
   test "builds workout assignment request copy with personal coaching route" do

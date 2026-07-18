@@ -123,3 +123,15 @@ msgstr "נשלחה ביקורת מסוג %{target_type} עם דירוג %{rating
 
 msgid "A new %{target_type} review needs attention."
 msgstr "ביקורת חדשה מסוג %{target_type} דורשת התייחסות."
+
+msgid "Class bookings approved"
+msgstr "הזמנות לשיעורים אושרו"
+
+msgid "Your coach approved one or more class booking requests."
+msgstr "המאמן שלך אישר בקשה אחת או יותר להזמנת שיעורים."
+
+msgid "New workouts assigned"
+msgstr "הוקצו אימונים חדשים"
+
+msgid "Your coach assigned one or more workouts to you."
+msgstr "המאמן שלך הקצה לך אימון אחד או יותר."

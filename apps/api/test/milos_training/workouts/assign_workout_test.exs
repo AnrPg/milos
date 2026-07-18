@@ -21,6 +21,13 @@ defmodule MilosTraining.Workouts.AssignWorkoutTest do
     assert assignment.master_workout_id == workout.id
     assert MapSet.new(assignment.athlete_ids) == MapSet.new([athlete_one.id, athlete_two.id])
     assert assignment.workout.id == workout.id
+
+    for athlete <- [athlete_one, athlete_two] do
+      assert Enum.any?(
+               MilosTraining.Notifications.list_for_user(athlete.id),
+               &(&1.type == "workout_assigned")
+             )
+    end
   end
 
   test "merges repeat assignment requests for the same workout and date" do

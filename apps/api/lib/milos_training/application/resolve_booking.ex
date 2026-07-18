@@ -8,7 +8,13 @@ defmodule MilosTraining.Application.ResolveBooking do
     with booking when not is_nil(booking) <- Scheduling.get_booking(booking_id),
          {:ok, updated_booking} <- run_resolution(action, booking_id, admin_message) do
       maybe_reconcile_now(action, updated_booking)
-      MilosTraining.Notifications.dispatch_event(:booking_resolved, updated_booking)
+
+      notification_payload =
+        updated_booking
+        |> plain_map()
+        |> Map.put(:notification_batch_at, DateTime.utc_now() |> DateTime.truncate(:second))
+
+      MilosTraining.Notifications.dispatch_event(:booking_resolved, notification_payload)
       broadcast_resolution(updated_booking)
       {:ok, updated_booking}
     else
@@ -66,6 +72,9 @@ defmodule MilosTraining.Application.ResolveBooking do
   end
 
   defp maybe_reconcile_now(_action, _booking), do: :ok
+
+  defp plain_map(%_{} = struct), do: Map.from_struct(struct)
+  defp plain_map(map) when is_map(map), do: map
 
   defp broadcast_resolution(booking) do
     Phoenix.PubSub.broadcast(

@@ -123,3 +123,15 @@ msgstr "Изпратен е отзив за %{target_type} с оценка %{rat
 
 msgid "A new %{target_type} review needs attention."
 msgstr "Нов отзив за %{target_type} изисква внимание."
+
+msgid "Class bookings approved"
+msgstr "Одобрени резервации за класове"
+
+msgid "Your coach approved one or more class booking requests."
+msgstr "Вашият треньор одобри една или повече заявки за класове."
+
+msgid "New workouts assigned"
+msgstr "Зададени са нови тренировки"
+
+msgid "Your coach assigned one or more workouts to you."
+msgstr "Вашият треньор ви зададе една или повече тренировки."

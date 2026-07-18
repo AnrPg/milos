@@ -123,3 +123,15 @@ msgstr "تم إرسال مراجعة من نوع %{target_type} بتقييم %{r
 
 msgid "A new %{target_type} review needs attention."
 msgstr "تحتاج مراجعة جديدة من نوع %{target_type} إلى الاهتمام."
+
+msgid "Class bookings approved"
+msgstr "تمت الموافقة على حجوزات الصفوف"
+
+msgid "Your coach approved one or more class booking requests."
+msgstr "وافق مدربك على طلب واحد أو أكثر لحجز الصفوف."
+
+msgid "New workouts assigned"
+msgstr "تم تعيين تمارين جديدة"
+
+msgid "Your coach assigned one or more workouts to you."
+msgstr "عيّن لك مدربك تمرينًا واحدًا أو أكثر."
