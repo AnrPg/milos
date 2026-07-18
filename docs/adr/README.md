@@ -64,3 +64,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-062 | Entitlement guidance and notification consolidation | Accepted |
 | ADR-063 | Browser-safe avatar editing and dossier navigation | Accepted |
 | ADR-064 | Shared collapsible home history | Accepted |
+| ADR-065 | Private document export and system sharing | Accepted |
