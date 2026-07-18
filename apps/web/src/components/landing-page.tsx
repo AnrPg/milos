@@ -26,6 +26,7 @@ import {
   type TrainingQuote,
 } from "@/api/landing";
 import { HelpIcon, InfoModal } from "@/components/InfoModal";
+import { HomeDisclosure } from "@/components/home/HomeDisclosure";
 import { ReviewFormPanel } from "@/components/panels/ReviewFormPanel";
 import { WellbeingFormPanel } from "@/components/panels/WellbeingFormPanel";
 import { useSession } from "@/components/session-provider";
@@ -833,11 +834,11 @@ export function LandingPage() {
             </div>
           </section>
 
-          {/* ── Hall of Fame / Pantheon (non-admin) ────────────────────── */}
-          {!isAdmin && <PantheonSection />}
+          {/* ── Hall of Fame / Pantheon ────────────────────────────────── */}
+          <PantheonSection />
 
-          {/* ── Workout history (non-admin) ─────────────────────────────── */}
-          {!isAdmin && (() => {
+          {/* ── Workout history ────────────────────────────────────────── */}
+          {(() => {
             const now = new Date();
             const startOfWeek = new Date(now);
             startOfWeek.setDate(now.getDate() - now.getDay());
@@ -882,13 +883,10 @@ export function LandingPage() {
             });
 
             return (
-              <section className="rounded-[2.2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-                <div className="flex items-center justify-between gap-4 flex-wrap">
-                  <div>
-                    <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>{i18n("workoutHistory4c84737")}</p>
-                    <h2 className="mt-3 text-2xl font-semibold tracking-tight" style={{ color: "var(--text)" }}>{i18n("recentCompletions4866ac5")}</h2>
-                  </div>
-                  {/* View toggle */}
+              <HomeDisclosure
+                eyebrow={i18n("workoutHistory4c84737")}
+                title={i18n("recentCompletions4866ac5")}
+                actions={
                   <div
                     className="flex rounded-xl overflow-hidden"
                     style={{ border: "1px solid var(--border)" }}
@@ -916,7 +914,8 @@ export function LandingPage() {
                       ≡
                     </button>
                   </div>
-                </div>
+                }
+              >
 
                 {/* Filters */}
                 <div className="mt-4">
@@ -1114,7 +1113,7 @@ export function LandingPage() {
                     ))
                   )}
                 </div>
-              </section>
+              </HomeDisclosure>
             );
           })()}
         </div>

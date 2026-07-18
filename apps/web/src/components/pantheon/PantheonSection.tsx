@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { listPRs, type PRRecord } from "@/api/gamification";
 import { useSession } from "@/components/session-provider";
+import { HomeDisclosure } from "@/components/home/HomeDisclosure";
 import { PantheonCard } from "./PantheonCard";
 import { PRFormModal } from "./PRFormModal";
 import { PRShareModal } from "./PRShareModal";
@@ -28,13 +29,11 @@ export function PantheonSection() {
 
   return (
     <>
-      <section className="rounded-[2.2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>{i18n("hallOfFamee10f949")}</p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-tight" style={{ color: "var(--text)" }}>{i18n("personalRecords4769a96")}</h2>
-          </div>
-          <div className="flex items-center gap-2">
+      <HomeDisclosure
+        eyebrow={i18n("hallOfFamee10f949")}
+        title={i18n("personalRecords4769a96")}
+        actions={
+          <>
             <button
               type="button"
               onClick={() => setFormPR("new")}
@@ -51,10 +50,11 @@ export function PantheonSection() {
             >
               {i18n("viewAll931e1a4")}
             </Link>
-          </div>
-        </div>
+          </>
+        }
+      >
 
-        <div className="mt-5">
+        <div>
           {prsQuery.isPending ? (
             <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
           ) : topPRs.length === 0 ? (
@@ -81,7 +81,7 @@ export function PantheonSection() {
             </div>
           )}
         </div>
-      </section>
+      </HomeDisclosure>
 
       {formPR !== null && (
         <PRFormModal
