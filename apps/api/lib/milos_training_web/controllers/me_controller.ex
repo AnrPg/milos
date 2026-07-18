@@ -179,12 +179,15 @@ defmodule MilosTrainingWeb.MeController do
 
   def update_avatar(conn, _params) do
     user = Guardian.Plug.current_resource(conn)
-    avatar_key = conn.body_params["avatar_key"]
 
-    with {:ok, updated_user} <- UpdateAvatar.call(user.id, avatar_key) do
+    with {:ok, avatar_key} <- avatar_key_param(conn.body_params),
+         {:ok, updated_user} <- UpdateAvatar.call(user.id, avatar_key) do
       json(conn, %{user: %{id: updated_user.id, avatar_url: updated_user.avatar_url}})
     end
   end
+
+  defp avatar_key_param(%{"avatar_key" => avatar_key}), do: {:ok, avatar_key}
+  defp avatar_key_param(_params), do: {:error, :invalid_avatar_upload}
 
   def avatar_upload_url(conn, _params) do
     user = Guardian.Plug.current_resource(conn)
