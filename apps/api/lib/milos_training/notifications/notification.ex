@@ -14,6 +14,7 @@ defmodule MilosTraining.Notifications.Notification do
     :workout_deleted,
     :workout_rejected,
     :workout_moved,
+    :workout_assigned,
     :workout_assignment_requested,
     :review_submitted,
     :athlete_message,
