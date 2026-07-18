@@ -76,6 +76,9 @@ services:
     build:
       context: ./apps/web
       dockerfile: Dockerfile
+      args:
+        MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-http://media.localhost:18080}
+        NEXT_PUBLIC_MEDIA_ORIGIN: ${NEXT_PUBLIC_MEDIA_ORIGIN:-${MINIO_PUBLIC_ENDPOINT:-http://media.localhost:18080}}
     environment:
       API_PROXY_TARGET: http://api:4000
       MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-http://media.localhost:18080}
