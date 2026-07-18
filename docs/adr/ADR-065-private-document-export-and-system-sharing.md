@@ -33,8 +33,9 @@ The dialog exposes one selected format and three delivery paths:
 3. Explicit destination shortcuts use the same file-capable system share sheet
    when available. Where it is unavailable, email receives a localized plain-
    text `mailto:` fallback and cloud-drive actions download the artifact before
-   opening the provider's upload surface. Social fallback copies a plain-text
-   summary for pasting without creating a public application URL.
+   opening the provider's upload surface. Social fallback downloads the same
+   selected-format artifact for manual attachment without creating a public
+   application URL.
 
 PDF generation uses `jspdf`. Standards-compliant ODT files use `jszip` to build
 the required OpenDocument package with an uncompressed first `mimetype` entry.
@@ -89,4 +90,30 @@ hierarchy as PDF, ODT, Markdown, or text. The canonical row contract must remain
 stable enough for spreadsheet import.
 
 ## Implementation Notes
-To be completed after implementation and live verification.
+Implemented on 2026-07-18 with a single `ShareExportDialog` used by the admin
+workout library, the current user's WOD history, and the current user's
+Pantheon PR list. The Pantheon dialog retains its existing authenticated Milos
+direct-message recipient flow as a secondary section rather than replacing it.
+
+The canonical export model has source adapters for materialized workouts,
+editable workout drafts, executions, and PRs. Draft normalization is deliberately
+limited to the existing workout-draft contract and does not create a second
+domain model. The renderers generate real PDF and ODT containers; PDF and ODT
+use a violet, teal, pink, slate visual hierarchy, while Unicode-capable ODT,
+Markdown, and text outputs include contextual emoji. CSV remains BOM-prefixed,
+quoted, and hierarchy-flattened for spreadsheet interoperability.
+
+The Web Share path passes the generated `File` itself in the selected format.
+Provider shortcuts reuse that path when the browser supports file sharing. On
+unsupported browsers the exact artifact is downloaded before the mail composer
+or cloud upload surface opens; this is an explicit fallback because browsers do
+not permit one website to inject a local file into another provider's page.
+
+Verification completed with 56 frontend tests, including real PDF signatures,
+ODT package/color/emoji assertions, draft-workout content, and selected-format
+file handoff; TypeScript, targeted ESLint, the production Next.js build, and the
+localization gates all pass. The localization catalog contains 2,303 matching
+messages across all 12 supported locales with no hard-coded TSX copy. A local
+production server smoke test returned HTTP 200 for `/` and `/admin/workouts`.
+No new technical-debt entry was created: direct provider OAuth integrations are
+an explicitly rejected alternative, not incomplete work in this implementation.
