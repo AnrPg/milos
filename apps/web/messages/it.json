@@ -34,7 +34,18 @@
     "languageDescription": "Scegli la lingua di Milos Training",
     "languageLabel": "Lingua dell'app",
     "languageSaved": "Lingua aggiornata.",
-    "languageError": "Impossibile aggiornare la lingua."
+    "languageError": "Impossibile aggiornare la lingua.",
+    "avatarEditorTitle": "Modifica immagine del profilo",
+    "avatarEditorDescription": "Ingrandisci e posiziona l’immagine nel cerchio.",
+    "avatarReadError": "Impossibile leggere questa immagine. Scegli un altro file JPEG, PNG o WebP.",
+    "avatarPreviewLabel": "Anteprima dell’avatar modificato",
+    "avatarZoom": "Zoom",
+    "avatarHorizontalPosition": "Posizione orizzontale",
+    "avatarVerticalPosition": "Posizione verticale",
+    "avatarApply": "Usa questa immagine",
+    "avatarUnsupportedType": "Scegli un’immagine JPEG, PNG o WebP.",
+    "avatarTooLarge": "L’immagine deve essere inferiore a 5 MiB.",
+    "avatarFormatHelp": "JPEG, PNG o WebP fino a 5 MiB. Puoi ritagliarla e posizionarla prima del caricamento."
   },
   "Session": {
     "required": "Autenticazione richiesta",

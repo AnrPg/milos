@@ -34,7 +34,18 @@
     "languageDescription": "Kies de taal van Milos Training",
     "languageLabel": "Taal van de app",
     "languageSaved": "Taal bijgewerkt.",
-    "languageError": "De taal kon niet worden bijgewerkt."
+    "languageError": "De taal kon niet worden bijgewerkt.",
+    "avatarEditorTitle": "Profielfoto bewerken",
+    "avatarEditorDescription": "Zoom en plaats de afbeelding binnen de cirkel.",
+    "avatarReadError": "Deze afbeelding kon niet worden gelezen. Kies een ander JPEG-, PNG- of WebP-bestand.",
+    "avatarPreviewLabel": "Voorbeeld van bewerkte avatar",
+    "avatarZoom": "Zoom",
+    "avatarHorizontalPosition": "Horizontale positie",
+    "avatarVerticalPosition": "Verticale positie",
+    "avatarApply": "Deze afbeelding gebruiken",
+    "avatarUnsupportedType": "Kies een JPEG-, PNG- of WebP-afbeelding.",
+    "avatarTooLarge": "De afbeelding moet kleiner zijn dan 5 MiB.",
+    "avatarFormatHelp": "JPEG, PNG of WebP tot 5 MiB. Je kunt bijsnijden en positioneren vóór het uploaden."
   },
   "Session": {
     "required": "Aanmelden vereist",

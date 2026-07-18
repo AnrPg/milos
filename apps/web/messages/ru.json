@@ -34,7 +34,18 @@
     "languageDescription": "Выберите язык Milos Training",
     "languageLabel": "Язык приложения",
     "languageSaved": "Язык обновлён.",
-    "languageError": "Не удалось обновить язык."
+    "languageError": "Не удалось обновить язык.",
+    "avatarEditorTitle": "Редактирование фото профиля",
+    "avatarEditorDescription": "Масштабируйте и расположите изображение внутри круга.",
+    "avatarReadError": "Не удалось прочитать изображение. Выберите другой файл JPEG, PNG или WebP.",
+    "avatarPreviewLabel": "Предпросмотр отредактированного аватара",
+    "avatarZoom": "Масштаб",
+    "avatarHorizontalPosition": "Положение по горизонтали",
+    "avatarVerticalPosition": "Положение по вертикали",
+    "avatarApply": "Использовать это изображение",
+    "avatarUnsupportedType": "Выберите изображение JPEG, PNG или WebP.",
+    "avatarTooLarge": "Размер изображения должен быть меньше 5 MiB.",
+    "avatarFormatHelp": "JPEG, PNG или WebP до 5 MiB. Перед загрузкой можно обрезать и расположить изображение."
   },
   "Session": {
     "required": "Требуется вход",

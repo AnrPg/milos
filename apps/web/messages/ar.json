@@ -34,7 +34,18 @@
     "languageDescription": "اختر اللغة المستخدمة في Milos Training",
     "languageLabel": "لغة التطبيق",
     "languageSaved": "تم تحديث اللغة.",
-    "languageError": "تعذر تحديث اللغة."
+    "languageError": "تعذر تحديث اللغة.",
+    "avatarEditorTitle": "تعديل صورة الملف الشخصي",
+    "avatarEditorDescription": "كبّر الصورة وضعها داخل الدائرة.",
+    "avatarReadError": "تعذرت قراءة هذه الصورة. اختر ملف JPEG أو PNG أو WebP آخر.",
+    "avatarPreviewLabel": "معاينة الصورة الرمزية المعدلة",
+    "avatarZoom": "التكبير",
+    "avatarHorizontalPosition": "الموضع الأفقي",
+    "avatarVerticalPosition": "الموضع الرأسي",
+    "avatarApply": "استخدام هذه الصورة",
+    "avatarUnsupportedType": "اختر صورة JPEG أو PNG أو WebP.",
+    "avatarTooLarge": "يجب أن يكون حجم الصورة أقل من 5 MiB.",
+    "avatarFormatHelp": "JPEG أو PNG أو WebP حتى 5 MiB. يمكنك قصها وتحديد موضعها قبل الرفع."
   },
   "Session": {
     "required": "يلزم تسجيل الدخول",
