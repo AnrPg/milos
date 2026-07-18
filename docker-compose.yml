@@ -151,6 +151,7 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-milos_minio}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-milos-minio-change-me}
+      MINIO_API_CORS_ALLOW_ORIGIN: ${MINIO_API_CORS_ALLOW_ORIGIN:-*}
     volumes:
       - ./.minio-data:/data
     networks: [app]

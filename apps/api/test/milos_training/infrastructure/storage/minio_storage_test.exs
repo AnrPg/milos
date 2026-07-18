@@ -10,4 +10,20 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorageTest do
     assert operation.bucket == "milos-avatars"
     assert operation.resource == "location"
   end
+
+  test "avatar uploads only require headers browsers may set" do
+    assert MinioStorage.avatar_upload_headers("image/jpeg") == [
+             {"content-type", "image/jpeg"}
+           ]
+  end
+
+  test "avatar metadata probe uses a bounded body-bearing GET" do
+    operation = MinioStorage.avatar_probe_operation("milos-avatars", "avatars/user/avatar.jpg")
+
+    assert operation.http_method == :get
+    assert operation.bucket == "milos-avatars"
+    assert operation.path == "avatars/user/avatar.jpg"
+    assert operation.headers["range"] == "bytes=0-0"
+  end
+
 end
