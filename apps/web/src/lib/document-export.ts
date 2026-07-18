@@ -34,6 +34,16 @@ export type ExportLabels = {
   baseOnly: string;
   none: string;
   generatedBy: string;
+  teamWorkout: string;
+  setsLabel: string;
+  roundsLabel: string;
+  excluded: string;
+  basePrescription: string;
+  load: string;
+  yes: string;
+  no: string;
+  session: string;
+  score: string;
 };
 
 export type ExportItem = {
@@ -70,9 +80,9 @@ function compact(values: Array<string | null | undefined>): string[] {
   return values.filter((value): value is string => Boolean(value));
 }
 
-function displayValue(value: unknown): string {
+function displayValue(value: unknown, labels?: ExportLabels): string {
   if (value === null || value === undefined || value === "") return "—";
-  if (typeof value === "boolean") return value ? "Yes" : "No";
+  if (typeof value === "boolean") return value ? (labels?.yes ?? "Yes") : (labels?.no ?? "No");
   return String(value).replaceAll("_", " ");
 }
 
@@ -86,7 +96,7 @@ function duration(milliseconds: number): string {
     : `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
-function prescription(exercise: WorkoutExerciseRecord | WorkoutVariationRecord): string {
+function prescription(exercise: WorkoutExerciseRecord | WorkoutVariationRecord, labels: ExportLabels): string {
   const parts: string[] = [];
   const sets = exercise.sets;
   const value = exercise.prescription_value;
@@ -97,19 +107,19 @@ function prescription(exercise: WorkoutExerciseRecord | WorkoutVariationRecord):
   } else if (value !== null && value !== undefined) {
     parts.push(`${displayValue(value)}${unit ? ` ${displayValue(unit)}` : ""}`);
   } else if (sets) {
-    parts.push(`${sets} sets`);
+    parts.push(`${sets} ${labels.setsLabel}`);
   }
 
   if (exercise.load_value !== null && exercise.load_value !== undefined) {
-    parts.push(`${displayValue(exercise.load_value)} ${displayValue(exercise.load_mode ?? "load")}`);
+    parts.push(`${displayValue(exercise.load_value)} ${displayValue(exercise.load_mode ?? labels.load)}`);
   }
 
   return parts.join(" · ") || "—";
 }
 
-function variationDetail(variation: WorkoutVariationRecord, base: WorkoutExerciseRecord): string {
+function variationDetail(variation: WorkoutVariationRecord, base: WorkoutExerciseRecord, labels: ExportLabels): string {
   const name = variation.scale_level.label;
-  if (variation.excluded) return `${name}: excluded`;
+  if (variation.excluded) return `${name}: ${labels.excluded}`;
   const merged = {
     ...variation,
     sets: variation.sets ?? base.sets,
@@ -118,13 +128,13 @@ function variationDetail(variation: WorkoutVariationRecord, base: WorkoutExercis
   };
   const override = compact([
     variation.exercise_name_override ?? undefined,
-    prescription(merged),
+    prescription(merged, labels),
     variation.description ?? undefined,
   ]).filter((value, index, values) => value !== "—" && values.indexOf(value) === index);
-  return `${name}: ${override.join(" · ") || "base prescription"}`;
+  return `${name}: ${override.join(" · ") || labels.basePrescription}`;
 }
 
-function timerSummary(timer: Record<string, unknown> | null | undefined): string | undefined {
+function timerSummary(timer: Record<string, unknown> | null | undefined, labels: ExportLabels): string | undefined {
   if (!timer) return undefined;
   const type = displayValue(timer.type);
   const durationSeconds = Number(timer.duration_seconds ?? 0);
@@ -132,7 +142,7 @@ function timerSummary(timer: Record<string, unknown> | null | undefined): string
   return compact([
     type,
     durationSeconds > 0 ? duration(durationSeconds * 1000) : undefined,
-    rounds > 0 ? `${rounds} rounds` : undefined,
+    rounds > 0 ? `${rounds} ${labels.roundsLabel}` : undefined,
   ]).join(" · ");
 }
 
@@ -141,7 +151,7 @@ export function buildWorkoutDocument(workout: WorkoutRecord, labels: ExportLabel
     icon: "🏋️",
     category: labels.workout,
     title: workout.title || labels.workout,
-    subtitle: workout.is_team_workout ? "Team workout" : undefined,
+    subtitle: workout.is_team_workout ? labels.teamWorkout : undefined,
     metadata: [
       { label: labels.type, value: displayValue(workout.type) },
       { label: labels.status, value: displayValue(workout.status ?? "published") },
@@ -164,11 +174,11 @@ export function buildWorkoutDocument(workout: WorkoutRecord, labels: ExportLabel
           .sort((a, b) => a.order - b.order)
           .map((exercise) => ({
             label: exercise.name,
-            value: prescription(exercise),
+            value: prescription(exercise, labels),
             details: compact([
               exercise.description ?? undefined,
-              timerSummary(section.timer_config),
-              ...exercise.variations.map((variation) => variationDetail(variation, exercise)),
+              timerSummary(section.timer_config, labels),
+              ...exercise.variations.map((variation) => variationDetail(variation, exercise, labels)),
             ]),
           })),
       })),
@@ -225,7 +235,7 @@ export function buildExecutionDocument(
     title: execution.workout_title ?? labels.workout,
     metadata: [
       { label: labels.date, value: new Date(completedDate).toLocaleString(locale) },
-      { label: labels.type, value: displayValue(execution.workout_type ?? "session") },
+      { label: labels.type, value: displayValue(execution.workout_type ?? labels.session) },
       { label: labels.scale, value: displayValue(execution.scale_level_slug ?? labels.baseOnly) },
       { label: labels.source, value: displayValue(execution.source) },
       { label: labels.duration, value: duration(execution.total_elapsed_ms) },
@@ -256,7 +266,7 @@ export function buildPRDocument(pr: PRRecord, labels: ExportLabels, locale: stri
     title: pr.name,
     subtitle: `${displayValue(pr.current_score)} ${displayValue(pr.unit)}`,
     metadata: [
-      { label: "Score", value: `${displayValue(pr.current_score)} ${displayValue(pr.unit)}` },
+      { label: labels.score, value: `${displayValue(pr.current_score)} ${displayValue(pr.unit)}` },
       { label: labels.date, value: new Date(`${pr.beaten_on}T00:00:00`).toLocaleDateString(locale) },
       { label: labels.comparison, value: pr.higher_is_better ? labels.higherIsBetter : labels.lowerIsBetter },
     ],
