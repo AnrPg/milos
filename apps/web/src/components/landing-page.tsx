@@ -12,7 +12,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { fetchExecution, type WorkoutExecution } from "@/api/executions";
+import { fetchExecution, listMyExecutions, type WorkoutExecution } from "@/api/executions";
 import { fetchAssignedWorkoutWeek } from "@/api/assigned-workouts";
 import { fetchSchedule } from "@/api/schedule";
 import { PantheonSection } from "@/components/pantheon/PantheonSection";
@@ -35,8 +35,9 @@ import { LocalizedScore } from "@/components/localized-score";
 import { formatLocalIsoDate } from "@/components/schedule/calendar-window";
 import { workoutCta } from "@/components/workout-cta";
 import { ShareExportDialog } from "@/components/share-export/ShareExportDialog";
+import { InAppShareDialog } from "@/components/share-export/InAppShareDialog";
 import { useShareExport } from "@/components/share-export/useShareExport";
-import { buildExecutionDocument } from "@/lib/document-export";
+import { buildExecutionDocument, buildExecutionHistoryDocument, renderText } from "@/lib/document-export";
 
 // ── Badge helpers ─────────────────────────────────────────────────────────────
 
@@ -425,6 +426,7 @@ export function LandingPage() {
   const [leaderboardMode, setLeaderboardMode] = useState<"weekly" | "monthly">("weekly");
   const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null);
   const [shareExecution, setShareExecution] = useState<WorkoutExecution | null>(null);
+  const [historyExportOpen, setHistoryExportOpen] = useState(false);
   const [activeInfoModal, setActiveInfoModal] = useState<string | null>(null);
   const [trainingReadinessOpen, setTrainingReadinessOpen] = useState(false);
   const [reviewPanelOpen, setReviewPanelOpen] = useState(false);
@@ -506,6 +508,16 @@ export function LandingPage() {
         throw new Error(i18n("executionNotAvailablea9817d4"));
       }
       return fetchExecution(tokens.access_token, selectedExecutionId);
+    },
+  });
+
+  const historyExportQuery = useQuery({
+    queryKey: ["executions", "export-all"],
+    enabled: Boolean(tokens?.access_token && historyExportOpen),
+    queryFn: async () => {
+      if (!tokens?.access_token) throw new Error(i18n("authenticationRequired9e44e0b"));
+      const executions = await listMyExecutions(tokens.access_token);
+      return executions.filter((execution) => execution.status === "completed");
     },
   });
 
@@ -893,7 +905,15 @@ export function LandingPage() {
                 title={i18n("recentCompletions4866ac5")}
               >
 
-                <div className="mb-4 flex justify-end">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                  <button
+                    className="rounded-xl px-4 py-2 text-sm font-semibold"
+                    onClick={() => setHistoryExportOpen(true)}
+                    style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+                    type="button"
+                  >
+                    {historyExportOpen && historyExportQuery.isPending ? shareExport.copy.working : i18n("exportFullWorkoutHistory")}
+                  </button>
                   <div
                     className="flex rounded-xl overflow-hidden"
                     style={{ border: "1px solid var(--border)" }}
@@ -1124,11 +1144,11 @@ export function LandingPage() {
                           </div>
                         </button>
                         <button
-                          aria-label={`${shareExport.copy.title}: ${execution.workout_title ?? i18n("workout39463a5")}`}
+                          aria-label={`${i18n("shareInMilos")}: ${execution.workout_title ?? i18n("workout39463a5")}`}
                           className="absolute end-3 top-3 flex h-10 w-10 items-center justify-center rounded-xl text-base"
                           onClick={() => setShareExecution(execution)}
                           style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--primary)" }}
-                          title={shareExport.copy.title}
+                          title={i18n("shareInMilos")}
                           type="button"
                         >
                           📤
@@ -1317,10 +1337,18 @@ export function LandingPage() {
         ) : null}
 
         {shareExecution ? (
+          <InAppShareDialog
+            message={renderText(buildExecutionDocument(shareExecution, shareExport.labels, uiLocale))}
+            onClose={() => setShareExecution(null)}
+            title={shareExecution.workout_title ?? i18n("workout39463a5")}
+          />
+        ) : null}
+
+        {historyExportOpen && historyExportQuery.data ? (
           <ShareExportDialog
             copy={shareExport.copy}
-            document={buildExecutionDocument(shareExecution, shareExport.labels, uiLocale)}
-            onClose={() => setShareExecution(null)}
+            document={buildExecutionHistoryDocument(historyExportQuery.data, shareExport.labels, uiLocale)}
+            onClose={() => setHistoryExportOpen(false)}
           />
         ) : null}
 
