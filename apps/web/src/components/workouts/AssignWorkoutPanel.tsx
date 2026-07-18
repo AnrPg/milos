@@ -5,7 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
-import { localizeError } from "@/i18n/presentation";
+import { localizeAdminAssignmentError, localizeError } from "@/i18n/presentation";
 import { useEffect, useState } from "react";
 
 import { ApiError } from "@/api/client";
@@ -106,7 +106,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
       onAssigned();
       onClose();
     } catch (requestError) {
-      setError(requestError instanceof Error ? localizeError(requestError, i18n) : i18n("couldNotAssignWorkout58ad222"));
+      setError(requestError instanceof Error ? localizeAdminAssignmentError(requestError, i18n) : i18n("couldNotAssignWorkout58ad222"));
     } finally {
       setSaving(false);
     }

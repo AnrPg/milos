@@ -451,7 +451,7 @@ export function AssignedWorkoutsConsole({
     } catch (requestError) {
       if (
         requestError instanceof ApiError &&
-        (requestError.status === 401 || requestError.status === 403)
+        requestError.status === 401
       ) {
         signOut();
         return;
@@ -782,7 +782,7 @@ export function AssignedWorkoutsConsole({
     } catch (requestError) {
       if (
         requestError instanceof ApiError &&
-        (requestError.status === 401 || requestError.status === 403)
+        requestError.status === 401
       ) {
         signOut();
         return;

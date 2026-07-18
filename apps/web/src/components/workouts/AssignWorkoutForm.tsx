@@ -5,7 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
-import { localizeError } from "@/i18n/presentation";
+import { localizeAdminAssignmentError, localizeError } from "@/i18n/presentation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -120,7 +120,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
 
       router.push("/my-workouts");
     } catch (requestError) {
-      setError(requestError instanceof Error ? localizeError(requestError, i18n) : i18n("couldNotAssignWorkout58ad222"));
+      setError(requestError instanceof Error ? localizeAdminAssignmentError(requestError, i18n) : i18n("couldNotAssignWorkout58ad222"));
     } finally {
       setSaving(false);
     }

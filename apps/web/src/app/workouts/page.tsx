@@ -6,7 +6,7 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import {useUiLocale} from "@/i18n/use-ui-locale";
-import { semanticLabel } from "@/i18n/presentation";
+import { localizeError, semanticLabel } from "@/i18n/presentation";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDrag } from "@use-gesture/react";
@@ -306,8 +306,12 @@ function WorkoutsPageContent() {
       });
 
       router.push(`/workouts/${execution.id}/execute`);
-    } catch {
-      setError(i18n("workoutCouldNotBeStartedc7410d6"));
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? localizeError(requestError, i18n)
+          : i18n("workoutCouldNotBeStartedc7410d6"),
+      );
       setLaunching(false);
     }
   }

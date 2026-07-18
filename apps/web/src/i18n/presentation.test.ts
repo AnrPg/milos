@@ -1,7 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { ApiError } from "@/api/client";
-import { formatScore, localizeError, semanticLabel } from "@/i18n/presentation";
+import {
+  formatScore,
+  localizeAdminAssignmentError,
+  localizeError,
+  semanticLabel,
+} from "@/i18n/presentation";
 
 const translate = vi.fn((key: string, params?: Record<string, unknown>) =>
   params ? `${key}:${JSON.stringify(params)}` : key,
@@ -38,6 +43,43 @@ describe("localizeError", () => {
   it("uses localized generic copy for non-API failures", () => {
     expect(localizeError(new Error("NetworkError in English"), translate)).toBe(
       "apiErrorRequestFailed",
+    );
+  });
+
+  it.each([
+    ["finance_profile_missing", "apiErrorSelfFinanceProfileMissing"],
+    ["finance_entitlement_inactive", "apiErrorSelfFinanceEntitlementInactive"],
+    ["finance_entitlement_blocked", "apiErrorSelfFinanceEntitlementBlocked"],
+    ["finance_entitlement_plan_missing", "apiErrorSelfFinanceEntitlementPlanMissing"],
+    ["finance_channel_not_included", "apiErrorSelfFinanceChannelNotIncluded"],
+    ["finance_capability_not_included", "apiErrorSelfFinanceCapabilityNotIncluded"],
+    ["finance_allowance_not_included", "apiErrorSelfFinanceAllowanceNotIncluded"],
+    ["finance_allowance_exhausted", "apiErrorSelfFinanceAllowanceExhausted"],
+    ["invalid_athletes", "apiErrorInvalidAthletes"],
+    ["workout_not_published", "apiErrorWorkoutNotPublished"],
+  ])("gives an actionable assignment message for %s", (code, key) => {
+    const error = new ApiError(403, "Compatibility copy", { code });
+    expect(localizeError(error, translate)).toBe(key);
+  });
+
+  it("uses athlete-specific mitigation in the admin assignment flow", () => {
+    const error = new ApiError(403, "Compatibility copy", {
+      code: "finance_profile_missing",
+    });
+
+    expect(localizeAdminAssignmentError(error, translate)).toBe(
+      "apiErrorFinanceProfileMissing",
+    );
+  });
+
+  it("humanizes entitlement detail parameters for plain users", () => {
+    const error = new ApiError(409, "Compatibility copy", {
+      code: "finance_allowance_exhausted",
+      params: { allowance: "class_visits", limit: 8, committed: 8 },
+    });
+
+    expect(localizeError(error, translate)).toBe(
+      'apiErrorSelfFinanceAllowanceExhausted:{"allowance":"class visits","limit":8,"committed":8}',
     );
   });
 });

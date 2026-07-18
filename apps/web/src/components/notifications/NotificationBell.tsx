@@ -223,6 +223,8 @@ function NotificationCard({
         return i18n("challengeCompletedec1f9a3");
       case "workout_moved":
         return i18n("workoutRescheduledb1ead39");
+      case "workout_assigned":
+        return i18n("newWorkoutsAssigned");
       case "workout_assignment_requested":
         return i18n("notificationc18f8f2");
       case "review_submitted":
