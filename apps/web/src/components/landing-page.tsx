@@ -891,13 +891,17 @@ export function LandingPage() {
               <HomeDisclosure
                 eyebrow={i18n("workoutHistory4c84737")}
                 title={i18n("recentCompletions4866ac5")}
-                actions={
+              >
+
+                <div className="mb-4 flex justify-end">
                   <div
                     className="flex rounded-xl overflow-hidden"
                     style={{ border: "1px solid var(--border)" }}
                   >
                     <button
                       type="button"
+                      aria-label={i18n("gridView8da0c5d")}
+                      title={i18n("gridView8da0c5d")}
                       onClick={() => setHistoryView("grid")}
                       className="px-3 py-1.5 text-sm font-semibold"
                       style={{
@@ -909,6 +913,8 @@ export function LandingPage() {
                     </button>
                     <button
                       type="button"
+                      aria-label={i18n("listViewd5d2df9")}
+                      title={i18n("listViewd5d2df9")}
                       onClick={() => setHistoryView("list")}
                       className="px-3 py-1.5 text-sm font-semibold"
                       style={{
@@ -919,8 +925,7 @@ export function LandingPage() {
                       ≡
                     </button>
                   </div>
-                }
-              >
+                </div>
 
                 {/* Filters */}
                 <div className="mt-4">

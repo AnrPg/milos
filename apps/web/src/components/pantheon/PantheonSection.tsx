@@ -32,8 +32,9 @@ export function PantheonSection() {
       <HomeDisclosure
         eyebrow={i18n("hallOfFamee10f949")}
         title={i18n("personalRecords4769a96")}
-        actions={
-          <>
+      >
+
+        <div className="mb-4 flex flex-wrap items-center justify-end gap-2">
             <button
               type="button"
               onClick={() => setFormPR("new")}
@@ -50,9 +51,7 @@ export function PantheonSection() {
             >
               {i18n("viewAll931e1a4")}
             </Link>
-          </>
-        }
-      >
+        </div>
 
         <div>
           {prsQuery.isPending ? (
