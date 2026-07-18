@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export function proxy(request: NextRequest) {
-  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
-  const mediaOrigins = (process.env.NEXT_PUBLIC_MEDIA_ORIGIN ?? "http://media.localhost:18080")
+type MediaOriginEnv = Record<string, string | undefined>;
+
+export function configuredMediaOrigins(env: MediaOriginEnv = process.env) {
+  return (env.NEXT_PUBLIC_MEDIA_ORIGIN ?? env.MINIO_PUBLIC_ENDPOINT ?? "http://media.localhost:18080")
     .split(/[\s,]+/)
     .map((origin) => origin.trim())
     .filter(Boolean)
     .join(" ");
+}
+
+export function proxy(request: NextRequest) {
+  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  const mediaOrigins = configuredMediaOrigins();
   const development = process.env.NODE_ENV !== "production";
 
   const csp = [
