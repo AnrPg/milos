@@ -26,6 +26,32 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorageTest do
     assert operation.headers["range"] == "bytes=0-15"
   end
 
+  test "avatar probe falls back to the public object URL when the private endpoint misses" do
+    public_probe = fn ->
+      {:ok,
+       %{
+         headers: [
+           {"content-type", "image/jpeg"},
+           {"content-range", "bytes 0-15/91390"}
+         ],
+         body: <<0xFF, 0xD8, 0xFF, 0xE0, "jpeg-rest">>
+       }}
+    end
+
+    assert MinioStorage.avatar_probe_result(
+             {:error, {:http_error, 404, %{}}},
+             public_probe
+           ) ==
+             {:ok,
+              %{
+                headers: [
+                  {"content-type", "image/jpeg"},
+                  {"content-range", "bytes 0-15/91390"}
+                ],
+                body: <<0xFF, 0xD8, 0xFF, 0xE0, "jpeg-rest">>
+              }}
+  end
+
   test "avatar metadata accepts generic storage content type when bytes are a supported image" do
     headers = [
       {"content-type", "application/octet-stream"},

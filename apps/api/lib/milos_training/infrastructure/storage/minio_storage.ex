@@ -116,12 +116,16 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
   end
 
   defp request_avatar_probe(config, bucket, key, public_url) do
-    case avatar_probe_operation(bucket, key) |> ExAws.request(config) do
-      {:ok, _response} = result -> result
-      {:error, {:http_error, 404, _response}} = error -> error
-      {:error, _reason} -> request_public_avatar_probe(public_url)
-    end
+    avatar_probe_operation(bucket, key)
+    |> ExAws.request(config)
+    |> avatar_probe_result(fn -> request_public_avatar_probe(public_url) end)
   end
+
+  @doc false
+  def avatar_probe_result({:ok, _response} = result, _public_probe), do: result
+
+  def avatar_probe_result({:error, _reason}, public_probe) when is_function(public_probe, 0),
+    do: public_probe.()
 
   defp request_public_avatar_probe(public_url) do
     case Req.get(public_url,
