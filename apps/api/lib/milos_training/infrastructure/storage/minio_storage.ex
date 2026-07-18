@@ -91,10 +91,8 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
         error ->
           reason = avatar_validation_reason(error)
 
-          Logger.warning("avatar upload validation failed",
-            reason: inspect(error),
-            bucket: bucket,
-            key_prefix: expected_prefix
+          Logger.warning(
+            "avatar_upload_validation_failed reason=#{inspect(error)} bucket=#{bucket} key_prefix=#{expected_prefix}"
           )
 
           {:error, reason}
