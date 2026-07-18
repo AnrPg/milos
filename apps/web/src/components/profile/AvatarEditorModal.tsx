@@ -25,12 +25,29 @@ export function AvatarEditorModal({ file, pending, uploadError, onCancel, onSave
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const url = URL.createObjectURL(file);
+    let cancelled = false;
     const nextImage = new Image();
-    nextImage.onload = () => setImage(nextImage);
-    nextImage.onerror = () => setError(tProfile("avatarReadError"));
-    nextImage.src = url;
-    return () => URL.revokeObjectURL(url);
+    const reader = new FileReader();
+
+    nextImage.onload = () => {
+      if (!cancelled) setImage(nextImage);
+    };
+    nextImage.onerror = () => {
+      if (!cancelled) setError(tProfile("avatarReadError"));
+    };
+    reader.onload = () => {
+      if (cancelled || typeof reader.result !== "string") return;
+      nextImage.src = reader.result;
+    };
+    reader.onerror = () => {
+      if (!cancelled) setError(tProfile("avatarReadError"));
+    };
+    reader.readAsDataURL(file);
+
+    return () => {
+      cancelled = true;
+      if (reader.readyState === FileReader.LOADING) reader.abort();
+    };
   }, [file, tProfile]);
 
   useEffect(() => {
