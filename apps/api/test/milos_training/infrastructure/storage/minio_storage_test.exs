@@ -25,5 +25,4 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorageTest do
     assert operation.path == "avatars/user/avatar.jpg"
     assert operation.headers["range"] == "bytes=0-0"
   end
-
 end
