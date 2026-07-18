@@ -45,7 +45,10 @@
     "avatarApply": "שימוש בתמונה הזו",
     "avatarUnsupportedType": "בחרו תמונת JPEG, PNG או WebP.",
     "avatarTooLarge": "התמונה חייבת להיות קטנה מ־5 MiB.",
-    "avatarFormatHelp": "JPEG, PNG או WebP עד 5 MiB. ניתן לחתוך ולמקם לפני ההעלאה."
+    "avatarFormatHelp": "JPEG, PNG או WebP עד 5 MiB. ניתן לחתוך ולמקם לפני ההעלאה.",
+    "avatarRotation": "סיבוב",
+    "avatarRotateLeft": "סובב שמאלה",
+    "avatarRotateRight": "סובב ימינה"
   },
   "Session": {
     "required": "נדרשת התחברות",
@@ -2312,6 +2315,8 @@
     "shareExportFormatMarkdown": "Markdown",
     "shareExportFormatText": "טקסט",
     "shareExportFormatOdt": "ODT",
-    "shareExportFormatCsv": "CSV"
+    "shareExportFormatCsv": "CSV",
+    "gridView8da0c5d": "תצוגת רשת",
+    "listViewd5d2df9": "תצוגת רשימה"
   }
 }

@@ -45,7 +45,10 @@
     "avatarApply": "Use this picture",
     "avatarUnsupportedType": "Choose a JPEG, PNG, or WebP image.",
     "avatarTooLarge": "The image must be smaller than 5 MiB.",
-    "avatarFormatHelp": "JPEG, PNG, or WebP up to 5 MiB. You can crop and position it before upload."
+    "avatarFormatHelp": "JPEG, PNG, or WebP up to 5 MiB. You can crop and position it before upload.",
+    "avatarRotation": "Rotation",
+    "avatarRotateLeft": "Rotate left",
+    "avatarRotateRight": "Rotate right"
   },
   "Session": {
     "required": "Authentication required",
@@ -2312,6 +2315,8 @@
     "shareExportFormatMarkdown": "Markdown",
     "shareExportFormatText": "Text",
     "shareExportFormatOdt": "ODT",
-    "shareExportFormatCsv": "CSV"
+    "shareExportFormatCsv": "CSV",
+    "gridView8da0c5d": "Grid view",
+    "listViewd5d2df9": "List view"
   }
 }

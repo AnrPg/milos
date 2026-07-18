@@ -45,7 +45,10 @@
     "avatarApply": "Χρήση αυτής της εικόνας",
     "avatarUnsupportedType": "Επιλέξτε εικόνα JPEG, PNG ή WebP.",
     "avatarTooLarge": "Η εικόνα πρέπει να είναι μικρότερη από 5 MiB.",
-    "avatarFormatHelp": "JPEG, PNG ή WebP έως 5 MiB. Μπορείτε να την περικόψετε και να την τοποθετήσετε πριν τη μεταφόρτωση."
+    "avatarFormatHelp": "JPEG, PNG ή WebP έως 5 MiB. Μπορείτε να την περικόψετε και να την τοποθετήσετε πριν τη μεταφόρτωση.",
+    "avatarRotation": "Περιστροφή",
+    "avatarRotateLeft": "Περιστροφή αριστερά",
+    "avatarRotateRight": "Περιστροφή δεξιά"
   },
   "Session": {
     "required": "Απαιτείται σύνδεση",
@@ -2312,6 +2315,8 @@
     "shareExportFormatMarkdown": "Markdown",
     "shareExportFormatText": "Κείμενο",
     "shareExportFormatOdt": "ODT",
-    "shareExportFormatCsv": "CSV"
+    "shareExportFormatCsv": "CSV",
+    "gridView8da0c5d": "Προβολή πλέγματος",
+    "listViewd5d2df9": "Προβολή λίστας"
   }
 }

@@ -45,7 +45,10 @@
     "avatarApply": "Utiliser cette image",
     "avatarUnsupportedType": "Choisissez une image JPEG, PNG ou WebP.",
     "avatarTooLarge": "L’image doit faire moins de 5 Mio.",
-    "avatarFormatHelp": "JPEG, PNG ou WebP jusqu’à 5 Mio. Vous pouvez la recadrer et la positionner avant l’envoi."
+    "avatarFormatHelp": "JPEG, PNG ou WebP jusqu’à 5 Mio. Vous pouvez la recadrer et la positionner avant l’envoi.",
+    "avatarRotation": "Rotation",
+    "avatarRotateLeft": "Pivoter à gauche",
+    "avatarRotateRight": "Pivoter à droite"
   },
   "Session": {
     "required": "Authentification requise",
@@ -2312,6 +2315,8 @@
     "shareExportFormatMarkdown": "Démarquage",
     "shareExportFormatText": "Texte",
     "shareExportFormatOdt": "ODT",
-    "shareExportFormatCsv": "CSV"
+    "shareExportFormatCsv": "CSV",
+    "gridView8da0c5d": "Vue grille",
+    "listViewd5d2df9": "Vue liste"
   }
 }

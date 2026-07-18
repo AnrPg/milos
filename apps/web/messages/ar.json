@@ -45,7 +45,10 @@
     "avatarApply": "استخدام هذه الصورة",
     "avatarUnsupportedType": "اختر صورة JPEG أو PNG أو WebP.",
     "avatarTooLarge": "يجب أن يكون حجم الصورة أقل من 5 MiB.",
-    "avatarFormatHelp": "JPEG أو PNG أو WebP حتى 5 MiB. يمكنك قصها وتحديد موضعها قبل الرفع."
+    "avatarFormatHelp": "JPEG أو PNG أو WebP حتى 5 MiB. يمكنك قصها وتحديد موضعها قبل الرفع.",
+    "avatarRotation": "التدوير",
+    "avatarRotateLeft": "تدوير لليسار",
+    "avatarRotateRight": "تدوير لليمين"
   },
   "Session": {
     "required": "يلزم تسجيل الدخول",
@@ -2312,6 +2315,8 @@
     "shareExportFormatMarkdown": "تخفيض السعر",
     "shareExportFormatText": "نص",
     "shareExportFormatOdt": "ODT",
-    "shareExportFormatCsv": "CSV"
+    "shareExportFormatCsv": "CSV",
+    "gridView8da0c5d": "عرض شبكي",
+    "listViewd5d2df9": "عرض قائمة"
   }
 }

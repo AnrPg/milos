@@ -45,7 +45,10 @@
     "avatarApply": "Използване на тази снимка",
     "avatarUnsupportedType": "Изберете JPEG, PNG или WebP изображение.",
     "avatarTooLarge": "Изображението трябва да е по-малко от 5 MiB.",
-    "avatarFormatHelp": "JPEG, PNG или WebP до 5 MiB. Можете да го изрежете и позиционирате преди качване."
+    "avatarFormatHelp": "JPEG, PNG или WebP до 5 MiB. Можете да го изрежете и позиционирате преди качване.",
+    "avatarRotation": "Завъртане",
+    "avatarRotateLeft": "Завъртане наляво",
+    "avatarRotateRight": "Завъртане надясно"
   },
   "Session": {
     "required": "Нужно е вписване",
@@ -2312,6 +2315,8 @@
     "shareExportFormatMarkdown": "Markdown",
     "shareExportFormatText": "Текст",
     "shareExportFormatOdt": "ODT",
-    "shareExportFormatCsv": "CSV"
+    "shareExportFormatCsv": "CSV",
+    "gridView8da0c5d": "Изглед в решетка",
+    "listViewd5d2df9": "Изглед списък"
   }
 }

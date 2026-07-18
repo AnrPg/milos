@@ -45,7 +45,10 @@
     "avatarApply": "Deze afbeelding gebruiken",
     "avatarUnsupportedType": "Kies een JPEG-, PNG- of WebP-afbeelding.",
     "avatarTooLarge": "De afbeelding moet kleiner zijn dan 5 MiB.",
-    "avatarFormatHelp": "JPEG, PNG of WebP tot 5 MiB. Je kunt bijsnijden en positioneren vóór het uploaden."
+    "avatarFormatHelp": "JPEG, PNG of WebP tot 5 MiB. Je kunt bijsnijden en positioneren vóór het uploaden.",
+    "avatarRotation": "Rotatie",
+    "avatarRotateLeft": "Linksom draaien",
+    "avatarRotateRight": "Rechtsom draaien"
   },
   "Session": {
     "required": "Aanmelden vereist",
@@ -2312,6 +2315,8 @@
     "shareExportFormatMarkdown": "Afwaardering",
     "shareExportFormatText": "Tekst",
     "shareExportFormatOdt": "ODT",
-    "shareExportFormatCsv": "CSV"
+    "shareExportFormatCsv": "CSV",
+    "gridView8da0c5d": "Rasterweergave",
+    "listViewd5d2df9": "Lijstweergave"
   }
 }

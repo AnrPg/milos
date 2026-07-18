@@ -45,7 +45,10 @@
     "avatarApply": "Использовать это изображение",
     "avatarUnsupportedType": "Выберите изображение JPEG, PNG или WebP.",
     "avatarTooLarge": "Размер изображения должен быть меньше 5 MiB.",
-    "avatarFormatHelp": "JPEG, PNG или WebP до 5 MiB. Перед загрузкой можно обрезать и расположить изображение."
+    "avatarFormatHelp": "JPEG, PNG или WebP до 5 MiB. Перед загрузкой можно обрезать и расположить изображение.",
+    "avatarRotation": "Поворот",
+    "avatarRotateLeft": "Повернуть влево",
+    "avatarRotateRight": "Повернуть вправо"
   },
   "Session": {
     "required": "Требуется вход",
@@ -2312,6 +2315,8 @@
     "shareExportFormatMarkdown": "Уценка",
     "shareExportFormatText": "Текст",
     "shareExportFormatOdt": "ОДТ",
-    "shareExportFormatCsv": "CSV-файл"
+    "shareExportFormatCsv": "CSV-файл",
+    "gridView8da0c5d": "Вид сеткой",
+    "listViewd5d2df9": "Вид списком"
   }
 }

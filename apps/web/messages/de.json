@@ -45,7 +45,10 @@
     "avatarApply": "Dieses Bild verwenden",
     "avatarUnsupportedType": "Wähle ein JPEG-, PNG- oder WebP-Bild.",
     "avatarTooLarge": "Das Bild muss kleiner als 5 MiB sein.",
-    "avatarFormatHelp": "JPEG, PNG oder WebP bis 5 MiB. Du kannst es vor dem Upload zuschneiden und positionieren."
+    "avatarFormatHelp": "JPEG, PNG oder WebP bis 5 MiB. Du kannst es vor dem Upload zuschneiden und positionieren.",
+    "avatarRotation": "Drehung",
+    "avatarRotateLeft": "Nach links drehen",
+    "avatarRotateRight": "Nach rechts drehen"
   },
   "Session": {
     "required": "Anmeldung erforderlich",
@@ -2312,6 +2315,8 @@
     "shareExportFormatMarkdown": "Abschlag",
     "shareExportFormatText": "Text",
     "shareExportFormatOdt": "ODT",
-    "shareExportFormatCsv": "CSV"
+    "shareExportFormatCsv": "CSV",
+    "gridView8da0c5d": "Rasteransicht",
+    "listViewd5d2df9": "Listenansicht"
   }
 }
