@@ -213,7 +213,7 @@ export function PRFormModal({
         style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
       >
         <h2 id={titleId} className="text-xl font-semibold" style={{ color: "var(--text)" }}>
-          {isExisting ? i18n("updatePr71b8cf3") : i18n("newPr1c0d9f2")}
+          {isExisting ? i18n("exportPersonalRecord") : i18n("newPr1c0d9f2")}
         </h2>
 
         <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
@@ -392,7 +392,7 @@ export function PRFormModal({
               {mutation.isPending && mutation.variables !== "edit"
                 ? i18n("saving56a2285")
                 : isExisting
-                  ? i18n("updatePr71b8cf3")
+                  ? i18n("recordBetterPr")
                   : i18n("addPr24c8c6f")}
             </button>
             {isExisting && (
@@ -405,7 +405,7 @@ export function PRFormModal({
               >
                 {mutation.isPending && mutation.variables === "edit"
                   ? i18n("saving56a2285")
-                  : i18n("edit5301648")}
+                  : i18n("applyPrEdits")}
               </button>
             )}
             <button
