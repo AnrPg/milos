@@ -25,6 +25,11 @@ import {
 import type { PRSupportingMetrics } from "@/api/gamification";
 import type { EffectiveEntitlement } from "@/api/my-finance";
 import { visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
+import {
+  ADMIN_PROFILE_SECTION_REQUEST,
+  openAdminProfileSection,
+  type AdminProfileSectionRequest,
+} from "@/components/admin/users/admin-profile-navigation";
 import { LocalizedScore } from "@/components/localized-score";
 import { formatPRCardDetails } from "@/components/pantheon/pr-card-details";
 import { SemanticLabel } from "@/components/semantic-label";
@@ -38,20 +43,36 @@ function Panel({ id, title, children, href, hrefLabel }: { id: string; title: st
   const resolvedHrefLabel = hrefLabel ?? i18n("openWorkspace8b23311");
   const [open, setOpen] = useState(id === "overview" || id === "finance" || id === "admin_actions");
 
+  useEffect(() => {
+    const initialHashFrame = window.requestAnimationFrame(() => {
+      if (window.location.hash === `#${id}`) setOpen(true);
+    });
+
+    function handleSectionRequest(event: Event) {
+      if ((event as AdminProfileSectionRequest).detail.section === id) setOpen(true);
+    }
+
+    window.addEventListener(ADMIN_PROFILE_SECTION_REQUEST, handleSectionRequest);
+    return () => {
+      window.cancelAnimationFrame(initialHashFrame);
+      window.removeEventListener(ADMIN_PROFILE_SECTION_REQUEST, handleSectionRequest);
+    };
+  }, [id]);
+
   return (
-    <article id={id} className="scroll-mt-20 rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+    <article id={id} className="scroll-mt-20 overflow-hidden rounded-[2rem]" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
       <button
         type="button"
         aria-expanded={open}
         aria-controls={`${id}-content`}
         onClick={() => setOpen((value) => !value)}
-        className="flex w-full items-center justify-between gap-4 text-start"
+        className="flex w-full items-center justify-between gap-4 p-6 text-start"
       >
         <span className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--primary)" }}>{title}</span>
         <span className="text-sm font-semibold" style={{ color: "var(--dim)" }}>{open ? i18n("hide34d8b60") : i18n("showd97d1ee")}</span>
       </button>
       {open ? (
-        <div id={`${id}-content`} className="mt-4 text-sm leading-6" style={{ color: "var(--text-soft)" }}>
+        <div id={`${id}-content`} className="border-t px-6 pb-6 pt-4 text-sm leading-6" style={{ borderColor: "var(--border)", color: "var(--text-soft)" }}>
           {children}
           {href ? <Link href={href} className="mt-4 inline-flex items-center gap-1 text-sm font-semibold" style={{ color: "var(--primary)" }}>{resolvedHrefLabel} <span className="inline-block rtl:rotate-180">→</span></Link> : null}
         </div>
@@ -429,7 +450,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
         </section>
 
         <nav aria-label={i18n("profileSectionscd4815c")} className="flex flex-wrap gap-2">
-          {visibleSections.map((section) => <a key={section} href={`#${section}`} className="rounded-full px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-80" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>{semanticLabel(section, i18n)}</a>)}
+          {visibleSections.map((section) => <a key={section} href={`#${section}`} onClick={(event) => { event.preventDefault(); openAdminProfileSection(section); }} className="rounded-full px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-80" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>{semanticLabel(section, i18n)}</a>)}
         </nav>
 
         <section className="space-y-4">
