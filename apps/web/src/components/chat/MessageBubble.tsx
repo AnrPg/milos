@@ -2,9 +2,10 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import type { ChatMessage } from "@/api/messaging";
+import type { DisplayChatMessage } from "@/lib/offline-message-outbox";
 
 interface MessageBubbleProps {
-  message: ChatMessage;
+  message: ChatMessage | DisplayChatMessage;
   isOwnMessage: boolean;
   senderNickname?: string;
 }
@@ -47,6 +48,12 @@ export function MessageBubble({ message, isOwnMessage, senderNickname }: Message
       </div>
       <span className="text-[10px] px-1" style={{ color: "var(--dim)" }}>
         {time}
+        {"delivery_status" in message && message.delivery_status === "pending"
+          ? ` · ${i18n("sendingcf76551")}`
+          : ""}
+        {"delivery_status" in message && message.delivery_status === "failed"
+          ? ` · ${i18n("messageCouldNotBeSent7aa3b0a")}`
+          : ""}
       </span>
     </div>
   );

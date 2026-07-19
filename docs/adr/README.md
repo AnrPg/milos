@@ -66,3 +66,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-064 | Shared collapsible home history | Accepted |
 | ADR-065 | Private document export and system sharing | Accepted |
 | ADR-066 | Home controls and avatar editor hardening | Accepted |
+| ADR-067 | Durable offline command delivery | Accepted |

@@ -58,8 +58,23 @@ defmodule MilosTrainingWeb.ChatChannelTest do
     assert user_id == admin.id
     assert nickname == admin.nickname
 
-    ref = Phoenix.ChannelTest.push(admin_socket, "send_message", %{"body" => "acknowledged"})
+    operation_id = Ecto.UUID.generate()
+
+    ref =
+      Phoenix.ChannelTest.push(admin_socket, "send_message", %{
+        "body" => "acknowledged",
+        "client_operation_id" => operation_id
+      })
+
     assert_reply ref, :ok, %{id: message_id}, 1_000
+
+    replay_ref =
+      Phoenix.ChannelTest.push(admin_socket, "send_message", %{
+        "body" => "acknowledged",
+        "client_operation_id" => operation_id
+      })
+
+    assert_reply replay_ref, :ok, %{id: ^message_id}, 1_000
 
     ref = Phoenix.ChannelTest.push(admin_socket, "mark_read", %{"message_id" => message_id})
     assert_reply ref, :ok, %{read: true, message_id: ^message_id}

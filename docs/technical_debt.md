@@ -25,6 +25,7 @@ the original wording and dates for traceability.
 | TD-032 | Resolved |
 | TD-033 | Open |
 | TD-034 | Open |
+| TD-035 | Open |
 
 ## Detailed Ledger
 
@@ -64,3 +65,4 @@ the original wording and dates for traceability.
 | TD-032 | Localization Phase 3 live verification | Resolved 2026-07-16: local and Compose deployments publish MinIO through Caddy at `http://media.localhost:18080`; presigned URLs, the web CSP, `.env.example`, and the media virtual host share that origin | Kept for traceability of the local avatar/CSP mismatch | Low | 2026-07-16 |
 | TD-033 | Training Log | Add standalone training-log aggregate for class or offline workouts that were never started as `workout_executions` | ADR-050 hardens actual-workout patches on the existing execution aggregate first; non-execution logs need source selection, authorization, and completion/gamification semantics without overloading timer execution state | High | 2026-07-17 |
 | TD-034 | Multi-tenancy | Automate delivery of one-off tenant-scoped registration invitations through verified email links or an OTP provider, including delivery status, retry, abuse controls, and recovery workflows | The initial multi-tenant rollout will have the platform owner distribute invitations manually; provider selection, sender-domain configuration, privacy review, and operational monitoring require a dedicated integration phase | High | 2026-07-18 |
+| TD-035 | Offline Commands | Add retry/remove controls for permanently failed message operations plus explicit outbox adapters and server idempotency/conflict policies for selected non-message notification-triggering commands | ADR-067 deliberately enables automatic retry for transient message failures first; permanent failures need explicit UX, while booking, approval, journal, and other commands must opt in through their owning contexts rather than being replayed generically | Medium | 2026-07-19 |

@@ -13867,6 +13867,11 @@
                           "body": {
                             "type": "string"
                           },
+                          "client_operation_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "id": {
                             "format": "uuid",
                             "type": "string"
@@ -13898,6 +13903,7 @@
                           "sender_id",
                           "body",
                           "message_type",
+                          "client_operation_id",
                           "inserted_at"
                         ],
                         "type": "object"
@@ -13959,6 +13965,10 @@
                     "minLength": 1,
                     "type": "string"
                   },
+                  "client_operation_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
                   "message_type": {
                     "default": "chat",
                     "enum": [
@@ -13986,6 +13996,11 @@
                     "message": {
                       "properties": {
                         "body": {
+                          "type": "string"
+                        },
+                        "client_operation_id": {
+                          "format": "uuid",
+                          "nullable": true,
                           "type": "string"
                         },
                         "id": {
@@ -14019,6 +14034,7 @@
                         "sender_id",
                         "body",
                         "message_type",
+                        "client_operation_id",
                         "inserted_at"
                       ],
                       "type": "object"

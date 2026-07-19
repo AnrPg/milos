@@ -12,6 +12,7 @@ defmodule MilosTraining.Messaging.Message do
     field :sender_id, :binary_id
     field :body, :string
     field :message_type, Ecto.Enum, values: @message_types, default: :chat
+    field :client_operation_id, Ecto.UUID
     field :sequence_number, :integer, read_after_writes: true
 
     timestamps(updated_at: false)
@@ -19,10 +20,13 @@ defmodule MilosTraining.Messaging.Message do
 
   def changeset(message, attrs) do
     message
-    |> cast(attrs, [:thread_id, :sender_id, :body, :message_type])
+    |> cast(attrs, [:thread_id, :sender_id, :body, :message_type, :client_operation_id])
     |> validate_required([:thread_id, :sender_id, :body])
     |> validate_length(:body, min: 1, max: 5000)
     |> foreign_key_constraint(:thread_id)
     |> foreign_key_constraint(:sender_id)
+    |> unique_constraint(:client_operation_id,
+      name: :messaging_messages_sender_client_operation_id_index
+    )
   end
 end

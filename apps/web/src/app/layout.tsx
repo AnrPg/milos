@@ -6,6 +6,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { QueryProvider } from "@/components/query-provider";
 import { RealtimeSyncBridge } from "@/components/realtime-sync-bridge";
+import { OfflineMessageSyncBridge } from "@/components/offline-message-sync-bridge";
 import { SessionProvider } from "@/components/session-provider";
 import { ServiceWorkerBootstrap } from "@/components/service-worker-bootstrap";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -84,6 +85,7 @@ export default async function RootLayout({
             <ThemeProvider>
               <SessionProvider>
                 <RealtimeSyncBridge />
+                <OfflineMessageSyncBridge />
                 <ServiceWorkerBootstrap />
                 <TopNav />
                 {children}

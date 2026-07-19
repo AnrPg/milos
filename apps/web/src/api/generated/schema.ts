@@ -8700,6 +8700,8 @@ export interface operations {
                         messages: {
                             body: string;
                             /** Format: uuid */
+                            client_operation_id: string | null;
+                            /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             inserted_at: string;
@@ -8737,6 +8739,8 @@ export interface operations {
             content: {
                 "application/json": {
                     body: string;
+                    /** Format: uuid */
+                    client_operation_id?: string;
                     /**
                      * @default chat
                      * @enum {string}
@@ -8755,6 +8759,8 @@ export interface operations {
                     "application/json": {
                         message: {
                             body: string;
+                            /** Format: uuid */
+                            client_operation_id: string | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */

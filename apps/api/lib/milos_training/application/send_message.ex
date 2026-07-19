@@ -10,7 +10,7 @@ defmodule MilosTraining.Application.SendMessage do
   alias MilosTraining.{Finance, Identity, Messaging}
 
   def call(%{id: sender_id, role: :admin}, %{message_type: :coaching_note} = params) do
-    delivery_id = Ecto.UUID.generate()
+    delivery_id = Map.get(params, :client_operation_id) || Ecto.UUID.generate()
 
     with {:ok, thread} <- Messaging.get_thread(params.thread_id, sender_id),
          recipients <- coaching_recipients(thread, sender_id),

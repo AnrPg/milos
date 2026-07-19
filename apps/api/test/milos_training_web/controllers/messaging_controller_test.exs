@@ -1,6 +1,7 @@
 defmodule MilosTrainingWeb.MessagingControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
+  import Ecto.Query
   import MilosTraining.TestFixtures
 
   describe "POST /api/threads (direct)" do
@@ -236,6 +237,50 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       assert response["message"]["body"] == "Great session today!"
       assert response["message"]["message_type"] == "chat"
       assert response["message"]["sender_id"] == admin.id
+    end
+
+    test "replays a client operation without duplicating the message", %{conn: conn} do
+      admin = admin_fixture()
+      athlete = user_fixture(%{role: :athlete})
+      operation_id = Ecto.UUID.generate()
+
+      %{"thread" => thread} =
+        conn
+        |> put_bearer_token(admin)
+        |> post("/api/threads", %{context_type: "direct", participant_id: athlete.id})
+        |> json_response(200)
+
+      payload = %{
+        body: "Persist this once",
+        message_type: "chat",
+        client_operation_id: operation_id
+      }
+
+      first =
+        conn
+        |> put_bearer_token(admin)
+        |> post("/api/threads/#{thread["id"]}/messages", payload)
+        |> json_response(201)
+
+      replay =
+        conn
+        |> put_bearer_token(admin)
+        |> post("/api/threads/#{thread["id"]}/messages", payload)
+        |> json_response(201)
+
+      assert replay["message"]["id"] == first["message"]["id"]
+      assert replay["message"]["client_operation_id"] == operation_id
+      assert MilosTraining.Repo.aggregate(Oban.Job, :count) == 1
+
+      assert 1 ==
+               MilosTraining.Repo.aggregate(
+                 from(message in MilosTraining.Messaging.Message,
+                   where:
+                     message.sender_id == ^admin.id and
+                       message.client_operation_id == ^operation_id
+                 ),
+                 :count
+               )
     end
 
     test "admin can send a coaching_note", %{conn: conn} do

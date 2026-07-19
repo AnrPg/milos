@@ -6,6 +6,7 @@ defmodule MilosTraining.Messaging.Application.SendMessage do
 
   def call(%{thread_id: thread_id, sender_id: sender_id, body: body} = params, delivery) do
     message_type = Map.get(params, :message_type, :chat)
+    client_operation_id = Map.get(params, :client_operation_id)
 
     with %{} = thread <-
            ThreadStore.get_thread_with_participants(thread_id) || {:error, :not_found},
@@ -16,7 +17,8 @@ defmodule MilosTraining.Messaging.Application.SendMessage do
                thread_id: thread_id,
                sender_id: sender_id,
                body: body,
-               message_type: message_type
+               message_type: message_type,
+               client_operation_id: client_operation_id
              },
              delivery
            ) do

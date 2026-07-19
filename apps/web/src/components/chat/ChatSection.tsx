@@ -39,6 +39,8 @@ export function ChatSection({
   const [threadLoading, setThreadLoading] = useState(false);
   const [input, setInput] = useState("");
   const [messageType] = useState<MessageType>("chat");
+  const [isSending, setIsSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -79,10 +81,21 @@ export function ChatSection({
     }
   }, [messages, isExpanded]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
-    sendMessage(input, messageType);
-    setInput("");
+  const handleSend = async () => {
+    const draft = input;
+    if (!draft.trim() || isSending) return;
+
+    setIsSending(true);
+    setSendError(null);
+    try {
+      await sendMessage(draft, messageType);
+      setInput((current) => (current === draft ? "" : current));
+      sendTypingStop();
+    } catch (error) {
+      setSendError(error instanceof Error ? error.message : i18n("messageCouldNotBeSent7aa3b0a"));
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -130,11 +143,17 @@ export function ChatSection({
               <MessageComposer
                 placeholder={i18n("writeAMessage24bf2a3")}
                 value={input}
-                onChange={setInput}
+                onChange={(value) => {
+                  setInput(value);
+                  setSendError(null);
+                }}
                 onFocus={sendTypingStart}
                 onBlur={sendTypingStop}
-                onSend={handleSend}
+                onSend={() => void handleSend()}
                 sendLabel={i18n("send9bc2575")}
+                sending={isSending}
+                sendingLabel={i18n("sendingcf76551")}
+                error={sendError}
               />
             </div>
           )}
