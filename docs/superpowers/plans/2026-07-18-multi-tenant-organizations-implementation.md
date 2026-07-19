@@ -3,16 +3,20 @@
 **Date:** 2026-07-18
 
 **Status:** In progress
-**Goal:** Convert Milos Training into a shared-schema, independently operated multi-tenant product with membership-scoped roles, one-time invitations, automatic tenant inference, and defense-in-depth isolation.
+**Goal:** Convert Milos Training into a single-origin, shared-schema multi-tenant
+product with membership-scoped roles, one-time invitations, path-resolved tenant
+context, global personal resources, and defense-in-depth isolation.
 
 ## Governing decisions
 
 - ADR-055: Organizations bounded context and membership-scoped identity.
 - ADR-056: Shared schema with explicit predicates and PostgreSQL RLS.
 - ADR-057: Opaque, hashed, expiring, one-time invitations.
-- ADR-058: Invitation and verified-host tenant resolution.
+- ADR-058: Invitation joining and single-origin path-resolved tenant context.
 - ADR-059: Tenant propagation through all infrastructure.
 - ADR-060: Expand/backfill/enforce/contract rollout.
+- Journal-first cross-feature constraints:
+  `docs/superpowers/specs/2026-07-19-journal-first-app-redesign.md`.
 
 ## Non-negotiable delivery rules
 
@@ -30,7 +34,11 @@
 - [x] Create the feature branch.
 - [x] Write ADR-055 through ADR-060.
 - [ ] Build a tenant-ownership inventory for every table, materialized view, job, cache key, topic, search document, and object path.
-- [ ] Classify the small set of intentionally platform-global resources.
+- [ ] Classify every resource as tenant-owned, global-personal, or platform-global.
+- [ ] Record self-authored Wellbeing facts and Pantheon PRs as global-personal; record
+      organization-authored safety facts as tenant-owned.
+- [ ] Record the movement catalog as platform-global with tenant-scoped proposal and
+      alias moderation.
 - [ ] Add tenant migration status and deferred delivery automation to the debt ledger as needed.
 
 ## Phase T1 — Organization primitives
@@ -47,6 +55,8 @@
 
 ## Phase T2 — Invitation redemption and tenant-aware registration
 
+- [ ] Preserve open personal registration without creating a synthetic organization
+      membership.
 - [ ] Pure token generation/digest and invitation policy tests.
 - [ ] Transactional invitation redemption port owned by Organizations.
 - [ ] Cross-context application services for new-account and existing-account redemption.
@@ -56,14 +66,19 @@
 - [ ] Rate-limit inspection and redemption without exposing whether arbitrary organizations exist.
 - [ ] Prove one-time behavior under concurrent redemption.
 
-## Phase T3 — Request, authorization, and realtime tenant context
+## Phase T3 — Path, authorization, and realtime tenant context
 
 - [ ] Add transport-neutral `TenantContext` and membership authorization policy.
-- [ ] Resolve verified hosts in HTTP plugs and Phoenix socket connection.
+- [ ] Resolve `/org/:organization_slug/...` in HTTP plugs and Phoenix socket
+      connection, then validate active membership.
+- [ ] Keep personal routes user-scoped and independent of tenant selection.
+- [ ] Add an authenticated membership selector that generates organization paths;
+      never rely on hidden selected-organization session state.
 - [ ] Carry organization and membership claims in access tokens without treating claims as the source of truth.
 - [ ] Replace global role plugs with membership-aware authorization.
 - [ ] Scope Channels and PubSub topics by organization and user.
-- [ ] Add cross-host, stale-membership, forged-claim, and socket-isolation tests.
+- [ ] Add cross-path, multi-tab, stale-membership, forged-claim, personal-route, and
+      socket-isolation tests.
 
 ## Phase T4 — Context-by-context database ownership
 
@@ -75,24 +90,35 @@ For each bounded context, repeat the complete expand/backfill/enforce loop befor
 4. Execution.
 5. Finance.
 6. Messaging and Notifications.
-7. Gamification and Pantheon.
-8. Coaching, Analytics, Feedback, and Wellbeing.
+7. Gamification and tenant-owned Pantheon projections; keep personal PR records
+   user-owned.
+8. Coaching, Analytics, Feedback, and Wellbeing, splitting self-authored personal
+   facts from organization-authored safety facts.
 
 Each loop includes:
 
 - [ ] Nullable ownership migration and indexes.
 - [ ] Idempotent changeset-backed legacy backfill.
-- [ ] Public API and store port signatures require `TenantContext`.
+- [ ] Tenant-owned public API and store port signatures require `TenantContext`;
+      global-personal signatures require authenticated `UserContext`.
 - [ ] Same-tenant foreign-key constraints.
 - [ ] Non-null ownership migration.
 - [ ] Explicit query predicates plus RLS policy.
 - [ ] Two-tenant read/write isolation suite.
+- [ ] For global-personal tables, use owner/grant predicates and user-scoped RLS
+      instead of forcing `organization_id`.
+- [ ] Preserve former-member read access only to the user's own actual result, never
+      prescription, class, peer, or coach-private data.
 
 ## Phase T5 — Infrastructure isolation
 
 - [ ] Oban payloads, uniqueness, and workers establish tenant context.
-- [ ] Redis keys and invalidation include organization ID.
-- [ ] Meilisearch documents and filters include organization ID; rebuild indexes.
+- [ ] Tenant-owned Redis keys and invalidation include organization ID;
+      global-personal keys include owner user ID.
+- [ ] Tenant-owned Meilisearch documents and filters include organization ID;
+      rebuild indexes.
+- [ ] Global-personal indexes use owner scope; the global movement catalog indexes
+      only approved canonical terms and correctly scoped aliases.
 - [ ] MinIO paths and signed URLs include organization prefixes; migrate objects.
 - [ ] Calendar/CSV/document exports bind organization and membership.
 - [ ] Notification delivery and push subscriptions cannot cross organizations.
@@ -102,6 +128,7 @@ Each loop includes:
 
 - [ ] Provision distinct migration-owner and runtime database roles.
 - [ ] Set transaction-local organization context in runtime adapters.
+- [ ] Set transaction-local user context for global-personal adapters.
 - [ ] Enable and force RLS only after unmapped-row checks reach zero.
 - [ ] Remove global-role authorization and tenantless fallbacks.
 - [ ] Remove the fixed admin registration code.
@@ -114,7 +141,7 @@ Each loop includes:
 - [ ] Organization lifecycle: active, suspended, archived.
 - [ ] Initial owner invitation and copy-once delivery.
 - [ ] Organization branding, locale, timezone, and configurable invitation lifetimes.
-- [ ] Wildcard DNS/TLS and organization subdomain routing.
+- [ ] Single-origin organization path routing and canonical deep links.
 - [ ] Backup/export/restore runbook and tenant deletion policy.
 - [ ] Keep automated email/OTP delivery deferred under TD-034 until provider work begins.
 
@@ -122,6 +149,10 @@ Each loop includes:
 
 - All tests, architecture checks, contract generation, lint, localization, and production builds pass.
 - No tenant-owned row is nullable or reachable without tenant context.
+- No global-personal row is reachable without owner or explicit grant authorization.
 - No raw invitation token persists in PostgreSQL, logs, analytics, or job arguments.
 - Two organizations can use every shipped surface independently with identical nicknames and no observable cross-tenant data.
+- An independent account can register and use personal surfaces without a synthetic
+  organization, while organization paths remain deterministic across tabs and
+  bookmarks.
 - ADR implementation notes and the technical debt ledger reflect all emergent decisions and deferrals.

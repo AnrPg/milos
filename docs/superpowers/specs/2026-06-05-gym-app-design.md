@@ -3,6 +3,11 @@
 **Status:** Approved  
 **App Name:** Milos Training
 
+> **Approved cross-feature constraint (2026-07-19):** Multi-tenancy must preserve
+> global personal ownership and the future Journal-first experience described in
+> `docs/superpowers/specs/2026-07-19-journal-first-app-redesign.md`. Organization
+> membership scopes tenant operations; it does not own the user's personal history.
+
 ---
 
 ## 1. Overview
