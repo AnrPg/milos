@@ -3,6 +3,12 @@
 **Status:** Approved  
 **App Name:** Milos Training
 
+> **Approved product-direction addendum (2026-07-19):** The personal-user
+> experience is being redesigned around Today, Journal, and Progress. Read
+> `docs/superpowers/specs/2026-07-19-journal-first-app-redesign.md` together with
+> this PRD. Its architecture decision gates must be accepted before implementation;
+> until then, this document's architecture constraints remain fully authoritative.
+
 ---
 
 ## 1. Overview
