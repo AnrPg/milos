@@ -193,6 +193,7 @@ defmodule MilosTrainingWeb.MeController do
     end
   end
 
+  defp avatar_key_param(%{avatar_key: avatar_key}), do: {:ok, avatar_key}
   defp avatar_key_param(%{"avatar_key" => avatar_key}), do: {:ok, avatar_key}
   defp avatar_key_param(_params), do: {:error, :invalid_avatar_upload}
 
