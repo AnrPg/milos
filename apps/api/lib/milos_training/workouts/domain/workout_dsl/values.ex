@@ -78,12 +78,16 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Values do
   def load(raw, opts \\ [])
 
   def load(raw, opts) when is_binary(raw) do
+    normalized = raw |> String.trim() |> String.downcase()
     signed? = Keyword.get(opts, :signed, false)
     sign = if signed?, do: "[+-]?", else: ""
     regex = Regex.compile!("^(#{sign}\\d+(?:\\.\\d+)?)\\s*(kg|lb|%1rm|%|bw)$", "i")
 
-    case Regex.run(regex, String.trim(raw)) do
-      [_, raw_number, raw_unit] ->
+    case {normalized, Regex.run(regex, String.trim(raw))} do
+      {"bw", _match} ->
+        {:ok, %{value: 0, mode: "bw", unit: "bodyweight"}}
+
+      {_normalized, [_, raw_number, raw_unit]} ->
         unit = String.downcase(raw_unit)
 
         if unit == "bw" do
@@ -98,7 +102,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Values do
           end
         end
 
-      _ ->
+      {_normalized, _match} ->
         :error
     end
   end

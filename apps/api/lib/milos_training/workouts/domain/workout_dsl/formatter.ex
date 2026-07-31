@@ -532,8 +532,19 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Formatter do
   defp value(map, key, default \\ nil)
   defp value(nil, _key, default), do: default
 
-  defp value(map, key, default) when is_map(map),
-    do: Map.get(map, key, Map.get(map, to_string(key), default))
+  defp value(map, key, default) when is_map(map) do
+    case Map.fetch(map, key) do
+      {:ok, found} ->
+        found
+
+      :error ->
+        Enum.reduce_while(map, default, fn {candidate, found}, _acc ->
+          if to_string(candidate) == to_string(key),
+            do: {:halt, found},
+            else: {:cont, default}
+        end)
+    end
+  end
 
   defp blank?(nil), do: true
   defp blank?(""), do: true

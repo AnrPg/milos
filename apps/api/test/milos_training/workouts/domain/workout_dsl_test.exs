@@ -118,7 +118,10 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDslTest do
       assert exercise.sets == 4
       assert exercise.tempo == "31X1"
       assert exercise.rest_seconds == 150
-      assert exercise.note == "Reduce the final heavy set if bar speed drops."
+      refute Map.has_key?(exercise, :note)
+
+      assert [%{type: "coach-note", body: "Reduce the final heavy set if bar speed drops."}] =
+               exercise.notes
 
       assert Enum.map(exercise.set_prescriptions, & &1.load_value) == [60, 70, 80, 65]
       assert Enum.map(exercise.set_prescriptions, & &1.prescription_value) == [5, 5, 3, 5]
@@ -151,7 +154,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDslTest do
              end)
 
       assert Enum.any?(diagnostics, fn diagnostic ->
-               diagnostic.code == :unknown_exercise_parameter and diagnostic.line == 9
+               diagnostic.code == :unresolved_exercise_reference and diagnostic.line == 8
              end)
 
       assert Enum.any?(diagnostics, fn diagnostic ->
@@ -203,6 +206,178 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDslTest do
       assert {:ok, second} = WorkoutDsl.parse(formatted)
       assert second.workout == first.workout
       assert WorkoutDsl.format(second.workout, version: second.version) == formatted
+    end
+
+    test "every canonical section template parses and round-trips idempotently" do
+      alias MilosTraining.Workouts.Domain.WorkoutDsl.Templates
+
+      Enum.each(Vocabulary.section_formats(), fn format ->
+        source = """
+        [workout]
+        dsl-version: 1
+        title: #{format} conformance
+        type: strength
+        #{Templates.section(format)}
+        [/workout]
+        """
+
+        assert {:ok, first} = WorkoutDsl.parse(source), "template failed for #{format}"
+        formatted = WorkoutDsl.format(first.workout, version: first.version)
+        assert {:ok, second} = WorkoutDsl.parse(formatted), "round-trip failed for #{format}"
+        assert second.workout == first.workout
+        assert WorkoutDsl.format(second.workout, version: second.version) == formatted
+      end)
+    end
+
+    test "nested sections, groups, scales, rich metadata and linear deload survive round-trip" do
+      source = """
+      [workout]
+      dsl-version: 1
+      canonical-schema-version: 1
+      source-revision: 7
+      title: Complete Strength Day
+      subtitle: Lower body emphasis
+      description: Build strength without losing movement quality.
+      type: strength
+      difficulty: intermediate
+      estimated-duration: 75m
+      equipment: barbell, rack, pull-up bar
+      tags: strength, deload
+      target-population: Intermediate athletes
+      objective: Strength with controlled fatigue
+      location: Main gym
+      modality: Mixed
+      program-position: Week 3 Day 2
+      default-scale: rx
+      is-team-workout: false
+      !athlete-note:
+      Move with intent and stop if technique deteriorates.
+
+      [section: straight-sets]
+      title: Strength
+      subtitle: Primary work
+      rest-between-exercises: 2m
+      rest-before-next-section: 3m
+      [header]
+      title: Main lifts
+      subtitle: Quality before load
+      [/header]
+      [exercise: Back Squat]
+      subtitle: Controlled eccentric
+      progression: linear
+      sets: 4
+      reps: 5
+      load-start: 80%1rm
+      load-step: -5%1rm
+      tempo: 31X1
+      target-rpe: 8
+      target-rir: 2
+      percentage-of: training max
+      side: both
+      stance: shoulder width
+      grip: full
+      range-of-motion: below parallel
+      equipment: barbell, rack
+      rest-between-reps: 2s
+      rest-between-sets: 2m
+      rest-after-exercise: 90s
+      rest-until: breathing controlled
+      rest-range: 90s..2m
+      [scale: beginner]
+      variation: Goblet Squat
+      sets: 4
+      reps: 8
+      load: 16kg
+      !scaling-note:
+      Preserve full depth.
+      [/scale]
+      [/exercise]
+      [section: amrap]
+      title: Assistance
+      duration: 8m
+      score: rounds+reps
+      [group: superset]
+      title: Pull and press
+      sets: 3
+      rest-between-groups: 60s
+      [exercise: Pull-up]
+      reps: 8
+      load: bw
+      [/exercise]
+      [exercise: Push-up]
+      reps: 12
+      load: bw
+      [/exercise]
+      [/group]
+      [/section]
+      [/section]
+      [/workout]
+      """
+
+      assert {:ok, first} = WorkoutDsl.parse(source)
+      formatted = WorkoutDsl.format(first.workout, version: first.version)
+      assert {:ok, second} = WorkoutDsl.parse(formatted)
+      assert second.workout == first.workout
+
+      [section] = first.workout.sections
+      [header, squat] = section.exercises
+      [assistance] = section.sections
+      assert header.item_type == "header"
+      assert squat.load_progression.direction == "decrease"
+      assert Enum.map(squat.set_prescriptions, & &1.load_value) == [80, 75, 70, 65]
+      assert [%{scale_level_slug: "beginner"}] = squat.variations
+      assert length(assistance.exercises) == 2
+      assert Enum.uniq(Enum.map(assistance.exercises, & &1.superset_group_id)) |> length() == 1
+    end
+
+    test "representative randomized prescriptions remain stable after canonical formatting" do
+      for sets <- 1..8, reps <- [1, 3, 5, 8, 12], load <- [0, 20, 42.5, 80] do
+        source = """
+        [workout]
+        dsl-version: 1
+        title: Generated #{sets}-#{reps}-#{load}
+        type: strength
+        [section: untimed]
+        title: Main
+        [exercise: Deadlift]
+        sets: #{sets}
+        reps: #{reps}
+        load: #{load}kg
+        [/exercise]
+        [/section]
+        [/workout]
+        """
+
+        assert {:ok, first} = WorkoutDsl.parse(source)
+        assert {:ok, second} = first.workout |> WorkoutDsl.format() |> WorkoutDsl.parse()
+        assert second.workout == first.workout
+      end
+    end
+  end
+
+  describe "bounded and strict input" do
+    test "rejects oversized source before tokenization" do
+      assert {:error, [%{code: :source_too_large}]} =
+               WorkoutDsl.parse(String.duplicate("x", 200_001))
+    end
+
+    test "rejects unsupported exercise capability instead of silently dropping it" do
+      source = """
+      [workout]
+      dsl-version: 1
+      title: Invalid capability
+      type: strength
+      [section: untimed]
+      title: Main
+      [exercise: Air Squat]
+      distance: 500m
+      [/exercise]
+      [/section]
+      [/workout]
+      """
+
+      assert {:error, diagnostics} = WorkoutDsl.parse(source)
+      assert Enum.any?(diagnostics, &(&1.code == :exercise_capability_not_supported))
     end
   end
 end

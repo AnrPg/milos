@@ -35,12 +35,9 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Templates do
       "[section: #{Vocabulary.dsl_format(format)}]",
       "title: #{humanize(format)}",
       Enum.map(spec.dsl_required, &required_line/1),
+      if(format == "rest", do: "duration: 1m"),
       score_line(spec.scores),
-      "[exercise: Air Squat]",
-      "sets: 3",
-      "reps: 10",
-      "!coach-note: Add coaching intent here.",
-      "[/exercise]",
+      exercise_lines(format),
       "[/section]"
     ]
     |> List.flatten()
@@ -67,6 +64,19 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Templates do
 
   defp score_line([]), do: nil
   defp score_line([score | _rest]), do: "score: #{score}"
+
+  defp exercise_lines("rest"), do: nil
+
+  defp exercise_lines(_format) do
+    [
+      "[exercise: Air Squat]",
+      "sets: 3",
+      "reps: 10",
+      "!coach-note:",
+      "Add coaching intent here.",
+      "[/exercise]"
+    ]
+  end
 
   defp humanize(format) do
     format

@@ -182,6 +182,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Vocabulary do
     "work" => :work_seconds,
     "rest" => :rest_seconds,
     "rounds" => :rounds,
+    "sets" => :sets,
     "cycles" => :cycles,
     "intra-set-rest" => :intra_rest_seconds,
     "effort-duration" => :effort_seconds,
@@ -222,7 +223,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Vocabulary do
   )
 
   @exercise_keys ~w(
-    sets reps duration calories distance load load-mode percentage-of
+    subtitle sets reps duration calories distance load load-mode percentage-of
     target-rpe target-rir tempo pace cadence target-heart-rate side stance
     grip range-of-motion height incline resistance equipment variation
     interval-assignment score-contribution transition-time
@@ -333,6 +334,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Vocabulary do
              :max_windows,
              :target_rounds,
              :cluster_reps,
+             :sets,
              :hr_zone,
              :hr_drop_target
            ],

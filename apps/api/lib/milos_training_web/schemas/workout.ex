@@ -188,6 +188,7 @@ defmodule MilosTrainingWeb.Schemas.Workout do
         tags: %Schema{type: :array, items: %Schema{type: :string}},
         notes: %Schema{type: :array, items: typed_note_schema()},
         workout_metadata: %Schema{type: :object, additionalProperties: true},
+        draft_data: %Schema{type: :object, additionalProperties: true, nullable: true},
         sections: %Schema{type: :array, items: section_schema()},
         editor_session_id: @nullable_uuid,
         authoring_mode: %Schema{
@@ -197,7 +198,12 @@ defmodule MilosTrainingWeb.Schemas.Workout do
         },
         dsl_version: %Schema{type: :integer, enum: [1], nullable: true},
         dsl_source: %Schema{type: :string, maxLength: 200_000, nullable: true},
-        dsl_document: %Schema{type: :object, additionalProperties: true, nullable: true}
+        dsl_document: %Schema{type: :object, additionalProperties: true, nullable: true},
+        expected_source_revision: %Schema{type: :integer, minimum: 0, nullable: true},
+        last_dsl_diagnostics: %Schema{
+          type: :array,
+          items: MilosTrainingWeb.Schemas.WorkoutDsl.diagnostic_schema()
+        }
       },
       additionalProperties: false
     }
@@ -226,7 +232,16 @@ defmodule MilosTrainingWeb.Schemas.Workout do
         scale_level: scale_level_schema(),
         available_scale_levels: %Schema{type: :array, items: scale_level_schema()},
         sections: %Schema{type: :array, items: section_schema()},
-        draft_data: %Schema{type: :object, nullable: true, additionalProperties: true}
+        draft_data: %Schema{type: :object, nullable: true, additionalProperties: true},
+        authoring_mode: %Schema{type: :string, enum: ["structured", "quick_text"]},
+        dsl_version: %Schema{type: :integer, enum: [1], nullable: true},
+        dsl_source: %Schema{type: :string, nullable: true},
+        dsl_document: %Schema{type: :object, additionalProperties: true, nullable: true},
+        dsl_source_revision: %Schema{type: :integer, minimum: 0},
+        last_dsl_diagnostics: %Schema{
+          type: :array,
+          items: MilosTrainingWeb.Schemas.WorkoutDsl.diagnostic_schema()
+        }
       },
       required: [:id, :title, :type, :sections],
       additionalProperties: false

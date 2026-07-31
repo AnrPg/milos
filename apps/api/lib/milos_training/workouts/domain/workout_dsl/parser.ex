@@ -185,7 +185,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
         notes: [],
         equipment: [],
         tags: [],
-        workout_metadata: %{},
+        workout_metadata: %{"schema_version" => @schema_version},
         is_team_workout: false
       })
 
@@ -895,28 +895,28 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
   end
 
   defp put_timer_value(state, key, field, raw_value, line_number) do
-    parser =
+    {parser, error_code} =
       case Vocabulary.timer_value_kind(field) do
         :duration ->
-          &Values.duration/1
+          {&Values.duration/1, :invalid_duration}
 
         :distance ->
-          &Values.distance/1
+          {&Values.distance/1, :invalid_distance}
 
         :integer ->
-          &Values.integer/1
+          {&Values.integer/1, :invalid_integer}
 
         :enum ->
-          fn value ->
-            normalized = value |> String.downcase() |> String.replace("-", "_")
+          {fn value ->
+             normalized = value |> String.downcase() |> String.replace("-", "_")
 
-            if normalized in Vocabulary.timer_enum_values(field),
-              do: {:ok, normalized},
-              else: :error
-          end
+             if normalized in Vocabulary.timer_enum_values(field),
+               do: {:ok, normalized},
+               else: :error
+           end, :invalid_enum_value}
 
         :string ->
-          fn value -> text_value(value) end
+          {fn value -> text_value(value) end, :invalid_text_value}
       end
 
     put_once(state, key, line_number, fn state ->
@@ -927,7 +927,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
           end)
 
         :error ->
-          add_error(state, :invalid_timer_value, line_number, %{key: key, value: raw_value})
+          add_error(state, error_code, line_number, %{key: key, value: raw_value})
       end
     end)
   end
@@ -989,6 +989,9 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
         :invalid_set_count,
         "sets"
       )
+
+  defp put_exercise_statement(state, _kind, "subtitle", raw_value, line_number),
+    do: with_text(state, "subtitle", raw_value, line_number, &put_top_data(state, :subtitle, &1))
 
   defp put_exercise_statement(state, _kind, "reps", raw_value, line_number),
     do: put_prescription(state, "reps", raw_value, "reps", &Values.integer/1, line_number)
@@ -1378,7 +1381,10 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
     put_once(state, key, line_number, fn state ->
       frame = hd(state.frames)
 
-      if Enum.any?(~w(reps duration calories distance), &MapSet.member?(frame.seen, &1)) do
+      if Enum.any?(
+           ~w(reps duration calories distance),
+           &(&1 != key and MapSet.member?(frame.seen, &1))
+         ) do
         add_error(state, :conflicting_prescription_dimensions, line_number, %{key: key})
       else
         case parser.(raw_value) do
