@@ -8,16 +8,21 @@ defmodule MilosTraining.Workouts.WorkoutExercise do
   @foreign_key_type :binary_id
   @prescription_units [:reps, :secs, :kcal]
   @load_modes [:absolute, :pct_1rm, :bw]
+  @item_types [:exercise, :header]
 
   schema "workout_exercises" do
     field :name, :string
+    field :item_type, Ecto.Enum, values: @item_types, default: :exercise
     field :sets, :integer
+    field :set_prescriptions, {:array, :map}, default: []
     field :prescription_value, :integer
     field :prescription_unit, Ecto.Enum, values: @prescription_units
     field :load_value, :integer
     field :load_mode, Ecto.Enum, values: @load_modes
+    field :load_progression, :map
     field :order, :integer
     field :superset_group_id, :binary_id
+    field :alternating_group_id, :binary_id
     field :hr_zone, :integer
     field :tempo, :string
     field :rest_seconds, :integer
@@ -38,13 +43,17 @@ defmodule MilosTraining.Workouts.WorkoutExercise do
     |> cast(params, [
       :workout_section_id,
       :name,
+      :item_type,
       :sets,
+      :set_prescriptions,
       :prescription_value,
       :prescription_unit,
       :load_value,
       :load_mode,
+      :load_progression,
       :order,
       :superset_group_id,
+      :alternating_group_id,
       :hr_zone,
       :tempo,
       :rest_seconds,
@@ -66,6 +75,7 @@ defmodule MilosTraining.Workouts.WorkoutExercise do
     |> validate_optional_number(:rest_pause_seconds, 0)
     |> validate_optional_number(:pacing, 0)
     |> validate_optional_number(:interval_assignment, 0)
+    |> validate_item_groups()
     |> foreign_key_constraint(:workout_section_id)
     |> cast_assoc(:variations, with: &ExerciseVariation.changeset/2)
   end
@@ -76,4 +86,25 @@ defmodule MilosTraining.Workouts.WorkoutExercise do
 
   defp normalize_name(nil), do: nil
   defp normalize_name(name), do: String.trim(name)
+
+  defp validate_item_groups(changeset) do
+    item_type = get_field(changeset, :item_type)
+    superset_group_id = get_field(changeset, :superset_group_id)
+    alternating_group_id = get_field(changeset, :alternating_group_id)
+
+    cond do
+      item_type == :header and (superset_group_id || alternating_group_id) ->
+        add_error(changeset, :item_type, "headers cannot belong to a set group")
+
+      superset_group_id && alternating_group_id ->
+        add_error(
+          changeset,
+          :alternating_group_id,
+          "cannot combine superset and alternating groups"
+        )
+
+      true ->
+        changeset
+    end
+  end
 end

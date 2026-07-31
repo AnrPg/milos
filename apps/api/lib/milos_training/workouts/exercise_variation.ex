@@ -12,11 +12,14 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
   schema "exercise_variations" do
     field :exercise_name_override, :string
     field :sets, :integer
+    field :set_prescriptions, {:array, :map}
     field :prescription_value, :integer
     field :prescription_unit, Ecto.Enum, values: @prescription_units
     field :load_value, :integer
     field :load_mode, Ecto.Enum, values: @load_modes
+    field :load_progression, :map
     field :excluded, :boolean, default: false
+    field :note, :string
 
     belongs_to :workout_exercise, WorkoutExercise
     belongs_to :scale_level, ScaleLevel
@@ -31,10 +34,13 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
       :scale_level_id,
       :exercise_name_override,
       :sets,
+      :set_prescriptions,
       :prescription_value,
       :prescription_unit,
       :load_value,
       :load_mode,
+      :load_progression,
+      :note,
       :excluded
     ])
     |> update_change(:exercise_name_override, &normalize_string/1)
@@ -61,7 +67,16 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
   end
 
   defp validate_at_least_one_override(changeset) do
-    fields = [:exercise_name_override, :sets, :prescription_value, :load_value, :load_mode]
+    fields = [
+      :exercise_name_override,
+      :sets,
+      :set_prescriptions,
+      :prescription_value,
+      :load_value,
+      :load_mode,
+      :load_progression,
+      :note
+    ]
 
     if Enum.all?(fields, &(get_field(changeset, &1) |> blank?())) do
       add_error(
