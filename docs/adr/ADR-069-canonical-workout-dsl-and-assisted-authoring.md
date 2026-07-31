@@ -141,41 +141,80 @@ and publication require a valid canonical result.
 
 ## Implementation Notes
 
-The first vertical slice was implemented on 2026-07-31:
+Both implementation phases were completed on 2026-07-31.
 
-- `MilosTraining.Workouts.Domain.WorkoutDsl` now provides a deterministic
-  line-oriented parser and canonical formatter with positioned diagnostics.
-  It supports workout and section metadata, the nineteen canonical section
-  formats, exercise/header blocks, notes, uniform prescriptions, explicit
-  per-set load progressions and deloads, tempo, rest, and interval assignment.
-- `WorkoutDsl.Vocabulary` is the shared backend registry for format names,
-  timer parameters, DSL tokens, and contextual completion metadata.
-  `TimerConfig` delegates its duplicated format registry to this module.
-- The admin-only `POST /api/admin/workouts/dsl/parse` OpenAPI operation calls
-  an Application service through the Workouts public API. It returns the
-  canonical preview, formatted source, vocabulary, or source-positioned
-  diagnostics.
-- Draft payloads retain `authoring_mode`, `dsl_version`, `dsl_source`, and the
-  optional Tiptap document. No published-workout schema or table was added.
-- The workout creation screen now offers Structured and Quick Text modes.
-  Quick Text uses Tiptap with conventional formatting controls, draft
-  autosave, debounced authoritative parsing, canonical preview, Beautify,
-  contextual completion, and conversion into the existing structured draft.
-- Canonical tokens and formats are supplied by the backend preview vocabulary.
-  The initial exercise-name and prose dictionaries are local curated lists;
-  they do not create semantics and do not send workout text to third parties.
+Phase 1 established the canonical language and safe preview boundary:
 
-Verification completed with 22 isolated domain/application tests, 3
-controller integration tests against PostgreSQL, 4 frontend suggestion tests,
-TypeScript, ESLint, localization parity/hard-coded-copy checks, OpenAPI client
-generation, compilation with warnings as errors, and
-`mix milos.architecture`. A Playwright Chromium flow also exercised loading a
-Quick Text draft, editing, authoritative preview, Beautify, autosave, and
-conversion to Structured mode.
+- `MilosTraining.Workouts.Domain.WorkoutDsl` provides a deterministic,
+  line-oriented parser, canonicalizer, validator, and formatter with
+  source-positioned diagnostics and bounded source/document sizes.
+- `WorkoutDsl.Vocabulary` is the single registry for the nineteen canonical
+  section formats, aliases, required and optional timer fields, DSL tokens,
+  note markers, enums, units, contextual completion metadata, and the
+  code-backed exercise catalog. `TimerConfig`, templates, the manual, and the
+  frontend consume that registry instead of maintaining parallel lists.
+- The grammar covers workout and section metadata, nested sections, headers
+  and subtitles, typed notes, exercises, composition groups, scale
+  variations, uniform and concrete per-set prescriptions, bodyweight and
+  percentage loads, linear and arbitrary progressions/deloads, tempo, pace,
+  cadence, range-of-motion and equipment tweaks, typed rest, score settings,
+  and all timer-specific parameters.
+- `POST /api/admin/workouts/dsl/parse` is an admin-only, contract-first
+  Application-service boundary. Invalid or ambiguous input remains savable but
+  cannot cross preview, conversion, or publication boundaries.
 
-This slice deliberately does not claim the entire grammar manual. Full
-format-specific templates, all nested/section/workout tweak combinations,
-stable exercise-catalog IDs, richer localized diagnostic messages, direct
-Quick Text publication through the existing canonical publish path, and
-generated coach documentation/conformance fixtures remain follow-up work
-tracked as TD-036.
+Phase 2 completed durable authoring and publication:
+
+- Drafts retain `authoring_mode`, DSL version/source, optional sanitized
+  Tiptap JSON, the latest diagnostics, and a monotonically increasing source
+  revision. Autosave uses optimistic revision checks so two tabs cannot
+  silently overwrite one another.
+- Tiptap supplies a familiar document surface with headings, emphasis,
+  underline, strike-through, highlighting, lists, quotes, code blocks,
+  alignment, links, undo/redo, spellcheck, character limits, and sanitized
+  HTML paste. The editor is read-only until the exact server revision has
+  loaded, preventing late-load overwrites.
+- Contextual completion continuously narrows canonical tokens, parameters,
+  enum values, section templates, exercise catalog names/aliases, and
+  non-semantic common words. Slash commands insert registry-generated,
+  parseable section templates.
+- The generated coach manual and all nineteen format templates come from the
+  same registry used by parsing. The in-app manual, static Greek guide,
+  vocabulary endpoint, and conformance tests therefore fail together rather
+  than drifting independently.
+- Beautify reparses and replaces the source with the canonical formatter
+  output. Conversion to Structured mode and direct publication use the same
+  canonical draft model.
+- Direct publication first saves the exact editor snapshot, verifies its
+  revision under a row lock, reparses it, requires explicit warning
+  acknowledgement, performs an execution/timer dry-run, and only then invokes
+  the existing Workouts publication/materialization path.
+- OpenAPI request/response schemas and the generated TypeScript contract expose
+  the revisioned authoring state, diagnostics, preflight result, manual,
+  vocabulary, and publication result.
+
+Final verification included 43 focused backend tests covering the nineteen
+templates, parse-format-parse idempotence, rich nested/group/scale programs,
+randomized prescription combinations, source and capability limits,
+manual/vocabulary synchronization, timer construction, stale revisions, and
+warning acknowledgement. The affected workout creation suite passes 5/5,
+compilation with warnings as errors succeeds, and
+`mix milos.architecture` reports clean boundaries.
+
+The frontend passes 26 Vitest files / 96 tests, TypeScript, ESLint, and a full
+Next.js production build. Playwright verifies load, preview, Beautify,
+Structured conversion, revisioned autosave, and exact-revision direct publish
+in desktop and mobile Chromium (4/4 flows). All 2,468 messages remain
+locale-parity valid. Generated OpenAPI files were produced from an isolated
+committed worktree so unrelated concurrent endpoints were not folded into
+this feature.
+
+The complete clean committed backend suite ran 484 tests: 483 passed and the
+sole failure is the pre-existing Gamification
+`AdminChallengeControllerTest` overlap-limit expectation, outside the Workouts
+context and unchanged by this feature. All Quick Text, Workouts creation,
+compilation, architecture, contract, frontend, build, and browser gates are
+green.
+
+TD-036 is resolved. No part of the agreed Quick Text DSL, assisted authoring,
+canonical beautification, or safe publication surface remains deferred.

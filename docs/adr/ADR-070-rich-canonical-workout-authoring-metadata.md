@@ -107,4 +107,31 @@ entry cannot invalidate an already published workout reference.
 
 ## Implementation Notes
 
-To be completed after both implementation phases and final verification.
+Completed on 2026-07-31 as part of the two-phase Quick Text rollout.
+
+- Additive migrations retain workout subtitle, difficulty, estimated duration,
+  equipment, typed notes, workout metadata, section subtitle/notes/rest and
+  metadata, exercise catalog references/subtitles/notes/prescription and group
+  metadata, scale-level rich prescriptions, and bounded per-set metadata.
+- `WorkoutAuthoringMetadata` validates the allowed keys, value shapes, typed
+  note visibility, and size/capability limits before persistence. Empty
+  default note arrays and metadata maps do not count as scale overrides.
+- Existing explicit execution columns and concrete set prescriptions remain
+  authoritative for runtime behavior. Rich maps retain sparse authoring intent
+  without replacing queryable or execution-critical fields.
+- The code-backed exercise catalog provides stable identifiers, exact aliases,
+  capabilities, and autocomplete labels. Publication resolves only exact
+  canonical names/aliases; fuzzy suggestions never become publication
+  semantics.
+- Composition groups receive deterministic coordinate-derived identifiers and
+  repeat validated configuration on their existing membership representation.
+- Materialization, duplication, draft reconstruction, serializers, OpenAPI,
+  structured conversion, and Quick Text publication round-trip the new fields.
+  Coach-only notes remain restricted to admin authoring responses.
+- Migrations are additive and the legacy compact fields remain compatible with
+  execution, history, analytics, and existing structured workouts.
+
+The exhaustive DSL round-trip, randomized prescription, timer dry-run,
+controller/revision, frontend security, production-build, and desktop/mobile
+Playwright results are recorded in ADR-069. No rich canonical metadata item
+from this decision remains deferred.
