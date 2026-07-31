@@ -67,3 +67,5 @@ must have an ADR. See `template.md` for the format.
 | ADR-065 | Private document export and system sharing | Accepted |
 | ADR-066 | Home controls and avatar editor hardening | Accepted |
 | ADR-067 | Durable offline command delivery | Accepted |
+| ADR-068 | Structured workout set composition | Accepted |
+| ADR-069 | Canonical workout DSL and assisted authoring | Accepted |
