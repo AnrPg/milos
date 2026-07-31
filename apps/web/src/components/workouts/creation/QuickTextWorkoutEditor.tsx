@@ -81,6 +81,7 @@ export function QuickTextWorkoutEditor({
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [sourceRevision, setSourceRevision] = useState(0);
   const [suggestions, setSuggestions] = useState<WorkoutDslSuggestion[]>([]);
+  const [authoringReady, setAuthoringReady] = useState(false);
   const loadedDraftRef = useRef<string | null>(null);
   const parseRequestRef = useRef(0);
   const sourceRef = useRef(source);
@@ -88,7 +89,10 @@ export function QuickTextWorkoutEditor({
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        link: false,
+        underline: false,
+      }),
       Underline,
       Highlight.configure({ multicolor: true }),
       Link.configure({
@@ -103,6 +107,7 @@ export function QuickTextWorkoutEditor({
       CharacterCount.configure({ limit: 200_000 }),
     ],
     content: sourceToDocument(DEFAULT_WORKOUT_DSL_SOURCE),
+    editable: false,
     immediatelyRender: false,
     editorProps: {
       attributes: {
@@ -135,6 +140,10 @@ export function QuickTextWorkoutEditor({
   );
   const errors = diagnostics.filter((diagnostic) => diagnostic.severity === "error");
   const warnings = diagnostics.filter((diagnostic) => diagnostic.severity === "warning");
+
+  useEffect(() => {
+    editor?.setEditable(authoringReady);
+  }, [authoringReady, editor]);
 
   const updateSuggestions = useCallback(
     (currentEditor = editor) => {
@@ -192,18 +201,25 @@ export function QuickTextWorkoutEditor({
   useEffect(() => {
     if (!tokens?.access_token || !draftId || loadedDraftRef.current === draftId || !editor) return;
 
+    setAuthoringReady(false);
     loadedDraftRef.current = draftId;
     fetchWorkoutDslAuthoring(tokens.access_token, draftId)
       .then((authoring) => {
         const nextSource = authoring.source || DEFAULT_WORKOUT_DSL_SOURCE;
+        const nextRevision = authoring.source_revision ?? 0;
         sourceRef.current = nextSource;
-        revisionRef.current = authoring.source_revision;
+        revisionRef.current = nextRevision;
         setSource(nextSource);
-        setSourceRevision(authoring.source_revision);
-        setDiagnostics(authoring.diagnostics);
+        setSourceRevision(nextRevision);
+        setDiagnostics(authoring.diagnostics ?? []);
         editor.commands.setContent(authoring.document ?? sourceToDocument(nextSource));
+        setAuthoringReady(true);
       })
-      .catch(() => setSaveStatus("error"));
+      .catch(() => {
+        loadedDraftRef.current = null;
+        setAuthoringReady(false);
+        setSaveStatus("error");
+      });
   }, [draftId, editor, tokens?.access_token]);
 
   useEffect(() => {
@@ -216,7 +232,7 @@ export function QuickTextWorkoutEditor({
         .then((result) => {
           if (requestId !== parseRequestRef.current) return;
           setPreview(result);
-          setDiagnostics(result.diagnostics);
+          setDiagnostics(result.diagnostics ?? []);
           setParsing(false);
         })
         .catch((error: unknown) => {
@@ -312,7 +328,7 @@ export function QuickTextWorkoutEditor({
     const slashOffset = slashQuery === undefined ? 0 : 1;
     const replacement =
       suggestion.kind === "template"
-        ? manual?.templates.sections[suggestion.value] ?? suggestion.value
+        ? manual?.templates?.sections?.[suggestion.value] ?? suggestion.value
         : suggestion.value;
 
     editor
@@ -436,8 +452,8 @@ export function QuickTextWorkoutEditor({
             onChange={(event) => {
               insertTemplate(
                 event.target.value === "workout"
-                  ? manual?.templates.workout ?? ""
-                  : manual?.templates.sections[event.target.value] ?? "",
+                  ? manual?.templates?.workout ?? ""
+                  : manual?.templates?.sections?.[event.target.value] ?? "",
               );
               event.currentTarget.value = "";
             }}
@@ -446,7 +462,7 @@ export function QuickTextWorkoutEditor({
           >
             <option value="">{i18n("quickTextInsertTemplate")}</option>
             <option value="workout">{i18n("quickTextFullWorkoutTemplate")}</option>
-            {Object.keys(manual?.templates.sections ?? {}).map((format) => (
+            {Object.keys(manual?.templates?.sections ?? {}).map((format) => (
               <option key={format} value={format}>
                 {format.replaceAll("_", " ")}
               </option>

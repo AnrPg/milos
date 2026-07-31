@@ -51,6 +51,7 @@ const preview = {
     ],
   },
   formatted_source: `${source}\n`,
+  diagnostics: [],
   vocabulary: {
     version: 1,
     section_formats: ["untimed", "for_time", "amrap"],
@@ -67,13 +68,13 @@ test("coach can author Quick Text, preview it, and convert it to structured mode
   page,
 }) => {
   const draftUpdates: Array<Record<string, unknown>> = [];
-  await mockWorkoutApi(context, draftUpdates);
+  await mockWorkoutApi(context, { draftUpdates, publishes: [] });
 
   await page.goto(`/admin/workouts/new?mode=quick-text&draft=${draftId}`);
 
   const editor = page.getByRole("textbox", { name: "Quick Text workout editor" });
   await expect(editor).toBeVisible();
-  await editor.fill(source);
+  await expect(editor).toContainText("Quick Strength");
 
   await expect(page.getByText("Canonical preview ready")).toBeVisible();
   const canonicalPreview = page.getByRole("complementary");
@@ -97,9 +98,32 @@ test("coach can author Quick Text, preview it, and convert it to structured mode
   await expect(page).toHaveURL(/mode=structured/);
 });
 
+test("coach can publish the exact saved Quick Text revision", async ({ context, page }) => {
+  const publishes: Array<Record<string, unknown>> = [];
+  await mockWorkoutApi(context, { draftUpdates: [], publishes });
+
+  await page.goto(`/admin/workouts/new?mode=quick-text&draft=${draftId}`);
+
+  await expect(page.getByText("Canonical preview ready")).toBeVisible();
+  await page.getByRole("button", { name: "Publish workout" }).click();
+
+  await expect
+    .poll(() => publishes.length)
+    .toBe(1);
+  expect(publishes[0]).toMatchObject({
+    source,
+    acknowledge_warnings: false,
+  });
+  expect(publishes[0].expected_source_revision).toEqual(expect.any(Number));
+  await expect(page).toHaveURL(/\/admin\/workouts$/);
+});
+
 async function mockWorkoutApi(
   context: BrowserContext,
-  draftUpdates: Array<Record<string, unknown>>,
+  state: {
+    draftUpdates: Array<Record<string, unknown>>;
+    publishes: Array<Record<string, unknown>>;
+  },
 ) {
   await context.route("**/api/**", async (route) => {
     const url = new URL(route.request().url());
@@ -130,15 +154,53 @@ async function mockWorkoutApi(
 
     if (path === `/api/admin/workouts/${draftId}/draft` && method === "PATCH") {
       const update = route.request().postDataJSON() as Record<string, unknown>;
-      draftUpdates.push(update);
-      return json(route, { draft: { id: draftId, status: "draft" } });
+      state.draftUpdates.push(update);
+      return json(route, {
+        draft: {
+          id: draftId,
+          status: "draft",
+          dsl_source_revision: Number(update.expected_source_revision ?? 0) + 1,
+        },
+      });
     }
 
     if (path === "/api/admin/workouts/dsl/parse" && method === "POST") {
       return json(route, preview);
     }
 
+    if (path === "/api/admin/workouts/dsl/manual" && method === "GET") {
+      return json(route, {
+        version: 1,
+        markdown: "# Quick Text",
+        templates: { workout: source, sections: {} },
+        vocabulary: preview.vocabulary,
+      });
+    }
+
+    if (path === `/api/admin/workouts/${draftId}/dsl` && method === "GET") {
+      return json(route, {
+        version: 1,
+        source,
+        document: null,
+        source_revision: 4,
+        authoring_mode: "quick_text",
+        diagnostics: [],
+      });
+    }
+
+    if (path === `/api/admin/workouts/${draftId}/dsl/publish` && method === "POST") {
+      state.publishes.push(route.request().postDataJSON() as Record<string, unknown>);
+      return json(route, {
+        workout: { id: draftId, status: "published" },
+        formatted_source: `${source}\n`,
+        diagnostics: [],
+        execution_preview: { segment_count: 1, timed_seconds: 0, formats: ["untimed"] },
+      });
+    }
+
     if (path === "/api/admin/scale-levels") return json(route, { scale_levels: [] });
+    if (path === "/api/admin/workout-folders") return json(route, { folders: [] });
+    if (path === "/api/admin/workouts" && method === "GET") return json(route, { workouts: [] });
     return json(route, {});
   });
 }
