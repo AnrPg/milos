@@ -26,9 +26,16 @@ defmodule MilosTraining.Application.GetWorkoutExecution do
         })
 
       workout ->
+        presented_workout =
+          case execution.scale_level_slug do
+            nil -> workout
+            scale_slug -> Workouts.materialize_workout_for_scale(workout.id, scale_slug)
+          end
+
         Map.merge(execution, %{
           workout_title: workout.title,
           workout_type: workout.type,
+          workout: presented_workout,
           section_scores:
             attach_section_names(execution.section_scores || [], section_name_lookup(workout))
         })

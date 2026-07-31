@@ -61,10 +61,13 @@ defmodule MilosTraining.Workouts.Domain.WorkoutMaterializer do
         exercise
         |> maybe_put(:name, Map.get(variation, :exercise_name_override))
         |> maybe_put(:sets, Map.get(variation, :sets))
+        |> maybe_put(:set_prescriptions, Map.get(variation, :set_prescriptions))
         |> maybe_put(:prescription_value, Map.get(variation, :prescription_value))
         |> maybe_put(:prescription_unit, Map.get(variation, :prescription_unit))
         |> maybe_put(:load_value, Map.get(variation, :load_value))
         |> maybe_put(:load_mode, Map.get(variation, :load_mode))
+        |> maybe_put(:load_progression, Map.get(variation, :load_progression))
+        |> maybe_put(:note, Map.get(variation, :note))
         |> Map.put(:excluded, false)
         |> Map.put(:applied_variation, variation)
     end

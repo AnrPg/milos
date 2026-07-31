@@ -130,4 +130,20 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilderTest do
     labels = Enum.map(segments, & &1.label)
     assert labels == ["Min 1", "Min 2", "Min 3"]
   end
+
+  test "preserves section notes and authored header rows for presentation" do
+    header = %{id: "header-1", item_type: "header", name: "Primary lifts", note: "Header note"}
+    exercise = %{id: "exercise-1", item_type: "exercise", name: "Back squat", note: "Brace"}
+
+    [segment] =
+      workout([
+        section(%{type: "for_time"}, [header, exercise])
+        |> Map.put(:note, "Section note")
+      ])
+      |> TimerSequenceBuilder.build()
+
+    assert segment.section_note == "Section note"
+    assert Enum.map(segment.exercises, & &1.item_type) == ["header", "exercise"]
+    assert Enum.map(segment.exercises, & &1.note) == ["Header note", "Brace"]
+  end
 end

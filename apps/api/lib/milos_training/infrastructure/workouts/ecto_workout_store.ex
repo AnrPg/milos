@@ -24,7 +24,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   @impl true
   def create_workout(admin_id, params) do
-    with normalized_params <- WorkoutAuthoring.normalize_structure(params),
+    with {:ok, normalized_params} <- prepare_workout_structure(params),
          {:ok, params_with_levels} <- attach_scale_level_ids(normalized_params) do
       params_with_levels
       |> Map.put(:created_by_id, admin_id)
@@ -112,35 +112,36 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         merged_params =
           draft_data
           |> Map.merge(stringify_keys_deep(params))
-          |> WorkoutAuthoring.normalize_structure()
           |> stringify_keys_deep()
 
-        sections = Map.get(merged_params, "sections") || Map.get(merged_params, :sections) || []
+        with {:ok, prepared_params} <- prepare_workout_structure(merged_params) do
+          prepared_params = stringify_keys_deep(prepared_params)
+          sections = Map.get(prepared_params, "sections") || []
+          all_exercises_empty = sections == [] or not sections_have_exercises?(sections)
 
-        all_exercises_empty = sections == [] or not sections_have_exercises?(sections)
+          if all_exercises_empty do
+            {:error, :no_sections}
+          else
+            with {:ok, params_with_levels} <- attach_scale_level_ids(prepared_params) do
+              Multi.new()
+              |> Multi.update(:workout, MasterWorkout.publish_changeset(workout, prepared_params))
+              |> Multi.delete_all(:old_sections, Ecto.assoc(workout, :sections))
+              |> Multi.run(:new_sections, fn _repo, %{workout: published_workout} ->
+                insert_sections(published_workout.id, params_with_levels)
+              end)
+              |> Repo.transaction()
+              |> case do
+                {:ok, %{workout: published}} ->
+                  published =
+                    published
+                    |> Repo.preload(@workout_preloads)
+                    |> normalize_workout()
 
-        if all_exercises_empty do
-          {:error, :no_sections}
-        else
-          with {:ok, params_with_levels} <- attach_scale_level_ids(merged_params) do
-            Multi.new()
-            |> Multi.update(:workout, MasterWorkout.publish_changeset(workout, merged_params))
-            |> Multi.delete_all(:old_sections, Ecto.assoc(workout, :sections))
-            |> Multi.run(:new_sections, fn _repo, %{workout: published_workout} ->
-              insert_sections(published_workout.id, params_with_levels)
-            end)
-            |> Repo.transaction()
-            |> case do
-              {:ok, %{workout: published}} ->
-                published =
-                  published
-                  |> Repo.preload(@workout_preloads)
-                  |> normalize_workout()
+                  {:ok, published}
 
-                {:ok, published}
-
-              {:error, _step, %Ecto.Changeset{} = changeset, _changes} ->
-                {:error, changeset}
+                {:error, _step, %Ecto.Changeset{} = changeset, _changes} ->
+                  {:error, changeset}
+              end
             end
           end
         end
@@ -723,12 +724,16 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     %{
       id: exercise.id,
       name: exercise.name,
+      item_type: to_string(exercise.item_type),
       sets: exercise.sets,
+      set_prescriptions: exercise.set_prescriptions,
       prescription_value: exercise.prescription_value,
       prescription_unit: exercise.prescription_unit && to_string(exercise.prescription_unit),
       load_value: exercise.load_value,
       load_mode: exercise.load_mode && to_string(exercise.load_mode),
+      load_progression: exercise.load_progression,
       superset_group_id: exercise.superset_group_id,
+      alternating_group_id: exercise.alternating_group_id,
       hr_zone: exercise.hr_zone,
       tempo: exercise.tempo,
       rest_seconds: exercise.rest_seconds,
@@ -736,6 +741,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       rest_pause_seconds: exercise.rest_pause_seconds,
       pacing: exercise.pacing,
       interval_assignment: exercise.interval_assignment,
+      note: exercise.note,
       order: exercise.order,
       variations:
         exercise.variations
@@ -749,11 +755,14 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       id: variation.id,
       exercise_name_override: variation.exercise_name_override,
       sets: variation.sets,
+      set_prescriptions: variation.set_prescriptions,
       prescription_value: variation.prescription_value,
       prescription_unit: variation.prescription_unit && to_string(variation.prescription_unit),
       load_value: variation.load_value,
       load_mode: variation.load_mode && to_string(variation.load_mode),
+      load_progression: variation.load_progression,
       excluded: variation.excluded,
+      note: variation.note,
       scale_level: normalize_scale_level(variation.scale_level)
     }
   end
@@ -768,7 +777,10 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     Enum.any?(sections, fn section ->
       exercises = Map.get(section, "exercises") || Map.get(section, :exercises) || []
       children = Map.get(section, "sections") || Map.get(section, :sections) || []
-      exercises != [] or sections_have_exercises?(children)
+
+      Enum.any?(exercises, fn item ->
+        (Map.get(item, "item_type") || Map.get(item, :item_type) || "exercise") == "exercise"
+      end) or sections_have_exercises?(children)
     end)
   end
 
@@ -935,6 +947,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         scoreable: section.scoreable,
         score_config: section.score_config,
         timer_config: effective_timer_config,
+        note: section.note,
         exercises:
           section.exercises
           |> Enum.sort_by(& &1.order)
@@ -1257,6 +1270,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       base = %{
         "id" => section.id,
         "name" => section.name,
+        "note" => section.note,
         "scoreable" => section.scoreable,
         "timer_config" => section.timer_config,
         "score_config" => section.score_config,
@@ -1275,12 +1289,16 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     %{
       "id" => exercise.id,
       "name" => exercise.name,
+      "item_type" => to_string(exercise.item_type),
       "sets" => exercise.sets,
+      "set_prescriptions" => exercise.set_prescriptions,
       "prescription_value" => exercise.prescription_value,
       "prescription_unit" => exercise.prescription_unit && to_string(exercise.prescription_unit),
       "load_value" => exercise.load_value,
       "load_mode" => exercise.load_mode && to_string(exercise.load_mode),
+      "load_progression" => exercise.load_progression,
       "superset_group_id" => exercise.superset_group_id,
+      "alternating_group_id" => exercise.alternating_group_id,
       "hr_zone" => exercise.hr_zone,
       "tempo" => exercise.tempo,
       "rest_seconds" => exercise.rest_seconds,
@@ -1288,6 +1306,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       "rest_pause_seconds" => exercise.rest_pause_seconds,
       "pacing" => exercise.pacing,
       "interval_assignment" => exercise.interval_assignment,
+      "note" => exercise.note,
       "variations" => Enum.map(exercise.variations, &draft_variation_from_db/1)
     }
   end
@@ -1298,12 +1317,15 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       "scale_level_slug" => variation.scale_level.slug,
       "exercise_name_override" => variation.exercise_name_override,
       "sets" => variation.sets,
+      "set_prescriptions" => variation.set_prescriptions,
       "prescription_value" => variation.prescription_value,
       "prescription_unit" =>
         variation.prescription_unit && to_string(variation.prescription_unit),
       "load_value" => variation.load_value,
       "load_mode" => variation.load_mode && to_string(variation.load_mode),
-      "excluded" => variation.excluded
+      "load_progression" => variation.load_progression,
+      "excluded" => variation.excluded,
+      "note" => variation.note
     }
   end
 
@@ -1489,6 +1511,20 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       |> Repo.preload(@workout_preloads)
       |> reconstruct_draft_data()
       |> Map.put("title", title)
+    end
+  end
+
+  defp prepare_workout_structure(params) do
+    case WorkoutAuthoring.prepare_structure(params) do
+      {:ok, normalized} ->
+        {:ok, normalized}
+
+      {:error, reason} ->
+        changeset =
+          Ecto.Changeset.change(%WorkoutExercise{})
+          |> Ecto.Changeset.add_error(:set_composition, Atom.to_string(reason))
+
+        {:error, changeset}
     end
   end
 

@@ -313,6 +313,7 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
       total_rounds: total_rounds,
       label: label,
       exercises: exercises,
+      section_note: section[:note] || section["note"],
       scoreable: scoreable,
       score_config: score_config,
       timer_config: section[:timer_config] || section["timer_config"] || %{}
