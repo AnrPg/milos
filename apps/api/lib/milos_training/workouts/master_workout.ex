@@ -25,6 +25,12 @@ defmodule MilosTraining.Workouts.MasterWorkout do
     field :tags, {:array, :string}, default: []
     field :notes, {:array, :map}, default: []
     field :workout_metadata, :map, default: %{}
+    field :authoring_mode, :string, default: "structured"
+    field :dsl_version, :integer
+    field :dsl_source, :string
+    field :dsl_document, :map
+    field :dsl_source_revision, :integer, default: 0
+    field :last_dsl_diagnostics, {:array, :map}, default: []
 
     has_many :sections, WorkoutSection, preload_order: [asc: :order]
 
@@ -35,12 +41,14 @@ defmodule MilosTraining.Workouts.MasterWorkout do
     workout
     |> cast(params, authoring_fields() ++ [:created_by_id, :draft_data, :status])
     |> validate_required([:created_by_id])
+    |> validate_authoring_fields()
     |> foreign_key_constraint(:created_by_id)
   end
 
   def update_draft_changeset(workout, params) do
     workout
     |> cast(params, authoring_fields() ++ [:draft_data])
+    |> validate_authoring_fields()
   end
 
   def publish_changeset(workout, params) do
@@ -77,7 +85,12 @@ defmodule MilosTraining.Workouts.MasterWorkout do
       :equipment,
       :tags,
       :notes,
-      :workout_metadata
+      :workout_metadata,
+      :authoring_mode,
+      :dsl_version,
+      :dsl_source,
+      :dsl_document,
+      :last_dsl_diagnostics
     ]
   end
 
@@ -93,6 +106,9 @@ defmodule MilosTraining.Workouts.MasterWorkout do
     )
     |> validate_bounded_map(:workout_metadata, :workout)
     |> validate_typed_notes()
+    |> validate_inclusion(:authoring_mode, ["structured", "quick_text"])
+    |> validate_inclusion(:dsl_version, [1])
+    |> validate_length(:dsl_source, max: 200_000)
   end
 
   defp validate_bounded_map(changeset, field, scope) do

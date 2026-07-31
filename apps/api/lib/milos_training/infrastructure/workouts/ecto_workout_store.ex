@@ -51,8 +51,17 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     |> MasterWorkout.draft_changeset(%{created_by_id: admin_id, status: :draft})
     |> Repo.insert()
     |> case do
-      {:ok, workout} -> {:ok, %{id: workout.id, status: to_string(workout.status)}}
-      {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
+      {:ok, workout} ->
+        {:ok,
+         %{
+           id: workout.id,
+           status: to_string(workout.status),
+           authoring_mode: workout.authoring_mode,
+           dsl_source_revision: workout.dsl_source_revision
+         }}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:error, changeset}
     end
   end
 
@@ -63,22 +72,31 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         {:error, :not_found}
 
       workout ->
-        draft_data =
-          params
-          |> Map.get(:draft_data, Map.get(params, "draft_data", params))
-          |> stringify_keys_deep()
+        with :ok <- validate_expected_revision(workout, params) do
+          draft_data =
+            params
+            |> Map.get(:draft_data, Map.get(params, "draft_data", params))
+            |> stringify_keys_deep()
 
-        top_level =
-          draft_data
-          |> extract_top_level_draft_fields()
-          |> Map.put(:draft_data, draft_data)
+          top_level =
+            draft_data
+            |> extract_top_level_draft_fields()
+            |> Map.merge(extract_dsl_authoring_fields(params))
+            |> Map.put(:draft_data, draft_data)
 
-        workout
-        |> MasterWorkout.update_draft_changeset(top_level)
-        |> Repo.update()
-        |> case do
-          {:ok, updated} -> {:ok, %{id: updated.id, status: to_string(updated.status)}}
-          {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
+          changeset =
+            workout
+            |> MasterWorkout.update_draft_changeset(top_level)
+            |> maybe_lock_dsl_revision(params)
+
+          try do
+            case Repo.update(changeset) do
+              {:ok, updated} -> {:ok, draft_summary(updated)}
+              {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
+            end
+          rescue
+            Ecto.StaleEntryError -> {:error, :stale_dsl_revision}
+          end
         end
     end
   end
@@ -99,52 +117,31 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   @impl true
   def publish_workout(id, params) do
-    case Repo.get(MasterWorkout, id) do
-      nil ->
-        {:error, :not_found}
+    result =
+      Repo.transaction(fn ->
+        workout =
+          MasterWorkout
+          |> where([workout], workout.id == ^id)
+          |> lock("FOR UPDATE")
+          |> Repo.one()
 
-      %MasterWorkout{status: :published, draft_data: nil} ->
-        {:error, :already_published}
-
-      workout ->
-        draft_data = workout.draft_data || %{}
-
-        merged_params =
-          draft_data
-          |> Map.merge(stringify_keys_deep(params))
-          |> stringify_keys_deep()
-
-        with {:ok, prepared_params} <- prepare_workout_structure(merged_params) do
-          prepared_params = stringify_keys_deep(prepared_params)
-          sections = Map.get(prepared_params, "sections") || []
-          all_exercises_empty = sections == [] or not sections_have_exercises?(sections)
-
-          if all_exercises_empty do
-            {:error, :no_sections}
-          else
-            with {:ok, params_with_levels} <- attach_scale_level_ids(prepared_params) do
-              Multi.new()
-              |> Multi.update(:workout, MasterWorkout.publish_changeset(workout, prepared_params))
-              |> Multi.delete_all(:old_sections, Ecto.assoc(workout, :sections))
-              |> Multi.run(:new_sections, fn _repo, %{workout: published_workout} ->
-                insert_sections(published_workout.id, params_with_levels)
-              end)
-              |> Repo.transaction()
-              |> case do
-                {:ok, %{workout: published}} ->
-                  published =
-                    published
-                    |> Repo.preload(@workout_preloads)
-                    |> normalize_workout(note_visibility: :admin)
-
-                  {:ok, published}
-
-                {:error, _step, %Ecto.Changeset{} = changeset, _changes} ->
-                  {:error, changeset}
-              end
-            end
-          end
+        case publish_locked_workout(workout, params) do
+          {:ok, published} -> published
+          {:error, reason} -> Repo.rollback(reason)
         end
+      end)
+
+    case result do
+      {:ok, published} ->
+        published =
+          published
+          |> Repo.preload(@workout_preloads)
+          |> normalize_workout(note_visibility: :admin)
+
+        {:ok, published}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
@@ -191,6 +188,12 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           tags: workout.tags,
           notes: workout.notes,
           workout_metadata: workout.workout_metadata,
+          authoring_mode: workout.authoring_mode,
+          dsl_version: workout.dsl_version,
+          dsl_source: workout.dsl_source,
+          dsl_document: workout.dsl_document,
+          dsl_source_revision: workout.dsl_source_revision,
+          last_dsl_diagnostics: workout.last_dsl_diagnostics,
           draft_data: workout.draft_data,
           sections: draft_sections
         }
@@ -200,6 +203,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           |> Repo.preload(@workout_preloads)
           |> normalize_workout(note_visibility: :admin)
           |> Map.put(:draft_data, workout.draft_data)
+          |> Map.merge(authoring_state(workout))
         else
           base
         end
@@ -926,6 +930,92 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   end
 
   defp extract_top_level_draft_fields(_draft_data), do: %{}
+
+  defp extract_dsl_authoring_fields(params) do
+    %{}
+    |> maybe_put(:authoring_mode, get_map_value(params, :authoring_mode))
+    |> maybe_put(:dsl_version, get_map_value(params, :dsl_version))
+    |> maybe_put(:dsl_source, get_map_value(params, :dsl_source))
+    |> maybe_put(:dsl_document, get_map_value(params, :dsl_document))
+    |> maybe_put(:last_dsl_diagnostics, get_map_value(params, :last_dsl_diagnostics))
+  end
+
+  defp validate_expected_revision(workout, params) do
+    case get_map_value(params, :expected_source_revision) do
+      nil -> :ok
+      revision when revision == workout.dsl_source_revision -> :ok
+      _revision -> {:error, :stale_dsl_revision}
+    end
+  end
+
+  defp maybe_lock_dsl_revision(changeset, params) do
+    if get_map_value(params, :expected_source_revision) == nil do
+      changeset
+    else
+      Ecto.Changeset.optimistic_lock(changeset, :dsl_source_revision)
+    end
+  end
+
+  defp draft_summary(workout) do
+    %{
+      id: workout.id,
+      status: to_string(workout.status),
+      authoring_mode: workout.authoring_mode,
+      dsl_source_revision: workout.dsl_source_revision
+    }
+  end
+
+  defp authoring_state(workout) do
+    %{
+      authoring_mode: workout.authoring_mode,
+      dsl_version: workout.dsl_version,
+      dsl_source: workout.dsl_source,
+      dsl_document: workout.dsl_document,
+      dsl_source_revision: workout.dsl_source_revision,
+      last_dsl_diagnostics: workout.last_dsl_diagnostics
+    }
+  end
+
+  defp publish_locked_workout(nil, _params), do: {:error, :not_found}
+
+  defp publish_locked_workout(%MasterWorkout{status: :published, draft_data: nil}, _params),
+    do: {:error, :already_published}
+
+  defp publish_locked_workout(workout, params) do
+    with :ok <- validate_expected_revision(workout, params),
+         merged_params <- merge_publish_params(workout, params),
+         {:ok, prepared_params} <- prepare_workout_structure(merged_params),
+         prepared_params <- stringify_keys_deep(prepared_params),
+         :ok <- validate_publish_sections(prepared_params),
+         {:ok, params_with_levels} <- attach_scale_level_ids(prepared_params),
+         {:ok, published} <-
+           workout
+           |> MasterWorkout.publish_changeset(prepared_params)
+           |> Repo.update(),
+         {_count, _rows} <- Repo.delete_all(Ecto.assoc(workout, :sections)),
+         {:ok, _sections} <- insert_sections(published.id, params_with_levels) do
+      {:ok, published}
+    end
+  end
+
+  defp merge_publish_params(workout, params) do
+    params = stringify_keys_deep(params)
+
+    (workout.draft_data || %{})
+    |> Map.merge(params)
+    |> Map.merge(stringify_keys_deep(extract_dsl_authoring_fields(params)))
+    |> stringify_keys_deep()
+  end
+
+  defp validate_publish_sections(params) do
+    sections = Map.get(params, "sections") || []
+
+    if sections == [] or not sections_have_exercises?(sections) do
+      {:error, :no_sections}
+    else
+      :ok
+    end
+  end
 
   defp extract_sections_from_draft(draft_data) when is_map(draft_data) do
     get_map_value(draft_data, :sections) || []
