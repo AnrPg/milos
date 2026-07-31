@@ -69,3 +69,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-067 | Durable offline command delivery | Accepted |
 | ADR-068 | Structured workout set composition | Accepted |
 | ADR-069 | Canonical workout DSL and assisted authoring | Accepted |
+| ADR-070 | Rich canonical workout authoring metadata | Accepted |
