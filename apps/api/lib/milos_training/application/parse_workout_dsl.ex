@@ -12,7 +12,8 @@ defmodule MilosTraining.Application.ParseWorkoutDsl do
          version: parsed.version,
          workout: parsed.workout,
          formatted_source: Workouts.format_dsl(parsed.workout, version: parsed.version),
-         vocabulary: Workouts.dsl_vocabulary()
+         vocabulary: Workouts.dsl_vocabulary(),
+         diagnostics: parsed.diagnostics
        }}
     end
   end

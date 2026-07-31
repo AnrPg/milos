@@ -39,7 +39,14 @@ defmodule MilosTrainingWeb.AdminWorkoutDslController do
 
     case ParseWorkoutDsl.call(source) do
       {:ok, preview} ->
-        json(conn, preview)
+        json(
+          conn,
+          Map.update!(
+            preview,
+            :diagnostics,
+            &Enum.map(&1, fn diagnostic -> json_diagnostic(diagnostic) end)
+          )
+        )
 
       {:error, diagnostics} ->
         conn
@@ -51,6 +58,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslController do
   defp json_diagnostic(diagnostic) do
     diagnostic
     |> Map.update!(:code, &Atom.to_string/1)
+    |> Map.update!(:severity, &Atom.to_string/1)
     |> Map.update!(:params, &stringify_param_keys/1)
   end
 

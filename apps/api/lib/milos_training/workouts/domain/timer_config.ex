@@ -15,7 +15,9 @@ defmodule MilosTraining.Workouts.Domain.TimerConfig do
 
     with :ok <- validate_type(type),
          :ok <- validate_required_fields(type, config),
-         :ok <- validate_optional_fields(type, config) do
+         :ok <- validate_optional_fields(type, config),
+         :ok <- validate_registered_fields(type, config),
+         :ok <- reject_unknown_fields(type, config) do
       {:ok, build_config(type, config)}
     end
   end
@@ -70,6 +72,47 @@ defmodule MilosTraining.Workouts.Domain.TimerConfig do
           do: :ok,
           else: {:error, "#{field} must be one of: #{Enum.join(valid_values, ", ")}"}
     end
+  end
+
+  defp validate_registered_fields(type, config) do
+    Enum.reduce_while(required_fields(type) ++ optional_fields(type), :ok, fn field, :ok ->
+      case get_value(config, field) do
+        nil ->
+          {:cont, :ok}
+
+        value ->
+          if valid_registered_value?(field, value),
+            do: {:cont, :ok},
+            else: {:halt, {:error, "#{field} has an invalid value"}}
+      end
+    end)
+  end
+
+  defp valid_registered_value?(field, value) do
+    case Vocabulary.timer_value_kind(field) do
+      :duration -> is_integer(value) and value > 0
+      :distance -> is_number(value) and value > 0
+      :integer -> is_integer(value) and value > 0
+      :enum -> value in Vocabulary.timer_enum_values(field)
+      :string -> is_binary(value) and String.trim(value) != ""
+    end
+  end
+
+  defp reject_unknown_fields(type, config) do
+    allowed =
+      [:type | required_fields(type) ++ optional_fields(type)]
+      |> Enum.map(&to_string/1)
+      |> MapSet.new()
+
+    unknown =
+      config
+      |> Map.keys()
+      |> Enum.map(&to_string/1)
+      |> Enum.reject(&MapSet.member?(allowed, &1))
+
+    if unknown == [],
+      do: :ok,
+      else: {:error, "contains unsupported fields: #{Enum.map_join(unknown, ", ", &to_string/1)}"}
   end
 
   defp build_config(type, config) do
