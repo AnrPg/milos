@@ -3,10 +3,11 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
   import Ecto.Changeset
 
   alias MilosTraining.{ScaleLevel, Workouts.WorkoutExercise}
+  alias MilosTraining.Workouts.Domain.WorkoutAuthoringMetadata
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
-  @prescription_units [:reps, :secs, :kcal]
+  @prescription_units [:reps, :secs, :kcal, :meters]
   @load_modes [:absolute, :pct_1rm, :bw]
 
   schema "exercise_variations" do
@@ -20,6 +21,8 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
     field :load_progression, :map
     field :excluded, :boolean, default: false
     field :note, :string
+    field :notes, {:array, :map}, default: []
+    field :prescription_metadata, :map, default: %{}
 
     belongs_to :workout_exercise, WorkoutExercise
     belongs_to :scale_level, ScaleLevel
@@ -41,7 +44,9 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
       :load_mode,
       :load_progression,
       :note,
-      :excluded
+      :excluded,
+      :notes,
+      :prescription_metadata
     ])
     |> update_change(:exercise_name_override, &normalize_string/1)
     |> validate_required([:scale_level_id])
@@ -49,6 +54,8 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
     |> validate_optional_number(:prescription_value)
     |> validate_optional_number(:load_value)
     |> validate_override_or_excluded()
+    |> validate_bounded_metadata()
+    |> validate_typed_notes()
     |> foreign_key_constraint(:workout_exercise_id)
     |> foreign_key_constraint(:scale_level_id)
     |> unique_constraint([:workout_exercise_id, :scale_level_id])
@@ -75,7 +82,9 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
       :load_value,
       :load_mode,
       :load_progression,
-      :note
+      :note,
+      :notes,
+      :prescription_metadata
     ]
 
     if Enum.all?(fields, &(get_field(changeset, &1) |> blank?())) do
@@ -95,4 +104,22 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
   defp blank?(nil), do: true
   defp blank?(""), do: true
   defp blank?(_value), do: false
+
+  defp validate_bounded_metadata(changeset) do
+    validate_change(changeset, :prescription_metadata, fn :prescription_metadata, metadata ->
+      case WorkoutAuthoringMetadata.validate(:exercise, metadata) do
+        :ok -> []
+        {:error, reason} -> [prescription_metadata: "is invalid: #{inspect(reason)}"]
+      end
+    end)
+  end
+
+  defp validate_typed_notes(changeset) do
+    validate_change(changeset, :notes, fn :notes, notes ->
+      case WorkoutAuthoringMetadata.validate_notes(notes) do
+        :ok -> []
+        {:error, reason} -> [notes: "are invalid: #{inspect(reason)}"]
+      end
+    end)
+  end
 end

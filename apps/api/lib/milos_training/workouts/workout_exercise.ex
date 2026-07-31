@@ -2,11 +2,12 @@ defmodule MilosTraining.Workouts.WorkoutExercise do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias MilosTraining.Workouts.Domain.WorkoutAuthoringMetadata
   alias MilosTraining.Workouts.{ExerciseVariation, WorkoutSection}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
-  @prescription_units [:reps, :secs, :kcal]
+  @prescription_units [:reps, :secs, :kcal, :meters]
   @load_modes [:absolute, :pct_1rm, :bw]
   @item_types [:exercise, :header]
 
@@ -31,6 +32,11 @@ defmodule MilosTraining.Workouts.WorkoutExercise do
     field :pacing, :integer
     field :interval_assignment, :integer
     field :note, :string
+    field :subtitle, :string
+    field :exercise_ref, :string
+    field :notes, {:array, :map}, default: []
+    field :prescription_metadata, :map, default: %{}
+    field :group_config, :map
 
     belongs_to :workout_section, WorkoutSection
     has_many :variations, ExerciseVariation
@@ -61,11 +67,18 @@ defmodule MilosTraining.Workouts.WorkoutExercise do
       :rest_pause_seconds,
       :pacing,
       :interval_assignment,
-      :note
+      :note,
+      :subtitle,
+      :exercise_ref,
+      :notes,
+      :prescription_metadata,
+      :group_config
     ])
     |> update_change(:name, &normalize_name/1)
     |> validate_required([:name, :order])
     |> validate_number(:order, greater_than_or_equal_to: 1)
+    |> validate_length(:subtitle, max: 240)
+    |> validate_length(:exercise_ref, max: 120)
     |> validate_optional_number(:sets, 1)
     |> validate_optional_number(:prescription_value, 1)
     |> validate_optional_number(:load_value, 0)
@@ -75,6 +88,9 @@ defmodule MilosTraining.Workouts.WorkoutExercise do
     |> validate_optional_number(:rest_pause_seconds, 0)
     |> validate_optional_number(:pacing, 0)
     |> validate_optional_number(:interval_assignment, 0)
+    |> validate_bounded_metadata(:prescription_metadata, :exercise)
+    |> validate_optional_bounded_metadata(:group_config, :group)
+    |> validate_typed_notes()
     |> validate_item_groups()
     |> foreign_key_constraint(:workout_section_id)
     |> cast_assoc(:variations, with: &ExerciseVariation.changeset/2)
@@ -106,5 +122,36 @@ defmodule MilosTraining.Workouts.WorkoutExercise do
       true ->
         changeset
     end
+  end
+
+  defp validate_bounded_metadata(changeset, field, scope) do
+    validate_change(changeset, field, fn ^field, metadata ->
+      case WorkoutAuthoringMetadata.validate(scope, metadata) do
+        :ok -> []
+        {:error, reason} -> [{field, "is invalid: #{inspect(reason)}"}]
+      end
+    end)
+  end
+
+  defp validate_optional_bounded_metadata(changeset, field, scope) do
+    validate_change(changeset, field, fn
+      ^field, nil ->
+        []
+
+      ^field, metadata ->
+        case WorkoutAuthoringMetadata.validate(scope, metadata) do
+          :ok -> []
+          {:error, reason} -> [{field, "is invalid: #{inspect(reason)}"}]
+        end
+    end)
+  end
+
+  defp validate_typed_notes(changeset) do
+    validate_change(changeset, :notes, fn :notes, notes ->
+      case WorkoutAuthoringMetadata.validate_notes(notes) do
+        :ok -> []
+        {:error, reason} -> [notes: "are invalid: #{inspect(reason)}"]
+      end
+    end)
   end
 end

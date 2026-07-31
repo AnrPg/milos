@@ -8,6 +8,8 @@ defmodule MilosTraining.Workouts.Domain.WorkoutSetComposer do
   @progression_directions ["increase", "decrease"]
   @load_modes ["absolute", "pct_1rm", "bw"]
 
+  alias MilosTraining.Workouts.Domain.WorkoutAuthoringMetadata
+
   def normalize_items(items) when is_list(items) do
     with {:ok, normalized} <- normalize_each(items),
          :ok <- validate_group_membership(normalized),
@@ -172,17 +174,26 @@ defmodule MilosTraining.Workouts.Domain.WorkoutSetComposer do
         progression_mode(progression) ||
         value(item, :load_mode)
 
-    {:ok,
-     %{
-       set_index: requested_index,
-       prescription_value:
-         value(prescription, :prescription_value) || value(item, :prescription_value),
-       prescription_unit:
-         value(prescription, :prescription_unit) || value(item, :prescription_unit),
-       load_value: load_value,
-       load_mode: load_mode,
-       note: value(prescription, :note)
-     }}
+    metadata = value(prescription, :metadata) || %{}
+
+    case WorkoutAuthoringMetadata.validate(:set, metadata) do
+      :ok ->
+        {:ok,
+         %{
+           set_index: requested_index,
+           prescription_value:
+             value(prescription, :prescription_value) || value(item, :prescription_value),
+           prescription_unit:
+             value(prescription, :prescription_unit) || value(item, :prescription_unit),
+           load_value: load_value,
+           load_mode: load_mode,
+           note: value(prescription, :note),
+           metadata: WorkoutAuthoringMetadata.normalize_keys(metadata)
+         }}
+
+      {:error, _reason} ->
+        {:error, :invalid_set_prescription_metadata}
+    end
   end
 
   defp normalize_set_prescription(_prescription, _item, _progression, _set_index),

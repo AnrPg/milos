@@ -7,7 +7,12 @@ defmodule MilosTrainingWeb.Schemas.Workout do
   @nullable_uuid %Schema{type: :string, format: :uuid, nullable: true}
   @nullable_string %Schema{type: :string, nullable: true}
   @nullable_integer %Schema{type: :integer, nullable: true}
-  @prescription_unit %Schema{type: :string, enum: ["reps", "secs", "kcal"], nullable: true}
+  @nullable_number %Schema{type: :number, nullable: true}
+  @prescription_unit %Schema{
+    type: :string,
+    enum: ["reps", "secs", "kcal", "meters"],
+    nullable: true
+  }
   @load_mode %Schema{
     type: :string,
     enum: ["absolute", "pct_1rm", "bw"],
@@ -21,9 +26,10 @@ defmodule MilosTrainingWeb.Schemas.Workout do
         set_index: %Schema{type: :integer, minimum: 1},
         prescription_value: @nullable_integer,
         prescription_unit: @prescription_unit,
-        load_value: @nullable_integer,
+        load_value: @nullable_number,
         load_mode: @load_mode,
-        note: @nullable_string
+        note: @nullable_string,
+        metadata: %Schema{type: :object, additionalProperties: true}
       },
       required: [:set_index],
       additionalProperties: false
@@ -37,12 +43,12 @@ defmodule MilosTrainingWeb.Schemas.Workout do
       properties: %{
         mode: %Schema{type: :string, enum: ["linear", "per_set"]},
         direction: %Schema{type: :string, enum: ["increase", "decrease"]},
-        start_value: %Schema{type: :integer, minimum: 0},
-        start_mode: %Schema{type: :string, enum: ["absolute", "pct_1rm"]},
-        step_value: %Schema{type: :integer, minimum: 0},
+        start_value: %Schema{type: :number, minimum: 0},
+        start_mode: %Schema{type: :string, enum: ["absolute", "pct_1rm", "bw"]},
+        step_value: %Schema{type: :number, minimum: 0},
         per_set_values: %Schema{
           type: :array,
-          items: %Schema{type: :integer, minimum: 0}
+          items: %Schema{type: :number, minimum: 0, nullable: true}
         }
       },
       required: [
@@ -77,7 +83,9 @@ defmodule MilosTrainingWeb.Schemas.Workout do
         load_mode: @load_mode,
         load_progression: load_progression_schema(),
         excluded: %Schema{type: :boolean},
-        note: @nullable_string
+        note: @nullable_string,
+        notes: %Schema{type: :array, items: typed_note_schema()},
+        prescription_metadata: %Schema{type: :object, additionalProperties: true}
       },
       additionalProperties: false
     }
@@ -90,6 +98,8 @@ defmodule MilosTrainingWeb.Schemas.Workout do
         id: @nullable_uuid,
         item_type: %Schema{type: :string, enum: ["exercise", "header"], default: "exercise"},
         name: %Schema{type: :string},
+        subtitle: @nullable_string,
+        exercise_ref: @nullable_string,
         description: @nullable_string,
         order: %Schema{type: :integer, minimum: 1},
         sets: @nullable_integer,
@@ -111,6 +121,9 @@ defmodule MilosTrainingWeb.Schemas.Workout do
         rest_pause_seconds: @nullable_integer,
         pacing: @nullable_integer,
         note: @nullable_string,
+        notes: %Schema{type: :array, items: typed_note_schema()},
+        prescription_metadata: %Schema{type: :object, additionalProperties: true},
+        group_config: %Schema{type: :object, nullable: true, additionalProperties: true},
         excluded: %Schema{type: :boolean},
         variations: %Schema{type: :array, items: variation_schema()},
         applied_variation: %Schema{allOf: [variation_schema()], nullable: true}
@@ -134,12 +147,16 @@ defmodule MilosTrainingWeb.Schemas.Workout do
         id: @nullable_uuid,
         parent_section_id: @nullable_uuid,
         name: %Schema{type: :string},
+        subtitle: @nullable_string,
         order: %Schema{type: :integer, minimum: 1},
         scoreable: %Schema{type: :boolean},
         score_config: %Schema{type: :object, nullable: true, additionalProperties: true},
         timer_config: %Schema{type: :object, nullable: true, additionalProperties: true},
         rest_after_seconds: @nullable_integer,
+        rest_before_next_section_seconds: @nullable_integer,
         note: @nullable_string,
+        notes: %Schema{type: :array, items: typed_note_schema()},
+        section_metadata: %Schema{type: :object, additionalProperties: true},
         exercises: %Schema{type: :array, items: workout_item_schema()},
         sections: %Schema{type: :array, items: child_schema}
       },
@@ -159,6 +176,18 @@ defmodule MilosTrainingWeb.Schemas.Workout do
           nullable: true
         },
         is_team_workout: %Schema{type: :boolean},
+        subtitle: @nullable_string,
+        description: @nullable_string,
+        difficulty: %Schema{
+          type: :string,
+          enum: ["beginner", "intermediate", "advanced", "all-levels"],
+          nullable: true
+        },
+        estimated_duration_seconds: @nullable_integer,
+        equipment: %Schema{type: :array, items: %Schema{type: :string}},
+        tags: %Schema{type: :array, items: %Schema{type: :string}},
+        notes: %Schema{type: :array, items: typed_note_schema()},
+        workout_metadata: %Schema{type: :object, additionalProperties: true},
         sections: %Schema{type: :array, items: section_schema()},
         editor_session_id: @nullable_uuid,
         authoring_mode: %Schema{
@@ -183,6 +212,14 @@ defmodule MilosTrainingWeb.Schemas.Workout do
         type: %Schema{type: :string},
         status: %Schema{type: :string, enum: ["draft", "published"]},
         is_team_workout: %Schema{type: :boolean},
+        subtitle: @nullable_string,
+        description: @nullable_string,
+        difficulty: @nullable_string,
+        estimated_duration_seconds: @nullable_integer,
+        equipment: %Schema{type: :array, items: %Schema{type: :string}},
+        tags: %Schema{type: :array, items: %Schema{type: :string}},
+        notes: %Schema{type: :array, items: typed_note_schema()},
+        workout_metadata: %Schema{type: :object, additionalProperties: true},
         created_by_id: @nullable_uuid,
         inserted_at: %Schema{type: :string, format: :"date-time", nullable: true},
         updated_at: %Schema{type: :string, format: :"date-time", nullable: true},
@@ -201,6 +238,22 @@ defmodule MilosTrainingWeb.Schemas.Workout do
       type: :object,
       properties: %{workout: workout_schema()},
       required: [:workout],
+      additionalProperties: false
+    }
+  end
+
+  defp typed_note_schema do
+    %Schema{
+      type: :object,
+      properties: %{
+        type: %Schema{
+          type: :string,
+          enum: ~w(note coach-note athlete-note safety-note scaling-note equipment-note)
+        },
+        body: %Schema{type: :string, maxLength: 20_000},
+        document: %Schema{type: :object, nullable: true, additionalProperties: true}
+      },
+      required: [:type, :body],
       additionalProperties: false
     }
   end

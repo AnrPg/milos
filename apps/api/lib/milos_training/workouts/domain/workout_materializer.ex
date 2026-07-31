@@ -58,6 +58,16 @@ defmodule MilosTraining.Workouts.Domain.WorkoutMaterializer do
         |> Map.put(:applied_variation, variation)
 
       variation ->
+        merged_metadata =
+          Map.merge(
+            Map.get(exercise, :prescription_metadata) || %{},
+            Map.get(variation, :prescription_metadata) || %{}
+          )
+
+        merged_notes =
+          (Map.get(exercise, :notes) || []) ++
+            (Map.get(variation, :notes) || [])
+
         exercise
         |> maybe_put(:name, Map.get(variation, :exercise_name_override))
         |> maybe_put(:sets, Map.get(variation, :sets))
@@ -68,6 +78,8 @@ defmodule MilosTraining.Workouts.Domain.WorkoutMaterializer do
         |> maybe_put(:load_mode, Map.get(variation, :load_mode))
         |> maybe_put(:load_progression, Map.get(variation, :load_progression))
         |> maybe_put(:note, Map.get(variation, :note))
+        |> Map.put(:prescription_metadata, merged_metadata)
+        |> Map.put(:notes, merged_notes)
         |> Map.put(:excluded, false)
         |> Map.put(:applied_variation, variation)
     end
