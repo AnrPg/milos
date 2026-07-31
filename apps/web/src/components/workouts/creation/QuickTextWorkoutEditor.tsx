@@ -1,16 +1,27 @@
 "use client";
 
-import { EditorContent, useEditor, type Editor } from "@tiptap/react";
+import CharacterCount from "@tiptap/extension-character-count";
+import Highlight from "@tiptap/extension-highlight";
+import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
+import TextAlign from "@tiptap/extension-text-align";
+import Typography from "@tiptap/extension-typography";
+import Underline from "@tiptap/extension-underline";
+import { EditorContent, useEditor, type Editor, type JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ApiError } from "@/api/client";
 import {
   createDraftWorkout,
-  fetchAdminWorkout,
+  fetchWorkoutDslAuthoring,
+  fetchWorkoutDslManual,
   parseWorkoutDsl,
+  publishWorkoutDsl,
   updateDraftWorkout,
   type WorkoutDslDiagnostic,
+  type WorkoutDslManual,
   type WorkoutDslPreview,
 } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
@@ -18,7 +29,6 @@ import { useUiTranslations } from "@/i18n/ui";
 import {
   COMMON_WORKOUT_WORDS,
   DEFAULT_WORKOUT_DSL_SOURCE,
-  EXERCISE_NAMES,
   QUICK_TEXT_EDITOR_CLASS,
 } from "@/lib/workout-dsl-editor-data";
 import {
@@ -30,11 +40,16 @@ import {
 const EMPTY_VOCABULARY: WorkoutDslVocabulary = {
   version: 1,
   section_formats: [],
+  format_aliases: {},
+  format_specs: {},
   workout_parameters: [],
   exercise_parameters: [],
+  group_parameters: [],
+  scale_parameters: [],
   header_parameters: [],
   note_markers: [],
   section_parameters: {},
+  exercise_catalog: [],
 };
 
 type Props = {
@@ -43,7 +58,7 @@ type Props = {
   onSwitchToStructured: (id: string) => void;
 };
 
-type SaveStatus = "idle" | "saving" | "saved" | "error";
+type SaveStatus = "idle" | "saving" | "saved" | "error" | "conflict";
 
 export function QuickTextWorkoutEditor({
   draftId,
@@ -51,17 +66,40 @@ export function QuickTextWorkoutEditor({
   onSwitchToStructured,
 }: Props) {
   const i18n = useUiTranslations();
+  const router = useRouter();
   const { tokens } = useSession();
   const [source, setSource] = useState(DEFAULT_WORKOUT_DSL_SOURCE);
   const [preview, setPreview] = useState<WorkoutDslPreview | null>(null);
   const [diagnostics, setDiagnostics] = useState<WorkoutDslDiagnostic[]>([]);
+  const [manual, setManual] = useState<WorkoutDslManual | null>(null);
+  const [manualOpen, setManualOpen] = useState(false);
   const [parsing, setParsing] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [warningsAcknowledged, setWarningsAcknowledged] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  const [sourceRevision, setSourceRevision] = useState(0);
   const [suggestions, setSuggestions] = useState<WorkoutDslSuggestion[]>([]);
   const loadedDraftRef = useRef<string | null>(null);
+  const parseRequestRef = useRef(0);
+  const sourceRef = useRef(source);
+  const revisionRef = useRef(sourceRevision);
 
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit,
+      Underline,
+      Highlight.configure({ multicolor: true }),
+      Link.configure({
+        openOnClick: false,
+        autolink: true,
+        linkOnPaste: true,
+        protocols: ["https", "mailto"],
+      }),
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
+      Typography,
+      Placeholder.configure({ placeholder: i18n("quickTextEditorPlaceholder") }),
+      CharacterCount.configure({ limit: 200_000 }),
+    ],
     content: sourceToDocument(DEFAULT_WORKOUT_DSL_SOURCE),
     immediatelyRender: false,
     editorProps: {
@@ -71,16 +109,30 @@ export function QuickTextWorkoutEditor({
         role: "textbox",
         "aria-label": i18n("quickTextEditorLabel"),
       },
+      transformPastedHTML: sanitizePastedHtml,
     },
     onUpdate: ({ editor: currentEditor }) => {
-      setSource(currentEditor.getText({ blockSeparator: "\n" }));
+      const nextSource = currentEditor.getText({ blockSeparator: "\n" });
+      sourceRef.current = nextSource;
+      setSource(nextSource);
+      setWarningsAcknowledged(false);
     },
     onSelectionUpdate: ({ editor: currentEditor }) => {
       updateSuggestions(currentEditor);
     },
   });
 
-  const vocabulary = preview?.vocabulary ?? EMPTY_VOCABULARY;
+  const vocabulary = preview?.vocabulary ?? manual?.vocabulary ?? EMPTY_VOCABULARY;
+  const exerciseNames = useMemo(
+    () =>
+      (vocabulary.exercise_catalog ?? []).flatMap((exercise) => [
+        exercise.label,
+        ...exercise.aliases,
+      ]),
+    [vocabulary.exercise_catalog],
+  );
+  const errors = diagnostics.filter((diagnostic) => diagnostic.severity === "error");
+  const warnings = diagnostics.filter((diagnostic) => diagnostic.severity === "warning");
 
   const updateSuggestions = useCallback(
     (currentEditor = editor) => {
@@ -91,25 +143,44 @@ export function QuickTextWorkoutEditor({
         currentEditor.state.selection.from,
         "\n",
       );
-      const cursor = currentSource.length;
       const result = buildWorkoutDslSuggestions(
         currentSource,
-        cursor,
+        currentSource.length,
         vocabulary,
         COMMON_WORKOUT_WORDS,
-        EXERCISE_NAMES,
+        exerciseNames,
       );
       setSuggestions(result.items);
     },
-    [editor, vocabulary],
+    [editor, exerciseNames, vocabulary],
   );
+
+  useEffect(() => {
+    sourceRef.current = source;
+  }, [source]);
+
+  useEffect(() => {
+    revisionRef.current = sourceRevision;
+  }, [sourceRevision]);
+
+  useEffect(() => {
+    if (!tokens?.access_token || manual) return;
+    fetchWorkoutDslManual(tokens.access_token)
+      .then(setManual)
+      .catch(() => undefined);
+  }, [manual, tokens?.access_token]);
 
   useEffect(() => {
     if (!tokens?.access_token || draftId || loadedDraftRef.current === "creating") return;
 
     loadedDraftRef.current = "creating";
     createDraftWorkout(tokens.access_token)
-      .then((draft) => onDraftReady(draft.id))
+      .then((draft) => {
+        const revision = draft.dsl_source_revision ?? 0;
+        revisionRef.current = revision;
+        setSourceRevision(revision);
+        onDraftReady(draft.id);
+      })
       .catch(() => {
         loadedDraftRef.current = null;
         setSaveStatus("error");
@@ -120,18 +191,15 @@ export function QuickTextWorkoutEditor({
     if (!tokens?.access_token || !draftId || loadedDraftRef.current === draftId || !editor) return;
 
     loadedDraftRef.current = draftId;
-    fetchAdminWorkout(tokens.access_token, draftId)
-      .then((workout) => {
-        const draftData =
-          workout.draft_data && typeof workout.draft_data === "object"
-            ? (workout.draft_data as Record<string, unknown>)
-            : null;
-        const storedSource = typeof draftData?.dsl_source === "string" ? draftData.dsl_source : null;
-
-        if (storedSource) {
-          setSource(storedSource);
-          editor.commands.setContent(sourceToDocument(storedSource));
-        }
+    fetchWorkoutDslAuthoring(tokens.access_token, draftId)
+      .then((authoring) => {
+        const nextSource = authoring.source || DEFAULT_WORKOUT_DSL_SOURCE;
+        sourceRef.current = nextSource;
+        revisionRef.current = authoring.source_revision;
+        setSource(nextSource);
+        setSourceRevision(authoring.source_revision);
+        setDiagnostics(authoring.diagnostics);
+        editor.commands.setContent(authoring.document ?? sourceToDocument(nextSource));
       })
       .catch(() => setSaveStatus("error"));
   }, [draftId, editor, tokens?.access_token]);
@@ -139,15 +207,19 @@ export function QuickTextWorkoutEditor({
   useEffect(() => {
     if (!tokens?.access_token || !source.trim()) return;
 
+    const requestId = ++parseRequestRef.current;
     const timer = window.setTimeout(() => {
       setParsing(true);
       parseWorkoutDsl(tokens.access_token, source)
         .then((result) => {
+          if (requestId !== parseRequestRef.current) return;
           setPreview(result);
-          setDiagnostics([]);
+          setDiagnostics(result.diagnostics);
           setParsing(false);
         })
         .catch((error: unknown) => {
+          if (requestId !== parseRequestRef.current) return;
+          setPreview(null);
           if (error instanceof ApiError && error.status === 422 && error.payload.diagnostics) {
             setDiagnostics(error.payload.diagnostics);
           } else {
@@ -160,23 +232,55 @@ export function QuickTextWorkoutEditor({
     return () => window.clearTimeout(timer);
   }, [source, tokens?.access_token]);
 
-  useEffect(() => {
-    if (!tokens?.access_token || !draftId || loadedDraftRef.current !== draftId) return;
+  const saveDraftSnapshot = useCallback(
+    async (snapshot: string, document: JSONContent | null, expectedRevision: number) => {
+      if (!tokens?.access_token || !draftId) throw new Error();
+      setSaveStatus("saving");
 
-    setSaveStatus("saving");
+      try {
+        const draft = await updateDraftWorkout(tokens.access_token, draftId, {
+          draft_data: {
+            authoring_mode: "quick_text",
+            dsl_version: 1,
+            dsl_source: snapshot,
+            dsl_document: document,
+          },
+          authoring_mode: "quick_text",
+          dsl_version: 1,
+          dsl_source: snapshot,
+          dsl_document: document,
+          last_dsl_diagnostics: diagnostics,
+          expected_source_revision: expectedRevision,
+        });
+        const nextRevision = draft.dsl_source_revision ?? expectedRevision + 1;
+        revisionRef.current = nextRevision;
+        setSourceRevision(nextRevision);
+        setSaveStatus("saved");
+        return nextRevision;
+      } catch (error) {
+        if (error instanceof ApiError && error.payload.code === "stale_dsl_revision") {
+          setSaveStatus("conflict");
+        } else {
+          setSaveStatus("error");
+        }
+        throw error;
+      }
+    },
+    [diagnostics, draftId, tokens?.access_token],
+  );
+
+  useEffect(() => {
+    if (!draftId || loadedDraftRef.current !== draftId || !editor) return;
+
+    const snapshot = source;
+    const document = editor.getJSON();
+    const expectedRevision = revisionRef.current;
     const timer = window.setTimeout(() => {
-      updateDraftWorkout(tokens.access_token, draftId, {
-        authoring_mode: "quick_text",
-        dsl_version: 1,
-        dsl_source: source,
-        dsl_document: editor?.getJSON() ?? null,
-      })
-        .then(() => setSaveStatus("saved"))
-        .catch(() => setSaveStatus("error"));
+      void saveDraftSnapshot(snapshot, document, expectedRevision).catch(() => undefined);
     }, 1_200);
 
     return () => window.clearTimeout(timer);
-  }, [draftId, editor, source, tokens?.access_token]);
+  }, [draftId, editor, saveDraftSnapshot, source]);
 
   useEffect(() => {
     updateSuggestions();
@@ -184,59 +288,117 @@ export function QuickTextWorkoutEditor({
 
   const statusLabel = useMemo(() => {
     if (parsing) return i18n("quickTextParsing");
-    if (diagnostics.length > 0) return i18n("quickTextInvalid");
+    if (errors.length > 0) return i18n("quickTextInvalid");
+    if (warnings.length > 0) return i18n("quickTextWarnings");
     if (preview) return i18n("quickTextReady");
     return "";
-  }, [diagnostics.length, i18n, parsing, preview]);
+  }, [errors.length, i18n, parsing, preview, warnings.length]);
 
   function acceptSuggestion(suggestion: WorkoutDslSuggestion) {
     if (!editor) return;
-    const currentSource = editor.state.doc.textBetween(
-      0,
-      editor.state.selection.from,
-      "\n",
-    );
-    const currentLine = currentSource.slice(currentSource.lastIndexOf("\n") + 1);
+    const beforeCursor = editor.state.doc.textBetween(0, editor.state.selection.from, "\n");
+    const currentLine = beforeCursor.slice(beforeCursor.lastIndexOf("\n") + 1);
+    const slashQuery = currentLine.match(/^\s*\/([a-z0-9_-]*)$/i)?.[1];
     const query =
+      slashQuery ??
       currentLine.match(/^\s*\[section:\s*([a-z0-9_-]*)$/i)?.[1] ??
       currentLine.match(/^\s*\[exercise:\s*([^\]]*)$/i)?.[1] ??
       currentLine.match(/^\s*(![a-z-]*)$/i)?.[1] ??
       currentLine.match(/([a-z][a-z0-9-]*)$/i)?.[1] ??
       "";
     const to = editor.state.selection.from;
+    const slashOffset = slashQuery === undefined ? 0 : 1;
+    const replacement =
+      suggestion.kind === "template"
+        ? manual?.templates.sections[suggestion.value] ?? suggestion.value
+        : suggestion.value;
 
     editor
       .chain()
       .focus()
-      .deleteRange({ from: Math.max(1, to - query.length), to })
-      .insertContent(suggestion.value)
+      .deleteRange({ from: Math.max(1, to - query.length - slashOffset), to })
+      .insertContent(replacement)
       .run();
     setSuggestions([]);
   }
 
+  function insertTemplate(template: string) {
+    if (!editor || !template) return;
+    editor.chain().focus().insertContent(`${template.trim()}\n`).run();
+  }
+
   function beautify() {
-    if (!editor || !preview) return;
-    setSource(preview.formatted_source.trimEnd());
-    editor.commands.setContent(sourceToDocument(preview.formatted_source.trimEnd()));
+    if (!editor || !preview || errors.length > 0) return;
+    const formatted = preview.formatted_source.trimEnd();
+    sourceRef.current = formatted;
+    setSource(formatted);
+    editor.commands.setContent(sourceToDocument(formatted));
   }
 
   async function switchToStructured() {
-    if (!tokens?.access_token || !draftId || !preview) return;
-
-    setSaveStatus("saving");
+    if (!tokens?.access_token || !draftId || !preview || errors.length > 0) return;
 
     try {
+      const snapshot = sourceRef.current;
       await updateDraftWorkout(tokens.access_token, draftId, {
-        ...toStructuredDraft(preview.workout),
+        ...preview.workout,
         authoring_mode: "structured",
         dsl_version: preview.version,
-        dsl_source: source,
+        dsl_source: snapshot,
         dsl_document: editor?.getJSON() ?? null,
+        expected_source_revision: revisionRef.current,
       });
       setSaveStatus("saved");
       onSwitchToStructured(draftId);
-    } catch {
-      setSaveStatus("error");
+    } catch (error) {
+      setSaveStatus(
+        error instanceof ApiError && error.payload.code === "stale_dsl_revision"
+          ? "conflict"
+          : "error",
+      );
+    }
+  }
+
+  async function publish() {
+    if (
+      !tokens?.access_token ||
+      !draftId ||
+      !editor ||
+      !preview ||
+      errors.length > 0 ||
+      (warnings.length > 0 && !warningsAcknowledged)
+    ) {
+      return;
+    }
+
+    const snapshot = sourceRef.current;
+    const document = editor.getJSON();
+    setPublishing(true);
+
+    try {
+      const revision = await saveDraftSnapshot(snapshot, document, revisionRef.current);
+      if (sourceRef.current !== snapshot) {
+        setSaveStatus("error");
+        return;
+      }
+
+      await publishWorkoutDsl(tokens.access_token, draftId, {
+        source: snapshot,
+        document,
+        expected_source_revision: revision,
+        acknowledge_warnings: warningsAcknowledged,
+      });
+      router.push("/admin/workouts");
+    } catch (error) {
+      if (
+        error instanceof ApiError &&
+        error.payload.code === "dsl_warnings_require_acknowledgement"
+      ) {
+        setDiagnostics(error.payload.diagnostics ?? []);
+        setWarningsAcknowledged(false);
+      }
+    } finally {
+      setPublishing(false);
     }
   }
 
@@ -253,39 +415,58 @@ export function QuickTextWorkoutEditor({
                 {i18n("quickTextDescription")}
               </p>
             </div>
-            <div className="flex items-center gap-2 text-xs font-semibold" style={{ color: "var(--muted)" }}>
-              <span>{saveStatusText(saveStatus, i18n)}</span>
-              <span aria-live="polite">{statusLabel}</span>
+            <div className="text-end text-xs font-semibold" style={{ color: "var(--muted)" }}>
+              <div>{saveStatusText(saveStatus, i18n)}</div>
+              <div aria-live="polite">{statusLabel}</div>
+              <div>{i18n("quickTextRevision", { revision: sourceRevision })}</div>
             </div>
           </div>
         </div>
 
         <EditorToolbar editor={editor} />
+        <div
+          className="flex flex-wrap items-center gap-2 border-b px-4 py-2"
+          style={{ borderColor: "var(--dim)" }}
+        >
+          <select
+            aria-label={i18n("quickTextTemplate")}
+            defaultValue=""
+            onChange={(event) => {
+              insertTemplate(
+                event.target.value === "workout"
+                  ? manual?.templates.workout ?? ""
+                  : manual?.templates.sections[event.target.value] ?? "",
+              );
+              event.currentTarget.value = "";
+            }}
+            className="rounded-lg border px-3 py-2 text-sm"
+            style={{ background: "var(--card)", borderColor: "var(--dim)", color: "var(--text)" }}
+          >
+            <option value="">{i18n("quickTextInsertTemplate")}</option>
+            <option value="workout">{i18n("quickTextFullWorkoutTemplate")}</option>
+            {Object.keys(manual?.templates.sections ?? {}).map((format) => (
+              <option key={format} value={format}>
+                {format.replaceAll("_", " ")}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={() => setManualOpen(true)}
+            className="rounded-lg px-3 py-2 text-sm font-bold"
+            style={{ background: "var(--card)", color: "var(--text)" }}
+          >
+            {i18n("quickTextManual")}
+          </button>
+          <span className="text-xs" style={{ color: "var(--muted)" }}>
+            {i18n("quickTextSlashHint")}
+          </span>
+        </div>
 
         <div className="relative min-h-0 flex-1 overflow-auto">
           <EditorContent editor={editor} />
           {suggestions.length > 0 ? (
-            <div
-              className="sticky bottom-3 mx-4 max-w-xl overflow-hidden rounded-xl border shadow-xl"
-              style={{ background: "var(--panel)", borderColor: "var(--dim)" }}
-              role="listbox"
-              aria-label={i18n("quickTextSuggestions")}
-            >
-              {suggestions.map((suggestion) => (
-                <button
-                  type="button"
-                  key={`${suggestion.kind}:${suggestion.value}`}
-                  role="option"
-                  aria-selected="false"
-                  onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => acceptSuggestion(suggestion)}
-                  className="flex w-full items-center justify-between px-3 py-2 text-start text-sm hover:opacity-80"
-                  style={{ color: "var(--text)" }}
-                >
-                  <span>{suggestion.value}</span>
-                </button>
-              ))}
-            </div>
+            <SuggestionMenu suggestions={suggestions} onAccept={acceptSuggestion} />
           ) : null}
         </div>
 
@@ -294,12 +475,14 @@ export function QuickTextWorkoutEditor({
           style={{ borderColor: "var(--dim)" }}
         >
           <span className="text-xs" style={{ color: "var(--muted)" }}>
-            {i18n("quickTextAutocompleteHint")}
+            {i18n("quickTextCharacterCount", {
+              count: editor?.storage.characterCount.characters() ?? 0,
+            })}
           </span>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              disabled={!preview}
+              disabled={!preview || errors.length > 0}
               onClick={beautify}
               className="rounded-xl px-4 py-2 text-sm font-bold disabled:opacity-40"
               style={{ background: "var(--card)", color: "var(--text)" }}
@@ -308,12 +491,27 @@ export function QuickTextWorkoutEditor({
             </button>
             <button
               type="button"
-              disabled={!preview || diagnostics.length > 0}
+              disabled={!preview || errors.length > 0}
               onClick={switchToStructured}
               className="rounded-xl px-4 py-2 text-sm font-bold disabled:opacity-40"
-              style={{ background: "var(--primary)", color: "var(--primary-foreground, white)" }}
+              style={{ background: "var(--card)", color: "var(--text)" }}
             >
               {i18n("quickTextSwitchStructured")}
+            </button>
+            <button
+              type="button"
+              disabled={
+                publishing ||
+                !preview ||
+                errors.length > 0 ||
+                saveStatus === "conflict" ||
+                (warnings.length > 0 && !warningsAcknowledged)
+              }
+              onClick={publish}
+              className="rounded-xl px-5 py-2 text-sm font-black disabled:opacity-40"
+              style={{ background: "var(--primary)", color: "var(--primary-foreground, white)" }}
+            >
+              {publishing ? i18n("quickTextPublishing") : i18n("quickTextPublish")}
             </button>
           </div>
         </div>
@@ -321,11 +519,27 @@ export function QuickTextWorkoutEditor({
 
       <aside className="min-h-0 overflow-auto p-5" style={{ background: "var(--panel)" }}>
         {diagnostics.length > 0 ? (
-          <DiagnosticsPanel diagnostics={diagnostics} />
+          <>
+            <DiagnosticsPanel diagnostics={diagnostics} />
+            {warnings.length > 0 && errors.length === 0 ? (
+              <label className="mt-4 flex items-start gap-2 text-sm" style={{ color: "var(--text)" }}>
+                <input
+                  type="checkbox"
+                  checked={warningsAcknowledged}
+                  onChange={(event) => setWarningsAcknowledged(event.target.checked)}
+                />
+                {i18n("quickTextAcknowledgeWarnings")}
+              </label>
+            ) : null}
+          </>
         ) : (
           <CanonicalPreview preview={preview} />
         )}
       </aside>
+
+      {manualOpen && manual ? (
+        <ManualDialog markdown={manual.markdown} onClose={() => setManualOpen(false)} />
+      ) : null}
     </div>
   );
 }
@@ -335,13 +549,22 @@ function EditorToolbar({ editor }: { editor: Editor | null }) {
   if (!editor) return null;
 
   const actions = [
-    { label: i18n("editorBold"), text: i18n("editorBold"), active: editor.isActive("bold"), run: () => editor.chain().focus().toggleBold().run() },
-    { label: i18n("editorItalic"), text: i18n("editorItalic"), active: editor.isActive("italic"), run: () => editor.chain().focus().toggleItalic().run() },
-    { label: i18n("editorHeading"), text: i18n("editorHeading"), active: editor.isActive("heading"), run: () => editor.chain().focus().toggleHeading({ level: 2 }).run() },
-    { label: i18n("editorBulletList"), text: "•", active: editor.isActive("bulletList"), run: () => editor.chain().focus().toggleBulletList().run() },
-    { label: i18n("editorOrderedList"), text: "1.", active: editor.isActive("orderedList"), run: () => editor.chain().focus().toggleOrderedList().run() },
-    { label: i18n("editorUndo"), text: "↶", active: false, run: () => editor.chain().focus().undo().run() },
-    { label: i18n("editorRedo"), text: "↷", active: false, run: () => editor.chain().focus().redo().run() },
+    button(i18n("editorBold"), i18n("editorBold"), editor.isActive("bold"), () => editor.chain().focus().toggleBold().run()),
+    button(i18n("editorItalic"), i18n("editorItalic"), editor.isActive("italic"), () => editor.chain().focus().toggleItalic().run()),
+    button(i18n("editorUnderline"), i18n("editorUnderline"), editor.isActive("underline"), () => editor.chain().focus().toggleUnderline().run()),
+    button(i18n("editorStrike"), i18n("editorStrike"), editor.isActive("strike"), () => editor.chain().focus().toggleStrike().run()),
+    button(i18n("editorHighlight"), "▰", editor.isActive("highlight"), () => editor.chain().focus().toggleHighlight().run()),
+    button(i18n("editorHeading"), i18n("editorHeading"), editor.isActive("heading", { level: 2 }), () => editor.chain().focus().toggleHeading({ level: 2 }).run()),
+    button(i18n("editorBulletList"), "•", editor.isActive("bulletList"), () => editor.chain().focus().toggleBulletList().run()),
+    button(i18n("editorOrderedList"), "1.", editor.isActive("orderedList"), () => editor.chain().focus().toggleOrderedList().run()),
+    button(i18n("editorQuote"), "❝", editor.isActive("blockquote"), () => editor.chain().focus().toggleBlockquote().run()),
+    button(i18n("editorCode"), "</>", editor.isActive("codeBlock"), () => editor.chain().focus().toggleCodeBlock().run()),
+    button(i18n("editorAlignLeft"), "⇤", editor.isActive({ textAlign: "left" }), () => editor.chain().focus().setTextAlign("left").run()),
+    button(i18n("editorAlignCenter"), "↔", editor.isActive({ textAlign: "center" }), () => editor.chain().focus().setTextAlign("center").run()),
+    button(i18n("editorAlignRight"), "⇥", editor.isActive({ textAlign: "right" }), () => editor.chain().focus().setTextAlign("right").run()),
+    button(i18n("editorLink"), "🔗", editor.isActive("link"), () => setEditorLink(editor, i18n("editorLinkPrompt"))),
+    button(i18n("editorUndo"), "↶", false, () => editor.chain().focus().undo().run()),
+    button(i18n("editorRedo"), "↷", false, () => editor.chain().focus().redo().run()),
   ];
 
   return (
@@ -366,6 +589,43 @@ function EditorToolbar({ editor }: { editor: Editor | null }) {
   );
 }
 
+function SuggestionMenu({
+  suggestions,
+  onAccept,
+}: {
+  suggestions: WorkoutDslSuggestion[];
+  onAccept: (suggestion: WorkoutDslSuggestion) => void;
+}) {
+  const i18n = useUiTranslations();
+
+  return (
+    <div
+      className="sticky bottom-3 mx-4 max-w-xl overflow-hidden rounded-xl border shadow-xl"
+      style={{ background: "var(--panel)", borderColor: "var(--dim)" }}
+      role="listbox"
+      aria-label={i18n("quickTextSuggestions")}
+    >
+      {suggestions.map((suggestion) => (
+        <button
+          type="button"
+          key={`${suggestion.kind}:${suggestion.value}`}
+          role="option"
+          aria-selected="false"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => onAccept(suggestion)}
+          className="flex w-full items-center justify-between px-3 py-2 text-start text-sm hover:opacity-80"
+          style={{ color: "var(--text)" }}
+        >
+          <span>{suggestion.value}</span>
+          <span className="text-[10px] uppercase" style={{ color: "var(--muted)" }}>
+            {suggestion.kind}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function DiagnosticsPanel({ diagnostics }: { diagnostics: WorkoutDslDiagnostic[] }) {
   const i18n = useUiTranslations();
 
@@ -375,23 +635,33 @@ function DiagnosticsPanel({ diagnostics }: { diagnostics: WorkoutDslDiagnostic[]
         {i18n("quickTextDiagnostics")}
       </h2>
       <div className="mt-3 space-y-2">
-        {diagnostics.map((diagnostic, index) => (
-          <div
-            key={`${diagnostic.code}:${diagnostic.line}:${index}`}
-            className="rounded-xl border px-3 py-2"
-            style={{
-              borderColor: "color-mix(in srgb, var(--danger) 45%, transparent)",
-              background: "color-mix(in srgb, var(--danger) 8%, transparent)",
-            }}
-          >
-            <div className="text-sm font-bold" style={{ color: "var(--danger)" }}>
-              {i18n("quickTextDiagnosticLine", { line: diagnostic.line })}
+        {diagnostics.map((diagnostic, index) => {
+          const danger = diagnostic.severity === "error";
+          const color = danger ? "var(--danger)" : "var(--warning, #b7791f)";
+
+          return (
+            <div
+              key={`${diagnostic.code}:${diagnostic.line}:${index}`}
+              className="rounded-xl border px-3 py-2"
+              style={{ borderColor: color }}
+            >
+              <div className="text-sm font-bold" style={{ color }}>
+                {i18n("quickTextDiagnosticPosition", {
+                  line: diagnostic.line,
+                  column: diagnostic.column,
+                })}
+              </div>
+              <div className="mt-1 font-mono text-xs" style={{ color: "var(--text)" }}>
+                {diagnostic.code}
+              </div>
+              {Object.keys(diagnostic.params).length > 0 ? (
+                <div className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
+                  {formatDiagnosticParams(diagnostic.params)}
+                </div>
+              ) : null}
             </div>
-            <div className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
-              {i18n("quickTextInvalid")}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -445,7 +715,8 @@ function CanonicalPreview({ preview }: { preview: WorkoutDslPreview | null }) {
                         {exercise.item_type !== "header" ? (
                           <span style={{ color: "var(--muted)" }}>
                             {" "}
-                            · {String(exercise.sets ?? 1)} × {String(exercise.prescription_value ?? "")}
+                            · {String(exercise.sets ?? 1)} ×{" "}
+                            {String(exercise.prescription_value ?? "")}
                           </span>
                         ) : null}
                       </div>
@@ -461,6 +732,53 @@ function CanonicalPreview({ preview }: { preview: WorkoutDslPreview | null }) {
   );
 }
 
+function ManualDialog({ markdown, onClose }: { markdown: string; onClose: () => void }) {
+  const i18n = useUiTranslations();
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/55 p-4" role="presentation">
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-label={i18n("quickTextManual")}
+        className="flex max-h-[90dvh] w-full max-w-4xl flex-col rounded-2xl shadow-2xl"
+        style={{ background: "var(--panel)" }}
+      >
+        <header className="flex items-center justify-between border-b p-4" style={{ borderColor: "var(--dim)" }}>
+          <h2 className="text-lg font-black" style={{ color: "var(--text)" }}>
+            {i18n("quickTextManual")}
+          </h2>
+          <button type="button" onClick={onClose} className="rounded-lg px-3 py-2" style={{ color: "var(--text)" }}>
+            {i18n("quickTextCloseManual")}
+          </button>
+        </header>
+        <pre
+          className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap p-5 font-sans text-sm leading-6"
+          style={{ color: "var(--text)" }}
+        >
+          {markdown}
+        </pre>
+      </section>
+    </div>
+  );
+}
+
+function button(label: string, text: string, active: boolean, run: () => unknown) {
+  return { label, text, active, run };
+}
+
+function setEditorLink(editor: Editor, promptLabel: string) {
+  const previous = editor.getAttributes("link").href as string | undefined;
+  const url = window.prompt(promptLabel, previous ?? "");
+  if (url === null) return;
+  if (url.trim() === "") {
+    editor.chain().focus().extendMarkRange("link").unsetLink().run();
+    return;
+  }
+  if (!/^(https?:|mailto:)/i.test(url.trim())) return;
+  editor.chain().focus().extendMarkRange("link").setLink({ href: url.trim() }).run();
+}
+
 function saveStatusText(status: SaveStatus, i18n: ReturnType<typeof useUiTranslations>) {
   switch (status) {
     case "saving":
@@ -469,12 +787,14 @@ function saveStatusText(status: SaveStatus, i18n: ReturnType<typeof useUiTransla
       return i18n("quickTextSaved");
     case "error":
       return i18n("quickTextSaveError");
+    case "conflict":
+      return i18n("quickTextRevisionConflict");
     case "idle":
       return "";
   }
 }
 
-function sourceToDocument(source: string) {
+function sourceToDocument(source: string): JSONContent {
   return {
     type: "doc",
     content: source.split("\n").map((line) => ({
@@ -484,43 +804,25 @@ function sourceToDocument(source: string) {
   };
 }
 
-function toStructuredDraft(workout: Record<string, unknown>) {
-  const sections = Array.isArray(workout.sections) ? workout.sections : [];
+function sanitizePastedHtml(html: string) {
+  if (typeof DOMParser === "undefined") return "";
+  const document = new DOMParser().parseFromString(html, "text/html");
+  document.querySelectorAll("script,style,iframe,object,embed,form,meta,link").forEach((node) => node.remove());
+  document.querySelectorAll("*").forEach((node) => {
+    for (const attribute of [...node.attributes]) {
+      const name = attribute.name.toLowerCase();
+      const value = attribute.value.trim();
+      if (name.startsWith("on") || name === "style") node.removeAttribute(attribute.name);
+      if ((name === "href" || name === "src") && !/^(https?:|mailto:|\/|#)/i.test(value)) {
+        node.removeAttribute(attribute.name);
+      }
+    }
+  });
+  return document.body.innerHTML;
+}
 
-  return {
-    title: workout.title,
-    type: workout.type,
-    is_team_workout: Boolean(workout.is_team_workout),
-    sections: sections.map((rawSection) => {
-      const section = rawSection as Record<string, unknown>;
-      const exercises = Array.isArray(section.exercises) ? section.exercises : [];
-
-      return {
-        name: section.name,
-        scoreable: Boolean(section.scoreable),
-        score_config: section.score_config ?? null,
-        timer_config: section.timer_config ?? { type: "untimed" },
-        note: section.note ?? null,
-        exercises: exercises.map((rawExercise) => {
-          const exercise = rawExercise as Record<string, unknown>;
-          return {
-            item_type: exercise.item_type ?? "exercise",
-            name: exercise.name,
-            sets: exercise.sets ?? null,
-            set_prescriptions: exercise.set_prescriptions ?? [],
-            prescription_value: exercise.prescription_value ?? null,
-            prescription_unit: exercise.prescription_unit ?? null,
-            load_value: exercise.load_value ?? null,
-            load_mode: exercise.load_mode ?? null,
-            load_progression: exercise.load_progression ?? null,
-            interval_assignment: exercise.interval_assignment ?? null,
-            tempo: exercise.tempo ?? null,
-            rest_seconds: exercise.rest_seconds ?? null,
-            note: exercise.note ?? null,
-            variations: [],
-          };
-        }),
-      };
-    }),
-  };
+function formatDiagnosticParams(params: Record<string, unknown>) {
+  return Object.entries(params)
+    .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(", ") : String(value)}`)
+    .join(" · ");
 }
