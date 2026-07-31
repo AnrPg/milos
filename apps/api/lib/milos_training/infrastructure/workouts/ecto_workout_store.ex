@@ -137,6 +137,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           published
           |> Repo.preload(@workout_preloads)
           |> normalize_workout(note_visibility: :admin)
+          |> Map.merge(authoring_state(published))
 
         {:ok, published}
 

@@ -2,14 +2,38 @@ defmodule MilosTrainingWeb.AdminWorkoutDslController do
   use MilosTrainingWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias MilosTraining.Application.ParseWorkoutDsl
+  alias MilosTraining.Application.{
+    GetWorkoutDslAuthoring,
+    ParseWorkoutDsl,
+    PublishWorkoutDsl
+  }
+
   alias MilosTrainingWeb.Schemas.WorkoutDsl, as: WorkoutDslSchema
-  alias OpenApiSpex.{MediaType, RequestBody, Schema}
+  alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
+
+  action_fallback MilosTrainingWeb.FallbackController
 
   tags(["Admin Workouts"])
   security([%{"bearerAuth" => []}])
 
   plug(OpenApiSpex.Plug.CastAndValidate, json_render_error_v2: true)
+
+  @id_param %Parameter{
+    name: :id,
+    in: :path,
+    required: true,
+    schema: %Schema{type: :string, format: :uuid}
+  }
+
+  @error_schema %Schema{
+    type: :object,
+    properties: %{
+      code: %Schema{type: :string},
+      error: %Schema{type: :string},
+      diagnostics: %Schema{type: :array, items: WorkoutDslSchema.diagnostic_schema()}
+    },
+    required: [:code, :error]
+  }
 
   operation(:parse,
     summary: "Parse and canonically format Quick Text workout source",
@@ -55,6 +79,64 @@ defmodule MilosTrainingWeb.AdminWorkoutDslController do
     end
   end
 
+  operation(:show_authoring,
+    summary: "Get retained or canonically generated Quick Text source",
+    parameters: [@id_param],
+    responses: [
+      ok:
+        {"Quick Text authoring state", "application/json",
+         WorkoutDslSchema.authoring_response_schema()},
+      not_found: {"Not found", "application/json", @error_schema}
+    ]
+  )
+
+  def show_authoring(conn, params) do
+    id = params[:id] || params["id"]
+
+    with {:ok, authoring} <- GetWorkoutDslAuthoring.call(id) do
+      json(conn, authoring)
+    end
+  end
+
+  operation(:publish,
+    summary: "Parse, preflight, and publish an exact Quick Text source revision",
+    parameters: [@id_param],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{schema: WorkoutDslSchema.publish_request_schema()}
+      }
+    },
+    responses: [
+      ok:
+        {"Published canonical workout", "application/json",
+         WorkoutDslSchema.publish_response_schema()},
+      conflict:
+        {"Revision conflict or warning acknowledgement required", "application/json",
+         @error_schema},
+      unprocessable_entity:
+        {"DSL or canonical validation failed", "application/json",
+         WorkoutDslSchema.diagnostic_response_schema()}
+    ]
+  )
+
+  def publish(conn, params) do
+    id = params[:id] || params["id"]
+
+    case PublishWorkoutDsl.call(id, conn.body_params) do
+      {:ok, result} ->
+        json(conn, json_publish_result(result))
+
+      {:error, diagnostics} when is_list(diagnostics) ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> json(%{diagnostics: Enum.map(diagnostics, &json_diagnostic/1)})
+
+      error ->
+        error
+    end
+  end
+
   defp json_diagnostic(diagnostic) do
     diagnostic
     |> Map.update!(:code, &Atom.to_string/1)
@@ -64,5 +146,13 @@ defmodule MilosTrainingWeb.AdminWorkoutDslController do
 
   defp stringify_param_keys(params) do
     Map.new(params, fn {key, value} -> {to_string(key), value} end)
+  end
+
+  defp json_publish_result(result) do
+    Map.update!(
+      result,
+      :diagnostics,
+      &Enum.map(&1, fn diagnostic -> json_diagnostic(diagnostic) end)
+    )
   end
 end

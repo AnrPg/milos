@@ -110,6 +110,8 @@ defmodule MilosTrainingWeb.Router do
     get("/workouts", AdminWorkoutController, :index)
     post("/workouts", AdminWorkoutController, :create)
     post("/workouts/dsl/parse", AdminWorkoutDslController, :parse)
+    get("/workouts/:id/dsl", AdminWorkoutDslController, :show_authoring)
+    post("/workouts/:id/dsl/publish", AdminWorkoutDslController, :publish)
     get("/workouts/:id", AdminWorkoutController, :show)
     patch("/workouts/:id/draft", AdminWorkoutController, :update_draft)
     post("/workouts/:id/publish", AdminWorkoutController, :publish)

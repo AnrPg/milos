@@ -88,6 +88,53 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "not_found", error: "Not found"})
   end
 
+  def call(conn, {:error, :stale_dsl_revision}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "stale_dsl_revision",
+      error:
+        "The Quick Text source changed in another editor. Reload before saving or publishing."
+    })
+  end
+
+  def call(conn, {:error, {:dsl_warnings_require_acknowledgement, diagnostics}}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "dsl_warnings_require_acknowledgement",
+      error: "Review and acknowledge the Quick Text warnings before publishing.",
+      diagnostics: Enum.map(diagnostics, &json_dsl_diagnostic/1)
+    })
+  end
+
+  def call(conn, {:error, reason})
+      when reason in [
+             :invalid_canonical_workout,
+             :missing_workout_title,
+             :missing_workout_type,
+             :invalid_sections,
+             :empty_execution_sequence,
+             :invalid_execution_timer_segment
+           ] do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: to_string(reason),
+      error: "The canonical workout failed publication preflight."
+    })
+  end
+
+  def call(conn, {:error, {:unknown_scale_level, slug}}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "unknown_scale_level",
+      error: "The workout references an inactive or unknown scale level.",
+      params: %{slug: slug}
+    })
+  end
+
   def call(conn, {:error, {:class_type_replacement_required, future_class_count}}) do
     conn
     |> put_status(:conflict)
@@ -966,6 +1013,16 @@ defmodule MilosTrainingWeb.FallbackController do
     conn
     |> put_status(:internal_server_error)
     |> json(%{code: "unexpected_server_error", error: "Unexpected server error"})
+  end
+
+  defp json_dsl_diagnostic(diagnostic) do
+    %{
+      code: to_string(diagnostic.code),
+      severity: to_string(diagnostic.severity),
+      line: diagnostic.line,
+      column: diagnostic.column,
+      params: Map.new(diagnostic.params, fn {key, value} -> {to_string(key), value} end)
+    }
   end
 
   defp translate_error({msg, opts}) do

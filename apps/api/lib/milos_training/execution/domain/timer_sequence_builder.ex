@@ -4,7 +4,7 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
   sequence of executable timer segments. Each segment describes one discrete
   timed (or manual) phase the athlete works through during execution.
 
-  Supports all 18 timer formats. Section traversal is depth-first (nested
+  Supports all 19 timer formats. Section traversal is depth-first (nested
   sections are expanded inline) to match the workout authoring display order.
   """
 
@@ -23,7 +23,10 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
     - :scoreable         — boolean
   """
   def build(workout) do
-    sections = workout[:sections] || workout["sections"] || []
+    sections =
+      workout
+      |> value(:sections, [])
+      |> flatten_nested_sections()
 
     top_level =
       sections
@@ -120,7 +123,9 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
 
       "rest" ->
         duration = get_timer_field(section, :duration_seconds)
-        [segment(section, :countdown, duration, nil, nil, [], label: "Rest")]
+
+        kind = if is_integer(duration) and duration > 0, do: :countdown, else: :manual
+        [segment(section, kind, duration, nil, nil, [], label: "Rest")]
 
       _ ->
         [segment(section, :no_timer, nil, nil, nil, exercises)]
@@ -356,5 +361,43 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
 
   defp sort_sections(sections) do
     Enum.sort_by(sections, &(&1[:order] || &1["order"] || 0))
+  end
+
+  defp flatten_nested_sections(sections) do
+    sections
+    |> Enum.with_index(1)
+    |> Enum.flat_map(fn {section, index} ->
+      flatten_nested_section(section, nil, Integer.to_string(index))
+    end)
+  end
+
+  defp flatten_nested_section(section, parent_id, path) do
+    id = value(section, :id) || "draft-section-#{path}"
+    children = value(section, :sections, [])
+
+    normalized =
+      section
+      |> Map.delete(:sections)
+      |> Map.delete("sections")
+      |> put_value(:id, id)
+      |> put_value(:parent_section_id, parent_id)
+
+    nested =
+      children
+      |> Enum.with_index(1)
+      |> Enum.flat_map(fn {child, index} ->
+        flatten_nested_section(child, id, "#{path}.#{index}")
+      end)
+
+    [normalized | nested]
+  end
+
+  defp value(map, key, default \\ nil),
+    do: Map.get(map, key, Map.get(map, Atom.to_string(key), default))
+
+  defp put_value(map, key, value) do
+    map
+    |> Map.delete(Atom.to_string(key))
+    |> Map.put(key, value)
   end
 end

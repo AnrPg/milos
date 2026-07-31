@@ -59,6 +59,74 @@ defmodule MilosTrainingWeb.Schemas.WorkoutDsl do
     }
   end
 
+  def publish_request_schema do
+    %Schema{
+      title: "WorkoutDslPublishRequest",
+      type: :object,
+      properties: %{
+        source: %Schema{type: :string, minLength: 1, maxLength: 200_000},
+        document: %Schema{type: :object, additionalProperties: true, nullable: true},
+        expected_source_revision: %Schema{type: :integer, minimum: 0},
+        acknowledge_warnings: %Schema{type: :boolean, default: false}
+      },
+      required: [:source, :expected_source_revision],
+      additionalProperties: false
+    }
+  end
+
+  def publish_response_schema do
+    %Schema{
+      title: "WorkoutDslPublishResponse",
+      type: :object,
+      properties: %{
+        workout: %Schema{type: :object, additionalProperties: true},
+        formatted_source: %Schema{type: :string},
+        diagnostics: %Schema{type: :array, items: diagnostic_schema()},
+        execution_preview: %Schema{type: :object, additionalProperties: true}
+      },
+      required: [:workout, :formatted_source, :diagnostics, :execution_preview],
+      additionalProperties: false
+    }
+  end
+
+  def authoring_response_schema do
+    %Schema{
+      title: "WorkoutDslAuthoringResponse",
+      type: :object,
+      properties: %{
+        version: %Schema{type: :integer, enum: [1]},
+        source: %Schema{type: :string},
+        document: %Schema{type: :object, additionalProperties: true, nullable: true},
+        source_revision: %Schema{type: :integer, minimum: 0},
+        authoring_mode: %Schema{type: :string, enum: ["structured", "quick_text"]},
+        diagnostics: %Schema{type: :array, items: diagnostic_schema()}
+      },
+      required: [
+        :version,
+        :source,
+        :source_revision,
+        :authoring_mode,
+        :diagnostics
+      ],
+      additionalProperties: false
+    }
+  end
+
+  def manual_response_schema do
+    %Schema{
+      title: "WorkoutDslManualResponse",
+      type: :object,
+      properties: %{
+        version: %Schema{type: :integer, enum: [1]},
+        markdown: %Schema{type: :string},
+        templates: %Schema{type: :object, additionalProperties: true},
+        vocabulary: vocabulary_schema()
+      },
+      required: [:version, :markdown, :templates, :vocabulary],
+      additionalProperties: false
+    }
+  end
+
   def vocabulary_schema do
     %Schema{
       title: "WorkoutDslVocabulary",
