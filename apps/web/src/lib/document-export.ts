@@ -47,6 +47,11 @@ export type ExportLabels = {
   no: string;
   session: string;
   score: string;
+  header: string;
+  superset: string;
+  alternatingSets: string;
+  progressiveLoad: string;
+  progressiveDeload: string;
 };
 
 export type ExportItem = {
@@ -120,6 +125,51 @@ function prescription(exercise: WorkoutExerciseRecord | WorkoutVariationRecord, 
   return parts.join(" · ") || "—";
 }
 
+function setPrescriptionDetails(
+  exercise: WorkoutExerciseRecord | WorkoutVariationRecord,
+  labels: ExportLabels,
+): string[] {
+  return (exercise.set_prescriptions ?? []).map((set) => {
+    const prescribed = compact([
+      set.prescription_value != null
+        ? `${set.prescription_value}${set.prescription_unit ? ` ${displayValue(set.prescription_unit)}` : ""}`
+        : undefined,
+      set.load_value != null
+        ? `${set.load_value} ${set.load_mode === "pct_1rm" ? "%1RM" : displayValue(set.load_mode ?? labels.load)}`
+        : undefined,
+      set.note ?? undefined,
+    ]);
+
+    return `${labels.setsLabel} ${set.set_index}: ${prescribed.join(" · ") || "—"}`;
+  });
+}
+
+function loadProgressionDetail(
+  exercise: WorkoutExerciseRecord | WorkoutVariationRecord,
+  labels: ExportLabels,
+): string | undefined {
+  const progression = exercise.load_progression;
+  if (!progression) return undefined;
+
+  const label = progression.direction === "decrease"
+    ? labels.progressiveDeload
+    : labels.progressiveLoad;
+  const unit = progression.start_mode === "pct_1rm" ? "%1RM" : "kg";
+
+  if (progression.mode === "per_set") {
+    return `${label}: ${progression.per_set_values.join("/")} ${unit}`;
+  }
+
+  const sign = progression.direction === "decrease" ? "−" : "+";
+  return `${label}: ${progression.start_value} ${unit} (${sign}${progression.step_value} ${unit}/${labels.setsLabel})`;
+}
+
+function groupDetail(exercise: WorkoutExerciseRecord, labels: ExportLabels): string | undefined {
+  if (exercise.superset_group_id) return labels.superset;
+  if (exercise.alternating_group_id) return labels.alternatingSets;
+  return undefined;
+}
+
 function variationDetail(variation: WorkoutVariationRecord, base: WorkoutExerciseRecord, labels: ExportLabels): string {
   const name = variation.scale_level.label;
   if (variation.excluded) return `${name}: ${labels.excluded}`;
@@ -191,8 +241,53 @@ function draftVariation(value: unknown, index: number): WorkoutVariationRecord |
     load_mode: typeof variation.load_mode === "string"
       ? variation.load_mode as WorkoutVariationRecord["load_mode"]
       : null,
+    set_prescriptions: draftSetPrescriptions(variation.set_prescriptions),
+    load_progression: draftLoadProgression(variation.load_progression),
     excluded: variation.excluded === true,
+    note: typeof variation.note === "string" ? variation.note : null,
     scale_level: draftScaleLevel(variation.scale_level, variation.scale_level_slug, index),
+  };
+}
+
+function draftSetPrescriptions(value: unknown): NonNullable<WorkoutExerciseRecord["set_prescriptions"]> {
+  if (!Array.isArray(value)) return [];
+
+  return value.flatMap((entry, index) => {
+    const set = objectValue(entry);
+    if (!set) return [];
+
+    return [{
+      set_index: numberValue(set.set_index) ?? index + 1,
+      prescription_value: numberValue(set.prescription_value),
+      prescription_unit: typeof set.prescription_unit === "string"
+        ? set.prescription_unit as WorkoutExerciseRecord["prescription_unit"]
+        : null,
+      load_value: numberValue(set.load_value),
+      load_mode: typeof set.load_mode === "string"
+        ? set.load_mode as WorkoutExerciseRecord["load_mode"]
+        : null,
+      note: typeof set.note === "string" ? set.note : null,
+    }];
+  });
+}
+
+function draftLoadProgression(value: unknown): WorkoutExerciseRecord["load_progression"] {
+  const progression = objectValue(value);
+  if (!progression) return null;
+
+  const mode = progression.mode === "per_set" ? "per_set" : "linear";
+  const direction = progression.direction === "decrease" ? "decrease" : "increase";
+  const startMode = progression.start_mode === "pct_1rm" ? "pct_1rm" : "absolute";
+
+  return {
+    mode,
+    direction,
+    start_value: numberValue(progression.start_value) ?? 0,
+    start_mode: startMode,
+    step_value: numberValue(progression.step_value) ?? 0,
+    per_set_values: Array.isArray(progression.per_set_values)
+      ? progression.per_set_values.flatMap((item) => numberValue(item) ?? [])
+      : [],
   };
 }
 
@@ -201,6 +296,7 @@ function draftExercise(value: unknown, index: number): WorkoutExerciseRecord | n
   if (!exercise || typeof exercise.name !== "string") return null;
 
   return {
+    item_type: exercise.item_type === "header" ? "header" : "exercise",
     name: exercise.name,
     description: typeof exercise.description === "string" ? exercise.description : null,
     sets: numberValue(exercise.sets),
@@ -212,6 +308,15 @@ function draftExercise(value: unknown, index: number): WorkoutExerciseRecord | n
     load_mode: typeof exercise.load_mode === "string"
       ? exercise.load_mode as WorkoutExerciseRecord["load_mode"]
       : null,
+    set_prescriptions: draftSetPrescriptions(exercise.set_prescriptions),
+    load_progression: draftLoadProgression(exercise.load_progression),
+    superset_group_id: typeof exercise.superset_group_id === "string"
+      ? exercise.superset_group_id
+      : null,
+    alternating_group_id: typeof exercise.alternating_group_id === "string"
+      ? exercise.alternating_group_id
+      : null,
+    note: typeof exercise.note === "string" ? exercise.note : null,
     order: numberValue(exercise.order) ?? index,
     variations: Array.isArray(exercise.variations)
       ? exercise.variations.map(draftVariation).filter((item): item is WorkoutVariationRecord => Boolean(item))
@@ -237,6 +342,7 @@ function exportWorkoutSections(workout: WorkoutRecord): WorkoutSectionRecord[] {
       scoreable: section.scoreable === true,
       score_config: objectValue(section.score_config),
       timer_config: objectValue(section.timer_config),
+      note: typeof section.note === "string" ? section.note : null,
       exercises,
     }];
   });
@@ -274,18 +380,36 @@ export function buildWorkoutDocument(workout: WorkoutRecord, labels: ExportLabel
       .map((section) => ({
         icon: section.scoreable ? "🎯" : "⚡",
         title: section.name,
-        items: section.exercises
-          .slice()
-          .sort((a, b) => a.order - b.order)
-          .map((exercise) => ({
-            label: exercise.name,
-            value: prescription(exercise, labels),
-            details: compact([
-              exercise.description ?? undefined,
-              timerSummary(section.timer_config, labels),
-              ...exercise.variations.map((variation) => variationDetail(variation, exercise, labels)),
-            ]),
-          })),
+        items: [
+          ...(section.note ? [{ label: labels.notes, value: section.note }] : []),
+          ...section.exercises
+            .slice()
+            .sort((a, b) => a.order - b.order)
+            .map((exercise) => exercise.item_type === "header"
+              ? {
+                  label: labels.header,
+                  value: exercise.name,
+                  details: compact([exercise.note ?? undefined]),
+                }
+              : {
+                  label: exercise.name,
+                  value: prescription(exercise, labels),
+                  details: compact([
+                    groupDetail(exercise, labels),
+                    exercise.description ?? undefined,
+                    exercise.note ?? undefined,
+                    timerSummary(section.timer_config, labels),
+                    loadProgressionDetail(exercise, labels),
+                    ...setPrescriptionDetails(exercise, labels),
+                    ...exercise.variations.flatMap((variation) => [
+                      variationDetail(variation, exercise, labels),
+                      variation.note ?? undefined,
+                      loadProgressionDetail(variation, labels),
+                      ...setPrescriptionDetails(variation, labels),
+                    ]),
+                  ]),
+                }),
+        ],
       })),
     footer: labels.generatedBy,
   };
@@ -298,6 +422,10 @@ export function buildExecutionDocument(
 ): ExportDocument {
   const completedDate = execution.completed_at_utc ?? execution.started_at_utc;
   const sections: ExportSection[] = [];
+
+  if (execution.workout) {
+    sections.push(...buildWorkoutDocument(execution.workout, labels).sections);
+  }
 
   if (execution.section_scores.length > 0) {
     sections.push({

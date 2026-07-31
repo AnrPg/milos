@@ -50,6 +50,11 @@ const labels: ExportLabels = {
   no: "No",
   session: "session",
   score: "Score",
+  header: "Header",
+  superset: "Superset",
+  alternatingSets: "Alternating sets",
+  progressiveLoad: "Progressive load",
+  progressiveDeload: "Progressive deload",
 };
 
 describe("document export adapters", () => {
@@ -115,6 +120,61 @@ describe("document export adapters", () => {
     expect(document.sections[0].title).toBe("Chipper");
     expect(document.sections[0].items[0].value).toBe("5 × 12 reps");
     expect(document.sections[0].items[0].details).toContain("scaled: 5 × 8 reps");
+  });
+
+  it("exports structured groups, headers, notes, per-set reps, and deloads", () => {
+    const document = buildWorkoutDocument({
+      id: "structured-1",
+      title: "Strength complex",
+      type: "strength",
+      status: "published",
+      available_scale_levels: [],
+      sections: [{
+        name: "Main",
+        note: "Keep the bar close",
+        order: 0,
+        scoreable: false,
+        exercises: [{
+          item_type: "header",
+          name: "Barbell complex",
+          note: "No rest between movements",
+          order: 0,
+          variations: [],
+        }, {
+          item_type: "exercise",
+          name: "Back squat",
+          order: 1,
+          sets: 3,
+          prescription_value: 10,
+          prescription_unit: "reps",
+          set_prescriptions: [
+            { set_index: 1, prescription_value: 10, prescription_unit: "reps", note: "Controlled" },
+            { set_index: 2, prescription_value: 8, prescription_unit: "reps" },
+            { set_index: 3, prescription_value: 6, prescription_unit: "reps" },
+          ],
+          load_progression: {
+            mode: "linear",
+            direction: "decrease",
+            start_value: 80,
+            start_mode: "pct_1rm",
+            step_value: 5,
+            per_set_values: [],
+          },
+          superset_group_id: "group-1",
+          note: "Brace before every rep",
+          variations: [],
+        }],
+      }],
+    }, labels);
+
+    const output = renderText(document);
+    expect(output).toContain("Notes: Keep the bar close");
+    expect(output).toContain("Header: Barbell complex");
+    expect(output).toContain("No rest between movements");
+    expect(output).toContain("Superset");
+    expect(output).toContain("sets 2: 8 reps");
+    expect(output).toContain("Progressive deload: 80 %1RM (−5 %1RM/sets)");
+    expect(output).toContain("Brace before every rep");
   });
 
   it("includes execution scores, notes, and actual-vs-prescribed modifications", () => {

@@ -74,6 +74,11 @@ export function useShareExport() {
       no: i18n("exportNo"),
       session: i18n("exportSession"),
       score: i18n("exportScore"),
+      header: i18n("headerLabel"),
+      superset: i18n("supersetLabel"),
+      alternatingSets: i18n("alternatingSetsLabel"),
+      progressiveLoad: i18n("progressiveLoadIncrease"),
+      progressiveDeload: i18n("progressiveLoadDecrease"),
     },
   }), [i18n]);
 }
