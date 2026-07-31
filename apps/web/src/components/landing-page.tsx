@@ -17,6 +17,7 @@ import { fetchAssignedWorkoutWeek } from "@/api/assigned-workouts";
 import { fetchSchedule } from "@/api/schedule";
 import { PantheonSection } from "@/components/pantheon/PantheonSection";
 import { ChallengeCard } from "@/components/workouts/ChallengeCard";
+import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
 import {
   fetchLandingPayload,
   updateLeaderboardOptIn,
@@ -1269,6 +1270,21 @@ export function LandingPage() {
                       </p>
                     </div>
                   </div>
+
+                  {selectedExecution.workout ? (
+                    <div>
+                      <p className="text-sm font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+                        {i18n("workout39463a5")}
+                      </p>
+                      <div className="mt-3">
+                        <WorkoutPreviewDetail
+                          activeScaleOverride={selectedExecution.scale_level_slug}
+                          hideScaleChips
+                          sections={selectedExecution.workout.sections}
+                        />
+                      </div>
+                    </div>
+                  ) : null}
 
                   <div>
                     <p className="text-sm font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{i18n("sectionScorescaef89a")}</p>

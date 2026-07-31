@@ -6,7 +6,7 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import {useUiLocale} from "@/i18n/use-ui-locale";
-import { localizeError, semanticLabel } from "@/i18n/presentation";
+import { localizeError } from "@/i18n/presentation";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDrag } from "@use-gesture/react";
@@ -20,9 +20,9 @@ import {
 import { AuthGuard } from "@/components/auth-guard";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
+import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
 import { subscribeToTopic } from "@/lib/realtime";
 import { useExecutionStore } from "@/stores/execution";
-import { SemanticLabel } from "@/components/semantic-label";
 
 type Step = "type" | "week" | "preview";
 
@@ -325,66 +325,7 @@ function WorkoutsPageContent() {
   }
 
   function renderWorkoutPreview(workout: WorkoutRecord) {
-    return (
-      <div className="space-y-4">
-        {workout.sections.map((section) => (
-          <section
-            key={section.id ?? (String(section.name ?? i18n("sectionf2c6b56"))) + "-" + (section.order)}
-            className="rounded-3xl border p-5"
-            style={{
-              background: "color-mix(in srgb, var(--panel) 78%, transparent)",
-              borderColor: "var(--border)",
-            }}
-          >
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold">{section.name}</h2>
-              {section.timer_config?.type ? (
-                <span
-                  className="rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]"
-                  style={{
-                    background: "color-mix(in srgb, var(--primary) 15%, transparent)",
-                    border: "1px solid color-mix(in srgb, var(--primary) 35%, transparent)",
-                    color: "var(--primary)",
-                  }}
-                >
-                  <SemanticLabel value={section.timer_config.type} />
-                </span>
-              ) : null}
-            </div>
-
-            <div className="mt-4 space-y-3">
-              {section.exercises.map((exercise) => (
-                <div
-                  key={exercise.id ?? (exercise.name) + "-" + (exercise.order)}
-                  className="rounded-2xl border px-4 py-3"
-                  style={{
-                    background: "color-mix(in srgb, var(--panel-muted) 78%, transparent)",
-                    borderColor: "color-mix(in srgb, var(--border-strong) 90%, transparent)",
-                  }}
-                >
-                  <div className="text-sm font-semibold">{exercise.name}</div>
-                  <div className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
-                    {[
-                      exercise.sets ? (exercise.sets) + " " + semanticLabel("sets", i18n) : null,
-                      exercise.prescription_value
-                        ? (exercise.prescription_value) + " " + semanticLabel(exercise.prescription_unit ?? "reps", i18n)
-                        : null,
-                      exercise.load_value
-                        ? (exercise.load_value) + " " + (exercise.load_mode === "pct_1rm" ? i18n("rma904756") : semanticLabel("kg", i18n))
-                        : exercise.load_mode === "bw"
-                          ? i18n("bodyweight")
-                          : null,
-                    ]
-                      .filter(Boolean)
-                      .join(" · ") || i18n("customExecutionDetailsb430ba9")}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        ))}
-      </div>
-    );
+    return <WorkoutPreviewDetail hideScaleChips sections={workout.sections} />;
   }
 
   if (step === "type") {

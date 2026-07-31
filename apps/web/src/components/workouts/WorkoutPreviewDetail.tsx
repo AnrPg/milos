@@ -13,14 +13,32 @@ import { scaleLevelVar, translucent } from "@/lib/theme";
 
 export type PreviewExercise = {
   id?: string;
+  item_type?: "exercise" | "header";
   name: string;
   sets?: number | null;
   prescription_value?: number | null;
   prescription_unit?: string | null;
   load_value?: number | null;
   load_mode?: string | null;
+  set_prescriptions?: Array<{
+    set_index: number;
+    prescription_value?: number | null;
+    prescription_unit?: string | null;
+    load_value?: number | null;
+    load_mode?: string | null;
+    note?: string | null;
+  }> | null;
+  load_progression?: {
+    mode?: "linear" | "per_set";
+    direction?: "increase" | "decrease";
+    start_value?: number;
+    start_mode?: string;
+    step_value?: number;
+    per_set_values?: number[];
+  } | null;
   order?: number;
   superset_group_id?: string | null;
+  alternating_group_id?: string | null;
   hr_zone?: number | null;
   tempo?: string | null;
   rest_seconds?: number | null;
@@ -38,7 +56,10 @@ export type PreviewExercise = {
     prescription_unit?: string | null;
     load_value?: number | null;
     load_mode?: string | null;
+    set_prescriptions?: PreviewExercise["set_prescriptions"];
+    load_progression?: PreviewExercise["load_progression"];
     excluded?: boolean;
+    note?: string | null;
     scale_level?: { id?: string; slug?: string; label?: string; sort_order?: number } | null;
   }>;
 };
@@ -92,6 +113,9 @@ function resolveExercise(exercise: PreviewExercise, activeScale: string | null):
     prescription_unit: variation.prescription_unit ?? exercise.prescription_unit,
     load_value: variation.load_value ?? exercise.load_value,
     load_mode: variation.load_mode ?? exercise.load_mode,
+    set_prescriptions: variation.set_prescriptions ?? exercise.set_prescriptions,
+    load_progression: variation.load_progression ?? exercise.load_progression,
+    note: variation.note ?? exercise.note,
     varied: true,
     variationLabel: variation.scale_level?.label ?? variation.scale_level?.slug,
     variationSlug: variation.scale_level?.slug,
@@ -123,6 +147,21 @@ function sectionScaleOptions(section: PreviewSection) {
 function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
   const i18n = useUiTranslations();
 
+  if (exercise.item_type === "header") {
+    return (
+      <li className="border-y px-2 py-2" style={{ borderColor: "var(--border-strong)" }}>
+        <div className="text-xs font-bold uppercase" style={{ color: "var(--primary)" }}>
+          {exercise.name}
+        </div>
+        {exercise.note ? (
+          <p className="mt-0.5 text-xs" style={{ color: "var(--muted)" }}>
+            {exercise.note}
+          </p>
+        ) : null}
+      </li>
+    );
+  }
+
   function formatExtras(exercise: PreviewExercise): string[] {
     const extras: string[] = [];
     if (exercise.tempo) extras.push(i18n("tempoValue0e842308", {value0: exercise.tempo}));
@@ -135,6 +174,27 @@ function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
 
   function formatPrescription(exercise: PreviewExercise): string {
     const parts: string[] = [];
+
+    if (exercise.set_prescriptions && exercise.set_prescriptions.length > 0) {
+      const first = exercise.set_prescriptions[0];
+      const differs = exercise.set_prescriptions.some(
+        (set) =>
+          set.prescription_value !== first?.prescription_value ||
+          set.load_value !== first?.load_value ||
+          set.load_mode !== first?.load_mode,
+      );
+
+      if (differs) {
+        return exercise.set_prescriptions
+          .map((set) => {
+            const unit = semanticLabel(set.prescription_unit ?? "reps", i18n);
+            const loadUnit = set.load_mode === "pct_1rm" ? i18n("percentOneRepMaxUnit") : i18n("kilogramsUnit");
+            const load = set.load_value != null ? ` · ${set.load_value} ${loadUnit}` : "";
+            return `${set.set_index}: ${set.prescription_value ?? "—"} ${unit}${load}`;
+          })
+          .join(" | ");
+      }
+    }
   
     if (exercise.sets && exercise.sets > 1) {
       parts.push(`${exercise.sets}×`);
@@ -158,6 +218,12 @@ function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
   const prescription = formatPrescription(exercise);
   const extras = formatExtras(exercise);
   const variationColor = scaleLevelVar(exercise.variationSlug ?? exercise.variationLabel);
+  const groupKind = exercise.superset_group_id
+    ? "superset"
+    : exercise.alternating_group_id
+      ? "alternating"
+      : null;
+  const groupColor = groupKind === "superset" ? "var(--primary)" : "var(--info)";
 
   return (
     <li
@@ -165,7 +231,11 @@ function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
       style={{
         background: exercise.varied ? translucent(variationColor, 11) : "var(--panel-muted)",
         border: exercise.varied ? `1px solid ${translucent(variationColor, 32)}` : "1px solid var(--border)",
-        boxShadow: exercise.varied ? `inset 3px 0 0 ${variationColor}` : "none",
+        boxShadow: groupKind
+          ? `inset 3px 0 0 ${groupColor}`
+          : exercise.varied
+            ? `inset 3px 0 0 ${variationColor}`
+            : "none",
       }}
     >
       <div className="flex items-start justify-between gap-3">
@@ -179,6 +249,14 @@ function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
               style={{ background: translucent(variationColor, 18), color: variationColor }}
             >
               {exercise.variationLabel ?? i18n("variation15920a4")}
+            </span>
+          ) : null}
+          {groupKind ? (
+            <span
+              className="ms-2 px-2 py-0.5 text-[10px] font-bold uppercase"
+              style={{ background: `color-mix(in srgb, ${groupColor} 15%, transparent)`, color: groupColor }}
+            >
+              {groupKind === "superset" ? i18n("supersetLabel") : i18n("alternatingSetsLabel")}
             </span>
           ) : null}
         </div>
@@ -264,6 +342,7 @@ export function WorkoutPreviewDetail({
         const visibleExercises = section.exercises
           .map((exercise) => resolveExercise(exercise, activeScale))
           .filter((exercise): exercise is ResolvedExercise => Boolean(exercise));
+        const exerciseCount = visibleExercises.filter((exercise) => exercise.item_type !== "header").length;
 
         return (
           <div
@@ -301,7 +380,7 @@ export function WorkoutPreviewDetail({
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <span className="text-xs font-semibold" style={{ color: "var(--dim)" }}>
-                  {section.exercises.length} {i18n("exerciseeb70d1f")}{section.exercises.length !== 1 ? i18n("sa0f1490") : ""}
+                  {exerciseCount} {i18n("exerciseeb70d1f")}{exerciseCount !== 1 ? i18n("sa0f1490") : ""}
                 </span>
                 <span className="text-xs" style={{ color: "var(--dim)" }}>
                   {expanded ? "▲" : "▼"}
