@@ -64,4 +64,12 @@ describe("buildWorkoutDslSuggestions", () => {
     expect(result.items.map((item) => item.value)).toEqual(["Back Squat", "Back Extension"]);
     expect(result.items.every((item) => item.kind === "exercise")).toBe(true);
   });
+
+  it("narrows slash-command templates by canonical format", () => {
+    const source = "/complex";
+    const result = buildWorkoutDslSuggestions(source, source.length, vocabulary, []);
+
+    expect(result.query).toBe("complex");
+    expect(result.items).toEqual([{ value: "complex_emom", kind: "template" }]);
+  });
 });

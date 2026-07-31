@@ -30,6 +30,7 @@ import {
   COMMON_WORKOUT_WORDS,
   DEFAULT_WORKOUT_DSL_SOURCE,
   QUICK_TEXT_EDITOR_CLASS,
+  sanitizeWorkoutDslPaste,
 } from "@/lib/workout-dsl-editor-data";
 import {
   buildWorkoutDslSuggestions,
@@ -68,6 +69,7 @@ export function QuickTextWorkoutEditor({
   const i18n = useUiTranslations();
   const router = useRouter();
   const { tokens } = useSession();
+  const accessToken = tokens?.access_token;
   const [source, setSource] = useState(DEFAULT_WORKOUT_DSL_SOURCE);
   const [preview, setPreview] = useState<WorkoutDslPreview | null>(null);
   const [diagnostics, setDiagnostics] = useState<WorkoutDslDiagnostic[]>([]);
@@ -109,7 +111,7 @@ export function QuickTextWorkoutEditor({
         role: "textbox",
         "aria-label": i18n("quickTextEditorLabel"),
       },
-      transformPastedHTML: sanitizePastedHtml,
+      transformPastedHTML: sanitizeWorkoutDslPaste,
     },
     onUpdate: ({ editor: currentEditor }) => {
       const nextSource = currentEditor.getText({ blockSeparator: "\n" });
@@ -234,11 +236,11 @@ export function QuickTextWorkoutEditor({
 
   const saveDraftSnapshot = useCallback(
     async (snapshot: string, document: JSONContent | null, expectedRevision: number) => {
-      if (!tokens?.access_token || !draftId) throw new Error();
+      if (!accessToken || !draftId) throw new Error();
       setSaveStatus("saving");
 
       try {
-        const draft = await updateDraftWorkout(tokens.access_token, draftId, {
+        const draft = await updateDraftWorkout(accessToken, draftId, {
           draft_data: {
             authoring_mode: "quick_text",
             dsl_version: 1,
@@ -266,7 +268,7 @@ export function QuickTextWorkoutEditor({
         throw error;
       }
     },
-    [diagnostics, draftId, tokens?.access_token],
+    [accessToken, diagnostics, draftId],
   );
 
   useEffect(() => {
@@ -802,23 +804,6 @@ function sourceToDocument(source: string): JSONContent {
       content: line ? [{ type: "text", text: line }] : undefined,
     })),
   };
-}
-
-function sanitizePastedHtml(html: string) {
-  if (typeof DOMParser === "undefined") return "";
-  const document = new DOMParser().parseFromString(html, "text/html");
-  document.querySelectorAll("script,style,iframe,object,embed,form,meta,link").forEach((node) => node.remove());
-  document.querySelectorAll("*").forEach((node) => {
-    for (const attribute of [...node.attributes]) {
-      const name = attribute.name.toLowerCase();
-      const value = attribute.value.trim();
-      if (name.startsWith("on") || name === "style") node.removeAttribute(attribute.name);
-      if ((name === "href" || name === "src") && !/^(https?:|mailto:|\/|#)/i.test(value)) {
-        node.removeAttribute(attribute.name);
-      }
-    }
-  });
-  return document.body.innerHTML;
 }
 
 function formatDiagnosticParams(params: Record<string, unknown>) {

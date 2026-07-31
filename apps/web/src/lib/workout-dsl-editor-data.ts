@@ -23,14 +23,24 @@ export const COMMON_WORKOUT_WORDS = [
   "stability", "strength", "technique", "tempo", "unbroken", "warm-up",
 ];
 
-export const EXERCISE_NAMES = [
-  "Air Squat", "Back Extension", "Back Squat", "Bench Press", "Box Jump", "Burpee",
-  "Clean", "Deadlift", "Dumbbell Row", "Front Squat", "Glute Bridge", "Handstand Hold",
-  "Hip Flexor Stretch", "Kettlebell Swing", "Lunge", "Muscle-up", "Overhead Press",
-  "Pallof Press", "Plank", "Pull-up", "Push Press", "Push-up", "Ring Row", "Row",
-  "Run", "Shoulder Press", "Snatch", "Split Squat", "Strict Press", "Thruster",
-  "Toes-to-bar", "Wall Ball",
-];
-
 export const QUICK_TEXT_EDITOR_CLASS =
   "min-h-[32rem] px-5 py-4 font-mono text-sm leading-6 outline-none whitespace-pre-wrap";
+
+export function sanitizeWorkoutDslPaste(html: string) {
+  if (typeof DOMParser === "undefined") return "";
+  const document = new DOMParser().parseFromString(html, "text/html");
+  document
+    .querySelectorAll("script,style,iframe,object,embed,form,meta,link")
+    .forEach((node) => node.remove());
+  document.querySelectorAll("*").forEach((node) => {
+    for (const attribute of [...node.attributes]) {
+      const name = attribute.name.toLowerCase();
+      const value = attribute.value.trim();
+      if (name.startsWith("on") || name === "style") node.removeAttribute(attribute.name);
+      if ((name === "href" || name === "src") && !/^(https?:|mailto:|\/|#)/i.test(value)) {
+        node.removeAttribute(attribute.name);
+      }
+    }
+  });
+  return document.body.innerHTML;
+}
