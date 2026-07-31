@@ -109,6 +109,7 @@ defmodule MilosTrainingWeb.Router do
     delete("/class-types/:id", AdminClassTypeController, :delete)
     get("/workouts", AdminWorkoutController, :index)
     post("/workouts", AdminWorkoutController, :create)
+    post("/workouts/dsl/parse", AdminWorkoutDslController, :parse)
     get("/workouts/:id", AdminWorkoutController, :show)
     patch("/workouts/:id/draft", AdminWorkoutController, :update_draft)
     post("/workouts/:id/publish", AdminWorkoutController, :publish)

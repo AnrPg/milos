@@ -160,7 +160,15 @@ defmodule MilosTrainingWeb.Schemas.Workout do
         },
         is_team_workout: %Schema{type: :boolean},
         sections: %Schema{type: :array, items: section_schema()},
-        editor_session_id: @nullable_uuid
+        editor_session_id: @nullable_uuid,
+        authoring_mode: %Schema{
+          type: :string,
+          enum: ["structured", "quick_text"],
+          nullable: true
+        },
+        dsl_version: %Schema{type: :integer, enum: [1], nullable: true},
+        dsl_source: %Schema{type: :string, maxLength: 200_000, nullable: true},
+        dsl_document: %Schema{type: :object, additionalProperties: true, nullable: true}
       },
       additionalProperties: false
     }

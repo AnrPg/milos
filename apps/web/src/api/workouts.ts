@@ -1,4 +1,5 @@
 import { apiRequest } from "@/api/client";
+import type { WorkoutDslVocabulary } from "@/lib/workout-dsl-suggestions";
 import type { LoadMode, LoadProgression, PrescriptionUnit, WorkoutType } from "@/types/workout";
 
 export type ScaleLevel = {
@@ -158,9 +159,31 @@ export type MaterializedWorkoutResponse = {
   scales: WorkoutRecord[];
 };
 
+export type WorkoutDslDiagnostic = {
+  code: string;
+  line: number;
+  column: number;
+  params: Record<string, unknown>;
+};
+
+export type WorkoutDslPreview = {
+  version: number;
+  workout: Record<string, unknown>;
+  formatted_source: string;
+  vocabulary: WorkoutDslVocabulary;
+};
+
 export async function listScaleLevels(token: string) {
   const response = await apiRequest<{ scale_levels: ScaleLevel[] }>("/admin/scale-levels", { token });
   return response.scale_levels;
+}
+
+export async function parseWorkoutDsl(token: string, source: string) {
+  return apiRequest<WorkoutDslPreview>("/admin/workouts/dsl/parse", {
+    method: "POST",
+    token,
+    body: { source },
+  });
 }
 
 export async function replaceScaleLevels(token: string, payload: ReplaceScaleLevelsRequest) {

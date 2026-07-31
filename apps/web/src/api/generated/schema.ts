@@ -141,6 +141,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/workouts/dsl/parse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Parse and canonically format Quick Text workout source */
+        post: operations["MilosTrainingWeb.AdminWorkoutDslController.parse"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/invoices/{id}/download-url": {
         parameters: {
             query?: never;
@@ -2264,6 +2281,65 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** WorkoutDslDiagnostic */
+        WorkoutDslDiagnostic: {
+            code: string;
+            column: number;
+            line: number;
+            params: {
+                [key: string]: unknown;
+            };
+        };
+        /** WorkoutDslDiagnosticResponse */
+        WorkoutDslDiagnosticResponse: {
+            diagnostics: {
+                code: string;
+                column: number;
+                line: number;
+                params: {
+                    [key: string]: unknown;
+                };
+            }[];
+        };
+        /** WorkoutDslParseRequest */
+        WorkoutDslParseRequest: {
+            source: string;
+        };
+        /** WorkoutDslParseResponse */
+        WorkoutDslParseResponse: {
+            formatted_source: string;
+            /** @enum {integer} */
+            version: 1;
+            /** WorkoutDslVocabulary */
+            vocabulary: {
+                exercise_parameters: string[];
+                header_parameters: string[];
+                note_markers: string[];
+                section_formats: string[];
+                section_parameters: {
+                    [key: string]: string[];
+                };
+                /** @enum {integer} */
+                version: 1;
+                workout_parameters: string[];
+            };
+            workout: {
+                [key: string]: unknown;
+            };
+        };
+        /** WorkoutDslVocabulary */
+        WorkoutDslVocabulary: {
+            exercise_parameters: string[];
+            header_parameters: string[];
+            note_markers: string[];
+            section_formats: string[];
+            section_parameters: {
+                [key: string]: string[];
+            };
+            /** @enum {integer} */
+            version: 1;
+            workout_parameters: string[];
+        };
     };
     responses: never;
     parameters: never;
@@ -2683,6 +2759,92 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminWorkoutDslController.parse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    source: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Canonical workout preview */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        formatted_source: string;
+                        /** @enum {integer} */
+                        version: 1;
+                        /** WorkoutDslVocabulary */
+                        vocabulary: {
+                            exercise_parameters: string[];
+                            header_parameters: string[];
+                            note_markers: string[];
+                            section_formats: string[];
+                            section_parameters: {
+                                [key: string]: string[];
+                            };
+                            /** @enum {integer} */
+                            version: 1;
+                            workout_parameters: string[];
+                        };
+                        workout: {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description DSL diagnostics */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        diagnostics: {
+                            code: string;
+                            column: number;
+                            line: number;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                        }[];
                     };
                 };
             };
@@ -5359,6 +5521,14 @@ export interface operations {
         requestBody?: {
             content: {
                 "application/json": {
+                    /** @enum {string|null} */
+                    authoring_mode?: "structured" | "quick_text" | null;
+                    dsl_document?: {
+                        [key: string]: unknown;
+                    } | null;
+                    dsl_source?: string | null;
+                    /** @enum {integer|null} */
+                    dsl_version?: 1 | null;
                     /** Format: uuid */
                     editor_session_id?: string | null;
                     is_team_workout?: boolean;
@@ -10062,6 +10232,14 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @enum {string|null} */
+                    authoring_mode?: "structured" | "quick_text" | null;
+                    dsl_document?: {
+                        [key: string]: unknown;
+                    } | null;
+                    dsl_source?: string | null;
+                    /** @enum {integer|null} */
+                    dsl_version?: 1 | null;
                     /** Format: uuid */
                     editor_session_id?: string | null;
                     is_team_workout?: boolean;

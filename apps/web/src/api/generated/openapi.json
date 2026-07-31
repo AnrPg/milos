@@ -40,6 +40,238 @@
           "errors"
         ],
         "type": "object"
+      },
+      "WorkoutDslDiagnostic": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "column": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "line": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "params": {
+            "additionalProperties": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "code",
+          "line",
+          "column",
+          "params"
+        ],
+        "title": "WorkoutDslDiagnostic",
+        "type": "object"
+      },
+      "WorkoutDslDiagnosticResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "diagnostics": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "column": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "line": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "params": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              },
+              "required": [
+                "code",
+                "line",
+                "column",
+                "params"
+              ],
+              "title": "WorkoutDslDiagnostic",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "diagnostics"
+        ],
+        "title": "WorkoutDslDiagnosticResponse",
+        "type": "object"
+      },
+      "WorkoutDslParseRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "source": {
+            "maxLength": 200000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "source"
+        ],
+        "title": "WorkoutDslParseRequest",
+        "type": "object"
+      },
+      "WorkoutDslParseResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "formatted_source": {
+            "type": "string"
+          },
+          "version": {
+            "enum": [
+              1
+            ],
+            "type": "integer"
+          },
+          "vocabulary": {
+            "additionalProperties": false,
+            "properties": {
+              "exercise_parameters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "header_parameters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "note_markers": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "section_formats": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "section_parameters": {
+                "additionalProperties": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "type": "object"
+              },
+              "version": {
+                "enum": [
+                  1
+                ],
+                "type": "integer"
+              },
+              "workout_parameters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "version",
+              "section_formats",
+              "workout_parameters",
+              "exercise_parameters",
+              "header_parameters",
+              "note_markers",
+              "section_parameters"
+            ],
+            "title": "WorkoutDslVocabulary",
+            "type": "object"
+          },
+          "workout": {
+            "additionalProperties": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "version",
+          "workout",
+          "formatted_source",
+          "vocabulary"
+        ],
+        "title": "WorkoutDslParseResponse",
+        "type": "object"
+      },
+      "WorkoutDslVocabulary": {
+        "additionalProperties": false,
+        "properties": {
+          "exercise_parameters": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "header_parameters": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "note_markers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "section_formats": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "section_parameters": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "type": "object"
+          },
+          "version": {
+            "enum": [
+              1
+            ],
+            "type": "integer"
+          },
+          "workout_parameters": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "version",
+          "section_formats",
+          "workout_parameters",
+          "exercise_parameters",
+          "header_parameters",
+          "note_markers",
+          "section_parameters"
+        ],
+        "title": "WorkoutDslVocabulary",
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -1016,6 +1248,224 @@
         "summary": "Record an audited refund or reversal for a membership payment",
         "tags": [
           "Admin Finance"
+        ]
+      }
+    },
+    "/api/admin/workouts/dsl/parse": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminWorkoutDslController.parse",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "source": {
+                    "maxLength": 200000,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "source"
+                ],
+                "title": "WorkoutDslParseRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "formatted_source": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "enum": [
+                        1
+                      ],
+                      "type": "integer"
+                    },
+                    "vocabulary": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "exercise_parameters": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "header_parameters": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "note_markers": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "section_formats": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "section_parameters": {
+                          "additionalProperties": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "type": "object"
+                        },
+                        "version": {
+                          "enum": [
+                            1
+                          ],
+                          "type": "integer"
+                        },
+                        "workout_parameters": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "version",
+                        "section_formats",
+                        "workout_parameters",
+                        "exercise_parameters",
+                        "header_parameters",
+                        "note_markers",
+                        "section_parameters"
+                      ],
+                      "title": "WorkoutDslVocabulary",
+                      "type": "object"
+                    },
+                    "workout": {
+                      "additionalProperties": true,
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "version",
+                    "workout",
+                    "formatted_source",
+                    "vocabulary"
+                  ],
+                  "title": "WorkoutDslParseResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Canonical workout preview"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "diagnostics": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "code": {
+                            "type": "string"
+                          },
+                          "column": {
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "line": {
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "params": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "code",
+                          "line",
+                          "column",
+                          "params"
+                        ],
+                        "title": "WorkoutDslDiagnostic",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "diagnostics"
+                  ],
+                  "title": "WorkoutDslDiagnosticResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "DSL diagnostics"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Parse and canonically format Quick Text workout source",
+        "tags": [
+          "Admin Workouts"
         ]
       }
     },
@@ -7487,6 +7937,31 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
+                  "authoring_mode": {
+                    "enum": [
+                      "structured",
+                      "quick_text"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "dsl_document": {
+                    "additionalProperties": true,
+                    "nullable": true,
+                    "type": "object"
+                  },
+                  "dsl_source": {
+                    "maxLength": 200000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "dsl_version": {
+                    "enum": [
+                      1
+                    ],
+                    "nullable": true,
+                    "type": "integer"
+                  },
                   "editor_session_id": {
                     "format": "uuid",
                     "nullable": true,
@@ -20461,6 +20936,31 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
+                  "authoring_mode": {
+                    "enum": [
+                      "structured",
+                      "quick_text"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "dsl_document": {
+                    "additionalProperties": true,
+                    "nullable": true,
+                    "type": "object"
+                  },
+                  "dsl_source": {
+                    "maxLength": 200000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "dsl_version": {
+                    "enum": [
+                      1
+                    ],
+                    "nullable": true,
+                    "type": "integer"
+                  },
                   "editor_session_id": {
                     "format": "uuid",
                     "nullable": true,
