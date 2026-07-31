@@ -294,6 +294,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/workouts/{id}/dsl": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get retained or canonically generated Quick Text source */
+        get: operations["MilosTrainingWeb.AdminWorkoutDslController.show_authoring"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/login": {
         parameters: {
             query?: never;
@@ -1864,6 +1881,23 @@ export interface paths {
         patch: operations["MilosTrainingWeb.AdminScheduleController.reject_booking"];
         trace?: never;
     };
+    "/api/admin/workouts/dsl/manual": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the versioned coach manual, templates, and vocabulary */
+        get: operations["MilosTrainingWeb.AdminWorkoutDslController.manual"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/workouts/{id}/timer-sequence": {
         parameters: {
             query?: never;
@@ -2190,6 +2224,23 @@ export interface paths {
         patch: operations["MilosTrainingWeb.AdminScheduleController.approve_booking"];
         trace?: never;
     };
+    "/api/admin/workouts/{id}/dsl/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Parse, preflight, and publish an exact Quick Text source revision */
+        post: operations["MilosTrainingWeb.AdminWorkoutDslController.publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/threads/{id}/messages": {
         parameters: {
             query?: never;
@@ -2281,6 +2332,28 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** WorkoutDslAuthoringResponse */
+        WorkoutDslAuthoringResponse: {
+            /** @enum {string} */
+            authoring_mode: "structured" | "quick_text";
+            diagnostics: {
+                code: string;
+                column: number;
+                line: number;
+                params: {
+                    [key: string]: unknown;
+                };
+                /** @enum {string} */
+                severity: "error" | "warning";
+            }[];
+            document?: {
+                [key: string]: unknown;
+            } | null;
+            source: string;
+            source_revision: number;
+            /** @enum {integer} */
+            version: 1;
+        };
         /** WorkoutDslDiagnostic */
         WorkoutDslDiagnostic: {
             code: string;
@@ -2289,6 +2362,8 @@ export interface components {
             params: {
                 [key: string]: unknown;
             };
+            /** @enum {string} */
+            severity: "error" | "warning";
         };
         /** WorkoutDslDiagnosticResponse */
         WorkoutDslDiagnosticResponse: {
@@ -2299,7 +2374,46 @@ export interface components {
                 params: {
                     [key: string]: unknown;
                 };
+                /** @enum {string} */
+                severity: "error" | "warning";
             }[];
+        };
+        /** WorkoutDslManualResponse */
+        WorkoutDslManualResponse: {
+            markdown: string;
+            templates: {
+                [key: string]: unknown;
+            };
+            /** @enum {integer} */
+            version: 1;
+            /** WorkoutDslVocabulary */
+            vocabulary: {
+                exercise_catalog: {
+                    aliases: string[];
+                    capabilities: string[];
+                    category: string;
+                    id: string;
+                    label: string;
+                }[];
+                exercise_parameters: string[];
+                format_aliases: {
+                    [key: string]: unknown;
+                };
+                format_specs: {
+                    [key: string]: unknown;
+                };
+                group_parameters: string[];
+                header_parameters: string[];
+                note_markers: string[];
+                scale_parameters: string[];
+                section_formats: string[];
+                section_parameters: {
+                    [key: string]: string[];
+                };
+                /** @enum {integer} */
+                version: 1;
+                workout_parameters: string[];
+            };
         };
         /** WorkoutDslParseRequest */
         WorkoutDslParseRequest: {
@@ -2307,14 +2421,39 @@ export interface components {
         };
         /** WorkoutDslParseResponse */
         WorkoutDslParseResponse: {
+            diagnostics: {
+                code: string;
+                column: number;
+                line: number;
+                params: {
+                    [key: string]: unknown;
+                };
+                /** @enum {string} */
+                severity: "error" | "warning";
+            }[];
             formatted_source: string;
             /** @enum {integer} */
             version: 1;
             /** WorkoutDslVocabulary */
             vocabulary: {
+                exercise_catalog: {
+                    aliases: string[];
+                    capabilities: string[];
+                    category: string;
+                    id: string;
+                    label: string;
+                }[];
                 exercise_parameters: string[];
+                format_aliases: {
+                    [key: string]: unknown;
+                };
+                format_specs: {
+                    [key: string]: unknown;
+                };
+                group_parameters: string[];
                 header_parameters: string[];
                 note_markers: string[];
+                scale_parameters: string[];
                 section_formats: string[];
                 section_parameters: {
                     [key: string]: string[];
@@ -2327,11 +2466,56 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** WorkoutDslPublishRequest */
+        WorkoutDslPublishRequest: {
+            /** @default false */
+            acknowledge_warnings: boolean;
+            document?: {
+                [key: string]: unknown;
+            } | null;
+            expected_source_revision: number;
+            source: string;
+        };
+        /** WorkoutDslPublishResponse */
+        WorkoutDslPublishResponse: {
+            diagnostics: {
+                code: string;
+                column: number;
+                line: number;
+                params: {
+                    [key: string]: unknown;
+                };
+                /** @enum {string} */
+                severity: "error" | "warning";
+            }[];
+            execution_preview: {
+                [key: string]: unknown;
+            };
+            formatted_source: string;
+            workout: {
+                [key: string]: unknown;
+            };
+        };
         /** WorkoutDslVocabulary */
         WorkoutDslVocabulary: {
+            exercise_catalog: {
+                aliases: string[];
+                capabilities: string[];
+                category: string;
+                id: string;
+                label: string;
+            }[];
             exercise_parameters: string[];
+            format_aliases: {
+                [key: string]: unknown;
+            };
+            format_specs: {
+                [key: string]: unknown;
+            };
+            group_parameters: string[];
             header_parameters: string[];
             note_markers: string[];
+            scale_parameters: string[];
             section_formats: string[];
             section_parameters: {
                 [key: string]: string[];
@@ -2786,14 +2970,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        diagnostics: {
+                            code: string;
+                            column: number;
+                            line: number;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** @enum {string} */
+                            severity: "error" | "warning";
+                        }[];
                         formatted_source: string;
                         /** @enum {integer} */
                         version: 1;
                         /** WorkoutDslVocabulary */
                         vocabulary: {
+                            exercise_catalog: {
+                                aliases: string[];
+                                capabilities: string[];
+                                category: string;
+                                id: string;
+                                label: string;
+                            }[];
                             exercise_parameters: string[];
+                            format_aliases: {
+                                [key: string]: unknown;
+                            };
+                            format_specs: {
+                                [key: string]: unknown;
+                            };
+                            group_parameters: string[];
                             header_parameters: string[];
                             note_markers: string[];
+                            scale_parameters: string[];
                             section_formats: string[];
                             section_parameters: {
                                 [key: string]: string[];
@@ -2844,6 +3053,8 @@ export interface operations {
                             params: {
                                 [key: string]: unknown;
                             };
+                            /** @enum {string} */
+                            severity: "error" | "warning";
                         }[];
                     };
                 };
@@ -3091,6 +3302,70 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminWorkoutDslController.show_authoring": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Quick Text authoring state */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        authoring_mode: "structured" | "quick_text";
+                        diagnostics: {
+                            code: string;
+                            column: number;
+                            line: number;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** @enum {string} */
+                            severity: "error" | "warning";
+                        }[];
+                        document?: {
+                            [key: string]: unknown;
+                        } | null;
+                        source: string;
+                        source_revision: number;
+                        /** @enum {integer} */
+                        version: 1;
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        diagnostics?: {
+                            code: string;
+                            column: number;
+                            line: number;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** @enum {string} */
+                            severity: "error" | "warning";
+                        }[];
+                        error: string;
                     };
                 };
             };
@@ -3883,14 +4158,26 @@ export interface operations {
                             } | null)[];
                             /** Format: uuid */
                             created_by_id?: string | null;
+                            description?: string | null;
+                            difficulty?: string | null;
                             draft_data?: {
                                 [key: string]: unknown;
                             } | null;
+                            equipment?: string[];
+                            estimated_duration_seconds?: number | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string | null;
                             is_team_workout?: boolean;
+                            notes?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                            }[];
                             scale_level?: {
                                 /** Format: uuid */
                                 id?: string | null;
@@ -3915,16 +4202,27 @@ export interface operations {
                                             direction: "increase" | "decrease";
                                             /** @enum {string} */
                                             mode: "linear" | "per_set";
-                                            per_set_values: number[];
+                                            per_set_values: (number | null)[];
                                             /** @enum {string} */
-                                            start_mode: "absolute" | "pct_1rm";
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
                                             start_value: number;
                                             step_value: number;
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
+                                        notes?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                        }[];
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         scale_level?: {
                                             /** Format: uuid */
@@ -3939,9 +4237,12 @@ export interface operations {
                                             /** @enum {string|null} */
                                             load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                             load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             note?: string | null;
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             set_index: number;
                                         }[] | null;
@@ -3950,6 +4251,10 @@ export interface operations {
                                     cluster_rest_seconds?: number | null;
                                     description?: string | null;
                                     excluded?: boolean;
+                                    exercise_ref?: string | null;
+                                    group_config?: {
+                                        [key: string]: unknown;
+                                    } | null;
                                     hr_zone?: number | null;
                                     /** Format: uuid */
                                     id?: string | null;
@@ -3967,20 +4272,31 @@ export interface operations {
                                         direction: "increase" | "decrease";
                                         /** @enum {string} */
                                         mode: "linear" | "per_set";
-                                        per_set_values: number[];
+                                        per_set_values: (number | null)[];
                                         /** @enum {string} */
-                                        start_mode: "absolute" | "pct_1rm";
+                                        start_mode: "absolute" | "pct_1rm" | "bw";
                                         start_value: number;
                                         step_value: number;
                                     } | null;
                                     load_value?: number | null;
                                     name: string;
                                     note?: string | null;
+                                    notes?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                    }[];
                                     order?: number;
                                     pacing?: number | null;
+                                    prescription_metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     prescription_step?: number | null;
                                     /** @enum {string|null} */
-                                    prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                     prescription_value?: number | null;
                                     rest_pause_seconds?: number | null;
                                     rest_seconds?: number | null;
@@ -3988,13 +4304,17 @@ export interface operations {
                                         /** @enum {string|null} */
                                         load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                         load_value?: number | null;
+                                        metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         note?: string | null;
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         set_index: number;
                                     }[];
                                     sets?: number | null;
+                                    subtitle?: string | null;
                                     /** Format: uuid */
                                     superset_group_id?: string | null;
                                     tempo?: string | null;
@@ -4010,16 +4330,27 @@ export interface operations {
                                             direction: "increase" | "decrease";
                                             /** @enum {string} */
                                             mode: "linear" | "per_set";
-                                            per_set_values: number[];
+                                            per_set_values: (number | null)[];
                                             /** @enum {string} */
-                                            start_mode: "absolute" | "pct_1rm";
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
                                             start_value: number;
                                             step_value: number;
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
+                                        notes?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                        }[];
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         scale_level?: {
                                             /** Format: uuid */
@@ -4034,9 +4365,12 @@ export interface operations {
                                             /** @enum {string|null} */
                                             load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                             load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             note?: string | null;
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             set_index: number;
                                         }[] | null;
@@ -4047,14 +4381,26 @@ export interface operations {
                                 id?: string | null;
                                 name: string;
                                 note?: string | null;
+                                notes?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                }[];
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
                                 rest_after_seconds?: number | null;
+                                rest_before_next_section_seconds?: number | null;
                                 score_config?: {
                                     [key: string]: unknown;
                                 } | null;
                                 scoreable?: boolean;
+                                section_metadata?: {
+                                    [key: string]: unknown;
+                                };
                                 sections?: {
                                     exercises: {
                                         /** Format: uuid */
@@ -4071,16 +4417,27 @@ export interface operations {
                                                 direction: "increase" | "decrease";
                                                 /** @enum {string} */
                                                 mode: "linear" | "per_set";
-                                                per_set_values: number[];
+                                                per_set_values: (number | null)[];
                                                 /** @enum {string} */
-                                                start_mode: "absolute" | "pct_1rm";
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
                                                 start_value: number;
                                                 step_value: number;
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
+                                            notes?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                            }[];
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             scale_level?: {
                                                 /** Format: uuid */
@@ -4095,9 +4452,12 @@ export interface operations {
                                                 /** @enum {string|null} */
                                                 load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                                 load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
                                                 note?: string | null;
                                                 /** @enum {string|null} */
-                                                prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                                 prescription_value?: number | null;
                                                 set_index: number;
                                             }[] | null;
@@ -4106,6 +4466,10 @@ export interface operations {
                                         cluster_rest_seconds?: number | null;
                                         description?: string | null;
                                         excluded?: boolean;
+                                        exercise_ref?: string | null;
+                                        group_config?: {
+                                            [key: string]: unknown;
+                                        } | null;
                                         hr_zone?: number | null;
                                         /** Format: uuid */
                                         id?: string | null;
@@ -4123,20 +4487,31 @@ export interface operations {
                                             direction: "increase" | "decrease";
                                             /** @enum {string} */
                                             mode: "linear" | "per_set";
-                                            per_set_values: number[];
+                                            per_set_values: (number | null)[];
                                             /** @enum {string} */
-                                            start_mode: "absolute" | "pct_1rm";
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
                                             start_value: number;
                                             step_value: number;
                                         } | null;
                                         load_value?: number | null;
                                         name: string;
                                         note?: string | null;
+                                        notes?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                        }[];
                                         order?: number;
                                         pacing?: number | null;
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         prescription_step?: number | null;
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         rest_pause_seconds?: number | null;
                                         rest_seconds?: number | null;
@@ -4144,13 +4519,17 @@ export interface operations {
                                             /** @enum {string|null} */
                                             load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                             load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             note?: string | null;
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             set_index: number;
                                         }[];
                                         sets?: number | null;
+                                        subtitle?: string | null;
                                         /** Format: uuid */
                                         superset_group_id?: string | null;
                                         tempo?: string | null;
@@ -4166,16 +4545,27 @@ export interface operations {
                                                 direction: "increase" | "decrease";
                                                 /** @enum {string} */
                                                 mode: "linear" | "per_set";
-                                                per_set_values: number[];
+                                                per_set_values: (number | null)[];
                                                 /** @enum {string} */
-                                                start_mode: "absolute" | "pct_1rm";
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
                                                 start_value: number;
                                                 step_value: number;
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
+                                            notes?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                            }[];
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             scale_level?: {
                                                 /** Format: uuid */
@@ -4190,9 +4580,12 @@ export interface operations {
                                                 /** @enum {string|null} */
                                                 load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                                 load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
                                                 note?: string | null;
                                                 /** @enum {string|null} */
-                                                prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                                 prescription_value?: number | null;
                                                 set_index: number;
                                             }[] | null;
@@ -4203,31 +4596,50 @@ export interface operations {
                                     id?: string | null;
                                     name: string;
                                     note?: string | null;
+                                    notes?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                    }[];
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
                                     rest_after_seconds?: number | null;
+                                    rest_before_next_section_seconds?: number | null;
                                     score_config?: {
                                         [key: string]: unknown;
                                     } | null;
                                     scoreable?: boolean;
+                                    section_metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     sections?: {
                                         [key: string]: unknown;
                                     }[];
+                                    subtitle?: string | null;
                                     timer_config?: {
                                         [key: string]: unknown;
                                     } | null;
                                 }[];
+                                subtitle?: string | null;
                                 timer_config?: {
                                     [key: string]: unknown;
                                 } | null;
                             }[];
                             /** @enum {string} */
                             status?: "draft" | "published";
+                            subtitle?: string | null;
+                            tags?: string[];
                             title: string;
                             type: string;
                             /** Format: date-time */
                             updated_at?: string | null;
+                            workout_metadata?: {
+                                [key: string]: unknown;
+                            };
                         };
                     };
                 };
@@ -5523,6 +5935,9 @@ export interface operations {
                 "application/json": {
                     /** @enum {string|null} */
                     authoring_mode?: "structured" | "quick_text" | null;
+                    description?: string | null;
+                    /** @enum {string|null} */
+                    difficulty?: "beginner" | "intermediate" | "advanced" | "all-levels" | null;
                     dsl_document?: {
                         [key: string]: unknown;
                     } | null;
@@ -5531,7 +5946,17 @@ export interface operations {
                     dsl_version?: 1 | null;
                     /** Format: uuid */
                     editor_session_id?: string | null;
+                    equipment?: string[];
+                    estimated_duration_seconds?: number | null;
                     is_team_workout?: boolean;
+                    notes?: {
+                        body: string;
+                        document?: {
+                            [key: string]: unknown;
+                        } | null;
+                        /** @enum {string} */
+                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                    }[];
                     sections?: {
                         exercises: {
                             /** Format: uuid */
@@ -5548,16 +5973,27 @@ export interface operations {
                                     direction: "increase" | "decrease";
                                     /** @enum {string} */
                                     mode: "linear" | "per_set";
-                                    per_set_values: number[];
+                                    per_set_values: (number | null)[];
                                     /** @enum {string} */
-                                    start_mode: "absolute" | "pct_1rm";
+                                    start_mode: "absolute" | "pct_1rm" | "bw";
                                     start_value: number;
                                     step_value: number;
                                 } | null;
                                 load_value?: number | null;
                                 note?: string | null;
+                                notes?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                }[];
+                                prescription_metadata?: {
+                                    [key: string]: unknown;
+                                };
                                 /** @enum {string|null} */
-                                prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                 prescription_value?: number | null;
                                 scale_level?: {
                                     /** Format: uuid */
@@ -5572,9 +6008,12 @@ export interface operations {
                                     /** @enum {string|null} */
                                     load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                     load_value?: number | null;
+                                    metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     note?: string | null;
                                     /** @enum {string|null} */
-                                    prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                     prescription_value?: number | null;
                                     set_index: number;
                                 }[] | null;
@@ -5583,6 +6022,10 @@ export interface operations {
                             cluster_rest_seconds?: number | null;
                             description?: string | null;
                             excluded?: boolean;
+                            exercise_ref?: string | null;
+                            group_config?: {
+                                [key: string]: unknown;
+                            } | null;
                             hr_zone?: number | null;
                             /** Format: uuid */
                             id?: string | null;
@@ -5600,20 +6043,31 @@ export interface operations {
                                 direction: "increase" | "decrease";
                                 /** @enum {string} */
                                 mode: "linear" | "per_set";
-                                per_set_values: number[];
+                                per_set_values: (number | null)[];
                                 /** @enum {string} */
-                                start_mode: "absolute" | "pct_1rm";
+                                start_mode: "absolute" | "pct_1rm" | "bw";
                                 start_value: number;
                                 step_value: number;
                             } | null;
                             load_value?: number | null;
                             name: string;
                             note?: string | null;
+                            notes?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                            }[];
                             order?: number;
                             pacing?: number | null;
+                            prescription_metadata?: {
+                                [key: string]: unknown;
+                            };
                             prescription_step?: number | null;
                             /** @enum {string|null} */
-                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                             prescription_value?: number | null;
                             rest_pause_seconds?: number | null;
                             rest_seconds?: number | null;
@@ -5621,13 +6075,17 @@ export interface operations {
                                 /** @enum {string|null} */
                                 load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                 load_value?: number | null;
+                                metadata?: {
+                                    [key: string]: unknown;
+                                };
                                 note?: string | null;
                                 /** @enum {string|null} */
-                                prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                 prescription_value?: number | null;
                                 set_index: number;
                             }[];
                             sets?: number | null;
+                            subtitle?: string | null;
                             /** Format: uuid */
                             superset_group_id?: string | null;
                             tempo?: string | null;
@@ -5643,16 +6101,27 @@ export interface operations {
                                     direction: "increase" | "decrease";
                                     /** @enum {string} */
                                     mode: "linear" | "per_set";
-                                    per_set_values: number[];
+                                    per_set_values: (number | null)[];
                                     /** @enum {string} */
-                                    start_mode: "absolute" | "pct_1rm";
+                                    start_mode: "absolute" | "pct_1rm" | "bw";
                                     start_value: number;
                                     step_value: number;
                                 } | null;
                                 load_value?: number | null;
                                 note?: string | null;
+                                notes?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                }[];
+                                prescription_metadata?: {
+                                    [key: string]: unknown;
+                                };
                                 /** @enum {string|null} */
-                                prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                 prescription_value?: number | null;
                                 scale_level?: {
                                     /** Format: uuid */
@@ -5667,9 +6136,12 @@ export interface operations {
                                     /** @enum {string|null} */
                                     load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                     load_value?: number | null;
+                                    metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     note?: string | null;
                                     /** @enum {string|null} */
-                                    prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                     prescription_value?: number | null;
                                     set_index: number;
                                 }[] | null;
@@ -5680,14 +6152,26 @@ export interface operations {
                         id?: string | null;
                         name: string;
                         note?: string | null;
+                        notes?: {
+                            body: string;
+                            document?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** @enum {string} */
+                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                        }[];
                         order?: number;
                         /** Format: uuid */
                         parent_section_id?: string | null;
                         rest_after_seconds?: number | null;
+                        rest_before_next_section_seconds?: number | null;
                         score_config?: {
                             [key: string]: unknown;
                         } | null;
                         scoreable?: boolean;
+                        section_metadata?: {
+                            [key: string]: unknown;
+                        };
                         sections?: {
                             exercises: {
                                 /** Format: uuid */
@@ -5704,16 +6188,27 @@ export interface operations {
                                         direction: "increase" | "decrease";
                                         /** @enum {string} */
                                         mode: "linear" | "per_set";
-                                        per_set_values: number[];
+                                        per_set_values: (number | null)[];
                                         /** @enum {string} */
-                                        start_mode: "absolute" | "pct_1rm";
+                                        start_mode: "absolute" | "pct_1rm" | "bw";
                                         start_value: number;
                                         step_value: number;
                                     } | null;
                                     load_value?: number | null;
                                     note?: string | null;
+                                    notes?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                    }[];
+                                    prescription_metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     /** @enum {string|null} */
-                                    prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                     prescription_value?: number | null;
                                     scale_level?: {
                                         /** Format: uuid */
@@ -5728,9 +6223,12 @@ export interface operations {
                                         /** @enum {string|null} */
                                         load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                         load_value?: number | null;
+                                        metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         note?: string | null;
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         set_index: number;
                                     }[] | null;
@@ -5739,6 +6237,10 @@ export interface operations {
                                 cluster_rest_seconds?: number | null;
                                 description?: string | null;
                                 excluded?: boolean;
+                                exercise_ref?: string | null;
+                                group_config?: {
+                                    [key: string]: unknown;
+                                } | null;
                                 hr_zone?: number | null;
                                 /** Format: uuid */
                                 id?: string | null;
@@ -5756,20 +6258,31 @@ export interface operations {
                                     direction: "increase" | "decrease";
                                     /** @enum {string} */
                                     mode: "linear" | "per_set";
-                                    per_set_values: number[];
+                                    per_set_values: (number | null)[];
                                     /** @enum {string} */
-                                    start_mode: "absolute" | "pct_1rm";
+                                    start_mode: "absolute" | "pct_1rm" | "bw";
                                     start_value: number;
                                     step_value: number;
                                 } | null;
                                 load_value?: number | null;
                                 name: string;
                                 note?: string | null;
+                                notes?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                }[];
                                 order?: number;
                                 pacing?: number | null;
+                                prescription_metadata?: {
+                                    [key: string]: unknown;
+                                };
                                 prescription_step?: number | null;
                                 /** @enum {string|null} */
-                                prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                 prescription_value?: number | null;
                                 rest_pause_seconds?: number | null;
                                 rest_seconds?: number | null;
@@ -5777,13 +6290,17 @@ export interface operations {
                                     /** @enum {string|null} */
                                     load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                     load_value?: number | null;
+                                    metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     note?: string | null;
                                     /** @enum {string|null} */
-                                    prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                     prescription_value?: number | null;
                                     set_index: number;
                                 }[];
                                 sets?: number | null;
+                                subtitle?: string | null;
                                 /** Format: uuid */
                                 superset_group_id?: string | null;
                                 tempo?: string | null;
@@ -5799,16 +6316,27 @@ export interface operations {
                                         direction: "increase" | "decrease";
                                         /** @enum {string} */
                                         mode: "linear" | "per_set";
-                                        per_set_values: number[];
+                                        per_set_values: (number | null)[];
                                         /** @enum {string} */
-                                        start_mode: "absolute" | "pct_1rm";
+                                        start_mode: "absolute" | "pct_1rm" | "bw";
                                         start_value: number;
                                         step_value: number;
                                     } | null;
                                     load_value?: number | null;
                                     note?: string | null;
+                                    notes?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                    }[];
+                                    prescription_metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     /** @enum {string|null} */
-                                    prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                     prescription_value?: number | null;
                                     scale_level?: {
                                         /** Format: uuid */
@@ -5823,9 +6351,12 @@ export interface operations {
                                         /** @enum {string|null} */
                                         load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                         load_value?: number | null;
+                                        metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         note?: string | null;
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         set_index: number;
                                     }[] | null;
@@ -5836,28 +6367,47 @@ export interface operations {
                             id?: string | null;
                             name: string;
                             note?: string | null;
+                            notes?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                            }[];
                             order?: number;
                             /** Format: uuid */
                             parent_section_id?: string | null;
                             rest_after_seconds?: number | null;
+                            rest_before_next_section_seconds?: number | null;
                             score_config?: {
                                 [key: string]: unknown;
                             } | null;
                             scoreable?: boolean;
+                            section_metadata?: {
+                                [key: string]: unknown;
+                            };
                             sections?: {
                                 [key: string]: unknown;
                             }[];
+                            subtitle?: string | null;
                             timer_config?: {
                                 [key: string]: unknown;
                             } | null;
                         }[];
+                        subtitle?: string | null;
                         timer_config?: {
                             [key: string]: unknown;
                         } | null;
                     }[];
+                    subtitle?: string | null;
+                    tags?: string[];
                     title?: string | null;
                     /** @enum {string|null} */
                     type?: "crossfit" | "strength" | "gymnastics" | "aerobics" | "flexibility" | "recovery" | null;
+                    workout_metadata?: {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };
@@ -5880,14 +6430,26 @@ export interface operations {
                             } | null)[];
                             /** Format: uuid */
                             created_by_id?: string | null;
+                            description?: string | null;
+                            difficulty?: string | null;
                             draft_data?: {
                                 [key: string]: unknown;
                             } | null;
+                            equipment?: string[];
+                            estimated_duration_seconds?: number | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string | null;
                             is_team_workout?: boolean;
+                            notes?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                            }[];
                             scale_level?: {
                                 /** Format: uuid */
                                 id?: string | null;
@@ -5912,16 +6474,27 @@ export interface operations {
                                             direction: "increase" | "decrease";
                                             /** @enum {string} */
                                             mode: "linear" | "per_set";
-                                            per_set_values: number[];
+                                            per_set_values: (number | null)[];
                                             /** @enum {string} */
-                                            start_mode: "absolute" | "pct_1rm";
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
                                             start_value: number;
                                             step_value: number;
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
+                                        notes?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                        }[];
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         scale_level?: {
                                             /** Format: uuid */
@@ -5936,9 +6509,12 @@ export interface operations {
                                             /** @enum {string|null} */
                                             load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                             load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             note?: string | null;
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             set_index: number;
                                         }[] | null;
@@ -5947,6 +6523,10 @@ export interface operations {
                                     cluster_rest_seconds?: number | null;
                                     description?: string | null;
                                     excluded?: boolean;
+                                    exercise_ref?: string | null;
+                                    group_config?: {
+                                        [key: string]: unknown;
+                                    } | null;
                                     hr_zone?: number | null;
                                     /** Format: uuid */
                                     id?: string | null;
@@ -5964,20 +6544,31 @@ export interface operations {
                                         direction: "increase" | "decrease";
                                         /** @enum {string} */
                                         mode: "linear" | "per_set";
-                                        per_set_values: number[];
+                                        per_set_values: (number | null)[];
                                         /** @enum {string} */
-                                        start_mode: "absolute" | "pct_1rm";
+                                        start_mode: "absolute" | "pct_1rm" | "bw";
                                         start_value: number;
                                         step_value: number;
                                     } | null;
                                     load_value?: number | null;
                                     name: string;
                                     note?: string | null;
+                                    notes?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                    }[];
                                     order?: number;
                                     pacing?: number | null;
+                                    prescription_metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     prescription_step?: number | null;
                                     /** @enum {string|null} */
-                                    prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                     prescription_value?: number | null;
                                     rest_pause_seconds?: number | null;
                                     rest_seconds?: number | null;
@@ -5985,13 +6576,17 @@ export interface operations {
                                         /** @enum {string|null} */
                                         load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                         load_value?: number | null;
+                                        metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         note?: string | null;
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         set_index: number;
                                     }[];
                                     sets?: number | null;
+                                    subtitle?: string | null;
                                     /** Format: uuid */
                                     superset_group_id?: string | null;
                                     tempo?: string | null;
@@ -6007,16 +6602,27 @@ export interface operations {
                                             direction: "increase" | "decrease";
                                             /** @enum {string} */
                                             mode: "linear" | "per_set";
-                                            per_set_values: number[];
+                                            per_set_values: (number | null)[];
                                             /** @enum {string} */
-                                            start_mode: "absolute" | "pct_1rm";
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
                                             start_value: number;
                                             step_value: number;
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
+                                        notes?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                        }[];
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         scale_level?: {
                                             /** Format: uuid */
@@ -6031,9 +6637,12 @@ export interface operations {
                                             /** @enum {string|null} */
                                             load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                             load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             note?: string | null;
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             set_index: number;
                                         }[] | null;
@@ -6044,14 +6653,26 @@ export interface operations {
                                 id?: string | null;
                                 name: string;
                                 note?: string | null;
+                                notes?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                }[];
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
                                 rest_after_seconds?: number | null;
+                                rest_before_next_section_seconds?: number | null;
                                 score_config?: {
                                     [key: string]: unknown;
                                 } | null;
                                 scoreable?: boolean;
+                                section_metadata?: {
+                                    [key: string]: unknown;
+                                };
                                 sections?: {
                                     exercises: {
                                         /** Format: uuid */
@@ -6068,16 +6689,27 @@ export interface operations {
                                                 direction: "increase" | "decrease";
                                                 /** @enum {string} */
                                                 mode: "linear" | "per_set";
-                                                per_set_values: number[];
+                                                per_set_values: (number | null)[];
                                                 /** @enum {string} */
-                                                start_mode: "absolute" | "pct_1rm";
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
                                                 start_value: number;
                                                 step_value: number;
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
+                                            notes?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                            }[];
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             scale_level?: {
                                                 /** Format: uuid */
@@ -6092,9 +6724,12 @@ export interface operations {
                                                 /** @enum {string|null} */
                                                 load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                                 load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
                                                 note?: string | null;
                                                 /** @enum {string|null} */
-                                                prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                                 prescription_value?: number | null;
                                                 set_index: number;
                                             }[] | null;
@@ -6103,6 +6738,10 @@ export interface operations {
                                         cluster_rest_seconds?: number | null;
                                         description?: string | null;
                                         excluded?: boolean;
+                                        exercise_ref?: string | null;
+                                        group_config?: {
+                                            [key: string]: unknown;
+                                        } | null;
                                         hr_zone?: number | null;
                                         /** Format: uuid */
                                         id?: string | null;
@@ -6120,20 +6759,31 @@ export interface operations {
                                             direction: "increase" | "decrease";
                                             /** @enum {string} */
                                             mode: "linear" | "per_set";
-                                            per_set_values: number[];
+                                            per_set_values: (number | null)[];
                                             /** @enum {string} */
-                                            start_mode: "absolute" | "pct_1rm";
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
                                             start_value: number;
                                             step_value: number;
                                         } | null;
                                         load_value?: number | null;
                                         name: string;
                                         note?: string | null;
+                                        notes?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                        }[];
                                         order?: number;
                                         pacing?: number | null;
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         prescription_step?: number | null;
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         rest_pause_seconds?: number | null;
                                         rest_seconds?: number | null;
@@ -6141,13 +6791,17 @@ export interface operations {
                                             /** @enum {string|null} */
                                             load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                             load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             note?: string | null;
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             set_index: number;
                                         }[];
                                         sets?: number | null;
+                                        subtitle?: string | null;
                                         /** Format: uuid */
                                         superset_group_id?: string | null;
                                         tempo?: string | null;
@@ -6163,16 +6817,27 @@ export interface operations {
                                                 direction: "increase" | "decrease";
                                                 /** @enum {string} */
                                                 mode: "linear" | "per_set";
-                                                per_set_values: number[];
+                                                per_set_values: (number | null)[];
                                                 /** @enum {string} */
-                                                start_mode: "absolute" | "pct_1rm";
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
                                                 start_value: number;
                                                 step_value: number;
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
+                                            notes?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                            }[];
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             scale_level?: {
                                                 /** Format: uuid */
@@ -6187,9 +6852,12 @@ export interface operations {
                                                 /** @enum {string|null} */
                                                 load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                                 load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
                                                 note?: string | null;
                                                 /** @enum {string|null} */
-                                                prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                                 prescription_value?: number | null;
                                                 set_index: number;
                                             }[] | null;
@@ -6200,31 +6868,50 @@ export interface operations {
                                     id?: string | null;
                                     name: string;
                                     note?: string | null;
+                                    notes?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                    }[];
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
                                     rest_after_seconds?: number | null;
+                                    rest_before_next_section_seconds?: number | null;
                                     score_config?: {
                                         [key: string]: unknown;
                                     } | null;
                                     scoreable?: boolean;
+                                    section_metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     sections?: {
                                         [key: string]: unknown;
                                     }[];
+                                    subtitle?: string | null;
                                     timer_config?: {
                                         [key: string]: unknown;
                                     } | null;
                                 }[];
+                                subtitle?: string | null;
                                 timer_config?: {
                                     [key: string]: unknown;
                                 } | null;
                             }[];
                             /** @enum {string} */
                             status?: "draft" | "published";
+                            subtitle?: string | null;
+                            tags?: string[];
                             title: string;
                             type: string;
                             /** Format: date-time */
                             updated_at?: string | null;
+                            workout_metadata?: {
+                                [key: string]: unknown;
+                            };
                         };
                     };
                 };
@@ -7010,14 +7697,26 @@ export interface operations {
                             } | null)[];
                             /** Format: uuid */
                             created_by_id?: string | null;
+                            description?: string | null;
+                            difficulty?: string | null;
                             draft_data?: {
                                 [key: string]: unknown;
                             } | null;
+                            equipment?: string[];
+                            estimated_duration_seconds?: number | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string | null;
                             is_team_workout?: boolean;
+                            notes?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                            }[];
                             scale_level?: {
                                 /** Format: uuid */
                                 id?: string | null;
@@ -7042,16 +7741,27 @@ export interface operations {
                                             direction: "increase" | "decrease";
                                             /** @enum {string} */
                                             mode: "linear" | "per_set";
-                                            per_set_values: number[];
+                                            per_set_values: (number | null)[];
                                             /** @enum {string} */
-                                            start_mode: "absolute" | "pct_1rm";
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
                                             start_value: number;
                                             step_value: number;
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
+                                        notes?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                        }[];
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         scale_level?: {
                                             /** Format: uuid */
@@ -7066,9 +7776,12 @@ export interface operations {
                                             /** @enum {string|null} */
                                             load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                             load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             note?: string | null;
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             set_index: number;
                                         }[] | null;
@@ -7077,6 +7790,10 @@ export interface operations {
                                     cluster_rest_seconds?: number | null;
                                     description?: string | null;
                                     excluded?: boolean;
+                                    exercise_ref?: string | null;
+                                    group_config?: {
+                                        [key: string]: unknown;
+                                    } | null;
                                     hr_zone?: number | null;
                                     /** Format: uuid */
                                     id?: string | null;
@@ -7094,20 +7811,31 @@ export interface operations {
                                         direction: "increase" | "decrease";
                                         /** @enum {string} */
                                         mode: "linear" | "per_set";
-                                        per_set_values: number[];
+                                        per_set_values: (number | null)[];
                                         /** @enum {string} */
-                                        start_mode: "absolute" | "pct_1rm";
+                                        start_mode: "absolute" | "pct_1rm" | "bw";
                                         start_value: number;
                                         step_value: number;
                                     } | null;
                                     load_value?: number | null;
                                     name: string;
                                     note?: string | null;
+                                    notes?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                    }[];
                                     order?: number;
                                     pacing?: number | null;
+                                    prescription_metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     prescription_step?: number | null;
                                     /** @enum {string|null} */
-                                    prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                     prescription_value?: number | null;
                                     rest_pause_seconds?: number | null;
                                     rest_seconds?: number | null;
@@ -7115,13 +7843,17 @@ export interface operations {
                                         /** @enum {string|null} */
                                         load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                         load_value?: number | null;
+                                        metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         note?: string | null;
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         set_index: number;
                                     }[];
                                     sets?: number | null;
+                                    subtitle?: string | null;
                                     /** Format: uuid */
                                     superset_group_id?: string | null;
                                     tempo?: string | null;
@@ -7137,16 +7869,27 @@ export interface operations {
                                             direction: "increase" | "decrease";
                                             /** @enum {string} */
                                             mode: "linear" | "per_set";
-                                            per_set_values: number[];
+                                            per_set_values: (number | null)[];
                                             /** @enum {string} */
-                                            start_mode: "absolute" | "pct_1rm";
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
                                             start_value: number;
                                             step_value: number;
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
+                                        notes?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                        }[];
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         scale_level?: {
                                             /** Format: uuid */
@@ -7161,9 +7904,12 @@ export interface operations {
                                             /** @enum {string|null} */
                                             load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                             load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             note?: string | null;
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             set_index: number;
                                         }[] | null;
@@ -7174,14 +7920,26 @@ export interface operations {
                                 id?: string | null;
                                 name: string;
                                 note?: string | null;
+                                notes?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                }[];
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
                                 rest_after_seconds?: number | null;
+                                rest_before_next_section_seconds?: number | null;
                                 score_config?: {
                                     [key: string]: unknown;
                                 } | null;
                                 scoreable?: boolean;
+                                section_metadata?: {
+                                    [key: string]: unknown;
+                                };
                                 sections?: {
                                     exercises: {
                                         /** Format: uuid */
@@ -7198,16 +7956,27 @@ export interface operations {
                                                 direction: "increase" | "decrease";
                                                 /** @enum {string} */
                                                 mode: "linear" | "per_set";
-                                                per_set_values: number[];
+                                                per_set_values: (number | null)[];
                                                 /** @enum {string} */
-                                                start_mode: "absolute" | "pct_1rm";
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
                                                 start_value: number;
                                                 step_value: number;
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
+                                            notes?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                            }[];
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             scale_level?: {
                                                 /** Format: uuid */
@@ -7222,9 +7991,12 @@ export interface operations {
                                                 /** @enum {string|null} */
                                                 load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                                 load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
                                                 note?: string | null;
                                                 /** @enum {string|null} */
-                                                prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                                 prescription_value?: number | null;
                                                 set_index: number;
                                             }[] | null;
@@ -7233,6 +8005,10 @@ export interface operations {
                                         cluster_rest_seconds?: number | null;
                                         description?: string | null;
                                         excluded?: boolean;
+                                        exercise_ref?: string | null;
+                                        group_config?: {
+                                            [key: string]: unknown;
+                                        } | null;
                                         hr_zone?: number | null;
                                         /** Format: uuid */
                                         id?: string | null;
@@ -7250,20 +8026,31 @@ export interface operations {
                                             direction: "increase" | "decrease";
                                             /** @enum {string} */
                                             mode: "linear" | "per_set";
-                                            per_set_values: number[];
+                                            per_set_values: (number | null)[];
                                             /** @enum {string} */
-                                            start_mode: "absolute" | "pct_1rm";
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
                                             start_value: number;
                                             step_value: number;
                                         } | null;
                                         load_value?: number | null;
                                         name: string;
                                         note?: string | null;
+                                        notes?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                        }[];
                                         order?: number;
                                         pacing?: number | null;
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         prescription_step?: number | null;
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         rest_pause_seconds?: number | null;
                                         rest_seconds?: number | null;
@@ -7271,13 +8058,17 @@ export interface operations {
                                             /** @enum {string|null} */
                                             load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                             load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             note?: string | null;
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             set_index: number;
                                         }[];
                                         sets?: number | null;
+                                        subtitle?: string | null;
                                         /** Format: uuid */
                                         superset_group_id?: string | null;
                                         tempo?: string | null;
@@ -7293,16 +8084,27 @@ export interface operations {
                                                 direction: "increase" | "decrease";
                                                 /** @enum {string} */
                                                 mode: "linear" | "per_set";
-                                                per_set_values: number[];
+                                                per_set_values: (number | null)[];
                                                 /** @enum {string} */
-                                                start_mode: "absolute" | "pct_1rm";
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
                                                 start_value: number;
                                                 step_value: number;
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
+                                            notes?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                            }[];
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             scale_level?: {
                                                 /** Format: uuid */
@@ -7317,9 +8119,12 @@ export interface operations {
                                                 /** @enum {string|null} */
                                                 load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                                 load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
                                                 note?: string | null;
                                                 /** @enum {string|null} */
-                                                prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                                 prescription_value?: number | null;
                                                 set_index: number;
                                             }[] | null;
@@ -7330,31 +8135,50 @@ export interface operations {
                                     id?: string | null;
                                     name: string;
                                     note?: string | null;
+                                    notes?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                    }[];
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
                                     rest_after_seconds?: number | null;
+                                    rest_before_next_section_seconds?: number | null;
                                     score_config?: {
                                         [key: string]: unknown;
                                     } | null;
                                     scoreable?: boolean;
+                                    section_metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     sections?: {
                                         [key: string]: unknown;
                                     }[];
+                                    subtitle?: string | null;
                                     timer_config?: {
                                         [key: string]: unknown;
                                     } | null;
                                 }[];
+                                subtitle?: string | null;
                                 timer_config?: {
                                     [key: string]: unknown;
                                 } | null;
                             }[];
                             /** @enum {string} */
                             status?: "draft" | "published";
+                            subtitle?: string | null;
+                            tags?: string[];
                             title: string;
                             type: string;
                             /** Format: date-time */
                             updated_at?: string | null;
+                            workout_metadata?: {
+                                [key: string]: unknown;
+                            };
                         };
                     };
                 };
@@ -7588,14 +8412,26 @@ export interface operations {
                             } | null)[];
                             /** Format: uuid */
                             created_by_id?: string | null;
+                            description?: string | null;
+                            difficulty?: string | null;
                             draft_data?: {
                                 [key: string]: unknown;
                             } | null;
+                            equipment?: string[];
+                            estimated_duration_seconds?: number | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string | null;
                             is_team_workout?: boolean;
+                            notes?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                            }[];
                             scale_level?: {
                                 /** Format: uuid */
                                 id?: string | null;
@@ -7620,16 +8456,27 @@ export interface operations {
                                             direction: "increase" | "decrease";
                                             /** @enum {string} */
                                             mode: "linear" | "per_set";
-                                            per_set_values: number[];
+                                            per_set_values: (number | null)[];
                                             /** @enum {string} */
-                                            start_mode: "absolute" | "pct_1rm";
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
                                             start_value: number;
                                             step_value: number;
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
+                                        notes?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                        }[];
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         scale_level?: {
                                             /** Format: uuid */
@@ -7644,9 +8491,12 @@ export interface operations {
                                             /** @enum {string|null} */
                                             load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                             load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             note?: string | null;
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             set_index: number;
                                         }[] | null;
@@ -7655,6 +8505,10 @@ export interface operations {
                                     cluster_rest_seconds?: number | null;
                                     description?: string | null;
                                     excluded?: boolean;
+                                    exercise_ref?: string | null;
+                                    group_config?: {
+                                        [key: string]: unknown;
+                                    } | null;
                                     hr_zone?: number | null;
                                     /** Format: uuid */
                                     id?: string | null;
@@ -7672,20 +8526,31 @@ export interface operations {
                                         direction: "increase" | "decrease";
                                         /** @enum {string} */
                                         mode: "linear" | "per_set";
-                                        per_set_values: number[];
+                                        per_set_values: (number | null)[];
                                         /** @enum {string} */
-                                        start_mode: "absolute" | "pct_1rm";
+                                        start_mode: "absolute" | "pct_1rm" | "bw";
                                         start_value: number;
                                         step_value: number;
                                     } | null;
                                     load_value?: number | null;
                                     name: string;
                                     note?: string | null;
+                                    notes?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                    }[];
                                     order?: number;
                                     pacing?: number | null;
+                                    prescription_metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     prescription_step?: number | null;
                                     /** @enum {string|null} */
-                                    prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                     prescription_value?: number | null;
                                     rest_pause_seconds?: number | null;
                                     rest_seconds?: number | null;
@@ -7693,13 +8558,17 @@ export interface operations {
                                         /** @enum {string|null} */
                                         load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                         load_value?: number | null;
+                                        metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         note?: string | null;
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         set_index: number;
                                     }[];
                                     sets?: number | null;
+                                    subtitle?: string | null;
                                     /** Format: uuid */
                                     superset_group_id?: string | null;
                                     tempo?: string | null;
@@ -7715,16 +8584,27 @@ export interface operations {
                                             direction: "increase" | "decrease";
                                             /** @enum {string} */
                                             mode: "linear" | "per_set";
-                                            per_set_values: number[];
+                                            per_set_values: (number | null)[];
                                             /** @enum {string} */
-                                            start_mode: "absolute" | "pct_1rm";
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
                                             start_value: number;
                                             step_value: number;
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
+                                        notes?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                        }[];
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         scale_level?: {
                                             /** Format: uuid */
@@ -7739,9 +8619,12 @@ export interface operations {
                                             /** @enum {string|null} */
                                             load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                             load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             note?: string | null;
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             set_index: number;
                                         }[] | null;
@@ -7752,14 +8635,26 @@ export interface operations {
                                 id?: string | null;
                                 name: string;
                                 note?: string | null;
+                                notes?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                }[];
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
                                 rest_after_seconds?: number | null;
+                                rest_before_next_section_seconds?: number | null;
                                 score_config?: {
                                     [key: string]: unknown;
                                 } | null;
                                 scoreable?: boolean;
+                                section_metadata?: {
+                                    [key: string]: unknown;
+                                };
                                 sections?: {
                                     exercises: {
                                         /** Format: uuid */
@@ -7776,16 +8671,27 @@ export interface operations {
                                                 direction: "increase" | "decrease";
                                                 /** @enum {string} */
                                                 mode: "linear" | "per_set";
-                                                per_set_values: number[];
+                                                per_set_values: (number | null)[];
                                                 /** @enum {string} */
-                                                start_mode: "absolute" | "pct_1rm";
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
                                                 start_value: number;
                                                 step_value: number;
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
+                                            notes?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                            }[];
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             scale_level?: {
                                                 /** Format: uuid */
@@ -7800,9 +8706,12 @@ export interface operations {
                                                 /** @enum {string|null} */
                                                 load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                                 load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
                                                 note?: string | null;
                                                 /** @enum {string|null} */
-                                                prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                                 prescription_value?: number | null;
                                                 set_index: number;
                                             }[] | null;
@@ -7811,6 +8720,10 @@ export interface operations {
                                         cluster_rest_seconds?: number | null;
                                         description?: string | null;
                                         excluded?: boolean;
+                                        exercise_ref?: string | null;
+                                        group_config?: {
+                                            [key: string]: unknown;
+                                        } | null;
                                         hr_zone?: number | null;
                                         /** Format: uuid */
                                         id?: string | null;
@@ -7828,20 +8741,31 @@ export interface operations {
                                             direction: "increase" | "decrease";
                                             /** @enum {string} */
                                             mode: "linear" | "per_set";
-                                            per_set_values: number[];
+                                            per_set_values: (number | null)[];
                                             /** @enum {string} */
-                                            start_mode: "absolute" | "pct_1rm";
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
                                             start_value: number;
                                             step_value: number;
                                         } | null;
                                         load_value?: number | null;
                                         name: string;
                                         note?: string | null;
+                                        notes?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                        }[];
                                         order?: number;
                                         pacing?: number | null;
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         prescription_step?: number | null;
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         rest_pause_seconds?: number | null;
                                         rest_seconds?: number | null;
@@ -7849,13 +8773,17 @@ export interface operations {
                                             /** @enum {string|null} */
                                             load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                             load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             note?: string | null;
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             set_index: number;
                                         }[];
                                         sets?: number | null;
+                                        subtitle?: string | null;
                                         /** Format: uuid */
                                         superset_group_id?: string | null;
                                         tempo?: string | null;
@@ -7871,16 +8799,27 @@ export interface operations {
                                                 direction: "increase" | "decrease";
                                                 /** @enum {string} */
                                                 mode: "linear" | "per_set";
-                                                per_set_values: number[];
+                                                per_set_values: (number | null)[];
                                                 /** @enum {string} */
-                                                start_mode: "absolute" | "pct_1rm";
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
                                                 start_value: number;
                                                 step_value: number;
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
+                                            notes?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                            }[];
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             scale_level?: {
                                                 /** Format: uuid */
@@ -7895,9 +8834,12 @@ export interface operations {
                                                 /** @enum {string|null} */
                                                 load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                                 load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
                                                 note?: string | null;
                                                 /** @enum {string|null} */
-                                                prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                                 prescription_value?: number | null;
                                                 set_index: number;
                                             }[] | null;
@@ -7908,31 +8850,50 @@ export interface operations {
                                     id?: string | null;
                                     name: string;
                                     note?: string | null;
+                                    notes?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                    }[];
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
                                     rest_after_seconds?: number | null;
+                                    rest_before_next_section_seconds?: number | null;
                                     score_config?: {
                                         [key: string]: unknown;
                                     } | null;
                                     scoreable?: boolean;
+                                    section_metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     sections?: {
                                         [key: string]: unknown;
                                     }[];
+                                    subtitle?: string | null;
                                     timer_config?: {
                                         [key: string]: unknown;
                                     } | null;
                                 }[];
+                                subtitle?: string | null;
                                 timer_config?: {
                                     [key: string]: unknown;
                                 } | null;
                             }[];
                             /** @enum {string} */
                             status?: "draft" | "published";
+                            subtitle?: string | null;
+                            tags?: string[];
                             title: string;
                             type: string;
                             /** Format: date-time */
                             updated_at?: string | null;
+                            workout_metadata?: {
+                                [key: string]: unknown;
+                            };
                         }[];
                         workout: {
                             available_scale_levels?: ({
@@ -7945,14 +8906,26 @@ export interface operations {
                             } | null)[];
                             /** Format: uuid */
                             created_by_id?: string | null;
+                            description?: string | null;
+                            difficulty?: string | null;
                             draft_data?: {
                                 [key: string]: unknown;
                             } | null;
+                            equipment?: string[];
+                            estimated_duration_seconds?: number | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string | null;
                             is_team_workout?: boolean;
+                            notes?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                            }[];
                             scale_level?: {
                                 /** Format: uuid */
                                 id?: string | null;
@@ -7977,16 +8950,27 @@ export interface operations {
                                             direction: "increase" | "decrease";
                                             /** @enum {string} */
                                             mode: "linear" | "per_set";
-                                            per_set_values: number[];
+                                            per_set_values: (number | null)[];
                                             /** @enum {string} */
-                                            start_mode: "absolute" | "pct_1rm";
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
                                             start_value: number;
                                             step_value: number;
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
+                                        notes?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                        }[];
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         scale_level?: {
                                             /** Format: uuid */
@@ -8001,9 +8985,12 @@ export interface operations {
                                             /** @enum {string|null} */
                                             load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                             load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             note?: string | null;
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             set_index: number;
                                         }[] | null;
@@ -8012,6 +8999,10 @@ export interface operations {
                                     cluster_rest_seconds?: number | null;
                                     description?: string | null;
                                     excluded?: boolean;
+                                    exercise_ref?: string | null;
+                                    group_config?: {
+                                        [key: string]: unknown;
+                                    } | null;
                                     hr_zone?: number | null;
                                     /** Format: uuid */
                                     id?: string | null;
@@ -8029,20 +9020,31 @@ export interface operations {
                                         direction: "increase" | "decrease";
                                         /** @enum {string} */
                                         mode: "linear" | "per_set";
-                                        per_set_values: number[];
+                                        per_set_values: (number | null)[];
                                         /** @enum {string} */
-                                        start_mode: "absolute" | "pct_1rm";
+                                        start_mode: "absolute" | "pct_1rm" | "bw";
                                         start_value: number;
                                         step_value: number;
                                     } | null;
                                     load_value?: number | null;
                                     name: string;
                                     note?: string | null;
+                                    notes?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                    }[];
                                     order?: number;
                                     pacing?: number | null;
+                                    prescription_metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     prescription_step?: number | null;
                                     /** @enum {string|null} */
-                                    prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                     prescription_value?: number | null;
                                     rest_pause_seconds?: number | null;
                                     rest_seconds?: number | null;
@@ -8050,13 +9052,17 @@ export interface operations {
                                         /** @enum {string|null} */
                                         load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                         load_value?: number | null;
+                                        metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         note?: string | null;
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         set_index: number;
                                     }[];
                                     sets?: number | null;
+                                    subtitle?: string | null;
                                     /** Format: uuid */
                                     superset_group_id?: string | null;
                                     tempo?: string | null;
@@ -8072,16 +9078,27 @@ export interface operations {
                                             direction: "increase" | "decrease";
                                             /** @enum {string} */
                                             mode: "linear" | "per_set";
-                                            per_set_values: number[];
+                                            per_set_values: (number | null)[];
                                             /** @enum {string} */
-                                            start_mode: "absolute" | "pct_1rm";
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
                                             start_value: number;
                                             step_value: number;
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
+                                        notes?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                        }[];
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         scale_level?: {
                                             /** Format: uuid */
@@ -8096,9 +9113,12 @@ export interface operations {
                                             /** @enum {string|null} */
                                             load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                             load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             note?: string | null;
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             set_index: number;
                                         }[] | null;
@@ -8109,14 +9129,26 @@ export interface operations {
                                 id?: string | null;
                                 name: string;
                                 note?: string | null;
+                                notes?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                }[];
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
                                 rest_after_seconds?: number | null;
+                                rest_before_next_section_seconds?: number | null;
                                 score_config?: {
                                     [key: string]: unknown;
                                 } | null;
                                 scoreable?: boolean;
+                                section_metadata?: {
+                                    [key: string]: unknown;
+                                };
                                 sections?: {
                                     exercises: {
                                         /** Format: uuid */
@@ -8133,16 +9165,27 @@ export interface operations {
                                                 direction: "increase" | "decrease";
                                                 /** @enum {string} */
                                                 mode: "linear" | "per_set";
-                                                per_set_values: number[];
+                                                per_set_values: (number | null)[];
                                                 /** @enum {string} */
-                                                start_mode: "absolute" | "pct_1rm";
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
                                                 start_value: number;
                                                 step_value: number;
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
+                                            notes?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                            }[];
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             scale_level?: {
                                                 /** Format: uuid */
@@ -8157,9 +9200,12 @@ export interface operations {
                                                 /** @enum {string|null} */
                                                 load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                                 load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
                                                 note?: string | null;
                                                 /** @enum {string|null} */
-                                                prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                                 prescription_value?: number | null;
                                                 set_index: number;
                                             }[] | null;
@@ -8168,6 +9214,10 @@ export interface operations {
                                         cluster_rest_seconds?: number | null;
                                         description?: string | null;
                                         excluded?: boolean;
+                                        exercise_ref?: string | null;
+                                        group_config?: {
+                                            [key: string]: unknown;
+                                        } | null;
                                         hr_zone?: number | null;
                                         /** Format: uuid */
                                         id?: string | null;
@@ -8185,20 +9235,31 @@ export interface operations {
                                             direction: "increase" | "decrease";
                                             /** @enum {string} */
                                             mode: "linear" | "per_set";
-                                            per_set_values: number[];
+                                            per_set_values: (number | null)[];
                                             /** @enum {string} */
-                                            start_mode: "absolute" | "pct_1rm";
+                                            start_mode: "absolute" | "pct_1rm" | "bw";
                                             start_value: number;
                                             step_value: number;
                                         } | null;
                                         load_value?: number | null;
                                         name: string;
                                         note?: string | null;
+                                        notes?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                        }[];
                                         order?: number;
                                         pacing?: number | null;
+                                        prescription_metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         prescription_step?: number | null;
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         rest_pause_seconds?: number | null;
                                         rest_seconds?: number | null;
@@ -8206,13 +9267,17 @@ export interface operations {
                                             /** @enum {string|null} */
                                             load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                             load_value?: number | null;
+                                            metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             note?: string | null;
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             set_index: number;
                                         }[];
                                         sets?: number | null;
+                                        subtitle?: string | null;
                                         /** Format: uuid */
                                         superset_group_id?: string | null;
                                         tempo?: string | null;
@@ -8228,16 +9293,27 @@ export interface operations {
                                                 direction: "increase" | "decrease";
                                                 /** @enum {string} */
                                                 mode: "linear" | "per_set";
-                                                per_set_values: number[];
+                                                per_set_values: (number | null)[];
                                                 /** @enum {string} */
-                                                start_mode: "absolute" | "pct_1rm";
+                                                start_mode: "absolute" | "pct_1rm" | "bw";
                                                 start_value: number;
                                                 step_value: number;
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
+                                            notes?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                            }[];
+                                            prescription_metadata?: {
+                                                [key: string]: unknown;
+                                            };
                                             /** @enum {string|null} */
-                                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                             prescription_value?: number | null;
                                             scale_level?: {
                                                 /** Format: uuid */
@@ -8252,9 +9328,12 @@ export interface operations {
                                                 /** @enum {string|null} */
                                                 load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                                 load_value?: number | null;
+                                                metadata?: {
+                                                    [key: string]: unknown;
+                                                };
                                                 note?: string | null;
                                                 /** @enum {string|null} */
-                                                prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                                 prescription_value?: number | null;
                                                 set_index: number;
                                             }[] | null;
@@ -8265,31 +9344,50 @@ export interface operations {
                                     id?: string | null;
                                     name: string;
                                     note?: string | null;
+                                    notes?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                    }[];
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
                                     rest_after_seconds?: number | null;
+                                    rest_before_next_section_seconds?: number | null;
                                     score_config?: {
                                         [key: string]: unknown;
                                     } | null;
                                     scoreable?: boolean;
+                                    section_metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     sections?: {
                                         [key: string]: unknown;
                                     }[];
+                                    subtitle?: string | null;
                                     timer_config?: {
                                         [key: string]: unknown;
                                     } | null;
                                 }[];
+                                subtitle?: string | null;
                                 timer_config?: {
                                     [key: string]: unknown;
                                 } | null;
                             }[];
                             /** @enum {string} */
                             status?: "draft" | "published";
+                            subtitle?: string | null;
+                            tags?: string[];
                             title: string;
                             type: string;
                             /** Format: date-time */
                             updated_at?: string | null;
+                            workout_metadata?: {
+                                [key: string]: unknown;
+                            };
                         };
                     };
                 };
@@ -9934,6 +11032,61 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminWorkoutDslController.manual": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Quick Text manual */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        markdown: string;
+                        templates: {
+                            [key: string]: unknown;
+                        };
+                        /** @enum {integer} */
+                        version: 1;
+                        /** WorkoutDslVocabulary */
+                        vocabulary: {
+                            exercise_catalog: {
+                                aliases: string[];
+                                capabilities: string[];
+                                category: string;
+                                id: string;
+                                label: string;
+                            }[];
+                            exercise_parameters: string[];
+                            format_aliases: {
+                                [key: string]: unknown;
+                            };
+                            format_specs: {
+                                [key: string]: unknown;
+                            };
+                            group_parameters: string[];
+                            header_parameters: string[];
+                            note_markers: string[];
+                            scale_parameters: string[];
+                            section_formats: string[];
+                            section_parameters: {
+                                [key: string]: string[];
+                            };
+                            /** @enum {integer} */
+                            version: 1;
+                            workout_parameters: string[];
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.ExecutionController.timer_sequence": {
         parameters: {
             query: {
@@ -10234,6 +11387,9 @@ export interface operations {
                 "application/json": {
                     /** @enum {string|null} */
                     authoring_mode?: "structured" | "quick_text" | null;
+                    description?: string | null;
+                    /** @enum {string|null} */
+                    difficulty?: "beginner" | "intermediate" | "advanced" | "all-levels" | null;
                     dsl_document?: {
                         [key: string]: unknown;
                     } | null;
@@ -10242,7 +11398,17 @@ export interface operations {
                     dsl_version?: 1 | null;
                     /** Format: uuid */
                     editor_session_id?: string | null;
+                    equipment?: string[];
+                    estimated_duration_seconds?: number | null;
                     is_team_workout?: boolean;
+                    notes?: {
+                        body: string;
+                        document?: {
+                            [key: string]: unknown;
+                        } | null;
+                        /** @enum {string} */
+                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                    }[];
                     sections?: {
                         exercises: {
                             /** Format: uuid */
@@ -10259,16 +11425,27 @@ export interface operations {
                                     direction: "increase" | "decrease";
                                     /** @enum {string} */
                                     mode: "linear" | "per_set";
-                                    per_set_values: number[];
+                                    per_set_values: (number | null)[];
                                     /** @enum {string} */
-                                    start_mode: "absolute" | "pct_1rm";
+                                    start_mode: "absolute" | "pct_1rm" | "bw";
                                     start_value: number;
                                     step_value: number;
                                 } | null;
                                 load_value?: number | null;
                                 note?: string | null;
+                                notes?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                }[];
+                                prescription_metadata?: {
+                                    [key: string]: unknown;
+                                };
                                 /** @enum {string|null} */
-                                prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                 prescription_value?: number | null;
                                 scale_level?: {
                                     /** Format: uuid */
@@ -10283,9 +11460,12 @@ export interface operations {
                                     /** @enum {string|null} */
                                     load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                     load_value?: number | null;
+                                    metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     note?: string | null;
                                     /** @enum {string|null} */
-                                    prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                     prescription_value?: number | null;
                                     set_index: number;
                                 }[] | null;
@@ -10294,6 +11474,10 @@ export interface operations {
                             cluster_rest_seconds?: number | null;
                             description?: string | null;
                             excluded?: boolean;
+                            exercise_ref?: string | null;
+                            group_config?: {
+                                [key: string]: unknown;
+                            } | null;
                             hr_zone?: number | null;
                             /** Format: uuid */
                             id?: string | null;
@@ -10311,20 +11495,31 @@ export interface operations {
                                 direction: "increase" | "decrease";
                                 /** @enum {string} */
                                 mode: "linear" | "per_set";
-                                per_set_values: number[];
+                                per_set_values: (number | null)[];
                                 /** @enum {string} */
-                                start_mode: "absolute" | "pct_1rm";
+                                start_mode: "absolute" | "pct_1rm" | "bw";
                                 start_value: number;
                                 step_value: number;
                             } | null;
                             load_value?: number | null;
                             name: string;
                             note?: string | null;
+                            notes?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                            }[];
                             order?: number;
                             pacing?: number | null;
+                            prescription_metadata?: {
+                                [key: string]: unknown;
+                            };
                             prescription_step?: number | null;
                             /** @enum {string|null} */
-                            prescription_unit?: "reps" | "secs" | "kcal" | null;
+                            prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                             prescription_value?: number | null;
                             rest_pause_seconds?: number | null;
                             rest_seconds?: number | null;
@@ -10332,13 +11527,17 @@ export interface operations {
                                 /** @enum {string|null} */
                                 load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                 load_value?: number | null;
+                                metadata?: {
+                                    [key: string]: unknown;
+                                };
                                 note?: string | null;
                                 /** @enum {string|null} */
-                                prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                 prescription_value?: number | null;
                                 set_index: number;
                             }[];
                             sets?: number | null;
+                            subtitle?: string | null;
                             /** Format: uuid */
                             superset_group_id?: string | null;
                             tempo?: string | null;
@@ -10354,16 +11553,27 @@ export interface operations {
                                     direction: "increase" | "decrease";
                                     /** @enum {string} */
                                     mode: "linear" | "per_set";
-                                    per_set_values: number[];
+                                    per_set_values: (number | null)[];
                                     /** @enum {string} */
-                                    start_mode: "absolute" | "pct_1rm";
+                                    start_mode: "absolute" | "pct_1rm" | "bw";
                                     start_value: number;
                                     step_value: number;
                                 } | null;
                                 load_value?: number | null;
                                 note?: string | null;
+                                notes?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                }[];
+                                prescription_metadata?: {
+                                    [key: string]: unknown;
+                                };
                                 /** @enum {string|null} */
-                                prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                 prescription_value?: number | null;
                                 scale_level?: {
                                     /** Format: uuid */
@@ -10378,9 +11588,12 @@ export interface operations {
                                     /** @enum {string|null} */
                                     load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                     load_value?: number | null;
+                                    metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     note?: string | null;
                                     /** @enum {string|null} */
-                                    prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                     prescription_value?: number | null;
                                     set_index: number;
                                 }[] | null;
@@ -10391,14 +11604,26 @@ export interface operations {
                         id?: string | null;
                         name: string;
                         note?: string | null;
+                        notes?: {
+                            body: string;
+                            document?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** @enum {string} */
+                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                        }[];
                         order?: number;
                         /** Format: uuid */
                         parent_section_id?: string | null;
                         rest_after_seconds?: number | null;
+                        rest_before_next_section_seconds?: number | null;
                         score_config?: {
                             [key: string]: unknown;
                         } | null;
                         scoreable?: boolean;
+                        section_metadata?: {
+                            [key: string]: unknown;
+                        };
                         sections?: {
                             exercises: {
                                 /** Format: uuid */
@@ -10415,16 +11640,27 @@ export interface operations {
                                         direction: "increase" | "decrease";
                                         /** @enum {string} */
                                         mode: "linear" | "per_set";
-                                        per_set_values: number[];
+                                        per_set_values: (number | null)[];
                                         /** @enum {string} */
-                                        start_mode: "absolute" | "pct_1rm";
+                                        start_mode: "absolute" | "pct_1rm" | "bw";
                                         start_value: number;
                                         step_value: number;
                                     } | null;
                                     load_value?: number | null;
                                     note?: string | null;
+                                    notes?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                    }[];
+                                    prescription_metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     /** @enum {string|null} */
-                                    prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                     prescription_value?: number | null;
                                     scale_level?: {
                                         /** Format: uuid */
@@ -10439,9 +11675,12 @@ export interface operations {
                                         /** @enum {string|null} */
                                         load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                         load_value?: number | null;
+                                        metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         note?: string | null;
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         set_index: number;
                                     }[] | null;
@@ -10450,6 +11689,10 @@ export interface operations {
                                 cluster_rest_seconds?: number | null;
                                 description?: string | null;
                                 excluded?: boolean;
+                                exercise_ref?: string | null;
+                                group_config?: {
+                                    [key: string]: unknown;
+                                } | null;
                                 hr_zone?: number | null;
                                 /** Format: uuid */
                                 id?: string | null;
@@ -10467,20 +11710,31 @@ export interface operations {
                                     direction: "increase" | "decrease";
                                     /** @enum {string} */
                                     mode: "linear" | "per_set";
-                                    per_set_values: number[];
+                                    per_set_values: (number | null)[];
                                     /** @enum {string} */
-                                    start_mode: "absolute" | "pct_1rm";
+                                    start_mode: "absolute" | "pct_1rm" | "bw";
                                     start_value: number;
                                     step_value: number;
                                 } | null;
                                 load_value?: number | null;
                                 name: string;
                                 note?: string | null;
+                                notes?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                }[];
                                 order?: number;
                                 pacing?: number | null;
+                                prescription_metadata?: {
+                                    [key: string]: unknown;
+                                };
                                 prescription_step?: number | null;
                                 /** @enum {string|null} */
-                                prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                 prescription_value?: number | null;
                                 rest_pause_seconds?: number | null;
                                 rest_seconds?: number | null;
@@ -10488,13 +11742,17 @@ export interface operations {
                                     /** @enum {string|null} */
                                     load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                     load_value?: number | null;
+                                    metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     note?: string | null;
                                     /** @enum {string|null} */
-                                    prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                     prescription_value?: number | null;
                                     set_index: number;
                                 }[];
                                 sets?: number | null;
+                                subtitle?: string | null;
                                 /** Format: uuid */
                                 superset_group_id?: string | null;
                                 tempo?: string | null;
@@ -10510,16 +11768,27 @@ export interface operations {
                                         direction: "increase" | "decrease";
                                         /** @enum {string} */
                                         mode: "linear" | "per_set";
-                                        per_set_values: number[];
+                                        per_set_values: (number | null)[];
                                         /** @enum {string} */
-                                        start_mode: "absolute" | "pct_1rm";
+                                        start_mode: "absolute" | "pct_1rm" | "bw";
                                         start_value: number;
                                         step_value: number;
                                     } | null;
                                     load_value?: number | null;
                                     note?: string | null;
+                                    notes?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                                    }[];
+                                    prescription_metadata?: {
+                                        [key: string]: unknown;
+                                    };
                                     /** @enum {string|null} */
-                                    prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                    prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                     prescription_value?: number | null;
                                     scale_level?: {
                                         /** Format: uuid */
@@ -10534,9 +11803,12 @@ export interface operations {
                                         /** @enum {string|null} */
                                         load_mode?: "absolute" | "pct_1rm" | "bw" | null;
                                         load_value?: number | null;
+                                        metadata?: {
+                                            [key: string]: unknown;
+                                        };
                                         note?: string | null;
                                         /** @enum {string|null} */
-                                        prescription_unit?: "reps" | "secs" | "kcal" | null;
+                                        prescription_unit?: "reps" | "secs" | "kcal" | "meters" | null;
                                         prescription_value?: number | null;
                                         set_index: number;
                                     }[] | null;
@@ -10547,28 +11819,47 @@ export interface operations {
                             id?: string | null;
                             name: string;
                             note?: string | null;
+                            notes?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
+                            }[];
                             order?: number;
                             /** Format: uuid */
                             parent_section_id?: string | null;
                             rest_after_seconds?: number | null;
+                            rest_before_next_section_seconds?: number | null;
                             score_config?: {
                                 [key: string]: unknown;
                             } | null;
                             scoreable?: boolean;
+                            section_metadata?: {
+                                [key: string]: unknown;
+                            };
                             sections?: {
                                 [key: string]: unknown;
                             }[];
+                            subtitle?: string | null;
                             timer_config?: {
                                 [key: string]: unknown;
                             } | null;
                         }[];
+                        subtitle?: string | null;
                         timer_config?: {
                             [key: string]: unknown;
                         } | null;
                     }[];
+                    subtitle?: string | null;
+                    tags?: string[];
                     title?: string | null;
                     /** @enum {string|null} */
                     type?: "crossfit" | "strength" | "gymnastics" | "aerobics" | "flexibility" | "recovery" | null;
+                    workout_metadata?: {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };
@@ -11261,6 +12552,100 @@ export interface operations {
                         booking: {
                             [key: string]: unknown;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminWorkoutDslController.publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @default false */
+                    acknowledge_warnings?: boolean;
+                    document?: {
+                        [key: string]: unknown;
+                    } | null;
+                    expected_source_revision: number;
+                    source: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Published canonical workout */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        diagnostics: {
+                            code: string;
+                            column: number;
+                            line: number;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** @enum {string} */
+                            severity: "error" | "warning";
+                        }[];
+                        execution_preview: {
+                            [key: string]: unknown;
+                        };
+                        formatted_source: string;
+                        workout: {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description Revision conflict or warning acknowledgement required */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        diagnostics?: {
+                            code: string;
+                            column: number;
+                            line: number;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** @enum {string} */
+                            severity: "error" | "warning";
+                        }[];
+                        error: string;
+                    };
+                };
+            };
+            /** @description DSL or canonical validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        diagnostics: {
+                            code: string;
+                            column: number;
+                            line: number;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** @enum {string} */
+                            severity: "error" | "warning";
+                        }[];
                     };
                 };
             };

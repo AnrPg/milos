@@ -152,6 +152,12 @@ export type WorkoutRecord = {
   available_scale_levels: ScaleLevel[];
   sections: WorkoutSectionRecord[];
   draft_data?: unknown;
+  authoring_mode?: "structured" | "quick_text";
+  dsl_version?: number | null;
+  dsl_source?: string | null;
+  dsl_document?: Record<string, unknown> | null;
+  dsl_source_revision?: number;
+  last_dsl_diagnostics?: WorkoutDslDiagnostic[];
 };
 
 export type MaterializedWorkoutResponse = {
@@ -161,6 +167,7 @@ export type MaterializedWorkoutResponse = {
 
 export type WorkoutDslDiagnostic = {
   code: string;
+  severity: "error" | "warning";
   line: number;
   column: number;
   params: Record<string, unknown>;
@@ -171,6 +178,37 @@ export type WorkoutDslPreview = {
   workout: Record<string, unknown>;
   formatted_source: string;
   vocabulary: WorkoutDslVocabulary;
+  diagnostics: WorkoutDslDiagnostic[];
+};
+
+export type WorkoutDslAuthoring = {
+  version: number;
+  source: string;
+  document: Record<string, unknown> | null;
+  source_revision: number;
+  authoring_mode: "structured" | "quick_text";
+  diagnostics: WorkoutDslDiagnostic[];
+};
+
+export type WorkoutDslManual = {
+  version: number;
+  markdown: string;
+  templates: {
+    workout: string;
+    sections: Record<string, string>;
+  };
+  vocabulary: WorkoutDslVocabulary;
+};
+
+export type WorkoutDslPublishResult = {
+  workout: WorkoutRecord;
+  formatted_source: string;
+  diagnostics: WorkoutDslDiagnostic[];
+  execution_preview: {
+    segment_count: number;
+    timed_seconds: number;
+    formats: string[];
+  };
 };
 
 export async function listScaleLevels(token: string) {
@@ -183,6 +221,31 @@ export async function parseWorkoutDsl(token: string, source: string) {
     method: "POST",
     token,
     body: { source },
+  });
+}
+
+export async function fetchWorkoutDslAuthoring(token: string, id: string) {
+  return apiRequest<WorkoutDslAuthoring>(`/admin/workouts/${id}/dsl`, { token });
+}
+
+export async function fetchWorkoutDslManual(token: string) {
+  return apiRequest<WorkoutDslManual>("/admin/workouts/dsl/manual", { token });
+}
+
+export async function publishWorkoutDsl(
+  token: string,
+  id: string,
+  payload: {
+    source: string;
+    document: Record<string, unknown> | null;
+    expected_source_revision: number;
+    acknowledge_warnings: boolean;
+  },
+) {
+  return apiRequest<WorkoutDslPublishResult>(`/admin/workouts/${id}/dsl/publish`, {
+    method: "POST",
+    token,
+    body: payload,
   });
 }
 
@@ -251,8 +314,22 @@ export async function createWorkout(token: string, payload: CreateWorkoutRequest
   return publishWorkout(token, draft.id);
 }
 
-export async function createDraftWorkout(token: string): Promise<{ id: string; status?: string }> {
-  const response = await apiRequest<{ draft: { id: string; status?: string } }>("/admin/workouts", {
+export async function createDraftWorkout(
+  token: string,
+): Promise<{
+  id: string;
+  status?: string;
+  authoring_mode?: string;
+  dsl_source_revision?: number;
+}> {
+  const response = await apiRequest<{
+    draft: {
+      id: string;
+      status?: string;
+      authoring_mode?: string;
+      dsl_source_revision?: number;
+    };
+  }>("/admin/workouts", {
     method: "POST",
     token,
   });
@@ -265,7 +342,12 @@ export async function updateDraftWorkout(
   id: string,
   payload: unknown,
   options?: { editorSessionId?: string },
-): Promise<{ id: string; status?: string }> {
+): Promise<{
+  id: string;
+  status?: string;
+  authoring_mode?: string;
+  dsl_source_revision?: number;
+}> {
   const normalizedPayload = stripNullDraftFields(payload);
   const requestBody =
     options?.editorSessionId && normalizedPayload && typeof normalizedPayload === "object"
@@ -275,7 +357,14 @@ export async function updateDraftWorkout(
         }
       : normalizedPayload;
 
-  const response = await apiRequest<{ draft: { id: string; status?: string } }>(
+  const response = await apiRequest<{
+    draft: {
+      id: string;
+      status?: string;
+      authoring_mode?: string;
+      dsl_source_revision?: number;
+    };
+  }>(
     `/admin/workouts/${id}/draft`,
     {
       method: "PATCH",

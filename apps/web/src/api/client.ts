@@ -22,6 +22,7 @@ export type ApiErrorPayload = {
   errors?: Record<string, unknown>;
   diagnostics?: Array<{
     code: string;
+    severity: "error" | "warning";
     line: number;
     column: number;
     params: Record<string, unknown>;

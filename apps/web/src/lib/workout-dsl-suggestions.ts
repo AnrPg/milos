@@ -1,16 +1,30 @@
 export type WorkoutDslVocabulary = {
   version: number;
   section_formats: string[];
+  format_aliases?: Record<string, { format: string; composition?: string | null }>;
+  format_specs?: Record<
+    string,
+    { required: string[]; optional: string[]; body: string; score_types: string[] }
+  >;
   workout_parameters: string[];
   exercise_parameters: string[];
+  group_parameters?: string[];
+  scale_parameters?: string[];
   header_parameters: string[];
   note_markers: string[];
   section_parameters: Record<string, string[]>;
+  exercise_catalog?: Array<{
+    id: string;
+    label: string;
+    category: string;
+    aliases: string[];
+    capabilities: string[];
+  }>;
 };
 
 export type WorkoutDslSuggestion = {
   value: string;
-  kind: "canonical" | "format" | "exercise" | "word";
+  kind: "canonical" | "format" | "exercise" | "template" | "word";
 };
 
 export type WorkoutDslSuggestionResult = {
@@ -30,6 +44,18 @@ export function buildWorkoutDslSuggestions(
 ): WorkoutDslSuggestionResult {
   const beforeCursor = source.slice(0, cursor);
   const currentLine = beforeCursor.slice(beforeCursor.lastIndexOf("\n") + 1);
+
+  const templateMatch = currentLine.match(/^\s*\/([a-z0-9_-]*)$/i);
+  if (templateMatch) {
+    return resultFor(
+      cursor,
+      templateMatch[1],
+      vocabulary.section_formats.map((value) => ({
+        value,
+        kind: "template" as const,
+      })),
+    );
+  }
 
   const sectionMatch = currentLine.match(/^\s*\[section:\s*([a-z0-9_-]*)$/i);
   if (sectionMatch) {
@@ -65,6 +91,8 @@ export function buildWorkoutDslSuggestions(
   const canonical = unique([
     ...vocabulary.workout_parameters,
     ...vocabulary.exercise_parameters,
+    ...(vocabulary.group_parameters ?? []),
+    ...(vocabulary.scale_parameters ?? []),
     ...vocabulary.header_parameters,
     ...Object.values(vocabulary.section_parameters).flat(),
   ]).map((value) => ({ value, kind: "canonical" as const }));
@@ -108,6 +136,8 @@ function rank(kind: WorkoutDslSuggestion["kind"]) {
       return 1;
     case "exercise":
       return 2;
+    case "template":
+      return 0;
     case "word":
       return 3;
   }
