@@ -1796,7 +1796,7 @@
     "repetitionsPrescribedValue": "Повторения (предписани: {value})",
     "peakLabel": "Пик",
     "repetitionsUnit": "повторения",
-    "linearLoadProgression": "· {start}→{end}{unit} (+{step}{unit}/набор)",
+    "linearLoadProgression": "· {start}→{end}{unit} ({step}{unit}/набор)",
     "perSetLoadProgression": "· {values}{unit}",
     "loadWithUnit": "· {value} {unit}",
     "pyramidPrescription": "Пик {value} {unit}, ±{step}/кръг",
@@ -2333,6 +2333,23 @@
     "shareExportFormatOdt": "ODT",
     "shareExportFormatCsv": "CSV",
     "gridView8da0c5d": "Изглед в решетка",
-    "listViewd5d2df9": "Изглед списък"
+    "listViewd5d2df9": "Изглед списък",
+    "reorderHeader": "Пренареждане на заглавието",
+    "headerLabel": "Заглавие",
+    "headerTextPlaceholder": "Текст на заглавието",
+    "headerNotePlaceholder": "Бележка към заглавието",
+    "supersetLabel": "Суперсерия",
+    "alternatingSetsLabel": "Редуващи се серии",
+    "selectExerciseForGrouping": "Изберете упражнение за групиране",
+    "selectedExerciseCount": "{count, plural, one {# избрано} other {# избрани}}",
+    "groupAsSuperset": "Групиране като суперсерия",
+    "groupAsAlternating": "Групиране като редуващи се серии",
+    "clearGroup": "Премахване на групата",
+    "addHeader": "Добавяне на заглавие",
+    "progressiveLoadIncrease": "Прогресивно натоварване",
+    "progressiveLoadDecrease": "Прогресивно разтоварване",
+    "setDetailsLabel": "Детайли за сериите",
+    "setNumberLabel": "Серия {number}",
+    "setNotePlaceholder": "Бележка за серията"
   }
 }

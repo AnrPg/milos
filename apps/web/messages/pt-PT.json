@@ -1796,7 +1796,7 @@
     "repetitionsPrescribedValue": "Representantes (prescritos: {value})",
     "peakLabel": "Pico",
     "repetitionsUnit": "repetições",
-    "linearLoadProgression": "· {start}→{end}{unit} (+{step}{unit}/conjunto)",
+    "linearLoadProgression": "· {start}→{end}{unit} ({step}{unit}/conjunto)",
     "perSetLoadProgression": "· {values}{unit}",
     "loadWithUnit": "· {value} {unit}",
     "pyramidPrescription": "Pico {value} {unit}, ±{step}/rodada",
@@ -2333,6 +2333,23 @@
     "shareExportFormatOdt": "ODT",
     "shareExportFormatCsv": "CSV",
     "gridView8da0c5d": "Vista em grelha",
-    "listViewd5d2df9": "Vista em lista"
+    "listViewd5d2df9": "Vista em lista",
+    "reorderHeader": "Reordenar cabeçalho",
+    "headerLabel": "Cabeçalho",
+    "headerTextPlaceholder": "Texto do cabeçalho",
+    "headerNotePlaceholder": "Nota do cabeçalho",
+    "supersetLabel": "Supersérie",
+    "alternatingSetsLabel": "Séries alternadas",
+    "selectExerciseForGrouping": "Selecionar exercício para agrupar",
+    "selectedExerciseCount": "{count, plural, one {# selecionado} other {# selecionados}}",
+    "groupAsSuperset": "Agrupar como supersérie",
+    "groupAsAlternating": "Agrupar como séries alternadas",
+    "clearGroup": "Desagrupar",
+    "addHeader": "Adicionar cabeçalho",
+    "progressiveLoadIncrease": "Carga progressiva",
+    "progressiveLoadDecrease": "Descarga progressiva",
+    "setDetailsLabel": "Detalhes das séries",
+    "setNumberLabel": "Série {number}",
+    "setNotePlaceholder": "Nota da série"
   }
 }

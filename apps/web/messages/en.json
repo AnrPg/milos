@@ -1796,7 +1796,7 @@
     "repetitionsPrescribedValue": "Reps (prescribed: {value})",
     "peakLabel": "Peak",
     "repetitionsUnit": "reps",
-    "linearLoadProgression": "· {start}→{end}{unit} (+{step}{unit}/set)",
+    "linearLoadProgression": "· {start}→{end}{unit} ({step}{unit}/set)",
     "perSetLoadProgression": "· {values}{unit}",
     "loadWithUnit": "· {value} {unit}",
     "pyramidPrescription": "Peak {value} {unit}, ±{step}/round",
@@ -2333,6 +2333,23 @@
     "shareExportFormatOdt": "ODT",
     "shareExportFormatCsv": "CSV",
     "gridView8da0c5d": "Grid view",
-    "listViewd5d2df9": "List view"
+    "listViewd5d2df9": "List view",
+    "reorderHeader": "Reorder header",
+    "headerLabel": "Header",
+    "headerTextPlaceholder": "Header text",
+    "headerNotePlaceholder": "Header note",
+    "supersetLabel": "Superset",
+    "alternatingSetsLabel": "Alternating sets",
+    "selectExerciseForGrouping": "Select exercise for grouping",
+    "selectedExerciseCount": "{count, plural, one {# selected} other {# selected}}",
+    "groupAsSuperset": "Group as superset",
+    "groupAsAlternating": "Group as alternating sets",
+    "clearGroup": "Clear group",
+    "addHeader": "Add header",
+    "progressiveLoadIncrease": "Progressive load",
+    "progressiveLoadDecrease": "Progressive deload",
+    "setDetailsLabel": "Set details",
+    "setNumberLabel": "Set {number}",
+    "setNotePlaceholder": "Set note"
   }
 }

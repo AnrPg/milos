@@ -1796,7 +1796,7 @@
     "repetitionsPrescribedValue": "Повторы (прописано: {value})",
     "peakLabel": "Пик",
     "repetitionsUnit": "представители",
-    "linearLoadProgression": "· {start}→{end}{unit} (+{step}{unit}/набор)",
+    "linearLoadProgression": "· {start}→{end}{unit} ({step}{unit}/набор)",
     "perSetLoadProgression": "· {values}{unit}",
     "loadWithUnit": "· {value} {unit}",
     "pyramidPrescription": "Пик {value} {unit}, ±{step}/раунд",
@@ -2333,6 +2333,23 @@
     "shareExportFormatOdt": "ОДТ",
     "shareExportFormatCsv": "CSV-файл",
     "gridView8da0c5d": "Вид сеткой",
-    "listViewd5d2df9": "Вид списком"
+    "listViewd5d2df9": "Вид списком",
+    "reorderHeader": "Изменить порядок заголовка",
+    "headerLabel": "Заголовок",
+    "headerTextPlaceholder": "Текст заголовка",
+    "headerNotePlaceholder": "Примечание к заголовку",
+    "supersetLabel": "Суперсет",
+    "alternatingSetsLabel": "Чередующиеся подходы",
+    "selectExerciseForGrouping": "Выбрать упражнение для группировки",
+    "selectedExerciseCount": "{count, plural, one {# выбрано} few {# выбрано} many {# выбрано} other {# выбрано}}",
+    "groupAsSuperset": "Сгруппировать в суперсет",
+    "groupAsAlternating": "Сгруппировать в чередующиеся подходы",
+    "clearGroup": "Разгруппировать",
+    "addHeader": "Добавить заголовок",
+    "progressiveLoadIncrease": "Прогрессивная нагрузка",
+    "progressiveLoadDecrease": "Прогрессивная разгрузка",
+    "setDetailsLabel": "Детали подходов",
+    "setNumberLabel": "Подход {number}",
+    "setNotePlaceholder": "Примечание к подходу"
   }
 }

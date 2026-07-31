@@ -10,13 +10,14 @@ import type {
   FormatParams,
   LoadMode,
   LoadProgression,
+  SetPrescription,
   MobileView,
   PrescriptionUnit,
   ScoreType,
   SectionFormat,
   WorkoutType,
 } from "@/types/workout";
-import { AUTO_SCORE_MAP, EMOM_SCORING_MODE_SCORE_TYPE, FORMAT_EXERCISE_CONTEXT, adaptExerciseToDestination, makeDefaultAdvancedSettings, makeDefaultExercise, makeDefaultFormatParams, makeDefaultSection } from "@/types/workout";
+import { AUTO_SCORE_MAP, EMOM_SCORING_MODE_SCORE_TYPE, FORMAT_EXERCISE_CONTEXT, adaptExerciseToDestination, concreteSetPrescriptions, makeDefaultAdvancedSettings, makeDefaultExercise, makeDefaultFormatParams, makeDefaultHeader, makeDefaultSection } from "@/types/workout";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 
@@ -45,10 +46,17 @@ type WorkoutCreationStore = DraftWorkoutState & {
   setEmomScoringMode: (sectionId: string, mode: EmomScoringMode | null) => void;
   setEmomAmrapScoringStyle: (sectionId: string, style: "grand_total" | "lowest_window" | null) => void;
   addExercise: (sectionId: string) => void;
+  addHeader: (sectionId: string) => void;
   updateExercise: (sectionId: string, exerciseId: string, patch: Partial<DraftExercise>) => void;
   deleteExercise: (sectionId: string, exerciseId: string) => void;
   reorderExercises: (sectionId: string, fromId: string, toId: string) => void;
   moveExercise: (exerciseId: string, fromSectionId: string, toSectionId: string) => void;
+  setExerciseGroup: (
+    sectionId: string,
+    exerciseIds: string[],
+    groupType: "superset" | "alternating",
+  ) => void;
+  clearExerciseGroups: (sectionId: string, exerciseIds: string[]) => void;
   toggleVariationsPanel: (sectionId: string, exerciseId: string) => void;
   addVariation: (sectionId: string, exerciseId: string, scaleLevelSlug: string) => void;
   updateVariation: (
@@ -116,11 +124,28 @@ function parseLoadProgression(value: unknown): LoadProgression | null {
   const mode = v.mode === "linear" || v.mode === "per_set" ? v.mode : "linear";
   return {
     mode,
+    direction: v.direction === "decrease" ? "decrease" : "increase",
     startValue: Number(v.start_value ?? 0),
     startMode: parseLoadMode(v.start_mode),
     stepValue: Number(v.step_value ?? 0),
     perSetValues: Array.isArray(v.per_set_values) ? v.per_set_values.map(Number) : [],
   };
+}
+
+function parseSetPrescriptions(value: unknown): SetPrescription[] {
+  if (!Array.isArray(value)) return [];
+
+  return value.map((item, index) => {
+    const set = (item || {}) as Record<string, unknown>;
+    return {
+      setIndex: Number(set.set_index ?? index + 1),
+      prescriptionValue: set.prescription_value != null ? Number(set.prescription_value) : null,
+      prescriptionUnit: set.prescription_unit != null ? parsePrescriptionUnit(set.prescription_unit) : null,
+      loadValue: set.load_value != null ? Number(set.load_value) : null,
+      loadMode: set.load_mode != null ? parseLoadMode(set.load_mode) : null,
+      note: typeof set.note === "string" ? set.note : null,
+    };
+  });
 }
 
 function parseAdvancedSettings(src: Record<string, unknown>): AdvancedSettings {
@@ -151,14 +176,19 @@ function parseDraftExercise(src: unknown): DraftExercise {
       prescriptionUnit: vr.prescription_unit != null ? parsePrescriptionUnit(vr.prescription_unit) : null,
       loadValue: vr.load_value != null ? Number(vr.load_value) : null,
       loadMode: vr.load_mode != null ? parseLoadMode(vr.load_mode) : null,
+      setPrescriptions: Array.isArray(vr.set_prescriptions) ? parseSetPrescriptions(vr.set_prescriptions) : null,
+      loadProgression: parseLoadProgression(vr.load_progression),
       excluded: Boolean(vr.excluded),
+      note: typeof vr.note === "string" ? vr.note : null,
     };
   });
 
   return {
     localId: crypto.randomUUID(),
+    itemType: e.item_type === "header" ? "header" : "exercise",
     name: typeof e.name === "string" ? e.name : "",
     sets: e.sets != null ? Number(e.sets) : defaults.sets,
+    setPrescriptions: parseSetPrescriptions(e.set_prescriptions),
     prescriptionValue: e.prescription_value != null ? Number(e.prescription_value) : defaults.prescriptionValue,
     prescriptionUnit: parsePrescriptionUnit(e.prescription_unit),
     prescriptionStep: e.prescription_step != null ? Number(e.prescription_step) : null,
@@ -168,6 +198,7 @@ function parseDraftExercise(src: unknown): DraftExercise {
     loadProgression: parseLoadProgression(e.load_progression),
     isBodyweight: Boolean(e.is_bodyweight),
     supersetGroupId: e.superset_group_id != null ? String(e.superset_group_id) : null,
+    alternatingGroupId: e.alternating_group_id != null ? String(e.alternating_group_id) : null,
     intervalAssignment: e.interval_assignment != null ? Number(e.interval_assignment) : null,
     advanced: parseAdvancedSettings(e as Record<string, unknown>),
     variationsOpen: false,
@@ -373,6 +404,15 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
       }),
     })),
 
+  addHeader: (sectionId) =>
+    set((state) => ({
+      sections: state.sections.map((section) =>
+        section.localId === sectionId
+          ? { ...section, exercises: [...section.exercises, makeDefaultHeader()] }
+          : section,
+      ),
+    })),
+
   updateExercise: (sectionId, exerciseId, patch) =>
     set((state) => ({
       sections: state.sections.map((section) => {
@@ -444,6 +484,50 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
       };
     }),
 
+  setExerciseGroup: (sectionId, exerciseIds, groupType) =>
+    set((state) => {
+      if (exerciseIds.length < 2) return state;
+      const groupId = crypto.randomUUID();
+      const selected = new Set(exerciseIds);
+
+      return {
+        sections: state.sections.map((section) => {
+          if (section.localId !== sectionId) return section;
+
+          return {
+            ...section,
+            exercises: section.exercises.map((exercise) => {
+              if (!selected.has(exercise.localId) || exercise.itemType === "header") return exercise;
+
+              return groupType === "superset"
+                ? { ...exercise, supersetGroupId: groupId, alternatingGroupId: null }
+                : { ...exercise, alternatingGroupId: groupId, supersetGroupId: null };
+            }),
+          };
+        }),
+      };
+    }),
+
+  clearExerciseGroups: (sectionId, exerciseIds) =>
+    set((state) => {
+      const selected = new Set(exerciseIds);
+
+      return {
+        sections: state.sections.map((section) =>
+          section.localId === sectionId
+            ? {
+                ...section,
+                exercises: section.exercises.map((exercise) =>
+                  selected.has(exercise.localId)
+                    ? { ...exercise, supersetGroupId: null, alternatingGroupId: null }
+                    : exercise,
+                ),
+              }
+            : section,
+        ),
+      };
+    }),
+
   toggleVariationsPanel: (sectionId, exerciseId) =>
     set((state) => ({
       sections: state.sections.map((section) => {
@@ -484,7 +568,10 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
                   prescriptionUnit: null,
                   loadValue: null,
                   loadMode: null,
+                  setPrescriptions: null,
+                  loadProgression: null,
                   excluded: false,
+                  note: null,
                 },
               ],
             };
@@ -628,8 +715,17 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
         rest_after_seconds: section.restAfterSeconds ?? null,
         note: section.note,
         exercises: section.exercises.map((exercise) => ({
+          item_type: exercise.itemType,
           name: exercise.name,
           sets: exercise.sets,
+          set_prescriptions: concreteSetPrescriptions(exercise).map((set) => ({
+            set_index: set.setIndex,
+            prescription_value: set.prescriptionValue,
+            prescription_unit: set.prescriptionUnit,
+            load_value: set.loadValue,
+            load_mode: set.loadMode,
+            note: set.note,
+          })),
           prescription_value: exercise.prescriptionValue,
           prescription_unit: exercise.prescriptionUnit,
           prescription_step: exercise.prescriptionStep,
@@ -639,6 +735,7 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
           load_progression: exercise.loadProgression
             ? {
                 mode: exercise.loadProgression.mode,
+                direction: exercise.loadProgression.direction,
                 start_value: exercise.loadProgression.startValue,
                 start_mode: exercise.loadProgression.startMode,
                 step_value: exercise.loadProgression.stepValue,
@@ -646,6 +743,7 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
               }
             : null,
           superset_group_id: exercise.supersetGroupId,
+          alternating_group_id: exercise.alternatingGroupId,
           interval_assignment: exercise.intervalAssignment,
           hr_zone: exercise.advanced.hrZone.enabled ? exercise.advanced.hrZone.value : null,
           tempo: exercise.advanced.tempo.enabled ? exercise.advanced.tempo.value : null,
@@ -668,7 +766,26 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
             prescription_unit: variation.prescriptionUnit,
             load_value: variation.loadValue,
             load_mode: variation.loadMode,
+            set_prescriptions: variation.setPrescriptions?.map((set) => ({
+              set_index: set.setIndex,
+              prescription_value: set.prescriptionValue,
+              prescription_unit: set.prescriptionUnit,
+              load_value: set.loadValue,
+              load_mode: set.loadMode,
+              note: set.note,
+            })) ?? null,
+            load_progression: variation.loadProgression
+              ? {
+                  mode: variation.loadProgression.mode,
+                  direction: variation.loadProgression.direction,
+                  start_value: variation.loadProgression.startValue,
+                  start_mode: variation.loadProgression.startMode,
+                  step_value: variation.loadProgression.stepValue,
+                  per_set_values: variation.loadProgression.perSetValues,
+                }
+              : null,
             excluded: variation.excluded,
+            note: variation.note,
           })),
         })),
       })),
@@ -682,10 +799,13 @@ export function isSectionComplete(section: DraftSection): boolean {
   const ctx = FORMAT_EXERCISE_CONTEXT[section.format];
   const needsExercises = section.format !== "rest" && section.format !== "kcal_target";
 
-  if (needsExercises && section.exercises.length === 0) return false;
+  if (needsExercises && section.exercises.every((exercise) => exercise.itemType === "header")) {
+    return false;
+  }
 
   return section.exercises.every((exercise) => {
     if (!exercise.name) return false;
+    if (exercise.itemType === "header") return true;
     if (ctx.showSets && exercise.sets <= 0) return false;
     if (ctx.showPrescription && !ctx.prescriptionHint && !ctx.ladderPrescription && exercise.prescriptionValue <= 0) return false;
     return true;

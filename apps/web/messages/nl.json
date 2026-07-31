@@ -1796,7 +1796,7 @@
     "repetitionsPrescribedValue": "Vertegenwoordigers (voorgeschreven: {value})",
     "peakLabel": "Piek",
     "repetitionsUnit": "herhalingen",
-    "linearLoadProgression": "· {start}→{end}{unit} (+{step}{unit}/set)",
+    "linearLoadProgression": "· {start}→{end}{unit} ({step}{unit}/set)",
     "perSetLoadProgression": "· {values}{unit}",
     "loadWithUnit": "· {value} {unit}",
     "pyramidPrescription": "Piek {value} {unit}, ±{step}/ronde",
@@ -2333,6 +2333,23 @@
     "shareExportFormatOdt": "ODT",
     "shareExportFormatCsv": "CSV",
     "gridView8da0c5d": "Rasterweergave",
-    "listViewd5d2df9": "Lijstweergave"
+    "listViewd5d2df9": "Lijstweergave",
+    "reorderHeader": "Kop opnieuw ordenen",
+    "headerLabel": "Kop",
+    "headerTextPlaceholder": "Koptekst",
+    "headerNotePlaceholder": "Notitie bij kop",
+    "supersetLabel": "Superset",
+    "alternatingSetsLabel": "Afwisselende sets",
+    "selectExerciseForGrouping": "Oefening selecteren om te groeperen",
+    "selectedExerciseCount": "{count, plural, one {# geselecteerd} other {# geselecteerd}}",
+    "groupAsSuperset": "Groeperen als superset",
+    "groupAsAlternating": "Groeperen als afwisselende sets",
+    "clearGroup": "Groep opheffen",
+    "addHeader": "Kop toevoegen",
+    "progressiveLoadIncrease": "Progressieve belasting",
+    "progressiveLoadDecrease": "Progressieve deload",
+    "setDetailsLabel": "Setdetails",
+    "setNumberLabel": "Set {number}",
+    "setNotePlaceholder": "Setnotitie"
   }
 }

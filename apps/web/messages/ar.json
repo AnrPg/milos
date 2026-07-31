@@ -1796,7 +1796,7 @@
     "repetitionsPrescribedValue": "المندوبون (المحدد: {value})",
     "peakLabel": "الذروة",
     "repetitionsUnit": "ممثلين",
-    "linearLoadProgression": "· {start}→{end}{unit} (+{step}{unit}/مجموعة)",
+    "linearLoadProgression": "· {start}→{end}{unit} ({step}{unit}/مجموعة)",
     "perSetLoadProgression": "· {values}{unit}",
     "loadWithUnit": "· {value} {unit}",
     "pyramidPrescription": "الذروة {value} {unit}، ±{step}/جولة",
@@ -2333,6 +2333,23 @@
     "shareExportFormatOdt": "ODT",
     "shareExportFormatCsv": "CSV",
     "gridView8da0c5d": "عرض شبكي",
-    "listViewd5d2df9": "عرض قائمة"
+    "listViewd5d2df9": "عرض قائمة",
+    "reorderHeader": "إعادة ترتيب العنوان",
+    "headerLabel": "عنوان",
+    "headerTextPlaceholder": "نص العنوان",
+    "headerNotePlaceholder": "ملاحظة العنوان",
+    "supersetLabel": "مجموعة فائقة",
+    "alternatingSetsLabel": "مجموعات متناوبة",
+    "selectExerciseForGrouping": "اختر تمرينًا للتجميع",
+    "selectedExerciseCount": "{count, plural, one {تم اختيار #} other {تم اختيار #}}",
+    "groupAsSuperset": "تجميع كمجموعة فائقة",
+    "groupAsAlternating": "تجميع كمجموعات متناوبة",
+    "clearGroup": "إلغاء التجميع",
+    "addHeader": "إضافة عنوان",
+    "progressiveLoadIncrease": "حمل تصاعدي",
+    "progressiveLoadDecrease": "خفض تدريجي للحمل",
+    "setDetailsLabel": "تفاصيل المجموعات",
+    "setNumberLabel": "المجموعة {number}",
+    "setNotePlaceholder": "ملاحظة المجموعة"
   }
 }

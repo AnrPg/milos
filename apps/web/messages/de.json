@@ -1796,7 +1796,7 @@
     "repetitionsPrescribedValue": "Vertreter (vorgeschrieben: {value})",
     "peakLabel": "Höhepunkt",
     "repetitionsUnit": "Vertreter",
-    "linearLoadProgression": "· {start}→{end}{unit} (+{step}{unit}/Satz)",
+    "linearLoadProgression": "· {start}→{end}{unit} ({step}{unit}/Satz)",
     "perSetLoadProgression": "· {values}{unit}",
     "loadWithUnit": "· {value} {unit}",
     "pyramidPrescription": "Spitze {value} {unit}, ±{step}/Runde",
@@ -2333,6 +2333,23 @@
     "shareExportFormatOdt": "ODT",
     "shareExportFormatCsv": "CSV",
     "gridView8da0c5d": "Rasteransicht",
-    "listViewd5d2df9": "Listenansicht"
+    "listViewd5d2df9": "Listenansicht",
+    "reorderHeader": "Überschrift neu anordnen",
+    "headerLabel": "Überschrift",
+    "headerTextPlaceholder": "Überschrift",
+    "headerNotePlaceholder": "Notiz zur Überschrift",
+    "supersetLabel": "Supersatz",
+    "alternatingSetsLabel": "Wechselsätze",
+    "selectExerciseForGrouping": "Übung zum Gruppieren auswählen",
+    "selectedExerciseCount": "{count, plural, one {# ausgewählt} other {# ausgewählt}}",
+    "groupAsSuperset": "Als Supersatz gruppieren",
+    "groupAsAlternating": "Als Wechselsätze gruppieren",
+    "clearGroup": "Gruppe aufheben",
+    "addHeader": "Überschrift hinzufügen",
+    "progressiveLoadIncrease": "Progressive Belastung",
+    "progressiveLoadDecrease": "Progressive Entlastung",
+    "setDetailsLabel": "Satzdetails",
+    "setNumberLabel": "Satz {number}",
+    "setNotePlaceholder": "Satznotiz"
   }
 }

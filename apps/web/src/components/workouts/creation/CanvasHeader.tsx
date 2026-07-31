@@ -68,12 +68,13 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
       const ctx = FORMAT_EXERCISE_CONTEXT[section.format];
       const sectionLabel = section.name.trim() || i18n("sectionValue0dd4f8fb", {value0: sectionIndex + 1});
       const needsExercises = section.format !== "rest" && section.format !== "kcal_target";
+      const executableExercises = section.exercises.filter((exercise) => exercise.itemType !== "header");
   
       if (!section.name.trim()) {
         messages.push(i18n("value0AddASectionName252e49c", {value0: sectionLabel}));
       }
   
-      if (needsExercises && section.exercises.length === 0) {
+      if (needsExercises && executableExercises.length === 0) {
         messages.push(i18n("value0AddAtLeastOneExercise3ce2e7a", {value0: sectionLabel}));
       }
   
@@ -83,6 +84,8 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
         if (!exercise.name.trim()) {
           messages.push(i18n("value0Value1NeedsANamedc0e3ad", {value0: sectionLabel, value1: exerciseLabel}));
         }
+
+        if (exercise.itemType === "header") return;
   
         if (ctx.showSets && exercise.sets <= 0) {
           messages.push(i18n("value0Value1NeedsSets042ee99", {value0: sectionLabel, value1: exerciseLabel}));

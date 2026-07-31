@@ -1796,7 +1796,7 @@
     "repetitionsPrescribedValue": "נציגים (מומלץ: {value})",
     "peakLabel": "שיא",
     "repetitionsUnit": "חזרות",
-    "linearLoadProgression": "· {start}→{end}{unit} (+{step}{unit}/סט)",
+    "linearLoadProgression": "· {start}→{end}{unit} ({step}{unit}/סט)",
     "perSetLoadProgression": "· {values}{unit}",
     "loadWithUnit": "· {value} {unit}",
     "pyramidPrescription": "שיא {value} {unit}, ±{step}/סיבוב",
@@ -2333,6 +2333,23 @@
     "shareExportFormatOdt": "ODT",
     "shareExportFormatCsv": "CSV",
     "gridView8da0c5d": "תצוגת רשת",
-    "listViewd5d2df9": "תצוגת רשימה"
+    "listViewd5d2df9": "תצוגת רשימה",
+    "reorderHeader": "שינוי סדר הכותרת",
+    "headerLabel": "כותרת",
+    "headerTextPlaceholder": "טקסט הכותרת",
+    "headerNotePlaceholder": "הערת כותרת",
+    "supersetLabel": "סופרסט",
+    "alternatingSetsLabel": "סטים מתחלפים",
+    "selectExerciseForGrouping": "בחירת תרגיל לקיבוץ",
+    "selectedExerciseCount": "{count, plural, one {# נבחר} other {# נבחרו}}",
+    "groupAsSuperset": "קיבוץ כסופרסט",
+    "groupAsAlternating": "קיבוץ כסטים מתחלפים",
+    "clearGroup": "ביטול קיבוץ",
+    "addHeader": "הוספת כותרת",
+    "progressiveLoadIncrease": "עומס מתקדם",
+    "progressiveLoadDecrease": "הפחתת עומס מתקדמת",
+    "setDetailsLabel": "פרטי הסטים",
+    "setNumberLabel": "סט {number}",
+    "setNotePlaceholder": "הערת סט"
   }
 }

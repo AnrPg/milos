@@ -1796,7 +1796,7 @@
     "repetitionsPrescribedValue": "Επανάληψη (συνταγογραφείται: {value})",
     "peakLabel": "Κορυφή",
     "repetitionsUnit": "επαναλήψεις",
-    "linearLoadProgression": "· {start}→{end}{unit} (+{step}{unit}/σύνολο)",
+    "linearLoadProgression": "· {start}→{end}{unit} ({step}{unit}/σύνολο)",
     "perSetLoadProgression": "· {values}{unit}",
     "loadWithUnit": "· {value} {unit}",
     "pyramidPrescription": "Κορυφή {value} {unit}, ±{step}/γύρος",
@@ -2333,6 +2333,23 @@
     "shareExportFormatOdt": "ODT",
     "shareExportFormatCsv": "CSV",
     "gridView8da0c5d": "Προβολή πλέγματος",
-    "listViewd5d2df9": "Προβολή λίστας"
+    "listViewd5d2df9": "Προβολή λίστας",
+    "reorderHeader": "Αναδιάταξη κεφαλίδας",
+    "headerLabel": "Κεφαλίδα",
+    "headerTextPlaceholder": "Κείμενο κεφαλίδας",
+    "headerNotePlaceholder": "Σημείωση κεφαλίδας",
+    "supersetLabel": "Superset",
+    "alternatingSetsLabel": "Εναλλασσόμενα σετ",
+    "selectExerciseForGrouping": "Επιλογή άσκησης για ομαδοποίηση",
+    "selectedExerciseCount": "{count, plural, one {# επιλεγμένη} other {# επιλεγμένες}}",
+    "groupAsSuperset": "Ομαδοποίηση ως superset",
+    "groupAsAlternating": "Ομαδοποίηση ως εναλλασσόμενα σετ",
+    "clearGroup": "Καθαρισμός ομάδας",
+    "addHeader": "Προσθήκη κεφαλίδας",
+    "progressiveLoadIncrease": "Προοδευτική αύξηση φορτίου",
+    "progressiveLoadDecrease": "Προοδευτική μείωση φορτίου",
+    "setDetailsLabel": "Λεπτομέρειες σετ",
+    "setNumberLabel": "Σετ {number}",
+    "setNotePlaceholder": "Σημείωση σετ"
   }
 }
