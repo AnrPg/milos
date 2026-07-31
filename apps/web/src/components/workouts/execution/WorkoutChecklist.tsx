@@ -8,13 +8,17 @@
 import {useUiTranslations} from "@/i18n/ui";
 import { semanticLabel } from "@/i18n/presentation";
 import type { TimerSegment } from "@/api/executions";
-import { buildStepId } from "./progress";
+import { buildSegmentStepDefinitions } from "./progress";
 
 export type ChecklistStep = {
   stepId: string;
   stepLabel: string | null;
   exerciseId: string;
   exercise: TimerSegment["exercises"][number];
+  setNumber: number;
+  setPrescription: ReturnType<typeof buildSegmentStepDefinitions>[number]["setPrescription"];
+  groupKind: "superset" | "alternating" | null;
+  groupId: string | null;
 };
 
 type Props = {
@@ -25,18 +29,16 @@ type Props = {
 };
 
 export function buildChecklistSteps(segment: TimerSegment): ChecklistStep[] {
-  return segment.exercises
-    .filter((exercise) => !exercise.excluded)
-    .flatMap((exercise) => {
-      const setCount = exercise.sets && exercise.sets > 1 ? exercise.sets : 1;
-
-      return Array.from({ length: setCount }, (_, index) => ({
-        stepId: buildStepId(segment, exercise, setCount, index + 1),
-        stepLabel: setCount > 1 ? `${index + 1}/${setCount}` : null,
-        exerciseId: exercise.id,
-        exercise,
-      }));
-    });
+  return buildSegmentStepDefinitions(segment).map((step) => ({
+    stepId: step.stepId,
+    stepLabel: step.setCount > 1 ? `${step.setNumber}/${step.setCount}` : null,
+    exerciseId: step.exercise.id,
+    exercise: step.exercise,
+    setNumber: step.setNumber,
+    setPrescription: step.setPrescription,
+    groupKind: step.groupKind,
+    groupId: step.groupId,
+  }));
 }
 
 export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModify }: Props) {
@@ -59,17 +61,23 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
     (s) => !checkedExerciseIds.includes(s.stepId) && !checkedExerciseIds.includes(s.exerciseId),
   ) ?? null;
 
-  const { exercise } = currentStep ?? steps[steps.length - 1]!;
+  const activeStep = currentStep ?? steps[steps.length - 1]!;
+  const { exercise } = activeStep;
 
-  const prescriptionLabel = exercise.prescription_value
-    ? (exercise.prescription_value) + " " + semanticLabel(exercise.prescription_unit ?? "reps", i18n)
+  const prescriptionValue = activeStep.setPrescription?.prescription_value ?? exercise.prescription_value;
+  const prescriptionUnit = activeStep.setPrescription?.prescription_unit ?? exercise.prescription_unit;
+  const loadValue = activeStep.setPrescription?.load_value ?? exercise.load_value;
+  const loadMode = activeStep.setPrescription?.load_mode ?? exercise.load_mode;
+
+  const prescriptionLabel = prescriptionValue
+    ? (prescriptionValue) + " " + semanticLabel(prescriptionUnit ?? "reps", i18n)
     : null;
 
-  const loadLabel = exercise.load_value
-    ? exercise.load_mode === "pct_1rm"
-      ? (exercise.load_value) + i18n("rma904756")
-      : (exercise.load_value) + " " + semanticLabel("kg", i18n)
-    : exercise.load_mode === "bw"
+  const loadLabel = loadValue
+    ? loadMode === "pct_1rm"
+      ? (loadValue) + i18n("rma904756")
+      : (loadValue) + " " + semanticLabel("kg", i18n)
+    : loadMode === "bw"
       ? i18n("bw4d64743")
       : null;
 
@@ -83,6 +91,12 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
         </span>
         <span>{doneCount}/{steps.length} {i18n("donee5fd9cf")}</span>
       </div>
+
+      {segment.section_note ? (
+        <div className="text-xs italic" style={{ color: "var(--muted)" }}>
+          {segment.section_note}
+        </div>
+      ) : null}
 
       {allDone ? (
         <div
@@ -120,6 +134,11 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
                   {i18n("setLabel")} {currentStep.stepLabel}
                 </p>
               )}
+              {activeStep.groupKind ? (
+                <p className="mt-1 text-xs font-bold uppercase" style={{ color: activeStep.groupKind === "superset" ? "var(--primary)" : "var(--info)" }}>
+                  {activeStep.groupKind === "superset" ? i18n("supersetLabel") : i18n("alternatingSetsLabel")}
+                </p>
+              ) : null}
               {(prescriptionLabel ?? loadLabel) && (
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {prescriptionLabel && (
@@ -140,6 +159,16 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
                   )}
                 </div>
               )}
+              {exercise.note ? (
+                <p className="mt-2 text-xs italic" style={{ color: "var(--muted)" }}>
+                  {exercise.note}
+                </p>
+              ) : null}
+              {activeStep.setPrescription?.note ? (
+                <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
+                  {activeStep.setPrescription.note}
+                </p>
+              ) : null}
             </div>
 
             <button

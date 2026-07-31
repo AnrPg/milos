@@ -11,6 +11,7 @@ import type { ExerciseModification } from "@/api/executions";
 import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
 import { semanticLabel } from "@/i18n/presentation";
+import { buildSegmentStepDefinitions } from "./progress";
 
 type SectionScore = {
   section_id: string;
@@ -220,6 +221,8 @@ type ExpandedWorkoutRow = {
   setIndex: number | null;
   exerciseId: string;
   exerciseName: string;
+  groupKind: "superset" | "alternating" | null;
+  note: string | null;
   fields: EditableField[];
 };
 
@@ -255,12 +258,15 @@ function buildExpandedRows(segments: TimerSegment[], i18n: ReturnType<typeof use
   let rowIndex = 1;
 
   for (const segment of segments) {
-    for (const exercise of segment.exercises ?? []) {
-      if (exercise.excluded) continue;
-
-      const setCount = Math.max(1, exercise.sets ?? 1);
-
-      for (let setIndex = 1; setIndex <= setCount; setIndex += 1) {
+    for (const step of buildSegmentStepDefinitions(segment)) {
+      const exercise = step.exercise;
+      const setIndex = step.setNumber;
+      const prescriptionValue =
+        step.setPrescription?.prescription_value ?? exercise.prescription_value;
+      const prescriptionUnit =
+        step.setPrescription?.prescription_unit ?? exercise.prescription_unit;
+      const loadValue = step.setPrescription?.load_value ?? exercise.load_value;
+      const loadMode = step.setPrescription?.load_mode ?? exercise.load_mode;
         const fields: EditableField[] = [
           {
             field: "exercise_name",
@@ -270,22 +276,22 @@ function buildExpandedRows(segments: TimerSegment[], i18n: ReturnType<typeof use
           },
         ];
 
-        if (exercise.prescription_value != null) {
+        if (prescriptionValue != null) {
           fields.push({
             field: "reps",
-            label: semanticLabel(exercise.prescription_unit ?? "reps", i18n),
-            canonicalValue: exercise.prescription_value,
-            unit: exercise.prescription_unit ?? "reps",
+            label: semanticLabel(prescriptionUnit ?? "reps", i18n),
+            canonicalValue: prescriptionValue,
+            unit: prescriptionUnit ?? "reps",
             inputMode: "decimal",
           });
         }
 
-        if (exercise.load_value != null) {
+        if (loadValue != null) {
           fields.push({
             field: "load",
-            label: exercise.load_mode === "pct_1rm" ? i18n("percentOneRepMaxUnit") : i18n("kilogramsUnit"),
-            canonicalValue: exercise.load_value,
-            unit: exercise.load_mode === "pct_1rm" ? "%" : "kg",
+            label: loadMode === "pct_1rm" ? i18n("percentOneRepMaxUnit") : i18n("kilogramsUnit"),
+            canonicalValue: loadValue,
+            unit: loadMode === "pct_1rm" ? "%" : "kg",
             inputMode: "decimal",
           });
         }
@@ -300,10 +306,11 @@ function buildExpandedRows(segments: TimerSegment[], i18n: ReturnType<typeof use
           setIndex,
           exerciseId: exercise.id,
           exerciseName: exercise.name,
+          groupKind: step.groupKind,
+          note: step.setPrescription?.note ?? exercise.note ?? null,
           fields,
         });
         rowIndex += 1;
-      }
     }
   }
 
@@ -483,6 +490,11 @@ function ModificationsEditorStep({
                             {row.setIndex ? `${i18n("setLabel")} ${row.setIndex} · ` : ""}
                             {row.exerciseName}
                           </p>
+                          {row.groupKind ? (
+                            <span className="text-[10px] font-bold uppercase" style={{ color: row.groupKind === "superset" ? "var(--primary)" : "var(--info)" }}>
+                              {row.groupKind === "superset" ? i18n("supersetLabel") : i18n("alternatingSetsLabel")}
+                            </span>
+                          ) : null}
                           <button
                             type="button"
                             className="shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold"
@@ -556,6 +568,11 @@ function ModificationsEditorStep({
                             );
                           })}
                         </div>
+                        {row.note ? (
+                          <p className="mt-2 text-xs italic" style={{ color: "var(--muted)" }}>
+                            {row.note}
+                          </p>
+                        ) : null}
                       </div>
                     );
                   })}
