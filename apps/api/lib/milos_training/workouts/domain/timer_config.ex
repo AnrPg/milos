@@ -3,14 +3,7 @@ defmodule MilosTraining.Workouts.Domain.TimerConfig do
   Pure validation and normalization for workout section timer configuration.
   """
 
-  @types ~w(
-    untimed for_time train_to_exhaustion kcal_target
-    emom complex_emom even_odd billat
-    amrap edt death_by
-    tabata custom_hiit cluster hrr
-    ladder_ascending ladder_descending pyramid
-    rest
-  )
+  alias MilosTraining.Workouts.Domain.WorkoutDsl.Vocabulary
 
   @valid_scoring_modes ~w(for_time for_quality amrap to_failure)
   @valid_amrap_scoring_styles ~w(grand_total lowest_window)
@@ -30,7 +23,9 @@ defmodule MilosTraining.Workouts.Domain.TimerConfig do
   def normalize(_config), do: {:error, "must be an object"}
 
   defp validate_type(type) do
-    if type in @types, do: :ok, else: {:error, "has unsupported timer type"}
+    if Vocabulary.valid_section_format?(type),
+      do: :ok,
+      else: {:error, "has unsupported timer type"}
   end
 
   defp validate_required_fields(type, config) do
@@ -49,36 +44,8 @@ defmodule MilosTraining.Workouts.Domain.TimerConfig do
     end
   end
 
-  defp required_fields("untimed"), do: []
-  defp required_fields("for_time"), do: []
-  defp required_fields("train_to_exhaustion"), do: []
-  defp required_fields("kcal_target"), do: []
-  defp required_fields("emom"), do: [:duration_seconds, :interval_seconds]
-  defp required_fields("complex_emom"), do: [:duration_seconds, :interval_seconds]
-  defp required_fields("even_odd"), do: [:duration_seconds]
-  defp required_fields("billat"), do: [:work_seconds, :rest_seconds, :cycles]
-  defp required_fields("amrap"), do: [:duration_seconds]
-  defp required_fields("edt"), do: [:duration_seconds]
-  defp required_fields("death_by"), do: [:start_reps, :step_reps]
-  defp required_fields("tabata"), do: [:work_seconds, :rest_seconds, :rounds]
-  defp required_fields("custom_hiit"), do: [:work_seconds, :rest_seconds, :rounds]
-  defp required_fields("cluster"), do: [:intra_rest_seconds, :sets]
-  defp required_fields("hrr"), do: [:effort_seconds]
-  defp required_fields("ladder_ascending"), do: [:start_reps, :step_reps]
-  defp required_fields("ladder_descending"), do: [:start_reps, :step_reps, :min_reps]
-  defp required_fields("pyramid"), do: [:peak_reps, :step_reps]
-  defp required_fields("rest"), do: [:duration_seconds]
-
-  defp optional_fields("for_time"), do: [:time_cap_seconds]
-  defp optional_fields("train_to_exhaustion"), do: [:rest_seconds]
-  defp optional_fields("kcal_target"), do: [:kcal_target, :time_cap_seconds]
-  defp optional_fields("emom"), do: [:scoring_mode, :max_windows]
-  defp optional_fields("complex_emom"), do: [:scoring_mode, :amrap_scoring_style, :max_windows]
-  defp optional_fields("edt"), do: [:pr_zone_rounds]
-  defp optional_fields("death_by"), do: [:ladder_cap]
-  defp optional_fields("ladder_ascending"), do: [:ladder_cap]
-  defp optional_fields("hrr"), do: [:hr_zone]
-  defp optional_fields(_type), do: []
+  defp required_fields(type), do: Vocabulary.required_timer_fields(type)
+  defp optional_fields(type), do: Vocabulary.optional_timer_fields(type)
 
   defp validate_optional_fields("emom", config) do
     validate_enum_field(config, :scoring_mode, @valid_scoring_modes)
