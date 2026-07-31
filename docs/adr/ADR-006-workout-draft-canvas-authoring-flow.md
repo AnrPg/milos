@@ -80,6 +80,7 @@ canvas on `/admin/workouts/new`, with debounced autosave, live preview, scale
 variation editing, and a mobile drill-down layout.
 
 Desktop section sorting and in-section exercise sorting shipped as planned.
-Cross-section exercise drag on desktop was deferred; the current release
-supports cross-section moves through the advanced panel's explicit "Move to
-section" action, which also covers mobile.
+Cross-section exercise drag on desktop was initially deferred, then completed
+on 2026-07-31 by retaining drag-start metadata while hover opens the destination
+section. The advanced panel's explicit "Move to section" action remains
+available and continues to cover mobile.

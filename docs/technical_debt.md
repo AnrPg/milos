@@ -7,7 +7,9 @@ the original wording and dates for traceability.
 
 | ID | Status |
 |---|---|
-| TD-001–TD-005 | Open |
+| TD-001–TD-002 | Open |
+| TD-003 | Resolved |
+| TD-004–TD-005 | Open |
 | TD-006 | Resolved |
 | TD-007–TD-008 | Open |
 | TD-009 | Resolved |
@@ -33,7 +35,7 @@ the original wording and dates for traceability.
 |---|---|---|---|---|---|
 | TD-001 | Phase 0 | Stripe payment gateway integration | Manual-only in v1 per spec | Medium | 2026-06-05 |
 | TD-002 | Phase 2 | Admin UI does not yet author nested sub-sections despite backend support for `parent_section_id` | Phase 2 shipped the flat linear editor first to keep the core creation/materialization flow stable | Medium | 2026-06-05 |
-| TD-003 | Phase 2 | Workout canvas does not yet support desktop cross-section exercise drag-hover moves | Phase 2 shipped sortable sections, sortable in-section exercises, and explicit move-to-section controls first to keep the authoring flow stable | Medium | 2026-06-07 |
+| TD-003 | Phase 2 | Resolved 2026-07-31: desktop cross-section exercise drag-hover moves preserve drag-start metadata while the destination section opens, so dropping reliably moves the exercise | Kept in the ledger for traceability of the original explicit-move-only fallback | Low | 2026-06-07 |
 | TD-004 | Phase 3 | Schedule UI uses a custom responsive day-column calendar instead of `react-big-calendar` | Phase 3 avoided introducing an additional date-localizer dependency while shipping the booking and approval flow end-to-end | Medium | 2026-06-08 |
 | TD-005 | Phase 3 | Admin cannot delete a slot that already has bookings; backend blocks deletion instead of offering a confirm-and-cancel/archive flow | Phase 3 chose safe non-destructive behavior first to avoid silently dropping booking history or member state | Medium | 2026-06-08 |
 | TD-006 | Phase 7 | Landing-page membership card has no live data source yet and remains hidden unless membership fields are added in a later phase | Membership persistence and admin financial tooling have not been implemented yet, so Phase 7 could only ship the optional UI slot and read-model placeholder | Medium | 2026-06-09 |
