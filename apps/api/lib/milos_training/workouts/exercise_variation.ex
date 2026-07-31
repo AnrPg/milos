@@ -103,6 +103,8 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
 
   defp blank?(nil), do: true
   defp blank?(""), do: true
+  defp blank?([]), do: true
+  defp blank?(value) when is_map(value), do: map_size(value) == 0
   defp blank?(_value), do: false
 
   defp validate_bounded_metadata(changeset) do
