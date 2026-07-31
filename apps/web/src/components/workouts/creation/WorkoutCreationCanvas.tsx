@@ -36,6 +36,10 @@ import { MobileCanvas } from "./MobileCanvas";
 import { MiddlePanel } from "./MiddlePanel";
 import { RightPanel } from "./RightPanel";
 import { ShortcutsModal } from "./ShortcutsModal";
+import {
+  resolveWorkoutDragEnd,
+  type WorkoutDragData,
+} from "./workout-drag";
 
 const AUTOSAVE_DELAY_MS = 1500;
 
@@ -178,6 +182,10 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
   const [overlayInitPos, setOverlayInitPos] = useState({ x: -9999, y: -9999 });
   // Original selected section at drag start — restored if drag is cancelled
   const dragOriginalSectionIdRef = useRef<string | null>(null);
+  // Hovering a destination section swaps the MiddlePanel and unmounts the source
+  // exercise card. Keep its metadata independently because dnd-kit may then clear
+  // active.data before onDragEnd fires.
+  const dragStartDataRef = useRef<WorkoutDragData | null>(null);
   // Guard against autosaving before the draft data has been loaded from the API
   const draftLoadedRef = useRef(false);
   const [editorSessionId] = useState(() =>
@@ -394,6 +402,14 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
     const dragType = active.data.current?.type as "section" | "exercise" | undefined;
     if (!dragType) return;
 
+    dragStartDataRef.current =
+      dragType === "exercise"
+        ? {
+            type: "exercise",
+            sectionId: active.data.current?.sectionId as string,
+          }
+        : { type: "section" };
+
     // Remember which section was active so we can restore it if the drag is cancelled
     dragOriginalSectionIdRef.current = selectedSectionId;
 
@@ -443,51 +459,44 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
       if (dragOriginalSectionIdRef.current) {
         selectSection(dragOriginalSectionIdRef.current);
       }
+      dragStartDataRef.current = null;
       return;
     }
 
-    const activeType = active.data.current?.type as string | undefined;
-    const overType = over.data.current?.type as string | undefined;
+    const operation = resolveWorkoutDragEnd({
+      activeId: active.id as string,
+      activeData: active.data.current,
+      dragStartData: dragStartDataRef.current,
+      overId: over.id as string,
+      overData: over.data.current,
+    });
+    dragStartDataRef.current = null;
 
-    if (activeType === "section") {
-      if (overType === "section") {
-        reorderSections(active.id as string, over.id as string);
-      }
-      return;
-    }
+    if (operation.type === "reorder-section") {
+      reorderSections(operation.fromSectionId, operation.toSectionId);
+    } else if (operation.type === "move-exercise") {
+      moveExercise(operation.exerciseId, operation.fromSectionId, operation.toSectionId);
+      selectSection(operation.toSectionId);
+    } else if (operation.type === "reorder-exercise") {
+      reorderExercises(
+        operation.sectionId,
+        operation.fromExerciseId,
+        operation.toExerciseId,
+      );
 
-    if (activeType === "exercise") {
-      const activeSectionId = active.data.current?.sectionId as string;
-
-      if (overType === "section") {
-        const targetSectionId = over.id as string;
-        if (activeSectionId !== targetSectionId) {
-          moveExercise(active.id as string, activeSectionId, targetSectionId);
-          selectSection(targetSectionId);
-        }
-        return;
-      }
-
-      if (overType === "exercise") {
-        const overSectionId = over.data.current?.sectionId as string;
-
-        if (activeSectionId === overSectionId) {
-          reorderExercises(activeSectionId, active.id as string, over.id as string);
-
-          // In complex_emom / even_odd, crossing group boundaries updates intervalAssignment
-          const section = sections.find((s) => s.localId === activeSectionId);
-          if (section && (section.format === "even_odd" || section.format === "complex_emom")) {
-            const activeEx = section.exercises.find((e) => e.localId === active.id);
-            const overEx = section.exercises.find((e) => e.localId === over.id);
-            if (activeEx && overEx && activeEx.intervalAssignment !== overEx.intervalAssignment) {
-              updateExercise(activeSectionId, active.id as string, {
-                intervalAssignment: overEx.intervalAssignment,
-              });
-            }
-          }
-        } else {
-          moveExercise(active.id as string, activeSectionId, overSectionId);
-          selectSection(overSectionId);
+      // In complex_emom / even_odd, crossing group boundaries updates intervalAssignment.
+      const section = sections.find((item) => item.localId === operation.sectionId);
+      if (section && (section.format === "even_odd" || section.format === "complex_emom")) {
+        const activeEx = section.exercises.find(
+          (exercise) => exercise.localId === operation.fromExerciseId,
+        );
+        const overEx = section.exercises.find(
+          (exercise) => exercise.localId === operation.toExerciseId,
+        );
+        if (activeEx && overEx && activeEx.intervalAssignment !== overEx.intervalAssignment) {
+          updateExercise(operation.sectionId, operation.fromExerciseId, {
+            intervalAssignment: overEx.intervalAssignment,
+          });
         }
       }
     }
