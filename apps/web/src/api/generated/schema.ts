@@ -4148,6 +4148,8 @@ export interface operations {
                 content: {
                     "application/json": {
                         workout: {
+                            /** @enum {string} */
+                            authoring_mode?: "structured" | "quick_text";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -4163,6 +4165,13 @@ export interface operations {
                             draft_data?: {
                                 [key: string]: unknown;
                             } | null;
+                            dsl_document?: {
+                                [key: string]: unknown;
+                            } | null;
+                            dsl_source?: string | null;
+                            dsl_source_revision?: number;
+                            /** @enum {integer|null} */
+                            dsl_version?: 1 | null;
                             equipment?: string[];
                             estimated_duration_seconds?: number | null;
                             /** Format: uuid */
@@ -4170,6 +4179,16 @@ export interface operations {
                             /** Format: date-time */
                             inserted_at?: string | null;
                             is_team_workout?: boolean;
+                            last_dsl_diagnostics?: {
+                                code: string;
+                                column: number;
+                                line: number;
+                                params: {
+                                    [key: string]: unknown;
+                                };
+                                /** @enum {string} */
+                                severity: "error" | "warning";
+                            }[];
                             notes?: {
                                 body: string;
                                 document?: {
@@ -5938,6 +5957,9 @@ export interface operations {
                     description?: string | null;
                     /** @enum {string|null} */
                     difficulty?: "beginner" | "intermediate" | "advanced" | "all-levels" | null;
+                    draft_data?: {
+                        [key: string]: unknown;
+                    } | null;
                     dsl_document?: {
                         [key: string]: unknown;
                     } | null;
@@ -5948,7 +5970,18 @@ export interface operations {
                     editor_session_id?: string | null;
                     equipment?: string[];
                     estimated_duration_seconds?: number | null;
+                    expected_source_revision?: number | null;
                     is_team_workout?: boolean;
+                    last_dsl_diagnostics?: {
+                        code: string;
+                        column: number;
+                        line: number;
+                        params: {
+                            [key: string]: unknown;
+                        };
+                        /** @enum {string} */
+                        severity: "error" | "warning";
+                    }[];
                     notes?: {
                         body: string;
                         document?: {
@@ -6420,6 +6453,8 @@ export interface operations {
                 content: {
                     "application/json": {
                         workout: {
+                            /** @enum {string} */
+                            authoring_mode?: "structured" | "quick_text";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -6435,6 +6470,13 @@ export interface operations {
                             draft_data?: {
                                 [key: string]: unknown;
                             } | null;
+                            dsl_document?: {
+                                [key: string]: unknown;
+                            } | null;
+                            dsl_source?: string | null;
+                            dsl_source_revision?: number;
+                            /** @enum {integer|null} */
+                            dsl_version?: 1 | null;
                             equipment?: string[];
                             estimated_duration_seconds?: number | null;
                             /** Format: uuid */
@@ -6442,6 +6484,16 @@ export interface operations {
                             /** Format: date-time */
                             inserted_at?: string | null;
                             is_team_workout?: boolean;
+                            last_dsl_diagnostics?: {
+                                code: string;
+                                column: number;
+                                line: number;
+                                params: {
+                                    [key: string]: unknown;
+                                };
+                                /** @enum {string} */
+                                severity: "error" | "warning";
+                            }[];
                             notes?: {
                                 body: string;
                                 document?: {
@@ -7687,6 +7739,8 @@ export interface operations {
                 content: {
                     "application/json": {
                         workout: {
+                            /** @enum {string} */
+                            authoring_mode?: "structured" | "quick_text";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -7702,6 +7756,13 @@ export interface operations {
                             draft_data?: {
                                 [key: string]: unknown;
                             } | null;
+                            dsl_document?: {
+                                [key: string]: unknown;
+                            } | null;
+                            dsl_source?: string | null;
+                            dsl_source_revision?: number;
+                            /** @enum {integer|null} */
+                            dsl_version?: 1 | null;
                             equipment?: string[];
                             estimated_duration_seconds?: number | null;
                             /** Format: uuid */
@@ -7709,6 +7770,16 @@ export interface operations {
                             /** Format: date-time */
                             inserted_at?: string | null;
                             is_team_workout?: boolean;
+                            last_dsl_diagnostics?: {
+                                code: string;
+                                column: number;
+                                line: number;
+                                params: {
+                                    [key: string]: unknown;
+                                };
+                                /** @enum {string} */
+                                severity: "error" | "warning";
+                            }[];
                             notes?: {
                                 body: string;
                                 document?: {
@@ -8402,6 +8473,8 @@ export interface operations {
                 content: {
                     "application/json": {
                         scales: {
+                            /** @enum {string} */
+                            authoring_mode?: "structured" | "quick_text";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -8417,6 +8490,13 @@ export interface operations {
                             draft_data?: {
                                 [key: string]: unknown;
                             } | null;
+                            dsl_document?: {
+                                [key: string]: unknown;
+                            } | null;
+                            dsl_source?: string | null;
+                            dsl_source_revision?: number;
+                            /** @enum {integer|null} */
+                            dsl_version?: 1 | null;
                             equipment?: string[];
                             estimated_duration_seconds?: number | null;
                             /** Format: uuid */
@@ -8424,6 +8504,16 @@ export interface operations {
                             /** Format: date-time */
                             inserted_at?: string | null;
                             is_team_workout?: boolean;
+                            last_dsl_diagnostics?: {
+                                code: string;
+                                column: number;
+                                line: number;
+                                params: {
+                                    [key: string]: unknown;
+                                };
+                                /** @enum {string} */
+                                severity: "error" | "warning";
+                            }[];
                             notes?: {
                                 body: string;
                                 document?: {
@@ -8896,6 +8986,8 @@ export interface operations {
                             };
                         }[];
                         workout: {
+                            /** @enum {string} */
+                            authoring_mode?: "structured" | "quick_text";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -8911,6 +9003,13 @@ export interface operations {
                             draft_data?: {
                                 [key: string]: unknown;
                             } | null;
+                            dsl_document?: {
+                                [key: string]: unknown;
+                            } | null;
+                            dsl_source?: string | null;
+                            dsl_source_revision?: number;
+                            /** @enum {integer|null} */
+                            dsl_version?: 1 | null;
                             equipment?: string[];
                             estimated_duration_seconds?: number | null;
                             /** Format: uuid */
@@ -8918,6 +9017,16 @@ export interface operations {
                             /** Format: date-time */
                             inserted_at?: string | null;
                             is_team_workout?: boolean;
+                            last_dsl_diagnostics?: {
+                                code: string;
+                                column: number;
+                                line: number;
+                                params: {
+                                    [key: string]: unknown;
+                                };
+                                /** @enum {string} */
+                                severity: "error" | "warning";
+                            }[];
                             notes?: {
                                 body: string;
                                 document?: {
@@ -11390,6 +11499,9 @@ export interface operations {
                     description?: string | null;
                     /** @enum {string|null} */
                     difficulty?: "beginner" | "intermediate" | "advanced" | "all-levels" | null;
+                    draft_data?: {
+                        [key: string]: unknown;
+                    } | null;
                     dsl_document?: {
                         [key: string]: unknown;
                     } | null;
@@ -11400,7 +11512,18 @@ export interface operations {
                     editor_session_id?: string | null;
                     equipment?: string[];
                     estimated_duration_seconds?: number | null;
+                    expected_source_revision?: number | null;
                     is_team_workout?: boolean;
+                    last_dsl_diagnostics?: {
+                        code: string;
+                        column: number;
+                        line: number;
+                        params: {
+                            [key: string]: unknown;
+                        };
+                        /** @enum {string} */
+                        severity: "error" | "warning";
+                    }[];
                     notes?: {
                         body: string;
                         document?: {

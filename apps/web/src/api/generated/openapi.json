@@ -4591,6 +4591,13 @@
                     "workout": {
                       "additionalProperties": false,
                       "properties": {
+                        "authoring_mode": {
+                          "enum": [
+                            "structured",
+                            "quick_text"
+                          ],
+                          "type": "string"
+                        },
                         "available_scale_levels": {
                           "items": {
                             "additionalProperties": false,
@@ -4636,6 +4643,26 @@
                           "nullable": true,
                           "type": "object"
                         },
+                        "dsl_document": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "dsl_source": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "dsl_source_revision": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "dsl_version": {
+                          "enum": [
+                            1
+                          ],
+                          "nullable": true,
+                          "type": "integer"
+                        },
                         "equipment": {
                           "items": {
                             "type": "string"
@@ -4657,6 +4684,45 @@
                         },
                         "is_team_workout": {
                           "type": "boolean"
+                        },
+                        "last_dsl_diagnostics": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "column": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "line": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "params": {
+                                "additionalProperties": true,
+                                "type": "object"
+                              },
+                              "severity": {
+                                "enum": [
+                                  "error",
+                                  "warning"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "code",
+                              "severity",
+                              "line",
+                              "column",
+                              "params"
+                            ],
+                            "title": "WorkoutDslDiagnostic",
+                            "type": "object"
+                          },
+                          "type": "array"
                         },
                         "notes": {
                           "items": {
@@ -9193,6 +9259,11 @@
                     "nullable": true,
                     "type": "string"
                   },
+                  "draft_data": {
+                    "additionalProperties": true,
+                    "nullable": true,
+                    "type": "object"
+                  },
                   "dsl_document": {
                     "additionalProperties": true,
                     "nullable": true,
@@ -9225,8 +9296,52 @@
                     "nullable": true,
                     "type": "integer"
                   },
+                  "expected_source_revision": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
                   "is_team_workout": {
                     "type": "boolean"
+                  },
+                  "last_dsl_diagnostics": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "column": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "line": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "params": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "severity": {
+                          "enum": [
+                            "error",
+                            "warning"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "severity",
+                        "line",
+                        "column",
+                        "params"
+                      ],
+                      "title": "WorkoutDslDiagnostic",
+                      "type": "object"
+                    },
+                    "type": "array"
                   },
                   "notes": {
                     "items": {
@@ -10962,6 +11077,13 @@
                     "workout": {
                       "additionalProperties": false,
                       "properties": {
+                        "authoring_mode": {
+                          "enum": [
+                            "structured",
+                            "quick_text"
+                          ],
+                          "type": "string"
+                        },
                         "available_scale_levels": {
                           "items": {
                             "additionalProperties": false,
@@ -11007,6 +11129,26 @@
                           "nullable": true,
                           "type": "object"
                         },
+                        "dsl_document": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "dsl_source": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "dsl_source_revision": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "dsl_version": {
+                          "enum": [
+                            1
+                          ],
+                          "nullable": true,
+                          "type": "integer"
+                        },
                         "equipment": {
                           "items": {
                             "type": "string"
@@ -11028,6 +11170,45 @@
                         },
                         "is_team_workout": {
                           "type": "boolean"
+                        },
+                        "last_dsl_diagnostics": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "column": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "line": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "params": {
+                                "additionalProperties": true,
+                                "type": "object"
+                              },
+                              "severity": {
+                                "enum": [
+                                  "error",
+                                  "warning"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "code",
+                              "severity",
+                              "line",
+                              "column",
+                              "params"
+                            ],
+                            "title": "WorkoutDslDiagnostic",
+                            "type": "object"
+                          },
+                          "type": "array"
                         },
                         "notes": {
                           "items": {
@@ -14390,6 +14571,13 @@
                     "workout": {
                       "additionalProperties": false,
                       "properties": {
+                        "authoring_mode": {
+                          "enum": [
+                            "structured",
+                            "quick_text"
+                          ],
+                          "type": "string"
+                        },
                         "available_scale_levels": {
                           "items": {
                             "additionalProperties": false,
@@ -14435,6 +14623,26 @@
                           "nullable": true,
                           "type": "object"
                         },
+                        "dsl_document": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "dsl_source": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "dsl_source_revision": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "dsl_version": {
+                          "enum": [
+                            1
+                          ],
+                          "nullable": true,
+                          "type": "integer"
+                        },
                         "equipment": {
                           "items": {
                             "type": "string"
@@ -14456,6 +14664,45 @@
                         },
                         "is_team_workout": {
                           "type": "boolean"
+                        },
+                        "last_dsl_diagnostics": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "column": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "line": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "params": {
+                                "additionalProperties": true,
+                                "type": "object"
+                              },
+                              "severity": {
+                                "enum": [
+                                  "error",
+                                  "warning"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "code",
+                              "severity",
+                              "line",
+                              "column",
+                              "params"
+                            ],
+                            "title": "WorkoutDslDiagnostic",
+                            "type": "object"
+                          },
+                          "type": "array"
                         },
                         "notes": {
                           "items": {
@@ -16713,6 +16960,13 @@
                       "items": {
                         "additionalProperties": false,
                         "properties": {
+                          "authoring_mode": {
+                            "enum": [
+                              "structured",
+                              "quick_text"
+                            ],
+                            "type": "string"
+                          },
                           "available_scale_levels": {
                             "items": {
                               "additionalProperties": false,
@@ -16758,6 +17012,26 @@
                             "nullable": true,
                             "type": "object"
                           },
+                          "dsl_document": {
+                            "additionalProperties": true,
+                            "nullable": true,
+                            "type": "object"
+                          },
+                          "dsl_source": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "dsl_source_revision": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "dsl_version": {
+                            "enum": [
+                              1
+                            ],
+                            "nullable": true,
+                            "type": "integer"
+                          },
                           "equipment": {
                             "items": {
                               "type": "string"
@@ -16779,6 +17053,45 @@
                           },
                           "is_team_workout": {
                             "type": "boolean"
+                          },
+                          "last_dsl_diagnostics": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "code": {
+                                  "type": "string"
+                                },
+                                "column": {
+                                  "minimum": 1,
+                                  "type": "integer"
+                                },
+                                "line": {
+                                  "minimum": 1,
+                                  "type": "integer"
+                                },
+                                "params": {
+                                  "additionalProperties": true,
+                                  "type": "object"
+                                },
+                                "severity": {
+                                  "enum": [
+                                    "error",
+                                    "warning"
+                                  ],
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "code",
+                                "severity",
+                                "line",
+                                "column",
+                                "params"
+                              ],
+                              "title": "WorkoutDslDiagnostic",
+                              "type": "object"
+                            },
+                            "type": "array"
                           },
                           "notes": {
                             "items": {
@@ -18536,6 +18849,13 @@
                     "workout": {
                       "additionalProperties": false,
                       "properties": {
+                        "authoring_mode": {
+                          "enum": [
+                            "structured",
+                            "quick_text"
+                          ],
+                          "type": "string"
+                        },
                         "available_scale_levels": {
                           "items": {
                             "additionalProperties": false,
@@ -18581,6 +18901,26 @@
                           "nullable": true,
                           "type": "object"
                         },
+                        "dsl_document": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "dsl_source": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "dsl_source_revision": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "dsl_version": {
+                          "enum": [
+                            1
+                          ],
+                          "nullable": true,
+                          "type": "integer"
+                        },
                         "equipment": {
                           "items": {
                             "type": "string"
@@ -18602,6 +18942,45 @@
                         },
                         "is_team_workout": {
                           "type": "boolean"
+                        },
+                        "last_dsl_diagnostics": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "column": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "line": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "params": {
+                                "additionalProperties": true,
+                                "type": "object"
+                              },
+                              "severity": {
+                                "enum": [
+                                  "error",
+                                  "warning"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "code",
+                              "severity",
+                              "line",
+                              "column",
+                              "params"
+                            ],
+                            "title": "WorkoutDslDiagnostic",
+                            "type": "object"
+                          },
+                          "type": "array"
                         },
                         "notes": {
                           "items": {
@@ -24627,6 +25006,11 @@
                     "nullable": true,
                     "type": "string"
                   },
+                  "draft_data": {
+                    "additionalProperties": true,
+                    "nullable": true,
+                    "type": "object"
+                  },
                   "dsl_document": {
                     "additionalProperties": true,
                     "nullable": true,
@@ -24659,8 +25043,52 @@
                     "nullable": true,
                     "type": "integer"
                   },
+                  "expected_source_revision": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
                   "is_team_workout": {
                     "type": "boolean"
+                  },
+                  "last_dsl_diagnostics": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "column": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "line": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "params": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "severity": {
+                          "enum": [
+                            "error",
+                            "warning"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "severity",
+                        "line",
+                        "column",
+                        "params"
+                      ],
+                      "title": "WorkoutDslDiagnostic",
+                      "type": "object"
+                    },
+                    "type": "array"
                   },
                   "notes": {
                     "items": {
