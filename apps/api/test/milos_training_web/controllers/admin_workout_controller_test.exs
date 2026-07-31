@@ -143,6 +143,91 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
 
       assert json_response(publish_conn, 200)["workout"]["status"] == "published"
     end
+
+    test "publishes structured set composition and returns it without losing notes", %{conn: conn} do
+      admin_conn = authenticate_as_admin(conn, "structured_set_author")
+
+      draft_id =
+        post(admin_conn, "/api/admin/workouts") |> json_response(201) |> get_in(["draft", "id"])
+
+      superset_group_id = Ecto.UUID.generate()
+      alternating_group_id = Ecto.UUID.generate()
+
+      draft_payload = %{
+        title: "Set Composition",
+        type: "strength",
+        sections: [
+          %{
+            name: "Main work",
+            note: "Section note",
+            timer_config: %{type: "for_time"},
+            exercises: [
+              %{item_type: "header", name: "Primary lifts", note: "Header note"},
+              %{
+                item_type: "exercise",
+                name: "Front squat",
+                note: "Stay upright",
+                sets: 3,
+                prescription_value: 8,
+                prescription_unit: "reps",
+                load_mode: "pct_1rm",
+                load_progression: %{
+                  mode: "linear",
+                  direction: "decrease",
+                  start_value: 80,
+                  start_mode: "pct_1rm",
+                  step_value: 5,
+                  per_set_values: []
+                },
+                superset_group_id: superset_group_id
+              },
+              %{
+                item_type: "exercise",
+                name: "Pull-up",
+                sets: 3,
+                prescription_value: 6,
+                prescription_unit: "reps",
+                superset_group_id: superset_group_id
+              },
+              alternating_exercise("Row", alternating_group_id, [12, 10, 8]),
+              alternating_exercise("Push-up", alternating_group_id, [10, 8, 6]),
+              alternating_exercise("Lunge", alternating_group_id, [8, 6, 4])
+            ]
+          }
+        ]
+      }
+
+      admin_conn
+      |> recycle()
+      |> put_req_header("content-type", "application/json")
+      |> patch("/api/admin/workouts/#{draft_id}/draft", Jason.encode!(draft_payload))
+      |> json_response(200)
+
+      workout =
+        admin_conn
+        |> recycle()
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/admin/workouts/#{draft_id}/publish", Jason.encode!(%{}))
+        |> json_response(200)
+        |> Map.fetch!("workout")
+
+      [section] = workout["sections"]
+      [header, squat, pull_up, row, push_up, lunge] = section["exercises"]
+
+      assert section["note"] == "Section note"
+
+      assert {header["item_type"], header["name"], header["note"]} ==
+               {"header", "Primary lifts", "Header note"}
+
+      assert squat["superset_group_id"] == superset_group_id
+      assert pull_up["superset_group_id"] == superset_group_id
+      assert squat["note"] == "Stay upright"
+      assert Enum.map(squat["set_prescriptions"], & &1["load_value"]) == [80, 75, 70]
+      assert Enum.map(row["set_prescriptions"], & &1["prescription_value"]) == [12, 10, 8]
+
+      assert Enum.map([row, push_up, lunge], & &1["alternating_group_id"]) ==
+               List.duplicate(alternating_group_id, 3)
+    end
   end
 
   defp authenticate_as_admin(conn, nickname) do
@@ -160,5 +245,22 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
 
     {:ok, admin} = Identity.update_role(user, :admin)
     admin
+  end
+
+  defp alternating_exercise(name, group_id, reps) do
+    %{
+      item_type: "exercise",
+      name: name,
+      sets: length(reps),
+      prescription_value: hd(reps),
+      prescription_unit: "reps",
+      alternating_group_id: group_id,
+      set_prescriptions:
+        reps
+        |> Enum.with_index(1)
+        |> Enum.map(fn {value, index} ->
+          %{set_index: index, prescription_value: value, prescription_unit: "reps"}
+        end)
+    }
   end
 end

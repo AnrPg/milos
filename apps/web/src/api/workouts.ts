@@ -1,5 +1,5 @@
 import { apiRequest } from "@/api/client";
-import type { LoadMode, PrescriptionUnit, WorkoutType } from "@/types/workout";
+import type { LoadMode, LoadProgression, PrescriptionUnit, WorkoutType } from "@/types/workout";
 
 export type ScaleLevel = {
   id?: string;
@@ -60,12 +60,30 @@ export type WorkoutVariationRecord = {
   prescription_unit?: PrescriptionUnit | null;
   load_value?: number | null;
   load_mode?: LoadMode | null;
+  set_prescriptions?: Array<{
+    set_index: number;
+    prescription_value?: number | null;
+    prescription_unit?: PrescriptionUnit | null;
+    load_value?: number | null;
+    load_mode?: LoadMode | null;
+    note?: string | null;
+  }> | null;
+  load_progression?: {
+    mode: LoadProgression["mode"];
+    direction: LoadProgression["direction"];
+    start_value: number;
+    start_mode: LoadMode;
+    step_value: number;
+    per_set_values: number[];
+  } | null;
   excluded?: boolean;
+  note?: string | null;
   scale_level: ScaleLevel;
 };
 
 export type WorkoutExerciseRecord = {
   id?: string;
+  item_type?: "exercise" | "header";
   name: string;
   description?: string | null;
   sets?: number | null;
@@ -73,7 +91,24 @@ export type WorkoutExerciseRecord = {
   prescription_unit?: PrescriptionUnit | null;
   load_value?: number | null;
   load_mode?: LoadMode | null;
+  set_prescriptions?: Array<{
+    set_index: number;
+    prescription_value?: number | null;
+    prescription_unit?: PrescriptionUnit | null;
+    load_value?: number | null;
+    load_mode?: LoadMode | null;
+    note?: string | null;
+  }>;
+  load_progression?: {
+    mode: LoadProgression["mode"];
+    direction: LoadProgression["direction"];
+    start_value: number;
+    start_mode: LoadMode;
+    step_value: number;
+    per_set_values: number[];
+  } | null;
   superset_group_id?: string | null;
+  alternating_group_id?: string | null;
   hr_zone?: number | null;
   tempo?: string | null;
   rest_seconds?: number | null;
@@ -84,6 +119,7 @@ export type WorkoutExerciseRecord = {
   order: number;
   variations: WorkoutVariationRecord[];
   applied_variation?: WorkoutVariationRecord | null;
+  note?: string | null;
 };
 
 export type WorkoutSectionRecord = {
@@ -98,6 +134,7 @@ export type WorkoutSectionRecord = {
     label?: string;
   } | null;
   timer_config?: Record<string, unknown> | null;
+  note?: string | null;
   exercises: WorkoutExerciseRecord[];
 };
 
