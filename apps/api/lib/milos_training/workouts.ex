@@ -1,7 +1,7 @@
 defmodule MilosTraining.Workouts do
   alias MilosTraining.Workouts.Domain.{WorkoutDsl, WorkoutType}
   alias MilosTraining.Workouts.Domain.WorkoutDsl.Preflight
-  alias MilosTraining.Workouts.Domain.WorkoutDsl.Vocabulary
+  alias MilosTraining.Workouts.Domain.WorkoutDsl.{Manual, Templates, Vocabulary}
 
   alias MilosTraining.Workouts.Commands.{
     ArchiveAthleteAssignments,
@@ -61,6 +61,8 @@ defmodule MilosTraining.Workouts do
   def parse_dsl(source), do: WorkoutDsl.parse(source)
   def format_dsl(workout, opts \\ []), do: WorkoutDsl.format(workout, opts)
   def dsl_vocabulary, do: Vocabulary.export()
+  def dsl_manual, do: Manual.export()
+  def dsl_templates, do: Templates.export()
 
   def preflight_dsl(workout, active_scale_slugs),
     do: Preflight.validate(workout, active_scale_slugs)

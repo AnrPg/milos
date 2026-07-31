@@ -4,6 +4,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslController do
 
   alias MilosTraining.Application.{
     GetWorkoutDslAuthoring,
+    GetWorkoutDslManual,
     ParseWorkoutDsl,
     PublishWorkoutDsl
   }
@@ -95,6 +96,19 @@ defmodule MilosTrainingWeb.AdminWorkoutDslController do
 
     with {:ok, authoring} <- GetWorkoutDslAuthoring.call(id) do
       json(conn, authoring)
+    end
+  end
+
+  operation(:manual,
+    summary: "Get the versioned coach manual, templates, and vocabulary",
+    responses: [
+      ok: {"Quick Text manual", "application/json", WorkoutDslSchema.manual_response_schema()}
+    ]
+  )
+
+  def manual(conn, _params) do
+    with {:ok, manual} <- GetWorkoutDslManual.call() do
+      json(conn, manual)
     end
   end
 
