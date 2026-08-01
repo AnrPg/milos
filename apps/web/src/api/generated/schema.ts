@@ -3275,8 +3275,6 @@ export interface operations {
                     excluded_dates?: string[];
                     /** Format: time */
                     local_start_time: string;
-                    /** Format: uuid */
-                    master_workout_id: string;
                     name: string;
                     /** Format: date */
                     starts_on: string;
@@ -10411,6 +10409,8 @@ export interface operations {
                     currency?: string | null;
                     description: string;
                     idempotency_key?: string | null;
+                    /** Format: uuid */
+                    membership_package_subscription_id?: string | null;
                     notes?: string | null;
                     /** Format: date */
                     paid_on?: string | null;

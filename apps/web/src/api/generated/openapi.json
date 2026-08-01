@@ -2235,10 +2235,6 @@
                     "format": "time",
                     "type": "string"
                   },
-                  "master_workout_id": {
-                    "format": "uuid",
-                    "type": "string"
-                  },
                   "name": {
                     "maxLength": 120,
                     "minLength": 1,
@@ -2263,7 +2259,6 @@
                   }
                 },
                 "required": [
-                  "master_workout_id",
                   "class_type_id",
                   "name",
                   "duration_minutes",
@@ -22733,6 +22728,11 @@
                   "idempotency_key": {
                     "maxLength": 200,
                     "minLength": 1,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "membership_package_subscription_id": {
+                    "format": "uuid",
                     "nullable": true,
                     "type": "string"
                   },
