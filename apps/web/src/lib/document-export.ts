@@ -113,17 +113,17 @@ function duration(milliseconds: number): string {
     : `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
-function prescription(exercise: WorkoutExerciseRecord | WorkoutVariationRecord, labels: ExportLabels): string {
+function prescription(exercise: WorkoutExerciseRecord | WorkoutVariationRecord, labels: ExportLabels, includeSets = true): string {
   const parts: string[] = [];
   const sets = exercise.sets;
   const value = exercise.prescription_value;
   const unit = exercise.prescription_unit;
 
-  if (sets && value !== null && value !== undefined) {
+  if (includeSets && sets && value !== null && value !== undefined) {
     parts.push(`${sets} × ${displayValue(value)}${unit ? ` ${displayValue(unit)}` : ""}`);
   } else if (value !== null && value !== undefined) {
     parts.push(`${displayValue(value)}${unit ? ` ${displayValue(unit)}` : ""}`);
-  } else if (sets) {
+  } else if (includeSets && sets) {
     parts.push(`${sets} ${labels.setsLabel}`);
   }
 
@@ -171,12 +171,6 @@ function loadProgressionDetail(
 
   const sign = progression.direction === "decrease" ? "−" : "+";
   return `${label}: ${progression.start_value} ${unit} (${sign}${progression.step_value} ${unit}/${labels.setsLabel})`;
-}
-
-function groupDetail(exercise: WorkoutExerciseRecord, labels: ExportLabels): string | undefined {
-  if (exercise.superset_group_id) return labels.superset;
-  if (exercise.alternating_group_id) return labels.alternatingSets;
-  return undefined;
 }
 
 function variationDetail(variation: WorkoutVariationRecord, base: WorkoutExerciseRecord, labels: ExportLabels): string {
@@ -391,37 +385,49 @@ export function buildWorkoutDocument(workout: WorkoutRecord, labels: ExportLabel
         title: section.name,
         items: [
           ...(section.note ? [{ label: labels.notes, value: section.note }] : []),
-          ...section.exercises
-            .slice()
-            .sort((a, b) => a.order - b.order)
-            .map((exercise) => exercise.item_type === "header"
-              ? {
-                  label: labels.header,
-                  value: exercise.name,
-                  details: compact([exercise.note ?? undefined]),
-                }
-              : {
-                  label: exercise.name,
-                  value: prescription(exercise, labels),
-                  details: compact([
-                    groupDetail(exercise, labels),
-                    exercise.description ?? undefined,
-                    exercise.note ?? undefined,
-                    timerSummary(section.timer_config, labels),
-                    loadProgressionDetail(exercise, labels),
-                    ...setPrescriptionDetails(exercise, labels),
-                    ...exercise.variations.flatMap((variation) => [
-                      variationDetail(variation, exercise, labels),
-                      variation.note ?? undefined,
-                      loadProgressionDetail(variation, labels),
-                      ...setPrescriptionDetails(variation, labels),
-                    ]),
-                  ]),
-                }),
+          ...exportExerciseItems(section, labels),
         ],
       })),
     footer: labels.generatedBy,
   };
+}
+
+function exportExerciseItems(section: WorkoutSectionRecord, labels: ExportLabels): ExportItem[] {
+  const exercises = section.exercises.slice().sort((a, b) => a.order - b.order);
+  const renderedGroups = new Set<string>();
+
+  const exerciseItem = (exercise: WorkoutExerciseRecord, grouped: boolean): ExportItem => exercise.item_type === "header"
+    ? { label: labels.header, value: exercise.name, details: compact([exercise.note ?? undefined]) }
+    : {
+        label: exercise.name,
+        value: prescription(exercise, labels, !grouped),
+        details: compact([
+          exercise.description ?? undefined,
+          exercise.note ?? undefined,
+          timerSummary(section.timer_config, labels),
+          loadProgressionDetail(exercise, labels),
+          ...setPrescriptionDetails(exercise, labels),
+          ...exercise.variations.flatMap((variation) => [
+            variationDetail(variation, exercise, labels),
+            variation.note ?? undefined,
+            loadProgressionDetail(variation, labels),
+            ...setPrescriptionDetails(variation, labels),
+          ]),
+        ]),
+      };
+
+  return exercises.flatMap((exercise) => {
+    const id = exercise.superset_group_id ?? exercise.alternating_group_id;
+    if (!id) return [exerciseItem(exercise, false)];
+    if (renderedGroups.has(id)) return [];
+    renderedGroups.add(id);
+    const members = exercises.filter((member) => member.superset_group_id === id || member.alternating_group_id === id);
+    const configSets = Number(exercise.group_config?.sets ?? exercise.sets ?? 0);
+    return [
+      { label: exercise.superset_group_id ? labels.superset : labels.alternatingSets, value: configSets > 0 ? `${configSets} ${labels.setsLabel}` : "" },
+      ...members.map((member) => exerciseItem(member, true)),
+    ];
+  });
 }
 
 export function buildExecutionDocument(
@@ -752,6 +758,17 @@ async function renderOdt(document: ExportDocument): Promise<Blob> {
 async function renderPdf(document: ExportDocument): Promise<Blob> {
   const { jsPDF } = await import("jspdf");
   const pdf = new jsPDF({ unit: "pt", format: "a4" });
+  const [regularFont, boldFont] = await Promise.all([
+    loadPdfFont("/fonts/DejaVuSans.ttf"),
+    loadPdfFont("/fonts/DejaVuSans-Bold.ttf"),
+  ]);
+  const fontFamily = regularFont && boldFont ? "DejaVuSans" : "helvetica";
+  if (regularFont && boldFont) {
+    pdf.addFileToVFS("DejaVuSans.ttf", arrayBufferToBase64(regularFont));
+    pdf.addFileToVFS("DejaVuSans-Bold.ttf", arrayBufferToBase64(boldFont));
+    pdf.addFont("DejaVuSans.ttf", fontFamily, "normal");
+    pdf.addFont("DejaVuSans-Bold.ttf", fontFamily, "bold");
+  }
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   const margin = 48;
@@ -765,11 +782,11 @@ async function renderPdf(document: ExportDocument): Promise<Blob> {
     pdf.setDrawColor(226, 232, 240);
     pdf.setLineWidth(0.75);
     pdf.line(margin, 42, pageWidth - margin, 42);
-    pdf.setFont("helvetica", "bold");
+    pdf.setFont(fontFamily, "bold");
     pdf.setFontSize(8);
     pdf.setTextColor(124, 58, 237);
     pdf.text(document.category.toLocaleUpperCase(), margin, 31);
-    pdf.setFont("helvetica", "normal");
+    pdf.setFont(fontFamily, "normal");
     pdf.setTextColor(100, 116, 139);
     pdf.text(document.title, pageWidth - margin, 31, { align: "right", maxWidth: contentWidth * 0.62 });
   };
@@ -790,7 +807,7 @@ async function renderPdf(document: ExportDocument): Promise<Blob> {
     const indent = options?.indent ?? 0;
     const gapBefore = options?.gapBefore ?? 0;
     const gapAfter = options?.gapAfter ?? 6;
-    pdf.setFont("helvetica", options?.bold ? "bold" : "normal");
+    pdf.setFont(fontFamily, options?.bold ? "bold" : "normal");
     pdf.setFontSize(size);
     pdf.setTextColor(...color);
     const lines = pdf.splitTextToSize(text, contentWidth - indent);
@@ -812,10 +829,10 @@ async function renderPdf(document: ExportDocument): Promise<Blob> {
   pdf.setFillColor(124, 58, 237);
   pdf.roundedRect(margin, y, contentWidth, 24, 8, 8, "F");
   pdf.setTextColor(255, 255, 255);
-  pdf.setFont("helvetica", "bold");
+  pdf.setFont(fontFamily, "bold");
   pdf.setFontSize(10);
   pdf.text(document.category.toUpperCase(), margin + 12, y + 16);
-  y += 44;
+  y += 54;
   textBlock(document.title, 27, [23, 32, 51], { bold: true, gapAfter: 8 });
   if (document.subtitle) textBlock(document.subtitle, 15, [219, 39, 119], { bold: true, gapAfter: 12 });
   y += 5;
@@ -851,13 +868,33 @@ async function renderPdf(document: ExportDocument): Promise<Blob> {
     pdf.setDrawColor(226, 232, 240);
     pdf.setLineWidth(0.75);
     pdf.line(margin, pageHeight - 37, pageWidth - margin, pageHeight - 37);
-    pdf.setFont("helvetica", "normal");
+    pdf.setFont(fontFamily, "normal");
     pdf.setFontSize(8);
     pdf.setTextColor(148, 163, 184);
     pdf.text(document.footer, margin, pageHeight - 24);
     pdf.text(`${page} / ${pageNumber}`, pageWidth - margin, pageHeight - 24, { align: "right" });
   }
   return pdf.output("blob");
+}
+
+function arrayBufferToBase64(buffer: ArrayBuffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
+  }
+  return btoa(binary);
+}
+
+async function loadPdfFont(path: string) {
+  try {
+    const response = await fetch(path);
+    if (!response.ok) return null;
+    return await response.arrayBuffer();
+  } catch {
+    return null;
+  }
 }
 
 export function exportFilename(document: ExportDocument, format: ExportFormat): string {
