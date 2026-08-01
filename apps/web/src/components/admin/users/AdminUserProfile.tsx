@@ -259,7 +259,13 @@ function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: s
   );
 }
 
-function FinanceDetails({ finance }: { finance: AdminUserFinance }) {
+function packageLabel(subscription: Record<string, unknown>) {
+  return valueText(subscription.package_name) ||
+    valueText(subscription.package_code_snapshot) ||
+    valueText(subscription.package_family_snapshot);
+}
+
+function FinanceDetails({ finance, workspaceHref }: { finance: AdminUserFinance; workspaceHref: string }) {
   const i18n = useUiTranslations();
   const membership = finance.details.membership;
   const subscriptions = finance.details.package_subscriptions;
@@ -269,34 +275,62 @@ function FinanceDetails({ finance }: { finance: AdminUserFinance }) {
   const membershipStatus = valueText(membership?.status);
 
   return (
-    <div className="mt-5 space-y-5">
-      <div>
-        <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("membership53bc967")}</p>
+    <div className="mt-5 space-y-6">
+      <div className="grid gap-3 lg:grid-cols-[1.1fr_1fr]">
+        <div>
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("membership53bc967")}</p>
+          <Link href={workspaceHref} className="text-xs font-semibold" style={{ color: "var(--primary)" }}>
+            {i18n("editPackage77c0543")} ↗
+          </Link>
+        </div>
         {membership ? (
-          <StatGrid items={[
-            [i18n("account85dfa32"), <SemanticLabel key="status" value={membershipStatus} />],
-            [i18n("startsOn6d888f7"), date(membership.starts_on)],
-            [i18n("expiresOn549cabe"), date(membership.expires_on)],
-            [i18n("signupSource69d3a02"), <SemanticLabel key="source" value={valueText(membership.signup_source)} />],
-          ]} />
+          <Link href={workspaceHref} className="block rounded-[1.5rem] p-4 transition-transform hover:-translate-y-0.5" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-[0.14em]" style={{ color: "var(--muted)" }}>{i18n("account85dfa32")}</p>
+                <p className="mt-1 text-lg font-semibold" style={{ color: "var(--text)" }}><SemanticLabel value={membershipStatus} /></p>
+              </div>
+              <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--panel)", color: "var(--primary)" }}>
+                {i18n("openWorkspace8b23311")}
+              </span>
+            </div>
+            <div className="mt-4 grid gap-2 sm:grid-cols-3">
+              <p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("startsOn6d888f7")}<br /><span style={{ color: "var(--text-soft)" }}>{date(membership.starts_on)}</span></p>
+              <p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("expiresOn549cabe")}<br /><span style={{ color: "var(--text-soft)" }}>{date(membership.expires_on)}</span></p>
+              <p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("signupSource69d3a02")}<br /><span style={{ color: "var(--text-soft)" }}><SemanticLabel value={valueText(membership.signup_source)} /></span></p>
+            </div>
+          </Link>
         ) : <Empty>{i18n("noMembershipRecord741b5d9")}</Empty>}
       </div>
 
       {subscriptions.length ? (
         <div>
-          <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("packageSubscriptions09a33f1")}</p>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2">
-            {subscriptions.map((subscription) => (
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("packageSubscriptions09a33f1")}</p>
+            <Link href={workspaceHref} className="text-xs font-semibold" style={{ color: "var(--primary)" }}>
+              {i18n("assignPackage90e07f6")} ↗
+            </Link>
+          </div>
+          <div className="grid gap-2">
+            {subscriptions.slice(0, 3).map((subscription) => (
               <GenericRecordCard
                 key={valueText(subscription.id)}
-                title={valueText(subscription.package_code_snapshot)}
+                title={packageLabel(subscription)}
                 meta={<><SemanticLabel value={valueText(subscription.status)} /> · {date(subscription.starts_on)}–{date(subscription.ends_on)}</>}
                 value={money(subscription.price_cents_snapshot)}
+                href={workspaceHref}
               />
             ))}
+            {subscriptions.length > 3 ? (
+              <Link href={workspaceHref} className="text-xs font-semibold" style={{ color: "var(--primary)" }}>
+                +{subscriptions.length - 3} {i18n("moree7c95b4")} ↗
+              </Link>
+            ) : null}
           </div>
         </div>
       ) : null}
+      </div>
 
       {claims.length ? (
         <FinanceRecordList
@@ -329,6 +363,75 @@ function FinanceDetails({ finance }: { finance: AdminUserFinance }) {
           </div>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function CoachingContextSummary({ drillDown }: { drillDown: Record<string, unknown> | null | undefined }) {
+  const i18n = useUiTranslations();
+  const activity = (drillDown?.recent_activity as Record<string, unknown> | undefined) ?? {};
+  const assignments = (drillDown?.assigned_workouts as Array<Record<string, unknown>> | undefined) ?? [];
+  const notes = (drillDown?.notes_context as Array<Record<string, unknown>> | undefined) ?? [];
+  const cues = (drillDown?.attention_cues as Array<Record<string, unknown>> | undefined) ?? [];
+  const trends = (drillDown?.score_trends as Array<Record<string, unknown>> | undefined) ?? [];
+
+  if (!drillDown) return <Empty>{i18n("notEvaluated4bb5e31")}</Empty>;
+
+  return (
+    <div className="space-y-5">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <DetailCard title={i18n("statusbae7d5b")} value={<SemanticLabel value={valueText(activity.state)} />} plainChildren>
+          <p className="text-xs" style={{ color: "var(--muted)" }}>{valueText(activity.reason)}</p>
+        </DetailCard>
+        <DetailCard title={i18n("assignedWorkoutSInTheCoachingWindow2200dd4")} value={assignments.length} plainChildren />
+        <DetailCard title={i18n("notes7044004")} value={notes.length} plainChildren />
+        <DetailCard title={i18n("scores126cb93")} value={trends.length} plainChildren />
+      </div>
+
+      {cues.length ? (
+        <div className="rounded-[1.5rem] p-4" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{i18n("attention74e0b9c")}</p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {cues.slice(0, 4).map((cue, index) => (
+              <p key={`${valueText(cue.key)}-${index}`} className="rounded-xl p-3 text-xs" style={{ background: "var(--panel)", color: "var(--text-soft)", border: "1px solid var(--border)" }}>
+                <SemanticLabel value={valueText(cue.key)} /> · <SemanticLabel value={valueText(cue.severity)} />
+              </p>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      <div className="grid gap-3 lg:grid-cols-2">
+        <div>
+          <p className="mb-2 font-semibold" style={{ color: "var(--text)" }}>{i18n("packageSubscriptions09a33f1")}</p>
+          <div className="space-y-2">
+            {assignments.slice(0, 4).map((assignment) => (
+              <GenericRecordCard
+                key={valueText(assignment.id)}
+                title={valueText((assignment.workout as Record<string, unknown> | undefined)?.title)}
+                meta={<><SemanticLabel value={valueText(assignment.status)} /> · {date(assignment.scheduled_for)}</>}
+                href={`/my-workouts?open_assignment=${valueText(assignment.id)}`}
+              />
+            ))}
+            {assignments.length === 0 ? <Empty>{i18n("none6eef664")}</Empty> : null}
+          </div>
+        </div>
+        <div>
+          <p className="mb-2 font-semibold" style={{ color: "var(--text)" }}>{i18n("notes7044004")}</p>
+          <div className="space-y-2">
+            {notes.slice(0, 4).map((note, index) => (
+              <GenericRecordCard
+                key={`${valueText(note.id)}-${index}`}
+                title={<SemanticLabel value={valueText(note.type)} />}
+                meta={date(note.inserted_at)}
+                detail={<p className="line-clamp-3">{valueText(note.body)}</p>}
+                href="/account/activity/chats"
+              />
+            ))}
+            {notes.length === 0 ? <Empty>{i18n("noConversationsRecordedd525265")}</Empty> : null}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -375,7 +478,10 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   const coaching = useDossierQuery(token, userId, "coaching", fetchAdminUserCoachingContext, Boolean(profile?.available_sections.includes("coaching_context")));
   const roleMutation = useMutation({
     mutationFn: (role: AdminUserDirectoryEntry["role"]) => updateAdminUserRole(token!, userId, role),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin", "users"] }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+      await queryClient.invalidateQueries({ queryKey: ["admin", "users", userId] });
+    },
   });
   const deleteMutation = useMutation({
     mutationFn: () => deleteAdminUser(token!, userId),
@@ -420,6 +526,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
     messages: messages.data?.threads.length ?? 0,
   });
   const sections = new Set(visibleSections);
+  const financeWorkspaceHref = `/admin/finance?tab=members&member=${userId}`;
   const overviewItems: Array<[string, React.ReactNode]> = [
     [i18n("rolec3f104d"), <SemanticLabel key="role" value={profile.identity.role} />],
     [i18n("account85dfa32"), <SemanticLabel key="account" value={profile.account_status} />],
@@ -458,7 +565,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
             <StatGrid items={overviewItems} />
           </Panel>
 
-          {sections.has("finance") ? <Panel id="finance" title={i18n("finance1b48d3f")} href="/admin/finance"><p className="text-2xl font-semibold" style={{ color: "var(--text)" }}>{finance.data?.summary?.credit_balance ?? 0} {i18n("credits66c22fa")}</p><p className="mt-2">{finance.data?.summary?.current_status?.state ? <SemanticLabel value={String(finance.data.summary.current_status.state)} /> : i18n("loadingMembershipStatusa609a3f")}</p>{finance.data ? <FinanceDetails finance={finance.data} /> : null}{token ? <AdminEntitlements token={token} userId={userId} entitlement={effectiveEntitlement} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
+          {sections.has("finance") ? <Panel id="finance" title={i18n("finance1b48d3f")} href={financeWorkspaceHref}><div className="grid gap-3 sm:grid-cols-3"><DetailCard title={i18n("credits66c22fa")} value={finance.data?.summary?.credit_balance ?? 0} plainChildren /><DetailCard title={i18n("statusbae7d5b")} value={finance.data?.summary?.current_status?.state ? <SemanticLabel value={String(finance.data.summary.current_status.state)} /> : "—"} plainChildren href={financeWorkspaceHref} /><DetailCard title={i18n("entitlement8994749")} value={effectiveEntitlement?.status ? <SemanticLabel value={effectiveEntitlement.status} /> : "—"} plainChildren href={financeWorkspaceHref} /></div>{finance.data ? <FinanceDetails finance={finance.data} workspaceHref={financeWorkspaceHref} /> : null}{token ? <AdminEntitlements token={token} userId={userId} entitlement={effectiveEntitlement} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
 
           {sections.has("training_history") ? <Panel id="training_history" title={i18n("trainingHistorya512053")} href="/admin/workouts"><p>{training.data?.summary.completed_count ?? 0} {i18n("completedOf88964ae")} {training.data?.summary.execution_count ?? 0} {i18n("executions8319d6e")}</p><div className="mt-3 grid gap-3">{executions.length ? executions.slice(0, 8).map((item) => <ExecutionCard key={item.id} item={item} href="/admin/workouts" />) : <Empty>{i18n("noWorkoutExecutionsRecorded0a0b1d0")}</Empty>}</div></Panel> : null}
 
@@ -468,7 +575,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
 
           {sections.has("health_incidents") ? <Panel id="health_incidents" title={i18n("healthIncidentse3ca869")} href="/admin/metrics#health-incidents"><p>{incidents.data?.summary.active ?? 0} {i18n("active4c71073")} {incidents.data?.summary.total ?? 0} {i18n("total5a537e2")}</p><div className="mt-3 grid gap-3">{incidents.data?.incidents.length ? incidents.data.incidents.map((incident) => <GenericRecordCard key={incident.id} title={incident.body_area} meta={<><SemanticLabel value={incident.severity} /> · <SemanticLabel value={incident.status} /> · {date(incident.started_on)}</>} detail={incident.training_limitations ? <p style={{ color: "var(--muted)" }}>{incident.training_limitations}</p> : null} href="/admin/metrics#health-incidents" />) : <Empty>{i18n("noHealthIncidentsRecorded91c9d4e")}</Empty>}</div></Panel> : null}
 
-          {sections.has("coaching_context") ? <Panel id="coaching_context" title={i18n("coachingContexteb3075d")} href="/admin/coaching-assignments"><p className="font-semibold" style={{ color: "var(--text)" }}><SemanticLabel value={String((coaching.data?.drill_down?.recent_activity as Record<string, unknown> | undefined)?.state ?? "unknown")} /></p><p className="mt-1" style={{ color: "var(--muted)" }}>{Array.isArray(coaching.data?.drill_down?.assigned_workouts) ? coaching.data.drill_down.assigned_workouts.length : 0} {i18n("assignedWorkoutSInTheCoachingWindow2200dd4")}</p></Panel> : null}
+          {sections.has("coaching_context") ? <Panel id="coaching_context" title={i18n("coachingContexteb3075d")} href="/admin/coaching-assignments"><CoachingContextSummary drillDown={coaching.data?.drill_down} /></Panel> : null}
 
           {sections.has("class_participation") ? <Panel id="class_participation" title={i18n("classParticipation9ef4001")} href="/admin/class-schedule"><div className="grid gap-3">{training.data?.class_participation.length ? training.data.class_participation.map((item) => <ExecutionCard key={item.id} item={item} href="/admin/class-schedule" />) : <Empty>{i18n("noClassLinkedWorkoutExecutionsRecordedf8ca7a6")}</Empty>}</div></Panel> : null}
 
