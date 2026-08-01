@@ -2187,6 +2187,124 @@
         ]
       }
     },
+    "/api/admin/schedule/slots/series": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminScheduleController.create_series",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "auto_approve": {
+                    "type": "boolean"
+                  },
+                  "booking_timeout_minutes": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "capacity": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "class_type_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "duration_minutes": {
+                    "maximum": 1440,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "ends_on": {
+                    "format": "date",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "excluded_dates": {
+                    "items": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "uniqueItems": true
+                  },
+                  "local_start_time": {
+                    "format": "time",
+                    "type": "string"
+                  },
+                  "master_workout_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 120,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "starts_on": {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "timezone": {
+                    "type": "string"
+                  },
+                  "weekdays": {
+                    "items": {
+                      "maximum": 7,
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "minItems": 1,
+                    "type": "array",
+                    "uniqueItems": true
+                  }
+                },
+                "required": [
+                  "master_workout_id",
+                  "class_type_id",
+                  "name",
+                  "duration_minutes",
+                  "timezone",
+                  "starts_on",
+                  "local_start_time",
+                  "weekdays",
+                  "capacity",
+                  "auto_approve",
+                  "booking_timeout_minutes"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Batch result"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create a recurring class series",
+        "tags": [
+          "Admin Schedule"
+        ]
+      }
+    },
     "/api/admin/finance/members/{id}/credits": {
       "post": {
         "callbacks": {},
@@ -3890,12 +4008,51 @@
                         "vapid_private_key_configured"
                       ],
                       "type": "object"
+                    },
+                    "scheduling": {
+                      "properties": {
+                        "default_auto_approve": {
+                          "type": "boolean"
+                        },
+                        "default_booking_timeout_minutes": {
+                          "maximum": 10080,
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "default_capacity": {
+                          "maximum": 500,
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "default_capacity",
+                        "default_auto_approve",
+                        "default_booking_timeout_minutes"
+                      ],
+                      "type": "object"
                     }
                   },
                   "required": [
                     "gamification",
                     "finance",
-                    "notifications"
+                    "notifications",
+                    "scheduling"
                   ],
                   "type": "object"
                 }
@@ -3979,6 +4136,24 @@
                       "vapid_subject": {
                         "nullable": true,
                         "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "scheduling": {
+                    "properties": {
+                      "default_auto_approve": {
+                        "type": "boolean"
+                      },
+                      "default_booking_timeout_minutes": {
+                        "maximum": 10080,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "default_capacity": {
+                        "maximum": 500,
+                        "minimum": 1,
+                        "type": "integer"
                       }
                     },
                     "type": "object"
@@ -4114,12 +4289,51 @@
                         "vapid_private_key_configured"
                       ],
                       "type": "object"
+                    },
+                    "scheduling": {
+                      "properties": {
+                        "default_auto_approve": {
+                          "type": "boolean"
+                        },
+                        "default_booking_timeout_minutes": {
+                          "maximum": 10080,
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "default_capacity": {
+                          "maximum": 500,
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "default_capacity",
+                        "default_auto_approve",
+                        "default_booking_timeout_minutes"
+                      ],
+                      "type": "object"
                     }
                   },
                   "required": [
                     "gamification",
                     "finance",
-                    "notifications"
+                    "notifications",
+                    "scheduling"
                   ],
                   "type": "object"
                 }
@@ -6556,6 +6770,145 @@
         ]
       }
     },
+    "/api/admin/workout-folders": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminWorkoutFolderController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "folders": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "created_by_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "parent_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "created_by_id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "folders"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Folders"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List nested workout-library folders",
+        "tags": [
+          "Admin Workouts"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminWorkoutFolderController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "maxLength": 120,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "parent_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "created_by_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "parent_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "created_by_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Folder"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create a workout-library folder",
+        "tags": [
+          "Admin Workouts"
+        ]
+      }
+    },
     "/api/calendar/export-links/regenerate": {
       "post": {
         "callbacks": {},
@@ -8634,8 +8987,18 @@
                     "format": "uuid",
                     "type": "string"
                   },
+                  "duration_minutes": {
+                    "maximum": 1440,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
                   "master_workout_id": {
                     "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 120,
+                    "minLength": 1,
                     "type": "string"
                   },
                   "scheduled_at": {
@@ -14217,8 +14580,18 @@
                     "format": "uuid",
                     "type": "string"
                   },
+                  "duration_minutes": {
+                    "maximum": 1440,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
                   "master_workout_id": {
                     "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 120,
+                    "minLength": 1,
                     "type": "string"
                   },
                   "scheduled_at": {
@@ -14269,6 +14642,123 @@
         "summary": "Create a scheduled class slot",
         "tags": [
           "Admin Schedule"
+        ]
+      }
+    },
+    "/api/admin/workout-folders/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminWorkoutFolderController.delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete a folder and move its contents to its parent",
+        "tags": [
+          "Admin Workouts"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminWorkoutFolderController.update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "maxLength": 120,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "parent_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "created_by_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "parent_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "created_by_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Folder"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Rename or reparent a workout-library folder",
+        "tags": [
+          "Admin Workouts"
         ]
       }
     },
@@ -22981,6 +23471,123 @@
         ]
       }
     },
+    "/api/admin/users/{id}/schedule": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminUserController.schedule",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "end_date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "User schedule"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get a role-specific user schedule",
+        "tags": [
+          "Admin Users"
+        ]
+      }
+    },
+    "/api/admin/workouts/{id}/library": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminWorkoutController.update_library",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "folder_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "folder_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Library metadata"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Move a workout in the nested library",
+        "tags": [
+          "Admin Workouts"
+        ]
+      }
+    },
     "/api/admin/finance/invoices/{id}/issue": {
       "patch": {
         "callbacks": {},
@@ -28756,6 +29363,93 @@
         "summary": "Send a message in a thread",
         "tags": [
           "Messaging"
+        ]
+      }
+    },
+    "/api/admin/users/{id}/programming": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminUserController.program_workout",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "admin_notes": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "copy_source": {
+                    "default": true,
+                    "type": "boolean"
+                  },
+                  "folder_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "master_workout_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "scheduled_for": {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "slot_id": {
+                    "allOf": [
+                      {
+                        "format": "uuid",
+                        "type": "string"
+                      }
+                    ],
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "master_workout_id",
+                  "folder_id",
+                  "scheduled_for",
+                  "copy_source"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Programming result"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Copy or save a workout and associate it with this user's athlete assignment or booked class",
+        "tags": [
+          "Admin Users"
         ]
       }
     },

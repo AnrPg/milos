@@ -192,6 +192,23 @@ export interface paths {
         patch: operations["MilosTrainingWeb.AdminFinanceController.update_invoice"];
         trace?: never;
     };
+    "/api/admin/schedule/slots/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a recurring class series */
+        post: operations["MilosTrainingWeb.AdminScheduleController.create_series"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/finance/members/{id}/credits": {
         parameters: {
             query?: never;
@@ -581,6 +598,24 @@ export interface paths {
         get: operations["MilosTrainingWeb.AuthController.nickname_available"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/workout-folders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List nested workout-library folders */
+        get: operations["MilosTrainingWeb.AdminWorkoutFolderController.index"];
+        put?: never;
+        /** Create a workout-library folder */
+        post: operations["MilosTrainingWeb.AdminWorkoutFolderController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1239,6 +1274,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/workout-folders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a folder and move its contents to its parent */
+        delete: operations["MilosTrainingWeb.AdminWorkoutFolderController.delete"];
+        options?: never;
+        head?: never;
+        /** Rename or reparent a workout-library folder */
+        patch: operations["MilosTrainingWeb.AdminWorkoutFolderController.update"];
+        trace?: never;
+    };
     "/api/prs/{id}": {
         parameters: {
             query?: never;
@@ -1620,6 +1673,40 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/admin/users/{id}/schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a role-specific user schedule */
+        get: operations["MilosTrainingWeb.AdminUserController.schedule"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/workouts/{id}/library": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Move a workout in the nested library */
+        patch: operations["MilosTrainingWeb.AdminWorkoutController.update_library"];
         trace?: never;
     };
     "/api/admin/finance/invoices/{id}/issue": {
@@ -2253,6 +2340,23 @@ export interface paths {
         put?: never;
         /** Send a message in a thread */
         post: operations["MilosTrainingWeb.MessagingController.send_message"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/users/{id}/programming": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Copy or save a workout and associate it with this user's athlete assignment or booked class */
+        post: operations["MilosTrainingWeb.AdminUserController.program_workout"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3133,6 +3237,51 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminScheduleController.create_series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    auto_approve: boolean;
+                    booking_timeout_minutes: number;
+                    capacity: number;
+                    /** Format: uuid */
+                    class_type_id: string;
+                    duration_minutes: number;
+                    /** Format: date */
+                    ends_on?: string | null;
+                    excluded_dates?: string[];
+                    /** Format: time */
+                    local_start_time: string;
+                    /** Format: uuid */
+                    master_workout_id: string;
+                    name: string;
+                    /** Format: date */
+                    starts_on: string;
+                    timezone: string;
+                    weekdays: number[];
+                };
+            };
+        };
+        responses: {
+            /** @description Batch result */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminFinanceController.create_manual_credit": {
         parameters: {
             query?: never;
@@ -3860,6 +4009,17 @@ export interface operations {
                             vapid_public_key?: string | null;
                             vapid_subject?: string | null;
                         };
+                        scheduling: {
+                            default_auto_approve: boolean;
+                            default_booking_timeout_minutes: number;
+                            default_capacity: number;
+                            /** Format: uuid */
+                            id?: string | null;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                        };
                     };
                 };
             };
@@ -3889,6 +4049,11 @@ export interface operations {
                         vapid_private_key?: string | null;
                         vapid_public_key?: string | null;
                         vapid_subject?: string | null;
+                    };
+                    scheduling?: {
+                        default_auto_approve?: boolean;
+                        default_booking_timeout_minutes?: number;
+                        default_capacity?: number;
                     };
                 };
             };
@@ -3934,6 +4099,17 @@ export interface operations {
                             vapid_private_key_configured: boolean;
                             vapid_public_key?: string | null;
                             vapid_subject?: string | null;
+                        };
+                        scheduling: {
+                            default_auto_approve: boolean;
+                            default_booking_timeout_minutes: number;
+                            default_capacity: number;
+                            /** Format: uuid */
+                            id?: string | null;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
                         };
                     };
                 };
@@ -4728,6 +4904,72 @@ export interface operations {
                 content: {
                     "application/json": {
                         available: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminWorkoutFolderController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Folders */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        folders: {
+                            /** Format: uuid */
+                            created_by_id: string;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            /** Format: uuid */
+                            parent_id?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminWorkoutFolderController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    /** Format: uuid */
+                    parent_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Folder */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        created_by_id: string;
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                        /** Format: uuid */
+                        parent_id?: string | null;
                     };
                 };
             };
@@ -5689,8 +5931,10 @@ export interface operations {
                     capacity: number;
                     /** Format: uuid */
                     class_type_id: string;
+                    duration_minutes?: number;
                     /** Format: uuid */
                     master_workout_id: string;
+                    name?: string;
                     /** Format: date-time */
                     scheduled_at: string;
                 };
@@ -7561,8 +7805,10 @@ export interface operations {
                     capacity: number;
                     /** Format: uuid */
                     class_type_id: string;
+                    duration_minutes?: number;
                     /** Format: uuid */
                     master_workout_id: string;
+                    name?: string;
                     /** Format: date-time */
                     scheduled_at: string;
                 };
@@ -7579,6 +7825,64 @@ export interface operations {
                         slot: {
                             [key: string]: unknown;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminWorkoutFolderController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminWorkoutFolderController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    /** Format: uuid */
+                    parent_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Folder */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        created_by_id: string;
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                        /** Format: uuid */
+                        parent_id?: string | null;
                     };
                 };
             };
@@ -10463,6 +10767,64 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminUserController.schedule": {
+        parameters: {
+            query: {
+                start_date: string;
+                end_date: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description User schedule */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminWorkoutController.update_library": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    folder_id: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Library metadata */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminFinanceController.issue_invoice": {
         parameters: {
             query?: never;
@@ -12889,6 +13251,45 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminUserController.program_workout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    admin_notes?: string | null;
+                    /** @default true */
+                    copy_source: boolean;
+                    /** Format: uuid */
+                    folder_id: string;
+                    /** Format: uuid */
+                    master_workout_id: string;
+                    /** Format: date */
+                    scheduled_for: string;
+                    slot_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Programming result */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };
