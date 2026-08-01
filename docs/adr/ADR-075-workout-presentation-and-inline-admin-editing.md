@@ -115,9 +115,7 @@ PDF export embeds DejaVu Sans and DejaVu Sans Bold for Unicode output, increases
 section-label/title spacing, and humanizes package snapshots instead of printing
 placeholder punctuation or machine codes.
 
-Validation completed with frontend unit tests, lint, localization checks,
-TypeScript, production build, backend compile and full tests, formatter, Credo,
-the architecture boundary gate, a clean-database migration, and browser checks
-covering grouped previews, line numbers, mode-bar behavior, inline membership
-editing, conditional group controls, list/folder presentation, and recurring
-series authoring. No new technical debt was deferred.
+Validation completed with 104 frontend unit tests, lint, localization checks,
+TypeScript, the production build, and the backend precommit suite (498 tests,
+formatter, Credo, and the architecture boundary gate). Live browser testing was
+skipped at the user's direction. No new technical debt was deferred.
