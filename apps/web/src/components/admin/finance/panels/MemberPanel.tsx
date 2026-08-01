@@ -47,6 +47,17 @@ function statusColor(status: string): string {
   return "var(--muted)";
 }
 
+function packageLabelFromSubscription(
+  subscription: FinanceRecord | null | undefined,
+  packages: FinanceRecord[],
+) {
+  const packageId = field(subscription, "membership_package_id");
+  const code = field(subscription, "package_code_snapshot");
+  const family = field(subscription, "package_family_snapshot");
+  const match = packages.find((pkg) => field(pkg, "id") === packageId);
+  return field(match, "name") || code || family || "";
+}
+
 type Section = "overview" | "invoices" | "payments" | "credits";
 
 export function MemberPanel({
@@ -269,7 +280,7 @@ export function MemberPanel({
                   <div key={field(sub, "id")} className="rounded-[1rem] px-3 py-2" style={{ background: "var(--panel)" }}>
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-                        {field(sub, "package_code_snapshot")}
+                        {packageLabelFromSubscription(sub, packages)}
                       </span>
                       <span
                         className="rounded-full px-2 py-0.5 text-xs font-semibold"
@@ -327,20 +338,20 @@ export function MemberPanel({
                         );
                         const priceCents =
                           typeof subscription?.price_cents_snapshot === "number" ? subscription.price_cents_snapshot : null;
-                        const code = field(subscription, "package_code_snapshot");
+                        const packageName = packageLabelFromSubscription(subscription, packages);
 
                         setInvoiceForm({
                           ...invoiceForm,
                           membership_package_subscription_id,
                           amount_cents: priceCents !== null ? String(priceCents / 100) : invoiceForm.amount_cents,
-                          description: code ? i18n("package5544677") + (code) : invoiceForm.description,
+                          description: packageName ? i18n("package5544677") + (packageName) : invoiceForm.description,
                         });
                       }}
                     >
                       <option value="">{i18n("noPackageLink7149c0f")}</option>
                       {packageSubscriptions.map((sub) => (
                         <option key={field(sub, "id")} value={field(sub, "id")}>
-                          {field(sub, "package_code_snapshot", i18n("package7431e3d"))} · {money(uiLocale, sub.price_cents_snapshot)}
+                          {packageLabelFromSubscription(sub, packages) || i18n("package7431e3d")} · {money(uiLocale, sub.price_cents_snapshot)}
                         </option>
                       ))}
                     </select>

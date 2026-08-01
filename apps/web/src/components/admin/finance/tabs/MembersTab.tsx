@@ -39,6 +39,17 @@ function field(record: FinanceRecord | null | undefined, key: string, fallback =
   return String(value);
 }
 
+function packageLabelFromSubscription(
+  subscription: FinanceRecord | null | undefined,
+  packages: FinanceRecord[],
+) {
+  const packageId = field(subscription, "membership_package_id");
+  const code = field(subscription, "package_code_snapshot");
+  const family = field(subscription, "package_family_snapshot");
+  const match = packages.find((pkg) => field(pkg, "id") === packageId);
+  return field(match, "name") || code || family || "";
+}
+
 function expiresWarn(expiresOn: string): boolean {
   if (!expiresOn) return false;
   const diff = new Date(expiresOn).getTime() - Date.now();
@@ -241,7 +252,7 @@ export function MembersTab() {
   const uniquePlanCodes = Array.from(
     new Set(
       members
-        .map((m) => field(m.active_package_subscription as FinanceRecord, "package_code_snapshot"))
+        .map((m) => packageLabelFromSubscription(m.active_package_subscription as FinanceRecord, packages))
         .filter(Boolean),
     ),
   );
@@ -600,6 +611,7 @@ function MemberRow({
     typeof member.outstanding_balance_cents === "number" ? member.outstanding_balance_cents : 0;
   const userType = field(membership, "user_type_snapshot") || field(member, "identity_role");
   const currentPlanCode = activeSub ? field(activeSub, "package_code_snapshot") || null : null;
+  const currentPlanLabel = activeSub ? packageLabelFromSubscription(activeSub, packages) || null : null;
   const lastPaidOn = field(member, "last_payment_on");
   const lastPaidCents =
     typeof member.last_payment_amount_cents === "number" ? member.last_payment_amount_cents : null;
@@ -653,6 +665,7 @@ function MemberRow({
         <InlineAssignPackage
           userId={field(member, "id")}
           currentCode={currentPlanCode}
+          currentLabel={currentPlanLabel}
           packages={packages}
           pending={assignPending}
           onAssign={onAssignPackage}

@@ -35,6 +35,15 @@ function formatDate(uiLocale: string, value: string | null | undefined) {
   });
 }
 
+function packageLabel(subscription: Record<string, unknown> | null | undefined) {
+  return String(
+    subscription?.package_name ??
+      subscription?.package_code_snapshot ??
+      subscription?.package_family_snapshot ??
+      "—",
+  );
+}
+
 const STATUS_COLORS: Record<string, string> = {
   issued: "var(--success)",
   partially_paid: "var(--warning)",
@@ -388,7 +397,7 @@ export default function BillingPage() {
               {activeSub ? (
                 <div className="flex flex-col gap-1">
                   <span className="text-base font-semibold" style={{ color: "var(--text)" }}>
-                    {String(activeSub.package_code_snapshot ?? activeSub.package_family_snapshot ?? "—")}
+                    {packageLabel(activeSub as Record<string, unknown>)}
                   </span>
                   <span className="text-xs" style={{ color: "var(--dim)" }}>
                     {activeSub.billing_period_snapshot

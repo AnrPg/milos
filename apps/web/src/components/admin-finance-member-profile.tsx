@@ -45,6 +45,15 @@ function field(record: FinanceRecord | null | undefined, key: string, fallback =
   return String(value);
 }
 
+function packageLabel(record: FinanceRecord | null | undefined, fallback = "—") {
+  return (
+    field(record, "package_name") ||
+    field(record, "package_code_snapshot") ||
+    field(record, "package_family_snapshot") ||
+    fallback
+  );
+}
+
 function dateField(record: FinanceRecord | null | undefined, key: string) {
   return field(record, key).slice(0, 10);
 }
@@ -520,7 +529,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 options={packageSubscriptions.map((subscription) => field(subscription, "id"))}
                 optionLabel={(id) => {
                   const subscription = packageSubscriptions.find((item) => field(item, "id") === id);
-                  return (field(subscription, "package_code_snapshot", id)) + " · " + (money(uiLocale, subscription?.price_cents_snapshot));
+                  return (packageLabel(subscription, id)) + " · " + (money(uiLocale, subscription?.price_cents_snapshot));
                 }}
                 required={false}
                 onChange={(membership_package_subscription_id) => {
@@ -529,13 +538,13 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                   );
                   const priceCents =
                     typeof subscription?.price_cents_snapshot === "number" ? subscription.price_cents_snapshot : null;
-                  const code = field(subscription, "package_code_snapshot");
+                  const selectedPackageLabel = packageLabel(subscription, "");
 
                   setInvoiceForm({
                     ...invoiceForm,
                     membership_package_subscription_id,
                     amount: priceCents !== null ? euroInputValue(priceCents) : invoiceForm.amount,
-                    description: code ? i18n("package5544677") + (code) : invoiceForm.description,
+                    description: selectedPackageLabel ? i18n("package5544677") + (selectedPackageLabel) : invoiceForm.description,
                   });
                 }}
               />
@@ -564,7 +573,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 options={renewableSubscriptions.map((subscription) => field(subscription, "id"))}
                 optionLabel={(id) => {
                   const subscription = renewableSubscriptions.find((item) => field(item, "id") === id);
-                  return (field(subscription, "package_code_snapshot", id)) + " · " + (money(uiLocale, subscription?.price_cents_snapshot));
+                  return (packageLabel(subscription, id)) + " · " + (money(uiLocale, subscription?.price_cents_snapshot));
                 }}
                 required={false}
                 onChange={(membership_package_subscription_id) =>
@@ -825,7 +834,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
             onVoid={(id) => voidInvoiceMutation.mutate(id)}
             onRefresh={invalidateMember}
           />
-          <History title={i18n("packageSubscriptions09a33f1")} rows={memberQuery.data?.package_subscriptions ?? []} primary="package_code_snapshot" secondary="status" />
+          <History title={i18n("packageSubscriptions09a33f1")} rows={memberQuery.data?.package_subscriptions ?? []} primary="package_name" secondary="status" primaryFallback={(row) => packageLabel(row)} />
           <History title={i18n("payments44357ae")} rows={memberQuery.data?.payments ?? []} primary="payment_status" secondary="amount_cents" moneySecondary />
           <History title={i18n("paymentReversals0f3a7be")} rows={memberQuery.data?.payment_reversals ?? []} primary="reversal_type" secondary="amount_cents" moneySecondary />
           <History title={i18n("promoRedemptions7408919")} rows={memberQuery.data?.promotion_redemptions ?? []} primary="discount_type_snapshot" secondary="discount_value_snapshot" />
@@ -1205,12 +1214,14 @@ function History({
   rows,
   primary,
   secondary,
+  primaryFallback,
   moneySecondary = false,
 }: {
   title: string;
   rows: FinanceRecord[];
   primary: string;
   secondary: string;
+  primaryFallback?: (row: FinanceRecord) => string;
   moneySecondary?: boolean;
 }) {
   const uiLocale = useUiLocale();
@@ -1222,7 +1233,7 @@ function History({
         {rows.length === 0 ? <p className="text-sm text-[var(--muted)]">{i18n("noRecords2cd2e01")}</p> : null}
         {rows.map((row) => (
           <div key={field(row, "id")} className="rounded-2xl border border-[var(--border)] p-4">
-            <p className="font-bold">{field(row, primary)}</p>
+            <p className="font-bold">{field(row, primary) || primaryFallback?.(row) || "—"}</p>
             <p className="text-sm text-[var(--muted)]">{moneySecondary ? money(uiLocale, row[secondary]) : field(row, secondary)}</p>
           </div>
         ))}
