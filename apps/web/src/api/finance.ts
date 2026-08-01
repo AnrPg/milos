@@ -113,6 +113,10 @@ export type FinanceReceipt = {
   amount_cents: number;
   currency: string;
   description: string;
+  membership_package_subscription_id?: string | null;
+  package_name?: string | null;
+  package_code_snapshot?: string | null;
+  package_family_snapshot?: string | null;
   invoice: FinanceRecord;
   payment: FinanceRecord;
 };
