@@ -43,6 +43,11 @@ should prefer names. Deeper dossier edit affordances should continue to route to
 the owning workspace or a bounded-context application service.
 
 ## Implementation Notes
+ADR-075 amends the dossier navigation decision: small membership facts now edit
+inline through the existing Finance mutation, while larger workflows remain in
+their owning workspaces. The dossier no longer renders transparent deep links or
+duplicates actions already reachable from its sections.
+
 Initial implementation makes package code optional in the Ecto changeset and
 OpenAPI contract, collapses the UI field, prefers package names in finance
 tables and package assignment controls, refreshes relevant profile queries after

@@ -74,3 +74,5 @@ must have an ADR. See `template.md` for the format.
 | ADR-072 | Document export rendering hardening | Accepted |
 | ADR-073 | Recurring class series and receipt mode | Accepted |
 | ADR-074 | Admin finance and user profile usability | Accepted |
+| ADR-075 | Workout presentation and inline admin editing | Accepted |
+| ADR-076 | Package-associated receipts | Accepted |
