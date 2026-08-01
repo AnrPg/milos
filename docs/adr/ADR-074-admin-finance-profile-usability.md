@@ -62,3 +62,9 @@ targeted ESLint, backend compile, and `mix milos.architecture` passed. The
 DB-backed finance controller test command could not run locally because
 PostgreSQL on `localhost:5432` refused connections; no assertion failure was
 observed before the database creation failed.
+
+Follow-up note: coaching-touchpoint package entitlements are also temporarily
+blocked in package edits alongside Workout Library access. Existing
+`coaching_touchpoints` allowances, including `unlimited`, are ignored by the
+package editor sanitizer until the product has a plain-member/athlete surface
+where admins can safely sell and users can actually consume that benefit.
