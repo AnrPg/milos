@@ -39,6 +39,7 @@ export type PreviewExercise = {
   order?: number;
   superset_group_id?: string | null;
   alternating_group_id?: string | null;
+  group_config?: { sets?: number | null; title?: string | null } | null;
   hr_zone?: number | null;
   tempo?: string | null;
   rest_seconds?: number | null;
@@ -144,7 +145,7 @@ function sectionScaleOptions(section: PreviewSection) {
   });
 }
 
-function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
+function ExerciseRow({ exercise, groupColor }: { exercise: ResolvedExercise; groupColor?: string }) {
   const i18n = useUiTranslations();
 
   if (exercise.item_type === "header") {
@@ -196,7 +197,7 @@ function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
       }
     }
   
-    if (exercise.sets && exercise.sets > 1) {
+    if (!groupColor && exercise.sets && exercise.sets > 1) {
       parts.push(`${exercise.sets}×`);
     }
   
@@ -218,20 +219,13 @@ function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
   const prescription = formatPrescription(exercise);
   const extras = formatExtras(exercise);
   const variationColor = scaleLevelVar(exercise.variationSlug ?? exercise.variationLabel);
-  const groupKind = exercise.superset_group_id
-    ? "superset"
-    : exercise.alternating_group_id
-      ? "alternating"
-      : null;
-  const groupColor = groupKind === "superset" ? "var(--primary)" : "var(--info)";
-
   return (
     <li
       className="rounded-[1rem] px-4 py-3"
       style={{
         background: exercise.varied ? translucent(variationColor, 11) : "var(--panel-muted)",
         border: exercise.varied ? `1px solid ${translucent(variationColor, 32)}` : "1px solid var(--border)",
-        boxShadow: groupKind
+        boxShadow: groupColor
           ? `inset 3px 0 0 ${groupColor}`
           : exercise.varied
             ? `inset 3px 0 0 ${variationColor}`
@@ -249,14 +243,6 @@ function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
               style={{ background: translucent(variationColor, 18), color: variationColor }}
             >
               {exercise.variationLabel ?? i18n("variation15920a4")}
-            </span>
-          ) : null}
-          {groupKind ? (
-            <span
-              className="ms-2 px-2 py-0.5 text-[10px] font-bold uppercase"
-              style={{ background: `color-mix(in srgb, ${groupColor} 15%, transparent)`, color: groupColor }}
-            >
-              {groupKind === "superset" ? i18n("supersetLabel") : i18n("alternatingSetsLabel")}
             </span>
           ) : null}
         </div>
@@ -284,6 +270,52 @@ function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
       ) : null}
     </li>
   );
+}
+
+type PresentedExercise =
+  | { type: "exercise"; exercise: ResolvedExercise }
+  | {
+      type: "group";
+      id: string;
+      kind: "superset" | "alternating";
+      sets: number | null;
+      title: string | null;
+      exercises: ResolvedExercise[];
+    };
+
+function presentExercises(exercises: ResolvedExercise[]): PresentedExercise[] {
+  const rendered = new Set<string>();
+  const result: PresentedExercise[] = [];
+
+  for (const exercise of exercises) {
+    const kind = exercise.superset_group_id ? "superset" : exercise.alternating_group_id ? "alternating" : null;
+    const id = exercise.superset_group_id ?? exercise.alternating_group_id;
+    if (!kind || !id) {
+      result.push({ type: "exercise", exercise });
+      continue;
+    }
+    if (rendered.has(id)) continue;
+    rendered.add(id);
+    const members = exercises.filter((item) =>
+      kind === "superset" ? item.superset_group_id === id : item.alternating_group_id === id,
+    );
+    result.push({
+      type: "group",
+      id,
+      kind,
+      sets: exercise.group_config?.sets ?? exercise.sets ?? null,
+      title: exercise.group_config?.title ?? null,
+      exercises: members,
+    });
+  }
+
+  return result;
+}
+
+function presentationGroupColor(id: string) {
+  const colors = ["var(--primary)", "var(--info)", "var(--success)", "var(--warning)", "var(--danger)"];
+  const hash = Array.from(id).reduce((sum, character) => sum + character.charCodeAt(0), 0);
+  return colors[hash % colors.length];
 }
 
 export function WorkoutPreviewDetail({
@@ -343,6 +375,7 @@ export function WorkoutPreviewDetail({
           .map((exercise) => resolveExercise(exercise, activeScale))
           .filter((exercise): exercise is ResolvedExercise => Boolean(exercise));
         const exerciseCount = visibleExercises.filter((exercise) => exercise.item_type !== "header").length;
+        const presentedExercises = presentExercises(visibleExercises);
 
         return (
           <div
@@ -439,11 +472,37 @@ export function WorkoutPreviewDetail({
             {expanded ? (
               <div className="space-y-3 p-3" style={{ background: "var(--panel)" }}>
                 {visibleExercises.length > 0 ? (
-                  <ul className="space-y-2">
-                    {visibleExercises.map((exercise, ei) => (
-                      <ExerciseRow key={exercise.id ?? (key) + "-" + (ei)} exercise={exercise} />
-                    ))}
-                  </ul>
+                  <div className="space-y-2">
+                    {presentedExercises.map((item, ei) => {
+                      if (item.type === "exercise") {
+                        return <ul className="space-y-2" key={item.exercise.id ?? `${key}-${ei}`}><ExerciseRow exercise={item.exercise} /></ul>;
+                      }
+
+                      const color = presentationGroupColor(item.id);
+                      const label = item.title || (item.kind === "superset" ? i18n("supersetLabel") : i18n("alternatingSetsLabel"));
+                      const setLabel = item.sets ? ` · ${item.sets} ${i18n("setsd6c8220")}` : "";
+                      return (
+                        <section
+                          aria-label={`${label}${setLabel}`}
+                          className="rounded-[1rem] border p-3"
+                          key={item.id}
+                          role="group"
+                          style={{ borderColor: `color-mix(in srgb, ${color} 45%, var(--border))` }}
+                        >
+                          <header className="mb-2 flex items-center gap-2 text-xs font-bold uppercase" style={{ color }}>
+                            <span>{label}</span>
+                            {item.sets ? <span>{item.sets} {i18n("setsd6c8220")}</span> : null}
+                            <span className="h-px flex-1" style={{ background: color, opacity: 0.3 }} />
+                          </header>
+                          <ul className="space-y-2">
+                            {item.exercises.map((exercise, index) => (
+                              <ExerciseRow key={exercise.id ?? `${item.id}-${index}`} exercise={exercise} groupColor={color} />
+                            ))}
+                          </ul>
+                        </section>
+                      );
+                    })}
+                  </div>
                 ) : (
                   <p
                     className="rounded-[1rem] px-4 py-3 text-sm"

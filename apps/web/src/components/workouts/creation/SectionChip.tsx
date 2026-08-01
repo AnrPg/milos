@@ -32,6 +32,7 @@ export function SectionChip({ section, isSelected, onSelect }: SectionChipProps)
   return (
     <div
       ref={setNodeRef}
+      data-workout-section-id={section.localId}
       onClick={onSelect}
       className="flex cursor-pointer select-none items-center gap-2 rounded-2xl px-3 py-2 transition-colors"
       style={{

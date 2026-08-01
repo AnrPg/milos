@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 import { useUiTranslations } from "@/i18n/ui";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
@@ -15,6 +16,32 @@ export function WorkoutAuthoringModes() {
   const storeDraftId = useWorkoutCreationStore((state) => state.draftId);
   const mode = searchParams.get("mode") === "quick-text" ? "quick-text" : "structured";
   const draftId = searchParams.get("draft") ?? storeDraftId;
+  const [modeBarVisible, setModeBarVisible] = useState(true);
+  const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    function handleScroll(event: Event) {
+      const target = event.target as Document | HTMLElement;
+      const next = target instanceof Document
+        ? (target.scrollingElement?.scrollTop ?? 0)
+        : target.scrollTop;
+      setModeBarVisible(true);
+      if (hideTimer.current) clearTimeout(hideTimer.current);
+      if (next >= 24) hideTimer.current = setTimeout(() => setModeBarVisible(false), 900);
+    }
+
+    function handlePointerMove(event: PointerEvent) {
+      if (event.clientY <= 88) setModeBarVisible(true);
+    }
+
+    window.addEventListener("scroll", handleScroll, true);
+    window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll, true);
+      window.removeEventListener("pointermove", handlePointerMove);
+      if (hideTimer.current) clearTimeout(hideTimer.current);
+    };
+  }, []);
 
   function selectMode(nextMode: "structured" | "quick-text", selectedDraftId = draftId) {
     const params = new URLSearchParams(searchParams.toString());
@@ -29,9 +56,17 @@ export function WorkoutAuthoringModes() {
 
   return (
     <div className="flex min-h-[calc(100dvh-3.25rem)] flex-col" style={{ background: "var(--bg)" }}>
+      <div className="h-[57px] shrink-0" aria-hidden />
       <div
-        className="flex shrink-0 items-center justify-center gap-1 border-b px-4 py-2"
-        style={{ background: "var(--panel)", borderColor: "var(--dim)" }}
+        className="fixed inset-x-0 top-[3.25rem] z-40 flex items-center justify-center gap-1 border-b px-4 py-2 transition-transform duration-200"
+        onFocus={() => setModeBarVisible(true)}
+        onMouseEnter={() => setModeBarVisible(true)}
+        style={{
+          background: "var(--panel)",
+          borderColor: "var(--dim)",
+          transform: modeBarVisible ? "translateY(0)" : "translateY(-110%)",
+        }}
+        data-visible={modeBarVisible}
         role="tablist"
         aria-label={i18n("workoutAuthoringModeLabel")}
       >

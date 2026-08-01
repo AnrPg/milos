@@ -164,6 +164,11 @@ function parseDraftExercise(src: unknown): DraftExercise {
   const defaults = makeDefaultExercise();
   if (!src || typeof src !== "object") return defaults;
   const e = src as Record<string, unknown>;
+  const grouped = e.superset_group_id != null || e.alternating_group_id != null;
+  const groupConfig =
+    e.group_config && typeof e.group_config === "object"
+      ? (e.group_config as Record<string, unknown>)
+      : null;
 
   const rawVariations = Array.isArray(e.variations) ? e.variations : [];
   const variations: DraftVariation[] = rawVariations.map((v: unknown) => {
@@ -187,7 +192,12 @@ function parseDraftExercise(src: unknown): DraftExercise {
     localId: crypto.randomUUID(),
     itemType: e.item_type === "header" ? "header" : "exercise",
     name: typeof e.name === "string" ? e.name : "",
-    sets: e.sets != null ? Number(e.sets) : defaults.sets,
+    sets:
+      grouped && groupConfig?.sets != null
+        ? Number(groupConfig.sets)
+        : e.sets != null
+          ? Number(e.sets)
+          : defaults.sets,
     setPrescriptions: parseSetPrescriptions(e.set_prescriptions),
     prescriptionValue: e.prescription_value != null ? Number(e.prescription_value) : defaults.prescriptionValue,
     prescriptionUnit: parsePrescriptionUnit(e.prescription_unit),
@@ -289,10 +299,11 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
     if (!data || typeof data !== "object") return;
     const record = data as Record<string, unknown>;
     // Prefer draft_data (has full state including load_progression) over materialized sections.
-    const source =
+    const nestedDraft =
       record.draft_data && typeof record.draft_data === "object"
         ? (record.draft_data as Record<string, unknown>)
-        : record;
+        : null;
+    const source = nestedDraft && Array.isArray(nestedDraft.sections) ? nestedDraft : record;
     set({
       title: typeof source.title === "string" ? source.title : (typeof record.title === "string" ? record.title : ""),
       type: parseWorkoutType(source.type ?? record.type),
@@ -744,6 +755,9 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
             : null,
           superset_group_id: exercise.supersetGroupId,
           alternating_group_id: exercise.alternatingGroupId,
+          group_config: exercise.supersetGroupId || exercise.alternatingGroupId
+            ? { sets: exercise.sets }
+            : null,
           interval_assignment: exercise.intervalAssignment,
           hr_zone: exercise.advanced.hrZone.enabled ? exercise.advanced.hrZone.value : null,
           tempo: exercise.advanced.tempo.enabled ? exercise.advanced.tempo.value : null,

@@ -24,7 +24,7 @@ export const COMMON_WORKOUT_WORDS = [
 ];
 
 export const QUICK_TEXT_EDITOR_CLASS =
-  "min-h-[32rem] px-5 py-4 font-mono text-sm leading-6 outline-none whitespace-pre-wrap";
+  "quick-text-line-numbers min-h-[32rem] py-4 pe-5 ps-14 font-mono text-sm leading-6 outline-none whitespace-pre-wrap";
 
 export function sanitizeWorkoutDslPaste(html: string) {
   if (typeof DOMParser === "undefined") return "";

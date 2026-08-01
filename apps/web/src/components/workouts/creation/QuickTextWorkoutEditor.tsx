@@ -360,6 +360,10 @@ export function QuickTextWorkoutEditor({
       const snapshot = sourceRef.current;
       await updateDraftWorkout(tokens.access_token, draftId, {
         ...preview.workout,
+        draft_data: {
+          ...preview.workout,
+          authoring_mode: "structured",
+        },
         authoring_mode: "structured",
         dsl_version: preview.version,
         dsl_source: snapshot,
@@ -723,23 +727,10 @@ function CanonicalPreview({ preview }: { preview: WorkoutDslPreview | null }) {
                   {String(section.name ?? "")}
                 </div>
                 <div className="mt-2 space-y-2">
-                  {exercises.map((rawExercise, exerciseIndex) => {
-                    const exercise = rawExercise as Record<string, unknown>;
-                    return (
-                      <div key={`${String(exercise.name)}:${exerciseIndex}`} className="text-sm">
-                        <span className="font-bold" style={{ color: "var(--text)" }}>
-                          {String(exercise.name ?? "")}
-                        </span>
-                        {exercise.item_type !== "header" ? (
-                          <span style={{ color: "var(--muted)" }}>
-                            {" "}
-                            · {String(exercise.sets ?? 1)} ×{" "}
-                            {String(exercise.prescription_value ?? "")}
-                          </span>
-                        ) : null}
-                      </div>
-                    );
-                  })}
+                  {presentCanonicalExercises(exercises).map((item, exerciseIndex) => item.type === "exercise"
+                    ? <CanonicalExercise exercise={item.exercise} key={`${String(item.exercise.name)}:${exerciseIndex}`} />
+                    : <section className="rounded-lg border p-3" key={item.id} style={{ borderColor: item.color }}><header className="mb-2 flex items-center gap-2 text-xs font-bold uppercase" style={{ color: item.color }}><span>{item.kind === "superset" ? i18n("supersetLabel") : i18n("alternatingSetsLabel")}</span><span>{item.sets} {i18n("setsd6c8220")}</span><span className="h-px flex-1 opacity-30" style={{ background: item.color }} /></header><div className="space-y-2">{item.exercises.map((exercise, index) => <CanonicalExercise exercise={exercise} groupColor={item.color} key={`${item.id}:${index}`} />)}</div></section>
+                  )}
                 </div>
               </div>
             );
@@ -748,6 +739,37 @@ function CanonicalPreview({ preview }: { preview: WorkoutDslPreview | null }) {
       )}
     </div>
   );
+}
+
+function CanonicalExercise({ exercise, groupColor }: { exercise: Record<string, unknown>; groupColor?: string }) {
+  return <div className="text-sm" style={{ borderInlineStart: groupColor ? `3px solid ${groupColor}` : undefined, paddingInlineStart: groupColor ? "0.5rem" : undefined }}><span className="font-bold" style={{ color: "var(--text)" }}>{String(exercise.name ?? "")}</span>{exercise.item_type !== "header" ? <span style={{ color: "var(--muted)" }}> · {groupColor ? "" : `${String(exercise.sets ?? 1)} × `}{String(exercise.prescription_value ?? "")}</span> : null}</div>;
+}
+
+type CanonicalPresentation =
+  | { type: "exercise"; exercise: Record<string, unknown> }
+  | { type: "group"; id: string; kind: "superset" | "alternating"; sets: number; color: string; exercises: Record<string, unknown>[] };
+
+function presentCanonicalExercises(rawExercises: unknown[]): CanonicalPresentation[] {
+  const exercises = rawExercises.map((exercise) => exercise as Record<string, unknown>);
+  const rendered = new Set<string>();
+  const result: CanonicalPresentation[] = [];
+  exercises.forEach((exercise) => {
+    const supersetId = typeof exercise.superset_group_id === "string" ? exercise.superset_group_id : null;
+    const alternatingId = typeof exercise.alternating_group_id === "string" ? exercise.alternating_group_id : null;
+    const id = supersetId ?? alternatingId;
+    if (!id) {
+      result.push({ type: "exercise", exercise });
+      return;
+    }
+    if (rendered.has(id)) return;
+    rendered.add(id);
+    const members = exercises.filter((member) => member.superset_group_id === id || member.alternating_group_id === id);
+    const hash = Array.from(id).reduce((sum, character) => sum + character.charCodeAt(0), 0);
+    const colors = ["var(--primary)", "var(--info)", "var(--success)", "var(--warning)"];
+    const groupConfig = exercise.group_config as Record<string, unknown> | undefined;
+    result.push({ type: "group", id, kind: supersetId ? "superset" : "alternating", sets: Number(groupConfig?.sets ?? exercise.sets ?? 1), color: colors[hash % colors.length], exercises: members });
+  });
+  return result;
 }
 
 function ManualDialog({ markdown, onClose }: { markdown: string; onClose: () => void }) {

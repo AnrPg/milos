@@ -9,6 +9,7 @@ import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import type { DraftExercise, DraftSection, LoadMode, PrescriptionUnit } from "@/types/workout";
 
 import { UnitCycler } from "./UnitCycler";
+import { NumberStepper } from "./NumberStepper";
 
 const PRESCRIPTION_UNITS: PrescriptionUnit[] = ["reps", "secs", "kcal"];
 const LOAD_MODES: LoadMode[] = ["absolute", "pct_1rm", "bw"];
@@ -97,32 +98,26 @@ export function VariationsPanel({ exercise, section, scaleLevels }: Props) {
               style={{ color: "var(--dim)" }}
             />
 
-            <input
-              type="number"
+            <NumberStepper
               value={variation.sets ?? exercise.sets}
-              onChange={(event) =>
+              onChange={(sets) =>
                 updateVariation(section.localId, exercise.localId, scaleLevel.slug, {
-                  sets: Number.parseInt(event.target.value, 10) || null,
+                  sets,
                 })
               }
-              className="w-8 bg-transparent text-center text-sm outline-none"
-              style={{ color: "var(--text)" }}
               min={1}
             />
             <span className="text-xs" style={{ color: "var(--muted)" }}>
               {i18n("setsd6c8220")}
             </span>
 
-            <input
-              type="number"
+            <NumberStepper
               value={variation.prescriptionValue ?? exercise.prescriptionValue}
-              onChange={(event) =>
+              onChange={(prescriptionValue) =>
                 updateVariation(section.localId, exercise.localId, scaleLevel.slug, {
-                  prescriptionValue: Number.parseInt(event.target.value, 10) || null,
+                  prescriptionValue,
                 })
               }
-              className="w-10 bg-transparent text-center text-sm outline-none"
-              style={{ color: "var(--text)" }}
               min={1}
             />
             <UnitCycler
@@ -135,18 +130,14 @@ export function VariationsPanel({ exercise, section, scaleLevels }: Props) {
               }
             />
 
-            <input
-              type="number"
-              value={variation.loadValue ?? exercise.loadValue ?? ""}
-              onChange={(event) =>
+            <NumberStepper
+              value={variation.loadValue ?? exercise.loadValue ?? 0}
+              onChange={(loadValue) =>
                 updateVariation(section.localId, exercise.localId, scaleLevel.slug, {
-                  loadValue: Number.parseInt(event.target.value, 10) || null,
+                  loadValue,
                 })
               }
-              placeholder="—"
-              className="w-10 bg-transparent text-center text-sm outline-none"
-              style={{ color: "var(--text)" }}
-              min={1}
+              min={0}
             />
             <UnitCycler
               options={LOAD_MODES}

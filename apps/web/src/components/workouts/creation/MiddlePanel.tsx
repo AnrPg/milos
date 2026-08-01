@@ -28,6 +28,12 @@ type ExerciseGroup = {
   exercises: DraftExercise[];
 };
 
+function groupColor(groupId: string) {
+  const colors = ["var(--primary)", "var(--info)", "var(--success)", "var(--warning)", "var(--danger)"];
+  const hash = Array.from(groupId).reduce((sum, character) => sum + character.charCodeAt(0), 0);
+  return colors[hash % colors.length];
+}
+
 export function MiddlePanel({ scaleLevels }: Props) {
   const i18n = useUiTranslations();
   const formatLabels = getFormatLabels(i18n);
@@ -39,6 +45,7 @@ export function MiddlePanel({ scaleLevels }: Props) {
     clearExerciseGroups,
     setExerciseGroup,
     setMobileView,
+    updateExercise,
     updateSection,
   } = useWorkoutCreationStore();
   const [selectedExerciseIds, setSelectedExerciseIds] = useState<Set<string>>(new Set());
@@ -142,9 +149,21 @@ export function MiddlePanel({ scaleLevels }: Props) {
             : item.alternatingGroupId === groupId,
         );
 
+        const color = groupColor(groupId);
         return (
-          <SupersetWrapper key={groupId} kind={kind}>
-            {members.map((member) => renderExerciseCard(member))}
+          <SupersetWrapper
+            color={color}
+            key={groupId}
+            kind={kind}
+            onSetsChange={(sets) => members.forEach((member) => {
+              updateExercise(selectedSection!.localId, member.localId, {
+                sets,
+                setPrescriptions: member.setPrescriptions.slice(0, sets),
+              });
+            })}
+            sets={members[0]?.sets ?? 1}
+          >
+            {members.map((member) => renderExerciseCard(member, color, true))}
           </SupersetWrapper>
         );
       }
@@ -153,7 +172,7 @@ export function MiddlePanel({ scaleLevels }: Props) {
     });
   }
 
-  function renderExerciseCard(exercise: DraftExercise) {
+  function renderExerciseCard(exercise: DraftExercise, color?: string, grouped = false) {
     return (
       <ExerciseCard
         key={exercise.localId}
@@ -163,6 +182,8 @@ export function MiddlePanel({ scaleLevels }: Props) {
         section={selectedSection!}
         sectionOptions={sectionOptions}
         selected={selectedExerciseIds.has(exercise.localId)}
+        groupColor={color}
+        grouped={grouped}
       />
     );
   }
@@ -216,29 +237,33 @@ export function MiddlePanel({ scaleLevels }: Props) {
         {selectedSection && selectedExerciseIds.size > 0 ? (
           <div
             className="sticky top-0 z-10 flex flex-wrap items-center gap-2 px-3 py-2"
-            style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+            style={{
+              background: "var(--panel, #ffffff)",
+              border: "1px solid var(--border, #cfe1e8)",
+            }}
           >
             <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>
               {i18n("selectedExerciseCount", { count: selectedExerciseIds.size })}
             </span>
+            {selectedExerciseIds.size >= 2 ? (
+              <>
+                <button className="rounded-md px-3 py-1.5 text-xs font-semibold" style={{ background: "color-mix(in srgb, var(--workout-crossfit, #d94d3d) 16%, #ffffff)", color: "var(--workout-crossfit, #a93226)" }} onClick={() => groupSelected("superset")} type="button">
+                  {i18n("groupAsSuperset")}
+                </button>
+                <button className="rounded-md px-3 py-1.5 text-xs font-semibold" style={{ background: "color-mix(in srgb, var(--info, #27869b) 18%, #ffffff)", color: "var(--info, #1f6f80)" }} onClick={() => groupSelected("alternating")} type="button">
+                  {i18n("groupAsAlternating")}
+                </button>
+              </>
+            ) : null}
             <button
-              disabled={selectedExerciseIds.size < 2}
-              onClick={() => groupSelected("superset")}
-              type="button"
-            >
-              {i18n("groupAsSuperset")}
-            </button>
-            <button
-              disabled={selectedExerciseIds.size < 2}
-              onClick={() => groupSelected("alternating")}
-              type="button"
-            >
-              {i18n("groupAsAlternating")}
-            </button>
-            <button
+              className="rounded-md px-3 py-1.5 text-xs font-semibold"
               onClick={() => {
                 clearExerciseGroups(selectedSection.localId, Array.from(selectedExerciseIds));
                 setSelectedExerciseIds(new Set());
+              }}
+              style={{
+                background: "var(--panel-muted, #edf4f6)",
+                color: "var(--text-soft, #39515a)",
               }}
               type="button"
             >

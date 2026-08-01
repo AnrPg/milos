@@ -110,6 +110,7 @@ export type WorkoutExerciseRecord = {
   } | null;
   superset_group_id?: string | null;
   alternating_group_id?: string | null;
+  group_config?: { sets?: number | null; title?: string | null } | null;
   hr_zone?: number | null;
   tempo?: string | null;
   rest_seconds?: number | null;

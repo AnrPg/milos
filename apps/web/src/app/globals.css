@@ -142,3 +142,24 @@ input[type="number"] {
   overflow-y: auto;
   scrollbar-gutter: stable;
 }
+/* Every DSL source line is a separate ProseMirror paragraph. */
+.quick-text-line-numbers {
+  counter-reset: workout-line;
+}
+
+.quick-text-line-numbers > p {
+  counter-increment: workout-line;
+  min-height: 1.5rem;
+  position: relative;
+}
+
+.quick-text-line-numbers > p::before {
+  color: var(--dim);
+  content: counter(workout-line);
+  font-variant-numeric: tabular-nums;
+  inset-inline-end: calc(100% + 0.75rem);
+  position: absolute;
+  text-align: end;
+  user-select: none;
+  width: 2.25rem;
+}

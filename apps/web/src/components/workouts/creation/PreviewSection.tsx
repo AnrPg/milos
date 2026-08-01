@@ -175,7 +175,7 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
 
       {!collapsed ? (
         <div className="flex flex-col gap-1 ps-2">
-          {section.exercises.map((exercise) => {
+          {section.exercises.map((exercise, exerciseIndex) => {
             const resolved = resolveExercise(exercise, activeScale);
             const scaleLevel = activeScale ? scaleLevels.find((item) => item.slug === activeScale) : null;
 
@@ -258,8 +258,8 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
             } else if (ctx.prescriptionHint) {
               prescriptionText = (resolved.prescriptionUnit) + " — " + i18n(ctx.prescriptionHint);
             } else if (section.format === "cluster" && resolved.clustersPerSet) {
-              prescriptionText = (resolved.sets) + " × " + (resolved.clustersPerSet) + i18n("clusters65add00") + (resolved.prescriptionValue) + " " + (resolved.prescriptionUnit);
-            } else if (ctx.showSets) {
+              prescriptionText = (resolved.clustersPerSet) + i18n("clusters65add00") + (resolved.prescriptionValue) + " " + (resolved.prescriptionUnit);
+            } else if (ctx.showSets && !resolved.supersetGroupId && !resolved.alternatingGroupId) {
               const suffix = ctx.prescriptionSuffix ? "(" + i18n(ctx.prescriptionSuffix) + ")" : "";
               prescriptionText = (resolved.sets) + " × " + (resolved.prescriptionValue) + " " + (resolved.prescriptionUnit) + (suffix);
             } else {
@@ -272,14 +272,20 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
               prefixBadge = exercise.intervalAssignment === 1 ? i18n("odd710756a") : i18n("even70ca748");
             } else if (section.format === "complex_emom" && exercise.intervalAssignment !== null) {
               prefixBadge = i18n("min7eb0cee") + (exercise.intervalAssignment);
-            } else if (resolved.supersetGroupId) {
-              prefixBadge = i18n("supersetLabel");
-            } else if (resolved.alternatingGroupId) {
-              prefixBadge = i18n("alternatingSetsLabel");
             }
 
+            const compositionId = resolved.supersetGroupId ?? resolved.alternatingGroupId;
+            const previous = section.exercises[exerciseIndex - 1];
+            const previousCompositionId = previous?.supersetGroupId ?? previous?.alternatingGroupId;
+            const compositionColor = compositionId
+              ? ["var(--primary)", "var(--info)", "var(--success)", "var(--warning)"][Array.from(compositionId).reduce((sum, character) => sum + character.charCodeAt(0), 0) % 4]
+              : null;
+            const startsComposition = Boolean(compositionId && compositionId !== previousCompositionId);
+
             return (
-              <div key={exercise.localId} className="py-1 text-xs">
+              <div key={exercise.localId}>
+              {startsComposition ? <header className="mt-2 flex items-center gap-2 py-1 text-xs font-bold uppercase" style={{ color: compositionColor ?? undefined }}><span>{resolved.supersetGroupId ? i18n("supersetLabel") : i18n("alternatingSetsLabel")}</span><span>{resolved.sets} {i18n("setsd6c8220")}</span><span className="h-px flex-1 opacity-30" style={{ background: compositionColor ?? undefined }} /></header> : null}
+              <div className="py-1 ps-2 text-xs" style={{ borderInlineStart: compositionColor ? `3px solid ${compositionColor}` : undefined }}>
                 <div className="flex flex-wrap items-baseline gap-1.5">
                   {prefixBadge ? (
                     <span
@@ -332,7 +338,7 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
                     {resolved.note}
                   </div>
                 ) : null}
-              </div>
+              </div></div>
             );
           })}
         </div>

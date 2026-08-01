@@ -82,6 +82,9 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
       : null;
 
   const allDone = doneCount === steps.length;
+  const activeGroupSteps = activeStep.groupId ? steps.filter((step) => step.groupId === activeStep.groupId) : [];
+  const activeGroupSets = activeGroupSteps.reduce((max, step) => Math.max(max, step.setNumber), 0);
+  const groupColor = activeStep.groupKind === "superset" ? "var(--primary)" : "var(--info)";
 
   return (
     <div className="flex flex-col gap-3">
@@ -109,9 +112,17 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
           </p>
         </div>
       ) : (
+        <>
+        {activeStep.groupKind ? (
+          <header className="flex items-center gap-2 rounded-t-lg px-4 py-2 text-xs font-bold uppercase" style={{ border: `1px solid ${groupColor}`, borderBottom: 0, color: groupColor }}>
+            <span>{activeStep.groupKind === "superset" ? i18n("supersetLabel") : i18n("alternatingSetsLabel")}</span>
+            {activeGroupSets > 0 ? <span>{activeGroupSets} {i18n("setsd6c8220")}</span> : null}
+            <span className="h-px flex-1 opacity-30" style={{ background: groupColor }} />
+          </header>
+        ) : null}
         <div
-          className="rounded-2xl p-5 cursor-pointer select-none active:scale-[0.98] transition-transform"
-          style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+          className={`${activeStep.groupKind ? "rounded-b-lg" : "rounded-2xl"} p-5 cursor-pointer select-none active:scale-[0.98] transition-transform`}
+          style={{ background: "var(--panel)", border: `1px solid ${activeStep.groupKind ? groupColor : "var(--border)"}`, boxShadow: activeStep.groupKind ? `inset 3px 0 0 ${groupColor}` : "none" }}
           onClick={() => currentStep && onToggle(currentStep.stepId, steps)}
           role="button"
           tabIndex={0}
@@ -134,11 +145,6 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
                   {i18n("setLabel")} {currentStep.stepLabel}
                 </p>
               )}
-              {activeStep.groupKind ? (
-                <p className="mt-1 text-xs font-bold uppercase" style={{ color: activeStep.groupKind === "superset" ? "var(--primary)" : "var(--info)" }}>
-                  {activeStep.groupKind === "superset" ? i18n("supersetLabel") : i18n("alternatingSetsLabel")}
-                </p>
-              ) : null}
               {(prescriptionLabel ?? loadLabel) && (
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {prescriptionLabel && (
@@ -196,6 +202,7 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
             </p>
           </div>
         </div>
+        </>
       )}
 
       {doneCount > 0 && (
