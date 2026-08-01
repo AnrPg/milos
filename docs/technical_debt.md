@@ -29,6 +29,7 @@ the original wording and dates for traceability.
 | TD-034 | Open |
 | TD-035 | Open |
 | TD-036 | Resolved |
+| TD-037 | Open |
 
 ## Detailed Ledger
 
@@ -70,3 +71,4 @@ the original wording and dates for traceability.
 | TD-034 | Multi-tenancy | Automate delivery of one-off tenant-scoped registration invitations through verified email links or an OTP provider, including delivery status, retry, abuse controls, and recovery workflows | The initial multi-tenant rollout will have the platform owner distribute invitations manually; provider selection, sender-domain configuration, privacy review, and operational monitoring require a dedicated integration phase | High | 2026-07-18 |
 | TD-035 | Offline Commands | Add retry/remove controls for permanently failed message operations plus explicit outbox adapters and server idempotency/conflict policies for selected non-message notification-triggering commands | ADR-067 deliberately enables automatic retry for transient message failures first; permanent failures need explicit UX, while booking, approval, journal, and other commands must opt in through their owning contexts rather than being replayed generically | Medium | 2026-07-19 |
 | TD-036 | Workout Quick Text DSL | Resolved 2026-07-31 by ADR-069/ADR-070: all nineteen registry-generated templates, nested metadata and tweak combinations, stable code-backed exercise catalog IDs, positioned diagnostics, revision-safe direct publication, conformance coverage, autocomplete, and the coach manual now share one canonical contract | Kept in the ledger for traceability of the original first-slice limitation | Low | 2026-07-31 |
+| TD-037 | User-profile programming | Support personalized WODs or per-member WOD modifications independently of a booked class | Members currently receive workouts only through booked classes by explicit product decision; the ownership, execution, and entitlement semantics for direct personalized member programming need a separate design | Medium | 2026-08-01 |
