@@ -3666,7 +3666,7 @@ export interface operations {
                     base_price_cents?: number;
                     /** @enum {string} */
                     billing_period?: "monthly" | "quarterly" | "annual" | "custom";
-                    code?: string;
+                    code?: string | null;
                     currency?: string;
                     description?: string | null;
                     family?: string;
@@ -3767,7 +3767,7 @@ export interface operations {
                     base_price_cents?: number;
                     /** @enum {string} */
                     billing_period: "monthly" | "quarterly" | "annual" | "custom";
-                    code: string;
+                    code?: string | null;
                     currency?: string;
                     description?: string | null;
                     family: string;

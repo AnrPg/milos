@@ -126,7 +126,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
     }
   }
   @package_properties %{
-    code: %Schema{type: :string},
+    code: %Schema{type: :string, nullable: true},
     name: %Schema{type: :string},
     description: %Schema{type: :string, nullable: true},
     family: %Schema{type: :string},
@@ -147,7 +147,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
         schema: %Schema{
           type: :object,
           properties: @package_properties,
-          required: [:code, :name, :family, :billing_period],
+          required: [:name, :family, :billing_period],
           additionalProperties: false
         }
       }

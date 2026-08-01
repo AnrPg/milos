@@ -125,7 +125,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
           "status" => "active",
           "starts_on" => Date.utc_today(),
           "ends_on" => subscription.ends_on,
-          "package_code_snapshot" => replacement.code,
+          "package_code_snapshot" => package_identity_snapshot(replacement),
           "package_family_snapshot" => replacement.family,
           "billing_period_snapshot" => replacement.billing_period,
           "price_cents_snapshot" => replacement.base_price_cents,
@@ -249,7 +249,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
           |> Map.merge(%{
             "membership_id" => membership.id,
             "membership_package_id" => package.id,
-            "package_code_snapshot" => package.code,
+            "package_code_snapshot" => package_identity_snapshot(package),
             "package_family_snapshot" => package.family,
             "billing_period_snapshot" => package.billing_period,
             "price_cents_snapshot" => package.base_price_cents,
@@ -1267,6 +1267,18 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       metadata: entry.metadata,
       inserted_at: entry.inserted_at
     }
+  end
+
+  defp package_identity_snapshot(package) do
+    [package.code, package.name, package.family]
+    |> Enum.find_value(fn
+      value when is_binary(value) ->
+        trimmed = String.trim(value)
+        if trimmed == "", do: nil, else: trimmed
+
+      _ ->
+        nil
+    end)
   end
 
   defp serialize_entitlement_plan(plan) do
@@ -3082,6 +3094,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   end
 
   defp normalize_subscription(%MembershipPackageSubscription{} = subscription) do
+    package = Repo.get(MembershipPackage, subscription.membership_package_id)
+
     %{
       id: subscription.id,
       membership_id: subscription.membership_id,
@@ -3089,6 +3103,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       status: subscription.status,
       starts_on: subscription.starts_on,
       ends_on: subscription.ends_on,
+      package_name: package && package.name,
       package_code_snapshot: subscription.package_code_snapshot,
       package_family_snapshot: subscription.package_family_snapshot,
       billing_period_snapshot: subscription.billing_period_snapshot,

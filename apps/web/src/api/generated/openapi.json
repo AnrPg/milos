@@ -3312,6 +3312,7 @@
                     "type": "string"
                   },
                   "code": {
+                    "nullable": true,
                     "type": "string"
                   },
                   "currency": {
@@ -3575,6 +3576,7 @@
                     "type": "string"
                   },
                   "code": {
+                    "nullable": true,
                     "type": "string"
                   },
                   "currency": {
@@ -3725,7 +3727,6 @@
                   }
                 },
                 "required": [
-                  "code",
                   "name",
                   "family",
                   "billing_period"
