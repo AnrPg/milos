@@ -146,6 +146,8 @@ export type WorkoutRecord = {
   is_team_workout?: boolean;
   status?: string;
   created_by_id?: string;
+  folder_id?: string | null;
+  source_workout_id?: string | null;
   inserted_at?: string;
   updated_at?: string;
   scale_level?: ScaleLevel;
@@ -158,6 +160,13 @@ export type WorkoutRecord = {
   dsl_document?: Record<string, unknown> | null;
   dsl_source_revision?: number;
   last_dsl_diagnostics?: WorkoutDslDiagnostic[];
+};
+
+export type WorkoutFolder = {
+  id: string;
+  name: string;
+  parent_id: string | null;
+  created_by_id: string;
 };
 
 export type MaterializedWorkoutResponse = {
@@ -262,6 +271,31 @@ export async function replaceScaleLevels(token: string, payload: ReplaceScaleLev
 export async function listAdminWorkouts(token: string) {
   const response = await apiRequest<{ workouts: WorkoutRecord[] }>("/admin/workouts", { token });
   return response.workouts;
+}
+
+export async function listWorkoutFolders(token: string) {
+  const response = await apiRequest<{ folders: WorkoutFolder[] }>("/admin/workout-folders", { token });
+  return response.folders;
+}
+
+export function createWorkoutFolder(token: string, body: { name: string; parent_id: string | null }) {
+  return apiRequest<WorkoutFolder>("/admin/workout-folders", { token, method: "POST", body });
+}
+
+export function updateWorkoutFolder(token: string, id: string, body: { name: string; parent_id: string | null }) {
+  return apiRequest<WorkoutFolder>(`/admin/workout-folders/${id}`, { token, method: "PATCH", body });
+}
+
+export function deleteWorkoutFolder(token: string, id: string) {
+  return apiRequest<void>(`/admin/workout-folders/${id}`, { token, method: "DELETE" });
+}
+
+export function moveWorkoutToFolder(token: string, id: string, folderId: string | null) {
+  return apiRequest<{ id: string; folder_id: string | null }>(`/admin/workouts/${id}/library`, {
+    token,
+    method: "PATCH",
+    body: { folder_id: folderId },
+  });
 }
 
 function stripNullDraftFields(payload: unknown) {

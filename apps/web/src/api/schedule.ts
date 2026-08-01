@@ -75,6 +75,9 @@ export type ScheduleBooking = {
 export type ScheduleSlot = {
   id: string;
   master_workout_id: string;
+  class_series_id?: string | null;
+  name: string;
+  duration_minutes: number;
   scheduled_at: string;
   class_type_id: string;
   class_type: ClassTypeRecord;
@@ -99,6 +102,8 @@ export type ScheduleWindow = {
 export type ScheduleSlotPayload = {
   master_workout_id: string;
   class_type_id: string;
+  name: string;
+  duration_minutes: number;
   scheduled_at: string;
   capacity: number;
   auto_approve: boolean;
@@ -181,6 +186,30 @@ export async function createScheduleSlot(token: string, payload: ScheduleSlotPay
   });
 
   return response.slot;
+}
+
+export async function createScheduleSeries(
+  token: string,
+  payload: {
+    master_workout_id: string;
+    class_type_id: string;
+    name: string;
+    duration_minutes: number;
+    timezone: string;
+    starts_on: string;
+    ends_on: string | null;
+    local_start_time: string;
+    weekdays: number[];
+    excluded_dates: string[];
+    capacity: number;
+    auto_approve: boolean;
+    booking_timeout_minutes: number;
+  },
+) {
+  return apiRequest<{ series: { id: string; occurrence_count: number } }>(
+    "/admin/schedule/slots/series",
+    { method: "POST", token, body: payload },
+  );
 }
 
 export async function updateScheduleSlot(token: string, slotId: string, payload: ScheduleSlotPayload) {

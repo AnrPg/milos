@@ -12,8 +12,14 @@ import { useRouter } from "next/navigation";
 
 import { ApiError } from "@/api/client";
 import {
+  createWorkoutFolder,
+  deleteWorkoutFolder,
   deleteWorkout,
+  listWorkoutFolders,
   listAdminWorkouts,
+  moveWorkoutToFolder,
+  updateWorkoutFolder,
+  type WorkoutFolder,
   type WorkoutRecord,
 } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
@@ -33,6 +39,12 @@ export function WorkoutAdminConsole() {
   const router = useRouter();
   const { currentUser, signOut, status, tokens } = useSession();
   const [workouts, setWorkouts] = useState<WorkoutRecord[]>([]);
+  const [folders, setFolders] = useState<WorkoutFolder[]>([]);
+  const [viewMode, setViewMode] = useState<"folders" | "tiles" | "list">("folders");
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null | "all">("all");
+  const [sortKey, setSortKey] = useState<"title" | "type" | "updated_at">("title");
+  const [folderName, setFolderName] = useState("");
+  const [folderParentId, setFolderParentId] = useState<string>("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busyAction, setBusyAction] = useState<string | null>(null);
@@ -50,8 +62,12 @@ export function WorkoutAdminConsole() {
     if (currentUser.role !== "admin") return;
 
     try {
-      const workoutList = await listAdminWorkouts(tokens.access_token);
+      const [workoutList, folderList] = await Promise.all([
+        listAdminWorkouts(tokens.access_token),
+        listWorkoutFolders(tokens.access_token),
+      ]);
       setWorkouts(workoutList);
+      setFolders(folderList);
       setMessage(null);
       setError(null);
     } catch (loadError) {
@@ -139,6 +155,57 @@ export function WorkoutAdminConsole() {
     });
   }
 
+  const folderById = new Map(folders.map((folder) => [folder.id, folder]));
+  const folderLabel = (folder: WorkoutFolder) => {
+    const parts = [folder.name];
+    let parent = folder.parent_id ? folderById.get(folder.parent_id) : undefined;
+    while (parent) {
+      parts.unshift(parent.name);
+      parent = parent.parent_id ? folderById.get(parent.parent_id) : undefined;
+    }
+    return parts.join(" / ");
+  };
+  const orderedFolders = [...folders].sort((a, b) => folderLabel(a).localeCompare(folderLabel(b)));
+  const visibleWorkouts = workouts
+    .filter((workout) => selectedFolderId === "all" || workout.folder_id === selectedFolderId)
+    .sort((a, b) => String(a[sortKey] ?? "").localeCompare(String(b[sortKey] ?? "")));
+
+  async function addFolder() {
+    if (!tokens?.access_token || !folderName.trim()) return;
+    await runAction("create-folder", async () => {
+      const folder = await createWorkoutFolder(tokens.access_token!, {
+        name: folderName.trim(),
+        parent_id: folderParentId || null,
+      });
+      setFolders((current) => [...current, folder]);
+      setFolderName("");
+    });
+  }
+
+  async function renameFolder(folder: WorkoutFolder) {
+    if (!tokens?.access_token) return;
+    const name = window.prompt(i18n("featureFolderName"), folder.name)?.trim();
+    if (!name) return;
+    await runAction(`folder-${folder.id}`, async () => {
+      const updated = await updateWorkoutFolder(tokens.access_token!, folder.id, {
+        name,
+        parent_id: folder.parent_id,
+      });
+      setFolders((current) => current.map((item) => item.id === updated.id ? updated : item));
+    });
+  }
+
+  async function removeFolder(folder: WorkoutFolder) {
+    if (!tokens?.access_token || !window.confirm(
+      i18n("featureDeleteFolderConfirm", { name: folder.name }),
+    )) return;
+    await runAction(`folder-${folder.id}`, async () => {
+      await deleteWorkoutFolder(tokens.access_token!, folder.id);
+      setFolders((current) => current.filter((item) => item.id !== folder.id).map((item) => item.parent_id === folder.id ? { ...item, parent_id: folder.parent_id } : item));
+      setWorkouts((current) => current.map((item) => item.folder_id === folder.id ? { ...item, folder_id: folder.parent_id } : item));
+    });
+  }
+
   return (
     <main className="min-h-screen px-6 py-8 md:px-10 md:py-12" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-7xl space-y-8">
@@ -212,8 +279,32 @@ export function WorkoutAdminConsole() {
                 </Link>
               </div>
 
-              <div className="mt-6 grid gap-4 lg:grid-cols-2">
-                {workouts.map((workout) => (
+              <div className="mt-6 grid gap-4 rounded-[1.5rem] p-4 lg:grid-cols-[1fr_auto]" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
+                <div className="flex flex-wrap gap-2">
+                  <input aria-label={i18n("featureNewFolderName")} className="min-w-44 rounded-xl px-3 py-2 text-sm" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} placeholder={i18n("featureNewFolder")} value={folderName} onChange={(event) => setFolderName(event.target.value)} />
+                  <select aria-label={i18n("featureParentFolder")} className="rounded-xl px-3 py-2 text-sm" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} value={folderParentId} onChange={(event) => setFolderParentId(event.target.value)}>
+                    <option value="">{i18n("featureLibraryRoot")}</option>
+                    {orderedFolders.map((folder) => <option key={folder.id} value={folder.id}>{folderLabel(folder)}</option>)}
+                  </select>
+                  <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }} onClick={() => void addFolder()}>{i18n("featureAddFolder")}</button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {(["folders", "tiles", "list"] as const).map((mode) => <button key={mode} type="button" aria-pressed={viewMode === mode} className="rounded-full px-3 py-2 text-sm font-semibold capitalize" style={{ background: viewMode === mode ? "var(--text)" : "var(--panel)", color: viewMode === mode ? "var(--bg)" : "var(--text-soft)", border: "1px solid var(--border)" }} onClick={() => setViewMode(mode)}>{i18n(`featureView${mode[0].toUpperCase()}${mode.slice(1)}`)}</button>)}
+                </div>
+              </div>
+
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <select aria-label={i18n("featureFilterByFolder")} className="rounded-xl px-3 py-2 text-sm" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={selectedFolderId ?? ""} onChange={(event) => setSelectedFolderId(event.target.value === "all" ? "all" : event.target.value || null)}>
+                  <option value="all">{i18n("featureAllFolders")}</option>
+                  <option value="">{i18n("featureUncategorized")}</option>
+                  {orderedFolders.map((folder) => <option key={folder.id} value={folder.id}>{folderLabel(folder)}</option>)}
+                </select>
+                {viewMode === "list" ? <select aria-label={i18n("featureSortWorkouts")} className="rounded-xl px-3 py-2 text-sm" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={sortKey} onChange={(event) => setSortKey(event.target.value as typeof sortKey)}><option value="title">{i18n("featureTitle")}</option><option value="type">{i18n("featureType")}</option><option value="updated_at">{i18n("featureUpdated")}</option></select> : null}
+                {viewMode === "folders" ? orderedFolders.map((folder) => <span key={folder.id} className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}><button type="button" onClick={() => setSelectedFolderId(folder.id)}>{folderLabel(folder)}</button><button type="button" aria-label={i18n("featureRenameFolder", { name: folder.name })} onClick={() => void renameFolder(folder)}>✎</button><button type="button" aria-label={i18n("featureDeleteFolder", { name: folder.name })} onClick={() => void removeFolder(folder)}>×</button></span>) : null}
+              </div>
+
+              <div className={viewMode === "list" ? "mt-6 space-y-2" : "mt-6 grid gap-4 lg:grid-cols-2"}>
+                {visibleWorkouts.map((workout) => (
                   <article key={workout.id} className="rounded-[1.5rem] p-5" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", cursor: "pointer" }} onClick={() => setPreviewWorkoutId(workout.id)}>
                     <div className="flex items-center justify-between gap-4">
                       <div>
@@ -233,11 +324,19 @@ export function WorkoutAdminConsole() {
                         <p className="mt-1 text-sm uppercase tracking-[0.18em] text-[var(--primary)]"><SemanticLabel value={workout.type} /></p>
                       </div>
                       <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--muted)" }}>
-                        {(workout.sections ?? []).length} {i18n("section20182fb")}{(workout.sections ?? []).length === 1 ? "" : i18n("sa0f1490")}
+                        {i18n("featureSectionCount", { count: (workout.sections ?? []).length })}
                       </span>
                     </div>
 
                     <div className="mt-4 flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
+                      <select aria-label={i18n("featureFolderForWorkout", { title: workout.title })} className="rounded-full px-3 py-1 text-xs" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} value={workout.folder_id ?? ""} onChange={(event) => {
+                        const folderId = event.target.value || null;
+                        if (!tokens?.access_token) return;
+                        void moveWorkoutToFolder(tokens.access_token, workout.id, folderId).then(() => setWorkouts((current) => current.map((item) => item.id === workout.id ? { ...item, folder_id: folderId } : item)));
+                      }}>
+                        <option value="">{i18n("featureUncategorized")}</option>
+                        {orderedFolders.map((folder) => <option key={folder.id} value={folder.id}>{folderLabel(folder)}</option>)}
+                      </select>
                       {workout.status === "draft" ? (
                         <Link
                           className="rounded-full px-3 py-1 text-xs font-semibold"
