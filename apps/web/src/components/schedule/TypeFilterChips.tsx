@@ -28,6 +28,8 @@ export function TypeFilterChips({ classTypes, value, onChange }: TypeFilterChips
   const [pinned, setPinned] = useState(false);
   const t = useTranslations("Schedule");
 
+  if (classTypes.filter((type) => !type.archived_at).length <= 1) return null;
+
   return (
     <div
       className="relative min-w-0 flex-1"

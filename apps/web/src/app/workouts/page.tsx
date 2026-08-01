@@ -137,7 +137,14 @@ function WorkoutsPageContent() {
       endAt: end.toISOString(),
       days: 7,
       classTypeIds: [],
-    }).then((schedule) => setClassTypes(schedule.class_types)).catch(() => setClassTypes([]));
+    }).then((schedule) => {
+      setClassTypes(schedule.class_types);
+      const activeTypes = schedule.class_types.filter((type) => !type.archived_at);
+      if (activeTypes.length === 1) {
+        setSelectedClassType(activeTypes[0]);
+        setStep("week");
+      }
+    }).catch(() => setClassTypes([]));
   }, [accessToken]);
 
   const loadWeek = useCallback(async () => {
@@ -387,13 +394,13 @@ function WorkoutsPageContent() {
           }}
         >
           <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
-            <button
+            {classTypes.filter((type) => !type.archived_at).length > 1 ? <button
               onClick={() => setStep("type")}
               className="text-sm"
               style={{ color: "var(--muted)" }}
             >
               {i18n("backdc381ae")}
-            </button>
+            </button> : <span className="w-10" />}
             <div className="text-center">
               <div className="text-xs uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
                 {selectedClassType?.name}
