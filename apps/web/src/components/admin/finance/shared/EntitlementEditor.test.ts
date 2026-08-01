@@ -22,30 +22,49 @@ const draft: EntitlementDraft = {
 };
 
 describe("EntitlementEditor entitlement helpers", () => {
-  it("removes blocked workout-library options from editable drafts", () => {
+  it("removes blocked workout-library and coaching-touchpoint options from editable drafts", () => {
     expect(sanitizeEntitlementDraft(draft)).toMatchObject({
       channels: ["in_person", "personal_programming"],
-      capabilities: ["book_classes", "execute_assigned_workouts", "receive_coaching_touchpoints"],
+      capabilities: ["book_classes", "execute_assigned_workouts"],
     });
   });
 
-  it("does not persist blocked workout-library options in package params", () => {
+  it("does not persist blocked workout-library or coaching-touchpoint options in package params", () => {
     expect(entitlementParams(draft)).toMatchObject({
       channels: ["in_person", "personal_programming"],
-      capabilities: ["book_classes", "execute_assigned_workouts", "receive_coaching_touchpoints"],
+      capabilities: ["book_classes", "execute_assigned_workouts"],
+      allowances: {
+        class_visits: {
+          limit: "unlimited",
+          period: "calendar_month",
+          counted_kinds: [],
+        },
+      },
     });
+    expect(entitlementParams(draft).allowances).not.toHaveProperty("coaching_touchpoints");
   });
 
-  it("strips blocked workout-library options loaded from existing package params", () => {
+  it("strips blocked workout-library and coaching-touchpoint options loaded from existing package params", () => {
     expect(
       entitlementDraft({
         channels: ["workout_library", "in_person"],
-        capabilities: ["execute_library_workouts", "execute_class_workouts"],
-        allowances: {},
+        capabilities: [
+          "execute_library_workouts",
+          "execute_class_workouts",
+          "receive_coaching_touchpoints",
+        ],
+        allowances: {
+          coaching_touchpoints: {
+            limit: "unlimited",
+            period: "calendar_month",
+            counted_kinds: [],
+          },
+        },
       }),
     ).toMatchObject({
       channels: ["in_person"],
       capabilities: ["execute_class_workouts"],
+      coachingTouchpointLimit: "unlimited",
     });
   });
 });

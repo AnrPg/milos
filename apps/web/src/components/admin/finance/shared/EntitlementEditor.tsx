@@ -9,7 +9,10 @@ import {useUiTranslations} from "@/i18n/ui";
 import { SemanticLabel } from "@/components/semantic-label";
 
 const BLOCKED_CHANNELS = new Set(["workout_library"]);
-const BLOCKED_CAPABILITIES = new Set(["execute_library_workouts"]);
+const BLOCKED_CAPABILITIES = new Set([
+  "execute_library_workouts",
+  "receive_coaching_touchpoints",
+]);
 
 export type EntitlementDraft = {
   channels: string[];
@@ -100,7 +103,11 @@ export function EntitlementEditor({
       disabledReason: i18n("workoutOptionsUnavailable3c866ef"),
     },
     { key: "execute_assigned_workouts", text: i18n("executeAssignedWorkouts8b32393") },
-    { key: "receive_coaching_touchpoints", text: i18n("receiveCoachingTouchpointscadf91e") },
+    {
+      key: "receive_coaching_touchpoints",
+      text: i18n("receiveCoachingTouchpointscadf91e"),
+      disabledReason: i18n("workoutOptionsUnavailable3c866ef"),
+    },
   ] as const;
 
   const CHANNELS = [
