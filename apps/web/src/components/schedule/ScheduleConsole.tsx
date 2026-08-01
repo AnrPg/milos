@@ -306,6 +306,26 @@ export function ScheduleConsole({
     }
   }
 
+  async function deleteSelectedSlot() {
+    if (!tokens?.access_token || !selectedSlot) return;
+    if (!window.confirm(t("deleteSlot"))) return;
+
+    setBusy(true);
+    setError(null);
+
+    try {
+      await deleteScheduleSlot(tokens.access_token, selectedSlot.id);
+      setSelectedSlot(null);
+      await loadSchedule();
+    } catch (requestError) {
+      const message =
+        requestError instanceof ApiError ? localizeError(requestError, i18n) : t("failedToDeleteSlot");
+      setError(message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   function openCreateEditor(isoDate: string) {
     if (!workouts.length || !classTypes.some((type) => !type.archived_at)) {
       setError(t("createPrerequisites"));
@@ -467,6 +487,7 @@ export function ScheduleConsole({
           onBook={() => setBookingTarget(selectedSlot)}
           onCancelBooking={() => void loadSchedule()}
           onClose={() => setSelectedSlot(null)}
+          onDelete={() => void deleteSelectedSlot()}
           onEdit={() => openUpdateEditor(selectedSlot)}
           onRejectBooking={(booking) => {
             setResolveMessage("");
