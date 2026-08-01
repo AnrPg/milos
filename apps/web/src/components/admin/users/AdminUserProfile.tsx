@@ -24,10 +24,10 @@ import {
 } from "@/api/admin-users";
 import type { PRSupportingMetrics } from "@/api/gamification";
 import type { EffectiveEntitlement } from "@/api/my-finance";
-import { visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
+import { updateFinanceMember } from "@/api/finance";
+import { packageSubscriptionLabel, visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
 import {
   ADMIN_PROFILE_SECTION_REQUEST,
-  openAdminProfileSection,
   type AdminProfileSectionRequest,
 } from "@/components/admin/users/admin-profile-navigation";
 import { LocalizedScore } from "@/components/localized-score";
@@ -38,10 +38,10 @@ import { semanticLabel } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { UserProgrammingSchedule } from "@/components/admin/users/UserProgrammingSchedule";
+import { IntegerInput } from "@/components/integer-input";
 
-function Panel({ id, title, children, href, hrefLabel }: { id: string; title: string; children: React.ReactNode; href?: string; hrefLabel?: string }) {
+function Panel({ id, title, children }: { id: string; title: string; children: React.ReactNode; href?: string; hrefLabel?: string }) {
   const i18n = useUiTranslations();
-  const resolvedHrefLabel = hrefLabel ?? i18n("openWorkspace8b23311");
   const [open, setOpen] = useState(id === "overview" || id === "finance" || id === "admin_actions");
 
   useEffect(() => {
@@ -75,7 +75,6 @@ function Panel({ id, title, children, href, hrefLabel }: { id: string; title: st
       {open ? (
         <div id={`${id}-content`} className="border-t px-6 pb-6 pt-4 text-sm leading-6" style={{ borderColor: "var(--border)", color: "var(--text-soft)" }}>
           {children}
-          {href ? <Link href={href} className="mt-4 inline-flex items-center gap-1 text-sm font-semibold" style={{ color: "var(--primary)" }}>{resolvedHrefLabel} <span className="inline-block rtl:rotate-180">→</span></Link> : null}
         </div>
       ) : null}
     </article>
@@ -130,8 +129,7 @@ function StatGrid({ items }: { items: Array<[string, React.ReactNode]> }) {
   );
 }
 
-function DetailCard({ title, meta, value, children, href, plainChildren = false }: { title: React.ReactNode; meta?: React.ReactNode; value?: React.ReactNode; children?: React.ReactNode; href?: string; plainChildren?: boolean }) {
-  const i18n = useUiTranslations();
+function DetailCard({ title, meta, value, children, plainChildren = false }: { title: React.ReactNode; meta?: React.ReactNode; value?: React.ReactNode; children?: React.ReactNode; href?: string; plainChildren?: boolean }) {
   const content = (
     <>
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -149,21 +147,8 @@ function DetailCard({ title, meta, value, children, href, plainChildren = false 
           {children}
         </div>
       ) : null}
-      {href ? (
-        <span aria-hidden className="absolute bottom-3 end-3 rounded-xl px-2 py-1 text-xs font-semibold opacity-50 transition-opacity group-hover:opacity-100" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
-          ↗
-        </span>
-      ) : null}
     </>
   );
-
-  if (href) {
-    return (
-      <Link href={href} aria-label={i18n("openWorkspace8b23311")} className="group relative block rounded-[1.4rem] p-4 transition-transform hover:-translate-y-0.5" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
-        {content}
-      </Link>
-    );
-  }
 
   return (
     <div className="group relative rounded-[1.4rem] p-4 transition-transform hover:-translate-y-0.5" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
@@ -259,7 +244,7 @@ function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: s
           <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("extendThisUserSAllowance6e08374")}</p>
           <div className="grid gap-3 sm:grid-cols-3">
             <select value={form.allowance} onChange={() => setForm({ ...form, allowance: "class_visits" })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}><option value="class_visits">{i18n("classVisits142b3b0")}</option></select>
-            <input aria-label={i18n("additionalUnits1d9dac0")} type="number" min={1} value={form.quantity} onChange={(event) => setForm({ ...form, quantity: Number(event.target.value) })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)" }} />
+            <IntegerInput aria-label={i18n("additionalUnits1d9dac0")} min={1} value={form.quantity} emptyValue={1} onValueChange={(quantity) => setForm({ ...form, quantity: quantity ?? 1 })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)" }} />
             <select value={form.period} onChange={(event) => setForm({ ...form, period: event.target.value as typeof form.period })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}><option value="calendar_week">{i18n("thisCalendarWeekb05ceca")}</option><option value="calendar_month">{i18n("thisCalendarMonthbb33495")}</option><option value="subscription_period">{i18n("subscriptionPeriod22e7508")}</option></select>
           </div>
           <textarea required minLength={3} placeholder={i18n("reasonForThisPersonalExtensionbe8ddf7")} value={form.reason} onChange={(event) => setForm({ ...form, reason: event.target.value })} className="min-h-20 w-full rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)" }} />
@@ -276,80 +261,70 @@ function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: s
   );
 }
 
-function packageLabel(subscription: Record<string, unknown>) {
-  return valueText(subscription.package_name) ||
-    valueText(subscription.package_code_snapshot) ||
-    valueText(subscription.package_family_snapshot);
-}
-
-function FinanceDetails({ finance, workspaceHref }: { finance: AdminUserFinance; workspaceHref: string }) {
+function FinanceDetails({ finance, token, userId, onRefresh }: { finance: AdminUserFinance; token: string; userId: string; onRefresh: () => Promise<unknown> }) {
   const i18n = useUiTranslations();
   const membership = finance.details.membership;
   const subscriptions = finance.details.package_subscriptions;
   const claims = finance.details.referral_claims;
   const referredMembers = finance.details.referred_members;
   const rewards = finance.details.referral_rewards;
-  const membershipStatus = valueText(membership?.status);
+  const [draft, setDraft] = useState(() => ({
+    status: valueText(membership?.status) === "—" ? "active" : valueText(membership?.status),
+    starts_on: typeof membership?.starts_on === "string" ? membership.starts_on.slice(0, 10) : "",
+    expires_on: typeof membership?.expires_on === "string" ? membership.expires_on.slice(0, 10) : "",
+    signup_source: valueText(membership?.signup_source) === "—" ? "" : valueText(membership?.signup_source),
+    notes: valueText(membership?.notes) === "—" ? "" : valueText(membership?.notes),
+  }));
+  const updateMembership = useMutation({
+    mutationFn: (patch: Record<string, unknown>) => updateFinanceMember(token, userId, patch),
+    onSuccess: () => onRefresh(),
+  });
+  const fieldStyle = { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" };
 
   return (
     <div className="mt-5 space-y-6">
-      <div className="grid gap-3 lg:grid-cols-[1.1fr_1fr]">
+      <div className="space-y-5">
         <div>
-        <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="mb-3">
           <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("membership53bc967")}</p>
-          <Link href={workspaceHref} className="text-xs font-semibold" style={{ color: "var(--primary)" }}>
-            {i18n("editPackage77c0543")} ↗
-          </Link>
         </div>
         {membership ? (
-          <Link href={workspaceHref} className="block rounded-[1.5rem] p-4 transition-transform hover:-translate-y-0.5" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="text-xs uppercase tracking-[0.14em]" style={{ color: "var(--muted)" }}>{i18n("account85dfa32")}</p>
-                <p className="mt-1 text-lg font-semibold" style={{ color: "var(--text)" }}><SemanticLabel value={membershipStatus} /></p>
-              </div>
-              <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--panel)", color: "var(--primary)" }}>
-                {i18n("openWorkspace8b23311")}
-              </span>
-            </div>
-            <div className="mt-4 grid gap-2 sm:grid-cols-3">
-              <p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("startsOn6d888f7")}<br /><span style={{ color: "var(--text-soft)" }}>{date(membership.starts_on)}</span></p>
-              <p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("expiresOn549cabe")}<br /><span style={{ color: "var(--text-soft)" }}>{date(membership.expires_on)}</span></p>
-              <p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("signupSource69d3a02")}<br /><span style={{ color: "var(--text-soft)" }}><SemanticLabel value={valueText(membership.signup_source)} /></span></p>
-            </div>
-          </Link>
+          <div className="space-y-3 rounded-[1.5rem] p-4" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+            <label className="block text-xs" style={{ color: "var(--muted)" }}>{i18n("statusbae7d5b")}
+              <select className="mt-1 w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft.status} onChange={(event) => { const status = event.target.value; setDraft((current) => ({ ...current, status })); updateMembership.mutate({ status }); }}>
+                {['active', 'inactive', 'cancelled'].map((status) => <option key={status} value={status}>{semanticLabel(status, i18n)}</option>)}
+              </select>
+            </label>
+            {[['starts_on', i18n("startsOn6d888f7")], ['expires_on', i18n("expiresOn549cabe")]].map(([key, label]) => <label className="block text-xs" key={key} style={{ color: "var(--muted)" }}>{label}<input className="mt-1 w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} type="date" value={draft[key as 'starts_on' | 'expires_on']} onChange={(event) => setDraft((current) => ({ ...current, [key]: event.target.value }))} onBlur={() => updateMembership.mutate({ [key]: draft[key as 'starts_on' | 'expires_on'] || null })} /></label>)}
+            <label className="block text-xs" style={{ color: "var(--muted)" }}>{i18n("signupSource69d3a02")}<input className="mt-1 w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft.signup_source} onChange={(event) => setDraft((current) => ({ ...current, signup_source: event.target.value }))} onBlur={() => updateMembership.mutate({ signup_source: draft.signup_source || null })} /></label>
+            <label className="block text-xs" style={{ color: "var(--muted)" }}>{i18n("notes7044004")}<textarea className="mt-1 min-h-20 w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft.notes} onChange={(event) => setDraft((current) => ({ ...current, notes: event.target.value }))} onBlur={() => updateMembership.mutate({ notes: draft.notes || null })} /></label>
+            {updateMembership.isPending ? <p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("quickTextSaving")}</p> : null}
+            {updateMembership.isError ? <p className="text-xs" style={{ color: "var(--danger)" }}>{i18n("quickTextSaveError")}</p> : null}
+          </div>
         ) : <Empty>{i18n("noMembershipRecord741b5d9")}</Empty>}
       </div>
 
       {subscriptions.length ? (
         <div>
-          <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="mb-3">
             <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("packageSubscriptions09a33f1")}</p>
-            <Link href={workspaceHref} className="text-xs font-semibold" style={{ color: "var(--primary)" }}>
-              {i18n("assignPackage90e07f6")} ↗
-            </Link>
           </div>
           <div className="grid gap-2">
             {subscriptions.slice(0, 3).map((subscription) => (
               <GenericRecordCard
                 key={valueText(subscription.id)}
-                title={packageLabel(subscription)}
+                title={packageSubscriptionLabel(subscription)}
                 meta={<><SemanticLabel value={valueText(subscription.status)} /> · {date(subscription.starts_on)}–{date(subscription.ends_on)}</>}
                 value={money(subscription.price_cents_snapshot)}
-                href={workspaceHref}
               />
             ))}
-            {subscriptions.length > 3 ? (
-              <Link href={workspaceHref} className="text-xs font-semibold" style={{ color: "var(--primary)" }}>
-                +{subscriptions.length - 3} {i18n("moree7c95b4")} ↗
-              </Link>
-            ) : null}
+            {subscriptions.length > 3 ? <p className="text-xs" style={{ color: "var(--muted)" }}>+{subscriptions.length - 3} {i18n("moree7c95b4")}</p> : null}
           </div>
         </div>
       ) : null}
       </div>
 
-      {claims.length ? (
+      {(claims.length || referredMembers.length || rewards.length) ? <details className="rounded-xl p-4" style={{ border: "1px solid var(--border)" }}><summary className="cursor-pointer font-semibold" style={{ color: "var(--text)" }}>{i18n("advancedSettingsc8fef35")}</summary><div className="mt-4 space-y-5">{claims.length ? (
         <FinanceRecordList
           title={i18n("referralEvents8bcf3f4")}
           records={claims}
@@ -363,7 +338,7 @@ function FinanceDetails({ finance, workspaceHref }: { finance: AdminUserFinance;
           records={referredMembers}
           personKey="referred_nickname"
         />
-      ) : null}
+      ) : null}</div></details> : null}
 
       {rewards.length ? (
         <div>
@@ -544,7 +519,6 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   });
   const sections = new Set(visibleSections);
   if (profile.identity.role === "member" || profile.identity.role === "athlete") sections.add("schedule");
-  const financeWorkspaceHref = `/admin/finance?tab=members&member=${userId}`;
   const overviewItems: Array<[string, React.ReactNode]> = [
     [i18n("rolec3f104d"), <SemanticLabel key="role" value={profile.identity.role} />],
     [i18n("account85dfa32"), <SemanticLabel key="account" value={profile.account_status} />],
@@ -555,7 +529,6 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   if (sections.has("finance")) {
     overviewItems.push(
       [i18n("finance1b48d3f"), finance.data?.summary?.current_status?.state ? <SemanticLabel key="finance" value={String(finance.data.summary.current_status.state)} /> : "—"],
-      [i18n("credits66c22fa"), finance.data?.summary?.credit_balance ?? "—"],
     );
   }
   if (executions.length) overviewItems.push([i18n("totalCompletionsfa16f4c"), training.data?.summary.completed_count ?? 0]);
@@ -574,11 +547,6 @@ export function AdminUserProfile({ userId }: { userId: string }) {
           </div>
         </section>
 
-        <nav aria-label={i18n("profileSectionscd4815c")} className="flex flex-wrap gap-2">
-          {(profile.identity.role === "member" || profile.identity.role === "athlete") ? <a href="#schedule" onClick={(event) => { event.preventDefault(); openAdminProfileSection("schedule"); }} className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>{i18n("featureScheduleProgramming")}</a> : null}
-          {visibleSections.map((section) => <a key={section} href={`#${section}`} onClick={(event) => { event.preventDefault(); openAdminProfileSection(section); }} className="rounded-full px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-80" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>{semanticLabel(section, i18n)}</a>)}
-        </nav>
-
         <section className="space-y-4">
           <Panel id="overview" title={i18n("overview0efc2e6")}>
             <StatGrid items={overviewItems} />
@@ -586,7 +554,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
 
           {token && (profile.identity.role === "member" || profile.identity.role === "athlete") ? <Panel id="schedule" title={i18n("featureScheduleProgramming")}><UserProgrammingSchedule token={token} userId={userId} role={profile.identity.role} /></Panel> : null}
 
-          {sections.has("finance") ? <Panel id="finance" title={i18n("finance1b48d3f")} href={financeWorkspaceHref}><div className="grid gap-3 sm:grid-cols-3"><DetailCard title={i18n("credits66c22fa")} value={finance.data?.summary?.credit_balance ?? 0} plainChildren /><DetailCard title={i18n("statusbae7d5b")} value={finance.data?.summary?.current_status?.state ? <SemanticLabel value={String(finance.data.summary.current_status.state)} /> : "—"} plainChildren href={financeWorkspaceHref} /><DetailCard title={i18n("entitlement8994749")} value={effectiveEntitlement?.status ? <SemanticLabel value={effectiveEntitlement.status} /> : "—"} plainChildren href={financeWorkspaceHref} /></div>{finance.data ? <FinanceDetails finance={finance.data} workspaceHref={financeWorkspaceHref} /> : null}{token ? <AdminEntitlements token={token} userId={userId} entitlement={effectiveEntitlement} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
+          {sections.has("finance") ? <Panel id="finance" title={i18n("finance1b48d3f")}>{finance.data && token ? <FinanceDetails finance={finance.data} token={token} userId={userId} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}<details className="mt-5 rounded-2xl p-4" style={{ border: "1px solid var(--border)" }}><summary className="cursor-pointer font-semibold" style={{ color: "var(--text)" }}>{i18n("advancedSettingsc8fef35")}</summary><div className="mt-4"><div className="grid gap-3 sm:grid-cols-2"><DetailCard title={i18n("credits66c22fa")} value={finance.data?.summary?.credit_balance ?? 0} plainChildren /><DetailCard title={i18n("entitlement8994749")} value={effectiveEntitlement?.status ? <SemanticLabel value={effectiveEntitlement.status} /> : "—"} plainChildren /></div>{token ? <AdminEntitlements token={token} userId={userId} entitlement={effectiveEntitlement} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</div></details></Panel> : null}
 
           {sections.has("training_history") ? <Panel id="training_history" title={i18n("trainingHistorya512053")} href="/admin/workouts"><p>{training.data?.summary.completed_count ?? 0} {i18n("completedOf88964ae")} {training.data?.summary.execution_count ?? 0} {i18n("executions8319d6e")}</p><div className="mt-3 grid gap-3">{executions.length ? executions.slice(0, 8).map((item) => <ExecutionCard key={item.id} item={item} href="/admin/workouts" />) : <Empty>{i18n("noWorkoutExecutionsRecorded0a0b1d0")}</Empty>}</div></Panel> : null}
 
