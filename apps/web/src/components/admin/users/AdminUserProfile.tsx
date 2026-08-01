@@ -132,9 +132,8 @@ function StatGrid({ items }: { items: Array<[string, React.ReactNode]> }) {
 
 function DetailCard({ title, meta, value, children, href, plainChildren = false }: { title: React.ReactNode; meta?: React.ReactNode; value?: React.ReactNode; children?: React.ReactNode; href?: string; plainChildren?: boolean }) {
   const i18n = useUiTranslations();
-
-  return (
-    <div className="group relative rounded-[1.4rem] p-4 transition-transform hover:-translate-y-0.5" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+  const content = (
+    <>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate font-semibold" style={{ color: "var(--text)" }}>{title}</p>
@@ -151,10 +150,24 @@ function DetailCard({ title, meta, value, children, href, plainChildren = false 
         </div>
       ) : null}
       {href ? (
-        <Link href={href} aria-label={i18n("openWorkspace8b23311")} className="absolute bottom-3 end-3 rounded-xl px-2 py-1 text-xs font-semibold opacity-50 transition-opacity hover:opacity-100" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
+        <span aria-hidden className="absolute bottom-3 end-3 rounded-xl px-2 py-1 text-xs font-semibold opacity-50 transition-opacity group-hover:opacity-100" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
           ↗
-        </Link>
+        </span>
       ) : null}
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link href={href} aria-label={i18n("openWorkspace8b23311")} className="group relative block rounded-[1.4rem] p-4 transition-transform hover:-translate-y-0.5" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <div className="group relative rounded-[1.4rem] p-4 transition-transform hover:-translate-y-0.5" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+      {content}
     </div>
   );
 }
@@ -227,7 +240,7 @@ function GenericRecordCard({ title, meta, detail, value, href }: { title: React.
 
 function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: string; userId: string; entitlement: EffectiveEntitlement | null | undefined; onRefresh: () => Promise<unknown> }) {
   const i18n = useUiTranslations();
-  const [form, setForm] = useState({ allowance: "class_visits" as "class_visits" | "coaching_touchpoints", quantity: 1, period: "calendar_month" as "calendar_week" | "calendar_month" | "subscription_period", reason: "" });
+  const [form, setForm] = useState({ allowance: "class_visits" as const, quantity: 1, period: "calendar_month" as "calendar_week" | "calendar_month" | "subscription_period", reason: "" });
   const [revokeTarget, setRevokeTarget] = useState<string | null>(null);
   const [revokeReason, setRevokeReason] = useState("");
   const grant = useMutation({ mutationFn: () => grantAdminUserAllowance(token, userId, form), onSuccess: async () => { setForm((value) => ({ ...value, quantity: 1, reason: "" })); await onRefresh(); } });
@@ -238,24 +251,27 @@ function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: s
   return (
     <>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        {Object.entries(entitlement?.allowances ?? {}).map(([key, allowance]) => allowance ? <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><p className="font-semibold">{semanticLabel(key, i18n)}</p><p>{String(allowance.remaining)} {i18n("remainingOf8553660")} {String(allowance.limit)}{allowance.extensions > 0 ? i18n("personalExtensionCount", { count: allowance.extensions }) : ""}</p><p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("resetsAftere96e46e")} {date(allowance.period_end)}</p></div> : null)}
+        {Object.entries(entitlement?.allowances ?? {}).filter(([key]) => key !== "coaching_touchpoints").map(([key, allowance]) => allowance ? <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><p className="font-semibold">{semanticLabel(key, i18n)}</p><p>{String(allowance.remaining)} {i18n("remainingOf8553660")} {String(allowance.limit)}{allowance.extensions > 0 ? i18n("personalExtensionCount", { count: allowance.extensions }) : ""}</p><p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("resetsAftere96e46e")} {date(allowance.period_end)}</p></div> : null)}
       </div>
-      <form className="mt-5 space-y-3 rounded-2xl p-4" style={{ border: "1px solid var(--border)" }} onSubmit={(event) => { event.preventDefault(); grant.mutate(); }}>
-        <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("extendThisUserSAllowance6e08374")}</p>
-        <div className="grid gap-3 sm:grid-cols-3">
-          <select value={form.allowance} onChange={(event) => setForm({ ...form, allowance: event.target.value as typeof form.allowance })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}><option value="class_visits">{i18n("classVisits142b3b0")}</option><option value="coaching_touchpoints">{i18n("coachingTouchpoints23bfcb6")}</option></select>
-          <input aria-label={i18n("additionalUnits1d9dac0")} type="number" min={1} value={form.quantity} onChange={(event) => setForm({ ...form, quantity: Number(event.target.value) })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)" }} />
-          <select value={form.period} onChange={(event) => setForm({ ...form, period: event.target.value as typeof form.period })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}><option value="calendar_week">{i18n("thisCalendarWeekb05ceca")}</option><option value="calendar_month">{i18n("thisCalendarMonthbb33495")}</option><option value="subscription_period">{i18n("subscriptionPeriod22e7508")}</option></select>
+      <details className="mt-5 rounded-2xl p-4" style={{ border: "1px solid var(--border)" }}>
+        <summary className="cursor-pointer font-semibold" style={{ color: "var(--text)" }}>{i18n("advancedSettingsc8fef35")}</summary>
+        <form className="mt-4 space-y-3" onSubmit={(event) => { event.preventDefault(); grant.mutate(); }}>
+          <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("extendThisUserSAllowance6e08374")}</p>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <select value={form.allowance} onChange={() => setForm({ ...form, allowance: "class_visits" })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}><option value="class_visits">{i18n("classVisits142b3b0")}</option></select>
+            <input aria-label={i18n("additionalUnits1d9dac0")} type="number" min={1} value={form.quantity} onChange={(event) => setForm({ ...form, quantity: Number(event.target.value) })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)" }} />
+            <select value={form.period} onChange={(event) => setForm({ ...form, period: event.target.value as typeof form.period })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}><option value="calendar_week">{i18n("thisCalendarWeekb05ceca")}</option><option value="calendar_month">{i18n("thisCalendarMonthbb33495")}</option><option value="subscription_period">{i18n("subscriptionPeriod22e7508")}</option></select>
+          </div>
+          <textarea required minLength={3} placeholder={i18n("reasonForThisPersonalExtensionbe8ddf7")} value={form.reason} onChange={(event) => setForm({ ...form, reason: event.target.value })} className="min-h-20 w-full rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)" }} />
+          <button disabled={grant.isPending || form.reason.trim().length < 3} className="rounded-full px-4 py-2 font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--bg)" }}>{grant.isPending ? i18n("extending80e2fcd") : i18n("extendAllowance2d3fd3a")}</button>
+          {grant.isError ? <p style={{ color: "var(--danger)" }}>{i18n("theExtensionCouldNotBeRecorded8e3fe5d")}</p> : null}
+        </form>
+        <div className="mt-5 space-y-2">
+          <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("personalExtensionHistory752eda5")}</p>
+          {entries.filter((entry) => entry.allowance_key !== "coaching_touchpoints" && entry.event_type === "adjustment" && entry.quantity_delta < 0).map((entry) => <div key={entry.id} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><div className="flex flex-wrap items-center justify-between gap-2"><div><strong>+{Math.abs(entry.quantity_delta)} {semanticLabel(entry.allowance_key, i18n)}</strong><p className="text-xs" style={{ color: "var(--muted)" }}>{entry.reason} · {date(entry.inserted_at)} {i18n("validThrough263dc88")} {date(entry.period_end)}</p></div>{revoked.has(entry.id) ? <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>{i18n("revoked85f17ac")}</span> : <button type="button" onClick={() => setRevokeTarget(entry.id)} className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{i18n("revoke0be7207")}</button>}</div>{revokeTarget === entry.id ? <form className="mt-3 flex flex-col gap-2 sm:flex-row" onSubmit={(event) => { event.preventDefault(); revoke.mutate(); }}><input required minLength={3} value={revokeReason} onChange={(event) => setRevokeReason(event.target.value)} placeholder={i18n("reasonForRevocationac5b98c")} className="min-w-0 flex-1 rounded-xl px-3 py-2" style={{ background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border)" }} /><button disabled={revoke.isPending || revokeReason.trim().length < 3} className="rounded-full px-3 py-2 text-xs font-semibold disabled:opacity-50" style={{ background: "var(--danger)", color: "white" }}>{i18n("confirmRevocationc1a9d03")}</button></form> : null}</div>)}
+          {entries.every((entry) => entry.allowance_key === "coaching_touchpoints" || entry.event_type !== "adjustment" || entry.quantity_delta >= 0) ? <Empty>{i18n("noPersonalExtensionsRecorded558dcb3")}</Empty> : null}
         </div>
-        <textarea required minLength={3} placeholder={i18n("reasonForThisPersonalExtensionbe8ddf7")} value={form.reason} onChange={(event) => setForm({ ...form, reason: event.target.value })} className="min-h-20 w-full rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)" }} />
-        <button disabled={grant.isPending || form.reason.trim().length < 3} className="rounded-full px-4 py-2 font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--bg)" }}>{grant.isPending ? i18n("extending80e2fcd") : i18n("extendAllowance2d3fd3a")}</button>
-        {grant.isError ? <p style={{ color: "var(--danger)" }}>{i18n("theExtensionCouldNotBeRecorded8e3fe5d")}</p> : null}
-      </form>
-      <div className="mt-5 space-y-2">
-        <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("personalExtensionHistory752eda5")}</p>
-        {entries.filter((entry) => entry.event_type === "adjustment" && entry.quantity_delta < 0).map((entry) => <div key={entry.id} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><div className="flex flex-wrap items-center justify-between gap-2"><div><strong>+{Math.abs(entry.quantity_delta)} {semanticLabel(entry.allowance_key, i18n)}</strong><p className="text-xs" style={{ color: "var(--muted)" }}>{entry.reason} · {date(entry.inserted_at)} {i18n("validThrough263dc88")} {date(entry.period_end)}</p></div>{revoked.has(entry.id) ? <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>{i18n("revoked85f17ac")}</span> : <button type="button" onClick={() => setRevokeTarget(entry.id)} className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{i18n("revoke0be7207")}</button>}</div>{revokeTarget === entry.id ? <form className="mt-3 flex flex-col gap-2 sm:flex-row" onSubmit={(event) => { event.preventDefault(); revoke.mutate(); }}><input required minLength={3} value={revokeReason} onChange={(event) => setRevokeReason(event.target.value)} placeholder={i18n("reasonForRevocationac5b98c")} className="min-w-0 flex-1 rounded-xl px-3 py-2" style={{ background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border)" }} /><button disabled={revoke.isPending || revokeReason.trim().length < 3} className="rounded-full px-3 py-2 text-xs font-semibold disabled:opacity-50" style={{ background: "var(--danger)", color: "white" }}>{i18n("confirmRevocationc1a9d03")}</button></form> : null}</div>)}
-        {entries.every((entry) => entry.event_type !== "adjustment" || entry.quantity_delta >= 0) ? <Empty>{i18n("noPersonalExtensionsRecorded558dcb3")}</Empty> : null}
-      </div>
+      </details>
     </>
   );
 }
