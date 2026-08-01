@@ -12,6 +12,15 @@ export type ExportFormat = "pdf" | "md" | "txt" | "odt" | "csv";
 
 export type ExportLabels = {
   appName: string;
+  finance: string;
+  members: string;
+  plan: string;
+  expires: string;
+  lastPaid: string;
+  amount: string;
+  credits: string;
+  balanceDue: string;
+  referrals: string;
   workout: string;
   workoutHistory: string;
   personalRecord: string;
@@ -562,6 +571,65 @@ export function buildExecutionHistoryDocument(
   };
 }
 
+function financeRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
+
+function financeAmount(value: unknown, locale: string): string {
+  if (value === null || value === undefined || value === "") return "—";
+  const amount = typeof value === "number" ? value : Number(value ?? 0);
+  if (!Number.isFinite(amount)) return "—";
+  return new Intl.NumberFormat(locale, { style: "currency", currency: "EUR" }).format(amount / 100);
+}
+
+function financePackageLabel(subscription: Record<string, unknown>): unknown {
+  return (
+    subscription.package_name ??
+    subscription.package_code_snapshot ??
+    subscription.package_family_snapshot
+  );
+}
+
+export function buildFinanceMembersDocument(
+  members: Array<Record<string, unknown>>,
+  labels: ExportLabels,
+  locale: string,
+): ExportDocument {
+  return {
+    icon: "📋",
+    category: labels.finance,
+    title: labels.members,
+    metadata: [{ label: labels.members, value: String(members.length) }],
+    sections: members.map((member) => {
+      const membership = financeRecord(member.membership);
+      const subscription = financeRecord(member.active_package_subscription);
+      const referrals = Array.isArray(member.referrals_made_user_ids) ? member.referrals_made_user_ids : [];
+      const nickname = displayValue(member.nickname || member.id || labels.members);
+      const details = compact([
+        `${labels.type}: ${displayValue(member.identity_role ?? membership.user_type_snapshot)}`,
+        `${labels.status}: ${displayValue(membership.status)}`,
+        `${labels.plan}: ${displayValue(financePackageLabel(subscription))}`,
+        `${labels.expires}: ${displayValue(subscription.ends_on)}`,
+        `${labels.lastPaid}: ${displayValue(member.last_payment_on)}`,
+        `${labels.amount}: ${financeAmount(member.last_payment_amount_cents, locale)}`,
+        `${labels.credits}: ${financeAmount(member.credit_balance_cents ?? member.credit_balance, locale)}`,
+        `${labels.balanceDue}: ${financeAmount(member.outstanding_balance_cents, locale)}`,
+        `${labels.notes}: ${displayValue(membership.notes ?? member.notes)}`,
+        `${labels.referrals}: ${referrals.length}`,
+      ]);
+
+      return {
+        icon: "👤",
+        title: nickname,
+        items: details.map((value) => ({ value })),
+      };
+    }),
+    footer: labels.generatedBy,
+  };
+}
+
 function markdownEscape(value: string): string {
   return value.replaceAll("|", "\\|").replaceAll("\n", " ");
 }
@@ -688,23 +756,57 @@ async function renderPdf(document: ExportDocument): Promise<Blob> {
   const pageHeight = pdf.internal.pageSize.getHeight();
   const margin = 48;
   const contentWidth = pageWidth - margin * 2;
+  const bodyTop = 76;
+  const bodyBottom = pageHeight - 56;
   let y = 44;
+  let pageNumber = 1;
+
+  const drawContinuationHeader = () => {
+    pdf.setDrawColor(226, 232, 240);
+    pdf.setLineWidth(0.75);
+    pdf.line(margin, 42, pageWidth - margin, 42);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(8);
+    pdf.setTextColor(124, 58, 237);
+    pdf.text(document.category.toLocaleUpperCase(), margin, 31);
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(100, 116, 139);
+    pdf.text(document.title, pageWidth - margin, 31, { align: "right", maxWidth: contentWidth * 0.62 });
+  };
+
+  const nextPage = () => {
+    pdf.addPage();
+    pageNumber += 1;
+    drawContinuationHeader();
+    y = bodyTop;
+  };
 
   const ensureSpace = (height: number) => {
-    if (y + height <= pageHeight - 44) return;
-    pdf.addPage();
-    y = 48;
+    if (y + height <= bodyBottom) return;
+    nextPage();
   };
-  const textBlock = (text: string, size: number, color: [number, number, number], options?: { bold?: boolean; indent?: number }) => {
+
+  const textBlock = (text: string, size: number, color: [number, number, number], options?: { bold?: boolean; indent?: number; gapBefore?: number; gapAfter?: number }) => {
     const indent = options?.indent ?? 0;
+    const gapBefore = options?.gapBefore ?? 0;
+    const gapAfter = options?.gapAfter ?? 6;
     pdf.setFont("helvetica", options?.bold ? "bold" : "normal");
     pdf.setFontSize(size);
     pdf.setTextColor(...color);
     const lines = pdf.splitTextToSize(text, contentWidth - indent);
-    const height = lines.length * (size * 1.35);
-    ensureSpace(height + 5);
-    pdf.text(lines, margin + indent, y);
-    y += height + 5;
+    const lineHeight = size * 1.4;
+    y += gapBefore;
+
+    for (let lineIndex = 0; lineIndex < lines.length;) {
+      if (y + lineHeight > bodyBottom) nextPage();
+      const availableLines = Math.max(1, Math.floor((bodyBottom - y) / lineHeight));
+      const chunk = lines.slice(lineIndex, lineIndex + availableLines);
+      pdf.text(chunk, margin + indent, y);
+      y += chunk.length * lineHeight;
+      lineIndex += chunk.length;
+    }
+
+    y += gapAfter;
   };
 
   pdf.setFillColor(124, 58, 237);
@@ -714,39 +816,47 @@ async function renderPdf(document: ExportDocument): Promise<Blob> {
   pdf.setFontSize(10);
   pdf.text(document.category.toUpperCase(), margin + 12, y + 16);
   y += 44;
-  textBlock(document.title, 27, [23, 32, 51], { bold: true });
-  if (document.subtitle) textBlock(document.subtitle, 15, [219, 39, 119], { bold: true });
+  textBlock(document.title, 27, [23, 32, 51], { bold: true, gapAfter: 8 });
+  if (document.subtitle) textBlock(document.subtitle, 15, [219, 39, 119], { bold: true, gapAfter: 12 });
   y += 5;
 
   for (const meta of document.metadata) {
-    ensureSpace(22);
-    pdf.setFillColor(246, 243, 255);
-    pdf.roundedRect(margin, y - 11, contentWidth, 20, 5, 5, "F");
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(9);
-    pdf.setTextColor(124, 58, 237);
-    pdf.text(`${meta.label}:`, margin + 9, y + 2);
-    pdf.setFont("helvetica", "normal");
-    pdf.setTextColor(71, 85, 105);
-    pdf.text(pdf.splitTextToSize(meta.value, contentWidth * 0.68)[0] ?? "", margin + 120, y + 2);
-    y += 25;
+    ensureSpace(26);
+    textBlock(`${meta.label}: ${meta.value}`, 9.5, [71, 85, 105], { gapAfter: 5 });
   }
 
   for (const section of document.sections) {
-    y += 10;
+    y += 12;
     ensureSpace(42);
     pdf.setDrawColor(13, 148, 136);
     pdf.setLineWidth(3);
     pdf.line(margin, y - 12, margin, y + 8);
-    textBlock(section.title, 16, [15, 118, 110], { bold: true, indent: 12 });
+    textBlock(section.title, 16, [15, 118, 110], { bold: true, indent: 12, gapAfter: 9 });
     for (const item of section.items) {
-      textBlock(item.label ? `${item.label}: ${item.value}` : item.value, 11, [23, 32, 51], { bold: Boolean(item.label), indent: 12 });
-      for (const detail of item.details ?? []) textBlock(`• ${detail}`, 9, [100, 116, 139], { indent: 26 });
+      if (item.label) {
+        textBlock(item.label, 11, [23, 32, 51], { bold: true, indent: 12, gapAfter: 2 });
+        textBlock(item.value, 10.5, [51, 65, 85], { indent: 20, gapAfter: 4 });
+      } else {
+        textBlock(item.value, 10.5, [23, 32, 51], { indent: 12, gapAfter: 4 });
+      }
+      for (const detail of item.details ?? []) textBlock(`• ${detail}`, 9.5, [100, 116, 139], { indent: 28, gapAfter: 3 });
     }
   }
 
   y += 14;
-  textBlock(document.footer, 8, [148, 163, 184]);
+  textBlock(document.footer, 8, [148, 163, 184], { gapAfter: 0 });
+
+  for (let page = 1; page <= pageNumber; page += 1) {
+    pdf.setPage(page);
+    pdf.setDrawColor(226, 232, 240);
+    pdf.setLineWidth(0.75);
+    pdf.line(margin, pageHeight - 37, pageWidth - margin, pageHeight - 37);
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(8);
+    pdf.setTextColor(148, 163, 184);
+    pdf.text(document.footer, margin, pageHeight - 24);
+    pdf.text(`${page} / ${pageNumber}`, pageWidth - margin, pageHeight - 24, { align: "right" });
+  }
   return pdf.output("blob");
 }
 

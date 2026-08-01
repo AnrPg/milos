@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildExecutionDocument,
   buildExecutionHistoryDocument,
+  buildFinanceMembersDocument,
   buildPRDocument,
   buildPRListDocument,
   buildWorkoutDocument,
@@ -10,11 +11,21 @@ import {
   renderCsv,
   renderMarkdown,
   renderText,
+  type ExportDocument,
   type ExportLabels,
 } from "@/lib/document-export";
 
 const labels: ExportLabels = {
   appName: "Milos Training",
+  finance: "Finance",
+  members: "Members",
+  plan: "Plan",
+  expires: "Expires",
+  lastPaid: "Last paid",
+  amount: "Amount",
+  credits: "Credits",
+  balanceDue: "Balance due",
+  referrals: "Referrals",
   workout: "Workout",
   workoutHistory: "WOD History",
   personalRecord: "Personal Record",
@@ -302,5 +313,75 @@ describe("document export adapters", () => {
     expect(odtContent).toContain("Deadlift");
     expect(odtContent).toContain("🏆");
     expect(odtContent).toContain('fo:color="#7C3AED"');
+  });
+
+  it("keeps wrapped metadata and long paragraph details in the PDF", async () => {
+    const longMetadata = "A complete membership note that must survive PDF wrapping without losing its final words.";
+    const longDetail = "Coach instruction: keep each repetition controlled, record the adjustment, and retain this complete paragraph on the following line when required.";
+    const document: ExportDocument = {
+      icon: "📄",
+      category: "Export",
+      title: "Complete document",
+      metadata: [{ label: "Summary", value: longMetadata }],
+      sections: [{
+        icon: "📝",
+        title: "Long-form notes",
+        items: [{ label: "Instruction", value: longDetail }],
+      }],
+      footer: "Milos Training",
+    };
+
+    const file = await generateExportFile(document, "pdf");
+    const pdf = new TextDecoder().decode(await file.arrayBuffer());
+
+    expect(pdf).toContain("final words.");
+    expect(pdf).toContain("following line when required.");
+  });
+
+  it("continues overflowing content onto later PDF pages", async () => {
+    const document: ExportDocument = {
+      icon: "📄",
+      category: "Export",
+      title: "Paginated document",
+      metadata: [],
+      sections: [{
+        icon: "📝",
+        title: "Entries",
+        items: Array.from({ length: 90 }, (_, index) => ({
+          label: `Entry ${index + 1}`,
+          value: `The complete content for entry ${index + 1} is retained across page boundaries.`,
+        })),
+      }],
+      footer: "Milos Training",
+    };
+
+    const file = await generateExportFile(document, "pdf");
+    const pdf = new TextDecoder().decode(await file.arrayBuffer());
+
+    expect(pdf.match(/\/Type \/Page\b/g)?.length).toBeGreaterThan(1);
+    expect(pdf).toContain("complete content for entry 90");
+  });
+
+  it("preserves every visible finance member field for export", () => {
+    const document = buildFinanceMembersDocument([{
+      id: "member-1",
+      nickname: "Niko",
+      identity_role: "member",
+      membership: { status: "active", notes: "Needs a receipt with the full billing address." },
+      active_package_subscription: { package_code_snapshot: "UNLIMITED", ends_on: "2026-08-31" },
+      last_payment_on: "2026-07-01",
+      last_payment_amount_cents: 8500,
+      credit_balance_cents: 1000,
+      outstanding_balance_cents: 1200,
+      referrals_made_user_ids: ["u-2", "u-3"],
+    }], labels, "en");
+
+    const exported = renderText(document);
+    expect(document.category).toBe("Finance");
+    expect(exported).toContain("Niko");
+    expect(exported).toContain("Needs a receipt with the full billing address.");
+    expect(exported).toContain("UNLIMITED");
+    expect(exported).toContain("€85.00");
+    expect(exported).toContain("2");
   });
 });

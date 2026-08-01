@@ -25,6 +25,8 @@ import { Combobox, type ComboboxOption } from "@/components/admin/finance/shared
 import { SemanticLabel } from "@/components/semantic-label";
 import { semanticLabel } from "@/i18n/presentation";
 import { MemberPanel } from "@/components/admin/finance/panels/MemberPanel";
+import { ShareExportDialog } from "@/components/share-export/ShareExportDialog";
+import { useShareExport } from "@/components/share-export/useShareExport";
 import { ReferralEventWizard } from "@/components/admin/finance/ReferralEventWizard";
 import { InlineAssignPackage } from "@/components/admin/finance/shared/InlineAssignPackage";
 import { SortableHeader } from "@/components/admin/finance/shared/SortableHeader";
@@ -32,6 +34,7 @@ import {
   useSortFilter,
   type ColumnKey,
 } from "@/components/admin/finance/hooks/useSortFilter";
+import { buildFinanceMembersDocument } from "@/lib/document-export";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -123,6 +126,8 @@ function MultiCheck({
 
 export function MembersTab() {
   const i18n = useUiTranslations();
+  const uiLocale = useUiLocale();
+  const shareExport = useShareExport();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
   const queryClient = useQueryClient();
@@ -171,6 +176,7 @@ export function MembersTab() {
     useSortFilter(members);
 
   const [userQuery, setUserQuery] = useState("");
+  const [shareOpen, setShareOpen] = useState(false);
 
   const updateMutation = useMutation({
     mutationFn: ({ userId, body }: { userId: string; body: FinanceRecord }) =>
@@ -315,16 +321,26 @@ export function MembersTab() {
             ? i18n("memberCount", {count: members.length})
             : i18n("filteredMemberCount", {filtered: filteredMembers.length, total: members.length})}
         </p>
-        {hasActiveFilters && (
+        <div className="flex items-center gap-3">
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="text-xs hover:opacity-70 transition-opacity"
+              style={{ color: "var(--primary)" }}
+            >
+              {i18n("clearFilters4122267")}
+            </button>
+          )}
           <button
+            className="rounded-full px-3 py-1.5 text-xs font-semibold"
+            style={{ background: "color-mix(in srgb, var(--success) 14%, transparent)", color: "var(--success)" }}
+            onClick={() => setShareOpen(true)}
             type="button"
-            onClick={clearFilters}
-            className="text-xs hover:opacity-70 transition-opacity"
-            style={{ color: "var(--primary)" }}
           >
-            {i18n("clearFilters4122267")}
+            📤 {shareExport.copy.title}
           </button>
-        )}
+        </div>
       </div>
 
       <div
@@ -550,6 +566,14 @@ export function MembersTab() {
           prefillReferrerUser={prefillUser}
           prefillReferrerId={prefillReferrerId}
           onClose={() => setParam({ "new-referral": null, referrer: null })}
+        />
+      ) : null}
+
+      {shareOpen ? (
+        <ShareExportDialog
+          copy={shareExport.copy}
+          document={buildFinanceMembersDocument(filteredMembers, shareExport.labels, uiLocale)}
+          onClose={() => setShareOpen(false)}
         />
       ) : null}
     </div>
