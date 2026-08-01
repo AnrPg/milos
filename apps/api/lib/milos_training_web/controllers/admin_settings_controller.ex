@@ -54,14 +54,28 @@ defmodule MilosTrainingWeb.AdminSettingsController do
     required: [:enabled, :vapid_private_key_configured]
   }
 
+  @scheduling_settings_schema %Schema{
+    type: :object,
+    properties: %{
+      id: %Schema{type: :string, format: :uuid, nullable: true},
+      default_capacity: %Schema{type: :integer, minimum: 1, maximum: 500},
+      default_auto_approve: %Schema{type: :boolean},
+      default_booking_timeout_minutes: %Schema{type: :integer, minimum: 1, maximum: 10_080},
+      inserted_at: %Schema{type: :string, format: :"date-time", nullable: true},
+      updated_at: %Schema{type: :string, format: :"date-time", nullable: true}
+    },
+    required: [:default_capacity, :default_auto_approve, :default_booking_timeout_minutes]
+  }
+
   @admin_settings_response_schema %Schema{
     type: :object,
     properties: %{
       gamification: @gamification_settings_schema,
       finance: @finance_settings_schema,
-      notifications: @notification_push_settings_schema
+      notifications: @notification_push_settings_schema,
+      scheduling: @scheduling_settings_schema
     },
-    required: [:gamification, :finance, :notifications]
+    required: [:gamification, :finance, :notifications, :scheduling]
   }
 
   @admin_settings_update_schema %Schema{
@@ -95,6 +109,19 @@ defmodule MilosTrainingWeb.AdminSettingsController do
           vapid_public_key: %Schema{type: :string, nullable: true},
           vapid_private_key: %Schema{type: :string, nullable: true},
           vapid_subject: %Schema{type: :string, nullable: true}
+        },
+        required: []
+      },
+      scheduling: %Schema{
+        type: :object,
+        properties: %{
+          default_capacity: %Schema{type: :integer, minimum: 1, maximum: 500},
+          default_auto_approve: %Schema{type: :boolean},
+          default_booking_timeout_minutes: %Schema{
+            type: :integer,
+            minimum: 1,
+            maximum: 10_080
+          }
         },
         required: []
       }
