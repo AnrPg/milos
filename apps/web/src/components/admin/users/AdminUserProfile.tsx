@@ -37,6 +37,7 @@ import { useSession } from "@/components/session-provider";
 import { semanticLabel } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
+import { UserProgrammingSchedule } from "@/components/admin/users/UserProgrammingSchedule";
 
 function Panel({ id, title, children, href, hrefLabel }: { id: string; title: string; children: React.ReactNode; href?: string; hrefLabel?: string }) {
   const i18n = useUiTranslations();
@@ -526,6 +527,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
     messages: messages.data?.threads.length ?? 0,
   });
   const sections = new Set(visibleSections);
+  if (profile.identity.role === "member" || profile.identity.role === "athlete") sections.add("schedule");
   const financeWorkspaceHref = `/admin/finance?tab=members&member=${userId}`;
   const overviewItems: Array<[string, React.ReactNode]> = [
     [i18n("rolec3f104d"), <SemanticLabel key="role" value={profile.identity.role} />],
@@ -557,6 +559,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
         </section>
 
         <nav aria-label={i18n("profileSectionscd4815c")} className="flex flex-wrap gap-2">
+          {(profile.identity.role === "member" || profile.identity.role === "athlete") ? <a href="#schedule" onClick={(event) => { event.preventDefault(); openAdminProfileSection("schedule"); }} className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>{i18n("featureScheduleProgramming")}</a> : null}
           {visibleSections.map((section) => <a key={section} href={`#${section}`} onClick={(event) => { event.preventDefault(); openAdminProfileSection(section); }} className="rounded-full px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-80" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>{semanticLabel(section, i18n)}</a>)}
         </nav>
 
@@ -564,6 +567,8 @@ export function AdminUserProfile({ userId }: { userId: string }) {
           <Panel id="overview" title={i18n("overview0efc2e6")}>
             <StatGrid items={overviewItems} />
           </Panel>
+
+          {token && (profile.identity.role === "member" || profile.identity.role === "athlete") ? <Panel id="schedule" title={i18n("featureScheduleProgramming")}><UserProgrammingSchedule token={token} userId={userId} role={profile.identity.role} /></Panel> : null}
 
           {sections.has("finance") ? <Panel id="finance" title={i18n("finance1b48d3f")} href={financeWorkspaceHref}><div className="grid gap-3 sm:grid-cols-3"><DetailCard title={i18n("credits66c22fa")} value={finance.data?.summary?.credit_balance ?? 0} plainChildren /><DetailCard title={i18n("statusbae7d5b")} value={finance.data?.summary?.current_status?.state ? <SemanticLabel value={String(finance.data.summary.current_status.state)} /> : "—"} plainChildren href={financeWorkspaceHref} /><DetailCard title={i18n("entitlement8994749")} value={effectiveEntitlement?.status ? <SemanticLabel value={effectiveEntitlement.status} /> : "—"} plainChildren href={financeWorkspaceHref} /></div>{finance.data ? <FinanceDetails finance={finance.data} workspaceHref={financeWorkspaceHref} /> : null}{token ? <AdminEntitlements token={token} userId={userId} entitlement={effectiveEntitlement} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
 

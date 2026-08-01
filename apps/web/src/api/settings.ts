@@ -28,10 +28,20 @@ export type NotificationPushSettings = {
   updated_at?: string | null;
 };
 
+export type SchedulingSettings = {
+  id?: string | null;
+  default_capacity: number;
+  default_auto_approve: boolean;
+  default_booking_timeout_minutes: number;
+  inserted_at?: string | null;
+  updated_at?: string | null;
+};
+
 export type AdminSettingsPayload = {
   gamification: GamificationSettings;
   finance: FinanceSettings;
   notifications: NotificationPushSettings;
+  scheduling: SchedulingSettings;
 };
 
 export type GamificationUpdate = Partial<
@@ -50,6 +60,7 @@ export type AdminSettingsUpdate = {
   gamification?: GamificationUpdate;
   finance?: FinanceUpdate;
   notifications?: NotificationPushUpdate;
+  scheduling?: Partial<Pick<SchedulingSettings, "default_capacity" | "default_auto_approve" | "default_booking_timeout_minutes">>;
 };
 
 export async function fetchAdminSettings(token: string) {

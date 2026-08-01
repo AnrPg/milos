@@ -15,6 +15,7 @@ import {
   type FinanceSettings,
   type GamificationSettings,
   type NotificationPushSettings,
+  type SchedulingSettings,
 } from "@/api/settings";
 import { listScaleLevels, replaceScaleLevels, type ScaleLevel } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
@@ -593,6 +594,46 @@ function FinanceSection({ token }: { token: string }) {
   );
 }
 
+function SchedulingDefaultsSection({ token }: { token: string }) {
+  const i18n = useUiTranslations();
+  const queryClient = useQueryClient();
+  const settingsQuery = useQuery({ queryKey: ["admin", "settings"], queryFn: () => fetchAdminSettings(token) });
+  const [form, setForm] = useState({ capacity: 12, timeout: 60, autoApprove: false });
+
+  useEffect(() => {
+    const value = settingsQuery.data?.scheduling;
+    if (value) {
+      queueMicrotask(() => setForm({
+        capacity: value.default_capacity,
+        timeout: value.default_booking_timeout_minutes,
+        autoApprove: value.default_auto_approve,
+      }));
+    }
+  }, [settingsQuery.data?.scheduling]);
+
+  const save = useMutation({
+    mutationFn: () => updateAdminSettings(token, { scheduling: {
+      default_capacity: form.capacity,
+      default_booking_timeout_minutes: form.timeout,
+      default_auto_approve: form.autoApprove,
+    } }),
+    onSuccess: (data) => queryClient.setQueryData(["admin", "settings"], data),
+  });
+  const current: SchedulingSettings | undefined = settingsQuery.data?.scheduling;
+  const dirty = Boolean(current) && (
+    current!.default_capacity !== form.capacity ||
+    current!.default_booking_timeout_minutes !== form.timeout ||
+    current!.default_auto_approve !== form.autoApprove
+  );
+
+  return <div className="grid max-w-3xl gap-4 sm:grid-cols-2">
+    <label className="text-sm font-semibold">{i18n("featureDefaultClassCapacity")}<input type="number" min={1} max={500} className="mt-2 w-full rounded-xl px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={form.capacity} onChange={(event) => setForm({ ...form, capacity: Number(event.target.value) })} /></label>
+    <label className="text-sm font-semibold">{i18n("featureDefaultBookingTimeout")}<input type="number" min={1} max={10080} className="mt-2 w-full rounded-xl px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={form.timeout} onChange={(event) => setForm({ ...form, timeout: Number(event.target.value) })} /></label>
+    <label className="flex items-center gap-3 text-sm font-semibold"><input type="checkbox" checked={form.autoApprove} onChange={(event) => setForm({ ...form, autoApprove: event.target.checked })} />{i18n("featureAutoApproveClassBookings")}</label>
+    <div className="sm:col-span-2"><SaveBar dirty={dirty} pending={save.isPending} success={save.isSuccess} error={save.error} onSave={() => save.mutate()} onReset={() => current && setForm({ capacity: current.default_capacity, timeout: current.default_booking_timeout_minutes, autoApprove: current.default_auto_approve })} /></div>
+  </div>;
+}
+
 // ── Notifications section ────────────────────────────────────────────────────
 
 type NotificationPushFormState = {
@@ -869,6 +910,14 @@ export function AdminSettingsHub() {
               description={i18n("scheduleClassificationAndFiltersc6f2df8")}
             >
               <ClassTypeSettings token={token} />
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              id="class-defaults"
+              title={i18n("featureClassCreationDefaults")}
+              description={i18n("featureClassDefaultsDescription")}
+            >
+              <SchedulingDefaultsSection token={token} />
             </CollapsibleSection>
 
             <CollapsibleSection
