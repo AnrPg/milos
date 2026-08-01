@@ -76,7 +76,21 @@ defmodule MilosTraining.Workouts do
     as: :call
 
   defdelegate reopen_workout(id), to: ReopenWorkout, as: :call
-  def duplicate_workout(id, title_suffix \\ "(copy)"), do: DuplicateWorkout.call(id, title_suffix)
+
+  def duplicate_workout(id, title_suffix \\ "(copy)", attrs \\ %{}),
+    do: DuplicateWorkout.call(id, title_suffix, attrs)
+
+  def list_folders, do: MilosTraining.Workouts.WorkoutStore.list_folders()
+
+  def create_folder(admin_id, params),
+    do: MilosTraining.Workouts.WorkoutStore.create_folder(admin_id, params)
+
+  def update_folder(id, params), do: MilosTraining.Workouts.WorkoutStore.update_folder(id, params)
+  def delete_folder(id), do: MilosTraining.Workouts.WorkoutStore.delete_folder(id)
+
+  def update_library_metadata(id, params),
+    do: MilosTraining.Workouts.WorkoutStore.update_library_metadata(id, params)
+
   def get_assigned_workout(id), do: MilosTraining.Workouts.WorkoutStore.get_assigned_workout(id)
 
   def get_assignment_execution_access(assignment_id, athlete_id),

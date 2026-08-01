@@ -3,6 +3,7 @@ defmodule MilosTraining.Workouts.MasterWorkout do
   import Ecto.Changeset
 
   alias MilosTraining.Workouts.WorkoutSection
+  alias MilosTraining.Workouts.WorkoutFolder
   alias MilosTraining.Workouts.Domain.WorkoutAuthoringMetadata
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -16,6 +17,7 @@ defmodule MilosTraining.Workouts.MasterWorkout do
     field :status, Ecto.Enum, values: @statuses, default: :draft
     field :draft_data, :map
     field :created_by_id, :binary_id
+    field :source_workout_id, :binary_id
     field :is_team_workout, :boolean, default: false
     field :subtitle, :string
     field :description, :string
@@ -33,13 +35,17 @@ defmodule MilosTraining.Workouts.MasterWorkout do
     field :last_dsl_diagnostics, {:array, :map}, default: []
 
     has_many :sections, WorkoutSection, preload_order: [asc: :order]
+    belongs_to :folder, WorkoutFolder
 
     timestamps()
   end
 
   def draft_changeset(workout \\ %__MODULE__{}, params) do
     workout
-    |> cast(params, authoring_fields() ++ [:created_by_id, :draft_data, :status])
+    |> cast(
+      params,
+      authoring_fields() ++ [:created_by_id, :folder_id, :source_workout_id, :draft_data, :status]
+    )
     |> validate_required([:created_by_id])
     |> validate_authoring_fields()
     |> foreign_key_constraint(:created_by_id)
@@ -62,11 +68,13 @@ defmodule MilosTraining.Workouts.MasterWorkout do
 
   def create_changeset(workout \\ %__MODULE__{}, params) do
     workout
-    |> cast(params, authoring_fields() ++ [:created_by_id])
+    |> cast(params, authoring_fields() ++ [:created_by_id, :folder_id, :source_workout_id])
     |> validate_required([:title, :type, :created_by_id])
     |> validate_authoring_fields()
     |> put_change(:status, :published)
     |> foreign_key_constraint(:created_by_id)
+    |> foreign_key_constraint(:folder_id)
+    |> foreign_key_constraint(:source_workout_id)
     |> cast_assoc(:sections, required: true, with: &WorkoutSection.changeset/2)
   end
 

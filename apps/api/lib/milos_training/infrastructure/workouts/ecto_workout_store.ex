@@ -15,6 +15,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     Workouts.Domain.WorkoutMaterializer,
     Workouts.ExerciseVariation,
     Workouts.MasterWorkout,
+    Workouts.WorkoutFolder,
     Workouts.WorkoutExercise,
     Workouts.WorkoutSection
   }
@@ -229,6 +230,89 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       |> normalize_workout(note_visibility: :admin)
       |> Map.update!(:sections, &summarize_sections_for_list/1)
     end)
+  end
+
+  @impl true
+  def list_folders do
+    WorkoutFolder
+    |> order_by([folder], asc: folder.name)
+    |> Repo.all()
+    |> Enum.map(&normalize_folder/1)
+  end
+
+  @impl true
+  def create_folder(admin_id, params) do
+    key = if Enum.any?(Map.keys(params), &is_binary/1), do: "created_by_id", else: :created_by_id
+    params = Map.put(params, key, admin_id)
+
+    with :ok <- validate_folder_parent(nil, params),
+         {:ok, folder} <- %WorkoutFolder{} |> WorkoutFolder.changeset(params) |> Repo.insert() do
+      {:ok, normalize_folder(folder)}
+    end
+  end
+
+  @impl true
+  def update_folder(id, params) do
+    case Repo.get(WorkoutFolder, id) do
+      nil ->
+        {:error, :not_found}
+
+      folder ->
+        with :ok <- validate_folder_parent(folder, params),
+             {:ok, updated} <- folder |> WorkoutFolder.changeset(params) |> Repo.update() do
+          {:ok, normalize_folder(updated)}
+        end
+    end
+  end
+
+  @impl true
+  def delete_folder(id) do
+    case Repo.get(WorkoutFolder, id) do
+      nil ->
+        {:error, :not_found}
+
+      folder ->
+        Repo.transaction(fn ->
+          from(child in WorkoutFolder, where: child.parent_id == ^id)
+          |> Repo.update_all(set: [parent_id: folder.parent_id])
+
+          from(workout in MasterWorkout, where: workout.folder_id == ^id)
+          |> Repo.update_all(set: [folder_id: folder.parent_id])
+
+          Repo.delete!(folder)
+        end)
+        |> case do
+          {:ok, _} -> :ok
+          {:error, reason} -> {:error, reason}
+        end
+    end
+  end
+
+  @impl true
+  def update_library_metadata(id, params) do
+    case Repo.get(MasterWorkout, id) do
+      nil ->
+        {:error, :not_found}
+
+      workout ->
+        workout
+        |> Ecto.Changeset.cast(params, [:folder_id, :source_workout_id])
+        |> Ecto.Changeset.foreign_key_constraint(:folder_id)
+        |> Ecto.Changeset.foreign_key_constraint(:source_workout_id)
+        |> Repo.update()
+        |> case do
+          {:ok, updated} ->
+            {:ok,
+             %{
+               id: updated.id,
+               folder_id: updated.folder_id,
+               source_workout_id: updated.source_workout_id
+             }}
+
+          error ->
+            error
+        end
+    end
   end
 
   defp summarize_sections_for_list(sections) do
@@ -690,6 +774,8 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       notes: visible_notes(workout.notes, note_visibility),
       workout_metadata: workout.workout_metadata,
       created_by_id: workout.created_by_id,
+      folder_id: workout.folder_id,
+      source_workout_id: workout.source_workout_id,
       inserted_at: workout.inserted_at,
       updated_at: workout.updated_at,
       sections: sections
@@ -1662,7 +1748,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   end
 
   @impl true
-  def duplicate_workout(id, title_suffix) do
+  def duplicate_workout(id, title_suffix, attrs) do
     case Repo.get(MasterWorkout, id) do
       nil ->
         {:error, :not_found}
@@ -1676,6 +1762,8 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           status: :draft,
           title: title,
           type: source.type,
+          folder_id: Map.get(attrs, :folder_id) || Map.get(attrs, "folder_id"),
+          source_workout_id: source.id,
           draft_data: draft_data
         }
 
@@ -1683,6 +1771,39 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           {:ok, new_workout} -> {:ok, %{id: new_workout.id, status: "draft", title: title}}
           {:error, changeset} -> {:error, changeset}
         end
+    end
+  end
+
+  defp normalize_folder(folder) do
+    %{
+      id: folder.id,
+      name: folder.name,
+      parent_id: folder.parent_id,
+      created_by_id: folder.created_by_id,
+      inserted_at: folder.inserted_at,
+      updated_at: folder.updated_at
+    }
+  end
+
+  defp validate_folder_parent(folder, params) do
+    parent_id = Map.get(params, :parent_id) || Map.get(params, "parent_id")
+    folder_id = folder && folder.id
+
+    cond do
+      is_nil(parent_id) or parent_id == "" -> :ok
+      parent_id == folder_id -> {:error, :folder_cycle}
+      is_nil(Repo.get(WorkoutFolder, parent_id)) -> {:error, :folder_parent_not_found}
+      folder_id && descendant_folder?(parent_id, folder_id) -> {:error, :folder_cycle}
+      true -> :ok
+    end
+  end
+
+  defp descendant_folder?(candidate_id, ancestor_id) do
+    case Repo.get(WorkoutFolder, candidate_id) do
+      nil -> false
+      %{parent_id: nil} -> false
+      %{parent_id: ^ancestor_id} -> true
+      %{parent_id: parent_id} -> descendant_folder?(parent_id, ancestor_id)
     end
   end
 
