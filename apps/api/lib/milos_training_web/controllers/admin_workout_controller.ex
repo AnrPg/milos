@@ -144,6 +144,29 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
     ]
   )
 
+  operation(:update_library,
+    summary: "Move a workout in the nested library",
+    parameters: [@id_param],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            additionalProperties: false,
+            properties: %{folder_id: %Schema{type: :string, format: :uuid, nullable: true}},
+            required: [:folder_id]
+          }
+        }
+      }
+    },
+    responses: [
+      ok:
+        {"Library metadata", "application/json",
+         %Schema{type: :object, additionalProperties: true}}
+    ]
+  )
+
   def index(conn, _params) do
     with {:ok, workouts} <- ListAdminWorkouts.call() do
       json(conn, %{workouts: workouts})
@@ -191,6 +214,15 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
   def delete(conn, %{"id" => id}) do
     with :ok <- DeleteWorkout.call(id) do
       send_resp(conn, :no_content, "")
+    end
+  end
+
+  def update_library(conn, params) do
+    id = params["id"] || params[:id]
+
+    with {:ok, metadata} <-
+           MilosTraining.Workouts.update_library_metadata(id, conn.body_params) do
+      json(conn, metadata)
     end
   end
 

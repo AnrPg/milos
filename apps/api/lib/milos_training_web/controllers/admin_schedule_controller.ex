@@ -4,6 +4,7 @@ defmodule MilosTrainingWeb.AdminScheduleController do
 
   alias MilosTraining.Application.{
     AdminRecordAttendance,
+    CreateRecurringClassSeries,
     CreateScheduledSlot,
     DeleteScheduledSlot,
     ResolveBooking,
@@ -19,13 +20,21 @@ defmodule MilosTrainingWeb.AdminScheduleController do
 
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true]
-       when action in [:create_slot, :update_slot, :approve_booking, :reject_booking]
+       when action in [
+              :create_slot,
+              :create_series,
+              :update_slot,
+              :approve_booking,
+              :reject_booking
+            ]
 
   @slot_body_schema %Schema{
     type: :object,
     properties: %{
       master_workout_id: %Schema{type: :string, format: :uuid},
       class_type_id: %Schema{type: :string, format: :uuid},
+      name: %Schema{type: :string, minLength: 1, maxLength: 120},
+      duration_minutes: %Schema{type: :integer, minimum: 1, maximum: 1440},
       scheduled_at: %Schema{type: :string, format: :"date-time"},
       capacity: %Schema{type: :integer},
       auto_approve: %Schema{type: :boolean},
@@ -68,6 +77,62 @@ defmodule MilosTrainingWeb.AdminScheduleController do
            properties: %{slot: %Schema{type: :object, additionalProperties: true}},
            required: [:slot]
          }}
+    ]
+  )
+
+  operation(:create_series,
+    summary: "Create a recurring class series",
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            additionalProperties: false,
+            properties: %{
+              master_workout_id: %Schema{type: :string, format: :uuid},
+              class_type_id: %Schema{type: :string, format: :uuid},
+              name: %Schema{type: :string, minLength: 1, maxLength: 120},
+              duration_minutes: %Schema{type: :integer, minimum: 1, maximum: 1440},
+              timezone: %Schema{type: :string},
+              starts_on: %Schema{type: :string, format: :date},
+              ends_on: %Schema{type: :string, format: :date, nullable: true},
+              local_start_time: %Schema{type: :string, format: :time},
+              weekdays: %Schema{
+                type: :array,
+                minItems: 1,
+                uniqueItems: true,
+                items: %Schema{type: :integer, minimum: 1, maximum: 7}
+              },
+              excluded_dates: %Schema{
+                type: :array,
+                uniqueItems: true,
+                items: %Schema{type: :string, format: :date}
+              },
+              capacity: %Schema{type: :integer, minimum: 1},
+              auto_approve: %Schema{type: :boolean},
+              booking_timeout_minutes: %Schema{type: :integer, minimum: 1}
+            },
+            required: [
+              :master_workout_id,
+              :class_type_id,
+              :name,
+              :duration_minutes,
+              :timezone,
+              :starts_on,
+              :local_start_time,
+              :weekdays,
+              :capacity,
+              :auto_approve,
+              :booking_timeout_minutes
+            ]
+          }
+        }
+      }
+    },
+    responses: [
+      created:
+        {"Batch result", "application/json", %Schema{type: :object, additionalProperties: true}}
     ]
   )
 
@@ -140,6 +205,14 @@ defmodule MilosTrainingWeb.AdminScheduleController do
       conn
       |> put_status(:created)
       |> json(%{slot: slot})
+    end
+  end
+
+  def create_series(conn, params) do
+    body = normalize_body_params(conn, params)
+
+    with {:ok, series} <- CreateRecurringClassSeries.call(body) do
+      conn |> put_status(:created) |> json(%{series: series})
     end
   end
 

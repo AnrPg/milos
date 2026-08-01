@@ -985,6 +985,15 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "already_booked", error: "User already booked this slot"})
   end
 
+  def call(conn, {:error, :slot_not_booked_by_member}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "slot_not_booked_by_member",
+      error: "Choose a class booked by this member on the selected day"
+    })
+  end
+
   def call(conn, {:error, :booking_not_pending}) do
     conn
     |> put_status(:conflict)
