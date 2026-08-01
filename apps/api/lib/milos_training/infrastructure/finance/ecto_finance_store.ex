@@ -305,6 +305,76 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   end
 
   @impl true
+  def create_receipt(membership_id, params) do
+    params = string_key_map(params)
+    amount_cents = parse_integer(params["amount_cents"], 0)
+    paid_on = parse_date(params["paid_on"], Date.utc_today())
+    description = params["description"] || params["notes"] || "Payment received"
+    currency = params["currency"] || "EUR"
+
+    Repo.transaction(fn ->
+      invoice_params = %{
+        "invoice_type" => "manual",
+        "issue_date" => paid_on,
+        "due_date" => paid_on,
+        "currency" => currency,
+        "notes" => params["notes"],
+        "params" => %{
+          "document_kind" => "receipt",
+          "idempotency_key" => params["idempotency_key"]
+        },
+        "lines" => [
+          %{
+            "line_type" => "manual_charge",
+            "description" => description,
+            "quantity" => 1,
+            "unit_amount_cents" => amount_cents,
+            "discount_cents" => 0
+          }
+        ]
+      }
+
+      with true <- amount_cents > 0 || {:error, :invalid_receipt_amount},
+           {:ok, invoice} <- create_invoice(membership_id, invoice_params),
+           {:ok, _issued_invoice} <-
+             issue_invoice(invoice.id, %{"issue_date" => paid_on, "due_date" => paid_on}),
+           {:ok, payment} <-
+             record_payment(membership_id, %{
+               "finance_invoice_id" => invoice.id,
+               "amount_cents" => amount_cents,
+               "currency" => currency,
+               "paid_on" => paid_on,
+               "payment_method" => params["payment_method"] || "cash",
+               "payment_status" => "paid",
+               "notes" => params["notes"],
+               "params" => %{
+                 "document_kind" => "receipt",
+                 "idempotency_key" => params["idempotency_key"],
+                 "created_by_id" => params["created_by_id"]
+               }
+             }) do
+        paid_invoice =
+          FinanceInvoice
+          |> Repo.get!(invoice.id)
+          |> normalize_invoice_with_balance()
+
+        %{
+          document_type: "receipt",
+          reference: paid_invoice.invoice_number,
+          issued_on: paid_on,
+          amount_cents: amount_cents,
+          currency: currency,
+          description: description,
+          invoice: paid_invoice,
+          payment: payment
+        }
+      else
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+  end
+
+  @impl true
   def create_manual_credit(membership_id, params) do
     params = string_key_map(params)
 
@@ -3460,7 +3530,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         %{
           payment_reminder_interval_days: 7,
           entitlement_enforcement_mode: "observe",
-          entitlement_timezone: "Europe/Athens"
+          entitlement_timezone: "Europe/Athens",
+          document_mode: "invoice"
         }
 
       settings ->
@@ -3491,6 +3562,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       payment_reminder_interval_days: s.payment_reminder_interval_days,
       entitlement_enforcement_mode: s.entitlement_enforcement_mode,
       entitlement_timezone: s.entitlement_timezone,
+      document_mode: s.document_mode,
       inserted_at: s.inserted_at,
       updated_at: s.updated_at
     }

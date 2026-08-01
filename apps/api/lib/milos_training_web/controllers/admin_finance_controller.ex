@@ -15,6 +15,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
     CreateFinanceReferralEvent,
     CreateFinanceReferralProgram,
     CreateFinanceReferralReward,
+    CreateFinanceReceipt,
     GetAdminFinanceSummary,
     GetFinanceOperationalQueues,
     GetFinancePackage,
@@ -441,6 +442,30 @@ defmodule MilosTrainingWeb.AdminFinanceController do
       }
     }
   }
+  @receipt_request_body %RequestBody{
+    required: true,
+    content: %{
+      "application/json" => %MediaType{
+        schema: %Schema{
+          type: :object,
+          additionalProperties: false,
+          required: [:amount_cents, :payment_method, :description],
+          properties: %{
+            amount_cents: %Schema{type: :integer, minimum: 1},
+            currency: %Schema{type: :string, minLength: 3, maxLength: 3, nullable: true},
+            paid_on: %Schema{type: :string, format: :date, nullable: true},
+            payment_method: %Schema{
+              type: :string,
+              enum: ["cash", "bank_transfer", "card_manual", "other"]
+            },
+            description: %Schema{type: :string, minLength: 1, maxLength: 500},
+            notes: %Schema{type: :string, nullable: true},
+            idempotency_key: %Schema{type: :string, minLength: 1, maxLength: 200, nullable: true}
+          }
+        }
+      }
+    }
+  }
 
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true]
@@ -455,6 +480,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
               :create_referral_reward,
               :create_manual_credit,
               :create_invoice,
+              :create_receipt,
               :apply_credit_to_payment,
               :apply_credit_to_invoice,
               :reverse_payment,
@@ -639,6 +665,26 @@ defmodule MilosTrainingWeb.AdminFinanceController do
       conn
       |> put_status(:created)
       |> json(%{payment: payment})
+    end
+  end
+
+  operation(:create_receipt,
+    summary: "Record received money and immediately issue its receipt",
+    parameters: [@id_parameter],
+    request_body: @receipt_request_body,
+    responses: [created: {"Paid receipt", "application/json", @open_object}]
+  )
+
+  def create_receipt(conn, params) do
+    with {:ok, receipt} <-
+           CreateFinanceReceipt.call(
+             param_id(params),
+             current_user_id(conn),
+             body_params(conn, params)
+           ) do
+      conn
+      |> put_status(:created)
+      |> json(%{receipt: receipt})
     end
   end
 

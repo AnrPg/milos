@@ -5,6 +5,38 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
 
   import MilosTraining.TestFixtures
 
+  test "receipt endpoint records money and returns the immediately paid document", %{conn: conn} do
+    admin = admin_fixture(%{nickname: "receipt_admin"})
+    member = user_fixture(%{role: :member, nickname: "receipt_member"})
+
+    assert {:ok, _membership} =
+             Finance.upsert_membership(member.id, %{
+               user_type_snapshot: "member",
+               status: "active",
+               signup_source: "admin_created"
+             })
+
+    response =
+      conn
+      |> put_bearer_token(admin)
+      |> post("/api/admin/finance/members/#{member.id}/receipts", %{
+        amount_cents: 5_000,
+        payment_method: "cash",
+        paid_on: Date.to_iso8601(Date.utc_today()),
+        description: "Monthly membership",
+        idempotency_key: Ecto.UUID.generate()
+      })
+      |> json_response(201)
+
+    assert response["receipt"]["document_type"] == "receipt"
+    assert response["receipt"]["amount_cents"] == 5_000
+    assert response["receipt"]["invoice"]["status"] == "paid"
+    assert response["receipt"]["invoice"]["balance_due_cents"] == 0
+
+    assert response["receipt"]["payment"]["finance_invoice_id"] ==
+             response["receipt"]["invoice"]["id"]
+  end
+
   test "retiring a package atomically reconciles effective subscribers by role", %{conn: conn} do
     admin = admin_fixture()
     member = user_fixture(%{role: :member, nickname: "retired_plan_member"})

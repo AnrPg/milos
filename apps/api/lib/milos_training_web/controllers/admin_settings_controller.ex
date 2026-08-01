@@ -34,10 +34,11 @@ defmodule MilosTrainingWeb.AdminSettingsController do
     properties: %{
       id: %Schema{type: :string, format: :uuid, nullable: true},
       payment_reminder_interval_days: %Schema{type: :integer, minimum: 1},
+      document_mode: %Schema{type: :string, enum: ["invoice", "receipt"]},
       inserted_at: %Schema{type: :string, format: :"date-time", nullable: true},
       updated_at: %Schema{type: :string, format: :"date-time", nullable: true}
     },
-    required: [:payment_reminder_interval_days]
+    required: [:payment_reminder_interval_days, :document_mode]
   }
 
   @notification_push_settings_schema %Schema{
@@ -99,7 +100,8 @@ defmodule MilosTrainingWeb.AdminSettingsController do
       finance: %Schema{
         type: :object,
         properties: %{
-          payment_reminder_interval_days: %Schema{type: :integer, minimum: 1}
+          payment_reminder_interval_days: %Schema{type: :integer, minimum: 1},
+          document_mode: %Schema{type: :string, enum: ["invoice", "receipt"]}
         },
         required: []
       },

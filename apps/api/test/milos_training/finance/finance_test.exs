@@ -4,6 +4,36 @@ defmodule MilosTraining.FinanceTest do
   alias MilosTraining.Finance
   alias MilosTraining.TestFixtures
 
+  test "records received money as an immediately issued paid receipt" do
+    user = TestFixtures.user_fixture(%{role: :member})
+
+    assert {:ok, membership} =
+             Finance.upsert_membership(user.id, %{
+               user_type_snapshot: "member",
+               status: "active",
+               signup_source: "direct"
+             })
+
+    assert {:ok, receipt} =
+             Finance.create_receipt(membership.id, %{
+               amount_cents: 4_500,
+               payment_method: "cash",
+               paid_on: ~D[2026-07-31],
+               description: "August membership",
+               created_by_id: user.id,
+               idempotency_key: "receipt-test-1"
+             })
+
+    assert receipt.document_type == "receipt"
+    assert receipt.amount_cents == 4_500
+    assert receipt.issued_on == ~D[2026-07-31]
+    assert receipt.reference == receipt.invoice.invoice_number
+    assert receipt.invoice.status == "paid"
+    assert receipt.invoice.balance_due_cents == 0
+    assert receipt.payment.finance_invoice_id == receipt.invoice.id
+    assert receipt.payment.payment_status == "paid"
+  end
+
   test "creates a membership package and assigns it to a membership profile" do
     user = TestFixtures.user_fixture(%{role: :member})
 

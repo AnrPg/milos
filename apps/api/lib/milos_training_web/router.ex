@@ -163,6 +163,7 @@ defmodule MilosTrainingWeb.Router do
     patch("/finance/members/:id", AdminFinanceController, :update_member)
     post("/finance/members/:id/packages", AdminFinanceController, :assign_package)
     post("/finance/members/:id/payments", AdminFinanceController, :record_payment)
+    post("/finance/members/:id/receipts", AdminFinanceController, :create_receipt)
     post("/finance/members/:id/invoices", AdminFinanceController, :create_invoice)
 
     post(

@@ -6,6 +6,7 @@ defmodule MilosTraining.Finance do
     AssignPackage,
     ApplyCreditToInvoice,
     CreateInvoice,
+    CreateReceipt,
     CreateManualCredit,
     CreatePackage,
     CreatePromotionCampaign,
@@ -64,6 +65,7 @@ defmodule MilosTraining.Finance do
   defdelegate search_member_summaries(params), to: SearchMemberSummaries, as: :call
   defdelegate assign_package(membership_id, package_id, params), to: AssignPackage, as: :call
   defdelegate record_payment(membership_id, params), to: RecordPayment, as: :call
+  defdelegate create_receipt(membership_id, params), to: CreateReceipt, as: :call
   defdelegate create_manual_credit(membership_id, params), to: CreateManualCredit, as: :call
 
   defdelegate apply_credit_to_payment(membership_id, payment_id, params),
