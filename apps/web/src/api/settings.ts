@@ -14,6 +14,7 @@ export type GamificationSettings = {
 export type FinanceSettings = {
   id?: string | null;
   payment_reminder_interval_days: number;
+  document_mode: "invoice" | "receipt";
   inserted_at?: string | null;
   updated_at?: string | null;
 };
@@ -48,7 +49,7 @@ export type GamificationUpdate = Partial<
   Pick<GamificationSettings, "weekly_workout_target" | "streak_shield_reset_day" | "leaderboard_enabled" | "theme_slug">
 >;
 
-export type FinanceUpdate = Partial<Pick<FinanceSettings, "payment_reminder_interval_days">>;
+export type FinanceUpdate = Partial<Pick<FinanceSettings, "payment_reminder_interval_days" | "document_mode">>;
 
 export type NotificationPushUpdate = Partial<{
   vapid_public_key: string | null;

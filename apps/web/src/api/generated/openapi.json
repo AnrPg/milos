@@ -3892,6 +3892,13 @@
                   "properties": {
                     "finance": {
                       "properties": {
+                        "document_mode": {
+                          "enum": [
+                            "invoice",
+                            "receipt"
+                          ],
+                          "type": "string"
+                        },
                         "id": {
                           "format": "uuid",
                           "nullable": true,
@@ -3913,7 +3920,8 @@
                         }
                       },
                       "required": [
-                        "payment_reminder_interval_days"
+                        "payment_reminder_interval_days",
+                        "document_mode"
                       ],
                       "type": "object"
                     },
@@ -4082,6 +4090,13 @@
                 "properties": {
                   "finance": {
                     "properties": {
+                      "document_mode": {
+                        "enum": [
+                          "invoice",
+                          "receipt"
+                        ],
+                        "type": "string"
+                      },
                       "payment_reminder_interval_days": {
                         "minimum": 1,
                         "type": "integer"
@@ -4173,6 +4188,13 @@
                   "properties": {
                     "finance": {
                       "properties": {
+                        "document_mode": {
+                          "enum": [
+                            "invoice",
+                            "receipt"
+                          ],
+                          "type": "string"
+                        },
                         "id": {
                           "format": "uuid",
                           "nullable": true,
@@ -4194,7 +4216,8 @@
                         }
                       },
                       "required": [
-                        "payment_reminder_interval_days"
+                        "payment_reminder_interval_days",
+                        "document_mode"
                       ],
                       "type": "object"
                     },
@@ -22668,6 +22691,102 @@
         "summary": "Create a seasonal challenge",
         "tags": [
           "Admin Challenges"
+        ]
+      }
+    },
+    "/api/admin/finance/members/{id}/receipts": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFinanceController.create_receipt",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "amount_cents": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "currency": {
+                    "maxLength": 3,
+                    "minLength": 3,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "description": {
+                    "maxLength": 500,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "idempotency_key": {
+                    "maxLength": 200,
+                    "minLength": 1,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "notes": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "paid_on": {
+                    "format": "date",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "payment_method": {
+                    "enum": [
+                      "cash",
+                      "bank_transfer",
+                      "card_manual",
+                      "other"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "amount_cents",
+                  "payment_method",
+                  "description"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Paid receipt"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Record received money and immediately issue its receipt",
+        "tags": [
+          "Admin Finance"
         ]
       }
     },

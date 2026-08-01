@@ -516,13 +516,19 @@ function LevelTaxonomySection({ token }: { token: string }) {
 // ── Finance section ──────────────────────────────────────────────────────────
 
 function financeFormFromSettings(s: FinanceSettings) {
-  return { paymentReminderIntervalDays: String(s.payment_reminder_interval_days) };
+  return {
+    paymentReminderIntervalDays: String(s.payment_reminder_interval_days),
+    documentMode: s.document_mode,
+  };
 }
 
 function FinanceSection({ token }: { token: string }) {
   const i18n = useUiTranslations();
   const queryClient = useQueryClient();
-  const [form, setForm] = useState({ paymentReminderIntervalDays: "7" });
+  const [form, setForm] = useState({
+    paymentReminderIntervalDays: "7",
+    documentMode: "invoice" as "invoice" | "receipt",
+  });
   const [initialized, setInitialized] = useState(false);
 
   const settingsQuery = useQuery({
@@ -542,6 +548,7 @@ function FinanceSection({ token }: { token: string }) {
         gamification: {},
         finance: {
           payment_reminder_interval_days: Number(form.paymentReminderIntervalDays),
+          document_mode: form.documentMode,
         },
       }),
     onSuccess: (data) => {
@@ -552,7 +559,10 @@ function FinanceSection({ token }: { token: string }) {
   const serverDays = settingsQuery.data?.finance
     ? String(settingsQuery.data.finance.payment_reminder_interval_days)
     : "7";
-  const dirty = initialized && form.paymentReminderIntervalDays !== serverDays;
+  const serverMode = settingsQuery.data?.finance?.document_mode ?? "invoice";
+  const dirty =
+    initialized &&
+    (form.paymentReminderIntervalDays !== serverDays || form.documentMode !== serverMode);
 
   return (
     <div className="space-y-5">
@@ -573,7 +583,7 @@ function FinanceSection({ token }: { token: string }) {
           min={1}
           max={365}
           value={form.paymentReminderIntervalDays}
-          onChange={(e) => setForm({ paymentReminderIntervalDays: e.target.value })}
+          onChange={(e) => setForm((current) => ({ ...current, paymentReminderIntervalDays: e.target.value }))}
           className="w-28 rounded-xl px-4 py-2.5 text-sm outline-none"
           style={{
             background: "var(--panel-muted)",
@@ -582,13 +592,48 @@ function FinanceSection({ token }: { token: string }) {
           }}
         />
       </div>
+      <fieldset className="space-y-3">
+        <legend className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
+          {i18n("featureFinanceDocumentWorkflow")}
+        </legend>
+        <p className="text-xs leading-5" style={{ color: "var(--dim)" }}>
+          {i18n("featureFinanceDocumentDescription")}
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {(["receipt", "invoice"] as const).map((mode) => (
+            <label
+              key={mode}
+              className="flex cursor-pointer items-start gap-3 rounded-2xl p-4"
+              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
+            >
+              <input
+                checked={form.documentMode === mode}
+                name="finance-document-mode"
+                type="radio"
+                value={mode}
+                onChange={() => setForm((current) => ({ ...current, documentMode: mode }))}
+              />
+              <span>
+                <span className="block text-sm font-semibold" style={{ color: "var(--text)" }}>
+                  {mode === "receipt" ? i18n("featurePlainReceipts") : i18n("featureInvoices")}
+                </span>
+                <span className="mt-1 block text-xs leading-5" style={{ color: "var(--dim)" }}>
+                  {mode === "receipt"
+                    ? i18n("featureReceiptWorkflowDescription")
+                    : i18n("featureInvoiceWorkflowDescription")}
+                </span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
       <SaveBar
         dirty={dirty}
         pending={saveMutation.isPending}
         success={saveMutation.isSuccess}
         error={saveMutation.error}
         onSave={() => saveMutation.mutate()}
-        onReset={() => setForm({ paymentReminderIntervalDays: serverDays })}
+        onReset={() => setForm({ paymentReminderIntervalDays: serverDays, documentMode: serverMode })}
       />
     </div>
   );

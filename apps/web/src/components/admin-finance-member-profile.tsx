@@ -18,6 +18,7 @@ import {
   applyCreditToPayment,
   applyCreditToInvoice,
   assignFinancePackage,
+  createFinanceReceipt,
   createFinanceInvoice,
   createManualCredit,
   fetchFinanceMember,
@@ -36,8 +37,11 @@ import {
   updateFinanceInvoice,
   voidFinanceInvoice,
   type FinanceRecord,
+  type FinanceReceipt,
 } from "@/api/finance";
+import { fetchAdminSettings } from "@/api/settings";
 import { useSession } from "@/components/session-provider";
+import { generateExportFile, type ExportDocument } from "@/lib/document-export";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -66,12 +70,84 @@ function euroInputValue(cents: unknown) {
   return (Number(cents ?? 0) / 100).toFixed(2);
 }
 
+type ReceiptExportCopy = {
+  receipt: string;
+  documentTitle: string;
+  paymentReceived: string;
+  reference: string;
+  date: string;
+  amountReceived: string;
+  payment: string;
+  purpose: string;
+  method: string;
+  status: string;
+  paid: string;
+  footer: string;
+};
+
+async function downloadReceipt(
+  receipt: FinanceReceipt,
+  uiLocale: string,
+  copy: ReceiptExportCopy,
+) {
+  const amount = new Intl.NumberFormat(uiLocale, {
+    style: "currency",
+    currency: receipt.currency,
+  }).format(receipt.amount_cents / 100);
+
+  const document: ExportDocument = {
+    icon: "✓",
+    category: copy.receipt,
+    title: copy.documentTitle,
+    subtitle: copy.paymentReceived,
+    metadata: [
+      { label: copy.reference, value: receipt.reference },
+      { label: copy.date, value: receipt.issued_on },
+      { label: copy.amountReceived, value: amount },
+    ],
+    sections: [
+      {
+        icon: "€",
+        title: copy.payment,
+        items: [
+          { label: copy.purpose, value: receipt.description },
+          { label: copy.method, value: field(receipt.payment, "payment_method") },
+          { label: copy.status, value: copy.paid },
+        ],
+      },
+    ],
+    footer: copy.footer,
+  };
+
+  const file = await generateExportFile(document, "pdf");
+  const url = URL.createObjectURL(file);
+  const anchor = window.document.createElement("a");
+  anchor.href = url;
+  anchor.download = file.name;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
 export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const { tokens } = useSession();
   const queryClient = useQueryClient();
   const token = tokens?.access_token;
+  const receiptExportCopy = (reference: string): ReceiptExportCopy => ({
+    receipt: i18n("featureReceipt"),
+    documentTitle: i18n("featureReceiptDocumentTitle", { reference }),
+    paymentReceived: i18n("featurePaymentReceived"),
+    reference: i18n("featureReference"),
+    date: i18n("featureDate"),
+    amountReceived: i18n("featureAmountReceived"),
+    payment: i18n("featurePayment"),
+    purpose: i18n("featurePurpose"),
+    method: i18n("featureMethod"),
+    status: i18n("featureStatus"),
+    paid: i18n("featurePaid"),
+    footer: i18n("featureReceiptFooter"),
+  });
   const [membershipOverrides, setMembershipOverrides] = useState<
     Partial<{
       user_type_snapshot: string;
@@ -91,6 +167,8 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
     finance_invoice_id: "",
     notes: "",
   });
+  const [receiptDescription, setReceiptDescription] = useState("");
+  const [lastReceipt, setLastReceipt] = useState<FinanceReceipt | null>(null);
   const [invoiceForm, setInvoiceForm] = useState({
     amount: "0",
     description: "",
@@ -120,6 +198,12 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
     queryFn: async () => fetchFinanceMember(token!, userId),
   });
 
+  const settingsQuery = useQuery({
+    queryKey: ["admin", "settings"],
+    enabled,
+    queryFn: async () => fetchAdminSettings(token!),
+  });
+
   const packagesQuery = useQuery({
     queryKey: ["admin", "finance", "packages"],
     enabled,
@@ -140,6 +224,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
   });
 
   const membership = memberQuery.data?.membership ?? null;
+  const receiptMode = settingsQuery.data?.finance.document_mode === "receipt";
   const packages = packagesQuery.data?.packages ?? [];
   const campaigns = campaignsQuery.data?.promotion_campaigns ?? [];
   const codes = codesQuery.data?.promotion_codes ?? [];
@@ -233,6 +318,25 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
         finance_invoice_id: "",
         notes: "",
       });
+      await invalidateMember();
+    },
+  });
+
+  const createReceiptMutation = useMutation({
+    mutationFn: async () =>
+      createFinanceReceipt(token!, userId, {
+        amount_cents: Math.round(Number(paymentForm.amount || 0) * 100),
+        payment_method: paymentForm.payment_method,
+        paid_on: paymentForm.paid_on || null,
+        description: receiptDescription,
+        notes: paymentForm.notes || null,
+        idempotency_key: crypto.randomUUID(),
+      }),
+    onSuccess: async ({ receipt }) => {
+      setLastReceipt(receipt);
+      setReceiptDescription("");
+      setPaymentForm((current) => ({ ...current, amount: "0", paid_on: "", notes: "" }));
+      await downloadReceipt(receipt, uiLocale, receiptExportCopy(receipt.reference));
       await invalidateMember();
     },
   });
@@ -465,29 +569,37 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
             </form>
           </Panel>
 
-          <Panel title={i18n("recordPayment86e5632")}>
+          <Panel title={receiptMode ? i18n("featureIssueReceipt") : i18n("recordPayment86e5632")}>
             <form
               className="space-y-3"
               onSubmit={(event) => {
                 event.preventDefault();
-                recordPaymentMutation.mutate();
+                if (receiptMode) createReceiptMutation.mutate();
+                else recordPaymentMutation.mutate();
               }}
             >
               <Input label={i18n("amountInEure238d40")} type="number" value={paymentForm.amount} onChange={(amount) => setPaymentForm({ ...paymentForm, amount })} />
+              {receiptMode ? (
+                <Input
+                  label={i18n("featurePaymentPurpose")}
+                  value={receiptDescription}
+                  onChange={setReceiptDescription}
+                />
+              ) : null}
               <Select
                 label={i18n("paymentMethod0e55fb3")}
                 value={paymentForm.payment_method}
                 options={["cash", "bank_transfer", "card_manual", "other"]}
                 onChange={(payment_method) => setPaymentForm({ ...paymentForm, payment_method })}
               />
-              <Select
+              {!receiptMode ? <Select
                 label={i18n("paymentStatus9dfea40")}
                 value={paymentForm.payment_status}
                 options={["paid", "pending", "refunded", "failed", "waived"]}
                 onChange={(payment_status) => setPaymentForm({ ...paymentForm, payment_status })}
-              />
+              /> : null}
               <Input label={i18n("paidOnfca3213")} required={false} type="date" value={paymentForm.paid_on} onChange={(paid_on) => setPaymentForm({ ...paymentForm, paid_on })} />
-              <Select
+              {!receiptMode ? <Select
                 label={i18n("invoicef9f3881")}
                 value={paymentForm.finance_invoice_id}
                 options={payableInvoices.map((invoice) => field(invoice, "id"))}
@@ -507,14 +619,34 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                     amount: balanceDue !== null ? euroInputValue(balanceDue) : paymentForm.amount,
                   });
                 }}
-              />
+              /> : null}
               <Input label={i18n("notes7044004")} required={false} value={paymentForm.notes} onChange={(notes) => setPaymentForm({ ...paymentForm, notes })} />
-              <SubmitButton pending={recordPaymentMutation.isPending}>{i18n("recordPayment86e5632")}</SubmitButton>
-              <ErrorText error={recordPaymentMutation.error} />
+              <SubmitButton
+                pending={receiptMode ? createReceiptMutation.isPending : recordPaymentMutation.isPending}
+                disabled={receiptMode && !receiptDescription.trim()}
+              >
+                {receiptMode ? i18n("featureRecordAndDownloadReceipt") : i18n("recordPayment86e5632")}
+              </SubmitButton>
+              <ErrorText error={receiptMode ? createReceiptMutation.error : recordPaymentMutation.error} />
+              {receiptMode && lastReceipt ? (
+                <button
+                  className="text-sm font-semibold text-[var(--primary)]"
+                  type="button"
+                  onClick={() =>
+                    void downloadReceipt(
+                      lastReceipt,
+                      uiLocale,
+                      receiptExportCopy(lastReceipt.reference),
+                    )
+                  }
+                >
+                  {i18n("featureDownloadReceiptAgain", { reference: lastReceipt.reference })}
+                </button>
+              ) : null}
             </form>
           </Panel>
 
-          <Panel title={i18n("createInvoicea0567cf")}>
+          {!receiptMode ? <Panel title={i18n("createInvoicea0567cf")}>
             <form
               className="space-y-3"
               onSubmit={(event) => {
@@ -557,9 +689,9 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
               <SubmitButton pending={createInvoiceMutation.isPending}>{i18n("createDraftInvoice1ef1fa2")}</SubmitButton>
               <ErrorText error={createInvoiceMutation.error} />
             </form>
-          </Panel>
+          </Panel> : null}
 
-          <Panel title={i18n("generateRenewalInvoice9242ec6")}>
+          {!receiptMode ? <Panel title={i18n("generateRenewalInvoice9242ec6")}>
             <form
               className="space-y-3"
               onSubmit={(event) => {
@@ -586,7 +718,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
               <SubmitButton pending={renewalInvoiceMutation.isPending}>{i18n("generateRenewalInvoice9242ec6")}</SubmitButton>
               <ErrorText error={renewalInvoiceMutation.error} />
             </form>
-          </Panel>
+          </Panel> : null}
 
           <Panel title={i18n("redeemPromotiona0fb02e")}>
             <form
@@ -827,6 +959,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
         <section className="grid gap-6 xl:grid-cols-5">
           <InvoiceHistory
             rows={invoices}
+            receiptMode={receiptMode}
             token={token!}
             issuePending={issueInvoiceMutation.isPending}
             voidPending={voidInvoiceMutation.isPending}
@@ -925,6 +1058,7 @@ function Select({
 
 function InvoiceHistory({
   rows,
+  receiptMode,
   token,
   issuePending,
   voidPending,
@@ -933,6 +1067,7 @@ function InvoiceHistory({
   onRefresh,
 }: {
   rows: FinanceRecord[];
+  receiptMode: boolean;
   token: string;
   issuePending: boolean;
   voidPending: boolean;
@@ -944,9 +1079,9 @@ function InvoiceHistory({
   const i18n = useUiTranslations();
   return (
     <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--panel)] p-6 xl:col-span-4">
-      <h2 className="text-xl font-black">{i18n("invoices35f8f37")}</h2>
+      <h2 className="text-xl font-black">{receiptMode ? i18n("featureReceipts") : i18n("invoices35f8f37")}</h2>
       <div className="mt-4 grid gap-3 md:grid-cols-2">
-        {rows.length === 0 ? <p className="text-sm text-[var(--muted)]">{i18n("noInvoicesacd181b")}</p> : null}
+        {rows.length === 0 ? <p className="text-sm text-[var(--muted)]">{receiptMode ? i18n("featureNoReceipts") : i18n("noInvoicesacd181b")}</p> : null}
         {rows.map((row) => {
           const id = field(row, "id");
           const status = field(row, "status");

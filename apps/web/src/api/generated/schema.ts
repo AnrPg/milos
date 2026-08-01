@@ -1520,6 +1520,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/finance/members/{id}/receipts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record received money and immediately issue its receipt */
+        post: operations["MilosTrainingWeb.AdminFinanceController.create_receipt"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/finance/members/{id}/invoices/renewal": {
         parameters: {
             query?: never;
@@ -3976,6 +3993,8 @@ export interface operations {
                 content: {
                     "application/json": {
                         finance: {
+                            /** @enum {string} */
+                            document_mode: "invoice" | "receipt";
                             /** Format: uuid */
                             id?: string | null;
                             /** Format: date-time */
@@ -4036,6 +4055,8 @@ export interface operations {
             content: {
                 "application/json": {
                     finance?: {
+                        /** @enum {string} */
+                        document_mode?: "invoice" | "receipt";
                         payment_reminder_interval_days?: number;
                     };
                     gamification?: {
@@ -4067,6 +4088,8 @@ export interface operations {
                 content: {
                     "application/json": {
                         finance: {
+                            /** @enum {string} */
+                            document_mode: "invoice" | "receipt";
                             /** Format: uuid */
                             id?: string | null;
                             /** Format: date-time */
@@ -10368,6 +10391,44 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminFinanceController.create_receipt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    amount_cents: number;
+                    currency?: string | null;
+                    description: string;
+                    idempotency_key?: string | null;
+                    notes?: string | null;
+                    /** Format: date */
+                    paid_on?: string | null;
+                    /** @enum {string} */
+                    payment_method: "cash" | "bank_transfer" | "card_manual" | "other";
+                };
+            };
+        };
+        responses: {
+            /** @description Paid receipt */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };
