@@ -17,7 +17,8 @@ defmodule MilosTraining.Application.CreateFinanceReceipt do
           admin_id: admin_id,
           reference: receipt.reference,
           amount_cents: receipt.amount_cents,
-          payment_method: receipt.payment.payment_method
+          payment_method: receipt.payment.payment_method,
+          membership_package_subscription_id: receipt.membership_package_subscription_id
         }
       })
 

@@ -459,6 +459,11 @@ defmodule MilosTrainingWeb.AdminFinanceController do
               enum: ["cash", "bank_transfer", "card_manual", "other"]
             },
             description: %Schema{type: :string, minLength: 1, maxLength: 500},
+            membership_package_subscription_id: %Schema{
+              type: :string,
+              format: :uuid,
+              nullable: true
+            },
             notes: %Schema{type: :string, nullable: true},
             idempotency_key: %Schema{type: :string, minLength: 1, maxLength: 200, nullable: true}
           }

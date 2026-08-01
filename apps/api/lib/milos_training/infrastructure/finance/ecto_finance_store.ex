@@ -318,20 +318,14 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         "issue_date" => paid_on,
         "due_date" => paid_on,
         "currency" => currency,
+        "amount_cents" => amount_cents,
+        "description" => description,
+        "membership_package_subscription_id" => params["membership_package_subscription_id"],
         "notes" => params["notes"],
         "params" => %{
           "document_kind" => "receipt",
           "idempotency_key" => params["idempotency_key"]
-        },
-        "lines" => [
-          %{
-            "line_type" => "manual_charge",
-            "description" => description,
-            "quantity" => 1,
-            "unit_amount_cents" => amount_cents,
-            "discount_cents" => 0
-          }
-        ]
+        }
       }
 
       with true <- amount_cents > 0 || {:error, :invalid_receipt_amount},
@@ -341,6 +335,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
            {:ok, payment} <-
              record_payment(membership_id, %{
                "finance_invoice_id" => invoice.id,
+               "membership_package_subscription_id" =>
+                 params["membership_package_subscription_id"],
                "amount_cents" => amount_cents,
                "currency" => currency,
                "paid_on" => paid_on,
@@ -358,6 +354,20 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
           |> Repo.get!(invoice.id)
           |> normalize_invoice_with_balance()
 
+        package_subscription =
+          case paid_invoice.membership_package_subscription_id do
+            nil ->
+              nil
+
+            subscription_id ->
+              MembershipPackageSubscription
+              |> Repo.get(subscription_id)
+              |> case do
+                nil -> nil
+                subscription -> normalize_subscription(subscription)
+              end
+          end
+
         %{
           document_type: "receipt",
           reference: paid_invoice.invoice_number,
@@ -365,6 +375,12 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
           amount_cents: amount_cents,
           currency: currency,
           description: description,
+          membership_package_subscription_id: paid_invoice.membership_package_subscription_id,
+          package_name: package_subscription && package_subscription.package_name,
+          package_code_snapshot:
+            package_subscription && package_subscription.package_code_snapshot,
+          package_family_snapshot:
+            package_subscription && package_subscription.package_family_snapshot,
           invoice: paid_invoice,
           payment: payment
         }

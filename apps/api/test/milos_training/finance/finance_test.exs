@@ -7,11 +7,25 @@ defmodule MilosTraining.FinanceTest do
   test "records received money as an immediately issued paid receipt" do
     user = TestFixtures.user_fixture(%{role: :member})
 
+    assert {:ok, package} =
+             Finance.create_package(%{
+               code: "monthly-receipt",
+               name: "Monthly Receipt Package",
+               family: "unlimited",
+               billing_period: "monthly",
+               base_price_cents: 4_500
+             })
+
     assert {:ok, membership} =
              Finance.upsert_membership(user.id, %{
                user_type_snapshot: "member",
                status: "active",
                signup_source: "direct"
+             })
+
+    assert {:ok, subscription} =
+             Finance.assign_package(membership.id, package.id, %{
+               starts_on: ~D[2026-07-31]
              })
 
     assert {:ok, receipt} =
@@ -20,6 +34,7 @@ defmodule MilosTraining.FinanceTest do
                payment_method: "cash",
                paid_on: ~D[2026-07-31],
                description: "August membership",
+               membership_package_subscription_id: subscription.id,
                created_by_id: user.id,
                idempotency_key: "receipt-test-1"
              })
@@ -30,8 +45,54 @@ defmodule MilosTraining.FinanceTest do
     assert receipt.reference == receipt.invoice.invoice_number
     assert receipt.invoice.status == "paid"
     assert receipt.invoice.balance_due_cents == 0
+    assert receipt.invoice.membership_package_subscription_id == subscription.id
+    assert receipt.package_name == "Monthly Receipt Package"
+    assert receipt.package_code_snapshot == "monthly_receipt"
+    assert receipt.package_family_snapshot == "unlimited"
+    assert [%{membership_package_subscription_id: subscription_id} = line] = receipt.invoice.lines
+    assert subscription_id == subscription.id
+    assert line.line_type == "membership_package"
+    assert line.package_code_snapshot == "monthly_receipt"
     assert receipt.payment.finance_invoice_id == receipt.invoice.id
+    assert receipt.payment.membership_package_subscription_id == subscription.id
     assert receipt.payment.payment_status == "paid"
+  end
+
+  test "rejects a receipt package subscription owned by another membership" do
+    user = TestFixtures.user_fixture(%{role: :member})
+    other_user = TestFixtures.user_fixture(%{role: :member})
+
+    assert {:ok, package} =
+             Finance.create_package(%{
+               name: "Foreign receipt package",
+               family: "unlimited",
+               billing_period: "monthly"
+             })
+
+    assert {:ok, membership} =
+             Finance.upsert_membership(user.id, %{
+               user_type_snapshot: "member",
+               status: "active",
+               signup_source: "direct"
+             })
+
+    assert {:ok, other_membership} =
+             Finance.upsert_membership(other_user.id, %{
+               user_type_snapshot: "member",
+               status: "active",
+               signup_source: "direct"
+             })
+
+    assert {:ok, other_subscription} =
+             Finance.assign_package(other_membership.id, package.id, %{})
+
+    assert {:error, {:membership_mismatch, :membership_package_subscription_id}} =
+             Finance.create_receipt(membership.id, %{
+               amount_cents: 4_500,
+               payment_method: "cash",
+               description: "Invalid package association",
+               membership_package_subscription_id: other_subscription.id
+             })
   end
 
   test "creates a membership package and assigns it to a membership profile" do
