@@ -98,3 +98,25 @@ weekdays, excluded dates, open-ended horizons, and recurring iCalendar output.
 The admin UI uses a compact “Create series” modal: core recurrence fields remain
 visible, while capacity, booking timeout, and auto-approval stay in an optional
 disclosure and inherit the persisted Scheduling defaults.
+
+Finance receipt mode is implemented as one outer Ecto transaction that creates a
+manual-charge invoice, issues it, and records the equal payment before returning a
+receipt projection. The API exposes that workflow as a dedicated member receipt
+endpoint, while `document_mode` lets the admin UI replace invoice lifecycle copy and
+controls with a receive-money form. The resulting paid document uses the existing
+private client-side document export path, so no parallel receipt ledger or public
+document URL was introduced.
+
+An iCalendar edge case discovered during verification changed recurring `DTSTART`
+to the first materialized occurrence in the feed rather than the series boundary.
+This keeps `DTSTART` aligned with `BYDAY` when `starts_on` is not itself a selected
+weekday. Member feeds continue to contain only individually booked occurrences.
+
+Verification completed on 2026-08-01 with the full backend precommit gate (497
+tests), frontend unit tests (96 tests), type-check, lint, localization validation,
+OpenAPI regeneration, and a production Next.js build. A Docker live test created
+two distinct recurring series at the same `Europe/Athens` wall time, confirmed two
+weekly RRULE events with the configured end/exclusion semantics, and recorded a
+EUR 25.00 cash receipt whose backing invoice was immediately `paid` and marked
+`document_kind: receipt`. No additional deferred work was introduced by this
+implementation.
