@@ -5,11 +5,21 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
 
   alias Ecto.Multi
   alias MilosTraining.Repo
-  alias MilosTraining.Scheduling.{Booking, ClassAttendanceRecord, ClassType, ScheduledClass}
-  alias MilosTraining.Scheduling.Domain.ClassTypeArchivePolicy
-  alias MilosTraining.Workers.BookingTimeoutJob
 
-  @slot_preloads [:bookings, :class_type]
+  alias MilosTraining.Scheduling.{
+    Booking,
+    ClassAttendanceRecord,
+    ClassSeries,
+    ClassType,
+    ScheduledClass,
+    SchedulingSetting
+  }
+
+  alias MilosTraining.Scheduling.Domain.{ClassTypeArchivePolicy, RecurrenceRule}
+  alias MilosTraining.Workers.BookingTimeoutJob
+  alias MilosTraining.Workers.ClassSeriesExtensionJob
+
+  @slot_preloads [:bookings, :class_type, :class_series]
 
   @impl true
   def create_class_type(params) do
@@ -133,6 +143,86 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
+  def create_class_series(params) do
+    params = string_key_map(params)
+
+    starts_on = parse_series_date(params["starts_on"])
+    ends_on = parse_optional_series_date(params["ends_on"])
+    horizon = ends_on || Date.add(starts_on || Date.utc_today(), 365)
+    params = Map.put(params, "materialized_through", horizon)
+    changeset = ClassSeries.changeset(%ClassSeries{}, params)
+
+    with {:ok, candidate} <- Ecto.Changeset.apply_action(changeset, :insert),
+         {:ok, occurrences} <- RecurrenceRule.occurrences(candidate, horizon: horizon),
+         future_occurrences <-
+           Enum.filter(occurrences, &(DateTime.compare(&1, DateTime.utc_now()) == :gt)),
+         :ok <- require_occurrences(future_occurrences) do
+      Repo.transaction(fn ->
+        series =
+          changeset
+          |> Repo.insert()
+          |> case do
+            {:ok, inserted} -> inserted
+            {:error, reason} -> Repo.rollback(reason)
+          end
+
+        slots =
+          Enum.map(future_occurrences, fn scheduled_at ->
+            %ScheduledClass{}
+            |> ScheduledClass.changeset(%{
+              master_workout_id: series.master_workout_id,
+              class_type_id: series.class_type_id,
+              class_series_id: series.id,
+              name: series.name,
+              duration_minutes: series.duration_minutes,
+              scheduled_at: scheduled_at,
+              capacity: series.capacity,
+              auto_approve: series.auto_approve,
+              booking_timeout_minutes: series.booking_timeout_minutes
+            })
+            |> Repo.insert()
+            |> case do
+              {:ok, slot} -> slot
+              {:error, reason} -> Repo.rollback(reason)
+            end
+          end)
+
+        schedule_series_extension(series)
+
+        series
+        |> Repo.preload(:class_type)
+        |> normalize_class_series()
+        |> Map.put(:occurrence_count, length(slots))
+      end)
+    end
+  end
+
+  @impl true
+  def extend_class_series(series_id, %Date{} = horizon) do
+    Repo.transaction(fn ->
+      series =
+        ClassSeries
+        |> where([series], series.id == ^series_id)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      cond do
+        is_nil(series) ->
+          Repo.rollback(:not_found)
+
+        series.status != "active" ->
+          Repo.rollback(:class_series_inactive)
+
+        series.ends_on && Date.after?(horizon, series.ends_on) ->
+          extend_locked_series(series, series.ends_on)
+
+        true ->
+          extend_locked_series(series, horizon)
+      end
+    end)
+  end
+
+  @impl true
   def update_slot(id, params) do
     case Repo.get(ScheduledClass, id) do
       nil ->
@@ -248,6 +338,53 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
     |> Repo.all()
     |> Repo.preload(@slot_preloads)
     |> Enum.map(&normalize_slot/1)
+  end
+
+  @impl true
+  def list_member_slots(user_id, start_at, end_at) do
+    Booking
+    |> join(:inner, [booking], slot in ScheduledClass, on: slot.id == booking.scheduled_class_id)
+    |> where(
+      [booking, slot],
+      booking.user_id == ^user_id and booking.status in [:pending, :approved] and
+        slot.scheduled_at >= ^start_at and slot.scheduled_at < ^end_at
+    )
+    |> order_by([_booking, slot], asc: slot.scheduled_at)
+    |> preload([booking, slot], scheduled_class: {slot, [:class_type]})
+    |> Repo.all()
+    |> Enum.map(fn booking ->
+      booking.scheduled_class
+      |> normalize_slot()
+      |> Map.put(:user_booking, normalize_booking(booking))
+    end)
+  end
+
+  @impl true
+  def get_settings do
+    case Repo.one(from settings in SchedulingSetting, limit: 1) do
+      nil ->
+        %{
+          default_capacity: 12,
+          default_auto_approve: false,
+          default_booking_timeout_minutes: 60
+        }
+
+      settings ->
+        normalize_settings(settings)
+    end
+  end
+
+  @impl true
+  def update_settings(params) do
+    settings = Repo.one(from settings in SchedulingSetting, limit: 1) || %SchedulingSetting{}
+
+    settings
+    |> SchedulingSetting.changeset(params)
+    |> Repo.insert_or_update()
+    |> case do
+      {:ok, updated} -> {:ok, normalize_settings(updated)}
+      error -> error
+    end
   end
 
   @impl true
@@ -707,6 +844,10 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
     %{
       id: slot.id,
       master_workout_id: slot.master_workout_id,
+      class_series_id: slot.class_series_id,
+      class_series: normalize_loaded_class_series(slot.class_series),
+      name: slot.name,
+      duration_minutes: slot.duration_minutes,
       class_type_id: slot.class_type_id,
       class_type: normalize_loaded_class_type(slot.class_type),
       scheduled_at: slot.scheduled_at,
@@ -787,6 +928,108 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
     }
   end
 
+  defp normalize_loaded_class_series(%Ecto.Association.NotLoaded{}), do: nil
+  defp normalize_loaded_class_series(nil), do: nil
+  defp normalize_loaded_class_series(series), do: normalize_class_series(series)
+
+  defp normalize_class_series(%ClassSeries{} = series) do
+    %{
+      id: series.id,
+      master_workout_id: series.master_workout_id,
+      class_type_id: series.class_type_id,
+      name: series.name,
+      duration_minutes: series.duration_minutes,
+      timezone: series.timezone,
+      starts_on: series.starts_on,
+      ends_on: series.ends_on,
+      local_start_time: series.local_start_time,
+      weekdays: series.weekdays,
+      excluded_dates: series.excluded_dates,
+      materialized_through: series.materialized_through,
+      capacity: series.capacity,
+      auto_approve: series.auto_approve,
+      booking_timeout_minutes: series.booking_timeout_minutes,
+      status: series.status
+    }
+  end
+
+  defp parse_series_date(%Date{} = date), do: date
+
+  defp parse_series_date(value) when is_binary(value) do
+    case Date.from_iso8601(value) do
+      {:ok, date} -> date
+      _ -> nil
+    end
+  end
+
+  defp parse_series_date(_), do: nil
+  defp parse_optional_series_date(nil), do: nil
+  defp parse_optional_series_date(""), do: nil
+  defp parse_optional_series_date(value), do: parse_series_date(value)
+
+  defp require_occurrences([]), do: {:error, :no_future_occurrences}
+  defp require_occurrences(_occurrences), do: :ok
+
+  defp extend_locked_series(series, horizon) do
+    starts_on = Date.add(series.materialized_through, 1)
+
+    if Date.after?(starts_on, horizon) do
+      normalize_class_series(series)
+    else
+      rule = %{series | starts_on: starts_on}
+
+      with {:ok, occurrences} <- RecurrenceRule.occurrences(rule, horizon: horizon) do
+        Enum.each(occurrences, fn scheduled_at ->
+          %ScheduledClass{}
+          |> ScheduledClass.changeset(%{
+            master_workout_id: series.master_workout_id,
+            class_type_id: series.class_type_id,
+            class_series_id: series.id,
+            name: series.name,
+            duration_minutes: series.duration_minutes,
+            scheduled_at: scheduled_at,
+            capacity: series.capacity,
+            auto_approve: series.auto_approve,
+            booking_timeout_minutes: series.booking_timeout_minutes
+          })
+          |> Repo.insert!()
+        end)
+
+        updated =
+          series
+          |> Ecto.Changeset.change(materialized_through: horizon)
+          |> Repo.update!()
+
+        schedule_series_extension(updated)
+
+        updated
+        |> normalize_class_series()
+        |> Map.put(:occurrence_count, length(occurrences))
+      else
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end
+  end
+
+  defp schedule_series_extension(%ClassSeries{ends_on: ends_on}) when not is_nil(ends_on), do: :ok
+
+  defp schedule_series_extension(%ClassSeries{} = series) do
+    next_horizon = Date.add(series.materialized_through, 365)
+    run_on = Date.add(series.materialized_through, -30)
+    scheduled_at = DateTime.new!(run_on, ~T[02:00:00], "Etc/UTC")
+
+    %{
+      "series_id" => series.id,
+      "horizon" => Date.to_iso8601(next_horizon)
+    }
+    |> ClassSeriesExtensionJob.new(scheduled_at: scheduled_at)
+    |> Repo.insert()
+    |> case do
+      {:ok, _job} -> :ok
+      {:error, reason} -> Repo.rollback(reason)
+    end
+  end
+
   defp string_key_map(params) when is_map(params) do
     Map.new(params, fn {key, value} -> {to_string(key), value} end)
   end
@@ -816,5 +1059,16 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
     |> select([s], count(s.id))
     |> Repo.one()
     |> Kernel.||(0)
+  end
+
+  defp normalize_settings(settings) do
+    %{
+      id: settings.id,
+      default_capacity: settings.default_capacity,
+      default_auto_approve: settings.default_auto_approve,
+      default_booking_timeout_minutes: settings.default_booking_timeout_minutes,
+      inserted_at: settings.inserted_at,
+      updated_at: settings.updated_at
+    }
   end
 end

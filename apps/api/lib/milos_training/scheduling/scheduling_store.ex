@@ -23,6 +23,11 @@ defmodule MilosTraining.Scheduling.SchedulingStore do
 
   @impl true
   def create_slot(params), do: adapter().create_slot(params)
+  @impl true
+  def create_class_series(params), do: adapter().create_class_series(params)
+  @impl true
+  def extend_class_series(series_id, horizon),
+    do: adapter().extend_class_series(series_id, horizon)
 
   @impl true
   def update_slot(id, params), do: adapter().update_slot(id, params)
@@ -46,6 +51,16 @@ defmodule MilosTraining.Scheduling.SchedulingStore do
   @impl true
   def list_slots_window(start_at, end_at, opts \\ []),
     do: adapter().list_slots_window(start_at, end_at, opts)
+
+  @impl true
+  def list_member_slots(user_id, start_at, end_at),
+    do: adapter().list_member_slots(user_id, start_at, end_at)
+
+  @impl true
+  def get_settings, do: adapter().get_settings()
+
+  @impl true
+  def update_settings(params), do: adapter().update_settings(params)
 
   @impl true
   def get_pending_bookings, do: adapter().get_pending_bookings()

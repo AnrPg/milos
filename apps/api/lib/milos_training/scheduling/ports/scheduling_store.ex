@@ -12,6 +12,8 @@ defmodule MilosTraining.Scheduling.Ports.SchedulingStore do
   @callback list_class_types(keyword()) :: [map()]
   @callback get_class_type(Ecto.UUID.t(), keyword()) :: map() | nil
   @callback create_slot(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
+  @callback create_class_series(map()) :: {:ok, map()} | {:error, term()}
+  @callback extend_class_series(Ecto.UUID.t(), Date.t()) :: {:ok, map()} | {:error, term()}
   @callback update_slot(Ecto.UUID.t(), map()) ::
               {:ok, map()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
   @callback delete_slot(Ecto.UUID.t()) ::
@@ -22,6 +24,9 @@ defmodule MilosTraining.Scheduling.Ports.SchedulingStore do
   @callback list_slot_ids_for_workout(Ecto.UUID.t()) :: [Ecto.UUID.t()]
   @callback get_slot(Ecto.UUID.t()) :: map() | nil
   @callback list_slots_window(DateTime.t(), DateTime.t(), keyword()) :: [map()]
+  @callback list_member_slots(Ecto.UUID.t(), DateTime.t(), DateTime.t()) :: [map()]
+  @callback get_settings() :: map()
+  @callback update_settings(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback get_pending_bookings() :: [map()]
   @callback get_booking(Ecto.UUID.t()) :: map() | nil
   @callback get_booking_execution_access(Ecto.UUID.t(), Ecto.UUID.t()) :: map() | nil
