@@ -54,6 +54,7 @@ export function UserProgrammingSchedule({ token, userId, role }: Props) {
   const [selectedWorkoutId, setSelectedWorkoutId] = useState("");
   const [selectedFolderId, setSelectedFolderId] = useState("");
   const [selectedSlotId, setSelectedSlotId] = useState("");
+  const [assignmentModalOpen, setAssignmentModalOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -123,6 +124,7 @@ export function UserProgrammingSchedule({ token, userId, role }: Props) {
       });
       setMessage(role === "athlete" ? i18n("featurePersonalWodAssigned") : i18n("featureClassWodAttached"));
       setSelectedWorkoutId("");
+      setAssignmentModalOpen(false);
       await reload();
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : i18n("featureProgrammingSaveFailed"));
@@ -158,7 +160,7 @@ export function UserProgrammingSchedule({ token, userId, role }: Props) {
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-7">
         {days.map((day) => {
           const items = (schedule?.items ?? []).filter((item) => itemDate(item) === day);
-          return <button key={day} type="button" className="min-h-28 rounded-2xl p-3 text-start" style={{ background: selectedDate === day ? "color-mix(in srgb, var(--primary) 14%, var(--bg-soft))" : "var(--bg-soft)", border: selectedDate === day ? "1px solid var(--primary)" : "1px solid var(--border)" }} onClick={() => { setSelectedDate(day); setSelectedSlotId(""); }}>
+          return <button key={day} type="button" className="min-h-28 rounded-2xl p-3 text-start" style={{ background: selectedDate === day ? "color-mix(in srgb, var(--primary) 14%, var(--bg-soft))" : "var(--bg-soft)", border: selectedDate === day ? "1px solid var(--primary)" : "1px solid var(--border)" }} onClick={() => { setSelectedDate(day); setSelectedSlotId(""); setAssignmentModalOpen(true); }}>
             <span className="block text-xs font-semibold">{new Intl.DateTimeFormat(undefined, { weekday: "short", day: "numeric" }).format(new Date(`${day}T12:00:00`))}</span>
             <span className="mt-2 block text-xs" style={{ color: "var(--muted)" }}>{items.length ? i18n("featureScheduledCount", { count: items.length }) : i18n("featureOpenDay")}</span>
             {items.slice(0, 2).map((item) => <span key={itemId(item)} className="mt-1 block truncate text-xs">{itemTitle(item, i18n("featureScheduledClass"))}</span>)}
@@ -166,6 +168,18 @@ export function UserProgrammingSchedule({ token, userId, role }: Props) {
         })}
       </div>
 
+      {message ? <p className="text-sm" style={{ color: "var(--success)" }}>{message}</p> : null}
+      {error ? <p className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
+
+      {assignmentModalOpen ? <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,.65)" }} onClick={() => setAssignmentModalOpen(false)} role="presentation">
+      <div className="w-full max-w-3xl rounded-2xl p-4 shadow-[0_30px_90px_rgba(0,0,0,.35)]" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} onClick={(event) => event.stopPropagation()}>
+        <div className="mb-4 flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--primary)" }}>{i18n("featureScheduleProgramming")}</p>
+            <h3 className="mt-1 text-xl font-semibold" style={{ color: "var(--text)" }}>{selectedDate}</h3>
+          </div>
+          <button type="button" className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--muted)" }} onClick={() => setAssignmentModalOpen(false)}>{i18n("closebbfa773")}</button>
+        </div>
       <div className="rounded-2xl p-4" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
         <div className="grid gap-3 md:grid-cols-3">
           <label className="text-xs font-semibold">{i18n("featureSaveInFolder")}
@@ -195,6 +209,8 @@ export function UserProgrammingSchedule({ token, userId, role }: Props) {
         {message ? <p className="mt-3 text-sm" style={{ color: "var(--success)" }}>{message}</p> : null}
         {error ? <p className="mt-3 text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
       </div>
+      </div>
+      </div> : null}
 
       {creating ? <div className="fixed inset-0 z-[80] flex items-center justify-center p-3" style={{ background: "rgba(0,0,0,.82)" }}><div className="w-full max-w-[96rem] overflow-hidden rounded-3xl"><WorkoutCreationCanvas embedded onCancel={() => setCreating(false)} onPublished={(workout) => { setCreating(false); void program(workout.id, false); }} /></div></div> : null}
     </div>
