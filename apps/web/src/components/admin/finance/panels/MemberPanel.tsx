@@ -15,6 +15,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   assignFinancePackage,
+  createFinanceReceipt,
   createFinanceInvoice,
   fetchFinanceMember,
   fetchFinancePackages,
@@ -25,9 +26,12 @@ import {
   updateFinanceInvoice,
   voidFinanceInvoice,
   type FinanceRecord,
+  type FinanceReceipt,
 } from "@/api/finance";
+import { fetchAdminSettings } from "@/api/settings";
 import { useSession } from "@/components/session-provider";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
+import { generateExportFile, type ExportDocument } from "@/lib/document-export";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -58,7 +62,56 @@ function packageLabelFromSubscription(
   return field(match, "name") || code || family || "";
 }
 
-type Section = "overview" | "invoices" | "payments" | "credits";
+type Section = "overview" | "invoices" | "payments" | "receipts" | "credits";
+
+type ReceiptCopy = {
+  receipt: string;
+  documentTitle: string;
+  paymentReceived: string;
+  reference: string;
+  date: string;
+  amountReceived: string;
+  payment: string;
+  purpose: string;
+  method: string;
+  status: string;
+  paid: string;
+  footer: string;
+};
+
+async function downloadReceipt(receipt: FinanceReceipt, uiLocale: string, copy: ReceiptCopy) {
+  const amount = new Intl.NumberFormat(uiLocale, { style: "currency", currency: receipt.currency }).format(receipt.amount_cents / 100);
+  const document: ExportDocument = {
+    icon: "✓",
+    category: copy.receipt,
+    title: copy.documentTitle,
+    subtitle: copy.paymentReceived,
+    metadata: [
+      { label: copy.reference, value: receipt.reference },
+      { label: copy.date, value: receipt.issued_on },
+      { label: copy.amountReceived, value: amount },
+    ],
+    sections: [
+      {
+        icon: "€",
+        title: copy.payment,
+        items: [
+          { label: copy.purpose, value: receipt.description },
+          { label: copy.method, value: field(receipt.payment, "payment_method") },
+          { label: copy.status, value: copy.paid },
+        ],
+      },
+    ],
+    footer: copy.footer,
+  };
+  const file = await generateExportFile(document, "pdf");
+  const url = URL.createObjectURL(file);
+  const anchor = window.document.createElement("a");
+  anchor.href = url;
+  anchor.download = file.name;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
 
 export function MemberPanel({
   userId,
@@ -74,6 +127,20 @@ export function MemberPanel({
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
   const queryClient = useQueryClient();
+  const receiptCopy = (reference: string): ReceiptCopy => ({
+    receipt: i18n("featureReceipt"),
+    documentTitle: i18n("featureReceiptDocumentTitle", { reference }),
+    paymentReceived: i18n("featurePaymentReceived"),
+    reference: i18n("featureReference"),
+    date: i18n("featureDate"),
+    amountReceived: i18n("featureAmountReceived"),
+    payment: i18n("featurePayment"),
+    purpose: i18n("featurePurpose"),
+    method: i18n("featureMethod"),
+    status: i18n("featureStatus"),
+    paid: i18n("featurePaid"),
+    footer: i18n("featureReceiptFooter"),
+  });
 
   const [section, setSection] = useState<Section>("overview");
   const [showPaymentForm, setShowPaymentForm] = useState(false);
@@ -85,6 +152,7 @@ export function MemberPanel({
     finance_invoice_id: "",
     notes: "",
   });
+  const [receiptDescription, setReceiptDescription] = useState("");
   const [invoiceForm, setInvoiceForm] = useState({
     amount_cents: "",
     description: "",
@@ -105,6 +173,12 @@ export function MemberPanel({
     queryFn: () => fetchFinancePackages(token),
   });
 
+  const settingsQuery = useQuery({
+    queryKey: ["admin", "settings"],
+    enabled: Boolean(token),
+    queryFn: () => fetchAdminSettings(token),
+  });
+
   const profile = profileQuery.data;
   const packages = packagesQuery.data?.packages ?? [];
   const packageSubscriptions = ((profile?.package_subscriptions as FinanceRecord[] | undefined) ?? []).filter(
@@ -121,6 +195,7 @@ export function MemberPanel({
     const balanceDue = typeof invoice.balance_due_cents === "number" ? invoice.balance_due_cents : 0;
     return ["issued", "partially_paid", "overdue"].includes(status) && balanceDue > 0;
   });
+  const receiptMode = settingsQuery.data?.finance.document_mode === "receipt";
 
   const recordPaymentMutation = useMutation({
     mutationFn: () =>
@@ -133,6 +208,27 @@ export function MemberPanel({
     onSuccess: async () => {
       setShowPaymentForm(false);
       setPaymentForm({ amount_cents: "", paid_on: "", finance_invoice_id: "", notes: "" });
+      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "member-profile", userId] });
+      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "members"] });
+      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "summary"] });
+    },
+  });
+
+  const createReceiptMutation = useMutation({
+    mutationFn: () =>
+      createFinanceReceipt(token, userId, {
+        amount_cents: Math.round(Number(paymentForm.amount_cents || 0) * 100),
+        payment_method: "cash",
+        paid_on: paymentForm.paid_on || undefined,
+        description: receiptDescription || undefined,
+        notes: paymentForm.notes || undefined,
+        idempotency_key: crypto.randomUUID(),
+      }),
+    onSuccess: async ({ receipt }) => {
+      setShowPaymentForm(false);
+      setPaymentForm({ amount_cents: "", paid_on: "", finance_invoice_id: "", notes: "" });
+      setReceiptDescription("");
+      await downloadReceipt(receipt, uiLocale, receiptCopy(receipt.reference));
       await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "member-profile", userId] });
       await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "members"] });
       await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "summary"] });
@@ -171,12 +267,18 @@ export function MemberPanel({
     },
   });
 
-  const SECTIONS: { key: Section; label: string }[] = [
-    { key: "overview", label: i18n("overview0efc2e6") },
-    { key: "invoices", label: i18n("invoices35f8f37") },
-    { key: "payments", label: i18n("payments44357ae") },
-    { key: "credits", label: i18n("creditsbfac50d") },
-  ];
+  const SECTIONS: { key: Section; label: string }[] = receiptMode
+    ? [
+        { key: "overview", label: i18n("overview0efc2e6") },
+        { key: "receipts", label: i18n("featureReceipt") },
+        { key: "credits", label: i18n("creditsbfac50d") },
+      ]
+    : [
+        { key: "overview", label: i18n("overview0efc2e6") },
+        { key: "invoices", label: i18n("invoices35f8f37") },
+        { key: "payments", label: i18n("payments44357ae") },
+        { key: "credits", label: i18n("creditsbfac50d") },
+      ];
 
   return (
     <SidePanel
@@ -295,6 +397,99 @@ export function MemberPanel({
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Receipts */}
+          {section === "receipts" && receiptMode && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+                  {i18n("featureReceipt")} ({(profile.invoices as FinanceRecord[]).length})
+                </p>
+                <button
+                  className="rounded-full px-3 py-1 text-xs font-semibold"
+                  style={{ background: "color-mix(in srgb, var(--success) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--success) 24%, transparent)", color: "var(--success)" }}
+                  onClick={() => setShowPaymentForm((v) => !v)}
+                  type="button"
+                >
+                  {showPaymentForm ? i18n("cancel77dfd21") : i18n("featureRecordAndDownloadReceipt")}
+                </button>
+              </div>
+
+              {showPaymentForm && (
+                <div className="rounded-[1.5rem] p-4 space-y-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
+                  <FormField label={i18n("amountEur2dc6463")}>
+                    <input
+                      className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
+                      style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+                      type="number"
+                      value={paymentForm.amount_cents}
+                      onChange={(e) => setPaymentForm({ ...paymentForm, amount_cents: e.target.value })}
+                    />
+                  </FormField>
+                  <FormField label={i18n("featurePaymentPurpose")}>
+                    <input
+                      className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
+                      style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+                      value={receiptDescription}
+                      onChange={(e) => setReceiptDescription(e.target.value)}
+                    />
+                  </FormField>
+                  <FormField label={i18n("paidOnfca3213")}>
+                    <input
+                      className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
+                      style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+                      type="date"
+                      value={paymentForm.paid_on}
+                      onChange={(e) => setPaymentForm({ ...paymentForm, paid_on: e.target.value })}
+                    />
+                  </FormField>
+                  <FormField label={i18n("notesOptional4d56ca9")}>
+                    <input
+                      className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
+                      style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+                      value={paymentForm.notes}
+                      onChange={(e) => setPaymentForm({ ...paymentForm, notes: e.target.value })}
+                    />
+                  </FormField>
+                  <button
+                    className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
+                    style={{ background: "var(--text)", color: "var(--bg)" }}
+                    disabled={!paymentForm.amount_cents || !receiptDescription.trim() || createReceiptMutation.isPending}
+                    onClick={() => createReceiptMutation.mutate()}
+                    type="button"
+                  >
+                    {createReceiptMutation.isPending ? i18n("recording72f9eb4") : i18n("featureRecordAndDownloadReceipt")}
+                  </button>
+                  {createReceiptMutation.error instanceof Error && (
+                    <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{localizeError(createReceiptMutation.error, i18n)}</p>
+                  )}
+                </div>
+              )}
+
+              {(profile.invoices as FinanceRecord[]).length === 0 ? (
+                <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("noPaymentsRecordedc84cf39")}</p>
+              ) : (
+                <div className="space-y-2">
+                  {(profile.invoices as FinanceRecord[]).map((receipt) => (
+                    <div key={field(receipt, "id")} className="rounded-[1.2rem] px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>{field(receipt, "invoice_number", field(receipt, "id"))}</p>
+                          <p className="mt-1 text-sm font-semibold" style={{ color: "var(--text)" }}>{money(uiLocale, receipt.total_cents)}</p>
+                        </div>
+                        <span className="text-xs font-semibold" style={{ color: statusColor(field(receipt, "status")) }}>
+                          <SemanticLabel value={field(receipt, "status")} />
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
+                        {i18n("featureDate")} {field(receipt, "issued_on", field(receipt, "due_date", "—"))}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
