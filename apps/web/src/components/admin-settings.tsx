@@ -23,6 +23,7 @@ import { THEME_UPDATED_EVENT } from "@/components/theme-provider";
 import { APP_THEMES, THEME_SLUGS, normalizeThemeSlug, type ThemeSlug } from "@/lib/theme";
 import { ClassTypeSettings } from "@/components/admin/ClassTypeSettings";
 import { TransientHero } from "@/components/TransientHero";
+import { IntegerInput } from "@/components/integer-input";
 
 // ── Shared sub-components ────────────────────────────────────────────────────
 
@@ -672,8 +673,8 @@ function SchedulingDefaultsSection({ token }: { token: string }) {
   );
 
   return <div className="grid max-w-3xl gap-4 sm:grid-cols-2">
-    <label className="text-sm font-semibold">{i18n("featureDefaultClassCapacity")}<input type="number" min={1} max={500} className="mt-2 w-full rounded-xl px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={form.capacity} onChange={(event) => setForm({ ...form, capacity: Number(event.target.value) })} /></label>
-    <label className="text-sm font-semibold">{i18n("featureDefaultBookingTimeout")}<input type="number" min={1} max={10080} className="mt-2 w-full rounded-xl px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={form.timeout} onChange={(event) => setForm({ ...form, timeout: Number(event.target.value) })} /></label>
+    <label className="text-sm font-semibold">{i18n("featureDefaultClassCapacity")}<IntegerInput min={1} max={500} emptyValue={1} className="mt-2 w-full rounded-xl px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={form.capacity} onValueChange={(capacity) => setForm({ ...form, capacity: capacity ?? 1 })} /></label>
+    <label className="text-sm font-semibold">{i18n("featureDefaultBookingTimeout")}<IntegerInput min={1} max={10080} emptyValue={1} className="mt-2 w-full rounded-xl px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={form.timeout} onValueChange={(timeout) => setForm({ ...form, timeout: timeout ?? 1 })} /></label>
     <label className="flex items-center gap-3 text-sm font-semibold"><input type="checkbox" checked={form.autoApprove} onChange={(event) => setForm({ ...form, autoApprove: event.target.checked })} />{i18n("featureAutoApproveClassBookings")}</label>
     <div className="sm:col-span-2"><SaveBar dirty={dirty} pending={save.isPending} success={save.isSuccess} error={save.error} onSave={() => save.mutate()} onReset={() => current && setForm({ capacity: current.default_capacity, timeout: current.default_booking_timeout_minutes, autoApprove: current.default_auto_approve })} /></div>
   </div>;
