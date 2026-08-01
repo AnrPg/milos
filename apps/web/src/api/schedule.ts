@@ -191,7 +191,6 @@ export async function createScheduleSlot(token: string, payload: ScheduleSlotPay
 export async function createScheduleSeries(
   token: string,
   payload: {
-    master_workout_id: string;
     class_type_id: string;
     name: string;
     duration_minutes: number;

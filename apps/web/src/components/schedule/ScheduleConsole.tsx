@@ -35,6 +35,7 @@ import { SlotPopup } from "@/components/schedule/SlotPopup";
 import { TypeFilterChips } from "@/components/schedule/TypeFilterChips";
 import { subscribeToTopic } from "@/lib/realtime";
 import { useScheduleStore } from "@/stores/schedule";
+import { IntegerInput } from "@/components/integer-input";
 
 type SlotEditorState = {
   slotId: string | null;
@@ -42,7 +43,7 @@ type SlotEditorState = {
 };
 
 type SeriesEditorState = {
-  values: Omit<ScheduleSlotPayload, "scheduled_at">;
+  values: Omit<ScheduleSlotPayload, "scheduled_at" | "master_workout_id">;
   startDate: string;
   endDate: string;
   time: string;
@@ -342,7 +343,6 @@ export function ScheduleConsole({
     const base = defaultSlotValues(startDate, workouts, classTypes, schedulingDefaults);
     setSeriesEditor({
       values: {
-        master_workout_id: base.master_workout_id,
         class_type_id: base.class_type_id,
         name: base.name,
         duration_minutes: base.duration_minutes,
@@ -613,17 +613,17 @@ export function ScheduleConsole({
                       value={editor.values.name}
                     />
                   ) : type === "number-duration" ? (
-                    <input
+                    <IntegerInput
                       className="w-full rounded-2xl px-4 py-3 outline-none"
                       style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                       min={1}
                       max={1440}
-                      onChange={(event) =>
+                      emptyValue={1}
+                      onValueChange={(durationMinutes) =>
                         setEditor((current) =>
-                          current ? { ...current, values: { ...current.values, duration_minutes: Number(event.target.value) || 1 } } : current,
+                          current ? { ...current, values: { ...current.values, duration_minutes: durationMinutes ?? 1 } } : current,
                         )
                       }
-                      type="number"
                       value={editor.values.duration_minutes}
                     />
                   ) : type === "datetime" ? (
@@ -639,29 +639,29 @@ export function ScheduleConsole({
                       value={editorDateValue}
                     />
                   ) : type === "number-cap" ? (
-                    <input
+                    <IntegerInput
                       className="w-full rounded-2xl px-4 py-3 outline-none"
                       style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                       min={1}
-                      onChange={(event) =>
+                      emptyValue={1}
+                      onValueChange={(capacity) =>
                         setEditor((current) =>
-                          current ? { ...current, values: { ...current.values, capacity: Number(event.target.value) || 1 } } : current,
+                          current ? { ...current, values: { ...current.values, capacity: capacity ?? 1 } } : current,
                         )
                       }
-                      type="number"
                       value={editor.values.capacity}
                     />
                   ) : (
-                    <input
+                    <IntegerInput
                       className="w-full rounded-2xl px-4 py-3 outline-none"
                       style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                       min={1}
-                      onChange={(event) =>
+                      emptyValue={1}
+                      onValueChange={(timeoutMinutes) =>
                         setEditor((current) =>
-                          current ? { ...current, values: { ...current.values, booking_timeout_minutes: Number(event.target.value) || 1 } } : current,
+                          current ? { ...current, values: { ...current.values, booking_timeout_minutes: timeoutMinutes ?? 1 } } : current,
                         )
                       }
-                      type="number"
                       value={editor.values.booking_timeout_minutes}
                     />
                   )}
@@ -724,8 +724,7 @@ export function ScheduleConsole({
             <div className="flex items-center justify-between"><div><p className="text-xs font-semibold uppercase tracking-[.2em]" style={{ color: "var(--primary)" }}>{i18n("featureBatchScheduling")}</p><h3 className="mt-2 text-2xl font-semibold">{i18n("featureCreateClassSeries")}</h3></div><button type="button" onClick={() => setSeriesEditor(null)}>×</button></div>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               <label className="text-sm font-semibold">{i18n("featureClassName")}<input className="mt-2 w-full rounded-xl px-3 py-2" maxLength={120} value={seriesEditor.values.name} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, name: event.target.value } })} /></label>
-              <label className="text-sm font-semibold">{i18n("featureDurationMinutes")}<input className="mt-2 w-full rounded-xl px-3 py-2" type="number" min={1} max={1440} value={seriesEditor.values.duration_minutes} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, duration_minutes: Number(event.target.value) || 1 } })} /></label>
-              <label className="text-sm font-semibold">{i18n("featureWorkout")}<select className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.master_workout_id} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, master_workout_id: event.target.value } })}>{workouts.map((workout) => <option key={workout.id} value={workout.id}>{workout.title}</option>)}</select></label>
+              <label className="text-sm font-semibold">{i18n("featureDurationMinutes")}<IntegerInput className="mt-2 w-full rounded-xl px-3 py-2" min={1} max={1440} value={seriesEditor.values.duration_minutes} emptyValue={1} onValueChange={(durationMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, duration_minutes: durationMinutes ?? 1 } })} /></label>
               <label className="text-sm font-semibold">{i18n("featureClassType")}<select className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.class_type_id} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, class_type_id: event.target.value } })}>{classTypes.filter((item) => !item.archived_at).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
               <label className="text-sm font-semibold">{i18n("featureStarts")}<input className="mt-2 w-full rounded-xl px-3 py-2" type="date" value={seriesEditor.startDate} onChange={(event) => setSeriesEditor({ ...seriesEditor, startDate: event.target.value })} /></label>
               <label className="text-sm font-semibold">{i18n("featureEndsOptional")}<input className="mt-2 w-full rounded-xl px-3 py-2" min={seriesEditor.startDate} type="date" value={seriesEditor.endDate} onChange={(event) => setSeriesEditor({ ...seriesEditor, endDate: event.target.value })} /></label>
@@ -734,7 +733,7 @@ export function ScheduleConsole({
               <label className="text-sm font-semibold">{i18n("featureExcludedDates")}<input className="mt-2 w-full rounded-xl px-3 py-2" placeholder="2026-08-15, 2026-12-25" value={seriesEditor.excludedDates} onChange={(event) => setSeriesEditor({ ...seriesEditor, excludedDates: event.target.value })} /><span className="mt-1 block text-xs font-normal" style={{ color: "var(--dim)" }}>{i18n("featureCommaSeparatedDates")}</span></label>
               <label className="text-sm font-semibold">{i18n("featureTimezone")}<input className="mt-2 w-full rounded-xl px-3 py-2" readOnly value={seriesEditor.timezone} /></label>
             </div>
-            <details className="mt-5 rounded-2xl p-4" style={{ background: "var(--panel-muted)" }}><summary className="cursor-pointer text-sm font-semibold">{i18n("featureOptionalClassSettings")}</summary><div className="mt-4 grid gap-3 sm:grid-cols-3"><label className="text-xs">{i18n("featureCapacity")}<input className="mt-1 w-full rounded-xl px-3 py-2" type="number" min={1} value={seriesEditor.values.capacity} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, capacity: Number(event.target.value) } })} /></label><label className="text-xs">{i18n("featureTimeoutMinutes")}<input className="mt-1 w-full rounded-xl px-3 py-2" type="number" min={1} value={seriesEditor.values.booking_timeout_minutes} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, booking_timeout_minutes: Number(event.target.value) } })} /></label><label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={seriesEditor.values.auto_approve} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, auto_approve: event.target.checked } })} />{i18n("featureAutoApprove")}</label></div></details>
+            <details className="mt-5 rounded-2xl p-4" style={{ background: "var(--panel-muted)" }}><summary className="cursor-pointer text-sm font-semibold">{i18n("featureOptionalClassSettings")}</summary><div className="mt-4 grid gap-3 sm:grid-cols-3"><label className="text-xs">{i18n("featureCapacity")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" min={1} value={seriesEditor.values.capacity} emptyValue={1} onValueChange={(capacity) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, capacity: capacity ?? 1 } })} /></label><label className="text-xs">{i18n("featureTimeoutMinutes")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" min={1} value={seriesEditor.values.booking_timeout_minutes} emptyValue={1} onValueChange={(timeoutMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, booking_timeout_minutes: timeoutMinutes ?? 1 } })} /></label><label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={seriesEditor.values.auto_approve} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, auto_approve: event.target.checked } })} />{i18n("featureAutoApprove")}</label></div></details>
             <div className="mt-6 flex items-center justify-end"><div className="flex gap-2"><button type="button" className="rounded-full px-4 py-2" onClick={() => setSeriesEditor(null)}>{common("cancel")}</button><button type="button" disabled={busy || seriesEditor.weekdays.length === 0 || !seriesEditor.values.name.trim()} className="rounded-full px-5 py-2 font-semibold disabled:opacity-50" style={{ background: "var(--text)", color: "var(--bg)" }} onClick={() => void saveSeries()}>{busy ? i18n("featureCreating") : i18n("featureCreateSeries")}</button></div></div>
           </div>
         </div>
