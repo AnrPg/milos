@@ -37,7 +37,6 @@ defmodule MilosTraining.Scheduling.ScheduledClass do
       :booking_timeout_minutes
     ])
     |> validate_required([
-      :master_workout_id,
       :class_type_id,
       :name,
       :duration_minutes,
@@ -50,10 +49,20 @@ defmodule MilosTraining.Scheduling.ScheduledClass do
     |> validate_length(:name, min: 1, max: 120)
     |> validate_number(:duration_minutes, greater_than: 0, less_than_or_equal_to: 1440)
     |> validate_number(:booking_timeout_minutes, greater_than: 0)
+    |> require_workout_for_standalone_slot()
     |> validate_future_schedule()
     |> foreign_key_constraint(:master_workout_id)
     |> foreign_key_constraint(:class_type_id)
     |> foreign_key_constraint(:class_series_id)
+  end
+
+  defp require_workout_for_standalone_slot(changeset) do
+    if is_nil(get_field(changeset, :class_series_id)) and
+         is_nil(get_field(changeset, :master_workout_id)) do
+      add_error(changeset, :master_workout_id, "is required")
+    else
+      changeset
+    end
   end
 
   defp validate_future_schedule(changeset) do

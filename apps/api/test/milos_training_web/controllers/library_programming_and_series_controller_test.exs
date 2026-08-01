@@ -64,7 +64,6 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
 
   test "admin batch creates explicit class occurrences", %{conn: conn} do
     admin = admin_fixture(%{nickname: "series_admin"})
-    workout = workout_fixture(admin, %{title: "Series WOD"})
     class_type = class_type_fixture(%{name: "Series Class"})
     admin_conn = put_bearer_token(conn, admin)
     first = Date.utc_today() |> Date.add(1)
@@ -73,7 +72,6 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
     result =
       admin_conn
       |> post("/api/admin/schedule/slots/series", %{
-        master_workout_id: workout.id,
         class_type_id: class_type.id,
         name: "Weekly Series",
         duration_minutes: 60,
@@ -90,6 +88,7 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
       |> json_response(201)
 
     assert result["series"]["occurrence_count"] == 2
+    assert result["series"]["master_workout_id"] == nil
   end
 
   test "member profile schedule can copy a WOD into a folder and attach it to the booked class",

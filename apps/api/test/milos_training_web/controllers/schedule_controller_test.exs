@@ -128,7 +128,6 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
       |> post(
         "/api/admin/schedule/slots/series",
         Jason.encode!(%{
-          master_workout_id: workout.id,
           class_type_id: class_type.id,
           name: "CrossFit beginners",
           duration_minutes: 75,
@@ -144,7 +143,12 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
         })
       )
 
-    assert %{"series" => %{"occurrence_count" => 2}} = json_response(series_response, 201)
+    assert %{
+             "series" => %{
+               "occurrence_count" => 2,
+               "master_workout_id" => nil
+             }
+           } = json_response(series_response, 201)
 
     first_start = DateTime.new!(starts_on, ~T[17:00:00], "Etc/UTC")
 

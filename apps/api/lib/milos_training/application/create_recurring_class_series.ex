@@ -1,12 +1,10 @@
 defmodule MilosTraining.Application.CreateRecurringClassSeries do
-  alias MilosTraining.{Scheduling, Workouts}
+  alias MilosTraining.Scheduling
 
   def call(params) do
-    master_workout_id = value(params, :master_workout_id)
     class_type_id = value(params, :class_type_id)
 
-    with {:ok, _workout} <- fetch_workout(master_workout_id),
-         {:ok, _class_type} <- fetch_class_type(class_type_id),
+    with {:ok, _class_type} <- fetch_class_type(class_type_id),
          {:ok, series} <- Scheduling.create_class_series(params) do
       Phoenix.PubSub.broadcast(
         MilosTraining.PubSub,
@@ -15,13 +13,6 @@ defmodule MilosTraining.Application.CreateRecurringClassSeries do
       )
 
       {:ok, series}
-    end
-  end
-
-  defp fetch_workout(id) do
-    case Workouts.get_workout(id) do
-      nil -> {:error, :workout_not_found}
-      workout -> {:ok, workout}
     end
   end
 
