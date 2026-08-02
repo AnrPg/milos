@@ -144,6 +144,45 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
       assert json_response(publish_conn, 200)["workout"]["status"] == "published"
     end
 
+    test "publishes a free-text workout without structured sections", %{conn: conn} do
+      admin_conn = authenticate_as_admin(conn, "free_text_author")
+
+      draft_id =
+        post(admin_conn, "/api/admin/workouts") |> json_response(201) |> get_in(["draft", "id"])
+
+      draft_payload = %{
+        title: "Friday Board WOD",
+        type: "crossfit",
+        authoring_mode: "free_text",
+        free_text_body: "AMRAP 20\n10 pull-ups\n15 wall balls",
+        free_text_document: %{
+          type: "doc",
+          content: [%{type: "paragraph", content: [%{type: "text", text: "AMRAP 20"}]}]
+        },
+        sections: []
+      }
+
+      admin_conn
+      |> recycle()
+      |> put_req_header("content-type", "application/json")
+      |> patch("/api/admin/workouts/#{draft_id}/draft", Jason.encode!(draft_payload))
+      |> json_response(200)
+
+      workout =
+        admin_conn
+        |> recycle()
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/admin/workouts/#{draft_id}/publish", Jason.encode!(%{}))
+        |> json_response(200)
+        |> Map.fetch!("workout")
+
+      assert workout["status"] == "published"
+      assert workout["authoring_mode"] == "free_text"
+      assert workout["free_text_body"] == "AMRAP 20\n10 pull-ups\n15 wall balls"
+      assert workout["sections"] == []
+      assert workout["available_scale_levels"] == []
+    end
+
     test "publishes structured set composition and returns it without losing notes", %{conn: conn} do
       admin_conn = authenticate_as_admin(conn, "structured_set_author")
 
