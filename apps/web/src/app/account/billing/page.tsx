@@ -14,6 +14,10 @@ import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { SemanticLabel } from "@/components/semantic-label";
+import {
+  visibleBillingAllowances,
+  visibleBillingChannels,
+} from "@/app/account/billing/billing-entitlement-visibility";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -579,7 +583,8 @@ function EntitlementCard({ entitlement }: { entitlement: EffectiveEntitlement | 
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   if (!entitlement?.plan) return null;
-  const allowanceEntries = Object.entries(entitlement.allowances);
+  const allowanceEntries = visibleBillingAllowances(entitlement.allowances);
+  const channels = visibleBillingChannels(entitlement.plan.channels);
   return (
     <section className="rounded-2xl p-5" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
       <div className="flex items-center justify-between gap-3">
@@ -587,7 +592,7 @@ function EntitlementCard({ entitlement }: { entitlement: EffectiveEntitlement | 
         <StatusBadge status={entitlement.status} />
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
-        {entitlement.plan.channels.map((channel) => <span key={channel} className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }}><SemanticLabel value={channel} /></span>)}
+        {channels.map((channel) => <span key={channel} className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }}><SemanticLabel value={channel} /></span>)}
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {allowanceEntries.map(([key, usage]) => usage ? (

@@ -906,14 +906,26 @@ export function LandingPage() {
                 title={i18n("recentCompletions4866ac5")}
               >
 
-                <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                <div className="mb-6 flex items-center justify-end gap-4">
                   <button
-                    className="rounded-xl px-4 py-2 text-sm font-semibold"
+                    aria-label={historyExportOpen && historyExportQuery.isPending ? shareExport.copy.working : i18n("exportFullWorkoutHistory")}
+                    className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-opacity hover:opacity-80 disabled:cursor-wait disabled:opacity-50"
+                    disabled={historyExportOpen && historyExportQuery.isPending}
                     onClick={() => setHistoryExportOpen(true)}
-                    style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+                    style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--dim)" }}
+                    title={historyExportOpen && historyExportQuery.isPending ? shareExport.copy.working : i18n("exportFullWorkoutHistory")}
                     type="button"
                   >
-                    {historyExportOpen && historyExportQuery.isPending ? shareExport.copy.working : i18n("exportFullWorkoutHistory")}
+                    {historyExportOpen && historyExportQuery.isPending ? (
+                      <svg aria-hidden="true" className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" fill="none" r="9" stroke="currentColor" strokeOpacity="0.25" strokeWidth="2" />
+                        <path d="M12 3a9 9 0 0 1 9 9" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+                      </svg>
+                    ) : (
+                      <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
+                        <path d="M12 3v11m0 0 4-4m-4 4-4-4M5 15v4h14v-4" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" />
+                      </svg>
+                    )}
                   </button>
                   <div
                     className="flex rounded-xl overflow-hidden"
@@ -949,7 +961,7 @@ export function LandingPage() {
                 </div>
 
                 {/* Filters */}
-                <div className="mt-4">
+                <div>
                   <div className="flex flex-wrap gap-2">
                     {/* Date preset chips */}
                     {(["all", "week", "month"] as const).map((d) => {
