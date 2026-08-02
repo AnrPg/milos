@@ -75,6 +75,7 @@ export function QuickTextWorkoutEditor({
   const [diagnostics, setDiagnostics] = useState<WorkoutDslDiagnostic[]>([]);
   const [manual, setManual] = useState<WorkoutDslManual | null>(null);
   const [manualOpen, setManualOpen] = useState(false);
+  const [correctionsOpen, setCorrectionsOpen] = useState(true);
   const [parsing, setParsing] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [warningsAcknowledged, setWarningsAcknowledged] = useState(false);
@@ -425,7 +426,7 @@ export function QuickTextWorkoutEditor({
   }
 
   return (
-    <div className="grid h-full min-h-[calc(100dvh-6.5rem)] grid-cols-1 lg:grid-cols-[minmax(0,1.25fr)_minmax(20rem,0.75fr)]">
+    <div className={correctionsOpen ? "grid h-full min-h-[calc(100dvh-6.5rem)] grid-cols-1 lg:grid-cols-[minmax(0,1.25fr)_minmax(20rem,0.75fr)]" : "grid h-full min-h-[calc(100dvh-6.5rem)] grid-cols-1"}>
       <section className="flex min-h-0 flex-col border-e" style={{ borderColor: "var(--dim)" }}>
         <div className="border-b px-5 py-4" style={{ borderColor: "var(--dim)" }}>
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -445,44 +446,41 @@ export function QuickTextWorkoutEditor({
           </div>
         </div>
 
-        <EditorToolbar editor={editor} />
+        <EditorToolbar editor={editor} onManualOpen={() => setManualOpen(true)} />
         <div
-          className="flex flex-wrap items-center gap-2 border-b px-4 py-2"
+          className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-2"
           style={{ borderColor: "var(--dim)" }}
         >
-          <select
-            aria-label={i18n("quickTextTemplate")}
-            defaultValue=""
-            onChange={(event) => {
-              insertTemplate(
-                event.target.value === "workout"
-                  ? manual?.templates?.workout ?? ""
-                  : manual?.templates?.sections?.[event.target.value] ?? "",
-              );
-              event.currentTarget.value = "";
-            }}
-            className="rounded-lg border px-3 py-2 text-sm"
-            style={{ background: "var(--card)", borderColor: "var(--dim)", color: "var(--text)" }}
-          >
-            <option value="">{i18n("quickTextInsertTemplate")}</option>
-            <option value="workout">{i18n("quickTextFullWorkoutTemplate")}</option>
-            {Object.keys(manual?.templates?.sections ?? {}).map((format) => (
-              <option key={format} value={format}>
-                {format.replaceAll("_", " ")}
-              </option>
-            ))}
-          </select>
-          <button
-            type="button"
-            onClick={() => setManualOpen(true)}
-            className="rounded-lg px-3 py-2 text-sm font-bold"
-            style={{ background: "var(--card)", color: "var(--text)" }}
-          >
-            {i18n("quickTextManual")}
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              aria-label={i18n("quickTextTemplate")}
+              defaultValue=""
+              onChange={(event) => {
+                insertTemplate(
+                  event.target.value === "workout"
+                    ? manual?.templates?.workout ?? ""
+                    : manual?.templates?.sections?.[event.target.value] ?? "",
+                );
+                event.currentTarget.value = "";
+              }}
+              className="rounded-lg border px-3 py-2 text-sm"
+              style={{ background: "var(--card)", borderColor: "var(--dim)", color: "var(--text)" }}
+            >
+              <option value="">{i18n("quickTextInsertTemplate")}</option>
+              <option value="workout">{i18n("quickTextFullWorkoutTemplate")}</option>
+              {Object.keys(manual?.templates?.sections ?? {}).map((format) => (
+                <option key={format} value={format}>
+                  {format.replaceAll("_", " ")}
+                </option>
+              ))}
+            </select>
+            <span className="text-xs" style={{ color: "var(--muted)" }}>
+              {i18n("quickTextSlashHint")}
+            </span>
+          </div>
+          <button type="button" className="rounded-lg px-3 py-2 text-xs font-bold" style={{ background: "var(--card)", color: "var(--text)" }} onClick={() => setCorrectionsOpen((open) => !open)}>
+            {correctionsOpen ? i18n("hide34d8b60") : i18n("showd97d1ee")}
           </button>
-          <span className="text-xs" style={{ color: "var(--muted)" }}>
-            {i18n("quickTextSlashHint")}
-          </span>
         </div>
 
         <div className="relative min-h-0 flex-1 overflow-auto">
@@ -539,7 +537,7 @@ export function QuickTextWorkoutEditor({
         </div>
       </section>
 
-      <aside className="min-h-0 overflow-auto p-5" style={{ background: "var(--panel)" }}>
+      {correctionsOpen ? <aside className="min-h-0 overflow-auto p-5" style={{ background: "var(--panel)" }}>
         {diagnostics.length > 0 ? (
           <>
             <DiagnosticsPanel diagnostics={diagnostics} />
@@ -557,7 +555,7 @@ export function QuickTextWorkoutEditor({
         ) : (
           <CanonicalPreview preview={preview} />
         )}
-      </aside>
+      </aside> : null}
 
       {manualOpen && manual ? (
         <ManualDialog markdown={manual.markdown} onClose={() => setManualOpen(false)} />
@@ -566,7 +564,7 @@ export function QuickTextWorkoutEditor({
   );
 }
 
-function EditorToolbar({ editor }: { editor: Editor | null }) {
+function EditorToolbar({ editor, onManualOpen }: { editor: Editor | null; onManualOpen: () => void }) {
   const i18n = useUiTranslations();
   if (!editor) return null;
 
@@ -587,6 +585,7 @@ function EditorToolbar({ editor }: { editor: Editor | null }) {
     button(i18n("editorLink"), "🔗", editor.isActive("link"), () => setEditorLink(editor, i18n("editorLinkPrompt"))),
     button(i18n("editorUndo"), "↶", false, () => editor.chain().focus().undo().run()),
     button(i18n("editorRedo"), "↷", false, () => editor.chain().focus().redo().run()),
+    button(i18n("quickTextManual"), "?", false, onManualOpen),
   ];
 
   return (

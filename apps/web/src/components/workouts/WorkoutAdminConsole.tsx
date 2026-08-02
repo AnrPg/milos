@@ -46,6 +46,7 @@ export function WorkoutAdminConsole() {
   const [folderName, setFolderName] = useState("");
   const [folderParentId, setFolderParentId] = useState<string>("");
   const [folderModalOpen, setFolderModalOpen] = useState(false);
+  const [moveMenuWorkoutId, setMoveMenuWorkoutId] = useState<string | null>(null);
   const [draggedWorkoutId, setDraggedWorkoutId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -296,21 +297,17 @@ export function WorkoutAdminConsole() {
             <section className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>{i18n("masterWorkoutsd9ed039")}</p>
-                  <h2 className="mt-2 text-2xl font-semibold" style={{ color: "var(--text)" }}>{i18n("savedWorkoutDefinitions0b771a2")}</h2>
+                  <h2 className="text-2xl font-semibold" style={{ color: "var(--text)" }}>{i18n("semanticWorkoutLibrary")}</h2>
                 </div>
 
-                <Link
-                  className="rounded-full px-4 py-2 text-sm font-semibold"
-                  style={{ background: "var(--text)", color: "var(--bg)" }}
-                  href="/admin/workouts/new"
-                >
-                  {i18n("newWorkout5fc6e4c")}
-                </Link>
-              </div>
-
-              <div className="mt-6 grid gap-4 rounded-[1.5rem] p-4 lg:grid-cols-[1fr_auto]" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
-                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Link
+                    className="rounded-full px-4 py-2 text-sm font-semibold"
+                    style={{ background: "var(--text)", color: "var(--bg)" }}
+                    href="/admin/workouts/new"
+                  >
+                    {i18n("newWorkout5fc6e4c")}
+                  </Link>
                   <button
                     type="button"
                     className="rounded-full px-4 py-2 text-sm font-semibold"
@@ -320,8 +317,13 @@ export function WorkoutAdminConsole() {
                       setFolderModalOpen(true);
                     }}
                   >
-                    {i18n("featureAddFolder")}
+                    {i18n("featureNewFolder")}
                   </button>
+                </div>
+              </div>
+
+              <div className="mt-6 grid gap-4 rounded-[1.5rem] p-4 lg:grid-cols-[1fr_auto]" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
                   <nav aria-label={i18n("featureFilterByFolder")} className="flex min-w-0 flex-wrap items-center gap-1 text-sm">
                     <button type="button" className="rounded-full px-3 py-1.5 font-semibold" style={{ background: selectedFolderId === "all" ? "var(--text)" : "var(--panel)", color: selectedFolderId === "all" ? "var(--bg)" : "var(--text-soft)", border: "1px solid var(--border)" }} onClick={() => setSelectedFolderId("all")}>
                       {i18n("featureLibraryRoot")}
@@ -336,7 +338,8 @@ export function WorkoutAdminConsole() {
                     ))}
                   </nav>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>{i18n("featureViewLabel")}</span>
                   {(["folders", "tiles", "list"] as const).map((mode) => <button key={mode} type="button" aria-pressed={viewMode === mode} className="rounded-full px-3 py-2 text-sm font-semibold capitalize" style={{ background: viewMode === mode ? "var(--text)" : "var(--panel)", color: viewMode === mode ? "var(--bg)" : "var(--text-soft)", border: "1px solid var(--border)" }} onClick={() => setViewMode(mode)}>{i18n(`featureView${mode[0].toUpperCase()}${mode.slice(1)}`)}</button>)}
                 </div>
               </div>
@@ -384,9 +387,8 @@ export function WorkoutAdminConsole() {
               {viewMode === "list" ? (
                 <div className="mt-6 overflow-hidden rounded-lg" style={{ border: "1px solid var(--border)" }}>
                   {visibleWorkouts.map((workout) => (
-                    <button key={workout.id} type="button" className="grid w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-4 border-b px-4 py-3 text-start last:border-b-0 hover:bg-[var(--panel-muted)]" style={{ borderColor: "var(--border)", color: "var(--text)" }} onClick={() => setPreviewWorkoutId(workout.id)}>
+                    <button key={workout.id} type="button" className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-b px-4 py-3 text-start last:border-b-0 hover:bg-[var(--panel-muted)]" style={{ borderColor: "var(--border)", color: "var(--text)" }} onClick={() => setPreviewWorkoutId(workout.id)}>
                       <span className="min-w-0"><strong className="block truncate text-sm">{workout.title || i18n("untitledWorkouta1885a5")}</strong><span className="text-xs" style={{ color: "var(--muted)" }}><SemanticLabel value={workout.type} /></span></span>
-                      <span className="text-xs" style={{ color: "var(--muted)" }}>{i18n("featureSectionCount", { count: (workout.sections ?? []).length })}</span>
                       <span className="text-xs font-semibold" style={{ color: workout.status === "draft" ? "var(--warning)" : "var(--success)" }}><SemanticLabel value={workout.status ?? "published"} /></span>
                     </button>
                   ))}
@@ -404,7 +406,7 @@ export function WorkoutAdminConsole() {
                     style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", cursor: viewMode === "folders" ? "grab" : "pointer" }}
                     onClick={() => setPreviewWorkoutId(workout.id)}
                   >
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-start justify-between gap-4">
                       <div>
                         <div className="flex items-center gap-2">
                           <p className="text-lg font-semibold" style={{ color: "var(--text)" }}>{workout.title || i18n("untitledWorkouta1885a5")}</p>
@@ -421,20 +423,26 @@ export function WorkoutAdminConsole() {
                         </div>
                         <p className="mt-1 text-sm uppercase tracking-[0.18em] text-[var(--primary)]"><SemanticLabel value={workout.type} /></p>
                       </div>
-                      <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--muted)" }}>
-                        {i18n("featureSectionCount", { count: (workout.sections ?? []).length })}
-                      </span>
+                      <div className="flex shrink-0 items-center gap-1" onClick={(event) => event.stopPropagation()}>
+                        <button type="button" aria-label={i18n("featureMoveToFolder")} title={i18n("featureMoveToFolder")} className="grid h-8 w-8 place-items-center rounded-full text-sm opacity-65 hover:opacity-100" style={{ background: "var(--panel)", color: "var(--text-soft)", border: "1px solid var(--border)" }} onClick={() => setMoveMenuWorkoutId((id) => id === workout.id ? null : workout.id)}>↪</button>
+                        {workout.status === "published" ? <button type="button" aria-label={i18n("edit5301648")} title={i18n("edit5301648")} className="grid h-8 w-8 place-items-center rounded-full text-sm opacity-65 hover:opacity-100" style={{ background: "var(--panel)", color: "var(--text-soft)", border: "1px solid var(--border)" }} onClick={() => setEditTarget(workout)}>✎</button> : null}
+                        <button type="button" aria-label={shareExport.copy.title} title={shareExport.copy.title} className="grid h-8 w-8 place-items-center rounded-full text-sm opacity-65 hover:opacity-100" style={{ background: "var(--panel)", color: "var(--success)", border: "1px solid var(--border)" }} onClick={() => setShareTarget(workout)}>⇪</button>
+                        <button type="button" aria-label={i18n("deletef6fdbe4")} title={i18n("deletef6fdbe4")} disabled={busyAction === `delete-${workout.id}`} className="grid h-8 w-8 place-items-center rounded-full text-sm opacity-65 hover:opacity-100 disabled:opacity-30" style={{ background: "var(--panel)", color: "var(--danger)", border: "1px solid var(--border)" }} onClick={() => void handleDeleteWorkout(workout)}>×</button>
+                      </div>
                     </div>
 
                     <div className="mt-4 flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
-                      <select aria-label={i18n("featureFolderForWorkout", { title: workout.title })} className="rounded-full px-3 py-1 text-xs" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} value={workout.folder_id ?? ""} onChange={(event) => {
+                      {moveMenuWorkoutId === workout.id ? <select aria-label={i18n("featureFolderForWorkout", { title: workout.title })} className="rounded-full px-3 py-1 text-xs" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} value={workout.folder_id ?? ""} onChange={(event) => {
                         const folderId = event.target.value || null;
                         if (!tokens?.access_token) return;
-                        void moveWorkoutToFolder(tokens.access_token, workout.id, folderId).then(() => setWorkouts((current) => current.map((item) => item.id === workout.id ? { ...item, folder_id: folderId } : item)));
+                        void moveWorkoutToFolder(tokens.access_token, workout.id, folderId).then(() => {
+                          setWorkouts((current) => current.map((item) => item.id === workout.id ? { ...item, folder_id: folderId } : item));
+                          setMoveMenuWorkoutId(null);
+                        });
                       }}>
                         <option value="">{i18n("featureUncategorized")}</option>
                         {orderedFolders.map((folder) => <option key={folder.id} value={folder.id}>{folderLabel(folder)}</option>)}
-                      </select>
+                      </select> : null}
                       {workout.status === "draft" ? (
                         <Link
                           className="rounded-full px-3 py-1 text-xs font-semibold"
@@ -454,37 +462,10 @@ export function WorkoutAdminConsole() {
                             onClick={(e) => { e.stopPropagation(); setAssignTarget(workout); }}
                             type="button"
                           >
-                            {i18n("assignToAthletesafa315d")}
-                          </button>
-                          <button
-                            className="rounded-full px-3 py-1 text-xs font-semibold"
-                            style={{ background: "var(--border)", color: "var(--text-soft)" }}
-                            onClick={(e) => { e.stopPropagation(); setEditTarget(workout); }}
-                            type="button"
-                          >
-                            {i18n("edit5301648")}
+                            {i18n("featureAssignToAthleteOrClass")}
                           </button>
                         </>
                       ) : null}
-
-                      <button
-                        className="rounded-full px-3 py-1 text-xs font-semibold"
-                        style={{ background: "color-mix(in srgb, var(--success) 14%, transparent)", color: "var(--success)" }}
-                        onClick={(event) => { event.stopPropagation(); setShareTarget(workout); }}
-                        type="button"
-                      >
-                        📤 {shareExport.copy.title}
-                      </button>
-
-                      <button
-                        className="rounded-full px-3 py-1 text-xs font-semibold disabled:opacity-50"
-                        style={{ background: "color-mix(in srgb, var(--primary) 16%, transparent)", color: "var(--primary-strong)" }}
-                        disabled={busyAction === `delete-${workout.id}`}
-                        onClick={(e) => { e.stopPropagation(); void handleDeleteWorkout(workout); }}
-                        type="button"
-                      >
-                        {busyAction === `delete-${workout.id}` ? i18n("deletinge16cac6") : i18n("deletef6fdbe4")}
-                      </button>
 
                       {workout.available_scale_levels.length > 0 ? (
                         workout.available_scale_levels.map((scaleLevel) => (
@@ -608,7 +589,7 @@ export function WorkoutAdminConsole() {
                   <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}><SemanticLabel value={pw.type} /></p>
                   <h2 className="mt-1 text-xl font-semibold" style={{ color: "var(--text)" }}>{pw.title || i18n("untitledWorkouta1885a5")}</h2>
                   <p className="mt-1 text-sm" style={{ color: "var(--dim)" }}>
-                    {pw.sections.length} {i18n("section20182fb")}{pw.sections.length === 1 ? "" : i18n("sa0f1490")} · {pw.available_scale_levels.length > 0 ? i18n("scaleLevelCount", {count: pw.available_scale_levels.length}) : i18n("baseOnly061c4ff")}
+                    {pw.available_scale_levels.length > 0 ? i18n("scaleLevelCount", {count: pw.available_scale_levels.length}) : i18n("baseOnly061c4ff")}
                   </p>
                 </div>
                 <button

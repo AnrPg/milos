@@ -47,6 +47,7 @@ export type PreviewExercise = {
   rest_pause_seconds?: number | null;
   pacing?: number | null;
   interval_assignment?: number | null;
+  description?: string | null;
   note?: string | null;
   variations?: Array<{
     id?: string;
@@ -170,7 +171,21 @@ function ExerciseRow({ exercise, groupColor }: { exercise: ResolvedExercise; gro
     if (exercise.hr_zone) extras.push(i18n("hrZValue0defc7f9", {value0: exercise.hr_zone}));
     if (exercise.pacing) extras.push(i18n("paceValue0SRep5b31b72", {value0: exercise.pacing}));
     if (exercise.cluster_rest_seconds) extras.push(i18n("clusterValue0S3514326", {value0: exercise.cluster_rest_seconds}));
+    if (exercise.rest_pause_seconds) extras.push(i18n("restValue0S0cde064", {value0: exercise.rest_pause_seconds}));
+    if (exercise.interval_assignment) extras.push(`${i18n("interval011efcd")} ${exercise.interval_assignment}`);
     return extras;
+  }
+
+  function formatProgression(exercise: PreviewExercise): string | null {
+    const progression = exercise.load_progression;
+    if (!progression) return null;
+    const direction = progression.direction === "decrease" ? i18n("progressiveLoadDecrease") : i18n("progressiveLoadIncrease");
+    if (progression.mode === "per_set" && progression.per_set_values?.length) {
+      return `${direction}: ${progression.per_set_values.join(" / ")}`;
+    }
+    const start = progression.start_value != null ? `${progression.start_value} ${progression.start_mode ?? ""}`.trim() : "";
+    const step = progression.step_value != null ? `+${progression.step_value}` : "";
+    return [direction, start, step].filter(Boolean).join(" · ");
   }
 
   function formatPrescription(exercise: PreviewExercise): string {
@@ -218,7 +233,9 @@ function ExerciseRow({ exercise, groupColor }: { exercise: ResolvedExercise; gro
 
   const prescription = formatPrescription(exercise);
   const extras = formatExtras(exercise);
+  const progression = formatProgression(exercise);
   const variationColor = scaleLevelVar(exercise.variationSlug ?? exercise.variationLabel);
+  const displayName = exercise.name?.trim() || exercise.description?.trim() || i18n("exercise1091b7f");
   return (
     <li
       className="rounded-[1rem] px-4 py-3"
@@ -235,7 +252,7 @@ function ExerciseRow({ exercise, groupColor }: { exercise: ResolvedExercise; gro
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <span className="text-sm font-semibold leading-5" style={{ color: "var(--text)" }}>
-            {exercise.name}
+            {displayName}
           </span>
           {exercise.varied ? (
             <span
@@ -261,6 +278,16 @@ function ExerciseRow({ exercise, groupColor }: { exercise: ResolvedExercise; gro
       {extras.length > 0 ? (
         <p className="mt-1.5 text-xs leading-5" style={{ color: "var(--dim)" }}>
           {extras.join(" · ")}
+        </p>
+      ) : null}
+      {exercise.description ? (
+        <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
+          {exercise.description}
+        </p>
+      ) : null}
+      {progression ? (
+        <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
+          {progression}
         </p>
       ) : null}
       {exercise.note ? (
@@ -413,7 +440,7 @@ export function WorkoutPreviewDetail({
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <span className="text-xs font-semibold" style={{ color: "var(--dim)" }}>
-                  {exerciseCount} {i18n("exerciseeb70d1f")}{exerciseCount !== 1 ? i18n("sa0f1490") : ""}
+                  {i18n("featureExerciseCount", { count: exerciseCount })}
                 </span>
                 <span className="text-xs" style={{ color: "var(--dim)" }}>
                   {expanded ? "▲" : "▼"}

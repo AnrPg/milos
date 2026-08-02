@@ -261,13 +261,28 @@ function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: s
   );
 }
 
-function FinanceDetails({ finance, token, userId, onRefresh }: { finance: AdminUserFinance; token: string; userId: string; onRefresh: () => Promise<unknown> }) {
+function FinanceDetails({
+  finance,
+  token,
+  userId,
+  effectiveEntitlement,
+  creditBalance,
+  onRefresh,
+}: {
+  finance: AdminUserFinance;
+  token: string;
+  userId: string;
+  effectiveEntitlement: EffectiveEntitlement | null | undefined;
+  creditBalance: unknown;
+  onRefresh: () => Promise<unknown>;
+}) {
   const i18n = useUiTranslations();
   const membership = finance.details.membership;
   const subscriptions = finance.details.package_subscriptions;
   const claims = finance.details.referral_claims;
   const referredMembers = finance.details.referred_members;
   const rewards = finance.details.referral_rewards;
+  const [editing, setEditing] = useState<string | null>(null);
   const [draft, setDraft] = useState(() => ({
     status: valueText(membership?.status) === "—" ? "active" : valueText(membership?.status),
     starts_on: typeof membership?.starts_on === "string" ? membership.starts_on.slice(0, 10) : "",
@@ -277,84 +292,70 @@ function FinanceDetails({ finance, token, userId, onRefresh }: { finance: AdminU
   }));
   const updateMembership = useMutation({
     mutationFn: (patch: Record<string, unknown>) => updateFinanceMember(token, userId, patch),
-    onSuccess: () => onRefresh(),
+    onSuccess: async () => {
+      setEditing(null);
+      await onRefresh();
+    },
   });
   const fieldStyle = { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" };
+  const packageContent = subscriptions
+    .map((subscription) => {
+      const label = packageSubscriptionLabel(subscription);
+      return [label, semanticLabel(valueText(subscription.status), i18n), money(subscription.price_cents_snapshot)]
+        .filter((part) => part && part !== "—")
+        .join(" · ");
+    })
+    .filter(Boolean)
+    .join("\n");
 
   return (
     <div className="mt-5 space-y-6">
-      <div className="space-y-5">
-        <div>
-        <div className="mb-3">
-          <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("membership53bc967")}</p>
-        </div>
+      <div>
+        <p className="mb-3 font-semibold" style={{ color: "var(--text)" }}>{i18n("membership53bc967")}</p>
         {membership ? (
-          <div className="space-y-3 rounded-[1.5rem] p-4" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
-            <label className="block text-xs" style={{ color: "var(--muted)" }}>{i18n("statusbae7d5b")}
-              <select className="mt-1 w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft.status} onChange={(event) => { const status = event.target.value; setDraft((current) => ({ ...current, status })); updateMembership.mutate({ status }); }}>
+          <div className="space-y-2">
+            <EditableFinanceCard label={i18n("statusbae7d5b")} editing={editing === "status"} value={<SemanticLabel value={draft.status} />} onOpen={() => setEditing("status")}>
+              <select className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft.status} onChange={(event) => { const status = event.target.value; setDraft((current) => ({ ...current, status })); updateMembership.mutate({ status }); }}>
                 {['active', 'inactive', 'cancelled'].map((status) => <option key={status} value={status}>{semanticLabel(status, i18n)}</option>)}
               </select>
-            </label>
-            {[['starts_on', i18n("startsOn6d888f7")], ['expires_on', i18n("expiresOn549cabe")]].map(([key, label]) => <label className="block text-xs" key={key} style={{ color: "var(--muted)" }}>{label}<input className="mt-1 w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} type="date" value={draft[key as 'starts_on' | 'expires_on']} onChange={(event) => setDraft((current) => ({ ...current, [key]: event.target.value }))} onBlur={() => updateMembership.mutate({ [key]: draft[key as 'starts_on' | 'expires_on'] || null })} /></label>)}
-            <label className="block text-xs" style={{ color: "var(--muted)" }}>{i18n("signupSource69d3a02")}<input className="mt-1 w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft.signup_source} onChange={(event) => setDraft((current) => ({ ...current, signup_source: event.target.value }))} onBlur={() => updateMembership.mutate({ signup_source: draft.signup_source || null })} /></label>
-            <label className="block text-xs" style={{ color: "var(--muted)" }}>{i18n("notes7044004")}<textarea className="mt-1 min-h-20 w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft.notes} onChange={(event) => setDraft((current) => ({ ...current, notes: event.target.value }))} onBlur={() => updateMembership.mutate({ notes: draft.notes || null })} /></label>
+            </EditableFinanceCard>
+            {([['starts_on', i18n("startsOn6d888f7")], ['expires_on', i18n("expiresOn549cabe")]] as const).map(([key, label]) => (
+              <EditableFinanceCard key={key} label={label} editing={editing === key} value={date(draft[key])} onOpen={() => setEditing(key)}>
+                <input className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} type="date" value={draft[key]} onChange={(event) => setDraft((current) => ({ ...current, [key]: event.target.value }))} onBlur={() => updateMembership.mutate({ [key]: draft[key] || null })} />
+              </EditableFinanceCard>
+            ))}
+            <EditableFinanceCard label={i18n("packageSubscriptions09a33f1")} value={packageContent || ""} />
             {updateMembership.isPending ? <p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("quickTextSaving")}</p> : null}
             {updateMembership.isError ? <p className="text-xs" style={{ color: "var(--danger)" }}>{i18n("quickTextSaveError")}</p> : null}
           </div>
         ) : <Empty>{i18n("noMembershipRecord741b5d9")}</Empty>}
       </div>
 
-      {subscriptions.length ? (
-        <div>
-          <div className="mb-3">
-            <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("packageSubscriptions09a33f1")}</p>
-          </div>
-          <div className="grid gap-2">
-            {subscriptions.slice(0, 3).map((subscription) => (
-              <GenericRecordCard
-                key={valueText(subscription.id)}
-                title={packageSubscriptionLabel(subscription)}
-                meta={<><SemanticLabel value={valueText(subscription.status)} /> · {date(subscription.starts_on)}–{date(subscription.ends_on)}</>}
-                value={money(subscription.price_cents_snapshot)}
-              />
-            ))}
-            {subscriptions.length > 3 ? <p className="text-xs" style={{ color: "var(--muted)" }}>+{subscriptions.length - 3} {i18n("moree7c95b4")}</p> : null}
-          </div>
+      <details className="rounded-xl p-4" style={{ border: "1px solid var(--border)" }}>
+        <summary className="cursor-pointer font-semibold" style={{ color: "var(--text)" }}>{i18n("advancedSettingsc8fef35")}</summary>
+        <div className="mt-4 space-y-5">
+          <div className="grid gap-3 sm:grid-cols-2"><DetailCard title={i18n("credits66c22fa")} value={valueText(creditBalance) === "—" ? 0 : valueText(creditBalance)} plainChildren /><DetailCard title={i18n("entitlement8994749")} value={effectiveEntitlement?.status ? <SemanticLabel value={effectiveEntitlement.status} /> : ""} plainChildren /></div>
+          <AdminEntitlements token={token} userId={userId} entitlement={effectiveEntitlement} onRefresh={onRefresh} />
+          {claims.length ? <FinanceRecordList title={i18n("referralEvents8bcf3f4")} records={claims} personKey="referrer_nickname" /> : null}
+          {referredMembers.length ? <FinanceRecordList title={i18n("madeReferralsbe27ef7")} records={referredMembers} personKey="referred_nickname" /> : null}
+          {rewards.length ? <div><p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("referralRewards22d6a91")}</p><div className="mt-2 grid gap-2 sm:grid-cols-2">{rewards.map((reward) => <GenericRecordCard key={valueText(reward.id)} title={<SemanticLabel value={valueText(reward.reward_type)} />} meta={<><SemanticLabel value={valueText(reward.status)} /> · {date(reward.applied_at ?? reward.inserted_at)}</>} value={valueText(reward.reward_value)} />)}</div></div> : null}
         </div>
-      ) : null}
-      </div>
+      </details>
+    </div>
+  );
+}
 
-      {(claims.length || referredMembers.length || rewards.length) ? <details className="rounded-xl p-4" style={{ border: "1px solid var(--border)" }}><summary className="cursor-pointer font-semibold" style={{ color: "var(--text)" }}>{i18n("advancedSettingsc8fef35")}</summary><div className="mt-4 space-y-5">{claims.length ? (
-        <FinanceRecordList
-          title={i18n("referralEvents8bcf3f4")}
-          records={claims}
-          personKey="referrer_nickname"
-        />
-      ) : null}
-
-      {referredMembers.length ? (
-        <FinanceRecordList
-          title={i18n("madeReferralsbe27ef7")}
-          records={referredMembers}
-          personKey="referred_nickname"
-        />
-      ) : null}</div></details> : null}
-
-      {rewards.length ? (
-        <div>
-          <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("referralRewards22d6a91")}</p>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2">
-            {rewards.map((reward) => (
-              <GenericRecordCard
-                key={valueText(reward.id)}
-                title={<SemanticLabel value={valueText(reward.reward_type)} />}
-                meta={<><SemanticLabel value={valueText(reward.status)} /> · {date(reward.applied_at ?? reward.inserted_at)}</>}
-                value={valueText(reward.reward_value)}
-              />
-            ))}
-          </div>
-        </div>
-      ) : null}
+function EditableFinanceCard({ label, value, editing = false, onOpen, children }: { label: string; value: React.ReactNode; editing?: boolean; onOpen?: () => void; children?: React.ReactNode }) {
+  const content = (
+    <>
+      <span className="block text-xs uppercase tracking-[0.14em]" style={{ color: "var(--muted)" }}>{label}</span>
+      {!editing ? <span className="mt-1 block whitespace-pre-line font-semibold" style={{ color: "var(--text)" }}>{value || ""}</span> : null}
+    </>
+  );
+  return (
+    <div className="w-full rounded-[1.25rem] p-4 text-start" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+      {onOpen ? <button type="button" className="w-full text-start" onClick={onOpen}>{content}</button> : <div>{content}</div>}
+      {editing ? <div className="mt-3">{children}</div> : null}
     </div>
   );
 }
@@ -554,7 +555,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
 
           {token && (profile.identity.role === "member" || profile.identity.role === "athlete") ? <Panel id="schedule" title={i18n("featureScheduleProgramming")}><UserProgrammingSchedule token={token} userId={userId} role={profile.identity.role} /></Panel> : null}
 
-          {sections.has("finance") ? <Panel id="finance" title={i18n("finance1b48d3f")}>{finance.data && token ? <FinanceDetails finance={finance.data} token={token} userId={userId} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}<details className="mt-5 rounded-2xl p-4" style={{ border: "1px solid var(--border)" }}><summary className="cursor-pointer font-semibold" style={{ color: "var(--text)" }}>{i18n("advancedSettingsc8fef35")}</summary><div className="mt-4"><div className="grid gap-3 sm:grid-cols-2"><DetailCard title={i18n("credits66c22fa")} value={finance.data?.summary?.credit_balance ?? 0} plainChildren /><DetailCard title={i18n("entitlement8994749")} value={effectiveEntitlement?.status ? <SemanticLabel value={effectiveEntitlement.status} /> : "—"} plainChildren /></div>{token ? <AdminEntitlements token={token} userId={userId} entitlement={effectiveEntitlement} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</div></details></Panel> : null}
+          {sections.has("finance") ? <Panel id="finance" title={i18n("finance1b48d3f")}>{finance.data && token ? <FinanceDetails finance={finance.data} token={token} userId={userId} effectiveEntitlement={effectiveEntitlement} creditBalance={finance.data?.summary?.credit_balance ?? 0} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
 
           {sections.has("training_history") ? <Panel id="training_history" title={i18n("trainingHistorya512053")} href="/admin/workouts"><p>{training.data?.summary.completed_count ?? 0} {i18n("completedOf88964ae")} {training.data?.summary.execution_count ?? 0} {i18n("executions8319d6e")}</p><div className="mt-3 grid gap-3">{executions.length ? executions.slice(0, 8).map((item) => <ExecutionCard key={item.id} item={item} href="/admin/workouts" />) : <Empty>{i18n("noWorkoutExecutionsRecorded0a0b1d0")}</Empty>}</div></Panel> : null}
 

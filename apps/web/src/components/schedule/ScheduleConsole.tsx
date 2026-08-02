@@ -414,11 +414,16 @@ export function ScheduleConsole({
 
 
         <section className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-          <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-            <TypeFilterChips classTypes={classTypes} value={classTypeIds} onChange={setClassTypeIds} />
+          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] xl:items-center">
+            <div className="min-w-0">
+              <TypeFilterChips classTypes={classTypes} value={classTypeIds} onChange={setClassTypeIds} />
+            </div>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex justify-start xl:justify-center">
               {isAdmin ? <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }} onClick={openSeriesEditor}>{i18n("featureCreateSeries")}</button> : null}
+            </div>
+
+            <div className="flex flex-wrap justify-start gap-3 xl:justify-end">
               <ViewModeSelector
                 ariaLabel={t("calendarView")}
                 onChange={setDays}

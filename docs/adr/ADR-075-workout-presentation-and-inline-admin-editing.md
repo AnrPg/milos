@@ -100,8 +100,8 @@ the destination beneath the moving card from dnd-kit's movement stream, opens it
 once per boundary crossing, and retains drag-start metadata through source unmount.
 
 The Quick Text editor has a CSS-counter line-number gutter and an auto-hiding mode
-bar that returns on scrolling or top-edge hover. Shared integer editors retain an
-empty display value until blur, then normalize to their allowed minimum.
+bar that returns only from the page-top hover/focus region. Shared integer editors
+retain an empty display value until blur, then normalize to their allowed minimum.
 
 The admin dossier now stacks inline membership controls and moves credits,
 entitlements, referrals, and rewards into Advanced settings. The workout library
@@ -122,3 +122,14 @@ grouped Quick Text and Structured previews, draft reload hydration, line numbers
 the auto-hiding mode bar, conditional grouping actions, inline membership editing,
 humanized package labels, workout-library presentation, and workout-free recurring
 series authoring. No new technical debt was deferred.
+
+Additional UI hardening keeps the same model while reducing surface clutter: the
+library heading is now the product-facing Workout Library label, card actions are
+subtle icon controls except the primary athlete/class assignment action, folder
+creation sits beside new-WOD creation, and preview side panels render full section
+and exercise prescriptions rather than compact placeholders. Schedule controls use
+fixed left-filter, middle-series, and right-view/navigation regions so view controls
+remain right-aligned. The Quick Text diagnostics/preview panel can collapse. The
+admin user finance section has one Advanced settings disclosure and stacked
+click-to-edit membership cards, including package subscriptions without placeholder
+dashes.

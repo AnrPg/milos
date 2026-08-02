@@ -2405,6 +2405,7 @@
     "editorLinkPrompt": "Enter an https or mailto link",
     "featureScheduleProgramming": "Schedule & programming",
     "featureScheduledClass": "Scheduled class",
+    "featureAssignToClass": "Assign to class",
     "featureCouldNotLoadSchedule": "Could not load schedule",
     "featureFolderName": "Folder name",
     "featureChooseLibraryFolder": "Choose the library folder where this WOD will be saved.",
@@ -2433,6 +2434,9 @@
     "featureLibraryRoot": "Library root",
     "featureAddFolder": "Add folder",
     "featureViewFolders": "Folders",
+    "featureViewLabel": "View:",
+    "featureMoveToFolder": "Move to folder",
+    "featureAssignToAthleteOrClass": "Assign to athlete/class",
     "featureViewTiles": "Tiles",
     "featureViewList": "List",
     "featureFilterByFolder": "Filter by folder",
@@ -2503,6 +2507,7 @@
     "featureInvoices": "Invoices",
     "featureReceiptWorkflowDescription": "I received money → record it → give the member a receipt.",
     "featureInvoiceWorkflowDescription": "Create, issue, collect, allocate, and reconcile receivables.",
-    "featureSectionCount": "{count, plural, one {# section} other {# sections}}"
+    "featureSectionCount": "{count, plural, one {# section} other {# sections}}",
+    "featureExerciseCount": "{count, plural, one {# exercise} other {# exercises}}"
   }
 }
