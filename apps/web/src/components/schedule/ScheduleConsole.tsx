@@ -452,12 +452,13 @@ export function ScheduleConsole({
               </div>
             </div>
           </div>
-          {isAdmin ? (
-            <div className="mt-4 flex justify-end">
-              <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }} onClick={openSeriesEditor}>{i18n("featureCreateSeries")}</button>
-            </div>
-          ) : null}
         </section>
+
+        {isAdmin ? (
+          <div className="flex justify-end">
+            <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }} onClick={openSeriesEditor}>{i18n("featureCreateSeries")}</button>
+          </div>
+        ) : null}
 
         {error ? (
           <div className="rounded-[1.6rem] px-5 py-4 text-sm" style={{ background: "var(--primary)]/10", border: "1px solid var(--primary)30", color: "var(--primary-strong)" }}>
