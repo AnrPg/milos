@@ -76,3 +76,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-074 | Admin finance and user profile usability | Accepted |
 | ADR-075 | Workout presentation and inline admin editing | Accepted |
 | ADR-076 | Package-associated receipts | Accepted |
+| ADR-077 | Free-text exercises and continuous DSL completion | Accepted |
