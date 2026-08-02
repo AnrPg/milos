@@ -117,5 +117,8 @@ placeholder punctuation or machine codes.
 
 Validation completed with 104 frontend unit tests, lint, localization checks,
 TypeScript, the production build, and the backend precommit suite (498 tests,
-formatter, Credo, and the architecture boundary gate). Live browser testing was
-skipped at the user's direction. No new technical debt was deferred.
+formatter, Credo, and the architecture boundary gate). Live browser checks covered
+grouped Quick Text and Structured previews, draft reload hydration, line numbers,
+the auto-hiding mode bar, conditional grouping actions, inline membership editing,
+humanized package labels, workout-library presentation, and workout-free recurring
+series authoring. No new technical debt was deferred.
