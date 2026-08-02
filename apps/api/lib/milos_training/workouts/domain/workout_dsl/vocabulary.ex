@@ -236,6 +236,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Vocabulary do
   @group_keys ~w(title sets rest-between-groups)
   @scale_keys @exercise_keys
   @note_markers Enum.map(WorkoutAuthoringMetadata.note_types(), &"!#{&1}")
+  @key_aliases %{"set" => "sets"}
 
   def section_formats, do: @section_formats
   def format_aliases, do: @format_aliases
@@ -420,6 +421,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Vocabulary do
     |> String.trim()
     |> String.downcase()
     |> String.replace("_", "-")
+    |> then(&Map.get(@key_aliases, &1, &1))
   end
 
   defp spec_list(format, key) do

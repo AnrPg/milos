@@ -290,34 +290,15 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
       {state, data, catalog} =
         case ExerciseCatalog.resolve(name) do
           {:ok, entry, :canonical} ->
-            {state, base_exercise(entry.label, entry.id), entry}
+            {state, base_exercise(name, entry.id), entry}
 
           {:ok, entry, :alias} ->
-            state =
-              add_warning(state, :exercise_alias_resolved, line_number, %{
-                alias: name,
-                canonical: entry.label,
-                exercise_ref: entry.id
-              })
+            {state, base_exercise(name, entry.id), entry}
 
-            data =
-              entry.label
-              |> base_exercise(entry.id)
-              |> put_metadata_value("catalog_alias", name)
-
-            {state, data, entry}
-
-          {:error, {:ambiguous, ids}} ->
-            state =
-              add_error(state, :ambiguous_exercise_reference, line_number, %{
-                name: name,
-                matches: ids
-              })
-
+          {:error, {:ambiguous, _ids}} ->
             {state, base_exercise(name, nil), nil}
 
           {:error, :not_found} ->
-            state = add_error(state, :unresolved_exercise_reference, line_number, %{name: name})
             {state, base_exercise(name, nil), nil}
         end
 
@@ -484,7 +465,6 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
         else: state
 
     {state, data} = finalize_prescriptions(state, frame.data, frame, line_number)
-    state = validate_capabilities(state, frame, line_number)
     {state, %{frame | data: data}}
   end
 
@@ -505,7 +485,6 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
           add_error(state, :empty_scale_variation, line_number, %{scale: data.scale_level_slug}),
         else: state
 
-    state = validate_capabilities(state, frame, line_number)
     {state, %{frame | data: data}}
   end
 
@@ -1718,26 +1697,6 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
     |> clean_internal()
   end
 
-  defp validate_capabilities(state, frame, line_number) do
-    catalog = get_in(frame, [:context, :catalog])
-
-    if catalog do
-      Enum.reduce(frame.used, state, fn capability, acc ->
-        if ExerciseCatalog.supports?(catalog, capability) do
-          acc
-        else
-          add_error(acc, :exercise_capability_not_supported, line_number, %{
-            exercise_ref: catalog.id,
-            exercise: catalog.label,
-            capability: capability
-          })
-        end
-      end)
-    else
-      state
-    end
-  end
-
   defp validate_section_score(state, frame, line_number) do
     score_config = frame.data.score_config
 
@@ -2041,9 +2000,6 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
 
   defp add_error(state, code, line, params \\ %{}),
     do: add_diagnostic(state, code, :error, line, params)
-
-  defp add_warning(state, code, line, params),
-    do: add_diagnostic(state, code, :warning, line, params)
 
   defp add_diagnostic(state, code, severity, line, params) do
     update_in(state.diagnostics, &[diagnostic(code, line, params, severity) | &1])

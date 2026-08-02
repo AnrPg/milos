@@ -153,8 +153,12 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDslTest do
                diagnostic.code == :invalid_duration and diagnostic.line == 7
              end)
 
-      assert Enum.any?(diagnostics, fn diagnostic ->
-               diagnostic.code == :unresolved_exercise_reference and diagnostic.line == 8
+      refute Enum.any?(diagnostics, fn diagnostic ->
+               diagnostic.code in [
+                 :unresolved_exercise_reference,
+                 :ambiguous_exercise_reference,
+                 :exercise_alias_resolved
+               ]
              end)
 
       assert Enum.any?(diagnostics, fn diagnostic ->
@@ -179,6 +183,34 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDslTest do
       assert {:error, diagnostics} = WorkoutDsl.parse(source)
       assert Enum.any?(diagnostics, &(&1.code == :mismatched_closing_block and &1.line == 9))
       assert Enum.any?(diagnostics, &(&1.code == :unclosed_block))
+    end
+
+    test "preserves free-text exercise labels and accepts singular set without diagnostics" do
+      source = """
+      [workout]
+      dsl-version: 1
+      title: Coach vocabulary
+      type: strength
+      [section: untimed]
+      title: Main
+      [exercise: Squat Snatch]
+      set: 3
+      reps: 5
+      [/exercise]
+      [exercise: My Odd Carry]
+      distance: 500m
+      [/exercise]
+      [/section]
+      [/workout]
+      """
+
+      assert {:ok, result} = WorkoutDsl.parse(source)
+      assert result.diagnostics == []
+      assert [alias_label, custom_label] = hd(result.workout.sections).exercises
+      assert alias_label.name == "Squat Snatch"
+      assert alias_label.sets == 3
+      assert custom_label.name == "My Odd Carry"
+      assert WorkoutDsl.format(result.workout) =~ "sets: 3"
     end
   end
 
@@ -361,7 +393,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDslTest do
                WorkoutDsl.parse(String.duplicate("x", 200_001))
     end
 
-    test "rejects unsupported exercise capability instead of silently dropping it" do
+    test "catalog capabilities do not constrain a free-text exercise prescription" do
       source = """
       [workout]
       dsl-version: 1
@@ -376,8 +408,11 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDslTest do
       [/workout]
       """
 
-      assert {:error, diagnostics} = WorkoutDsl.parse(source)
-      assert Enum.any?(diagnostics, &(&1.code == :exercise_capability_not_supported))
+      assert {:ok, result} = WorkoutDsl.parse(source)
+      assert result.diagnostics == []
+
+      assert hd(hd(result.workout.sections).exercises).prescription_metadata["distance_meters"] ==
+               500
     end
   end
 end
