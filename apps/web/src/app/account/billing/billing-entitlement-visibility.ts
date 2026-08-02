@@ -10,3 +10,10 @@ export function visibleBillingAllowances<T>(allowances: Record<string, T>): [str
     ([allowance]) => !HIDDEN_CUSTOMER_ALLOWANCES.has(allowance),
   );
 }
+
+export function shouldShowAllowanceQuota(usage: {
+  limit?: number | "unlimited" | string | null;
+  remaining?: number | "unlimited" | string | null;
+}) {
+  return usage.limit !== "unlimited" || usage.remaining !== "unlimited";
+}

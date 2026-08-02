@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  shouldShowAllowanceQuota,
   visibleBillingAllowances,
   visibleBillingChannels,
 } from "@/app/account/billing/billing-entitlement-visibility";
@@ -22,5 +23,11 @@ describe("customer billing entitlement visibility", () => {
         coaching_touchpoints: { remaining: 10_000 },
       }),
     ).toEqual([["class_visits", { remaining: 4 }]]);
+  });
+
+  it("suppresses finite quota copy for unlimited allowances", () => {
+    expect(shouldShowAllowanceQuota({ remaining: "unlimited", limit: "unlimited" })).toBe(false);
+    expect(shouldShowAllowanceQuota({ remaining: 4, limit: "unlimited" })).toBe(true);
+    expect(shouldShowAllowanceQuota({ remaining: "unlimited", limit: 12 })).toBe(true);
   });
 });

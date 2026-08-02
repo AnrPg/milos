@@ -29,9 +29,15 @@ import {
   type FinanceReceipt,
 } from "@/api/finance";
 import { fetchAdminSettings } from "@/api/settings";
+import {
+  buildFinanceReceiptPayload,
+  receiptPackageLabel,
+} from "@/components/admin-finance-receipt";
 import { useSession } from "@/components/session-provider";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
 import { generateExportFile, type ExportDocument } from "@/lib/document-export";
+
+const MANUAL_RECEIPT_PURPOSE = "__manual_receipt_purpose__";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -42,6 +48,10 @@ function field(record: FinanceRecord | null | undefined, key: string, fallback =
 function money(uiLocale: string, cents: unknown) {
   const amount = typeof cents === "number" ? cents : Number(cents ?? 0);
   return new Intl.NumberFormat(uiLocale, { style: "currency", currency: "EUR" }).format(amount / 100);
+}
+
+function euroInputValue(cents: unknown) {
+  return (Number(cents ?? 0) / 100).toFixed(2);
 }
 
 function statusColor(status: string): string {
@@ -71,6 +81,7 @@ type ReceiptCopy = {
   reference: string;
   date: string;
   amountReceived: string;
+  package: string;
   payment: string;
   purpose: string;
   method: string;
@@ -81,6 +92,7 @@ type ReceiptCopy = {
 
 async function downloadReceipt(receipt: FinanceReceipt, uiLocale: string, copy: ReceiptCopy) {
   const amount = new Intl.NumberFormat(uiLocale, { style: "currency", currency: receipt.currency }).format(receipt.amount_cents / 100);
+  const selectedPackage = receiptPackageLabel(receipt);
   const document: ExportDocument = {
     icon: "✓",
     category: copy.receipt,
@@ -90,6 +102,7 @@ async function downloadReceipt(receipt: FinanceReceipt, uiLocale: string, copy: 
       { label: copy.reference, value: receipt.reference },
       { label: copy.date, value: receipt.issued_on },
       { label: copy.amountReceived, value: amount },
+      ...(selectedPackage ? [{ label: copy.package, value: selectedPackage }] : []),
     ],
     sections: [
       {
@@ -134,6 +147,7 @@ export function MemberPanel({
     reference: i18n("featureReference"),
     date: i18n("featureDate"),
     amountReceived: i18n("featureAmountReceived"),
+    package: i18n("package7431e3d"),
     payment: i18n("featurePayment"),
     purpose: i18n("featurePurpose"),
     method: i18n("featureMethod"),
@@ -153,6 +167,7 @@ export function MemberPanel({
     notes: "",
   });
   const [receiptDescription, setReceiptDescription] = useState("");
+  const [receiptPackageSubscriptionId, setReceiptPackageSubscriptionId] = useState("");
   const [invoiceForm, setInvoiceForm] = useState({
     amount_cents: "",
     description: "",
@@ -196,6 +211,7 @@ export function MemberPanel({
     return ["issued", "partially_paid", "overdue"].includes(status) && balanceDue > 0;
   });
   const receiptMode = settingsQuery.data?.finance.document_mode === "receipt";
+  const receiptPurposeValue = receiptPackageSubscriptionId || (receiptDescription ? MANUAL_RECEIPT_PURPOSE : "");
 
   const recordPaymentMutation = useMutation({
     mutationFn: () =>
@@ -216,18 +232,26 @@ export function MemberPanel({
 
   const createReceiptMutation = useMutation({
     mutationFn: () =>
-      createFinanceReceipt(token, userId, {
-        amount_cents: Math.round(Number(paymentForm.amount_cents || 0) * 100),
-        payment_method: "cash",
-        paid_on: paymentForm.paid_on || undefined,
-        description: receiptDescription || undefined,
-        notes: paymentForm.notes || undefined,
-        idempotency_key: crypto.randomUUID(),
-      }),
+      createFinanceReceipt(
+        token,
+        userId,
+        buildFinanceReceiptPayload(
+          {
+            amount: paymentForm.amount_cents,
+            paymentMethod: "cash",
+            paidOn: paymentForm.paid_on,
+            description: receiptDescription,
+            notes: paymentForm.notes,
+            packageSubscriptionId: receiptPackageSubscriptionId,
+          },
+          crypto.randomUUID(),
+        ),
+      ),
     onSuccess: async ({ receipt }) => {
       setShowPaymentForm(false);
       setPaymentForm({ amount_cents: "", paid_on: "", finance_invoice_id: "", notes: "" });
       setReceiptDescription("");
+      setReceiptPackageSubscriptionId("");
       await downloadReceipt(receipt, uiLocale, receiptCopy(receipt.reference));
       await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "member-profile", userId] });
       await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "members"] });
@@ -429,13 +453,54 @@ export function MemberPanel({
                     />
                   </FormField>
                   <FormField label={i18n("featurePaymentPurpose")}>
-                    <input
+                    <select
                       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                       style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-                      value={receiptDescription}
-                      onChange={(e) => setReceiptDescription(e.target.value)}
-                    />
+                      value={receiptPurposeValue}
+                      onChange={(e) => {
+                        const receiptPurpose = e.target.value;
+                        if (receiptPurpose === MANUAL_RECEIPT_PURPOSE) {
+                          setReceiptPackageSubscriptionId("");
+                          setReceiptDescription("");
+                          return;
+                        }
+
+                        const subscription = packageSubscriptions.find((item) => field(item, "id") === receiptPurpose);
+                        const priceCents = typeof subscription?.price_cents_snapshot === "number" ? subscription.price_cents_snapshot : null;
+                        const selectedPackageLabel = packageLabelFromSubscription(subscription, packages);
+
+                        setReceiptPackageSubscriptionId(receiptPurpose);
+                        setPaymentForm((current) => ({
+                          ...current,
+                          amount_cents: priceCents !== null ? euroInputValue(priceCents) : current.amount_cents,
+                        }));
+                        if (selectedPackageLabel) {
+                          setReceiptDescription(i18n("package5544677") + selectedPackageLabel);
+                        }
+                      }}
+                    >
+                      <option value="" disabled>{i18n("select8598222") + i18n("featurePaymentPurpose").toLowerCase()}</option>
+                      {packageSubscriptions.map((subscription) => {
+                        const id = field(subscription, "id");
+                        return (
+                          <option key={id} value={id}>
+                            {packageLabelFromSubscription(subscription, packages)} · {money(uiLocale, subscription.price_cents_snapshot)}
+                          </option>
+                        );
+                      })}
+                      <option value={MANUAL_RECEIPT_PURPOSE}>{i18n("featureReceiptManualPurposeOption")}</option>
+                    </select>
                   </FormField>
+                  {receiptPurposeValue === MANUAL_RECEIPT_PURPOSE ? (
+                    <FormField label={i18n("featurePurpose")}>
+                      <input
+                        className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
+                        style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+                        value={receiptDescription}
+                        onChange={(e) => setReceiptDescription(e.target.value)}
+                      />
+                    </FormField>
+                  ) : null}
                   <FormField label={i18n("paidOnfca3213")}>
                     <input
                       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"

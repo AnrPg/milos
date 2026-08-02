@@ -15,6 +15,7 @@ import { TransientHero } from "@/components/TransientHero";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { SemanticLabel } from "@/components/semantic-label";
 import {
+  shouldShowAllowanceQuota,
   visibleBillingAllowances,
   visibleBillingChannels,
 } from "@/app/account/billing/billing-entitlement-visibility";
@@ -599,7 +600,7 @@ function EntitlementCard({ entitlement }: { entitlement: EffectiveEntitlement | 
           <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}>
             <p className="text-sm font-semibold" style={{ color: "var(--text)" }}><SemanticLabel value={key} /></p>
             <p className="mt-1 text-2xl font-semibold" style={{ color: "var(--primary)" }}>{String(usage.remaining)}</p>
-            <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("remainingOf8553660")} {String(usage.limit)} {i18n("resets5de1b0d")} {formatDate(uiLocale, usage.period_end)}</p>
+            {shouldShowAllowanceQuota(usage) ? <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("remainingOf8553660")} {String(usage.limit)} {i18n("resets5de1b0d")} {formatDate(uiLocale, usage.period_end)}</p> : null}
             {usage.extensions > 0 ? <p className="mt-1 text-xs" style={{ color: "var(--success)" }}>{i18n("includes820531f")}{usage.extensions} {i18n("personalExtension95a8d48")}</p> : null}
           </div>
         ) : null)}

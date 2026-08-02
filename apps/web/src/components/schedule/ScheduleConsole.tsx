@@ -414,13 +414,9 @@ export function ScheduleConsole({
 
 
         <section className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] xl:items-center">
+          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
             <div className="min-w-0">
               <TypeFilterChips classTypes={classTypes} value={classTypeIds} onChange={setClassTypeIds} />
-            </div>
-
-            <div className="flex justify-start xl:justify-center">
-              {isAdmin ? <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }} onClick={openSeriesEditor}>{i18n("featureCreateSeries")}</button> : null}
             </div>
 
             <div className="flex flex-wrap justify-start gap-3 xl:justify-end">
@@ -456,6 +452,11 @@ export function ScheduleConsole({
               </div>
             </div>
           </div>
+          {isAdmin ? (
+            <div className="mt-4 flex justify-end">
+              <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }} onClick={openSeriesEditor}>{i18n("featureCreateSeries")}</button>
+            </div>
+          ) : null}
         </section>
 
         {error ? (
