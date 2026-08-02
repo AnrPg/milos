@@ -254,29 +254,6 @@ export function WorkoutAdminConsole() {
             </div>
           </div>
 
-          <div className="mt-6 flex flex-wrap gap-3 text-sm font-semibold">
-            <Link
-              className="rounded-full px-4 py-2"
-              style={{ background: "var(--text)", color: "var(--bg)" }}
-              href="/admin/workouts"
-            >
-              {i18n("workoutList1f538d5")}
-            </Link>
-            <Link
-              className="rounded-full px-4 py-2 transition-colors"
-              style={{ background: "var(--border)", color: "var(--text-soft)" }}
-              href="/admin/workouts/new"
-            >
-              {i18n("newWorkout5fc6e4c")}
-            </Link>
-            <Link
-              className="rounded-full px-4 py-2 transition-colors"
-              style={{ background: "transparent", border: "1px solid var(--border)", color: "var(--dim)" }}
-              href="/admin/settings#level-taxonomy"
-            >
-              {i18n("levelTaxonomy893f642")}
-            </Link>
-          </div>
         </section>
         </TransientHero>
 
