@@ -33,6 +33,8 @@ defmodule MilosTraining.Workouts.MasterWorkout do
     field :dsl_document, :map
     field :dsl_source_revision, :integer, default: 0
     field :last_dsl_diagnostics, {:array, :map}, default: []
+    field :free_text_body, :string
+    field :free_text_document, :map
 
     has_many :sections, WorkoutSection, preload_order: [asc: :order]
     belongs_to :folder, WorkoutFolder
@@ -98,7 +100,9 @@ defmodule MilosTraining.Workouts.MasterWorkout do
       :dsl_version,
       :dsl_source,
       :dsl_document,
-      :last_dsl_diagnostics
+      :last_dsl_diagnostics,
+      :free_text_body,
+      :free_text_document
     ]
   end
 
@@ -114,9 +118,10 @@ defmodule MilosTraining.Workouts.MasterWorkout do
     )
     |> validate_bounded_map(:workout_metadata, :workout)
     |> validate_typed_notes()
-    |> validate_inclusion(:authoring_mode, ["structured", "quick_text"])
+    |> validate_inclusion(:authoring_mode, ["structured", "quick_text", "free_text"])
     |> validate_inclusion(:dsl_version, [1])
     |> validate_length(:dsl_source, max: 200_000)
+    |> validate_length(:free_text_body, max: 200_000)
   end
 
   defp validate_bounded_map(changeset, field, scope) do

@@ -193,7 +193,7 @@ defmodule MilosTrainingWeb.Schemas.Workout do
         editor_session_id: @nullable_uuid,
         authoring_mode: %Schema{
           type: :string,
-          enum: ["structured", "quick_text"],
+          enum: ["structured", "quick_text", "free_text"],
           nullable: true
         },
         dsl_version: %Schema{type: :integer, enum: [1], nullable: true},
@@ -203,7 +203,9 @@ defmodule MilosTrainingWeb.Schemas.Workout do
         last_dsl_diagnostics: %Schema{
           type: :array,
           items: MilosTrainingWeb.Schemas.WorkoutDsl.diagnostic_schema()
-        }
+        },
+        free_text_body: %Schema{type: :string, maxLength: 200_000, nullable: true},
+        free_text_document: %Schema{type: :object, additionalProperties: true, nullable: true}
       },
       additionalProperties: false
     }
@@ -233,7 +235,7 @@ defmodule MilosTrainingWeb.Schemas.Workout do
         available_scale_levels: %Schema{type: :array, items: scale_level_schema()},
         sections: %Schema{type: :array, items: section_schema()},
         draft_data: %Schema{type: :object, nullable: true, additionalProperties: true},
-        authoring_mode: %Schema{type: :string, enum: ["structured", "quick_text"]},
+        authoring_mode: %Schema{type: :string, enum: ["structured", "quick_text", "free_text"]},
         dsl_version: %Schema{type: :integer, enum: [1], nullable: true},
         dsl_source: %Schema{type: :string, nullable: true},
         dsl_document: %Schema{type: :object, additionalProperties: true, nullable: true},
@@ -241,7 +243,9 @@ defmodule MilosTrainingWeb.Schemas.Workout do
         last_dsl_diagnostics: %Schema{
           type: :array,
           items: MilosTrainingWeb.Schemas.WorkoutDsl.diagnostic_schema()
-        }
+        },
+        free_text_body: %Schema{type: :string, nullable: true},
+        free_text_document: %Schema{type: :object, additionalProperties: true, nullable: true}
       },
       required: [:id, :title, :type, :sections],
       additionalProperties: false

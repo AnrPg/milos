@@ -196,6 +196,8 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           dsl_document: workout.dsl_document,
           dsl_source_revision: workout.dsl_source_revision,
           last_dsl_diagnostics: workout.last_dsl_diagnostics,
+          free_text_body: workout.free_text_body,
+          free_text_document: workout.free_text_document,
           draft_data: workout.draft_data,
           sections: draft_sections
         }
@@ -1025,6 +1027,8 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     |> maybe_put(:dsl_source, get_map_value(params, :dsl_source))
     |> maybe_put(:dsl_document, get_map_value(params, :dsl_document))
     |> maybe_put(:last_dsl_diagnostics, get_map_value(params, :last_dsl_diagnostics))
+    |> maybe_put(:free_text_body, get_map_value(params, :free_text_body))
+    |> maybe_put(:free_text_document, get_map_value(params, :free_text_document))
   end
 
   defp validate_expected_revision(workout, params) do
@@ -1059,7 +1063,9 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       dsl_source: workout.dsl_source,
       dsl_document: workout.dsl_document,
       dsl_source_revision: workout.dsl_source_revision,
-      last_dsl_diagnostics: workout.last_dsl_diagnostics
+      last_dsl_diagnostics: workout.last_dsl_diagnostics,
+      free_text_body: workout.free_text_body,
+      free_text_document: workout.free_text_document
     }
   end
 
@@ -1073,7 +1079,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
          merged_params <- merge_publish_params(workout, params),
          {:ok, prepared_params} <- prepare_workout_structure(merged_params),
          prepared_params <- stringify_keys_deep(prepared_params),
-         :ok <- validate_publish_sections(prepared_params),
+         :ok <- validate_publish_body(prepared_params),
          {:ok, params_with_levels} <- attach_scale_level_ids(prepared_params),
          {:ok, published} <-
            workout
@@ -1093,6 +1099,18 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     |> Map.merge(stringify_keys_deep(extract_dsl_authoring_fields(params)))
     |> stringify_keys_deep()
   end
+
+  defp validate_publish_body(%{"authoring_mode" => "free_text"} = params) do
+    body = Map.get(params, "free_text_body")
+
+    if is_binary(body) and String.trim(body) != "" do
+      :ok
+    else
+      {:error, :no_free_text_body}
+    end
+  end
+
+  defp validate_publish_body(params), do: validate_publish_sections(params)
 
   defp validate_publish_sections(params) do
     sections = Map.get(params, "sections") || []
@@ -1136,6 +1154,9 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       tags: workout.tags,
       notes: visible_notes(workout.notes, :athlete),
       workout_metadata: workout.workout_metadata,
+      authoring_mode: workout.authoring_mode,
+      free_text_body: workout.free_text_body,
+      free_text_document: workout.free_text_document,
       sections: normalize_sections(workout.sections, note_visibility: :athlete)
     }
   end
