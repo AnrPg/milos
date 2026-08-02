@@ -65,6 +65,41 @@ describe("buildWorkoutDslSuggestions", () => {
     expect(result.items.every((item) => item.kind === "exercise")).toBe(true);
   });
 
+  it("fuzzily suggests exercises for a misspelled or partial movement name", () => {
+    const typoSource = "[exercise: sqt snach";
+    const typoResult = buildWorkoutDslSuggestions(
+      typoSource,
+      typoSource.length,
+      vocabulary,
+      [],
+      ["Air Squat", "Squat Snatch", "Back Extension"],
+    );
+
+    expect(typoResult.items[0]).toMatchObject({ value: "Squat Snatch", kind: "exercise" });
+
+    const partialSource = "[exercise: extension";
+    const partialResult = buildWorkoutDslSuggestions(
+      partialSource,
+      partialSource.length,
+      vocabulary,
+      [],
+      ["Air Squat", "Back Extension"],
+    );
+
+    expect(partialResult.items[0]?.value).toBe("Back Extension");
+  });
+
+  it("keeps contextual DSL keys available on an empty line", () => {
+    const source = "[workout]\n[section: untimed]\ntitle: Main\n[exercise: Any Move]\n";
+    const result = buildWorkoutDslSuggestions(source, source.length, vocabulary, []);
+
+    expect(result.query).toBe("");
+    expect(result.items.map((item) => item.value)).toEqual(
+      expect.arrayContaining(["sets", "reps", "load"]),
+    );
+    expect(result.items.map((item) => item.value)).not.toContain("dsl-version");
+  });
+
   it("narrows slash-command templates by canonical format", () => {
     const source = "/complex";
     const result = buildWorkoutDslSuggestions(source, source.length, vocabulary, []);

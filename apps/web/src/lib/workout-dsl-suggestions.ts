@@ -68,7 +68,7 @@ export function buildWorkoutDslSuggestions(
 
   const exerciseMatch = currentLine.match(/^\s*\[exercise:\s*([^\]]*)$/i);
   if (exerciseMatch) {
-    return resultFor(
+    return fuzzyResultFor(
       cursor,
       exerciseMatch[1],
       exerciseNames.map((value) => ({ value, kind: "exercise" as const })),
@@ -86,19 +86,81 @@ export function buildWorkoutDslSuggestions(
 
   const tokenMatch = currentLine.match(/([a-z][a-z0-9-]*)$/i);
   const query = tokenMatch?.[1] ?? "";
-  if (!query) return { from: cursor, query: "", items: [] };
+  const canonical = contextualParameters(beforeCursor, vocabulary).map((value) => ({
+    value,
+    kind: "canonical" as const,
+  }));
 
-  const canonical = unique([
-    ...vocabulary.workout_parameters,
-    ...vocabulary.exercise_parameters,
-    ...(vocabulary.group_parameters ?? []),
-    ...(vocabulary.scale_parameters ?? []),
-    ...vocabulary.header_parameters,
-    ...Object.values(vocabulary.section_parameters).flat(),
-  ]).map((value) => ({ value, kind: "canonical" as const }));
+  if (!query && currentLine.trim() !== "") {
+    return { from: cursor, query: "", items: [] };
+  }
 
   const words = commonWords.map((value) => ({ value, kind: "word" as const }));
   return resultFor(cursor, query, [...canonical, ...words]);
+}
+
+type DslScope = { kind: string; format?: string };
+
+function contextualParameters(
+  beforeCursor: string,
+  vocabulary: WorkoutDslVocabulary,
+): string[] {
+  const currentLineStart = beforeCursor.lastIndexOf("\n") + 1;
+  const completedSource = beforeCursor.slice(0, currentLineStart);
+  const stack: DslScope[] = [];
+
+  for (const rawLine of completedSource.split("\n")) {
+    const line = rawLine.trim();
+    const close = line.match(/^\[\/(workout|section|group|exercise|header|scale)\]$/i);
+    if (close) {
+      const index = stack.map((scope) => scope.kind).lastIndexOf(close[1].toLowerCase());
+      if (index >= 0) stack.splice(index);
+      continue;
+    }
+
+    const section = line.match(/^\[section:\s*([^\]]+)\]$/i);
+    if (section) {
+      stack.push({ kind: "section", format: normalize(section[1]).replaceAll("-", "_") });
+      continue;
+    }
+
+    const open = line.match(/^\[(workout|header|exercise|scale)(?::[^\]]+)?\]$/i);
+    if (open) {
+      stack.push({ kind: open[1].toLowerCase() });
+      continue;
+    }
+
+    const group = line.match(/^\[group:\s*(?:superset|alternating)\]$/i);
+    if (group) stack.push({ kind: "group" });
+  }
+
+  const scope = stack.at(-1);
+  switch (scope?.kind) {
+    case "workout":
+      return unique(vocabulary.workout_parameters);
+    case "section":
+      return unique(
+        vocabulary.section_parameters[scope.format ?? ""] ??
+          Object.values(vocabulary.section_parameters).flat(),
+      );
+    case "exercise":
+      return unique(vocabulary.exercise_parameters);
+    case "scale":
+      return unique(vocabulary.scale_parameters ?? vocabulary.exercise_parameters);
+    case "group":
+      return unique(vocabulary.group_parameters ?? []);
+    case "header":
+      return unique(vocabulary.header_parameters);
+    default:
+      return unique([
+        ...vocabulary.workout_parameters,
+        ...vocabulary.exercise_parameters,
+        ...(vocabulary.group_parameters ?? []),
+        ...(vocabulary.scale_parameters ?? []),
+        ...vocabulary.header_parameters,
+        ...Object.values(vocabulary.section_parameters).flat(),
+      ]);
+  }
 }
 
 function resultFor(
@@ -126,6 +188,96 @@ function resultFor(
     query,
     items,
   };
+}
+
+function fuzzyResultFor(
+  cursor: number,
+  rawQuery: string,
+  candidates: WorkoutDslSuggestion[],
+): WorkoutDslSuggestionResult {
+  const query = rawQuery.trim();
+  const scored = candidates
+    .map((candidate, index) => ({ candidate, index, score: fuzzyScore(query, candidate.value) }))
+    .filter((entry) => Number.isFinite(entry.score))
+    .sort((left, right) => left.score - right.score || left.index - right.index)
+    .filter(
+      (entry, index, all) =>
+        all.findIndex(
+          (item) => normalize(item.candidate.value) === normalize(entry.candidate.value),
+        ) === index,
+    )
+    .slice(0, MAX_SUGGESTIONS)
+    .map((entry) => entry.candidate);
+
+  return { from: cursor - rawQuery.length, query, items: scored };
+}
+
+function fuzzyScore(rawQuery: string, rawCandidate: string) {
+  const query = normalize(rawQuery);
+  const candidate = normalize(rawCandidate);
+  if (!query) return 0;
+  if (candidate === query) return 0;
+  if (candidate.startsWith(query)) return 1;
+
+  const words = candidate.split(" ");
+  const wordPrefix = words.findIndex((word) => word.startsWith(query));
+  if (wordPrefix >= 0) return 2 + wordPrefix / 100;
+  if (candidate.includes(query)) return 3;
+
+  const queryWords = query.split(" ");
+  let total = 0;
+  for (const queryWord of queryWords) {
+    const scores = words.map((word) => fuzzyWordScore(queryWord, word));
+    const best = Math.min(...scores);
+    if (!Number.isFinite(best)) return Number.POSITIVE_INFINITY;
+    total += best;
+  }
+  return 4 + total;
+}
+
+function fuzzyWordScore(query: string, candidate: string) {
+  if (candidate.startsWith(query)) return 0;
+  if (isSubsequence(query, candidate)) return 0.5 + (candidate.length - query.length) / 100;
+
+  const distance = levenshtein(query, candidate);
+  const tolerance = Math.max(1, Math.floor(Math.max(query.length, candidate.length) * 0.35));
+  return distance <= tolerance ? 1 + distance / 10 : Number.POSITIVE_INFINITY;
+}
+
+function isSubsequence(query: string, candidate: string) {
+  let queryIndex = 0;
+  for (const character of candidate) {
+    if (character === query[queryIndex]) queryIndex += 1;
+    if (queryIndex === query.length) return true;
+  }
+  return false;
+}
+
+function levenshtein(left: string, right: string) {
+  const previous = Array.from({ length: right.length + 1 }, (_, index) => index);
+  for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
+    const current = [leftIndex];
+    for (let rightIndex = 1; rightIndex <= right.length; rightIndex += 1) {
+      current[rightIndex] = Math.min(
+        current[rightIndex - 1] + 1,
+        previous[rightIndex] + 1,
+        previous[rightIndex - 1] +
+          (left[leftIndex - 1] === right[rightIndex - 1] ? 0 : 1),
+      );
+    }
+    previous.splice(0, previous.length, ...current);
+  }
+  return previous[right.length];
+}
+
+function normalize(value: string) {
+  return value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .replace(/\s+/g, " ");
 }
 
 function rank(kind: WorkoutDslSuggestion["kind"]) {
