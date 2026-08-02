@@ -10,7 +10,15 @@ import Underline from "@tiptap/extension-underline";
 import { EditorContent, useEditor, type Editor, type JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from "react";
 
 import { ApiError } from "@/api/client";
 import {
@@ -61,6 +69,13 @@ type Props = {
 
 type SaveStatus = "idle" | "saving" | "saved" | "error" | "conflict";
 
+type SuggestionAnchor = {
+  left: number;
+  top?: number;
+  bottom?: number;
+  maxHeight: number;
+};
+
 export function QuickTextWorkoutEditor({
   draftId,
   onDraftReady,
@@ -82,11 +97,14 @@ export function QuickTextWorkoutEditor({
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [sourceRevision, setSourceRevision] = useState(0);
   const [suggestions, setSuggestions] = useState<WorkoutDslSuggestion[]>([]);
+  const [suggestionAnchor, setSuggestionAnchor] = useState<SuggestionAnchor | null>(null);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0);
   const [authoringReady, setAuthoringReady] = useState(false);
   const loadedDraftRef = useRef<string | null>(null);
   const parseRequestRef = useRef(0);
   const sourceRef = useRef(source);
   const revisionRef = useRef(sourceRevision);
+  const updateSuggestionsRef = useRef<(currentEditor?: Editor | null) => void>(() => undefined);
 
   const editor = useEditor({
     extensions: [
@@ -124,6 +142,7 @@ export function QuickTextWorkoutEditor({
       sourceRef.current = nextSource;
       setSource(nextSource);
       setWarningsAcknowledged(false);
+      window.requestAnimationFrame(() => updateSuggestionsRef.current(currentEditor));
     },
     onSelectionUpdate: ({ editor: currentEditor }) => {
       updateSuggestions(currentEditor);
@@ -163,9 +182,43 @@ export function QuickTextWorkoutEditor({
         exerciseNames,
       );
       setSuggestions(result.items);
+      setActiveSuggestionIndex(0);
+
+      if (result.items.length === 0) {
+        setSuggestionAnchor(null);
+        return;
+      }
+
+      const caret = currentEditor.view.coordsAtPos(currentEditor.state.selection.from);
+      const viewportPadding = 12;
+      const menuWidth = Math.min(352, window.innerWidth - viewportPadding * 2);
+      const left = Math.max(
+        viewportPadding,
+        Math.min(caret.left, window.innerWidth - menuWidth - viewportPadding),
+      );
+      const roomBelow = window.innerHeight - caret.bottom - viewportPadding;
+      const roomAbove = caret.top - viewportPadding;
+
+      if (roomBelow >= 140 || roomBelow >= roomAbove) {
+        setSuggestionAnchor({
+          left,
+          top: caret.bottom + 6,
+          maxHeight: Math.max(96, Math.min(288, roomBelow - 6)),
+        });
+      } else {
+        setSuggestionAnchor({
+          left,
+          bottom: window.innerHeight - caret.top + 6,
+          maxHeight: Math.max(96, Math.min(288, roomAbove - 6)),
+        });
+      }
     },
     [editor, exerciseNames, vocabulary],
   );
+
+  useEffect(() => {
+    updateSuggestionsRef.current = updateSuggestions;
+  }, [updateSuggestions]);
 
   useEffect(() => {
     sourceRef.current = source;
@@ -330,7 +383,11 @@ export function QuickTextWorkoutEditor({
     const replacement =
       suggestion.kind === "template"
         ? manual?.templates?.sections?.[suggestion.value] ?? suggestion.value
-        : suggestion.value;
+        : suggestion.kind === "exercise" || suggestion.kind === "format"
+          ? `${suggestion.value}]`
+          : suggestion.kind === "canonical"
+            ? `${suggestion.value}: `
+            : suggestion.value;
 
     editor
       .chain()
@@ -339,6 +396,32 @@ export function QuickTextWorkoutEditor({
       .insertContent(replacement)
       .run();
     setSuggestions([]);
+    setSuggestionAnchor(null);
+  }
+
+  function handleSuggestionKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
+    if (suggestions.length === 0) return;
+
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      const direction = event.key === "ArrowDown" ? 1 : -1;
+      setActiveSuggestionIndex(
+        (current) => (current + direction + suggestions.length) % suggestions.length,
+      );
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === "Tab") {
+      event.preventDefault();
+      acceptSuggestion(suggestions[activeSuggestionIndex] ?? suggestions[0]);
+      return;
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setSuggestions([]);
+      setSuggestionAnchor(null);
+    }
   }
 
   function insertTemplate(template: string) {
@@ -483,10 +566,20 @@ export function QuickTextWorkoutEditor({
           </button>
         </div>
 
-        <div className="relative min-h-0 flex-1 overflow-auto">
+        <div
+          className="relative min-h-0 flex-1 overflow-auto"
+          onKeyDownCapture={handleSuggestionKeyDown}
+          onScroll={() => updateSuggestions()}
+        >
           <EditorContent editor={editor} />
-          {suggestions.length > 0 ? (
-            <SuggestionMenu suggestions={suggestions} onAccept={acceptSuggestion} />
+          {suggestions.length > 0 && suggestionAnchor ? (
+            <SuggestionMenu
+              suggestions={suggestions}
+              anchor={suggestionAnchor}
+              activeIndex={activeSuggestionIndex}
+              onActiveIndexChange={setActiveSuggestionIndex}
+              onAccept={acceptSuggestion}
+            />
           ) : null}
         </div>
 
@@ -612,30 +705,55 @@ function EditorToolbar({ editor, onManualOpen }: { editor: Editor | null; onManu
 
 function SuggestionMenu({
   suggestions,
+  anchor,
+  activeIndex,
+  onActiveIndexChange,
   onAccept,
 }: {
   suggestions: WorkoutDslSuggestion[];
+  anchor: SuggestionAnchor;
+  activeIndex: number;
+  onActiveIndexChange: (index: number) => void;
   onAccept: (suggestion: WorkoutDslSuggestion) => void;
 }) {
   const i18n = useUiTranslations();
+  const position: CSSProperties = {
+    position: "fixed",
+    left: anchor.left,
+    top: anchor.top,
+    bottom: anchor.bottom,
+    maxHeight: anchor.maxHeight,
+    width: "min(22rem, calc(100vw - 1.5rem))",
+  };
 
   return (
     <div
-      className="sticky bottom-3 mx-4 max-w-xl overflow-hidden rounded-xl border shadow-xl"
-      style={{ background: "var(--panel)", borderColor: "var(--dim)" }}
+      className="z-50 overflow-y-auto rounded-lg border shadow-xl"
+      style={{
+        ...position,
+        background: "var(--panel)",
+        borderColor: "var(--dim)",
+      }}
       role="listbox"
       aria-label={i18n("quickTextSuggestions")}
     >
-      {suggestions.map((suggestion) => (
+      {suggestions.map((suggestion, index) => (
         <button
           type="button"
           key={`${suggestion.kind}:${suggestion.value}`}
           role="option"
-          aria-selected="false"
+          aria-selected={index === activeIndex}
           onMouseDown={(event) => event.preventDefault()}
+          onMouseEnter={() => onActiveIndexChange(index)}
           onClick={() => onAccept(suggestion)}
-          className="flex w-full items-center justify-between px-3 py-2 text-start text-sm hover:opacity-80"
-          style={{ color: "var(--text)" }}
+          ref={(element) => {
+            if (index === activeIndex) element?.scrollIntoView({ block: "nearest" });
+          }}
+          className="flex w-full items-center justify-between px-3 py-2 text-start text-sm"
+          style={{
+            color: "var(--text)",
+            background: index === activeIndex ? "var(--card)" : "transparent",
+          }}
         >
           <span>{suggestion.value}</span>
           <span className="text-[10px] uppercase" style={{ color: "var(--muted)" }}>
