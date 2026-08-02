@@ -119,7 +119,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
     assert retained["authoring_mode"] == "quick_text"
   end
 
-  test "direct publish requires warning acknowledgement then retains canonical source", %{
+  test "direct publish retains free-text exercise source without warning acknowledgement", %{
     conn: conn
   } do
     admin_conn = authenticate_as_admin(conn, "dsl_publish_admin")
@@ -140,7 +140,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
       |> json_response(200)
       |> Map.fetch!("draft")
 
-    warning_response =
+    published =
       admin_conn
       |> recycle()
       |> put_req_header("content-type", "application/json")
@@ -150,25 +150,11 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
         expected_source_revision: saved["dsl_source_revision"],
         acknowledge_warnings: false
       })
-      |> json_response(409)
-
-    assert warning_response["code"] == "dsl_warnings_require_acknowledgement"
-    assert [%{"code" => "exercise_alias_resolved"}] = warning_response["diagnostics"]
-
-    published =
-      admin_conn
-      |> recycle()
-      |> put_req_header("content-type", "application/json")
-      |> post("/api/admin/workouts/#{draft["id"]}/dsl/publish", %{
-        source: source,
-        document: %{type: "doc"},
-        expected_source_revision: saved["dsl_source_revision"],
-        acknowledge_warnings: true
-      })
       |> json_response(200)
 
     assert published["workout"]["status"] == "published"
     assert published["workout"]["dsl_source"] == source
+    assert published["diagnostics"] == []
     assert published["execution_preview"]["segment_count"] == 1
 
     assert get_in(published, [
@@ -179,7 +165,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
              Access.at(0),
              "name"
            ]) ==
-             "Deadlift"
+             "Conventional Deadlift"
   end
 
   defp authenticate_as_admin(conn, nickname) do
