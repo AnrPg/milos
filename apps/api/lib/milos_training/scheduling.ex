@@ -5,6 +5,7 @@ defmodule MilosTraining.Scheduling do
     CancelUserBookingsForRoleTransition,
     CreateClassType,
     CreateClassSeries,
+    DeleteClassSeriesForWorkout,
     ExtendClassSeries,
     CreateSlot,
     DeleteSlotsForWorkout,
@@ -37,6 +38,10 @@ defmodule MilosTraining.Scheduling do
   defdelegate update_slot(id, params), to: UpdateSlot, as: :call
   defdelegate delete_slot(id), to: DeleteSlot, as: :call
   defdelegate delete_slots_for_workout(workout_id), to: DeleteSlotsForWorkout, as: :call
+
+  defdelegate delete_class_series_for_workout(workout_id),
+    to: DeleteClassSeriesForWorkout,
+    as: :call
 
   defdelegate create_class_type(params), to: CreateClassType, as: :call
   defdelegate update_class_type(id, params), to: UpdateClassType, as: :call

@@ -291,6 +291,31 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
+  def delete_class_series_for_workout(workout_id) do
+    series =
+      ClassSeries
+      |> where([series], series.master_workout_id == ^workout_id)
+      |> Repo.all()
+
+    Repo.transaction(fn ->
+      Enum.each(series, &cancel_class_series_extension_jobs/1)
+
+      Enum.each(series, fn series ->
+        case Repo.delete(series) do
+          {:ok, _deleted_series} -> :ok
+          {:error, %Ecto.Changeset{} = changeset} -> Repo.rollback(changeset)
+        end
+      end)
+
+      :ok
+    end)
+    |> case do
+      {:ok, :ok} -> :ok
+      {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
+    end
+  end
+
+  @impl true
   def list_workout_change_targets(workout_id) do
     ScheduledClass
     |> where([slot], slot.master_workout_id == ^workout_id)
@@ -717,6 +742,14 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
         job_id -> Oban.cancel_job(job_id)
       end
     end)
+  end
+
+  defp cancel_class_series_extension_jobs(%ClassSeries{id: series_id}) do
+    Oban.Job
+    |> where([job], job.worker == ^to_string(ClassSeriesExtensionJob))
+    |> where([job], fragment("?->>'series_id' = ?", job.args, ^series_id))
+    |> Repo.all()
+    |> Enum.each(&Oban.cancel_job(&1.id))
   end
 
   defp resolve_booking_transaction(id, params) do

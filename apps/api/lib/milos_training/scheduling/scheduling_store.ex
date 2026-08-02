@@ -39,6 +39,10 @@ defmodule MilosTraining.Scheduling.SchedulingStore do
   def delete_slots_for_workout(workout_id), do: adapter().delete_slots_for_workout(workout_id)
 
   @impl true
+  def delete_class_series_for_workout(workout_id),
+    do: adapter().delete_class_series_for_workout(workout_id)
+
+  @impl true
   def list_workout_change_targets(workout_id),
     do: adapter().list_workout_change_targets(workout_id)
 

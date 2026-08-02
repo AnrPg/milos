@@ -20,6 +20,8 @@ defmodule MilosTraining.Scheduling.Ports.SchedulingStore do
               :ok | {:error, :not_found} | {:error, Ecto.Changeset.t()}
   @callback delete_slots_for_workout(Ecto.UUID.t()) ::
               {:ok, [Ecto.UUID.t()]} | {:error, Ecto.Changeset.t()}
+  @callback delete_class_series_for_workout(Ecto.UUID.t()) ::
+              :ok | {:error, Ecto.Changeset.t()}
   @callback list_workout_change_targets(Ecto.UUID.t()) :: [map()]
   @callback list_slot_ids_for_workout(Ecto.UUID.t()) :: [Ecto.UUID.t()]
   @callback get_slot(Ecto.UUID.t()) :: map() | nil
