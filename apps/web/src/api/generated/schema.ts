@@ -4346,7 +4346,7 @@ export interface operations {
                     "application/json": {
                         workout: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -4371,6 +4371,10 @@ export interface operations {
                             dsl_version?: 1 | null;
                             equipment?: string[];
                             estimated_duration_seconds?: number | null;
+                            free_text_body?: string | null;
+                            free_text_document?: {
+                                [key: string]: unknown;
+                            } | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
@@ -6218,7 +6222,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @enum {string|null} */
-                    authoring_mode?: "structured" | "quick_text" | null;
+                    authoring_mode?: "structured" | "quick_text" | "free_text" | null;
                     description?: string | null;
                     /** @enum {string|null} */
                     difficulty?: "beginner" | "intermediate" | "advanced" | "all-levels" | null;
@@ -6236,6 +6240,10 @@ export interface operations {
                     equipment?: string[];
                     estimated_duration_seconds?: number | null;
                     expected_source_revision?: number | null;
+                    free_text_body?: string | null;
+                    free_text_document?: {
+                        [key: string]: unknown;
+                    } | null;
                     is_team_workout?: boolean;
                     last_dsl_diagnostics?: {
                         code: string;
@@ -6719,7 +6727,7 @@ export interface operations {
                     "application/json": {
                         workout: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -6744,6 +6752,10 @@ export interface operations {
                             dsl_version?: 1 | null;
                             equipment?: string[];
                             estimated_duration_seconds?: number | null;
+                            free_text_body?: string | null;
+                            free_text_document?: {
+                                [key: string]: unknown;
+                            } | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
@@ -8065,7 +8077,7 @@ export interface operations {
                     "application/json": {
                         workout: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -8090,6 +8102,10 @@ export interface operations {
                             dsl_version?: 1 | null;
                             equipment?: string[];
                             estimated_duration_seconds?: number | null;
+                            free_text_body?: string | null;
+                            free_text_document?: {
+                                [key: string]: unknown;
+                            } | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
@@ -8799,7 +8815,7 @@ export interface operations {
                     "application/json": {
                         scales: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -8824,6 +8840,10 @@ export interface operations {
                             dsl_version?: 1 | null;
                             equipment?: string[];
                             estimated_duration_seconds?: number | null;
+                            free_text_body?: string | null;
+                            free_text_document?: {
+                                [key: string]: unknown;
+                            } | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
@@ -9312,7 +9332,7 @@ export interface operations {
                         }[];
                         workout: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -9337,6 +9357,10 @@ export interface operations {
                             dsl_version?: 1 | null;
                             equipment?: string[];
                             estimated_duration_seconds?: number | null;
+                            free_text_body?: string | null;
+                            free_text_document?: {
+                                [key: string]: unknown;
+                            } | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
@@ -11918,7 +11942,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @enum {string|null} */
-                    authoring_mode?: "structured" | "quick_text" | null;
+                    authoring_mode?: "structured" | "quick_text" | "free_text" | null;
                     description?: string | null;
                     /** @enum {string|null} */
                     difficulty?: "beginner" | "intermediate" | "advanced" | "all-levels" | null;
@@ -11936,6 +11960,10 @@ export interface operations {
                     equipment?: string[];
                     estimated_duration_seconds?: number | null;
                     expected_source_revision?: number | null;
+                    free_text_body?: string | null;
+                    free_text_document?: {
+                        [key: string]: unknown;
+                    } | null;
                     is_team_workout?: boolean;
                     last_dsl_diagnostics?: {
                         code: string;

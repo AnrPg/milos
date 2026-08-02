@@ -4827,7 +4827,8 @@
                         "authoring_mode": {
                           "enum": [
                             "structured",
-                            "quick_text"
+                            "quick_text",
+                            "free_text"
                           ],
                           "type": "string"
                         },
@@ -4905,6 +4906,15 @@
                         "estimated_duration_seconds": {
                           "nullable": true,
                           "type": "integer"
+                        },
+                        "free_text_body": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "free_text_document": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
                         },
                         "id": {
                           "format": "uuid",
@@ -9622,7 +9632,8 @@
                   "authoring_mode": {
                     "enum": [
                       "structured",
-                      "quick_text"
+                      "quick_text",
+                      "free_text"
                     ],
                     "nullable": true,
                     "type": "string"
@@ -9682,6 +9693,16 @@
                     "minimum": 0,
                     "nullable": true,
                     "type": "integer"
+                  },
+                  "free_text_body": {
+                    "maxLength": 200000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "free_text_document": {
+                    "additionalProperties": true,
+                    "nullable": true,
+                    "type": "object"
                   },
                   "is_team_workout": {
                     "type": "boolean"
@@ -11462,7 +11483,8 @@
                         "authoring_mode": {
                           "enum": [
                             "structured",
-                            "quick_text"
+                            "quick_text",
+                            "free_text"
                           ],
                           "type": "string"
                         },
@@ -11540,6 +11562,15 @@
                         "estimated_duration_seconds": {
                           "nullable": true,
                           "type": "integer"
+                        },
+                        "free_text_body": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "free_text_document": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
                         },
                         "id": {
                           "format": "uuid",
@@ -15083,7 +15114,8 @@
                         "authoring_mode": {
                           "enum": [
                             "structured",
-                            "quick_text"
+                            "quick_text",
+                            "free_text"
                           ],
                           "type": "string"
                         },
@@ -15161,6 +15193,15 @@
                         "estimated_duration_seconds": {
                           "nullable": true,
                           "type": "integer"
+                        },
+                        "free_text_body": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "free_text_document": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
                         },
                         "id": {
                           "format": "uuid",
@@ -17472,7 +17513,8 @@
                           "authoring_mode": {
                             "enum": [
                               "structured",
-                              "quick_text"
+                              "quick_text",
+                              "free_text"
                             ],
                             "type": "string"
                           },
@@ -17550,6 +17592,15 @@
                           "estimated_duration_seconds": {
                             "nullable": true,
                             "type": "integer"
+                          },
+                          "free_text_body": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "free_text_document": {
+                            "additionalProperties": true,
+                            "nullable": true,
+                            "type": "object"
                           },
                           "id": {
                             "format": "uuid",
@@ -19361,7 +19412,8 @@
                         "authoring_mode": {
                           "enum": [
                             "structured",
-                            "quick_text"
+                            "quick_text",
+                            "free_text"
                           ],
                           "type": "string"
                         },
@@ -19439,6 +19491,15 @@
                         "estimated_duration_seconds": {
                           "nullable": true,
                           "type": "integer"
+                        },
+                        "free_text_body": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "free_text_document": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
                         },
                         "id": {
                           "format": "uuid",
@@ -25714,7 +25775,8 @@
                   "authoring_mode": {
                     "enum": [
                       "structured",
-                      "quick_text"
+                      "quick_text",
+                      "free_text"
                     ],
                     "nullable": true,
                     "type": "string"
@@ -25774,6 +25836,16 @@
                     "minimum": 0,
                     "nullable": true,
                     "type": "integer"
+                  },
+                  "free_text_body": {
+                    "maxLength": 200000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "free_text_document": {
+                    "additionalProperties": true,
+                    "nullable": true,
+                    "type": "object"
                   },
                   "is_team_workout": {
                     "type": "boolean"
