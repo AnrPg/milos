@@ -21,6 +21,7 @@ import { AuthGuard } from "@/components/auth-guard";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
+import { isFreeTextWorkout, storeFreeTextExecutionWorkout } from "@/lib/free-text-execution";
 import { subscribeToTopic } from "@/lib/realtime";
 import { useExecutionStore } from "@/stores/execution";
 
@@ -274,6 +275,12 @@ function WorkoutsPageContent() {
     setError(null);
 
     try {
+      if (isFreeTextWorkout(selectedWorkout)) {
+        storeFreeTextExecutionWorkout(selectedWorkout);
+        router.push(`/workouts/free-text/execute?workout=${selectedWorkout.id}`);
+        return;
+      }
+
       const execution = await startExecution(tokens.access_token, {
         master_workout_id: selectedSlot.workout.id,
         scale_level_slug: selectedScale,
@@ -332,7 +339,14 @@ function WorkoutsPageContent() {
   }
 
   function renderWorkoutPreview(workout: WorkoutRecord) {
-    return <WorkoutPreviewDetail hideScaleChips sections={workout.sections} />;
+    return (
+      <WorkoutPreviewDetail
+        hideScaleChips
+        sections={workout.sections}
+        authoringMode={workout.authoring_mode}
+        freeTextBody={workout.free_text_body}
+      />
+    );
   }
 
   if (step === "type") {

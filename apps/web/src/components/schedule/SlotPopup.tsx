@@ -422,6 +422,8 @@ export function SlotPopup({
                 sections={slot.workout.sections}
                 activeScaleOverride={!isAdmin ? activeScale : undefined}
                 hideScaleChips={!isAdmin}
+                authoringMode={slot.workout.authoring_mode}
+                freeTextBody={slot.workout.free_text_body}
               />
             ) : (
               <p className="text-sm" style={{ color: "var(--dim)" }}>

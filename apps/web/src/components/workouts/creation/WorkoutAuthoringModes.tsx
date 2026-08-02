@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useUiTranslations } from "@/i18n/ui";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 
+import { FreeTextWorkoutEditor } from "./FreeTextWorkoutEditor";
 import { QuickTextWorkoutEditor } from "./QuickTextWorkoutEditor";
 import { WorkoutCreationCanvas } from "./WorkoutCreationCanvas";
 
@@ -14,11 +15,12 @@ export function WorkoutAuthoringModes() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const storeDraftId = useWorkoutCreationStore((state) => state.draftId);
-  const mode = searchParams.get("mode") === "quick-text" ? "quick-text" : "structured";
+  const requestedMode = searchParams.get("mode");
+  const mode = requestedMode === "quick-text" || requestedMode === "free-text" ? requestedMode : "structured";
   const draftId = searchParams.get("draft") ?? storeDraftId;
   const [modeBarVisible, setModeBarVisible] = useState(false);
 
-  function selectMode(nextMode: "structured" | "quick-text", selectedDraftId = draftId) {
+  function selectMode(nextMode: "structured" | "quick-text" | "free-text", selectedDraftId = draftId) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("mode", nextMode);
 
@@ -61,6 +63,11 @@ export function WorkoutAuthoringModes() {
           onClick={() => selectMode("quick-text")}
           label={i18n("authoringModeQuickText")}
         />
+        <ModeButton
+          active={mode === "free-text"}
+          onClick={() => selectMode("free-text")}
+          label={i18n("authoringModeFreeText")}
+        />
       </div>
 
       <div className="min-h-0 flex-1">
@@ -69,6 +76,11 @@ export function WorkoutAuthoringModes() {
             draftId={draftId}
             onDraftReady={(id) => selectMode("quick-text", id)}
             onSwitchToStructured={(id) => selectMode("structured", id)}
+          />
+        ) : mode === "free-text" ? (
+          <FreeTextWorkoutEditor
+            draftId={draftId}
+            onDraftReady={(id) => selectMode("free-text", id)}
           />
         ) : (
           <WorkoutCreationCanvas />

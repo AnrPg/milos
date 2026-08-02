@@ -82,6 +82,8 @@ type Props = {
   initiallyExpanded?: boolean;
   activeScaleOverride?: string | null;
   hideScaleChips?: boolean;
+  authoringMode?: "structured" | "quick_text" | "free_text";
+  freeTextBody?: string | null;
 };
 
 type PreviewVariation = NonNullable<PreviewExercise["variations"]>[number];
@@ -350,8 +352,23 @@ export function WorkoutPreviewDetail({
   initiallyExpanded = true,
   activeScaleOverride,
   hideScaleChips = false,
+  authoringMode,
+  freeTextBody,
 }: Props) {
   const i18n = useUiTranslations();
+
+  if (authoringMode === "free_text") {
+    return (
+      <div
+        className="rounded-[1.2rem] border p-4"
+        style={{ background: "var(--panel)", borderColor: "var(--border)" }}
+      >
+        <pre className="whitespace-pre-wrap font-sans text-sm leading-6" style={{ color: "var(--text)" }}>
+          {freeTextBody?.trim() ? freeTextBody : i18n("freeTextPreviewEmpty")}
+        </pre>
+      </div>
+    );
+  }
 
   function formatTimerLabel(timerConfig: Record<string, unknown> | null | undefined): string | null {
     if (!timerConfig) return null;

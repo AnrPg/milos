@@ -60,6 +60,9 @@ export type WorkoutPreview = {
   id: string;
   title: string;
   type: string;
+  authoring_mode?: "structured" | "quick_text" | "free_text";
+  free_text_body?: string | null;
+  free_text_document?: Record<string, unknown> | null;
   sections: WorkoutPreviewSection[];
 };
 

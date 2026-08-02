@@ -155,12 +155,14 @@ export type WorkoutRecord = {
   available_scale_levels: ScaleLevel[];
   sections: WorkoutSectionRecord[];
   draft_data?: unknown;
-  authoring_mode?: "structured" | "quick_text";
+  authoring_mode?: "structured" | "quick_text" | "free_text";
   dsl_version?: number | null;
   dsl_source?: string | null;
   dsl_document?: Record<string, unknown> | null;
   dsl_source_revision?: number;
   last_dsl_diagnostics?: WorkoutDslDiagnostic[];
+  free_text_body?: string | null;
+  free_text_document?: Record<string, unknown> | null;
 };
 
 export type WorkoutFolder = {
