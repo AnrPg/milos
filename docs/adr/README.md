@@ -77,3 +77,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-075 | Workout presentation and inline admin editing | Accepted |
 | ADR-076 | Package-associated receipts | Accepted |
 | ADR-077 | Free-text exercises and continuous DSL completion | Accepted |
+| ADR-078 | Free-text workout authoring | Accepted |
