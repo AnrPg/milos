@@ -2492,6 +2492,7 @@
     "featureReceiptFooter": "Issued by Milos Training as proof of payment.",
     "featureIssueReceipt": "Issue receipt",
     "featurePaymentPurpose": "What was the payment for?",
+    "featureReceiptManualPurposeOption": "Something else. Type here...",
     "featureRecordAndDownloadReceipt": "Record money and download receipt",
     "featureDownloadReceiptAgain": "Download receipt {reference} again",
     "featureReceipts": "Receipts",

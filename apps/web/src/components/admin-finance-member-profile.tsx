@@ -47,6 +47,8 @@ import {
 import { useSession } from "@/components/session-provider";
 import { generateExportFile, type ExportDocument } from "@/lib/document-export";
 
+const MANUAL_RECEIPT_PURPOSE = "__manual_receipt_purpose__";
+
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
   if (value === null || value === undefined) return fallback;
@@ -270,6 +272,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
   const customRenewal = field(selectedRenewalSubscription, "billing_period_snapshot") === "custom";
   const creditBalance = memberQuery.data?.credit_balance ?? 0;
   const entitlement = memberQuery.data?.entitlement;
+  const receiptPurposeValue = receiptPackageSubscriptionId || (receiptDescription ? MANUAL_RECEIPT_PURPOSE : "");
   const membershipForm = {
     user_type_snapshot: membershipOverrides.user_type_snapshot ?? field(membership, "user_type_snapshot", "member"),
     status: membershipOverrides.status ?? field(membership, "status", "active"),
@@ -599,17 +602,26 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
               {receiptMode ? (
                 <>
                   <Select
-                    label={i18n("package7431e3d")}
-                    value={receiptPackageSubscriptionId}
-                    options={packageSubscriptions.map((subscription) => field(subscription, "id"))}
+                    label={i18n("featurePaymentPurpose")}
+                    value={receiptPurposeValue}
+                    options={[
+                      ...packageSubscriptions.map((subscription) => field(subscription, "id")),
+                      MANUAL_RECEIPT_PURPOSE,
+                    ]}
                     optionLabel={(id) => {
+                      if (id === MANUAL_RECEIPT_PURPOSE) return i18n("featureReceiptManualPurposeOption");
                       const subscription = packageSubscriptions.find((item) => field(item, "id") === id);
-                      return packageLabel(subscription, id);
+                      return (packageLabel(subscription, id)) + " · " + (money(uiLocale, subscription?.price_cents_snapshot));
                     }}
-                    required={false}
-                    onChange={(membership_package_subscription_id) => {
+                    onChange={(receiptPurpose) => {
+                      if (receiptPurpose === MANUAL_RECEIPT_PURPOSE) {
+                        setReceiptPackageSubscriptionId("");
+                        setReceiptDescription("");
+                        return;
+                      }
+
                       const subscription = packageSubscriptions.find(
-                        (item) => field(item, "id") === membership_package_subscription_id,
+                        (item) => field(item, "id") === receiptPurpose,
                       );
                       const priceCents =
                         typeof subscription?.price_cents_snapshot === "number"
@@ -617,7 +629,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                           : null;
                       const selectedPackageLabel = packageLabel(subscription, "");
 
-                      setReceiptPackageSubscriptionId(membership_package_subscription_id);
+                      setReceiptPackageSubscriptionId(receiptPurpose);
                       setPaymentForm((current) => ({
                         ...current,
                         amount: priceCents !== null ? euroInputValue(priceCents) : current.amount,
@@ -627,11 +639,13 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                       }
                     }}
                   />
-                  <Input
-                    label={i18n("featurePaymentPurpose")}
-                    value={receiptDescription}
-                    onChange={setReceiptDescription}
-                  />
+                  {receiptPurposeValue === MANUAL_RECEIPT_PURPOSE ? (
+                    <Input
+                      label={i18n("featurePurpose")}
+                      value={receiptDescription}
+                      onChange={setReceiptDescription}
+                    />
+                  ) : null}
                 </>
               ) : null}
               <Select

@@ -60,6 +60,12 @@ available when no package is selected, and includes the package label in the
 private client-generated PDF. The OpenAPI request contract and generated
 TypeScript artifacts were regenerated.
 
+The receipt form now treats "What was the payment for?" as the choice point:
+member package subscriptions appear directly in that dropdown, and the manual
+receipt path is the explicit Other choice that reveals the free-text purpose
+field. This keeps package association discoverable without removing ad-hoc
+receipt descriptions.
+
 Verification completed with focused Finance/controller coverage, including
 foreign-membership rejection; 104 frontend unit tests; lint; type-check; the
 production build; localization; and the full backend precommit suite (498 tests,
