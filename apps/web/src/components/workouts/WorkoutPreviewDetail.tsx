@@ -357,19 +357,6 @@ export function WorkoutPreviewDetail({
 }: Props) {
   const i18n = useUiTranslations();
 
-  if (authoringMode === "free_text") {
-    return (
-      <div
-        className="rounded-[1.2rem] border p-4"
-        style={{ background: "var(--panel)", borderColor: "var(--border)" }}
-      >
-        <pre className="whitespace-pre-wrap font-sans text-sm leading-6" style={{ color: "var(--text)" }}>
-          {freeTextBody?.trim() ? freeTextBody : i18n("freeTextPreviewEmpty")}
-        </pre>
-      </div>
-    );
-  }
-
   function formatTimerLabel(timerConfig: Record<string, unknown> | null | undefined): string | null {
     if (!timerConfig) return null;
     const type = timerConfig.type as string | undefined;
@@ -385,6 +372,19 @@ export function WorkoutPreviewDetail({
     return new Set(sections.map((s, i) => s.id ?? String(i)));
   });
   const [sectionScales, setSectionScales] = useState<Record<string, string | null>>({});
+
+  if (authoringMode === "free_text") {
+    return (
+      <div
+        className="rounded-[1.2rem] border p-4"
+        style={{ background: "var(--panel)", borderColor: "var(--border)" }}
+      >
+        <pre className="whitespace-pre-wrap font-sans text-sm leading-6" style={{ color: "var(--text)" }}>
+          {freeTextBody?.trim() ? freeTextBody : i18n("freeTextPreviewEmpty")}
+        </pre>
+      </div>
+    );
+  }
 
   function toggleSection(key: string) {
     setExpandedSections((prev) => {

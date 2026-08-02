@@ -20,7 +20,7 @@ import {
 } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
-import { sanitizeWorkoutDslPaste } from "@/lib/workout-dsl-editor-data";
+import { FREE_TEXT_EDITOR_CLASS, sanitizeWorkoutDslPaste } from "@/lib/workout-dsl-editor-data";
 import type { WorkoutType } from "@/types/workout";
 
 type Props = {
@@ -71,8 +71,7 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class:
-          "min-h-[26rem] px-6 py-5 outline-none prose prose-sm max-w-none whitespace-pre-wrap",
+        class: FREE_TEXT_EDITOR_CLASS,
         spellcheck: "true",
         role: "textbox",
         "aria-label": i18n("freeTextEditorLabel"),
@@ -252,22 +251,22 @@ function FreeTextToolbar({ editor }: { editor: Editor | null }) {
   if (!editor) return null;
 
   const actions = [
-    toolbarButton(i18n("editorBold"), "B", editor.isActive("bold"), () => editor.chain().focus().toggleBold().run()),
-    toolbarButton(i18n("editorItalic"), "I", editor.isActive("italic"), () => editor.chain().focus().toggleItalic().run()),
-    toolbarButton(i18n("editorUnderline"), "U", editor.isActive("underline"), () => editor.chain().focus().toggleUnderline().run()),
-    toolbarButton(i18n("editorStrike"), "S", editor.isActive("strike"), () => editor.chain().focus().toggleStrike().run()),
-    toolbarButton(i18n("editorHighlight"), "H", editor.isActive("highlight"), () => editor.chain().focus().toggleHighlight().run()),
-    toolbarButton(i18n("editorHeading"), "H2", editor.isActive("heading", { level: 2 }), () => editor.chain().focus().toggleHeading({ level: 2 }).run()),
+    toolbarButton(i18n("editorBold"), i18n("editorBold"), editor.isActive("bold"), () => editor.chain().focus().toggleBold().run()),
+    toolbarButton(i18n("editorItalic"), i18n("editorItalic"), editor.isActive("italic"), () => editor.chain().focus().toggleItalic().run()),
+    toolbarButton(i18n("editorUnderline"), i18n("editorUnderline"), editor.isActive("underline"), () => editor.chain().focus().toggleUnderline().run()),
+    toolbarButton(i18n("editorStrike"), i18n("editorStrike"), editor.isActive("strike"), () => editor.chain().focus().toggleStrike().run()),
+    toolbarButton(i18n("editorHighlight"), i18n("editorHighlight"), editor.isActive("highlight"), () => editor.chain().focus().toggleHighlight().run()),
+    toolbarButton(i18n("editorHeading"), i18n("editorHeading"), editor.isActive("heading", { level: 2 }), () => editor.chain().focus().toggleHeading({ level: 2 }).run()),
     toolbarButton(i18n("editorBulletList"), "•", editor.isActive("bulletList"), () => editor.chain().focus().toggleBulletList().run()),
     toolbarButton(i18n("editorOrderedList"), "1.", editor.isActive("orderedList"), () => editor.chain().focus().toggleOrderedList().run()),
     toolbarButton(i18n("editorQuote"), "“”", editor.isActive("blockquote"), () => editor.chain().focus().toggleBlockquote().run()),
     toolbarButton(i18n("editorCode"), "</>", editor.isActive("codeBlock"), () => editor.chain().focus().toggleCodeBlock().run()),
-    toolbarButton(i18n("editorAlignLeft"), "L", editor.isActive({ textAlign: "left" }), () => editor.chain().focus().setTextAlign("left").run()),
-    toolbarButton(i18n("editorAlignCenter"), "C", editor.isActive({ textAlign: "center" }), () => editor.chain().focus().setTextAlign("center").run()),
-    toolbarButton(i18n("editorAlignRight"), "R", editor.isActive({ textAlign: "right" }), () => editor.chain().focus().setTextAlign("right").run()),
-    toolbarButton(i18n("editorLink"), "Link", editor.isActive("link"), () => setEditorLink(editor, i18n("editorLinkPrompt"))),
-    toolbarButton(i18n("editorUndo"), "Undo", false, () => editor.chain().focus().undo().run()),
-    toolbarButton(i18n("editorRedo"), "Redo", false, () => editor.chain().focus().redo().run()),
+    toolbarButton(i18n("editorAlignLeft"), i18n("editorAlignLeft"), editor.isActive({ textAlign: "left" }), () => editor.chain().focus().setTextAlign("left").run()),
+    toolbarButton(i18n("editorAlignCenter"), i18n("editorAlignCenter"), editor.isActive({ textAlign: "center" }), () => editor.chain().focus().setTextAlign("center").run()),
+    toolbarButton(i18n("editorAlignRight"), i18n("editorAlignRight"), editor.isActive({ textAlign: "right" }), () => editor.chain().focus().setTextAlign("right").run()),
+    toolbarButton(i18n("editorLink"), i18n("editorLink"), editor.isActive("link"), () => setEditorLink(editor, i18n("editorLinkPrompt"))),
+    toolbarButton(i18n("editorUndo"), i18n("editorUndo"), false, () => editor.chain().focus().undo().run()),
+    toolbarButton(i18n("editorRedo"), i18n("editorRedo"), false, () => editor.chain().focus().redo().run()),
   ];
 
   return (

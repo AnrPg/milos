@@ -11,6 +11,24 @@ vi.mock("@/i18n/ui", () => ({
 }));
 
 describe("WorkoutPreviewDetail composition groups", () => {
+  it("renders only the stored text body for free-text workouts", () => {
+    render(
+      <WorkoutPreviewDetail
+        authoringMode="free_text"
+        freeTextBody={"AMRAP 20\n10 pull-ups"}
+        sections={[{
+          id: "section-1",
+          name: "Should not show",
+          exercises: [{ id: "a", name: "Hidden squat", sets: 4, prescription_value: 6, prescription_unit: "reps" }],
+        }]}
+      />,
+    );
+
+    expect(screen.getByText(/AMRAP 20/)).toBeInTheDocument();
+    expect(screen.queryByText("Should not show")).not.toBeInTheDocument();
+    expect(screen.queryByText("Hidden squat")).not.toBeInTheDocument();
+  });
+
   it("renders one group header with set count and child exercises without repeated group labels", () => {
     render(
       <WorkoutPreviewDetail
