@@ -35,7 +35,7 @@ import { LocalizedScore } from "@/components/localized-score";
 import { formatPRCardDetails } from "@/components/pantheon/pr-card-details";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
-import { semanticLabel } from "@/i18n/presentation";
+import { localizeError, semanticLabel } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { UserProgrammingSchedule } from "@/components/admin/users/UserProgrammingSchedule";
@@ -239,9 +239,8 @@ function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: s
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {Object.entries(entitlement?.allowances ?? {}).filter(([key]) => key !== "coaching_touchpoints").map(([key, allowance]) => allowance ? <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><p className="font-semibold">{semanticLabel(key, i18n)}</p>{shouldShowAllowanceQuota(allowance) ? <p>{String(allowance.remaining)} {i18n("remainingOf8553660")} {String(allowance.limit)}{allowance.extensions > 0 ? i18n("personalExtensionCount", { count: allowance.extensions }) : ""}</p> : null}<p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("resetsAftere96e46e")} {date(allowance.period_end)}</p></div> : null)}
       </div>
-      <details className="mt-5 rounded-2xl p-4" style={{ border: "1px solid var(--border)" }}>
-        <summary className="cursor-pointer font-semibold" style={{ color: "var(--text)" }}>{i18n("advancedSettingsc8fef35")}</summary>
-        <form className="mt-4 space-y-3" onSubmit={(event) => { event.preventDefault(); grant.mutate(); }}>
+      <div className="mt-5 space-y-5 rounded-2xl p-4" style={{ border: "1px solid var(--border)" }}>
+        <form className="space-y-3" onSubmit={(event) => { event.preventDefault(); grant.mutate(); }}>
           <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("extendThisUserSAllowance6e08374")}</p>
           <div className="grid gap-3 sm:grid-cols-3">
             <select value={form.allowance} onChange={() => setForm({ ...form, allowance: "class_visits" })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}><option value="class_visits">{i18n("classVisits142b3b0")}</option></select>
@@ -257,7 +256,7 @@ function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: s
           {entries.filter((entry) => entry.allowance_key !== "coaching_touchpoints" && entry.event_type === "adjustment" && entry.quantity_delta < 0).map((entry) => <div key={entry.id} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><div className="flex flex-wrap items-center justify-between gap-2"><div><strong>+{Math.abs(entry.quantity_delta)} {semanticLabel(entry.allowance_key, i18n)}</strong><p className="text-xs" style={{ color: "var(--muted)" }}>{entry.reason} · {date(entry.inserted_at)} {i18n("validThrough263dc88")} {date(entry.period_end)}</p></div>{revoked.has(entry.id) ? <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>{i18n("revoked85f17ac")}</span> : <button type="button" onClick={() => setRevokeTarget(entry.id)} className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{i18n("revoke0be7207")}</button>}</div>{revokeTarget === entry.id ? <form className="mt-3 flex flex-col gap-2 sm:flex-row" onSubmit={(event) => { event.preventDefault(); revoke.mutate(); }}><input required minLength={3} value={revokeReason} onChange={(event) => setRevokeReason(event.target.value)} placeholder={i18n("reasonForRevocationac5b98c")} className="min-w-0 flex-1 rounded-xl px-3 py-2" style={{ background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border)" }} /><button disabled={revoke.isPending || revokeReason.trim().length < 3} className="rounded-full px-3 py-2 text-xs font-semibold disabled:opacity-50" style={{ background: "var(--danger)", color: "white" }}>{i18n("confirmRevocationc1a9d03")}</button></form> : null}</div>)}
           {entries.every((entry) => entry.allowance_key === "coaching_touchpoints" || entry.event_type !== "adjustment" || entry.quantity_delta >= 0) ? <Empty>{i18n("noPersonalExtensionsRecorded558dcb3")}</Empty> : null}
         </div>
-      </details>
+      </div>
     </>
   );
 }
@@ -608,7 +607,11 @@ export function AdminUserProfile({ userId }: { userId: string }) {
                   >
                     {deleteMutation.isPending ? i18n("loading33ce417") : i18n("deletef6fdbe4")}
                   </button>
-                  {deleteMutation.isError ? <p className="mt-2 text-sm" style={{ color: "var(--danger)" }}>{i18n("userProfileCouldNotBeLoaded7bc2d73")}</p> : null}
+                  {deleteMutation.isError ? (
+                    <p className="mt-2 text-sm" style={{ color: "var(--danger)" }}>
+                      {localizeError(deleteMutation.error, i18n)}
+                    </p>
+                  ) : null}
                 </div>
               </div>
             </Panel>
