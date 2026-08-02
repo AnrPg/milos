@@ -179,6 +179,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
   });
   const [receiptDescription, setReceiptDescription] = useState("");
   const [receiptPackageSubscriptionId, setReceiptPackageSubscriptionId] = useState("");
+  const [receiptManualPurposeSelected, setReceiptManualPurposeSelected] = useState(false);
   const [lastReceipt, setLastReceipt] = useState<FinanceReceipt | null>(null);
   const [invoiceForm, setInvoiceForm] = useState({
     amount: "0",
@@ -272,7 +273,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
   const customRenewal = field(selectedRenewalSubscription, "billing_period_snapshot") === "custom";
   const creditBalance = memberQuery.data?.credit_balance ?? 0;
   const entitlement = memberQuery.data?.entitlement;
-  const receiptPurposeValue = receiptPackageSubscriptionId || (receiptDescription ? MANUAL_RECEIPT_PURPOSE : "");
+  const receiptPurposeValue = receiptManualPurposeSelected ? MANUAL_RECEIPT_PURPOSE : receiptPackageSubscriptionId;
   const membershipForm = {
     user_type_snapshot: membershipOverrides.user_type_snapshot ?? field(membership, "user_type_snapshot", "member"),
     status: membershipOverrides.status ?? field(membership, "status", "active"),
@@ -616,6 +617,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                     onChange={(receiptPurpose) => {
                       if (receiptPurpose === MANUAL_RECEIPT_PURPOSE) {
                         setReceiptPackageSubscriptionId("");
+                        setReceiptManualPurposeSelected(true);
                         setReceiptDescription("");
                         return;
                       }
@@ -630,6 +632,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                       const selectedPackageLabel = packageLabel(subscription, "");
 
                       setReceiptPackageSubscriptionId(receiptPurpose);
+                      setReceiptManualPurposeSelected(false);
                       setPaymentForm((current) => ({
                         ...current,
                         amount: priceCents !== null ? euroInputValue(priceCents) : current.amount,
@@ -638,6 +641,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                         setReceiptDescription(i18n("package5544677") + selectedPackageLabel);
                       }
                     }}
+                    showPlaceholder={false}
                   />
                   {receiptPurposeValue === MANUAL_RECEIPT_PURPOSE ? (
                     <Input
@@ -1085,6 +1089,7 @@ function Select({
   optionLabel,
   disabled = false,
   required = true,
+  showPlaceholder = true,
 }: {
   label: string;
   value: string;
@@ -1093,6 +1098,7 @@ function Select({
   optionLabel?: (value: string) => string;
   disabled?: boolean;
   required?: boolean;
+  showPlaceholder?: boolean;
 }) {
   const i18n = useUiTranslations();
   return (
@@ -1105,9 +1111,11 @@ function Select({
         value={value}
         onChange={(event) => onChange(event.target.value)}
       >
-        <option value="" disabled={required}>
-          {required ? i18n("select8598222") + (label.toLowerCase()) : i18n("no816c52f") + (label.toLowerCase())}
-        </option>
+        {showPlaceholder ? (
+          <option value="" disabled={required}>
+            {required ? i18n("select8598222") + (label.toLowerCase()) : i18n("no816c52f") + (label.toLowerCase())}
+          </option>
+        ) : null}
         {options.map((option) => (
           <option key={option} value={option}>
             {optionLabel ? optionLabel(option) : option}

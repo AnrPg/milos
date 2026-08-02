@@ -168,6 +168,7 @@ export function MemberPanel({
   });
   const [receiptDescription, setReceiptDescription] = useState("");
   const [receiptPackageSubscriptionId, setReceiptPackageSubscriptionId] = useState("");
+  const [receiptManualPurposeSelected, setReceiptManualPurposeSelected] = useState(false);
   const [invoiceForm, setInvoiceForm] = useState({
     amount_cents: "",
     description: "",
@@ -211,7 +212,7 @@ export function MemberPanel({
     return ["issued", "partially_paid", "overdue"].includes(status) && balanceDue > 0;
   });
   const receiptMode = settingsQuery.data?.finance.document_mode === "receipt";
-  const receiptPurposeValue = receiptPackageSubscriptionId || (receiptDescription ? MANUAL_RECEIPT_PURPOSE : "");
+  const receiptPurposeValue = receiptManualPurposeSelected ? MANUAL_RECEIPT_PURPOSE : receiptPackageSubscriptionId;
 
   const recordPaymentMutation = useMutation({
     mutationFn: () =>
@@ -461,6 +462,7 @@ export function MemberPanel({
                         const receiptPurpose = e.target.value;
                         if (receiptPurpose === MANUAL_RECEIPT_PURPOSE) {
                           setReceiptPackageSubscriptionId("");
+                          setReceiptManualPurposeSelected(true);
                           setReceiptDescription("");
                           return;
                         }
@@ -470,6 +472,7 @@ export function MemberPanel({
                         const selectedPackageLabel = packageLabelFromSubscription(subscription, packages);
 
                         setReceiptPackageSubscriptionId(receiptPurpose);
+                        setReceiptManualPurposeSelected(false);
                         setPaymentForm((current) => ({
                           ...current,
                           amount_cents: priceCents !== null ? euroInputValue(priceCents) : current.amount_cents,
@@ -479,7 +482,6 @@ export function MemberPanel({
                         }
                       }}
                     >
-                      <option value="" disabled>{i18n("select8598222") + i18n("featurePaymentPurpose").toLowerCase()}</option>
                       {packageSubscriptions.map((subscription) => {
                         const id = field(subscription, "id");
                         return (
