@@ -79,3 +79,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-077 | Free-text exercises and continuous DSL completion | Accepted |
 | ADR-078 | Free-text workout authoring | Accepted |
 | ADR-079 | Workout delete removes recurring class series | Accepted |
+| ADR-080 | Workoutless recurring class series | Accepted |
