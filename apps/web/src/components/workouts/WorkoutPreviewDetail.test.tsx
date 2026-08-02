@@ -11,7 +11,7 @@ vi.mock("@/i18n/ui", () => ({
 }));
 
 describe("WorkoutPreviewDetail composition groups", () => {
-  it("renders only the stored text body for free-text workouts", () => {
+  it("renders only the stored free-text body for free-text workouts", () => {
     render(
       <WorkoutPreviewDetail
         authoringMode="free_text"
@@ -27,6 +27,40 @@ describe("WorkoutPreviewDetail composition groups", () => {
     expect(screen.getByText(/AMRAP 20/)).toBeInTheDocument();
     expect(screen.queryByText("Should not show")).not.toBeInTheDocument();
     expect(screen.queryByText("Hidden squat")).not.toBeInTheDocument();
+  });
+
+  it("preserves rich free-text document formatting", () => {
+    render(
+      <WorkoutPreviewDetail
+        authoringMode="free_text"
+        freeTextBody="AMRAP 20"
+        freeTextDocument={{
+          type: "doc",
+          content: [
+            {
+              type: "paragraph",
+              attrs: { textAlign: "center" },
+              content: [{ type: "text", text: "AMRAP 20", marks: [{ type: "bold" }] }],
+            },
+            {
+              type: "orderedList",
+              content: [
+                {
+                  type: "listItem",
+                  content: [{ type: "paragraph", content: [{ type: "text", text: "10 pull-ups", marks: [{ type: "highlight" }] }] }],
+                },
+              ],
+            },
+          ],
+        }}
+        sections={[]}
+      />,
+    );
+
+    expect(screen.getByText("AMRAP 20").tagName).toBe("STRONG");
+    expect(screen.getByText("AMRAP 20").closest("p")).toHaveStyle({ textAlign: "center" });
+    expect(screen.getByText("10 pull-ups").tagName).toBe("MARK");
+    expect(screen.getByRole("list")).toBeInTheDocument();
   });
 
   it("renders one group header with set count and child exercises without repeated group labels", () => {

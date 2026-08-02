@@ -424,6 +424,7 @@ export function SlotPopup({
                 hideScaleChips={!isAdmin}
                 authoringMode={slot.workout.authoring_mode}
                 freeTextBody={slot.workout.free_text_body}
+                freeTextDocument={slot.workout.free_text_document}
               />
             ) : (
               <p className="text-sm" style={{ color: "var(--dim)" }}>

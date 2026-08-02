@@ -7,7 +7,7 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import { semanticLabel } from "@/i18n/presentation";
-import { useState } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 
 import { scaleLevelVar, translucent } from "@/lib/theme";
 
@@ -84,6 +84,7 @@ type Props = {
   hideScaleChips?: boolean;
   authoringMode?: "structured" | "quick_text" | "free_text";
   freeTextBody?: string | null;
+  freeTextDocument?: Record<string, unknown> | null;
 };
 
 type PreviewVariation = NonNullable<PreviewExercise["variations"]>[number];
@@ -124,6 +125,84 @@ function resolveExercise(exercise: PreviewExercise, activeScale: string | null):
     variationLabel: variation.scale_level?.label ?? variation.scale_level?.slug,
     variationSlug: variation.scale_level?.slug,
   };
+}
+
+function renderFreeTextDocument(document: Record<string, unknown> | null | undefined): ReactNode | null {
+  if (!document || document.type !== "doc" || !Array.isArray(document.content)) return null;
+  return document.content.map((node, index) => renderFreeTextNode(node, index));
+}
+
+function renderFreeTextNode(rawNode: unknown, key: string | number): ReactNode {
+  if (!rawNode || typeof rawNode !== "object") return null;
+  const node = rawNode as Record<string, unknown>;
+  const attrs = (node.attrs && typeof node.attrs === "object" ? node.attrs : {}) as Record<string, unknown>;
+  const children = Array.isArray(node.content)
+    ? node.content.map((child, index) => renderFreeTextNode(child, `${key}-${index}`))
+    : null;
+  const style = freeTextNodeStyle(attrs);
+
+  switch (node.type) {
+    case "text":
+      return applyFreeTextMarks(String(node.text ?? ""), node.marks, key);
+    case "paragraph":
+      return <p key={key} style={style}>{children}</p>;
+    case "heading": {
+      const level = attrs.level === 1 || attrs.level === 3 ? attrs.level : 2;
+      if (level === 1) return <h1 key={key} className="text-xl font-black" style={style}>{children}</h1>;
+      if (level === 3) return <h3 key={key} className="text-base font-black" style={style}>{children}</h3>;
+      return <h2 key={key} className="text-lg font-black" style={style}>{children}</h2>;
+    }
+    case "bulletList":
+      return <ul key={key}>{children}</ul>;
+    case "orderedList":
+      return <ol key={key}>{children}</ol>;
+    case "listItem":
+      return <li key={key}>{children}</li>;
+    case "blockquote":
+      return <blockquote key={key}>{children}</blockquote>;
+    case "codeBlock":
+      return <pre key={key}><code>{children}</code></pre>;
+    case "hardBreak":
+      return <br key={key} />;
+    default:
+      return children;
+  }
+}
+
+function freeTextNodeStyle(attrs: Record<string, unknown>): CSSProperties | undefined {
+  return typeof attrs.textAlign === "string" ? { textAlign: attrs.textAlign as CSSProperties["textAlign"] } : undefined;
+}
+
+function applyFreeTextMarks(text: string, rawMarks: unknown, key: string | number): ReactNode {
+  if (!Array.isArray(rawMarks)) return text;
+
+  return rawMarks.reduce<ReactNode>((content, rawMark, index) => {
+    if (!rawMark || typeof rawMark !== "object") return content;
+    const mark = rawMark as Record<string, unknown>;
+    const markKey = `${key}-mark-${index}`;
+
+    switch (mark.type) {
+      case "bold":
+        return <strong key={markKey}>{content}</strong>;
+      case "italic":
+        return <em key={markKey}>{content}</em>;
+      case "underline":
+        return <u key={markKey}>{content}</u>;
+      case "strike":
+        return <s key={markKey}>{content}</s>;
+      case "highlight":
+        return <mark key={markKey}>{content}</mark>;
+      case "link": {
+        const attrs = (mark.attrs && typeof mark.attrs === "object" ? mark.attrs : {}) as Record<string, unknown>;
+        const href = typeof attrs.href === "string" && /^(https?:|mailto:)/i.test(attrs.href) ? attrs.href : undefined;
+        return href ? <a key={markKey} href={href}>{content}</a> : content;
+      }
+      case "code":
+        return <code key={markKey}>{content}</code>;
+      default:
+        return content;
+    }
+  }, text);
 }
 
 function sectionScaleOptions(section: PreviewSection) {
@@ -354,6 +433,7 @@ export function WorkoutPreviewDetail({
   hideScaleChips = false,
   authoringMode,
   freeTextBody,
+  freeTextDocument,
 }: Props) {
   const i18n = useUiTranslations();
 
@@ -374,14 +454,20 @@ export function WorkoutPreviewDetail({
   const [sectionScales, setSectionScales] = useState<Record<string, string | null>>({});
 
   if (authoringMode === "free_text") {
+    const richContent = renderFreeTextDocument(freeTextDocument);
+
     return (
       <div
         className="rounded-[1.2rem] border p-4"
         style={{ background: "var(--panel)", borderColor: "var(--border)" }}
       >
-        <pre className="whitespace-pre-wrap font-sans text-sm leading-6" style={{ color: "var(--text)" }}>
-          {freeTextBody?.trim() ? freeTextBody : i18n("freeTextPreviewEmpty")}
-        </pre>
+        {richContent ? (
+          <div className="free-text-rich-content text-sm leading-6">{richContent}</div>
+        ) : (
+          <pre className="whitespace-pre-wrap font-sans text-sm leading-6" style={{ color: "var(--text)" }}>
+            {freeTextBody?.trim() ? freeTextBody : i18n("freeTextPreviewEmpty")}
+          </pre>
+        )}
       </div>
     );
   }

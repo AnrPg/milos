@@ -47,8 +47,10 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
   const [title, setTitle] = useState("");
   const [type, setType] = useState<WorkoutType>("crossfit");
   const [body, setBody] = useState("");
+  const [html, setHtml] = useState("");
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [publishing, setPublishing] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(true);
   const loadedDraftRef = useRef<string | null>(null);
 
   const editor = useEditor({
@@ -80,6 +82,7 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
     },
     onUpdate: ({ editor: currentEditor }) => {
       setBody(currentEditor.getText({ blockSeparator: "\n" }));
+      setHtml(currentEditor.getHTML());
     },
   });
 
@@ -108,6 +111,7 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
         const nextBody = workout.free_text_body ?? "";
         setBody(nextBody);
         editor.commands.setContent(workout.free_text_document ?? textToDocument(nextBody));
+        setHtml(editor.getHTML());
       })
       .catch(() => {
         loadedDraftRef.current = null;
@@ -157,7 +161,7 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
   }
 
   return (
-    <div className="grid min-h-[calc(100dvh-6.5rem)] grid-cols-1 lg:grid-cols-[minmax(0,1fr)_24rem]">
+    <div className={previewOpen ? "grid min-h-[calc(100dvh-6.5rem)] grid-cols-1 lg:grid-cols-[minmax(0,1fr)_24rem]" : "grid min-h-[calc(100dvh-6.5rem)] grid-cols-1 lg:grid-cols-[minmax(0,1fr)_4rem]"}>
       <section className="flex min-h-0 flex-col border-e" style={{ borderColor: "var(--dim)" }}>
         <header className="border-b px-5 py-4" style={{ borderColor: "var(--dim)" }}>
           <div className="flex flex-wrap items-start justify-between gap-4">
@@ -178,7 +182,7 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
         <div className="grid gap-3 border-b p-4 md:grid-cols-[minmax(0,1fr)_12rem]" style={{ borderColor: "var(--dim)" }}>
           <label className="block">
             <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-              {i18n("titleb78a322")}
+              {i18n("title768e0c1")}
             </span>
             <input
               className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none"
@@ -190,7 +194,7 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
           </label>
           <label className="block">
             <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-              {i18n("typea1fa277")}
+              {i18n("workoutType34a530c")}
             </span>
             <select
               className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none"
@@ -222,25 +226,48 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
             disabled={publishing || !title.trim() || !body.trim()}
             onClick={() => void publish()}
             className="rounded-xl px-5 py-2 text-sm font-black disabled:opacity-40"
-            style={{ background: "var(--primary)", color: "var(--primary-foreground, white)" }}
+            style={{ background: "var(--success, var(--primary))", color: "var(--bg)", boxShadow: "0 10px 24px color-mix(in srgb, var(--primary) 22%, transparent)" }}
           >
             {publishing ? i18n("quickTextPublishing") : i18n("quickTextPublish")}
           </button>
         </footer>
       </section>
 
-      <aside className="min-h-0 overflow-auto p-5" style={{ background: "var(--panel)" }}>
-        <h2 className="text-lg font-black" style={{ color: "var(--text)" }}>
-          {i18n("quickTextCanonicalPreview")}
-        </h2>
-        <div className="mt-4 rounded-2xl border p-4" style={{ borderColor: "var(--dim)", background: "var(--card)" }}>
-          <div className="text-xl font-black" style={{ color: "var(--text)" }}>
-            {title || i18n("untitledWorkout579b8a6")}
-          </div>
-          <pre className="mt-4 whitespace-pre-wrap font-sans text-sm leading-6" style={{ color: "var(--text)" }}>
-            {body || i18n("freeTextPreviewEmpty")}
-          </pre>
+      <aside className="min-h-0 overflow-auto p-4" style={{ background: "var(--panel)" }}>
+        <div className="flex items-center justify-between gap-3">
+          {previewOpen ? (
+            <h2 className="text-lg font-black" style={{ color: "var(--text)" }}>
+              {i18n("quickTextCanonicalPreview")}
+            </h2>
+          ) : null}
+          <button
+            type="button"
+            className="rounded-lg px-3 py-2 text-xs font-bold"
+            style={{ background: "var(--card)", color: "var(--text)", border: "1px solid var(--dim)" }}
+            onClick={() => setPreviewOpen((open) => !open)}
+            aria-expanded={previewOpen}
+          >
+            {previewOpen ? i18n("hide34d8b60") : i18n("showd97d1ee")}
+          </button>
         </div>
+        {previewOpen ? (
+          <div className="mt-4 rounded-2xl border p-4" style={{ borderColor: "var(--dim)", background: "var(--card)" }}>
+            <div className="text-xl font-black" style={{ color: "var(--text)" }}>
+              {title || i18n("untitledWorkout579b8a6")}
+            </div>
+            {body ? (
+              <div
+                className="free-text-rich-content mt-4 text-sm leading-6"
+                style={{ color: "var(--text)" }}
+                dangerouslySetInnerHTML={{ __html: html }}
+              />
+            ) : (
+              <p className="mt-4 text-sm" style={{ color: "var(--muted)" }}>
+                {i18n("freeTextPreviewEmpty")}
+              </p>
+            )}
+          </div>
+        ) : null}
       </aside>
     </div>
   );

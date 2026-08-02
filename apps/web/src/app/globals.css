@@ -163,3 +163,58 @@ input[type="number"] {
   user-select: none;
   width: 2.25rem;
 }
+
+.free-text-rich-content {
+  color: var(--text);
+}
+
+.free-text-rich-content :where(p, ul, ol, blockquote, pre, h1, h2, h3) {
+  margin-block: 0.65rem;
+}
+
+.free-text-rich-content :where(strong) {
+  font-weight: 800;
+}
+
+.free-text-rich-content :where(mark) {
+  background: #f5f113;
+  border-radius: 0.2rem;
+  padding-inline: 0.08rem;
+}
+
+.free-text-rich-content :where(s) {
+  text-decoration-thickness: 0.12em;
+}
+
+.free-text-rich-content :where(ul) {
+  list-style: disc;
+  padding-inline-start: 1.4rem;
+}
+
+.free-text-rich-content :where(ol) {
+  list-style: decimal;
+  padding-inline-start: 1.4rem;
+}
+
+.free-text-rich-content :where(li) {
+  margin-block: 0.25rem;
+}
+
+.free-text-rich-content :where(blockquote) {
+  border-inline-start: 3px solid var(--primary);
+  color: var(--text-soft);
+  padding-inline-start: 0.9rem;
+}
+
+.free-text-rich-content :where(pre) {
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  border-radius: 0.7rem;
+  overflow-x: auto;
+  padding: 0.75rem;
+}
+
+.free-text-rich-content :where(a) {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: underline;
+}

@@ -143,18 +143,6 @@ export function WorkoutEditModal({
                 </button>
                 <button
                   className="rounded-full px-4 py-3 text-sm font-semibold disabled:opacity-50"
-                  style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-                  disabled={busy !== null}
-                  onClick={() => void handleDuplicate("quick-text")}
-                  type="button"
-                >
-                  {busy === "duplicate"
-                    ? i18n("duplicating7d74a9e")
-                    : i18n("authoringModeQuickText")}
-                </button>
-
-                <button
-                  className="rounded-full px-4 py-3 text-sm font-semibold disabled:opacity-50"
                   style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)", color: "var(--primary)" }}
                   disabled={busy !== null}
                   onClick={() => void handleReopen("structured")}
@@ -174,15 +162,6 @@ export function WorkoutEditModal({
                   type="button"
                 >
                   {busy === "reopen" ? i18n("openingb1b8530") : i18n("editGloballyac84ca5")}
-                </button>
-                <button
-                  className="rounded-full px-4 py-3 text-sm font-semibold disabled:opacity-50"
-                  style={{ background: "var(--text)", color: "var(--bg)" }}
-                  disabled={busy !== null}
-                  onClick={() => void handleReopen("quick-text")}
-                  type="button"
-                >
-                  {busy === "reopen" ? i18n("openingb1b8530") : i18n("authoringModeQuickText")}
                 </button>
               </>
             )}
