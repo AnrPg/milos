@@ -7,6 +7,9 @@ import Placeholder from "@tiptap/extension-placeholder";
 import TextAlign from "@tiptap/extension-text-align";
 import Typography from "@tiptap/extension-typography";
 import Underline from "@tiptap/extension-underline";
+import { Extension } from "@tiptap/core";
+import type { ResolvedPos } from "@tiptap/pm/model";
+import { Plugin } from "@tiptap/pm/state";
 import { EditorContent, useEditor, type Editor, type JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useRouter } from "next/navigation";
@@ -68,6 +71,7 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
       Typography,
       Placeholder.configure({ placeholder: i18n("freeTextEditorPlaceholder") }),
       CharacterCount.configure({ limit: 200_000 }),
+      FreeTextEditingAssist,
     ],
     content: emptyDocument(),
     immediatelyRender: false,
@@ -297,7 +301,14 @@ function FreeTextToolbar({ editor }: { editor: Editor | null }) {
   ];
 
   return (
-    <div className="flex flex-wrap gap-1 border-b px-4 py-2" style={{ borderColor: "var(--dim)" }}>
+    <div
+      className="sticky top-0 z-20 flex flex-wrap gap-1 border-b px-4 py-2"
+      style={{
+        borderColor: "var(--dim)",
+        background: "color-mix(in srgb, var(--bg) 96%, transparent)",
+        backdropFilter: "blur(12px)",
+      }}
+    >
       {actions.map((action) => (
         <button
           type="button"
@@ -316,6 +327,80 @@ function FreeTextToolbar({ editor }: { editor: Editor | null }) {
       ))}
     </div>
   );
+}
+
+const FreeTextEditingAssist = Extension.create({
+  name: "freeTextEditingAssist",
+
+  addKeyboardShortcuts() {
+    return {
+      "Shift-Enter": () => this.editor.commands.setHardBreak(),
+    };
+  },
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        props: {
+          handleDOMEvents: {
+            mousedown: (view, event) => {
+              if (!(event.ctrlKey || event.metaKey) || event.button !== 0) {
+                return false;
+              }
+
+              const position = view.posAtCoords({
+                left: event.clientX,
+                top: event.clientY,
+              });
+
+              if (!position) return false;
+
+              const wordRange = findWordRangeAt(view.state.doc.resolve(position.pos));
+              if (!wordRange) return false;
+
+              event.preventDefault();
+              const { state, dispatch } = view;
+              const highlight = state.schema.marks.highlight;
+              if (!highlight) return false;
+
+              dispatch(
+                state.tr
+                  .addMark(wordRange.from, wordRange.to, highlight.create({ color: "#fde68a" }))
+                  .setMeta("addToHistory", true),
+              );
+              return true;
+            },
+          },
+        },
+      }),
+    ];
+  },
+});
+
+function findWordRangeAt($pos: ResolvedPos) {
+  const parentText = $pos.parent.textContent;
+  if (!parentText) return null;
+
+  const offset = Math.min($pos.parentOffset, parentText.length - 1);
+  const wordChar = /[\p{L}\p{N}_-]/u;
+
+  let fromOffset = offset;
+  while (fromOffset > 0 && wordChar.test(parentText[fromOffset - 1] ?? "")) {
+    fromOffset -= 1;
+  }
+
+  let toOffset = offset;
+  while (toOffset < parentText.length && wordChar.test(parentText[toOffset] ?? "")) {
+    toOffset += 1;
+  }
+
+  if (fromOffset === toOffset) return null;
+
+  const blockStart = $pos.start();
+  return {
+    from: blockStart + fromOffset,
+    to: blockStart + toOffset,
+  };
 }
 
 function buildPayload({
