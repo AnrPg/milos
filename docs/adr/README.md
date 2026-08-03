@@ -80,3 +80,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-078 | Free-text workout authoring | Accepted |
 | ADR-079 | Workout delete removes recurring class series | Accepted |
 | ADR-080 | Workoutless recurring class series | Accepted |
+| ADR-081 | Subtle finance payment rollback | Accepted |
