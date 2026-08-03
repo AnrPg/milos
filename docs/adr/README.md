@@ -87,3 +87,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-079 | Workout delete removes recurring class series | Accepted |
 | ADR-080 | Workoutless recurring class series | Accepted |
 | ADR-081 | Subtle finance payment rollback | Accepted |
+| ADR-082 | Free-text execution modification notes | Accepted |
