@@ -32,7 +32,7 @@ shared merely because an organization key is absent.
 | Notifications | `notifications` | Ownership follows source: tenant-owned or global-personal | Persist source ownership class |
 | Notifications | `push_subscriptions` | Global-personal device registration | Delivery payload still carries source ownership |
 | Notifications | `notification_push_settings` | Platform-global installation setting | Platform-operator only |
-| Coaching | `admin_athlete_notes` | Tenant-owned | T4 Coaching |
+| Coaching | `coaching_aggregates` and tenant-scoped drill-down projection | Tenant-owned projection | T4 Coaching; source only active athlete memberships, matching execution provenance, and tenant coaching messages |
 | Compatibility | `assignment_messages` | Removed legacy table | No backfill |
 | Oban | `oban_jobs`, `oban_peers` | Platform operational | Tenant/user ownership belongs in validated job args and uniqueness keys |
 

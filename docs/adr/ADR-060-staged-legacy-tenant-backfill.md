@@ -37,3 +37,37 @@ The baseline ownership inventory is recorded in
 Organizations API, release function, or `mix milos.organizations.ensure_legacy`.
 No legacy domain rows were assigned yet; those changes remain in the ordered T4
 expand/backfill/enforce loops.
+
+Scheduling completed its enforce step on 2026-08-03 with same-tenant constraints,
+explicit predicates, transaction-local context, a two-tenant isolation suite, and
+forced RLS. `mix milos.tenancy.audit` classifies every other tenant table as
+transitional and deliberately prevents a false full-enforcement declaration.
+
+Workouts completed the same enforcement slice on 2026-08-04 for workout library
+and assignment tables. Tenant-scoped public store calls run inside
+`RepoContext`, the adapter adds explicit organization predicates to its primary
+workout reads, and a two-organization integration test covers draft isolation.
+The migration deliberately does not enable RLS for the remaining T4 contexts:
+their HTTP and job entry points must first propagate an explicit tenant or user
+context. This preserves the staged rollout rather than silently routing them to
+the legacy organization.
+
+Execution completed its global-personal ownership slice on 2026-08-04.
+`workout_executions` and `execution_progress_operations` use transaction-local
+user context, explicit owner predicates, forced user-scoped RLS, and a forged
+`user_id` isolation test. The user supplied by authenticated context always wins
+over an identifier in a request payload.
+
+Feedback completed its tenant-owned ownership slice on 2026-08-04. Review reads,
+updates, aggregates, and answer loading run under explicit tenant context with
+organization predicates and forced RLS across questionnaires, reviews, and
+answers. Canonical `/api/org/:organization_slug/me/reviews` and admin paths
+require membership before reaching the context; legacy routes remain temporary
+compatibility paths until T6 contract cleanup.
+
+Coaching completed its tenant projection slice on 2026-08-04. The aggregate is
+partitioned by organization, uses active athlete memberships as its population,
+and counts only matching execution provenance and tenant coaching messages. The
+canonical admin drill-down rejects athletes without an active membership in the
+selected organization and exposes no personal execution history without that
+provenance.

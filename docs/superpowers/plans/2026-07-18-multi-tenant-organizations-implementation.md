@@ -116,6 +116,13 @@ Each loop includes:
 - [ ] Preserve former-member read access only to the user's own actual result, never
       prescription, class, peer, or coach-private data.
 
+T4 progress note (2026-08-04): Scheduling and Workouts have completed their
+tenant-owned enforcement loops. Execution has completed its global-personal,
+user-scoped loop, while Feedback and Coaching have completed their tenant-owned
+projection loops. Finance is explicitly paused before enforcement; Messaging,
+Notifications, Gamification, Analytics, and Wellbeing remain transitional pending
+their own complete context, API, and isolation-test slices.
+
 ## Phase T5 — Infrastructure isolation
 
 - [ ] Oban payloads, uniqueness, and workers establish tenant context.
@@ -130,26 +137,41 @@ Each loop includes:
 - [ ] Notification delivery and push subscriptions cannot cross organizations.
 - [ ] Logs/traces redact invitation tokens and classify organization labels safely.
 
+T5 foundation note (2026-08-03): Scheduling jobs now carry organization scope and
+resolve trusted system tenant context; messaging delivery jobs reject missing or
+mismatched organization scope; personal PR search jobs require `owner_user_id`;
+landing cache keys are user-scoped; and new document/avatar objects use canonical
+organization/user prefixes with presigned-download ownership checks. Member search,
+tenant notification delivery, calendar exports, analytics, and migration of legacy
+object keys remain paired with their unfinished T4 context loops.
+
 ## Phase T6 — RLS enforcement and contract cleanup
 
-- [ ] Provision distinct migration-owner and runtime database roles.
+- [x] Provision distinct migration-owner and runtime database roles.
 - [ ] Set transaction-local organization context in runtime adapters.
 - [ ] Set transaction-local user context for global-personal adapters.
 - [ ] Enable and force RLS only after unmapped-row checks reach zero.
 - [ ] Remove global-role authorization and tenantless fallbacks.
-- [ ] Remove the fixed admin registration code.
-- [ ] Add an architecture check for unscoped tenant-owned adapters.
+- [x] Remove the fixed admin registration code.
+- [x] Add an architecture check for unscoped tenant-owned adapters.
 - [ ] Perform a live two-organization penetration test across HTTP, sockets, jobs, cache, search, storage, analytics, and exports.
+
+T6 enforcement note (2026-08-03): the runtime/migration role split, release migration
+URL, Scheduling transaction-local context, forced Scheduling RLS, and audit gate are
+implemented. The audit reports zero unmapped Scheduling rows and forced RLS on all
+six Scheduling tables, then intentionally fails while the remaining T4 contexts are
+transitional. Global-personal user-scoped RLS and removal of all tenantless context
+fallbacks cannot complete before those bounded-context loops.
 
 ## Phase T7 — Commercial provisioning
 
-- [ ] Platform-owner organization provisioning surface.
-- [ ] Organization lifecycle: active, suspended, archived.
-- [ ] Initial owner invitation and copy-once delivery.
-- [ ] Organization branding, locale, timezone, and configurable invitation lifetimes.
-- [ ] Single-origin organization path routing and canonical deep links.
-- [ ] Backup/export/restore runbook and tenant deletion policy.
-- [ ] Keep automated email/OTP delivery deferred under TD-034 until provider work begins.
+- [x] Platform-owner organization provisioning surface.
+- [x] Organization lifecycle: active, suspended, archived.
+- [x] Initial owner invitation and copy-once delivery.
+- [x] Organization branding, locale, timezone, and configurable invitation lifetimes.
+- [x] Single-origin organization path routing and canonical deep links.
+- [x] Backup/export/restore runbook and tenant deletion policy.
+- [x] Keep automated email/OTP delivery deferred under TD-034 until provider work begins.
 
 ## Completion gates
 

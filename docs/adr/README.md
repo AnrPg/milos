@@ -88,3 +88,6 @@ must have an ADR. See `template.md` for the format.
 | ADR-080 | Workoutless recurring class series | Accepted |
 | ADR-081 | Subtle finance payment rollback | Accepted |
 | ADR-082 | Free-text execution modification notes | Accepted |
+| ADR-083 | Platform provisioning and tenant lifecycle | Accepted |
+| ADR-084 | Finance correction and soft-delete policy | Accepted |
+| ADR-085 | Tenant-scoped coaching projections | Accepted |
