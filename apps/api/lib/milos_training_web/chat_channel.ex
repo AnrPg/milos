@@ -5,18 +5,18 @@ defmodule MilosTrainingWeb.ChatChannel do
   alias MilosTraining.Application.SendMessage
 
   @impl true
-  def join("chat:thread:" <> thread_id, _payload, socket) do
+  def join("org:" <> topic_suffix, _payload, socket) do
     user_id = socket.assigns.current_user.id
 
-    case Messaging.get_thread(thread_id, user_id) do
-      {:ok, thread} ->
+    with [organization_id, "chat", "thread", thread_id] <-
+           String.split(topic_suffix, ":", parts: 4),
+         %{organization_id: ^organization_id} <- socket.assigns[:tenant_context],
+         {:ok, thread} <- Messaging.get_thread(thread_id, user_id),
+         ^organization_id <- thread.organization_id do
         {:ok, %{thread_id: thread.id}, assign(socket, :thread_id, thread.id)}
-
-      {:error, :not_found} ->
-        {:error, %{reason: "not_found"}}
-
-      {:error, :forbidden} ->
-        {:error, %{reason: "forbidden"}}
+    else
+      {:error, :not_found} -> {:error, %{reason: "not_found"}}
+      _reason -> {:error, %{reason: "forbidden"}}
     end
   end
 

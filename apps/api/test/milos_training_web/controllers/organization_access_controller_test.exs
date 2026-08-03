@@ -51,8 +51,9 @@ defmodule MilosTrainingWeb.OrganizationAccessControllerTest do
       |> put_bearer_token(context.member)
       |> get("/api/memberships")
 
-    assert [%{"organization" => %{"slug" => ^slug}, "role" => "member"}] =
-             json_response(memberships, 200)
+    assert Enum.any?(json_response(memberships, 200), fn entry ->
+             entry["organization"]["slug"] == slug and entry["role"] == "member"
+           end)
   end
 
   test "organization paths validate membership instead of trusting the slug", context do

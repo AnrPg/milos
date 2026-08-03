@@ -36,8 +36,10 @@ defmodule MilosTraining.OrganizationsTest do
     assert Organizations.get_by_id(context.organization.id).slug == context.organization.slug
     assert Organizations.get_by_slug(context.organization.slug).id == context.organization.id
 
-    assert [%{membership: %{role: :owner}}] =
-             Organizations.list_memberships(context.owner.id)
+    assert Enum.any?(Organizations.list_memberships(context.owner.id), fn entry ->
+             entry.organization.id == context.organization.id and
+               entry.membership.role == :owner
+           end)
 
     assert %TenantContext{membership_id: membership_id} = context.context
     assert membership_id == context.owner_membership.id

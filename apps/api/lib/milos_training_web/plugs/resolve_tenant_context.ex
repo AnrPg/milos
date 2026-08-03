@@ -9,6 +9,7 @@ defmodule MilosTrainingWeb.Plugs.ResolveTenantContext do
 
   def call(conn, _opts) do
     account = GuardianPlug.current_resource(conn)
+
     slug =
       conn.path_params["organization_slug"] ||
         List.first(get_req_header(conn, "x-organization-slug")) ||

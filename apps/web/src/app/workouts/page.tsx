@@ -22,7 +22,7 @@ import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
 import { isFreeTextWorkout, storeFreeTextExecutionWorkout } from "@/lib/free-text-execution";
-import { subscribeToTopic } from "@/lib/realtime";
+import { organizationTopic, subscribeToTopic } from "@/lib/realtime";
 import { useExecutionStore } from "@/stores/execution";
 
 type Step = "type" | "week" | "preview";
@@ -242,7 +242,10 @@ function WorkoutsPageContent() {
   useEffect(() => {
     if (step !== "week" || !accessToken) return;
 
-    return subscribeToTopic(accessToken, "schedule:lobby", {
+    const topic = organizationTopic(accessToken, "schedule");
+    if (!topic) return;
+
+    return subscribeToTopic(accessToken, topic, {
       schedule_refresh: () => {
         void loadWeek();
       },

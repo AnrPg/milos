@@ -441,6 +441,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         })
 
       {:ok, admin} = Identity.update_role(admin, :admin)
+      {:ok, _membership} = Organizations.ensure_legacy_membership(admin, :owner)
 
       {:ok, athlete} =
         Identity.register(%{
@@ -472,6 +473,8 @@ defmodule MilosTrainingWeb.AuthControllerTest do
           role: :member
         })
 
+      {:ok, _membership} = Organizations.ensure_legacy_membership(member, :member)
+
       {:ok, athlete} =
         Identity.register(%{
           nickname: "artemis",
@@ -499,6 +502,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         })
 
       {:ok, admin} = Identity.update_role(admin, :admin)
+      {:ok, _membership} = Organizations.ensure_legacy_membership(admin, :owner)
 
       {:ok, access_token, _claims} =
         Guardian.encode_and_sign(admin, %{"sv" => admin.security_version}, token_type: "access")

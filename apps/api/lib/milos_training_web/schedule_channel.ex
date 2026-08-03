@@ -2,10 +2,13 @@ defmodule MilosTrainingWeb.ScheduleChannel do
   use Phoenix.Channel
 
   @impl true
-  def join("schedule:lobby", _payload, socket) do
-    case socket.assigns[:current_user] do
-      %{role: role} when role in [:member, :admin, :athlete] -> {:ok, socket}
-      _ -> {:error, %{reason: "unauthorized"}}
+  def join("org:" <> topic_suffix, _payload, socket) do
+    with [organization_id, "schedule"] <- String.split(topic_suffix, ":", parts: 2),
+         %{organization_id: ^organization_id, role: role} <- socket.assigns[:tenant_context],
+         true <- role in [:owner, :admin, :coach, :member, :athlete] do
+      {:ok, socket}
+    else
+      _reason -> {:error, %{reason: "unauthorized"}}
     end
   end
 end
