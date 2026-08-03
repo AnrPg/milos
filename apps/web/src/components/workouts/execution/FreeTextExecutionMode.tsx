@@ -52,6 +52,7 @@ export function FreeTextExecutionMode() {
   const [workSeconds, setWorkSeconds] = useState(20);
   const [restSeconds, setRestSeconds] = useState(10);
   const [intervalSeconds, setIntervalSeconds] = useState(60);
+  const intervalMinutes = Math.max(1, Math.round(intervalSeconds / 60));
   const [status, setStatus] = useState<TimerStatus>("idle");
   const [elapsedMs, setElapsedMs] = useState(0);
   const startedAtRef = useRef<number | null>(null);
@@ -196,7 +197,16 @@ export function FreeTextExecutionMode() {
                   <NumberField label={i18n("roundsLabel")} value={rounds} min={1} onChange={setRounds} />
                 ) : null}
                 {usesInterval(format) ? (
-                  <NumberField label={i18n("intervalSecondsLabel")} value={intervalSeconds} min={5} onChange={setIntervalSeconds} />
+                  format === "complex_emom" ? (
+                    <NumberField
+                      label={i18n("complexEmomIntervalLabel", { minutes: intervalMinutes })}
+                      value={intervalMinutes}
+                      min={1}
+                      onChange={(value) => setIntervalSeconds(value * 60)}
+                    />
+                  ) : (
+                    <NumberField label={i18n("intervalSecondsLabel")} value={intervalSeconds} min={5} onChange={setIntervalSeconds} />
+                  )
                 ) : null}
                 {usesWorkRest(format) ? (
                   <>
@@ -325,6 +335,14 @@ function phaseLabel(
   if (format === "untimed") return i18n("manual4e836fd");
   if (usesInterval(format)) {
     const currentRound = Math.min(rounds, Math.floor(elapsedSeconds / intervalSeconds) + 1);
+    if (format === "complex_emom") {
+      return [
+        i18n("complexEmomIntervalLabel", {
+          minutes: Math.max(1, Math.round(intervalSeconds / 60)),
+        }),
+        i18n("timerRoundLabel", { round: currentRound, rounds }),
+      ].join(" · ");
+    }
     return i18n("timerRoundLabel", { round: currentRound, rounds });
   }
   if (usesWorkRest(format)) {

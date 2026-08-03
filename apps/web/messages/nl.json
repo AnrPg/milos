@@ -2520,6 +2520,7 @@
     "durationMinutesLabel": "Duration (minutes)",
     "roundsLabel": "Rounds",
     "intervalSecondsLabel": "Interval seconds",
+    "complexEmomIntervalLabel": "E{minutes}MOM",
     "workSecondsLabel": "Work seconds",
     "restSecondsLabel": "Rest seconds",
     "remainingTimeLabel": "{time} remaining",
