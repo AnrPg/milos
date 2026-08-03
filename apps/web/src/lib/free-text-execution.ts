@@ -3,6 +3,9 @@ export type FreeTextExecutionWorkout = {
   title: string;
   type?: string | null;
   body: string;
+  execution_id?: string | null;
+  source?: "class_booking" | "assigned" | "self_selected" | string | null;
+  source_reference_id?: string | null;
 };
 
 const STORAGE_KEY = "milos:free-text-execution";
@@ -12,6 +15,10 @@ export function storeFreeTextExecutionWorkout(workout: {
   title: string;
   type?: string | null;
   free_text_body?: string | null;
+}, execution?: {
+  id?: string | null;
+  source?: string | null;
+  source_reference_id?: string | null;
 }) {
   if (typeof window === "undefined") return;
 
@@ -20,9 +27,23 @@ export function storeFreeTextExecutionWorkout(workout: {
     title: workout.title,
     type: workout.type ?? null,
     body: workout.free_text_body ?? "",
+    execution_id: execution?.id ?? null,
+    source: execution?.source ?? null,
+    source_reference_id: execution?.source_reference_id ?? null,
   };
 
   window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+}
+
+export function clearFreeTextExecutionWorkout(workoutId?: string | null) {
+  if (typeof window === "undefined") return;
+  if (!workoutId) {
+    window.sessionStorage.removeItem(STORAGE_KEY);
+    return;
+  }
+
+  const current = readFreeTextExecutionWorkout(workoutId);
+  if (current) window.sessionStorage.removeItem(STORAGE_KEY);
 }
 
 export function readFreeTextExecutionWorkout(workoutId?: string | null) {

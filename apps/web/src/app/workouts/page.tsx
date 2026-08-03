@@ -276,8 +276,14 @@ function WorkoutsPageContent() {
 
     try {
       if (isFreeTextWorkout(selectedWorkout)) {
-        storeFreeTextExecutionWorkout(selectedWorkout);
-        router.push(`/workouts/free-text/execute?workout=${selectedWorkout.id}`);
+        const execution = await startExecution(tokens.access_token, {
+          master_workout_id: selectedWorkout.id,
+          scale_level_slug: selectedScale,
+          source: "self_selected",
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        });
+        storeFreeTextExecutionWorkout(selectedWorkout, execution);
+        router.push(`/workouts/free-text/execute?workout=${selectedWorkout.id}&execution=${execution.id}`);
         return;
       }
 

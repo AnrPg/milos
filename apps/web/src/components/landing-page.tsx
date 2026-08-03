@@ -905,64 +905,9 @@ export function LandingPage() {
                 eyebrow={i18n("workoutHistory4c84737")}
                 title={i18n("recentCompletions4866ac5")}
               >
-
-                <div className="mb-6 flex items-center justify-end gap-4">
-                  <button
-                    aria-label={historyExportOpen && historyExportQuery.isPending ? shareExport.copy.working : i18n("exportFullWorkoutHistory")}
-                    className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-opacity hover:opacity-80 disabled:cursor-wait disabled:opacity-50"
-                    disabled={historyExportOpen && historyExportQuery.isPending}
-                    onClick={() => setHistoryExportOpen(true)}
-                    style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--dim)" }}
-                    title={historyExportOpen && historyExportQuery.isPending ? shareExport.copy.working : i18n("exportFullWorkoutHistory")}
-                    type="button"
-                  >
-                    {historyExportOpen && historyExportQuery.isPending ? (
-                      <svg aria-hidden="true" className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" fill="none" r="9" stroke="currentColor" strokeOpacity="0.25" strokeWidth="2" />
-                        <path d="M12 3a9 9 0 0 1 9 9" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
-                      </svg>
-                    ) : (
-                      <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
-                        <path d="M12 3v11m0 0 4-4m-4 4-4-4M5 15v4h14v-4" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" />
-                      </svg>
-                    )}
-                  </button>
-                  <div
-                    className="flex rounded-xl overflow-hidden"
-                    style={{ border: "1px solid var(--border)" }}
-                  >
-                    <button
-                      type="button"
-                      aria-label={i18n("gridView8da0c5d")}
-                      title={i18n("gridView8da0c5d")}
-                      onClick={() => setHistoryView("grid")}
-                      className="px-3 py-1.5 text-sm font-semibold"
-                      style={{
-                        background: historyView === "grid" ? "var(--primary)" : "var(--panel-muted)",
-                        color: historyView === "grid" ? "var(--primary-contrast)" : "var(--muted)",
-                      }}
-                    >
-                      ⊞
-                    </button>
-                    <button
-                      type="button"
-                      aria-label={i18n("listViewd5d2df9")}
-                      title={i18n("listViewd5d2df9")}
-                      onClick={() => setHistoryView("list")}
-                      className="px-3 py-1.5 text-sm font-semibold"
-                      style={{
-                        background: historyView === "list" ? "var(--primary)" : "var(--panel-muted)",
-                        color: historyView === "list" ? "var(--primary-contrast)" : "var(--muted)",
-                      }}
-                    >
-                      ≡
-                    </button>
-                  </div>
-                </div>
-
                 {/* Filters */}
-                <div>
-                  <div className="flex flex-wrap gap-2">
+                <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex min-w-0 flex-wrap gap-2">
                     {/* Date preset chips */}
                     {(["all", "week", "month"] as const).map((d) => {
                       const hasData = d === "all" || datePresetHasData(d);
@@ -1044,6 +989,59 @@ export function LandingPage() {
                         })}
                       </>
                     ) : null}
+                  </div>
+                  <div className="ms-auto flex shrink-0 items-center gap-4">
+                    <button
+                      aria-label={historyExportOpen && historyExportQuery.isPending ? shareExport.copy.working : i18n("exportFullWorkoutHistory")}
+                      className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-opacity hover:opacity-80 disabled:cursor-wait disabled:opacity-50"
+                      disabled={historyExportOpen && historyExportQuery.isPending}
+                      onClick={() => setHistoryExportOpen(true)}
+                      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--dim)" }}
+                      title={historyExportOpen && historyExportQuery.isPending ? shareExport.copy.working : i18n("exportFullWorkoutHistory")}
+                      type="button"
+                    >
+                      {historyExportOpen && historyExportQuery.isPending ? (
+                        <svg aria-hidden="true" className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                          <circle cx="12" cy="12" fill="none" r="9" stroke="currentColor" strokeOpacity="0.25" strokeWidth="2" />
+                          <path d="M12 3a9 9 0 0 1 9 9" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+                        </svg>
+                      ) : (
+                        <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
+                          <path d="M12 3v11m0 0 4-4m-4 4-4-4M5 15v4h14v-4" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" />
+                        </svg>
+                      )}
+                    </button>
+                    <div
+                      className="flex overflow-hidden rounded-xl"
+                      style={{ border: "1px solid var(--border)" }}
+                    >
+                      <button
+                        type="button"
+                        aria-label={i18n("gridView8da0c5d")}
+                        title={i18n("gridView8da0c5d")}
+                        onClick={() => setHistoryView("grid")}
+                        className="px-3 py-1.5 text-sm font-semibold"
+                        style={{
+                          background: historyView === "grid" ? "var(--primary)" : "var(--panel-muted)",
+                          color: historyView === "grid" ? "var(--primary-contrast)" : "var(--muted)",
+                        }}
+                      >
+                        ⊞
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={i18n("listViewd5d2df9")}
+                        title={i18n("listViewd5d2df9")}
+                        onClick={() => setHistoryView("list")}
+                        className="px-3 py-1.5 text-sm font-semibold"
+                        style={{
+                          background: historyView === "list" ? "var(--primary)" : "var(--panel-muted)",
+                          color: historyView === "list" ? "var(--primary-contrast)" : "var(--muted)",
+                        }}
+                      >
+                        ≡
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -1293,6 +1291,9 @@ export function LandingPage() {
                           activeScaleOverride={selectedExecution.scale_level_slug}
                           hideScaleChips
                           sections={selectedExecution.workout.sections}
+                          authoringMode={selectedExecution.workout.authoring_mode}
+                          freeTextBody={selectedExecution.workout.free_text_body}
+                          freeTextDocument={selectedExecution.workout.free_text_document}
                         />
                       </div>
                     </div>

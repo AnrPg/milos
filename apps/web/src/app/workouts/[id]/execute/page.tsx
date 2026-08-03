@@ -10,6 +10,7 @@ import { fetchExecution, fetchTimerSequence } from "@/api/executions";
 import { AuthGuard } from "@/components/auth-guard";
 import { ExecutionMode } from "@/components/workouts/execution/ExecutionMode";
 import { useSession } from "@/components/session-provider";
+import { storeFreeTextExecutionWorkout } from "@/lib/free-text-execution";
 import { useExecutionStore } from "@/stores/execution";
 
 function ExecutePageContent() {
@@ -47,6 +48,16 @@ function ExecutePageContent() {
 
         if (!execution.master_workout_id) {
           router.replace("/workouts");
+          return;
+        }
+
+        if (execution.workout?.authoring_mode === "free_text") {
+          storeFreeTextExecutionWorkout(execution.workout, execution);
+          const params = new URLSearchParams({
+            workout: execution.master_workout_id,
+            execution: execution.id,
+          });
+          router.replace(`/workouts/free-text/execute?${params.toString()}`);
           return;
         }
 

@@ -1,4 +1,9 @@
-type ExecutionCandidate = { id: string; status: string };
+type ExecutionCandidate = {
+  id: string;
+  status: string;
+  master_workout_id?: string | null;
+  workout?: { authoring_mode?: string | null } | null;
+};
 type ScheduleCandidate = {
   id: string;
   scheduled_at: string;
@@ -26,6 +31,17 @@ const TWO_HOURS_MS = 2 * 60 * 60 * 1_000;
 export function workoutCta(input: WorkoutCtaInput): WorkoutCta | null {
   const activeExecution = input.executions.find((execution) => execution.status !== "completed");
   if (activeExecution) {
+    if (
+      activeExecution.workout?.authoring_mode === "free_text" &&
+      activeExecution.master_workout_id
+    ) {
+      const params = new URLSearchParams({
+        workout: activeExecution.master_workout_id,
+        execution: activeExecution.id,
+      });
+      return { href: `/workouts/free-text/execute?${params.toString()}`, label: "resume" };
+    }
+
     return { href: `/workouts/${activeExecution.id}/execute`, label: "resume" };
   }
 

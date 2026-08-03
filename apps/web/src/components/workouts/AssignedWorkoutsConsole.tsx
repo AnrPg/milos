@@ -746,8 +746,14 @@ export function AssignedWorkoutsConsole({
 
     try {
       if (isFreeTextWorkout(assignment.workout)) {
-        storeFreeTextExecutionWorkout(assignment.workout);
-        router.push(`/workouts/free-text/execute?workout=${assignment.workout.id}`);
+        const execution = await startExecution(tokens.access_token, {
+          master_workout_id: assignment.workout.id,
+          source: "assigned",
+          source_reference_id: assignment.id,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        });
+        storeFreeTextExecutionWorkout(assignment.workout, execution);
+        router.push(`/workouts/free-text/execute?workout=${assignment.workout.id}&execution=${execution.id}`);
         return;
       }
 

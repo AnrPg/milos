@@ -3,15 +3,23 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+import {
+  completeExecution as completeExecutionRequest,
+  fetchExecution,
+  startExecution,
+  type SectionScore,
+} from "@/api/executions";
 import { fetchWorkout } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 import {
+  clearFreeTextExecutionWorkout,
   readFreeTextExecutionWorkout,
   storeFreeTextExecutionWorkout,
   type FreeTextExecutionWorkout,
 } from "@/lib/free-text-execution";
 import type { SectionFormat } from "@/types/workout";
+import { FinishWizard } from "./FinishWizard";
 
 const TIMER_FORMATS: SectionFormat[] = [
   "untimed",
@@ -43,6 +51,7 @@ export function FreeTextExecutionMode() {
   const searchParams = useSearchParams();
   const { tokens } = useSession();
   const workoutId = searchParams.get("workout");
+  const executionId = searchParams.get("execution");
   const [workout, setWorkout] = useState<FreeTextExecutionWorkout | null>(() =>
     readFreeTextExecutionWorkout(workoutId),
   );
@@ -55,24 +64,55 @@ export function FreeTextExecutionMode() {
   const intervalMinutes = Math.max(1, Math.round(intervalSeconds / 60));
   const [status, setStatus] = useState<TimerStatus>("idle");
   const [elapsedMs, setElapsedMs] = useState(0);
+  const [showFinishWizard, setShowFinishWizard] = useState(false);
+  const [isSavingCompletion, setIsSavingCompletion] = useState(false);
+  const [completionFeedback, setCompletionFeedback] = useState<string | null>(null);
   const startedAtRef = useRef<number | null>(null);
   const carriedElapsedRef = useRef(0);
   const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (workout || !tokens?.access_token || !workoutId) return;
+    if (workout?.execution_id || !tokens?.access_token || !workoutId) return;
 
-    fetchWorkout(tokens.access_token, workoutId)
-      .then((record) => {
+    const accessToken = tokens.access_token;
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    let cancelled = false;
+
+    async function recoverWorkout() {
+      try {
+        const record = await fetchWorkout(accessToken, workoutId!);
         if (record.authoring_mode !== "free_text") {
           router.replace("/workouts");
           return;
         }
-        storeFreeTextExecutionWorkout(record);
+
+        const execution = executionId
+          ? await fetchExecution(accessToken, executionId)
+          : await startExecution(accessToken, {
+              master_workout_id: record.id,
+              source: "self_selected",
+              timezone,
+            });
+
+        if (execution.master_workout_id !== record.id) {
+          router.replace("/workouts");
+          return;
+        }
+
+        if (cancelled) return;
+        storeFreeTextExecutionWorkout(record, execution);
         setWorkout(readFreeTextExecutionWorkout(workoutId));
-      })
-      .catch(() => router.replace("/workouts"));
-  }, [router, tokens?.access_token, workout, workoutId]);
+      } catch {
+        if (!cancelled) router.replace("/workouts");
+      }
+    }
+
+    void recoverWorkout();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [executionId, router, tokens?.access_token, workout?.execution_id, workoutId]);
 
   useEffect(() => {
     if (status !== "running") {
@@ -133,11 +173,59 @@ export function FreeTextExecutionMode() {
     setStatus("idle");
   }
 
+  function beginFinish() {
+    if (status === "running") pause();
+    setCompletionFeedback(null);
+    setShowFinishWizard(true);
+  }
+
+  async function confirmFinish(editedScores: SectionScore[]) {
+    if (!tokens?.access_token || !workout?.execution_id) {
+      setCompletionFeedback(i18n("workoutCompletionCouldNotBeSavedTryAgaindce610c"));
+      return;
+    }
+
+    setIsSavingCompletion(true);
+    setCompletionFeedback(null);
+
+    try {
+      await completeExecutionRequest(tokens.access_token, workout.execution_id, {
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        checked_exercise_ids: [],
+        section_scores: editedScores,
+        total_elapsed_ms: elapsedMs,
+        section_elapsed_ms: {},
+        segment_cycle_counts: {},
+      });
+      clearFreeTextExecutionWorkout(workout.id);
+      router.push("/");
+    } catch (error) {
+      setCompletionFeedback(
+        error instanceof Error ? error.message : i18n("workoutCompletionCouldNotBeSavedTryAgaindce610c"),
+      );
+    } finally {
+      setIsSavingCompletion(false);
+    }
+  }
+
   if (!workout) {
     return (
       <div className="flex min-h-screen items-center justify-center px-6 text-sm" style={{ background: "var(--bg)", color: "var(--muted)" }}>
         {i18n("recoveringWorkoutSessionc78ae35")}
       </div>
+    );
+  }
+
+  if (showFinishWizard) {
+    return (
+      <FinishWizard
+        scores={[]}
+        segments={[]}
+        initialModifications={[]}
+        isSaving={isSavingCompletion}
+        feedback={completionFeedback}
+        onConfirm={confirmFinish}
+      />
     );
   }
 
@@ -153,7 +241,7 @@ export function FreeTextExecutionMode() {
             {i18n("authoringModeFreeText")}
           </div>
         </div>
-        <button type="button" onClick={() => router.push("/")} className="rounded-xl px-3 py-2 text-sm" style={{ color: "var(--primary)" }}>
+        <button type="button" onClick={beginFinish} className="rounded-xl px-3 py-2 text-sm" style={{ color: "var(--primary)" }}>
           {i18n("donee9b450d")}
         </button>
       </header>

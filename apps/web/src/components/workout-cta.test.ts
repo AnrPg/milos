@@ -17,6 +17,28 @@ describe("workoutCta", () => {
     ).toEqual({ href: "/workouts/execution-1/execute", label: "resume" });
   });
 
+  it("resumes an active free-text execution in the free-text runner", () => {
+    expect(
+      workoutCta({
+        role: "athlete",
+        now,
+        executions: [
+          {
+            id: "execution-free-text",
+            status: "active",
+            master_workout_id: "workout-free-text",
+            workout: { authoring_mode: "free_text" },
+          },
+        ],
+        scheduleSlots: [],
+        assignments: [],
+      }),
+    ).toEqual({
+      href: "/workouts/free-text/execute?workout=workout-free-text&execution=execution-free-text",
+      label: "resume",
+    });
+  });
+
   it("offers logging for an approved booked class within two hours", () => {
     expect(
       workoutCta({
