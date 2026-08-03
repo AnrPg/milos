@@ -11,6 +11,19 @@ defmodule MilosTraining.Release do
     end
   end
 
+  def ensure_legacy_organization do
+    load_app()
+
+    for repo <- repos() do
+      {:ok, result, _started_apps} =
+        Ecto.Migrator.with_repo(repo, fn _repo ->
+          MilosTraining.Organizations.ensure_legacy_organization()
+        end)
+
+      result
+    end
+  end
+
   defp repos do
     Application.fetch_env!(@app, :ecto_repos)
   end

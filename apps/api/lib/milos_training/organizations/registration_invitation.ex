@@ -41,6 +41,28 @@ defmodule MilosTraining.Organizations.RegistrationInvitation do
     |> foreign_key_constraint(:issued_by_user_id)
   end
 
+  def redeem_changeset(invitation, user_id, redeemed_at) do
+    invitation
+    |> cast(%{redeemed_by_user_id: user_id, redeemed_at: redeemed_at}, [
+      :redeemed_by_user_id,
+      :redeemed_at
+    ])
+    |> validate_required([:redeemed_by_user_id, :redeemed_at])
+    |> foreign_key_constraint(:redeemed_by_user_id)
+    |> check_constraint(:redeemed_at,
+      name: :registration_invitations_terminal_state_check
+    )
+  end
+
+  def revoke_changeset(invitation, revoked_at) do
+    invitation
+    |> cast(%{revoked_at: revoked_at}, [:revoked_at])
+    |> validate_required([:revoked_at])
+    |> check_constraint(:revoked_at,
+      name: :registration_invitations_terminal_state_check
+    )
+  end
+
   defp validate_digest(changeset, field) do
     validate_change(changeset, field, fn ^field, digest ->
       if is_binary(digest) and byte_size(digest) == @sha256_bytes,

@@ -16,26 +16,42 @@ defmodule MilosTrainingWeb.Router do
     plug(Guardian.Plug.EnsureAuthenticated)
     plug(Guardian.Plug.LoadResource)
     plug(MilosTrainingWeb.Plugs.LoggerUserMetadata)
+    plug(MilosTrainingWeb.Plugs.AssignUserContext)
   end
 
   pipeline :auth_rate_limited do
     plug(MilosTrainingWeb.Plugs.RateLimit, max: 10, interval: 60_000)
   end
 
+  pipeline :invitation_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 10, interval: 60_000)
+  end
+
   pipeline :admin_only do
-    plug(MilosTrainingWeb.Plugs.RequireRole, roles: [:admin])
+    plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
+    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin])
   end
 
   pipeline :member_or_admin do
-    plug(MilosTrainingWeb.Plugs.RequireRole, roles: [:member, :admin])
+    plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
+    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin, :member])
   end
 
   pipeline :athlete_or_admin do
-    plug(MilosTrainingWeb.Plugs.RequireRole, roles: [:athlete, :admin])
+    plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
+    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin, :coach, :athlete])
   end
 
   pipeline :user_only do
-    plug(MilosTrainingWeb.Plugs.RequireRole, roles: [:member, :athlete, :admin])
+    plug(MilosTrainingWeb.Plugs.AssignUserContext)
+  end
+
+  pipeline :tenant_context do
+    plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
+  end
+
+  pipeline :organization_admin do
+    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin])
   end
 
   scope "/api" do
@@ -52,7 +68,9 @@ defmodule MilosTrainingWeb.Router do
 
     get("/nickname-available", AuthController, :nickname_available)
     post("/register", AuthController, :register)
+    post("/register-member", AuthController, :register_member)
     post("/register-admin", AuthController, :register_admin)
+    post("/invitations/inspect", OrganizationAccessController, :inspect)
     post("/login", AuthController, :login)
     post("/refresh", AuthController, :refresh)
     post("/logout", AuthController, :logout)
@@ -63,6 +81,25 @@ defmodule MilosTrainingWeb.Router do
 
     get("/me", AuthController, :me)
     post("/sign-out-all", AuthController, :sign_out_all)
+  end
+
+  scope "/api", MilosTrainingWeb do
+    pipe_through([:api, :authenticated])
+
+    get("/memberships", OrganizationAccessController, :memberships)
+  end
+
+  scope "/api", MilosTrainingWeb do
+    pipe_through([:api, :authenticated, :invitation_rate_limited])
+
+    post("/memberships/redeem", OrganizationAccessController, :redeem)
+  end
+
+  scope "/api/org/:organization_slug", MilosTrainingWeb do
+    pipe_through([:api, :authenticated, :tenant_context, :organization_admin])
+
+    post("/invitations", OrganizationAccessController, :issue)
+    delete("/invitations/:id", OrganizationAccessController, :revoke)
   end
 
   scope "/api/me", MilosTrainingWeb do

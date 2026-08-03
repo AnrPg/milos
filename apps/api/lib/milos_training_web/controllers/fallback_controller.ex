@@ -88,6 +88,12 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "not_found", error: "Not found"})
   end
 
+  def call(conn, {:error, :invalid_invitation}) do
+    conn
+    |> put_status(:not_found)
+    |> json(%{code: "invalid_invitation", error: "Invitation is invalid or unavailable"})
+  end
+
   def call(conn, {:error, :stale_dsl_revision}) do
     conn
     |> put_status(:conflict)
