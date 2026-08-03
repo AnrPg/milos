@@ -529,41 +529,49 @@ export function QuickTextWorkoutEditor({
           </div>
         </div>
 
-        <EditorToolbar editor={editor} onManualOpen={() => setManualOpen(true)} />
         <div
-          className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-2"
-          style={{ borderColor: "var(--dim)" }}
+          className="sticky top-[3.25rem] z-50"
+          style={{
+            background: "color-mix(in srgb, var(--bg) 96%, transparent)",
+            backdropFilter: "blur(12px)",
+          }}
         >
-          <div className="flex flex-wrap items-center gap-2">
-            <select
-              aria-label={i18n("quickTextTemplate")}
-              defaultValue=""
-              onChange={(event) => {
-                insertTemplate(
-                  event.target.value === "workout"
-                    ? manual?.templates?.workout ?? ""
-                    : manual?.templates?.sections?.[event.target.value] ?? "",
-                );
-                event.currentTarget.value = "";
-              }}
-              className="rounded-lg border px-3 py-2 text-sm"
-              style={{ background: "var(--card)", borderColor: "var(--dim)", color: "var(--text)" }}
-            >
-              <option value="">{i18n("quickTextInsertTemplate")}</option>
-              <option value="workout">{i18n("quickTextFullWorkoutTemplate")}</option>
-              {Object.keys(manual?.templates?.sections ?? {}).map((format) => (
-                <option key={format} value={format}>
-                  {format.replaceAll("_", " ")}
-                </option>
-              ))}
-            </select>
-            <span className="text-xs" style={{ color: "var(--muted)" }}>
-              {i18n("quickTextSlashHint")}
-            </span>
+          <EditorToolbar editor={editor} onManualOpen={() => setManualOpen(true)} />
+          <div
+            className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-2"
+            style={{ borderColor: "var(--dim)" }}
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              <select
+                aria-label={i18n("quickTextTemplate")}
+                defaultValue=""
+                onChange={(event) => {
+                  insertTemplate(
+                    event.target.value === "workout"
+                      ? manual?.templates?.workout ?? ""
+                      : manual?.templates?.sections?.[event.target.value] ?? "",
+                  );
+                  event.currentTarget.value = "";
+                }}
+                className="rounded-lg border px-3 py-2 text-sm"
+                style={{ background: "var(--card)", borderColor: "var(--dim)", color: "var(--text)" }}
+              >
+                <option value="">{i18n("quickTextInsertTemplate")}</option>
+                <option value="workout">{i18n("quickTextFullWorkoutTemplate")}</option>
+                {Object.keys(manual?.templates?.sections ?? {}).map((format) => (
+                  <option key={format} value={format}>
+                    {format.replaceAll("_", " ")}
+                  </option>
+                ))}
+              </select>
+              <span className="text-xs" style={{ color: "var(--muted)" }}>
+                {i18n("quickTextSlashHint")}
+              </span>
+            </div>
+            <button type="button" className="rounded-lg px-3 py-2 text-xs font-bold" style={{ background: "var(--card)", color: "var(--text)" }} onClick={() => setCorrectionsOpen((open) => !open)}>
+              {correctionsOpen ? i18n("hide34d8b60") : i18n("showd97d1ee")}
+            </button>
           </div>
-          <button type="button" className="rounded-lg px-3 py-2 text-xs font-bold" style={{ background: "var(--card)", color: "var(--text)" }} onClick={() => setCorrectionsOpen((open) => !open)}>
-            {correctionsOpen ? i18n("hide34d8b60") : i18n("showd97d1ee")}
-          </button>
         </div>
 
         <div

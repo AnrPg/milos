@@ -228,7 +228,14 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
                 <SemanticLabel value={workout.type} />
               </p>
               <div className="mt-3">
-                <WorkoutPreviewDetail sections={workout.sections} initiallyExpanded hideScaleChips />
+                <WorkoutPreviewDetail
+                  sections={workout.sections}
+                  initiallyExpanded
+                  hideScaleChips
+                  authoringMode={workout.authoring_mode}
+                  freeTextBody={workout.free_text_body}
+                  freeTextDocument={workout.free_text_document}
+                />
               </div>
             </section>
           ) : null}

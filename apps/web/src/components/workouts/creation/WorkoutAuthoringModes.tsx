@@ -40,7 +40,7 @@ export function WorkoutAuthoringModes() {
         aria-hidden
       />
       <div
-        className="fixed inset-x-0 top-[3.25rem] z-40 flex items-center justify-center gap-1 border-b px-4 py-2 transition-transform duration-200"
+        className="fixed inset-x-0 top-[7.25rem] z-30 flex items-center justify-center gap-1 border-b px-4 py-2 transition-transform duration-200"
         onFocus={() => setModeBarVisible(true)}
         onMouseEnter={() => setModeBarVisible(true)}
         onMouseLeave={() => setModeBarVisible(false)}

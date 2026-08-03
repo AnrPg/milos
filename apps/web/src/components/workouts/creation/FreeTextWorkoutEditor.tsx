@@ -302,7 +302,7 @@ function FreeTextToolbar({ editor }: { editor: Editor | null }) {
 
   return (
     <div
-      className="sticky top-0 z-20 flex flex-wrap gap-1 border-b px-4 py-2"
+      className="sticky top-[3.25rem] z-50 flex flex-wrap gap-1 border-b px-4 py-2"
       style={{
         borderColor: "var(--dim)",
         background: "color-mix(in srgb, var(--bg) 96%, transparent)",

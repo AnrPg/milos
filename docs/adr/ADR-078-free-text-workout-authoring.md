@@ -54,3 +54,10 @@ publication is allowed only for nonblank `free_text_body`. The frontend adds a
 third authoring tab with a Tiptap rich-text editor, text-only preview rendering,
 and a local execution surface with selectable timer formats. No technical debt was
 deferred.
+
+Follow-up implementation hardening on 2026-08-03 fixed missed preview entry
+points so library and assignment side panels forward `authoring_mode`,
+`free_text_body`, and `free_text_document` into the shared preview renderer. The
+Quick Text and Free Text editor toolbars are kept as the top sticky authoring
+controls below global navigation; transient authoring-mode tabs render beneath
+that toolbar layer instead of covering wrapped toolbar rows.

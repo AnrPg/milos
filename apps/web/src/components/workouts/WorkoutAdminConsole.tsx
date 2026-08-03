@@ -579,7 +579,13 @@ export function WorkoutAdminConsole() {
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto px-6 py-5">
-                <WorkoutPreviewDetail sections={pw.sections} initiallyExpanded />
+                <WorkoutPreviewDetail
+                  sections={pw.sections}
+                  initiallyExpanded
+                  authoringMode={pw.authoring_mode}
+                  freeTextBody={pw.free_text_body}
+                  freeTextDocument={pw.free_text_document}
+                />
               </div>
             </aside>
           </>
