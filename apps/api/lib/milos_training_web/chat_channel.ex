@@ -12,7 +12,7 @@ defmodule MilosTrainingWeb.ChatChannel do
          %{organization_id: ^organization_id} <- socket.assigns[:tenant_context],
          {:ok, thread} <- Messaging.get_thread(thread_id, user_id),
          ^organization_id <- thread.organization_id do
-        {:ok, %{thread_id: thread.id}, assign(socket, :thread_id, thread.id)}
+      {:ok, %{thread_id: thread.id}, assign(socket, :thread_id, thread.id)}
     else
       {:error, :not_found} -> {:error, %{reason: "not_found"}}
       _reason -> {:error, %{reason: "forbidden"}}

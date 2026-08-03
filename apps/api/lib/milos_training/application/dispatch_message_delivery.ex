@@ -39,12 +39,12 @@ defmodule MilosTraining.Application.DispatchMessageDelivery do
       "chat:#{thread.organization_id}:thread:#{message.thread_id}",
       "new_message",
       %{
-      id: message.id,
-      thread_id: message.thread_id,
-      sender_id: message.sender_id,
-      body: message.body,
-      message_type: message.message_type,
-      inserted_at: message.inserted_at
+        id: message.id,
+        thread_id: message.thread_id,
+        sender_id: message.sender_id,
+        body: message.body,
+        message_type: message.message_type,
+        inserted_at: message.inserted_at
       }
     )
   end

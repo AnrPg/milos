@@ -9,9 +9,9 @@ defmodule MilosTrainingWeb.Realtime do
         legacy_organization_id()
 
     Endpoint.broadcast("schedule:#{organization_id}", "schedule:refresh", %{
-        event: event,
-        payload: payload
-      })
+      event: event,
+      payload: payload
+    })
   end
 
   def broadcast_notification_changed(user_id) do
