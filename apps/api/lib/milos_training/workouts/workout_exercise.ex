@@ -12,6 +12,7 @@ defmodule MilosTraining.Workouts.WorkoutExercise do
   @item_types [:exercise, :header]
 
   schema "workout_exercises" do
+    field :organization_id, :binary_id
     field :name, :string
     field :item_type, Ecto.Enum, values: @item_types, default: :exercise
     field :sets, :integer

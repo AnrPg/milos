@@ -6,6 +6,7 @@ defmodule MilosTraining.Finance.Membership do
   @foreign_key_type :binary_id
 
   schema "memberships" do
+    field :organization_id, :binary_id
     field :user_id, :binary_id
     field :user_type_snapshot, :string
     field :status, :string, default: "trial"

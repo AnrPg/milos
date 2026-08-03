@@ -5,6 +5,7 @@ defmodule MilosTraining.Scheduling.SchedulingSetting do
   @primary_key {:id, :binary_id, autogenerate: true}
 
   schema "scheduling_settings" do
+    field :organization_id, :binary_id
     field :default_capacity, :integer, default: 12
     field :default_auto_approve, :boolean, default: false
     field :default_booking_timeout_minutes, :integer, default: 60

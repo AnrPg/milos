@@ -6,6 +6,7 @@ defmodule MilosTraining.Gamification.ChallengeLeaderboardOptIn do
   @foreign_key_type :binary_id
 
   schema "challenge_leaderboard_opt_ins" do
+    field :organization_id, :binary_id
     field :user_id, :binary_id
     field :challenge_id, :binary_id
     field :inserted_at, :utc_datetime_usec, autogenerate: {DateTime, :utc_now, []}

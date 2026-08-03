@@ -6,6 +6,7 @@ defmodule MilosTraining.Analytics.CommunicationMessage do
   @foreign_key_type :binary_id
 
   schema "communication_messages" do
+    field :organization_id, :binary_id
     field :thread_id, :binary_id
     field :sender_id, :binary_id
     field :recipient_id, :binary_id

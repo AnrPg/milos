@@ -8,6 +8,7 @@ defmodule MilosTraining.Scheduling.ClassSeries do
   @foreign_key_type :binary_id
 
   schema "class_series" do
+    field :organization_id, :binary_id
     field :master_workout_id, :binary_id
     field :name, :string
     field :duration_minutes, :integer

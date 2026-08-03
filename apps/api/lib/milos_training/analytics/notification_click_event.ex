@@ -6,6 +6,7 @@ defmodule MilosTraining.Analytics.NotificationClickEvent do
   @foreign_key_type :binary_id
 
   schema "notification_click_events" do
+    field :organization_id, :binary_id
     field :notification_id, :binary_id
     field :user_id, :binary_id
     field :url, :string

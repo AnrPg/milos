@@ -6,6 +6,7 @@ defmodule MilosTraining.Scheduling.ClassAttendanceRecord do
   @foreign_key_type :binary_id
 
   schema "class_attendance_records" do
+    field :organization_id, :binary_id
     field :scheduled_class_id, :binary_id
     field :booking_id, :binary_id
     field :user_id, :binary_id

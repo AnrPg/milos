@@ -6,6 +6,7 @@ defmodule MilosTraining.Messaging.Participant do
   @foreign_key_type :binary_id
 
   schema "messaging_participants" do
+    field :organization_id, :binary_id
     belongs_to :thread, MilosTraining.Messaging.Thread
     field :user_id, :binary_id
     field :last_read_message_id, :binary_id

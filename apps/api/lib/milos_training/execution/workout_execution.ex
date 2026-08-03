@@ -8,6 +8,7 @@ defmodule MilosTraining.Execution.WorkoutExecution do
   @statuses [:active, :paused, :completed]
 
   schema "workout_executions" do
+    field(:organization_id, :binary_id)
     field(:user_id, :binary_id)
     field(:master_workout_id, :binary_id)
     field(:scale_level_slug, :string)

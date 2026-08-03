@@ -7,6 +7,7 @@ defmodule MilosTraining.Finance.MembershipPackage do
   @foreign_key_type :binary_id
 
   schema "membership_packages" do
+    field :organization_id, :binary_id
     field :code, :string
     field :name, :string
     field :description, :string

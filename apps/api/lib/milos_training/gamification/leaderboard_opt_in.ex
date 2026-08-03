@@ -6,6 +6,7 @@ defmodule MilosTraining.Gamification.LeaderboardOptIn do
   @foreign_key_type :binary_id
 
   schema "leaderboard_opt_ins" do
+    field :organization_id, :binary_id
     field :user_id, :binary_id
     field :opted_in_at, :utc_datetime_usec
   end

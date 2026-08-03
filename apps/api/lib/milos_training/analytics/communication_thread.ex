@@ -6,6 +6,7 @@ defmodule MilosTraining.Analytics.CommunicationThread do
   @foreign_key_type :binary_id
 
   schema "communication_threads" do
+    field :organization_id, :binary_id
     field :context_type, :string
     field :context_id, :binary_id
     field :status, :string, default: "open"

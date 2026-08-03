@@ -6,6 +6,7 @@ defmodule MilosTraining.Finance.FinanceInvoice do
   @foreign_key_type :binary_id
 
   schema "finance_invoices" do
+    field :organization_id, :binary_id
     field :membership_id, :binary_id
     field :user_id, :binary_id
     field :membership_package_subscription_id, :binary_id

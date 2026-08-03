@@ -9,6 +9,7 @@ defmodule MilosTraining.Gamification.SeasonalChallenge do
   @criteria_types [:workout_count, :workout_type_count, :pr_count, :custom]
 
   schema "seasonal_challenges" do
+    field :organization_id, :binary_id
     field :title, :string
     field :description, :string
     field :criteria_type, Ecto.Enum, values: @criteria_types

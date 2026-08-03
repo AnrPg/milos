@@ -6,6 +6,7 @@ defmodule MilosTraining.Workouts.WorkoutFolder do
   @foreign_key_type :binary_id
 
   schema "workout_folders" do
+    field :organization_id, :binary_id
     field :name, :string
     field :parent_id, :binary_id
     field :created_by_id, :binary_id

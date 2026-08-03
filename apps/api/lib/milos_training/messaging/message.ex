@@ -8,6 +8,7 @@ defmodule MilosTraining.Messaging.Message do
   @foreign_key_type :binary_id
 
   schema "messaging_messages" do
+    field :organization_id, :binary_id
     belongs_to :thread, MilosTraining.Messaging.Thread
     field :sender_id, :binary_id
     field :body, :string

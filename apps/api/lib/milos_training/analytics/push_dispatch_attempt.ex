@@ -6,6 +6,7 @@ defmodule MilosTraining.Analytics.PushDispatchAttempt do
   @foreign_key_type :binary_id
 
   schema "push_dispatch_attempts" do
+    field :organization_id, :binary_id
     field :notification_id, :binary_id
     field :user_id, :binary_id
     field :endpoint_hash, :string

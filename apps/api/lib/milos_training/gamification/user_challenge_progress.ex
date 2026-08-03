@@ -6,6 +6,7 @@ defmodule MilosTraining.Gamification.UserChallengeProgress do
   @foreign_key_type :binary_id
 
   schema "user_challenge_progress" do
+    field :organization_id, :binary_id
     field :user_id, :binary_id
     field :challenge_id, :binary_id
     field :progress, :integer, default: 0

@@ -9,6 +9,7 @@ defmodule MilosTraining.Scheduling.Booking do
   @statuses [:pending, :approved, :rejected, :cancelled]
 
   schema "bookings" do
+    field :organization_id, :binary_id
     belongs_to :scheduled_class, ScheduledClass
     field :user_id, :binary_id
     field :status, Ecto.Enum, values: @statuses

@@ -6,6 +6,7 @@ defmodule MilosTraining.Wellbeing.InjuryReport do
   @foreign_key_type :binary_id
 
   schema "injury_reports" do
+    field :organization_id, :binary_id
     field :user_id, :binary_id
     field :reported_by_id, :binary_id
     field :reported_by_role, :string

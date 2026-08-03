@@ -8,6 +8,7 @@ defmodule MilosTraining.Messaging.Thread do
   @foreign_key_type :binary_id
 
   schema "messaging_threads" do
+    field :organization_id, :binary_id
     field :context_type, Ecto.Enum, values: @context_types
     field :context_id, :binary_id
     field :direct_key, :string

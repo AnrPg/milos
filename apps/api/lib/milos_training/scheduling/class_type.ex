@@ -6,6 +6,7 @@ defmodule MilosTraining.Scheduling.ClassType do
   @foreign_key_type :binary_id
 
   schema "class_types" do
+    field :organization_id, :binary_id
     field :name, :string
     field :slug, :string
     field :sort_order, :integer, default: 0

@@ -6,6 +6,7 @@ defmodule MilosTraining.Finance.FinanceCreditLedgerEntry do
   @foreign_key_type :binary_id
 
   schema "finance_credit_ledger_entries" do
+    field :organization_id, :binary_id
     field :membership_id, :binary_id
     field :user_id, :binary_id
     field :membership_payment_id, :binary_id

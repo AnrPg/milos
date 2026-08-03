@@ -5,6 +5,7 @@ defmodule MilosTraining.Finance.ReferralProgram do
   @primary_key {:id, :binary_id, autogenerate: true}
 
   schema "referral_programs" do
+    field :organization_id, :binary_id
     field :name, :string
     field :description, :string
     field :active, :boolean, default: true

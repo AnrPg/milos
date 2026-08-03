@@ -6,6 +6,7 @@ defmodule MilosTraining.Analytics.AnalyticsEvent do
   @foreign_key_type :binary_id
 
   schema "analytics_events" do
+    field :organization_id, :binary_id
     field :event_name, :string
     field :user_id, :binary_id
     field :actor_role_snapshot, :string

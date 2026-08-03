@@ -8,6 +8,7 @@ defmodule MilosTraining.Pantheon.PRRecord do
   @valid_units ~w(mins_secs reps sets kcals m kg)
 
   schema "user_pr_records" do
+    field(:organization_id, :binary_id)
     field(:user_id, :binary_id)
     field(:name, :string)
     field(:current_score, :decimal)

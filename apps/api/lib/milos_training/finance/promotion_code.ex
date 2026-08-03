@@ -6,6 +6,7 @@ defmodule MilosTraining.Finance.PromotionCode do
   @foreign_key_type :binary_id
 
   schema "promotion_codes" do
+    field :organization_id, :binary_id
     field :promotion_campaign_id, :binary_id
     field :code, :string
     field :discount_type, :string

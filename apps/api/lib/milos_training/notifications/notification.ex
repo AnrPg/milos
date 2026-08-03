@@ -27,6 +27,7 @@ defmodule MilosTraining.Notifications.Notification do
   ]
 
   schema "notifications" do
+    field :organization_id, :binary_id
     field :user_id, :binary_id
     field :type, Ecto.Enum, values: @types
     field :payload, :map, default: %{}

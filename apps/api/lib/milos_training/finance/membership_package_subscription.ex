@@ -6,6 +6,7 @@ defmodule MilosTraining.Finance.MembershipPackageSubscription do
   @foreign_key_type :binary_id
 
   schema "membership_package_subscriptions" do
+    field :organization_id, :binary_id
     field :membership_id, :binary_id
     field :membership_package_id, :binary_id
     field :status, :string, default: "active"

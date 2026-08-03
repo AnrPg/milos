@@ -6,6 +6,7 @@ defmodule MilosTraining.Pantheon.PRHistory do
   @foreign_key_type :binary_id
 
   schema "user_pr_history" do
+    field(:organization_id, :binary_id)
     field(:pr_record_id, :binary_id)
     field(:score, :decimal)
     field(:beaten_on, :date)

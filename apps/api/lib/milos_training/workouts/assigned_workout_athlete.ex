@@ -10,6 +10,7 @@ defmodule MilosTraining.Workouts.AssignedWorkoutAthlete do
   @athlete_statuses [:accepted, :rejected, :archived]
 
   schema "assigned_workout_athletes" do
+    field :organization_id, :binary_id
     field :athlete_id, :binary_id
     field :athlete_status, Ecto.Enum, values: @athlete_statuses
     field :scheduled_for, :date

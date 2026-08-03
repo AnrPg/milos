@@ -6,6 +6,7 @@ defmodule MilosTraining.Feedback.ReviewQuestionnaire do
   @foreign_key_type :binary_id
 
   schema "review_questionnaires" do
+    field :organization_id, :binary_id
     field :target_type, :string
     field :version, :integer, default: 1
     field :questions, {:array, :map}, default: []
