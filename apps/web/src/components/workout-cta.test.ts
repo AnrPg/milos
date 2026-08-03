@@ -46,7 +46,10 @@ describe("workoutCta", () => {
           { id: "assignment-1", scheduled_for: "2026-07-17", execution_status: null },
         ],
       }),
-    ).toEqual({ href: "/my-workouts", label: "log" });
+    ).toEqual({
+      href: "/my-workouts?open_assignment=assignment-1&date=2026-07-17",
+      label: "log",
+    });
   });
 
   it("hides the CTA without a qualifying trigger", () => {

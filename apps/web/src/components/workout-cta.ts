@@ -47,7 +47,13 @@ export function workoutCta(input: WorkoutCtaInput): WorkoutCta | null {
         assignment.my_athlete_status !== "rejected",
     );
 
-    if (dueAssignment) return { href: "/my-workouts", label: "log" };
+    if (dueAssignment) {
+      const params = new URLSearchParams({
+        open_assignment: dueAssignment.id,
+        date: dueAssignment.scheduled_for,
+      });
+      return { href: `/my-workouts?${params.toString()}`, label: "log" };
+    }
   }
 
   return null;
