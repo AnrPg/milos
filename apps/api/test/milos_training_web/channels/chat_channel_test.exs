@@ -42,7 +42,7 @@ defmodule MilosTrainingWeb.ChatChannelTest do
              subscribe_and_join(
                outsider_socket,
                ChatChannel,
-               "org:#{outsider_context.organization_id}:chat:thread:#{thread.id}"
+               "chat:#{outsider_context.organization_id}:thread:#{thread.id}"
              )
   end
 
@@ -81,14 +81,14 @@ defmodule MilosTrainingWeb.ChatChannelTest do
       subscribe_and_join(
         admin_socket,
         ChatChannel,
-        "org:#{admin_context.organization_id}:chat:thread:#{thread.id}"
+        "chat:#{admin_context.organization_id}:thread:#{thread.id}"
       )
 
     {:ok, _, _athlete_socket} =
       subscribe_and_join(
         athlete_socket,
         ChatChannel,
-        "org:#{athlete_context.organization_id}:chat:thread:#{thread.id}"
+        "chat:#{athlete_context.organization_id}:thread:#{thread.id}"
       )
 
     ref = Phoenix.ChannelTest.push(admin_socket, "typing_start", %{})

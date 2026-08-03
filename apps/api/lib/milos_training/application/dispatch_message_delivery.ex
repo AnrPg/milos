@@ -36,7 +36,7 @@ defmodule MilosTraining.Application.DispatchMessageDelivery do
 
   defp publish(message, thread) do
     RealtimePublisher.broadcast(
-      "org:#{thread.organization_id}:chat:thread:#{message.thread_id}",
+      "chat:#{thread.organization_id}:thread:#{message.thread_id}",
       "new_message",
       %{
       id: message.id,

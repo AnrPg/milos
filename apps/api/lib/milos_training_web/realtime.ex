@@ -1,6 +1,5 @@
 defmodule MilosTrainingWeb.Realtime do
   alias MilosTraining.Organizations
-  alias MilosTraining.Organizations.Domain.TenantTopics
   alias MilosTrainingWeb.Endpoint
 
   def broadcast_schedule_refresh(event, payload \\ %{}) do
@@ -9,14 +8,10 @@ defmodule MilosTrainingWeb.Realtime do
         Map.get(payload, "organization_id") ||
         legacy_organization_id()
 
-    Endpoint.broadcast(
-      TenantTopics.organization(organization_id, "schedule"),
-      "schedule:refresh",
-      %{
+    Endpoint.broadcast("schedule:#{organization_id}", "schedule:refresh", %{
         event: event,
         payload: payload
-      }
-    )
+      })
   end
 
   def broadcast_notification_changed(user_id) do

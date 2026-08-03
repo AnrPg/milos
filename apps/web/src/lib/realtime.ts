@@ -52,7 +52,13 @@ function organizationSlug(token: string) {
 export function organizationTopic(token: string, suffix: string) {
   const slug = organizationSlug(token);
   const membership = membershipClaims(token).find((entry) => entry.organization_slug === slug);
-  return membership ? `org:${membership.organization_id}:${suffix}` : null;
+  if (!membership) return null;
+  if (suffix === "schedule") return `schedule:${membership.organization_id}`;
+  if (suffix.startsWith("chat:thread:")) {
+    return `chat:${membership.organization_id}:thread:${suffix.slice("chat:thread:".length)}`;
+  }
+
+  return `org:${membership.organization_id}:${suffix}`;
 }
 
 function ensureSocket(token: string) {

@@ -4,11 +4,11 @@ defmodule MilosTrainingWeb.UserSocket do
   alias MilosTraining.Infrastructure.Auth.Guardian
   alias MilosTraining.Application.ResolveTenantContext
 
-  channel "org:*", MilosTrainingWeb.ScheduleChannel
+  channel "schedule:*", MilosTrainingWeb.ScheduleChannel
   channel "notifications:*", MilosTrainingWeb.NotificationChannel
   channel "sync:*", MilosTrainingWeb.SyncChannel
   channel "execution:*", MilosTrainingWeb.ExecutionChannel
-  channel "org:*", MilosTrainingWeb.ChatChannel
+  channel "chat:*", MilosTrainingWeb.ChatChannel
 
   @impl true
   def connect(%{"token" => token} = params, socket, _connect_info) when is_binary(token) do
