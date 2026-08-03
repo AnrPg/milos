@@ -325,6 +325,7 @@
     "activeCampaign6f5bb84": "קמפיין פעיל",
     "activeCampaignCount": "{count, plural, one {# קמפיין פעיל} other {# קמפיינים פעילים}}",
     "adminRegistration": "רישום מנהל",
+    "organization": "ארגון",
     "adminRegistrationCode": "קוד רישום מנהל",
     "adminRegistrationCodeHelp": "רק מי שקיבל קוד מבעל העסק יכול ליצור חשבון מנהל.",
     "createAdminAccount": "יצירת חשבון מנהל",

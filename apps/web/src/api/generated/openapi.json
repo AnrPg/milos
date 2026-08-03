@@ -1405,6 +1405,89 @@
         ]
       }
     },
+    "/api/memberships/redeem": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.redeem",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "invitation_token": {
+                    "maxLength": 256,
+                    "minLength": 20,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "invitation_token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Opaque invitation token",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "organization": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "slug"
+                      ],
+                      "type": "object"
+                    },
+                    "role": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "role",
+                    "organization"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Membership"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Redeem an invitation for the authenticated account",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
     "/api/my-workouts": {
       "get": {
         "callbacks": {},
@@ -2969,6 +3052,27 @@
         "summary": "Fetch Phase 8 analytics summary from persisted facts and aggregates",
         "tags": [
           "Admin Analytics"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/invitations/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.revoke",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Revoked"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Revoke an active organization invitation",
+        "tags": [
+          "Organizations"
         ]
       }
     },
@@ -9291,6 +9395,76 @@
         ]
       }
     },
+    "/api/auth/register-member": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AuthController.register_member",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "invitation_token": {
+                    "maxLength": 256,
+                    "minLength": 20,
+                    "type": "string"
+                  },
+                  "nickname": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "minLength": 4,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "nickname",
+                  "password",
+                  "invitation_token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "access_token": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "access_token"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Access session"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid invitation"
+          }
+        },
+        "summary": "Register through an organization invitation",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
     "/api/executions/{id}/modifications": {
       "post": {
         "callbacks": {},
@@ -14484,6 +14658,102 @@
         "summary": "Update a user's role",
         "tags": [
           "Admin Users"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/invitations": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.issue",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "lifetime_seconds": {
+                    "maximum": 604800,
+                    "minimum": 300,
+                    "type": "integer"
+                  },
+                  "role": {
+                    "enum": [
+                      "owner",
+                      "admin",
+                      "coach",
+                      "member",
+                      "athlete"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "role"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expires_at": {
+                      "format": "date_time",
+                      "type": "string"
+                    },
+                    "organization": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "slug"
+                      ],
+                      "type": "object"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "token": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "organization",
+                    "role",
+                    "expires_at"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invitation token"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Issue a one-time organization invitation",
+        "tags": [
+          "Organizations"
         ]
       }
     },
@@ -23288,6 +23558,88 @@
         ]
       }
     },
+    "/api/auth/invitations/inspect": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.inspect",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "invitation_token": {
+                    "maxLength": 256,
+                    "minLength": 20,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "invitation_token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Opaque invitation token",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expires_at": {
+                      "format": "date_time",
+                      "type": "string"
+                    },
+                    "organization": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "slug"
+                      ],
+                      "type": "object"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "token": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "organization",
+                    "role",
+                    "expires_at"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invitation"
+          }
+        },
+        "summary": "Inspect a one-time organization invitation",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
     "/api/admin/finance/invoices/{id}/download-url": {
       "get": {
         "callbacks": {},
@@ -24556,6 +24908,71 @@
         "summary": "Create a referral event",
         "tags": [
           "Admin Finance"
+        ]
+      }
+    },
+    "/api/memberships": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.memberships",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "organization": {
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "slug": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "slug"
+                        ],
+                        "type": "object"
+                      },
+                      "role": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "role",
+                      "organization"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Memberships"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List active organization memberships for the authenticated account",
+        "tags": [
+          "Organizations"
         ]
       }
     },
@@ -27855,7 +28272,9 @@
             "application/json": {
               "schema": {
                 "properties": {
-                  "admin_code": {
+                  "invitation_token": {
+                    "maxLength": 256,
+                    "minLength": 20,
                     "type": "string"
                   },
                   "nickname": {
@@ -27869,7 +28288,7 @@
                 "required": [
                   "nickname",
                   "password",
-                  "admin_code"
+                  "invitation_token"
                 ],
                 "type": "object"
               }
@@ -27897,27 +28316,23 @@
             },
             "description": "Access session"
           },
-          "401": {
+          "404": {
             "content": {
               "application/json": {
                 "schema": {
                   "properties": {
-                    "code": {
-                      "type": "string"
-                    },
                     "error": {
                       "type": "string"
                     }
                   },
                   "required": [
-                    "code",
                     "error"
                   ],
                   "type": "object"
                 }
               }
             },
-            "description": "Invalid admin registration code"
+            "description": "Invalid invitation"
           },
           "422": {
             "content": {
@@ -27966,7 +28381,7 @@
             "description": "Rate limited"
           }
         },
-        "summary": "Register a code-authorized admin user",
+        "summary": "Register through an owner or admin organization invitation",
         "tags": [
           "Authentication"
         ]

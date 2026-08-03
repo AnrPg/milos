@@ -325,6 +325,7 @@
     "activeCampaign6f5bb84": "активная кампания",
     "activeCampaignCount": "{count, plural, one {# активная кампания} other {# активных кампаний}}",
     "adminRegistration": "Регистрация администратора",
+    "organization": "Организация",
     "adminRegistrationCode": "Код регистрации администратора",
     "adminRegistrationCodeHelp": "Создать учётную запись администратора могут только те, у кого есть код от владельца.",
     "createAdminAccount": "Создать учётную запись администратора",

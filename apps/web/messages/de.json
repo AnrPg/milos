@@ -325,6 +325,7 @@
     "activeCampaign6f5bb84": "aktive Kampagne",
     "activeCampaignCount": "{count, plural, one {# aktive Kampagne} other {# aktive Kampagnen}}",
     "adminRegistration": "Admin-Registrierung",
+    "organization": "Organisation",
     "adminRegistrationCode": "Admin-Registrierungscode",
     "adminRegistrationCodeHelp": "Nur Personen mit dem vom Betreiber ausgegebenen Code können ein Admin-Konto erstellen.",
     "createAdminAccount": "Admin-Konto erstellen",

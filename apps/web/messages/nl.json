@@ -325,6 +325,7 @@
     "activeCampaign6f5bb84": "actieve campagne",
     "activeCampaignCount": "{count, plural, one {# actieve campagne} other {# actieve campagnes}}",
     "adminRegistration": "Beheerdersregistratie",
+    "organization": "Organisatie",
     "adminRegistrationCode": "Registratiecode voor beheerder",
     "adminRegistrationCodeHelp": "Alleen mensen met de door de eigenaar verstrekte code kunnen een beheerdersaccount maken.",
     "createAdminAccount": "Beheerdersaccount maken",

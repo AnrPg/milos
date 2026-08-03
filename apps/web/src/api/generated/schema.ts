@@ -90,6 +90,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/memberships/redeem": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Redeem an invitation for the authenticated account */
+        post: operations["MilosTrainingWeb.OrganizationAccessController.redeem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/my-workouts": {
         parameters: {
             query?: never;
@@ -357,6 +374,23 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/invitations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke an active organization invitation */
+        delete: operations["MilosTrainingWeb.OrganizationAccessController.revoke"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1001,6 +1035,23 @@ export interface paths {
         patch: operations["MilosTrainingWeb.AdminFinanceController.update_referral_status"];
         trace?: never;
     };
+    "/api/auth/register-member": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Register through an organization invitation */
+        post: operations["MilosTrainingWeb.AuthController.register_member"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/executions/{id}/modifications": {
         parameters: {
             query?: never;
@@ -1221,6 +1272,23 @@ export interface paths {
         head?: never;
         /** Update a user's role */
         patch: operations["MilosTrainingWeb.AdminUserController.update_role"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Issue a one-time organization invitation */
+        post: operations["MilosTrainingWeb.OrganizationAccessController.issue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/admin/finance/members": {
@@ -1623,6 +1691,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/invitations/inspect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Inspect a one-time organization invitation */
+        post: operations["MilosTrainingWeb.OrganizationAccessController.inspect"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/finance/invoices/{id}/download-url": {
         parameters: {
             query?: never;
@@ -1915,6 +2000,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/memberships": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List active organization memberships for the authenticated account */
+        get: operations["MilosTrainingWeb.OrganizationAccessController.memberships"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/notifications": {
         parameters: {
             query?: never;
@@ -2132,7 +2234,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Register a code-authorized admin user */
+        /** Register through an owner or admin organization invitation */
         post: operations["MilosTrainingWeb.AuthController.register_admin"];
         delete?: never;
         options?: never;
@@ -2918,6 +3020,43 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.OrganizationAccessController.redeem": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Opaque invitation token */
+        requestBody: {
+            content: {
+                "application/json": {
+                    invitation_token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Membership */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        id: string;
+                        organization: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            slug: string;
+                        };
+                        role: string;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.MyWorkoutController.index": {
         parameters: {
             query?: {
@@ -3637,6 +3776,24 @@ export interface operations {
                         [key: string]: unknown;
                     };
                 };
+            };
+        };
+    };
+    "MilosTrainingWeb.OrganizationAccessController.revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Revoked */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -6083,6 +6240,45 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AuthController.register_member": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    invitation_token: string;
+                    nickname: string;
+                    password: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Access session */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        access_token: string;
+                    };
+                };
+            };
+            /** @description Invalid invitation */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.ExecutionController.add_modifications": {
         parameters: {
             query?: never;
@@ -7745,6 +7941,45 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.OrganizationAccessController.issue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    lifetime_seconds?: number;
+                    /** @enum {string} */
+                    role: "owner" | "admin" | "coach" | "member" | "athlete";
+                };
+            };
+        };
+        responses: {
+            /** @description Invitation token */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date_time */
+                        expires_at: string;
+                        organization: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            slug: string;
+                        };
+                        role: string;
+                        token?: string | null;
                     };
                 };
             };
@@ -10666,6 +10901,44 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.OrganizationAccessController.inspect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Opaque invitation token */
+        requestBody: {
+            content: {
+                "application/json": {
+                    invitation_token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Invitation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date_time */
+                        expires_at: string;
+                        organization: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            slug: string;
+                        };
+                        role: string;
+                        token?: string | null;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminFinanceController.invoice_download_url": {
         parameters: {
             query?: never;
@@ -11393,6 +11666,36 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.OrganizationAccessController.memberships": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Memberships */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        id: string;
+                        organization: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            slug: string;
+                        };
+                        role: string;
+                    }[];
                 };
             };
         };
@@ -12563,7 +12866,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    admin_code: string;
+                    invitation_token: string;
                     nickname: string;
                     password: string;
                 };
@@ -12581,14 +12884,13 @@ export interface operations {
                     };
                 };
             };
-            /** @description Invalid admin registration code */
-            401: {
+            /** @description Invalid invitation */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        code: string;
                         error: string;
                     };
                 };

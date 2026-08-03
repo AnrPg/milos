@@ -325,6 +325,7 @@
     "activeCampaign6f5bb84": "active campaign",
     "activeCampaignCount": "{count, plural, one {# active campaign} other {# active campaigns}}",
     "adminRegistration": "Admin registration",
+    "organization": "Organization",
     "adminRegistrationCode": "Admin registration code",
     "adminRegistrationCodeHelp": "Only people with the owner-issued code can create an admin account.",
     "createAdminAccount": "Create admin account",
