@@ -38,4 +38,8 @@ platform-global payloads explicitly. A missing `organization_id` is valid only w
 the resource class and required user/platform authorization metadata are present.
 
 ## Implementation Notes
-To be completed after implementation.
+Canonical tenant and user topic builders now exist, and sockets validate an optional
+organization slug against current membership. Existing schedule, chat, execution,
+job, cache, search, and storage resources are catalogued in the ownership inventory;
+their key migrations stay paired with the owning T4/T5 data migrations so a scoped
+topic cannot imply isolation over unscoped rows.

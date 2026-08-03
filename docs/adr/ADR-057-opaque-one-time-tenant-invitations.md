@@ -20,4 +20,9 @@ Deterministic or reversible tenant codes were rejected as predictable and diffic
 Possession of an unexpired token authorizes its intended registration, so tokens must be short-lived, rate-limited, redacted from logs, and displayed once. Manual delivery remains an initial operational constraint; automated verified delivery is tracked as TD-034.
 
 ## Implementation Notes
-To be completed after implementation.
+The initial implementation generates 256-bit URL-safe tokens, stores only SHA-256
+digests, rate-limits inspection and redemption, and transmits tokens in request
+bodies rather than URL paths. Redemption locks the invitation row and atomically
+activates one membership and consumes the invitation; a concurrent PostgreSQL test
+proves only one claimant succeeds. Automated delivery remains deferred under
+`TD-034`.

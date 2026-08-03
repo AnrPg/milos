@@ -47,4 +47,8 @@ domains and wildcard tenant DNS are outside the initial design; adding them requ
 a new ADR that preserves canonical path identity and authorization semantics.
 
 ## Implementation Notes
-To be completed after implementation.
+HTTP organization paths and optional socket organization parameters are resolved
+through the Organizations public API and validated against current database
+membership state. Access-token membership claims support client navigation but are
+never accepted as authorization. The web membership selector generates explicit
+`/org/:slug` paths; full tenant operations remain gated on T4 ownership migration.

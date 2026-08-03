@@ -33,52 +33,58 @@ context, global personal resources, and defense-in-depth isolation.
 - [x] Preserve the approved discussion verbatim.
 - [x] Create the feature branch.
 - [x] Write ADR-055 through ADR-060.
-- [ ] Build a tenant-ownership inventory for every table, materialized view, job, cache key, topic, search document, and object path.
-- [ ] Classify every resource as tenant-owned, global-personal, or platform-global.
-- [ ] Record self-authored Wellbeing facts and Pantheon PRs as global-personal; record
+- [x] Build a tenant-ownership inventory for every table, materialized view, job, cache key, topic, search document, and object path.
+- [x] Classify every resource as tenant-owned, global-personal, or platform-global.
+- [x] Record self-authored Wellbeing facts and Pantheon PRs as global-personal; record
       organization-authored safety facts as tenant-owned.
-- [ ] Record the movement catalog as platform-global with tenant-scoped proposal and
+- [x] Record the movement catalog as platform-global with tenant-scoped proposal and
       alias moderation.
-- [ ] Add tenant migration status and deferred delivery automation to the debt ledger as needed.
+- [x] Add tenant migration status and deferred delivery automation to the debt ledger as needed (`TD-034` remains the delivery deferral; migration state stays in this plan).
 
 ## Phase T1 — Organization primitives
 
 - [x] Migration: create `organizations`, `organization_memberships`, `registration_invitations`, `organization_domains`, and `organization_settings`.
 - [x] Domain tests: slug normalization, membership roles, invitation expiry limits, and state transitions.
 - [x] Schemas and changesets for each aggregate.
-- [ ] Organization store port and Ecto adapter.
-- [ ] Commands: create organization, add membership, issue/revoke invitation.
-- [ ] Queries: organization by ID/slug/domain, memberships, invitation by digest.
-- [ ] Public `Organizations` context API.
-- [ ] Create the stable legacy organization through an idempotent release/backfill command.
-- [ ] Verify migration, constraints, architecture gate, and focused tests.
+- [x] Organization store port and Ecto adapter.
+- [x] Commands: create organization, add membership, issue/revoke invitation.
+- [x] Queries: organization by ID/slug/domain, memberships, invitation by digest.
+- [x] Public `Organizations` context API.
+- [x] Create the stable legacy organization through an idempotent release/backfill command.
+- [x] Verify migration, constraints, architecture gate, and focused tests.
 
 ## Phase T2 — Invitation redemption and tenant-aware registration
 
-- [ ] Preserve open personal registration without creating a synthetic organization
+- [x] Preserve open personal registration without creating a synthetic organization
       membership.
-- [ ] Pure token generation/digest and invitation policy tests.
-- [ ] Transactional invitation redemption port owned by Organizations.
-- [ ] Cross-context application services for new-account and existing-account redemption.
-- [ ] OpenAPI contracts for invitation inspection, member registration, and admin registration.
-- [ ] Replace the shared `/set-admin` code with an organization-owner/admin invitation.
-- [ ] Update `/register` and `/set-admin` to accept link or typed token and show non-editable organization confirmation.
-- [ ] Rate-limit inspection and redemption without exposing whether arbitrary organizations exist.
-- [ ] Prove one-time behavior under concurrent redemption.
+- [x] Pure token generation/digest and invitation policy tests.
+- [x] Transactional invitation redemption port owned by Organizations.
+- [x] Cross-context application services for new-account and existing-account redemption.
+- [x] OpenAPI contracts for invitation inspection, member registration, and admin registration.
+- [x] Replace the shared `/set-admin` code with an organization-owner/admin invitation.
+- [x] Update `/register` and `/set-admin` to accept link or typed token and show non-editable organization confirmation.
+- [x] Rate-limit inspection and redemption without exposing whether arbitrary organizations exist.
+- [x] Prove one-time behavior under concurrent redemption.
 
 ## Phase T3 — Path, authorization, and realtime tenant context
 
-- [ ] Add transport-neutral `TenantContext` and membership authorization policy.
-- [ ] Resolve `/org/:organization_slug/...` in HTTP plugs and Phoenix socket
+- [x] Add transport-neutral `TenantContext`, `UserContext`, and membership authorization policy.
+- [x] Resolve `/org/:organization_slug/...` in HTTP plugs and Phoenix socket
       connection, then validate active membership.
-- [ ] Keep personal routes user-scoped and independent of tenant selection.
-- [ ] Add an authenticated membership selector that generates organization paths;
+- [x] Keep personal routes user-scoped and independent of tenant selection.
+- [x] Add an authenticated membership selector that generates organization paths;
       never rely on hidden selected-organization session state.
-- [ ] Carry organization and membership claims in access tokens without treating claims as the source of truth.
+- [x] Carry organization and membership claims in access tokens without treating claims as the source of truth.
 - [ ] Replace global role plugs with membership-aware authorization.
 - [ ] Scope Channels and PubSub topics by organization and user.
 - [ ] Add cross-path, multi-tab, stale-membership, forged-claim, personal-route, and
       socket-isolation tests.
+
+T3 foundation note (2026-08-03): organization routes use database-validated
+membership context, and personal routes use `UserContext`. Replacing every legacy
+global-role plug and migrating existing schedule/chat/execution topics remains open
+until each owning context receives T4 ownership columns and isolation tests; doing
+that earlier would attach tenant-shaped authorization to still-global data.
 
 ## Phase T4 — Context-by-context database ownership
 

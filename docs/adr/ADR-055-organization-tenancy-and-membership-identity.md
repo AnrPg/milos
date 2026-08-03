@@ -31,4 +31,9 @@ require owner access, an accepted coaching relationship with its documented base
 or an explicit personal grant.
 
 ## Implementation Notes
-To be completed after implementation.
+The T0-T3 foundation landed on 2026-08-03. `MilosTraining.Organizations` now owns a
+store port, Ecto adapter, commands, queries, public API, membership-scoped
+authorization, and a transport-neutral `TenantContext`. Personal registration still
+creates no synthetic membership; invited identities retain a transitional global
+member role while the organization membership carries tenant authority. Legacy
+global-role plugs remain only for contexts not yet migrated in T4.

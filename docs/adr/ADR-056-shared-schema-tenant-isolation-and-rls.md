@@ -32,4 +32,7 @@ tests must prove that forged organization, user, source, or grant identifiers ca
 cross a policy boundary.
 
 ## Implementation Notes
-To be completed after implementation.
+The 2026-08-03 foundation establishes explicit ownership classification and requires
+database-validated `TenantContext` or `UserContext` at new boundaries. RLS is not yet
+enabled: ADR-060 requires T4 context-by-context backfill and zero-unmapped-row gates
+before the T6 runtime-role enforcement step.

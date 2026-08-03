@@ -31,4 +31,9 @@ platform-global counts. A zero unmapped-row count is required for each class bef
 its RLS policy is forced.
 
 ## Implementation Notes
-To be completed after implementation.
+The baseline ownership inventory is recorded in
+`docs/architecture/tenant-ownership-inventory.md`. The stable
+`legacy-milos-training` organization can be created idempotently through the public
+Organizations API, release function, or `mix milos.organizations.ensure_legacy`.
+No legacy domain rows were assigned yet; those changes remain in the ordered T4
+expand/backfill/enforce loops.
