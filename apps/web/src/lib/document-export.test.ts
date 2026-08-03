@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildExecutionDocument,
   buildExecutionHistoryDocument,
+  buildFinanceMembersDocument,
   buildPRDocument,
   buildPRListDocument,
   buildWorkoutDocument,
@@ -10,11 +11,21 @@ import {
   renderCsv,
   renderMarkdown,
   renderText,
+  type ExportDocument,
   type ExportLabels,
 } from "@/lib/document-export";
 
 const labels: ExportLabels = {
   appName: "Milos Training",
+  finance: "Finance",
+  members: "Members",
+  plan: "Plan",
+  expires: "Expires",
+  lastPaid: "Last paid",
+  amount: "Amount",
+  credits: "Credits",
+  balanceDue: "Balance due",
+  referrals: "Referrals",
   workout: "Workout",
   workoutHistory: "WOD History",
   personalRecord: "Personal Record",
@@ -50,6 +61,11 @@ const labels: ExportLabels = {
   no: "No",
   session: "session",
   score: "Score",
+  header: "Header",
+  superset: "Superset",
+  alternatingSets: "Alternating sets",
+  progressiveLoad: "Progressive load",
+  progressiveDeload: "Progressive deload",
 };
 
 describe("document export adapters", () => {
@@ -115,6 +131,61 @@ describe("document export adapters", () => {
     expect(document.sections[0].title).toBe("Chipper");
     expect(document.sections[0].items[0].value).toBe("5 × 12 reps");
     expect(document.sections[0].items[0].details).toContain("scaled: 5 × 8 reps");
+  });
+
+  it("exports structured groups, headers, notes, per-set reps, and deloads", () => {
+    const document = buildWorkoutDocument({
+      id: "structured-1",
+      title: "Strength complex",
+      type: "strength",
+      status: "published",
+      available_scale_levels: [],
+      sections: [{
+        name: "Main",
+        note: "Keep the bar close",
+        order: 0,
+        scoreable: false,
+        exercises: [{
+          item_type: "header",
+          name: "Barbell complex",
+          note: "No rest between movements",
+          order: 0,
+          variations: [],
+        }, {
+          item_type: "exercise",
+          name: "Back squat",
+          order: 1,
+          sets: 3,
+          prescription_value: 10,
+          prescription_unit: "reps",
+          set_prescriptions: [
+            { set_index: 1, prescription_value: 10, prescription_unit: "reps", note: "Controlled" },
+            { set_index: 2, prescription_value: 8, prescription_unit: "reps" },
+            { set_index: 3, prescription_value: 6, prescription_unit: "reps" },
+          ],
+          load_progression: {
+            mode: "linear",
+            direction: "decrease",
+            start_value: 80,
+            start_mode: "pct_1rm",
+            step_value: 5,
+            per_set_values: [],
+          },
+          superset_group_id: "group-1",
+          note: "Brace before every rep",
+          variations: [],
+        }],
+      }],
+    }, labels);
+
+    const output = renderText(document);
+    expect(output).toContain("Notes: Keep the bar close");
+    expect(output).toContain("Header: Barbell complex");
+    expect(output).toContain("No rest between movements");
+    expect(output).toContain("Superset");
+    expect(output).toContain("sets 2: 8 reps");
+    expect(output).toContain("Progressive deload: 80 %1RM (−5 %1RM/sets)");
+    expect(output).toContain("Brace before every rep");
   });
 
   it("includes execution scores, notes, and actual-vs-prescribed modifications", () => {
@@ -242,5 +313,75 @@ describe("document export adapters", () => {
     expect(odtContent).toContain("Deadlift");
     expect(odtContent).toContain("🏆");
     expect(odtContent).toContain('fo:color="#7C3AED"');
+  });
+
+  it("keeps wrapped metadata and long paragraph details in the PDF", async () => {
+    const longMetadata = "A complete membership note that must survive PDF wrapping without losing its final words.";
+    const longDetail = "Coach instruction: keep each repetition controlled, record the adjustment, and retain this complete paragraph on the following line when required.";
+    const document: ExportDocument = {
+      icon: "📄",
+      category: "Export",
+      title: "Complete document",
+      metadata: [{ label: "Summary", value: longMetadata }],
+      sections: [{
+        icon: "📝",
+        title: "Long-form notes",
+        items: [{ label: "Instruction", value: longDetail }],
+      }],
+      footer: "Milos Training",
+    };
+
+    const file = await generateExportFile(document, "pdf");
+    const pdf = new TextDecoder().decode(await file.arrayBuffer());
+
+    expect(pdf).toContain("final words.");
+    expect(pdf).toContain("following line when required.");
+  });
+
+  it("continues overflowing content onto later PDF pages", async () => {
+    const document: ExportDocument = {
+      icon: "📄",
+      category: "Export",
+      title: "Paginated document",
+      metadata: [],
+      sections: [{
+        icon: "📝",
+        title: "Entries",
+        items: Array.from({ length: 90 }, (_, index) => ({
+          label: `Entry ${index + 1}`,
+          value: `The complete content for entry ${index + 1} is retained across page boundaries.`,
+        })),
+      }],
+      footer: "Milos Training",
+    };
+
+    const file = await generateExportFile(document, "pdf");
+    const pdf = new TextDecoder().decode(await file.arrayBuffer());
+
+    expect(pdf.match(/\/Type \/Page\b/g)?.length).toBeGreaterThan(1);
+    expect(pdf).toContain("complete content for entry 90");
+  });
+
+  it("preserves every visible finance member field for export", () => {
+    const document = buildFinanceMembersDocument([{
+      id: "member-1",
+      nickname: "Niko",
+      identity_role: "member",
+      membership: { status: "active", notes: "Needs a receipt with the full billing address." },
+      active_package_subscription: { package_code_snapshot: "UNLIMITED", ends_on: "2026-08-31" },
+      last_payment_on: "2026-07-01",
+      last_payment_amount_cents: 8500,
+      credit_balance_cents: 1000,
+      outstanding_balance_cents: 1200,
+      referrals_made_user_ids: ["u-2", "u-3"],
+    }], labels, "en");
+
+    const exported = renderText(document);
+    expect(document.category).toBe("Finance");
+    expect(exported).toContain("Niko");
+    expect(exported).toContain("Needs a receipt with the full billing address.");
+    expect(exported).toContain("UNLIMITED");
+    expect(exported).toContain("€85.00");
+    expect(exported).toContain("2");
   });
 });

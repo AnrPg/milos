@@ -4,6 +4,9 @@ defmodule MilosTraining.Scheduling do
     AttachTimeoutJob,
     CancelUserBookingsForRoleTransition,
     CreateClassType,
+    CreateClassSeries,
+    DeleteClassSeriesForWorkout,
+    ExtendClassSeries,
     CreateSlot,
     DeleteSlotsForWorkout,
     DeleteSlot,
@@ -30,9 +33,15 @@ defmodule MilosTraining.Scheduling do
   }
 
   defdelegate create_slot(params), to: CreateSlot, as: :call
+  defdelegate create_class_series(params), to: CreateClassSeries, as: :call
+  defdelegate extend_class_series(series_id, horizon), to: ExtendClassSeries, as: :call
   defdelegate update_slot(id, params), to: UpdateSlot, as: :call
   defdelegate delete_slot(id), to: DeleteSlot, as: :call
   defdelegate delete_slots_for_workout(workout_id), to: DeleteSlotsForWorkout, as: :call
+
+  defdelegate delete_class_series_for_workout(workout_id),
+    to: DeleteClassSeriesForWorkout,
+    as: :call
 
   defdelegate create_class_type(params), to: CreateClassType, as: :call
   defdelegate update_class_type(id, params), to: UpdateClassType, as: :call
@@ -93,4 +102,12 @@ defmodule MilosTraining.Scheduling do
 
   def count_classes_today,
     do: MilosTraining.Scheduling.SchedulingStore.count_classes_today()
+
+  def list_member_slots(user_id, start_at, end_at),
+    do: MilosTraining.Scheduling.SchedulingStore.list_member_slots(user_id, start_at, end_at)
+
+  def get_settings, do: MilosTraining.Scheduling.SchedulingStore.get_settings()
+
+  def update_settings(params),
+    do: MilosTraining.Scheduling.SchedulingStore.update_settings(params)
 end

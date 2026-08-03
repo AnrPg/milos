@@ -10,6 +10,7 @@ defmodule MilosTraining.Application.DeleteWorkout do
          assignment_targets <- Workouts.list_workout_change_targets(id),
          booking_targets <- Scheduling.list_workout_change_targets(id),
          {:ok, deleted_slot_ids} <- Scheduling.delete_slots_for_workout(id),
+         :ok <- Scheduling.delete_class_series_for_workout(id),
          :ok <- Workouts.delete_workout(id) do
       broadcast_deleted_slots(deleted_slot_ids)
       notify_assignment_targets(assignment_targets)

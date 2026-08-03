@@ -9,11 +9,13 @@ defmodule MilosTrainingWeb.AdminUserController do
     GetAdminUserMessages,
     GetAdminUserProfile,
     GetAdminUserPRs,
+    GetAdminUserSchedule,
     GetAdminUserTrainingHistory,
     GrantUserAllowance,
     DeleteAdminUser,
     ListAdminUsers,
     ListAthletes,
+    ProgramUserWorkout,
     RevokeUserAllowance,
     UpdateUserRole
   }
@@ -120,9 +122,31 @@ defmodule MilosTrainingWeb.AdminUserController do
     }
   }
 
+  @schedule_response %Schema{type: :object, additionalProperties: true}
+  @program_body %RequestBody{
+    required: true,
+    content: %{
+      "application/json" => %MediaType{
+        schema: %Schema{
+          type: :object,
+          additionalProperties: false,
+          properties: %{
+            master_workout_id: @user_id,
+            folder_id: @user_id,
+            scheduled_for: %Schema{type: :string, format: :date},
+            slot_id: %Schema{allOf: [@user_id], nullable: true},
+            copy_source: %Schema{type: :boolean, default: true},
+            admin_notes: %Schema{type: :string, nullable: true}
+          },
+          required: [:master_workout_id, :folder_id, :scheduled_for, :copy_source]
+        }
+      }
+    }
+  }
+
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true]
-       when action in [:update_role, :grant_allowance, :revoke_allowance]
+       when action in [:update_role, :grant_allowance, :revoke_allowance, :program_workout]
 
   @allowance_grant_body %RequestBody{
     required: true,
@@ -223,6 +247,34 @@ defmodule MilosTrainingWeb.AdminUserController do
     summary: "Get a user's executions, scores, assignments, and class participation",
     parameters: [@id_parameter],
     responses: [ok: {"Training history", "application/json", @training_response}]
+  )
+
+  operation(:schedule,
+    summary: "Get a role-specific user schedule",
+    parameters: [
+      @id_parameter,
+      %Parameter{
+        name: :start_date,
+        in: :query,
+        required: true,
+        schema: %Schema{type: :string, format: :date}
+      },
+      %Parameter{
+        name: :end_date,
+        in: :query,
+        required: true,
+        schema: %Schema{type: :string, format: :date}
+      }
+    ],
+    responses: [ok: {"User schedule", "application/json", @schedule_response}]
+  )
+
+  operation(:program_workout,
+    summary:
+      "Copy or save a workout and associate it with this user's athlete assignment or booked class",
+    parameters: [@id_parameter],
+    request_body: @program_body,
+    responses: [created: {"Programming result", "application/json", @summary_object}]
   )
 
   operation(:prs,
@@ -464,6 +516,26 @@ defmodule MilosTrainingWeb.AdminUserController do
 
   def training_history(conn, params),
     do: render_service(conn, GetAdminUserTrainingHistory, params)
+
+  def schedule(conn, params) do
+    with {:ok, payload} <-
+           GetAdminUserSchedule.call(
+             params["id"] || params[:id],
+             params["start_date"] || params[:start_date],
+             params["end_date"] || params[:end_date]
+           ) do
+      json(conn, payload)
+    end
+  end
+
+  def program_workout(conn, params) do
+    admin = Guardian.Plug.current_resource(conn)
+
+    with {:ok, payload} <-
+           ProgramUserWorkout.call(admin, params["id"] || params[:id], conn.body_params) do
+      conn |> put_status(:created) |> json(payload)
+    end
+  end
 
   def prs(conn, params), do: render_service(conn, GetAdminUserPRs, params)
   def incidents(conn, params), do: render_service(conn, GetAdminUserIncidents, params)

@@ -15,6 +15,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     Workouts.Domain.WorkoutMaterializer,
     Workouts.ExerciseVariation,
     Workouts.MasterWorkout,
+    Workouts.WorkoutFolder,
     Workouts.WorkoutExercise,
     Workouts.WorkoutSection
   }
@@ -24,7 +25,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   @impl true
   def create_workout(admin_id, params) do
-    with normalized_params <- WorkoutAuthoring.normalize_structure(params),
+    with {:ok, normalized_params} <- prepare_workout_structure(params),
          {:ok, params_with_levels} <- attach_scale_level_ids(normalized_params) do
       params_with_levels
       |> Map.put(:created_by_id, admin_id)
@@ -35,7 +36,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           workout =
             workout
             |> Repo.preload(@workout_preloads)
-            |> normalize_workout()
+            |> normalize_workout(note_visibility: :admin)
 
           {:ok, workout}
 
@@ -51,8 +52,17 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     |> MasterWorkout.draft_changeset(%{created_by_id: admin_id, status: :draft})
     |> Repo.insert()
     |> case do
-      {:ok, workout} -> {:ok, %{id: workout.id, status: to_string(workout.status)}}
-      {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
+      {:ok, workout} ->
+        {:ok,
+         %{
+           id: workout.id,
+           status: to_string(workout.status),
+           authoring_mode: workout.authoring_mode,
+           dsl_source_revision: workout.dsl_source_revision
+         }}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:error, changeset}
     end
   end
 
@@ -63,22 +73,31 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         {:error, :not_found}
 
       workout ->
-        draft_data =
-          params
-          |> Map.get(:draft_data, Map.get(params, "draft_data", params))
-          |> stringify_keys_deep()
+        with :ok <- validate_expected_revision(workout, params) do
+          draft_data =
+            params
+            |> Map.get(:draft_data, Map.get(params, "draft_data", params))
+            |> stringify_keys_deep()
 
-        top_level =
-          draft_data
-          |> extract_top_level_draft_fields()
-          |> Map.put(:draft_data, draft_data)
+          top_level =
+            draft_data
+            |> extract_top_level_draft_fields()
+            |> Map.merge(extract_dsl_authoring_fields(params))
+            |> Map.put(:draft_data, draft_data)
 
-        workout
-        |> MasterWorkout.update_draft_changeset(top_level)
-        |> Repo.update()
-        |> case do
-          {:ok, updated} -> {:ok, %{id: updated.id, status: to_string(updated.status)}}
-          {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
+          changeset =
+            workout
+            |> MasterWorkout.update_draft_changeset(top_level)
+            |> maybe_lock_dsl_revision(params)
+
+          try do
+            case Repo.update(changeset) do
+              {:ok, updated} -> {:ok, draft_summary(updated)}
+              {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
+            end
+          rescue
+            Ecto.StaleEntryError -> {:error, :stale_dsl_revision}
+          end
         end
     end
   end
@@ -99,51 +118,32 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   @impl true
   def publish_workout(id, params) do
-    case Repo.get(MasterWorkout, id) do
-      nil ->
-        {:error, :not_found}
+    result =
+      Repo.transaction(fn ->
+        workout =
+          MasterWorkout
+          |> where([workout], workout.id == ^id)
+          |> lock("FOR UPDATE")
+          |> Repo.one()
 
-      %MasterWorkout{status: :published, draft_data: nil} ->
-        {:error, :already_published}
-
-      workout ->
-        draft_data = workout.draft_data || %{}
-
-        merged_params =
-          draft_data
-          |> Map.merge(stringify_keys_deep(params))
-          |> WorkoutAuthoring.normalize_structure()
-          |> stringify_keys_deep()
-
-        sections = Map.get(merged_params, "sections") || Map.get(merged_params, :sections) || []
-
-        all_exercises_empty = sections == [] or not sections_have_exercises?(sections)
-
-        if all_exercises_empty do
-          {:error, :no_sections}
-        else
-          with {:ok, params_with_levels} <- attach_scale_level_ids(merged_params) do
-            Multi.new()
-            |> Multi.update(:workout, MasterWorkout.publish_changeset(workout, merged_params))
-            |> Multi.delete_all(:old_sections, Ecto.assoc(workout, :sections))
-            |> Multi.run(:new_sections, fn _repo, %{workout: published_workout} ->
-              insert_sections(published_workout.id, params_with_levels)
-            end)
-            |> Repo.transaction()
-            |> case do
-              {:ok, %{workout: published}} ->
-                published =
-                  published
-                  |> Repo.preload(@workout_preloads)
-                  |> normalize_workout()
-
-                {:ok, published}
-
-              {:error, _step, %Ecto.Changeset{} = changeset, _changes} ->
-                {:error, changeset}
-            end
-          end
+        case publish_locked_workout(workout, params) do
+          {:ok, published} -> published
+          {:error, reason} -> Repo.rollback(reason)
         end
+      end)
+
+    case result do
+      {:ok, published} ->
+        published =
+          published
+          |> Repo.preload(@workout_preloads)
+          |> normalize_workout(note_visibility: :admin)
+          |> Map.merge(authoring_state(published))
+
+        {:ok, published}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
@@ -179,9 +179,25 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         base = %{
           id: workout.id,
           title: workout.title,
+          subtitle: workout.subtitle,
+          description: workout.description,
           type: workout.type && to_string(workout.type),
           status: to_string(workout.status),
           is_team_workout: workout.is_team_workout,
+          difficulty: workout.difficulty,
+          estimated_duration_seconds: workout.estimated_duration_seconds,
+          equipment: workout.equipment,
+          tags: workout.tags,
+          notes: workout.notes,
+          workout_metadata: workout.workout_metadata,
+          authoring_mode: workout.authoring_mode,
+          dsl_version: workout.dsl_version,
+          dsl_source: workout.dsl_source,
+          dsl_document: workout.dsl_document,
+          dsl_source_revision: workout.dsl_source_revision,
+          last_dsl_diagnostics: workout.last_dsl_diagnostics,
+          free_text_body: workout.free_text_body,
+          free_text_document: workout.free_text_document,
           draft_data: workout.draft_data,
           sections: draft_sections
         }
@@ -189,8 +205,9 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         if workout.status == :published do
           workout
           |> Repo.preload(@workout_preloads)
-          |> normalize_workout()
+          |> normalize_workout(note_visibility: :admin)
           |> Map.put(:draft_data, workout.draft_data)
+          |> Map.merge(authoring_state(workout))
         else
           base
         end
@@ -212,9 +229,92 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     |> Repo.preload(@workout_preloads)
     |> Enum.map(fn workout ->
       workout
-      |> normalize_workout()
+      |> normalize_workout(note_visibility: :admin)
       |> Map.update!(:sections, &summarize_sections_for_list/1)
     end)
+  end
+
+  @impl true
+  def list_folders do
+    WorkoutFolder
+    |> order_by([folder], asc: folder.name)
+    |> Repo.all()
+    |> Enum.map(&normalize_folder/1)
+  end
+
+  @impl true
+  def create_folder(admin_id, params) do
+    key = if Enum.any?(Map.keys(params), &is_binary/1), do: "created_by_id", else: :created_by_id
+    params = Map.put(params, key, admin_id)
+
+    with :ok <- validate_folder_parent(nil, params),
+         {:ok, folder} <- %WorkoutFolder{} |> WorkoutFolder.changeset(params) |> Repo.insert() do
+      {:ok, normalize_folder(folder)}
+    end
+  end
+
+  @impl true
+  def update_folder(id, params) do
+    case Repo.get(WorkoutFolder, id) do
+      nil ->
+        {:error, :not_found}
+
+      folder ->
+        with :ok <- validate_folder_parent(folder, params),
+             {:ok, updated} <- folder |> WorkoutFolder.changeset(params) |> Repo.update() do
+          {:ok, normalize_folder(updated)}
+        end
+    end
+  end
+
+  @impl true
+  def delete_folder(id) do
+    case Repo.get(WorkoutFolder, id) do
+      nil ->
+        {:error, :not_found}
+
+      folder ->
+        Repo.transaction(fn ->
+          from(child in WorkoutFolder, where: child.parent_id == ^id)
+          |> Repo.update_all(set: [parent_id: folder.parent_id])
+
+          from(workout in MasterWorkout, where: workout.folder_id == ^id)
+          |> Repo.update_all(set: [folder_id: folder.parent_id])
+
+          Repo.delete!(folder)
+        end)
+        |> case do
+          {:ok, _} -> :ok
+          {:error, reason} -> {:error, reason}
+        end
+    end
+  end
+
+  @impl true
+  def update_library_metadata(id, params) do
+    case Repo.get(MasterWorkout, id) do
+      nil ->
+        {:error, :not_found}
+
+      workout ->
+        workout
+        |> Ecto.Changeset.cast(params, [:folder_id, :source_workout_id])
+        |> Ecto.Changeset.foreign_key_constraint(:folder_id)
+        |> Ecto.Changeset.foreign_key_constraint(:source_workout_id)
+        |> Repo.update()
+        |> case do
+          {:ok, updated} ->
+            {:ok,
+             %{
+               id: updated.id,
+               folder_id: updated.folder_id,
+               source_workout_id: updated.source_workout_id
+             }}
+
+          error ->
+            error
+        end
+    end
   end
 
   defp summarize_sections_for_list(sections) do
@@ -657,16 +757,27 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     end
   end
 
-  defp normalize_workout(%MasterWorkout{} = workout) do
-    sections = normalize_sections(workout.sections)
+  defp normalize_workout(%MasterWorkout{} = workout, opts \\ []) do
+    note_visibility = Keyword.get(opts, :note_visibility, :athlete)
+    sections = normalize_sections(workout.sections, note_visibility: note_visibility)
 
     normalized = %{
       id: workout.id,
       title: workout.title,
+      subtitle: workout.subtitle,
+      description: workout.description,
       type: workout.type |> to_string(),
       status: workout.status |> to_string(),
       is_team_workout: workout.is_team_workout,
+      difficulty: workout.difficulty,
+      estimated_duration_seconds: workout.estimated_duration_seconds,
+      equipment: workout.equipment,
+      tags: workout.tags,
+      notes: visible_notes(workout.notes, note_visibility),
+      workout_metadata: workout.workout_metadata,
       created_by_id: workout.created_by_id,
+      folder_id: workout.folder_id,
+      source_workout_id: workout.source_workout_id,
       inserted_at: workout.inserted_at,
       updated_at: workout.updated_at,
       sections: sections
@@ -719,16 +830,22 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     |> Map.new(fn {id, [first | _rest]} -> {id, first} end)
   end
 
-  defp normalize_exercise(%WorkoutExercise{} = exercise) do
+  defp normalize_exercise(%WorkoutExercise{} = exercise, note_visibility) do
     %{
       id: exercise.id,
       name: exercise.name,
+      subtitle: exercise.subtitle,
+      exercise_ref: exercise.exercise_ref,
+      item_type: to_string(exercise.item_type),
       sets: exercise.sets,
+      set_prescriptions: exercise.set_prescriptions,
       prescription_value: exercise.prescription_value,
       prescription_unit: exercise.prescription_unit && to_string(exercise.prescription_unit),
       load_value: exercise.load_value,
       load_mode: exercise.load_mode && to_string(exercise.load_mode),
+      load_progression: exercise.load_progression,
       superset_group_id: exercise.superset_group_id,
+      alternating_group_id: exercise.alternating_group_id,
       hr_zone: exercise.hr_zone,
       tempo: exercise.tempo,
       rest_seconds: exercise.rest_seconds,
@@ -736,24 +853,33 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       rest_pause_seconds: exercise.rest_pause_seconds,
       pacing: exercise.pacing,
       interval_assignment: exercise.interval_assignment,
+      note: exercise.note,
+      notes: visible_notes(exercise.notes, note_visibility),
+      prescription_metadata: exercise.prescription_metadata,
+      group_config: visible_group_config(exercise.group_config, note_visibility),
       order: exercise.order,
       variations:
         exercise.variations
         |> Enum.sort_by(&{&1.scale_level.sort_order || 0, &1.scale_level.slug})
-        |> Enum.map(&normalize_variation/1)
+        |> Enum.map(&normalize_variation(&1, note_visibility))
     }
   end
 
-  defp normalize_variation(%ExerciseVariation{} = variation) do
+  defp normalize_variation(%ExerciseVariation{} = variation, note_visibility) do
     %{
       id: variation.id,
       exercise_name_override: variation.exercise_name_override,
       sets: variation.sets,
+      set_prescriptions: variation.set_prescriptions,
       prescription_value: variation.prescription_value,
       prescription_unit: variation.prescription_unit && to_string(variation.prescription_unit),
       load_value: variation.load_value,
       load_mode: variation.load_mode && to_string(variation.load_mode),
+      load_progression: variation.load_progression,
       excluded: variation.excluded,
+      note: variation.note,
+      notes: visible_notes(variation.notes, note_visibility),
+      prescription_metadata: variation.prescription_metadata,
       scale_level: normalize_scale_level(variation.scale_level)
     }
   end
@@ -768,7 +894,10 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     Enum.any?(sections, fn section ->
       exercises = Map.get(section, "exercises") || Map.get(section, :exercises) || []
       children = Map.get(section, "sections") || Map.get(section, :sections) || []
-      exercises != [] or sections_have_exercises?(children)
+
+      Enum.any?(exercises, fn item ->
+        (Map.get(item, "item_type") || Map.get(item, :item_type) || "exercise") == "exercise"
+      end) or sections_have_exercises?(children)
     end)
   end
 
@@ -875,9 +1004,123 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     %{}
     |> maybe_put(:title, get_map_value(draft_data, :title))
     |> maybe_put(:type, get_map_value(draft_data, :type))
+    |> maybe_put(:is_team_workout, get_map_value(draft_data, :is_team_workout))
+    |> maybe_put(:subtitle, get_map_value(draft_data, :subtitle))
+    |> maybe_put(:description, get_map_value(draft_data, :description))
+    |> maybe_put(:difficulty, get_map_value(draft_data, :difficulty))
+    |> maybe_put(
+      :estimated_duration_seconds,
+      get_map_value(draft_data, :estimated_duration_seconds)
+    )
+    |> maybe_put(:equipment, get_map_value(draft_data, :equipment))
+    |> maybe_put(:tags, get_map_value(draft_data, :tags))
+    |> maybe_put(:notes, get_map_value(draft_data, :notes))
+    |> maybe_put(:workout_metadata, get_map_value(draft_data, :workout_metadata))
   end
 
   defp extract_top_level_draft_fields(_draft_data), do: %{}
+
+  defp extract_dsl_authoring_fields(params) do
+    %{}
+    |> maybe_put(:authoring_mode, get_map_value(params, :authoring_mode))
+    |> maybe_put(:dsl_version, get_map_value(params, :dsl_version))
+    |> maybe_put(:dsl_source, get_map_value(params, :dsl_source))
+    |> maybe_put(:dsl_document, get_map_value(params, :dsl_document))
+    |> maybe_put(:last_dsl_diagnostics, get_map_value(params, :last_dsl_diagnostics))
+    |> maybe_put(:free_text_body, get_map_value(params, :free_text_body))
+    |> maybe_put(:free_text_document, get_map_value(params, :free_text_document))
+  end
+
+  defp validate_expected_revision(workout, params) do
+    case get_map_value(params, :expected_source_revision) do
+      nil -> :ok
+      revision when revision == workout.dsl_source_revision -> :ok
+      _revision -> {:error, :stale_dsl_revision}
+    end
+  end
+
+  defp maybe_lock_dsl_revision(changeset, params) do
+    if get_map_value(params, :expected_source_revision) == nil do
+      changeset
+    else
+      Ecto.Changeset.optimistic_lock(changeset, :dsl_source_revision)
+    end
+  end
+
+  defp draft_summary(workout) do
+    %{
+      id: workout.id,
+      status: to_string(workout.status),
+      authoring_mode: workout.authoring_mode,
+      dsl_source_revision: workout.dsl_source_revision
+    }
+  end
+
+  defp authoring_state(workout) do
+    %{
+      authoring_mode: workout.authoring_mode,
+      dsl_version: workout.dsl_version,
+      dsl_source: workout.dsl_source,
+      dsl_document: workout.dsl_document,
+      dsl_source_revision: workout.dsl_source_revision,
+      last_dsl_diagnostics: workout.last_dsl_diagnostics,
+      free_text_body: workout.free_text_body,
+      free_text_document: workout.free_text_document
+    }
+  end
+
+  defp publish_locked_workout(nil, _params), do: {:error, :not_found}
+
+  defp publish_locked_workout(%MasterWorkout{status: :published, draft_data: nil}, _params),
+    do: {:error, :already_published}
+
+  defp publish_locked_workout(workout, params) do
+    with :ok <- validate_expected_revision(workout, params),
+         merged_params <- merge_publish_params(workout, params),
+         {:ok, prepared_params} <- prepare_workout_structure(merged_params),
+         prepared_params <- stringify_keys_deep(prepared_params),
+         :ok <- validate_publish_body(prepared_params),
+         {:ok, params_with_levels} <- attach_scale_level_ids(prepared_params),
+         {:ok, published} <-
+           workout
+           |> MasterWorkout.publish_changeset(prepared_params)
+           |> Repo.update(),
+         {_count, _rows} <- Repo.delete_all(Ecto.assoc(workout, :sections)),
+         {:ok, _sections} <- insert_sections(published.id, params_with_levels) do
+      {:ok, published}
+    end
+  end
+
+  defp merge_publish_params(workout, params) do
+    params = stringify_keys_deep(params)
+
+    (workout.draft_data || %{})
+    |> Map.merge(params)
+    |> Map.merge(stringify_keys_deep(extract_dsl_authoring_fields(params)))
+    |> stringify_keys_deep()
+  end
+
+  defp validate_publish_body(%{"authoring_mode" => "free_text"} = params) do
+    body = Map.get(params, "free_text_body")
+
+    if is_binary(body) and String.trim(body) != "" do
+      :ok
+    else
+      {:error, :no_free_text_body}
+    end
+  end
+
+  defp validate_publish_body(params), do: validate_publish_sections(params)
+
+  defp validate_publish_sections(params) do
+    sections = Map.get(params, "sections") || []
+
+    if sections == [] or not sections_have_exercises?(sections) do
+      {:error, :no_sections}
+    else
+      :ok
+    end
+  end
 
   defp extract_sections_from_draft(draft_data) when is_map(draft_data) do
     get_map_value(draft_data, :sections) || []
@@ -901,25 +1144,40 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     %{
       id: workout.id,
       title: workout.title,
+      subtitle: workout.subtitle,
+      description: workout.description,
       type: workout.type |> to_string(),
       is_team_workout: workout.is_team_workout,
-      sections: normalize_sections(workout.sections)
+      difficulty: workout.difficulty,
+      estimated_duration_seconds: workout.estimated_duration_seconds,
+      equipment: workout.equipment,
+      tags: workout.tags,
+      notes: visible_notes(workout.notes, :athlete),
+      workout_metadata: workout.workout_metadata,
+      authoring_mode: workout.authoring_mode,
+      free_text_body: workout.free_text_body,
+      free_text_document: workout.free_text_document,
+      sections: normalize_sections(workout.sections, note_visibility: :athlete)
     }
   end
 
-  defp normalize_sections(sections, opts \\ []) do
-    exercise_mapper = Keyword.get(opts, :exercise_mapper, &normalize_exercise/1)
+  defp normalize_sections(sections, opts) do
+    note_visibility = Keyword.get(opts, :note_visibility, :athlete)
+
+    exercise_mapper =
+      Keyword.get(opts, :exercise_mapper, &normalize_exercise(&1, note_visibility))
 
     sections
     |> Enum.group_by(& &1.parent_section_id)
-    |> flatten_sections(nil, nil, exercise_mapper)
+    |> flatten_sections(nil, nil, exercise_mapper, note_visibility)
   end
 
   defp flatten_sections(
          grouped_sections,
          parent_section_id,
          inherited_timer_config,
-         exercise_mapper
+         exercise_mapper,
+         note_visibility
        ) do
     grouped_sections
     |> Map.get(parent_section_id, [])
@@ -931,10 +1189,15 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         id: section.id,
         parent_section_id: section.parent_section_id,
         name: section.name,
+        subtitle: section.subtitle,
         order: section.order,
         scoreable: section.scoreable,
         score_config: section.score_config,
         timer_config: effective_timer_config,
+        note: section.note,
+        notes: visible_notes(section.notes, note_visibility),
+        rest_before_next_section_seconds: section.rest_before_next_section_seconds,
+        section_metadata: section.section_metadata,
         exercises:
           section.exercises
           |> Enum.sort_by(& &1.order)
@@ -943,7 +1206,13 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
       [
         normalized_section
-        | flatten_sections(grouped_sections, section.id, effective_timer_config, exercise_mapper)
+        | flatten_sections(
+            grouped_sections,
+            section.id,
+            effective_timer_config,
+            exercise_mapper,
+            note_visibility
+          )
       ]
     end)
   end
@@ -1239,7 +1508,16 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   defp reconstruct_draft_data(%MasterWorkout{} = workout) do
     %{
       "title" => workout.title,
+      "subtitle" => workout.subtitle,
+      "description" => workout.description,
       "type" => workout.type && to_string(workout.type),
+      "is_team_workout" => workout.is_team_workout,
+      "difficulty" => workout.difficulty,
+      "estimated_duration_seconds" => workout.estimated_duration_seconds,
+      "equipment" => workout.equipment,
+      "tags" => workout.tags,
+      "notes" => workout.notes,
+      "workout_metadata" => workout.workout_metadata,
       "sections" => draft_sections_from_db(workout.sections)
     }
   end
@@ -1257,6 +1535,11 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       base = %{
         "id" => section.id,
         "name" => section.name,
+        "subtitle" => section.subtitle,
+        "note" => section.note,
+        "notes" => section.notes,
+        "rest_before_next_section_seconds" => section.rest_before_next_section_seconds,
+        "section_metadata" => section.section_metadata,
         "scoreable" => section.scoreable,
         "timer_config" => section.timer_config,
         "score_config" => section.score_config,
@@ -1275,12 +1558,18 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     %{
       "id" => exercise.id,
       "name" => exercise.name,
+      "subtitle" => exercise.subtitle,
+      "exercise_ref" => exercise.exercise_ref,
+      "item_type" => to_string(exercise.item_type),
       "sets" => exercise.sets,
+      "set_prescriptions" => exercise.set_prescriptions,
       "prescription_value" => exercise.prescription_value,
       "prescription_unit" => exercise.prescription_unit && to_string(exercise.prescription_unit),
       "load_value" => exercise.load_value,
       "load_mode" => exercise.load_mode && to_string(exercise.load_mode),
+      "load_progression" => exercise.load_progression,
       "superset_group_id" => exercise.superset_group_id,
+      "alternating_group_id" => exercise.alternating_group_id,
       "hr_zone" => exercise.hr_zone,
       "tempo" => exercise.tempo,
       "rest_seconds" => exercise.rest_seconds,
@@ -1288,6 +1577,10 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       "rest_pause_seconds" => exercise.rest_pause_seconds,
       "pacing" => exercise.pacing,
       "interval_assignment" => exercise.interval_assignment,
+      "note" => exercise.note,
+      "notes" => exercise.notes,
+      "prescription_metadata" => exercise.prescription_metadata,
+      "group_config" => exercise.group_config,
       "variations" => Enum.map(exercise.variations, &draft_variation_from_db/1)
     }
   end
@@ -1298,13 +1591,37 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       "scale_level_slug" => variation.scale_level.slug,
       "exercise_name_override" => variation.exercise_name_override,
       "sets" => variation.sets,
+      "set_prescriptions" => variation.set_prescriptions,
       "prescription_value" => variation.prescription_value,
       "prescription_unit" =>
         variation.prescription_unit && to_string(variation.prescription_unit),
       "load_value" => variation.load_value,
       "load_mode" => variation.load_mode && to_string(variation.load_mode),
-      "excluded" => variation.excluded
+      "load_progression" => variation.load_progression,
+      "excluded" => variation.excluded,
+      "note" => variation.note,
+      "notes" => variation.notes,
+      "prescription_metadata" => variation.prescription_metadata
     }
+  end
+
+  defp visible_notes(notes, :admin), do: notes || []
+
+  defp visible_notes(notes, _visibility) do
+    Enum.reject(notes || [], fn note ->
+      type = Map.get(note, "type") || Map.get(note, :type)
+      type == "coach-note"
+    end)
+  end
+
+  defp visible_group_config(nil, _visibility), do: nil
+
+  defp visible_group_config(config, visibility) do
+    notes = Map.get(config, "notes") || Map.get(config, :notes) || []
+
+    config
+    |> stringify_keys_deep()
+    |> Map.put("notes", visible_notes(notes, visibility))
   end
 
   defp blank?(value), do: is_nil(value) or String.trim(to_string(value)) == ""
@@ -1452,7 +1769,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   end
 
   @impl true
-  def duplicate_workout(id, title_suffix) do
+  def duplicate_workout(id, title_suffix, attrs) do
     case Repo.get(MasterWorkout, id) do
       nil ->
         {:error, :not_found}
@@ -1466,6 +1783,8 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           status: :draft,
           title: title,
           type: source.type,
+          folder_id: Map.get(attrs, :folder_id) || Map.get(attrs, "folder_id"),
+          source_workout_id: source.id,
           draft_data: draft_data
         }
 
@@ -1473,6 +1792,39 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           {:ok, new_workout} -> {:ok, %{id: new_workout.id, status: "draft", title: title}}
           {:error, changeset} -> {:error, changeset}
         end
+    end
+  end
+
+  defp normalize_folder(folder) do
+    %{
+      id: folder.id,
+      name: folder.name,
+      parent_id: folder.parent_id,
+      created_by_id: folder.created_by_id,
+      inserted_at: folder.inserted_at,
+      updated_at: folder.updated_at
+    }
+  end
+
+  defp validate_folder_parent(folder, params) do
+    parent_id = Map.get(params, :parent_id) || Map.get(params, "parent_id")
+    folder_id = folder && folder.id
+
+    cond do
+      is_nil(parent_id) or parent_id == "" -> :ok
+      parent_id == folder_id -> {:error, :folder_cycle}
+      is_nil(Repo.get(WorkoutFolder, parent_id)) -> {:error, :folder_parent_not_found}
+      folder_id && descendant_folder?(parent_id, folder_id) -> {:error, :folder_cycle}
+      true -> :ok
+    end
+  end
+
+  defp descendant_folder?(candidate_id, ancestor_id) do
+    case Repo.get(WorkoutFolder, candidate_id) do
+      nil -> false
+      %{parent_id: nil} -> false
+      %{parent_id: ^ancestor_id} -> true
+      %{parent_id: parent_id} -> descendant_folder?(parent_id, ancestor_id)
     end
   end
 
@@ -1489,6 +1841,20 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       |> Repo.preload(@workout_preloads)
       |> reconstruct_draft_data()
       |> Map.put("title", title)
+    end
+  end
+
+  defp prepare_workout_structure(params) do
+    case WorkoutAuthoring.prepare_structure(params) do
+      {:ok, normalized} ->
+        {:ok, normalized}
+
+      {:error, reason} ->
+        changeset =
+          Ecto.Changeset.change(%WorkoutExercise{})
+          |> Ecto.Changeset.add_error(:set_composition, Atom.to_string(reason))
+
+        {:error, changeset}
     end
   end
 

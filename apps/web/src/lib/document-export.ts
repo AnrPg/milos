@@ -12,6 +12,15 @@ export type ExportFormat = "pdf" | "md" | "txt" | "odt" | "csv";
 
 export type ExportLabels = {
   appName: string;
+  finance: string;
+  members: string;
+  plan: string;
+  expires: string;
+  lastPaid: string;
+  amount: string;
+  credits: string;
+  balanceDue: string;
+  referrals: string;
   workout: string;
   workoutHistory: string;
   personalRecord: string;
@@ -47,6 +56,11 @@ export type ExportLabels = {
   no: string;
   session: string;
   score: string;
+  header: string;
+  superset: string;
+  alternatingSets: string;
+  progressiveLoad: string;
+  progressiveDeload: string;
 };
 
 export type ExportItem = {
@@ -99,17 +113,17 @@ function duration(milliseconds: number): string {
     : `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
-function prescription(exercise: WorkoutExerciseRecord | WorkoutVariationRecord, labels: ExportLabels): string {
+function prescription(exercise: WorkoutExerciseRecord | WorkoutVariationRecord, labels: ExportLabels, includeSets = true): string {
   const parts: string[] = [];
   const sets = exercise.sets;
   const value = exercise.prescription_value;
   const unit = exercise.prescription_unit;
 
-  if (sets && value !== null && value !== undefined) {
+  if (includeSets && sets && value !== null && value !== undefined) {
     parts.push(`${sets} × ${displayValue(value)}${unit ? ` ${displayValue(unit)}` : ""}`);
   } else if (value !== null && value !== undefined) {
     parts.push(`${displayValue(value)}${unit ? ` ${displayValue(unit)}` : ""}`);
-  } else if (sets) {
+  } else if (includeSets && sets) {
     parts.push(`${sets} ${labels.setsLabel}`);
   }
 
@@ -118,6 +132,45 @@ function prescription(exercise: WorkoutExerciseRecord | WorkoutVariationRecord, 
   }
 
   return parts.join(" · ") || "—";
+}
+
+function setPrescriptionDetails(
+  exercise: WorkoutExerciseRecord | WorkoutVariationRecord,
+  labels: ExportLabels,
+): string[] {
+  return (exercise.set_prescriptions ?? []).map((set) => {
+    const prescribed = compact([
+      set.prescription_value != null
+        ? `${set.prescription_value}${set.prescription_unit ? ` ${displayValue(set.prescription_unit)}` : ""}`
+        : undefined,
+      set.load_value != null
+        ? `${set.load_value} ${set.load_mode === "pct_1rm" ? "%1RM" : displayValue(set.load_mode ?? labels.load)}`
+        : undefined,
+      set.note ?? undefined,
+    ]);
+
+    return `${labels.setsLabel} ${set.set_index}: ${prescribed.join(" · ") || "—"}`;
+  });
+}
+
+function loadProgressionDetail(
+  exercise: WorkoutExerciseRecord | WorkoutVariationRecord,
+  labels: ExportLabels,
+): string | undefined {
+  const progression = exercise.load_progression;
+  if (!progression) return undefined;
+
+  const label = progression.direction === "decrease"
+    ? labels.progressiveDeload
+    : labels.progressiveLoad;
+  const unit = progression.start_mode === "pct_1rm" ? "%1RM" : "kg";
+
+  if (progression.mode === "per_set") {
+    return `${label}: ${progression.per_set_values.join("/")} ${unit}`;
+  }
+
+  const sign = progression.direction === "decrease" ? "−" : "+";
+  return `${label}: ${progression.start_value} ${unit} (${sign}${progression.step_value} ${unit}/${labels.setsLabel})`;
 }
 
 function variationDetail(variation: WorkoutVariationRecord, base: WorkoutExerciseRecord, labels: ExportLabels): string {
@@ -191,8 +244,53 @@ function draftVariation(value: unknown, index: number): WorkoutVariationRecord |
     load_mode: typeof variation.load_mode === "string"
       ? variation.load_mode as WorkoutVariationRecord["load_mode"]
       : null,
+    set_prescriptions: draftSetPrescriptions(variation.set_prescriptions),
+    load_progression: draftLoadProgression(variation.load_progression),
     excluded: variation.excluded === true,
+    note: typeof variation.note === "string" ? variation.note : null,
     scale_level: draftScaleLevel(variation.scale_level, variation.scale_level_slug, index),
+  };
+}
+
+function draftSetPrescriptions(value: unknown): NonNullable<WorkoutExerciseRecord["set_prescriptions"]> {
+  if (!Array.isArray(value)) return [];
+
+  return value.flatMap((entry, index) => {
+    const set = objectValue(entry);
+    if (!set) return [];
+
+    return [{
+      set_index: numberValue(set.set_index) ?? index + 1,
+      prescription_value: numberValue(set.prescription_value),
+      prescription_unit: typeof set.prescription_unit === "string"
+        ? set.prescription_unit as WorkoutExerciseRecord["prescription_unit"]
+        : null,
+      load_value: numberValue(set.load_value),
+      load_mode: typeof set.load_mode === "string"
+        ? set.load_mode as WorkoutExerciseRecord["load_mode"]
+        : null,
+      note: typeof set.note === "string" ? set.note : null,
+    }];
+  });
+}
+
+function draftLoadProgression(value: unknown): WorkoutExerciseRecord["load_progression"] {
+  const progression = objectValue(value);
+  if (!progression) return null;
+
+  const mode = progression.mode === "per_set" ? "per_set" : "linear";
+  const direction = progression.direction === "decrease" ? "decrease" : "increase";
+  const startMode = progression.start_mode === "pct_1rm" ? "pct_1rm" : "absolute";
+
+  return {
+    mode,
+    direction,
+    start_value: numberValue(progression.start_value) ?? 0,
+    start_mode: startMode,
+    step_value: numberValue(progression.step_value) ?? 0,
+    per_set_values: Array.isArray(progression.per_set_values)
+      ? progression.per_set_values.flatMap((item) => numberValue(item) ?? [])
+      : [],
   };
 }
 
@@ -201,6 +299,7 @@ function draftExercise(value: unknown, index: number): WorkoutExerciseRecord | n
   if (!exercise || typeof exercise.name !== "string") return null;
 
   return {
+    item_type: exercise.item_type === "header" ? "header" : "exercise",
     name: exercise.name,
     description: typeof exercise.description === "string" ? exercise.description : null,
     sets: numberValue(exercise.sets),
@@ -212,6 +311,15 @@ function draftExercise(value: unknown, index: number): WorkoutExerciseRecord | n
     load_mode: typeof exercise.load_mode === "string"
       ? exercise.load_mode as WorkoutExerciseRecord["load_mode"]
       : null,
+    set_prescriptions: draftSetPrescriptions(exercise.set_prescriptions),
+    load_progression: draftLoadProgression(exercise.load_progression),
+    superset_group_id: typeof exercise.superset_group_id === "string"
+      ? exercise.superset_group_id
+      : null,
+    alternating_group_id: typeof exercise.alternating_group_id === "string"
+      ? exercise.alternating_group_id
+      : null,
+    note: typeof exercise.note === "string" ? exercise.note : null,
     order: numberValue(exercise.order) ?? index,
     variations: Array.isArray(exercise.variations)
       ? exercise.variations.map(draftVariation).filter((item): item is WorkoutVariationRecord => Boolean(item))
@@ -237,6 +345,7 @@ function exportWorkoutSections(workout: WorkoutRecord): WorkoutSectionRecord[] {
       scoreable: section.scoreable === true,
       score_config: objectValue(section.score_config),
       timer_config: objectValue(section.timer_config),
+      note: typeof section.note === "string" ? section.note : null,
       exercises,
     }];
   });
@@ -274,21 +383,51 @@ export function buildWorkoutDocument(workout: WorkoutRecord, labels: ExportLabel
       .map((section) => ({
         icon: section.scoreable ? "🎯" : "⚡",
         title: section.name,
-        items: section.exercises
-          .slice()
-          .sort((a, b) => a.order - b.order)
-          .map((exercise) => ({
-            label: exercise.name,
-            value: prescription(exercise, labels),
-            details: compact([
-              exercise.description ?? undefined,
-              timerSummary(section.timer_config, labels),
-              ...exercise.variations.map((variation) => variationDetail(variation, exercise, labels)),
-            ]),
-          })),
+        items: [
+          ...(section.note ? [{ label: labels.notes, value: section.note }] : []),
+          ...exportExerciseItems(section, labels),
+        ],
       })),
     footer: labels.generatedBy,
   };
+}
+
+function exportExerciseItems(section: WorkoutSectionRecord, labels: ExportLabels): ExportItem[] {
+  const exercises = section.exercises.slice().sort((a, b) => a.order - b.order);
+  const renderedGroups = new Set<string>();
+
+  const exerciseItem = (exercise: WorkoutExerciseRecord, grouped: boolean): ExportItem => exercise.item_type === "header"
+    ? { label: labels.header, value: exercise.name, details: compact([exercise.note ?? undefined]) }
+    : {
+        label: exercise.name,
+        value: prescription(exercise, labels, !grouped),
+        details: compact([
+          exercise.description ?? undefined,
+          exercise.note ?? undefined,
+          timerSummary(section.timer_config, labels),
+          loadProgressionDetail(exercise, labels),
+          ...setPrescriptionDetails(exercise, labels),
+          ...exercise.variations.flatMap((variation) => [
+            variationDetail(variation, exercise, labels),
+            variation.note ?? undefined,
+            loadProgressionDetail(variation, labels),
+            ...setPrescriptionDetails(variation, labels),
+          ]),
+        ]),
+      };
+
+  return exercises.flatMap((exercise) => {
+    const id = exercise.superset_group_id ?? exercise.alternating_group_id;
+    if (!id) return [exerciseItem(exercise, false)];
+    if (renderedGroups.has(id)) return [];
+    renderedGroups.add(id);
+    const members = exercises.filter((member) => member.superset_group_id === id || member.alternating_group_id === id);
+    const configSets = Number(exercise.group_config?.sets ?? exercise.sets ?? 0);
+    return [
+      { label: exercise.superset_group_id ? labels.superset : labels.alternatingSets, value: configSets > 0 ? `${configSets} ${labels.setsLabel}` : "" },
+      ...members.map((member) => exerciseItem(member, true)),
+    ];
+  });
 }
 
 export function buildExecutionDocument(
@@ -298,6 +437,10 @@ export function buildExecutionDocument(
 ): ExportDocument {
   const completedDate = execution.completed_at_utc ?? execution.started_at_utc;
   const sections: ExportSection[] = [];
+
+  if (execution.workout) {
+    sections.push(...buildWorkoutDocument(execution.workout, labels).sections);
+  }
 
   if (execution.section_scores.length > 0) {
     sections.push({
@@ -434,6 +577,65 @@ export function buildExecutionHistoryDocument(
   };
 }
 
+function financeRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
+
+function financeAmount(value: unknown, locale: string): string {
+  if (value === null || value === undefined || value === "") return "—";
+  const amount = typeof value === "number" ? value : Number(value ?? 0);
+  if (!Number.isFinite(amount)) return "—";
+  return new Intl.NumberFormat(locale, { style: "currency", currency: "EUR" }).format(amount / 100);
+}
+
+function financePackageLabel(subscription: Record<string, unknown>): unknown {
+  return (
+    subscription.package_name ??
+    subscription.package_code_snapshot ??
+    subscription.package_family_snapshot
+  );
+}
+
+export function buildFinanceMembersDocument(
+  members: Array<Record<string, unknown>>,
+  labels: ExportLabels,
+  locale: string,
+): ExportDocument {
+  return {
+    icon: "📋",
+    category: labels.finance,
+    title: labels.members,
+    metadata: [{ label: labels.members, value: String(members.length) }],
+    sections: members.map((member) => {
+      const membership = financeRecord(member.membership);
+      const subscription = financeRecord(member.active_package_subscription);
+      const referrals = Array.isArray(member.referrals_made_user_ids) ? member.referrals_made_user_ids : [];
+      const nickname = displayValue(member.nickname || member.id || labels.members);
+      const details = compact([
+        `${labels.type}: ${displayValue(member.identity_role ?? membership.user_type_snapshot)}`,
+        `${labels.status}: ${displayValue(membership.status)}`,
+        `${labels.plan}: ${displayValue(financePackageLabel(subscription))}`,
+        `${labels.expires}: ${displayValue(subscription.ends_on)}`,
+        `${labels.lastPaid}: ${displayValue(member.last_payment_on)}`,
+        `${labels.amount}: ${financeAmount(member.last_payment_amount_cents, locale)}`,
+        `${labels.credits}: ${financeAmount(member.credit_balance_cents ?? member.credit_balance, locale)}`,
+        `${labels.balanceDue}: ${financeAmount(member.outstanding_balance_cents, locale)}`,
+        `${labels.notes}: ${displayValue(membership.notes ?? member.notes)}`,
+        `${labels.referrals}: ${referrals.length}`,
+      ]);
+
+      return {
+        icon: "👤",
+        title: nickname,
+        items: details.map((value) => ({ value })),
+      };
+    }),
+    footer: labels.generatedBy,
+  };
+}
+
 function markdownEscape(value: string): string {
   return value.replaceAll("|", "\\|").replaceAll("\n", " ");
 }
@@ -556,70 +758,143 @@ async function renderOdt(document: ExportDocument): Promise<Blob> {
 async function renderPdf(document: ExportDocument): Promise<Blob> {
   const { jsPDF } = await import("jspdf");
   const pdf = new jsPDF({ unit: "pt", format: "a4" });
+  const [regularFont, boldFont] = await Promise.all([
+    loadPdfFont("/fonts/DejaVuSans.ttf"),
+    loadPdfFont("/fonts/DejaVuSans-Bold.ttf"),
+  ]);
+  const fontFamily = regularFont && boldFont ? "DejaVuSans" : "helvetica";
+  if (regularFont && boldFont) {
+    pdf.addFileToVFS("DejaVuSans.ttf", arrayBufferToBase64(regularFont));
+    pdf.addFileToVFS("DejaVuSans-Bold.ttf", arrayBufferToBase64(boldFont));
+    pdf.addFont("DejaVuSans.ttf", fontFamily, "normal");
+    pdf.addFont("DejaVuSans-Bold.ttf", fontFamily, "bold");
+  }
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   const margin = 48;
   const contentWidth = pageWidth - margin * 2;
+  const bodyTop = 76;
+  const bodyBottom = pageHeight - 56;
   let y = 44;
+  let pageNumber = 1;
+
+  const drawContinuationHeader = () => {
+    pdf.setDrawColor(226, 232, 240);
+    pdf.setLineWidth(0.75);
+    pdf.line(margin, 42, pageWidth - margin, 42);
+    pdf.setFont(fontFamily, "bold");
+    pdf.setFontSize(8);
+    pdf.setTextColor(124, 58, 237);
+    pdf.text(document.category.toLocaleUpperCase(), margin, 31);
+    pdf.setFont(fontFamily, "normal");
+    pdf.setTextColor(100, 116, 139);
+    pdf.text(document.title, pageWidth - margin, 31, { align: "right", maxWidth: contentWidth * 0.62 });
+  };
+
+  const nextPage = () => {
+    pdf.addPage();
+    pageNumber += 1;
+    drawContinuationHeader();
+    y = bodyTop;
+  };
 
   const ensureSpace = (height: number) => {
-    if (y + height <= pageHeight - 44) return;
-    pdf.addPage();
-    y = 48;
+    if (y + height <= bodyBottom) return;
+    nextPage();
   };
-  const textBlock = (text: string, size: number, color: [number, number, number], options?: { bold?: boolean; indent?: number }) => {
+
+  const textBlock = (text: string, size: number, color: [number, number, number], options?: { bold?: boolean; indent?: number; gapBefore?: number; gapAfter?: number }) => {
     const indent = options?.indent ?? 0;
-    pdf.setFont("helvetica", options?.bold ? "bold" : "normal");
+    const gapBefore = options?.gapBefore ?? 0;
+    const gapAfter = options?.gapAfter ?? 6;
+    pdf.setFont(fontFamily, options?.bold ? "bold" : "normal");
     pdf.setFontSize(size);
     pdf.setTextColor(...color);
     const lines = pdf.splitTextToSize(text, contentWidth - indent);
-    const height = lines.length * (size * 1.35);
-    ensureSpace(height + 5);
-    pdf.text(lines, margin + indent, y);
-    y += height + 5;
+    const lineHeight = size * 1.4;
+    y += gapBefore;
+
+    for (let lineIndex = 0; lineIndex < lines.length;) {
+      if (y + lineHeight > bodyBottom) nextPage();
+      const availableLines = Math.max(1, Math.floor((bodyBottom - y) / lineHeight));
+      const chunk = lines.slice(lineIndex, lineIndex + availableLines);
+      pdf.text(chunk, margin + indent, y);
+      y += chunk.length * lineHeight;
+      lineIndex += chunk.length;
+    }
+
+    y += gapAfter;
   };
 
   pdf.setFillColor(124, 58, 237);
   pdf.roundedRect(margin, y, contentWidth, 24, 8, 8, "F");
   pdf.setTextColor(255, 255, 255);
-  pdf.setFont("helvetica", "bold");
+  pdf.setFont(fontFamily, "bold");
   pdf.setFontSize(10);
   pdf.text(document.category.toUpperCase(), margin + 12, y + 16);
-  y += 44;
-  textBlock(document.title, 27, [23, 32, 51], { bold: true });
-  if (document.subtitle) textBlock(document.subtitle, 15, [219, 39, 119], { bold: true });
+  y += 54;
+  textBlock(document.title, 27, [23, 32, 51], { bold: true, gapAfter: 8 });
+  if (document.subtitle) textBlock(document.subtitle, 15, [219, 39, 119], { bold: true, gapAfter: 12 });
   y += 5;
 
   for (const meta of document.metadata) {
-    ensureSpace(22);
-    pdf.setFillColor(246, 243, 255);
-    pdf.roundedRect(margin, y - 11, contentWidth, 20, 5, 5, "F");
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(9);
-    pdf.setTextColor(124, 58, 237);
-    pdf.text(`${meta.label}:`, margin + 9, y + 2);
-    pdf.setFont("helvetica", "normal");
-    pdf.setTextColor(71, 85, 105);
-    pdf.text(pdf.splitTextToSize(meta.value, contentWidth * 0.68)[0] ?? "", margin + 120, y + 2);
-    y += 25;
+    ensureSpace(26);
+    textBlock(`${meta.label}: ${meta.value}`, 9.5, [71, 85, 105], { gapAfter: 5 });
   }
 
   for (const section of document.sections) {
-    y += 10;
+    y += 12;
     ensureSpace(42);
     pdf.setDrawColor(13, 148, 136);
     pdf.setLineWidth(3);
     pdf.line(margin, y - 12, margin, y + 8);
-    textBlock(section.title, 16, [15, 118, 110], { bold: true, indent: 12 });
+    textBlock(section.title, 16, [15, 118, 110], { bold: true, indent: 12, gapAfter: 9 });
     for (const item of section.items) {
-      textBlock(item.label ? `${item.label}: ${item.value}` : item.value, 11, [23, 32, 51], { bold: Boolean(item.label), indent: 12 });
-      for (const detail of item.details ?? []) textBlock(`• ${detail}`, 9, [100, 116, 139], { indent: 26 });
+      if (item.label) {
+        textBlock(item.label, 11, [23, 32, 51], { bold: true, indent: 12, gapAfter: 2 });
+        textBlock(item.value, 10.5, [51, 65, 85], { indent: 20, gapAfter: 4 });
+      } else {
+        textBlock(item.value, 10.5, [23, 32, 51], { indent: 12, gapAfter: 4 });
+      }
+      for (const detail of item.details ?? []) textBlock(`• ${detail}`, 9.5, [100, 116, 139], { indent: 28, gapAfter: 3 });
     }
   }
 
   y += 14;
-  textBlock(document.footer, 8, [148, 163, 184]);
+  textBlock(document.footer, 8, [148, 163, 184], { gapAfter: 0 });
+
+  for (let page = 1; page <= pageNumber; page += 1) {
+    pdf.setPage(page);
+    pdf.setDrawColor(226, 232, 240);
+    pdf.setLineWidth(0.75);
+    pdf.line(margin, pageHeight - 37, pageWidth - margin, pageHeight - 37);
+    pdf.setFont(fontFamily, "normal");
+    pdf.setFontSize(8);
+    pdf.setTextColor(148, 163, 184);
+    pdf.text(document.footer, margin, pageHeight - 24);
+    pdf.text(`${page} / ${pageNumber}`, pageWidth - margin, pageHeight - 24, { align: "right" });
+  }
   return pdf.output("blob");
+}
+
+function arrayBufferToBase64(buffer: ArrayBuffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
+  }
+  return btoa(binary);
+}
+
+async function loadPdfFont(path: string) {
+  try {
+    const response = await fetch(path);
+    if (!response.ok) return null;
+    return await response.arrayBuffer();
+  } catch {
+    return null;
+  }
 }
 
 export function exportFilename(document: ExportDocument, format: ExportFormat): string {

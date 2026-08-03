@@ -39,6 +39,15 @@ export function useShareExport() {
     },
     labels: {
       appName: "Milos Training",
+      finance: i18n("finance1b48d3f"),
+      members: i18n("members1cb449c"),
+      plan: i18n("planae2f98a"),
+      expires: i18n("expiresa99be3d"),
+      lastPaid: i18n("lastPaid05b910a"),
+      amount: i18n("amount43dc853"),
+      credits: i18n("creditsbfac50d"),
+      balanceDue: i18n("balanceDue5a6bd4c"),
+      referrals: i18n("referrals2b0e3a3"),
       workout: i18n("exportWorkout"),
       workoutHistory: i18n("exportWorkoutHistory"),
       personalRecord: i18n("exportPersonalRecord"),
@@ -74,6 +83,11 @@ export function useShareExport() {
       no: i18n("exportNo"),
       session: i18n("exportSession"),
       score: i18n("exportScore"),
+      header: i18n("headerLabel"),
+      superset: i18n("supersetLabel"),
+      alternatingSets: i18n("alternatingSetsLabel"),
+      progressiveLoad: i18n("progressiveLoadIncrease"),
+      progressiveDeload: i18n("progressiveLoadDecrease"),
     },
   }), [i18n]);
 }

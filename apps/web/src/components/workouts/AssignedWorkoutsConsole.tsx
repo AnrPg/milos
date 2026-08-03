@@ -45,6 +45,7 @@ import { downloadIcsEvent } from "@/lib/ics";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { workoutTypeColor } from "@/lib/workout-colors";
 import { useExecutionStore } from "@/stores/execution";
+import { isFreeTextWorkout, storeFreeTextExecutionWorkout } from "@/lib/free-text-execution";
 import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
 
@@ -744,6 +745,18 @@ export function AssignedWorkoutsConsole({
     setError(null);
 
     try {
+      if (isFreeTextWorkout(assignment.workout)) {
+        const execution = await startExecution(tokens.access_token, {
+          master_workout_id: assignment.workout.id,
+          source: "assigned",
+          source_reference_id: assignment.id,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        });
+        storeFreeTextExecutionWorkout(assignment.workout, execution);
+        router.push(`/workouts/free-text/execute?workout=${assignment.workout.id}&execution=${execution.id}`);
+        return;
+      }
+
       const execution = await startExecution(tokens.access_token, {
         master_workout_id: assignment.workout.id,
         source: "assigned",

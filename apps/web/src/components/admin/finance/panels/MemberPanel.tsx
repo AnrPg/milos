@@ -15,6 +15,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   assignFinancePackage,
+  createFinanceReceipt,
   createFinanceInvoice,
   fetchFinanceMember,
   fetchFinancePackages,
@@ -22,12 +23,22 @@ import {
   getInvoiceUploadUrl,
   issueFinanceInvoice,
   recordFinancePayment,
+  reverseFinancePayment,
   updateFinanceInvoice,
   voidFinanceInvoice,
   type FinanceRecord,
+  type FinanceReceipt,
 } from "@/api/finance";
+import { fetchAdminSettings } from "@/api/settings";
+import {
+  buildFinanceReceiptPayload,
+  receiptPackageLabel,
+} from "@/components/admin-finance-receipt";
 import { useSession } from "@/components/session-provider";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
+import { generateExportFile, type ExportDocument } from "@/lib/document-export";
+
+const MANUAL_RECEIPT_PURPOSE = "__manual_receipt_purpose__";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -40,6 +51,15 @@ function money(uiLocale: string, cents: unknown) {
   return new Intl.NumberFormat(uiLocale, { style: "currency", currency: "EUR" }).format(amount / 100);
 }
 
+function euroInputValue(cents: unknown) {
+  return (Number(cents ?? 0) / 100).toFixed(2);
+}
+
+function numericField(record: FinanceRecord | null | undefined, key: string, fallback = 0) {
+  const value = record?.[key];
+  return typeof value === "number" ? value : Number(value ?? fallback);
+}
+
 function statusColor(status: string): string {
   if (["active", "paid", "applied"].includes(status)) return "var(--success)";
   if (["overdue", "void", "rejected"].includes(status)) return "var(--primary-strong)";
@@ -47,7 +67,70 @@ function statusColor(status: string): string {
   return "var(--muted)";
 }
 
-type Section = "overview" | "invoices" | "payments" | "credits";
+function packageLabelFromSubscription(
+  subscription: FinanceRecord | null | undefined,
+  packages: FinanceRecord[],
+) {
+  const packageId = field(subscription, "membership_package_id");
+  const code = field(subscription, "package_code_snapshot");
+  const family = field(subscription, "package_family_snapshot");
+  const match = packages.find((pkg) => field(pkg, "id") === packageId);
+  return field(match, "name") || code || family || "";
+}
+
+type Section = "overview" | "invoices" | "payments" | "receipts" | "credits";
+
+type ReceiptCopy = {
+  receipt: string;
+  documentTitle: string;
+  paymentReceived: string;
+  reference: string;
+  date: string;
+  amountReceived: string;
+  package: string;
+  payment: string;
+  purpose: string;
+  method: string;
+  status: string;
+  paid: string;
+  footer: string;
+};
+
+async function downloadReceipt(receipt: FinanceReceipt, uiLocale: string, copy: ReceiptCopy) {
+  const amount = new Intl.NumberFormat(uiLocale, { style: "currency", currency: receipt.currency }).format(receipt.amount_cents / 100);
+  const selectedPackage = receiptPackageLabel(receipt);
+  const document: ExportDocument = {
+    icon: "✓",
+    category: copy.receipt,
+    title: copy.documentTitle,
+    subtitle: copy.paymentReceived,
+    metadata: [
+      { label: copy.reference, value: receipt.reference },
+      { label: copy.date, value: receipt.issued_on },
+      { label: copy.amountReceived, value: amount },
+      ...(selectedPackage ? [{ label: copy.package, value: selectedPackage }] : []),
+    ],
+    sections: [
+      {
+        icon: "€",
+        title: copy.payment,
+        items: [
+          { label: copy.purpose, value: receipt.description },
+          { label: copy.method, value: field(receipt.payment, "payment_method") },
+          { label: copy.status, value: copy.paid },
+        ],
+      },
+    ],
+    footer: copy.footer,
+  };
+  const file = await generateExportFile(document, "pdf");
+  const url = URL.createObjectURL(file);
+  const anchor = window.document.createElement("a");
+  anchor.href = url;
+  anchor.download = file.name;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
 
 export function MemberPanel({
   userId,
@@ -63,6 +146,21 @@ export function MemberPanel({
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
   const queryClient = useQueryClient();
+  const receiptCopy = (reference: string): ReceiptCopy => ({
+    receipt: i18n("featureReceipt"),
+    documentTitle: i18n("featureReceiptDocumentTitle", { reference }),
+    paymentReceived: i18n("featurePaymentReceived"),
+    reference: i18n("featureReference"),
+    date: i18n("featureDate"),
+    amountReceived: i18n("featureAmountReceived"),
+    package: i18n("package7431e3d"),
+    payment: i18n("featurePayment"),
+    purpose: i18n("featurePurpose"),
+    method: i18n("featureMethod"),
+    status: i18n("featureStatus"),
+    paid: i18n("featurePaid"),
+    footer: i18n("featureReceiptFooter"),
+  });
 
   const [section, setSection] = useState<Section>("overview");
   const [showPaymentForm, setShowPaymentForm] = useState(false);
@@ -74,6 +172,9 @@ export function MemberPanel({
     finance_invoice_id: "",
     notes: "",
   });
+  const [receiptDescription, setReceiptDescription] = useState("");
+  const [receiptPackageSubscriptionId, setReceiptPackageSubscriptionId] = useState("");
+  const [receiptManualPurposeSelected, setReceiptManualPurposeSelected] = useState(false);
   const [invoiceForm, setInvoiceForm] = useState({
     amount_cents: "",
     description: "",
@@ -94,10 +195,41 @@ export function MemberPanel({
     queryFn: () => fetchFinancePackages(token),
   });
 
+  const settingsQuery = useQuery({
+    queryKey: ["admin", "settings"],
+    enabled: Boolean(token),
+    queryFn: () => fetchAdminSettings(token),
+  });
+
   const profile = profileQuery.data;
   const packages = packagesQuery.data?.packages ?? [];
   const packageSubscriptions = ((profile?.package_subscriptions as FinanceRecord[] | undefined) ?? []).filter(
     (sub) => field(sub, "status") === "active",
+  );
+  const paymentReversals = (profile?.payment_reversals as FinanceRecord[] | undefined) ?? [];
+  const payments = (profile?.payments as FinanceRecord[] | undefined) ?? [];
+  const paymentReversedCentsById = new Map<string, number>();
+  for (const reversal of paymentReversals) {
+    const paymentId = field(reversal, "membership_payment_id");
+    if (!paymentId) continue;
+    paymentReversedCentsById.set(
+      paymentId,
+      (paymentReversedCentsById.get(paymentId) ?? 0) + numericField(reversal, "amount_cents"),
+    );
+  }
+  const remainingReversiblePaymentCents = (payment: FinanceRecord | null | undefined) => {
+    if (!payment) return 0;
+    const status = field(payment, "payment_status");
+    if (!["paid", "waived"].includes(status)) return 0;
+    const paymentId = field(payment, "id");
+    const explicitNet = payment?.net_amount_cents;
+    if (typeof explicitNet === "number") return Math.max(explicitNet, 0);
+    return Math.max(numericField(payment, "amount_cents") - (paymentReversedCentsById.get(paymentId) ?? 0), 0);
+  };
+  const paymentByInvoiceId = new Map(
+    payments
+      .filter((payment) => field(payment, "finance_invoice_id"))
+      .map((payment) => [field(payment, "finance_invoice_id"), payment]),
   );
   const invoiceNumberById = new Map(
     (((profile?.invoices as FinanceRecord[] | undefined) ?? [])).map((invoice) => [
@@ -110,6 +242,17 @@ export function MemberPanel({
     const balanceDue = typeof invoice.balance_due_cents === "number" ? invoice.balance_due_cents : 0;
     return ["issued", "partially_paid", "overdue"].includes(status) && balanceDue > 0;
   });
+  const receiptMode = settingsQuery.data?.finance.document_mode === "receipt";
+  const receiptPurposeValue = receiptManualPurposeSelected ? MANUAL_RECEIPT_PURPOSE : receiptPackageSubscriptionId;
+
+  const invalidateFinanceSurfaces = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["admin", "finance"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "dashboard"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "analytics"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] }),
+    ]);
+  };
 
   const recordPaymentMutation = useMutation({
     mutationFn: () =>
@@ -122,9 +265,34 @@ export function MemberPanel({
     onSuccess: async () => {
       setShowPaymentForm(false);
       setPaymentForm({ amount_cents: "", paid_on: "", finance_invoice_id: "", notes: "" });
-      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "member-profile", userId] });
-      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "members"] });
-      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "summary"] });
+      await invalidateFinanceSurfaces();
+    },
+  });
+
+  const createReceiptMutation = useMutation({
+    mutationFn: () =>
+      createFinanceReceipt(
+        token,
+        userId,
+        buildFinanceReceiptPayload(
+          {
+            amount: paymentForm.amount_cents,
+            paymentMethod: "cash",
+            paidOn: paymentForm.paid_on,
+            description: receiptDescription,
+            notes: paymentForm.notes,
+            packageSubscriptionId: receiptPackageSubscriptionId,
+          },
+          crypto.randomUUID(),
+        ),
+      ),
+    onSuccess: async ({ receipt }) => {
+      setShowPaymentForm(false);
+      setPaymentForm({ amount_cents: "", paid_on: "", finance_invoice_id: "", notes: "" });
+      setReceiptDescription("");
+      setReceiptPackageSubscriptionId("");
+      await downloadReceipt(receipt, uiLocale, receiptCopy(receipt.reference));
+      await invalidateFinanceSurfaces();
     },
   });
 
@@ -144,9 +312,7 @@ export function MemberPanel({
         due_date: "",
         membership_package_subscription_id: "",
       });
-      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "member-profile", userId] });
-      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "members"] });
-      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "summary"] });
+      await invalidateFinanceSurfaces();
     },
   });
 
@@ -160,12 +326,37 @@ export function MemberPanel({
     },
   });
 
-  const SECTIONS: { key: Section; label: string }[] = [
-    { key: "overview", label: i18n("overview0efc2e6") },
-    { key: "invoices", label: i18n("invoices35f8f37") },
-    { key: "payments", label: i18n("payments44357ae") },
-    { key: "credits", label: i18n("creditsbfac50d") },
-  ];
+  const reversePaymentMutation = useMutation({
+    mutationFn: (payment: FinanceRecord) =>
+      reverseFinancePayment(token, userId, field(payment, "id"), {
+        amount_cents: remainingReversiblePaymentCents(payment),
+        reversal_type: field(payment, "payment_status") === "waived" ? "waiver_reversal" : "payment_reversal",
+        reason: i18n("refundOrReversePayment9d232b2"),
+        request_id: crypto.randomUUID(),
+      }),
+    onSuccess: invalidateFinanceSurfaces,
+  });
+
+  const rollbackPayment = (payment: FinanceRecord | null | undefined) => {
+    if (!payment || reversePaymentMutation.isPending) return;
+    const amount = remainingReversiblePaymentCents(payment);
+    if (amount <= 0) return;
+    if (!confirm(`${i18n("refundOrReversePayment9d232b2")} ${money(uiLocale, amount)}?`)) return;
+    reversePaymentMutation.mutate(payment);
+  };
+
+  const SECTIONS: { key: Section; label: string }[] = receiptMode
+    ? [
+        { key: "overview", label: i18n("overview0efc2e6") },
+        { key: "receipts", label: i18n("featureReceipt") },
+        { key: "credits", label: i18n("creditsbfac50d") },
+      ]
+    : [
+        { key: "overview", label: i18n("overview0efc2e6") },
+        { key: "invoices", label: i18n("invoices35f8f37") },
+        { key: "payments", label: i18n("payments44357ae") },
+        { key: "credits", label: i18n("creditsbfac50d") },
+      ];
 
   return (
     <SidePanel
@@ -269,7 +460,7 @@ export function MemberPanel({
                   <div key={field(sub, "id")} className="rounded-[1rem] px-3 py-2" style={{ background: "var(--panel)" }}>
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-                        {field(sub, "package_code_snapshot")}
+                        {packageLabelFromSubscription(sub, packages)}
                       </span>
                       <span
                         className="rounded-full px-2 py-0.5 text-xs font-semibold"
@@ -284,6 +475,152 @@ export function MemberPanel({
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Receipts */}
+          {section === "receipts" && receiptMode && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+                  {i18n("featureReceipt")} ({(profile.invoices as FinanceRecord[]).length})
+                </p>
+                <button
+                  className="rounded-full px-3 py-1 text-xs font-semibold"
+                  style={{ background: "color-mix(in srgb, var(--success) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--success) 24%, transparent)", color: "var(--success)" }}
+                  onClick={() => setShowPaymentForm((v) => !v)}
+                  type="button"
+                >
+                  {showPaymentForm ? i18n("cancel77dfd21") : i18n("featureRecordAndDownloadReceipt")}
+                </button>
+              </div>
+
+              {showPaymentForm && (
+                <div className="rounded-[1.5rem] p-4 space-y-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
+                  <FormField label={i18n("amountEur2dc6463")}>
+                    <input
+                      className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
+                      style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+                      type="number"
+                      value={paymentForm.amount_cents}
+                      onChange={(e) => setPaymentForm({ ...paymentForm, amount_cents: e.target.value })}
+                    />
+                  </FormField>
+                  <FormField label={i18n("featurePaymentPurpose")}>
+                    <select
+                      className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
+                      style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+                      value={receiptPurposeValue}
+                      onChange={(e) => {
+                        const receiptPurpose = e.target.value;
+                        if (receiptPurpose === MANUAL_RECEIPT_PURPOSE) {
+                          setReceiptPackageSubscriptionId("");
+                          setReceiptManualPurposeSelected(true);
+                          setReceiptDescription("");
+                          return;
+                        }
+
+                        const subscription = packageSubscriptions.find((item) => field(item, "id") === receiptPurpose);
+                        const priceCents = typeof subscription?.price_cents_snapshot === "number" ? subscription.price_cents_snapshot : null;
+                        const selectedPackageLabel = packageLabelFromSubscription(subscription, packages);
+
+                        setReceiptPackageSubscriptionId(receiptPurpose);
+                        setReceiptManualPurposeSelected(false);
+                        setPaymentForm((current) => ({
+                          ...current,
+                          amount_cents: priceCents !== null ? euroInputValue(priceCents) : current.amount_cents,
+                        }));
+                        if (selectedPackageLabel) {
+                          setReceiptDescription(i18n("package5544677") + selectedPackageLabel);
+                        }
+                      }}
+                    >
+                      {packageSubscriptions.map((subscription) => {
+                        const id = field(subscription, "id");
+                        return (
+                          <option key={id} value={id}>
+                            {packageLabelFromSubscription(subscription, packages)} · {money(uiLocale, subscription.price_cents_snapshot)}
+                          </option>
+                        );
+                      })}
+                      <option value={MANUAL_RECEIPT_PURPOSE}>{i18n("featureReceiptManualPurposeOption")}</option>
+                    </select>
+                  </FormField>
+                  {receiptPurposeValue === MANUAL_RECEIPT_PURPOSE ? (
+                    <FormField label={i18n("featurePurpose")}>
+                      <input
+                        className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
+                        style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+                        value={receiptDescription}
+                        onChange={(e) => setReceiptDescription(e.target.value)}
+                      />
+                    </FormField>
+                  ) : null}
+                  <FormField label={i18n("paidOnfca3213")}>
+                    <input
+                      className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
+                      style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+                      type="date"
+                      value={paymentForm.paid_on}
+                      onChange={(e) => setPaymentForm({ ...paymentForm, paid_on: e.target.value })}
+                    />
+                  </FormField>
+                  <FormField label={i18n("notesOptional4d56ca9")}>
+                    <input
+                      className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
+                      style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+                      value={paymentForm.notes}
+                      onChange={(e) => setPaymentForm({ ...paymentForm, notes: e.target.value })}
+                    />
+                  </FormField>
+                  <button
+                    className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
+                    style={{ background: "var(--text)", color: "var(--bg)" }}
+                    disabled={!paymentForm.amount_cents || !receiptDescription.trim() || createReceiptMutation.isPending}
+                    onClick={() => createReceiptMutation.mutate()}
+                    type="button"
+                  >
+                    {createReceiptMutation.isPending ? i18n("recording72f9eb4") : i18n("featureRecordAndDownloadReceipt")}
+                  </button>
+                  {createReceiptMutation.error instanceof Error && (
+                    <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{localizeError(createReceiptMutation.error, i18n)}</p>
+                  )}
+                </div>
+              )}
+
+              {(profile.invoices as FinanceRecord[]).length === 0 ? (
+                <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("noPaymentsRecordedc84cf39")}</p>
+              ) : (
+                <div className="space-y-2">
+                  {(profile.invoices as FinanceRecord[]).map((receipt) => {
+                    const receiptPayment = paymentByInvoiceId.get(field(receipt, "id"));
+                    return (
+                      <div key={field(receipt, "id")} className="rounded-[1.2rem] px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>{field(receipt, "invoice_number", field(receipt, "id"))}</p>
+                            <p className="mt-1 text-sm font-semibold" style={{ color: "var(--text)" }}>{money(uiLocale, receipt.total_cents)}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold" style={{ color: statusColor(field(receipt, "status")) }}>
+                              <SemanticLabel value={field(receipt, "status")} />
+                            </span>
+                            <PaymentRollbackIconButton
+                              disabled={reversePaymentMutation.isPending}
+                              i18n={i18n}
+                              onClick={() => rollbackPayment(receiptPayment)}
+                              visible={remainingReversiblePaymentCents(receiptPayment) > 0}
+                            />
+                          </div>
+                        </div>
+                        <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
+                          {i18n("featureDate")} {field(receipt, "issued_on", field(receipt, "due_date", "—"))}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 
@@ -327,20 +664,20 @@ export function MemberPanel({
                         );
                         const priceCents =
                           typeof subscription?.price_cents_snapshot === "number" ? subscription.price_cents_snapshot : null;
-                        const code = field(subscription, "package_code_snapshot");
+                        const packageName = packageLabelFromSubscription(subscription, packages);
 
                         setInvoiceForm({
                           ...invoiceForm,
                           membership_package_subscription_id,
                           amount_cents: priceCents !== null ? String(priceCents / 100) : invoiceForm.amount_cents,
-                          description: code ? i18n("package5544677") + (code) : invoiceForm.description,
+                          description: packageName ? i18n("package5544677") + (packageName) : invoiceForm.description,
                         });
                       }}
                     >
                       <option value="">{i18n("noPackageLink7149c0f")}</option>
                       {packageSubscriptions.map((sub) => (
                         <option key={field(sub, "id")} value={field(sub, "id")}>
-                          {field(sub, "package_code_snapshot", i18n("package7431e3d"))} · {money(uiLocale, sub.price_cents_snapshot)}
+                          {packageLabelFromSubscription(sub, packages) || i18n("package7431e3d")} · {money(uiLocale, sub.price_cents_snapshot)}
                         </option>
                       ))}
                     </select>
@@ -491,18 +828,33 @@ export function MemberPanel({
                 <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("noPaymentsRecordedc84cf39")}</p>
               ) : (
                 <div className="space-y-2">
-                  {(profile.payments as FinanceRecord[]).map((pay) => (
+                  {payments.map((pay) => (
                     <div key={field(pay, "id")} className="rounded-[1.2rem] px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
                       <div className="flex items-center justify-between gap-3">
-                        <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-                          {money(uiLocale, pay.amount_cents)}
-                        </span>
-                        <span className="text-xs" style={{ color: "var(--muted)" }}>
-                          {field(pay, "paid_on")}
-                          {field(pay, "finance_invoice_id")
-                            ? i18n("linkedToInvoice541dca8") + (invoiceNumberById.get(field(pay, "finance_invoice_id")) ?? field(pay, "finance_invoice_id"))
-                            : ""}
-                        </span>
+                        <div className="min-w-0">
+                          <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+                            {money(uiLocale, pay.amount_cents)}
+                          </span>
+                          {remainingReversiblePaymentCents(pay) < numericField(pay, "amount_cents") && (
+                            <p className="text-xs" style={{ color: "var(--dim)" }}>
+                              {money(uiLocale, remainingReversiblePaymentCents(pay))}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex min-w-0 items-center gap-2">
+                          <span className="truncate text-xs" style={{ color: "var(--muted)" }}>
+                            {field(pay, "paid_on")}
+                            {field(pay, "finance_invoice_id")
+                              ? i18n("linkedToInvoice541dca8") + (invoiceNumberById.get(field(pay, "finance_invoice_id")) ?? field(pay, "finance_invoice_id"))
+                              : ""}
+                          </span>
+                          <PaymentRollbackIconButton
+                            disabled={reversePaymentMutation.isPending}
+                            i18n={i18n}
+                            onClick={() => rollbackPayment(pay)}
+                            visible={remainingReversiblePaymentCents(pay) > 0}
+                          />
+                        </div>
                       </div>
                       {field(pay, "notes") && (
                         <p className="text-xs mt-0.5" style={{ color: "var(--dim)" }}>{field(pay, "notes")}</p>
@@ -843,5 +1195,39 @@ function FormField({ label, children }: { label: string; children: React.ReactNo
       <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{label}</span>
       {children}
     </label>
+  );
+}
+
+function PaymentRollbackIconButton({
+  disabled,
+  i18n,
+  onClick,
+  visible,
+}: {
+  disabled: boolean;
+  i18n: ReturnType<typeof useUiTranslations>;
+  onClick: () => void;
+  visible: boolean;
+}) {
+  if (!visible) return null;
+
+  const label = i18n("refundOrReversePayment9d232b2");
+
+  return (
+    <button
+      aria-label={label}
+      className="grid h-7 w-7 place-items-center rounded-full text-sm opacity-55 transition-opacity hover:opacity-100 disabled:opacity-30"
+      disabled={disabled}
+      onClick={onClick}
+      title={label}
+      type="button"
+      style={{
+        background: "var(--panel)",
+        border: "1px solid var(--border)",
+        color: "var(--primary-strong)",
+      }}
+    >
+      ↶
+    </button>
   );
 }

@@ -50,13 +50,14 @@ export function LeftPanel({ onSectionSelected, mobile = false, showAllSections =
   // Scroll list to top when an exercise drag starts so the first section is reachable
   useEffect(() => {
     if (showAllSections && listRef.current) {
+      setLeftCollapsed(false);
       listRef.current.scrollTop = 0;
     }
-  }, [showAllSections]);
+  }, [setLeftCollapsed, showAllSections]);
 
   const selectedSection = sections.find((section) => section.localId === selectedSectionId) ?? null;
 
-  if (!mobile && leftCollapsed) {
+  if (!mobile && leftCollapsed && !showAllSections) {
     return (
       <div
         className="flex w-10 shrink-0 cursor-pointer flex-col items-center justify-center"

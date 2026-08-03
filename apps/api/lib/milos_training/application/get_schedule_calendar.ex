@@ -31,6 +31,7 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
     workout_cache =
       slots
       |> Enum.map(& &1.master_workout_id)
+      |> Enum.reject(&is_nil/1)
       |> Enum.uniq()
       |> Enum.reduce(%{}, fn workout_id, acc ->
         Map.put(acc, workout_id, Workouts.get_workout(workout_id))
@@ -43,6 +44,10 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
       base = %{
         id: slot.id,
         master_workout_id: slot.master_workout_id,
+        class_series_id: slot.class_series_id,
+        class_series: slot.class_series,
+        name: slot.name,
+        duration_minutes: slot.duration_minutes,
         scheduled_at: slot.scheduled_at,
         class_type_id: slot.class_type_id,
         class_type: slot.class_type,

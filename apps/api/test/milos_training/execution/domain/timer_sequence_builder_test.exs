@@ -130,4 +130,49 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilderTest do
     labels = Enum.map(segments, & &1.label)
     assert labels == ["Min 1", "Min 2", "Min 3"]
   end
+
+  test "preserves section notes and authored header rows for presentation" do
+    header = %{id: "header-1", item_type: "header", name: "Primary lifts", note: "Header note"}
+    exercise = %{id: "exercise-1", item_type: "exercise", name: "Back squat", note: "Brace"}
+
+    [segment] =
+      workout([
+        section(%{type: "for_time"}, [header, exercise])
+        |> Map.put(:note, "Section note")
+      ])
+      |> TimerSequenceBuilder.build()
+
+    assert segment.section_note == "Section note"
+    assert Enum.map(segment.exercises, & &1.item_type) == ["header", "exercise"]
+    assert Enum.map(segment.exercises, & &1.note) == ["Header note", "Brace"]
+  end
+
+  test "flattens draft-shaped nested sections and assigns stable synthetic parent ids" do
+    nested = %{
+      name: "Nested AMRAP",
+      order: 1,
+      timer_config: %{type: "amrap", duration_seconds: 300},
+      exercises: [%{name: "Burpee", item_type: "exercise"}]
+    }
+
+    parent =
+      section(%{type: "untimed"}, [])
+      |> Map.delete(:id)
+      |> Map.put(:sections, [nested])
+
+    [child_segment] = TimerSequenceBuilder.build(workout([parent]))
+    assert child_segment.section_name == "Nested AMRAP"
+    assert child_segment.kind == :countdown
+    assert child_segment.duration_seconds == 300
+  end
+
+  test "conditional recovery without a duration becomes a manual segment" do
+    [segment] =
+      section(%{type: "rest", recovery_condition: "heart rate below 120"})
+      |> then(&workout([&1]))
+      |> TimerSequenceBuilder.build()
+
+    assert segment.kind == :manual
+    assert segment.duration_seconds == nil
+  end
 end

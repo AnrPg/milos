@@ -3,6 +3,18 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
 
   import MilosTraining.TestFixtures
 
+  alias MilosTraining.{
+    Gamification,
+    Messaging,
+    Repo,
+    Workouts,
+    Workouts.MasterWorkout,
+    Workouts.WorkoutFolder
+  }
+
+  alias MilosTraining.Gamification.SeasonalChallenge
+  alias MilosTraining.Messaging.{Message, Participant}
+
   test "admin lists all roles and filters by role and nickname", %{conn: conn} do
     admin = admin_fixture(%{nickname: "directory_admin"})
     member = user_fixture(%{role: :member, nickname: "directory_member"})
@@ -229,6 +241,65 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
 
     assert response.status == 204
     assert MilosTraining.Identity.find_by_id(user.id) == nil
+  end
+
+  test "admin can delete a user with messaging history", %{conn: conn} do
+    admin = admin_fixture()
+    user = user_fixture(%{role: :athlete, nickname: "delete_message_target"})
+
+    {:ok, thread} =
+      Messaging.get_or_create_thread(%{
+        context_type: :direct,
+        actor_id: admin.id,
+        participant_id: user.id
+      })
+
+    {:ok, message} =
+      Messaging.send_message(%{
+        thread_id: thread.id,
+        sender_id: user.id,
+        body: "Please delete my account"
+      })
+
+    response =
+      conn
+      |> put_bearer_token(admin)
+      |> delete("/api/admin/users/#{user.id}")
+
+    assert response.status == 204
+    assert MilosTraining.Identity.find_by_id(user.id) == nil
+    assert Repo.get(Message, message.id) == nil
+    assert Repo.get_by(Participant, user_id: user.id) == nil
+  end
+
+  test "admin authored content is detached instead of blocking account deletion", %{conn: conn} do
+    owner = admin_fixture(%{nickname: "deletable_content_admin"})
+    admin = admin_fixture(%{nickname: "remaining_content_admin"})
+
+    {:ok, folder} = Workouts.create_folder(owner.id, %{name: "Owner folder"})
+    {:ok, draft} = Workouts.create_draft(owner)
+
+    {:ok, challenge} =
+      Gamification.create_seasonal_challenge(owner.id, %{
+        "title" => "Owner challenge",
+        "criteria_type" => "workout_count",
+        "criteria_value" => %{"count" => 3},
+        "badge_key" => "owner_delete_badge",
+        "badge_label" => "Owner Delete",
+        "starts_at" => Date.utc_today(),
+        "ends_at" => Date.add(Date.utc_today(), 7)
+      })
+
+    response =
+      conn
+      |> put_bearer_token(admin)
+      |> delete("/api/admin/users/#{owner.id}")
+
+    assert response.status == 204
+    assert MilosTraining.Identity.find_by_id(owner.id) == nil
+    assert Repo.get(MasterWorkout, draft.id).created_by_id == nil
+    assert Repo.get(WorkoutFolder, folder.id).created_by_id == nil
+    assert Repo.get(SeasonalChallenge, challenge.id).created_by_id == nil
   end
 
   test "admin cannot delete their own account", %{conn: conn} do

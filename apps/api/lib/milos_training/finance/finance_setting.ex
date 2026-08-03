@@ -9,6 +9,7 @@ defmodule MilosTraining.Finance.FinanceSetting do
     field :payment_reminder_interval_days, :integer, default: 7
     field :entitlement_enforcement_mode, :string, default: "observe"
     field :entitlement_timezone, :string, default: "Europe/Athens"
+    field :document_mode, :string, default: "invoice"
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -18,12 +19,14 @@ defmodule MilosTraining.Finance.FinanceSetting do
     |> cast(params, [
       :payment_reminder_interval_days,
       :entitlement_enforcement_mode,
-      :entitlement_timezone
+      :entitlement_timezone,
+      :document_mode
     ])
     |> validate_required([
       :payment_reminder_interval_days,
       :entitlement_enforcement_mode,
-      :entitlement_timezone
+      :entitlement_timezone,
+      :document_mode
     ])
     |> validate_number(:payment_reminder_interval_days, greater_than: 0)
     |> validate_inclusion(:entitlement_enforcement_mode, [
@@ -32,5 +35,6 @@ defmodule MilosTraining.Finance.FinanceSetting do
       "enforce_all"
     ])
     |> validate_length(:entitlement_timezone, min: 1, max: 100)
+    |> validate_inclusion(:document_mode, ["invoice", "receipt"])
   end
 end

@@ -1,4 +1,5 @@
 import { apiRequest } from "@/api/client";
+import type { WorkoutRecord } from "@/api/workouts";
 
 export type TimerSegment = {
   segment_key: string;
@@ -10,6 +11,7 @@ export type TimerSegment = {
   round: number | null;
   total_rounds: number | null;
   label: string;
+  section_note?: string | null;
   scoreable: boolean;
   score_config: {
     type: string;
@@ -19,12 +21,25 @@ export type TimerSegment = {
   timer_config?: Record<string, unknown> | null;
   exercises: Array<{
     id: string;
+    item_type?: "exercise" | "header";
     name: string;
     sets?: number | null;
     prescription_value?: number | null;
     prescription_unit?: string | null;
     load_value?: number | null;
     load_mode?: string | null;
+    set_prescriptions?: Array<{
+      set_index: number;
+      prescription_value?: number | null;
+      prescription_unit?: string | null;
+      load_value?: number | null;
+      load_mode?: string | null;
+      note?: string | null;
+    }>;
+    load_progression?: Record<string, unknown> | null;
+    superset_group_id?: string | null;
+    alternating_group_id?: string | null;
+    note?: string | null;
     interval_assignment?: number | null;
     excluded?: boolean;
   }>;
@@ -36,6 +51,7 @@ export type WorkoutExecution = {
   master_workout_id: string | null;
   workout_title?: string | null;
   workout_type?: string | null;
+  workout?: WorkoutRecord | null;
   scale_level_slug: string | null;
   source: string;
   source_reference_id: string | null;

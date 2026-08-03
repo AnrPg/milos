@@ -2,6 +2,7 @@ defmodule MilosTrainingWeb.CalendarFeedControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
   alias MilosTraining.{Identity, Scheduling}
+  alias MilosTraining.Application.CreateRecurringClassSeries
 
   import MilosTraining.TestFixtures
 
@@ -37,6 +38,54 @@ defmodule MilosTrainingWeb.CalendarFeedControllerTest do
   test "calendar feed rejects invalid tokens", %{conn: conn} do
     conn = get(conn, "/api/calendar/feed.ics", %{token: "invalid"})
     assert json_response(conn, 401)
+  end
+
+  test "admin feed keeps recurring classes as recurring iCalendar events", %{conn: conn} do
+    admin = admin_fixture(%{nickname: "calendar_series_admin"})
+    workout = workout_fixture(admin, %{title: "Series Workout"})
+    class_type = class_type_fixture(%{name: "CrossFit"})
+    starts_on = Date.add(Date.utc_today(), 1)
+    first_occurrence_on = Date.add(starts_on, 1)
+    excluded_on = Date.add(first_occurrence_on, 7)
+
+    assert {:ok, series} =
+             CreateRecurringClassSeries.call(%{
+               master_workout_id: workout.id,
+               class_type_id: class_type.id,
+               name: "CrossFit beginners",
+               duration_minutes: 75,
+               timezone: "Etc/UTC",
+               starts_on: starts_on,
+               ends_on: Date.add(starts_on, 14),
+               local_start_time: ~T[17:00:00],
+               weekdays: [Date.day_of_week(first_occurrence_on)],
+               excluded_dates: [excluded_on],
+               capacity: 10,
+               auto_approve: true,
+               booking_timeout_minutes: 30
+             })
+
+    links =
+      conn
+      |> put_bearer_token(admin)
+      |> get("/api/calendar/export-links")
+      |> json_response(200)
+
+    feed =
+      conn
+      |> recycle()
+      |> get("/api/calendar/feed.ics", %{token: links["token"]})
+      |> response(200)
+
+    assert feed =~ "UID:class-series-#{series.id}@milos-training"
+
+    assert feed =~
+             "DTSTART;TZID=Etc/UTC:#{Calendar.strftime(first_occurrence_on, "%Y%m%d")}T170000"
+
+    assert feed =~ "RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY="
+    assert feed =~ "EXDATE;TZID=Etc/UTC:#{Calendar.strftime(excluded_on, "%Y%m%d")}T170000"
+    assert feed =~ "DURATION:PT75M"
+    assert feed =~ "SUMMARY:Class: CrossFit beginners"
   end
 
   test "calendar links and feed system copy use the recipient locale", %{conn: conn} do

@@ -268,6 +268,9 @@ export function AssignedWorkoutPanel({
                     initiallyExpanded
                     activeScaleOverride={scaleLevels.length > 0 ? activeScale : undefined}
                     hideScaleChips={scaleLevels.length > 0}
+                    authoringMode={assignment.workout.authoring_mode}
+                    freeTextBody={assignment.workout.free_text_body}
+                    freeTextDocument={assignment.workout.free_text_document}
                   />
                 </section>
 

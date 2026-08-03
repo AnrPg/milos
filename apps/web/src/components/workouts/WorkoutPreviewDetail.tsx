@@ -7,20 +7,39 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import { semanticLabel } from "@/i18n/presentation";
-import { useState } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 
 import { scaleLevelVar, translucent } from "@/lib/theme";
 
 export type PreviewExercise = {
   id?: string;
+  item_type?: "exercise" | "header";
   name: string;
   sets?: number | null;
   prescription_value?: number | null;
   prescription_unit?: string | null;
   load_value?: number | null;
   load_mode?: string | null;
+  set_prescriptions?: Array<{
+    set_index: number;
+    prescription_value?: number | null;
+    prescription_unit?: string | null;
+    load_value?: number | null;
+    load_mode?: string | null;
+    note?: string | null;
+  }> | null;
+  load_progression?: {
+    mode?: "linear" | "per_set";
+    direction?: "increase" | "decrease";
+    start_value?: number;
+    start_mode?: string;
+    step_value?: number;
+    per_set_values?: number[];
+  } | null;
   order?: number;
   superset_group_id?: string | null;
+  alternating_group_id?: string | null;
+  group_config?: { sets?: number | null; title?: string | null } | null;
   hr_zone?: number | null;
   tempo?: string | null;
   rest_seconds?: number | null;
@@ -28,6 +47,7 @@ export type PreviewExercise = {
   rest_pause_seconds?: number | null;
   pacing?: number | null;
   interval_assignment?: number | null;
+  description?: string | null;
   note?: string | null;
   variations?: Array<{
     id?: string;
@@ -38,7 +58,10 @@ export type PreviewExercise = {
     prescription_unit?: string | null;
     load_value?: number | null;
     load_mode?: string | null;
+    set_prescriptions?: PreviewExercise["set_prescriptions"];
+    load_progression?: PreviewExercise["load_progression"];
     excluded?: boolean;
+    note?: string | null;
     scale_level?: { id?: string; slug?: string; label?: string; sort_order?: number } | null;
   }>;
 };
@@ -59,6 +82,9 @@ type Props = {
   initiallyExpanded?: boolean;
   activeScaleOverride?: string | null;
   hideScaleChips?: boolean;
+  authoringMode?: "structured" | "quick_text" | "free_text";
+  freeTextBody?: string | null;
+  freeTextDocument?: Record<string, unknown> | null;
 };
 
 type PreviewVariation = NonNullable<PreviewExercise["variations"]>[number];
@@ -92,10 +118,91 @@ function resolveExercise(exercise: PreviewExercise, activeScale: string | null):
     prescription_unit: variation.prescription_unit ?? exercise.prescription_unit,
     load_value: variation.load_value ?? exercise.load_value,
     load_mode: variation.load_mode ?? exercise.load_mode,
+    set_prescriptions: variation.set_prescriptions ?? exercise.set_prescriptions,
+    load_progression: variation.load_progression ?? exercise.load_progression,
+    note: variation.note ?? exercise.note,
     varied: true,
     variationLabel: variation.scale_level?.label ?? variation.scale_level?.slug,
     variationSlug: variation.scale_level?.slug,
   };
+}
+
+function renderFreeTextDocument(document: Record<string, unknown> | null | undefined): ReactNode | null {
+  if (!document || document.type !== "doc" || !Array.isArray(document.content)) return null;
+  return document.content.map((node, index) => renderFreeTextNode(node, index));
+}
+
+function renderFreeTextNode(rawNode: unknown, key: string | number): ReactNode {
+  if (!rawNode || typeof rawNode !== "object") return null;
+  const node = rawNode as Record<string, unknown>;
+  const attrs = (node.attrs && typeof node.attrs === "object" ? node.attrs : {}) as Record<string, unknown>;
+  const children = Array.isArray(node.content)
+    ? node.content.map((child, index) => renderFreeTextNode(child, `${key}-${index}`))
+    : null;
+  const style = freeTextNodeStyle(attrs);
+
+  switch (node.type) {
+    case "text":
+      return applyFreeTextMarks(String(node.text ?? ""), node.marks, key);
+    case "paragraph":
+      return <p key={key} style={style}>{children}</p>;
+    case "heading": {
+      const level = attrs.level === 1 || attrs.level === 3 ? attrs.level : 2;
+      if (level === 1) return <h1 key={key} className="text-xl font-black" style={style}>{children}</h1>;
+      if (level === 3) return <h3 key={key} className="text-base font-black" style={style}>{children}</h3>;
+      return <h2 key={key} className="text-lg font-black" style={style}>{children}</h2>;
+    }
+    case "bulletList":
+      return <ul key={key}>{children}</ul>;
+    case "orderedList":
+      return <ol key={key}>{children}</ol>;
+    case "listItem":
+      return <li key={key}>{children}</li>;
+    case "blockquote":
+      return <blockquote key={key}>{children}</blockquote>;
+    case "codeBlock":
+      return <pre key={key}><code>{children}</code></pre>;
+    case "hardBreak":
+      return <br key={key} />;
+    default:
+      return children;
+  }
+}
+
+function freeTextNodeStyle(attrs: Record<string, unknown>): CSSProperties | undefined {
+  return typeof attrs.textAlign === "string" ? { textAlign: attrs.textAlign as CSSProperties["textAlign"] } : undefined;
+}
+
+function applyFreeTextMarks(text: string, rawMarks: unknown, key: string | number): ReactNode {
+  if (!Array.isArray(rawMarks)) return text;
+
+  return rawMarks.reduce<ReactNode>((content, rawMark, index) => {
+    if (!rawMark || typeof rawMark !== "object") return content;
+    const mark = rawMark as Record<string, unknown>;
+    const markKey = `${key}-mark-${index}`;
+
+    switch (mark.type) {
+      case "bold":
+        return <strong key={markKey}>{content}</strong>;
+      case "italic":
+        return <em key={markKey}>{content}</em>;
+      case "underline":
+        return <u key={markKey}>{content}</u>;
+      case "strike":
+        return <s key={markKey}>{content}</s>;
+      case "highlight":
+        return <mark key={markKey}>{content}</mark>;
+      case "link": {
+        const attrs = (mark.attrs && typeof mark.attrs === "object" ? mark.attrs : {}) as Record<string, unknown>;
+        const href = typeof attrs.href === "string" && /^(https?:|mailto:)/i.test(attrs.href) ? attrs.href : undefined;
+        return href ? <a key={markKey} href={href}>{content}</a> : content;
+      }
+      case "code":
+        return <code key={markKey}>{content}</code>;
+      default:
+        return content;
+    }
+  }, text);
 }
 
 function sectionScaleOptions(section: PreviewSection) {
@@ -120,8 +227,23 @@ function sectionScaleOptions(section: PreviewSection) {
   });
 }
 
-function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
+function ExerciseRow({ exercise, groupColor }: { exercise: ResolvedExercise; groupColor?: string }) {
   const i18n = useUiTranslations();
+
+  if (exercise.item_type === "header") {
+    return (
+      <li className="border-y px-2 py-2" style={{ borderColor: "var(--border-strong)" }}>
+        <div className="text-xs font-bold uppercase" style={{ color: "var(--primary)" }}>
+          {exercise.name}
+        </div>
+        {exercise.note ? (
+          <p className="mt-0.5 text-xs" style={{ color: "var(--muted)" }}>
+            {exercise.note}
+          </p>
+        ) : null}
+      </li>
+    );
+  }
 
   function formatExtras(exercise: PreviewExercise): string[] {
     const extras: string[] = [];
@@ -130,13 +252,48 @@ function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
     if (exercise.hr_zone) extras.push(i18n("hrZValue0defc7f9", {value0: exercise.hr_zone}));
     if (exercise.pacing) extras.push(i18n("paceValue0SRep5b31b72", {value0: exercise.pacing}));
     if (exercise.cluster_rest_seconds) extras.push(i18n("clusterValue0S3514326", {value0: exercise.cluster_rest_seconds}));
+    if (exercise.rest_pause_seconds) extras.push(i18n("restValue0S0cde064", {value0: exercise.rest_pause_seconds}));
+    if (exercise.interval_assignment) extras.push(`${i18n("interval011efcd")} ${exercise.interval_assignment}`);
     return extras;
+  }
+
+  function formatProgression(exercise: PreviewExercise): string | null {
+    const progression = exercise.load_progression;
+    if (!progression) return null;
+    const direction = progression.direction === "decrease" ? i18n("progressiveLoadDecrease") : i18n("progressiveLoadIncrease");
+    if (progression.mode === "per_set" && progression.per_set_values?.length) {
+      return `${direction}: ${progression.per_set_values.join(" / ")}`;
+    }
+    const start = progression.start_value != null ? `${progression.start_value} ${progression.start_mode ?? ""}`.trim() : "";
+    const step = progression.step_value != null ? `+${progression.step_value}` : "";
+    return [direction, start, step].filter(Boolean).join(" · ");
   }
 
   function formatPrescription(exercise: PreviewExercise): string {
     const parts: string[] = [];
+
+    if (exercise.set_prescriptions && exercise.set_prescriptions.length > 0) {
+      const first = exercise.set_prescriptions[0];
+      const differs = exercise.set_prescriptions.some(
+        (set) =>
+          set.prescription_value !== first?.prescription_value ||
+          set.load_value !== first?.load_value ||
+          set.load_mode !== first?.load_mode,
+      );
+
+      if (differs) {
+        return exercise.set_prescriptions
+          .map((set) => {
+            const unit = semanticLabel(set.prescription_unit ?? "reps", i18n);
+            const loadUnit = set.load_mode === "pct_1rm" ? i18n("percentOneRepMaxUnit") : i18n("kilogramsUnit");
+            const load = set.load_value != null ? ` · ${set.load_value} ${loadUnit}` : "";
+            return `${set.set_index}: ${set.prescription_value ?? "—"} ${unit}${load}`;
+          })
+          .join(" | ");
+      }
+    }
   
-    if (exercise.sets && exercise.sets > 1) {
+    if (!groupColor && exercise.sets && exercise.sets > 1) {
       parts.push(`${exercise.sets}×`);
     }
   
@@ -157,21 +314,26 @@ function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
 
   const prescription = formatPrescription(exercise);
   const extras = formatExtras(exercise);
+  const progression = formatProgression(exercise);
   const variationColor = scaleLevelVar(exercise.variationSlug ?? exercise.variationLabel);
-
+  const displayName = exercise.name?.trim() || exercise.description?.trim() || i18n("exercise1091b7f");
   return (
     <li
       className="rounded-[1rem] px-4 py-3"
       style={{
         background: exercise.varied ? translucent(variationColor, 11) : "var(--panel-muted)",
         border: exercise.varied ? `1px solid ${translucent(variationColor, 32)}` : "1px solid var(--border)",
-        boxShadow: exercise.varied ? `inset 3px 0 0 ${variationColor}` : "none",
+        boxShadow: groupColor
+          ? `inset 3px 0 0 ${groupColor}`
+          : exercise.varied
+            ? `inset 3px 0 0 ${variationColor}`
+            : "none",
       }}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <span className="text-sm font-semibold leading-5" style={{ color: "var(--text)" }}>
-            {exercise.name}
+            {displayName}
           </span>
           {exercise.varied ? (
             <span
@@ -199,6 +361,16 @@ function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
           {extras.join(" · ")}
         </p>
       ) : null}
+      {exercise.description ? (
+        <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
+          {exercise.description}
+        </p>
+      ) : null}
+      {progression ? (
+        <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
+          {progression}
+        </p>
+      ) : null}
       {exercise.note ? (
         <p className="mt-1 text-xs italic" style={{ color: "var(--muted)" }}>
           {exercise.note}
@@ -208,11 +380,60 @@ function ExerciseRow({ exercise }: { exercise: ResolvedExercise }) {
   );
 }
 
+type PresentedExercise =
+  | { type: "exercise"; exercise: ResolvedExercise }
+  | {
+      type: "group";
+      id: string;
+      kind: "superset" | "alternating";
+      sets: number | null;
+      title: string | null;
+      exercises: ResolvedExercise[];
+    };
+
+function presentExercises(exercises: ResolvedExercise[]): PresentedExercise[] {
+  const rendered = new Set<string>();
+  const result: PresentedExercise[] = [];
+
+  for (const exercise of exercises) {
+    const kind = exercise.superset_group_id ? "superset" : exercise.alternating_group_id ? "alternating" : null;
+    const id = exercise.superset_group_id ?? exercise.alternating_group_id;
+    if (!kind || !id) {
+      result.push({ type: "exercise", exercise });
+      continue;
+    }
+    if (rendered.has(id)) continue;
+    rendered.add(id);
+    const members = exercises.filter((item) =>
+      kind === "superset" ? item.superset_group_id === id : item.alternating_group_id === id,
+    );
+    result.push({
+      type: "group",
+      id,
+      kind,
+      sets: exercise.group_config?.sets ?? exercise.sets ?? null,
+      title: exercise.group_config?.title ?? null,
+      exercises: members,
+    });
+  }
+
+  return result;
+}
+
+function presentationGroupColor(id: string) {
+  const colors = ["var(--primary)", "var(--info)", "var(--success)", "var(--warning)", "var(--danger)"];
+  const hash = Array.from(id).reduce((sum, character) => sum + character.charCodeAt(0), 0);
+  return colors[hash % colors.length];
+}
+
 export function WorkoutPreviewDetail({
   sections,
   initiallyExpanded = true,
   activeScaleOverride,
   hideScaleChips = false,
+  authoringMode,
+  freeTextBody,
+  freeTextDocument,
 }: Props) {
   const i18n = useUiTranslations();
 
@@ -231,6 +452,25 @@ export function WorkoutPreviewDetail({
     return new Set(sections.map((s, i) => s.id ?? String(i)));
   });
   const [sectionScales, setSectionScales] = useState<Record<string, string | null>>({});
+
+  if (authoringMode === "free_text") {
+    const richContent = renderFreeTextDocument(freeTextDocument);
+
+    return (
+      <div
+        className="rounded-[1.2rem] border p-4"
+        style={{ background: "var(--panel)", borderColor: "var(--border)" }}
+      >
+        {richContent ? (
+          <div className="free-text-rich-content text-sm leading-6">{richContent}</div>
+        ) : (
+          <pre className="whitespace-pre-wrap font-sans text-sm leading-6" style={{ color: "var(--text)" }}>
+            {freeTextBody?.trim() ? freeTextBody : i18n("freeTextPreviewEmpty")}
+          </pre>
+        )}
+      </div>
+    );
+  }
 
   function toggleSection(key: string) {
     setExpandedSections((prev) => {
@@ -264,6 +504,8 @@ export function WorkoutPreviewDetail({
         const visibleExercises = section.exercises
           .map((exercise) => resolveExercise(exercise, activeScale))
           .filter((exercise): exercise is ResolvedExercise => Boolean(exercise));
+        const exerciseCount = visibleExercises.filter((exercise) => exercise.item_type !== "header").length;
+        const presentedExercises = presentExercises(visibleExercises);
 
         return (
           <div
@@ -301,7 +543,7 @@ export function WorkoutPreviewDetail({
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <span className="text-xs font-semibold" style={{ color: "var(--dim)" }}>
-                  {section.exercises.length} {i18n("exerciseeb70d1f")}{section.exercises.length !== 1 ? i18n("sa0f1490") : ""}
+                  {i18n("featureExerciseCount", { count: exerciseCount })}
                 </span>
                 <span className="text-xs" style={{ color: "var(--dim)" }}>
                   {expanded ? "▲" : "▼"}
@@ -360,11 +602,37 @@ export function WorkoutPreviewDetail({
             {expanded ? (
               <div className="space-y-3 p-3" style={{ background: "var(--panel)" }}>
                 {visibleExercises.length > 0 ? (
-                  <ul className="space-y-2">
-                    {visibleExercises.map((exercise, ei) => (
-                      <ExerciseRow key={exercise.id ?? (key) + "-" + (ei)} exercise={exercise} />
-                    ))}
-                  </ul>
+                  <div className="space-y-2">
+                    {presentedExercises.map((item, ei) => {
+                      if (item.type === "exercise") {
+                        return <ul className="space-y-2" key={item.exercise.id ?? `${key}-${ei}`}><ExerciseRow exercise={item.exercise} /></ul>;
+                      }
+
+                      const color = presentationGroupColor(item.id);
+                      const label = item.title || (item.kind === "superset" ? i18n("supersetLabel") : i18n("alternatingSetsLabel"));
+                      const setLabel = item.sets ? ` · ${item.sets} ${i18n("setsd6c8220")}` : "";
+                      return (
+                        <section
+                          aria-label={`${label}${setLabel}`}
+                          className="rounded-[1rem] border p-3"
+                          key={item.id}
+                          role="group"
+                          style={{ borderColor: `color-mix(in srgb, ${color} 45%, var(--border))` }}
+                        >
+                          <header className="mb-2 flex items-center gap-2 text-xs font-bold uppercase" style={{ color }}>
+                            <span>{label}</span>
+                            {item.sets ? <span>{item.sets} {i18n("setsd6c8220")}</span> : null}
+                            <span className="h-px flex-1" style={{ background: color, opacity: 0.3 }} />
+                          </header>
+                          <ul className="space-y-2">
+                            {item.exercises.map((exercise, index) => (
+                              <ExerciseRow key={exercise.id ?? `${item.id}-${index}`} exercise={exercise} groupColor={color} />
+                            ))}
+                          </ul>
+                        </section>
+                      );
+                    })}
+                  </div>
                 ) : (
                   <p
                     className="rounded-[1rem] px-4 py-3 text-sm"

@@ -36,7 +36,7 @@ defmodule MilosTraining.Finance.MembershipPackage do
       :active
     ])
     |> update_change(:code, &normalize_code/1)
-    |> validate_required([:code, :name, :family, :billing_period])
+    |> validate_required([:name, :family, :billing_period])
     |> validate_inclusion(:billing_period, ["monthly", "quarterly", "annual", "custom"])
     |> validate_number(:base_price_cents, greater_than_or_equal_to: 0)
     |> validate_entitlement_plan()
@@ -45,12 +45,18 @@ defmodule MilosTraining.Finance.MembershipPackage do
 
   defp normalize_code(nil), do: nil
 
+  defp normalize_code(""), do: nil
+
   defp normalize_code(code) do
     code
     |> String.trim()
     |> String.downcase()
     |> String.replace(~r/[^a-z0-9_]+/, "_")
     |> String.trim("_")
+    |> case do
+      "" -> nil
+      normalized -> normalized
+    end
   end
 
   defp validate_entitlement_plan(changeset) do

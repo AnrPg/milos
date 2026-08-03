@@ -1,15 +1,17 @@
 defmodule MilosTraining.Application.UpdateAdminSettings do
   alias MilosTraining.Application.{BroadcastUserSync, InvalidateLandingPages}
-  alias MilosTraining.{Finance, Gamification, Identity, Notifications}
+  alias MilosTraining.{Finance, Gamification, Identity, Notifications, Scheduling}
 
   def call(params) do
     gamification_params = gamification_params(params)
     finance_params = finance_params(params)
     notification_params = notification_params(params)
+    scheduling_params = scheduling_params(params)
 
     with {:ok, gamification_settings} <- maybe_update_gamification(gamification_params),
          {:ok, finance_settings} <- maybe_update_finance(finance_params),
-         {:ok, notification_settings} <- maybe_update_notifications(notification_params) do
+         {:ok, notification_settings} <- maybe_update_notifications(notification_params),
+         {:ok, scheduling_settings} <- maybe_update_scheduling(scheduling_params) do
       InvalidateLandingPages.for_all_users()
       admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
       BroadcastUserSync.for_users(admin_ids, ["admin_settings"], reason: "admin_settings_updated")
@@ -18,7 +20,8 @@ defmodule MilosTraining.Application.UpdateAdminSettings do
        %{
          gamification: gamification_settings,
          finance: finance_settings,
-         notifications: notification_settings
+         notifications: notification_settings,
+         scheduling: scheduling_settings
        }}
     end
   end
@@ -41,6 +44,12 @@ defmodule MilosTraining.Application.UpdateAdminSettings do
 
   defp maybe_update_notifications(params), do: Notifications.update_push_settings(params)
 
+  defp maybe_update_scheduling(params) when map_size(params) == 0 do
+    {:ok, Scheduling.get_settings()}
+  end
+
+  defp maybe_update_scheduling(params), do: Scheduling.update_settings(params)
+
   defp gamification_params(%{gamification: g}) when is_map(g), do: g
   defp gamification_params(%{"gamification" => g}) when is_map(g), do: g
   defp gamification_params(%{body: body}) when is_map(body), do: gamification_params(body)
@@ -58,4 +67,10 @@ defmodule MilosTraining.Application.UpdateAdminSettings do
   defp notification_params(%{body: body}) when is_map(body), do: notification_params(body)
   defp notification_params(%{"body" => body}) when is_map(body), do: notification_params(body)
   defp notification_params(_), do: %{}
+
+  defp scheduling_params(%{scheduling: value}) when is_map(value), do: value
+  defp scheduling_params(%{"scheduling" => value}) when is_map(value), do: value
+  defp scheduling_params(%{body: body}) when is_map(body), do: scheduling_params(body)
+  defp scheduling_params(%{"body" => body}) when is_map(body), do: scheduling_params(body)
+  defp scheduling_params(_), do: %{}
 end

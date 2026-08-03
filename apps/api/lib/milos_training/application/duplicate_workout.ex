@@ -7,7 +7,9 @@ defmodule MilosTraining.Application.DuplicateWorkout do
   def call(id, opts \\ []) do
     title_suffix = resolve_title_suffix(opts)
 
-    with {:ok, draft} <- Workouts.duplicate_workout(id, title_suffix) do
+    attrs = opts |> Keyword.take([:folder_id]) |> Map.new()
+
+    with {:ok, draft} <- Workouts.duplicate_workout(id, title_suffix, attrs) do
       broadcast_admin_refresh("workout_duplicated", draft.id)
       {:ok, draft}
     end
@@ -15,6 +17,9 @@ defmodule MilosTraining.Application.DuplicateWorkout do
 
   defp resolve_title_suffix(opts) do
     cond do
+      suffix = opts[:title_suffix] ->
+        suffix
+
       assignment_id = opts[:assignment_id] ->
         case Workouts.get_assigned_workout(assignment_id) do
           %{athlete_ids: [_ | _] = athlete_ids} ->

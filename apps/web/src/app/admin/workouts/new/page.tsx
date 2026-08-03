@@ -1,6 +1,6 @@
 
 import { AuthGuard } from "@/components/auth-guard";
-import { WorkoutCreationCanvas } from "@/components/workouts/creation/WorkoutCreationCanvas";
+import { WorkoutAuthoringModes } from "@/components/workouts/creation/WorkoutAuthoringModes";
 
 export const dynamic = "force-dynamic";
 
@@ -8,7 +8,7 @@ export default function NewWorkoutPage() {
   
   return (
     <AuthGuard roles={["admin"]}>
-      <WorkoutCreationCanvas />
+      <WorkoutAuthoringModes />
     </AuthGuard>
   );
 }

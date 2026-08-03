@@ -6,6 +6,14 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { SemanticLabel } from "@/components/semantic-label";
+
+const BLOCKED_CHANNELS = new Set(["workout_library"]);
+const BLOCKED_CAPABILITIES = new Set([
+  "execute_library_workouts",
+  "receive_coaching_touchpoints",
+]);
+
 export type EntitlementDraft = {
   channels: string[];
   capabilities: string[];
@@ -14,6 +22,14 @@ export type EntitlementDraft = {
   coachingTouchpointLimit: string;
   coachingTouchpointPeriod: string;
 };
+
+export function sanitizeEntitlementDraft(draft: EntitlementDraft): EntitlementDraft {
+  return {
+    ...draft,
+    channels: draft.channels.filter((channel) => !BLOCKED_CHANNELS.has(channel)),
+    capabilities: draft.capabilities.filter((capability) => !BLOCKED_CAPABILITIES.has(capability)),
+  };
+}
 
 export const DEFAULT_ENTITLEMENT: EntitlementDraft = {
   channels: ["in_person"],
@@ -25,21 +41,22 @@ export const DEFAULT_ENTITLEMENT: EntitlementDraft = {
 };
 
 export function entitlementParams(draft: EntitlementDraft) {
+  const sanitized = sanitizeEntitlementDraft(draft);
   const allowances: Record<string, ReturnType<typeof allowance>> = {
-    class_visits: allowance(draft.classVisitLimit, draft.classVisitPeriod),
+    class_visits: allowance(sanitized.classVisitLimit, sanitized.classVisitPeriod),
   };
 
-  if (draft.capabilities.includes("receive_coaching_touchpoints")) {
+  if (sanitized.capabilities.includes("receive_coaching_touchpoints")) {
     allowances.coaching_touchpoints = allowance(
-      draft.coachingTouchpointLimit,
-      draft.coachingTouchpointPeriod,
+      sanitized.coachingTouchpointLimit,
+      sanitized.coachingTouchpointPeriod,
     );
   }
 
   return {
     entitlement_version: 1,
-    channels: draft.channels,
-    capabilities: draft.capabilities,
+    channels: sanitized.channels,
+    capabilities: sanitized.capabilities,
     allowances,
   };
 }
@@ -50,14 +67,14 @@ export function entitlementDraft(params: unknown): EntitlementDraft {
   const visits = allowances.class_visits ?? {};
   const coaching = allowances.coaching_touchpoints ?? {};
 
-  return {
+  return sanitizeEntitlementDraft({
     channels: Array.isArray(value.channels) ? value.channels.map(String) : [],
     capabilities: Array.isArray(value.capabilities) ? value.capabilities.map(String) : [],
     classVisitLimit: String(visits.limit ?? "unlimited"),
     classVisitPeriod: String(visits.period ?? "calendar_month"),
     coachingTouchpointLimit: String(coaching.limit ?? "0"),
     coachingTouchpointPeriod: String(coaching.period ?? "calendar_month"),
-  };
+  });
 }
 
 function allowance(limit: string, period: string) {
@@ -78,18 +95,30 @@ export function EntitlementEditor({
   const i18n = useUiTranslations();
 
   const CAPABILITIES = [
-    ["book_classes", i18n("bookClasses0d3cc7b")],
-    ["execute_class_workouts", i18n("executeClassWorkouts842686e")],
-    ["execute_library_workouts", i18n("executeLibraryWorkouts6a80faa")],
-    ["execute_assigned_workouts", i18n("executeAssignedWorkouts8b32393")],
-    ["receive_coaching_touchpoints", i18n("receiveCoachingTouchpointscadf91e")],
+    { key: "book_classes", text: i18n("bookClasses0d3cc7b") },
+    { key: "execute_class_workouts", text: i18n("executeClassWorkouts842686e") },
+    {
+      key: "execute_library_workouts",
+      text: i18n("executeLibraryWorkouts6a80faa"),
+      disabledReason: i18n("workoutOptionsUnavailable3c866ef"),
+    },
+    { key: "execute_assigned_workouts", text: i18n("executeAssignedWorkouts8b32393") },
+    {
+      key: "receive_coaching_touchpoints",
+      text: i18n("receiveCoachingTouchpointscadf91e"),
+      disabledReason: i18n("workoutOptionsUnavailable3c866ef"),
+    },
   ] as const;
 
   const CHANNELS = [
-    ["in_person", i18n("inPersonClasses867d7ae")],
-    ["workout_library", i18n("workoutLibrarya039091")],
-    ["personal_programming", i18n("personalProgramming0517f6d")],
-    ["coach_messaging", i18n("coachMessagingf3902dc")],
+    { key: "in_person", text: i18n("inPersonClasses867d7ae") },
+    {
+      key: "workout_library",
+      text: i18n("workoutLibrarya039091"),
+      disabledReason: i18n("workoutOptionsUnavailable3c866ef"),
+    },
+    { key: "personal_programming", text: i18n("personalProgramming0517f6d") },
+    { key: "coach_messaging", text: i18n("coachMessagingf3902dc") },
   ] as const;
   function toggle(key: "channels" | "capabilities", option: string) {
     const values = value[key];
@@ -136,15 +165,41 @@ export function EntitlementEditor({
   );
 }
 
-function ChoiceGroup({ label, options, selected, onToggle }: { label: string; options: ReadonlyArray<readonly [string, string]>; selected: string[]; onToggle: (item: string) => void }) {
+type ChoiceOption = {
+  key: string;
+  text: string;
+  disabledReason?: string;
+};
+
+function ChoiceGroup({ label, options, selected, onToggle }: { label: string; options: ReadonlyArray<ChoiceOption>; selected: string[]; onToggle: (item: string) => void }) {
   return (
     <div>
       <p className="mb-2 text-xs font-semibold" style={{ color: "var(--text-soft)" }}>{label}</p>
       <div className="grid gap-2 sm:grid-cols-2">
-        {options.map(([key, text]) => (
-          <label key={key} className="flex items-center gap-2 text-sm" style={{ color: "var(--text-soft)" }}>
-            <input type="checkbox" checked={selected.includes(key)} onChange={() => onToggle(key)} />
-            {text}
+        {options.map(({ key, text, disabledReason }) => (
+          <label
+            key={key}
+            className="flex items-center gap-2 rounded-lg px-2 py-1 text-sm"
+            style={{
+              color: disabledReason ? "var(--dim)" : "var(--text-soft)",
+              background: disabledReason ? "color-mix(in srgb, var(--border) 55%, transparent)" : "transparent",
+              opacity: disabledReason ? 0.62 : 1,
+              cursor: disabledReason ? "not-allowed" : "pointer",
+            }}
+            title={disabledReason}
+          >
+            <input
+              type="checkbox"
+              checked={!disabledReason && selected.includes(key)}
+              disabled={Boolean(disabledReason)}
+              onChange={() => onToggle(key)}
+            />
+            <span className="min-w-0 flex-1">{text}</span>
+            {disabledReason ? (
+              <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ background: "var(--border)", color: "var(--dim)" }}>
+                <SemanticLabel value="blocked" />
+              </span>
+            ) : null}
           </label>
         ))}
       </div>

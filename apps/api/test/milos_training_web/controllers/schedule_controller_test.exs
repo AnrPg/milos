@@ -111,6 +111,85 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
     assert response(delete_conn, 204)
   end
 
+  test "admin creates a recurring series with exclusions and overlapping classes", %{conn: conn} do
+    admin = admin_fixture(%{nickname: "series_admin"})
+    workout = workout_fixture(admin, %{title: "Beginner CrossFit"})
+    class_type = class_type_fixture(%{name: "CrossFit"})
+    admin_conn = put_bearer_token(conn, admin)
+    starts_on = Date.add(Date.utc_today(), 1)
+    excluded_on = Date.add(starts_on, 7)
+    ends_on = Date.add(starts_on, 14)
+    weekday = Date.day_of_week(starts_on)
+
+    series_response =
+      admin_conn
+      |> recycle()
+      |> put_req_header("content-type", "application/json")
+      |> post(
+        "/api/admin/schedule/slots/series",
+        Jason.encode!(%{
+          class_type_id: class_type.id,
+          name: "CrossFit beginners",
+          duration_minutes: 75,
+          timezone: "Etc/UTC",
+          starts_on: starts_on,
+          ends_on: ends_on,
+          local_start_time: "17:00:00",
+          weekdays: [weekday],
+          excluded_dates: [excluded_on],
+          capacity: 10,
+          auto_approve: true,
+          booking_timeout_minutes: 30
+        })
+      )
+
+    assert %{
+             "series" => %{
+               "occurrence_count" => 2,
+               "master_workout_id" => nil
+             }
+           } = json_response(series_response, 201)
+
+    first_start = DateTime.new!(starts_on, ~T[17:00:00], "Etc/UTC")
+
+    overlap_response =
+      admin_conn
+      |> recycle()
+      |> put_req_header("content-type", "application/json")
+      |> post(
+        "/api/admin/schedule/slots",
+        Jason.encode!(%{
+          master_workout_id: workout.id,
+          class_type_id: class_type.id,
+          name: "Parallel strength",
+          duration_minutes: 45,
+          scheduled_at: first_start,
+          capacity: 6,
+          auto_approve: false,
+          booking_timeout_minutes: 30
+        })
+      )
+
+    assert %{"slot" => %{"name" => "Parallel strength"}} = json_response(overlap_response, 201)
+
+    schedule =
+      get(
+        admin_conn |> recycle(),
+        "/api/schedule?start_at=#{URI.encode_www_form(DateTime.to_iso8601(first_start))}&end_at=#{URI.encode_www_form(DateTime.to_iso8601(DateTime.add(first_start, 16 * 86_400, :second)))}&days=30"
+      )
+      |> json_response(200)
+
+    series_slots = Enum.filter(schedule["slots"], &(&1["name"] == "CrossFit beginners"))
+    assert Enum.map(series_slots, & &1["duration_minutes"]) == [75, 75]
+
+    assert length(
+             Enum.filter(
+               schedule["slots"],
+               &(&1["scheduled_at"] == DateTime.to_iso8601(first_start))
+             )
+           ) == 2
+  end
+
   test "schedule preview survives republished workouts with scale overrides", %{conn: conn} do
     admin = admin_fixture(%{nickname: "edited_schedule_admin"})
 

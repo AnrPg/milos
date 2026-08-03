@@ -14,6 +14,7 @@ export type GamificationSettings = {
 export type FinanceSettings = {
   id?: string | null;
   payment_reminder_interval_days: number;
+  document_mode: "invoice" | "receipt";
   inserted_at?: string | null;
   updated_at?: string | null;
 };
@@ -28,17 +29,27 @@ export type NotificationPushSettings = {
   updated_at?: string | null;
 };
 
+export type SchedulingSettings = {
+  id?: string | null;
+  default_capacity: number;
+  default_auto_approve: boolean;
+  default_booking_timeout_minutes: number;
+  inserted_at?: string | null;
+  updated_at?: string | null;
+};
+
 export type AdminSettingsPayload = {
   gamification: GamificationSettings;
   finance: FinanceSettings;
   notifications: NotificationPushSettings;
+  scheduling: SchedulingSettings;
 };
 
 export type GamificationUpdate = Partial<
   Pick<GamificationSettings, "weekly_workout_target" | "streak_shield_reset_day" | "leaderboard_enabled" | "theme_slug">
 >;
 
-export type FinanceUpdate = Partial<Pick<FinanceSettings, "payment_reminder_interval_days">>;
+export type FinanceUpdate = Partial<Pick<FinanceSettings, "payment_reminder_interval_days" | "document_mode">>;
 
 export type NotificationPushUpdate = Partial<{
   vapid_public_key: string | null;
@@ -50,6 +61,7 @@ export type AdminSettingsUpdate = {
   gamification?: GamificationUpdate;
   finance?: FinanceUpdate;
   notifications?: NotificationPushUpdate;
+  scheduling?: Partial<Pick<SchedulingSettings, "default_capacity" | "default_auto_approve" | "default_booking_timeout_minutes">>;
 };
 
 export async function fetchAdminSettings(token: string) {

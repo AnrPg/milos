@@ -18,6 +18,7 @@ import {
 import { FormatContextualFields } from "./FormatContextualFields";
 import { FormatDropdown } from "./FormatDropdown";
 import { TimeInput } from "./TimeInput";
+import { IntegerInput } from "@/components/integer-input";
 
 const SCORE_TYPES: ScoreType[] = ["time", "reps", "weight", "rounds", "rounds+reps", "kcal", "hr_drop", "load"];
 
@@ -328,15 +329,15 @@ export function SectionConfig({ section }: Props) {
           >
             {i18n("maxWindowsa070016")}
           </label>
-          <input
-            type="number"
+          <IntegerInput
             min={1}
             max={200}
             value={(section.formatParams.max_windows as number) ?? 100}
-            onChange={(event) =>
+            emptyValue={1}
+            onValueChange={(maxWindows) =>
               setFormatParams(section.localId, {
                 ...section.formatParams,
-                max_windows: Math.max(1, Number(event.target.value) || 1),
+                max_windows: maxWindows,
               })
             }
             className="w-20 rounded-lg px-2 py-1 text-end text-sm outline-none"

@@ -55,6 +55,7 @@ defmodule MilosTraining.MixProject do
       {:opentelemetry_ecto, "~> 1.2"},
       {:opentelemetry_bandit, "~> 0.2"},
       {:gettext, "~> 0.26"},
+      {:tz, "~> 0.28"},
       {:jason, "~> 1.2"},
       {:open_api_spex, "~> 3.18"},
       {:oban, "~> 2.22.1"},

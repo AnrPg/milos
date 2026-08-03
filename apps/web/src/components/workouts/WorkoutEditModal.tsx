@@ -48,19 +48,19 @@ export function WorkoutEditModal({
     firstButtonRef.current?.focus();
   }, []);
 
-  async function handleReopen() {
+  async function handleReopen(mode: "structured" | "quick-text" = "structured") {
     setBusy("reopen");
     setError(null);
     try {
       await reopenWorkout(accessToken, workoutId);
-      router.push(`/admin/workouts/new?draft=${workoutId}&is_reopen=true`);
+      router.push(`/admin/workouts/new?draft=${workoutId}&is_reopen=true&mode=${mode}`);
     } catch (err) {
       setError(err instanceof Error ? localizeError(err, i18n) : i18n("failedToReopenWorkoutf279a52"));
       setBusy(null);
     }
   }
 
-  async function handleDuplicate() {
+  async function handleDuplicate(mode: "structured" | "quick-text" = "structured") {
     setBusy("duplicate");
     setError(null);
     try {
@@ -77,7 +77,7 @@ export function WorkoutEditModal({
           : context.kind === "slot"
             ? "&substitute_for_slot=" + (context.sourceId)
             : "";
-      router.push(`/admin/workouts/new?draft=${draft.id}${substituteParam}`);
+      router.push(`/admin/workouts/new?draft=${draft.id}${substituteParam}&mode=${mode}`);
     } catch (err) {
       setError(err instanceof Error ? localizeError(err, i18n) : i18n("failedToDuplicateWorkouta77970b"));
       setBusy(null);
@@ -134,35 +134,36 @@ export function WorkoutEditModal({
                   className="rounded-full px-4 py-3 text-sm font-semibold disabled:opacity-50"
                   style={{ background: "var(--text)", color: "var(--bg)" }}
                   disabled={busy !== null}
-                  onClick={() => void handleDuplicate()}
+                  onClick={() => void handleDuplicate("structured")}
                   type="button"
                 >
                   {busy === "duplicate"
                     ? i18n("duplicating7d74a9e")
                     : i18n("duplicateAndEditFora53d360") + (sourceLabel)}
                 </button>
-
                 <button
                   className="rounded-full px-4 py-3 text-sm font-semibold disabled:opacity-50"
                   style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)", color: "var(--primary)" }}
                   disabled={busy !== null}
-                  onClick={() => void handleReopen()}
+                  onClick={() => void handleReopen("structured")}
                   type="button"
                 >
                   {busy === "reopen" ? i18n("openingb1b8530") : i18n("proceedToEditGlobally5ecabfa")}
                 </button>
               </>
             ) : (
-              <button
-                ref={firstButtonRef}
-                className="rounded-full px-4 py-3 text-sm font-semibold disabled:opacity-50"
-                style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-                disabled={busy !== null}
-                onClick={() => void handleReopen()}
-                type="button"
-              >
-                {busy === "reopen" ? i18n("openingb1b8530") : i18n("editGloballyac84ca5")}
-              </button>
+              <>
+                <button
+                  ref={firstButtonRef}
+                  className="rounded-full px-4 py-3 text-sm font-semibold disabled:opacity-50"
+                  style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+                  disabled={busy !== null}
+                  onClick={() => void handleReopen("structured")}
+                  type="button"
+                >
+                  {busy === "reopen" ? i18n("openingb1b8530") : i18n("editGloballyac84ca5")}
+                </button>
+              </>
             )}
 
             <button

@@ -22,7 +22,7 @@ defmodule MilosTraining.Workouts.Domain.TimerConfigTest do
              })
   end
 
-  test "accepts all 18 format types" do
+  test "accepts all 19 format types" do
     types_with_params = [
       {"untimed", %{}},
       {"for_time", %{}},
@@ -96,14 +96,16 @@ defmodule MilosTraining.Workouts.Domain.TimerConfigTest do
       assert config.max_windows == 50
     end
 
-    test "ignores amrap_scoring_style on emom type" do
-      assert {:ok, _} =
+    test "rejects amrap_scoring_style on emom type" do
+      assert {:error, reason} =
                TimerConfig.normalize(%{
                  "type" => "emom",
                  "duration_seconds" => 600,
                  "interval_seconds" => 60,
                  "amrap_scoring_style" => "invalid_value"
                })
+
+      assert reason =~ "unsupported fields"
     end
   end
 

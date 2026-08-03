@@ -2,7 +2,7 @@ defmodule MilosTraining.Workouts.WorkoutSection do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias MilosTraining.Workouts.Domain.TimerConfig
+  alias MilosTraining.Workouts.Domain.{TimerConfig, WorkoutAuthoringMetadata}
   alias MilosTraining.Workouts.{MasterWorkout, WorkoutExercise}
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -15,6 +15,10 @@ defmodule MilosTraining.Workouts.WorkoutSection do
     field :score_config, :map
     field :timer_config, :map
     field :note, :string
+    field :subtitle, :string
+    field :rest_before_next_section_seconds, :integer
+    field :notes, {:array, :map}, default: []
+    field :section_metadata, :map, default: %{}
 
     belongs_to :master_workout, MasterWorkout
     belongs_to :parent_section, __MODULE__
@@ -44,11 +48,19 @@ defmodule MilosTraining.Workouts.WorkoutSection do
       :score_config,
       :timer_config,
       :parent_section_id,
-      :note
+      :note,
+      :subtitle,
+      :rest_before_next_section_seconds,
+      :notes,
+      :section_metadata
     ])
     |> update_change(:name, &normalize_name/1)
     |> validate_required([:name, :order])
     |> validate_number(:order, greater_than_or_equal_to: 1)
+    |> validate_length(:subtitle, max: 240)
+    |> validate_number(:rest_before_next_section_seconds, greater_than_or_equal_to: 0)
+    |> validate_bounded_metadata()
+    |> validate_typed_notes()
     |> normalize_timer_config()
     |> foreign_key_constraint(:master_workout_id)
     |> foreign_key_constraint(:parent_section_id,
@@ -72,5 +84,23 @@ defmodule MilosTraining.Workouts.WorkoutSection do
       :error ->
         changeset
     end
+  end
+
+  defp validate_bounded_metadata(changeset) do
+    validate_change(changeset, :section_metadata, fn :section_metadata, metadata ->
+      case WorkoutAuthoringMetadata.validate(:section, metadata) do
+        :ok -> []
+        {:error, reason} -> [section_metadata: "is invalid: #{inspect(reason)}"]
+      end
+    end)
+  end
+
+  defp validate_typed_notes(changeset) do
+    validate_change(changeset, :notes, fn :notes, notes ->
+      case WorkoutAuthoringMetadata.validate_notes(notes) do
+        :ok -> []
+        {:error, reason} -> [notes: "are invalid: #{inspect(reason)}"]
+      end
+    end)
   end
 end

@@ -12,6 +12,9 @@ export type AssignedWorkoutPreview = {
   title: string;
   type: string;
   is_team_workout?: boolean;
+  authoring_mode?: "structured" | "quick_text" | "free_text";
+  free_text_body?: string | null;
+  free_text_document?: Record<string, unknown> | null;
   sections: Array<{
     id?: string;
     parent_section_id?: string | null;

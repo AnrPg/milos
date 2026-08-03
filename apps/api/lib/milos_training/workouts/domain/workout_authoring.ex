@@ -6,6 +6,8 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAuthoring do
   list position rather than trusted from caller-supplied integers.
   """
 
+  alias MilosTraining.Workouts.Domain.WorkoutSetComposer
+
   def normalize_structure(params) when is_map(params) do
     sections =
       params
@@ -17,6 +19,48 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAuthoring do
     |> drop_key(:sections)
     |> drop_key("sections")
     |> Map.put(:sections, sections)
+  end
+
+  def prepare_structure(params) when is_map(params) do
+    normalized = normalize_structure(params)
+
+    with {:ok, sections} <- prepare_sections(get_sections(normalized)) do
+      {:ok,
+       normalized
+       |> drop_key(:sections)
+       |> drop_key("sections")
+       |> Map.put(:sections, sections)}
+    end
+  end
+
+  defp prepare_sections(sections) do
+    Enum.reduce_while(sections, {:ok, []}, fn section, {:ok, acc} ->
+      with {:ok, exercises} <- WorkoutSetComposer.normalize_items(get_exercises(section)),
+           {:ok, child_sections} <- prepare_sections(get_sections(section)) do
+        prepared =
+          section
+          |> drop_key(:exercises)
+          |> drop_key("exercises")
+          |> drop_key(:sections)
+          |> drop_key("sections")
+          |> Map.put(:exercises, exercises)
+
+        prepared =
+          if child_sections == [] do
+            prepared
+          else
+            Map.put(prepared, :sections, child_sections)
+          end
+
+        {:cont, {:ok, [prepared | acc]}}
+      else
+        {:error, reason} -> {:halt, {:error, reason}}
+      end
+    end)
+    |> case do
+      {:ok, prepared} -> {:ok, Enum.reverse(prepared)}
+      error -> error
+    end
   end
 
   defp normalize_section(section, order, parent_section_id) do

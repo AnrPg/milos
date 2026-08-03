@@ -12,12 +12,13 @@ import { AnchoredOverlay } from "./AnchoredOverlay";
 interface Props {
   userId: string;
   currentCode: string | null;
+  currentLabel?: string | null;
   packages: FinanceRecord[];
   pending: boolean;
   onAssign: (packageId: string) => void;
 }
 
-export function InlineAssignPackage({ currentCode, packages, pending, onAssign }: Props) {
+export function InlineAssignPackage({ currentCode, currentLabel, packages, pending, onAssign }: Props) {
   const i18n = useUiTranslations();
   const [open, setOpen] = useState(false);
   const [selectedId, setSelectedId] = useState("");
@@ -52,7 +53,7 @@ export function InlineAssignPackage({ currentCode, packages, pending, onAssign }
 
   return (
     <div ref={ref} className="relative inline-block">
-      {currentCode ? (
+      {currentLabel || currentCode ? (
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
@@ -60,7 +61,7 @@ export function InlineAssignPackage({ currentCode, packages, pending, onAssign }
           style={{ background: "var(--border)", color: "var(--text-soft)" }}
           title={i18n("changePackage8621cbc")}
         >
-          {currentCode}
+          {currentLabel || currentCode}
           <span className="opacity-0 group-hover:opacity-60 transition-opacity text-[10px]">✎</span>
         </button>
       ) : (
@@ -104,7 +105,6 @@ export function InlineAssignPackage({ currentCode, packages, pending, onAssign }
                 disabled={pkg.active === false}
               >
                 {String(pkg.name || pkg.code)}
-                {pkg.code ? "(" + (String(pkg.code)) + ")" : ""}
                 {pkg.active === false ? i18n("inactive0e9b582") : ""}
               </option>
             ))}

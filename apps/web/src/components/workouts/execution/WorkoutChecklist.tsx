@@ -8,13 +8,17 @@
 import {useUiTranslations} from "@/i18n/ui";
 import { semanticLabel } from "@/i18n/presentation";
 import type { TimerSegment } from "@/api/executions";
-import { buildStepId } from "./progress";
+import { buildSegmentStepDefinitions } from "./progress";
 
 export type ChecklistStep = {
   stepId: string;
   stepLabel: string | null;
   exerciseId: string;
   exercise: TimerSegment["exercises"][number];
+  setNumber: number;
+  setPrescription: ReturnType<typeof buildSegmentStepDefinitions>[number]["setPrescription"];
+  groupKind: "superset" | "alternating" | null;
+  groupId: string | null;
 };
 
 type Props = {
@@ -25,18 +29,16 @@ type Props = {
 };
 
 export function buildChecklistSteps(segment: TimerSegment): ChecklistStep[] {
-  return segment.exercises
-    .filter((exercise) => !exercise.excluded)
-    .flatMap((exercise) => {
-      const setCount = exercise.sets && exercise.sets > 1 ? exercise.sets : 1;
-
-      return Array.from({ length: setCount }, (_, index) => ({
-        stepId: buildStepId(segment, exercise, setCount, index + 1),
-        stepLabel: setCount > 1 ? `${index + 1}/${setCount}` : null,
-        exerciseId: exercise.id,
-        exercise,
-      }));
-    });
+  return buildSegmentStepDefinitions(segment).map((step) => ({
+    stepId: step.stepId,
+    stepLabel: step.setCount > 1 ? `${step.setNumber}/${step.setCount}` : null,
+    exerciseId: step.exercise.id,
+    exercise: step.exercise,
+    setNumber: step.setNumber,
+    setPrescription: step.setPrescription,
+    groupKind: step.groupKind,
+    groupId: step.groupId,
+  }));
 }
 
 export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModify }: Props) {
@@ -59,21 +61,30 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
     (s) => !checkedExerciseIds.includes(s.stepId) && !checkedExerciseIds.includes(s.exerciseId),
   ) ?? null;
 
-  const { exercise } = currentStep ?? steps[steps.length - 1]!;
+  const activeStep = currentStep ?? steps[steps.length - 1]!;
+  const { exercise } = activeStep;
 
-  const prescriptionLabel = exercise.prescription_value
-    ? (exercise.prescription_value) + " " + semanticLabel(exercise.prescription_unit ?? "reps", i18n)
+  const prescriptionValue = activeStep.setPrescription?.prescription_value ?? exercise.prescription_value;
+  const prescriptionUnit = activeStep.setPrescription?.prescription_unit ?? exercise.prescription_unit;
+  const loadValue = activeStep.setPrescription?.load_value ?? exercise.load_value;
+  const loadMode = activeStep.setPrescription?.load_mode ?? exercise.load_mode;
+
+  const prescriptionLabel = prescriptionValue
+    ? (prescriptionValue) + " " + semanticLabel(prescriptionUnit ?? "reps", i18n)
     : null;
 
-  const loadLabel = exercise.load_value
-    ? exercise.load_mode === "pct_1rm"
-      ? (exercise.load_value) + i18n("rma904756")
-      : (exercise.load_value) + " " + semanticLabel("kg", i18n)
-    : exercise.load_mode === "bw"
+  const loadLabel = loadValue
+    ? loadMode === "pct_1rm"
+      ? (loadValue) + i18n("rma904756")
+      : (loadValue) + " " + semanticLabel("kg", i18n)
+    : loadMode === "bw"
       ? i18n("bw4d64743")
       : null;
 
   const allDone = doneCount === steps.length;
+  const activeGroupSteps = activeStep.groupId ? steps.filter((step) => step.groupId === activeStep.groupId) : [];
+  const activeGroupSets = activeGroupSteps.reduce((max, step) => Math.max(max, step.setNumber), 0);
+  const groupColor = activeStep.groupKind === "superset" ? "var(--primary)" : "var(--info)";
 
   return (
     <div className="flex flex-col gap-3">
@@ -83,6 +94,12 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
         </span>
         <span>{doneCount}/{steps.length} {i18n("donee5fd9cf")}</span>
       </div>
+
+      {segment.section_note ? (
+        <div className="text-xs italic" style={{ color: "var(--muted)" }}>
+          {segment.section_note}
+        </div>
+      ) : null}
 
       {allDone ? (
         <div
@@ -95,9 +112,17 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
           </p>
         </div>
       ) : (
+        <>
+        {activeStep.groupKind ? (
+          <header className="flex items-center gap-2 rounded-t-lg px-4 py-2 text-xs font-bold uppercase" style={{ border: `1px solid ${groupColor}`, borderBottom: 0, color: groupColor }}>
+            <span>{activeStep.groupKind === "superset" ? i18n("supersetLabel") : i18n("alternatingSetsLabel")}</span>
+            {activeGroupSets > 0 ? <span>{activeGroupSets} {i18n("setsd6c8220")}</span> : null}
+            <span className="h-px flex-1 opacity-30" style={{ background: groupColor }} />
+          </header>
+        ) : null}
         <div
-          className="rounded-2xl p-5 cursor-pointer select-none active:scale-[0.98] transition-transform"
-          style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+          className={`${activeStep.groupKind ? "rounded-b-lg" : "rounded-2xl"} p-5 cursor-pointer select-none active:scale-[0.98] transition-transform`}
+          style={{ background: "var(--panel)", border: `1px solid ${activeStep.groupKind ? groupColor : "var(--border)"}`, boxShadow: activeStep.groupKind ? `inset 3px 0 0 ${groupColor}` : "none" }}
           onClick={() => currentStep && onToggle(currentStep.stepId, steps)}
           role="button"
           tabIndex={0}
@@ -140,6 +165,16 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
                   )}
                 </div>
               )}
+              {exercise.note ? (
+                <p className="mt-2 text-xs italic" style={{ color: "var(--muted)" }}>
+                  {exercise.note}
+                </p>
+              ) : null}
+              {activeStep.setPrescription?.note ? (
+                <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
+                  {activeStep.setPrescription.note}
+                </p>
+              ) : null}
             </div>
 
             <button
@@ -167,6 +202,7 @@ export function WorkoutChecklist({ segment, checkedExerciseIds, onToggle, onModi
             </p>
           </div>
         </div>
+        </>
       )}
 
       {doneCount > 0 && (

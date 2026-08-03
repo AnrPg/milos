@@ -54,6 +54,21 @@ defmodule MilosTraining.Workouts.WorkoutStore do
   def list_workouts, do: adapter().list_workouts()
 
   @impl true
+  def list_folders, do: adapter().list_folders()
+
+  @impl true
+  def create_folder(admin_id, params), do: adapter().create_folder(admin_id, params)
+
+  @impl true
+  def update_folder(id, params), do: adapter().update_folder(id, params)
+
+  @impl true
+  def delete_folder(id), do: adapter().delete_folder(id)
+
+  @impl true
+  def update_library_metadata(id, params), do: adapter().update_library_metadata(id, params)
+
+  @impl true
   def list_scale_levels, do: adapter().list_scale_levels()
 
   @impl true
@@ -78,7 +93,8 @@ defmodule MilosTraining.Workouts.WorkoutStore do
     do: adapter().get_assignment_execution_access(assignment_id, athlete_id)
 
   @impl true
-  def duplicate_workout(id, title_suffix), do: adapter().duplicate_workout(id, title_suffix)
+  def duplicate_workout(id, title_suffix, attrs \\ %{}),
+    do: adapter().duplicate_workout(id, title_suffix, attrs)
 
   @impl true
   def substitute_assignment_workout(assignment_id, new_workout_id),

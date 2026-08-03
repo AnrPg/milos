@@ -67,6 +67,14 @@ export type AdminUserTraining = {
   summary: { execution_count: number; completed_count: number; scored_section_count: number };
 };
 
+export type AdminUserSchedule = {
+  user_id: string;
+  role: "member" | "athlete" | "admin";
+  start_date: string;
+  end_date: string;
+  items: Array<Record<string, unknown>>;
+};
+
 export type AdminUserPR = {
   id: string;
   name: string;
@@ -125,6 +133,29 @@ export function fetchAdminUserFinance(token: string, userId: string) {
 
 export function fetchAdminUserTraining(token: string, userId: string) {
   return apiRequest<AdminUserTraining>(`/admin/users/${userId}/training-history`, { token });
+}
+
+export function fetchAdminUserSchedule(token: string, userId: string, startDate: string, endDate: string) {
+  const query = new URLSearchParams({ start_date: startDate, end_date: endDate });
+  return apiRequest<AdminUserSchedule>(`/admin/users/${userId}/schedule?${query}`, { token });
+}
+
+export function programAdminUserWorkout(
+  token: string,
+  userId: string,
+  body: {
+    master_workout_id: string;
+    folder_id: string | null;
+    scheduled_for: string;
+    slot_id?: string | null;
+    copy_source: boolean;
+    admin_notes?: string;
+  },
+) {
+  return apiRequest<{ workout: Record<string, unknown>; association: Record<string, unknown> }>(
+    `/admin/users/${userId}/programming`,
+    { token, method: "POST", body },
+  );
 }
 
 export function fetchAdminUserPRs(token: string, userId: string) {

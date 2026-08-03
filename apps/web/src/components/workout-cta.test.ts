@@ -17,6 +17,28 @@ describe("workoutCta", () => {
     ).toEqual({ href: "/workouts/execution-1/execute", label: "resume" });
   });
 
+  it("resumes an active free-text execution in the free-text runner", () => {
+    expect(
+      workoutCta({
+        role: "athlete",
+        now,
+        executions: [
+          {
+            id: "execution-free-text",
+            status: "active",
+            master_workout_id: "workout-free-text",
+            workout: { authoring_mode: "free_text" },
+          },
+        ],
+        scheduleSlots: [],
+        assignments: [],
+      }),
+    ).toEqual({
+      href: "/workouts/free-text/execute?workout=workout-free-text&execution=execution-free-text",
+      label: "resume",
+    });
+  });
+
   it("offers logging for an approved booked class within two hours", () => {
     expect(
       workoutCta({
@@ -46,7 +68,10 @@ describe("workoutCta", () => {
           { id: "assignment-1", scheduled_for: "2026-07-17", execution_status: null },
         ],
       }),
-    ).toEqual({ href: "/my-workouts", label: "log" });
+    ).toEqual({
+      href: "/my-workouts?open_assignment=assignment-1&date=2026-07-17",
+      label: "log",
+    });
   });
 
   it("hides the CTA without a qualifying trigger", () => {

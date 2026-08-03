@@ -30,18 +30,50 @@ defmodule MilosTraining.Application.GetCalendarFeed do
   defp class_events(%{role: :athlete}, _start_at, _end_at, _locale), do: []
 
   defp class_events(user, start_at, end_at, locale) do
-    %{start_at: start_at, end_at: end_at}
-    |> Scheduling.get_calendar_week()
-    |> Enum.filter(&include_slot?(&1, user))
-    |> Enum.map(fn slot ->
-      %{
-        uid: "class-#{slot.id}@milos-training",
-        title: translate(locale, "Class: %{name}", %{name: class_type_name(slot)}),
-        starts_at: slot.scheduled_at,
-        ends_at: DateTime.add(slot.scheduled_at, 60 * 60, :second),
-        description: class_description(slot, user, locale)
-      }
-    end)
+    slots =
+      %{start_at: start_at, end_at: end_at}
+      |> Scheduling.get_calendar_week()
+      |> Enum.filter(&include_slot?(&1, user))
+
+    if user.role == :admin do
+      recurring_events =
+        slots
+        |> Enum.filter(& &1.class_series_id)
+        |> Enum.group_by(& &1.class_series_id)
+        |> Enum.map(fn {_series_id, [slot | _]} -> recurring_class_event(slot, user, locale) end)
+
+      one_off_events =
+        slots
+        |> Enum.reject(& &1.class_series_id)
+        |> Enum.map(&class_event(&1, user, locale))
+
+      recurring_events ++ one_off_events
+    else
+      Enum.map(slots, &class_event(&1, user, locale))
+    end
+  end
+
+  defp class_event(slot, user, locale) do
+    %{
+      uid: "class-#{slot.id}@milos-training",
+      title: translate(locale, "Class: %{name}", %{name: class_name(slot)}),
+      starts_at: slot.scheduled_at,
+      ends_at: DateTime.add(slot.scheduled_at, slot.duration_minutes * 60, :second),
+      description: class_description(slot, user, locale)
+    }
+  end
+
+  defp recurring_class_event(slot, user, locale) do
+    series = slot.class_series
+
+    %{
+      uid: "class-series-#{series.id}@milos-training",
+      title: translate(locale, "Class: %{name}", %{name: series.name}),
+      recurrence: series,
+      starts_at: slot.scheduled_at,
+      duration_minutes: series.duration_minutes,
+      description: class_description(slot, user, locale)
+    }
   end
 
   defp assignment_events(%{role: :member}, _start_date, _end_date, _locale), do: []
@@ -57,6 +89,8 @@ defmodule MilosTraining.Application.GetCalendarFeed do
   end
 
   defp assignment_event(assignment, locale) do
+    scheduled_for = date_value(assignment.scheduled_for)
+
     title =
       assignment
       |> get_in([:workout, :title])
@@ -69,11 +103,14 @@ defmodule MilosTraining.Application.GetCalendarFeed do
     %{
       uid: "assigned-workout-#{assignment.id}@milos-training",
       title: title,
-      starts_on: assignment.scheduled_for,
-      ends_on: Date.add(assignment.scheduled_for, 1),
+      starts_on: scheduled_for,
+      ends_on: Date.add(scheduled_for, 1),
       description: translate(locale, "Assigned workout in Milos Training.")
     }
   end
+
+  defp date_value(%Date{} = date), do: date
+  defp date_value(value) when is_binary(value), do: Date.from_iso8601!(value)
 
   defp include_slot?(_slot, %{role: :admin}), do: true
 
@@ -84,7 +121,7 @@ defmodule MilosTraining.Application.GetCalendarFeed do
   end
 
   defp class_description(slot, %{role: :admin}, locale) do
-    translate(locale, "Scheduled %{name} class in Milos Training.", %{name: class_type_name(slot)})
+    translate(locale, "Scheduled %{name} class in Milos Training.", %{name: class_name(slot)})
   end
 
   defp class_description(slot, user, locale) do
@@ -131,6 +168,22 @@ defmodule MilosTraining.Application.GetCalendarFeed do
     ]
   end
 
+  defp event_lines(%{recurrence: series, starts_at: starts_at} = event, now) do
+    [
+      "BEGIN:VEVENT",
+      "UID:#{escape(event.uid)}",
+      "DTSTAMP:#{format_datetime(now)}",
+      "DTSTART;TZID=#{escape(series.timezone)}:#{format_zoned_datetime(starts_at, series.timezone)}",
+      "DURATION:PT#{event.duration_minutes}M",
+      recurrence_rule(series),
+      excluded_dates(series),
+      "SUMMARY:#{escape(event.title)}",
+      "DESCRIPTION:#{escape(event.description)}",
+      "END:VEVENT"
+    ]
+    |> Enum.reject(&is_nil/1)
+  end
+
   defp event_lines(%{starts_on: starts_on, ends_on: ends_on} = event, now) do
     [
       "BEGIN:VEVENT",
@@ -147,6 +200,35 @@ defmodule MilosTraining.Application.GetCalendarFeed do
   defp class_type_name(%{class_type: %{name: name}}) when is_binary(name), do: name
   defp class_type_name(_slot), do: "—"
 
+  defp class_name(%{name: name}) when is_binary(name) and name != "Class", do: name
+  defp class_name(slot), do: class_type_name(slot)
+
+  defp recurrence_rule(series) do
+    byday = series.weekdays |> Enum.map(&weekday_code/1) |> Enum.join(",")
+    until_part = if series.ends_on, do: ";UNTIL=#{format_date(series.ends_on)}T235959Z", else: ""
+    "RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=#{byday}#{until_part}"
+  end
+
+  defp excluded_dates(%{excluded_dates: []}), do: nil
+  defp excluded_dates(%{excluded_dates: nil}), do: nil
+
+  defp excluded_dates(series) do
+    dates =
+      series.excluded_dates
+      |> Enum.map(&format_local_datetime(&1, series.local_start_time))
+      |> Enum.join(",")
+
+    "EXDATE;TZID=#{escape(series.timezone)}:#{dates}"
+  end
+
+  defp weekday_code(1), do: "MO"
+  defp weekday_code(2), do: "TU"
+  defp weekday_code(3), do: "WE"
+  defp weekday_code(4), do: "TH"
+  defp weekday_code(5), do: "FR"
+  defp weekday_code(6), do: "SA"
+  defp weekday_code(7), do: "SU"
+
   defp status_message(:pending), do: "Pending"
   defp status_message(:approved), do: "Approved"
   defp status_message("scheduled"), do: "Scheduled"
@@ -162,6 +244,16 @@ defmodule MilosTraining.Application.GetCalendarFeed do
   end
 
   defp format_date(date), do: Calendar.strftime(date, "%Y%m%d")
+
+  defp format_local_datetime(date, time) do
+    Calendar.strftime(date, "%Y%m%d") <> "T" <> Calendar.strftime(time, "%H%M%S")
+  end
+
+  defp format_zoned_datetime(datetime, timezone) do
+    datetime
+    |> DateTime.shift_zone!(timezone)
+    |> Calendar.strftime("%Y%m%dT%H%M%S")
+  end
 
   defp escape(value) do
     value

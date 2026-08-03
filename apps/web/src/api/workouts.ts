@@ -1,5 +1,6 @@
 import { apiRequest } from "@/api/client";
-import type { LoadMode, PrescriptionUnit, WorkoutType } from "@/types/workout";
+import type { WorkoutDslVocabulary } from "@/lib/workout-dsl-suggestions";
+import type { LoadMode, LoadProgression, PrescriptionUnit, WorkoutType } from "@/types/workout";
 
 export type ScaleLevel = {
   id?: string;
@@ -60,12 +61,30 @@ export type WorkoutVariationRecord = {
   prescription_unit?: PrescriptionUnit | null;
   load_value?: number | null;
   load_mode?: LoadMode | null;
+  set_prescriptions?: Array<{
+    set_index: number;
+    prescription_value?: number | null;
+    prescription_unit?: PrescriptionUnit | null;
+    load_value?: number | null;
+    load_mode?: LoadMode | null;
+    note?: string | null;
+  }> | null;
+  load_progression?: {
+    mode: LoadProgression["mode"];
+    direction: LoadProgression["direction"];
+    start_value: number;
+    start_mode: LoadMode;
+    step_value: number;
+    per_set_values: number[];
+  } | null;
   excluded?: boolean;
+  note?: string | null;
   scale_level: ScaleLevel;
 };
 
 export type WorkoutExerciseRecord = {
   id?: string;
+  item_type?: "exercise" | "header";
   name: string;
   description?: string | null;
   sets?: number | null;
@@ -73,7 +92,25 @@ export type WorkoutExerciseRecord = {
   prescription_unit?: PrescriptionUnit | null;
   load_value?: number | null;
   load_mode?: LoadMode | null;
+  set_prescriptions?: Array<{
+    set_index: number;
+    prescription_value?: number | null;
+    prescription_unit?: PrescriptionUnit | null;
+    load_value?: number | null;
+    load_mode?: LoadMode | null;
+    note?: string | null;
+  }>;
+  load_progression?: {
+    mode: LoadProgression["mode"];
+    direction: LoadProgression["direction"];
+    start_value: number;
+    start_mode: LoadMode;
+    step_value: number;
+    per_set_values: number[];
+  } | null;
   superset_group_id?: string | null;
+  alternating_group_id?: string | null;
+  group_config?: { sets?: number | null; title?: string | null } | null;
   hr_zone?: number | null;
   tempo?: string | null;
   rest_seconds?: number | null;
@@ -84,6 +121,7 @@ export type WorkoutExerciseRecord = {
   order: number;
   variations: WorkoutVariationRecord[];
   applied_variation?: WorkoutVariationRecord | null;
+  note?: string | null;
 };
 
 export type WorkoutSectionRecord = {
@@ -98,6 +136,7 @@ export type WorkoutSectionRecord = {
     label?: string;
   } | null;
   timer_config?: Record<string, unknown> | null;
+  note?: string | null;
   exercises: WorkoutExerciseRecord[];
 };
 
@@ -108,12 +147,29 @@ export type WorkoutRecord = {
   is_team_workout?: boolean;
   status?: string;
   created_by_id?: string;
+  folder_id?: string | null;
+  source_workout_id?: string | null;
   inserted_at?: string;
   updated_at?: string;
   scale_level?: ScaleLevel;
   available_scale_levels: ScaleLevel[];
   sections: WorkoutSectionRecord[];
   draft_data?: unknown;
+  authoring_mode?: "structured" | "quick_text" | "free_text";
+  dsl_version?: number | null;
+  dsl_source?: string | null;
+  dsl_document?: Record<string, unknown> | null;
+  dsl_source_revision?: number;
+  last_dsl_diagnostics?: WorkoutDslDiagnostic[];
+  free_text_body?: string | null;
+  free_text_document?: Record<string, unknown> | null;
+};
+
+export type WorkoutFolder = {
+  id: string;
+  name: string;
+  parent_id: string | null;
+  created_by_id: string;
 };
 
 export type MaterializedWorkoutResponse = {
@@ -121,9 +177,88 @@ export type MaterializedWorkoutResponse = {
   scales: WorkoutRecord[];
 };
 
+export type WorkoutDslDiagnostic = {
+  code: string;
+  severity: "error" | "warning";
+  line: number;
+  column: number;
+  params: Record<string, unknown>;
+};
+
+export type WorkoutDslPreview = {
+  version: number;
+  workout: Record<string, unknown>;
+  formatted_source: string;
+  vocabulary: WorkoutDslVocabulary;
+  diagnostics: WorkoutDslDiagnostic[];
+};
+
+export type WorkoutDslAuthoring = {
+  version: number;
+  source: string;
+  document: Record<string, unknown> | null;
+  source_revision: number;
+  authoring_mode: "structured" | "quick_text";
+  diagnostics: WorkoutDslDiagnostic[];
+};
+
+export type WorkoutDslManual = {
+  version: number;
+  markdown: string;
+  templates: {
+    workout: string;
+    sections: Record<string, string>;
+  };
+  vocabulary: WorkoutDslVocabulary;
+};
+
+export type WorkoutDslPublishResult = {
+  workout: WorkoutRecord;
+  formatted_source: string;
+  diagnostics: WorkoutDslDiagnostic[];
+  execution_preview: {
+    segment_count: number;
+    timed_seconds: number;
+    formats: string[];
+  };
+};
+
 export async function listScaleLevels(token: string) {
   const response = await apiRequest<{ scale_levels: ScaleLevel[] }>("/admin/scale-levels", { token });
   return response.scale_levels;
+}
+
+export async function parseWorkoutDsl(token: string, source: string) {
+  return apiRequest<WorkoutDslPreview>("/admin/workouts/dsl/parse", {
+    method: "POST",
+    token,
+    body: { source },
+  });
+}
+
+export async function fetchWorkoutDslAuthoring(token: string, id: string) {
+  return apiRequest<WorkoutDslAuthoring>(`/admin/workouts/${id}/dsl`, { token });
+}
+
+export async function fetchWorkoutDslManual(token: string) {
+  return apiRequest<WorkoutDslManual>("/admin/workouts/dsl/manual", { token });
+}
+
+export async function publishWorkoutDsl(
+  token: string,
+  id: string,
+  payload: {
+    source: string;
+    document: Record<string, unknown> | null;
+    expected_source_revision: number;
+    acknowledge_warnings: boolean;
+  },
+) {
+  return apiRequest<WorkoutDslPublishResult>(`/admin/workouts/${id}/dsl/publish`, {
+    method: "POST",
+    token,
+    body: payload,
+  });
 }
 
 export async function replaceScaleLevels(token: string, payload: ReplaceScaleLevelsRequest) {
@@ -139,6 +274,31 @@ export async function replaceScaleLevels(token: string, payload: ReplaceScaleLev
 export async function listAdminWorkouts(token: string) {
   const response = await apiRequest<{ workouts: WorkoutRecord[] }>("/admin/workouts", { token });
   return response.workouts;
+}
+
+export async function listWorkoutFolders(token: string) {
+  const response = await apiRequest<{ folders: WorkoutFolder[] }>("/admin/workout-folders", { token });
+  return response.folders;
+}
+
+export function createWorkoutFolder(token: string, body: { name: string; parent_id: string | null }) {
+  return apiRequest<WorkoutFolder>("/admin/workout-folders", { token, method: "POST", body });
+}
+
+export function updateWorkoutFolder(token: string, id: string, body: { name: string; parent_id: string | null }) {
+  return apiRequest<WorkoutFolder>(`/admin/workout-folders/${id}`, { token, method: "PATCH", body });
+}
+
+export function deleteWorkoutFolder(token: string, id: string) {
+  return apiRequest<void>(`/admin/workout-folders/${id}`, { token, method: "DELETE" });
+}
+
+export function moveWorkoutToFolder(token: string, id: string, folderId: string | null) {
+  return apiRequest<{ id: string; folder_id: string | null }>(`/admin/workouts/${id}/library`, {
+    token,
+    method: "PATCH",
+    body: { folder_id: folderId },
+  });
 }
 
 function stripNullDraftFields(payload: unknown) {
@@ -191,8 +351,22 @@ export async function createWorkout(token: string, payload: CreateWorkoutRequest
   return publishWorkout(token, draft.id);
 }
 
-export async function createDraftWorkout(token: string): Promise<{ id: string; status?: string }> {
-  const response = await apiRequest<{ draft: { id: string; status?: string } }>("/admin/workouts", {
+export async function createDraftWorkout(
+  token: string,
+): Promise<{
+  id: string;
+  status?: string;
+  authoring_mode?: string;
+  dsl_source_revision?: number;
+}> {
+  const response = await apiRequest<{
+    draft: {
+      id: string;
+      status?: string;
+      authoring_mode?: string;
+      dsl_source_revision?: number;
+    };
+  }>("/admin/workouts", {
     method: "POST",
     token,
   });
@@ -205,7 +379,12 @@ export async function updateDraftWorkout(
   id: string,
   payload: unknown,
   options?: { editorSessionId?: string },
-): Promise<{ id: string; status?: string }> {
+): Promise<{
+  id: string;
+  status?: string;
+  authoring_mode?: string;
+  dsl_source_revision?: number;
+}> {
   const normalizedPayload = stripNullDraftFields(payload);
   const requestBody =
     options?.editorSessionId && normalizedPayload && typeof normalizedPayload === "object"
@@ -215,7 +394,14 @@ export async function updateDraftWorkout(
         }
       : normalizedPayload;
 
-  const response = await apiRequest<{ draft: { id: string; status?: string } }>(
+  const response = await apiRequest<{
+    draft: {
+      id: string;
+      status?: string;
+      authoring_mode?: string;
+      dsl_source_revision?: number;
+    };
+  }>(
     `/admin/workouts/${id}/draft`,
     {
       method: "PATCH",

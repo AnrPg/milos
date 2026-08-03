@@ -1,5 +1,7 @@
 defmodule MilosTraining.Workouts do
-  alias MilosTraining.Workouts.Domain.WorkoutType
+  alias MilosTraining.Workouts.Domain.{WorkoutDsl, WorkoutType}
+  alias MilosTraining.Workouts.Domain.WorkoutDsl.Preflight
+  alias MilosTraining.Workouts.Domain.WorkoutDsl.{Manual, Templates, Vocabulary}
 
   alias MilosTraining.Workouts.Commands.{
     ArchiveAthleteAssignments,
@@ -56,6 +58,14 @@ defmodule MilosTraining.Workouts do
   defdelegate replace_scale_levels(levels), to: ReplaceScaleLevels, as: :call
   defdelegate materialize_workout(id), to: MaterializeWorkout, as: :by_id
   def supported_workout_types, do: WorkoutType.values()
+  def parse_dsl(source), do: WorkoutDsl.parse(source)
+  def format_dsl(workout, opts \\ []), do: WorkoutDsl.format(workout, opts)
+  def dsl_vocabulary, do: Vocabulary.export()
+  def dsl_manual, do: Manual.export()
+  def dsl_templates, do: Templates.export()
+
+  def preflight_dsl(workout, active_scale_slugs),
+    do: Preflight.validate(workout, active_scale_slugs)
 
   def reject_assignment_for_athlete(assignment_id, athlete_id),
     do:
@@ -66,7 +76,21 @@ defmodule MilosTraining.Workouts do
     as: :call
 
   defdelegate reopen_workout(id), to: ReopenWorkout, as: :call
-  def duplicate_workout(id, title_suffix \\ "(copy)"), do: DuplicateWorkout.call(id, title_suffix)
+
+  def duplicate_workout(id, title_suffix \\ "(copy)", attrs \\ %{}),
+    do: DuplicateWorkout.call(id, title_suffix, attrs)
+
+  def list_folders, do: MilosTraining.Workouts.WorkoutStore.list_folders()
+
+  def create_folder(admin_id, params),
+    do: MilosTraining.Workouts.WorkoutStore.create_folder(admin_id, params)
+
+  def update_folder(id, params), do: MilosTraining.Workouts.WorkoutStore.update_folder(id, params)
+  def delete_folder(id), do: MilosTraining.Workouts.WorkoutStore.delete_folder(id)
+
+  def update_library_metadata(id, params),
+    do: MilosTraining.Workouts.WorkoutStore.update_library_metadata(id, params)
+
   def get_assigned_workout(id), do: MilosTraining.Workouts.WorkoutStore.get_assigned_workout(id)
 
   def get_assignment_execution_access(assignment_id, athlete_id),
