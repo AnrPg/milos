@@ -4,6 +4,7 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoMessageStore do
   import Ecto.Query
 
   alias MilosTraining.Messaging.{Message, Participant, Thread}
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Repo
   alias MilosTraining.Workers.DispatchMessageJob
 
@@ -80,6 +81,29 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoMessageStore do
     |> order_by([message], desc: message.sequence_number)
     |> limit(^limit)
     |> Repo.all()
+  end
+
+  @impl true
+  def list_recent_coaching_notes_for_organization(user_id, limit) do
+    case RepoContext.current_setting("app.organization_id") do
+      organization_id when is_binary(organization_id) ->
+        Message
+        |> join(:inner, [message], thread in Thread, on: thread.id == message.thread_id)
+        |> join(:inner, [_message, thread], participant in Participant,
+          on: participant.thread_id == thread.id
+        )
+        |> where(
+          [message, thread, participant],
+          participant.user_id == ^user_id and thread.context_type == :direct and
+            message.message_type == :coaching_note and message.organization_id == ^organization_id
+        )
+        |> order_by([message], desc: message.sequence_number)
+        |> limit(^limit)
+        |> Repo.all()
+
+      _missing_scope ->
+        []
+    end
   end
 
   defp insert_message(

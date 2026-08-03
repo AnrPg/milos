@@ -7,4 +7,7 @@ defmodule MilosTraining.Messaging.Ports.MessageStore do
   @callback list_messages(Ecto.UUID.t(), map()) :: [Message.t()]
   @callback get_message(Ecto.UUID.t()) :: Message.t() | nil
   @callback list_recent_coaching_notes(Ecto.UUID.t(), pos_integer()) :: [Message.t()]
+  @callback list_recent_coaching_notes_for_organization(Ecto.UUID.t(), pos_integer()) :: [
+              Message.t()
+            ]
 end

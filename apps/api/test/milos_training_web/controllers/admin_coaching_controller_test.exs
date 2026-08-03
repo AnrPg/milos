@@ -1,7 +1,7 @@
 defmodule MilosTrainingWeb.AdminCoachingControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
-  alias MilosTraining.{Messaging, Notifications, Repo}
+  alias MilosTraining.{Messaging, Notifications, Organizations, Repo}
   alias MilosTraining.{Execution, Workouts}
   alias MilosTraining.Notifications.Notification
   alias MilosTraining.Workers.DispatchMessageJob
@@ -36,7 +36,10 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
 
     assert :ok =
              DispatchMessageJob.perform(%Oban.Job{
-               args: %{"message_id" => response["message"]["id"]}
+               args: %{
+                 "message_id" => response["message"]["id"],
+                 "organization_id" => thread.organization_id
+               }
              })
 
     notification =
@@ -55,6 +58,7 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
     admin = admin_fixture()
     athlete = user_fixture(%{role: :athlete, nickname: "coaching_drill_athlete"})
     workout = workout_fixture(admin, %{title: "Coaching Drill Workout", type: :strength})
+    legacy_organization = Organizations.get_by_slug(Organizations.legacy_organization_slug())
 
     assert {:ok, assignment} =
              Workouts.assign_workout(%{
@@ -66,6 +70,7 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
 
     assert {:ok, execution} =
              Execution.start_execution(athlete.id, %{
+               organization_id: legacy_organization.id,
                master_workout_id: workout.id,
                source: :assigned,
                source_reference_id: assignment.id,
@@ -114,7 +119,7 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
     response =
       conn
       |> put_bearer_token(admin)
-      |> get("/api/admin/athletes/#{athlete.id}/drill-down")
+      |> get("/api/org/#{legacy_organization.slug}/admin/athletes/#{athlete.id}/drill-down")
       |> json_response(200)
 
     assert response["drill_down"]["identity"]["nickname"] == "coaching_drill_athlete"

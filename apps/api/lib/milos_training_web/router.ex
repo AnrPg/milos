@@ -42,6 +42,14 @@ defmodule MilosTrainingWeb.Router do
     plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin, :coach, :athlete])
   end
 
+  pipeline :tenant_member do
+    plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
+
+    plug(MilosTrainingWeb.Plugs.RequireTenantRole,
+      roles: [:owner, :admin, :coach, :athlete, :member]
+    )
+  end
+
   pipeline :user_only do
     plug(MilosTrainingWeb.Plugs.AssignUserContext)
   end
@@ -52,6 +60,10 @@ defmodule MilosTrainingWeb.Router do
 
   pipeline :organization_admin do
     plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin])
+  end
+
+  pipeline :platform_owner do
+    plug(MilosTrainingWeb.Plugs.RequirePlatformOwner)
   end
 
   scope "/api" do
@@ -100,6 +112,33 @@ defmodule MilosTrainingWeb.Router do
 
     post("/invitations", OrganizationAccessController, :issue)
     delete("/invitations/:id", OrganizationAccessController, :revoke)
+  end
+
+  scope "/api/org/:organization_slug/me", MilosTrainingWeb do
+    pipe_through([:api, :authenticated, :tenant_member])
+
+    get("/finance", MyFinanceController, :index)
+    get("/entitlement", MyFinanceController, :entitlement)
+    get("/invoices/:id/download-url", MyFinanceController, :invoice_download_url)
+    get("/reviews", ReviewController, :index)
+    post("/reviews", ReviewController, :create)
+  end
+
+  scope "/api/org/:organization_slug/admin", MilosTrainingWeb do
+    pipe_through([:api, :authenticated, :admin_only])
+
+    get("/reviews", AdminReviewController, :index)
+    patch("/reviews/:id/status", AdminReviewController, :update_status)
+    get("/athletes/:id/drill-down", AdminCoachingController, :drill_down)
+  end
+
+  scope "/api/platform", MilosTrainingWeb do
+    pipe_through([:api, :authenticated, :platform_owner])
+
+    get("/organizations", PlatformOrganizationController, :index)
+    post("/organizations", PlatformOrganizationController, :create)
+    patch("/organizations/:id/lifecycle", PlatformOrganizationController, :lifecycle)
+    patch("/organizations/:id/settings", PlatformOrganizationController, :settings)
   end
 
   scope "/api/me", MilosTrainingWeb do
@@ -189,6 +228,8 @@ defmodule MilosTrainingWeb.Router do
     get("/athletes/:id/drill-down", AdminCoachingController, :drill_down)
     get("/finance/summary", AdminFinanceController, :summary)
     get("/finance/queues", AdminFinanceController, :operational_queues)
+    get("/finance/cleanup-records", AdminFinanceController, :cleanup_records)
+    post("/finance/cleanup-records/:id/purge", AdminFinanceController, :purge_record)
     get("/finance/packages", AdminFinanceController, :packages)
     post("/finance/packages", AdminFinanceController, :create_package)
     get("/finance/packages/:id", AdminFinanceController, :package)

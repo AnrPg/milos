@@ -1,35 +1,44 @@
 defmodule MilosTraining.Infrastructure.Coaching.EctoCoachingStore do
   @behaviour MilosTraining.Coaching.Ports.CoachingStore
 
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Repo
 
   @impl true
   def get_aggregates do
-    case Repo.query("""
-         SELECT period_start, active_athlete_count, inactive_athlete_count,
-                completed_workouts_this_week, coach_notes_this_week,
-                average_completion_rate, recent_workout_note_count
-         FROM coaching_aggregates
-         ORDER BY period_start DESC
-         LIMIT 1
-         """) do
-      {:ok, %{rows: [[period_start, active, inactive, completed, notes, rate, recent_notes]]}} ->
-        %{
-          period_start: period_start,
-          active_athlete_count: active,
-          inactive_athlete_count: inactive,
-          completed_workouts_this_week: completed,
-          coach_notes_this_week: notes,
-          average_completion_rate: rate,
-          recent_workout_note_count: recent_notes,
-          aggregate_status: "available"
-        }
+    with organization_id when is_binary(organization_id) <-
+           RepoContext.current_setting("app.organization_id"),
+         {:ok, result} <-
+           Repo.query(
+             """
+             SELECT period_start, active_athlete_count, inactive_athlete_count,
+                    completed_workouts_this_week, coach_notes_this_week,
+                    average_completion_rate, recent_workout_note_count
+             FROM coaching_aggregates
+             WHERE organization_id = $1::uuid
+             ORDER BY period_start DESC
+             LIMIT 1
+             """,
+             [Ecto.UUID.dump!(organization_id)]
+           ) do
+      case result do
+        %{rows: [[period_start, active, inactive, completed, notes, rate, recent_notes]]} ->
+          %{
+            period_start: period_start,
+            active_athlete_count: active,
+            inactive_athlete_count: inactive,
+            completed_workouts_this_week: completed,
+            coach_notes_this_week: notes,
+            average_completion_rate: rate,
+            recent_workout_note_count: recent_notes,
+            aggregate_status: "available"
+          }
 
-      {:ok, %{rows: []}} ->
-        empty_aggregates("available", nil)
-
-      {:error, reason} ->
-        empty_aggregates("unavailable", inspect(reason))
+        %{rows: []} ->
+          empty_aggregates("available", nil)
+      end
+    else
+      _missing_scope -> empty_aggregates("unavailable", "missing_organization_scope")
     end
   end
 
