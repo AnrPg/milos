@@ -22,9 +22,14 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
   defp authorize_assignment(%{id: athlete_id, role: :athlete}, workout_id, assignment_id)
        when is_binary(assignment_id) do
     case Workouts.get_assignment_execution_access(assignment_id, athlete_id) do
-      %{master_workout_id: ^workout_id, athlete_status: status}
+      %{master_workout_id: ^workout_id, athlete_status: status} = access
       when status in [nil, "accepted"] ->
-        {:ok, %{source: "assigned", source_reference_id: assignment_id}}
+        {:ok,
+         %{
+           source: "assigned",
+           source_reference_id: assignment_id,
+           organization_id: access.organization_id
+         }}
 
       %{master_workout_id: ^workout_id, athlete_status: "rejected"} ->
         {:error, :execution_source_forbidden}

@@ -1,9 +1,14 @@
 defmodule MilosTraining.Execution.ExecutionStore do
   @behaviour MilosTraining.Execution.Ports.ExecutionStore
 
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
+
   defp adapter do
     Application.fetch_env!(:milos_training, :execution_store)
   end
+
+  def with_user_context(context, fun) when is_function(fun, 0),
+    do: RepoContext.run(context, fun)
 
   @impl true
   def start_execution(params), do: adapter().start_execution(params)
@@ -23,6 +28,9 @@ defmodule MilosTraining.Execution.ExecutionStore do
 
   @impl true
   def list_executions_for_user(user_id), do: adapter().list_executions_for_user(user_id)
+
+  @impl true
+  def list_executions_for_coaching(user_id), do: adapter().list_executions_for_coaching(user_id)
 
   @impl true
   def progress_operation_applied?(execution_id, user_id, operation_id),

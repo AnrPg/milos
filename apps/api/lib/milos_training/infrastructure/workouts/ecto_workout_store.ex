@@ -1756,7 +1756,8 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     |> select([assignment, link], %{
       assignment_id: assignment.id,
       master_workout_id: assignment.master_workout_id,
-      athlete_status: link.athlete_status
+      athlete_status: link.athlete_status,
+      organization_id: assignment.organization_id
     })
     |> Repo.one()
     |> case do

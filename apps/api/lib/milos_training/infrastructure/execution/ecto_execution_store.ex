@@ -5,10 +5,13 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
 
   alias Ecto.Multi
   alias MilosTraining.Execution.{ProgressOperation, WorkoutExecution}
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Repo
 
   @impl true
   def start_execution(params) do
+    params = put_current_user(params)
+
     %WorkoutExecution{}
     |> WorkoutExecution.start_changeset(params)
     |> Repo.insert()
@@ -22,6 +25,7 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
   def complete_execution(id, params) do
     Repo.transaction(fn ->
       case WorkoutExecution
+           |> scoped_to_user()
            |> where([e], e.id == ^id)
            |> lock("FOR UPDATE")
            |> Repo.one() do
@@ -54,6 +58,7 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
     Multi.new()
     |> Multi.run(:execution, fn repo, _changes ->
       case WorkoutExecution
+           |> scoped_to_user()
            |> where([execution], execution.id == ^id)
            |> lock("FOR UPDATE")
            |> repo.one() do
@@ -91,7 +96,7 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
   def update_execution(id, params) do
     result =
       Repo.transaction(fn ->
-        case Repo.get(WorkoutExecution, id) do
+        case WorkoutExecution |> scoped_to_user() |> Repo.get(id) do
           nil -> Repo.rollback(:not_found)
           execution -> persist_versioned_update(execution, params)
         end
@@ -117,7 +122,7 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
 
   @impl true
   def get_execution(id) do
-    case Repo.get(WorkoutExecution, id) do
+    case WorkoutExecution |> scoped_to_user() |> Repo.get(id) do
       nil -> nil
       %WorkoutExecution{} = execution -> normalize(execution)
     end
@@ -126,10 +131,29 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
   @impl true
   def list_executions_for_user(user_id) do
     WorkoutExecution
+    |> scoped_to_user()
     |> where([e], e.user_id == ^user_id)
     |> order_by([e], desc: e.started_at_utc)
     |> Repo.all()
     |> Enum.map(&normalize/1)
+  end
+
+  @impl true
+  def list_executions_for_coaching(user_id) do
+    case RepoContext.current_setting("app.organization_id") do
+      organization_id when is_binary(organization_id) ->
+        WorkoutExecution
+        |> where(
+          [execution],
+          execution.user_id == ^user_id and execution.organization_id == ^organization_id
+        )
+        |> order_by([execution], desc: execution.started_at_utc)
+        |> Repo.all()
+        |> Enum.map(&normalize/1)
+
+      _missing_scope ->
+        []
+    end
   end
 
   defp normalize(%WorkoutExecution{} = execution) do
@@ -224,6 +248,25 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
       {:ok, get_execution(id)}
     else
       {:error, :stale_execution}
+    end
+  end
+
+  defp scoped_to_user(query) do
+    case RepoContext.current_setting("app.user_id") do
+      user_id when is_binary(user_id) -> where(query, [row], row.user_id == ^user_id)
+      _no_user_context -> query
+    end
+  end
+
+  defp put_current_user(params) do
+    case RepoContext.current_setting("app.user_id") do
+      user_id when is_binary(user_id) ->
+        if Enum.any?(Map.keys(params), &is_binary/1),
+          do: Map.put(params, "user_id", user_id),
+          else: Map.put(params, :user_id, user_id)
+
+      _no_user_context ->
+        params
     end
   end
 end

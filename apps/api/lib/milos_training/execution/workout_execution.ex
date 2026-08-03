@@ -38,6 +38,7 @@ defmodule MilosTraining.Execution.WorkoutExecution do
   def start_changeset(execution \\ %__MODULE__{}, params) do
     execution
     |> cast(params, [
+      :organization_id,
       :user_id,
       :master_workout_id,
       :scale_level_slug,
