@@ -495,7 +495,7 @@ function WorkoutsPageContent() {
                         {formatDayLabel(uiLocale, date)}
                       </h2>
                       <span className="text-xs" style={{ color: "var(--muted)" }}>
-                        {daySlots.length} {i18n("option14eb14e")}{daySlots.length === 1 ? "" : i18n("sa0f1490")}
+                        {i18n("optionCount", { count: daySlots.length })}
                       </span>
                     </div>
 
