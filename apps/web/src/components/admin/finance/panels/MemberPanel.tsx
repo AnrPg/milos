@@ -23,6 +23,7 @@ import {
   getInvoiceUploadUrl,
   issueFinanceInvoice,
   recordFinancePayment,
+  reverseFinancePayment,
   updateFinanceInvoice,
   voidFinanceInvoice,
   type FinanceRecord,
@@ -52,6 +53,11 @@ function money(uiLocale: string, cents: unknown) {
 
 function euroInputValue(cents: unknown) {
   return (Number(cents ?? 0) / 100).toFixed(2);
+}
+
+function numericField(record: FinanceRecord | null | undefined, key: string, fallback = 0) {
+  const value = record?.[key];
+  return typeof value === "number" ? value : Number(value ?? fallback);
 }
 
 function statusColor(status: string): string {
@@ -200,6 +206,31 @@ export function MemberPanel({
   const packageSubscriptions = ((profile?.package_subscriptions as FinanceRecord[] | undefined) ?? []).filter(
     (sub) => field(sub, "status") === "active",
   );
+  const paymentReversals = (profile?.payment_reversals as FinanceRecord[] | undefined) ?? [];
+  const payments = (profile?.payments as FinanceRecord[] | undefined) ?? [];
+  const paymentReversedCentsById = new Map<string, number>();
+  for (const reversal of paymentReversals) {
+    const paymentId = field(reversal, "membership_payment_id");
+    if (!paymentId) continue;
+    paymentReversedCentsById.set(
+      paymentId,
+      (paymentReversedCentsById.get(paymentId) ?? 0) + numericField(reversal, "amount_cents"),
+    );
+  }
+  const remainingReversiblePaymentCents = (payment: FinanceRecord | null | undefined) => {
+    if (!payment) return 0;
+    const status = field(payment, "payment_status");
+    if (!["paid", "waived"].includes(status)) return 0;
+    const paymentId = field(payment, "id");
+    const explicitNet = payment?.net_amount_cents;
+    if (typeof explicitNet === "number") return Math.max(explicitNet, 0);
+    return Math.max(numericField(payment, "amount_cents") - (paymentReversedCentsById.get(paymentId) ?? 0), 0);
+  };
+  const paymentByInvoiceId = new Map(
+    payments
+      .filter((payment) => field(payment, "finance_invoice_id"))
+      .map((payment) => [field(payment, "finance_invoice_id"), payment]),
+  );
   const invoiceNumberById = new Map(
     (((profile?.invoices as FinanceRecord[] | undefined) ?? [])).map((invoice) => [
       field(invoice, "id"),
@@ -214,6 +245,15 @@ export function MemberPanel({
   const receiptMode = settingsQuery.data?.finance.document_mode === "receipt";
   const receiptPurposeValue = receiptManualPurposeSelected ? MANUAL_RECEIPT_PURPOSE : receiptPackageSubscriptionId;
 
+  const invalidateFinanceSurfaces = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["admin", "finance"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "dashboard"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "analytics"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] }),
+    ]);
+  };
+
   const recordPaymentMutation = useMutation({
     mutationFn: () =>
       recordFinancePayment(token, userId, {
@@ -225,9 +265,7 @@ export function MemberPanel({
     onSuccess: async () => {
       setShowPaymentForm(false);
       setPaymentForm({ amount_cents: "", paid_on: "", finance_invoice_id: "", notes: "" });
-      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "member-profile", userId] });
-      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "members"] });
-      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "summary"] });
+      await invalidateFinanceSurfaces();
     },
   });
 
@@ -254,9 +292,7 @@ export function MemberPanel({
       setReceiptDescription("");
       setReceiptPackageSubscriptionId("");
       await downloadReceipt(receipt, uiLocale, receiptCopy(receipt.reference));
-      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "member-profile", userId] });
-      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "members"] });
-      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "summary"] });
+      await invalidateFinanceSurfaces();
     },
   });
 
@@ -276,9 +312,7 @@ export function MemberPanel({
         due_date: "",
         membership_package_subscription_id: "",
       });
-      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "member-profile", userId] });
-      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "members"] });
-      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "summary"] });
+      await invalidateFinanceSurfaces();
     },
   });
 
@@ -291,6 +325,25 @@ export function MemberPanel({
       await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "members"] });
     },
   });
+
+  const reversePaymentMutation = useMutation({
+    mutationFn: (payment: FinanceRecord) =>
+      reverseFinancePayment(token, userId, field(payment, "id"), {
+        amount_cents: remainingReversiblePaymentCents(payment),
+        reversal_type: field(payment, "payment_status") === "waived" ? "waiver_reversal" : "payment_reversal",
+        reason: i18n("refundOrReversePayment9d232b2"),
+        request_id: crypto.randomUUID(),
+      }),
+    onSuccess: invalidateFinanceSurfaces,
+  });
+
+  const rollbackPayment = (payment: FinanceRecord | null | undefined) => {
+    if (!payment || reversePaymentMutation.isPending) return;
+    const amount = remainingReversiblePaymentCents(payment);
+    if (amount <= 0) return;
+    if (!confirm(`${i18n("refundOrReversePayment9d232b2")} ${money(uiLocale, amount)}?`)) return;
+    reversePaymentMutation.mutate(payment);
+  };
 
   const SECTIONS: { key: Section; label: string }[] = receiptMode
     ? [
@@ -539,22 +592,33 @@ export function MemberPanel({
                 <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("noPaymentsRecordedc84cf39")}</p>
               ) : (
                 <div className="space-y-2">
-                  {(profile.invoices as FinanceRecord[]).map((receipt) => (
-                    <div key={field(receipt, "id")} className="rounded-[1.2rem] px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
-                      <div className="flex items-center justify-between gap-3">
-                        <div>
-                          <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>{field(receipt, "invoice_number", field(receipt, "id"))}</p>
-                          <p className="mt-1 text-sm font-semibold" style={{ color: "var(--text)" }}>{money(uiLocale, receipt.total_cents)}</p>
+                  {(profile.invoices as FinanceRecord[]).map((receipt) => {
+                    const receiptPayment = paymentByInvoiceId.get(field(receipt, "id"));
+                    return (
+                      <div key={field(receipt, "id")} className="rounded-[1.2rem] px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>{field(receipt, "invoice_number", field(receipt, "id"))}</p>
+                            <p className="mt-1 text-sm font-semibold" style={{ color: "var(--text)" }}>{money(uiLocale, receipt.total_cents)}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold" style={{ color: statusColor(field(receipt, "status")) }}>
+                              <SemanticLabel value={field(receipt, "status")} />
+                            </span>
+                            <PaymentRollbackIconButton
+                              disabled={reversePaymentMutation.isPending}
+                              i18n={i18n}
+                              onClick={() => rollbackPayment(receiptPayment)}
+                              visible={remainingReversiblePaymentCents(receiptPayment) > 0}
+                            />
+                          </div>
                         </div>
-                        <span className="text-xs font-semibold" style={{ color: statusColor(field(receipt, "status")) }}>
-                          <SemanticLabel value={field(receipt, "status")} />
-                        </span>
+                        <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
+                          {i18n("featureDate")} {field(receipt, "issued_on", field(receipt, "due_date", "—"))}
+                        </p>
                       </div>
-                      <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
-                        {i18n("featureDate")} {field(receipt, "issued_on", field(receipt, "due_date", "—"))}
-                      </p>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -764,18 +828,33 @@ export function MemberPanel({
                 <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("noPaymentsRecordedc84cf39")}</p>
               ) : (
                 <div className="space-y-2">
-                  {(profile.payments as FinanceRecord[]).map((pay) => (
+                  {payments.map((pay) => (
                     <div key={field(pay, "id")} className="rounded-[1.2rem] px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
                       <div className="flex items-center justify-between gap-3">
-                        <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-                          {money(uiLocale, pay.amount_cents)}
-                        </span>
-                        <span className="text-xs" style={{ color: "var(--muted)" }}>
-                          {field(pay, "paid_on")}
-                          {field(pay, "finance_invoice_id")
-                            ? i18n("linkedToInvoice541dca8") + (invoiceNumberById.get(field(pay, "finance_invoice_id")) ?? field(pay, "finance_invoice_id"))
-                            : ""}
-                        </span>
+                        <div className="min-w-0">
+                          <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+                            {money(uiLocale, pay.amount_cents)}
+                          </span>
+                          {remainingReversiblePaymentCents(pay) < numericField(pay, "amount_cents") && (
+                            <p className="text-xs" style={{ color: "var(--dim)" }}>
+                              {money(uiLocale, remainingReversiblePaymentCents(pay))}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex min-w-0 items-center gap-2">
+                          <span className="truncate text-xs" style={{ color: "var(--muted)" }}>
+                            {field(pay, "paid_on")}
+                            {field(pay, "finance_invoice_id")
+                              ? i18n("linkedToInvoice541dca8") + (invoiceNumberById.get(field(pay, "finance_invoice_id")) ?? field(pay, "finance_invoice_id"))
+                              : ""}
+                          </span>
+                          <PaymentRollbackIconButton
+                            disabled={reversePaymentMutation.isPending}
+                            i18n={i18n}
+                            onClick={() => rollbackPayment(pay)}
+                            visible={remainingReversiblePaymentCents(pay) > 0}
+                          />
+                        </div>
                       </div>
                       {field(pay, "notes") && (
                         <p className="text-xs mt-0.5" style={{ color: "var(--dim)" }}>{field(pay, "notes")}</p>
@@ -1116,5 +1195,39 @@ function FormField({ label, children }: { label: string; children: React.ReactNo
       <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{label}</span>
       {children}
     </label>
+  );
+}
+
+function PaymentRollbackIconButton({
+  disabled,
+  i18n,
+  onClick,
+  visible,
+}: {
+  disabled: boolean;
+  i18n: ReturnType<typeof useUiTranslations>;
+  onClick: () => void;
+  visible: boolean;
+}) {
+  if (!visible) return null;
+
+  const label = i18n("refundOrReversePayment9d232b2");
+
+  return (
+    <button
+      aria-label={label}
+      className="grid h-7 w-7 place-items-center rounded-full text-sm opacity-55 transition-opacity hover:opacity-100 disabled:opacity-30"
+      disabled={disabled}
+      onClick={onClick}
+      title={label}
+      type="button"
+      style={{
+        background: "var(--panel)",
+        border: "1px solid var(--border)",
+        color: "var(--primary-strong)",
+      }}
+    >
+      ↶
+    </button>
   );
 }
