@@ -56,19 +56,19 @@ describe("PRFormModal", () => {
     updatePR.mockReset().mockResolvedValue(pr);
   });
 
-  it("keeps update and in-place edit as separate popup actions", async () => {
+  it("applies edits without creating a historical result", async () => {
     renderModal();
 
-    fireEvent.click(screen.getByRole("button", { name: "edit5301648" }));
+    fireEvent.click(screen.getByRole("button", { name: "applyPrEdits" }));
 
     await waitFor(() => expect(editPR).toHaveBeenCalledOnce());
     expect(updatePR).not.toHaveBeenCalled();
   });
 
-  it("records a new result when Update is clicked", async () => {
+  it("records a new result when a better PR is submitted", async () => {
     renderModal();
 
-    fireEvent.click(screen.getByRole("button", { name: "updatePr71b8cf3" }));
+    fireEvent.click(screen.getByRole("button", { name: "recordBetterPr" }));
 
     await waitFor(() => expect(updatePR).toHaveBeenCalledOnce());
     expect(editPR).not.toHaveBeenCalled();

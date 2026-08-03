@@ -16,9 +16,19 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
 
   def build("booking_approved", payload, localize) do
     %{
-      title: localize.("Booking approved", %{}),
-      body: payload["body"] || booking_body(payload, localize),
+      title: localize.("Class bookings approved", %{}),
+      body:
+        payload["body"] ||
+          localize.("Your coach approved one or more class booking requests.", %{}),
       url: payload["url"] || "/schedule"
+    }
+  end
+
+  def build("workout_assigned", payload, localize) do
+    %{
+      title: localize.("New workouts assigned", %{}),
+      body: payload["body"] || localize.("Your coach assigned one or more workouts to you.", %{}),
+      url: payload["url"] || "/my-workouts"
     }
   end
 
@@ -88,6 +98,47 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
       title: localize.("Workout rescheduled", %{}),
       body: payload["body"] || localize.("An athlete rescheduled their workout.", %{}),
       url: payload["url"] || "/my-workouts"
+    }
+  end
+
+  def build("workout_assignment_requested", payload, localize) do
+    nickname = payload["athlete_nickname"] || localize.("An athlete", %{})
+    requested_for = payload["requested_for"] || localize.("a requested date", %{})
+    note = payload["note"]
+
+    body =
+      localize.("%{nickname} requested a workout assignment for %{requested_for}.", %{
+        nickname: nickname,
+        requested_for: requested_for
+      })
+
+    %{
+      title: localize.("Workout assignment requested", %{}),
+      body: append_note(body, note),
+      url:
+        payload["url"] ||
+          "/admin/coaching-assignments?date=#{requested_for}"
+    }
+  end
+
+  def build("review_submitted", payload, localize) do
+    rating = payload["rating"]
+    target_type = payload["target_type"] || localize.("general", %{})
+
+    body =
+      if is_integer(rating) do
+        localize.("A %{target_type} review was submitted with a %{rating}/5 rating.", %{
+          target_type: target_type,
+          rating: rating
+        })
+      else
+        localize.("A new %{target_type} review needs attention.", %{target_type: target_type})
+      end
+
+    %{
+      title: localize.("New review submitted", %{}),
+      body: payload["body"] || body,
+      url: payload["url"] || "/admin/reviews"
     }
   end
 
@@ -181,6 +232,9 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
 
   defp default_to("", fallback), do: fallback
   defp default_to(value, _fallback), do: value
+
+  defp append_note(body, note) when is_binary(note) and note != "", do: body <> " " <> note
+  defp append_note(body, _note), do: body
 
   defp default_localize(message, bindings) do
     Enum.reduce(bindings, message, fn {key, value}, copy ->

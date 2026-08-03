@@ -56,9 +56,18 @@ defmodule MilosTrainingWeb.MessagingController do
       sender_id: %Schema{type: :string, format: :uuid},
       body: %Schema{type: :string},
       message_type: %Schema{type: :string, enum: ["chat", "coaching_note", "system"]},
+      client_operation_id: %Schema{type: :string, format: :uuid, nullable: true},
       inserted_at: %Schema{type: :string, format: :"date-time"}
     },
-    required: [:id, :thread_id, :sender_id, :body, :message_type, :inserted_at]
+    required: [
+      :id,
+      :thread_id,
+      :sender_id,
+      :body,
+      :message_type,
+      :client_operation_id,
+      :inserted_at
+    ]
   }
 
   operation(:create_thread,
@@ -185,7 +194,8 @@ defmodule MilosTrainingWeb.MessagingController do
                 type: :string,
                 enum: ["chat", "coaching_note"],
                 default: "chat"
-              }
+              },
+              client_operation_id: %Schema{type: :string, format: :uuid}
             },
             required: [:body]
           }
@@ -315,7 +325,8 @@ defmodule MilosTrainingWeb.MessagingController do
              thread_id: thread_id,
              sender_id: user.id,
              body: bp(conn, "body"),
-             message_type: message_type
+             message_type: message_type,
+             client_operation_id: bp(conn, "client_operation_id")
            }) do
       conn
       |> put_status(:created)
@@ -360,6 +371,7 @@ defmodule MilosTrainingWeb.MessagingController do
       sender_id: message.sender_id,
       body: message.body,
       message_type: message.message_type,
+      client_operation_id: message.client_operation_id,
       inserted_at: message.inserted_at
     }
   end

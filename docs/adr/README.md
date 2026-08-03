@@ -66,3 +66,24 @@ must have an ADR. See `template.md` for the format.
 | ADR-058 | Tenant resolution and request context | Accepted |
 | ADR-059 | Tenant propagation beyond PostgreSQL | Accepted |
 | ADR-060 | Staged legacy-tenant backfill and enforcement rollout | Accepted |
+| ADR-061 | Semantic notifications and canonical deep links | Accepted |
+| ADR-062 | Entitlement guidance and notification consolidation | Accepted |
+| ADR-063 | Browser-safe avatar editing and dossier navigation | Accepted |
+| ADR-064 | Shared collapsible home history | Accepted |
+| ADR-065 | Private document export and system sharing | Accepted |
+| ADR-066 | Home controls and avatar editor hardening | Accepted |
+| ADR-067 | Durable offline command delivery | Accepted |
+| ADR-068 | Structured workout set composition | Accepted |
+| ADR-069 | Canonical workout DSL and assisted authoring | Accepted |
+| ADR-070 | Rich canonical workout authoring metadata | Accepted |
+| ADR-071 | Library organization and scoped programming | Accepted |
+| ADR-072 | Document export rendering hardening | Accepted |
+| ADR-073 | Recurring class series and receipt mode | Accepted |
+| ADR-074 | Admin finance and user profile usability | Accepted |
+| ADR-075 | Workout presentation and inline admin editing | Accepted |
+| ADR-076 | Package-associated receipts | Accepted |
+| ADR-077 | Free-text exercises and continuous DSL completion | Accepted |
+| ADR-078 | Free-text workout authoring | Accepted |
+| ADR-079 | Workout delete removes recurring class series | Accepted |
+| ADR-080 | Workoutless recurring class series | Accepted |
+| ADR-081 | Subtle finance payment rollback | Accepted |

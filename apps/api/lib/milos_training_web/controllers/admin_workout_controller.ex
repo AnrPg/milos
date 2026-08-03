@@ -16,6 +16,7 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
   }
 
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
+  alias MilosTrainingWeb.Schemas.Workout, as: WorkoutSchema
 
   action_fallback MilosTrainingWeb.FallbackController
 
@@ -73,13 +74,7 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
     summary: "Get an admin workout draft or published workout",
     parameters: [@id_param],
     responses: [
-      ok:
-        {"Workout", "application/json",
-         %Schema{
-           type: :object,
-           properties: %{workout: %Schema{type: :object, additionalProperties: true}},
-           required: [:workout]
-         }},
+      ok: {"Workout", "application/json", WorkoutSchema.response_schema()},
       not_found:
         {"Not found", "application/json",
          %Schema{type: :object, properties: %{error: %Schema{type: :string}}, required: [:error]}}
@@ -94,22 +89,7 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
       required: true,
       content: %{
         "application/json" => %MediaType{
-          schema: %Schema{
-            type: :object,
-            properties: %{
-              title: %Schema{type: :string},
-              type: %Schema{
-                type: :string,
-                enum: Enum.map(MilosTraining.Workouts.supported_workout_types(), &to_string/1),
-                nullable: true
-              },
-              sections: %Schema{
-                type: :array,
-                items: %Schema{type: :object, additionalProperties: true}
-              }
-            },
-            additionalProperties: true
-          }
+          schema: WorkoutSchema.draft_request_schema()
         }
       }
     },
@@ -132,33 +112,12 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
       required: false,
       content: %{
         "application/json" => %MediaType{
-          schema: %Schema{
-            type: :object,
-            properties: %{
-              title: %Schema{type: :string},
-              type: %Schema{
-                type: :string,
-                enum: Enum.map(MilosTraining.Workouts.supported_workout_types(), &to_string/1),
-                nullable: true
-              },
-              sections: %Schema{
-                type: :array,
-                items: %Schema{type: :object, additionalProperties: true}
-              }
-            },
-            additionalProperties: true
-          }
+          schema: WorkoutSchema.draft_request_schema()
         }
       }
     },
     responses: [
-      ok:
-        {"Workout", "application/json",
-         %Schema{
-           type: :object,
-           properties: %{workout: %Schema{type: :object, additionalProperties: true}},
-           required: [:workout]
-         }},
+      ok: {"Workout", "application/json", WorkoutSchema.response_schema()},
       unprocessable_entity:
         {"Validation errors", "application/json",
          %Schema{
@@ -182,6 +141,29 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
       not_found:
         {"Not found", "application/json",
          %Schema{type: :object, properties: %{error: %Schema{type: :string}}, required: [:error]}}
+    ]
+  )
+
+  operation(:update_library,
+    summary: "Move a workout in the nested library",
+    parameters: [@id_param],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            additionalProperties: false,
+            properties: %{folder_id: %Schema{type: :string, format: :uuid, nullable: true}},
+            required: [:folder_id]
+          }
+        }
+      }
+    },
+    responses: [
+      ok:
+        {"Library metadata", "application/json",
+         %Schema{type: :object, additionalProperties: true}}
     ]
   )
 
@@ -232,6 +214,15 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
   def delete(conn, %{"id" => id}) do
     with :ok <- DeleteWorkout.call(id) do
       send_resp(conn, :no_content, "")
+    end
+  end
+
+  def update_library(conn, params) do
+    id = params["id"] || params[:id]
+
+    with {:ok, metadata} <-
+           MilosTraining.Workouts.update_library_metadata(id, conn.body_params) do
+      json(conn, metadata)
     end
   end
 

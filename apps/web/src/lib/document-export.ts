@@ -1,0 +1,919 @@
+import type { WorkoutExecution } from "@/api/executions";
+import type { PRRecord } from "@/api/gamification";
+import type {
+  ScaleLevel,
+  WorkoutExerciseRecord,
+  WorkoutRecord,
+  WorkoutSectionRecord,
+  WorkoutVariationRecord,
+} from "@/api/workouts";
+
+export type ExportFormat = "pdf" | "md" | "txt" | "odt" | "csv";
+
+export type ExportLabels = {
+  appName: string;
+  finance: string;
+  members: string;
+  plan: string;
+  expires: string;
+  lastPaid: string;
+  amount: string;
+  credits: string;
+  balanceDue: string;
+  referrals: string;
+  workout: string;
+  workoutHistory: string;
+  personalRecord: string;
+  personalRecords: string;
+  type: string;
+  status: string;
+  scale: string;
+  scales: string;
+  date: string;
+  source: string;
+  duration: string;
+  sections: string;
+  exercises: string;
+  scores: string;
+  notes: string;
+  modifications: string;
+  supportingDetails: string;
+  comparison: string;
+  higherIsBetter: string;
+  lowerIsBetter: string;
+  prescribed: string;
+  actual: string;
+  baseOnly: string;
+  none: string;
+  generatedBy: string;
+  teamWorkout: string;
+  setsLabel: string;
+  roundsLabel: string;
+  excluded: string;
+  basePrescription: string;
+  load: string;
+  yes: string;
+  no: string;
+  session: string;
+  score: string;
+  header: string;
+  superset: string;
+  alternatingSets: string;
+  progressiveLoad: string;
+  progressiveDeload: string;
+};
+
+export type ExportItem = {
+  label?: string;
+  value: string;
+  details?: string[];
+};
+
+export type ExportSection = {
+  icon: string;
+  title: string;
+  items: ExportItem[];
+};
+
+export type ExportDocument = {
+  icon: string;
+  category: string;
+  title: string;
+  subtitle?: string;
+  metadata: Array<{ label: string; value: string }>;
+  sections: ExportSection[];
+  footer: string;
+};
+
+const MIME_TYPES: Record<ExportFormat, string> = {
+  pdf: "application/pdf",
+  md: "text/markdown;charset=utf-8",
+  txt: "text/plain;charset=utf-8",
+  odt: "application/vnd.oasis.opendocument.text",
+  csv: "text/csv;charset=utf-8",
+};
+
+function compact(values: Array<string | null | undefined>): string[] {
+  return values.filter((value): value is string => Boolean(value));
+}
+
+function displayValue(value: unknown, labels?: ExportLabels): string {
+  if (value === null || value === undefined || value === "") return "—";
+  if (typeof value === "boolean") return value ? (labels?.yes ?? "Yes") : (labels?.no ?? "No");
+  return String(value).replaceAll("_", " ");
+}
+
+function duration(milliseconds: number): string {
+  const totalSeconds = Math.max(0, Math.round(milliseconds / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return hours > 0
+    ? `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+    : `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
+
+function prescription(exercise: WorkoutExerciseRecord | WorkoutVariationRecord, labels: ExportLabels, includeSets = true): string {
+  const parts: string[] = [];
+  const sets = exercise.sets;
+  const value = exercise.prescription_value;
+  const unit = exercise.prescription_unit;
+
+  if (includeSets && sets && value !== null && value !== undefined) {
+    parts.push(`${sets} × ${displayValue(value)}${unit ? ` ${displayValue(unit)}` : ""}`);
+  } else if (value !== null && value !== undefined) {
+    parts.push(`${displayValue(value)}${unit ? ` ${displayValue(unit)}` : ""}`);
+  } else if (includeSets && sets) {
+    parts.push(`${sets} ${labels.setsLabel}`);
+  }
+
+  if (exercise.load_value !== null && exercise.load_value !== undefined) {
+    parts.push(`${displayValue(exercise.load_value)} ${displayValue(exercise.load_mode ?? labels.load)}`);
+  }
+
+  return parts.join(" · ") || "—";
+}
+
+function setPrescriptionDetails(
+  exercise: WorkoutExerciseRecord | WorkoutVariationRecord,
+  labels: ExportLabels,
+): string[] {
+  return (exercise.set_prescriptions ?? []).map((set) => {
+    const prescribed = compact([
+      set.prescription_value != null
+        ? `${set.prescription_value}${set.prescription_unit ? ` ${displayValue(set.prescription_unit)}` : ""}`
+        : undefined,
+      set.load_value != null
+        ? `${set.load_value} ${set.load_mode === "pct_1rm" ? "%1RM" : displayValue(set.load_mode ?? labels.load)}`
+        : undefined,
+      set.note ?? undefined,
+    ]);
+
+    return `${labels.setsLabel} ${set.set_index}: ${prescribed.join(" · ") || "—"}`;
+  });
+}
+
+function loadProgressionDetail(
+  exercise: WorkoutExerciseRecord | WorkoutVariationRecord,
+  labels: ExportLabels,
+): string | undefined {
+  const progression = exercise.load_progression;
+  if (!progression) return undefined;
+
+  const label = progression.direction === "decrease"
+    ? labels.progressiveDeload
+    : labels.progressiveLoad;
+  const unit = progression.start_mode === "pct_1rm" ? "%1RM" : "kg";
+
+  if (progression.mode === "per_set") {
+    return `${label}: ${progression.per_set_values.join("/")} ${unit}`;
+  }
+
+  const sign = progression.direction === "decrease" ? "−" : "+";
+  return `${label}: ${progression.start_value} ${unit} (${sign}${progression.step_value} ${unit}/${labels.setsLabel})`;
+}
+
+function variationDetail(variation: WorkoutVariationRecord, base: WorkoutExerciseRecord, labels: ExportLabels): string {
+  const name = variation.scale_level.label;
+  if (variation.excluded) return `${name}: ${labels.excluded}`;
+  const merged = {
+    ...variation,
+    sets: variation.sets ?? base.sets,
+    prescription_unit: variation.prescription_unit ?? base.prescription_unit,
+    load_mode: variation.load_mode ?? base.load_mode,
+  };
+  const override = compact([
+    variation.exercise_name_override ?? undefined,
+    prescription(merged, labels),
+    variation.description ?? undefined,
+  ]).filter((value, index, values) => value !== "—" && values.indexOf(value) === index);
+  return `${name}: ${override.join(" · ") || labels.basePrescription}`;
+}
+
+function timerSummary(timer: Record<string, unknown> | null | undefined, labels: ExportLabels): string | undefined {
+  if (!timer) return undefined;
+  const type = displayValue(timer.type);
+  const durationSeconds = Number(timer.duration_seconds ?? 0);
+  const rounds = Number(timer.rounds ?? 0);
+  return compact([
+    type,
+    durationSeconds > 0 ? duration(durationSeconds * 1000) : undefined,
+    rounds > 0 ? `${rounds} ${labels.roundsLabel}` : undefined,
+  ]).join(" · ");
+}
+
+function objectValue(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
+function numberValue(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function draftScaleLevel(value: unknown, fallbackSlug: unknown, index: number): ScaleLevel {
+  const scale = objectValue(value);
+  const slug = typeof scale?.slug === "string"
+    ? scale.slug
+    : typeof fallbackSlug === "string" ? fallbackSlug : `scale-${index + 1}`;
+
+  return {
+    slug,
+    label: typeof scale?.label === "string" ? scale.label : slug,
+    sort_order: numberValue(scale?.sort_order) ?? index,
+    is_active: typeof scale?.is_active === "boolean" ? scale.is_active : true,
+  };
+}
+
+function draftVariation(value: unknown, index: number): WorkoutVariationRecord | null {
+  const variation = objectValue(value);
+  if (!variation) return null;
+
+  return {
+    description: typeof variation.description === "string" ? variation.description : null,
+    sets: numberValue(variation.sets),
+    exercise_name_override: typeof variation.exercise_name_override === "string"
+      ? variation.exercise_name_override
+      : null,
+    prescription_value: numberValue(variation.prescription_value),
+    prescription_unit: typeof variation.prescription_unit === "string"
+      ? variation.prescription_unit as WorkoutVariationRecord["prescription_unit"]
+      : null,
+    load_value: numberValue(variation.load_value),
+    load_mode: typeof variation.load_mode === "string"
+      ? variation.load_mode as WorkoutVariationRecord["load_mode"]
+      : null,
+    set_prescriptions: draftSetPrescriptions(variation.set_prescriptions),
+    load_progression: draftLoadProgression(variation.load_progression),
+    excluded: variation.excluded === true,
+    note: typeof variation.note === "string" ? variation.note : null,
+    scale_level: draftScaleLevel(variation.scale_level, variation.scale_level_slug, index),
+  };
+}
+
+function draftSetPrescriptions(value: unknown): NonNullable<WorkoutExerciseRecord["set_prescriptions"]> {
+  if (!Array.isArray(value)) return [];
+
+  return value.flatMap((entry, index) => {
+    const set = objectValue(entry);
+    if (!set) return [];
+
+    return [{
+      set_index: numberValue(set.set_index) ?? index + 1,
+      prescription_value: numberValue(set.prescription_value),
+      prescription_unit: typeof set.prescription_unit === "string"
+        ? set.prescription_unit as WorkoutExerciseRecord["prescription_unit"]
+        : null,
+      load_value: numberValue(set.load_value),
+      load_mode: typeof set.load_mode === "string"
+        ? set.load_mode as WorkoutExerciseRecord["load_mode"]
+        : null,
+      note: typeof set.note === "string" ? set.note : null,
+    }];
+  });
+}
+
+function draftLoadProgression(value: unknown): WorkoutExerciseRecord["load_progression"] {
+  const progression = objectValue(value);
+  if (!progression) return null;
+
+  const mode = progression.mode === "per_set" ? "per_set" : "linear";
+  const direction = progression.direction === "decrease" ? "decrease" : "increase";
+  const startMode = progression.start_mode === "pct_1rm" ? "pct_1rm" : "absolute";
+
+  return {
+    mode,
+    direction,
+    start_value: numberValue(progression.start_value) ?? 0,
+    start_mode: startMode,
+    step_value: numberValue(progression.step_value) ?? 0,
+    per_set_values: Array.isArray(progression.per_set_values)
+      ? progression.per_set_values.flatMap((item) => numberValue(item) ?? [])
+      : [],
+  };
+}
+
+function draftExercise(value: unknown, index: number): WorkoutExerciseRecord | null {
+  const exercise = objectValue(value);
+  if (!exercise || typeof exercise.name !== "string") return null;
+
+  return {
+    item_type: exercise.item_type === "header" ? "header" : "exercise",
+    name: exercise.name,
+    description: typeof exercise.description === "string" ? exercise.description : null,
+    sets: numberValue(exercise.sets),
+    prescription_value: numberValue(exercise.prescription_value),
+    prescription_unit: typeof exercise.prescription_unit === "string"
+      ? exercise.prescription_unit as WorkoutExerciseRecord["prescription_unit"]
+      : null,
+    load_value: numberValue(exercise.load_value),
+    load_mode: typeof exercise.load_mode === "string"
+      ? exercise.load_mode as WorkoutExerciseRecord["load_mode"]
+      : null,
+    set_prescriptions: draftSetPrescriptions(exercise.set_prescriptions),
+    load_progression: draftLoadProgression(exercise.load_progression),
+    superset_group_id: typeof exercise.superset_group_id === "string"
+      ? exercise.superset_group_id
+      : null,
+    alternating_group_id: typeof exercise.alternating_group_id === "string"
+      ? exercise.alternating_group_id
+      : null,
+    note: typeof exercise.note === "string" ? exercise.note : null,
+    order: numberValue(exercise.order) ?? index,
+    variations: Array.isArray(exercise.variations)
+      ? exercise.variations.map(draftVariation).filter((item): item is WorkoutVariationRecord => Boolean(item))
+      : [],
+  };
+}
+
+function exportWorkoutSections(workout: WorkoutRecord): WorkoutSectionRecord[] {
+  if (workout.sections.length > 0) return workout.sections;
+  const draft = objectValue(workout.draft_data);
+  if (!Array.isArray(draft?.sections)) return [];
+
+  return draft.sections.flatMap((value, index) => {
+    const section = objectValue(value);
+    if (!section || typeof section.name !== "string") return [];
+    const exercises = Array.isArray(section.exercises)
+      ? section.exercises.map(draftExercise).filter((item): item is WorkoutExerciseRecord => Boolean(item))
+      : [];
+
+    return [{
+      name: section.name,
+      order: numberValue(section.order) ?? index,
+      scoreable: section.scoreable === true,
+      score_config: objectValue(section.score_config),
+      timer_config: objectValue(section.timer_config),
+      note: typeof section.note === "string" ? section.note : null,
+      exercises,
+    }];
+  });
+}
+
+export function buildWorkoutDocument(workout: WorkoutRecord, labels: ExportLabels): ExportDocument {
+  const sections = exportWorkoutSections(workout);
+  const scaleLevels = workout.available_scale_levels.length > 0
+    ? workout.available_scale_levels
+    : Array.from(new Map(
+        sections.flatMap((section) => section.exercises)
+          .flatMap((exercise) => exercise.variations)
+          .map((variation) => [variation.scale_level.slug, variation.scale_level]),
+      ).values());
+
+  return {
+    icon: "🏋️",
+    category: labels.workout,
+    title: workout.title || labels.workout,
+    subtitle: workout.is_team_workout ? labels.teamWorkout : undefined,
+    metadata: [
+      { label: labels.type, value: displayValue(workout.type) },
+      { label: labels.status, value: displayValue(workout.status ?? "published") },
+      {
+        label: labels.scales,
+        value: scaleLevels.length > 0
+          ? scaleLevels.map((scale) => scale.label).join(", ")
+          : labels.baseOnly,
+      },
+      { label: labels.sections, value: String(sections.length) },
+    ],
+    sections: sections
+      .slice()
+      .sort((a, b) => a.order - b.order)
+      .map((section) => ({
+        icon: section.scoreable ? "🎯" : "⚡",
+        title: section.name,
+        items: [
+          ...(section.note ? [{ label: labels.notes, value: section.note }] : []),
+          ...exportExerciseItems(section, labels),
+        ],
+      })),
+    footer: labels.generatedBy,
+  };
+}
+
+function exportExerciseItems(section: WorkoutSectionRecord, labels: ExportLabels): ExportItem[] {
+  const exercises = section.exercises.slice().sort((a, b) => a.order - b.order);
+  const renderedGroups = new Set<string>();
+
+  const exerciseItem = (exercise: WorkoutExerciseRecord, grouped: boolean): ExportItem => exercise.item_type === "header"
+    ? { label: labels.header, value: exercise.name, details: compact([exercise.note ?? undefined]) }
+    : {
+        label: exercise.name,
+        value: prescription(exercise, labels, !grouped),
+        details: compact([
+          exercise.description ?? undefined,
+          exercise.note ?? undefined,
+          timerSummary(section.timer_config, labels),
+          loadProgressionDetail(exercise, labels),
+          ...setPrescriptionDetails(exercise, labels),
+          ...exercise.variations.flatMap((variation) => [
+            variationDetail(variation, exercise, labels),
+            variation.note ?? undefined,
+            loadProgressionDetail(variation, labels),
+            ...setPrescriptionDetails(variation, labels),
+          ]),
+        ]),
+      };
+
+  return exercises.flatMap((exercise) => {
+    const id = exercise.superset_group_id ?? exercise.alternating_group_id;
+    if (!id) return [exerciseItem(exercise, false)];
+    if (renderedGroups.has(id)) return [];
+    renderedGroups.add(id);
+    const members = exercises.filter((member) => member.superset_group_id === id || member.alternating_group_id === id);
+    const configSets = Number(exercise.group_config?.sets ?? exercise.sets ?? 0);
+    return [
+      { label: exercise.superset_group_id ? labels.superset : labels.alternatingSets, value: configSets > 0 ? `${configSets} ${labels.setsLabel}` : "" },
+      ...members.map((member) => exerciseItem(member, true)),
+    ];
+  });
+}
+
+export function buildExecutionDocument(
+  execution: WorkoutExecution,
+  labels: ExportLabels,
+  locale: string,
+): ExportDocument {
+  const completedDate = execution.completed_at_utc ?? execution.started_at_utc;
+  const sections: ExportSection[] = [];
+
+  if (execution.workout) {
+    sections.push(...buildWorkoutDocument(execution.workout, labels).sections);
+  }
+
+  if (execution.section_scores.length > 0) {
+    sections.push({
+      icon: "🏁",
+      title: labels.scores,
+      items: execution.section_scores.map((score) => ({
+        label: score.section_name ?? score.score_type ?? labels.scores,
+        value: `${displayValue(score.value)}${score.unit ? ` ${displayValue(score.unit)}` : ""}`,
+      })),
+    });
+  }
+
+  if (execution.exercise_modifications.length > 0) {
+    sections.push({
+      icon: "🔧",
+      title: labels.modifications,
+      items: execution.exercise_modifications.map((change) => ({
+        label: change.exercise_name ?? change.section_name ?? displayValue(change.field),
+        value: `${labels.prescribed}: ${displayValue(change.canonical_value)} → ${labels.actual}: ${displayValue(change.actual_value)}${change.unit ? ` ${displayValue(change.unit)}` : ""}`,
+        details: compact([change.note ?? undefined]),
+      })),
+    });
+  }
+
+  if (execution.exercise_notes.length > 0) {
+    sections.push({
+      icon: "📝",
+      title: labels.notes,
+      items: execution.exercise_notes.map((note) => ({
+        label: note.selected_text || labels.notes,
+        value: note.note_text || note.tags?.join(", ") || "—",
+        details: note.tags?.length ? [note.tags.join(" · ")] : undefined,
+      })),
+    });
+  }
+
+  return {
+    icon: "✅",
+    category: labels.workoutHistory,
+    title: execution.workout_title ?? labels.workout,
+    metadata: [
+      { label: labels.date, value: new Date(completedDate).toLocaleString(locale) },
+      { label: labels.type, value: displayValue(execution.workout_type ?? labels.session) },
+      { label: labels.scale, value: displayValue(execution.scale_level_slug ?? labels.baseOnly) },
+      { label: labels.source, value: displayValue(execution.source) },
+      { label: labels.duration, value: duration(execution.total_elapsed_ms) },
+      { label: labels.status, value: displayValue(execution.status) },
+    ],
+    sections,
+    footer: labels.generatedBy,
+  };
+}
+
+export function buildPRDocument(pr: PRRecord, labels: ExportLabels, locale: string): ExportDocument {
+  const details = Object.entries(pr.supporting_metrics ?? {}).map(([key, value]) => ({
+    label: displayValue(key).replace(/^./, (character) => character.toLocaleUpperCase(locale)),
+    value: displayValue(value),
+  }));
+  const sections: ExportSection[] = [];
+
+  if (details.length > 0) {
+    sections.push({ icon: "📊", title: labels.supportingDetails, items: details });
+  }
+  if (pr.notes) {
+    sections.push({ icon: "📝", title: labels.notes, items: [{ value: pr.notes }] });
+  }
+
+  return {
+    icon: "🏆",
+    category: labels.personalRecord,
+    title: pr.name,
+    subtitle: `${displayValue(pr.current_score)} ${displayValue(pr.unit)}`,
+    metadata: [
+      { label: labels.score, value: `${displayValue(pr.current_score)} ${displayValue(pr.unit)}` },
+      { label: labels.date, value: new Date(`${pr.beaten_on}T00:00:00`).toLocaleDateString(locale) },
+      { label: labels.comparison, value: pr.higher_is_better ? labels.higherIsBetter : labels.lowerIsBetter },
+    ],
+    sections,
+    footer: labels.generatedBy,
+  };
+}
+
+export function buildPRListDocument(prs: PRRecord[], labels: ExportLabels, locale: string): ExportDocument {
+  return {
+    icon: "🏆",
+    category: labels.personalRecords,
+    title: labels.personalRecords,
+    metadata: [{ label: labels.personalRecord, value: String(prs.length) }],
+    sections: prs.map((pr) => {
+      const document = buildPRDocument(pr, labels, locale);
+      return {
+        icon: document.icon,
+        title: document.title,
+        items: [
+          ...document.metadata.map(({ label, value }) => ({ label, value })),
+          ...document.sections.flatMap((section) => section.items.map((item) => ({
+            label: item.label ?? section.title,
+            value: item.value,
+            details: item.details,
+          }))),
+        ],
+      };
+    }),
+    footer: labels.generatedBy,
+  };
+}
+
+export function buildExecutionHistoryDocument(
+  executions: WorkoutExecution[],
+  labels: ExportLabels,
+  locale: string,
+): ExportDocument {
+  return {
+    icon: "📚",
+    category: labels.workoutHistory,
+    title: labels.workoutHistory,
+    metadata: [{ label: labels.workout, value: String(executions.length) }],
+    sections: executions.map((execution) => {
+      const document = buildExecutionDocument(execution, labels, locale);
+      return {
+        icon: document.icon,
+        title: document.title,
+        items: [
+          ...document.metadata.map(({ label, value }) => ({ label, value })),
+          ...document.sections.flatMap((section) => section.items.map((item) => ({
+            label: item.label ?? section.title,
+            value: item.value,
+            details: item.details,
+          }))),
+        ],
+      };
+    }),
+    footer: labels.generatedBy,
+  };
+}
+
+function financeRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
+
+function financeAmount(value: unknown, locale: string): string {
+  if (value === null || value === undefined || value === "") return "—";
+  const amount = typeof value === "number" ? value : Number(value ?? 0);
+  if (!Number.isFinite(amount)) return "—";
+  return new Intl.NumberFormat(locale, { style: "currency", currency: "EUR" }).format(amount / 100);
+}
+
+function financePackageLabel(subscription: Record<string, unknown>): unknown {
+  return (
+    subscription.package_name ??
+    subscription.package_code_snapshot ??
+    subscription.package_family_snapshot
+  );
+}
+
+export function buildFinanceMembersDocument(
+  members: Array<Record<string, unknown>>,
+  labels: ExportLabels,
+  locale: string,
+): ExportDocument {
+  return {
+    icon: "📋",
+    category: labels.finance,
+    title: labels.members,
+    metadata: [{ label: labels.members, value: String(members.length) }],
+    sections: members.map((member) => {
+      const membership = financeRecord(member.membership);
+      const subscription = financeRecord(member.active_package_subscription);
+      const referrals = Array.isArray(member.referrals_made_user_ids) ? member.referrals_made_user_ids : [];
+      const nickname = displayValue(member.nickname || member.id || labels.members);
+      const details = compact([
+        `${labels.type}: ${displayValue(member.identity_role ?? membership.user_type_snapshot)}`,
+        `${labels.status}: ${displayValue(membership.status)}`,
+        `${labels.plan}: ${displayValue(financePackageLabel(subscription))}`,
+        `${labels.expires}: ${displayValue(subscription.ends_on)}`,
+        `${labels.lastPaid}: ${displayValue(member.last_payment_on)}`,
+        `${labels.amount}: ${financeAmount(member.last_payment_amount_cents, locale)}`,
+        `${labels.credits}: ${financeAmount(member.credit_balance_cents ?? member.credit_balance, locale)}`,
+        `${labels.balanceDue}: ${financeAmount(member.outstanding_balance_cents, locale)}`,
+        `${labels.notes}: ${displayValue(membership.notes ?? member.notes)}`,
+        `${labels.referrals}: ${referrals.length}`,
+      ]);
+
+      return {
+        icon: "👤",
+        title: nickname,
+        items: details.map((value) => ({ value })),
+      };
+    }),
+    footer: labels.generatedBy,
+  };
+}
+
+function markdownEscape(value: string): string {
+  return value.replaceAll("|", "\\|").replaceAll("\n", " ");
+}
+
+export function renderMarkdown(document: ExportDocument): string {
+  const lines = [
+    `# ${document.icon} ${document.title}`,
+    "",
+    `_${document.category}_`,
+    ...(document.subtitle ? ["", `**${document.subtitle}**`] : []),
+    "",
+    ...document.metadata.flatMap(({ label, value }) => [`- **${label}:** ${value}`]),
+  ];
+
+  for (const section of document.sections) {
+    lines.push("", `## ${section.icon} ${section.title}`, "");
+    for (const item of section.items) {
+      lines.push(`- ${item.label ? `**${item.label}:** ` : ""}${item.value}`);
+      for (const detail of item.details ?? []) lines.push(`  - ${detail}`);
+    }
+  }
+
+  lines.push("", "---", document.footer, "");
+  return lines.join("\n");
+}
+
+export function renderText(document: ExportDocument): string {
+  const lines = [
+    `${document.icon} ${document.title}`,
+    document.category.toUpperCase(),
+    ...(document.subtitle ? [document.subtitle] : []),
+    "",
+    ...document.metadata.map(({ label, value }) => `${label}: ${value}`),
+  ];
+
+  for (const section of document.sections) {
+    lines.push("", `${section.icon} ${section.title}`);
+    for (const item of section.items) {
+      lines.push(`• ${item.label ? `${item.label}: ` : ""}${item.value}`);
+      for (const detail of item.details ?? []) lines.push(`  ↳ ${detail}`);
+    }
+  }
+
+  lines.push("", document.footer, "");
+  return lines.join("\n");
+}
+
+function csvCell(value: string): string {
+  return `"${value.replaceAll('"', '""')}"`;
+}
+
+export function renderCsv(document: ExportDocument): string {
+  const rows: string[][] = [
+    ["Section", "Label", "Value"],
+    [document.category, "Title", document.title],
+    ...(document.subtitle ? [[document.category, "Subtitle", document.subtitle]] : []),
+    ...document.metadata.map(({ label, value }) => ["Metadata", label, value]),
+  ];
+
+  for (const section of document.sections) {
+    for (const item of section.items) {
+      rows.push([section.title, item.label ?? "", item.value]);
+      for (const detail of item.details ?? []) rows.push([section.title, item.label ?? "Detail", detail]);
+    }
+  }
+
+  return `\uFEFF${rows.map((row) => row.map((cell) => csvCell(markdownEscape(cell))).join(",")).join("\r\n")}\r\n`;
+}
+
+function xmlEscape(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&apos;");
+}
+
+async function renderOdt(document: ExportDocument): Promise<Blob> {
+  const { default: JSZip } = await import("jszip");
+  const zip = new JSZip();
+  zip.file("mimetype", MIME_TYPES.odt, { compression: "STORE" });
+
+  const paragraphs = [
+    `<text:p text:style-name="Category">${xmlEscape(`${document.icon} ${document.category}`)}</text:p>`,
+    `<text:h text:style-name="Title" text:outline-level="1">${xmlEscape(document.title)}</text:h>`,
+    ...(document.subtitle ? [`<text:p text:style-name="Subtitle">${xmlEscape(document.subtitle)}</text:p>`] : []),
+    ...document.metadata.map(({ label, value }) =>
+      `<text:p text:style-name="Meta"><text:span text:style-name="MetaLabel">${xmlEscape(label)}:</text:span> ${xmlEscape(value)}</text:p>`),
+    ...document.sections.flatMap((section) => [
+      `<text:h text:style-name="Section" text:outline-level="2">${xmlEscape(`${section.icon} ${section.title}`)}</text:h>`,
+      ...section.items.flatMap((item) => [
+        `<text:p text:style-name="Item">${item.label ? `<text:span text:style-name="ItemLabel">${xmlEscape(item.label)}:</text:span> ` : ""}${xmlEscape(item.value)}</text:p>`,
+        ...(item.details ?? []).map((detail) => `<text:p text:style-name="Detail">↳ ${xmlEscape(detail)}</text:p>`),
+      ]),
+    ]),
+    `<text:p text:style-name="Footer">${xmlEscape(document.footer)}</text:p>`,
+  ].join("");
+
+  zip.file("content.xml", `<?xml version="1.0" encoding="UTF-8"?>
+<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" office:version="1.3">
+<office:automatic-styles>
+  <style:style style:name="Category" style:family="paragraph"><style:paragraph-properties fo:margin-bottom="0.08in"/><style:text-properties fo:color="#7C3AED" fo:font-weight="bold" fo:font-size="11pt"/></style:style>
+  <style:style style:name="Title" style:family="paragraph"><style:paragraph-properties fo:margin-bottom="0.12in"/><style:text-properties fo:color="#172033" fo:font-weight="bold" fo:font-size="25pt"/></style:style>
+  <style:style style:name="Subtitle" style:family="paragraph"><style:text-properties fo:color="#DB2777" fo:font-weight="bold" fo:font-size="15pt"/></style:style>
+  <style:style style:name="Meta" style:family="paragraph"><style:paragraph-properties fo:margin-bottom="0.04in"/><style:text-properties fo:color="#475569"/></style:style>
+  <style:style style:name="MetaLabel" style:family="text"><style:text-properties fo:color="#7C3AED" fo:font-weight="bold"/></style:style>
+  <style:style style:name="Section" style:family="paragraph"><style:paragraph-properties fo:margin-top="0.2in" fo:margin-bottom="0.08in"/><style:text-properties fo:color="#0F766E" fo:font-weight="bold" fo:font-size="16pt"/></style:style>
+  <style:style style:name="Item" style:family="paragraph"><style:paragraph-properties fo:margin-left="0.12in" fo:margin-bottom="0.05in"/><style:text-properties fo:color="#172033"/></style:style>
+  <style:style style:name="ItemLabel" style:family="text"><style:text-properties fo:font-weight="bold" fo:color="#DB2777"/></style:style>
+  <style:style style:name="Detail" style:family="paragraph"><style:paragraph-properties fo:margin-left="0.3in"/><style:text-properties fo:color="#64748B" fo:font-size="9pt"/></style:style>
+  <style:style style:name="Footer" style:family="paragraph"><style:paragraph-properties fo:margin-top="0.3in"/><style:text-properties fo:color="#94A3B8" fo:font-size="8pt"/></style:style>
+</office:automatic-styles><office:body><office:text>${paragraphs}</office:text></office:body></office:document-content>`);
+  zip.file("styles.xml", `<?xml version="1.0" encoding="UTF-8"?><office:document-styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" office:version="1.3"><office:styles/></office:document-styles>`);
+  zip.file("meta.xml", `<?xml version="1.0" encoding="UTF-8"?><office:document-meta xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" office:version="1.3"><office:meta/></office:document-meta>`);
+  zip.file("META-INF/manifest.xml", `<?xml version="1.0" encoding="UTF-8"?><manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.3"><manifest:file-entry manifest:full-path="/" manifest:media-type="${MIME_TYPES.odt}"/><manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/><manifest:file-entry manifest:full-path="styles.xml" manifest:media-type="text/xml"/><manifest:file-entry manifest:full-path="meta.xml" manifest:media-type="text/xml"/></manifest:manifest>`);
+  return zip.generateAsync({ type: "blob", mimeType: MIME_TYPES.odt, compression: "DEFLATE" });
+}
+
+async function renderPdf(document: ExportDocument): Promise<Blob> {
+  const { jsPDF } = await import("jspdf");
+  const pdf = new jsPDF({ unit: "pt", format: "a4" });
+  const [regularFont, boldFont] = await Promise.all([
+    loadPdfFont("/fonts/DejaVuSans.ttf"),
+    loadPdfFont("/fonts/DejaVuSans-Bold.ttf"),
+  ]);
+  const fontFamily = regularFont && boldFont ? "DejaVuSans" : "helvetica";
+  if (regularFont && boldFont) {
+    pdf.addFileToVFS("DejaVuSans.ttf", arrayBufferToBase64(regularFont));
+    pdf.addFileToVFS("DejaVuSans-Bold.ttf", arrayBufferToBase64(boldFont));
+    pdf.addFont("DejaVuSans.ttf", fontFamily, "normal");
+    pdf.addFont("DejaVuSans-Bold.ttf", fontFamily, "bold");
+  }
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 48;
+  const contentWidth = pageWidth - margin * 2;
+  const bodyTop = 76;
+  const bodyBottom = pageHeight - 56;
+  let y = 44;
+  let pageNumber = 1;
+
+  const drawContinuationHeader = () => {
+    pdf.setDrawColor(226, 232, 240);
+    pdf.setLineWidth(0.75);
+    pdf.line(margin, 42, pageWidth - margin, 42);
+    pdf.setFont(fontFamily, "bold");
+    pdf.setFontSize(8);
+    pdf.setTextColor(124, 58, 237);
+    pdf.text(document.category.toLocaleUpperCase(), margin, 31);
+    pdf.setFont(fontFamily, "normal");
+    pdf.setTextColor(100, 116, 139);
+    pdf.text(document.title, pageWidth - margin, 31, { align: "right", maxWidth: contentWidth * 0.62 });
+  };
+
+  const nextPage = () => {
+    pdf.addPage();
+    pageNumber += 1;
+    drawContinuationHeader();
+    y = bodyTop;
+  };
+
+  const ensureSpace = (height: number) => {
+    if (y + height <= bodyBottom) return;
+    nextPage();
+  };
+
+  const textBlock = (text: string, size: number, color: [number, number, number], options?: { bold?: boolean; indent?: number; gapBefore?: number; gapAfter?: number }) => {
+    const indent = options?.indent ?? 0;
+    const gapBefore = options?.gapBefore ?? 0;
+    const gapAfter = options?.gapAfter ?? 6;
+    pdf.setFont(fontFamily, options?.bold ? "bold" : "normal");
+    pdf.setFontSize(size);
+    pdf.setTextColor(...color);
+    const lines = pdf.splitTextToSize(text, contentWidth - indent);
+    const lineHeight = size * 1.4;
+    y += gapBefore;
+
+    for (let lineIndex = 0; lineIndex < lines.length;) {
+      if (y + lineHeight > bodyBottom) nextPage();
+      const availableLines = Math.max(1, Math.floor((bodyBottom - y) / lineHeight));
+      const chunk = lines.slice(lineIndex, lineIndex + availableLines);
+      pdf.text(chunk, margin + indent, y);
+      y += chunk.length * lineHeight;
+      lineIndex += chunk.length;
+    }
+
+    y += gapAfter;
+  };
+
+  pdf.setFillColor(124, 58, 237);
+  pdf.roundedRect(margin, y, contentWidth, 24, 8, 8, "F");
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFont(fontFamily, "bold");
+  pdf.setFontSize(10);
+  pdf.text(document.category.toUpperCase(), margin + 12, y + 16);
+  y += 54;
+  textBlock(document.title, 27, [23, 32, 51], { bold: true, gapAfter: 8 });
+  if (document.subtitle) textBlock(document.subtitle, 15, [219, 39, 119], { bold: true, gapAfter: 12 });
+  y += 5;
+
+  for (const meta of document.metadata) {
+    ensureSpace(26);
+    textBlock(`${meta.label}: ${meta.value}`, 9.5, [71, 85, 105], { gapAfter: 5 });
+  }
+
+  for (const section of document.sections) {
+    y += 12;
+    ensureSpace(42);
+    pdf.setDrawColor(13, 148, 136);
+    pdf.setLineWidth(3);
+    pdf.line(margin, y - 12, margin, y + 8);
+    textBlock(section.title, 16, [15, 118, 110], { bold: true, indent: 12, gapAfter: 9 });
+    for (const item of section.items) {
+      if (item.label) {
+        textBlock(item.label, 11, [23, 32, 51], { bold: true, indent: 12, gapAfter: 2 });
+        textBlock(item.value, 10.5, [51, 65, 85], { indent: 20, gapAfter: 4 });
+      } else {
+        textBlock(item.value, 10.5, [23, 32, 51], { indent: 12, gapAfter: 4 });
+      }
+      for (const detail of item.details ?? []) textBlock(`• ${detail}`, 9.5, [100, 116, 139], { indent: 28, gapAfter: 3 });
+    }
+  }
+
+  y += 14;
+  textBlock(document.footer, 8, [148, 163, 184], { gapAfter: 0 });
+
+  for (let page = 1; page <= pageNumber; page += 1) {
+    pdf.setPage(page);
+    pdf.setDrawColor(226, 232, 240);
+    pdf.setLineWidth(0.75);
+    pdf.line(margin, pageHeight - 37, pageWidth - margin, pageHeight - 37);
+    pdf.setFont(fontFamily, "normal");
+    pdf.setFontSize(8);
+    pdf.setTextColor(148, 163, 184);
+    pdf.text(document.footer, margin, pageHeight - 24);
+    pdf.text(`${page} / ${pageNumber}`, pageWidth - margin, pageHeight - 24, { align: "right" });
+  }
+  return pdf.output("blob");
+}
+
+function arrayBufferToBase64(buffer: ArrayBuffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
+  }
+  return btoa(binary);
+}
+
+async function loadPdfFont(path: string) {
+  try {
+    const response = await fetch(path);
+    if (!response.ok) return null;
+    return await response.arrayBuffer();
+  } catch {
+    return null;
+  }
+}
+
+export function exportFilename(document: ExportDocument, format: ExportFormat): string {
+  const slug = document.title
+    .normalize("NFKD")
+    .replace(/[^\p{L}\p{N}]+/gu, "-")
+    .replace(/^-|-$/g, "")
+    .toLocaleLowerCase()
+    .slice(0, 72) || "milos-training";
+  return `${slug}.${format}`;
+}
+
+export async function generateExportFile(document: ExportDocument, format: ExportFormat): Promise<File> {
+  let blob: Blob;
+  if (format === "pdf") blob = await renderPdf(document);
+  else if (format === "odt") blob = await renderOdt(document);
+  else {
+    const content = format === "md" ? renderMarkdown(document) : format === "csv" ? renderCsv(document) : renderText(document);
+    blob = new Blob([content], { type: MIME_TYPES[format] });
+  }
+  return new File([blob], exportFilename(document, format), { type: MIME_TYPES[format] });
+}

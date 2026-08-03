@@ -14,6 +14,11 @@ import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { SemanticLabel } from "@/components/semantic-label";
+import {
+  shouldShowAllowanceQuota,
+  visibleBillingAllowances,
+  visibleBillingChannels,
+} from "@/app/account/billing/billing-entitlement-visibility";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -33,6 +38,15 @@ function formatDate(uiLocale: string, value: string | null | undefined) {
     month: "short",
     year: "numeric",
   });
+}
+
+function packageLabel(subscription: Record<string, unknown> | null | undefined) {
+  return String(
+    subscription?.package_name ??
+      subscription?.package_code_snapshot ??
+      subscription?.package_family_snapshot ??
+      "—",
+  );
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -388,7 +402,7 @@ export default function BillingPage() {
               {activeSub ? (
                 <div className="flex flex-col gap-1">
                   <span className="text-base font-semibold" style={{ color: "var(--text)" }}>
-                    {String(activeSub.package_code_snapshot ?? activeSub.package_family_snapshot ?? "—")}
+                    {packageLabel(activeSub as Record<string, unknown>)}
                   </span>
                   <span className="text-xs" style={{ color: "var(--dim)" }}>
                     {activeSub.billing_period_snapshot
@@ -570,7 +584,8 @@ function EntitlementCard({ entitlement }: { entitlement: EffectiveEntitlement | 
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   if (!entitlement?.plan) return null;
-  const allowanceEntries = Object.entries(entitlement.allowances);
+  const allowanceEntries = visibleBillingAllowances(entitlement.allowances);
+  const channels = visibleBillingChannels(entitlement.plan.channels);
   return (
     <section className="rounded-2xl p-5" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
       <div className="flex items-center justify-between gap-3">
@@ -578,14 +593,14 @@ function EntitlementCard({ entitlement }: { entitlement: EffectiveEntitlement | 
         <StatusBadge status={entitlement.status} />
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
-        {entitlement.plan.channels.map((channel) => <span key={channel} className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }}><SemanticLabel value={channel} /></span>)}
+        {channels.map((channel) => <span key={channel} className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }}><SemanticLabel value={channel} /></span>)}
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {allowanceEntries.map(([key, usage]) => usage ? (
           <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}>
             <p className="text-sm font-semibold" style={{ color: "var(--text)" }}><SemanticLabel value={key} /></p>
             <p className="mt-1 text-2xl font-semibold" style={{ color: "var(--primary)" }}>{String(usage.remaining)}</p>
-            <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("remainingOf8553660")} {String(usage.limit)} {i18n("resets5de1b0d")} {formatDate(uiLocale, usage.period_end)}</p>
+            {shouldShowAllowanceQuota(usage) ? <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("remainingOf8553660")} {String(usage.limit)} {i18n("resets5de1b0d")} {formatDate(uiLocale, usage.period_end)}</p> : null}
             {usage.extensions > 0 ? <p className="mt-1 text-xs" style={{ color: "var(--success)" }}>{i18n("includes820531f")}{usage.extensions} {i18n("personalExtension95a8d48")}</p> : null}
           </div>
         ) : null)}

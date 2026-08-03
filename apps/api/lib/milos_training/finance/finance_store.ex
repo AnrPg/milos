@@ -28,6 +28,8 @@ defmodule MilosTraining.Finance.FinanceStore do
   @impl true
   def record_payment(membership_id, params), do: adapter().record_payment(membership_id, params)
   @impl true
+  def create_receipt(membership_id, params), do: adapter().create_receipt(membership_id, params)
+  @impl true
   def create_manual_credit(membership_id, params),
     do: adapter().create_manual_credit(membership_id, params)
 

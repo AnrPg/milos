@@ -3,6 +3,7 @@ defmodule MilosTrainingWeb.WorkoutController do
   use OpenApiSpex.ControllerSpecs
 
   alias MilosTraining.Application.{GetMaterializedWorkout, GetPublishedWorkout}
+  alias MilosTrainingWeb.Schemas.Workout, as: WorkoutSchema
   alias OpenApiSpex.{Parameter, Schema}
 
   action_fallback MilosTrainingWeb.FallbackController
@@ -22,13 +23,7 @@ defmodule MilosTrainingWeb.WorkoutController do
     summary: "Get a master workout",
     parameters: [@id_param],
     responses: [
-      ok:
-        {"Workout", "application/json",
-         %Schema{
-           type: :object,
-           properties: %{workout: %Schema{type: :object, additionalProperties: true}},
-           required: [:workout]
-         }},
+      ok: {"Workout", "application/json", WorkoutSchema.response_schema()},
       not_found:
         {"Not found", "application/json",
          %Schema{type: :object, properties: %{error: %Schema{type: :string}}, required: [:error]}}
@@ -40,18 +35,7 @@ defmodule MilosTrainingWeb.WorkoutController do
     parameters: [@id_param],
     responses: [
       ok:
-        {"Materialized scales", "application/json",
-         %Schema{
-           type: :object,
-           properties: %{
-             workout: %Schema{type: :object, additionalProperties: true},
-             scales: %Schema{
-               type: :array,
-               items: %Schema{type: :object, additionalProperties: true}
-             }
-           },
-           required: [:workout, :scales]
-         }},
+        {"Materialized scales", "application/json", WorkoutSchema.materialized_response_schema()},
       not_found:
         {"Not found", "application/json",
          %Schema{type: :object, properties: %{error: %Schema{type: :string}}, required: [:error]}}

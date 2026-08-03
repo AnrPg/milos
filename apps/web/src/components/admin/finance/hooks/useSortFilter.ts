@@ -50,6 +50,14 @@ function activeSub(member: FinanceRecord): FinanceRecord | null {
   return (member.active_package_subscription as FinanceRecord | null) ?? null;
 }
 
+function packageLabel(subscription: FinanceRecord | null): string {
+  return (
+    str(field(subscription, "package_name")) ||
+    str(field(subscription, "package_code_snapshot")) ||
+    str(field(subscription, "package_family_snapshot"))
+  );
+}
+
 function applyFilter(member: FinanceRecord, col: ColumnKey, filter: FilterValue): boolean {
   const mem = membership(member);
   const sub = activeSub(member);
@@ -71,7 +79,7 @@ function applyFilter(member: FinanceRecord, col: ColumnKey, filter: FilterValue)
     }
     case "plan": {
       if (filter.kind !== "multi" || filter.values.length === 0) return true;
-      const code = str(field(sub, "package_code_snapshot"));
+      const code = packageLabel(sub);
       if (filter.values.includes("__none__")) {
         if (!code) return true;
       }
@@ -160,9 +168,7 @@ function cmp(a: FinanceRecord, b: FinanceRecord, col: ColumnKey): number {
     case "status":
       return str(field(memA, "status")).localeCompare(str(field(memB, "status")));
     case "plan":
-      return str(field(subA, "package_code_snapshot")).localeCompare(
-        str(field(subB, "package_code_snapshot"))
-      );
+      return packageLabel(subA).localeCompare(packageLabel(subB));
     case "expires": {
       const ea = str(field(subA, "ends_on")) || str(field(memA, "expires_on"));
       const eb = str(field(subB, "ends_on")) || str(field(memB, "expires_on"));

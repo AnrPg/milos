@@ -1,7 +1,7 @@
 "use client";
 
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -23,79 +23,63 @@ function toggle(values: string[], id: string) {
 }
 
 export function TypeFilterChips({ classTypes, value, onChange }: TypeFilterChipsProps) {
-  
-  const detailsRef = useRef<HTMLDetailsElement>(null);
   const [pending, setPending] = useState(value);
+  const [open, setOpen] = useState(false);
+  const [pinned, setPinned] = useState(false);
   const t = useTranslations("Schedule");
 
+  if (classTypes.filter((type) => !type.archived_at).length <= 1) return null;
+
   return (
-    <div className="min-w-0 flex-1">
-      <div className="hidden min-w-0 items-center gap-1.5 md:flex" aria-label={t("filterByClassType")}>
-        <button
-          aria-pressed={value.length === 0}
-          className="shrink-0 rounded-full border px-2.5 py-1.5 text-xs font-semibold transition-colors"
-          style={
-            value.length === 0
-              ? { background: "var(--text)", borderColor: "var(--text)", color: "var(--bg)" }
-              : { background: "transparent", borderColor: "var(--border)", color: "var(--dim)" }
-          }
-          onClick={() => onChange([])}
-          type="button"
-        >
-          {t("all")}
-        </button>
-
-        {classTypes.map((type) => {
-          const selected = value.includes(type.id);
-          const color = classTypeColor(type);
-
-          return (
-            <button
-              aria-pressed={selected}
-              className="min-w-0 flex-1 truncate rounded-full border px-2 py-1.5 text-[11px] font-semibold transition-colors lg:px-2.5 lg:text-xs"
-              key={type.id}
-              onClick={() => onChange(toggle(value, type.id))}
-              style={
-                selected
-                  ? { background: color, borderColor: color, color: "var(--bg)" }
-                  : { background: "transparent", borderColor: "var(--border)", color: "var(--dim)" }
-              }
-              title={(type.name) + (type.archived_at ? ` (${t("archived")})` : "")}
-              type="button"
-            >
-              {type.name}
-            </button>
-          );
-        })}
-      </div>
-
-      <details
-        className="relative md:hidden"
-        onToggle={(event) => {
-          if (event.currentTarget.open) setPending(value);
+    <div
+      className="relative min-w-0 flex-1"
+      onMouseEnter={() => {
+        setPending(value);
+        setOpen(true);
+      }}
+      onMouseLeave={() => {
+        if (!pinned) setOpen(false);
+      }}
+    >
+      <button
+        type="button"
+        aria-expanded={open}
+        className="flex w-full max-w-md items-center justify-between rounded-full px-4 py-2.5 text-sm font-semibold"
+        style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+        onClick={() => {
+          setPending(value);
+          setPinned((current) => {
+            const nextPinned = !current;
+            setOpen(nextPinned || !open);
+            return nextPinned;
+          });
         }}
-        ref={detailsRef}
       >
-        <summary
-          className="flex cursor-pointer list-none items-center justify-between rounded-full px-4 py-2.5 text-sm font-semibold"
-          style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
-        >
-          <span>{t("classTypes")}</span>
-          <span style={{ color: "var(--primary)" }}>{value.length === 0 ? t("all") : t("selectedCount", { count: value.length })}</span>
-        </summary>
+        <span>{t("classTypes")}</span>
+        <span style={{ color: "var(--primary)" }}>{value.length === 0 ? t("all") : t("selectedCount", { count: value.length })}</span>
+      </button>
 
+      {open ? (
         <div
-          className="absolute inset-x-0 top-full z-30 mt-2 rounded-[1.4rem] p-4 shadow-[0_20px_60px_rgba(0,0,0,0.55)]"
+          className="absolute start-0 top-full z-30 mt-2 w-full max-w-md rounded-[1.4rem] p-4 shadow-[0_20px_60px_rgba(0,0,0,0.55)]"
           style={{ background: "var(--panel)", border: "1px solid var(--border-strong)" }}
         >
           <div className="max-h-64 space-y-2 overflow-y-auto">
+            <label
+              className="flex cursor-pointer items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-sm"
+              style={{ background: pending.length === 0 ? "color-mix(in srgb, var(--primary) 10%, transparent)" : "var(--panel-muted)", color: "var(--text)" }}
+            >
+              <span className="truncate">{t("all")}</span>
+              <input checked={pending.length === 0} onChange={() => setPending([])} type="checkbox" />
+            </label>
             {classTypes.map((type) => {
               const selected = pending.includes(type.id);
+              const color = classTypeColor(type);
               return (
                 <label
                   className="flex cursor-pointer items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-sm"
                   key={type.id}
-                  style={{ background: selected ? "color-mix(in srgb, var(--primary) 10%, transparent)" : "var(--panel-muted)", color: "var(--text)" }}
+                  style={{ background: selected ? `color-mix(in srgb, ${color} 12%, transparent)` : "var(--panel-muted)", color: "var(--text)" }}
                 >
                   <span className="truncate">{type.name}</span>
                   <input
@@ -121,7 +105,8 @@ export function TypeFilterChips({ classTypes, value, onChange }: TypeFilterChips
               className="flex-1 rounded-full px-3 py-2 text-xs font-semibold"
               onClick={() => {
                 onChange(pending);
-                detailsRef.current?.removeAttribute("open");
+                setPinned(false);
+                setOpen(false);
               }}
               style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
               type="button"
@@ -130,7 +115,7 @@ export function TypeFilterChips({ classTypes, value, onChange }: TypeFilterChips
             </button>
           </div>
         </div>
-      </details>
+      ) : null}
     </div>
   );
 }

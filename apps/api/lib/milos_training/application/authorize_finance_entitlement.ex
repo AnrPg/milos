@@ -5,7 +5,10 @@ defmodule MilosTraining.Application.AuthorizeFinanceEntitlement do
   def call(%{id: user_id, role: role}, request) when is_map(request) do
     entitlement = Finance.get_effective_entitlement(user_id)
     mode = entitlement_mode(entitlement)
-    EntitlementPolicy.authorize(entitlement, request, mode: mode, actor_role: role)
+
+    entitlement
+    |> EntitlementPolicy.authorize(request, mode: mode, actor_role: role)
+    |> add_denial_details(request)
   end
 
   def call(user_id, capability) do
@@ -25,4 +28,17 @@ defmodule MilosTraining.Application.AuthorizeFinanceEntitlement do
 
   defp entitlement_mode(%{enforcement_mode: mode}) when is_atom(mode), do: mode
   defp entitlement_mode(_), do: :observe
+
+  defp add_denial_details({:error, :finance_channel_not_included}, request),
+    do: {:error, :finance_channel_not_included, %{channel: value(request, :channel)}}
+
+  defp add_denial_details({:error, :finance_capability_not_included}, request),
+    do: {:error, :finance_capability_not_included, %{capability: value(request, :capability)}}
+
+  defp add_denial_details({:error, :finance_allowance_not_included}, request),
+    do: {:error, :finance_allowance_not_included, %{allowance: value(request, :allowance)}}
+
+  defp add_denial_details(result, _request), do: result
+
+  defp value(request, key), do: Map.get(request, key) || Map.get(request, Atom.to_string(key))
 end

@@ -18,6 +18,7 @@ import {
   applyCreditToPayment,
   applyCreditToInvoice,
   assignFinancePackage,
+  createFinanceReceipt,
   createFinanceInvoice,
   createManualCredit,
   fetchFinanceMember,
@@ -36,13 +37,31 @@ import {
   updateFinanceInvoice,
   voidFinanceInvoice,
   type FinanceRecord,
+  type FinanceReceipt,
 } from "@/api/finance";
+import { fetchAdminSettings } from "@/api/settings";
+import {
+  buildFinanceReceiptPayload,
+  receiptPackageLabel,
+} from "@/components/admin-finance-receipt";
 import { useSession } from "@/components/session-provider";
+import { generateExportFile, type ExportDocument } from "@/lib/document-export";
+
+const MANUAL_RECEIPT_PURPOSE = "__manual_receipt_purpose__";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
   if (value === null || value === undefined) return fallback;
   return String(value);
+}
+
+function packageLabel(record: FinanceRecord | null | undefined, fallback = "—") {
+  return (
+    field(record, "package_name") ||
+    field(record, "package_code_snapshot") ||
+    field(record, "package_family_snapshot") ||
+    fallback
+  );
 }
 
 function dateField(record: FinanceRecord | null | undefined, key: string) {
@@ -57,12 +76,88 @@ function euroInputValue(cents: unknown) {
   return (Number(cents ?? 0) / 100).toFixed(2);
 }
 
+type ReceiptExportCopy = {
+  receipt: string;
+  documentTitle: string;
+  paymentReceived: string;
+  reference: string;
+  date: string;
+  amountReceived: string;
+  package: string;
+  payment: string;
+  purpose: string;
+  method: string;
+  status: string;
+  paid: string;
+  footer: string;
+};
+
+async function downloadReceipt(
+  receipt: FinanceReceipt,
+  uiLocale: string,
+  copy: ReceiptExportCopy,
+) {
+  const amount = new Intl.NumberFormat(uiLocale, {
+    style: "currency",
+    currency: receipt.currency,
+  }).format(receipt.amount_cents / 100);
+  const selectedPackage = receiptPackageLabel(receipt);
+
+  const document: ExportDocument = {
+    icon: "✓",
+    category: copy.receipt,
+    title: copy.documentTitle,
+    subtitle: copy.paymentReceived,
+    metadata: [
+      { label: copy.reference, value: receipt.reference },
+      { label: copy.date, value: receipt.issued_on },
+      { label: copy.amountReceived, value: amount },
+      ...(selectedPackage ? [{ label: copy.package, value: selectedPackage }] : []),
+    ],
+    sections: [
+      {
+        icon: "€",
+        title: copy.payment,
+        items: [
+          { label: copy.purpose, value: receipt.description },
+          { label: copy.method, value: field(receipt.payment, "payment_method") },
+          { label: copy.status, value: copy.paid },
+        ],
+      },
+    ],
+    footer: copy.footer,
+  };
+
+  const file = await generateExportFile(document, "pdf");
+  const url = URL.createObjectURL(file);
+  const anchor = window.document.createElement("a");
+  anchor.href = url;
+  anchor.download = file.name;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
 export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const { tokens } = useSession();
   const queryClient = useQueryClient();
   const token = tokens?.access_token;
+  const receiptExportCopy = (reference: string): ReceiptExportCopy => ({
+    receipt: i18n("featureReceipt"),
+    documentTitle: i18n("featureReceiptDocumentTitle", { reference }),
+    paymentReceived: i18n("featurePaymentReceived"),
+    reference: i18n("featureReference"),
+    date: i18n("featureDate"),
+    amountReceived: i18n("featureAmountReceived"),
+    package: i18n("package7431e3d"),
+    payment: i18n("featurePayment"),
+    purpose: i18n("featurePurpose"),
+    method: i18n("featureMethod"),
+    status: i18n("featureStatus"),
+    paid: i18n("featurePaid"),
+    footer: i18n("featureReceiptFooter"),
+  });
   const [membershipOverrides, setMembershipOverrides] = useState<
     Partial<{
       user_type_snapshot: string;
@@ -82,6 +177,10 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
     finance_invoice_id: "",
     notes: "",
   });
+  const [receiptDescription, setReceiptDescription] = useState("");
+  const [receiptPackageSubscriptionId, setReceiptPackageSubscriptionId] = useState("");
+  const [receiptManualPurposeSelected, setReceiptManualPurposeSelected] = useState(false);
+  const [lastReceipt, setLastReceipt] = useState<FinanceReceipt | null>(null);
   const [invoiceForm, setInvoiceForm] = useState({
     amount: "0",
     description: "",
@@ -111,6 +210,12 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
     queryFn: async () => fetchFinanceMember(token!, userId),
   });
 
+  const settingsQuery = useQuery({
+    queryKey: ["admin", "settings"],
+    enabled,
+    queryFn: async () => fetchAdminSettings(token!),
+  });
+
   const packagesQuery = useQuery({
     queryKey: ["admin", "finance", "packages"],
     enabled,
@@ -131,6 +236,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
   });
 
   const membership = memberQuery.data?.membership ?? null;
+  const receiptMode = settingsQuery.data?.finance.document_mode === "receipt";
   const packages = packagesQuery.data?.packages ?? [];
   const campaigns = campaignsQuery.data?.promotion_campaigns ?? [];
   const codes = codesQuery.data?.promotion_codes ?? [];
@@ -167,6 +273,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
   const customRenewal = field(selectedRenewalSubscription, "billing_period_snapshot") === "custom";
   const creditBalance = memberQuery.data?.credit_balance ?? 0;
   const entitlement = memberQuery.data?.entitlement;
+  const receiptPurposeValue = receiptManualPurposeSelected ? MANUAL_RECEIPT_PURPOSE : receiptPackageSubscriptionId;
   const membershipForm = {
     user_type_snapshot: membershipOverrides.user_type_snapshot ?? field(membership, "user_type_snapshot", "member"),
     status: membershipOverrides.status ?? field(membership, "status", "active"),
@@ -224,6 +331,33 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
         finance_invoice_id: "",
         notes: "",
       });
+      await invalidateMember();
+    },
+  });
+
+  const createReceiptMutation = useMutation({
+    mutationFn: async () =>
+      createFinanceReceipt(
+        token!,
+        userId,
+        buildFinanceReceiptPayload(
+          {
+            amount: paymentForm.amount,
+            paymentMethod: paymentForm.payment_method,
+            paidOn: paymentForm.paid_on,
+            description: receiptDescription,
+            notes: paymentForm.notes,
+            packageSubscriptionId: receiptPackageSubscriptionId,
+          },
+          crypto.randomUUID(),
+        ),
+      ),
+    onSuccess: async ({ receipt }) => {
+      setLastReceipt(receipt);
+      setReceiptDescription("");
+      setReceiptPackageSubscriptionId("");
+      setPaymentForm((current) => ({ ...current, amount: "0", paid_on: "", notes: "" }));
+      await downloadReceipt(receipt, uiLocale, receiptExportCopy(receipt.reference));
       await invalidateMember();
     },
   });
@@ -456,29 +590,82 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
             </form>
           </Panel>
 
-          <Panel title={i18n("recordPayment86e5632")}>
+          <Panel title={receiptMode ? i18n("featureIssueReceipt") : i18n("recordPayment86e5632")}>
             <form
               className="space-y-3"
               onSubmit={(event) => {
                 event.preventDefault();
-                recordPaymentMutation.mutate();
+                if (receiptMode) createReceiptMutation.mutate();
+                else recordPaymentMutation.mutate();
               }}
             >
               <Input label={i18n("amountInEure238d40")} type="number" value={paymentForm.amount} onChange={(amount) => setPaymentForm({ ...paymentForm, amount })} />
+              {receiptMode ? (
+                <>
+                  <Select
+                    label={i18n("featurePaymentPurpose")}
+                    value={receiptPurposeValue}
+                    options={[
+                      ...packageSubscriptions.map((subscription) => field(subscription, "id")),
+                      MANUAL_RECEIPT_PURPOSE,
+                    ]}
+                    optionLabel={(id) => {
+                      if (id === MANUAL_RECEIPT_PURPOSE) return i18n("featureReceiptManualPurposeOption");
+                      const subscription = packageSubscriptions.find((item) => field(item, "id") === id);
+                      return (packageLabel(subscription, id)) + " · " + (money(uiLocale, subscription?.price_cents_snapshot));
+                    }}
+                    onChange={(receiptPurpose) => {
+                      if (receiptPurpose === MANUAL_RECEIPT_PURPOSE) {
+                        setReceiptPackageSubscriptionId("");
+                        setReceiptManualPurposeSelected(true);
+                        setReceiptDescription("");
+                        return;
+                      }
+
+                      const subscription = packageSubscriptions.find(
+                        (item) => field(item, "id") === receiptPurpose,
+                      );
+                      const priceCents =
+                        typeof subscription?.price_cents_snapshot === "number"
+                          ? subscription.price_cents_snapshot
+                          : null;
+                      const selectedPackageLabel = packageLabel(subscription, "");
+
+                      setReceiptPackageSubscriptionId(receiptPurpose);
+                      setReceiptManualPurposeSelected(false);
+                      setPaymentForm((current) => ({
+                        ...current,
+                        amount: priceCents !== null ? euroInputValue(priceCents) : current.amount,
+                      }));
+                      if (selectedPackageLabel) {
+                        setReceiptDescription(i18n("package5544677") + selectedPackageLabel);
+                      }
+                    }}
+                    showPlaceholder={false}
+                  />
+                  {receiptPurposeValue === MANUAL_RECEIPT_PURPOSE ? (
+                    <Input
+                      label={i18n("featurePurpose")}
+                      value={receiptDescription}
+                      onChange={setReceiptDescription}
+                    />
+                  ) : null}
+                </>
+              ) : null}
               <Select
                 label={i18n("paymentMethod0e55fb3")}
                 value={paymentForm.payment_method}
                 options={["cash", "bank_transfer", "card_manual", "other"]}
                 onChange={(payment_method) => setPaymentForm({ ...paymentForm, payment_method })}
               />
-              <Select
+              {!receiptMode ? <Select
                 label={i18n("paymentStatus9dfea40")}
                 value={paymentForm.payment_status}
                 options={["paid", "pending", "refunded", "failed", "waived"]}
                 onChange={(payment_status) => setPaymentForm({ ...paymentForm, payment_status })}
-              />
+              /> : null}
               <Input label={i18n("paidOnfca3213")} required={false} type="date" value={paymentForm.paid_on} onChange={(paid_on) => setPaymentForm({ ...paymentForm, paid_on })} />
-              <Select
+              {!receiptMode ? <Select
                 label={i18n("invoicef9f3881")}
                 value={paymentForm.finance_invoice_id}
                 options={payableInvoices.map((invoice) => field(invoice, "id"))}
@@ -498,14 +685,34 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                     amount: balanceDue !== null ? euroInputValue(balanceDue) : paymentForm.amount,
                   });
                 }}
-              />
+              /> : null}
               <Input label={i18n("notes7044004")} required={false} value={paymentForm.notes} onChange={(notes) => setPaymentForm({ ...paymentForm, notes })} />
-              <SubmitButton pending={recordPaymentMutation.isPending}>{i18n("recordPayment86e5632")}</SubmitButton>
-              <ErrorText error={recordPaymentMutation.error} />
+              <SubmitButton
+                pending={receiptMode ? createReceiptMutation.isPending : recordPaymentMutation.isPending}
+                disabled={receiptMode && !receiptDescription.trim()}
+              >
+                {receiptMode ? i18n("featureRecordAndDownloadReceipt") : i18n("recordPayment86e5632")}
+              </SubmitButton>
+              <ErrorText error={receiptMode ? createReceiptMutation.error : recordPaymentMutation.error} />
+              {receiptMode && lastReceipt ? (
+                <button
+                  className="text-sm font-semibold text-[var(--primary)]"
+                  type="button"
+                  onClick={() =>
+                    void downloadReceipt(
+                      lastReceipt,
+                      uiLocale,
+                      receiptExportCopy(lastReceipt.reference),
+                    )
+                  }
+                >
+                  {i18n("featureDownloadReceiptAgain", { reference: lastReceipt.reference })}
+                </button>
+              ) : null}
             </form>
           </Panel>
 
-          <Panel title={i18n("createInvoicea0567cf")}>
+          {!receiptMode ? <Panel title={i18n("createInvoicea0567cf")}>
             <form
               className="space-y-3"
               onSubmit={(event) => {
@@ -520,7 +727,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 options={packageSubscriptions.map((subscription) => field(subscription, "id"))}
                 optionLabel={(id) => {
                   const subscription = packageSubscriptions.find((item) => field(item, "id") === id);
-                  return (field(subscription, "package_code_snapshot", id)) + " · " + (money(uiLocale, subscription?.price_cents_snapshot));
+                  return (packageLabel(subscription, id)) + " · " + (money(uiLocale, subscription?.price_cents_snapshot));
                 }}
                 required={false}
                 onChange={(membership_package_subscription_id) => {
@@ -529,13 +736,13 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                   );
                   const priceCents =
                     typeof subscription?.price_cents_snapshot === "number" ? subscription.price_cents_snapshot : null;
-                  const code = field(subscription, "package_code_snapshot");
+                  const selectedPackageLabel = packageLabel(subscription, "");
 
                   setInvoiceForm({
                     ...invoiceForm,
                     membership_package_subscription_id,
                     amount: priceCents !== null ? euroInputValue(priceCents) : invoiceForm.amount,
-                    description: code ? i18n("package5544677") + (code) : invoiceForm.description,
+                    description: selectedPackageLabel ? i18n("package5544677") + (selectedPackageLabel) : invoiceForm.description,
                   });
                 }}
               />
@@ -548,9 +755,9 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
               <SubmitButton pending={createInvoiceMutation.isPending}>{i18n("createDraftInvoice1ef1fa2")}</SubmitButton>
               <ErrorText error={createInvoiceMutation.error} />
             </form>
-          </Panel>
+          </Panel> : null}
 
-          <Panel title={i18n("generateRenewalInvoice9242ec6")}>
+          {!receiptMode ? <Panel title={i18n("generateRenewalInvoice9242ec6")}>
             <form
               className="space-y-3"
               onSubmit={(event) => {
@@ -564,7 +771,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 options={renewableSubscriptions.map((subscription) => field(subscription, "id"))}
                 optionLabel={(id) => {
                   const subscription = renewableSubscriptions.find((item) => field(item, "id") === id);
-                  return (field(subscription, "package_code_snapshot", id)) + " · " + (money(uiLocale, subscription?.price_cents_snapshot));
+                  return (packageLabel(subscription, id)) + " · " + (money(uiLocale, subscription?.price_cents_snapshot));
                 }}
                 required={false}
                 onChange={(membership_package_subscription_id) =>
@@ -577,7 +784,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
               <SubmitButton pending={renewalInvoiceMutation.isPending}>{i18n("generateRenewalInvoice9242ec6")}</SubmitButton>
               <ErrorText error={renewalInvoiceMutation.error} />
             </form>
-          </Panel>
+          </Panel> : null}
 
           <Panel title={i18n("redeemPromotiona0fb02e")}>
             <form
@@ -818,6 +1025,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
         <section className="grid gap-6 xl:grid-cols-5">
           <InvoiceHistory
             rows={invoices}
+            receiptMode={receiptMode}
             token={token!}
             issuePending={issueInvoiceMutation.isPending}
             voidPending={voidInvoiceMutation.isPending}
@@ -825,7 +1033,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
             onVoid={(id) => voidInvoiceMutation.mutate(id)}
             onRefresh={invalidateMember}
           />
-          <History title={i18n("packageSubscriptions09a33f1")} rows={memberQuery.data?.package_subscriptions ?? []} primary="package_code_snapshot" secondary="status" />
+          <History title={i18n("packageSubscriptions09a33f1")} rows={memberQuery.data?.package_subscriptions ?? []} primary="package_name" secondary="status" primaryFallback={(row) => packageLabel(row)} />
           <History title={i18n("payments44357ae")} rows={memberQuery.data?.payments ?? []} primary="payment_status" secondary="amount_cents" moneySecondary />
           <History title={i18n("paymentReversals0f3a7be")} rows={memberQuery.data?.payment_reversals ?? []} primary="reversal_type" secondary="amount_cents" moneySecondary />
           <History title={i18n("promoRedemptions7408919")} rows={memberQuery.data?.promotion_redemptions ?? []} primary="discount_type_snapshot" secondary="discount_value_snapshot" />
@@ -881,6 +1089,7 @@ function Select({
   optionLabel,
   disabled = false,
   required = true,
+  showPlaceholder = true,
 }: {
   label: string;
   value: string;
@@ -889,6 +1098,7 @@ function Select({
   optionLabel?: (value: string) => string;
   disabled?: boolean;
   required?: boolean;
+  showPlaceholder?: boolean;
 }) {
   const i18n = useUiTranslations();
   return (
@@ -901,9 +1111,11 @@ function Select({
         value={value}
         onChange={(event) => onChange(event.target.value)}
       >
-        <option value="" disabled={required}>
-          {required ? i18n("select8598222") + (label.toLowerCase()) : i18n("no816c52f") + (label.toLowerCase())}
-        </option>
+        {showPlaceholder ? (
+          <option value="" disabled={required}>
+            {required ? i18n("select8598222") + (label.toLowerCase()) : i18n("no816c52f") + (label.toLowerCase())}
+          </option>
+        ) : null}
         {options.map((option) => (
           <option key={option} value={option}>
             {optionLabel ? optionLabel(option) : option}
@@ -916,6 +1128,7 @@ function Select({
 
 function InvoiceHistory({
   rows,
+  receiptMode,
   token,
   issuePending,
   voidPending,
@@ -924,6 +1137,7 @@ function InvoiceHistory({
   onRefresh,
 }: {
   rows: FinanceRecord[];
+  receiptMode: boolean;
   token: string;
   issuePending: boolean;
   voidPending: boolean;
@@ -935,9 +1149,9 @@ function InvoiceHistory({
   const i18n = useUiTranslations();
   return (
     <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--panel)] p-6 xl:col-span-4">
-      <h2 className="text-xl font-black">{i18n("invoices35f8f37")}</h2>
+      <h2 className="text-xl font-black">{receiptMode ? i18n("featureReceipts") : i18n("invoices35f8f37")}</h2>
       <div className="mt-4 grid gap-3 md:grid-cols-2">
-        {rows.length === 0 ? <p className="text-sm text-[var(--muted)]">{i18n("noInvoicesacd181b")}</p> : null}
+        {rows.length === 0 ? <p className="text-sm text-[var(--muted)]">{receiptMode ? i18n("featureNoReceipts") : i18n("noInvoicesacd181b")}</p> : null}
         {rows.map((row) => {
           const id = field(row, "id");
           const status = field(row, "status");
@@ -1205,12 +1419,14 @@ function History({
   rows,
   primary,
   secondary,
+  primaryFallback,
   moneySecondary = false,
 }: {
   title: string;
   rows: FinanceRecord[];
   primary: string;
   secondary: string;
+  primaryFallback?: (row: FinanceRecord) => string;
   moneySecondary?: boolean;
 }) {
   const uiLocale = useUiLocale();
@@ -1222,7 +1438,7 @@ function History({
         {rows.length === 0 ? <p className="text-sm text-[var(--muted)]">{i18n("noRecords2cd2e01")}</p> : null}
         {rows.map((row) => (
           <div key={field(row, "id")} className="rounded-2xl border border-[var(--border)] p-4">
-            <p className="font-bold">{field(row, primary)}</p>
+            <p className="font-bold">{field(row, primary) || primaryFallback?.(row) || "—"}</p>
             <p className="text-sm text-[var(--muted)]">{moneySecondary ? money(uiLocale, row[secondary]) : field(row, secondary)}</p>
           </div>
         ))}

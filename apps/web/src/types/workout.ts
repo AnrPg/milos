@@ -1,10 +1,22 @@
 export type PrescriptionUnit = "reps" | "secs" | "kcal";
 export type LoadMode = "absolute" | "pct_1rm" | "bw";
 export type LoadProgressionMode = "linear" | "per_set";
+export type LoadProgressionDirection = "increase" | "decrease";
 export type IntervalMode = "none" | "minute" | "odd_even";
+export type WorkoutItemType = "exercise" | "header";
+
+export type SetPrescription = {
+  setIndex: number;
+  prescriptionValue: number | null;
+  prescriptionUnit: PrescriptionUnit | null;
+  loadValue: number | null;
+  loadMode: LoadMode | null;
+  note: string | null;
+};
 
 export type LoadProgression = {
   mode: LoadProgressionMode;
+  direction: LoadProgressionDirection;
   startValue: number;
   startMode: LoadMode;
   stepValue: number;
@@ -99,7 +111,10 @@ export type DraftVariation = {
   prescriptionUnit: PrescriptionUnit | null;
   loadValue: number | null;
   loadMode: LoadMode | null;
+  setPrescriptions: SetPrescription[] | null;
+  loadProgression: LoadProgression | null;
   excluded: boolean;
+  note: string | null;
 };
 
 export type AdvancedSettings = {
@@ -113,8 +128,10 @@ export type AdvancedSettings = {
 
 export type DraftExercise = {
   localId: string;
+  itemType: WorkoutItemType;
   name: string;
   sets: number;
+  setPrescriptions: SetPrescription[];
   prescriptionValue: number;
   prescriptionUnit: PrescriptionUnit;
   prescriptionStep: number | null;
@@ -124,6 +141,7 @@ export type DraftExercise = {
   loadProgression: LoadProgression | null;
   isBodyweight: boolean;
   supersetGroupId: string | null;
+  alternatingGroupId: string | null;
   intervalAssignment: number | null;
   advanced: AdvancedSettings;
   variationsOpen: boolean;
@@ -329,8 +347,10 @@ export const FORMAT_EXERCISE_CONTEXT: Record<SectionFormat, ExerciseFormatContex
 export function makeDefaultExercise(): DraftExercise {
   return {
     localId: crypto.randomUUID(),
+    itemType: "exercise",
     name: "",
     sets: 3,
+    setPrescriptions: [],
     prescriptionValue: 10,
     prescriptionUnit: "reps",
     prescriptionStep: null,
@@ -340,6 +360,7 @@ export function makeDefaultExercise(): DraftExercise {
     loadProgression: null,
     isBodyweight: false,
     supersetGroupId: null,
+    alternatingGroupId: null,
     intervalAssignment: null,
     advanced: makeDefaultAdvancedSettings(),
     variationsOpen: false,
@@ -347,6 +368,47 @@ export function makeDefaultExercise(): DraftExercise {
     variations: [],
     note: null,
   };
+}
+
+export function makeDefaultHeader(): DraftExercise {
+  return {
+    ...makeDefaultExercise(),
+    itemType: "header",
+    name: "",
+    sets: 0,
+    setPrescriptions: [],
+    prescriptionValue: 0,
+    loadValue: null,
+    loadProgression: null,
+  };
+}
+
+export function concreteSetPrescriptions(exercise: DraftExercise): SetPrescription[] {
+  if (exercise.itemType === "header") return [];
+
+  return Array.from({ length: Math.max(exercise.sets, 1) }, (_, index) => {
+    const existing = exercise.setPrescriptions[index];
+    const progression = exercise.loadProgression;
+    let progressiveLoad: number | null = null;
+
+    if (progression) {
+      if (progression.mode === "per_set") {
+        progressiveLoad = progression.perSetValues[index] ?? progression.startValue;
+      } else {
+        const sign = progression.direction === "decrease" ? -1 : 1;
+        progressiveLoad = Math.max(0, progression.startValue + sign * progression.stepValue * index);
+      }
+    }
+
+    return {
+      setIndex: index + 1,
+      prescriptionValue: existing?.prescriptionValue ?? exercise.prescriptionValue,
+      prescriptionUnit: existing?.prescriptionUnit ?? exercise.prescriptionUnit,
+      loadValue: progression ? progressiveLoad : (existing?.loadValue ?? exercise.loadValue),
+      loadMode: progression ? progression.startMode : (existing?.loadMode ?? exercise.loadMode),
+      note: existing?.note ?? null,
+    };
+  });
 }
 
 function fmins(i18n: UiTranslate, secs: number | null | undefined): string {

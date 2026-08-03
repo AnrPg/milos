@@ -63,6 +63,7 @@ function restorePlaceholders(message, names) {
 function normalizeIcuPlural(message, source) {
   const sourceMatch = source.match(/\{([A-Za-z_][\w]*),\s*plural,/);
   if (!sourceMatch) return message;
+  if (new RegExp(`^\\{${sourceMatch[1]},\\s*plural,`).test(message)) return message;
 
   const translatedMatch = message.match(
     /^(.*)\{[^,،{}]+[,،]\s*[^,،{}]+[,،]\s*[^{]*\{([^{}]*)\}\s*[^{]*\{([^{}]*)\}\s*\}$/s,

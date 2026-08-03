@@ -12,11 +12,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { fetchExecution } from "@/api/executions";
+import { fetchExecution, listMyExecutions, type WorkoutExecution } from "@/api/executions";
 import { fetchAssignedWorkoutWeek } from "@/api/assigned-workouts";
 import { fetchSchedule } from "@/api/schedule";
 import { PantheonSection } from "@/components/pantheon/PantheonSection";
 import { ChallengeCard } from "@/components/workouts/ChallengeCard";
+import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
 import {
   fetchLandingPayload,
   updateLeaderboardOptIn,
@@ -26,6 +27,7 @@ import {
   type TrainingQuote,
 } from "@/api/landing";
 import { HelpIcon, InfoModal } from "@/components/InfoModal";
+import { HomeDisclosure } from "@/components/home/HomeDisclosure";
 import { ReviewFormPanel } from "@/components/panels/ReviewFormPanel";
 import { WellbeingFormPanel } from "@/components/panels/WellbeingFormPanel";
 import { useSession } from "@/components/session-provider";
@@ -33,6 +35,10 @@ import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
 import { formatLocalIsoDate } from "@/components/schedule/calendar-window";
 import { workoutCta } from "@/components/workout-cta";
+import { ShareExportDialog } from "@/components/share-export/ShareExportDialog";
+import { InAppShareDialog } from "@/components/share-export/InAppShareDialog";
+import { useShareExport } from "@/components/share-export/useShareExport";
+import { buildExecutionDocument, buildExecutionHistoryDocument, renderText } from "@/lib/document-export";
 
 // ── Badge helpers ─────────────────────────────────────────────────────────────
 
@@ -416,9 +422,12 @@ function MemberHero({
 export function LandingPage() {
   const i18n = useUiTranslations();
   const uiLocale = useUiLocale();
+  const shareExport = useShareExport();
   const { currentUser, rotate, tokens } = useSession();
   const [leaderboardMode, setLeaderboardMode] = useState<"weekly" | "monthly">("weekly");
   const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null);
+  const [shareExecution, setShareExecution] = useState<WorkoutExecution | null>(null);
+  const [historyExportOpen, setHistoryExportOpen] = useState(false);
   const [activeInfoModal, setActiveInfoModal] = useState<string | null>(null);
   const [trainingReadinessOpen, setTrainingReadinessOpen] = useState(false);
   const [reviewPanelOpen, setReviewPanelOpen] = useState(false);
@@ -500,6 +509,16 @@ export function LandingPage() {
         throw new Error(i18n("executionNotAvailablea9817d4"));
       }
       return fetchExecution(tokens.access_token, selectedExecutionId);
+    },
+  });
+
+  const historyExportQuery = useQuery({
+    queryKey: ["executions", "export-all"],
+    enabled: Boolean(tokens?.access_token && historyExportOpen),
+    queryFn: async () => {
+      if (!tokens?.access_token) throw new Error(i18n("authenticationRequired9e44e0b"));
+      const executions = await listMyExecutions(tokens.access_token);
+      return executions.filter((execution) => execution.status === "completed");
     },
   });
 
@@ -833,11 +852,11 @@ export function LandingPage() {
             </div>
           </section>
 
-          {/* ── Hall of Fame / Pantheon (non-admin) ────────────────────── */}
-          {!isAdmin && <PantheonSection />}
+          {/* ── Hall of Fame / Pantheon ────────────────────────────────── */}
+          <PantheonSection />
 
-          {/* ── Workout history (non-admin) ─────────────────────────────── */}
-          {!isAdmin && (() => {
+          {/* ── Workout history ────────────────────────────────────────── */}
+          {(() => {
             const now = new Date();
             const startOfWeek = new Date(now);
             startOfWeek.setDate(now.getDate() - now.getDay());
@@ -882,45 +901,13 @@ export function LandingPage() {
             });
 
             return (
-              <section className="rounded-[2.2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-                <div className="flex items-center justify-between gap-4 flex-wrap">
-                  <div>
-                    <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>{i18n("workoutHistory4c84737")}</p>
-                    <h2 className="mt-3 text-2xl font-semibold tracking-tight" style={{ color: "var(--text)" }}>{i18n("recentCompletions4866ac5")}</h2>
-                  </div>
-                  {/* View toggle */}
-                  <div
-                    className="flex rounded-xl overflow-hidden"
-                    style={{ border: "1px solid var(--border)" }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => setHistoryView("grid")}
-                      className="px-3 py-1.5 text-sm font-semibold"
-                      style={{
-                        background: historyView === "grid" ? "var(--primary)" : "var(--panel-muted)",
-                        color: historyView === "grid" ? "var(--primary-contrast)" : "var(--muted)",
-                      }}
-                    >
-                      ⊞
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setHistoryView("list")}
-                      className="px-3 py-1.5 text-sm font-semibold"
-                      style={{
-                        background: historyView === "list" ? "var(--primary)" : "var(--panel-muted)",
-                        color: historyView === "list" ? "var(--primary-contrast)" : "var(--muted)",
-                      }}
-                    >
-                      ≡
-                    </button>
-                  </div>
-                </div>
-
+              <HomeDisclosure
+                eyebrow={i18n("workoutHistory4c84737")}
+                title={i18n("recentCompletions4866ac5")}
+              >
                 {/* Filters */}
-                <div className="mt-4">
-                  <div className="flex flex-wrap gap-2">
+                <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex min-w-0 flex-wrap gap-2">
                     {/* Date preset chips */}
                     {(["all", "week", "month"] as const).map((d) => {
                       const hasData = d === "all" || datePresetHasData(d);
@@ -1003,6 +990,59 @@ export function LandingPage() {
                       </>
                     ) : null}
                   </div>
+                  <div className="ms-auto flex shrink-0 items-center gap-4">
+                    <button
+                      aria-label={historyExportOpen && historyExportQuery.isPending ? shareExport.copy.working : i18n("exportFullWorkoutHistory")}
+                      className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-opacity hover:opacity-80 disabled:cursor-wait disabled:opacity-50"
+                      disabled={historyExportOpen && historyExportQuery.isPending}
+                      onClick={() => setHistoryExportOpen(true)}
+                      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--dim)" }}
+                      title={historyExportOpen && historyExportQuery.isPending ? shareExport.copy.working : i18n("exportFullWorkoutHistory")}
+                      type="button"
+                    >
+                      {historyExportOpen && historyExportQuery.isPending ? (
+                        <svg aria-hidden="true" className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                          <circle cx="12" cy="12" fill="none" r="9" stroke="currentColor" strokeOpacity="0.25" strokeWidth="2" />
+                          <path d="M12 3a9 9 0 0 1 9 9" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+                        </svg>
+                      ) : (
+                        <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
+                          <path d="M12 3v11m0 0 4-4m-4 4-4-4M5 15v4h14v-4" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" />
+                        </svg>
+                      )}
+                    </button>
+                    <div
+                      className="flex overflow-hidden rounded-xl"
+                      style={{ border: "1px solid var(--border)" }}
+                    >
+                      <button
+                        type="button"
+                        aria-label={i18n("gridView8da0c5d")}
+                        title={i18n("gridView8da0c5d")}
+                        onClick={() => setHistoryView("grid")}
+                        className="px-3 py-1.5 text-sm font-semibold"
+                        style={{
+                          background: historyView === "grid" ? "var(--primary)" : "var(--panel-muted)",
+                          color: historyView === "grid" ? "var(--primary-contrast)" : "var(--muted)",
+                        }}
+                      >
+                        ⊞
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={i18n("listViewd5d2df9")}
+                        title={i18n("listViewd5d2df9")}
+                        onClick={() => setHistoryView("list")}
+                        className="px-3 py-1.5 text-sm font-semibold"
+                        style={{
+                          background: historyView === "list" ? "var(--primary)" : "var(--panel-muted)",
+                          color: historyView === "list" ? "var(--primary-contrast)" : "var(--muted)",
+                        }}
+                      >
+                        ≡
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Date range modal */}
@@ -1083,38 +1123,52 @@ export function LandingPage() {
                     </p>
                   ) : (
                     filtered.map((execution) => (
-                      <button
+                      <article
                         key={execution.id}
-                        className={"rounded-[1.5rem] text-start transition-transform hover:-translate-y-0.5 " + (historyView === "list" ? "flex items-center gap-4 px-4 py-3" : "px-4 py-4")}
+                        className="relative rounded-[1.5rem] transition-transform hover:-translate-y-0.5"
                         style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
-                        onClick={() => setSelectedExecutionId(execution.id)}
-                        type="button"
                       >
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold truncate" style={{ color: "var(--text)" }}>
-                            {execution.workout_title ?? i18n("workout39463a5")}
-                          </p>
-                          <p className="mt-1 text-xs uppercase tracking-[0.18em]" style={{ color: "var(--primary)" }}>
-                            <SemanticLabel value={execution.workout_type ?? "session"} />
-                            {execution.scale_level_slug ? <>· <SemanticLabel value={execution.scale_level_slug} /></> : ""}
-                          </p>
-                        </div>
-                        <div className={historyView === "list" ? "shrink-0 text-end" : "mt-3"}>
-                          <p className="text-sm" style={{ color: "var(--muted)" }}>
-                            {execution.completed_at_utc
-                              ? new Date(execution.completed_at_utc).toLocaleDateString(uiLocale)
-                              : i18n("inProgressb6bd42e")}
-                          </p>
-                          <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
-                            {execution.exercise_notes.length} {i18n("notec51048b")}{execution.exercise_notes.length === 1 ? "" : i18n("sa0f1490")} ·{" "}
-                            {execution.section_scores.length} {i18n("score75ebcb3")}{execution.section_scores.length === 1 ? "" : i18n("sa0f1490")}
-                          </p>
-                        </div>
-                      </button>
+                        <button
+                          className={"w-full text-start " + (historyView === "list" ? "flex items-center gap-4 px-4 py-3 pe-16" : "px-4 py-4 pe-16")}
+                          onClick={() => setSelectedExecutionId(execution.id)}
+                          type="button"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-semibold" style={{ color: "var(--text)" }}>
+                              {execution.workout_title ?? i18n("workout39463a5")}
+                            </p>
+                            <p className="mt-1 text-xs uppercase tracking-[0.18em]" style={{ color: "var(--primary)" }}>
+                              <SemanticLabel value={execution.workout_type ?? "session"} />
+                              {execution.scale_level_slug ? <>· <SemanticLabel value={execution.scale_level_slug} /></> : ""}
+                            </p>
+                          </div>
+                          <div className={historyView === "list" ? "shrink-0 text-end" : "mt-3"}>
+                            <p className="text-sm" style={{ color: "var(--muted)" }}>
+                              {execution.completed_at_utc
+                                ? new Date(execution.completed_at_utc).toLocaleDateString(uiLocale)
+                                : i18n("inProgressb6bd42e")}
+                            </p>
+                            <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
+                              {execution.exercise_notes.length} {i18n("notec51048b")}{execution.exercise_notes.length === 1 ? "" : i18n("sa0f1490")} ·{" "}
+                              {execution.section_scores.length} {i18n("score75ebcb3")}{execution.section_scores.length === 1 ? "" : i18n("sa0f1490")}
+                            </p>
+                          </div>
+                        </button>
+                        <button
+                          aria-label={`${i18n("shareInMilos")}: ${execution.workout_title ?? i18n("workout39463a5")}`}
+                          className="absolute end-3 top-3 flex h-10 w-10 items-center justify-center rounded-xl text-base"
+                          onClick={() => setShareExecution(execution)}
+                          style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--primary)" }}
+                          title={i18n("shareInMilos")}
+                          type="button"
+                        >
+                          📤
+                        </button>
+                      </article>
                     ))
                   )}
                 </div>
-              </section>
+              </HomeDisclosure>
             );
           })()}
         </div>
@@ -1227,6 +1281,24 @@ export function LandingPage() {
                     </div>
                   </div>
 
+                  {selectedExecution.workout ? (
+                    <div>
+                      <p className="text-sm font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+                        {i18n("workout39463a5")}
+                      </p>
+                      <div className="mt-3">
+                        <WorkoutPreviewDetail
+                          activeScaleOverride={selectedExecution.scale_level_slug}
+                          hideScaleChips
+                          sections={selectedExecution.workout.sections}
+                          authoringMode={selectedExecution.workout.authoring_mode}
+                          freeTextBody={selectedExecution.workout.free_text_body}
+                          freeTextDocument={selectedExecution.workout.free_text_document}
+                        />
+                      </div>
+                    </div>
+                  ) : null}
+
                   <div>
                     <p className="text-sm font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{i18n("sectionScorescaef89a")}</p>
                     <div className="mt-3 space-y-2">
@@ -1291,6 +1363,22 @@ export function LandingPage() {
               )}
             </div>
           </div>
+        ) : null}
+
+        {shareExecution ? (
+          <InAppShareDialog
+            message={renderText(buildExecutionDocument(shareExecution, shareExport.labels, uiLocale))}
+            onClose={() => setShareExecution(null)}
+            title={shareExecution.workout_title ?? i18n("workout39463a5")}
+          />
+        ) : null}
+
+        {historyExportOpen && historyExportQuery.data ? (
+          <ShareExportDialog
+            copy={shareExport.copy}
+            document={buildExecutionHistoryDocument(historyExportQuery.data, shareExport.labels, uiLocale)}
+            onClose={() => setHistoryExportOpen(false)}
+          />
         ) : null}
 
         {trainingReadinessOpen && (

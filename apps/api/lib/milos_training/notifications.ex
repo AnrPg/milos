@@ -116,6 +116,12 @@ defmodule MilosTraining.Notifications do
   def process_event("workout_rejected", payload), do: enqueue_workout_rejected(payload)
   def process_event("athlete_message_sent", payload), do: enqueue_athlete_message(payload)
   def process_event("workout_moved", payload), do: enqueue_workout_moved(payload)
+  def process_event("workout_assigned", payload), do: enqueue_workout_assigned(payload)
+
+  def process_event("workout_assignment_requested", payload),
+    do: enqueue_workout_assignment_requested(payload)
+
+  def process_event("review_submitted", payload), do: enqueue_review_submitted(payload)
   def process_event("invoice_issued", payload), do: enqueue_invoice_issued(payload)
   def process_event("payment_reminder", payload), do: enqueue_payment_reminder(payload)
   def process_event(_event, _payload), do: {:error, :bad_request}
@@ -230,10 +236,10 @@ defmodule MilosTraining.Notifications do
     url =
       case scheduled_for do
         nil ->
-          "/admin/coaching-assignments?open=#{assigned_workout_id}"
+          "/admin/coaching-assignments?open_assignment=#{assigned_workout_id}"
 
         date ->
-          "/admin/coaching-assignments?open=#{assigned_workout_id}&date=#{Date.to_iso8601(date)}"
+          "/admin/coaching-assignments?open_assignment=#{assigned_workout_id}&date=#{Date.to_iso8601(date)}"
       end
 
     Identity.list_by_role(:admin)
@@ -289,7 +295,8 @@ defmodule MilosTraining.Notifications do
     from_date = field(payload, :from_date)
     to_date = field(payload, :to_date)
 
-    url = "/admin/coaching-assignments?open=#{assigned_workout_id}&date=#{to_date}"
+    url =
+      "/admin/coaching-assignments?open_assignment=#{assigned_workout_id}&date=#{to_date}"
 
     Identity.list_by_role(:admin)
     |> Enum.each(fn admin ->
@@ -311,6 +318,74 @@ defmodule MilosTraining.Notifications do
     end)
 
     :ok
+  end
+
+  def enqueue_workout_assigned(payload) when is_map(payload) do
+    assignment_id = field(payload, :assignment_id)
+    batch_at = field(payload, :notification_batch_at) || DateTime.utc_now()
+
+    payload
+    |> field(:athlete_ids)
+    |> List.wrap()
+    |> Enum.uniq()
+    |> Enum.reduce_while(:ok, fn athlete_id, :ok ->
+      result =
+        deliver_notification(athlete_id, :workout_assigned, %{
+          assignment_id: assignment_id,
+          workout_title: field(payload, :workout_title),
+          scheduled_for: field(payload, :scheduled_for),
+          dedupe_key: NotificationDedupe.batch_key(athlete_id, :workout_assigned, batch_at),
+          url: "/my-workouts"
+        })
+
+      if delivered?(result), do: {:cont, :ok}, else: {:halt, result}
+    end)
+  end
+
+  def enqueue_workout_assignment_requested(payload) when is_map(payload) do
+    request_id = field(payload, :request_id)
+    athlete_id = field(payload, :athlete_id)
+    athlete_nickname = field(payload, :athlete_nickname)
+    requested_for = field(payload, :requested_for)
+    note = field(payload, :note)
+    dedupe_id = request_id || "#{athlete_id}:#{requested_for}"
+    url = "/admin/coaching-assignments?date=#{requested_for}"
+
+    Identity.list_by_role(:admin)
+    |> Enum.reduce_while(:ok, fn admin, :ok ->
+      result =
+        deliver_notification(admin.id, :workout_assignment_requested, %{
+          athlete_id: athlete_id,
+          athlete_nickname: athlete_nickname,
+          requested_for: requested_for,
+          note: note,
+          dedupe_key: "workout-assignment-requested:#{admin.id}:#{dedupe_id}",
+          url: url
+        })
+
+      if delivered?(result), do: {:cont, :ok}, else: {:halt, result}
+    end)
+  end
+
+  def enqueue_review_submitted(payload) when is_map(payload) do
+    review_id = field(payload, :review_id)
+
+    Identity.list_by_role(:admin)
+    |> Enum.reduce_while(:ok, fn admin, :ok ->
+      result =
+        deliver_notification(admin.id, :review_submitted, %{
+          review_id: review_id,
+          user_id: field(payload, :user_id),
+          target_type: field(payload, :target_type),
+          target_id: field(payload, :target_id),
+          rating: field(payload, :rating),
+          body: field(payload, :body),
+          dedupe_key: "review-submitted:#{admin.id}:#{review_id}",
+          url: "/admin/reviews"
+        })
+
+      if delivered?(result), do: {:cont, :ok}, else: {:halt, result}
+    end)
   end
 
   def enqueue_invoice_issued(invoice) when is_map(invoice) do
@@ -404,7 +479,7 @@ defmodule MilosTraining.Notifications do
     scheduled_class = nested_map(booking, :scheduled_class)
     class_type = scheduled_class && nested_map(scheduled_class, :class_type)
 
-    %{
+    payload = %{
       booking_id: field(booking, :id),
       scheduled_class_id: field(booking, :scheduled_class_id),
       scheduled_at: scheduled_class && field(scheduled_class, :scheduled_at),
@@ -416,6 +491,14 @@ defmodule MilosTraining.Notifications do
       dedupe_key: NotificationDedupe.booking_key(user_id, type, field(booking, :id)),
       url: "/schedule"
     }
+
+    if type == :booking_approved do
+      batch_at = field(booking, :notification_batch_at) || DateTime.utc_now()
+
+      Map.put(payload, :dedupe_key, NotificationDedupe.batch_key(user_id, type, batch_at))
+    else
+      payload
+    end
   end
 
   defp deliver_notification(user_id, type, payload) do

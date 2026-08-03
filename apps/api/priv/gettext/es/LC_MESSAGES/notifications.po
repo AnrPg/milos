@@ -102,3 +102,36 @@ msgstr "Recordatorio de pago"
 
 msgid "You have an outstanding balance of %{amount} due."
 msgstr "Tiene un saldo pendiente de %{amount} adeudado."
+
+msgid "Workout assignment requested"
+msgstr "Asignación de entrenamiento solicitada"
+
+msgid "%{nickname} requested a workout assignment for %{requested_for}."
+msgstr "%{nickname} solicitó una asignación de entrenamiento para el %{requested_for}."
+
+msgid "a requested date"
+msgstr "una fecha solicitada"
+
+msgid "New review submitted"
+msgstr "Nueva reseña enviada"
+
+msgid "general"
+msgstr "general"
+
+msgid "A %{target_type} review was submitted with a %{rating}/5 rating."
+msgstr "Se envió una reseña de %{target_type} con una valoración de %{rating}/5."
+
+msgid "A new %{target_type} review needs attention."
+msgstr "Una nueva reseña de %{target_type} requiere atención."
+
+msgid "Class bookings approved"
+msgstr "Reservas de clases aprobadas"
+
+msgid "Your coach approved one or more class booking requests."
+msgstr "Tu entrenador aprobó una o más solicitudes de reserva de clases."
+
+msgid "New workouts assigned"
+msgstr "Nuevos entrenamientos asignados"
+
+msgid "Your coach assigned one or more workouts to you."
+msgstr "Tu entrenador te asignó uno o más entrenamientos."

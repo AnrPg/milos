@@ -6,7 +6,7 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import {useUiLocale} from "@/i18n/use-ui-locale";
-import { semanticLabel } from "@/i18n/presentation";
+import { localizeError } from "@/i18n/presentation";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDrag } from "@use-gesture/react";
@@ -20,9 +20,10 @@ import {
 import { AuthGuard } from "@/components/auth-guard";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
+import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
+import { isFreeTextWorkout, storeFreeTextExecutionWorkout } from "@/lib/free-text-execution";
 import { subscribeToTopic } from "@/lib/realtime";
 import { useExecutionStore } from "@/stores/execution";
-import { SemanticLabel } from "@/components/semantic-label";
 
 type Step = "type" | "week" | "preview";
 
@@ -137,7 +138,14 @@ function WorkoutsPageContent() {
       endAt: end.toISOString(),
       days: 7,
       classTypeIds: [],
-    }).then((schedule) => setClassTypes(schedule.class_types)).catch(() => setClassTypes([]));
+    }).then((schedule) => {
+      setClassTypes(schedule.class_types);
+      const activeTypes = schedule.class_types.filter((type) => !type.archived_at);
+      if (activeTypes.length === 1) {
+        setSelectedClassType(activeTypes[0]);
+        setStep("week");
+      }
+    }).catch(() => setClassTypes([]));
   }, [accessToken]);
 
   const loadWeek = useCallback(async () => {
@@ -267,6 +275,18 @@ function WorkoutsPageContent() {
     setError(null);
 
     try {
+      if (isFreeTextWorkout(selectedWorkout)) {
+        const execution = await startExecution(tokens.access_token, {
+          master_workout_id: selectedWorkout.id,
+          scale_level_slug: selectedScale,
+          source: "self_selected",
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        });
+        storeFreeTextExecutionWorkout(selectedWorkout, execution);
+        router.push(`/workouts/free-text/execute?workout=${selectedWorkout.id}&execution=${execution.id}`);
+        return;
+      }
+
       const execution = await startExecution(tokens.access_token, {
         master_workout_id: selectedSlot.workout.id,
         scale_level_slug: selectedScale,
@@ -306,8 +326,12 @@ function WorkoutsPageContent() {
       });
 
       router.push(`/workouts/${execution.id}/execute`);
-    } catch {
-      setError(i18n("workoutCouldNotBeStartedc7410d6"));
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? localizeError(requestError, i18n)
+          : i18n("workoutCouldNotBeStartedc7410d6"),
+      );
       setLaunching(false);
     }
   }
@@ -322,64 +346,12 @@ function WorkoutsPageContent() {
 
   function renderWorkoutPreview(workout: WorkoutRecord) {
     return (
-      <div className="space-y-4">
-        {workout.sections.map((section) => (
-          <section
-            key={section.id ?? (String(section.name ?? i18n("sectionf2c6b56"))) + "-" + (section.order)}
-            className="rounded-3xl border p-5"
-            style={{
-              background: "color-mix(in srgb, var(--panel) 78%, transparent)",
-              borderColor: "var(--border)",
-            }}
-          >
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold">{section.name}</h2>
-              {section.timer_config?.type ? (
-                <span
-                  className="rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]"
-                  style={{
-                    background: "color-mix(in srgb, var(--primary) 15%, transparent)",
-                    border: "1px solid color-mix(in srgb, var(--primary) 35%, transparent)",
-                    color: "var(--primary)",
-                  }}
-                >
-                  <SemanticLabel value={section.timer_config.type} />
-                </span>
-              ) : null}
-            </div>
-
-            <div className="mt-4 space-y-3">
-              {section.exercises.map((exercise) => (
-                <div
-                  key={exercise.id ?? (exercise.name) + "-" + (exercise.order)}
-                  className="rounded-2xl border px-4 py-3"
-                  style={{
-                    background: "color-mix(in srgb, var(--panel-muted) 78%, transparent)",
-                    borderColor: "color-mix(in srgb, var(--border-strong) 90%, transparent)",
-                  }}
-                >
-                  <div className="text-sm font-semibold">{exercise.name}</div>
-                  <div className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
-                    {[
-                      exercise.sets ? (exercise.sets) + " " + semanticLabel("sets", i18n) : null,
-                      exercise.prescription_value
-                        ? (exercise.prescription_value) + " " + semanticLabel(exercise.prescription_unit ?? "reps", i18n)
-                        : null,
-                      exercise.load_value
-                        ? (exercise.load_value) + " " + (exercise.load_mode === "pct_1rm" ? i18n("rma904756") : semanticLabel("kg", i18n))
-                        : exercise.load_mode === "bw"
-                          ? i18n("bodyweight")
-                          : null,
-                    ]
-                      .filter(Boolean)
-                      .join(" · ") || i18n("customExecutionDetailsb430ba9")}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        ))}
-      </div>
+      <WorkoutPreviewDetail
+        hideScaleChips
+        sections={workout.sections}
+        authoringMode={workout.authoring_mode}
+        freeTextBody={workout.free_text_body}
+      />
     );
   }
 
@@ -442,13 +414,13 @@ function WorkoutsPageContent() {
           }}
         >
           <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
-            <button
+            {classTypes.filter((type) => !type.archived_at).length > 1 ? <button
               onClick={() => setStep("type")}
               className="text-sm"
               style={{ color: "var(--muted)" }}
             >
               {i18n("backdc381ae")}
-            </button>
+            </button> : <span className="w-10" />}
             <div className="text-center">
               <div className="text-xs uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
                 {selectedClassType?.name}

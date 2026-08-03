@@ -51,6 +51,7 @@ type SlotPopupProps = {
   onClose: () => void;
   onBook: () => void;
   onEdit: () => void;
+  onDelete?: () => void;
   onApproveBooking: (booking: ScheduleBooking) => void;
   onRejectBooking: (booking: ScheduleBooking) => void;
   onCancelBooking?: () => void;
@@ -63,6 +64,7 @@ export function SlotPopup({
   onClose,
   onBook,
   onEdit,
+  onDelete,
   onApproveBooking,
   onRejectBooking,
   onCancelBooking,
@@ -356,8 +358,18 @@ export function SlotPopup({
                     onClick={onEdit}
                     type="button"
                   >
-                    {i18n("editSlot4754d1f")}
-                  </button>
+                      {i18n("editSlot4754d1f")}
+                    </button>
+                  {onDelete ? (
+                    <button
+                      className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+                      style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--danger) 24%, transparent)", color: "var(--danger)" }}
+                      onClick={onDelete}
+                      type="button"
+                    >
+                      {i18n("deletef6fdbe4")}
+                    </button>
+                  ) : null}
                   {slot.workout ? (
                     <button
                       className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
@@ -410,6 +422,9 @@ export function SlotPopup({
                 sections={slot.workout.sections}
                 activeScaleOverride={!isAdmin ? activeScale : undefined}
                 hideScaleChips={!isAdmin}
+                authoringMode={slot.workout.authoring_mode}
+                freeTextBody={slot.workout.free_text_body}
+                freeTextDocument={slot.workout.free_text_document}
               />
             ) : (
               <p className="text-sm" style={{ color: "var(--dim)" }}>

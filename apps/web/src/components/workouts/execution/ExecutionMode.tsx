@@ -600,13 +600,7 @@ export function ExecutionMode() {
           {currentSegmentIndex + 1} / {segments.length}
         </div>
         <button
-          onClick={() => {
-            if (currentSegment?.scoreable) {
-              void openScoreModal();
-            } else {
-              void handleFinish();
-            }
-          }}
+          onClick={() => void handleFinish()}
           disabled={isSaving}
           className="rounded-xl px-3 py-1.5 text-sm font-semibold disabled:opacity-30"
           style={{ color: "var(--accent, var(--primary))" }}
@@ -677,11 +671,7 @@ export function ExecutionMode() {
         <button
           onClick={() => {
             if (isLastSegment) {
-              if (currentSegment?.scoreable) {
-                void openScoreModal();
-              } else {
-                void handleFinish();
-              }
+              void handleFinish();
             } else {
               handleNext();
             }

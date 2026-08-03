@@ -102,3 +102,36 @@ msgstr "Lembrete de pagamento"
 
 msgid "You have an outstanding balance of %{amount} due."
 msgstr "Você tem um saldo pendente de %{amount} devido."
+
+msgid "Workout assignment requested"
+msgstr "Atribuição de treino solicitada"
+
+msgid "%{nickname} requested a workout assignment for %{requested_for}."
+msgstr "%{nickname} solicitou uma atribuição de treino para %{requested_for}."
+
+msgid "a requested date"
+msgstr "uma data solicitada"
+
+msgid "New review submitted"
+msgstr "Nova avaliação submetida"
+
+msgid "general"
+msgstr "geral"
+
+msgid "A %{target_type} review was submitted with a %{rating}/5 rating."
+msgstr "Foi submetida uma avaliação de %{target_type} com uma classificação de %{rating}/5."
+
+msgid "A new %{target_type} review needs attention."
+msgstr "Uma nova avaliação de %{target_type} requer atenção."
+
+msgid "Class bookings approved"
+msgstr "Reservas de aulas aprovadas"
+
+msgid "Your coach approved one or more class booking requests."
+msgstr "O seu treinador aprovou um ou mais pedidos de reserva de aulas."
+
+msgid "New workouts assigned"
+msgstr "Novos treinos atribuídos"
+
+msgid "Your coach assigned one or more workouts to you."
+msgstr "O seu treinador atribuiu-lhe um ou mais treinos."

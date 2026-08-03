@@ -72,9 +72,11 @@ export function PackagesTab() {
   const [entitlement, setEntitlement] = useState<EntitlementDraft>(DEFAULT_ENTITLEMENT);
 
   const createMutation = useMutation({
-    mutationFn: () =>
-      createFinancePackage(token, {
-        code: form.code,
+    mutationFn: () => {
+      const code = form.code.trim();
+
+      return createFinancePackage(token, {
+        ...(code ? { code } : {}),
         name: form.name,
         family: form.family,
         billing_period: form.billing_period,
@@ -82,7 +84,8 @@ export function PackagesTab() {
         currency: "EUR",
         tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
         params: entitlementParams(entitlement),
-      }),
+      });
+    },
     onSuccess: async () => {
       setForm(BLANK_FORM);
       setEntitlement(DEFAULT_ENTITLEMENT);
@@ -149,7 +152,7 @@ export function PackagesTab() {
               <button
                 className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
                 style={{ background: "var(--text)", color: "var(--bg)" }}
-                disabled={createMutation.isPending || !form.code || !form.name}
+                disabled={createMutation.isPending || !form.name}
                 onClick={() => createMutation.mutate()}
                 type="button"
               >
@@ -167,14 +170,6 @@ export function PackagesTab() {
           }
         >
           <div className="space-y-4">
-            <PanelField label={i18n("packageCode4e5df5f")}>
-              <input
-                className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
-                style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-                value={form.code}
-                onChange={(e) => setForm({ ...form, code: e.target.value })}
-              />
-            </PanelField>
             <PanelField label={i18n("name709a232")}>
               <input
                 className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
@@ -183,6 +178,21 @@ export function PackagesTab() {
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
             </PanelField>
+            <details className="rounded-2xl p-3" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+              <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+                {i18n("packageCode4e5df5f")} · {i18n("optional48a7b88")}
+              </summary>
+              <div className="mt-3">
+                <PanelField label={i18n("packageCode4e5df5f")}>
+                  <input
+                    className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
+                    style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+                    value={form.code}
+                    onChange={(e) => setForm({ ...form, code: e.target.value })}
+                  />
+                </PanelField>
+              </div>
+            </details>
             <div className="grid gap-4 md:grid-cols-2">
               <PanelField label={i18n("family4efb6cb")}>
                 <select
@@ -253,7 +263,7 @@ function PackageRows({ packages, onOpen }: { packages: FinanceRecord[]; onOpen: 
           {field(pkg, "name", field(pkg, "code"))}
         </p>
         <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
-          {field(pkg, "code")} · <SemanticLabel value={field(pkg, "family")} /> · <SemanticLabel value={field(pkg, "billing_period")} />
+          {field(pkg, "code") ? `${field(pkg, "code")} · ` : ""}<SemanticLabel value={field(pkg, "family")} /> · <SemanticLabel value={field(pkg, "billing_period")} />
         </p>
       </div>
       <div className="flex items-center gap-4">

@@ -12,16 +12,30 @@ type Props = {
 };
 
 export function NumberStepper({ value, onChange, min = 1, max, width = "w-10" }: Props) {
-  
   const [showArrows, setShowArrows] = useState(false);
+  const [draft, setDraft] = useState<string | null>(null);
+  const text = draft ?? String(value);
 
   function increment() {
     const next = value + 1;
-    onChange(max !== undefined ? Math.min(max, next) : next);
+    const normalized = max !== undefined ? Math.min(max, next) : next;
+    setDraft(null);
+    onChange(normalized);
   }
 
   function decrement() {
-    onChange(Math.max(min, value - 1));
+    const normalized = Math.max(min, value - 1);
+    setDraft(null);
+    onChange(normalized);
+  }
+
+  function commit() {
+    const parsed = Number.parseInt(text, 10);
+    const bounded = Math.max(min, max === undefined ? parsed : Math.min(max, parsed));
+    const normalized = Number.isNaN(bounded) ? min : bounded;
+    setDraft(null);
+    if (normalized !== value || text.trim() === "") onChange(normalized);
+    setShowArrows(false);
   }
 
   return (
@@ -59,10 +73,19 @@ export function NumberStepper({ value, onChange, min = 1, max, width = "w-10" }:
       </div>
       <input
         type="number"
-        value={value}
-        onChange={(event) => onChange(Math.max(min, Number.parseInt(event.target.value, 10) || min))}
-        onFocus={() => setShowArrows(true)}
-        onBlur={() => setShowArrows(false)}
+        value={text}
+        onChange={(event) => {
+          const next = event.target.value;
+          setDraft(next);
+          if (next.trim() === "") return;
+          const parsed = Number.parseInt(next, 10);
+          if (!Number.isNaN(parsed)) onChange(parsed);
+        }}
+        onFocus={() => {
+          setDraft(String(value));
+          setShowArrows(true);
+        }}
+        onBlur={commit}
         className={(width) + " bg-transparent text-center text-sm font-semibold outline-none"}
         style={{ color: "var(--text)" }}
         min={min}

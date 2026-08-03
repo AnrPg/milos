@@ -19,6 +19,7 @@ import {
   useSensors,
   type CollisionDetection,
   type DragEndEvent,
+  type DragMoveEvent,
   type DragOverEvent,
   type DragStartEvent,
   type UniqueIdentifier,
@@ -36,6 +37,10 @@ import { MobileCanvas } from "./MobileCanvas";
 import { MiddlePanel } from "./MiddlePanel";
 import { RightPanel } from "./RightPanel";
 import { ShortcutsModal } from "./ShortcutsModal";
+import {
+  resolveWorkoutDragEnd,
+  type WorkoutDragData,
+} from "./workout-drag";
 
 const AUTOSAVE_DELAY_MS = 1500;
 
@@ -178,6 +183,12 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
   const [overlayInitPos, setOverlayInitPos] = useState({ x: -9999, y: -9999 });
   // Original selected section at drag start — restored if drag is cancelled
   const dragOriginalSectionIdRef = useRef<string | null>(null);
+  // Hovering a destination section swaps the MiddlePanel and unmounts the source
+  // exercise card. Keep its metadata independently because dnd-kit may then clear
+  // active.data before onDragEnd fires.
+  const dragStartDataRef = useRef<WorkoutDragData | null>(null);
+  const dragHoveredSectionIdRef = useRef<string | null>(null);
+  const dragPointerStartRef = useRef({ x: -9999, y: -9999 });
   // Guard against autosaving before the draft data has been loaded from the API
   const draftLoadedRef = useRef(false);
   const [editorSessionId] = useState(() =>
@@ -188,42 +199,38 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
   const editorSessionIdRef = useRef(editorSessionId);
 
   useEffect(() => {
-    if (!activeDrag) return;
-
     function onPointerMove(e: PointerEvent) {
       if (overlayRef.current) {
         overlayRef.current.style.transform = "translate(" + (e.clientX + 10) + "px, " + (e.clientY - 18) + "px)";
       }
+
     }
 
-    window.addEventListener("pointermove", onPointerMove, { passive: true });
-    return () => window.removeEventListener("pointermove", onPointerMove);
-  }, [activeDrag]);
+    window.addEventListener("pointermove", onPointerMove, { capture: true, passive: true });
+    return () => window.removeEventListener("pointermove", onPointerMove, { capture: true });
+  }, [selectSection]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 5 } }),
   );
 
-  // Custom collision: for exercise drags, use the start-center point of the draggable
-  // rect to detect hover over section chips in the LeftPanel. This lets the section
-  // open as soon as the card's leading edge crosses into the chip — before the pointer
-  // physically reaches the LeftPanel. For everything else, fall back to pointer-within
-  // then closest-center.
+  // Exercise-to-section hover follows the pointer so compact section rows open as soon
+  // as they are targeted. Keyboard drags retain the draggable-rectangle fallback.
   const collisionDetection = useCallback<CollisionDetection>((args) => {
-    const { active, collisionRect, droppableContainers, droppableRects } = args;
+    const { active, collisionRect, droppableContainers, droppableRects, pointerCoordinates } = args;
 
-    if (active.data.current?.type === "exercise") {
-      const lcX = collisionRect.left;
-      const lcY = (collisionRect.top + collisionRect.bottom) / 2;
+    if (active.data.current?.type === "exercise" || dragStartDataRef.current?.type === "exercise") {
+      const targetX = pointerCoordinates?.x ?? collisionRect.left;
+      const targetY = pointerCoordinates?.y ?? (collisionRect.top + collisionRect.bottom) / 2;
 
       let bestId: UniqueIdentifier | null = null;
       let bestDy = Infinity;
 
       for (const [id, rect] of droppableRects) {
         if (droppableContainers.find((c) => c.id === id)?.data.current?.type !== "section") continue;
-        if (lcX >= rect.left && lcX <= rect.right && lcY >= rect.top && lcY <= rect.bottom) {
-          const dy = Math.abs(lcY - (rect.top + rect.bottom) / 2);
+        if (targetX >= rect.left && targetX <= rect.right && targetY >= rect.top && targetY <= rect.bottom) {
+          const dy = Math.abs(targetY - (rect.top + rect.bottom) / 2);
           if (dy < bestDy) { bestDy = dy; bestId = id; }
         }
       }
@@ -394,6 +401,15 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
     const dragType = active.data.current?.type as "section" | "exercise" | undefined;
     if (!dragType) return;
 
+    dragStartDataRef.current =
+      dragType === "exercise"
+        ? {
+            type: "exercise",
+            sectionId: active.data.current?.sectionId as string,
+          }
+        : { type: "section" };
+    dragHoveredSectionIdRef.current = selectedSectionId;
+
     // Remember which section was active so we can restore it if the drag is cancelled
     dragOriginalSectionIdRef.current = selectedSectionId;
 
@@ -401,6 +417,7 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
     const pe = activatorEvent as PointerEvent;
     const initX = pe.clientX ?? -9999;
     const initY = pe.clientY ?? -9999;
+    dragPointerStartRef.current = { x: initX, y: initY };
     setOverlayInitPos({ x: initX + 10, y: initY - 18 });
 
     const width = active.rect.current.initial?.width;
@@ -426,10 +443,27 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
     setActiveDrag({ id: active.id as string, type: dragType, name, width, exercise, exerciseSection });
   }
 
+  function handleDragMove({ delta }: DragMoveEvent) {
+    if (dragStartDataRef.current?.type !== "exercise") return;
+
+    const point = {
+      x: dragPointerStartRef.current.x + delta.x,
+      y: dragPointerStartRef.current.y + delta.y,
+    };
+    const sectionChip = document
+      .elementsFromPoint(point.x, point.y)
+      .map((element) => element.closest<HTMLElement>("[data-workout-section-id]"))
+      .find((element): element is HTMLElement => element !== null);
+    const sectionId = sectionChip?.dataset.workoutSectionId ?? null;
+    if (sectionId === dragHoveredSectionIdRef.current) return;
+    dragHoveredSectionIdRef.current = sectionId;
+    if (sectionId) selectSection(sectionId);
+  }
+
   // When an exercise is hovered over a section chip, open that section in the MiddlePanel
   // so the user can see where the exercise will land before releasing.
   function handleDragOver({ active, over }: DragOverEvent) {
-    if (active.data.current?.type !== "exercise") return;
+    if (active.data.current?.type !== "exercise" && dragStartDataRef.current?.type !== "exercise") return;
     if (over?.data.current?.type === "section") {
       selectSection(over.id as string);
     }
@@ -438,56 +472,64 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
   function handleDragEnd({ active, over }: DragEndEvent) {
     setActiveDrag(null);
 
+    const hoveredSectionId = dragHoveredSectionIdRef.current;
+    dragHoveredSectionIdRef.current = null;
+    const dragStartData = dragStartDataRef.current;
+
+    if (
+      dragStartData?.type === "exercise" &&
+      hoveredSectionId &&
+      hoveredSectionId !== dragStartData.sectionId
+    ) {
+      moveExercise(active.id as string, dragStartData.sectionId, hoveredSectionId);
+      selectSection(hoveredSectionId);
+      dragStartDataRef.current = null;
+      return;
+    }
+
     if (!over || active.id === over.id) {
       // Drag cancelled — restore the section that was open before the drag
       if (dragOriginalSectionIdRef.current) {
         selectSection(dragOriginalSectionIdRef.current);
       }
+      dragStartDataRef.current = null;
       return;
     }
 
-    const activeType = active.data.current?.type as string | undefined;
-    const overType = over.data.current?.type as string | undefined;
+    const operation = resolveWorkoutDragEnd({
+      activeId: active.id as string,
+      activeData: active.data.current,
+      dragStartData: dragStartDataRef.current,
+      overId: over.id as string,
+      overData: over.data.current,
+    });
+    dragStartDataRef.current = null;
 
-    if (activeType === "section") {
-      if (overType === "section") {
-        reorderSections(active.id as string, over.id as string);
-      }
-      return;
-    }
+    if (operation.type === "reorder-section") {
+      reorderSections(operation.fromSectionId, operation.toSectionId);
+    } else if (operation.type === "move-exercise") {
+      moveExercise(operation.exerciseId, operation.fromSectionId, operation.toSectionId);
+      selectSection(operation.toSectionId);
+    } else if (operation.type === "reorder-exercise") {
+      reorderExercises(
+        operation.sectionId,
+        operation.fromExerciseId,
+        operation.toExerciseId,
+      );
 
-    if (activeType === "exercise") {
-      const activeSectionId = active.data.current?.sectionId as string;
-
-      if (overType === "section") {
-        const targetSectionId = over.id as string;
-        if (activeSectionId !== targetSectionId) {
-          moveExercise(active.id as string, activeSectionId, targetSectionId);
-          selectSection(targetSectionId);
-        }
-        return;
-      }
-
-      if (overType === "exercise") {
-        const overSectionId = over.data.current?.sectionId as string;
-
-        if (activeSectionId === overSectionId) {
-          reorderExercises(activeSectionId, active.id as string, over.id as string);
-
-          // In complex_emom / even_odd, crossing group boundaries updates intervalAssignment
-          const section = sections.find((s) => s.localId === activeSectionId);
-          if (section && (section.format === "even_odd" || section.format === "complex_emom")) {
-            const activeEx = section.exercises.find((e) => e.localId === active.id);
-            const overEx = section.exercises.find((e) => e.localId === over.id);
-            if (activeEx && overEx && activeEx.intervalAssignment !== overEx.intervalAssignment) {
-              updateExercise(activeSectionId, active.id as string, {
-                intervalAssignment: overEx.intervalAssignment,
-              });
-            }
-          }
-        } else {
-          moveExercise(active.id as string, activeSectionId, overSectionId);
-          selectSection(overSectionId);
+      // In complex_emom / even_odd, crossing group boundaries updates intervalAssignment.
+      const section = sections.find((item) => item.localId === operation.sectionId);
+      if (section && (section.format === "even_odd" || section.format === "complex_emom")) {
+        const activeEx = section.exercises.find(
+          (exercise) => exercise.localId === operation.fromExerciseId,
+        );
+        const overEx = section.exercises.find(
+          (exercise) => exercise.localId === operation.toExerciseId,
+        );
+        if (activeEx && overEx && activeEx.intervalAssignment !== overEx.intervalAssignment) {
+          updateExercise(operation.sectionId, operation.fromExerciseId, {
+            intervalAssignment: overEx.intervalAssignment,
+          });
         }
       }
     }
@@ -507,6 +549,7 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
         sensors={sensors}
         collisionDetection={collisionDetection}
         onDragStart={handleDragStart}
+        onDragMove={handleDragMove}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >

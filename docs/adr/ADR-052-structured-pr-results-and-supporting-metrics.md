@@ -67,10 +67,11 @@ current result's contextual details corrects that result in place.
 - Added a pure Pantheon domain validator that normalizes accepted metrics,
   including the controlled text fields `equipment` and `variation`, and rejects
   unknown, negative, malformed, or blank values before persistence.
-- The PR form now exposes two explicit persistence modes. **Update** records a
-  new achieved result and archives the previous score, date, metrics, and note;
-  **Edit** corrects the selected current result in place without creating a
-  history row. Both modes enforce ownership through Application services.
+- The PR form exposes two explicit persistence modes. **Record Better Result**
+  records a new achieved result and archives the previous score, date, metrics,
+  and note; **Apply Edits** corrects the selected current result in place without
+  creating a history row. Both modes enforce ownership through Application
+  services.
 - The form retains the primary-unit dropdown and provides a unit-aware Add
   detail selector for reps, sets, load, time, distance, calories, rounds, and
   variation. Notes do not appear on Pantheon cards; they appear in PR history.

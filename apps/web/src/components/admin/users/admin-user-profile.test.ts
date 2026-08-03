@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
+import {
+  packageSubscriptionLabel,
+  visibleAdminProfileSections,
+} from "@/components/admin/users/admin-user-profile";
 
 describe("visibleAdminProfileSections", () => {
   it("keeps operational sections but removes empty person-history sections", () => {
@@ -29,5 +32,14 @@ describe("visibleAdminProfileSections", () => {
         },
       ),
     ).toEqual(["overview", "finance", "prs", "admin_actions"]);
+  });
+
+  it("uses a human package label and leaves a missing label empty", () => {
+    expect(packageSubscriptionLabel({ package_name: "Unlimited" })).toBe("Unlimited");
+    expect(packageSubscriptionLabel({ package_code_snapshot: "LEGACY" })).toBe("LEGACY");
+    expect(packageSubscriptionLabel({ package_code_snapshot: "live_coaching" })).toBe(
+      "Live Coaching",
+    );
+    expect(packageSubscriptionLabel({})).toBe("");
   });
 });

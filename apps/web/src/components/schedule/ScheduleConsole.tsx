@@ -13,6 +13,7 @@ import {
   approveBooking,
   createBooking,
   createScheduleSlot,
+  createScheduleSeries,
   deleteScheduleSlot,
   fetchSchedule,
   rejectBooking,
@@ -22,6 +23,7 @@ import {
   type ScheduleSlot,
   type ScheduleSlotPayload,
 } from "@/api/schedule";
+import { fetchAdminSettings, type SchedulingSettings } from "@/api/settings";
 import { listAdminWorkouts, type WorkoutRecord } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
@@ -33,10 +35,21 @@ import { SlotPopup } from "@/components/schedule/SlotPopup";
 import { TypeFilterChips } from "@/components/schedule/TypeFilterChips";
 import { subscribeToTopic } from "@/lib/realtime";
 import { useScheduleStore } from "@/stores/schedule";
+import { IntegerInput } from "@/components/integer-input";
 
 type SlotEditorState = {
   slotId: string | null;
   values: ScheduleSlotPayload;
+};
+
+type SeriesEditorState = {
+  values: Omit<ScheduleSlotPayload, "scheduled_at" | "master_workout_id">;
+  startDate: string;
+  endDate: string;
+  time: string;
+  weekdays: number[];
+  excludedDates: string;
+  timezone: string;
 };
 
 function formatDateTimeLocal(isoString: string) {
@@ -54,16 +67,19 @@ function defaultSlotValues(
   isoDate: string,
   workouts: WorkoutRecord[],
   classTypes: ClassTypeRecord[],
+  defaults?: SchedulingSettings,
 ): ScheduleSlotPayload {
   const date = new Date(`${isoDate}T09:00:00`);
 
   return {
     master_workout_id: workouts[0]?.id ?? "",
     class_type_id: classTypes.find((type) => !type.archived_at)?.id ?? "",
+    name: classTypes.find((type) => !type.archived_at)?.name ?? "",
+    duration_minutes: 60,
     scheduled_at: date.toISOString(),
-    capacity: 12,
-    auto_approve: false,
-    booking_timeout_minutes: 60,
+    capacity: defaults?.default_capacity ?? 12,
+    auto_approve: defaults?.default_auto_approve ?? false,
+    booking_timeout_minutes: defaults?.default_booking_timeout_minutes ?? 60,
   };
 }
 
@@ -95,6 +111,8 @@ export function ScheduleConsole({
   const [busy, setBusy] = useState(false);
   const [workouts, setWorkouts] = useState<WorkoutRecord[]>([]);
   const [editor, setEditor] = useState<SlotEditorState | null>(null);
+  const [seriesEditor, setSeriesEditor] = useState<SeriesEditorState | null>(null);
+  const [schedulingDefaults, setSchedulingDefaults] = useState<SchedulingSettings | undefined>();
   const appliedMobileDefault = useRef(false);
   const initialOpenHandledRef = useRef(false);
 
@@ -157,9 +175,12 @@ export function ScheduleConsole({
 
     let cancelled = false;
 
-    void listAdminWorkouts(token)
-      .then((nextWorkouts) => {
-        if (!cancelled) setWorkouts(nextWorkouts.filter((workout) => workout.status === "published"));
+    void Promise.all([listAdminWorkouts(token), fetchAdminSettings(token)])
+      .then(([nextWorkouts, settings]) => {
+        if (!cancelled) {
+          setWorkouts(nextWorkouts.filter((workout) => workout.status === "published"));
+          setSchedulingDefaults(settings.scheduling);
+        }
       })
       .catch(() => {
         if (!cancelled) setWorkouts([]);
@@ -286,6 +307,26 @@ export function ScheduleConsole({
     }
   }
 
+  async function deleteSelectedSlot() {
+    if (!tokens?.access_token || !selectedSlot) return;
+    if (!window.confirm(t("deleteSlot"))) return;
+
+    setBusy(true);
+    setError(null);
+
+    try {
+      await deleteScheduleSlot(tokens.access_token, selectedSlot.id);
+      setSelectedSlot(null);
+      await loadSchedule();
+    } catch (requestError) {
+      const message =
+        requestError instanceof ApiError ? localizeError(requestError, i18n) : t("failedToDeleteSlot");
+      setError(message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   function openCreateEditor(isoDate: string) {
     if (!workouts.length || !classTypes.some((type) => !type.archived_at)) {
       setError(t("createPrerequisites"));
@@ -294,8 +335,55 @@ export function ScheduleConsole({
 
     setEditor({
       slotId: null,
-      values: defaultSlotValues(isoDate, workouts, classTypes),
+      values: defaultSlotValues(isoDate, workouts, classTypes, schedulingDefaults),
     });
+  }
+
+  function openSeriesEditor() {
+    const base = defaultSlotValues(startDate, workouts, classTypes, schedulingDefaults);
+    setSeriesEditor({
+      values: {
+        class_type_id: base.class_type_id,
+        name: base.name,
+        duration_minutes: base.duration_minutes,
+        capacity: base.capacity,
+        auto_approve: base.auto_approve,
+        booking_timeout_minutes: base.booking_timeout_minutes,
+      },
+      startDate,
+      endDate: "",
+      time: "09:00",
+      weekdays: [new Date(`${startDate}T12:00:00`).getDay() || 7],
+      excludedDates: "",
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Etc/UTC",
+    });
+  }
+
+  async function saveSeries() {
+    if (!seriesEditor || !tokens?.access_token) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const result = await createScheduleSeries(tokens.access_token, {
+        ...seriesEditor.values,
+        timezone: seriesEditor.timezone,
+        starts_on: seriesEditor.startDate,
+        ends_on: seriesEditor.endDate || null,
+        local_start_time: `${seriesEditor.time}:00`,
+        weekdays: seriesEditor.weekdays,
+        excluded_dates: seriesEditor.excludedDates
+          .split(",")
+          .map((date) => date.trim())
+          .filter(Boolean),
+      });
+      if (!result.series.occurrence_count) setError(i18n("featureNoSeriesOccurrences"));
+      setSeriesEditor(null);
+      await loadSchedule();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : i18n("featureSeriesCreateFailed"));
+    } finally {
+      setBusy(false);
+    }
   }
 
   function openUpdateEditor(slot: ScheduleSlot) {
@@ -304,6 +392,8 @@ export function ScheduleConsole({
       values: {
         master_workout_id: slot.master_workout_id,
         class_type_id: slot.class_type_id,
+        name: slot.name,
+        duration_minutes: slot.duration_minutes,
         scheduled_at: slot.scheduled_at,
         capacity: slot.capacity,
         auto_approve: slot.auto_approve,
@@ -324,10 +414,12 @@ export function ScheduleConsole({
 
 
         <section className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-          <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-            <TypeFilterChips classTypes={classTypes} value={classTypeIds} onChange={setClassTypeIds} />
+          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
+            <div className="min-w-0">
+              <TypeFilterChips classTypes={classTypes} value={classTypeIds} onChange={setClassTypeIds} />
+            </div>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap justify-start gap-3 xl:justify-end">
               <ViewModeSelector
                 ariaLabel={t("calendarView")}
                 onChange={setDays}
@@ -361,6 +453,12 @@ export function ScheduleConsole({
             </div>
           </div>
         </section>
+
+        {isAdmin ? (
+          <div className="flex justify-end">
+            <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }} onClick={openSeriesEditor}>{i18n("featureCreateSeries")}</button>
+          </div>
+        ) : null}
 
         {error ? (
           <div className="rounded-[1.6rem] px-5 py-4 text-sm" style={{ background: "var(--primary)]/10", border: "1px solid var(--primary)30", color: "var(--primary-strong)" }}>
@@ -396,6 +494,7 @@ export function ScheduleConsole({
           onBook={() => setBookingTarget(selectedSlot)}
           onCancelBooking={() => void loadSchedule()}
           onClose={() => setSelectedSlot(null)}
+          onDelete={() => void deleteSelectedSlot()}
           onEdit={() => openUpdateEditor(selectedSlot)}
           onRejectBooking={(booking) => {
             setResolveMessage("");
@@ -470,6 +569,8 @@ export function ScheduleConsole({
               {[
                 { label: t("workout"), type: "select" as const },
                 { label: t("classType"), type: "select-type" as const },
+                { label: i18n("featureClassName"), type: "name" as const },
+                { label: i18n("featureDurationMinutes"), type: "number-duration" as const },
                 { label: t("scheduledAt"), type: "datetime" as const },
                 { label: t("capacity"), type: "number-cap" as const },
                 { label: t("timeoutMinutes"), type: "number-timeout" as const },
@@ -506,6 +607,32 @@ export function ScheduleConsole({
                         <option key={option.id} value={option.id}>{option.name}</option>
                       ))}
                     </select>
+                  ) : type === "name" ? (
+                    <input
+                      className="w-full rounded-2xl px-4 py-3 outline-none"
+                      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+                      maxLength={120}
+                      onChange={(event) =>
+                        setEditor((current) =>
+                          current ? { ...current, values: { ...current.values, name: event.target.value } } : current,
+                        )
+                      }
+                      value={editor.values.name}
+                    />
+                  ) : type === "number-duration" ? (
+                    <IntegerInput
+                      className="w-full rounded-2xl px-4 py-3 outline-none"
+                      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+                      min={1}
+                      max={1440}
+                      emptyValue={1}
+                      onValueChange={(durationMinutes) =>
+                        setEditor((current) =>
+                          current ? { ...current, values: { ...current.values, duration_minutes: durationMinutes ?? 1 } } : current,
+                        )
+                      }
+                      value={editor.values.duration_minutes}
+                    />
                   ) : type === "datetime" ? (
                     <input
                       className="w-full rounded-2xl px-4 py-3 outline-none"
@@ -519,29 +646,29 @@ export function ScheduleConsole({
                       value={editorDateValue}
                     />
                   ) : type === "number-cap" ? (
-                    <input
+                    <IntegerInput
                       className="w-full rounded-2xl px-4 py-3 outline-none"
                       style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                       min={1}
-                      onChange={(event) =>
+                      emptyValue={1}
+                      onValueChange={(capacity) =>
                         setEditor((current) =>
-                          current ? { ...current, values: { ...current.values, capacity: Number(event.target.value) || 1 } } : current,
+                          current ? { ...current, values: { ...current.values, capacity: capacity ?? 1 } } : current,
                         )
                       }
-                      type="number"
                       value={editor.values.capacity}
                     />
                   ) : (
-                    <input
+                    <IntegerInput
                       className="w-full rounded-2xl px-4 py-3 outline-none"
                       style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                       min={1}
-                      onChange={(event) =>
+                      emptyValue={1}
+                      onValueChange={(timeoutMinutes) =>
                         setEditor((current) =>
-                          current ? { ...current, values: { ...current.values, booking_timeout_minutes: Number(event.target.value) || 1 } } : current,
+                          current ? { ...current, values: { ...current.values, booking_timeout_minutes: timeoutMinutes ?? 1 } } : current,
                         )
                       }
-                      type="number"
                       value={editor.values.booking_timeout_minutes}
                     />
                   )}
@@ -586,7 +713,7 @@ export function ScheduleConsole({
                 <button
                   className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
                   style={{ background: "var(--text)", color: "var(--bg)" }}
-                  disabled={busy || !editor.values.master_workout_id || !editor.values.class_type_id}
+                  disabled={busy || !editor.values.master_workout_id || !editor.values.class_type_id || !editor.values.name.trim()}
                   onClick={() => void saveSlot()}
                   type="button"
                 >
@@ -594,6 +721,27 @@ export function ScheduleConsole({
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      ) : null}
+
+      {seriesEditor ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,.72)" }}>
+          <div className="w-full max-w-2xl rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+            <div className="flex items-center justify-between"><div><p className="text-xs font-semibold uppercase tracking-[.2em]" style={{ color: "var(--primary)" }}>{i18n("featureBatchScheduling")}</p><h3 className="mt-2 text-2xl font-semibold">{i18n("featureCreateClassSeries")}</h3></div><button type="button" onClick={() => setSeriesEditor(null)}>×</button></div>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <label className="text-sm font-semibold">{i18n("featureClassName")}<input className="mt-2 w-full rounded-xl px-3 py-2" maxLength={120} value={seriesEditor.values.name} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, name: event.target.value } })} /></label>
+              <label className="text-sm font-semibold">{i18n("featureDurationMinutes")}<IntegerInput className="mt-2 w-full rounded-xl px-3 py-2" min={1} max={1440} value={seriesEditor.values.duration_minutes} emptyValue={1} onValueChange={(durationMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, duration_minutes: durationMinutes ?? 1 } })} /></label>
+              <label className="text-sm font-semibold">{i18n("featureClassType")}<select className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.class_type_id} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, class_type_id: event.target.value } })}>{classTypes.filter((item) => !item.archived_at).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+              <label className="text-sm font-semibold">{i18n("featureStarts")}<input className="mt-2 w-full rounded-xl px-3 py-2" type="date" value={seriesEditor.startDate} onChange={(event) => setSeriesEditor({ ...seriesEditor, startDate: event.target.value })} /></label>
+              <label className="text-sm font-semibold">{i18n("featureEndsOptional")}<input className="mt-2 w-full rounded-xl px-3 py-2" min={seriesEditor.startDate} type="date" value={seriesEditor.endDate} onChange={(event) => setSeriesEditor({ ...seriesEditor, endDate: event.target.value })} /></label>
+              <label className="text-sm font-semibold">{i18n("featureTime")}<input className="mt-2 w-full rounded-xl px-3 py-2" type="time" value={seriesEditor.time} onChange={(event) => setSeriesEditor({ ...seriesEditor, time: event.target.value })} /></label>
+              <div className="text-sm font-semibold">{i18n("featureWeekdays")}<div className="mt-2 flex flex-wrap gap-2">{["featureMonday", "featureTuesday", "featureWednesday", "featureThursday", "featureFriday", "featureSaturday", "featureSunday"].map((key, index) => { const day = index + 1; return <button key={key} type="button" aria-pressed={seriesEditor.weekdays.includes(day)} className="rounded-full px-3 py-2 text-xs" style={{ background: seriesEditor.weekdays.includes(day) ? "var(--primary)" : "var(--panel-muted)", color: seriesEditor.weekdays.includes(day) ? "var(--primary-contrast)" : "var(--text-soft)" }} onClick={() => setSeriesEditor({ ...seriesEditor, weekdays: seriesEditor.weekdays.includes(day) ? seriesEditor.weekdays.filter((item) => item !== day) : [...seriesEditor.weekdays, day] })}>{i18n(key)}</button>; })}</div></div>
+              <label className="text-sm font-semibold">{i18n("featureExcludedDates")}<input className="mt-2 w-full rounded-xl px-3 py-2" placeholder="2026-08-15, 2026-12-25" value={seriesEditor.excludedDates} onChange={(event) => setSeriesEditor({ ...seriesEditor, excludedDates: event.target.value })} /><span className="mt-1 block text-xs font-normal" style={{ color: "var(--dim)" }}>{i18n("featureCommaSeparatedDates")}</span></label>
+              <label className="text-sm font-semibold">{i18n("featureTimezone")}<input className="mt-2 w-full rounded-xl px-3 py-2" readOnly value={seriesEditor.timezone} /></label>
+            </div>
+            <details className="mt-5 rounded-2xl p-4" style={{ background: "var(--panel-muted)" }}><summary className="cursor-pointer text-sm font-semibold">{i18n("featureOptionalClassSettings")}</summary><div className="mt-4 grid gap-3 sm:grid-cols-3"><label className="text-xs">{i18n("featureCapacity")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" min={1} value={seriesEditor.values.capacity} emptyValue={1} onValueChange={(capacity) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, capacity: capacity ?? 1 } })} /></label><label className="text-xs">{i18n("featureTimeoutMinutes")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" min={1} value={seriesEditor.values.booking_timeout_minutes} emptyValue={1} onValueChange={(timeoutMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, booking_timeout_minutes: timeoutMinutes ?? 1 } })} /></label><label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={seriesEditor.values.auto_approve} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, auto_approve: event.target.checked } })} />{i18n("featureAutoApprove")}</label></div></details>
+            <div className="mt-6 flex items-center justify-end"><div className="flex gap-2"><button type="button" className="rounded-full px-4 py-2" onClick={() => setSeriesEditor(null)}>{common("cancel")}</button><button type="button" disabled={busy || seriesEditor.weekdays.length === 0 || !seriesEditor.values.name.trim()} className="rounded-full px-5 py-2 font-semibold disabled:opacity-50" style={{ background: "var(--text)", color: "var(--bg)" }} onClick={() => void saveSeries()}>{busy ? i18n("featureCreating") : i18n("featureCreateSeries")}</button></div></div>
           </div>
         </div>
       ) : null}

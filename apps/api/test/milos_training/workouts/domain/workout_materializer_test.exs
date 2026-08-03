@@ -90,6 +90,56 @@ defmodule MilosTraining.Workouts.Domain.WorkoutMaterializerTest do
     assert e2.load_value == 20
   end
 
+  test "variation overrides per-set prescriptions and load progression without changing groups or notes" do
+    group_id = Ecto.UUID.generate()
+
+    workout = %{
+      id: "wod-sets",
+      sections: [
+        %{
+          id: "s1",
+          note: "Section note",
+          exercises: [
+            %{
+              id: "e1",
+              item_type: "exercise",
+              name: "Front squat",
+              note: "Stay upright",
+              sets: 2,
+              superset_group_id: group_id,
+              alternating_group_id: nil,
+              set_prescriptions: [
+                %{set_index: 1, prescription_value: 5, load_value: 70},
+                %{set_index: 2, prescription_value: 3, load_value: 75}
+              ],
+              load_progression: %{"direction" => "increase"},
+              variations: [
+                %{
+                  scale_level: @scaled,
+                  set_prescriptions: [
+                    %{set_index: 1, prescription_value: 5, load_value: 50},
+                    %{set_index: 2, prescription_value: 3, load_value: 55}
+                  ],
+                  load_progression: %{"direction" => "increase"},
+                  note: "Scaled note"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+
+    exercise =
+      workout
+      |> WorkoutMaterializer.materialize("scaled")
+      |> get_exercise("e1")
+
+    assert Enum.map(exercise.set_prescriptions, & &1.load_value) == [50, 55]
+    assert exercise.superset_group_id == group_id
+    assert exercise.note == "Scaled note"
+  end
+
   defp get_exercise(instance, exercise_id) do
     instance.sections
     |> Enum.flat_map(& &1.exercises)

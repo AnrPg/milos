@@ -61,12 +61,17 @@ export async function sendMessage(
   threadId: string,
   body: string,
   messageType: MessageType = "chat",
+  clientOperationId?: string,
 ) {
   return apiRequest<{ message: ChatMessage }>(`/threads/${threadId}/messages`, {
     method: "POST",
     token,
-    body: { body, message_type: messageType },
-  });
+    body: {
+      body,
+      message_type: messageType,
+      ...(clientOperationId ? { client_operation_id: clientOperationId } : {}),
+    },
+  }).then((response) => response.message);
 }
 
 export async function markThreadRead(token: string, threadId: string, lastMessageId: string) {

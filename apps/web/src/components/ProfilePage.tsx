@@ -16,6 +16,8 @@ import { fetchMyReviews } from "@/api/reviews";
 import { getAvatarUploadUrl, updateAvatar, updateProfile } from "@/api/profile";
 import { fetchGamificationPreferences, updateGamificationPreferences } from "@/api/gamification";
 import { ReviewList } from "@/components/my-reviews";
+import { AvatarEditorModal } from "@/components/profile/AvatarEditorModal";
+import { isSupportedAvatarSource } from "@/components/profile/avatar-crop";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -139,6 +141,7 @@ export function ProfilePage() {
   const [avatarPending, setAvatarPending] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(user?.avatar_url ?? null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const queryClient = useQueryClient();
@@ -267,11 +270,21 @@ export function ProfilePage() {
       const result = await updateAvatar(tokens.access_token, key);
       broadcastUserUpdate(result.user);
       setAvatarPreview(result.user.avatar_url);
+      setAvatarFile(null);
     } catch (err) {
       setAvatarError(err instanceof Error ? localizeError(err, i18n) : i18n("avatarUploadFailed8d620ac"));
     } finally {
       setAvatarPending(false);
     }
+  }
+
+  function selectAvatarFile(file: File) {
+    setAvatarError(null);
+    if (!isSupportedAvatarSource(file)) {
+      setAvatarError(tProfile("avatarUnsupportedType"));
+      return;
+    }
+    setAvatarFile(file);
   }
 
   async function handleLanguageChange(nextLocale: AppLocale) {
@@ -304,6 +317,18 @@ export function ProfilePage() {
           </h1>
         </div>
         </TransientHero>
+
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            form="profile-personal-form"
+            disabled={personalPending}
+            className="rounded-xl px-6 py-2.5 text-sm font-semibold disabled:opacity-50"
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+          >
+            {personalPending ? i18n("saving56a2285") : i18n("saveChanges179359b")}
+          </button>
+        </div>
 
         <CollapsibleSection
           id="language-region"
@@ -397,7 +422,7 @@ export function ProfilePage() {
           description={i18n("nicknameAndPassword3e84316")}
           defaultOpen
         >
-          <form className="space-y-5" onSubmit={(e) => void handlePersonalSave(e)}>
+          <form id="profile-personal-form" className="space-y-5" onSubmit={(e) => void handlePersonalSave(e)}>
             <FieldGroup label={i18n("nicknamece2bd99")}>
               <TextInput
                 value={nicknameValue}
@@ -518,13 +543,18 @@ export function ProfilePage() {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/avif,.jpg,.jpeg,.png,.webp,.gif,.bmp,.avif"
               className="hidden"
               onChange={(e) => {
                 const file = e.target.files?.[0];
-                if (file) void handleAvatarFile(file);
+                if (file) selectAvatarFile(file);
+                e.target.value = "";
               }}
             />
+
+            <p className="text-xs leading-5" style={{ color: "var(--muted)" }}>
+              {tProfile("avatarFormatHelp")}
+            </p>
 
             <button
               type="button"
@@ -547,6 +577,16 @@ export function ProfilePage() {
             )}
           </div>
         </CollapsibleSection>
+
+        {avatarFile ? (
+          <AvatarEditorModal
+            file={avatarFile}
+            pending={avatarPending}
+            uploadError={avatarError}
+            onCancel={() => setAvatarFile(null)}
+            onSave={handleAvatarFile}
+          />
+        ) : null}
 
         <CollapsibleSection
           id="account-activity"

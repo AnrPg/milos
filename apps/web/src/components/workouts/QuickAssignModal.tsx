@@ -5,7 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
-import { localizeError } from "@/i18n/presentation";
+import { localizeAdminAssignmentError } from "@/i18n/presentation";
 import { useEffect, useId, useState } from "react";
 
 import { assignWorkout, listAthletes, type AthleteOption } from "@/api/assigned-workouts";
@@ -126,7 +126,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
       });
       onAssigned();
     } catch (err) {
-      setError(err instanceof Error ? localizeError(err, i18n) : i18n("couldNotAssignWorkout58ad222"));
+      setError(err instanceof Error ? localizeAdminAssignmentError(err, i18n) : i18n("couldNotAssignWorkout58ad222"));
     } finally {
       setSaving(false);
     }

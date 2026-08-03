@@ -19,6 +19,11 @@ defmodule MilosTraining.Workouts.Ports.WorkoutStore do
   @callback list_assigned_workouts_for_admin(Date.t(), Date.t()) :: [map()]
   @callback list_workout_change_targets(binary()) :: [map()]
   @callback list_workouts() :: [map()]
+  @callback list_folders() :: [map()]
+  @callback create_folder(binary(), map()) :: {:ok, map()} | {:error, term()}
+  @callback update_folder(binary(), map()) :: {:ok, map()} | {:error, term()}
+  @callback delete_folder(binary()) :: :ok | {:error, term()}
+  @callback update_library_metadata(binary(), map()) :: {:ok, map()} | {:error, term()}
   @callback list_scale_levels() :: [map()]
   @callback replace_scale_levels([map()]) :: {:ok, [map()]} | {:error, Ecto.Changeset.t()}
   @callback reject_assignment_for_athlete(binary(), binary()) ::
@@ -29,7 +34,7 @@ defmodule MilosTraining.Workouts.Ports.WorkoutStore do
               {:ok, map()} | {:error, :not_found | :not_published}
   @callback get_assigned_workout(Ecto.UUID.t()) :: map() | nil
   @callback get_assignment_execution_access(Ecto.UUID.t(), Ecto.UUID.t()) :: map() | nil
-  @callback duplicate_workout(Ecto.UUID.t(), String.t()) ::
+  @callback duplicate_workout(Ecto.UUID.t(), String.t(), map()) ::
               {:ok, map()} | {:error, :not_found}
   @callback substitute_assignment_workout(Ecto.UUID.t(), Ecto.UUID.t()) ::
               {:ok, map()} | {:error, :not_found}

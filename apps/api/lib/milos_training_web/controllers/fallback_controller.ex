@@ -88,6 +88,53 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "not_found", error: "Not found"})
   end
 
+  def call(conn, {:error, :stale_dsl_revision}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "stale_dsl_revision",
+      error:
+        "The Quick Text source changed in another editor. Reload before saving or publishing."
+    })
+  end
+
+  def call(conn, {:error, {:dsl_warnings_require_acknowledgement, diagnostics}}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "dsl_warnings_require_acknowledgement",
+      error: "Review and acknowledge the Quick Text warnings before publishing.",
+      diagnostics: Enum.map(diagnostics, &json_dsl_diagnostic/1)
+    })
+  end
+
+  def call(conn, {:error, reason})
+      when reason in [
+             :invalid_canonical_workout,
+             :missing_workout_title,
+             :missing_workout_type,
+             :invalid_sections,
+             :empty_execution_sequence,
+             :invalid_execution_timer_segment
+           ] do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: to_string(reason),
+      error: "The canonical workout failed publication preflight."
+    })
+  end
+
+  def call(conn, {:error, {:unknown_scale_level, slug}}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "unknown_scale_level",
+      error: "The workout references an inactive or unknown scale level.",
+      params: %{slug: slug}
+    })
+  end
+
   def call(conn, {:error, {:class_type_replacement_required, future_class_count}}) do
     conn
     |> put_status(:conflict)
@@ -161,7 +208,72 @@ defmodule MilosTrainingWeb.FallbackController do
     |> put_status(:unprocessable_entity)
     |> json(%{
       code: "invalid_avatar_upload",
-      error: "Avatar must be a verified JPEG, PNG, or WebP up to 5 MiB"
+      error: "Use a JPG, JPEG, PNG, WebP, GIF, BMP, or AVIF image up to 5 MiB"
+    })
+  end
+
+  def call(conn, {:error, :avatar_upload_missing}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "avatar_upload_missing",
+      error: "The avatar upload was not found in storage. Upload the image again."
+    })
+  end
+
+  def call(conn, {:error, :avatar_upload_unverified}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "avatar_upload_unverified",
+      error: "Avatar storage rejected server verification for this upload."
+    })
+  end
+
+  def call(conn, {:error, :unsupported_avatar_type}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "unsupported_avatar_type",
+      error:
+        "The uploaded file is not a supported image. Use JPG, JPEG, PNG, WebP, GIF, BMP, or AVIF."
+    })
+  end
+
+  def call(conn, {:error, :avatar_upload_metadata_missing}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "avatar_upload_metadata_missing",
+      error: "The uploaded avatar is missing storage size metadata. Upload the image again."
+    })
+  end
+
+  def call(conn, {:error, {:avatar_too_large, byte_size}}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "avatar_too_large",
+      params: %{byte_size: byte_size, max_bytes: 5_242_880},
+      error: "The uploaded avatar is larger than 5 MiB."
+    })
+  end
+
+  def call(conn, {:error, :avatar_key_forbidden}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "avatar_key_forbidden",
+      error: "The avatar upload does not belong to the current user."
+    })
+  end
+
+  def call(conn, {:error, :avatar_storage_unavailable}) do
+    conn
+    |> put_status(:service_unavailable)
+    |> json(%{
+      code: "avatar_storage_unavailable",
+      error: "Avatar storage could not be reached for verification. Try again shortly."
     })
   end
 
@@ -569,7 +681,18 @@ defmodule MilosTrainingWeb.FallbackController do
     |> put_status(:forbidden)
     |> json(%{
       code: "finance_channel_not_included",
-      error: "Package channel not included"
+      error: "Package channel not included",
+      params: %{channel: "the required service"}
+    })
+  end
+
+  def call(conn, {:error, :finance_channel_not_included, details}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "finance_channel_not_included",
+      error: "Package channel not included",
+      params: details
     })
   end
 
@@ -578,7 +701,18 @@ defmodule MilosTrainingWeb.FallbackController do
     |> put_status(:forbidden)
     |> json(%{
       code: "finance_capability_not_included",
-      error: "Package capability not included"
+      error: "Package capability not included",
+      params: %{capability: "the required benefit"}
+    })
+  end
+
+  def call(conn, {:error, :finance_capability_not_included, details}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "finance_capability_not_included",
+      error: "Package capability not included",
+      params: details
     })
   end
 
@@ -587,7 +721,18 @@ defmodule MilosTrainingWeb.FallbackController do
     |> put_status(:forbidden)
     |> json(%{
       code: "finance_allowance_not_included",
-      error: "Package allowance not included"
+      error: "Package allowance not included",
+      params: %{allowance: "the required usage"}
+    })
+  end
+
+  def call(conn, {:error, :finance_allowance_not_included, details}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "finance_allowance_not_included",
+      error: "Package allowance not included",
+      params: details
     })
   end
 
@@ -840,6 +985,15 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "already_booked", error: "User already booked this slot"})
   end
 
+  def call(conn, {:error, :slot_not_booked_by_member}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "slot_not_booked_by_member",
+      error: "Choose a class booked by this member on the selected day"
+    })
+  end
+
   def call(conn, {:error, :booking_not_pending}) do
     conn
     |> put_status(:conflict)
@@ -868,6 +1022,16 @@ defmodule MilosTrainingWeb.FallbackController do
     conn
     |> put_status(:internal_server_error)
     |> json(%{code: "unexpected_server_error", error: "Unexpected server error"})
+  end
+
+  defp json_dsl_diagnostic(diagnostic) do
+    %{
+      code: to_string(diagnostic.code),
+      severity: to_string(diagnostic.severity),
+      line: diagnostic.line,
+      column: diagnostic.column,
+      params: Map.new(diagnostic.params, fn {key, value} -> {to_string(key), value} end)
+    }
   end
 
   defp translate_error({msg, opts}) do

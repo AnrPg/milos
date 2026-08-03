@@ -24,15 +24,89 @@ export function buildStepId(
 }
 
 export function buildSegmentStepIds(segment: TimerSegment) {
-  return segment.exercises
-    .filter((exercise) => !exercise.excluded)
-    .flatMap((exercise) => {
-      const setCount = exercise.sets && exercise.sets > 1 ? exercise.sets : 1;
+  return buildSegmentStepDefinitions(segment).map((step) => step.stepId);
+}
 
-      return Array.from({ length: setCount }, (_, index) =>
-        buildStepId(segment, exercise, setCount, index + 1),
+export type SegmentStepDefinition = {
+  stepId: string;
+  exercise: TimerSegment["exercises"][number];
+  setNumber: number;
+  setCount: number;
+  setPrescription: NonNullable<TimerSegment["exercises"][number]["set_prescriptions"]>[number] | null;
+  groupKind: "superset" | "alternating" | null;
+  groupId: string | null;
+};
+
+export function buildSegmentStepDefinitions(segment: TimerSegment): SegmentStepDefinition[] {
+  const exercises = segment.exercises.filter(
+    (exercise) => !exercise.excluded && exercise.item_type !== "header",
+  );
+  const consumedGroups = new Set<string>();
+  const steps: SegmentStepDefinition[] = [];
+
+  for (const exercise of exercises) {
+    const groupKind = exercise.superset_group_id
+      ? "superset"
+      : exercise.alternating_group_id
+        ? "alternating"
+        : null;
+    const groupId = exercise.superset_group_id ?? exercise.alternating_group_id ?? null;
+
+    if (groupKind && groupId) {
+      if (consumedGroups.has(groupId)) continue;
+      consumedGroups.add(groupId);
+      const members = exercises.filter((candidate) =>
+        groupKind === "superset"
+          ? candidate.superset_group_id === groupId
+          : candidate.alternating_group_id === groupId,
       );
-    });
+      const maxSets = Math.max(...members.map(exerciseSetCount));
+
+      for (let setNumber = 1; setNumber <= maxSets; setNumber += 1) {
+        for (const member of members) {
+          const setCount = exerciseSetCount(member);
+          if (setNumber > setCount) continue;
+          steps.push(stepDefinition(segment, member, setNumber, setCount, groupKind, groupId));
+        }
+      }
+
+      continue;
+    }
+
+    const setCount = exerciseSetCount(exercise);
+    for (let setNumber = 1; setNumber <= setCount; setNumber += 1) {
+      steps.push(stepDefinition(segment, exercise, setNumber, setCount, null, null));
+    }
+  }
+
+  return steps;
+}
+
+function stepDefinition(
+  segment: TimerSegment,
+  exercise: TimerSegment["exercises"][number],
+  setNumber: number,
+  setCount: number,
+  groupKind: SegmentStepDefinition["groupKind"],
+  groupId: string | null,
+): SegmentStepDefinition {
+  return {
+    stepId: buildStepId(segment, exercise, setCount, setNumber),
+    exercise,
+    setNumber,
+    setCount,
+    setPrescription:
+      exercise.set_prescriptions?.find((set) => set.set_index === setNumber) ?? null,
+    groupKind,
+    groupId,
+  };
+}
+
+function exerciseSetCount(exercise: TimerSegment["exercises"][number]) {
+  if (exercise.set_prescriptions && exercise.set_prescriptions.length > 0) {
+    return exercise.set_prescriptions.length;
+  }
+  return exercise.sets && exercise.sets > 1 ? exercise.sets : 1;
 }
 
 export function isRepeatableSegment(segment: TimerSegment) {
@@ -188,17 +262,10 @@ function cycleReps(segment: TimerSegment) {
 }
 
 function stepDefinitions(segment: TimerSegment) {
-  return segment.exercises
-    .filter((exercise) => !exercise.excluded)
-    .flatMap((exercise) => {
-      const setCount = exercise.sets && exercise.sets > 1 ? exercise.sets : 1;
-      const reps = exercise.prescription_value ?? 1;
-
-      return Array.from({ length: setCount }, (_, index) => ({
-        stepId: buildStepId(segment, exercise, setCount, index + 1),
-        reps,
-      }));
-    });
+  return buildSegmentStepDefinitions(segment).map((step) => ({
+    stepId: step.stepId,
+    reps: step.setPrescription?.prescription_value ?? step.exercise.prescription_value ?? 1,
+  }));
 }
 
 function dynamicReps(

@@ -125,7 +125,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
           "status" => "active",
           "starts_on" => Date.utc_today(),
           "ends_on" => subscription.ends_on,
-          "package_code_snapshot" => replacement.code,
+          "package_code_snapshot" => package_identity_snapshot(replacement),
           "package_family_snapshot" => replacement.family,
           "billing_period_snapshot" => replacement.billing_period,
           "price_cents_snapshot" => replacement.base_price_cents,
@@ -249,7 +249,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
           |> Map.merge(%{
             "membership_id" => membership.id,
             "membership_package_id" => package.id,
-            "package_code_snapshot" => package.code,
+            "package_code_snapshot" => package_identity_snapshot(package),
             "package_family_snapshot" => package.family,
             "billing_period_snapshot" => package.billing_period,
             "price_cents_snapshot" => package.base_price_cents,
@@ -299,6 +299,92 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         normalize_payment(payment)
       else
         nil -> Repo.rollback(:not_found)
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+  end
+
+  @impl true
+  def create_receipt(membership_id, params) do
+    params = string_key_map(params)
+    amount_cents = parse_integer(params["amount_cents"], 0)
+    paid_on = parse_date(params["paid_on"], Date.utc_today())
+    description = params["description"] || params["notes"] || "Payment received"
+    currency = params["currency"] || "EUR"
+
+    Repo.transaction(fn ->
+      invoice_params = %{
+        "invoice_type" => "manual",
+        "issue_date" => paid_on,
+        "due_date" => paid_on,
+        "currency" => currency,
+        "amount_cents" => amount_cents,
+        "description" => description,
+        "membership_package_subscription_id" => params["membership_package_subscription_id"],
+        "notes" => params["notes"],
+        "params" => %{
+          "document_kind" => "receipt",
+          "idempotency_key" => params["idempotency_key"]
+        }
+      }
+
+      with true <- amount_cents > 0 || {:error, :invalid_receipt_amount},
+           {:ok, invoice} <- create_invoice(membership_id, invoice_params),
+           {:ok, _issued_invoice} <-
+             issue_invoice(invoice.id, %{"issue_date" => paid_on, "due_date" => paid_on}),
+           {:ok, payment} <-
+             record_payment(membership_id, %{
+               "finance_invoice_id" => invoice.id,
+               "membership_package_subscription_id" =>
+                 params["membership_package_subscription_id"],
+               "amount_cents" => amount_cents,
+               "currency" => currency,
+               "paid_on" => paid_on,
+               "payment_method" => params["payment_method"] || "cash",
+               "payment_status" => "paid",
+               "notes" => params["notes"],
+               "params" => %{
+                 "document_kind" => "receipt",
+                 "idempotency_key" => params["idempotency_key"],
+                 "created_by_id" => params["created_by_id"]
+               }
+             }) do
+        paid_invoice =
+          FinanceInvoice
+          |> Repo.get!(invoice.id)
+          |> normalize_invoice_with_balance()
+
+        package_subscription =
+          case paid_invoice.membership_package_subscription_id do
+            nil ->
+              nil
+
+            subscription_id ->
+              MembershipPackageSubscription
+              |> Repo.get(subscription_id)
+              |> case do
+                nil -> nil
+                subscription -> normalize_subscription(subscription)
+              end
+          end
+
+        %{
+          document_type: "receipt",
+          reference: paid_invoice.invoice_number,
+          issued_on: paid_on,
+          amount_cents: amount_cents,
+          currency: currency,
+          description: description,
+          membership_package_subscription_id: paid_invoice.membership_package_subscription_id,
+          package_name: package_subscription && package_subscription.package_name,
+          package_code_snapshot:
+            package_subscription && package_subscription.package_code_snapshot,
+          package_family_snapshot:
+            package_subscription && package_subscription.package_family_snapshot,
+          invoice: paid_invoice,
+          payment: payment
+        }
+      else
         {:error, reason} -> Repo.rollback(reason)
       end
     end)
@@ -1062,12 +1148,26 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         %{id: nil, decision: %{remaining: :not_metered}, observed?: true}
 
       {:error, reason} ->
-        Repo.rollback(reason)
+        case entitlement_denial_details(reason, policy_request) do
+          nil -> Repo.rollback(reason)
+          details -> Repo.rollback({reason, details})
+        end
 
       {:error, reason, details} ->
         Repo.rollback({reason, details})
     end
   end
+
+  defp entitlement_denial_details(:finance_channel_not_included, request),
+    do: %{channel: Map.get(request, :channel)}
+
+  defp entitlement_denial_details(:finance_capability_not_included, request),
+    do: %{capability: Map.get(request, :capability)}
+
+  defp entitlement_denial_details(:finance_allowance_not_included, request),
+    do: %{allowance: Map.get(request, :allowance)}
+
+  defp entitlement_denial_details(_reason, _request), do: nil
 
   defp authorize_missing_profile!(request) do
     case EntitlementPolicy.authorize(nil, request,
@@ -1253,6 +1353,18 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       metadata: entry.metadata,
       inserted_at: entry.inserted_at
     }
+  end
+
+  defp package_identity_snapshot(package) do
+    [package.code, package.name, package.family]
+    |> Enum.find_value(fn
+      value when is_binary(value) ->
+        trimmed = String.trim(value)
+        if trimmed == "", do: nil, else: trimmed
+
+      _ ->
+        nil
+    end)
   end
 
   defp serialize_entitlement_plan(plan) do
@@ -3068,6 +3180,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   end
 
   defp normalize_subscription(%MembershipPackageSubscription{} = subscription) do
+    package = Repo.get(MembershipPackage, subscription.membership_package_id)
+
     %{
       id: subscription.id,
       membership_id: subscription.membership_id,
@@ -3075,6 +3189,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       status: subscription.status,
       starts_on: subscription.starts_on,
       ends_on: subscription.ends_on,
+      package_name: package && package.name,
       package_code_snapshot: subscription.package_code_snapshot,
       package_family_snapshot: subscription.package_family_snapshot,
       billing_period_snapshot: subscription.billing_period_snapshot,
@@ -3431,7 +3546,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         %{
           payment_reminder_interval_days: 7,
           entitlement_enforcement_mode: "observe",
-          entitlement_timezone: "Europe/Athens"
+          entitlement_timezone: "Europe/Athens",
+          document_mode: "invoice"
         }
 
       settings ->
@@ -3462,6 +3578,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       payment_reminder_interval_days: s.payment_reminder_interval_days,
       entitlement_enforcement_mode: s.entitlement_enforcement_mode,
       entitlement_timezone: s.entitlement_timezone,
+      document_mode: s.document_mode,
       inserted_at: s.inserted_at,
       updated_at: s.updated_at
     }

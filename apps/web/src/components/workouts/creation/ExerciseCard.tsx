@@ -12,7 +12,7 @@ import { CSS } from "@dnd-kit/utilities";
 
 import type { ScaleLevel } from "@/api/workouts";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
-import { FORMAT_EXERCISE_CONTEXT, type DraftExercise, type DraftSection, type LoadMode, type PrescriptionUnit } from "@/types/workout";
+import { concreteSetPrescriptions, FORMAT_EXERCISE_CONTEXT, type DraftExercise, type DraftSection, type LoadMode, type PrescriptionUnit } from "@/types/workout";
 
 import { AdvancedSettingsPanel } from "./AdvancedSettingsPanel";
 import { NumberStepper } from "./NumberStepper";
@@ -27,14 +27,21 @@ type Props = {
   section: DraftSection;
   scaleLevels: ScaleLevel[];
   sectionOptions: Array<{ id: string; name: string }>;
+  selected?: boolean;
+  onSelectedChange?: (selected: boolean) => void;
+  grouped?: boolean;
+  groupColor?: string;
 };
 
-export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }: Props) {
+export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions, selected = false, onSelectedChange, grouped = false, groupColor }: Props) {
   const i18n = useUiTranslations();
   const LOAD_LABELS: Record<LoadMode, string> = { absolute: i18n("kilogramsUnit"), pct_1rm: i18n("percentOneRepMaxUnit"), bw: i18n("bw4d64743") };
 
   const { updateExercise, toggleVariationsPanel, toggleAdvancedPanel } = useWorkoutCreationStore();
   const [noteOpen, setNoteOpen] = useState(() => Boolean(exercise.note));
+  const [detailsPinned, setDetailsPinned] = useState(false);
+  const [detailsHovered, setDetailsHovered] = useState(false);
+  const detailsOpen = detailsPinned || detailsHovered;
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: exercise.localId,
     data: { type: "exercise", sectionId: section.localId },
@@ -294,103 +301,97 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
     );
   }
 
-  // ── Progressive load panel ────────────────────────────────────────────────
+  function renderSetDetailsPanel() {
+    if (!ctx.showSets) {
+      return (
+        <div
+          className="flex flex-wrap items-center gap-3 border-t px-4 py-3"
+          style={{ borderColor: "var(--dim)" }}
+        >
+          {renderClusters()}
+          {renderPrescription()}
+          {renderLoad()}
+        </div>
+      );
+    }
 
-  function renderProgressiveLoadPanel() {
-    if (!ctx.showLoad || !exercise.loadProgression || exercise.loadMode === "bw") return null;
-    const prog = exercise.loadProgression;
+    if (exercise.sets < 1) return null;
+    const setRows = concreteSetPrescriptions(exercise);
 
     return (
       <div className="border-t px-4 py-3" style={{ borderColor: "var(--dim)" }}>
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-            {i18n("loadProgression1c3f8ed")}
-          </span>
-          <button
-            type="button"
-            onClick={() =>
-              update({
-                loadProgression: {
-                  ...prog,
-                  mode: prog.mode === "linear" ? "per_set" : "linear",
-                  perSetValues: [],
-                },
-              })
-            }
-            className="rounded-lg px-2 py-0.5 text-xs font-semibold"
-            style={{ background: "var(--bg)", border: "1px solid var(--dim)", color: "var(--muted)" }}
-          >
-            {prog.mode === "linear" ? i18n("linearaf502f2") : i18n("perSet1e0dfe5")} ⟳
-          </button>
-
-          {prog.mode === "linear" ? (
-            <>
+        <div className="mb-2 text-xs font-bold uppercase" style={{ color: "var(--muted)" }}>
+          {i18n("setDetailsLabel")}
+        </div>
+        {ctx.showClusters ? <div className="mb-2">{renderClusters()}</div> : null}
+        <div className="space-y-2">
+          {setRows.map((setRow, index) => (
+            <div
+              className="grid items-center gap-2 sm:grid-cols-[auto_1fr_1fr_1fr]"
+              key={setRow.setIndex}
+            >
+              <span className="text-xs font-bold" style={{ color: "var(--dim)" }}>
+                {i18n("setNumberLabel", { number: setRow.setIndex })}
+              </span>
               <div className="flex items-center gap-1">
-                <span className="text-xs" style={{ color: "var(--muted)" }}>
-                  {i18n("start952f375")}
-                </span>
                 <NumberStepper
-                  value={prog.startValue}
-                  onChange={(value) => update({ loadProgression: { ...prog, startValue: value } })}
                   min={1}
+                  onChange={(value) => {
+                    const next = [...setRows];
+                    next[index] = { ...setRow, prescriptionValue: value };
+                    update({ setPrescriptions: next });
+                  }}
+                  value={setRow.prescriptionValue ?? exercise.prescriptionValue}
                 />
                 <UnitCycler
-                  options={LOAD_MODES}
-                  value={prog.startMode}
-                  onChange={(mode) => update({ loadProgression: { ...prog, startMode: mode } })}
-                  labels={LOAD_LABELS}
+                  onChange={(value) => {
+                    const next = [...setRows];
+                    next[index] = { ...setRow, prescriptionUnit: value };
+                    update({ setPrescriptions: next });
+                  }}
+                  options={PRESCRIPTION_UNITS}
+                  value={setRow.prescriptionUnit ?? exercise.prescriptionUnit}
                 />
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-xs" style={{ color: "var(--muted)" }}>
-                  +
-                </span>
-                <NumberStepper
-                  value={prog.stepValue}
-                  onChange={(value) => update({ loadProgression: { ...prog, stepValue: value } })}
+                <input
+                  className="w-14 bg-transparent text-center text-sm outline-none"
                   min={0}
+                  onChange={(event) => {
+                    const next = [...setRows];
+                    next[index] = {
+                      ...setRow,
+                      loadValue: event.target.value === "" ? null : Number(event.target.value),
+                    };
+                    update({ setPrescriptions: next });
+                  }}
+                  type="number"
+                  value={setRow.loadValue ?? ""}
                 />
-                <span className="text-xs" style={{ color: "var(--muted)" }}>
-                  {i18n("set71c16be")}
-                </span>
+                <UnitCycler
+                  labels={LOAD_LABELS}
+                  onChange={(value) => {
+                    const next = [...setRows];
+                    next[index] = { ...setRow, loadMode: value };
+                    update({ setPrescriptions: next });
+                  }}
+                  options={LOAD_MODES}
+                  value={setRow.loadMode ?? exercise.loadMode}
+                />
               </div>
-            </>
-          ) : (
-            <div className="flex flex-wrap items-center gap-2">
-              {Array.from({ length: exercise.sets }, (_, i) => (
-                <div key={i} className="flex items-center gap-0.5">
-                  <span className="text-xs" style={{ color: "var(--dim)" }}>
-                    {i18n("s02aa629")}{i + 1}
-                  </span>
-                  <NumberStepper
-                    value={prog.perSetValues[i] ?? prog.startValue}
-                    onChange={(value) => {
-                      const next = [...prog.perSetValues];
-                      while (next.length <= i) next.push(prog.startValue);
-                      next[i] = value;
-                      update({ loadProgression: { ...prog, perSetValues: next } });
-                    }}
-                    min={0}
-                  />
-                </div>
-              ))}
-              <UnitCycler
-                options={LOAD_MODES}
-                value={prog.startMode}
-                onChange={(mode) => update({ loadProgression: { ...prog, startMode: mode } })}
-                labels={LOAD_LABELS}
+              <input
+                className="min-w-0 bg-transparent text-xs outline-none"
+                onChange={(event) => {
+                  const next = [...setRows];
+                  next[index] = { ...setRow, note: event.target.value || null };
+                  update({ setPrescriptions: next });
+                }}
+                placeholder={i18n("setNotePlaceholder")}
+                type="text"
+                value={setRow.note ?? ""}
               />
             </div>
-          )}
-
-          <button
-            type="button"
-            onClick={() => update({ loadProgression: null })}
-            className="ms-auto text-xs"
-            style={{ color: "var(--dim)" }}
-          >
-            {i18n("removee963907")}
-          </button>
+          ))}
         </div>
       </div>
     );
@@ -402,12 +403,23 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
     <div ref={setNodeRef} style={{ ...style, overflow: "visible" }}>
       <div
         className="rounded-2xl"
+        onMouseEnter={() => setDetailsHovered(true)}
+        onMouseLeave={() => setDetailsHovered(false)}
         style={{
           background: "var(--card)",
           border: `1px solid ${exercise.advancedOpen ? "var(--accent)" : "var(--dim)"}`,
+          boxShadow: groupColor ? `inset 3px 0 0 ${groupColor}` : "none",
         }}
       >
-        <div className="flex flex-wrap items-center gap-3 px-4 py-3">
+        <div className="flex flex-wrap items-center gap-3 px-4 py-3" onClick={() => setDetailsPinned((current) => !current)}>
+          <input
+            aria-label={i18n("selectExerciseForGrouping")}
+            checked={selected}
+            className="h-4 w-4 shrink-0"
+            onChange={(event) => onSelectedChange?.(event.target.checked)}
+            onClick={(event) => event.stopPropagation()}
+            type="checkbox"
+          />
           <span
             {...attributes}
             {...listeners}
@@ -423,16 +435,22 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
             type="text"
             value={exercise.name}
             onChange={(event) => update({ name: event.target.value })}
+            onClick={(event) => event.stopPropagation()}
             placeholder={i18n("exerciseName9a5c1af")}
             className="min-w-[10rem] flex-1 bg-transparent text-base font-bold outline-none"
             style={{ color: "var(--text)" }}
           />
 
-          {ctx.showSets ? (
+          {ctx.showSets && !grouped && detailsOpen ? (
             <div className="flex shrink-0 items-center gap-1">
               <NumberStepper
                 value={exercise.sets}
-                onChange={(value) => update({ sets: value })}
+                onChange={(value) =>
+                  update({
+                    sets: value,
+                    setPrescriptions: concreteSetPrescriptions({ ...exercise, sets: value }),
+                  })
+                }
                 min={1}
               />
               <span className="text-sm" style={{ color: "var(--muted)" }}>
@@ -441,37 +459,9 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
             </div>
           ) : null}
 
-          {renderClusters()}
-          {renderPrescription()}
-          {renderLoad()}
-
-          {/* Progressive load toggle — hidden only when BW (no numeric load to progress) */}
-          {ctx.showLoad && exercise.loadMode !== "bw" && !exercise.loadProgression ? (
-            <button
-              type="button"
-              onClick={() =>
-                update({
-                  loadProgression: {
-                    mode: "linear",
-                    startValue: exercise.loadValue ?? 40,
-                    startMode: exercise.loadMode,
-                    stepValue: 10,
-                    perSetValues: [],
-                  },
-                  loadValue: null,
-                })
-              }
-              className="shrink-0 text-xs"
-              style={{ color: "var(--dim)" }}
-              title={i18n("setProgressiveLoadAcrossSetsb3a6402")}
-            >
-              ∿
-            </button>
-          ) : null}
-
           <button
             type="button"
-            onClick={() => toggleVariationsPanel(section.localId, exercise.localId)}
+            onClick={(event) => { event.stopPropagation(); toggleVariationsPanel(section.localId, exercise.localId); }}
             className="shrink-0 rounded-xl px-2 py-1 text-xs font-semibold transition-colors"
             style={{
               background: exercise.variationsOpen
@@ -486,7 +476,8 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
 
           <button
             type="button"
-            onClick={() => {
+            onClick={(event) => {
+              event.stopPropagation();
               const next = !noteOpen;
               setNoteOpen(next);
               if (!next) update({ note: null });
@@ -504,7 +495,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
 
           <button
             type="button"
-            onClick={() => toggleAdvancedPanel(section.localId, exercise.localId)}
+            onClick={(event) => { event.stopPropagation(); toggleAdvancedPanel(section.localId, exercise.localId); }}
             className="shrink-0 rounded-xl px-2 py-1 text-xs font-semibold transition-colors"
             style={{
               background: exercise.advancedOpen
@@ -518,7 +509,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions }:
           </button>
         </div>
 
-        {renderProgressiveLoadPanel()}
+        {detailsOpen ? renderSetDetailsPanel() : null}
 
         {noteOpen ? (
           <div className="border-t px-4 py-2" style={{ borderColor: "var(--dim)" }}>

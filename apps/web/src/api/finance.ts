@@ -106,6 +106,29 @@ export async function recordFinancePayment(token: string, userId: string, body: 
   });
 }
 
+export type FinanceReceipt = {
+  document_type: "receipt";
+  reference: string;
+  issued_on: string;
+  amount_cents: number;
+  currency: string;
+  description: string;
+  membership_package_subscription_id?: string | null;
+  package_name?: string | null;
+  package_code_snapshot?: string | null;
+  package_family_snapshot?: string | null;
+  invoice: FinanceRecord;
+  payment: FinanceRecord;
+};
+
+export async function createFinanceReceipt(token: string, userId: string, body: FinanceRecord) {
+  return apiRequest<{ receipt: FinanceReceipt }>(`/admin/finance/members/${userId}/receipts`, {
+    method: "POST",
+    token,
+    body,
+  });
+}
+
 export async function createFinanceInvoice(token: string, userId: string, body: FinanceRecord) {
   return apiRequest<{ invoice: FinanceRecord }>(`/admin/finance/members/${userId}/invoices`, {
     method: "POST",

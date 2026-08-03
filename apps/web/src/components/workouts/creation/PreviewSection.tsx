@@ -8,7 +8,7 @@ import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 
 import type { ScaleLevel } from "@/api/workouts";
-import { FORMAT_EXERCISE_CONTEXT, getFormatInstruction, getFormatLabels, type DraftExercise, type DraftSection, type LoadMode, type LoadProgression, type PrescriptionUnit } from "@/types/workout";
+import { concreteSetPrescriptions, FORMAT_EXERCISE_CONTEXT, getFormatInstruction, getFormatLabels, type DraftExercise, type DraftSection, type LoadMode, type LoadProgression, type PrescriptionUnit, type SetPrescription } from "@/types/workout";
 
 import { FormatTooltip } from "./FormatTooltip";
 
@@ -19,6 +19,7 @@ type Props = {
 };
 
 type ResolvedExercise = {
+  itemType: "exercise" | "header";
   name: string;
   sets: number;
   prescriptionValue: number;
@@ -26,6 +27,10 @@ type ResolvedExercise = {
   loadValue: number | null;
   loadMode: LoadMode;
   loadProgression: LoadProgression | null;
+  setPrescriptions: SetPrescription[];
+  supersetGroupId: string | null;
+  alternatingGroupId: string | null;
+  note: string | null;
   clustersPerSet: number | null;
   excluded: boolean;
   varied: boolean;
@@ -37,6 +42,7 @@ function resolveExercise(
 ): ResolvedExercise {
   if (!activeScale) {
     return {
+      itemType: exercise.itemType,
       name: exercise.name,
       sets: exercise.sets,
       prescriptionValue: exercise.prescriptionValue,
@@ -44,6 +50,10 @@ function resolveExercise(
       loadValue: exercise.loadValue,
       loadMode: exercise.loadMode,
       loadProgression: exercise.loadProgression,
+      setPrescriptions: concreteSetPrescriptions(exercise),
+      supersetGroupId: exercise.supersetGroupId,
+      alternatingGroupId: exercise.alternatingGroupId,
+      note: exercise.note,
       clustersPerSet: exercise.clustersPerSet,
       excluded: false,
       varied: false,
@@ -54,6 +64,7 @@ function resolveExercise(
 
   if (!variation) {
     return {
+      itemType: exercise.itemType,
       name: exercise.name,
       sets: exercise.sets,
       prescriptionValue: exercise.prescriptionValue,
@@ -61,6 +72,10 @@ function resolveExercise(
       loadValue: exercise.loadValue,
       loadMode: exercise.loadMode,
       loadProgression: exercise.loadProgression,
+      setPrescriptions: concreteSetPrescriptions(exercise),
+      supersetGroupId: exercise.supersetGroupId,
+      alternatingGroupId: exercise.alternatingGroupId,
+      note: exercise.note,
       clustersPerSet: exercise.clustersPerSet,
       excluded: false,
       varied: false,
@@ -69,6 +84,7 @@ function resolveExercise(
 
   if (variation.excluded) {
     return {
+      itemType: exercise.itemType,
       name: exercise.name,
       sets: exercise.sets,
       prescriptionValue: exercise.prescriptionValue,
@@ -76,20 +92,40 @@ function resolveExercise(
       loadValue: exercise.loadValue,
       loadMode: exercise.loadMode,
       loadProgression: exercise.loadProgression,
+      setPrescriptions: concreteSetPrescriptions(exercise),
+      supersetGroupId: exercise.supersetGroupId,
+      alternatingGroupId: exercise.alternatingGroupId,
+      note: exercise.note,
       clustersPerSet: exercise.clustersPerSet,
       excluded: true,
       varied: true,
     };
   }
 
-  return {
-    name: variation.exerciseNameOverride ?? exercise.name,
+  const variedExercise = {
+    ...exercise,
     sets: variation.sets ?? exercise.sets,
     prescriptionValue: variation.prescriptionValue ?? exercise.prescriptionValue,
     prescriptionUnit: variation.prescriptionUnit ?? exercise.prescriptionUnit,
     loadValue: variation.loadValue ?? exercise.loadValue,
     loadMode: variation.loadMode ?? exercise.loadMode,
-    loadProgression: exercise.loadProgression,
+    loadProgression: variation.loadProgression ?? exercise.loadProgression,
+    setPrescriptions: variation.setPrescriptions ?? exercise.setPrescriptions,
+  };
+
+  return {
+    itemType: exercise.itemType,
+    name: variation.exerciseNameOverride ?? exercise.name,
+    sets: variedExercise.sets,
+    prescriptionValue: variedExercise.prescriptionValue,
+    prescriptionUnit: variedExercise.prescriptionUnit,
+    loadValue: variedExercise.loadValue,
+    loadMode: variedExercise.loadMode,
+    loadProgression: variedExercise.loadProgression,
+    setPrescriptions: concreteSetPrescriptions(variedExercise),
+    supersetGroupId: exercise.supersetGroupId,
+    alternatingGroupId: exercise.alternatingGroupId,
+    note: variation.note ?? exercise.note,
     clustersPerSet: exercise.clustersPerSet,
     excluded: false,
     varied: true,
@@ -139,7 +175,7 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
 
       {!collapsed ? (
         <div className="flex flex-col gap-1 ps-2">
-          {section.exercises.map((exercise) => {
+          {section.exercises.map((exercise, exerciseIndex) => {
             const resolved = resolveExercise(exercise, activeScale);
             const scaleLevel = activeScale ? scaleLevels.find((item) => item.slug === activeScale) : null;
 
@@ -152,6 +188,25 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
                 >
                   {exercise.name}
                   {scaleLevel ? "(" + (scaleLevel.label) + ")" : ""}
+                </div>
+              );
+            }
+
+            if (resolved.itemType === "header") {
+              return (
+                <div
+                  className="mt-2 border-y py-2"
+                  key={exercise.localId}
+                  style={{ borderColor: "var(--border-strong)" }}
+                >
+                  <div className="text-xs font-bold uppercase" style={{ color: "var(--primary)" }}>
+                    {resolved.name || i18n("headerLabel")}
+                  </div>
+                  {resolved.note ? (
+                    <div className="mt-0.5 text-xs" style={{ color: "var(--muted)" }}>
+                      {resolved.note}
+                    </div>
+                  ) : null}
                 </div>
               );
             }
@@ -174,8 +229,10 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
               const prog = resolved.loadProgression;
               const unit = prog.startMode === "pct_1rm" ? i18n("percentOneRepMaxUnit") : i18n("kilogramsUnit");
               if (prog.mode === "linear") {
-                const end = prog.startValue + prog.stepValue * (resolved.sets - 1);
-                loadStr = i18n("linearLoadProgression", {start: prog.startValue, end, unit, step: prog.stepValue});
+                const sign = prog.direction === "decrease" ? -1 : 1;
+                const end = Math.max(0, prog.startValue + sign * prog.stepValue * (resolved.sets - 1));
+                const signedStep = `${prog.direction === "decrease" ? "−" : "+"}${prog.stepValue}`;
+                loadStr = i18n("linearLoadProgression", {start: prog.startValue, end, unit, step: signedStep});
               } else {
                 const vals = Array.from({ length: resolved.sets }, (_, i) =>
                   prog.perSetValues[i] ?? prog.startValue,
@@ -201,8 +258,8 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
             } else if (ctx.prescriptionHint) {
               prescriptionText = (resolved.prescriptionUnit) + " — " + i18n(ctx.prescriptionHint);
             } else if (section.format === "cluster" && resolved.clustersPerSet) {
-              prescriptionText = (resolved.sets) + " × " + (resolved.clustersPerSet) + i18n("clusters65add00") + (resolved.prescriptionValue) + " " + (resolved.prescriptionUnit);
-            } else if (ctx.showSets) {
+              prescriptionText = (resolved.clustersPerSet) + i18n("clusters65add00") + (resolved.prescriptionValue) + " " + (resolved.prescriptionUnit);
+            } else if (ctx.showSets && !resolved.supersetGroupId && !resolved.alternatingGroupId) {
               const suffix = ctx.prescriptionSuffix ? "(" + i18n(ctx.prescriptionSuffix) + ")" : "";
               prescriptionText = (resolved.sets) + " × " + (resolved.prescriptionValue) + " " + (resolved.prescriptionUnit) + (suffix);
             } else {
@@ -217,8 +274,18 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
               prefixBadge = i18n("min7eb0cee") + (exercise.intervalAssignment);
             }
 
+            const compositionId = resolved.supersetGroupId ?? resolved.alternatingGroupId;
+            const previous = section.exercises[exerciseIndex - 1];
+            const previousCompositionId = previous?.supersetGroupId ?? previous?.alternatingGroupId;
+            const compositionColor = compositionId
+              ? ["var(--primary)", "var(--info)", "var(--success)", "var(--warning)"][Array.from(compositionId).reduce((sum, character) => sum + character.charCodeAt(0), 0) % 4]
+              : null;
+            const startsComposition = Boolean(compositionId && compositionId !== previousCompositionId);
+
             return (
-              <div key={exercise.localId} className="py-1 text-xs">
+              <div key={exercise.localId}>
+              {startsComposition ? <header className="mt-2 flex items-center gap-2 py-1 text-xs font-bold uppercase" style={{ color: compositionColor ?? undefined }}><span>{resolved.supersetGroupId ? i18n("supersetLabel") : i18n("alternatingSetsLabel")}</span><span>{resolved.sets} {i18n("setsd6c8220")}</span><span className="h-px flex-1 opacity-30" style={{ background: compositionColor ?? undefined }} /></header> : null}
+              <div className="py-1 ps-2 text-xs" style={{ borderInlineStart: compositionColor ? `3px solid ${compositionColor}` : undefined }}>
                 <div className="flex flex-wrap items-baseline gap-1.5">
                   {prefixBadge ? (
                     <span
@@ -254,7 +321,24 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
                     {advancedLines.join(" · ")}
                   </div>
                 ) : null}
-              </div>
+                {resolved.setPrescriptions.some((set, index) =>
+                  index > 0 &&
+                  (set.prescriptionValue !== resolved.setPrescriptions[0]?.prescriptionValue ||
+                    set.loadValue !== resolved.setPrescriptions[0]?.loadValue)
+                ) ? (
+                  <div className="mt-1 ps-2 text-xs" style={{ color: "var(--muted)" }}>
+                    {resolved.setPrescriptions.map((set) =>
+                      `${set.setIndex}: ${set.prescriptionValue ?? "—"} ${set.prescriptionUnit ?? ""}` +
+                      (set.loadValue != null ? ` · ${set.loadValue} ${set.loadMode === "pct_1rm" ? "%1RM" : "kg"}` : "")
+                    ).join(" | ")}
+                  </div>
+                ) : null}
+                {resolved.note ? (
+                  <div className="mt-1 ps-2 text-xs italic" style={{ color: "var(--muted)" }}>
+                    {resolved.note}
+                  </div>
+                ) : null}
+              </div></div>
             );
           })}
         </div>
@@ -271,6 +355,11 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
             : i18n("secondsShort", {value: section.restAfterSeconds})})}
           </span>
           <div className="h-px flex-1" style={{ background: "var(--dim)", opacity: 0.4 }} />
+        </div>
+      ) : null}
+      {section.note ? (
+        <div className="mt-1 text-xs italic" style={{ color: "var(--muted)" }}>
+          {section.note}
         </div>
       ) : null}
     </div>

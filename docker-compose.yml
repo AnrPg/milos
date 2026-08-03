@@ -76,8 +76,13 @@ services:
     build:
       context: ./apps/web
       dockerfile: Dockerfile
+      args:
+        MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-http://media.localhost:18080}
+        NEXT_PUBLIC_MEDIA_ORIGIN: ${NEXT_PUBLIC_MEDIA_ORIGIN:-${MINIO_PUBLIC_ENDPOINT:-http://media.localhost:18080}}
     environment:
       API_PROXY_TARGET: http://api:4000
+      MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-http://media.localhost:18080}
+      NEXT_PUBLIC_MEDIA_ORIGIN: ${NEXT_PUBLIC_MEDIA_ORIGIN:-${MINIO_PUBLIC_ENDPOINT:-http://media.localhost:18080}}
       PORT: 3000
     depends_on:
       api:
@@ -151,6 +156,7 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-milos_minio}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-milos-minio-change-me}
+      MINIO_API_CORS_ALLOW_ORIGIN: ${MINIO_API_CORS_ALLOW_ORIGIN:-*}
     volumes:
       - ./.minio-data:/data
     networks: [app]

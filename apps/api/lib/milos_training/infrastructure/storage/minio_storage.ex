@@ -2,10 +2,11 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
   @moduledoc false
   @behaviour MilosTraining.Application.Ports.DocumentStorage
   @behaviour MilosTraining.Application.Ports.AvatarStorage
+  require Logger
 
   @expires_seconds 900
   @max_avatar_bytes 5 * 1_024 * 1_024
-  @allowed_avatar_types ~w(image/jpeg image/png image/webp)
+  @allowed_avatar_types ~w(image/jpeg image/png image/webp image/gif image/bmp image/avif)
 
   def ensure_buckets do
     {document_config, _document_url, document_bucket} = ex_aws_config()
@@ -50,7 +51,7 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
   end
 
   @impl true
-  def create_upload(user_id, content_type, byte_size) do
+  def create_upload(user_id, content_type, _byte_size) do
     extension = extension_for(content_type)
     key = "avatars/#{user_id}/#{Ecto.UUID.generate()}.#{extension}"
     {storage_config, url_config, bucket} = avatar_ex_aws_config()
@@ -61,16 +62,13 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
            ExAws.S3.presigned_url(url_config, :put, bucket, key,
              expires_in: @expires_seconds,
              virtual_host: false,
-             headers: [{"content-type", content_type}, {"content-length", to_string(byte_size)}]
+             headers: avatar_upload_headers(content_type)
            ) do
       {:ok,
        %{
          upload_url: url,
          key: key,
-         required_headers: %{
-           "content-type" => content_type,
-           "content-length" => to_string(byte_size)
-         },
+         required_headers: Map.new(avatar_upload_headers(content_type)),
          expires_in: @expires_seconds,
          max_bytes: @max_avatar_bytes
        }}
@@ -84,16 +82,23 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
     if String.starts_with?(key, expected_prefix) do
       {storage_config, _url_config, bucket} = avatar_ex_aws_config()
 
-      with {:ok, %{headers: headers}} <-
-             ExAws.S3.head_object(bucket, key) |> ExAws.request(storage_config),
-           {:ok, content_type, byte_size} <- avatar_metadata(headers),
-           true <- content_type in @allowed_avatar_types and byte_size <= @max_avatar_bytes do
+      with {:ok, %{headers: headers, body: body}} <-
+             request_avatar_probe(storage_config, bucket, key, avatar_public_url(bucket, key)),
+           {:ok, _content_type, byte_size} <- avatar_metadata(headers, body),
+           :ok <- validate_avatar_size(byte_size) do
         {:ok, avatar_public_url(bucket, key)}
       else
-        _ -> {:error, :invalid_avatar_upload}
+        error ->
+          reason = avatar_validation_reason(error)
+
+          Logger.warning(
+            "avatar_upload_validation_failed reason=#{inspect(error)} bucket=#{bucket} key_prefix=#{expected_prefix}"
+          )
+
+          {:error, reason}
       end
     else
-      {:error, :invalid_avatar_upload}
+      {:error, :avatar_key_forbidden}
     end
   end
 
@@ -101,6 +106,66 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
 
   @doc false
   def bucket_probe_operation(bucket), do: ExAws.S3.get_bucket_location(bucket)
+
+  @doc false
+  def avatar_upload_headers(content_type), do: [{"content-type", content_type}]
+
+  @doc false
+  def avatar_probe_operation(bucket, key) do
+    ExAws.S3.get_object(bucket, key, range: "bytes=0-15")
+  end
+
+  defp request_avatar_probe(config, bucket, key, public_url) do
+    avatar_probe_operation(bucket, key)
+    |> ExAws.request(config)
+    |> avatar_probe_result(fn -> request_public_avatar_probe(public_url) end)
+  end
+
+  @doc false
+  def avatar_probe_result({:ok, _response} = result, _public_probe), do: result
+
+  def avatar_probe_result({:error, _reason}, public_probe) when is_function(public_probe, 0),
+    do: public_probe.()
+
+  defp request_public_avatar_probe(public_url) do
+    case Req.get(public_url,
+           headers: [{"range", "bytes=0-15"}],
+           retry: false,
+           receive_timeout: 5_000
+         ) do
+      {:ok, %{status: status, headers: headers, body: body}} when status in 200..299 ->
+        {:ok, %{headers: headers, body: body}}
+
+      {:ok, %{status: status} = response} ->
+        {:error, {:http_error, status, response}}
+
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  defp validate_avatar_size(byte_size)
+       when is_integer(byte_size) and byte_size <= @max_avatar_bytes,
+       do: :ok
+
+  defp validate_avatar_size(byte_size), do: {:error, {:avatar_too_large, byte_size}}
+
+  defp avatar_validation_reason({:error, {:http_error, 404, _response}}),
+    do: :avatar_upload_missing
+
+  defp avatar_validation_reason({:error, {:http_error, 403, _response}}),
+    do: :avatar_upload_unverified
+
+  defp avatar_validation_reason({:error, :unsupported_avatar_type}), do: :unsupported_avatar_type
+
+  defp avatar_validation_reason({:error, :avatar_upload_metadata_missing}),
+    do: :avatar_upload_metadata_missing
+
+  defp avatar_validation_reason({:error, {:avatar_too_large, byte_size}}),
+    do: {:avatar_too_large, byte_size}
+
+  defp avatar_validation_reason({:error, _reason}), do: :avatar_storage_unavailable
+  defp avatar_validation_reason(_error), do: :avatar_storage_unavailable
 
   defp ex_aws_config do
     endpoint = Application.get_env(:milos_training, :minio_endpoint, "http://localhost:9000")
@@ -194,14 +259,73 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
   defp extension_for("image/jpeg"), do: "jpg"
   defp extension_for("image/png"), do: "png"
   defp extension_for("image/webp"), do: "webp"
+  defp extension_for("image/gif"), do: "gif"
+  defp extension_for("image/bmp"), do: "bmp"
+  defp extension_for("image/avif"), do: "avif"
 
-  defp avatar_metadata(headers) do
+  @doc false
+  def avatar_metadata(headers, body) do
     normalized = Map.new(headers, fn {key, value} -> {String.downcase(key), value} end)
-    content_type = normalized["content-type"]
+    content_type = normalized["content-type"] |> normalize_content_type()
+    detected_type = image_type_from_probe(body)
+    byte_size = total_object_size(normalized)
 
-    case Integer.parse(to_string(normalized["content-length"])) do
-      {byte_size, ""} when byte_size > 0 -> {:ok, content_type, byte_size}
-      _ -> {:error, :invalid_avatar_upload}
+    cond do
+      detected_type not in @allowed_avatar_types ->
+        {:error, :unsupported_avatar_type}
+
+      content_type in @allowed_avatar_types and is_integer(byte_size) and byte_size > 0 ->
+        {:ok, content_type, byte_size}
+
+      is_integer(byte_size) and byte_size > 0 ->
+        {:ok, detected_type, byte_size}
+
+      true ->
+        {:error, :avatar_upload_metadata_missing}
+    end
+  end
+
+  defp normalize_content_type(nil), do: nil
+
+  defp normalize_content_type(content_type) do
+    content_type
+    |> to_string()
+    |> String.split(";", parts: 2)
+    |> hd()
+    |> String.trim()
+    |> String.downcase()
+  end
+
+  defp image_type_from_probe(<<0xFF, 0xD8, 0xFF, _rest::binary>>), do: "image/jpeg"
+
+  defp image_type_from_probe(<<0x89, "PNG", 0x0D, 0x0A, 0x1A, 0x0A, _rest::binary>>),
+    do: "image/png"
+
+  defp image_type_from_probe(<<"RIFF", _size::binary-size(4), "WEBP", _rest::binary>>),
+    do: "image/webp"
+
+  defp image_type_from_probe(<<"GIF8", _version::binary-size(2), _rest::binary>>), do: "image/gif"
+  defp image_type_from_probe(<<"BM", _rest::binary>>), do: "image/bmp"
+
+  defp image_type_from_probe(
+         <<_size::binary-size(4), "ftyp", brand::binary-size(4), _rest::binary>>
+       )
+       when brand in ["avif", "avis"],
+       do: "image/avif"
+
+  defp image_type_from_probe(_body), do: nil
+
+  defp total_object_size(%{"content-range" => content_range}) do
+    case Regex.run(~r{/([0-9]+)$}, to_string(content_range), capture: :all_but_first) do
+      [value] -> String.to_integer(value)
+      _ -> nil
+    end
+  end
+
+  defp total_object_size(headers) do
+    case Integer.parse(to_string(headers["content-length"])) do
+      {byte_size, ""} -> byte_size
+      _ -> nil
     end
   end
 end

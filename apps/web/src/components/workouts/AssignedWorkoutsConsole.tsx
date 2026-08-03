@@ -45,6 +45,7 @@ import { downloadIcsEvent } from "@/lib/ics";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { workoutTypeColor } from "@/lib/workout-colors";
 import { useExecutionStore } from "@/stores/execution";
+import { isFreeTextWorkout, storeFreeTextExecutionWorkout } from "@/lib/free-text-execution";
 import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
 
@@ -394,7 +395,7 @@ export function AssignedWorkoutsConsole({
 
   const isAdmin = currentUser?.role === "admin";
 
-  const openParamId = searchParams.get("open");
+  const openParamId = searchParams.get("open_assignment") ?? searchParams.get("open");
   const openParamDate = searchParams.get("date");
   const autoOpenedRef = useRef<string | null>(null);
   const initialOpenHandledRef = useRef(false);
@@ -451,7 +452,7 @@ export function AssignedWorkoutsConsole({
     } catch (requestError) {
       if (
         requestError instanceof ApiError &&
-        (requestError.status === 401 || requestError.status === 403)
+        requestError.status === 401
       ) {
         signOut();
         return;
@@ -539,6 +540,7 @@ export function AssignedWorkoutsConsole({
       const frame = window.requestAnimationFrame(() => setPanelAssignment(target));
       const params = new URLSearchParams(searchParams.toString());
       params.delete("open");
+      params.delete("open_assignment");
       params.delete("date");
       router.replace(`?${params.toString()}`, { scroll: false });
       return () => window.cancelAnimationFrame(frame);
@@ -555,6 +557,16 @@ export function AssignedWorkoutsConsole({
       }
     }
   }, [openParamId, openParamDate, loading, allAssignments, searchParams, router]);
+
+  useEffect(() => {
+    if (openParamId || !openParamDate) return;
+
+    const targetDate = new Date(openParamDate + "T00:00:00");
+    if (isNaN(targetDate.getTime())) return;
+
+    const frame = window.requestAnimationFrame(() => setRefDate(targetDate));
+    return () => window.cancelAnimationFrame(frame);
+  }, [openParamDate, openParamId]);
 
   useEffect(() => {
     if (!initialOpenAssignmentId || initialOpenHandledRef.current || allAssignments.length === 0) return;
@@ -733,6 +745,18 @@ export function AssignedWorkoutsConsole({
     setError(null);
 
     try {
+      if (isFreeTextWorkout(assignment.workout)) {
+        const execution = await startExecution(tokens.access_token, {
+          master_workout_id: assignment.workout.id,
+          source: "assigned",
+          source_reference_id: assignment.id,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        });
+        storeFreeTextExecutionWorkout(assignment.workout, execution);
+        router.push(`/workouts/free-text/execute?workout=${assignment.workout.id}&execution=${execution.id}`);
+        return;
+      }
+
       const execution = await startExecution(tokens.access_token, {
         master_workout_id: assignment.workout.id,
         source: "assigned",
@@ -771,7 +795,7 @@ export function AssignedWorkoutsConsole({
     } catch (requestError) {
       if (
         requestError instanceof ApiError &&
-        (requestError.status === 401 || requestError.status === 403)
+        requestError.status === 401
       ) {
         signOut();
         return;

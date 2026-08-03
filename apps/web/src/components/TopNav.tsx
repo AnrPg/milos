@@ -49,7 +49,8 @@ type DashboardCategory = {
   items: { href: string; labelKey?: string; label?: string; description: string }[];
 };
 
-function pathActive(pathname: string, href: string) {
+export function pathActive(pathname: string, href: string) {
+  if (href === "/") return pathname === "/";
   if (href === "/admin") return pathname === "/admin";
   if (href === "/admin/metrics") {
     return ["/admin/metrics", "/admin/challenges", "/admin/reviews", "/admin/wellbeing"].some(

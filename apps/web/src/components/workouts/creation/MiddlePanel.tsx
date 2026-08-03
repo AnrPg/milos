@@ -5,7 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
 import type { ScaleLevel } from "@/api/workouts";
@@ -15,6 +15,8 @@ import { getFormatInstruction, getFormatLabels, type DraftExercise } from "@/typ
 
 import { ExerciseCard } from "./ExerciseCard";
 import { FormatTooltip } from "./FormatTooltip";
+import { HeaderCard } from "./HeaderCard";
+import { SupersetWrapper } from "./SupersetWrapper";
 
 type Props = {
   scaleLevels: ScaleLevel[];
@@ -26,10 +28,27 @@ type ExerciseGroup = {
   exercises: DraftExercise[];
 };
 
+function groupColor(groupId: string) {
+  const colors = ["var(--primary)", "var(--info)", "var(--success)", "var(--warning)", "var(--danger)"];
+  const hash = Array.from(groupId).reduce((sum, character) => sum + character.charCodeAt(0), 0);
+  return colors[hash % colors.length];
+}
+
 export function MiddlePanel({ scaleLevels }: Props) {
   const i18n = useUiTranslations();
   const formatLabels = getFormatLabels(i18n);
-  const { sections, selectedSectionId, addExercise, setMobileView, updateSection } = useWorkoutCreationStore();
+  const {
+    sections,
+    selectedSectionId,
+    addExercise,
+    addHeader,
+    clearExerciseGroups,
+    setExerciseGroup,
+    setMobileView,
+    updateExercise,
+    updateSection,
+  } = useWorkoutCreationStore();
+  const [selectedExerciseIds, setSelectedExerciseIds] = useState<Set<string>>(new Set());
 
   const selectedSection = sections.find((section) => section.localId === selectedSectionId);
   const sectionOptions = sections.map((section) => ({ id: section.localId, name: section.name }));
@@ -91,6 +110,84 @@ export function MiddlePanel({ scaleLevels }: Props) {
     return null;
   }, [i18n, selectedSection]);
 
+  function setSelected(exerciseId: string, selected: boolean) {
+    setSelectedExerciseIds((current) => {
+      const next = new Set(current);
+      if (selected) next.add(exerciseId);
+      else next.delete(exerciseId);
+      return next;
+    });
+  }
+
+  function groupSelected(groupType: "superset" | "alternating") {
+    if (!selectedSection || selectedExerciseIds.size < 2) return;
+    setExerciseGroup(selectedSection.localId, Array.from(selectedExerciseIds), groupType);
+    setSelectedExerciseIds(new Set());
+  }
+
+  function renderExerciseItems(items: DraftExercise[]) {
+    const renderedGroups = new Set<string>();
+
+    return items.map((exercise) => {
+      if (exercise.itemType === "header") {
+        return <HeaderCard key={exercise.localId} header={exercise} section={selectedSection!} />;
+      }
+
+      const kind = exercise.supersetGroupId
+        ? "superset"
+        : exercise.alternatingGroupId
+          ? "alternating"
+          : null;
+      const groupId = exercise.supersetGroupId ?? exercise.alternatingGroupId;
+
+      if (kind && groupId) {
+        if (renderedGroups.has(groupId)) return null;
+        renderedGroups.add(groupId);
+        const members = items.filter((item) =>
+          kind === "superset"
+            ? item.supersetGroupId === groupId
+            : item.alternatingGroupId === groupId,
+        );
+
+        const color = groupColor(groupId);
+        return (
+          <SupersetWrapper
+            color={color}
+            key={groupId}
+            kind={kind}
+            onSetsChange={(sets) => members.forEach((member) => {
+              updateExercise(selectedSection!.localId, member.localId, {
+                sets,
+                setPrescriptions: member.setPrescriptions.slice(0, sets),
+              });
+            })}
+            sets={members[0]?.sets ?? 1}
+          >
+            {members.map((member) => renderExerciseCard(member, color, true))}
+          </SupersetWrapper>
+        );
+      }
+
+      return renderExerciseCard(exercise);
+    });
+  }
+
+  function renderExerciseCard(exercise: DraftExercise, color?: string, grouped = false) {
+    return (
+      <ExerciseCard
+        key={exercise.localId}
+        exercise={exercise}
+        onSelectedChange={(selected) => setSelected(exercise.localId, selected)}
+        scaleLevels={scaleLevels}
+        section={selectedSection!}
+        sectionOptions={sectionOptions}
+        selected={selectedExerciseIds.has(exercise.localId)}
+        groupColor={color}
+        grouped={grouped}
+      />
+    );
+  }
+
   return (
     <div className="flex flex-1 flex-col overflow-hidden" style={{ background: "var(--bg)" }}>
       {selectedSection ? (
@@ -137,6 +234,43 @@ export function MiddlePanel({ scaleLevels }: Props) {
       )}
 
       <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-6 py-4">
+        {selectedSection && selectedExerciseIds.size > 0 ? (
+          <div
+            className="sticky top-0 z-10 flex flex-wrap items-center gap-2 px-3 py-2"
+            style={{
+              background: "var(--panel, #ffffff)",
+              border: "1px solid var(--border, #cfe1e8)",
+            }}
+          >
+            <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>
+              {i18n("selectedExerciseCount", { count: selectedExerciseIds.size })}
+            </span>
+            {selectedExerciseIds.size >= 2 ? (
+              <>
+                <button className="rounded-md px-3 py-1.5 text-xs font-semibold" style={{ background: "color-mix(in srgb, var(--workout-crossfit, #d94d3d) 16%, #ffffff)", color: "var(--workout-crossfit, #a93226)" }} onClick={() => groupSelected("superset")} type="button">
+                  {i18n("groupAsSuperset")}
+                </button>
+                <button className="rounded-md px-3 py-1.5 text-xs font-semibold" style={{ background: "color-mix(in srgb, var(--info, #27869b) 18%, #ffffff)", color: "var(--info, #1f6f80)" }} onClick={() => groupSelected("alternating")} type="button">
+                  {i18n("groupAsAlternating")}
+                </button>
+              </>
+            ) : null}
+            <button
+              className="rounded-md px-3 py-1.5 text-xs font-semibold"
+              onClick={() => {
+                clearExerciseGroups(selectedSection.localId, Array.from(selectedExerciseIds));
+                setSelectedExerciseIds(new Set());
+              }}
+              style={{
+                background: "var(--panel-muted, #edf4f6)",
+                color: "var(--text-soft, #39515a)",
+              }}
+              type="button"
+            >
+              {i18n("clearGroup")}
+            </button>
+          </div>
+        ) : null}
         {!selectedSection ? (
           <div className="flex flex-1 items-center justify-center">
             <p className="text-sm" style={{ color: "var(--dim)" }}>
@@ -148,13 +282,24 @@ export function MiddlePanel({ scaleLevels }: Props) {
             <p className="text-sm" style={{ color: "var(--dim)" }}>
               {i18n("noExercisesYet71ff283")}
             </p>
-            <button
-              onClick={() => addExercise(selectedSection.localId)}
-              className="rounded-2xl px-5 py-2 text-sm font-semibold"
-              style={{ background: "var(--accent)", color: "var(--bg)" }}
-            >
-              {i18n("addExercise7d65b0e")}
-            </button>
+            <div className="flex flex-wrap justify-center gap-2">
+              <button
+                onClick={() => addExercise(selectedSection.localId)}
+                className="rounded-2xl px-5 py-2 text-sm font-semibold"
+                style={{ background: "var(--accent)", color: "var(--bg)" }}
+                type="button"
+              >
+                {i18n("addExercise7d65b0e")}
+              </button>
+              <button
+                onClick={() => addHeader(selectedSection.localId)}
+                className="rounded-2xl px-5 py-2 text-sm font-semibold"
+                style={{ border: "1px dashed var(--dim)", color: "var(--muted)" }}
+                type="button"
+              >
+                {i18n("addHeader")}
+              </button>
+            </div>
           </div>
         ) : (
           <>
@@ -180,41 +325,34 @@ export function MiddlePanel({ scaleLevels }: Props) {
                       </div>
                     ) : null}
                     <div className="flex flex-col gap-3">
-                      {group.exercises.map((exercise) => (
-                        <ExerciseCard
-                          key={exercise.localId}
-                          exercise={exercise}
-                          section={selectedSection}
-                          scaleLevels={scaleLevels}
-                          sectionOptions={sectionOptions}
-                        />
-                      ))}
+                      {renderExerciseItems(group.exercises)}
                     </div>
                   </div>
                 ))
               ) : (
-                selectedSection.exercises.map((exercise) => (
-                  <ExerciseCard
-                    key={exercise.localId}
-                    exercise={exercise}
-                    section={selectedSection}
-                    scaleLevels={scaleLevels}
-                    sectionOptions={sectionOptions}
-                  />
-                ))
+                renderExerciseItems(selectedSection.exercises)
               )}
             </SortableContext>
 
-            <button
-              onClick={() => {
-                addExercise(selectedSection.localId);
-                setMobileView("exercises");
-              }}
-              className="self-start rounded-2xl px-4 py-2 text-sm font-semibold"
-              style={{ border: "1px dashed var(--dim)", color: "var(--muted)" }}
-            >
-              {i18n("addExercise7d65b0e")}
-            </button>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => {
+                  addExercise(selectedSection.localId);
+                  setMobileView("exercises");
+                }}
+                className="rounded-2xl px-4 py-2 text-sm font-semibold"
+                style={{ border: "1px dashed var(--dim)", color: "var(--muted)" }}
+              >
+                {i18n("addExercise7d65b0e")}
+              </button>
+              <button
+                onClick={() => addHeader(selectedSection.localId)}
+                className="rounded-2xl px-4 py-2 text-sm font-semibold"
+                style={{ border: "1px dashed var(--dim)", color: "var(--muted)" }}
+              >
+                {i18n("addHeader")}
+              </button>
+            </div>
           </>
         )}
       </div>

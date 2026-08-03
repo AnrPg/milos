@@ -229,6 +229,9 @@ const API_ERROR_KEYS: Record<string, string> = {
   auth_dependency_unavailable: "apiErrorAuthenticationUnavailable",
   rate_limiter_unavailable: "apiErrorRateLimiterUnavailable",
   not_found: "apiErrorNotFound",
+  cannot_delete_self: "apiErrorCannotDeleteSelf",
+  last_admin: "apiErrorLastAdmin",
+  user_has_restricted_history: "apiErrorUserHasRestrictedHistory",
   class_type_replacement_required: "apiErrorClassTypeReplacementRequired",
   invalid_class_type_replacement: "apiErrorInvalidClassTypeReplacement",
   last_active_class_type: "apiErrorLastActiveClassType",
@@ -238,15 +241,43 @@ const API_ERROR_KEYS: Record<string, string> = {
   self_conversation: "apiErrorSelfConversation",
   invalid_message: "apiErrorInvalidMessage",
   invalid_avatar_upload: "apiErrorInvalidAvatarUpload",
+  avatar_upload_missing: "apiErrorAvatarUploadMissing",
+  avatar_upload_unverified: "apiErrorAvatarUploadUnverified",
+  unsupported_avatar_type: "apiErrorUnsupportedAvatarType",
+  avatar_upload_metadata_missing: "apiErrorAvatarUploadMetadataMissing",
+  avatar_too_large: "apiErrorAvatarTooLarge",
+  avatar_key_forbidden: "apiErrorAvatarKeyForbidden",
+  avatar_storage_unavailable: "apiErrorAvatarStorageUnavailable",
   invalid_execution_source: "apiErrorInvalidExecutionSource",
   stale_execution: "apiErrorStaleExecution",
   execution_source_forbidden: "apiErrorExecutionSourceForbidden",
   execution_source_mismatch: "apiErrorExecutionSourceMismatch",
   completion_processing_unavailable: "apiErrorCompletionUnavailable",
+  finance_profile_missing: "apiErrorSelfFinanceProfileMissing",
+  finance_entitlement_inactive: "apiErrorSelfFinanceEntitlementInactive",
+  finance_entitlement_blocked: "apiErrorSelfFinanceEntitlementBlocked",
+  finance_entitlement_plan_missing: "apiErrorSelfFinanceEntitlementPlanMissing",
+  finance_channel_not_included: "apiErrorSelfFinanceChannelNotIncluded",
+  finance_capability_not_included: "apiErrorSelfFinanceCapabilityNotIncluded",
+  finance_allowance_not_included: "apiErrorSelfFinanceAllowanceNotIncluded",
+  finance_allowance_exhausted: "apiErrorSelfFinanceAllowanceExhausted",
+  invalid_athletes: "apiErrorInvalidAthletes",
+  workout_not_published: "apiErrorWorkoutNotPublished",
   unauthorized: "apiErrorUnauthorized",
   forbidden: "apiErrorForbidden",
   validation_failed: "apiErrorValidationFailed",
   offline: "apiErrorOffline",
+};
+
+const ADMIN_ASSIGNMENT_ERROR_KEYS: Record<string, string> = {
+  finance_profile_missing: "apiErrorFinanceProfileMissing",
+  finance_entitlement_inactive: "apiErrorFinanceEntitlementInactive",
+  finance_entitlement_blocked: "apiErrorFinanceEntitlementBlocked",
+  finance_entitlement_plan_missing: "apiErrorFinanceEntitlementPlanMissing",
+  finance_channel_not_included: "apiErrorFinanceChannelNotIncluded",
+  finance_capability_not_included: "apiErrorFinanceCapabilityNotIncluded",
+  finance_allowance_not_included: "apiErrorFinanceAllowanceNotIncluded",
+  finance_allowance_exhausted: "apiErrorFinanceAllowanceExhausted",
 };
 
 export function semanticLabel(value: unknown, translate: UiTranslator): string {
@@ -274,6 +305,18 @@ export function localizeError(error: unknown, translate: UiTranslator): string {
   return translate("apiErrorRequestFailed");
 }
 
+export function localizeAdminAssignmentError(
+  error: unknown,
+  translate: UiTranslator,
+): string {
+  if (error instanceof ApiError && error.payload.code) {
+    const key = ADMIN_ASSIGNMENT_ERROR_KEYS[error.payload.code];
+    if (key) return translate(key, normalizeParams(error.payload.params));
+  }
+
+  return localizeError(error, translate);
+}
+
 export function formatScore(
   value: unknown,
   scoreType: unknown,
@@ -299,9 +342,16 @@ export function formatScore(
 function normalizeParams(params: Record<string, unknown> | undefined) {
   if (!params) return undefined;
   return Object.fromEntries(
-    Object.entries(params).filter(
-      (entry): entry is [string, string | number] =>
-        typeof entry[1] === "string" || typeof entry[1] === "number",
-    ),
+    Object.entries(params)
+      .filter(
+        (entry): entry is [string, string | number] =>
+          typeof entry[1] === "string" || typeof entry[1] === "number",
+      )
+      .map(([key, value]) => [
+        key,
+        typeof value === "string" && ["channel", "capability", "allowance"].includes(key)
+          ? value.replaceAll("_", " ")
+          : value,
+      ]),
   );
 }

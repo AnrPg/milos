@@ -25,14 +25,24 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoMessageStore do
       |> Map.put("message_id", message_id)
       |> DispatchMessageJob.new()
 
-    Ecto.Multi.new()
-    |> Ecto.Multi.insert(:message, message_changeset)
-    |> Ecto.Multi.insert(:delivery_job, job)
-    |> Repo.transaction()
+    Repo.transaction(fn ->
+      case insert_message(message_changeset, attrs) do
+        {:created, message} ->
+          case Repo.insert(job) do
+            {:ok, _job} -> message
+            {:error, reason} -> Repo.rollback(reason)
+          end
+
+        {:existing, message} ->
+          message
+
+        {:error, changeset} ->
+          Repo.rollback(changeset)
+      end
+    end)
     |> case do
-      {:ok, %{message: message}} -> {:ok, message}
-      {:error, :message, changeset, _changes} -> {:error, changeset}
-      {:error, _operation, reason, _changes} -> {:error, reason}
+      {:ok, message} -> {:ok, message}
+      {:error, reason} -> {:error, reason}
     end
   end
 
@@ -70,6 +80,35 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoMessageStore do
     |> order_by([message], desc: message.sequence_number)
     |> limit(^limit)
     |> Repo.all()
+  end
+
+  defp insert_message(
+         changeset,
+         %{sender_id: sender_id, client_operation_id: operation_id}
+       )
+       when not is_nil(operation_id) do
+    case Repo.insert(changeset,
+           on_conflict: :nothing,
+           conflict_target: [:sender_id, :client_operation_id],
+           returning: true
+         ) do
+      {:ok, %{sequence_number: nil}} ->
+        {:existing,
+         Repo.get_by!(Message, sender_id: sender_id, client_operation_id: operation_id)}
+
+      {:ok, message} ->
+        {:created, message}
+
+      error ->
+        error
+    end
+  end
+
+  defp insert_message(changeset, _attrs) do
+    case Repo.insert(changeset) do
+      {:ok, message} -> {:created, message}
+      error -> error
+    end
   end
 
   defp maybe_before(query, nil), do: query

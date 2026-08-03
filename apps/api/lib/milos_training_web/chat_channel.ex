@@ -25,12 +25,14 @@ defmodule MilosTrainingWeb.ChatChannel do
     user_id = socket.assigns.current_user.id
     thread_id = socket.assigns.thread_id
     message_type = parse_message_type(Map.get(params, "message_type", "chat"))
+    client_operation_id = Map.get(params, "client_operation_id")
 
     case SendMessage.call(socket.assigns.current_user, %{
            thread_id: thread_id,
            sender_id: user_id,
            body: body,
-           message_type: message_type
+           message_type: message_type,
+           client_operation_id: client_operation_id
          }) do
       {:ok, message} ->
         {:reply, {:ok, serialize_message(message)}, socket}
@@ -84,6 +86,7 @@ defmodule MilosTrainingWeb.ChatChannel do
       sender_id: message.sender_id,
       body: message.body,
       message_type: message.message_type,
+      client_operation_id: message.client_operation_id,
       inserted_at: message.inserted_at
     }
   end

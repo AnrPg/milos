@@ -1,7 +1,17 @@
 defmodule MilosTraining.Application.SubmitReview do
   alias MilosTraining.Application.{BroadcastUserSync, RecordAnalyticsEvent}
   alias MilosTraining.Feedback.Domain.ReviewEligibility
-  alias MilosTraining.{Analytics, Execution, Feedback, Finance, Identity, Scheduling, Workouts}
+
+  alias MilosTraining.{
+    Analytics,
+    Execution,
+    Feedback,
+    Finance,
+    Identity,
+    Notifications,
+    Scheduling,
+    Workouts
+  }
 
   def call(user_id, params) do
     with {:ok, target_snapshot} <- target_snapshot(user_id, params),
@@ -21,9 +31,21 @@ defmodule MilosTraining.Application.SubmitReview do
       })
 
       broadcast_review_submitted(user_id, review.id)
+      dispatch_review_notification(user_id, review)
 
       {:ok, review}
     end
+  end
+
+  defp dispatch_review_notification(user_id, review) do
+    Notifications.dispatch_event(:review_submitted, %{
+      review_id: review.id,
+      user_id: user_id,
+      target_type: review.target_type,
+      target_id: review.target_id,
+      rating: review.rating,
+      body: review.body
+    })
   end
 
   defp target_snapshot(user_id, params) do

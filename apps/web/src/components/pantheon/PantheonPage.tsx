@@ -10,12 +10,18 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { listPRs, deletePR, type PRRecord } from "@/api/gamification";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
+import { ShareExportDialog } from "@/components/share-export/ShareExportDialog";
+import { useShareExport } from "@/components/share-export/useShareExport";
+import { useUiLocale } from "@/i18n/use-ui-locale";
+import { buildPRListDocument } from "@/lib/document-export";
 import { PantheonCard } from "./PantheonCard";
 import { PRFormModal } from "./PRFormModal";
 import { PRShareModal } from "./PRShareModal";
 
 export function PantheonPage() {
   const i18n = useUiTranslations();
+  const uiLocale = useUiLocale();
+  const shareExport = useShareExport();
   const { tokens } = useSession();
   const queryClient = useQueryClient();
 
@@ -25,6 +31,7 @@ export function PantheonPage() {
 
   const [formPR, setFormPR] = useState<PRRecord | null | "new">(null);
   const [sharePR, setSharePR] = useState<PRRecord | null>(null);
+  const [exportOpen, setExportOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<PRRecord | null>(null);
 
   function handleSearchChange(q: string) {
@@ -51,6 +58,12 @@ export function PantheonPage() {
     },
   });
 
+  const exportQuery = useQuery({
+    queryKey: ["prs", "export-all"],
+    enabled: Boolean(tokens?.access_token && exportOpen),
+    queryFn: async () => listPRs(tokens!.access_token),
+  });
+
   const prs = prsQuery.data ?? [];
 
   return (
@@ -68,14 +81,24 @@ export function PantheonPage() {
             </h1>
           </div>
           </TransientHero>
-          <button
-            type="button"
-            onClick={() => setFormPR("new")}
-            className="rounded-2xl px-5 py-3 text-sm font-semibold"
-            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-          >
-            {i18n("newPrbfecbc9")}
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setExportOpen(true)}
+              className="rounded-xl px-4 py-3 text-sm font-semibold"
+              style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+            >
+              {exportOpen && exportQuery.isPending ? shareExport.copy.working : i18n("exportAllPrs")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setFormPR("new")}
+              className="rounded-xl px-4 py-3 text-sm font-semibold"
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+            >
+              {i18n("newPrbfecbc9")}
+            </button>
+          </div>
         </div>
 
         {/* Search */}
@@ -153,6 +176,14 @@ export function PantheonPage() {
       {sharePR && (
         <PRShareModal pr={sharePR} onClose={() => setSharePR(null)} />
       )}
+
+      {exportOpen && exportQuery.data ? (
+        <ShareExportDialog
+          copy={shareExport.copy}
+          document={buildPRListDocument(exportQuery.data, shareExport.labels, uiLocale)}
+          onClose={() => setExportOpen(false)}
+        />
+      ) : null}
     </main>
   );
 }

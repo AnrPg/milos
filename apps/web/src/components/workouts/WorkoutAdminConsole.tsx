@@ -12,8 +12,14 @@ import { useRouter } from "next/navigation";
 
 import { ApiError } from "@/api/client";
 import {
+  createWorkoutFolder,
+  deleteWorkoutFolder,
   deleteWorkout,
+  listWorkoutFolders,
   listAdminWorkouts,
+  moveWorkoutToFolder,
+  updateWorkoutFolder,
+  type WorkoutFolder,
   type WorkoutRecord,
 } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
@@ -23,18 +29,32 @@ import { AssignWorkoutPanel } from "@/components/workouts/AssignWorkoutPanel";
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
 import { SemanticLabel } from "@/components/semantic-label";
+import { ShareExportDialog } from "@/components/share-export/ShareExportDialog";
+import { useShareExport } from "@/components/share-export/useShareExport";
+import { buildWorkoutDocument } from "@/lib/document-export";
 
 export function WorkoutAdminConsole() {
   const i18n = useUiTranslations();
+  const shareExport = useShareExport();
   const router = useRouter();
   const { currentUser, signOut, status, tokens } = useSession();
   const [workouts, setWorkouts] = useState<WorkoutRecord[]>([]);
+  const [folders, setFolders] = useState<WorkoutFolder[]>([]);
+  const [viewMode, setViewMode] = useState<"folders" | "tiles" | "list">("folders");
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null | "all">("all");
+  const sortKey = "title" as const;
+  const [folderName, setFolderName] = useState("");
+  const [folderParentId, setFolderParentId] = useState<string>("");
+  const [folderModalOpen, setFolderModalOpen] = useState(false);
+  const [moveMenuWorkoutId, setMoveMenuWorkoutId] = useState<string | null>(null);
+  const [draggedWorkoutId, setDraggedWorkoutId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [editTarget, setEditTarget] = useState<WorkoutRecord | null>(null);
   const [assignTarget, setAssignTarget] = useState<WorkoutRecord | null>(null);
   const [previewWorkoutId, setPreviewWorkoutId] = useState<string | null>(null);
+  const [shareTarget, setShareTarget] = useState<WorkoutRecord | null>(null);
 
   function clearAdminData() {
     setWorkouts([]);
@@ -45,8 +65,12 @@ export function WorkoutAdminConsole() {
     if (currentUser.role !== "admin") return;
 
     try {
-      const workoutList = await listAdminWorkouts(tokens.access_token);
+      const [workoutList, folderList] = await Promise.all([
+        listAdminWorkouts(tokens.access_token),
+        listWorkoutFolders(tokens.access_token),
+      ]);
       setWorkouts(workoutList);
+      setFolders(folderList);
       setMessage(null);
       setError(null);
     } catch (loadError) {
@@ -134,6 +158,85 @@ export function WorkoutAdminConsole() {
     });
   }
 
+  const folderById = new Map(folders.map((folder) => [folder.id, folder]));
+  const currentFolder = typeof selectedFolderId === "string" && selectedFolderId !== "all" ? folderById.get(selectedFolderId) : undefined;
+  const folderLabel = (folder: WorkoutFolder) => {
+    const parts = [folder.name];
+    let parent = folder.parent_id ? folderById.get(folder.parent_id) : undefined;
+    while (parent) {
+      parts.unshift(parent.name);
+      parent = parent.parent_id ? folderById.get(parent.parent_id) : undefined;
+    }
+    return parts.join(" / ");
+  };
+  const folderPath = (() => {
+    if (!currentFolder) return [];
+    const parts: WorkoutFolder[] = [];
+    let node: WorkoutFolder | undefined = currentFolder;
+    while (node) {
+      parts.unshift(node);
+      node = node.parent_id ? folderById.get(node.parent_id) : undefined;
+    }
+    return parts;
+  })();
+  const orderedFolders = [...folders].sort((a, b) => folderLabel(a).localeCompare(folderLabel(b)));
+  const visibleFolders = viewMode === "folders"
+    ? orderedFolders.filter((folder) => selectedFolderId === "all" ? !folder.parent_id : folder.parent_id === selectedFolderId)
+    : [];
+  const visibleWorkouts = workouts
+    .filter((workout) => {
+      if (viewMode !== "folders") return selectedFolderId === "all" || workout.folder_id === selectedFolderId;
+      return selectedFolderId === "all" ? !workout.folder_id : workout.folder_id === selectedFolderId;
+    })
+    .sort((a, b) => String(a[sortKey] ?? "").localeCompare(String(b[sortKey] ?? "")));
+
+  async function addFolder() {
+    if (!tokens?.access_token || !folderName.trim()) return;
+    await runAction("create-folder", async () => {
+      const folder = await createWorkoutFolder(tokens.access_token!, {
+        name: folderName.trim(),
+        parent_id: folderParentId || null,
+      });
+      setFolders((current) => [...current, folder]);
+      setFolderName("");
+      setFolderModalOpen(false);
+    });
+  }
+
+  async function moveDraggedWorkout(folderId: string | null) {
+    if (!tokens?.access_token || !draggedWorkoutId) return;
+    const workoutId = draggedWorkoutId;
+    setDraggedWorkoutId(null);
+    await runAction(`move-${workoutId}`, async () => {
+      await moveWorkoutToFolder(tokens.access_token!, workoutId, folderId);
+      setWorkouts((current) => current.map((item) => item.id === workoutId ? { ...item, folder_id: folderId } : item));
+    });
+  }
+
+  async function renameFolder(folder: WorkoutFolder) {
+    if (!tokens?.access_token) return;
+    const name = window.prompt(i18n("featureFolderName"), folder.name)?.trim();
+    if (!name) return;
+    await runAction(`folder-${folder.id}`, async () => {
+      const updated = await updateWorkoutFolder(tokens.access_token!, folder.id, {
+        name,
+        parent_id: folder.parent_id,
+      });
+      setFolders((current) => current.map((item) => item.id === updated.id ? updated : item));
+    });
+  }
+
+  async function removeFolder(folder: WorkoutFolder) {
+    if (!tokens?.access_token || !window.confirm(
+      i18n("featureDeleteFolderConfirm", { name: folder.name }),
+    )) return;
+    await runAction(`folder-${folder.id}`, async () => {
+      await deleteWorkoutFolder(tokens.access_token!, folder.id);
+      setFolders((current) => current.filter((item) => item.id !== folder.id).map((item) => item.parent_id === folder.id ? { ...item, parent_id: folder.parent_id } : item));
+      setWorkouts((current) => current.map((item) => item.folder_id === folder.id ? { ...item, folder_id: folder.parent_id } : item));
+    });
+  }
+
   return (
     <main className="min-h-screen px-6 py-8 md:px-10 md:py-12" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-7xl space-y-8">
@@ -151,29 +254,6 @@ export function WorkoutAdminConsole() {
             </div>
           </div>
 
-          <div className="mt-6 flex flex-wrap gap-3 text-sm font-semibold">
-            <Link
-              className="rounded-full px-4 py-2"
-              style={{ background: "var(--text)", color: "var(--bg)" }}
-              href="/admin/workouts"
-            >
-              {i18n("workoutList1f538d5")}
-            </Link>
-            <Link
-              className="rounded-full px-4 py-2 transition-colors"
-              style={{ background: "var(--border)", color: "var(--text-soft)" }}
-              href="/admin/workouts/new"
-            >
-              {i18n("newWorkout5fc6e4c")}
-            </Link>
-            <Link
-              className="rounded-full px-4 py-2 transition-colors"
-              style={{ background: "transparent", border: "1px solid var(--border)", color: "var(--dim)" }}
-              href="/admin/settings#level-taxonomy"
-            >
-              {i18n("levelTaxonomy893f642")}
-            </Link>
-          </div>
         </section>
         </TransientHero>
 
@@ -194,23 +274,116 @@ export function WorkoutAdminConsole() {
             <section className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>{i18n("masterWorkoutsd9ed039")}</p>
-                  <h2 className="mt-2 text-2xl font-semibold" style={{ color: "var(--text)" }}>{i18n("savedWorkoutDefinitions0b771a2")}</h2>
+                  <h2 className="text-2xl font-semibold" style={{ color: "var(--text)" }}>{i18n("semanticWorkoutLibrary")}</h2>
                 </div>
 
-                <Link
-                  className="rounded-full px-4 py-2 text-sm font-semibold"
-                  style={{ background: "var(--text)", color: "var(--bg)" }}
-                  href="/admin/workouts/new"
-                >
-                  {i18n("newWorkout5fc6e4c")}
-                </Link>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Link
+                    className="rounded-full px-4 py-2 text-sm font-semibold"
+                    style={{ background: "var(--text)", color: "var(--bg)" }}
+                    href="/admin/workouts/new"
+                  >
+                    {i18n("newWorkout5fc6e4c")}
+                  </Link>
+                  <button
+                    type="button"
+                    className="rounded-full px-4 py-2 text-sm font-semibold"
+                    style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+                    onClick={() => {
+                      setFolderParentId(currentFolder?.id ?? "");
+                      setFolderModalOpen(true);
+                    }}
+                  >
+                    {i18n("featureNewFolder")}
+                  </button>
+                </div>
               </div>
 
-              <div className="mt-6 grid gap-4 lg:grid-cols-2">
-                {workouts.map((workout) => (
-                  <article key={workout.id} className="rounded-[1.5rem] p-5" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", cursor: "pointer" }} onClick={() => setPreviewWorkoutId(workout.id)}>
-                    <div className="flex items-center justify-between gap-4">
+              <div className="mt-6 grid gap-4 rounded-[1.5rem] p-4 lg:grid-cols-[1fr_auto]" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                  <nav aria-label={i18n("featureFilterByFolder")} className="flex min-w-0 flex-wrap items-center gap-1 text-sm">
+                    <button type="button" className="rounded-full px-3 py-1.5 font-semibold" style={{ background: selectedFolderId === "all" ? "var(--text)" : "var(--panel)", color: selectedFolderId === "all" ? "var(--bg)" : "var(--text-soft)", border: "1px solid var(--border)" }} onClick={() => setSelectedFolderId("all")}>
+                      {i18n("featureLibraryRoot")}
+                    </button>
+                    {folderPath.map((folder) => (
+                      <span key={folder.id} className="inline-flex items-center gap-1">
+                        <span style={{ color: "var(--dim)" }}>/</span>
+                        <button type="button" className="rounded-full px-3 py-1.5 font-semibold" style={{ background: folder.id === selectedFolderId ? "var(--text)" : "var(--panel)", color: folder.id === selectedFolderId ? "var(--bg)" : "var(--text-soft)", border: "1px solid var(--border)" }} onClick={() => setSelectedFolderId(folder.id)}>
+                          {folder.name}
+                        </button>
+                      </span>
+                    ))}
+                  </nav>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>{i18n("featureViewLabel")}</span>
+                  {(["folders", "tiles", "list"] as const).map((mode) => <button key={mode} type="button" aria-pressed={viewMode === mode} className="rounded-full px-3 py-2 text-sm font-semibold capitalize" style={{ background: viewMode === mode ? "var(--text)" : "var(--panel)", color: viewMode === mode ? "var(--bg)" : "var(--text-soft)", border: "1px solid var(--border)" }} onClick={() => setViewMode(mode)}>{i18n(`featureView${mode[0].toUpperCase()}${mode.slice(1)}`)}</button>)}
+                </div>
+              </div>
+
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                {viewMode === "folders" && selectedFolderId !== "all" ? (
+                  <button type="button" className="rounded-full px-3 py-2 text-sm font-semibold" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text-soft)" }} onClick={() => setSelectedFolderId(currentFolder?.parent_id ?? "all")}>
+                    {i18n("backb52b36b")}
+                  </button>
+                ) : null}
+              </div>
+
+              {viewMode === "folders" ? (
+                <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {visibleFolders.map((folder) => {
+                    const childCount = folders.filter((item) => item.parent_id === folder.id).length;
+                    const workoutCount = workouts.filter((item) => item.folder_id === folder.id).length;
+                    return (
+                      <article
+                        key={folder.id}
+                        className="relative rounded-[1.2rem] p-4 transition-transform hover:-translate-y-0.5"
+                        style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
+                        onDragOver={(event) => event.preventDefault()}
+                        onDrop={() => void moveDraggedWorkout(folder.id)}
+                      >
+                        <button type="button" className="w-full text-start" onClick={() => setSelectedFolderId(folder.id)}>
+                          <div className="flex items-center gap-3">
+                            <span className="text-3xl" aria-hidden>📁</span>
+                            <div className="min-w-0">
+                              <p className="truncate font-semibold" style={{ color: "var(--text)" }}>{folder.name}</p>
+                              <p className="text-xs" style={{ color: "var(--muted)" }}>{workoutCount} {i18n("workoutsccb58b2")} · {childCount} {i18n("featureViewFolders")}</p>
+                            </div>
+                          </div>
+                        </button>
+                        <div className="absolute end-3 top-3 flex gap-1">
+                          <button aria-label={i18n("edit5301648")} title={i18n("edit5301648")} type="button" className="grid h-7 w-7 place-items-center rounded-md text-xs opacity-55 hover:opacity-100" style={{ background: "var(--panel)", color: "var(--text-soft)" }} onClick={() => void renameFolder(folder)}>✎</button>
+                          <button aria-label={i18n("deletef6fdbe4")} title={i18n("deletef6fdbe4")} type="button" className="grid h-7 w-7 place-items-center rounded-md text-sm opacity-55 hover:opacity-100" style={{ background: "var(--panel)", color: "var(--danger)" }} onClick={() => void removeFolder(folder)}>×</button>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              ) : null}
+
+              {viewMode === "list" ? (
+                <div className="mt-6 overflow-hidden rounded-lg" style={{ border: "1px solid var(--border)" }}>
+                  {visibleWorkouts.map((workout) => (
+                    <button key={workout.id} type="button" className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-b px-4 py-3 text-start last:border-b-0 hover:bg-[var(--panel-muted)]" style={{ borderColor: "var(--border)", color: "var(--text)" }} onClick={() => setPreviewWorkoutId(workout.id)}>
+                      <span className="min-w-0"><strong className="block truncate text-sm">{workout.title || i18n("untitledWorkouta1885a5")}</strong><span className="text-xs" style={{ color: "var(--muted)" }}><SemanticLabel value={workout.type} /></span></span>
+                      <span className="text-xs font-semibold" style={{ color: workout.status === "draft" ? "var(--warning)" : "var(--success)" }}><SemanticLabel value={workout.status ?? "published"} /></span>
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+
+              <div className={viewMode === "list" ? "hidden" : "mt-6 grid gap-4 lg:grid-cols-2"}>
+                {visibleWorkouts.map((workout) => (
+                  <article
+                    key={workout.id}
+                    className="rounded-[1.5rem] p-5"
+                    draggable={viewMode === "folders"}
+                    onDragStart={() => setDraggedWorkoutId(workout.id)}
+                    onDragEnd={() => setDraggedWorkoutId(null)}
+                    style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", cursor: viewMode === "folders" ? "grab" : "pointer" }}
+                    onClick={() => setPreviewWorkoutId(workout.id)}
+                  >
+                    <div className="flex items-start justify-between gap-4">
                       <div>
                         <div className="flex items-center gap-2">
                           <p className="text-lg font-semibold" style={{ color: "var(--text)" }}>{workout.title || i18n("untitledWorkouta1885a5")}</p>
@@ -227,12 +400,26 @@ export function WorkoutAdminConsole() {
                         </div>
                         <p className="mt-1 text-sm uppercase tracking-[0.18em] text-[var(--primary)]"><SemanticLabel value={workout.type} /></p>
                       </div>
-                      <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--muted)" }}>
-                        {(workout.sections ?? []).length} {i18n("section20182fb")}{(workout.sections ?? []).length === 1 ? "" : i18n("sa0f1490")}
-                      </span>
+                      <div className="flex shrink-0 items-center gap-1" onClick={(event) => event.stopPropagation()}>
+                        <button type="button" aria-label={i18n("featureMoveToFolder")} title={i18n("featureMoveToFolder")} className="grid h-8 w-8 place-items-center rounded-full text-sm opacity-65 hover:opacity-100" style={{ background: "var(--panel)", color: "var(--text-soft)", border: "1px solid var(--border)" }} onClick={() => setMoveMenuWorkoutId((id) => id === workout.id ? null : workout.id)}>↪</button>
+                        {workout.status === "published" ? <button type="button" aria-label={i18n("edit5301648")} title={i18n("edit5301648")} className="grid h-8 w-8 place-items-center rounded-full text-sm opacity-65 hover:opacity-100" style={{ background: "var(--panel)", color: "var(--text-soft)", border: "1px solid var(--border)" }} onClick={() => setEditTarget(workout)}>✎</button> : null}
+                        <button type="button" aria-label={shareExport.copy.title} title={shareExport.copy.title} className="grid h-8 w-8 place-items-center rounded-full text-sm opacity-65 hover:opacity-100" style={{ background: "var(--panel)", color: "var(--success)", border: "1px solid var(--border)" }} onClick={() => setShareTarget(workout)}>⇪</button>
+                        <button type="button" aria-label={i18n("deletef6fdbe4")} title={i18n("deletef6fdbe4")} disabled={busyAction === `delete-${workout.id}`} className="grid h-8 w-8 place-items-center rounded-full text-sm opacity-65 hover:opacity-100 disabled:opacity-30" style={{ background: "var(--panel)", color: "var(--danger)", border: "1px solid var(--border)" }} onClick={() => void handleDeleteWorkout(workout)}>×</button>
+                      </div>
                     </div>
 
                     <div className="mt-4 flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
+                      {moveMenuWorkoutId === workout.id ? <select aria-label={i18n("featureFolderForWorkout", { title: workout.title })} className="rounded-full px-3 py-1 text-xs" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} value={workout.folder_id ?? ""} onChange={(event) => {
+                        const folderId = event.target.value || null;
+                        if (!tokens?.access_token) return;
+                        void moveWorkoutToFolder(tokens.access_token, workout.id, folderId).then(() => {
+                          setWorkouts((current) => current.map((item) => item.id === workout.id ? { ...item, folder_id: folderId } : item));
+                          setMoveMenuWorkoutId(null);
+                        });
+                      }}>
+                        <option value="">{i18n("featureUncategorized")}</option>
+                        {orderedFolders.map((folder) => <option key={folder.id} value={folder.id}>{folderLabel(folder)}</option>)}
+                      </select> : null}
                       {workout.status === "draft" ? (
                         <Link
                           className="rounded-full px-3 py-1 text-xs font-semibold"
@@ -252,28 +439,10 @@ export function WorkoutAdminConsole() {
                             onClick={(e) => { e.stopPropagation(); setAssignTarget(workout); }}
                             type="button"
                           >
-                            {i18n("assignToAthletesafa315d")}
-                          </button>
-                          <button
-                            className="rounded-full px-3 py-1 text-xs font-semibold"
-                            style={{ background: "var(--border)", color: "var(--text-soft)" }}
-                            onClick={(e) => { e.stopPropagation(); setEditTarget(workout); }}
-                            type="button"
-                          >
-                            {i18n("edit5301648")}
+                            {i18n("featureAssignToAthleteOrClass")}
                           </button>
                         </>
                       ) : null}
-
-                      <button
-                        className="rounded-full px-3 py-1 text-xs font-semibold disabled:opacity-50"
-                        style={{ background: "color-mix(in srgb, var(--primary) 16%, transparent)", color: "var(--primary-strong)" }}
-                        disabled={busyAction === `delete-${workout.id}`}
-                        onClick={(e) => { e.stopPropagation(); void handleDeleteWorkout(workout); }}
-                        type="button"
-                      >
-                        {busyAction === `delete-${workout.id}` ? i18n("deletinge16cac6") : i18n("deletef6fdbe4")}
-                      </button>
 
                       {workout.available_scale_levels.length > 0 ? (
                         workout.available_scale_levels.map((scaleLevel) => (
@@ -307,6 +476,49 @@ export function WorkoutAdminConsole() {
           </>
         )}
       </div>
+
+      {folderModalOpen ? (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,.65)" }} onClick={() => setFolderModalOpen(false)} role="presentation">
+          <form
+            className="w-full max-w-md rounded-[1.5rem] p-5 shadow-[0_30px_90px_rgba(0,0,0,.35)]"
+            style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+            onClick={(event) => event.stopPropagation()}
+            onSubmit={(event) => {
+              event.preventDefault();
+              void addFolder();
+            }}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}>{i18n("featureNewFolder")}</p>
+                <h2 className="mt-1 text-xl font-semibold" style={{ color: "var(--text)" }}>{i18n("featureAddFolder")}</h2>
+              </div>
+              <button type="button" className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--muted)" }} onClick={() => setFolderModalOpen(false)}>
+                {i18n("closebbfa773")}
+              </button>
+            </div>
+            <label className="mt-5 block text-sm font-semibold" style={{ color: "var(--muted)" }}>
+              {i18n("featureFolderName")}
+              <input aria-label={i18n("featureNewFolderName")} className="mt-2 w-full rounded-xl px-3 py-2 text-sm" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }} value={folderName} onChange={(event) => setFolderName(event.target.value)} />
+            </label>
+            <label className="mt-4 block text-sm font-semibold" style={{ color: "var(--muted)" }}>
+              {i18n("featureParentFolder")}
+              <select aria-label={i18n("featureParentFolder")} className="mt-2 w-full rounded-xl px-3 py-2 text-sm" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }} value={folderParentId} onChange={(event) => setFolderParentId(event.target.value)}>
+                <option value="">{i18n("featureLibraryRoot")}</option>
+                {orderedFolders.map((folder) => <option key={folder.id} value={folder.id}>{folderLabel(folder)}</option>)}
+              </select>
+            </label>
+            <div className="mt-5 flex justify-end gap-2">
+              <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }} onClick={() => setFolderModalOpen(false)}>
+                {i18n("cancel77dfd21")}
+              </button>
+              <button type="submit" disabled={!folderName.trim() || busyAction === "create-folder"} className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
+                {i18n("featureAddFolder")}
+              </button>
+            </div>
+          </form>
+        </div>
+      ) : null}
 
       {editTarget && tokens?.access_token ? (
         <WorkoutEditModal
@@ -354,7 +566,7 @@ export function WorkoutAdminConsole() {
                   <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}><SemanticLabel value={pw.type} /></p>
                   <h2 className="mt-1 text-xl font-semibold" style={{ color: "var(--text)" }}>{pw.title || i18n("untitledWorkouta1885a5")}</h2>
                   <p className="mt-1 text-sm" style={{ color: "var(--dim)" }}>
-                    {pw.sections.length} {i18n("section20182fb")}{pw.sections.length === 1 ? "" : i18n("sa0f1490")} · {pw.available_scale_levels.length > 0 ? i18n("scaleLevelCount", {count: pw.available_scale_levels.length}) : i18n("baseOnly061c4ff")}
+                    {pw.available_scale_levels.length > 0 ? i18n("scaleLevelCount", {count: pw.available_scale_levels.length}) : i18n("baseOnly061c4ff")}
                   </p>
                 </div>
                 <button
@@ -367,12 +579,26 @@ export function WorkoutAdminConsole() {
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto px-6 py-5">
-                <WorkoutPreviewDetail sections={pw.sections} initiallyExpanded />
+                <WorkoutPreviewDetail
+                  sections={pw.sections}
+                  initiallyExpanded
+                  authoringMode={pw.authoring_mode}
+                  freeTextBody={pw.free_text_body}
+                  freeTextDocument={pw.free_text_document}
+                />
               </div>
             </aside>
           </>
         );
       })() : null}
+
+      {shareTarget ? (
+        <ShareExportDialog
+          copy={shareExport.copy}
+          document={buildWorkoutDocument(shareTarget, shareExport.labels)}
+          onClose={() => setShareTarget(null)}
+        />
+      ) : null}
     </main>
   );
 }

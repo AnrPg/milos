@@ -7,7 +7,9 @@ the original wording and dates for traceability.
 
 | ID | Status |
 |---|---|
-| TD-001–TD-005 | Open |
+| TD-001–TD-002 | Open |
+| TD-003 | Resolved |
+| TD-004–TD-005 | Open |
 | TD-006 | Resolved |
 | TD-007–TD-008 | Open |
 | TD-009 | Resolved |
@@ -25,6 +27,9 @@ the original wording and dates for traceability.
 | TD-032 | Resolved |
 | TD-033 | Open |
 | TD-034 | Open |
+| TD-035 | Open |
+| TD-036 | Resolved |
+| TD-037 | Open |
 
 ## Detailed Ledger
 
@@ -32,7 +37,7 @@ the original wording and dates for traceability.
 |---|---|---|---|---|---|
 | TD-001 | Phase 0 | Stripe payment gateway integration | Manual-only in v1 per spec | Medium | 2026-06-05 |
 | TD-002 | Phase 2 | Admin UI does not yet author nested sub-sections despite backend support for `parent_section_id` | Phase 2 shipped the flat linear editor first to keep the core creation/materialization flow stable | Medium | 2026-06-05 |
-| TD-003 | Phase 2 | Workout canvas does not yet support desktop cross-section exercise drag-hover moves | Phase 2 shipped sortable sections, sortable in-section exercises, and explicit move-to-section controls first to keep the authoring flow stable | Medium | 2026-06-07 |
+| TD-003 | Phase 2 | Resolved 2026-07-31: desktop cross-section exercise drag-hover moves preserve drag-start metadata while the destination section opens, so dropping reliably moves the exercise | Kept in the ledger for traceability of the original explicit-move-only fallback | Low | 2026-06-07 |
 | TD-004 | Phase 3 | Schedule UI uses a custom responsive day-column calendar instead of `react-big-calendar` | Phase 3 avoided introducing an additional date-localizer dependency while shipping the booking and approval flow end-to-end | Medium | 2026-06-08 |
 | TD-005 | Phase 3 | Admin cannot delete a slot that already has bookings; backend blocks deletion instead of offering a confirm-and-cancel/archive flow | Phase 3 chose safe non-destructive behavior first to avoid silently dropping booking history or member state | Medium | 2026-06-08 |
 | TD-006 | Phase 7 | Landing-page membership card has no live data source yet and remains hidden unless membership fields are added in a later phase | Membership persistence and admin financial tooling have not been implemented yet, so Phase 7 could only ship the optional UI slot and read-model placeholder | Medium | 2026-06-09 |
@@ -64,3 +69,6 @@ the original wording and dates for traceability.
 | TD-032 | Localization Phase 3 live verification | Resolved 2026-07-16: local and Compose deployments publish MinIO through Caddy at `http://media.localhost:18080`; presigned URLs, the web CSP, `.env.example`, and the media virtual host share that origin | Kept for traceability of the local avatar/CSP mismatch | Low | 2026-07-16 |
 | TD-033 | Training Log | Add standalone training-log aggregate for class or offline workouts that were never started as `workout_executions` | ADR-050 hardens actual-workout patches on the existing execution aggregate first; non-execution logs need source selection, authorization, and completion/gamification semantics without overloading timer execution state | High | 2026-07-17 |
 | TD-034 | Multi-tenancy | Automate delivery of one-off tenant-scoped registration invitations through verified email links or an OTP provider, including delivery status, retry, abuse controls, and recovery workflows | The initial multi-tenant rollout will have the platform owner distribute invitations manually; provider selection, sender-domain configuration, privacy review, and operational monitoring require a dedicated integration phase | High | 2026-07-18 |
+| TD-035 | Offline Commands | Add retry/remove controls for permanently failed message operations plus explicit outbox adapters and server idempotency/conflict policies for selected non-message notification-triggering commands | ADR-067 deliberately enables automatic retry for transient message failures first; permanent failures need explicit UX, while booking, approval, journal, and other commands must opt in through their owning contexts rather than being replayed generically | Medium | 2026-07-19 |
+| TD-036 | Workout Quick Text DSL | Resolved 2026-07-31 by ADR-069/ADR-070: all nineteen registry-generated templates, nested metadata and tweak combinations, stable code-backed exercise catalog IDs, positioned diagnostics, revision-safe direct publication, conformance coverage, autocomplete, and the coach manual now share one canonical contract | Kept in the ledger for traceability of the original first-slice limitation | Low | 2026-07-31 |
+| TD-037 | User-profile programming | Support personalized WODs or per-member WOD modifications independently of a booked class | Members currently receive workouts only through booked classes by explicit product decision; the ownership, execution, and entitlement semantics for direct personalized member programming need a separate design | Medium | 2026-08-01 |

@@ -5,15 +5,17 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
-import { localizeError } from "@/i18n/presentation";
+import { localizeAdminAssignmentError, localizeError } from "@/i18n/presentation";
 import { useEffect, useState } from "react";
 
 import { ApiError } from "@/api/client";
 import { assignWorkout, listAthletes, type AthleteOption } from "@/api/assigned-workouts";
+import { fetchSchedule, updateScheduleSlot, type ScheduleSlot } from "@/api/schedule";
 import { fetchAdminWorkout, type WorkoutRecord } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { formatLocalDate } from "@/lib/local-date";
 import { SemanticLabel } from "@/components/semantic-label";
+import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
 
 type Props = {
   workoutId: string;
@@ -26,8 +28,11 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
   const { tokens, signOut } = useSession();
   const [workout, setWorkout] = useState<WorkoutRecord | null>(null);
   const [athletes, setAthletes] = useState<AthleteOption[]>([]);
+  const [mode, setMode] = useState<"athletes" | "class">("athletes");
   const [query, setQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [slots, setSlots] = useState<ScheduleSlot[]>([]);
+  const [selectedSlotId, setSelectedSlotId] = useState("");
   const [scheduledFor, setScheduledFor] = useState(() => formatLocalDate(new Date()));
   const [adminNotes, setAdminNotes] = useState("");
   const [loading, setLoading] = useState(true);
@@ -89,6 +94,30 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
     };
   }, [query, tokens?.access_token]);
 
+  useEffect(() => {
+    if (!tokens?.access_token || mode !== "class") return;
+    let cancelled = false;
+    const start = new Date();
+    const end = new Date();
+    end.setDate(end.getDate() + 30);
+    void fetchSchedule(tokens.access_token, {
+      startAt: start.toISOString(),
+      endAt: end.toISOString(),
+      days: 30,
+      classTypeIds: [],
+    })
+      .then((window) => {
+        if (cancelled) return;
+        setSlots(window.slots ?? []);
+      })
+      .catch(() => {
+        if (!cancelled) setSlots([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, tokens?.access_token]);
+
   async function submitAssignment() {
     if (!tokens?.access_token) return;
 
@@ -103,6 +132,33 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
         admin_notes: adminNotes.trim() || undefined,
       });
 
+      onAssigned();
+      onClose();
+    } catch (requestError) {
+      setError(requestError instanceof Error ? localizeAdminAssignmentError(requestError, i18n) : i18n("couldNotAssignWorkout58ad222"));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function submitClassAssignment() {
+    if (!tokens?.access_token || !selectedSlotId) return;
+    const slot = slots.find((item) => item.id === selectedSlotId);
+    if (!slot) return;
+
+    setSaving(true);
+    setError(null);
+    try {
+      await updateScheduleSlot(tokens.access_token, selectedSlotId, {
+        master_workout_id: workoutId,
+        class_type_id: slot.class_type_id,
+        name: slot.name,
+        duration_minutes: slot.duration_minutes,
+        scheduled_at: slot.scheduled_at,
+        capacity: slot.capacity,
+        auto_approve: slot.auto_approve,
+        booking_timeout_minutes: slot.booking_timeout_minutes,
+      });
       onAssigned();
       onClose();
     } catch (requestError) {
@@ -165,104 +221,127 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
           {/* Workout summary */}
           {workout && !loading ? (
             <section
-              className="rounded-[1.4rem] p-4 space-y-2"
+              className="rounded-[1.4rem] p-4"
               style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
             >
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--primary)]">
                 <SemanticLabel value={workout.type} />
               </p>
-              <div className="space-y-1">
-                {workout.sections.map((section) => (
-                  <div
-                    key={section.id ?? (workout.id) + "-" + (section.order)}
-                    className="flex items-center justify-between gap-3"
-                  >
-                    <span className="text-sm" style={{ color: "var(--text)" }}>{section.name}</span>
-                    <span className="text-xs" style={{ color: "var(--dim)" }}>
-                      {section.exercises.length} {i18n("exercises0ee6e81")}
-                    </span>
-                  </div>
-                ))}
+              <div className="mt-3">
+                <WorkoutPreviewDetail
+                  sections={workout.sections}
+                  initiallyExpanded
+                  hideScaleChips
+                  authoringMode={workout.authoring_mode}
+                  freeTextBody={workout.free_text_body}
+                  freeTextDocument={workout.free_text_document}
+                />
               </div>
             </section>
           ) : null}
 
-          {/* Date */}
-          <label className="block">
-            <span className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
-              {i18n("dateeb9a4bc")}
-            </span>
-            <input
-              className="mt-2 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
-              style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-              onChange={(e) => setScheduledFor(e.target.value)}
-              type="date"
-              value={scheduledFor}
-            />
-          </label>
-
-          {/* Athlete search */}
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
-              {i18n("athletesda22204")}
-              {selectedIds.length > 0 ? (
-                <span
-                  className="ms-2 rounded-full px-1.5 py-0.5 text-[10px]"
-                  style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-                >
-                  {selectedIds.length} {i18n("selected835f3b5")}
-                </span>
-              ) : null}
-            </p>
-            <input
-              className="mt-2 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
-              style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-              onChange={(e) => {
-                setAthletesLoading(true);
-                setQuery(e.target.value);
-              }}
-              placeholder={i18n("searchByNicknameac5a7b7")}
-              value={query}
-            />
-
-            <div className="mt-3 max-h-56 space-y-2 overflow-y-auto pe-1">
-              {athletes.map((athlete) => {
-                const selected = selectedIds.includes(athlete.id);
-                return (
-                  <button
-                    key={athlete.id}
-                    className="flex w-full items-center justify-between rounded-[1rem] px-4 py-2.5 text-start text-sm transition-colors"
-                    style={
-                      selected
-                        ? { background: "var(--primary)", color: "var(--bg)" }
-                        : { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }
-                    }
-                    onClick={() =>
-                      setSelectedIds((current) =>
-                        current.includes(athlete.id)
-                          ? current.filter((id) => id !== athlete.id)
-                          : [...current, athlete.id],
-                      )
-                    }
-                    type="button"
-                  >
-                    <span className="font-semibold">{athlete.nickname}</span>
-                    <span className="text-xs uppercase tracking-[0.18em]">
-                      {selected ? i18n("selected9a976fc") : i18n("add61cc55a")}
-                    </span>
-                  </button>
-                );
-              })}
-              {!athletesLoading && athletes.length === 0 ? (
-                <p
-                  className="rounded-[1rem] px-4 py-4 text-sm"
-                  style={{ border: "1px dashed var(--border)", color: "var(--dim)" }}
-                >
-                  {i18n("noAthletesMatchedThatSearchd4f2c56")}
-                </p>
-              ) : null}
-            </div>
+          <div className="flex rounded-full p-1" style={{ background: "var(--border)" }}>
+            {([
+              ["athletes", i18n("athletesda22204")],
+              ["class", i18n("featureScheduledClass")],
+            ] as const).map(([nextMode, label]) => (
+              <button
+                key={nextMode}
+                type="button"
+                className="flex-1 rounded-full px-3 py-2 text-xs font-bold"
+                style={mode === nextMode ? { background: "var(--text)", color: "var(--bg)" } : { color: "var(--dim)" }}
+                onClick={() => setMode(nextMode)}
+              >
+                {label}
+              </button>
+            ))}
           </div>
+
+          {mode === "athletes" ? (
+            <>
+              <label className="block">
+                <span className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
+                  {i18n("dateeb9a4bc")}
+                </span>
+                <input
+                  className="mt-2 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
+                  style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+                  onChange={(e) => setScheduledFor(e.target.value)}
+                  type="date"
+                  value={scheduledFor}
+                />
+              </label>
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
+                  {i18n("athletesda22204")}
+                  {selectedIds.length > 0 ? (
+                    <span className="ms-2 rounded-full px-1.5 py-0.5 text-[10px]" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
+                      {selectedIds.length} {i18n("selected835f3b5")}
+                    </span>
+                  ) : null}
+                </p>
+                <input
+                  className="mt-2 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
+                  style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+                  onChange={(e) => {
+                    setAthletesLoading(true);
+                    setQuery(e.target.value);
+                  }}
+                  placeholder={i18n("searchByNicknameac5a7b7")}
+                  value={query}
+                />
+
+                <div className="mt-3 max-h-56 space-y-2 overflow-y-auto pe-1">
+                  {athletes.map((athlete) => {
+                    const selected = selectedIds.includes(athlete.id);
+                    return (
+                      <button
+                        key={athlete.id}
+                        className="flex w-full items-center justify-between rounded-[1rem] px-4 py-2.5 text-start text-sm transition-colors"
+                        style={selected ? { background: "var(--primary)", color: "var(--bg)" } : { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+                        onClick={() =>
+                          setSelectedIds((current) =>
+                            current.includes(athlete.id) ? current.filter((id) => id !== athlete.id) : [...current, athlete.id],
+                          )
+                        }
+                        type="button"
+                      >
+                        <span className="font-semibold">{athlete.nickname}</span>
+                        <span className="text-xs uppercase tracking-[0.18em]">
+                          {selected ? i18n("selected9a976fc") : i18n("add61cc55a")}
+                        </span>
+                      </button>
+                    );
+                  })}
+                  {!athletesLoading && athletes.length === 0 ? (
+                    <p className="rounded-[1rem] px-4 py-4 text-sm" style={{ border: "1px dashed var(--border)", color: "var(--dim)" }}>
+                      {i18n("noAthletesMatchedThatSearchd4f2c56")}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+            </>
+          ) : (
+            <label className="block">
+              <span className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
+                {i18n("featureScheduledClass")}
+              </span>
+              <select
+                className="mt-2 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
+                style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+                value={selectedSlotId}
+                onChange={(event) => setSelectedSlotId(event.target.value)}
+              >
+                <option value="">{i18n("featureChooseClass")}</option>
+                {slots.map((slot) => (
+                  <option key={slot.id} value={slot.id}>
+                    {new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(slot.scheduled_at))} · {slot.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
 
           {/* Admin notes */}
           <label className="block">
@@ -293,15 +372,17 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
           <button
             className="w-full rounded-full py-3 text-sm font-bold tracking-wide disabled:opacity-50"
             style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-            disabled={saving || selectedIds.length === 0 || loading || isUnassignable}
-            onClick={() => void submitAssignment()}
+            disabled={saving || loading || isUnassignable || (mode === "class" ? !selectedSlotId : selectedIds.length === 0)}
+            onClick={() => void (mode === "class" ? submitClassAssignment() : submitAssignment())}
             type="button"
           >
             {saving
-              ? i18n("assigning4d16a1a")
-              : selectedIds.length === 0
-                ? i18n("selectAthletesToAssign1666500")
-                : i18n("assignToAthletes", {count: selectedIds.length})}
+                ? i18n("assigning4d16a1a")
+                : mode === "class"
+                ? i18n("featureAssignToClass")
+                : selectedIds.length === 0
+                  ? i18n("selectAthletesToAssign1666500")
+                  : i18n("assignToAthletes", {count: selectedIds.length})}
           </button>
         </div>
       </div>
