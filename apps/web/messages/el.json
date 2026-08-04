@@ -2538,6 +2538,24 @@
     "workPhaseLabel": "Work",
     "restPhaseLabel": "Rest",
     "featureSectionCount": "{count, plural, one {# section} other {# sections}}",
-    "featureExerciseCount": "{count, plural, one {# exercise} other {# exercises}}"
+    "featureExerciseCount": "{count, plural, one {# exercise} other {# exercises}}",
+    "featureFinanceCleanupDefaultReason": "Εκκαθάριση από admin",
+    "featureFinanceCleanupTitle": "Εκκαθάριση οικονομικών εγγραφών",
+    "featureFinanceCleanupDescription": "Soft delete για λάθος τιμολόγια, αποδείξεις ή πληρωμές χωρίς αφαίρεση audit δεδομένων.",
+    "featureFinanceCleanupOpen": "Άνοιγμα εκκαθάρισης",
+    "featureFinanceCleanupCloseAria": "Κλείσιμο εκκαθάρισης",
+    "featureFinanceCleanupModalTitle": "Εκκαθάριση συναλλαγών",
+    "featureFinanceCleanupModalDescription": "Αναζήτησε κωδικό invoice, receipt ή payment, επίλεξε εγγραφή και βάλε ξανά τον κωδικό σου.",
+    "featureFinanceCleanupClose": "Κλείσιμο",
+    "featureFinanceCleanupSearchPlaceholder": "Αναζήτηση με κωδικό ή id",
+    "featureFinanceCleanupEmpty": "Δεν βρέθηκαν ενεργές εγγραφές.",
+    "featureFinanceCleanupUnknown": "άγνωστο",
+    "featureFinanceCleanupNoSelection": "Δεν έχει επιλεγεί εγγραφή",
+    "featureFinanceCleanupImpact": "Η εκκαθάριση κρύβει την εγγραφή από υπόλοιπα, overdue queues, revenue και profile λίστες.",
+    "featureFinanceCleanupReason": "Λόγος",
+    "featureFinanceCleanupPassword": "Κωδικός admin",
+    "featureFinanceCleanupSuccess": "Η εγγραφή εκκαθαρίστηκε.",
+    "featureFinanceCleanupPending": "Εκκαθάριση...",
+    "featureFinanceCleanupSubmit": "Οριστική εκκαθάριση"
   }
 }

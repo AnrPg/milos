@@ -2538,6 +2538,24 @@
     "workPhaseLabel": "Work",
     "restPhaseLabel": "Rest",
     "featureSectionCount": "{count, plural, one {# section} other {# sections}}",
-    "featureExerciseCount": "{count, plural, one {# exercise} other {# exercises}}"
+    "featureExerciseCount": "{count, plural, one {# exercise} other {# exercises}}",
+    "featureFinanceCleanupDefaultReason": "Admin purge",
+    "featureFinanceCleanupTitle": "Finance record cleanup",
+    "featureFinanceCleanupDescription": "Soft delete mistaken invoices, receipts, or payments without removing audit data.",
+    "featureFinanceCleanupOpen": "Open cleanup",
+    "featureFinanceCleanupCloseAria": "Close finance cleanup",
+    "featureFinanceCleanupModalTitle": "Transaction cleanup",
+    "featureFinanceCleanupModalDescription": "Search by invoice, receipt, or payment code, select a record, and re-enter your password.",
+    "featureFinanceCleanupClose": "Close",
+    "featureFinanceCleanupSearchPlaceholder": "Search by code or id",
+    "featureFinanceCleanupEmpty": "No active records found.",
+    "featureFinanceCleanupUnknown": "unknown",
+    "featureFinanceCleanupNoSelection": "No record selected",
+    "featureFinanceCleanupImpact": "Purge hides the record from balances, overdue queues, revenue, and profile lists.",
+    "featureFinanceCleanupReason": "Reason",
+    "featureFinanceCleanupPassword": "Admin password",
+    "featureFinanceCleanupSuccess": "The record was purged.",
+    "featureFinanceCleanupPending": "Purging...",
+    "featureFinanceCleanupSubmit": "Permanent purge"
   }
 }
