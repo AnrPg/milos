@@ -14,6 +14,7 @@ import { useTranslations } from "next-intl";
 import { fetchMyFinance } from "@/api/my-finance";
 import { fetchUnreadCount } from "@/api/messaging";
 import { fetchOrganizationMemberships } from "@/api/organizations";
+import { SELECTED_ORGANIZATION_SLUG_KEY } from "@/api/client";
 import { DirectMessagesPanel } from "@/components/chat/DirectMessagesPanel";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useSession } from "@/components/session-provider";
@@ -27,6 +28,10 @@ type UserRole = "member" | "athlete" | "admin";
 
 type NavLink = { href: string; labelKey: string; roles: UserRole[] };
 type AdminNavLink = { href: string; labelKey: string; mobileVisible: boolean };
+type OrganizationMembershipSummary = {
+  organization: { name: string; slug: string };
+  settings?: { brand_name?: string | null } | null;
+};
 
 const NAV_LINKS: NavLink[] = [
   { href: "/", labelKey: "home", roles: ["member", "athlete"] },
@@ -60,6 +65,27 @@ export function pathActive(pathname: string, href: string) {
     );
   }
   return pathname.startsWith(href);
+}
+
+export function tenantBrandName(
+  memberships: OrganizationMembershipSummary[],
+  selectedSlug?: string | null,
+) {
+  const selectedMembership =
+    selectedSlug ? memberships.find((entry) => entry.organization.slug === selectedSlug) : null;
+  const membership = selectedMembership ?? memberships[0];
+
+  return membership?.settings?.brand_name?.trim() || membership?.organization.name.trim() || null;
+}
+
+function storedOrganizationSlug() {
+  if (typeof window === "undefined") return null;
+
+  try {
+    return window.localStorage.getItem(SELECTED_ORGANIZATION_SLUG_KEY);
+  } catch {
+    return null;
+  }
 }
 
 function DashboardDropdown({ pathname }: { pathname: string }) {
@@ -220,7 +246,11 @@ export function TopNav() {
     queryFn: () => fetchOrganizationMemberships(tokens!.access_token),
     staleTime: 60_000,
   });
-  const hasTenantMembership = (membershipsQuery.data?.length ?? 0) > 0;
+  const memberships = Array.isArray(membershipsQuery.data) ? membershipsQuery.data : [];
+  const pathOrganizationSlug = pathname.match(/^\/org\/([^/]+)/)?.[1] ?? null;
+  const selectedOrganizationSlug = pathOrganizationSlug ?? storedOrganizationSlug();
+  const brandName = tenantBrandName(memberships, selectedOrganizationSlug) ?? i18n("milosTraining5b1a1c1");
+  const hasTenantMembership = memberships.length > 0;
   const showTenantShell = hasTenantMembership;
   const unreadQuery = useQuery({
     queryKey: ["messages", "unread"],
@@ -272,7 +302,7 @@ export function TopNav() {
           className="hidden shrink-0 text-xs font-bold uppercase tracking-[0.28em] sm:block"
           style={{ color: "var(--text)" }}
         >
-          {i18n("milose9defa8")}
+          {brandName}
         </Link>
 
         <nav className="flex min-w-0 flex-1 items-center gap-0.5 overflow-visible sm:gap-1">
