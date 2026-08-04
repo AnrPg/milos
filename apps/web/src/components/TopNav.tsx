@@ -13,6 +13,7 @@ import { useTranslations } from "next-intl";
 
 import { fetchMyFinance } from "@/api/my-finance";
 import { fetchUnreadCount } from "@/api/messaging";
+import { fetchOrganizationMemberships } from "@/api/organizations";
 import { DirectMessagesPanel } from "@/components/chat/DirectMessagesPanel";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useSession } from "@/components/session-provider";
@@ -199,6 +200,7 @@ export function TopNav() {
   const authenticated = status === "authenticated" && Boolean(tokens?.access_token) && Boolean(currentUser);
 
   const role = (currentUser?.role ?? "") as UserRole;
+  const isPlatformOwner = Boolean(currentUser?.platform_owner);
   const initials = currentUser?.nickname
     ? currentUser.nickname.slice(0, 2).toUpperCase()
     : "?";
@@ -212,9 +214,17 @@ export function TopNav() {
   });
   const outstandingCents = financeQuery.data?.total_outstanding_balance_cents ?? 0;
 
+  const membershipsQuery = useQuery({
+    queryKey: ["organization-memberships", tokens?.access_token],
+    enabled: authenticated,
+    queryFn: () => fetchOrganizationMemberships(tokens!.access_token),
+    staleTime: 60_000,
+  });
+  const hasTenantMembership = (membershipsQuery.data?.length ?? 0) > 0;
+  const showTenantShell = hasTenantMembership;
   const unreadQuery = useQuery({
     queryKey: ["messages", "unread"],
-    enabled: authenticated,
+    enabled: authenticated && showTenantShell,
     queryFn: () => fetchUnreadCount(tokens!.access_token),
     staleTime: 15 * 1000,
   });
@@ -266,9 +276,21 @@ export function TopNav() {
         </Link>
 
         <nav className="flex min-w-0 flex-1 items-center gap-0.5 overflow-visible sm:gap-1">
-          {role === "admin" ? <DashboardDropdown pathname={pathname} /> : null}
+          {isPlatformOwner ? (
+            <Link
+              href="/platform/organizations"
+              className="whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold transition-colors sm:px-3 sm:text-sm"
+              style={{
+                background: pathActive(pathname, "/platform") ? "var(--border)" : "transparent",
+                color: pathActive(pathname, "/platform") ? "var(--text)" : "var(--dim)",
+              }}
+            >
+              {t("platform")}
+            </Link>
+          ) : null}
+          {showTenantShell && role === "admin" ? <DashboardDropdown pathname={pathname} /> : null}
           <div className="flex min-w-0 items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-1">
-            {role === "admin"
+            {showTenantShell && role === "admin"
               ? ADMIN_NAV_LINKS.map((link) => {
                   const active = pathActive(pathname, link.href);
                   return (
@@ -286,7 +308,7 @@ export function TopNav() {
                   );
                 })
               : null}
-            {NAV_LINKS.filter((link) => link.roles.includes(role)).map((link) => {
+            {showTenantShell && NAV_LINKS.filter((link) => link.roles.includes(role)).map((link) => {
               const active = pathActive(pathname, link.href);
               const showBalanceBadge = link.href === "/account/billing" && outstandingCents > 0;
               return (
@@ -315,30 +337,32 @@ export function TopNav() {
         </nav>
 
         <div className="ms-auto flex shrink-0 items-center gap-1 sm:gap-2">
-          <NotificationBell />
+          {showTenantShell ? <NotificationBell /> : null}
 
-          <div className="relative shrink-0">
-            <button
-              type="button"
-              className="relative whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold transition-colors sm:px-3 sm:text-sm"
-              style={{
-                background: msgOpen ? "var(--border)" : "transparent",
-                color: msgOpen ? "var(--text)" : "var(--dim)",
-              }}
-              onClick={() => setMsgOpen((value) => !value)}
-            >
-              {t("chat")}
-              {unreadCount > 0 ? (
-                <span
-                  className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold"
-                  style={{ background: "var(--primary)", color: "var(--bg)" }}
-                >
-                  {unreadCount > 99 ? "99+" : unreadCount}
-                </span>
-              ) : null}
-            </button>
-            {msgOpen ? <DirectMessagesPanel onClose={() => setMsgOpen(false)} /> : null}
-          </div>
+          {showTenantShell ? (
+            <div className="relative shrink-0">
+              <button
+                type="button"
+                className="relative whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold transition-colors sm:px-3 sm:text-sm"
+                style={{
+                  background: msgOpen ? "var(--border)" : "transparent",
+                  color: msgOpen ? "var(--text)" : "var(--dim)",
+                }}
+                onClick={() => setMsgOpen((value) => !value)}
+              >
+                {t("chat")}
+                {unreadCount > 0 ? (
+                  <span
+                    className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold"
+                    style={{ background: "var(--primary)", color: "var(--bg)" }}
+                  >
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                ) : null}
+              </button>
+              {msgOpen ? <DirectMessagesPanel onClose={() => setMsgOpen(false)} /> : null}
+            </div>
+          ) : null}
 
           <div ref={menuRef} className="relative shrink-0">
             <button

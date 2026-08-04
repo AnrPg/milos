@@ -8,6 +8,7 @@
   },
   "Navigation": {
     "dashboard": "Панель управления",
+    "platform": "Platform",
     "home": "Главная",
     "users": "Пользователи",
     "finance": "Финансы",

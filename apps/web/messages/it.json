@@ -8,6 +8,7 @@
   },
   "Navigation": {
     "dashboard": "Cruscotto",
+    "platform": "Platform",
     "home": "Casa",
     "users": "Utenti",
     "finance": "Finanze",

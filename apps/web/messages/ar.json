@@ -8,6 +8,7 @@
   },
   "Navigation": {
     "dashboard": "لوحة التحكم",
+    "platform": "Platform",
     "home": "الرئيسية",
     "users": "المستخدمون",
     "finance": "المالية",

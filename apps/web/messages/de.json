@@ -8,6 +8,7 @@
   },
   "Navigation": {
     "dashboard": "Armaturenbrett",
+    "platform": "Platform",
     "home": "Start",
     "users": "Benutzer",
     "finance": "Finanzen",

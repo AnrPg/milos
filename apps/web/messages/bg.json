@@ -8,6 +8,7 @@
   },
   "Navigation": {
     "dashboard": "Табло",
+    "platform": "Platform",
     "home": "Начало",
     "users": "Потребители",
     "finance": "Финанси",

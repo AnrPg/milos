@@ -8,6 +8,7 @@
   },
   "Navigation": {
     "dashboard": "Dashboard",
+    "platform": "Platform",
     "home": "Home",
     "users": "Users",
     "finance": "Finance",

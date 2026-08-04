@@ -8,6 +8,7 @@
   },
   "Navigation": {
     "dashboard": "Πίνακας ελέγχου",
+    "platform": "Platform",
     "home": "Αρχική",
     "users": "Χρήστες",
     "finance": "Οικονομικά",

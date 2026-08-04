@@ -8,6 +8,7 @@
   },
   "Navigation": {
     "dashboard": "Dashboard",
+    "platform": "Platform",
     "home": "Thuis",
     "users": "Gebruikers",
     "finance": "Financiën",
