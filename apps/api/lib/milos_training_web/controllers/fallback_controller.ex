@@ -85,6 +85,27 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "not_found", error: "Not found"})
   end
 
+  def call(conn, {:error, :cannot_delete_self}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "cannot_delete_self", error: "You cannot delete your own account"})
+  end
+
+  def call(conn, {:error, :last_admin}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{code: "last_admin", error: "At least one admin account must remain"})
+  end
+
+  def call(conn, {:error, :user_has_restricted_history}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "user_has_restricted_history",
+      error: "This user has protected history and cannot be permanently deleted"
+    })
+  end
+
   def call(conn, {:error, :invalid_invitation}) do
     conn
     |> put_status(:not_found)
