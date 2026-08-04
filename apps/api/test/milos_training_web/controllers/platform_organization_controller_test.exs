@@ -113,4 +113,35 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
     assert "organization_settings_updated" in events
     assert "organization_suspended" in events
   end
+
+  test "archiving an organization soft-deletes tenant access and records lifecycle audit",
+       context do
+    {:ok, organization} = Organizations.create_organization(%{name: "Archive Gym"})
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: context.ordinary_user.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    conn =
+      context.conn
+      |> put_bearer_token(context.platform_user)
+      |> patch("/api/platform/organizations/#{organization.id}/lifecycle", %{status: "archived"})
+
+    assert %{"organization" => %{"status" => "archived"}} = json_response(conn, 200)
+
+    assert {:error, :inactive_organization} =
+             Organizations.resolve_tenant_context(context.ordinary_user, organization.slug)
+
+    assert Repo.exists?(
+             from event in OrganizationProvisioningEvent,
+               where:
+                 event.organization_id == ^organization.id and
+                   event.event == "organization_archived"
+           )
+  end
 end
