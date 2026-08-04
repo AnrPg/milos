@@ -43,3 +43,17 @@ organization slug against current membership. Existing schedule, chat, execution
 job, cache, search, and storage resources are catalogued in the ownership inventory;
 their key migrations stay paired with the owning T4/T5 data migrations so a scoped
 topic cannot imply isolation over unscoped rows.
+
+The T5 foundation now rejects missing organization scope in Scheduling reconciliation,
+timeout, series-extension, and messaging-delivery jobs; rejects missing owner scope
+in personal PR search jobs; namespaces landing cache keys by user; and validates
+canonical organization/user object prefixes before issuing MinIO URLs. Existing
+tenant member-search, notification, analytics, calendar-export, and legacy-object
+migrations remain coupled to their unfinished T4 ownership loops.
+
+On 2026-08-04 the remaining T4-T6 runtime loops were closed for Finance,
+Messaging, Notifications, Gamification, Analytics, Wellbeing, and Execution
+authorization reads. Legacy object migration is handled by
+`mix milos.storage.migrate_legacy_objects`, which dry-runs by default and, when
+applied, copies legacy invoice/avatar objects into canonical tenant/user prefixes,
+verifies destination bytes, and only then updates persisted PostgreSQL references.
