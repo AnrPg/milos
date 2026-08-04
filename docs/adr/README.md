@@ -91,3 +91,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-083 | Platform provisioning and tenant lifecycle | Accepted |
 | ADR-084 | Finance correction and soft-delete policy | Accepted |
 | ADR-085 | Tenant-scoped coaching projections | Accepted |
+| ADR-086 | TrainingJournal product shell and tenant branding | Accepted |

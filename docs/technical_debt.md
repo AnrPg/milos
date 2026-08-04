@@ -31,6 +31,7 @@ the original wording and dates for traceability.
 | TD-036 | Resolved |
 | TD-037 | Open |
 | TD-038–TD-039 | Resolved |
+| TD-040 | Open |
 
 ## Detailed Ledger
 
@@ -75,3 +76,4 @@ the original wording and dates for traceability.
 | TD-037 | User-profile programming | Support personalized WODs or per-member WOD modifications independently of a booked class | Members currently receive workouts only through booked classes by explicit product decision; the ownership, execution, and entitlement semantics for direct personalized member programming need a separate design | Medium | 2026-08-01 |
 | TD-038 | Multi-tenancy T4-T6 | Resolved 2026-08-04: ownership signatures, same-tenant constraints, owner/grant predicates, two-tenant tests, and forced RLS are now complete for Finance, Messaging, Notifications, Gamification, Analytics, and Wellbeing; `mix milos.tenancy.audit` and `mix milos.architecture` pass | Kept in ledger for traceability of the staged T4-T6 enforcement rollout | Low | 2026-08-03 |
 | TD-039 | Multi-tenant object migration | Resolved 2026-08-04: `mix milos.storage.migrate_legacy_objects` provides dry-run/apply migration for legacy `invoices/...` and avatar URLs into `organizations/<organization_id>/...` and `users/<user_id>/avatars/...`, with destination byte-checksum verification before persisted key updates | Kept in ledger for traceability of the operator-controlled object migration path | Low | 2026-08-03 |
+| TD-040 | Tenant branding | Add first-class tenant logo upload with tenant-scoped object storage, validation, preview, audit events, and UI consumption across branded surfaces | Organization settings currently store `brand_logo_url`; gym owners need direct upload rather than operator-managed URLs | Medium | 2026-08-04 |
