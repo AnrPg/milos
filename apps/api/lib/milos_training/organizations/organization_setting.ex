@@ -12,6 +12,9 @@ defmodule MilosTraining.Organizations.OrganizationSetting do
     field :timezone, :string, default: "UTC"
     field :default_locale, :string, default: "en"
     field :invitation_lifetime_seconds, :integer, default: 604_800
+    field :brand_name, :string
+    field :brand_logo_url, :string
+    field :brand_primary_color, :string
     field :settings, :map, default: %{}
 
     timestamps(type: :utc_datetime_usec)
@@ -24,6 +27,9 @@ defmodule MilosTraining.Organizations.OrganizationSetting do
       :timezone,
       :default_locale,
       :invitation_lifetime_seconds,
+      :brand_name,
+      :brand_logo_url,
+      :brand_primary_color,
       :settings
     ])
     |> validate_required([
@@ -35,6 +41,8 @@ defmodule MilosTraining.Organizations.OrganizationSetting do
     ])
     |> validate_length(:timezone, min: 1, max: 100)
     |> validate_length(:default_locale, min: 2, max: 20)
+    |> validate_length(:brand_name, max: 120)
+    |> validate_format(:brand_primary_color, ~r/^#[0-9A-Fa-f]{6}$/)
     |> validate_change(:invitation_lifetime_seconds, fn field, seconds ->
       if InvitationPolicy.valid_lifetime?(seconds),
         do: [],

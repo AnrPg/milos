@@ -1,9 +1,5 @@
 import Config
 
-config :milos_training,
-       :admin_registration_code,
-       System.get_env("ADMIN_REGISTRATION_CODE", "DEY48keGE")
-
 if System.get_env("PHX_SERVER") do
   config :milos_training, MilosTrainingWeb.Endpoint, server: true
 end
@@ -122,6 +118,9 @@ if config_env() == :prod do
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     socket_options: maybe_ipv6
+
+  config :milos_training,
+    migration_database_url: System.get_env("MIGRATION_DATABASE_URL") || database_url
 
   redis_url =
     System.get_env("REDIS_URL") ||

@@ -1,16 +1,23 @@
 defmodule MilosTraining.Organizations do
+  alias MilosTraining.Organizations.OrganizationStore
+
   alias MilosTraining.Organizations.Commands.{
     AddMembership,
     CreateOrganization,
     IssueInvitation,
+    ProvisionOrganization,
     RedeemInvitation,
-    RevokeInvitation
+    RevokeInvitation,
+    UpdateOrganizationLifecycle,
+    UpdateOrganizationSettings
   }
 
   alias MilosTraining.Organizations.Queries.{
     FindOrganization,
     InspectInvitation,
     ListMemberships,
+    ListProvisionedOrganizations,
+    ResolvePlatformContext,
     ResolveTenantContext
   }
 
@@ -39,6 +46,50 @@ defmodule MilosTraining.Organizations do
 
   def resolve_tenant_context(account, slug, request_metadata \\ %{}),
     do: ResolveTenantContext.call(account, slug, request_metadata)
+
+  def resolve_platform_context(account, request_metadata \\ %{}),
+    do: ResolvePlatformContext.call(account, request_metadata)
+
+  def grant_platform_owner(user_id), do: OrganizationStore.grant_platform_owner(user_id)
+
+  def provision_organization(context, params, issued_at \\ DateTime.utc_now()),
+    do: ProvisionOrganization.call(context, params, issued_at)
+
+  def list_provisioned_organizations(context),
+    do: ListProvisionedOrganizations.call(context)
+
+  def update_organization_lifecycle(
+        context,
+        organization_id,
+        status,
+        changed_at \\ DateTime.utc_now()
+      ),
+      do: UpdateOrganizationLifecycle.call(context, organization_id, status, changed_at)
+
+  def update_organization_settings(
+        context,
+        organization_id,
+        params,
+        changed_at \\ DateTime.utc_now()
+      ),
+      do: UpdateOrganizationSettings.call(context, organization_id, params, changed_at)
+
+  def resolve_system_tenant_context(organization_id, source, request_metadata \\ %{})
+      when is_binary(organization_id) and is_atom(source) do
+    case get_by_id(organization_id) do
+      %{status: :active} = organization ->
+        {:ok,
+         %MilosTraining.Organizations.SystemTenantContext{
+           organization: organization,
+           organization_id: organization.id,
+           source: source,
+           request_metadata: request_metadata || %{}
+         }}
+
+      _organization ->
+        {:error, :organization_not_found}
+    end
+  end
 
   def ensure_legacy_organization do
     case get_by_slug(@legacy_organization.slug) do

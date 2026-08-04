@@ -18,4 +18,15 @@ defmodule MilosTraining.Organizations.TenantContext do
     :role,
     request_metadata: %{}
   ]
+
+  @type t :: %__MODULE__{
+          organization: struct(),
+          membership: struct(),
+          account: struct(),
+          organization_id: Ecto.UUID.t(),
+          membership_id: Ecto.UUID.t(),
+          user_id: Ecto.UUID.t(),
+          role: atom(),
+          request_metadata: map()
+        }
 end

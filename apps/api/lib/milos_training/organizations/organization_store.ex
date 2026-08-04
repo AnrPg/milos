@@ -33,5 +33,48 @@ defmodule MilosTraining.Organizations.OrganizationStore do
   def get_invitation_with_organization(digest),
     do: impl().get_invitation_with_organization(digest)
 
+  @impl true
+  def grant_platform_owner(user_id), do: impl().grant_platform_owner(user_id)
+
+  @impl true
+  def get_platform_owner(user_id), do: impl().get_platform_owner(user_id)
+
+  @impl true
+  def provision_organization(organization_params, invitation_params, platform_user_id, issued_at),
+    do:
+      impl().provision_organization(
+        organization_params,
+        invitation_params,
+        platform_user_id,
+        issued_at
+      )
+
+  @impl true
+  def list_organizations, do: impl().list_organizations()
+
+  @impl true
+  def update_organization_lifecycle(organization_id, status, platform_user_id, changed_at),
+    do:
+      impl().update_organization_lifecycle(
+        organization_id,
+        status,
+        platform_user_id,
+        changed_at
+      )
+
+  @impl true
+  def get_organization_settings(organization_id),
+    do: impl().get_organization_settings(organization_id)
+
+  @impl true
+  def update_organization_settings(organization_id, params, platform_user_id, changed_at),
+    do:
+      impl().update_organization_settings(
+        organization_id,
+        params,
+        platform_user_id,
+        changed_at
+      )
+
   defp impl, do: Application.fetch_env!(:milos_training, :organization_store)
 end

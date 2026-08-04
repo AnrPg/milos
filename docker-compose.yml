@@ -4,7 +4,8 @@ services:
       context: ./apps/api
       dockerfile: Dockerfile
     environment:
-      DATABASE_URL: ecto://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres/${DB_NAME:-milos_training_dev}
+      DATABASE_URL: ecto://${DB_RUNTIME_USER:-milos_runtime}:${DB_RUNTIME_PASSWORD:?set DB_RUNTIME_PASSWORD in your environment or .env}@postgres/${DB_NAME:-milos_training_dev}
+      MIGRATION_DATABASE_URL: ecto://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres/${DB_NAME:-milos_training_dev}
       DB_HOST: postgres
       DB_NAME: ${DB_NAME:-milos_training_dev}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
@@ -117,8 +118,11 @@ services:
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
       POSTGRES_DB: ${DB_NAME:-milos_training_dev}
+      POSTGRES_RUNTIME_USER: ${DB_RUNTIME_USER:-milos_runtime}
+      POSTGRES_RUNTIME_PASSWORD: ${DB_RUNTIME_PASSWORD:?set DB_RUNTIME_PASSWORD in your environment or .env}
     volumes:
       - ./.postgres-data:/var/lib/postgresql/data
+      - ./ops/postgres/init:/docker-entrypoint-initdb.d:ro
     networks: [app]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-milos_training_dev}"]
