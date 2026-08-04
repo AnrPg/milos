@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 
+import { SELECTED_ORGANIZATION_SLUG_KEY } from "@/api/client";
 import { fetchOrganizationMemberships } from "@/api/organizations";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
@@ -12,6 +14,14 @@ export function OrganizationSelector() {
   const pathname = usePathname();
   const router = useRouter();
   const { tokens } = useSession();
+  const [storedSlug, setStoredSlug] = useState(() => {
+    if (typeof window === "undefined") return "";
+    try {
+      return window.localStorage.getItem(SELECTED_ORGANIZATION_SLUG_KEY) ?? "";
+    } catch {
+      return "";
+    }
+  });
 
   const memberships = useQuery({
     queryKey: ["organization-memberships"],
@@ -20,7 +30,27 @@ export function OrganizationSelector() {
     staleTime: 60_000,
   });
 
-  const selectedSlug = pathname.match(/^\/org\/([^/]+)/)?.[1] ?? "";
+  const pathSlug = pathname.match(/^\/org\/([^/]+)/)?.[1] ?? "";
+  const membershipsBySlug = useMemo(
+    () => new Map((memberships.data ?? []).map((entry) => [entry.organization.slug, entry])),
+    [memberships.data],
+  );
+  const fallbackSlug = memberships.data?.[0]?.organization.slug ?? "";
+  const selectedSlug =
+    pathSlug && membershipsBySlug.has(pathSlug)
+      ? pathSlug
+      : storedSlug && membershipsBySlug.has(storedSlug)
+        ? storedSlug
+        : fallbackSlug;
+
+  useEffect(() => {
+    if (!selectedSlug || selectedSlug === storedSlug) return;
+
+    try {
+      window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, selectedSlug);
+    } catch {}
+  }, [selectedSlug, storedSlug]);
+
   if (!memberships.data?.length) return null;
 
   return (
@@ -29,12 +59,17 @@ export function OrganizationSelector() {
       className="max-w-40 rounded-md px-2 py-1 text-xs outline-none"
       onChange={(event) => {
         const slug = event.target.value;
-        const membership = memberships.data.find((entry) => entry.organization.slug === slug);
+        const membership = membershipsBySlug.get(slug);
         if (!membership) return;
+
+        try {
+          window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, slug);
+        } catch {}
+        setStoredSlug(slug);
 
         router.push(
           ["owner", "admin", "coach"].includes(membership.role)
-            ? `/org/${slug}/admin`
+            ? "/admin"
             : `/org/${slug}`,
         );
       }}

@@ -24,6 +24,7 @@ import {
 } from "@/api/auth";
 import {
   broadcastSessionSignOut,
+  SELECTED_ORGANIZATION_SLUG_KEY,
   SESSION_EXPIRED_EVENT,
   SESSION_UPDATED_EVENT,
   setApiSessionUser,
@@ -95,6 +96,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   function resetSession(accessTokenForCleanup?: string | null) {
     resetRealtimeSocket();
     void setWorkoutCacheUser(null);
+    try {
+      window.localStorage.removeItem(SELECTED_ORGANIZATION_SLUG_KEY);
+    } catch {}
     setTokens(null);
     setCurrentUser(null);
     setStatus("guest");

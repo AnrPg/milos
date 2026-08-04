@@ -1,4 +1,5 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
+export const SELECTED_ORGANIZATION_SLUG_KEY = "milos:selected-organization-slug";
 export const SESSION_UPDATED_EVENT = "milos:session-updated";
 export const SESSION_EXPIRED_EVENT = "milos:session-expired";
 
@@ -51,6 +52,37 @@ type ApiRequestOptions = {
 function organizationSlugFromPath() {
   if (typeof window === "undefined") return null;
   return window.location.pathname.match(/^\/org\/([^/]+)/)?.[1] ?? null;
+}
+
+function selectedOrganizationSlug() {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(SELECTED_ORGANIZATION_SLUG_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function organizationSlugFromToken(token?: string | null) {
+  if (!token || typeof window === "undefined") return null;
+
+  try {
+    const payload = token.split(".")[1];
+    if (!payload) return null;
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(normalized.length + ((4 - (normalized.length % 4)) % 4), "=");
+    const claims = JSON.parse(window.atob(padded)) as {
+      memberships?: Array<{ organization_slug?: unknown }>;
+    };
+    const slug = claims.memberships?.[0]?.organization_slug;
+    return typeof slug === "string" && slug.length > 0 ? slug : null;
+  } catch {
+    return null;
+  }
+}
+
+function organizationSlugForRequest(token?: string | null) {
+  return organizationSlugFromPath() ?? selectedOrganizationSlug() ?? organizationSlugFromToken(token);
 }
 
 let refreshPromise: Promise<string | null> | null = null;
@@ -180,15 +212,14 @@ export async function apiRequest<T>(
     allowRefresh && options.token && tokenExpiresSoon(options.token)
       ? (await refreshAccessToken()) ?? options.token
       : options.token;
+  const organizationSlug = organizationSlugForRequest(token);
 
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method: options.method ?? "GET",
     headers: {
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(organizationSlugFromPath()
-        ? { "X-Organization-Slug": organizationSlugFromPath()! }
-        : {}),
+      ...(organizationSlug ? { "X-Organization-Slug": organizationSlug } : {}),
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
     credentials: "same-origin",
