@@ -36,3 +36,10 @@ The 2026-08-03 foundation establishes explicit ownership classification and requ
 database-validated `TenantContext` or `UserContext` at new boundaries. RLS is not yet
 enabled: ADR-060 requires T4 context-by-context backfill and zero-unmapped-row gates
 before the T6 runtime-role enforcement step.
+
+The first enforce loop landed for Scheduling on 2026-08-03. Runtime connections use
+a non-owner, non-`BYPASSRLS` role; release migrations temporarily use the migration
+owner URL. Scheduling store calls establish transaction-local organization/user
+settings, all six Scheduling tables have forced RLS, and the audit reports zero
+unmapped rows. Full enforcement remains blocked by the transitional T4 contexts and
+the audit fails closed while any such table lacks forced RLS.

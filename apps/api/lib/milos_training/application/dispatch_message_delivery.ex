@@ -7,15 +7,19 @@ defmodule MilosTraining.Application.DispatchMessageDelivery do
 
   alias MilosTraining.{Finance, Identity, Messaging, Notifications}
 
-  def call(%{"message_id" => message_id} = delivery) do
+  def call(%{"message_id" => message_id, "organization_id" => organization_id} = delivery) do
     with %{} = message <- Messaging.get_message(message_id) || {:error, :not_found},
          {:ok, thread} <- Messaging.get_thread(message.thread_id, message.sender_id),
+         true <- thread.organization_id == organization_id,
          :ok <- finalize_reservations(Map.get(delivery, "reservations", []), message),
          :ok <- notify_participants(thread, message),
          :ok <- invalidate_landing(thread, message),
          :ok <- record_analytics(message, thread),
          :ok <- publish(message, thread) do
       :ok
+    else
+      false -> {:error, :organization_scope_mismatch}
+      error -> error
     end
   end
 

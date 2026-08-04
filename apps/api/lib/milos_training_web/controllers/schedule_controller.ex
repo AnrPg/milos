@@ -113,7 +113,7 @@ defmodule MilosTrainingWeb.ScheduleController do
   def index(conn, params) do
     actor = GuardianPlug.current_resource(conn)
 
-    with {:ok, payload} <- GetScheduleCalendar.call(actor, params) do
+    with {:ok, payload} <- GetScheduleCalendar.call(conn.assigns.tenant_context, actor, params) do
       json(conn, payload)
     end
   end
@@ -121,7 +121,7 @@ defmodule MilosTrainingWeb.ScheduleController do
   def create_booking(conn, %{"slot_id" => slot_id}) do
     actor = GuardianPlug.current_resource(conn)
 
-    with {:ok, booking} <- SubmitBooking.call(actor.id, slot_id) do
+    with {:ok, booking} <- SubmitBooking.call(conn.assigns.tenant_context, actor, slot_id) do
       conn
       |> put_status(:created)
       |> json(%{booking: booking})
@@ -153,7 +153,7 @@ defmodule MilosTrainingWeb.ScheduleController do
   def delete_booking(conn, %{"id" => booking_id}) do
     actor = GuardianPlug.current_resource(conn)
 
-    case WithdrawBooking.call(actor.id, booking_id) do
+    case WithdrawBooking.call(conn.assigns.tenant_context, actor.id, booking_id) do
       {:ok, _booking} -> json(conn, %{ok: true})
       {:error, :not_found} -> {:error, :not_found}
       {:error, :forbidden} -> {:error, :forbidden}

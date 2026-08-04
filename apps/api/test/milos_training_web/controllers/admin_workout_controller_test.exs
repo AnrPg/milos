@@ -1,7 +1,7 @@
 defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
-  alias MilosTraining.Identity
+  alias MilosTraining.{Identity, Organizations}
 
   describe "admin workout draft flow" do
     test "admin can create, autosave, inspect, and publish a draft", %{conn: conn} do
@@ -283,6 +283,7 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
       })
 
     {:ok, admin} = Identity.update_role(user, :admin)
+    {:ok, _membership} = Organizations.ensure_legacy_membership(admin, :owner)
     admin
   end
 

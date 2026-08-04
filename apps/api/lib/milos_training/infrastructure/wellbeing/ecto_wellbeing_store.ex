@@ -4,6 +4,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
   import Ecto.Query
 
   alias Ecto.Multi
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Repo
   alias MilosTraining.Wellbeing.{InjuryReport, InjuryStatusEvent}
 
@@ -44,7 +45,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
 
   @impl true
   def mark_healed(injury_report_id, actor_id, healed_on) do
-    case Repo.get(InjuryReport, injury_report_id) do
+    case InjuryReport |> scoped_to_owner_or_tenant() |> Repo.get(injury_report_id) do
       nil ->
         {:error, :not_found}
 
@@ -82,6 +83,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
   @impl true
   def get_injury_for_user(user_id, injury_report_id) do
     InjuryReport
+    |> scoped_to_owner_or_tenant()
     |> where([injury], injury.id == ^injury_report_id and injury.user_id == ^user_id)
     |> Repo.one()
     |> case do
@@ -93,6 +95,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
   @impl true
   def list_injuries_for_user(user_id) do
     InjuryReport
+    |> scoped_to_owner_or_tenant()
     |> where([injury], injury.user_id == ^user_id)
     |> where([injury], injury.visibility == "user_and_admin")
     |> order_by([injury], desc: injury.inserted_at)
@@ -105,6 +108,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
     filters = string_key_map(filters || %{})
 
     InjuryReport
+    |> scoped_to_owner_or_tenant()
     |> maybe_filter(:status, filters["status"])
     |> maybe_filter(:severity, filters["severity"])
     |> maybe_filter(:body_area, filters["body_area"])
@@ -184,6 +188,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
 
   defp count_injuries(since) do
     InjuryReport
+    |> scoped_to_owner_or_tenant()
     |> where([injury], injury.inserted_at >= ^since)
     |> Repo.aggregate(:count)
   end
@@ -203,6 +208,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
 
   defp count_status(status, since) do
     InjuryReport
+    |> scoped_to_owner_or_tenant()
     |> where([injury], injury.status == ^status)
     |> where([injury], injury.inserted_at >= ^since)
     |> Repo.aggregate(:count)
@@ -210,6 +216,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
 
   defp count_injuries_by(field, since) do
     InjuryReport
+    |> scoped_to_owner_or_tenant()
     |> where([injury], injury.inserted_at >= ^since)
     |> group_by([injury], field(injury, ^field))
     |> select([injury], {field(injury, ^field), count(injury.id)})
@@ -227,6 +234,25 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
     case Integer.parse(days) do
       {value, ""} -> summary_since(value)
       _ -> summary_since(nil)
+    end
+  end
+
+  defp scoped_to_owner_or_tenant(query) do
+    user_id = RepoContext.current_setting("app.user_id")
+    organization_id = RepoContext.current_setting("app.organization_id")
+
+    cond do
+      is_binary(user_id) and is_binary(organization_id) ->
+        where(query, [row], row.user_id == ^user_id or row.organization_id == ^organization_id)
+
+      is_binary(user_id) ->
+        where(query, [row], row.user_id == ^user_id)
+
+      is_binary(organization_id) ->
+        where(query, [row], row.organization_id == ^organization_id)
+
+      true ->
+        query
     end
   end
 end

@@ -2,6 +2,8 @@ defmodule MilosTraining.Infrastructure.Cache.LandingCache do
   @behaviour MilosTraining.Application.Ports.LandingCache
   @ttl_seconds 60
 
+  alias MilosTraining.Application.OwnershipKeys
+
   def get_or_fetch(user_id, fetch_fun) when is_function(fetch_fun, 0) do
     case get(user_id) do
       {:ok, payload} ->
@@ -61,5 +63,5 @@ defmodule MilosTraining.Infrastructure.Cache.LandingCache do
     end
   end
 
-  defp cache_key(user_id), do: "landing:#{user_id}"
+  defp cache_key(user_id), do: OwnershipKeys.user(%{user_id: user_id}, "landing")
 end

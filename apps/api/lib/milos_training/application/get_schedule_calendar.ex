@@ -1,18 +1,17 @@
 defmodule MilosTraining.Application.GetScheduleCalendar do
   alias MilosTraining.{Identity, Scheduling, Workouts}
 
-  def call(actor, params) do
+  def call(context, actor, params) do
     with {:ok, start_at, end_at, days, class_type_ids} <- normalize_window(params) do
       slots =
-        %{
+        get_calendar_week(context, %{
           start_at: start_at,
           end_at: end_at,
           class_type_ids: class_type_ids
-        }
-        |> Scheduling.get_calendar_week()
-        |> enrich_slots(actor)
+        })
+        |> enrich_slots(context, actor)
 
-      class_types = schedule_class_types(slots)
+      class_types = schedule_class_types(context, slots)
 
       {:ok,
        %{
@@ -25,7 +24,12 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
     end
   end
 
-  defp enrich_slots(slots, actor) do
+  def call(actor, params), do: call(nil, actor, params)
+
+  defp get_calendar_week(nil, params), do: Scheduling.get_calendar_week(params)
+  defp get_calendar_week(context, params), do: Scheduling.get_calendar_week(context, params)
+
+  defp enrich_slots(slots, context, actor) do
     nickname_cache = booking_nickname_cache(slots, actor)
 
     workout_cache =
@@ -60,13 +64,16 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
         current_user_booking: current_booking && enrich_booking(current_booking, nickname_cache)
       }
 
-      if actor.role == :admin do
+      if admin_role?(context, actor) do
         Map.put(base, :bookings, Enum.map(slot.bookings, &enrich_booking(&1, nickname_cache)))
       else
         Map.put(base, :bookings, [])
       end
     end)
   end
+
+  defp admin_role?(nil, actor), do: actor.role == :admin
+  defp admin_role?(context, _actor), do: context.role in [:owner, :admin, :coach]
 
   defp preview_workout(nil), do: nil
 
@@ -158,8 +165,12 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
   defp active_booking_for_user?(booking, user_id),
     do: booking.user_id == user_id and booking.status in [:pending, :approved]
 
-  defp schedule_class_types(slots) do
-    active = Scheduling.list_class_types()
+  defp schedule_class_types(context, slots) do
+    active =
+      case context do
+        nil -> Scheduling.list_class_types()
+        _ -> Scheduling.list_class_types(context)
+      end
 
     referenced_archived =
       slots

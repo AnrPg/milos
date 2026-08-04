@@ -20,6 +20,7 @@ defmodule MilosTraining.Analytics.PushDispatchAttempt do
   def changeset(attempt \\ %__MODULE__{}, params) do
     attempt
     |> cast(params, [
+      :organization_id,
       :notification_id,
       :user_id,
       :endpoint_hash,

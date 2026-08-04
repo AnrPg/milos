@@ -19,6 +19,7 @@ defmodule MilosTraining.Gamification.GamificationSetting do
   def changeset(settings \\ %__MODULE__{}, params) do
     settings
     |> cast(params, [
+      :organization_id,
       :weekly_workout_target,
       :streak_shield_reset_day,
       :leaderboard_enabled,

@@ -73,7 +73,7 @@ defmodule MilosTrainingWeb.AdminWellbeingController do
   )
 
   def index(conn, params) do
-    with {:ok, payload} <- ListAdminInjuries.call(params) do
+    with {:ok, payload} <- ListAdminInjuries.call(conn.assigns.tenant_context, params) do
       json(conn, payload)
     end
   end
@@ -91,7 +91,12 @@ defmodule MilosTrainingWeb.AdminWellbeingController do
     admin = Guardian.Plug.current_resource(conn)
 
     with {:ok, injury} <-
-           AdminReportInjury.call(admin.id, param_id(params), body_params(conn, params)) do
+           AdminReportInjury.call(
+             conn.assigns.tenant_context,
+             admin.id,
+             param_id(params),
+             body_params(conn, params)
+           ) do
       conn
       |> put_status(:created)
       |> json(%{injury: injury})
@@ -109,7 +114,12 @@ defmodule MilosTrainingWeb.AdminWellbeingController do
     admin = Guardian.Plug.current_resource(conn)
 
     with {:ok, injury} <-
-           MarkInjuryHealed.call(admin.id, param_id(params), body_params(conn, params)) do
+           MarkInjuryHealed.call(
+             conn.assigns.tenant_context,
+             admin.id,
+             param_id(params),
+             body_params(conn, params)
+           ) do
       json(conn, %{injury: injury})
     end
   end

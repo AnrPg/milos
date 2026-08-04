@@ -22,6 +22,7 @@ defmodule MilosTraining.Analytics.CommunicationThread do
   def changeset(thread \\ %__MODULE__{}, params) do
     thread
     |> cast(params, [
+      :organization_id,
       :context_type,
       :context_id,
       :status,
@@ -33,6 +34,9 @@ defmodule MilosTraining.Analytics.CommunicationThread do
     ])
     |> validate_required([:context_type, :status, :created_by_id])
     |> validate_inclusion(:status, ["open", "resolved", "needs_follow_up"])
+    |> unique_constraint([:organization_id, :context_type, :context_id],
+      name: :communication_threads_organization_context_index
+    )
     |> foreign_key_constraint(:created_by_id)
     |> foreign_key_constraint(:assigned_admin_id)
   end

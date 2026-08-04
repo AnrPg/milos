@@ -33,6 +33,7 @@ defmodule MilosTraining.Scheduling.ClassSeries do
   def changeset(series \\ %__MODULE__{}, params) do
     series
     |> cast(params, [
+      :organization_id,
       :master_workout_id,
       :class_type_id,
       :name,
@@ -50,6 +51,7 @@ defmodule MilosTraining.Scheduling.ClassSeries do
       :status
     ])
     |> validate_required([
+      :organization_id,
       :class_type_id,
       :name,
       :duration_minutes,

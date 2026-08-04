@@ -19,6 +19,7 @@ defmodule MilosTraining.Analytics.AnalyticsEvent do
   def changeset(event \\ %__MODULE__{}, params) do
     event
     |> cast(params, [
+      :organization_id,
       :event_name,
       :user_id,
       :actor_role_snapshot,

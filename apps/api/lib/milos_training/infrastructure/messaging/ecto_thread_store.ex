@@ -3,17 +3,19 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoThreadStore do
 
   import Ecto.Query
 
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Messaging.{Message, Participant, Thread}
   alias MilosTraining.Repo
 
   @impl true
   def get_thread(id) do
-    Repo.get(Thread, id)
+    Thread |> scoped_to_tenant() |> Repo.get(id)
   end
 
   @impl true
   def get_thread_with_participants(id) do
     Thread
+    |> scoped_to_tenant()
     |> where([t], t.id == ^id)
     |> preload(:participants)
     |> Repo.one()
@@ -25,15 +27,18 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoThreadStore do
 
     thread_ids_for_a =
       Participant
+      |> scoped_to_tenant()
       |> where([p], p.user_id == ^user_id_a)
       |> select([p], p.thread_id)
 
     thread_ids_for_b =
       Participant
+      |> scoped_to_tenant()
       |> where([p], p.user_id == ^user_id_b)
       |> select([p], p.thread_id)
 
     Thread
+    |> scoped_to_tenant()
     |> where([t], t.context_type == :direct)
     |> where([t], t.id in subquery(thread_ids_for_a))
     |> where([t], t.id in subquery(thread_ids_for_b))
@@ -49,6 +54,7 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoThreadStore do
   @impl true
   def find_context_thread(context_type, context_id) do
     Thread
+    |> scoped_to_tenant()
     |> where([t], t.context_type == ^context_type and t.context_id == ^context_id)
     |> preload(:participants)
     |> Repo.one()
@@ -58,10 +64,14 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoThreadStore do
   def list_threads_for_user(user_id, context_type) do
     thread_ids =
       Participant
+      |> scoped_to_tenant()
       |> where([p], p.user_id == ^user_id)
       |> select([p], p.thread_id)
 
-    base = Thread |> where([t], t.id in subquery(thread_ids))
+    base =
+      Thread
+      |> scoped_to_tenant()
+      |> where([t], t.id in subquery(thread_ids))
 
     base
     |> maybe_filter_context(context_type)
@@ -86,7 +96,11 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoThreadStore do
       |> Enum.uniq()
       |> Enum.each(fn user_id ->
         %Participant{}
-        |> Participant.changeset(%{thread_id: thread.id, user_id: user_id})
+        |> Participant.changeset(%{
+          organization_id: thread.organization_id,
+          thread_id: thread.id,
+          user_id: user_id
+        })
         |> Repo.insert!(on_conflict: :nothing, conflict_target: [:thread_id, :user_id])
       end)
 
@@ -101,8 +115,12 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoThreadStore do
 
   @impl true
   def add_participant(thread_id, user_id) do
+    attrs =
+      %{thread_id: thread_id, user_id: user_id}
+      |> put_current_organization_id()
+
     %Participant{}
-    |> Participant.changeset(%{thread_id: thread_id, user_id: user_id})
+    |> Participant.changeset(attrs)
     |> Repo.insert(on_conflict: :nothing, conflict_target: [:thread_id, :user_id])
   end
 
@@ -111,12 +129,14 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoThreadStore do
     Repo.transaction(fn ->
       participant =
         Participant
+        |> scoped_to_tenant()
         |> where([p], p.thread_id == ^thread_id and p.user_id == ^user_id)
         |> lock("FOR UPDATE")
         |> Repo.one()
 
       target =
         Message
+        |> scoped_to_tenant()
         |> where([m], m.id == ^message_id and m.thread_id == ^thread_id)
         |> Repo.one()
 
@@ -131,7 +151,7 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoThreadStore do
           advance_read_pointer(participant, target)
 
         true ->
-          current = Repo.get(Message, participant.last_read_message_id)
+          current = Message |> scoped_to_tenant() |> Repo.get(participant.last_read_message_id)
 
           if later_message?(target, current) do
             advance_read_pointer(participant, target)
@@ -149,6 +169,7 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoThreadStore do
   @impl true
   def count_unread_threads(user_id) do
     Participant
+    |> scoped_to_tenant()
     |> where([p], p.user_id == ^user_id)
     |> join(:left, [p], lr in Message, on: lr.id == p.last_read_message_id)
     |> join(:inner, [p, _lr], m in Message,
@@ -173,17 +194,26 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoThreadStore do
   end
 
   defp insert_or_get_thread(%{context_type: :direct, direct_key: direct_key} = attrs) do
-    insert_or_get_thread(attrs, [:direct_key], fn ->
-      Repo.get_by!(Thread, direct_key: direct_key)
-    end)
+    insert_or_get_thread(
+      attrs,
+      {:unsafe_fragment, "(organization_id, direct_key) WHERE direct_key IS NOT NULL"},
+      fn ->
+        Thread
+        |> scoped_to_tenant()
+        |> Repo.get_by!(direct_key: direct_key)
+      end
+    )
   end
 
   defp insert_or_get_thread(%{context_type: context_type, context_id: context_id} = attrs) do
     conflict_target =
-      {:unsafe_fragment, "(context_type, context_id) WHERE context_type != 'direct'"}
+      {:unsafe_fragment,
+       "(organization_id, context_type, context_id) WHERE context_type != 'direct'"}
 
     insert_or_get_thread(attrs, conflict_target, fn ->
-      Repo.get_by!(Thread, context_type: context_type, context_id: context_id)
+      Thread
+      |> scoped_to_tenant()
+      |> Repo.get_by!(context_type: context_type, context_id: context_id)
     end)
   end
 
@@ -193,6 +223,7 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoThreadStore do
 
     row =
       attrs
+      |> put_current_organization_id()
       |> Map.put(:id, id)
       |> Map.put(:inserted_at, now)
 
@@ -201,7 +232,7 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoThreadStore do
            conflict_target: conflict_target,
            returning: [:id]
          ) do
-      {1, _rows} -> Repo.get!(Thread, id)
+      {1, _rows} -> Thread |> scoped_to_tenant() |> Repo.get!(id)
       {0, _rows} -> fetch_existing.()
     end
   end
@@ -236,4 +267,26 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoThreadStore do
   end
 
   defp find_legacy_direct_thread(_attrs, _participant_ids), do: nil
+
+  defp scoped_to_tenant(query) do
+    case current_organization_id() do
+      organization_id when is_binary(organization_id) ->
+        where(query, [row], row.organization_id == ^organization_id)
+
+      _missing_scope ->
+        query
+    end
+  end
+
+  defp current_organization_id, do: RepoContext.current_setting("app.organization_id")
+
+  defp put_current_organization_id(attrs) do
+    case current_organization_id() do
+      organization_id when is_binary(organization_id) ->
+        Map.put_new(attrs, :organization_id, organization_id)
+
+      _missing_scope ->
+        attrs
+    end
+  end
 end

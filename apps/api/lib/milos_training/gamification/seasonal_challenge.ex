@@ -26,6 +26,7 @@ defmodule MilosTraining.Gamification.SeasonalChallenge do
   def changeset(challenge \\ %__MODULE__{}, params) do
     challenge
     |> cast(params, [
+      :organization_id,
       :title,
       :description,
       :criteria_type,

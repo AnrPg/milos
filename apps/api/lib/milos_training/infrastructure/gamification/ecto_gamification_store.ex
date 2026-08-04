@@ -14,6 +14,7 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
   }
 
   alias MilosTraining.Gamification.Domain.ChallengeSchedulePolicy
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Repo
 
   @impl true
@@ -26,7 +27,7 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
 
   @impl true
   def get_settings do
-    case Repo.one(from settings in GamificationSetting, limit: 1) do
+    case Repo.one(from settings in scoped_to_tenant(GamificationSetting), limit: 1) do
       nil ->
         %{
           weekly_workout_target: 2,
@@ -42,7 +43,7 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
 
   @impl true
   def update_settings(params) do
-    case Repo.one(from settings in GamificationSetting, limit: 1) do
+    case Repo.one(from settings in scoped_to_tenant(GamificationSetting), limit: 1) do
       nil ->
         %GamificationSetting{}
         |> GamificationSetting.changeset(params)
@@ -153,6 +154,7 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
       fn ->
         existing_challenges =
           SeasonalChallenge
+          |> scoped_to_tenant()
           |> order_by([challenge], asc: challenge.starts_at, asc: challenge.inserted_at)
           |> Repo.all()
           |> Enum.map(&normalize_challenge/1)
@@ -190,7 +192,7 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
 
   @impl true
   def get_challenge(id) do
-    case Repo.get(SeasonalChallenge, id) do
+    case SeasonalChallenge |> scoped_to_tenant() |> Repo.get(id) do
       nil -> nil
       %SeasonalChallenge{} = challenge -> normalize_challenge(challenge)
     end
@@ -198,7 +200,7 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
 
   @impl true
   def update_challenge(id, params) do
-    case Repo.get(SeasonalChallenge, id) do
+    case SeasonalChallenge |> scoped_to_tenant() |> Repo.get(id) do
       nil ->
         {:error, :not_found}
 
@@ -212,7 +214,7 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
 
   @impl true
   def delete_challenge(id) do
-    case Repo.get(SeasonalChallenge, id) do
+    case SeasonalChallenge |> scoped_to_tenant() |> Repo.get(id) do
       nil ->
         {:error, :not_found}
 
@@ -227,6 +229,7 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
   @impl true
   def list_challenges do
     SeasonalChallenge
+    |> scoped_to_tenant()
     |> order_by([challenge], desc: challenge.starts_at, desc: challenge.inserted_at)
     |> Repo.all()
     |> Enum.map(&normalize_challenge/1)
@@ -235,6 +238,7 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
   @impl true
   def list_active_challenges(date) do
     SeasonalChallenge
+    |> scoped_to_tenant()
     |> where([challenge], challenge.starts_at <= ^date and challenge.ends_at >= ^date)
     |> order_by([challenge], asc: challenge.starts_at, asc: challenge.inserted_at)
     |> Repo.all()
@@ -243,7 +247,9 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
 
   @impl true
   def get_user_challenge_progress(user_id, challenge_id) do
-    case Repo.get_by(UserChallengeProgress, user_id: user_id, challenge_id: challenge_id) do
+    case UserChallengeProgress
+         |> scoped_to_tenant()
+         |> Repo.get_by(user_id: user_id, challenge_id: challenge_id) do
       nil -> nil
       progress -> normalize_progress(progress)
     end
@@ -252,6 +258,7 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
   @impl true
   def lock_challenge(challenge_id) do
     SeasonalChallenge
+    |> scoped_to_tenant()
     |> where([challenge], challenge.id == ^challenge_id)
     |> lock("FOR UPDATE")
     |> Repo.one()
@@ -264,6 +271,7 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
   @impl true
   def list_challenge_progress(challenge_id) do
     UserChallengeProgress
+    |> scoped_to_tenant()
     |> where([progress], progress.challenge_id == ^challenge_id)
     |> Repo.all()
     |> Enum.map(&normalize_progress/1)
@@ -271,10 +279,9 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
 
   @impl true
   def upsert_user_challenge_progress(params) do
-    case Repo.get_by(UserChallengeProgress,
-           user_id: params.user_id,
-           challenge_id: params.challenge_id
-         ) do
+    case UserChallengeProgress
+         |> scoped_to_tenant()
+         |> Repo.get_by(user_id: params.user_id, challenge_id: params.challenge_id) do
       nil ->
         %UserChallengeProgress{}
         |> UserChallengeProgress.changeset(params)
@@ -293,7 +300,7 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
   def set_leaderboard_opt_in(user_id, true) do
     now = DateTime.utc_now()
 
-    case Repo.get_by(LeaderboardOptIn, user_id: user_id) do
+    case LeaderboardOptIn |> scoped_to_tenant() |> Repo.get_by(user_id: user_id) do
       nil ->
         %LeaderboardOptIn{}
         |> LeaderboardOptIn.changeset(%{user_id: user_id, opted_in_at: now})
@@ -312,6 +319,7 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
   def set_leaderboard_opt_in(user_id, false) do
     {_deleted, _rows} =
       LeaderboardOptIn
+      |> scoped_to_tenant()
       |> where([opt_in], opt_in.user_id == ^user_id)
       |> Repo.delete_all()
 
@@ -320,7 +328,10 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
 
   @impl true
   def leaderboard_opted_in?(user_id) do
-    Repo.exists?(from opt_in in LeaderboardOptIn, where: opt_in.user_id == ^user_id)
+    LeaderboardOptIn
+    |> scoped_to_tenant()
+    |> where([opt_in], opt_in.user_id == ^user_id)
+    |> Repo.exists?()
   end
 
   @weekly_leaderboard_query """
@@ -486,7 +497,9 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
 
   @impl true
   def opt_in_challenge_leaderboard(user_id, challenge_id) do
-    case Repo.get_by(ChallengeLeaderboardOptIn, user_id: user_id, challenge_id: challenge_id) do
+    case ChallengeLeaderboardOptIn
+         |> scoped_to_tenant()
+         |> Repo.get_by(user_id: user_id, challenge_id: challenge_id) do
       nil ->
         %ChallengeLeaderboardOptIn{}
         |> ChallengeLeaderboardOptIn.changeset(%{user_id: user_id, challenge_id: challenge_id})
@@ -500,6 +513,7 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
   @impl true
   def opt_out_challenge_leaderboard(user_id, challenge_id) do
     ChallengeLeaderboardOptIn
+    |> scoped_to_tenant()
     |> where([o], o.user_id == ^user_id and o.challenge_id == ^challenge_id)
     |> Repo.delete_all()
 
@@ -509,6 +523,7 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
   @impl true
   def challenge_leaderboard_opted_in?(user_id, challenge_id) do
     ChallengeLeaderboardOptIn
+    |> scoped_to_tenant()
     |> where([o], o.user_id == ^user_id and o.challenge_id == ^challenge_id)
     |> Repo.exists?()
   end
@@ -516,6 +531,7 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
   @impl true
   def list_challenge_leaderboard_participants(challenge_id) do
     UserChallengeProgress
+    |> scoped_to_tenant()
     |> join(:inner, [p], o in ChallengeLeaderboardOptIn,
       on: p.user_id == o.user_id and p.challenge_id == o.challenge_id
     )
@@ -556,5 +572,15 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
     params
     |> Map.new(fn {key, value} -> {to_string(key), value} end)
     |> Map.put("user_id", user_id)
+  end
+
+  defp scoped_to_tenant(query) do
+    case RepoContext.current_setting("app.organization_id") do
+      organization_id when is_binary(organization_id) ->
+        where(query, [row], row.organization_id == ^organization_id)
+
+      _missing_scope ->
+        query
+    end
   end
 end

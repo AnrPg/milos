@@ -1,9 +1,14 @@
 defmodule MilosTraining.Gamification.GamificationStore do
   @behaviour MilosTraining.Gamification.Ports.GamificationStore
 
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
+
   defp adapter do
     Application.fetch_env!(:milos_training, :gamification_store)
   end
+
+  def with_tenant_context(context, fun) when is_function(fun, 0),
+    do: RepoContext.run(context, fun)
 
   @impl true
   def get_user_stats(user_id), do: adapter().get_user_stats(user_id)

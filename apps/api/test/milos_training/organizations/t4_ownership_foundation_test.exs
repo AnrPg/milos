@@ -26,7 +26,7 @@ defmodule MilosTraining.Organizations.T4OwnershipFoundationTest do
     assert {:ok, ^legacy_organization_id} = Ecto.UUID.load(organization_id)
   end
 
-  test "tenant policies are installed without being enabled before T6" do
+  test "scheduling tenant policies are enabled and forced for T6" do
     %{rows: rows} =
       Repo.query!("""
       SELECT policyname
@@ -36,13 +36,14 @@ defmodule MilosTraining.Organizations.T4OwnershipFoundationTest do
 
     assert ["scheduled_classes_tenant_policy"] in rows
 
-    %{rows: [[rls_enabled]]} =
+    %{rows: [[rls_enabled, rls_forced]]} =
       Repo.query!("""
-      SELECT relrowsecurity
+      SELECT relrowsecurity, relforcerowsecurity
       FROM pg_class
       WHERE oid = 'scheduled_classes'::regclass
       """)
 
-    refute rls_enabled
+    assert rls_enabled
+    assert rls_forced
   end
 end

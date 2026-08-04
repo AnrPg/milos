@@ -39,7 +39,7 @@ defmodule MilosTraining.Notifications.Notification do
 
   def changeset(notification \\ %__MODULE__{}, params) do
     notification
-    |> cast(params, [:user_id, :type, :payload, :dedupe_key, :read_at])
+    |> cast(params, [:organization_id, :user_id, :type, :payload, :dedupe_key, :read_at])
     |> validate_required([:user_id, :type])
     |> foreign_key_constraint(:user_id)
     |> unique_constraint(:dedupe_key, name: :notifications_user_id_dedupe_key_index)

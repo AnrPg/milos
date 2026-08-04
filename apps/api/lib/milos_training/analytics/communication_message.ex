@@ -25,6 +25,7 @@ defmodule MilosTraining.Analytics.CommunicationMessage do
   def changeset(message \\ %__MODULE__{}, params) do
     message
     |> cast(params, [
+      :organization_id,
       :thread_id,
       :sender_id,
       :recipient_id,

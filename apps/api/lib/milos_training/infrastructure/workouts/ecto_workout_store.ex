@@ -7,6 +7,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   alias MilosTraining.{
     Execution.WorkoutExecution,
+    Infrastructure.Tenancy.RepoContext,
     Repo,
     ScaleLevel,
     Workouts.AssignedWorkout,
@@ -150,6 +151,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   @impl true
   def get_workout(id) do
     MasterWorkout
+    |> scoped_to_tenant()
     |> Repo.get(id)
     |> case do
       nil ->
@@ -167,7 +169,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   @impl true
   def get_workout_for_admin(id) do
-    case Repo.get(MasterWorkout, id) do
+    case MasterWorkout |> scoped_to_tenant() |> Repo.get(id) do
       nil ->
         nil
 
@@ -224,6 +226,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   @impl true
   def list_workouts do
     MasterWorkout
+    |> scoped_to_tenant()
     |> order_by([workout], desc: workout.inserted_at)
     |> Repo.all()
     |> Repo.preload(@workout_preloads)
@@ -1793,6 +1796,16 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           {:ok, new_workout} -> {:ok, %{id: new_workout.id, status: "draft", title: title}}
           {:error, changeset} -> {:error, changeset}
         end
+    end
+  end
+
+  defp scoped_to_tenant(query) do
+    case RepoContext.current_setting("app.organization_id") do
+      organization_id when is_binary(organization_id) ->
+        where(query, [row], row.organization_id == ^organization_id)
+
+      _no_tenant_context ->
+        query
     end
   end
 

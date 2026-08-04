@@ -15,11 +15,13 @@ defmodule MilosTraining.Scheduling.SchedulingSetting do
   def changeset(settings \\ %__MODULE__{}, params) do
     settings
     |> cast(params, [
+      :organization_id,
       :default_capacity,
       :default_auto_approve,
       :default_booking_timeout_minutes
     ])
     |> validate_required([
+      :organization_id,
       :default_capacity,
       :default_auto_approve,
       :default_booking_timeout_minutes

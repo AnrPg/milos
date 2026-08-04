@@ -1,6 +1,20 @@
 defmodule MilosTraining.Application.WithdrawBooking do
   alias MilosTraining.{Finance, Notifications, Scheduling}
 
+  def call(context, user_id, booking_id) do
+    with booking when not is_nil(booking) <- Scheduling.get_booking(context, booking_id),
+         :ok <- verify_ownership(booking, user_id),
+         {:ok, withdrawn_booking} <-
+           Scheduling.withdraw_booking(context, booking_id, reconciliation(booking)) do
+      reconcile_now(booking)
+      {:ok, withdrawn_booking}
+    else
+      nil -> {:error, :not_found}
+      {:error, :not_owner} -> {:error, :forbidden}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
   def call(user_id, booking_id) do
     with booking when not is_nil(booking) <- Scheduling.get_booking(booking_id),
          :ok <- verify_ownership(booking, user_id),
@@ -20,6 +34,7 @@ defmodule MilosTraining.Application.WithdrawBooking do
 
   defp reconciliation(booking) do
     %{
+      organization_id: booking.organization_id,
       booking_id: booking.id,
       user_id: booking.user_id,
       scheduled_class_id: booking.scheduled_class_id,

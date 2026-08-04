@@ -15,25 +15,33 @@ defmodule MilosTraining.Notifications do
   alias MilosTraining.Notifications.Queries.GetPushSubscriptionStatus
   alias MilosTraining.Notifications.Queries.ListPushSubscriptions
   alias MilosTraining.Notifications.NotificationStore
+  alias MilosTraining.Notifications.PushSubscriptionStore
   alias MilosTraining.Notifications.Queries.ListNotifications
 
   def create_notification(params), do: create_and_broadcast_notification(params)
 
-  def list_for_user(user_id), do: ListNotifications.for_user(user_id)
+  def list_for_user(user_id),
+    do:
+      NotificationStore.with_user_context(%{user_id: user_id}, fn ->
+        ListNotifications.for_user(user_id)
+      end)
 
   def list_inbox(user_id, params \\ %{}) do
-    with {:ok, page} <- ListInboxPage.call(user_id, params) do
-      {:ok,
-       %{
-         notifications: page.notifications,
-         unread_count: GetUnreadCount.call(user_id),
-         next_cursor: page.next_cursor
-       }}
-    end
+    NotificationStore.with_user_context(%{user_id: user_id}, fn ->
+      with {:ok, page} <- ListInboxPage.call(user_id, params) do
+        {:ok,
+         %{
+           notifications: page.notifications,
+           unread_count: GetUnreadCount.call(user_id),
+           next_cursor: page.next_cursor
+         }}
+      end
+    end)
   end
 
   def mark_all_read(user_id) do
-    marked_count = MarkAllRead.call(user_id)
+    marked_count =
+      NotificationStore.with_user_context(%{user_id: user_id}, fn -> MarkAllRead.call(user_id) end)
 
     if marked_count > 0 do
       broadcast_notification_changed(user_id)
@@ -43,7 +51,9 @@ defmodule MilosTraining.Notifications do
   end
 
   def mark_read(user_id, notification_id) do
-    case MarkNotificationRead.call(user_id, notification_id) do
+    case NotificationStore.with_user_context(%{user_id: user_id}, fn ->
+           MarkNotificationRead.call(user_id, notification_id)
+         end) do
       true ->
         broadcast_notification_changed(user_id)
         :ok
@@ -65,20 +75,30 @@ defmodule MilosTraining.Notifications do
   def update_push_settings(params), do: NotificationStore.update_push_settings(params)
 
   def save_push_subscription(user_id, attrs) do
-    attrs
-    |> unwrap_subscription_attrs()
-    |> normalize_subscription_attrs(user_id)
-    |> SavePushSubscription.call()
+    PushSubscriptionStore.with_user_context(%{user_id: user_id}, fn ->
+      attrs
+      |> unwrap_subscription_attrs()
+      |> normalize_subscription_attrs(user_id)
+      |> SavePushSubscription.call()
+    end)
   end
 
-  def get_push_subscriptions(user_id), do: ListPushSubscriptions.call(user_id)
+  def get_push_subscriptions(user_id),
+    do:
+      PushSubscriptionStore.with_user_context(%{user_id: user_id}, fn ->
+        ListPushSubscriptions.call(user_id)
+      end)
 
   def get_push_subscription_status(user_id, endpoint) when is_binary(endpoint) do
-    GetPushSubscriptionStatus.call(user_id, endpoint)
+    PushSubscriptionStore.with_user_context(%{user_id: user_id}, fn ->
+      GetPushSubscriptionStatus.call(user_id, endpoint)
+    end)
   end
 
   def delete_push_subscription(user_id, endpoint) when is_binary(endpoint) do
-    DeletePushSubscription.call(user_id, endpoint)
+    PushSubscriptionStore.with_user_context(%{user_id: user_id}, fn ->
+      DeletePushSubscription.call(user_id, endpoint)
+    end)
   end
 
   def enqueue_event(event, payload), do: EnqueueNotificationEvent.call(event, payload)
@@ -563,7 +583,11 @@ defmodule MilosTraining.Notifications do
   end
 
   defp create_and_broadcast_notification(params) do
-    case MilosTraining.Notifications.Commands.CreateNotification.call(params) do
+    user_id = Map.get(params, :user_id) || Map.get(params, "user_id")
+
+    case NotificationStore.with_user_context(%{user_id: user_id}, fn ->
+           MilosTraining.Notifications.Commands.CreateNotification.call(params)
+         end) do
       {:ok, notification} = ok ->
         case notification do
           :duplicate ->

@@ -1,6 +1,10 @@
 defmodule MilosTraining.Scheduling.Queries.GetCalendarWeek do
   alias MilosTraining.Scheduling.SchedulingStore
 
+  def call(context, %{start_at: %DateTime{} = start_at, end_at: %DateTime{} = end_at} = params) do
+    SchedulingStore.list_slots_window(context, start_at, end_at, params)
+  end
+
   def call(%{start_at: %DateTime{} = start_at, end_at: %DateTime{} = end_at} = params) do
     SchedulingStore.list_slots_window(start_at, end_at, params)
   end

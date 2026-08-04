@@ -8,6 +8,12 @@ defmodule MilosTrainingWeb.AdminReviewController do
 
   action_fallback(MilosTrainingWeb.FallbackController)
 
+  def action(conn, _) do
+    MilosTraining.Feedback.FeedbackStore.with_tenant_context(conn.assigns.tenant_context, fn ->
+      apply(__MODULE__, action_name(conn), [conn, conn.params])
+    end)
+  end
+
   tags(["Admin Reviews"])
   security([%{"bearerAuth" => []}])
 

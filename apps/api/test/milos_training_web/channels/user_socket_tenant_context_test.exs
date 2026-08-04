@@ -6,6 +6,7 @@ defmodule MilosTrainingWeb.UserSocketTenantContextTest do
   alias MilosTraining.Infrastructure.Auth.Guardian
   alias MilosTraining.Organizations
   alias MilosTrainingWeb.UserSocket
+  alias MilosTrainingWeb.ScheduleChannel
 
   test "socket organization context is resolved from current membership, not JWT claims" do
     user = user_fixture()
@@ -57,5 +58,44 @@ defmodule MilosTrainingWeb.UserSocketTenantContextTest do
                "token" => token,
                "organization_slug" => foreign.slug
              })
+  end
+
+  test "channel join revalidates a membership that became stale after socket connection" do
+    user = user_fixture()
+    {:ok, organization} = Organizations.create_organization(%{name: "Stale Membership Gym"})
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: user.id,
+        role: :member,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    {:ok, token, _claims} =
+      Guardian.encode_and_sign(user, %{"sv" => user.security_version || 1}, token_type: "access")
+
+    assert {:ok, socket} =
+             Phoenix.ChannelTest.connect(UserSocket, %{
+               "token" => token,
+               "organization_slug" => organization.slug
+             })
+
+    {:ok, _suspended} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: user.id,
+        role: :member,
+        status: :suspended,
+        joined_at: DateTime.utc_now()
+      })
+
+    assert {:error, %{reason: "unauthorized"}} =
+             Phoenix.ChannelTest.subscribe_and_join(
+               socket,
+               ScheduleChannel,
+               "schedule:#{organization.id}"
+             )
   end
 end

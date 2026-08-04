@@ -2,7 +2,15 @@ defmodule MilosTraining.Application.UpdateAdminSettings do
   alias MilosTraining.Application.{BroadcastUserSync, InvalidateLandingPages}
   alias MilosTraining.{Finance, Gamification, Identity, Notifications, Scheduling}
 
+  def call(context, params) do
+    do_call(context, params)
+  end
+
   def call(params) do
+    do_call(nil, params)
+  end
+
+  defp do_call(context, params) do
     gamification_params = gamification_params(params)
     finance_params = finance_params(params)
     notification_params = notification_params(params)
@@ -11,7 +19,7 @@ defmodule MilosTraining.Application.UpdateAdminSettings do
     with {:ok, gamification_settings} <- maybe_update_gamification(gamification_params),
          {:ok, finance_settings} <- maybe_update_finance(finance_params),
          {:ok, notification_settings} <- maybe_update_notifications(notification_params),
-         {:ok, scheduling_settings} <- maybe_update_scheduling(scheduling_params) do
+         {:ok, scheduling_settings} <- maybe_update_scheduling(context, scheduling_params) do
       InvalidateLandingPages.for_all_users()
       admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
       BroadcastUserSync.for_users(admin_ids, ["admin_settings"], reason: "admin_settings_updated")
@@ -44,11 +52,18 @@ defmodule MilosTraining.Application.UpdateAdminSettings do
 
   defp maybe_update_notifications(params), do: Notifications.update_push_settings(params)
 
-  defp maybe_update_scheduling(params) when map_size(params) == 0 do
+  defp maybe_update_scheduling(nil, params) when map_size(params) == 0 do
     {:ok, Scheduling.get_settings()}
   end
 
-  defp maybe_update_scheduling(params), do: Scheduling.update_settings(params)
+  defp maybe_update_scheduling(nil, params), do: Scheduling.update_settings(params)
+
+  defp maybe_update_scheduling(context, params) when map_size(params) == 0 do
+    {:ok, Scheduling.get_settings(context)}
+  end
+
+  defp maybe_update_scheduling(context, params),
+    do: Scheduling.update_settings(context, params)
 
   defp gamification_params(%{gamification: g}) when is_map(g), do: g
   defp gamification_params(%{"gamification" => g}) when is_map(g), do: g

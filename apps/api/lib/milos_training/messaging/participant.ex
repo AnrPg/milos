@@ -16,7 +16,7 @@ defmodule MilosTraining.Messaging.Participant do
 
   def changeset(participant, attrs) do
     participant
-    |> cast(attrs, [:thread_id, :user_id, :last_read_message_id])
+    |> cast(attrs, [:organization_id, :thread_id, :user_id, :last_read_message_id])
     |> validate_required([:thread_id, :user_id])
     |> unique_constraint([:thread_id, :user_id])
     |> foreign_key_constraint(:user_id)

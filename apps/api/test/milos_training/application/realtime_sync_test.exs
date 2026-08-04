@@ -39,7 +39,9 @@ defmodule MilosTraining.Application.RealtimeSyncTest do
              })
 
     assert :ok =
-             DispatchMessageJob.perform(%Oban.Job{args: %{"message_id" => message.id}})
+             DispatchMessageJob.perform(%Oban.Job{
+               args: %{"message_id" => message.id, "organization_id" => thread.organization_id}
+             })
 
     assert_user_syncs([
       %{user_id: athlete.id, scopes: ["landing"], reason: "landing_invalidated"}

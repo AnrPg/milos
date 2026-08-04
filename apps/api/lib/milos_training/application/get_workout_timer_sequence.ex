@@ -1,6 +1,10 @@
 defmodule MilosTraining.Application.GetWorkoutTimerSequence do
   alias MilosTraining.Application.{AuthorizeFinanceEntitlement, AuthorizeWorkoutExecutionSource}
   alias MilosTraining.{Execution, Workouts}
+  alias MilosTraining.Execution.ExecutionStore
+
+  def call(context, actor, workout_id, params),
+    do: ExecutionStore.with_user_context(context, fn -> call(actor, workout_id, params) end)
 
   def call(actor, workout_id, params \\ %{}) do
     scale_slug = params[:scale] || params["scale"]

@@ -21,7 +21,14 @@ defmodule MilosTraining.Messaging.Message do
 
   def changeset(message, attrs) do
     message
-    |> cast(attrs, [:thread_id, :sender_id, :body, :message_type, :client_operation_id])
+    |> cast(attrs, [
+      :organization_id,
+      :thread_id,
+      :sender_id,
+      :body,
+      :message_type,
+      :client_operation_id
+    ])
     |> validate_required([:thread_id, :sender_id, :body])
     |> validate_length(:body, min: 1, max: 5000)
     |> foreign_key_constraint(:thread_id)

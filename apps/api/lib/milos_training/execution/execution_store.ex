@@ -10,6 +10,9 @@ defmodule MilosTraining.Execution.ExecutionStore do
   def with_user_context(context, fun) when is_function(fun, 0),
     do: RepoContext.run(context, fun)
 
+  def with_authorization_context(context, fun) when is_function(fun, 0),
+    do: RepoContext.run(Map.put(context, :execution_authorization_check, true), fun)
+
   @impl true
   def start_execution(params), do: adapter().start_execution(params)
 

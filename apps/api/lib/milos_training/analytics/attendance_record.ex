@@ -22,6 +22,7 @@ defmodule MilosTraining.Analytics.AttendanceRecord do
   def changeset(record \\ %__MODULE__{}, params) do
     record
     |> cast(params, [
+      :organization_id,
       :scheduled_class_id,
       :booking_id,
       :user_id,

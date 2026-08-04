@@ -1,7 +1,7 @@
 defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
-  alias MilosTraining.Identity
+  alias MilosTraining.{Identity, Organizations}
 
   test "admin can parse and canonically format Quick Text", %{conn: conn} do
     conn = authenticate_as_admin(conn, "dsl_preview_admin")
@@ -52,6 +52,8 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
         password: "S3cur3P@ss!",
         role: :member
       })
+
+    {:ok, _membership} = Organizations.ensure_legacy_membership(member)
 
     conn
     |> put_bearer_token(member)
@@ -177,6 +179,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
       })
 
     {:ok, admin} = Identity.update_role(user, :admin)
+    {:ok, _membership} = Organizations.ensure_legacy_membership(admin, :owner)
     put_bearer_token(conn, admin)
   end
 

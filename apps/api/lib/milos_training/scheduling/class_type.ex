@@ -17,12 +17,12 @@ defmodule MilosTraining.Scheduling.ClassType do
 
   def create_changeset(class_type \\ %__MODULE__{}, params) do
     class_type
-    |> cast(params, [:name, :slug, :sort_order])
-    |> validate_required([:name, :slug, :sort_order])
+    |> cast(params, [:organization_id, :name, :slug, :sort_order])
+    |> validate_required([:organization_id, :name, :slug, :sort_order])
     |> validate_length(:name, min: 2, max: 80)
     |> validate_format(:slug, ~r/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
     |> validate_number(:sort_order, greater_than_or_equal_to: 0)
-    |> unique_constraint(:slug)
+    |> unique_constraint([:organization_id, :slug], name: :class_types_organization_slug_index)
   end
 
   def update_changeset(class_type, params) do

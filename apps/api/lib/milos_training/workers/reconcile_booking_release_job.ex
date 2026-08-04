@@ -4,11 +4,13 @@ defmodule MilosTraining.Workers.ReconcileBookingReleaseJob do
     max_attempts: 20,
     unique: [period: 86_400, fields: [:worker, :args], keys: [:booking_id]]
 
+  alias MilosTraining.Application.OwnershipKeys
   alias MilosTraining.{Finance, Notifications}
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: args}) do
-    with {:ok, _result} <-
+    with {:ok, _args} <- OwnershipKeys.require_tenant_args(args),
+         {:ok, _result} <-
            Finance.release_entitlement_source(
              args["user_id"],
              "scheduling",

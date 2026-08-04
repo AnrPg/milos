@@ -22,6 +22,7 @@ defmodule MilosTraining.Scheduling.ClassAttendanceRecord do
   def changeset(record \\ %__MODULE__{}, params) do
     record
     |> cast(params, [
+      :organization_id,
       :scheduled_class_id,
       :booking_id,
       :user_id,
@@ -31,7 +32,7 @@ defmodule MilosTraining.Scheduling.ClassAttendanceRecord do
       :notes,
       :params
     ])
-    |> validate_required([:scheduled_class_id, :user_id, :status, :marked_at])
+    |> validate_required([:organization_id, :scheduled_class_id, :user_id, :status, :marked_at])
     |> validate_inclusion(:status, ["attended", "missed", "cancelled", "late_cancel", "no_show"])
     |> unique_constraint([:scheduled_class_id, :user_id])
     |> foreign_key_constraint(:scheduled_class_id)

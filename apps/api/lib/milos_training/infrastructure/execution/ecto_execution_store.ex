@@ -252,9 +252,18 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
   end
 
   defp scoped_to_user(query) do
-    case RepoContext.current_setting("app.user_id") do
-      user_id when is_binary(user_id) -> where(query, [row], row.user_id == ^user_id)
-      _no_user_context -> query
+    cond do
+      RepoContext.current_setting("app.admin_mode") == "true" ->
+        query
+
+      RepoContext.current_setting("app.execution_authorization_check") == "true" ->
+        query
+
+      user_id = RepoContext.current_setting("app.user_id") ->
+        where(query, [row], row.user_id == ^user_id)
+
+      true ->
+        query
     end
   end
 

@@ -3,6 +3,12 @@ defmodule MilosTraining.Application.MarkMyInjuryHealed do
   alias MilosTraining.{Identity, Wellbeing}
   alias MilosTraining.Wellbeing.Domain.InjuryPolicy
 
+  def call(context, user_id, injury_report_id, params),
+    do:
+      MilosTraining.Wellbeing.WellbeingStore.with_context(context, fn ->
+        call(user_id, injury_report_id, params)
+      end)
+
   def call(user_id, injury_report_id, params \\ %{}) do
     case Wellbeing.get_injury_for_user(user_id, injury_report_id) do
       injury when not is_nil(injury) ->
