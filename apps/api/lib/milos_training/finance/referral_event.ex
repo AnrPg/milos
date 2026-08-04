@@ -6,6 +6,7 @@ defmodule MilosTraining.Finance.ReferralEvent do
   @foreign_key_type :binary_id
 
   schema "referral_events" do
+    field :organization_id, :binary_id, read_after_writes: true
     field :referral_program_id, :binary_id
     field :referrer_user_id, :binary_id
     field :referred_user_id, :binary_id

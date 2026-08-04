@@ -10,6 +10,13 @@ defmodule MilosTraining.Application.UpdateDraftWorkout do
     end
   end
 
+  def call(context, id, params) do
+    with {:ok, draft} <- MilosTraining.Workouts.WorkoutStore.update_draft(context, id, params) do
+      broadcast_draft_refresh(draft.id, params)
+      {:ok, draft}
+    end
+  end
+
   defp broadcast_draft_refresh(draft_id, params) do
     admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
 

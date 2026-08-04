@@ -48,6 +48,11 @@ type ApiRequestOptions = {
   body?: unknown;
 };
 
+function organizationSlugFromPath() {
+  if (typeof window === "undefined") return null;
+  return window.location.pathname.match(/^\/org\/([^/]+)/)?.[1] ?? null;
+}
+
 let refreshPromise: Promise<string | null> | null = null;
 let sessionUser: unknown | null = null;
 let latestSharedAccessToken: string | null = null;
@@ -181,6 +186,9 @@ export async function apiRequest<T>(
     headers: {
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(organizationSlugFromPath()
+        ? { "X-Organization-Slug": organizationSlugFromPath()! }
+        : {}),
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
     credentials: "same-origin",

@@ -1,7 +1,11 @@
 defmodule MilosTraining.Application.SubmitExecutionNote do
   alias MilosTraining.Execution
+  alias MilosTraining.Execution.ExecutionStore
   alias MilosTraining.Execution.Domain.AnnotationValidator
   alias MilosTraining.Workouts
+
+  def call(context, execution_id, user_id, params),
+    do: ExecutionStore.with_user_context(context, fn -> call(execution_id, user_id, params) end)
 
   def call(execution_id, user_id, params) do
     params_with_id = ensure_note_id(params)

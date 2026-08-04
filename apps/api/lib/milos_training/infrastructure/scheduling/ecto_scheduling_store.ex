@@ -22,7 +22,9 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   @slot_preloads [:bookings, :class_type, :class_series]
 
   @impl true
-  def create_class_type(params) do
+  def create_class_type(%{organization_id: organization_id}, params) do
+    params = Map.put(params, :organization_id, organization_id)
+
     %ClassType{}
     |> ClassType.create_changeset(params)
     |> Repo.insert()
@@ -30,8 +32,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def update_class_type(id, params) do
-    case Repo.get(ClassType, id) do
+  def update_class_type(%{organization_id: organization_id}, id, params) do
+    case Repo.get_by(ClassType, id: id, organization_id: organization_id) do
       nil ->
         {:error, :not_found}
 
@@ -47,13 +49,14 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def archive_class_type(id, replacement_id) do
+  def archive_class_type(%{organization_id: organization_id}, id, replacement_id) do
     now = DateTime.utc_now() |> DateTime.truncate(:second)
 
-    Repo.transaction(fn ->
+    tenant_transaction(fn ->
       source =
         ClassType
         |> where([class_type], class_type.id == ^id)
+        |> for_organization(organization_id)
         |> lock("FOR UPDATE")
         |> Repo.one()
 
@@ -71,12 +74,14 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
               [slot],
               slot.class_type_id == ^id and slot.scheduled_at > ^now
             )
+            |> for_organization(organization_id)
 
           future_count = Repo.aggregate(future_query, :count)
 
           active_ids =
             ClassType
             |> where([class_type], is_nil(class_type.archived_at))
+            |> for_organization(organization_id)
             |> select([class_type], class_type.id)
             |> Repo.all()
 
@@ -113,10 +118,11 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def list_class_types(opts \\ []) do
+  def list_class_types(%{organization_id: organization_id}, opts \\ []) do
     include_archived = Keyword.get(opts, :include_archived, false)
 
     ClassType
+    |> where([class_type], class_type.organization_id == ^organization_id)
     |> maybe_include_archived(include_archived)
     |> order_by([class_type], asc: class_type.sort_order, asc: class_type.name)
     |> Repo.all()
@@ -124,18 +130,23 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def get_class_type(id, opts \\ []) do
+  def get_class_type(%{organization_id: organization_id}, id, opts \\ []) do
     include_archived = Keyword.get(opts, :include_archived, false)
 
     ClassType
-    |> where([class_type], class_type.id == ^id)
+    |> where(
+      [class_type],
+      class_type.id == ^id and class_type.organization_id == ^organization_id
+    )
     |> maybe_include_archived(include_archived)
     |> Repo.one()
     |> normalize_class_type()
   end
 
   @impl true
-  def create_slot(params) do
+  def create_slot(%{organization_id: organization_id}, params) do
+    params = Map.put(params, :organization_id, organization_id)
+
     %ScheduledClass{}
     |> ScheduledClass.changeset(params)
     |> Repo.insert()
@@ -143,8 +154,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def create_class_series(params) do
-    params = string_key_map(params)
+  def create_class_series(%{organization_id: organization_id}, params) do
+    params = params |> string_key_map() |> Map.put("organization_id", organization_id)
 
     starts_on = parse_series_date(params["starts_on"])
     ends_on = parse_optional_series_date(params["ends_on"])
@@ -157,7 +168,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
          future_occurrences <-
            Enum.filter(occurrences, &(DateTime.compare(&1, DateTime.utc_now()) == :gt)),
          :ok <- require_occurrences(future_occurrences) do
-      Repo.transaction(fn ->
+      tenant_transaction(fn ->
         series =
           changeset
           |> Repo.insert()
@@ -170,6 +181,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
           Enum.map(future_occurrences, fn scheduled_at ->
             %ScheduledClass{}
             |> ScheduledClass.changeset(%{
+              organization_id: organization_id,
               master_workout_id: series.master_workout_id,
               class_type_id: series.class_type_id,
               class_series_id: series.id,
@@ -198,11 +210,12 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def extend_class_series(series_id, %Date{} = horizon) do
-    Repo.transaction(fn ->
+  def extend_class_series(%{organization_id: organization_id}, series_id, %Date{} = horizon) do
+    tenant_transaction(fn ->
       series =
         ClassSeries
         |> where([series], series.id == ^series_id)
+        |> for_organization(organization_id)
         |> lock("FOR UPDATE")
         |> Repo.one()
 
@@ -223,8 +236,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def update_slot(id, params) do
-    case Repo.get(ScheduledClass, id) do
+  def update_slot(%{organization_id: organization_id}, id, params) do
+    case Repo.get_by(ScheduledClass, id: id, organization_id: organization_id) do
       nil ->
         {:error, :not_found}
 
@@ -240,8 +253,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def delete_slot(id) do
-    case Repo.get(ScheduledClass, id) do
+  def delete_slot(%{organization_id: organization_id}, id) do
+    case Repo.get_by(ScheduledClass, id: id, organization_id: organization_id) do
       nil ->
         {:error, :not_found}
 
@@ -264,14 +277,15 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def delete_slots_for_workout(workout_id) do
+  def delete_slots_for_workout(%{organization_id: organization_id}, workout_id) do
     slots =
       ScheduledClass
       |> where([slot], slot.master_workout_id == ^workout_id)
+      |> for_organization(organization_id)
       |> Repo.all()
       |> Repo.preload(@slot_preloads)
 
-    Repo.transaction(fn ->
+    tenant_transaction(fn ->
       Enum.reduce_while(slots, [], fn slot, deleted_ids ->
         cancel_booking_timeout_jobs(slot.bookings)
 
@@ -291,13 +305,14 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def delete_class_series_for_workout(workout_id) do
+  def delete_class_series_for_workout(%{organization_id: organization_id}, workout_id) do
     series =
       ClassSeries
       |> where([series], series.master_workout_id == ^workout_id)
+      |> for_organization(organization_id)
       |> Repo.all()
 
-    Repo.transaction(fn ->
+    tenant_transaction(fn ->
       Enum.each(series, &cancel_class_series_extension_jobs/1)
 
       Enum.each(series, fn series ->
@@ -316,9 +331,10 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def list_workout_change_targets(workout_id) do
+  def list_workout_change_targets(%{organization_id: organization_id}, workout_id) do
     ScheduledClass
     |> where([slot], slot.master_workout_id == ^workout_id)
+    |> for_organization(organization_id)
     |> Repo.all()
     |> Repo.preload(@slot_preloads)
     |> Enum.flat_map(fn slot ->
@@ -337,27 +353,31 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def list_slot_ids_for_workout(workout_id) do
+  def list_slot_ids_for_workout(%{organization_id: organization_id}, workout_id) do
     ScheduledClass
     |> where([slot], slot.master_workout_id == ^workout_id)
+    |> for_organization(organization_id)
     |> select([slot], slot.id)
     |> Repo.all()
   end
 
   @impl true
-  def get_slot(id) do
+  def get_slot(%{organization_id: organization_id}, id) do
     ScheduledClass
-    |> Repo.get(id)
+    |> where([slot], slot.id == ^id)
+    |> for_organization(organization_id)
+    |> Repo.one()
     |> preload_slot()
     |> normalize_slot()
   end
 
   @impl true
-  def list_slots_window(start_at, end_at, opts \\ []) do
+  def list_slots_window(%{organization_id: organization_id}, start_at, end_at, opts \\ []) do
     class_type_ids = opts[:class_type_ids] || []
 
     ScheduledClass
     |> where([slot], slot.scheduled_at >= ^start_at and slot.scheduled_at < ^end_at)
+    |> for_organization(organization_id)
     |> maybe_filter_class_types(class_type_ids)
     |> order_by([slot], asc: slot.scheduled_at)
     |> Repo.all()
@@ -366,12 +386,14 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def list_member_slots(user_id, start_at, end_at) do
+  def list_member_slots(%{organization_id: organization_id}, user_id, start_at, end_at) do
     Booking
     |> join(:inner, [booking], slot in ScheduledClass, on: slot.id == booking.scheduled_class_id)
     |> where(
       [booking, slot],
-      booking.user_id == ^user_id and booking.status in [:pending, :approved] and
+      booking.organization_id == ^organization_id and
+        slot.organization_id == ^organization_id and booking.user_id == ^user_id and
+        booking.status in [:pending, :approved] and
         slot.scheduled_at >= ^start_at and slot.scheduled_at < ^end_at
     )
     |> order_by([_booking, slot], asc: slot.scheduled_at)
@@ -385,8 +407,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def get_settings do
-    case Repo.one(from settings in SchedulingSetting, limit: 1) do
+  def get_settings(%{organization_id: organization_id}) do
+    case Repo.get_by(SchedulingSetting, organization_id: organization_id) do
       nil ->
         %{
           default_capacity: 12,
@@ -400,8 +422,11 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def update_settings(params) do
-    settings = Repo.one(from settings in SchedulingSetting, limit: 1) || %SchedulingSetting{}
+  def update_settings(%{organization_id: organization_id}, params) do
+    settings =
+      Repo.get_by(SchedulingSetting, organization_id: organization_id) || %SchedulingSetting{}
+
+    params = Map.put(params, :organization_id, organization_id)
 
     settings
     |> SchedulingSetting.changeset(params)
@@ -413,9 +438,10 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def get_pending_bookings do
+  def get_pending_bookings(%{organization_id: organization_id}) do
     Booking
     |> where([booking], booking.status == :pending)
+    |> for_organization(organization_id)
     |> order_by([booking], asc: booking.inserted_at)
     |> Repo.all()
     |> Repo.preload(:scheduled_class)
@@ -423,20 +449,27 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def get_booking(id) do
+  def get_booking(%{organization_id: organization_id}, id) do
     Booking
-    |> Repo.get(id)
+    |> where([booking], booking.id == ^id)
+    |> for_organization(organization_id)
+    |> Repo.one()
     |> preload_booking()
     |> normalize_booking()
   end
 
   @impl true
-  def get_booking_execution_access(booking_id, user_id) do
+  def get_booking_execution_access(
+        %{organization_id: organization_id},
+        booking_id,
+        user_id
+      ) do
     Booking
     |> join(:inner, [booking], slot in ScheduledClass, on: slot.id == booking.scheduled_class_id)
     |> where(
       [booking, _slot],
-      booking.id == ^booking_id and booking.user_id == ^user_id
+      booking.organization_id == ^organization_id and booking.id == ^booking_id and
+        booking.user_id == ^user_id
     )
     |> select([booking, slot], %{
       booking_id: booking.id,
@@ -451,10 +484,11 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def record_attendance(params) do
+  def record_attendance(%{organization_id: organization_id}, params) do
     params =
       params
       |> string_key_map()
+      |> Map.put("organization_id", organization_id)
       |> Map.put_new("marked_at", DateTime.utc_now())
 
     %ClassAttendanceRecord{}
@@ -469,6 +503,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       {:ok, %ClassAttendanceRecord{id: nil}} ->
         ClassAttendanceRecord
         |> Repo.get_by(
+          organization_id: organization_id,
           scheduled_class_id: params["scheduled_class_id"],
           user_id: params["user_id"]
         )
@@ -480,11 +515,16 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def get_attendance_for_user_class(user_id, scheduled_class_id) do
+  def get_attendance_for_user_class(
+        %{organization_id: organization_id},
+        user_id,
+        scheduled_class_id
+      ) do
     ClassAttendanceRecord
     |> where(
       [record],
-      record.user_id == ^user_id and record.scheduled_class_id == ^scheduled_class_id
+      record.organization_id == ^organization_id and record.user_id == ^user_id and
+        record.scheduled_class_id == ^scheduled_class_id
     )
     |> order_by([record], desc: record.marked_at)
     |> limit(1)
@@ -493,11 +533,15 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def get_approved_booking_for_class(user_id, scheduled_class_id) do
+  def get_approved_booking_for_class(
+        %{organization_id: organization_id},
+        user_id,
+        scheduled_class_id
+      ) do
     Booking
     |> where(
       [booking],
-      booking.user_id == ^user_id and
+      booking.organization_id == ^organization_id and booking.user_id == ^user_id and
         booking.scheduled_class_id == ^scheduled_class_id and
         booking.status == :approved
     )
@@ -509,11 +553,18 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def create_booking(user_id, slot_id, timeout_minutes) do
+  def create_booking(%{organization_id: organization_id}, user_id, slot_id, timeout_minutes) do
     Multi.new()
+    |> Multi.run(:slot, fn repo, _changes ->
+      case repo.get_by(ScheduledClass, id: slot_id, organization_id: organization_id) do
+        nil -> {:error, :not_found}
+        slot -> {:ok, slot}
+      end
+    end)
     |> Multi.insert(
       :booking,
       Booking.create_changeset(%Booking{}, %{
+        organization_id: organization_id,
         scheduled_class_id: slot_id,
         user_id: user_id,
         status: :pending
@@ -534,15 +585,22 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
 
       {:error, _step, %Ecto.Changeset{} = changeset, _changes} ->
         {:error, changeset}
+
+      {:error, :slot, :not_found, _changes} ->
+        {:error, :not_found}
     end
   end
 
   @impl true
-  def create_approved_booking(user_id, slot_id) do
-    Repo.transaction(fn ->
+  def create_approved_booking(%{organization_id: organization_id}, user_id, slot_id) do
+    tenant_transaction(fn ->
       slot =
         ScheduledClass
-        |> where([scheduled_class], scheduled_class.id == ^slot_id)
+        |> where(
+          [scheduled_class],
+          scheduled_class.id == ^slot_id and
+            scheduled_class.organization_id == ^organization_id
+        )
         |> lock("FOR UPDATE")
         |> Repo.one()
 
@@ -550,12 +608,13 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
         is_nil(slot) ->
           Repo.rollback(:not_found)
 
-        approved_booking_count(slot_id) >= slot.capacity ->
+        approved_booking_count(organization_id, slot_id) >= slot.capacity ->
           Repo.rollback(:slot_full)
 
         true ->
           %Booking{}
           |> Booking.create_changeset(%{
+            organization_id: organization_id,
             scheduled_class_id: slot_id,
             user_id: user_id,
             status: :approved
@@ -576,18 +635,24 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def approve_booking(id, admin_message) do
-    resolve_booking(id, %{status: :approved, admin_message: admin_message})
+  def approve_booking(%{organization_id: organization_id}, id, admin_message) do
+    resolve_booking(organization_id, id, %{status: :approved, admin_message: admin_message})
   end
 
   @impl true
-  def reject_booking(id, admin_message) do
-    resolve_booking(id, %{status: :rejected, admin_message: admin_message})
+  def reject_booking(%{organization_id: organization_id}, id, admin_message) do
+    resolve_booking(organization_id, id, %{status: :rejected, admin_message: admin_message})
   end
 
   @impl true
-  def reject_booking_with_reconciliation(id, admin_message, reconciliation) do
+  def reject_booking_with_reconciliation(
+        %{organization_id: organization_id},
+        id,
+        admin_message,
+        reconciliation
+      ) do
     resolve_booking(
+      organization_id,
       id,
       %{status: :rejected, admin_message: admin_message},
       reconciliation
@@ -595,8 +660,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def attach_timeout_job(booking_id, job_id) do
-    case Repo.get(Booking, booking_id) do
+  def attach_timeout_job(%{organization_id: organization_id}, booking_id, job_id) do
+    case Repo.get_by(Booking, id: booking_id, organization_id: organization_id) do
       nil ->
         {:error, :not_found}
 
@@ -609,8 +674,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def withdraw_booking(id) do
-    case Repo.get(Booking, id) do
+  def withdraw_booking(%{organization_id: organization_id}, id) do
+    case Repo.get_by(Booking, id: id, organization_id: organization_id) do
       nil ->
         {:error, :not_found}
 
@@ -629,9 +694,13 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def withdraw_booking_with_reconciliation(id, reconciliation) do
-    Repo.transaction(fn ->
-      case Repo.get(Booking, id) do
+  def withdraw_booking_with_reconciliation(
+        %{organization_id: organization_id},
+        id,
+        reconciliation
+      ) do
+    tenant_transaction(fn ->
+      case Repo.get_by(Booking, id: id, organization_id: organization_id) do
         nil ->
           Repo.rollback(:not_found)
 
@@ -660,10 +729,10 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def cancel_active_future_bookings_for_user(user_id) do
+  def cancel_active_future_bookings_for_user(%{organization_id: organization_id}, user_id) do
     now = DateTime.utc_now() |> DateTime.truncate(:second)
 
-    Repo.transaction(fn ->
+    tenant_transaction(fn ->
       bookings =
         Booking
         |> join(:inner, [booking], slot in ScheduledClass,
@@ -671,7 +740,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
         )
         |> where(
           [booking, slot],
-          booking.user_id == ^user_id and
+          booking.organization_id == ^organization_id and
+            slot.organization_id == ^organization_id and booking.user_id == ^user_id and
             booking.status in [:pending, :approved] and
             slot.scheduled_at >= ^now
         )
@@ -699,9 +769,9 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       else: :ok
   end
 
-  defp resolve_booking(id, params, reconciliation \\ nil) do
-    case Repo.transaction(fn ->
-           with {:ok, booking} <- resolve_booking_transaction(id, params),
+  defp resolve_booking(organization_id, id, params, reconciliation \\ nil) do
+    case tenant_transaction(fn ->
+           with {:ok, booking} <- resolve_booking_transaction(organization_id, id, params),
                 {:ok, _job} <- insert_reconciliation_job(reconciliation) do
              {:ok, booking}
            else
@@ -735,6 +805,10 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
     |> Repo.insert()
   end
 
+  defp tenant_transaction(fun) when is_function(fun, 0) do
+    if Repo.in_transaction?(), do: {:ok, fun.()}, else: Repo.transaction(fun)
+  end
+
   defp cancel_booking_timeout_jobs(bookings) do
     Enum.each(bookings, fn booking ->
       case booking.timeout_job_id do
@@ -752,10 +826,13 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
     |> Enum.each(&Oban.cancel_job(&1.id))
   end
 
-  defp resolve_booking_transaction(id, params) do
+  defp resolve_booking_transaction(organization_id, id, params) do
     booking =
       Booking
-      |> where([booking], booking.id == ^id)
+      |> where(
+        [booking],
+        booking.id == ^id and booking.organization_id == ^organization_id
+      )
       |> lock("FOR UPDATE")
       |> Repo.one()
 
@@ -766,7 +843,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       booking.status != :pending ->
         Repo.rollback(:booking_not_pending)
 
-      approving?(params) and slot_at_capacity?(booking.scheduled_class_id) ->
+      approving?(params) and slot_at_capacity?(organization_id, booking.scheduled_class_id) ->
         Repo.rollback(:slot_full)
 
       true ->
@@ -781,21 +858,25 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   defp approving?(%{"status" => :approved}), do: true
   defp approving?(_), do: false
 
-  defp slot_at_capacity?(scheduled_class_id) do
+  defp slot_at_capacity?(organization_id, scheduled_class_id) do
     slot =
       ScheduledClass
-      |> where([slot], slot.id == ^scheduled_class_id)
+      |> where(
+        [slot],
+        slot.id == ^scheduled_class_id and slot.organization_id == ^organization_id
+      )
       |> lock("FOR UPDATE")
       |> Repo.one!()
 
-    approved_booking_count(scheduled_class_id) >= slot.capacity
+    approved_booking_count(organization_id, scheduled_class_id) >= slot.capacity
   end
 
-  defp approved_booking_count(scheduled_class_id) do
+  defp approved_booking_count(organization_id, scheduled_class_id) do
     Booking
     |> where(
       [booking],
-      booking.scheduled_class_id == ^scheduled_class_id and booking.status == :approved
+      booking.organization_id == ^organization_id and
+        booking.scheduled_class_id == ^scheduled_class_id and booking.status == :approved
     )
     |> Repo.aggregate(:count)
   end
@@ -839,7 +920,13 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       |> ensure_datetime()
       |> DateTime.add(timeout_minutes * 60, :second)
 
-    BookingTimeoutJob.new(%{"booking_id" => booking.id}, scheduled_at: scheduled_at)
+    BookingTimeoutJob.new(
+      %{
+        "organization_id" => booking.organization_id,
+        "booking_id" => booking.id
+      },
+      scheduled_at: scheduled_at
+    )
   end
 
   defp ensure_datetime(%DateTime{} = datetime), do: datetime
@@ -876,6 +963,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
 
     %{
       id: slot.id,
+      organization_id: slot.organization_id,
       master_workout_id: slot.master_workout_id,
       class_series_id: slot.class_series_id,
       class_series: normalize_loaded_class_series(slot.class_series),
@@ -900,6 +988,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   defp normalize_booking(%Booking{} = booking) do
     %{
       id: booking.id,
+      organization_id: booking.organization_id,
       scheduled_class_id: booking.scheduled_class_id,
       scheduled_class: normalize_slot(booking.scheduled_class),
       user_id: booking.user_id,
@@ -914,6 +1003,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   defp normalize_booking_summary(%Booking{} = booking) do
     %{
       id: booking.id,
+      organization_id: booking.organization_id,
       user_id: booking.user_id,
       status: booking.status,
       admin_message: booking.admin_message,
@@ -928,6 +1018,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   defp normalize_attendance(%ClassAttendanceRecord{} = record) do
     %{
       id: record.id,
+      organization_id: record.organization_id,
       scheduled_class_id: record.scheduled_class_id,
       booking_id: record.booking_id,
       user_id: record.user_id,
@@ -952,6 +1043,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   defp normalize_class_type(%ClassType{} = class_type) do
     %{
       id: class_type.id,
+      organization_id: class_type.organization_id,
       name: class_type.name,
       slug: class_type.slug,
       sort_order: class_type.sort_order,
@@ -968,6 +1060,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   defp normalize_class_series(%ClassSeries{} = series) do
     %{
       id: series.id,
+      organization_id: series.organization_id,
       master_workout_id: series.master_workout_id,
       class_type_id: series.class_type_id,
       name: series.name,
@@ -1015,6 +1108,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
         Enum.each(occurrences, fn scheduled_at ->
           %ScheduledClass{}
           |> ScheduledClass.changeset(%{
+            organization_id: series.organization_id,
             master_workout_id: series.master_workout_id,
             class_type_id: series.class_type_id,
             class_series_id: series.id,
@@ -1052,6 +1146,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
     scheduled_at = DateTime.new!(run_on, ~T[02:00:00], "Etc/UTC")
 
     %{
+      "organization_id" => series.organization_id,
       "series_id" => series.id,
       "horizon" => Date.to_iso8601(next_horizon)
     }
@@ -1068,8 +1163,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def substitute_slot_workout(slot_id, new_workout_id) do
-    case Repo.get(ScheduledClass, slot_id) do
+  def substitute_slot_workout(%{organization_id: organization_id}, slot_id, new_workout_id) do
+    case Repo.get_by(ScheduledClass, id: slot_id, organization_id: organization_id) do
       nil ->
         {:error, :not_found}
 
@@ -1082,13 +1177,14 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def count_classes_today do
+  def count_classes_today(%{organization_id: organization_id}) do
     today = Date.utc_today()
     start_of_day = DateTime.new!(today, ~T[00:00:00], "Etc/UTC")
     end_of_day = DateTime.new!(today, ~T[23:59:59], "Etc/UTC")
 
     ScheduledClass
     |> where([s], s.scheduled_at >= ^start_of_day and s.scheduled_at <= ^end_of_day)
+    |> for_organization(organization_id)
     |> select([s], count(s.id))
     |> Repo.one()
     |> Kernel.||(0)
@@ -1097,11 +1193,16 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   defp normalize_settings(settings) do
     %{
       id: settings.id,
+      organization_id: settings.organization_id,
       default_capacity: settings.default_capacity,
       default_auto_approve: settings.default_auto_approve,
       default_booking_timeout_minutes: settings.default_booking_timeout_minutes,
       inserted_at: settings.inserted_at,
       updated_at: settings.updated_at
     }
+  end
+
+  defp for_organization(query, organization_id) do
+    where(query, [row], row.organization_id == ^organization_id)
   end
 end

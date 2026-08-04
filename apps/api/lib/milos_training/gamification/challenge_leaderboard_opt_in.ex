@@ -6,6 +6,7 @@ defmodule MilosTraining.Gamification.ChallengeLeaderboardOptIn do
   @foreign_key_type :binary_id
 
   schema "challenge_leaderboard_opt_ins" do
+    field :organization_id, :binary_id
     field :user_id, :binary_id
     field :challenge_id, :binary_id
     field :inserted_at, :utc_datetime_usec, autogenerate: {DateTime, :utc_now, []}
@@ -13,9 +14,11 @@ defmodule MilosTraining.Gamification.ChallengeLeaderboardOptIn do
 
   def changeset(opt_in \\ %__MODULE__{}, params) do
     opt_in
-    |> cast(params, [:user_id, :challenge_id])
+    |> cast(params, [:organization_id, :user_id, :challenge_id])
     |> validate_required([:user_id, :challenge_id])
-    |> unique_constraint([:user_id, :challenge_id])
+    |> unique_constraint([:organization_id, :user_id, :challenge_id],
+      name: :challenge_leaderboard_opt_ins_organization_user_challenge_index
+    )
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:challenge_id)
   end

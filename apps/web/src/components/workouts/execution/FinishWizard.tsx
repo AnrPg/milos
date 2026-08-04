@@ -7,7 +7,7 @@
 import {useUiTranslations} from "@/i18n/ui";
 import React, { useState } from "react";
 import type { TimerSegment } from "@/api/executions";
-import type { ExerciseModification } from "@/api/executions";
+import { isFreeTextModification, type ExerciseModification } from "@/api/executions";
 import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
 import { semanticLabel } from "@/i18n/presentation";
@@ -599,6 +599,93 @@ function ModificationsEditorStep({
   );
 }
 
+const FREE_TEXT_MODIFICATION_ID = "free-text:modification";
+
+function FreeTextModificationsStep({
+  initialMods,
+  onBack,
+  onNext,
+  onSkip,
+}: {
+  initialMods: ExerciseModification[];
+  onBack: () => void;
+  onNext: (mods: ExerciseModification[]) => void;
+  onSkip: () => void;
+}) {
+  const i18n = useUiTranslations();
+  const existing = initialMods.find(isFreeTextModification);
+  const [note, setNote] = useState(existing ? String(existing.actual_value) : "");
+
+  function continueWithNote() {
+    const actualValue = note.trim();
+    const otherModifications = initialMods.filter((modification) => !isFreeTextModification(modification));
+
+    if (!actualValue) {
+      onNext(otherModifications);
+      return;
+    }
+
+    onNext([
+      ...otherModifications,
+      {
+        patch_id: FREE_TEXT_MODIFICATION_ID,
+        type: "other",
+        field: "note",
+        section_id: "free_text",
+        canonical_value: "",
+        actual_value: actualValue,
+      },
+    ]);
+  }
+
+  return (
+    <div className="flex h-screen flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
+      <div className="flex items-center justify-between px-5 pt-8 pb-2">
+        <button type="button" onClick={onBack} className="text-sm" style={{ color: "var(--dim)" }}>
+          {i18n("backc32ae9f")}
+        </button>
+        <button type="button" onClick={onSkip} className="text-sm font-semibold" style={{ color: "var(--dim)" }}>
+          {i18n("skip10b7bbe")}
+        </button>
+      </div>
+
+      <div className="flex flex-col items-center gap-2 px-6 pt-4 pb-6">
+        <h2 className="text-center text-xl font-bold">{i18n("anyModifications97c3e24")}</h2>
+        <p className="max-w-xs text-center text-sm" style={{ color: "var(--muted)" }}>
+          {i18n("modificationsAndNotes8a73e2c")}
+        </p>
+      </div>
+
+      <div className="flex-1 px-4 pb-4">
+        <label className="block h-full rounded-2xl p-4" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+          <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+            {i18n("notes7044004")}
+          </span>
+          <textarea
+            aria-label={i18n("notes7044004")}
+            autoFocus
+            className="mt-3 min-h-48 w-full resize-y rounded-xl p-3 text-sm leading-6 outline-none"
+            style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
+            value={note}
+            onChange={(event) => setNote(event.target.value)}
+          />
+        </label>
+      </div>
+
+      <div className="p-4 pt-0">
+        <button
+          type="button"
+          onClick={continueWithNote}
+          className="w-full rounded-2xl py-3.5 text-base font-semibold"
+          style={{ background: "var(--primary)", color: "var(--primary-contrast, #fff)" }}
+        >
+          {i18n("next2f04eb1")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── Step 3: Confirm ───────────────────────────────────────────────────────────
 
 function ConfirmStep({
@@ -689,28 +776,31 @@ function ConfirmStep({
               {modifications.map((mod, i) => (
                 <div
                   key={(mod.patch_id ?? mod.exercise_id ?? mod.section_id) + "-" + (i)}
-                  className="flex justify-between items-center rounded-xl px-4 py-2.5"
+                  className={`rounded-xl px-4 py-2.5 ${isFreeTextModification(mod) ? "" : "flex items-center justify-between"}`}
                   style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
                 >
-                  <span className="text-sm truncate" style={{ color: "var(--muted)" }}>
-                    {mod.exercise_name ??
-                      (mod.exercise_id ? exerciseMap[mod.exercise_id] : null) ??
-                      mod.section_name ??
-                      mod.section_id}
-                  </span>
-                  <span
-                    className="text-xs font-semibold shrink-0 ms-2"
-                    style={{
-                      color:
-                        mod.type === "skipped"
-                          ? "var(--danger, var(--primary))"
-                          : "var(--warning)",
-                    }}
-                  >
-                    {mod.type === "skipped"
-                      ? i18n("skipped5a000ad")
-                      : `${mod.field}: ${String(mod.actual_value)}`}
-                  </span>
+                  {isFreeTextModification(mod) ? (
+                    <p className="whitespace-pre-wrap break-words text-sm leading-6" style={{ color: "var(--text)" }}>
+                      {String(mod.actual_value)}
+                    </p>
+                  ) : (
+                    <>
+                      <span className="truncate text-sm" style={{ color: "var(--muted)" }}>
+                        {mod.exercise_name ??
+                          (mod.exercise_id ? exerciseMap[mod.exercise_id] : null) ??
+                          mod.section_name ??
+                          mod.section_id}
+                      </span>
+                      <span
+                        className="ms-2 shrink-0 text-xs font-semibold"
+                        style={{ color: mod.type === "skipped" ? "var(--danger, var(--primary))" : "var(--warning)" }}
+                      >
+                        {mod.type === "skipped"
+                          ? i18n("skipped5a000ad")
+                          : `${mod.field}: ${String(mod.actual_value)}`}
+                      </span>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
@@ -751,6 +841,7 @@ export function FinishWizard({
   scores,
   segments,
   initialModifications,
+  freeText = false,
   isSaving,
   feedback,
   onConfirm,
@@ -758,6 +849,7 @@ export function FinishWizard({
   scores: SectionScore[];
   segments: TimerSegment[];
   initialModifications: ExerciseModification[];
+  freeText?: boolean;
   isSaving: boolean;
   feedback: string | null;
   onConfirm: (editedScores: SectionScore[], modifications: ExerciseModification[]) => void;
@@ -793,6 +885,17 @@ export function FinishWizard({
   }
 
   if (step === 2) {
+    if (freeText) {
+      return (
+        <FreeTextModificationsStep
+          initialMods={confirmedMods}
+          onBack={() => setStep(1)}
+          onNext={handleModsNext}
+          onSkip={() => setStep(3)}
+        />
+      );
+    }
+
     return (
       <ModificationsEditorStep
         segments={segments}

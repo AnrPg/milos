@@ -4,11 +4,11 @@ defmodule MilosTraining.Application.SubmitBooking do
   alias MilosTraining.{Finance, Identity, Scheduling}
   alias MilosTraining.Scheduling.Domain.BookingPolicy
 
-  def call(%{id: user_id} = actor, slot_id) do
-    with slot when not is_nil(slot) <- Scheduling.get_slot(slot_id),
+  def call(context, %{id: user_id} = actor, slot_id) do
+    with slot when not is_nil(slot) <- get_slot(context, slot_id),
          :ok <- BookingPolicy.can_book?(slot, user_id: user_id, now: DateTime.utc_now()),
-         {:ok, reservation} <- reserve_visit(actor, slot) do
-      case create_booking(slot, user_id) do
+         {:ok, reservation} <- reserve_visit(context, actor, slot) do
+      case create_booking(context, slot, user_id) do
         {:ok, booking} ->
           dispatch_booking_notification(slot, booking)
           broadcast_booking_event(slot, booking)
@@ -16,7 +16,7 @@ defmodule MilosTraining.Application.SubmitBooking do
           {:ok, booking}
 
         {:error, reason} ->
-          release_failed_reservation(reservation)
+          release_failed_reservation(context, reservation)
           {:error, reason}
       end
     else
@@ -26,15 +26,17 @@ defmodule MilosTraining.Application.SubmitBooking do
     end
   end
 
+  def call(%{id: _} = actor, slot_id), do: call(nil, actor, slot_id)
+
   def call(user_id, slot_id) when is_binary(user_id) do
     case Identity.find_by_id(user_id) do
       nil -> {:error, :not_found}
-      actor -> call(actor, slot_id)
+      actor -> call(nil, actor, slot_id)
     end
   end
 
-  defp reserve_visit(actor, slot) do
-    Finance.reserve_entitlement(actor.id, %{
+  defp reserve_visit(context, actor, slot) do
+    request = %{
       actor_role: actor.role,
       channel: :in_person,
       capability: :book_classes,
@@ -44,16 +46,26 @@ defmodule MilosTraining.Application.SubmitBooking do
       source_context: "scheduling",
       source_id: slot.id,
       idempotency_key: "booking-reservation:#{Ecto.UUID.generate()}"
-    })
+    }
+
+    case context do
+      nil -> Finance.reserve_entitlement(actor.id, request)
+      context -> Finance.reserve_entitlement(context, actor.id, request)
+    end
   end
 
-  defp release_failed_reservation(%{id: nil}), do: :ok
+  defp release_failed_reservation(_context, %{id: nil}), do: :ok
 
-  defp release_failed_reservation(%{id: reservation_id}) do
-    Finance.release_entitlement(reservation_id, %{
+  defp release_failed_reservation(context, %{id: reservation_id}) do
+    params = %{
       reason: "Scheduling rejected booking creation",
       idempotency_key: "booking-compensation:#{reservation_id}"
-    })
+    }
+
+    case context do
+      nil -> Finance.release_entitlement(reservation_id, params)
+      context -> Finance.release_entitlement(context, reservation_id, params)
+    end
 
     :ok
   end
@@ -66,11 +78,20 @@ defmodule MilosTraining.Application.SubmitBooking do
     )
   end
 
-  defp create_booking(%{auto_approve: true, id: slot_id}, user_id),
+  defp get_slot(nil, slot_id), do: Scheduling.get_slot(slot_id)
+  defp get_slot(context, slot_id), do: Scheduling.get_slot(context, slot_id)
+
+  defp create_booking(nil, %{auto_approve: true, id: slot_id}, user_id),
     do: Scheduling.submit_auto_approved_booking(user_id, slot_id)
 
-  defp create_booking(slot, user_id),
+  defp create_booking(context, %{auto_approve: true, id: slot_id}, user_id),
+    do: Scheduling.submit_auto_approved_booking(context, user_id, slot_id)
+
+  defp create_booking(nil, slot, user_id),
     do: Scheduling.submit_booking(user_id, slot.id, slot.booking_timeout_minutes)
+
+  defp create_booking(context, slot, user_id),
+    do: Scheduling.submit_booking(context, user_id, slot.id, slot.booking_timeout_minutes)
 
   defp dispatch_booking_notification(%{auto_approve: true}, booking),
     do: dispatch_non_critical(:booking_resolved, booking)

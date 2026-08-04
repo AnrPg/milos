@@ -6,6 +6,7 @@ defmodule MilosTraining.Messaging.Participant do
   @foreign_key_type :binary_id
 
   schema "messaging_participants" do
+    field :organization_id, :binary_id
     belongs_to :thread, MilosTraining.Messaging.Thread
     field :user_id, :binary_id
     field :last_read_message_id, :binary_id
@@ -15,7 +16,7 @@ defmodule MilosTraining.Messaging.Participant do
 
   def changeset(participant, attrs) do
     participant
-    |> cast(attrs, [:thread_id, :user_id, :last_read_message_id])
+    |> cast(attrs, [:organization_id, :thread_id, :user_id, :last_read_message_id])
     |> validate_required([:thread_id, :user_id])
     |> unique_constraint([:thread_id, :user_id])
     |> foreign_key_constraint(:user_id)

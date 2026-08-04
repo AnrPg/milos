@@ -30,6 +30,7 @@ the original wording and dates for traceability.
 | TD-035 | Open |
 | TD-036 | Resolved |
 | TD-037 | Open |
+| TD-038–TD-039 | Resolved |
 
 ## Detailed Ledger
 
@@ -72,3 +73,5 @@ the original wording and dates for traceability.
 | TD-035 | Offline Commands | Add retry/remove controls for permanently failed message operations plus explicit outbox adapters and server idempotency/conflict policies for selected non-message notification-triggering commands | ADR-067 deliberately enables automatic retry for transient message failures first; permanent failures need explicit UX, while booking, approval, journal, and other commands must opt in through their owning contexts rather than being replayed generically | Medium | 2026-07-19 |
 | TD-036 | Workout Quick Text DSL | Resolved 2026-07-31 by ADR-069/ADR-070: all nineteen registry-generated templates, nested metadata and tweak combinations, stable code-backed exercise catalog IDs, positioned diagnostics, revision-safe direct publication, conformance coverage, autocomplete, and the coach manual now share one canonical contract | Kept in the ledger for traceability of the original first-slice limitation | Low | 2026-07-31 |
 | TD-037 | User-profile programming | Support personalized WODs or per-member WOD modifications independently of a booked class | Members currently receive workouts only through booked classes by explicit product decision; the ownership, execution, and entitlement semantics for direct personalized member programming need a separate design | Medium | 2026-08-01 |
+| TD-038 | Multi-tenancy T4-T6 | Resolved 2026-08-04: ownership signatures, same-tenant constraints, owner/grant predicates, two-tenant tests, and forced RLS are now complete for Finance, Messaging, Notifications, Gamification, Analytics, and Wellbeing; `mix milos.tenancy.audit` and `mix milos.architecture` pass | Kept in ledger for traceability of the staged T4-T6 enforcement rollout | Low | 2026-08-03 |
+| TD-039 | Multi-tenant object migration | Resolved 2026-08-04: `mix milos.storage.migrate_legacy_objects` provides dry-run/apply migration for legacy `invoices/...` and avatar URLs into `organizations/<organization_id>/...` and `users/<user_id>/avatars/...`, with destination byte-checksum verification before persisted key updates | Kept in ledger for traceability of the operator-controlled object migration path | Low | 2026-08-03 |

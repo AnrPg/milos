@@ -122,20 +122,26 @@ defmodule MilosTrainingWeb.AdminClassTypeController do
   )
 
   def index(conn, _params) do
-    with {:ok, class_types} <- ListClassTypes.call(include_archived: true) do
+    with {:ok, class_types} <-
+           ListClassTypes.call(conn.assigns.tenant_context, include_archived: true) do
       json(conn, %{class_types: class_types})
     end
   end
 
   def create(conn, params) do
-    with {:ok, class_type} <- CreateClassType.call(body_params(conn, params)) do
+    with {:ok, class_type} <-
+           CreateClassType.call(conn.assigns.tenant_context, body_params(conn, params)) do
       conn |> put_status(:created) |> json(%{class_type: class_type})
     end
   end
 
   def update(conn, params) do
     with {:ok, class_type} <-
-           UpdateClassType.call(params[:id] || params["id"], body_params(conn, params)) do
+           UpdateClassType.call(
+             conn.assigns.tenant_context,
+             params[:id] || params["id"],
+             body_params(conn, params)
+           ) do
       json(conn, %{class_type: class_type})
     end
   end
@@ -143,6 +149,7 @@ defmodule MilosTrainingWeb.AdminClassTypeController do
   def delete(conn, params) do
     with {:ok, class_type} <-
            ArchiveClassType.call(
+             conn.assigns.tenant_context,
              params[:id] || params["id"],
              params[:replacement_class_type_id] || params["replacement_class_type_id"]
            ) do

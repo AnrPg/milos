@@ -1,7 +1,7 @@
 defmodule MilosTrainingWeb.WorkoutControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
-  alias MilosTraining.Identity
+  alias MilosTraining.{Identity, Organizations}
 
   describe "member workout queries" do
     test "member can view a workout and its materialized scales", %{conn: conn} do
@@ -114,6 +114,7 @@ defmodule MilosTrainingWeb.WorkoutControllerTest do
         role: :member
       })
 
+    {:ok, _membership} = Organizations.ensure_legacy_membership(member)
     put_bearer_token(conn, member)
   end
 
@@ -126,6 +127,7 @@ defmodule MilosTrainingWeb.WorkoutControllerTest do
       })
 
     {:ok, admin} = Identity.update_role(user, :admin)
+    {:ok, _membership} = Organizations.ensure_legacy_membership(admin, :owner)
     admin
   end
 
@@ -137,6 +139,7 @@ defmodule MilosTrainingWeb.WorkoutControllerTest do
         role: :athlete
       })
 
+    {:ok, _membership} = Organizations.ensure_legacy_membership(athlete)
     put_bearer_token(conn, athlete)
   end
 end

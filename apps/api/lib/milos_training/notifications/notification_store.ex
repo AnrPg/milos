@@ -1,6 +1,11 @@
 defmodule MilosTraining.Notifications.NotificationStore do
   @behaviour MilosTraining.Notifications.Ports.NotificationStore
 
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
+
+  def with_user_context(context, fun) when is_function(fun, 0),
+    do: RepoContext.run(context, fun)
+
   defp adapter do
     Application.fetch_env!(:milos_training, :notification_store)
   end

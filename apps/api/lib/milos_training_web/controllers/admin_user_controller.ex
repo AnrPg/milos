@@ -544,7 +544,8 @@ defmodule MilosTrainingWeb.AdminUserController do
   def coaching_context(conn, params) do
     id = params["id"] || params[:id]
 
-    with {:ok, payload} <- GetAdminUserCoachingContext.call(id, params) do
+    with {:ok, payload} <-
+           GetAdminUserCoachingContext.call(conn.assigns.tenant_context, id, params) do
       json(conn, payload)
     end
   end

@@ -1,0 +1,183 @@
+defmodule MilosTrainingWeb.OrganizationAccessController do
+  use MilosTrainingWeb, :controller
+  use OpenApiSpex.ControllerSpecs
+
+  alias Guardian.Plug, as: GuardianPlug
+
+  alias MilosTraining.Application.{
+    InspectRegistrationInvitation,
+    IssueRegistrationInvitation,
+    ListOrganizationMemberships,
+    RedeemRegistrationInvitation,
+    RevokeRegistrationInvitation
+  }
+
+  alias OpenApiSpex.{MediaType, RequestBody, Schema}
+
+  action_fallback MilosTrainingWeb.FallbackController
+  tags(["Organizations"])
+
+  @token_request %RequestBody{
+    description: "Opaque invitation token",
+    required: true,
+    content: %{
+      "application/json" => %MediaType{
+        schema: %Schema{
+          type: :object,
+          properties: %{invitation_token: %Schema{type: :string, minLength: 20, maxLength: 256}},
+          required: [:invitation_token]
+        }
+      }
+    }
+  }
+
+  @organization_schema %Schema{
+    type: :object,
+    properties: %{
+      id: %Schema{type: :string, format: :uuid},
+      name: %Schema{type: :string},
+      slug: %Schema{type: :string}
+    },
+    required: [:id, :name, :slug]
+  }
+
+  @invitation_schema %Schema{
+    type: :object,
+    properties: %{
+      organization: @organization_schema,
+      role: %Schema{type: :string},
+      expires_at: %Schema{type: :string, format: :date_time},
+      token: %Schema{type: :string, nullable: true}
+    },
+    required: [:organization, :role, :expires_at]
+  }
+
+  @membership_schema %Schema{
+    type: :object,
+    properties: %{
+      id: %Schema{type: :string, format: :uuid},
+      role: %Schema{type: :string},
+      organization: @organization_schema
+    },
+    required: [:id, :role, :organization]
+  }
+
+  plug OpenApiSpex.Plug.CastAndValidate,
+       [json_render_error_v2: true] when action in [:inspect, :redeem, :issue]
+
+  operation(:inspect,
+    summary: "Inspect a one-time organization invitation",
+    request_body: @token_request,
+    responses: [ok: {"Invitation", "application/json", @invitation_schema}]
+  )
+
+  operation(:redeem,
+    summary: "Redeem an invitation for the authenticated account",
+    security: [%{"bearerAuth" => []}],
+    request_body: @token_request,
+    responses: [created: {"Membership", "application/json", @membership_schema}]
+  )
+
+  operation(:memberships,
+    summary: "List active organization memberships for the authenticated account",
+    security: [%{"bearerAuth" => []}],
+    responses: [
+      ok: {"Memberships", "application/json", %Schema{type: :array, items: @membership_schema}}
+    ]
+  )
+
+  operation(:issue,
+    summary: "Issue a one-time organization invitation",
+    security: [%{"bearerAuth" => []}],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{
+              role: %Schema{type: :string, enum: ~w(owner admin coach member athlete)},
+              lifetime_seconds: %Schema{type: :integer, minimum: 300, maximum: 604_800}
+            },
+            required: [:role]
+          }
+        }
+      }
+    },
+    responses: [created: {"Invitation token", "application/json", @invitation_schema}]
+  )
+
+  operation(:revoke,
+    summary: "Revoke an active organization invitation",
+    security: [%{"bearerAuth" => []}],
+    responses: [no_content: {"Revoked", nil, nil}]
+  )
+
+  def inspect(conn, _params) do
+    with {:ok, invitation} <-
+           InspectRegistrationInvitation.call(conn.body_params.invitation_token) do
+      json(conn, serialize_invitation(invitation))
+    end
+  end
+
+  def redeem(conn, _params) do
+    user = GuardianPlug.current_resource(conn)
+
+    with {:ok, redemption} <-
+           RedeemRegistrationInvitation.call(user, conn.body_params.invitation_token) do
+      conn |> put_status(:created) |> json(serialize_membership(redemption))
+    end
+  end
+
+  def memberships(conn, _params) do
+    with {:ok, memberships} <-
+           ListOrganizationMemberships.call(GuardianPlug.current_resource(conn)) do
+      json(conn, Enum.map(memberships, &serialize_membership/1))
+    end
+  end
+
+  def issue(conn, _params) do
+    with {:ok, result} <-
+           IssueRegistrationInvitation.call(conn.assigns.tenant_context, conn.body_params) do
+      conn
+      |> put_status(:created)
+      |> json(
+        serialize_invitation(%{
+          organization: conn.assigns.tenant_context.organization,
+          role: result.invitation.role,
+          expires_at: result.invitation.expires_at,
+          token: result.token
+        })
+      )
+    end
+  end
+
+  def revoke(conn, %{"id" => invitation_id}) do
+    with {:ok, _invitation} <-
+           RevokeRegistrationInvitation.call(conn.assigns.tenant_context, invitation_id) do
+      send_resp(conn, :no_content, "")
+    end
+  end
+
+  defp serialize_invitation(invitation) do
+    %{
+      organization: %{
+        id: invitation.organization.id,
+        name: invitation.organization.name,
+        slug: invitation.organization.slug
+      },
+      role: to_string(invitation.role),
+      expires_at: invitation.expires_at,
+      token: Map.get(invitation, :token)
+    }
+    |> then(fn value -> if value.token, do: value, else: Map.delete(value, :token) end)
+  end
+
+  defp serialize_membership(%{membership: membership, organization: organization}) do
+    %{
+      id: membership.id,
+      role: to_string(membership.role),
+      organization: %{id: organization.id, name: organization.name, slug: organization.slug}
+    }
+  end
+end

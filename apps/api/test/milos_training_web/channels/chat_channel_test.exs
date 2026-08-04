@@ -26,13 +26,23 @@ defmodule MilosTrainingWeb.ChatChannelTest do
         context_id: assignment.id
       })
 
-    outsider_socket = socket(UserSocket, "user:#{outsider.id}", %{current_user: outsider})
+    {:ok, outsider_context} =
+      MilosTraining.Organizations.resolve_tenant_context(
+        outsider,
+        MilosTraining.Organizations.legacy_organization_slug()
+      )
+
+    outsider_socket =
+      socket(UserSocket, "user:#{outsider.id}", %{
+        current_user: outsider,
+        tenant_context: outsider_context
+      })
 
     assert {:error, %{reason: "forbidden"}} =
              subscribe_and_join(
                outsider_socket,
                ChatChannel,
-               "chat:thread:#{thread.id}"
+               "chat:#{outsider_context.organization_id}:thread:#{thread.id}"
              )
   end
 
@@ -43,14 +53,43 @@ defmodule MilosTrainingWeb.ChatChannelTest do
     {:ok, thread} =
       GetOrCreateMessagingThread.call(admin, %{context_type: :direct, participant_id: athlete.id})
 
-    admin_socket = socket(UserSocket, "user:#{admin.id}", %{current_user: admin})
-    athlete_socket = socket(UserSocket, "user:#{athlete.id}", %{current_user: athlete})
+    {:ok, admin_context} =
+      MilosTraining.Organizations.resolve_tenant_context(
+        admin,
+        MilosTraining.Organizations.legacy_organization_slug()
+      )
+
+    {:ok, athlete_context} =
+      MilosTraining.Organizations.resolve_tenant_context(
+        athlete,
+        MilosTraining.Organizations.legacy_organization_slug()
+      )
+
+    admin_socket =
+      socket(UserSocket, "user:#{admin.id}", %{
+        current_user: admin,
+        tenant_context: admin_context
+      })
+
+    athlete_socket =
+      socket(UserSocket, "user:#{athlete.id}", %{
+        current_user: athlete,
+        tenant_context: athlete_context
+      })
 
     {:ok, _, admin_socket} =
-      subscribe_and_join(admin_socket, ChatChannel, "chat:thread:#{thread.id}")
+      subscribe_and_join(
+        admin_socket,
+        ChatChannel,
+        "chat:#{admin_context.organization_id}:thread:#{thread.id}"
+      )
 
     {:ok, _, _athlete_socket} =
-      subscribe_and_join(athlete_socket, ChatChannel, "chat:thread:#{thread.id}")
+      subscribe_and_join(
+        athlete_socket,
+        ChatChannel,
+        "chat:#{athlete_context.organization_id}:thread:#{thread.id}"
+      )
 
     ref = Phoenix.ChannelTest.push(admin_socket, "typing_start", %{})
     assert_reply ref, :ok, %{typing: true}

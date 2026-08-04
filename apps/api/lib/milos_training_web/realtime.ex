@@ -1,8 +1,14 @@
 defmodule MilosTrainingWeb.Realtime do
+  alias MilosTraining.Organizations
   alias MilosTrainingWeb.Endpoint
 
   def broadcast_schedule_refresh(event, payload \\ %{}) do
-    Endpoint.broadcast("schedule:lobby", "schedule:refresh", %{
+    organization_id =
+      Map.get(payload, :organization_id) ||
+        Map.get(payload, "organization_id") ||
+        legacy_organization_id()
+
+    Endpoint.broadcast("schedule:#{organization_id}", "schedule:refresh", %{
       event: event,
       payload: payload
     })
@@ -41,5 +47,9 @@ defmodule MilosTrainingWeb.Realtime do
 
   def broadcast_execution_completed(execution_id, payload) do
     Endpoint.broadcast("execution:#{execution_id}", "execution:completed", payload)
+  end
+
+  defp legacy_organization_id do
+    Organizations.get_by_slug(Organizations.legacy_organization_slug()).id
   end
 end

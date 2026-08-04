@@ -6,6 +6,7 @@ defmodule MilosTraining.Finance.Membership do
   @foreign_key_type :binary_id
 
   schema "memberships" do
+    field :organization_id, :binary_id, read_after_writes: true
     field :user_id, :binary_id
     field :user_type_snapshot, :string
     field :status, :string, default: "trial"
@@ -62,7 +63,7 @@ defmodule MilosTraining.Finance.Membership do
       "imported"
     ])
     |> validate_inclusion(:entitlement_status, ["active", "grace", "blocked", "inactive"])
-    |> unique_constraint(:user_id)
+    |> unique_constraint([:organization_id, :user_id], name: :memberships_organization_user_index)
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:referred_by_user_id)
   end

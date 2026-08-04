@@ -7,6 +7,7 @@ defmodule MilosTraining.Scheduling.ScheduledClass do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "scheduled_classes" do
+    field :organization_id, :binary_id
     field :master_workout_id, :binary_id
     field :name, :string, default: "Class"
     field :duration_minutes, :integer, default: 60
@@ -26,6 +27,7 @@ defmodule MilosTraining.Scheduling.ScheduledClass do
   def changeset(slot \\ %__MODULE__{}, params) do
     slot
     |> cast(params, [
+      :organization_id,
       :master_workout_id,
       :class_type_id,
       :class_series_id,
@@ -37,6 +39,7 @@ defmodule MilosTraining.Scheduling.ScheduledClass do
       :booking_timeout_minutes
     ])
     |> validate_required([
+      :organization_id,
       :class_type_id,
       :name,
       :duration_minutes,

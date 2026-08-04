@@ -262,7 +262,7 @@ export function SlotPopup({
                 className="rounded-full px-3 py-1 text-xs font-semibold"
                 style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--muted)" }}
               >
-                {slot.spots_remaining} {i18n("spot9f4b527")}{slot.spots_remaining !== 1 ? i18n("sa0f1490") : ""} {i18n("left12c0f1f")}
+                {i18n("value0SpotsLeft3ff0ef6", { value0: slot.spots_remaining })}
               </span>
               <span
                 className="rounded-full px-3 py-1 text-xs font-semibold"

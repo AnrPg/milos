@@ -2,8 +2,9 @@ defmodule MilosTraining.Application.GetCoachingAthleteDrillDown do
   @moduledoc false
 
   alias MilosTraining.Application.ListWorkoutExecutions
+  alias MilosTraining.Coaching
   alias MilosTraining.Coaching.Domain.AthleteDrillDown
-  alias MilosTraining.Identity
+  alias MilosTraining.{Identity, Organizations}
   alias MilosTraining.Messaging
   alias MilosTraining.Workouts
 
@@ -33,8 +34,48 @@ defmodule MilosTraining.Application.GetCoachingAthleteDrillDown do
     end
   end
 
+  def call(%{organization_id: organization_id} = context, athlete_id, params)
+      when is_binary(organization_id) do
+    Coaching.with_tenant_context(context, fn ->
+      with %{role: :athlete} = athlete <- Identity.find_by_id(athlete_id),
+           true <- active_athlete_membership?(athlete_id, organization_id) do
+        {start_date, end_date} = assignment_window(params)
+
+        assignments =
+          Workouts.list_assigned_workouts_for_athlete(athlete_id, start_date, end_date)
+
+        executions = ListWorkoutExecutions.for_coaching(athlete_id)
+        coaching_messages = Messaging.list_recent_coaching_notes_for_organization(athlete_id, 50)
+
+        {:ok,
+         %{
+           drill_down:
+             AthleteDrillDown.build(
+               athlete,
+               assignments,
+               executions,
+               coaching_messages,
+               Date.utc_today()
+             )
+         }}
+      else
+        nil -> {:error, :not_found}
+        %{role: _other_role} -> {:error, :forbidden}
+        false -> {:error, :not_found}
+        error -> error
+      end
+    end)
+  end
+
   defp fetch_coaching_messages(athlete_id) do
     Messaging.list_recent_coaching_notes(athlete_id, 50)
+  end
+
+  defp active_athlete_membership?(athlete_id, organization_id) do
+    Enum.any?(Organizations.list_memberships(athlete_id), fn %{membership: membership} ->
+      membership.organization_id == organization_id and membership.role == :athlete and
+        membership.status == :active
+    end)
   end
 
   defp assignment_window(params) do

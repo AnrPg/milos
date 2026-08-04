@@ -1,6 +1,10 @@
 defmodule MilosTraining.Application.GetWorkoutExecution do
   alias MilosTraining.Execution
+  alias MilosTraining.Execution.ExecutionStore
   alias MilosTraining.Workouts
+
+  def call(context, execution_id, actor),
+    do: ExecutionStore.with_user_context(context, fn -> call(execution_id, actor) end)
 
   def call(execution_id, %{role: :admin}) do
     case Execution.get_execution(execution_id) do

@@ -21,6 +21,14 @@ defmodule MilosTraining.Messaging do
       when is_integer(limit) and limit in 1..50,
       do: MilosTraining.Messaging.MessageStore.list_recent_coaching_notes(user_id, limit)
 
+  def list_recent_coaching_notes_for_organization(user_id, limit \\ 5)
+      when is_integer(limit) and limit in 1..50,
+      do:
+        MilosTraining.Messaging.MessageStore.list_recent_coaching_notes_for_organization(
+          user_id,
+          limit
+        )
+
   def count_unread_threads(user_id),
     do: MilosTraining.Messaging.ThreadStore.count_unread_threads(user_id)
 end

@@ -10,7 +10,13 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { ApiError } from "@/api/client";
-import { checkNicknameAvailable, type LoginRequest, type RegisterRequest } from "@/api/auth";
+import {
+  checkNicknameAvailable,
+  inspectInvitation,
+  type InvitationInspection,
+  type LoginRequest,
+  type RegisterRequest,
+} from "@/api/auth";
 import { getAvatarUploadUrl, updateAvatar } from "@/api/profile";
 import { useSession } from "@/components/session-provider";
 
@@ -46,9 +52,11 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
   const i18n = useUiTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { signIn, signUp, status, tokens } = useSession();
+  const { signIn, signUp, signUpInvited, status, tokens } = useSession();
 
-  const [mode, setMode] = useState<Mode>(initialMode);
+  const [mode, setMode] = useState<Mode>(() =>
+    searchParams.get("token") ? "register" : initialMode,
+  );
   const [registerForm, setRegisterForm] = useState<RegisterRequest>(initialRegister);
   const [loginForm, setLoginForm] = useState<LoginRequest>(initialLogin);
   const [error, setError] = useState<string | null>(null);
@@ -56,6 +64,29 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [nicknameStatus, setNicknameStatus] = useState<"idle" | "checking" | "available" | "taken">("idle");
+  const [invitationToken, setInvitationToken] = useState(
+    () => searchParams.get("token") ?? "",
+  );
+  const [invitation, setInvitation] = useState<InvitationInspection | null>(null);
+
+  useEffect(() => {
+    const token = invitationToken.trim();
+    if (token.length < 20) return;
+
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      void inspectInvitation(token)
+        .then((result) => {
+          if (!cancelled) setInvitation(result);
+        })
+        .catch(() => undefined);
+    }, 300);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [invitationToken]);
 
   // Stored in a ref so the post-registration upload effect doesn't need it as a dep
   const pendingAvatarRef = useRef<File | null>(null);
@@ -285,8 +316,34 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                   )}
                 </label>
 
+                <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
+                  {i18n("adminRegistrationCode")}
+                  <input
+                    autoComplete="off"
+                    className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
+                    style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
+                    value={invitationToken}
+                    onChange={(event) => {
+                      setInvitation(null);
+                      setInvitationToken(event.target.value);
+                    }}
+                  />
+                </label>
+
+                {invitation ? (
+                  <div
+                    className="rounded-xl px-4 py-3 text-sm"
+                    style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
+                  >
+                    <strong>{invitation.organization.name}</strong>
+                    <span className="ms-2" style={{ color: "var(--muted)" }}>
+                      {invitation.role}
+                    </span>
+                  </div>
+                ) : null}
+
                 {/* Role cards */}
-                <div>
+                {!invitationToken.trim() ? <div>
                   <p className="mb-2 text-sm font-medium" style={{ color: "var(--text-soft)" }}>{i18n("iAmA5191365")}</p>
                   <div className="grid grid-cols-2 gap-3">
                     {(
@@ -326,15 +383,28 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                       {roleErrors.join(", ")}
                     </span>
                   )}
-                </div>
+                </div> : null}
 
                 <button
                   className="w-full rounded-2xl px-4 py-3 font-semibold disabled:opacity-60"
                   style={{ background: "var(--primary)", color: "var(--text)" }}
-                  disabled={busyAction === "register"}
+                  disabled={
+                    busyAction === "register" ||
+                    (invitationToken.trim().length > 0 && invitation === null)
+                  }
                   onClick={() => {
                     if (!validateCredentials(registerForm.nickname, registerForm.password)) return;
-                    void runAction("register", async () => { await signUp(registerForm); });
+                    void runAction("register", async () => {
+                      if (invitation) {
+                        await signUpInvited({
+                          nickname: registerForm.nickname,
+                          password: registerForm.password,
+                          invitation_token: invitationToken.trim(),
+                        });
+                      } else {
+                        await signUp(registerForm);
+                      }
+                    });
                   }}
                   type="button"
                 >

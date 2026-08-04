@@ -35,7 +35,14 @@ export function proxy(request: NextRequest) {
   requestHeaders.set("x-nonce", nonce);
   requestHeaders.set("Content-Security-Policy", csp);
 
-  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  const organizationMatch = request.nextUrl.pathname.match(/^\/org\/[^/]+(\/.*)$/);
+  const destination = organizationMatch?.[1];
+
+  const response = destination
+    ? NextResponse.rewrite(new URL(destination, request.url), {
+        request: { headers: requestHeaders },
+      })
+    : NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set("Content-Security-Policy", csp);
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   response.headers.set("X-Content-Type-Options", "nosniff");

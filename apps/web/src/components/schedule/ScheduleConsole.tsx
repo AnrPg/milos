@@ -33,7 +33,7 @@ import { CalendarView } from "@/components/schedule/CalendarView";
 import { buildScheduleWindow } from "@/components/schedule/calendar-window";
 import { SlotPopup } from "@/components/schedule/SlotPopup";
 import { TypeFilterChips } from "@/components/schedule/TypeFilterChips";
-import { subscribeToTopic } from "@/lib/realtime";
+import { organizationTopic, subscribeToTopic } from "@/lib/realtime";
 import { useScheduleStore } from "@/stores/schedule";
 import { IntegerInput } from "@/components/integer-input";
 
@@ -159,7 +159,10 @@ export function ScheduleConsole({
   useEffect(() => {
     if (!tokens?.access_token) return;
 
-    return subscribeToTopic(tokens.access_token, "schedule:lobby", {
+    const topic = organizationTopic(tokens.access_token, "schedule");
+    if (!topic) return;
+
+    return subscribeToTopic(tokens.access_token, topic, {
       "schedule:refresh": () => {
         void loadSchedule();
       },

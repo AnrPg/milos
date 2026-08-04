@@ -21,6 +21,9 @@ defmodule MilosTraining.Finance.Ports.FinanceStore do
   @callback update_invoice_params(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback update_invoice(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback mark_overdue_invoices() :: :ok | {:error, term()}
+  @callback list_finance_cleanup_records(map()) :: [map()]
+  @callback soft_delete_finance_record(String.t(), Ecto.UUID.t(), Ecto.UUID.t(), map()) ::
+              {:ok, map()} | {:error, term()}
   @callback create_invoice(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback generate_renewal_invoice(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback issue_invoice(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}

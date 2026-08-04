@@ -7,6 +7,7 @@ defmodule MilosTraining.Gamification.GamificationSetting do
   @theme_slugs ~w(ember sage steel aurora royal volt noir daybreak paper lagoon sunset)
 
   schema "gamification_settings" do
+    field :organization_id, :binary_id
     field :weekly_workout_target, :integer, default: 2
     field :streak_shield_reset_day, :integer
     field :leaderboard_enabled, :boolean, default: true
@@ -18,6 +19,7 @@ defmodule MilosTraining.Gamification.GamificationSetting do
   def changeset(settings \\ %__MODULE__{}, params) do
     settings
     |> cast(params, [
+      :organization_id,
       :weekly_workout_target,
       :streak_shield_reset_day,
       :leaderboard_enabled,

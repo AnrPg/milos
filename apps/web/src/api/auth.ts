@@ -13,6 +13,12 @@ export type AdminRegisterRequest =
   NonNullable<
     paths["/api/auth/register-admin"]["post"]["requestBody"]
   >["content"]["application/json"];
+export type InvitedRegisterRequest =
+  NonNullable<
+    paths["/api/auth/register-member"]["post"]["requestBody"]
+  >["content"]["application/json"];
+export type InvitationInspection =
+  paths["/api/auth/invitations/inspect"]["post"]["responses"]["200"]["content"]["application/json"];
 export type AuthTokens =
   paths["/api/auth/login"]["post"]["responses"]["200"]["content"]["application/json"];
 export type CurrentUser =
@@ -24,6 +30,17 @@ export function registerUser(payload: RegisterRequest) {
 
 export function registerAdminUser(payload: AdminRegisterRequest) {
   return apiRequest<AuthTokens>("/auth/register-admin", { method: "POST", body: payload });
+}
+
+export function registerInvitedUser(payload: InvitedRegisterRequest) {
+  return apiRequest<AuthTokens>("/auth/register-member", { method: "POST", body: payload });
+}
+
+export function inspectInvitation(invitation_token: string) {
+  return apiRequest<InvitationInspection>("/auth/invitations/inspect", {
+    method: "POST",
+    body: { invitation_token },
+  });
 }
 
 export function loginUser(payload: LoginRequest) {

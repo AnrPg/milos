@@ -6,6 +6,7 @@ defmodule MilosTraining.Gamification.UserChallengeProgress do
   @foreign_key_type :binary_id
 
   schema "user_challenge_progress" do
+    field :organization_id, :binary_id
     field :user_id, :binary_id
     field :challenge_id, :binary_id
     field :progress, :integer, default: 0
@@ -17,10 +18,19 @@ defmodule MilosTraining.Gamification.UserChallengeProgress do
 
   def changeset(progress \\ %__MODULE__{}, params) do
     progress
-    |> cast(params, [:user_id, :challenge_id, :progress, :completed_at, :last_increment_event])
+    |> cast(params, [
+      :organization_id,
+      :user_id,
+      :challenge_id,
+      :progress,
+      :completed_at,
+      :last_increment_event
+    ])
     |> validate_required([:user_id, :challenge_id, :progress])
     |> validate_number(:progress, greater_than_or_equal_to: 0)
-    |> unique_constraint([:user_id, :challenge_id])
+    |> unique_constraint([:organization_id, :user_id, :challenge_id],
+      name: :user_challenge_progress_organization_user_challenge_index
+    )
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:challenge_id)
   end

@@ -54,7 +54,8 @@ defmodule MilosTrainingWeb.AdminCoachingController do
   def drill_down(conn, params) do
     athlete_id = params["id"] || params[:id]
 
-    with {:ok, profile} <- GetCoachingAthleteDrillDown.call(athlete_id, params) do
+    with {:ok, profile} <-
+           GetCoachingAthleteDrillDown.call(conn.assigns.tenant_context, athlete_id, params) do
       json(conn, profile)
     end
   end

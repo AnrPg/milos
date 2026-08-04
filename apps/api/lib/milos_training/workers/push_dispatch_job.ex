@@ -5,6 +5,7 @@ defmodule MilosTraining.Workers.PushDispatchJob do
 
   alias MilosTraining.Notifications
   alias MilosTraining.Notifications.Domain.PushMessageBuilder
+  alias MilosTraining.Notifications.PushSubscriptionStore
   alias MilosTraining.Notifications.Queries.GetPushSubscription
 
   defp dispatcher do
@@ -27,7 +28,9 @@ defmodule MilosTraining.Workers.PushDispatchJob do
       }) do
     notification_id = Map.get(args, "notification_id")
 
-    case GetPushSubscription.call(user_id, endpoint) do
+    case PushSubscriptionStore.with_user_context(%{user_id: user_id}, fn ->
+           GetPushSubscription.call(user_id, endpoint)
+         end) do
       nil ->
         :ok
 
@@ -47,7 +50,10 @@ defmodule MilosTraining.Workers.PushDispatchJob do
             :ok
 
           {:error, :expired} ->
-            Notifications.delete_push_subscription(user_id, endpoint)
+            PushSubscriptionStore.with_user_context(%{user_id: user_id}, fn ->
+              Notifications.delete_push_subscription(user_id, endpoint)
+            end)
+
             :ok
 
           {:error, reason} ->

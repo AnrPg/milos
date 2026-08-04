@@ -17,7 +17,11 @@ defmodule MilosTraining.Workers.BookingTimeoutJobTest do
     {:ok, booking} =
       Scheduling.submit_booking(member.id, slot.id, slot.booking_timeout_minutes)
 
-    assert :ok = perform_job(BookingTimeoutJob, %{"booking_id" => booking.id})
+    assert :ok =
+             perform_job(BookingTimeoutJob, %{
+               "organization_id" => booking.organization_id,
+               "booking_id" => booking.id
+             })
 
     notifications = wait_for_notifications(admin.id)
     assert Enum.any?(notifications, &(&1.type == "booking_timeout"))
@@ -34,7 +38,11 @@ defmodule MilosTraining.Workers.BookingTimeoutJobTest do
 
     {:ok, _resolved} = Scheduling.approve_booking(booking.id, nil)
 
-    assert :ok = perform_job(BookingTimeoutJob, %{"booking_id" => booking.id})
+    assert :ok =
+             perform_job(BookingTimeoutJob, %{
+               "organization_id" => booking.organization_id,
+               "booking_id" => booking.id
+             })
 
     notifications = wait_for_notifications(admin.id)
     refute Enum.any?(notifications, &(&1.type == "booking_timeout"))

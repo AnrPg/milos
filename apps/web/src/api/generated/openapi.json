@@ -934,7 +934,7 @@
     "/api/admin/reviews": {
       "get": {
         "callbacks": {},
-        "operationId": "MilosTrainingWeb.AdminReviewController.index",
+        "operationId": "MilosTrainingWeb.AdminReviewController.index (2)",
         "parameters": [
           {
             "in": "query",
@@ -1402,6 +1402,89 @@
         "summary": "Save or update a push subscription for the current user",
         "tags": [
           "Notifications"
+        ]
+      }
+    },
+    "/api/memberships/redeem": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.redeem",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "invitation_token": {
+                    "maxLength": 256,
+                    "minLength": 20,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "invitation_token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Opaque invitation token",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "organization": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "slug"
+                      ],
+                      "type": "object"
+                    },
+                    "role": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "role",
+                    "organization"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Membership"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Redeem an invitation for the authenticated account",
+        "tags": [
+          "Organizations"
         ]
       }
     },
@@ -2081,7 +2164,7 @@
     "/api/me/invoices/{id}/download-url": {
       "get": {
         "callbacks": {},
-        "operationId": "MilosTrainingWeb.MyFinanceController.invoice_download_url",
+        "operationId": "MilosTrainingWeb.MyFinanceController.invoice_download_url (2)",
         "parameters": [
           {
             "in": "path",
@@ -2533,6 +2616,245 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/reviews": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminReviewController.index",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "target_type",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sentiment",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 250,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "reviews": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "answers": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "answer_text": {
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "inserted_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "question_key": {
+                                  "type": "string"
+                                },
+                                "question_text": {
+                                  "type": "string"
+                                },
+                                "rating_value": {
+                                  "maximum": 5,
+                                  "minimum": 1,
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "review_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "updated_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "review_id",
+                                "question_key",
+                                "question_text",
+                                "answer_text",
+                                "inserted_at",
+                                "updated_at"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "body": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "params": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "questionnaire_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "rating": {
+                            "maximum": 5,
+                            "minimum": 1,
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "sentiment": {
+                            "enum": [
+                              "positive",
+                              "neutral",
+                              "negative",
+                              "mixed"
+                            ],
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "open",
+                              "reviewed",
+                              "archived",
+                              "needs_follow_up"
+                            ],
+                            "type": "string"
+                          },
+                          "tags": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "target_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "target_snapshot": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "target_type": {
+                            "enum": [
+                              "workout",
+                              "execution",
+                              "exercise",
+                              "class_slot",
+                              "gym_parameter",
+                              "coaching_parameter",
+                              "membership_package",
+                              "app",
+                              "general"
+                            ],
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "visibility": {
+                            "enum": [
+                              "admin_only",
+                              "user_visible"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "user_id",
+                          "target_type",
+                          "target_snapshot",
+                          "sentiment",
+                          "visibility",
+                          "status",
+                          "tags",
+                          "params",
+                          "answers",
+                          "inserted_at",
+                          "updated_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "reviews"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Reviews"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List user reviews for admin moderation and analytics",
+        "tags": [
+          "Admin Reviews"
+        ]
+      }
+    },
     "/api/auth/logout": {
       "post": {
         "callbacks": {},
@@ -2969,6 +3291,27 @@
         "summary": "Fetch Phase 8 analytics summary from persisted facts and aggregates",
         "tags": [
           "Admin Analytics"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/invitations/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.revoke",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Revoked"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Revoke an active organization invitation",
+        "tags": [
+          "Organizations"
         ]
       }
     },
@@ -3608,7 +3951,7 @@
     "/api/me/finance": {
       "get": {
         "callbacks": {},
-        "operationId": "MilosTrainingWeb.MyFinanceController.index",
+        "operationId": "MilosTrainingWeb.MyFinanceController.index (2)",
         "parameters": [],
         "responses": {
           "200": {
@@ -4533,6 +4876,35 @@
         "summary": "Fetch finance analytics summary",
         "tags": [
           "Admin Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/finance": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyFinanceController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Member finance data"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get the current member's finance summary",
+        "tags": [
+          "Member Finance"
         ]
       }
     },
@@ -7592,6 +7964,65 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/me/invoices/{id}/download-url": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyFinanceController.invoice_download_url",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Download URL"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get a presigned download URL for one of the current member's invoices",
+        "tags": [
+          "Member Finance"
+        ]
+      }
+    },
     "/api/admin/users/{id}/finance": {
       "get": {
         "callbacks": {},
@@ -9080,6 +9511,485 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/me/reviews": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ReviewController.index (2)",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "reviews": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "answers": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "answer_text": {
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "inserted_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "question_key": {
+                                  "type": "string"
+                                },
+                                "question_text": {
+                                  "type": "string"
+                                },
+                                "rating_value": {
+                                  "maximum": 5,
+                                  "minimum": 1,
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "review_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "updated_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "review_id",
+                                "question_key",
+                                "question_text",
+                                "answer_text",
+                                "inserted_at",
+                                "updated_at"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "body": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "params": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "questionnaire_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "rating": {
+                            "maximum": 5,
+                            "minimum": 1,
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "sentiment": {
+                            "enum": [
+                              "positive",
+                              "neutral",
+                              "negative",
+                              "mixed"
+                            ],
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "open",
+                              "reviewed",
+                              "archived",
+                              "needs_follow_up"
+                            ],
+                            "type": "string"
+                          },
+                          "tags": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "target_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "target_snapshot": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "target_type": {
+                            "enum": [
+                              "workout",
+                              "execution",
+                              "exercise",
+                              "class_slot",
+                              "gym_parameter",
+                              "coaching_parameter",
+                              "membership_package",
+                              "app",
+                              "general"
+                            ],
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "visibility": {
+                            "enum": [
+                              "admin_only",
+                              "user_visible"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "user_id",
+                          "target_type",
+                          "target_snapshot",
+                          "sentiment",
+                          "visibility",
+                          "status",
+                          "tags",
+                          "params",
+                          "answers",
+                          "inserted_at",
+                          "updated_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "reviews"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Reviews"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List reviews submitted by the current user",
+        "tags": [
+          "Reviews"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ReviewController.create (2)",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "answers": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "answer_text": {
+                          "type": "string"
+                        },
+                        "question_key": {
+                          "type": "string"
+                        },
+                        "question_text": {
+                          "type": "string"
+                        },
+                        "rating_value": {
+                          "maximum": 5,
+                          "minimum": 1,
+                          "nullable": true,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "question_key",
+                        "question_text",
+                        "answer_text"
+                      ],
+                      "type": "object"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "body": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "rating": {
+                    "maximum": 5,
+                    "minimum": 1,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "sentiment": {
+                    "enum": [
+                      "positive",
+                      "neutral",
+                      "negative",
+                      "mixed"
+                    ],
+                    "type": "string"
+                  },
+                  "target_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "target_type": {
+                    "enum": [
+                      "workout",
+                      "execution",
+                      "exercise",
+                      "class_slot",
+                      "gym_parameter",
+                      "coaching_parameter",
+                      "membership_package",
+                      "app",
+                      "general"
+                    ],
+                    "type": "string"
+                  },
+                  "visibility": {
+                    "enum": [
+                      "admin_only",
+                      "user_visible"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "target_type",
+                  "sentiment",
+                  "answers"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "review": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "answers": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "answer_text": {
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "inserted_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "question_key": {
+                                "type": "string"
+                              },
+                              "question_text": {
+                                "type": "string"
+                              },
+                              "rating_value": {
+                                "maximum": 5,
+                                "minimum": 1,
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "review_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "review_id",
+                              "question_key",
+                              "question_text",
+                              "answer_text",
+                              "inserted_at",
+                              "updated_at"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "body": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "params": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "questionnaire_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "rating": {
+                          "maximum": 5,
+                          "minimum": 1,
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "sentiment": {
+                          "enum": [
+                            "positive",
+                            "neutral",
+                            "negative",
+                            "mixed"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "open",
+                            "reviewed",
+                            "archived",
+                            "needs_follow_up"
+                          ],
+                          "type": "string"
+                        },
+                        "tags": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "target_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "target_snapshot": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "target_type": {
+                          "enum": [
+                            "workout",
+                            "execution",
+                            "exercise",
+                            "class_slot",
+                            "gym_parameter",
+                            "coaching_parameter",
+                            "membership_package",
+                            "app",
+                            "general"
+                          ],
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "visibility": {
+                          "enum": [
+                            "admin_only",
+                            "user_visible"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "target_type",
+                        "target_snapshot",
+                        "sentiment",
+                        "visibility",
+                        "status",
+                        "tags",
+                        "params",
+                        "answers",
+                        "inserted_at",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "review"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Review"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Submit a review for a workout, exercise, gym parameter, or coaching target",
+        "tags": [
+          "Reviews"
+        ]
+      }
+    },
     "/api/admin/finance/members/{id}/payments/{payment_id}/credits": {
       "post": {
         "callbacks": {},
@@ -9288,6 +10198,76 @@
         "summary": "Update referral event status",
         "tags": [
           "Admin Finance"
+        ]
+      }
+    },
+    "/api/auth/register-member": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AuthController.register_member",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "invitation_token": {
+                    "maxLength": 256,
+                    "minLength": 20,
+                    "type": "string"
+                  },
+                  "nickname": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "minLength": 4,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "nickname",
+                  "password",
+                  "invitation_token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "access_token": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "access_token"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Access session"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid invitation"
+          }
+        },
+        "summary": "Register through an organization invitation",
+        "tags": [
+          "Authentication"
         ]
       }
     },
@@ -13893,7 +14873,7 @@
     "/api/admin/reviews/{id}/status": {
       "patch": {
         "callbacks": {},
-        "operationId": "MilosTrainingWeb.AdminReviewController.update_status",
+        "operationId": "MilosTrainingWeb.AdminReviewController.update_status (2)",
         "parameters": [
           {
             "in": "path",
@@ -14484,6 +15464,102 @@
         "summary": "Update a user's role",
         "tags": [
           "Admin Users"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/invitations": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.issue",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "lifetime_seconds": {
+                    "maximum": 604800,
+                    "minimum": 300,
+                    "type": "integer"
+                  },
+                  "role": {
+                    "enum": [
+                      "owner",
+                      "admin",
+                      "coach",
+                      "member",
+                      "athlete"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "role"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expires_at": {
+                      "format": "date_time",
+                      "type": "string"
+                    },
+                    "organization": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "slug"
+                      ],
+                      "type": "object"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "token": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "organization",
+                    "role",
+                    "expires_at"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invitation token"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Issue a one-time organization invitation",
+        "tags": [
+          "Organizations"
         ]
       }
     },
@@ -15082,6 +16158,105 @@
         "summary": "Update leaderboard opt-in preference",
         "tags": [
           "Landing"
+        ]
+      }
+    },
+    "/api/platform/organizations": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Organizations"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List provisioned organizations",
+        "tags": [
+          "Platform Organizations"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "brand_logo_url": {
+                    "type": "string"
+                  },
+                  "brand_name": {
+                    "type": "string"
+                  },
+                  "brand_primary_color": {
+                    "type": "string"
+                  },
+                  "default_locale": {
+                    "type": "string"
+                  },
+                  "initial_owner_email": {
+                    "type": "string"
+                  },
+                  "invitation_lifetime_seconds": {
+                    "type": "integer"
+                  },
+                  "name": {
+                    "maxLength": 120,
+                    "minLength": 2,
+                    "type": "string"
+                  },
+                  "slug": {
+                    "type": "string"
+                  },
+                  "timezone": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Provisioned organization"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Provision an organization and one-time initial owner invitation",
+        "tags": [
+          "Platform Organizations"
         ]
       }
     },
@@ -22524,6 +23699,83 @@
         ]
       }
     },
+    "/api/admin/finance/cleanup-records/{id}/purge": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFinanceController.purge_record",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "deletion_reason": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "password": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "reason": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "record_type": {
+                    "enum": [
+                      "invoice",
+                      "receipt",
+                      "payment",
+                      "transaction"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "record_type",
+                  "password"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Soft-deleted finance record"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Soft-delete a finance invoice, receipt, or payment after password re-entry",
+        "tags": [
+          "Admin Finance"
+        ]
+      }
+    },
     "/api/admin/finance/members/{id}/promotion-redemptions": {
       "post": {
         "callbacks": {},
@@ -23252,6 +24504,55 @@
         ]
       }
     },
+    "/api/platform/organizations/{id}/settings": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationController.settings",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Organization settings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update organization branding, locale, timezone, and invitation lifetime",
+        "tags": [
+          "Platform Organizations"
+        ]
+      }
+    },
     "/api/notifications/read-all": {
       "post": {
         "callbacks": {},
@@ -23285,6 +24586,117 @@
         "summary": "Mark all notifications as read for the current user",
         "tags": [
           "Notifications"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/entitlement": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyFinanceController.entitlement (2)",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Effective entitlement"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get the current user's effective package benefits and allowance usage",
+        "tags": [
+          "Member Finance"
+        ]
+      }
+    },
+    "/api/auth/invitations/inspect": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.inspect",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "invitation_token": {
+                    "maxLength": 256,
+                    "minLength": 20,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "invitation_token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Opaque invitation token",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expires_at": {
+                      "format": "date_time",
+                      "type": "string"
+                    },
+                    "organization": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "slug"
+                      ],
+                      "type": "object"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "token": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "organization",
+                    "role",
+                    "expires_at"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invitation"
+          }
+        },
+        "summary": "Inspect a one-time organization invitation",
+        "tags": [
+          "Organizations"
         ]
       }
     },
@@ -24457,6 +25869,68 @@
         ]
       }
     },
+    "/api/platform/organizations/{id}/lifecycle": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationController.lifecycle",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "active",
+                      "suspended",
+                      "archived"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "status"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Organization"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Change organization lifecycle state",
+        "tags": [
+          "Platform Organizations"
+        ]
+      }
+    },
     "/api/admin/finance/referrals": {
       "get": {
         "callbacks": {},
@@ -24556,6 +26030,71 @@
         "summary": "Create a referral event",
         "tags": [
           "Admin Finance"
+        ]
+      }
+    },
+    "/api/memberships": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.memberships",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "organization": {
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "slug": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "slug"
+                        ],
+                        "type": "object"
+                      },
+                      "role": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "role",
+                      "organization"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Memberships"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List active organization memberships for the authenticated account",
+        "tags": [
+          "Organizations"
         ]
       }
     },
@@ -27855,7 +29394,9 @@
             "application/json": {
               "schema": {
                 "properties": {
-                  "admin_code": {
+                  "invitation_token": {
+                    "maxLength": 256,
+                    "minLength": 20,
                     "type": "string"
                   },
                   "nickname": {
@@ -27869,7 +29410,7 @@
                 "required": [
                   "nickname",
                   "password",
-                  "admin_code"
+                  "invitation_token"
                 ],
                 "type": "object"
               }
@@ -27897,27 +29438,23 @@
             },
             "description": "Access session"
           },
-          "401": {
+          "404": {
             "content": {
               "application/json": {
                 "schema": {
                   "properties": {
-                    "code": {
-                      "type": "string"
-                    },
                     "error": {
                       "type": "string"
                     }
                   },
                   "required": [
-                    "code",
                     "error"
                   ],
                   "type": "object"
                 }
               }
             },
-            "description": "Invalid admin registration code"
+            "description": "Invalid invitation"
           },
           "422": {
             "content": {
@@ -27966,7 +29503,7 @@
             "description": "Rate limited"
           }
         },
-        "summary": "Register a code-authorized admin user",
+        "summary": "Register through an owner or admin organization invitation",
         "tags": [
           "Authentication"
         ]
@@ -28858,6 +30395,240 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/reviews/{id}/status": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminReviewController.update_status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "open",
+                      "reviewed",
+                      "archived",
+                      "needs_follow_up"
+                    ],
+                    "type": "string"
+                  },
+                  "tags": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "nullable": true,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "status"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "review": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "answers": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "answer_text": {
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "inserted_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "question_key": {
+                                "type": "string"
+                              },
+                              "question_text": {
+                                "type": "string"
+                              },
+                              "rating_value": {
+                                "maximum": 5,
+                                "minimum": 1,
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "review_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "review_id",
+                              "question_key",
+                              "question_text",
+                              "answer_text",
+                              "inserted_at",
+                              "updated_at"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "body": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "params": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "questionnaire_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "rating": {
+                          "maximum": 5,
+                          "minimum": 1,
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "sentiment": {
+                          "enum": [
+                            "positive",
+                            "neutral",
+                            "negative",
+                            "mixed"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "open",
+                            "reviewed",
+                            "archived",
+                            "needs_follow_up"
+                          ],
+                          "type": "string"
+                        },
+                        "tags": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "target_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "target_snapshot": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "target_type": {
+                          "enum": [
+                            "workout",
+                            "execution",
+                            "exercise",
+                            "class_slot",
+                            "gym_parameter",
+                            "coaching_parameter",
+                            "membership_package",
+                            "app",
+                            "general"
+                          ],
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "visibility": {
+                          "enum": [
+                            "admin_only",
+                            "user_visible"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "target_type",
+                        "target_snapshot",
+                        "sentiment",
+                        "visibility",
+                        "status",
+                        "tags",
+                        "params",
+                        "answers",
+                        "inserted_at",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "review"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Review"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update review moderation status",
+        "tags": [
+          "Admin Reviews"
+        ]
+      }
+    },
     "/api/prs/{id}/edit": {
       "patch": {
         "callbacks": {},
@@ -29719,6 +31490,51 @@
         "summary": "Get a user's communication thread summary",
         "tags": [
           "Admin Users"
+        ]
+      }
+    },
+    "/api/admin/finance/cleanup-records": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFinanceController.cleanup_records",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Finance cleanup records"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Search active finance records eligible for audited soft deletion",
+        "tags": [
+          "Admin Finance"
         ]
       }
     },

@@ -7,6 +7,7 @@ defmodule MilosTraining.Finance.MembershipPackage do
   @foreign_key_type :binary_id
 
   schema "membership_packages" do
+    field :organization_id, :binary_id, read_after_writes: true
     field :code, :string
     field :name, :string
     field :description, :string
@@ -40,7 +41,9 @@ defmodule MilosTraining.Finance.MembershipPackage do
     |> validate_inclusion(:billing_period, ["monthly", "quarterly", "annual", "custom"])
     |> validate_number(:base_price_cents, greater_than_or_equal_to: 0)
     |> validate_entitlement_plan()
-    |> unique_constraint(:code)
+    |> unique_constraint([:organization_id, :code],
+      name: :membership_packages_organization_code_index
+    )
   end
 
   defp normalize_code(nil), do: nil

@@ -5,7 +5,7 @@ defmodule MilosTraining.Application.DeletePR do
   def call(id, user_id) do
     case Pantheon.delete_record(id, user_id) do
       :ok ->
-        :ok = PRSearchIndex.enqueue_delete(id)
+        :ok = PRSearchIndex.enqueue_delete(id, user_id)
         InvalidateLandingPages.for_users([user_id])
         :ok
 

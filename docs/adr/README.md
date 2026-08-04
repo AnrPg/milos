@@ -59,7 +59,13 @@ must have an ADR. See `template.md` for the format.
 | ADR-051 | Separate notifications and messages presentation | Accepted |
 | ADR-052 | Structured PR results and supporting metrics | Accepted |
 | ADR-053 | Display usernames and device push controls | Accepted |
-| ADR-054 | Code-gated admin registration | Accepted |
+| ADR-054 | Code-gated admin registration | Superseded by ADR-057 for tenant onboarding |
+| ADR-055 | Organization tenancy and membership-scoped identity | Accepted |
+| ADR-056 | Shared-schema tenant isolation with PostgreSQL RLS | Accepted |
+| ADR-057 | Opaque one-time tenant invitations | Accepted |
+| ADR-058 | Tenant resolution and request context | Accepted |
+| ADR-059 | Tenant propagation beyond PostgreSQL | Accepted |
+| ADR-060 | Staged legacy-tenant backfill and enforcement rollout | Accepted |
 | ADR-061 | Semantic notifications and canonical deep links | Accepted |
 | ADR-062 | Entitlement guidance and notification consolidation | Accepted |
 | ADR-063 | Browser-safe avatar editing and dossier navigation | Accepted |
@@ -81,3 +87,7 @@ must have an ADR. See `template.md` for the format.
 | ADR-079 | Workout delete removes recurring class series | Accepted |
 | ADR-080 | Workoutless recurring class series | Accepted |
 | ADR-081 | Subtle finance payment rollback | Accepted |
+| ADR-082 | Free-text execution modification notes | Accepted |
+| ADR-083 | Platform provisioning and tenant lifecycle | Accepted |
+| ADR-084 | Finance correction and soft-delete policy | Accepted |
+| ADR-085 | Tenant-scoped coaching projections | Accepted |

@@ -1,6 +1,6 @@
 # ADR-054: Code-Gated Admin Registration
 Date: 2026-07-18
-Status: Accepted
+Status: Superseded by ADR-057 for tenant onboarding
 
 ## Context
 

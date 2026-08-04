@@ -3,6 +3,9 @@ defmodule MilosTraining.Application.AddExecutionModifications do
   alias MilosTraining.Execution.Domain.ModificationPatchValidator
   alias MilosTraining.Execution.ExecutionStore, as: ExStore
 
+  def call(context, execution_id, user_id, modifications),
+    do: ExStore.with_user_context(context, fn -> call(execution_id, user_id, modifications) end)
+
   def call(execution_id, user_id, modifications) do
     with execution when not is_nil(execution) <-
            Execution.get_execution_for_user(execution_id, user_id),

@@ -8,6 +8,7 @@ defmodule MilosTraining.Messaging.Message do
   @foreign_key_type :binary_id
 
   schema "messaging_messages" do
+    field :organization_id, :binary_id
     belongs_to :thread, MilosTraining.Messaging.Thread
     field :sender_id, :binary_id
     field :body, :string
@@ -20,7 +21,14 @@ defmodule MilosTraining.Messaging.Message do
 
   def changeset(message, attrs) do
     message
-    |> cast(attrs, [:thread_id, :sender_id, :body, :message_type, :client_operation_id])
+    |> cast(attrs, [
+      :organization_id,
+      :thread_id,
+      :sender_id,
+      :body,
+      :message_type,
+      :client_operation_id
+    ])
     |> validate_required([:thread_id, :sender_id, :body])
     |> validate_length(:body, min: 1, max: 5000)
     |> foreign_key_constraint(:thread_id)
