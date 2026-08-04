@@ -12,6 +12,20 @@ const recipient = {
   nickname: "Training Partner",
   role: "member",
 };
+const membership = {
+  id: "77777777-7777-4777-8777-777777777777",
+  role: "member",
+  organization: {
+    id: "88888888-8888-4888-8888-888888888888",
+    name: "Milos Training",
+    slug: "milos-training",
+  },
+  settings: {
+    brand_logo_url: null,
+    brand_name: "Milos Training",
+    brand_primary_color: null,
+  },
+};
 const thread = {
   id: "33333333-3333-4333-8333-333333333333",
   context_type: "direct",
@@ -67,7 +81,7 @@ async function mockAuthenticatedApi(
 
     if (path === "/api/auth/refresh") return json(route, { access_token: "test-token" });
     if (path === "/api/auth/me") return json(route, user);
-    if (path === "/api/memberships") return json(route, []);
+    if (path === "/api/memberships") return json(route, [membership]);
     if (path === "/api/threads/unread-count") return json(route, { unread_count: 0 });
     if (path === "/api/threads" && method === "GET") return json(route, { threads: [thread] });
 
