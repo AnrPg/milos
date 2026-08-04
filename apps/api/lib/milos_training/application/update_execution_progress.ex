@@ -1,5 +1,9 @@
 defmodule MilosTraining.Application.UpdateExecutionProgress do
   alias MilosTraining.{Execution, Workouts}
+  alias MilosTraining.Execution.ExecutionStore
+
+  def call(context, execution_id, user_id, params),
+    do: ExecutionStore.with_user_context(context, fn -> call(execution_id, user_id, params) end)
 
   def call(execution_id, user_id, params) do
     with {:ok, current_execution} <- fetch_execution(execution_id, user_id),

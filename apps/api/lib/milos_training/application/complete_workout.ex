@@ -1,8 +1,15 @@
 defmodule MilosTraining.Application.CompleteWorkout do
   alias MilosTraining.Application.{BroadcastUserSync, InvalidateLandingPages}
   alias MilosTraining.{Execution, Gamification, Identity, Notifications, Workouts}
+  alias MilosTraining.Execution.ExecutionStore
   alias MilosTraining.Workers.ProcessWorkoutCompletionJob
   alias MilosTraining.Workers.RefreshLeaderboardJob
+
+  def call(context, execution_id, user_id, params),
+    do:
+      ExecutionStore.with_authorization_context(context, fn ->
+        call(execution_id, user_id, params)
+      end)
 
   def call(execution_id, user_id, params) do
     with {:ok, current_execution} <- fetch_execution(execution_id, user_id),

@@ -1,9 +1,14 @@
 defmodule MilosTraining.Finance.FinanceStore do
   @behaviour MilosTraining.Finance.Ports.FinanceStore
 
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
+
   defp adapter do
     Application.fetch_env!(:milos_training, :finance_store)
   end
+
+  def with_tenant_context(context, fun) when is_function(fun, 0),
+    do: RepoContext.run(context, fun)
 
   @impl true
   def create_package(params), do: adapter().create_package(params)
@@ -55,6 +60,11 @@ defmodule MilosTraining.Finance.FinanceStore do
   def update_invoice(invoice_id, params), do: adapter().update_invoice(invoice_id, params)
   @impl true
   def mark_overdue_invoices, do: adapter().mark_overdue_invoices()
+  @impl true
+  def list_finance_cleanup_records(params), do: adapter().list_finance_cleanup_records(params)
+  @impl true
+  def soft_delete_finance_record(record_type, record_id, admin_id, params),
+    do: adapter().soft_delete_finance_record(record_type, record_id, admin_id, params)
 
   @impl true
   def create_invoice(membership_id, params), do: adapter().create_invoice(membership_id, params)

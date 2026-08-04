@@ -1,6 +1,11 @@
 defmodule MilosTraining.Messaging.ThreadStore do
   @behaviour MilosTraining.Messaging.Ports.ThreadStore
 
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
+
+  def with_tenant_context(context, fun) when is_function(fun, 0),
+    do: RepoContext.run(context, fun)
+
   @impl true
   def get_thread(id), do: impl().get_thread(id)
   @impl true

@@ -58,6 +58,80 @@ defmodule MilosTraining.FinanceTest do
     assert receipt.payment.payment_status == "paid"
   end
 
+  test "a reversed receipt is refunded rather than overdue" do
+    user = TestFixtures.user_fixture(%{role: :member})
+
+    assert {:ok, membership} =
+             Finance.upsert_membership(user.id, %{
+               user_type_snapshot: "member",
+               status: "active",
+               signup_source: "direct"
+             })
+
+    assert {:ok, receipt} =
+             Finance.create_receipt(membership.id, %{
+               amount_cents: 4_500,
+               payment_method: "cash",
+               paid_on: Date.add(Date.utc_today(), -1),
+               description: "Corrected cash receipt"
+             })
+
+    assert {:ok, _reversal} =
+             Finance.reverse_payment(membership.id, receipt.payment.id, %{
+               amount_cents: 4_500,
+               reason: "Admin correction"
+             })
+
+    profile = Finance.get_member_profile(user.id)
+    corrected_receipt = Enum.find(profile.invoices, &(&1.id == receipt.invoice.id))
+
+    assert corrected_receipt.status == "refunded"
+    refute corrected_receipt.status == "overdue"
+  end
+
+  test "a purged invoice is excluded from profile, outstanding balances, and entitlement" do
+    admin = TestFixtures.user_fixture(%{role: :member})
+    user = TestFixtures.user_fixture(%{role: :member})
+
+    assert {:ok, membership} =
+             Finance.upsert_membership(user.id, %{
+               user_type_snapshot: "member",
+               status: "active",
+               signup_source: "direct"
+             })
+
+    assert {:ok, invoice} =
+             Finance.create_invoice(membership.id, %{
+               amount_cents: 7_500,
+               description: "Mistaken invoice",
+               due_date: Date.add(Date.utc_today(), -3)
+             })
+
+    assert {:ok, issued_invoice} =
+             Finance.issue_invoice(invoice.id, %{
+               due_date: Date.add(Date.utc_today(), -3)
+             })
+
+    assert issued_invoice.balance_due_cents == 7_500
+    assert Finance.membership_outstanding_balance_cents(membership.id) == 7_500
+
+    profile_before = Finance.get_member_profile(user.id)
+    assert profile_before.entitlement.overdue_invoice_count == 1
+
+    assert {:ok, _purge} =
+             Finance.soft_delete_finance_record("invoice", invoice.id, admin.id, %{
+               reason: "Admin was testing the app"
+             })
+
+    profile_after = Finance.get_member_profile(user.id)
+    refute Enum.any?(profile_after.invoices, &(&1.id == invoice.id))
+    assert profile_after.entitlement.open_invoice_count == 0
+    assert profile_after.entitlement.overdue_invoice_count == 0
+    assert Finance.membership_outstanding_balance_cents(membership.id) == 0
+    assert Finance.total_outstanding_balance_cents() == 0
+    assert Finance.invoice_balance_due_map([invoice.id]) == %{}
+  end
+
   test "rejects a receipt package subscription owned by another membership" do
     user = TestFixtures.user_fixture(%{role: :member})
     other_user = TestFixtures.user_fixture(%{role: :member})

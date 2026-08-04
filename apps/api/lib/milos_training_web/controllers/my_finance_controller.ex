@@ -10,6 +10,18 @@ defmodule MilosTrainingWeb.MyFinanceController do
 
   action_fallback MilosTrainingWeb.FallbackController
 
+  def action(conn, _) do
+    case conn.assigns[:tenant_context] do
+      nil ->
+        apply(__MODULE__, action_name(conn), [conn, conn.params])
+
+      context ->
+        MilosTraining.Finance.with_tenant_context(context, fn ->
+          apply(__MODULE__, action_name(conn), [conn, conn.params])
+        end)
+    end
+  end
+
   tags(["Member Finance"])
   security([%{"bearerAuth" => []}])
 
@@ -25,7 +37,11 @@ defmodule MilosTrainingWeb.MyFinanceController do
   def index(conn, _params) do
     user = GuardianPlug.current_resource(conn)
 
-    {:ok, finance} = GetMyFinance.call(user.id)
+    {:ok, finance} =
+      case conn.assigns[:tenant_context] do
+        nil -> GetMyFinance.call(user.id)
+        context -> GetMyFinance.call(context, user.id)
+      end
 
     json(conn, finance)
   end
@@ -42,7 +58,13 @@ defmodule MilosTrainingWeb.MyFinanceController do
   def entitlement(conn, _params) do
     user = GuardianPlug.current_resource(conn)
 
-    json(conn, %{entitlement: Finance.get_effective_entitlement(user.id)})
+    entitlement =
+      case conn.assigns[:tenant_context] do
+        nil -> Finance.get_effective_entitlement(user.id)
+        context -> Finance.get_effective_entitlement(context, user.id)
+      end
+
+    json(conn, %{entitlement: entitlement})
   end
 
   operation(:invoice_download_url,
@@ -66,10 +88,16 @@ defmodule MilosTrainingWeb.MyFinanceController do
   def invoice_download_url(conn, %{"id" => invoice_id}) do
     user = GuardianPlug.current_resource(conn)
 
-    with {:ok, invoice} <- Finance.get_invoice(invoice_id),
+    context = conn.assigns[:tenant_context]
+
+    with {:ok, invoice} <- get_invoice(context, invoice_id),
          :ok <- verify_invoice_owner(invoice, user.id),
          file_key when is_binary(file_key) <- (invoice.params || %{})["file_key"],
-         {:ok, download_url} <- DocumentStorage.presigned_download_url(file_key) do
+         {:ok, download_url} <-
+           DocumentStorage.tenant_download_url(
+             %{organization_id: invoice.organization_id},
+             file_key
+           ) do
       file_name = (invoice.params || %{})["file_name"] || Path.basename(file_key)
       json(conn, %{download_url: download_url, file_name: file_name})
     else
@@ -82,4 +110,7 @@ defmodule MilosTrainingWeb.MyFinanceController do
   defp verify_invoice_owner(invoice, user_id) do
     if invoice.user_id == user_id, do: :ok, else: {:error, :forbidden}
   end
+
+  defp get_invoice(nil, invoice_id), do: Finance.get_invoice(invoice_id)
+  defp get_invoice(context, invoice_id), do: Finance.get_invoice(context, invoice_id)
 end

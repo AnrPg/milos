@@ -132,6 +132,7 @@ async function mockWorkoutApi(
 
     if (path === "/api/auth/refresh") return json(route, { access_token: "test-token" });
     if (path === "/api/auth/me") return json(route, admin);
+    if (path === "/api/memberships") return json(route, []);
     if (path === "/api/theme") return json(route, {});
     if (path === "/api/threads/unread-count") return json(route, { unread_count: 0 });
     if (path.startsWith("/api/notifications")) {

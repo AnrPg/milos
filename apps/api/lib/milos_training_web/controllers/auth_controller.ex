@@ -7,7 +7,7 @@ defmodule MilosTrainingWeb.AuthController do
     LogoutSession,
     NicknameAvailability,
     RefreshToken,
-    RegisterAdmin,
+    RegisterInvitedUser,
     RegisterUser,
     SignOutAllDevices
   }
@@ -21,7 +21,14 @@ defmodule MilosTrainingWeb.AuthController do
 
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true]
-       when action in [:register, :register_admin, :login, :refresh, :nickname_available]
+       when action in [
+              :register,
+              :register_admin,
+              :register_member,
+              :login,
+              :refresh,
+              :nickname_available
+            ]
 
   operation(:register,
     summary: "Register a new user",
@@ -145,7 +152,7 @@ defmodule MilosTrainingWeb.AuthController do
   )
 
   operation(:register_admin,
-    summary: "Register a code-authorized admin user",
+    summary: "Register through an owner or admin organization invitation",
     request_body: %RequestBody{
       description: "Admin registration params",
       required: true,
@@ -156,9 +163,9 @@ defmodule MilosTrainingWeb.AuthController do
             properties: %{
               nickname: %Schema{type: :string},
               password: %Schema{type: :string, minLength: 4},
-              admin_code: %Schema{type: :string}
+              invitation_token: %Schema{type: :string, minLength: 20, maxLength: 256}
             },
-            required: [:nickname, :password, :admin_code]
+            required: [:nickname, :password, :invitation_token]
           }
         }
       }
@@ -171,15 +178,14 @@ defmodule MilosTrainingWeb.AuthController do
            properties: %{access_token: %Schema{type: :string}},
            required: [:access_token]
          }},
-      unauthorized:
-        {"Invalid admin registration code", "application/json",
+      not_found:
+        {"Invalid invitation", "application/json",
          %Schema{
            type: :object,
            properties: %{
-             code: %Schema{type: :string},
              error: %Schema{type: :string}
            },
-           required: [:code, :error]
+           required: [:error]
          }},
       unprocessable_entity:
         {"Validation errors", "application/json",
@@ -201,6 +207,36 @@ defmodule MilosTrainingWeb.AuthController do
            properties: %{error: %Schema{type: :string}},
            required: [:error]
          }}
+    ]
+  )
+
+  operation(:register_member,
+    summary: "Register through an organization invitation",
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %OpenApiSpex.MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{
+              nickname: %Schema{type: :string},
+              password: %Schema{type: :string, minLength: 4},
+              invitation_token: %Schema{type: :string, minLength: 20, maxLength: 256}
+            },
+            required: [:nickname, :password, :invitation_token]
+          }
+        }
+      }
+    },
+    responses: [
+      created:
+        {"Access session", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{access_token: %Schema{type: :string}},
+           required: [:access_token]
+         }},
+      not_found: {"Invalid invitation", "application/json", %Schema{type: :object}}
     ]
   )
 
@@ -327,7 +363,15 @@ defmodule MilosTrainingWeb.AuthController do
   end
 
   def register_admin(conn, _params) do
-    case RegisterAdmin.call(conn.body_params) do
+    register_invited(conn, [:owner, :admin])
+  end
+
+  def register_member(conn, _params) do
+    register_invited(conn, [:owner, :admin, :coach, :member, :athlete])
+  end
+
+  defp register_invited(conn, allowed_roles) do
+    case RegisterInvitedUser.call(conn.body_params, allowed_roles) do
       {:ok, %{access_token: access_token, refresh_token: refresh_token}} ->
         conn
         |> put_refresh_cookie(refresh_token)

@@ -2,19 +2,34 @@ defmodule MilosTraining.Application.AuthorizeFinanceEntitlement do
   alias MilosTraining.Finance
   alias MilosTraining.Finance.Domain.EntitlementPolicy
 
+  def call(context, %{id: user_id, role: role}, request) when is_map(request) do
+    entitlement = Finance.get_effective_entitlement(context, user_id)
+    authorize(entitlement, role, request)
+  end
+
+  def call(context, user_id, capability) do
+    context
+    |> Finance.get_entitlement(user_id)
+    |> EntitlementPolicy.authorize(capability)
+  end
+
   def call(%{id: user_id, role: role}, request) when is_map(request) do
     entitlement = Finance.get_effective_entitlement(user_id)
-    mode = entitlement_mode(entitlement)
-
-    entitlement
-    |> EntitlementPolicy.authorize(request, mode: mode, actor_role: role)
-    |> add_denial_details(request)
+    authorize(entitlement, role, request)
   end
 
   def call(user_id, capability) do
     user_id
     |> Finance.get_entitlement()
     |> EntitlementPolicy.authorize(capability)
+  end
+
+  defp authorize(entitlement, role, request) do
+    mode = entitlement_mode(entitlement)
+
+    entitlement
+    |> EntitlementPolicy.authorize(request, mode: mode, actor_role: role)
+    |> add_denial_details(request)
   end
 
   def execution_request(%{source: "class_booking"}),

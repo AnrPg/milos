@@ -1,6 +1,11 @@
 defmodule MilosTraining.Wellbeing.WellbeingStore do
   @behaviour MilosTraining.Wellbeing.Ports.WellbeingStore
 
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
+
+  def with_context(context, fun) when is_function(fun, 0),
+    do: RepoContext.run(context, fun)
+
   def report_injury(user_id, actor_id, actor_role, params),
     do: adapter().report_injury(user_id, actor_id, actor_role, params)
 

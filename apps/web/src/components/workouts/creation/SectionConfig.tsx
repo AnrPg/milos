@@ -143,7 +143,7 @@ export function SectionConfig({ section }: Props) {
                   </button>
                   {rounds !== null ? (
                     <span className="ms-1 text-xs" style={{ color: "var(--dim)" }}>
-                      → {rounds} {i18n("roundf0590a6")}{rounds !== 1 ? i18n("sa0f1490") : ""}
+                      → {i18n("roundCount", { count: rounds })}
                     </span>
                   ) : null}
                 </div>

@@ -8,6 +8,18 @@ defmodule MilosTrainingWeb.ReviewController do
 
   action_fallback(MilosTrainingWeb.FallbackController)
 
+  def action(conn, _) do
+    case conn.assigns[:tenant_context] do
+      nil ->
+        apply(__MODULE__, action_name(conn), [conn, conn.params])
+
+      context ->
+        MilosTraining.Feedback.FeedbackStore.with_tenant_context(context, fn ->
+          apply(__MODULE__, action_name(conn), [conn, conn.params])
+        end)
+    end
+  end
+
   tags(["Reviews"])
   security([%{"bearerAuth" => []}])
 

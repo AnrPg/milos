@@ -5,6 +5,7 @@ defmodule MilosTraining.Finance.PromotionCampaign do
   @primary_key {:id, :binary_id, autogenerate: true}
 
   schema "promotion_campaigns" do
+    field :organization_id, :binary_id, read_after_writes: true
     field :name, :string
     field :description, :string
     field :starts_on, :date

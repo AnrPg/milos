@@ -18,7 +18,7 @@ import {
   removeQueuedMessageOperation,
   type QueuedMessageOperation,
 } from "@/lib/offline-message-outbox";
-import { joinChannelWithPush } from "@/lib/realtime";
+import { joinChannelWithPush, organizationTopic } from "@/lib/realtime";
 
 interface TypingUser {
   user_id: string;
@@ -114,7 +114,10 @@ export function useChat({ threadId, accessToken, currentUserId }: UseChatOptions
   useEffect(() => {
     if (!threadId || !accessToken) return;
 
-    const channel = joinChannelWithPush(accessToken, `chat:thread:${threadId}`, {
+    const topic = organizationTopic(accessToken, `chat:thread:${threadId}`);
+    if (!topic) return;
+
+    const channel = joinChannelWithPush(accessToken, topic, {
       new_message: (payload) => {
         const message = payload as ChatMessage;
         setServerMessages((previous) => upsertServerMessage(previous, message));

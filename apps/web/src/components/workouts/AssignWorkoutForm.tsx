@@ -302,7 +302,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
                 {saving ? i18n("assigningb89e1dc") : i18n("assignWorkout3e28a99")}
               </button>
               <p className="text-sm" style={{ color: "var(--dim)" }}>
-                {selectedIds.length} {i18n("athlete2822571")}{selectedIds.length === 1 ? "" : i18n("sa0f1490")} {i18n("selected835f3b5")}
+                {i18n("selectedAthleteCount", { count: selectedIds.length })}
               </p>
             </div>
           </article>

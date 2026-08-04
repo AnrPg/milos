@@ -1,4 +1,4 @@
-import type { WorkoutExecution } from "@/api/executions";
+import { isFreeTextModification, type WorkoutExecution } from "@/api/executions";
 import type { PRRecord } from "@/api/gamification";
 import type {
   ScaleLevel,
@@ -457,11 +457,15 @@ export function buildExecutionDocument(
     sections.push({
       icon: "🔧",
       title: labels.modifications,
-      items: execution.exercise_modifications.map((change) => ({
-        label: change.exercise_name ?? change.section_name ?? displayValue(change.field),
-        value: `${labels.prescribed}: ${displayValue(change.canonical_value)} → ${labels.actual}: ${displayValue(change.actual_value)}${change.unit ? ` ${displayValue(change.unit)}` : ""}`,
-        details: compact([change.note ?? undefined]),
-      })),
+      items: execution.exercise_modifications.map((change) =>
+        isFreeTextModification(change)
+          ? { label: labels.modifications, value: displayValue(change.actual_value) }
+          : {
+              label: change.exercise_name ?? change.section_name ?? displayValue(change.field),
+              value: `${labels.prescribed}: ${displayValue(change.canonical_value)} → ${labels.actual}: ${displayValue(change.actual_value)}${change.unit ? ` ${displayValue(change.unit)}` : ""}`,
+              details: compact([change.note ?? undefined]),
+            },
+      ),
     });
   }
 

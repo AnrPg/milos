@@ -45,7 +45,7 @@ defmodule MilosTraining.Execution.Domain.ModificationPatchValidator do
       section_id == nil ->
         {:error, :bad_request}
 
-      exercise_id == nil and field != "sets" ->
+      exercise_id == nil and not section_level_field?(field, section_id) ->
         {:error, :bad_request}
 
       field not in @fields ->
@@ -108,6 +108,10 @@ defmodule MilosTraining.Execution.Domain.ModificationPatchValidator do
 
   defp empty_change?(_canonical_value, _actual_value, "skipped"), do: false
   defp empty_change?(canonical_value, actual_value, _type), do: canonical_value == actual_value
+
+  defp section_level_field?("sets", _section_id), do: true
+  defp section_level_field?("note", "free_text"), do: true
+  defp section_level_field?(_field, _section_id), do: false
 
   defp string_value(map, key) do
     case fetch_key(map, key) do

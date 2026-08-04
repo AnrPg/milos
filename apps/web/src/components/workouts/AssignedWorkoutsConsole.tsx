@@ -1133,9 +1133,9 @@ export function AssignedWorkoutsConsole({
                         {assignment.workout.title}
                       </h2>
                       <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
-                        {assignment.workout.sections.length} {i18n("section20182fb")}{assignment.workout.sections.length !== 1 ? i18n("sa0f1490") : ""}
+                        {i18n("featureSectionCount", { count: assignment.workout.sections.length })}
                         {" · "}
-                        {assignment.workout.sections.reduce((n, s) => n + s.exercises.length, 0)} {i18n("exercises0ee6e81")}
+                        {i18n("featureExerciseCount", { count: assignment.workout.sections.reduce((n, s) => n + s.exercises.length, 0) })}
                       </p>
                     </button>
 

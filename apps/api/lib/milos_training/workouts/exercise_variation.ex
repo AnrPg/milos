@@ -11,6 +11,7 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
   @load_modes [:absolute, :pct_1rm, :bw]
 
   schema "exercise_variations" do
+    field :organization_id, :binary_id
     field :exercise_name_override, :string
     field :sets, :integer
     field :set_prescriptions, {:array, :map}

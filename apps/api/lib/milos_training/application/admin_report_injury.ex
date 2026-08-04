@@ -2,6 +2,15 @@ defmodule MilosTraining.Application.AdminReportInjury do
   alias MilosTraining.Application.{BroadcastUserSync, RecordAnalyticsEvent}
   alias MilosTraining.{Identity, Wellbeing}
 
+  def call(%{organization_id: organization_id} = context, admin_id, user_id, params)
+      when is_binary(organization_id) do
+    params = Map.put(params, :organization_id, organization_id)
+
+    MilosTraining.Wellbeing.WellbeingStore.with_context(context, fn ->
+      call(admin_id, user_id, params)
+    end)
+  end
+
   def call(admin_id, user_id, params) do
     with {:ok, target_user} <- training_user(user_id),
          {:ok, injury} <- Wellbeing.report_injury(target_user.id, admin_id, "admin", params) do

@@ -168,7 +168,7 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
   )
 
   def index(conn, _params) do
-    with {:ok, workouts} <- ListAdminWorkouts.call() do
+    with {:ok, workouts} <- ListAdminWorkouts.call(conn.assigns.tenant_context) do
       json(conn, %{workouts: workouts})
     end
   end
@@ -176,7 +176,7 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
   def create(conn, _params) do
     admin = GuardianPlug.current_resource(conn)
 
-    case CreateDraftWorkout.call(admin) do
+    case CreateDraftWorkout.call(conn.assigns.tenant_context, admin) do
       {:ok, draft} ->
         conn
         |> put_status(:created)
@@ -188,7 +188,7 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
   end
 
   def show(conn, %{"id" => id}) do
-    with {:ok, workout} <- GetAdminWorkout.call(id) do
+    with {:ok, workout} <- GetAdminWorkout.call(conn.assigns.tenant_context, id) do
       json(conn, %{workout: workout})
     end
   end
@@ -196,7 +196,7 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
   def update_draft(conn, params) do
     id = params[:id] || params["id"]
 
-    case UpdateDraftWorkout.call(id, conn.body_params) do
+    case UpdateDraftWorkout.call(conn.assigns.tenant_context, id, conn.body_params) do
       {:ok, draft} -> json(conn, %{draft: draft})
       error -> error
     end

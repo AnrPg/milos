@@ -64,7 +64,8 @@ defmodule MilosTrainingWeb.ExecutionController do
   def create(conn, params) do
     current_user = Guardian.Plug.current_resource(conn)
 
-    with {:ok, execution} <- StartWorkoutExecution.call(current_user, params) do
+    with {:ok, execution} <-
+           StartWorkoutExecution.call(conn.assigns.user_context, current_user, params) do
       conn
       |> put_status(:created)
       |> json(%{execution: execution})
@@ -83,7 +84,7 @@ defmodule MilosTrainingWeb.ExecutionController do
   def show(conn, %{"id" => id}) do
     current_user = Guardian.Plug.current_resource(conn)
 
-    with {:ok, execution} <- GetWorkoutExecution.call(id, current_user) do
+    with {:ok, execution} <- GetWorkoutExecution.call(conn.assigns.user_context, id, current_user) do
       json(conn, %{execution: execution})
     end
   end
@@ -141,7 +142,8 @@ defmodule MilosTrainingWeb.ExecutionController do
   def complete(conn, %{"id" => id} = params) do
     current_user = Guardian.Plug.current_resource(conn)
 
-    with {:ok, execution} <- CompleteWorkout.call(id, current_user.id, params) do
+    with {:ok, execution} <-
+           CompleteWorkout.call(conn.assigns.user_context, id, current_user.id, params) do
       json(conn, %{execution: execution})
     end
   end
@@ -221,7 +223,8 @@ defmodule MilosTrainingWeb.ExecutionController do
   def update_progress(conn, %{"id" => id} = params) do
     current_user = Guardian.Plug.current_resource(conn)
 
-    with {:ok, execution} <- UpdateExecutionProgress.call(id, current_user.id, params) do
+    with {:ok, execution} <-
+           UpdateExecutionProgress.call(conn.assigns.user_context, id, current_user.id, params) do
       json(conn, %{execution: execution})
     end
   end
@@ -254,7 +257,8 @@ defmodule MilosTrainingWeb.ExecutionController do
   def submit_note(conn, %{"id" => id} = params) do
     current_user = Guardian.Plug.current_resource(conn)
 
-    with {:ok, execution} <- SubmitExecutionNote.call(id, current_user.id, params) do
+    with {:ok, execution} <-
+           SubmitExecutionNote.call(conn.assigns.user_context, id, current_user.id, params) do
       json(conn, %{execution: execution})
     end
   end
@@ -289,7 +293,8 @@ defmodule MilosTrainingWeb.ExecutionController do
   def timer_sequence(conn, %{"id" => id} = params) do
     current_user = Guardian.Plug.current_resource(conn)
 
-    with {:ok, segments} <- GetWorkoutTimerSequence.call(current_user, id, params) do
+    with {:ok, segments} <-
+           GetWorkoutTimerSequence.call(conn.assigns.user_context, current_user, id, params) do
       json(conn, %{segments: segments})
     end
   end
@@ -302,7 +307,8 @@ defmodule MilosTrainingWeb.ExecutionController do
   def index(conn, _params) do
     current_user = Guardian.Plug.current_resource(conn)
 
-    with {:ok, executions} <- ListWorkoutExecutions.call(current_user.id) do
+    with {:ok, executions} <-
+           ListWorkoutExecutions.call(conn.assigns.user_context, current_user.id) do
       json(conn, %{executions: executions})
     end
   end
@@ -379,7 +385,13 @@ defmodule MilosTrainingWeb.ExecutionController do
   def add_modifications(conn, %{"id" => id, "modifications" => modifications}) do
     current_user = Guardian.Plug.current_resource(conn)
 
-    with {:ok, execution} <- AddExecutionModifications.call(id, current_user.id, modifications) do
+    with {:ok, execution} <-
+           AddExecutionModifications.call(
+             conn.assigns.user_context,
+             id,
+             current_user.id,
+             modifications
+           ) do
       json(conn, %{execution: execution})
     end
   end

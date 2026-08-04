@@ -4,9 +4,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import {
+  addExecutionModifications,
   completeExecution as completeExecutionRequest,
   fetchExecution,
   startExecution,
+  type ExerciseModification,
   type SectionScore,
 } from "@/api/executions";
 import { fetchWorkout } from "@/api/workouts";
@@ -67,6 +69,7 @@ export function FreeTextExecutionMode() {
   const [showFinishWizard, setShowFinishWizard] = useState(false);
   const [isSavingCompletion, setIsSavingCompletion] = useState(false);
   const [completionFeedback, setCompletionFeedback] = useState<string | null>(null);
+  const [initialModifications, setInitialModifications] = useState<ExerciseModification[]>([]);
   const startedAtRef = useRef<number | null>(null);
   const carriedElapsedRef = useRef(0);
   const rafRef = useRef<number | null>(null);
@@ -100,6 +103,7 @@ export function FreeTextExecutionMode() {
         }
 
         if (cancelled) return;
+        setInitialModifications(execution.exercise_modifications ?? []);
         storeFreeTextExecutionWorkout(record, execution);
         setWorkout(readFreeTextExecutionWorkout(workoutId));
       } catch {
@@ -113,6 +117,22 @@ export function FreeTextExecutionMode() {
       cancelled = true;
     };
   }, [executionId, router, tokens?.access_token, workout?.execution_id, workoutId]);
+
+  useEffect(() => {
+    const activeExecutionId = workout?.execution_id;
+    if (!tokens?.access_token || !activeExecutionId) return;
+
+    let cancelled = false;
+    void fetchExecution(tokens.access_token, activeExecutionId)
+      .then((execution) => {
+        if (!cancelled) setInitialModifications(execution.exercise_modifications ?? []);
+      })
+      .catch(() => undefined);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [tokens?.access_token, workout?.execution_id]);
 
   useEffect(() => {
     if (status !== "running") {
@@ -179,7 +199,7 @@ export function FreeTextExecutionMode() {
     setShowFinishWizard(true);
   }
 
-  async function confirmFinish(editedScores: SectionScore[]) {
+  async function confirmFinish(editedScores: SectionScore[], modifications: ExerciseModification[]) {
     if (!tokens?.access_token || !workout?.execution_id) {
       setCompletionFeedback(i18n("workoutCompletionCouldNotBeSavedTryAgaindce610c"));
       return;
@@ -189,6 +209,11 @@ export function FreeTextExecutionMode() {
     setCompletionFeedback(null);
 
     try {
+      if (modifications.length > 0) {
+        const updated = await addExecutionModifications(tokens.access_token, workout.execution_id, modifications);
+        setInitialModifications(updated.exercise_modifications ?? modifications);
+      }
+
       await completeExecutionRequest(tokens.access_token, workout.execution_id, {
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         checked_exercise_ids: [],
@@ -221,7 +246,8 @@ export function FreeTextExecutionMode() {
       <FinishWizard
         scores={[]}
         segments={[]}
-        initialModifications={[]}
+        initialModifications={initialModifications}
+        freeText
         isSaving={isSavingCompletion}
         feedback={completionFeedback}
         onConfirm={confirmFinish}

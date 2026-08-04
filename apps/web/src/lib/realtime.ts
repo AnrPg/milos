@@ -4,6 +4,7 @@ import { Socket, type Channel } from "phoenix";
 
 let activeSocket: Socket | null = null;
 let activeToken: string | null = null;
+let activeOrganizationSlug: string | null = null;
 
 type LifecycleHandlers = {
   onJoin?: () => void;
@@ -22,8 +23,52 @@ function socketEndpoint() {
   return `${protocol}//${window.location.host}/socket`;
 }
 
+type MembershipClaim = {
+  organization_id: string;
+  organization_slug: string;
+};
+
+function membershipClaims(token: string): MembershipClaim[] {
+  try {
+    const payload = token.split(".")[1];
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(normalized.length + ((4 - (normalized.length % 4)) % 4), "=");
+    const claims = JSON.parse(window.atob(padded)) as { memberships?: MembershipClaim[] };
+    return claims.memberships ?? [];
+  } catch {
+    return [];
+  }
+}
+
+function organizationSlug(token: string) {
+  const pathSlug =
+    typeof window === "undefined"
+      ? null
+      : window.location.pathname.match(/^\/org\/([^/]+)/)?.[1] ?? null;
+
+  return pathSlug ?? membershipClaims(token)[0]?.organization_slug ?? null;
+}
+
+export function organizationTopic(token: string, suffix: string) {
+  const slug = organizationSlug(token);
+  const membership = membershipClaims(token).find((entry) => entry.organization_slug === slug);
+  if (!membership) return null;
+  if (suffix === "schedule") return `schedule:${membership.organization_id}`;
+  if (suffix.startsWith("chat:thread:")) {
+    return `chat:${membership.organization_id}:thread:${suffix.slice("chat:thread:".length)}`;
+  }
+
+  return `org:${membership.organization_id}:${suffix}`;
+}
+
 function ensureSocket(token: string) {
-  if (activeSocket && activeToken === token) {
+  const nextOrganizationSlug = organizationSlug(token);
+
+  if (
+    activeSocket &&
+    activeToken === token &&
+    activeOrganizationSlug === nextOrganizationSlug
+  ) {
     return activeSocket;
   }
 
@@ -32,7 +77,10 @@ function ensureSocket(token: string) {
   }
 
   activeToken = token;
-  activeSocket = new Socket(socketEndpoint(), { params: { token } });
+  activeOrganizationSlug = nextOrganizationSlug;
+  activeSocket = new Socket(socketEndpoint(), {
+    params: { token, organization_slug: nextOrganizationSlug },
+  });
   activeSocket.connect();
   return activeSocket;
 }
@@ -44,6 +92,7 @@ export function resetRealtimeSocket() {
 
   activeSocket = null;
   activeToken = null;
+  activeOrganizationSlug = null;
 }
 
 export function joinChannelWithPush(

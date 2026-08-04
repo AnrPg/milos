@@ -9,6 +9,7 @@ defmodule MilosTraining.Workouts.WorkoutSection do
   @foreign_key_type :binary_id
 
   schema "workout_sections" do
+    field :organization_id, :binary_id
     field :name, :string
     field :order, :integer
     field :scoreable, :boolean, default: false

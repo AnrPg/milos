@@ -6,6 +6,7 @@ defmodule MilosTraining.Analytics.AttendanceRecord do
   @foreign_key_type :binary_id
 
   schema "attendance_records" do
+    field :organization_id, :binary_id
     field :scheduled_class_id, :binary_id
     field :booking_id, :binary_id
     field :user_id, :binary_id
@@ -21,6 +22,7 @@ defmodule MilosTraining.Analytics.AttendanceRecord do
   def changeset(record \\ %__MODULE__{}, params) do
     record
     |> cast(params, [
+      :organization_id,
       :scheduled_class_id,
       :booking_id,
       :user_id,

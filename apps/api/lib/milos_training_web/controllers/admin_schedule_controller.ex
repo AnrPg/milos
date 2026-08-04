@@ -199,7 +199,7 @@ defmodule MilosTrainingWeb.AdminScheduleController do
   def create_slot(conn, params) do
     body = normalize_body_params(conn, params)
 
-    with {:ok, slot} <- CreateScheduledSlot.call(body) do
+    with {:ok, slot} <- CreateScheduledSlot.call(conn.assigns.tenant_context, body) do
       conn
       |> put_status(:created)
       |> json(%{slot: slot})
@@ -209,7 +209,7 @@ defmodule MilosTrainingWeb.AdminScheduleController do
   def create_series(conn, params) do
     body = normalize_body_params(conn, params)
 
-    with {:ok, series} <- CreateRecurringClassSeries.call(body) do
+    with {:ok, series} <- CreateRecurringClassSeries.call(conn.assigns.tenant_context, body) do
       conn |> put_status(:created) |> json(%{series: series})
     end
   end
@@ -218,13 +218,13 @@ defmodule MilosTrainingWeb.AdminScheduleController do
     id = params["id"] || params[:id]
     body = normalize_body_params(conn, params)
 
-    with {:ok, slot} <- UpdateScheduledSlot.call(id, body) do
+    with {:ok, slot} <- UpdateScheduledSlot.call(conn.assigns.tenant_context, id, body) do
       json(conn, %{slot: slot})
     end
   end
 
   def delete_slot(conn, %{"id" => id}) do
-    with :ok <- DeleteScheduledSlot.call(id) do
+    with :ok <- DeleteScheduledSlot.call(conn.assigns.tenant_context, id) do
       send_resp(conn, :no_content, "")
     end
   end
@@ -234,7 +234,7 @@ defmodule MilosTrainingWeb.AdminScheduleController do
     body = normalize_body_params(conn, params)
 
     with {:ok, booking} <-
-           ResolveBooking.call(id, %{
+           ResolveBooking.call(conn.assigns.tenant_context, id, %{
              action: :approve,
              admin_message: body["admin_message"] || body[:admin_message]
            }) do
@@ -247,7 +247,7 @@ defmodule MilosTrainingWeb.AdminScheduleController do
     body = normalize_body_params(conn, params)
 
     with {:ok, booking} <-
-           ResolveBooking.call(id, %{
+           ResolveBooking.call(conn.assigns.tenant_context, id, %{
              action: :reject,
              admin_message: body["admin_message"] || body[:admin_message]
            }) do
@@ -305,7 +305,14 @@ defmodule MilosTrainingWeb.AdminScheduleController do
     admin_id = conn.assigns[:current_user].id
     body = normalize_body_params(conn, params)
 
-    with {:ok, attendance} <- AdminRecordAttendance.call(slot_id, user_id, admin_id, body) do
+    with {:ok, attendance} <-
+           AdminRecordAttendance.call(
+             conn.assigns.tenant_context,
+             slot_id,
+             user_id,
+             admin_id,
+             body
+           ) do
       json(conn, %{attendance: attendance})
     end
   end

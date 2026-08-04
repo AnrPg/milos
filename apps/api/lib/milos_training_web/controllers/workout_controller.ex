@@ -43,13 +43,13 @@ defmodule MilosTrainingWeb.WorkoutController do
   )
 
   def show(conn, %{"id" => id}) do
-    with {:ok, workout} <- GetPublishedWorkout.call(id) do
+    with {:ok, workout} <- GetPublishedWorkout.call(conn.assigns.tenant_context, id) do
       json(conn, %{workout: workout})
     end
   end
 
   def scales(conn, %{"id" => id}) do
-    with {:ok, payload} <- GetMaterializedWorkout.call(id) do
+    with {:ok, payload} <- GetMaterializedWorkout.call(conn.assigns.tenant_context, id) do
       json(conn, payload)
     end
   end

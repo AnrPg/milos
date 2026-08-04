@@ -29,8 +29,15 @@ defmodule MilosTraining.Workouts do
     MaterializeWorkout
   }
 
+  alias MilosTraining.Workouts.WorkoutStore
+
   def create_workout(admin, params), do: CreateWorkout.call(admin.id, params)
+
+  def create_workout(context, admin, params),
+    do: WorkoutStore.create_workout(context, admin.id, params)
+
   def create_draft(admin), do: CreateDraftWorkout.call(admin.id)
+  def create_draft(context, admin), do: WorkoutStore.create_draft(context, admin.id)
   defdelegate delete_workout(id), to: DeleteWorkout, as: :call
   defdelegate assign_workout(params), to: AssignWorkout, as: :call
   defdelegate update_assigned_workout(id, params), to: UpdateAssignedWorkout, as: :call
@@ -38,7 +45,9 @@ defmodule MilosTraining.Workouts do
   def update_draft(id, params), do: UpdateDraftWorkout.call(id, params)
   def publish_workout(id, params), do: PublishWorkout.call(id, params)
   defdelegate get_workout(id), to: GetWorkout, as: :by_id
+  def get_workout(context, id), do: WorkoutStore.get_workout(context, id)
   defdelegate get_workout_for_admin(id), to: GetAdminWorkout, as: :by_id
+  def get_workout_for_admin(context, id), do: WorkoutStore.get_workout_for_admin(context, id)
   def exercise_exists?(id), do: MilosTraining.Workouts.WorkoutStore.exercise_exists?(id)
 
   defdelegate list_assigned_workouts_for_admin(start_date, end_date),
@@ -54,6 +63,7 @@ defmodule MilosTraining.Workouts do
     as: :for_athlete
 
   defdelegate list_workouts, to: ListAdminWorkouts, as: :all
+  def list_workouts(context), do: WorkoutStore.list_workouts(context)
   defdelegate list_scale_levels, to: ListScaleLevels, as: :all
   defdelegate replace_scale_levels(levels), to: ReplaceScaleLevels, as: :call
   defdelegate materialize_workout(id), to: MaterializeWorkout, as: :by_id
@@ -81,17 +91,27 @@ defmodule MilosTraining.Workouts do
     do: DuplicateWorkout.call(id, title_suffix, attrs)
 
   def list_folders, do: MilosTraining.Workouts.WorkoutStore.list_folders()
+  def list_folders(context), do: WorkoutStore.list_folders(context)
 
   def create_folder(admin_id, params),
     do: MilosTraining.Workouts.WorkoutStore.create_folder(admin_id, params)
 
+  def create_folder(context, admin_id, params),
+    do: WorkoutStore.create_folder(context, admin_id, params)
+
   def update_folder(id, params), do: MilosTraining.Workouts.WorkoutStore.update_folder(id, params)
+  def update_folder(context, id, params), do: WorkoutStore.update_folder(context, id, params)
   def delete_folder(id), do: MilosTraining.Workouts.WorkoutStore.delete_folder(id)
+  def delete_folder(context, id), do: WorkoutStore.delete_folder(context, id)
 
   def update_library_metadata(id, params),
     do: MilosTraining.Workouts.WorkoutStore.update_library_metadata(id, params)
 
+  def update_library_metadata(context, id, params),
+    do: WorkoutStore.update_library_metadata(context, id, params)
+
   def get_assigned_workout(id), do: MilosTraining.Workouts.WorkoutStore.get_assigned_workout(id)
+  def get_assigned_workout(context, id), do: WorkoutStore.get_assigned_workout(context, id)
 
   def get_assignment_execution_access(assignment_id, athlete_id),
     do:

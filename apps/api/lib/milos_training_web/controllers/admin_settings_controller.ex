@@ -139,7 +139,7 @@ defmodule MilosTrainingWeb.AdminSettingsController do
   )
 
   def show(conn, _params) do
-    with {:ok, payload} <- GetAdminSettings.call() do
+    with {:ok, payload} <- GetAdminSettings.call(conn.assigns.tenant_context) do
       json(conn, payload)
     end
   end
@@ -156,7 +156,8 @@ defmodule MilosTrainingWeb.AdminSettingsController do
   )
 
   def update(conn, _params) do
-    with {:ok, payload} <- UpdateAdminSettings.call(conn.body_params) do
+    with {:ok, payload} <-
+           UpdateAdminSettings.call(conn.assigns.tenant_context, conn.body_params) do
       json(conn, payload)
     end
   end

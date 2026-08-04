@@ -2,6 +2,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
   alias MilosTraining.Identity
+  alias MilosTraining.Organizations
   alias MilosTraining.Infrastructure.Auth.Guardian
   alias MilosTraining.Infrastructure.Security.{MemoryRateLimiter, MemoryTokenStore}
 
@@ -69,11 +70,34 @@ defmodule MilosTrainingWeb.AuthControllerTest do
   end
 
   describe "POST /api/auth/register-admin" do
-    test "creates an admin session when the registration code is exact", %{conn: conn} do
+    setup do
+      owner = MilosTraining.TestFixtures.user_fixture()
+      {:ok, organization} = Organizations.create_organization(%{name: "Athena Strength"})
+
+      {:ok, _membership} =
+        Organizations.add_membership(%{
+          organization_id: organization.id,
+          user_id: owner.id,
+          role: :owner,
+          status: :active,
+          joined_at: DateTime.utc_now()
+        })
+
+      {:ok, context} = Organizations.resolve_tenant_context(owner, organization.slug)
+      {:ok, %{token: token}} = Organizations.issue_invitation(context, %{role: :admin})
+
+      %{organization: organization, invitation_token: token}
+    end
+
+    test "creates a tenant admin membership from an exact invitation", %{
+      conn: conn,
+      organization: organization,
+      invitation_token: token
+    } do
       params = %{
         nickname: "athena_admin",
         password: "S3cur3P@ss!",
-        admin_code: "DEY48keGE"
+        invitation_token: token
       }
 
       conn =
@@ -83,14 +107,24 @@ defmodule MilosTrainingWeb.AuthControllerTest do
 
       assert %{"access_token" => _} = json_response(conn, 201)
       assert conn.resp_cookies["milos_refresh"].http_only
-      assert Identity.find_by_nickname("athena_admin").role == :admin
+      account = Identity.find_by_nickname("athena_admin")
+      assert account.role == :member
+
+      assert [
+               %{
+                 membership: %{role: :admin, status: :active},
+                 organization: %{id: organization_id}
+               }
+             ] = Organizations.list_memberships(account.id)
+
+      assert organization_id == organization.id
     end
 
-    test "rejects an incorrect registration code without creating an account", %{conn: conn} do
+    test "rejects an invalid invitation without creating an account", %{conn: conn} do
       params = %{
         nickname: "false_admin",
         password: "S3cur3P@ss!",
-        admin_code: "incorrect"
+        invitation_token: String.duplicate("x", 43)
       }
 
       conn =
@@ -98,7 +132,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         |> put_req_header("content-type", "application/json")
         |> post("/api/auth/register-admin", Jason.encode!(params))
 
-      assert %{"code" => "invalid_admin_registration_code"} = json_response(conn, 401)
+      assert %{"code" => "invalid_invitation"} = json_response(conn, 404)
       assert Identity.find_by_nickname("false_admin") == nil
     end
   end
@@ -407,6 +441,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         })
 
       {:ok, admin} = Identity.update_role(admin, :admin)
+      {:ok, _membership} = Organizations.ensure_legacy_membership(admin, :owner)
 
       {:ok, athlete} =
         Identity.register(%{
@@ -438,6 +473,8 @@ defmodule MilosTrainingWeb.AuthControllerTest do
           role: :member
         })
 
+      {:ok, _membership} = Organizations.ensure_legacy_membership(member, :member)
+
       {:ok, athlete} =
         Identity.register(%{
           nickname: "artemis",
@@ -465,6 +502,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         })
 
       {:ok, admin} = Identity.update_role(admin, :admin)
+      {:ok, _membership} = Organizations.ensure_legacy_membership(admin, :owner)
 
       {:ok, access_token, _claims} =
         Guardian.encode_and_sign(admin, %{"sv" => admin.security_version}, token_type: "access")

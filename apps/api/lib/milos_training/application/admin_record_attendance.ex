@@ -2,8 +2,32 @@ defmodule MilosTraining.Application.AdminRecordAttendance do
   alias MilosTraining.Scheduling.Domain.AttendancePolicy
   alias MilosTraining.{Finance, Scheduling}
 
-  def call(slot_id, user_id, admin_id, params \\ %{}) do
-    with {:ok, approved_booking} <- approved_booking(slot_id, user_id),
+  def call(context, slot_id, user_id, admin_id, params) do
+    with {:ok, approved_booking} <- approved_booking(context, slot_id, user_id),
+         :ok <- AttendancePolicy.can_record_admin_attendance?(approved_booking) do
+      attendance_params =
+        params
+        |> string_key_map()
+        |> Map.merge(%{
+          "scheduled_class_id" => slot_id,
+          "booking_id" => approved_booking.id,
+          "user_id" => user_id,
+          "marked_by_id" => admin_id,
+          "status" => params["status"] || params[:status] || "attended"
+        })
+
+      with {:ok, attendance} <- Scheduling.record_attendance(context, attendance_params),
+           {:ok, _transition} <- reconcile_visit(attendance) do
+        {:ok, attendance}
+      end
+    end
+  end
+
+  def call(%{organization_id: _} = context, slot_id, user_id, admin_id),
+    do: call(context, slot_id, user_id, admin_id, %{})
+
+  def call(slot_id, user_id, admin_id, params) do
+    with {:ok, approved_booking} <- approved_booking(nil, slot_id, user_id),
          :ok <- AttendancePolicy.can_record_admin_attendance?(approved_booking) do
       attendance_params =
         params
@@ -22,6 +46,8 @@ defmodule MilosTraining.Application.AdminRecordAttendance do
       end
     end
   end
+
+  def call(slot_id, user_id, admin_id), do: call(slot_id, user_id, admin_id, %{})
 
   defp reconcile_visit(%{status: "cancelled"} = attendance) do
     Finance.release_entitlement_source(
@@ -53,8 +79,15 @@ defmodule MilosTraining.Application.AdminRecordAttendance do
     Map.new(params, fn {key, value} -> {to_string(key), value} end)
   end
 
-  defp approved_booking(slot_id, user_id) do
+  defp approved_booking(nil, slot_id, user_id) do
     case Scheduling.get_approved_booking_for_class(user_id, slot_id) do
+      nil -> {:error, :attendance_requires_approved_booking}
+      booking -> {:ok, booking}
+    end
+  end
+
+  defp approved_booking(context, slot_id, user_id) do
+    case Scheduling.get_approved_booking_for_class(context, user_id, slot_id) do
       nil -> {:error, :attendance_requires_approved_booking}
       booking -> {:ok, booking}
     end

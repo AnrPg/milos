@@ -57,6 +57,7 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
              "default_auto_approve" => true,
              "default_booking_timeout_minutes" => 25,
              "id" => payload["scheduling"]["id"],
+             "organization_id" => payload["scheduling"]["organization_id"],
              "inserted_at" => payload["scheduling"]["inserted_at"],
              "updated_at" => payload["scheduling"]["updated_at"]
            }

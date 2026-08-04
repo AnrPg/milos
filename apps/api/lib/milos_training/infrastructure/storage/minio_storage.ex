@@ -53,7 +53,7 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
   @impl true
   def create_upload(user_id, content_type, _byte_size) do
     extension = extension_for(content_type)
-    key = "avatars/#{user_id}/#{Ecto.UUID.generate()}.#{extension}"
+    key = "users/#{user_id}/avatars/#{Ecto.UUID.generate()}.#{extension}"
     {storage_config, url_config, bucket} = avatar_ex_aws_config()
 
     with :ok <- ensure_bucket(storage_config, bucket),
@@ -76,8 +76,8 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
   end
 
   @impl true
-  def validate_uploaded(user_id, "avatars/" <> _rest = key) do
-    expected_prefix = "avatars/#{user_id}/"
+  def validate_uploaded(user_id, "users/" <> _rest = key) do
+    expected_prefix = "users/#{user_id}/avatars/"
 
     if String.starts_with?(key, expected_prefix) do
       {storage_config, _url_config, bucket} = avatar_ex_aws_config()
@@ -222,7 +222,7 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
             Effect: "Allow",
             Principal: "*",
             Action: ["s3:GetObject"],
-            Resource: ["arn:aws:s3:::#{bucket}/avatars/*"]
+            Resource: ["arn:aws:s3:::#{bucket}/users/*/avatars/*"]
           }
         ]
       })

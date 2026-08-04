@@ -133,6 +133,10 @@ export type ExerciseModification = {
   logged_at?: string;
 };
 
+export function isFreeTextModification(modification: ExerciseModification) {
+  return modification.field === "note" && modification.section_id === "free_text";
+}
+
 export type ExerciseNote = {
   id?: string;
   exercise_id: string;

@@ -6,6 +6,7 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
   alias MilosTraining.Notifications.Domain.{InboxCursor, VisibleTypes}
   alias MilosTraining.Notifications.Notification
   alias MilosTraining.Notifications.PushSetting
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Repo
 
   @impl true
@@ -29,6 +30,7 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
   @impl true
   def list_for_user(user_id) do
     Notification
+    |> scoped_to_user()
     |> where([notification], notification.user_id == ^user_id)
     |> order_by([notification], desc: notification.inserted_at)
     |> Repo.all()
@@ -42,6 +44,7 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
 
     notifications =
       Notification
+      |> scoped_to_user()
       |> where([notification], notification.user_id == ^user_id)
       |> where(
         [notification],
@@ -63,20 +66,24 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
 
   @impl true
   def count_unread_inbox(user_id) do
-    from(notification in Notification,
-      where:
-        notification.user_id == ^user_id and is_nil(notification.read_at) and
-          fragment("? <> ALL(?)", notification.type, ^VisibleTypes.hidden_inbox_types())
+    Notification
+    |> scoped_to_user()
+    |> where(
+      [notification],
+      notification.user_id == ^user_id and is_nil(notification.read_at) and
+        fragment("? <> ALL(?)", notification.type, ^VisibleTypes.hidden_inbox_types())
     )
     |> Repo.aggregate(:count)
   end
 
   @impl true
   def mark_all_read(user_id) do
-    from(notification in Notification,
-      where:
-        notification.user_id == ^user_id and is_nil(notification.read_at) and
-          fragment("? <> ALL(?)", notification.type, ^VisibleTypes.hidden_inbox_types())
+    Notification
+    |> scoped_to_user()
+    |> where(
+      [notification],
+      notification.user_id == ^user_id and is_nil(notification.read_at) and
+        fragment("? <> ALL(?)", notification.type, ^VisibleTypes.hidden_inbox_types())
     )
     |> Repo.update_all(set: [read_at: current_timestamp()])
     |> elem(0)
@@ -84,7 +91,7 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
 
   @impl true
   def mark_read(user_id, notification_id) do
-    case Repo.get_by(Notification, id: notification_id, user_id: user_id) do
+    case Notification |> scoped_to_user() |> Repo.get_by(id: notification_id, user_id: user_id) do
       nil ->
         false
 
@@ -105,6 +112,7 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
   @impl true
   def delete_booking_pending_for_booking(booking_id) do
     Notification
+    |> scoped_to_organization()
     |> where(
       [n],
       n.type == :booking_pending and
@@ -241,4 +249,21 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
   end
 
   defp present?(value), do: is_binary(value) and String.trim(value) != ""
+
+  defp scoped_to_user(query) do
+    case RepoContext.current_setting("app.user_id") do
+      user_id when is_binary(user_id) -> where(query, [row], row.user_id == ^user_id)
+      _missing_scope -> query
+    end
+  end
+
+  defp scoped_to_organization(query) do
+    case RepoContext.current_setting("app.organization_id") do
+      organization_id when is_binary(organization_id) ->
+        where(query, [row], row.organization_id == ^organization_id)
+
+      _missing_scope ->
+        query
+    end
+  end
 end

@@ -52,6 +52,11 @@ config :milos_training, :start_oban, true
 config :milos_training, :redis_url, System.get_env("REDIS_URL", "redis://localhost:6379")
 config :milos_training, :readiness_checker, MilosTraining.Infrastructure.Readiness.Live
 config :milos_training, :identity_user_store, MilosTraining.Infrastructure.Identity.EctoUserStore
+
+config :milos_training,
+       :organization_store,
+       MilosTraining.Infrastructure.Organizations.EctoOrganizationStore
+
 config :milos_training, :coaching_store, MilosTraining.Infrastructure.Coaching.EctoCoachingStore
 
 config :milos_training,
@@ -124,7 +129,6 @@ config :milos_training, :token_store, MilosTraining.Infrastructure.Security.Redi
 config :milos_training, :token_issuer, MilosTraining.Infrastructure.Auth.GuardianTokenIssuer
 config :milos_training, :token_verifier, MilosTraining.Infrastructure.Auth.GuardianTokenVerifier
 config :milos_training, :password_verifier, MilosTraining.Infrastructure.Auth.Password
-config :milos_training, :admin_registration_code, "DEY48keGE"
 
 config :milos_training,
        :remote_ip,

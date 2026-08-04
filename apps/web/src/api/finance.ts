@@ -2,8 +2,52 @@ import { apiRequest } from "@/api/client";
 
 export type FinanceRecord = Record<string, unknown>;
 
+export type FinanceCleanupRecord = {
+  id: string;
+  record_type: "invoice" | "receipt" | "payment" | "transaction";
+  code: string;
+  label: string;
+  membership_id?: string | null;
+  user_id?: string | null;
+  finance_invoice_id?: string | null;
+  amount_cents?: number | null;
+  currency?: string | null;
+  status?: string | null;
+  issued_on?: string | null;
+  due_on?: string | null;
+  paid_on?: string | null;
+  inserted_at?: string | null;
+  deleted_at?: string | null;
+};
+
 export async function fetchFinanceSummary(token: string) {
   return apiRequest<FinanceRecord>("/admin/finance/summary", { token });
+}
+
+export async function fetchFinanceCleanupRecords(
+  token: string,
+  params: { q?: string; limit?: string } = {},
+) {
+  const query = new URLSearchParams(params).toString();
+  return apiRequest<{ records: FinanceCleanupRecord[] }>(
+    `/admin/finance/cleanup-records${query ? `?${query}` : ""}`,
+    { token },
+  );
+}
+
+export async function purgeFinanceRecord(
+  token: string,
+  recordId: string,
+  body: { record_type: string; password: string; reason?: string },
+) {
+  return apiRequest<{ record: FinanceCleanupRecord; purged_linked_records?: Record<string, number> }>(
+    `/admin/finance/cleanup-records/${recordId}/purge`,
+    {
+      method: "POST",
+      token,
+      body,
+    },
+  );
 }
 
 export async function fetchFinancePackages(token: string) {

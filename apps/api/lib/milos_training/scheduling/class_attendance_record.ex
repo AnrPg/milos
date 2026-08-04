@@ -6,6 +6,7 @@ defmodule MilosTraining.Scheduling.ClassAttendanceRecord do
   @foreign_key_type :binary_id
 
   schema "class_attendance_records" do
+    field :organization_id, :binary_id
     field :scheduled_class_id, :binary_id
     field :booking_id, :binary_id
     field :user_id, :binary_id
@@ -21,6 +22,7 @@ defmodule MilosTraining.Scheduling.ClassAttendanceRecord do
   def changeset(record \\ %__MODULE__{}, params) do
     record
     |> cast(params, [
+      :organization_id,
       :scheduled_class_id,
       :booking_id,
       :user_id,
@@ -30,7 +32,7 @@ defmodule MilosTraining.Scheduling.ClassAttendanceRecord do
       :notes,
       :params
     ])
-    |> validate_required([:scheduled_class_id, :user_id, :status, :marked_at])
+    |> validate_required([:organization_id, :scheduled_class_id, :user_id, :status, :marked_at])
     |> validate_inclusion(:status, ["attended", "missed", "cancelled", "late_cancel", "no_show"])
     |> unique_constraint([:scheduled_class_id, :user_id])
     |> foreign_key_constraint(:scheduled_class_id)

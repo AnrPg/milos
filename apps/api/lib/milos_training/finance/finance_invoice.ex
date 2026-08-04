@@ -6,6 +6,7 @@ defmodule MilosTraining.Finance.FinanceInvoice do
   @foreign_key_type :binary_id
 
   schema "finance_invoices" do
+    field :organization_id, :binary_id, read_after_writes: true
     field :membership_id, :binary_id
     field :user_id, :binary_id
     field :membership_package_subscription_id, :binary_id
@@ -22,6 +23,9 @@ defmodule MilosTraining.Finance.FinanceInvoice do
     field :currency, :string, default: "EUR"
     field :notes, :string
     field :voided_at, :utc_datetime_usec
+    field :deleted_at, :utc_datetime_usec
+    field :deleted_by_id, :binary_id
+    field :deletion_reason, :string
     field :params, :map, default: %{}
 
     timestamps(type: :utc_datetime_usec)
@@ -46,6 +50,9 @@ defmodule MilosTraining.Finance.FinanceInvoice do
       :currency,
       :notes,
       :voided_at,
+      :deleted_at,
+      :deleted_by_id,
+      :deletion_reason,
       :params
     ])
     |> validate_required([
@@ -66,13 +73,17 @@ defmodule MilosTraining.Finance.FinanceInvoice do
       "partially_paid",
       "paid",
       "overdue",
+      "partially_refunded",
+      "refunded",
       "void"
     ])
     |> validate_number(:subtotal_cents, greater_than_or_equal_to: 0)
     |> validate_number(:discount_cents, greater_than_or_equal_to: 0)
     |> validate_number(:total_cents, greater_than_or_equal_to: 0)
     |> validate_discount_not_above_subtotal()
-    |> unique_constraint(:invoice_number)
+    |> unique_constraint([:organization_id, :invoice_number],
+      name: :finance_invoices_organization_invoice_number_index
+    )
     |> unique_constraint(:service_period_start,
       name: :finance_renewal_invoices_period_unique_index
     )

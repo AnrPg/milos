@@ -303,7 +303,7 @@ export function PackagePanel({
             <div className="mt-5 space-y-3">
               {affectedRoles.map((role) => (
                 <label key={role} className="block space-y-1">
-                  <span className="text-xs font-semibold capitalize" style={{ color: "var(--text-soft)" }}><SemanticLabel value={role} /> {i18n("replacement898d79a")} {affectedByRole[role]} {i18n("user12dea96")}{affectedByRole[role] === 1 ? "" : i18n("sa0f1490")}</span>
+                  <span className="text-xs font-semibold capitalize" style={{ color: "var(--text-soft)" }}><SemanticLabel value={role} /> {i18n("replacement898d79a")} {i18n("userCount", { count: affectedByRole[role] })}</span>
                   <select
                     className="w-full rounded-xl px-3 py-2 text-sm"
                     style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}

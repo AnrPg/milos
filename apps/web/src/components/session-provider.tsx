@@ -13,15 +13,18 @@ import {
   logoutSession,
   refreshSession,
   registerAdminUser,
+  registerInvitedUser,
   registerUser,
   type AdminRegisterRequest,
   type AuthTokens,
   type CurrentUser,
   type LoginRequest,
+  type InvitedRegisterRequest,
   type RegisterRequest,
 } from "@/api/auth";
 import {
   broadcastSessionSignOut,
+  SELECTED_ORGANIZATION_SLUG_KEY,
   SESSION_EXPIRED_EVENT,
   SESSION_UPDATED_EVENT,
   setApiSessionUser,
@@ -45,6 +48,7 @@ type SessionContextValue = {
   signIn: (payload: LoginRequest) => Promise<CurrentUser>;
   signUp: (payload: RegisterRequest) => Promise<CurrentUser>;
   signUpAdmin: (payload: AdminRegisterRequest) => Promise<CurrentUser>;
+  signUpInvited: (payload: InvitedRegisterRequest) => Promise<CurrentUser>;
   rotate: () => Promise<void>;
   signOut: () => void;
 };
@@ -92,6 +96,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   function resetSession(accessTokenForCleanup?: string | null) {
     resetRealtimeSocket();
     void setWorkoutCacheUser(null);
+    try {
+      window.localStorage.removeItem(SELECTED_ORGANIZATION_SLUG_KEY);
+    } catch {}
     setTokens(null);
     setCurrentUser(null);
     setStatus("guest");
@@ -118,6 +125,11 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   async function signUpAdmin(payload: AdminRegisterRequest) {
     const issuedTokens = await registerAdminUser(payload);
+    return establishSession(issuedTokens);
+  }
+
+  async function signUpInvited(payload: InvitedRegisterRequest) {
+    const issuedTokens = await registerInvitedUser(payload);
     return establishSession(issuedTokens);
   }
 
@@ -248,6 +260,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         signIn,
         signUp,
         signUpAdmin,
+        signUpInvited,
         rotate,
         signOut,
       }}

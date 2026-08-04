@@ -12,6 +12,7 @@ defmodule MilosTraining.Workouts.MasterWorkout do
   @statuses [:draft, :published]
 
   schema "master_workouts" do
+    field :organization_id, :binary_id
     field :title, :string
     field :type, Ecto.Enum, values: @types
     field :status, Ecto.Enum, values: @statuses, default: :draft

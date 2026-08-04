@@ -5,6 +5,7 @@ defmodule MilosTraining.Infrastructure.Feedback.EctoFeedbackStore do
 
   alias Ecto.Multi
   alias MilosTraining.Feedback.{Review, ReviewAnswer}
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Repo
 
   @impl true
@@ -43,6 +44,7 @@ defmodule MilosTraining.Infrastructure.Feedback.EctoFeedbackStore do
   @impl true
   def list_reviews_for_user(user_id) do
     Review
+    |> scoped_to_tenant()
     |> where([review], review.user_id == ^user_id)
     |> order_by([review], desc: review.inserted_at)
     |> Repo.all()
@@ -54,6 +56,7 @@ defmodule MilosTraining.Infrastructure.Feedback.EctoFeedbackStore do
     filters = string_key_map(filters || %{})
 
     Review
+    |> scoped_to_tenant()
     |> maybe_filter(:target_type, filters["target_type"])
     |> maybe_filter(:status, filters["status"])
     |> maybe_filter(:sentiment, filters["sentiment"])
@@ -68,7 +71,7 @@ defmodule MilosTraining.Infrastructure.Feedback.EctoFeedbackStore do
   def update_review_status(review_id, params) do
     attrs = moderation_attrs(params)
 
-    case Repo.get(Review, review_id) do
+    case Review |> scoped_to_tenant() |> Repo.get(review_id) do
       nil ->
         {:error, :not_found}
 
@@ -127,6 +130,7 @@ defmodule MilosTraining.Infrastructure.Feedback.EctoFeedbackStore do
 
         review_ids ->
           ReviewAnswer
+          |> scoped_to_tenant()
           |> where([answer], answer.review_id in ^review_ids)
           |> order_by([answer], asc: answer.inserted_at)
           |> Repo.all()
@@ -140,6 +144,7 @@ defmodule MilosTraining.Infrastructure.Feedback.EctoFeedbackStore do
 
   defp list_answers(review_id) do
     ReviewAnswer
+    |> scoped_to_tenant()
     |> where([answer], answer.review_id == ^review_id)
     |> order_by([answer], asc: answer.inserted_at)
     |> Repo.all()
@@ -221,12 +226,14 @@ defmodule MilosTraining.Infrastructure.Feedback.EctoFeedbackStore do
 
   defp count_reviews(since) do
     Review
+    |> scoped_to_tenant()
     |> where([review], review.inserted_at >= ^since)
     |> Repo.aggregate(:count)
   end
 
   defp average_rating(since) do
     Review
+    |> scoped_to_tenant()
     |> where([review], review.inserted_at >= ^since)
     |> where([review], not is_nil(review.rating))
     |> Repo.aggregate(:avg, :rating)
@@ -238,6 +245,7 @@ defmodule MilosTraining.Infrastructure.Feedback.EctoFeedbackStore do
 
   defp count_reviews_by(field, since) do
     Review
+    |> scoped_to_tenant()
     |> where([review], review.inserted_at >= ^since)
     |> group_by([review], field(review, ^field))
     |> select([review], {field(review, ^field), count(review.id)})
@@ -247,6 +255,7 @@ defmodule MilosTraining.Infrastructure.Feedback.EctoFeedbackStore do
 
   defp low_rating_count(since) do
     Review
+    |> scoped_to_tenant()
     |> where([review], review.inserted_at >= ^since)
     |> where([review], not is_nil(review.rating) and review.rating <= 2)
     |> Repo.aggregate(:count)
@@ -287,5 +296,15 @@ defmodule MilosTraining.Infrastructure.Feedback.EctoFeedbackStore do
 
   defp string_key_map(params) when is_map(params) do
     Map.new(params, fn {key, value} -> {to_string(key), value} end)
+  end
+
+  defp scoped_to_tenant(query) do
+    case RepoContext.current_setting("app.organization_id") do
+      organization_id when is_binary(organization_id) ->
+        where(query, [row], row.organization_id == ^organization_id)
+
+      _no_tenant_context ->
+        query
+    end
   end
 end

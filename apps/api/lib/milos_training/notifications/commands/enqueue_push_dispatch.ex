@@ -22,6 +22,7 @@ defmodule MilosTraining.Notifications.Commands.EnqueuePushDispatch do
       "endpoint" => endpoint,
       "type" => notification.type,
       "payload" => notification.payload,
+      "organization_id" => Map.get(notification, :organization_id),
       "notification_id" => notification.id
     })
   end

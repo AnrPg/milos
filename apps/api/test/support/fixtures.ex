@@ -1,5 +1,5 @@
 defmodule MilosTraining.TestFixtures do
-  alias MilosTraining.{Identity, Scheduling, Workouts}
+  alias MilosTraining.{Identity, Organizations, Scheduling, Workouts}
 
   def user_fixture(attrs \\ %{}) do
     unique = System.unique_integer([:positive])
@@ -13,12 +13,14 @@ defmodule MilosTraining.TestFixtures do
       |> Map.merge(attrs)
 
     {:ok, user} = Identity.register(params)
+    {:ok, _membership} = Organizations.ensure_legacy_membership(user)
     user
   end
 
   def admin_fixture(attrs \\ %{}) do
     user = user_fixture(Map.put(attrs, :role, :member))
     {:ok, admin} = Identity.update_role(user, :admin)
+    {:ok, _membership} = Organizations.ensure_legacy_membership(admin, :owner)
     admin
   end
 

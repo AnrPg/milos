@@ -1,10 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { ApiError } from "@/api/client";
-import type { AdminRegisterRequest } from "@/api/auth";
+import {
+  inspectInvitation,
+  type AdminRegisterRequest,
+  type InvitationInspection,
+} from "@/api/auth";
 import { useSession } from "@/components/session-provider";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
@@ -12,16 +16,40 @@ import { useUiTranslations } from "@/i18n/ui";
 const INITIAL_FORM: AdminRegisterRequest = {
   nickname: "",
   password: "",
-  admin_code: "",
+  invitation_token: "",
 };
 
 export function AdminRegistrationConsole() {
   const i18n = useUiTranslations();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signUpAdmin, status } = useSession();
-  const [form, setForm] = useState<AdminRegisterRequest>(INITIAL_FORM);
+  const [form, setForm] = useState<AdminRegisterRequest>(() => ({
+    ...INITIAL_FORM,
+    invitation_token: searchParams.get("token") ?? "",
+  }));
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [invitation, setInvitation] = useState<InvitationInspection | null>(null);
+
+  useEffect(() => {
+    const token = form.invitation_token.trim();
+    if (token.length < 20) return;
+
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      void inspectInvitation(token)
+        .then((result) => {
+          if (!cancelled && ["owner", "admin"].includes(result.role)) setInvitation(result);
+        })
+        .catch(() => undefined);
+    }, 300);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [form.invitation_token]);
 
   useEffect(() => {
     if (status === "authenticated") router.replace("/");
@@ -29,7 +57,7 @@ export function AdminRegistrationConsole() {
 
   const validNickname = /^[\p{L}0-9_]{3,30}$/u.test(form.nickname);
   const validPassword = form.password.length >= 4 && !/\s/u.test(form.password);
-  const canSubmit = validNickname && validPassword && form.admin_code.length > 0 && !busy;
+  const canSubmit = validNickname && validPassword && invitation !== null && !busy;
 
   async function submit() {
     if (!canSubmit) return;
@@ -95,11 +123,27 @@ export function AdminRegistrationConsole() {
               autoComplete="off"
               className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
               style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
-              type="password"
-              value={form.admin_code}
-              onChange={(event) => setForm((current) => ({ ...current, admin_code: event.target.value }))}
+              value={form.invitation_token}
+              onChange={(event) =>
+                {
+                  setInvitation(null);
+                  setForm((current) => ({ ...current, invitation_token: event.target.value }));
+                }
+              }
             />
           </label>
+
+          {invitation ? (
+            <div
+              className="rounded-xl px-4 py-3 text-sm"
+              style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
+            >
+              <strong>{invitation.organization.name}</strong>
+              <span className="ms-2" style={{ color: "var(--muted)" }}>
+                {invitation.role}
+              </span>
+            </div>
+          ) : null}
 
           {error ? (
             <p

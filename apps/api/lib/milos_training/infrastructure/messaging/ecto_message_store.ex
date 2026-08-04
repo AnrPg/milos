@@ -4,6 +4,7 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoMessageStore do
   import Ecto.Query
 
   alias MilosTraining.Messaging.{Message, Participant, Thread}
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Repo
   alias MilosTraining.Workers.DispatchMessageJob
 
@@ -52,6 +53,7 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoMessageStore do
     before_id = Map.get(params, :before_id)
 
     Message
+    |> scoped_to_tenant()
     |> where([m], m.thread_id == ^thread_id)
     |> maybe_before(before_id)
     |> order_by([m], desc: m.sequence_number)
@@ -62,12 +64,13 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoMessageStore do
 
   @impl true
   def get_message(id) do
-    Repo.get(Message, id)
+    Message |> scoped_to_tenant() |> Repo.get(id)
   end
 
   @impl true
   def list_recent_coaching_notes(user_id, limit) do
     Message
+    |> scoped_to_tenant()
     |> join(:inner, [message], thread in Thread, on: thread.id == message.thread_id)
     |> join(:inner, [_message, thread], participant in Participant,
       on: participant.thread_id == thread.id
@@ -82,6 +85,29 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoMessageStore do
     |> Repo.all()
   end
 
+  @impl true
+  def list_recent_coaching_notes_for_organization(user_id, limit) do
+    case RepoContext.current_setting("app.organization_id") do
+      organization_id when is_binary(organization_id) ->
+        Message
+        |> join(:inner, [message], thread in Thread, on: thread.id == message.thread_id)
+        |> join(:inner, [_message, thread], participant in Participant,
+          on: participant.thread_id == thread.id
+        )
+        |> where(
+          [message, thread, participant],
+          participant.user_id == ^user_id and thread.context_type == :direct and
+            message.message_type == :coaching_note and message.organization_id == ^organization_id
+        )
+        |> order_by([message], desc: message.sequence_number)
+        |> limit(^limit)
+        |> Repo.all()
+
+      _missing_scope ->
+        []
+    end
+  end
+
   defp insert_message(
          changeset,
          %{sender_id: sender_id, client_operation_id: operation_id}
@@ -94,7 +120,9 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoMessageStore do
          ) do
       {:ok, %{sequence_number: nil}} ->
         {:existing,
-         Repo.get_by!(Message, sender_id: sender_id, client_operation_id: operation_id)}
+         Message
+         |> scoped_to_tenant()
+         |> Repo.get_by!(sender_id: sender_id, client_operation_id: operation_id)}
 
       {:ok, message} ->
         {:created, message}
@@ -114,12 +142,22 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoMessageStore do
   defp maybe_before(query, nil), do: query
 
   defp maybe_before(query, before_id) do
-    message = Repo.get(Message, before_id)
+    message = Message |> scoped_to_tenant() |> Repo.get(before_id)
 
     if message do
       where(query, [m], m.sequence_number < ^message.sequence_number)
     else
       query
+    end
+  end
+
+  defp scoped_to_tenant(query) do
+    case RepoContext.current_setting("app.organization_id") do
+      organization_id when is_binary(organization_id) ->
+        where(query, [row], row.organization_id == ^organization_id)
+
+      _missing_scope ->
+        query
     end
   end
 end

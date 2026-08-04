@@ -1,12 +1,13 @@
 defmodule MilosTraining.Application.ResolveBooking do
+  alias MilosTraining.Application.ScheduleRealtime
   alias MilosTraining.{Finance, Scheduling}
 
-  def call(booking_id, params) do
+  def call(context, booking_id, params) do
     action = Map.get(params, :action) || Map.get(params, "action")
     admin_message = Map.get(params, :admin_message) || Map.get(params, "admin_message")
 
-    with booking when not is_nil(booking) <- Scheduling.get_booking(booking_id),
-         {:ok, updated_booking} <- run_resolution(action, booking_id, admin_message) do
+    with booking when not is_nil(booking) <- Scheduling.get_booking(context, booking_id),
+         {:ok, updated_booking} <- run_resolution(context, action, booking_id, admin_message) do
       maybe_reconcile_now(action, updated_booking)
 
       notification_payload =
@@ -24,29 +25,54 @@ defmodule MilosTraining.Application.ResolveBooking do
     end
   end
 
-  defp run_resolution(:approve, booking_id, admin_message),
+  def call(booking_id, params), do: call(nil, booking_id, params)
+
+  defp run_resolution(nil, :approve, booking_id, admin_message),
     do: Scheduling.approve_booking(booking_id, admin_message)
 
-  defp run_resolution("approve", booking_id, admin_message),
-    do: run_resolution(:approve, booking_id, admin_message)
+  defp run_resolution(context, :approve, booking_id, admin_message),
+    do: Scheduling.approve_booking(context, booking_id, admin_message)
 
-  defp run_resolution(:reject, booking_id, admin_message),
+  defp run_resolution(context, "approve", booking_id, admin_message),
+    do: run_resolution(context, :approve, booking_id, admin_message)
+
+  defp run_resolution(nil, :reject, booking_id, admin_message),
     do:
       Scheduling.reject_booking(
         booking_id,
         admin_message,
-        reconciliation("Booking rejected", "booking-rejected", booking_id)
+        reconciliation(nil, "Booking rejected", "booking-rejected", booking_id)
       )
 
-  defp run_resolution("reject", booking_id, admin_message),
-    do: run_resolution(:reject, booking_id, admin_message)
+  defp run_resolution(context, :reject, booking_id, admin_message),
+    do:
+      Scheduling.reject_booking(
+        context,
+        booking_id,
+        admin_message,
+        reconciliation(context, "Booking rejected", "booking-rejected", booking_id)
+      )
 
-  defp run_resolution(_, _booking_id, _admin_message), do: :error
+  defp run_resolution(context, "reject", booking_id, admin_message),
+    do: run_resolution(context, :reject, booking_id, admin_message)
 
-  defp reconciliation(reason, idempotency_prefix, booking_id) do
+  defp run_resolution(_context, _, _booking_id, _admin_message), do: :error
+
+  defp reconciliation(nil, reason, idempotency_prefix, booking_id) do
     booking = Scheduling.get_booking(booking_id)
 
+    reconciliation_payload(booking, reason, idempotency_prefix)
+  end
+
+  defp reconciliation(context, reason, idempotency_prefix, booking_id) do
+    booking = Scheduling.get_booking(context, booking_id)
+
+    reconciliation_payload(booking, reason, idempotency_prefix)
+  end
+
+  defp reconciliation_payload(booking, reason, idempotency_prefix) do
     %{
+      organization_id: booking.organization_id,
       booking_id: booking.id,
       user_id: booking.user_id,
       scheduled_class_id: booking.scheduled_class_id,
@@ -77,10 +103,6 @@ defmodule MilosTraining.Application.ResolveBooking do
   defp plain_map(map) when is_map(map), do: map
 
   defp broadcast_resolution(booking) do
-    Phoenix.PubSub.broadcast(
-      MilosTraining.PubSub,
-      "booking:resolved",
-      {:booking_resolved, booking}
-    )
+    ScheduleRealtime.broadcast("booking_resolved", booking)
   end
 end

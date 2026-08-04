@@ -1,6 +1,9 @@
 defmodule MilosTraining.Application.ArchiveClassType do
   alias MilosTraining.Scheduling
 
+  def call(context, id, replacement_id),
+    do: Scheduling.archive_class_type(context, id, blank_to_nil(replacement_id))
+
   def call(id, replacement_id),
     do: Scheduling.archive_class_type(id, blank_to_nil(replacement_id))
 

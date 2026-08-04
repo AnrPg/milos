@@ -1,7 +1,7 @@
 # Milos Training - Journal-First Product Redesign
 
 **Date:** 2026-07-19  
-**Status:** Approved product direction; architecture gates in section 13 require ADR acceptance before implementation  
+**Status:** Approved product direction and cross-feature constraints; ADR codification remains required before implementation  
 **Ground truth:** `/home/rodochrousbisbiki/MyApps/Milos - training journal feature design discussion.md`  
 **Extends:** `docs/superpowers/specs/2026-06-05-gym-app-design.md`
 
@@ -122,6 +122,7 @@ only when relevant.
 - workout-level `notes`
 - `client_operation_id` for idempotent creation
 - `lock_version` for conflict-aware edits
+- captured IANA timezone and occurrence-local date
 - audit timestamps
 
 Allowed initial source types are `independent`, `coach_assignment`, `class_booking`,
@@ -222,6 +223,11 @@ performance. The source context remains authoritative for permissions, mutations
 and detailed reads. Cross-context events carry plain maps; the Journal must not
 import foreign Ecto schemas.
 
+The Journal is a global personal vault, not an organization-owned aggregate. A
+timeline item may carry optional organization provenance, but its owner is the global
+Identity user. Tenant-owned executions, bookings, assignments, feedback, and
+organization-authored safety records remain in their owning contexts.
+
 Every timeline item is unique by `(owner_user_id, source_context, source_type,
 source_id)`. Replaying a source event updates or no-ops the projection rather than
 creating another card.
@@ -230,6 +236,10 @@ Assignments and bookings appear in Today's planned area only. They enter permane
 history after an execution starts/completes or the user confirms an actual log.
 Derived events are deliberately sparse so the Journal does not become a noisy
 activity feed.
+
+When an organization membership ends, the user retains read-only access only to
+their own actual training results. Prescription, class detail, other-member data,
+coach-private data, and continuing tenant operations are no longer authorized.
 
 ## 7. Relationships Between Records
 
@@ -276,22 +286,67 @@ is visually integrated with the same workout-detail language.
 Legacy records are preserved. Backfills create timeline references/projections, not
 new duplicate canonical facts.
 
-## 9. Privacy and Sharing
+## 9. Privacy, Coaching, and Sharing
 
-Default visibility is private. Proposed user-controlled values are:
+The Journal is locked and private by default. Organization role alone never grants
+Journal access, including owner or admin roles.
 
-- `private`
-- `shared_with_coach`
-- a future explicit sharing policy after relationship authorization exists
+`Coaching` owns organization-scoped, many-to-many coaching relationships. A
+relationship requires mutual consent. The user selects one active relationship as
+their chosen/default coach. That coach receives baseline read access to:
 
-`shared_with_coach` must resolve through an explicit, active coaching relationship;
-it must not mean every admin can read the record. Until that relationship model is
-accepted and implemented, new entries remain private and the sharing control stays
-disabled.
+- the user's full PR and injury/body-update history;
+- assignments and booked classes only from the relationship's organization;
+- entries explicitly shared with that coach.
 
-Sharing one entity does not recursively share linked entities. A shared workout can
-link to a private body report without exposing the report's contents. Private coach
-notes never enter the user's Journal payload.
+Changing the chosen coach revokes the previous coach's baseline, explicit shares,
+and access grants. It does not delete canonical records.
+
+Baseline visibility updates the coach's authorized Personal Journal view without
+creating a notification. Only an intentional manual share creates an immediate
+recipient notification.
+
+The owner may explicitly share an entry with any active member of an organization
+they share, regardless of role. An explicit share is revocable and creates an
+immediate durable notification. Sharing one entity does not recursively share linked
+entities. A shared workout may link to a private body report without exposing it.
+
+Any active same-organization member may submit a structured Journal access request.
+The requester chooses scope and expiry; possession of an account, role, or request
+UUID does not grant access. The owner receives a notification with inline Approve
+and Deny actions and an Adjust action that may narrow the requested scope.
+
+The compact default request preset is the last 30 days of workouts and PRs. Body
+updates, recovery, and notes require explicit selection under Customize. The owner
+may explicitly include independent or other-organization entries. Grants are
+read-only, expiring, immediately revocable, and evaluated against canonical source
+permissions on every read. Private coach notes never enter a user Journal response.
+
+No Journal-specific comments system is introduced. Access requests and approvals are
+structured commands, not conversations.
+
+## 9.1 Personal fact ownership
+
+- Self-authored body updates and readiness facts are global user-owned Wellbeing
+  records with optional organization provenance.
+- Organization-authored injury/safety records remain tenant-owned Wellbeing records.
+- PRs and PR history are global user-owned Pantheon records.
+- Feedback remains owned by its target organization/context and is referenced by the
+  timeline.
+- Existing self/admin report provenance is used for additive migration; records are
+  not duplicated into Journal-owned copies.
+
+## 9.2 Removal, deletion, and revision history
+
+Journal-native entries use Trash rather than immediate deletion. Trash hides an
+entry immediately, permits restore for 30 days, and then purges content and owned
+children through a durable job. Accepted edits retain immutable revision history and
+use optimistic locking.
+
+For a projected canonical card, `Remove from Journal` creates a reversible personal
+suppression only. `Delete everywhere` is shown only when the owning context exposes
+an authorized destructive command; that context's retention and audit policy remains
+authoritative.
 
 ## 10. Offline and Multi-Device Semantics
 
@@ -310,6 +365,10 @@ write command has an owning-context idempotency and conflict policy.
 - The UI preserves the local draft and offers a field-aware conflict review.
 - Permanent validation/authorization failures remain visible and require explicit
   user action.
+- Journal-native creates and edits, explicit shares, and Journal access requests use
+  opt-in durable outbox adapters.
+- Trash, restore, purge, relationship changes, approvals, denials, and revocations
+  require an online authorization check.
 
 Before server acknowledgement, a draft exists only on its originating browser
 profile. After acknowledgement, PostgreSQL is authoritative and all devices obtain
@@ -329,6 +388,10 @@ The Journal produces reliable facts before it produces rewards.
 - Notes, body updates, and recovery entries do not award workout completion credit.
 - PR detection consumes typed actual performance and records provenance to the exact
   row where possible.
+- A potential PR from a manual workout requires explicit user confirmation and is
+  recorded with `self_reported` provenance.
+- Self-reported PRs remain outside public leaderboards and competitive challenge
+  credit.
 - Coach analytics compare prescription snapshots with actual rows without mutating
   either side.
 
@@ -348,27 +411,56 @@ Pantheon, Wellbeing, and Gamification facts. It is not another data-entry surfac
 - Locale, RTL, reduced-motion, and narrow viewport behavior are release gates.
 - Medical wording describes observations and training impact, not diagnoses.
 
-## 13. Architecture Decision Gates
+## 13. Multi-Tenant and Catalog Constraints
 
-These decisions must be accepted in ADR-068 before the first migration:
+Milos Training uses one browser origin and one deployment. Personal routes such as
+`/today`, `/journal`, and `/progress` are user-scoped. Organization routes use
+`/org/:slug/...`; the application router changes these paths through normal in-app
+navigation, and users never need to type an endpoint.
 
-1. **Bounded context:** add `MilosTraining.TrainingJournal` to own independent
-   workouts, recovery entries, personal notes, typed links, and the timeline
-   projection. This is recommended over overloading `Execution` or `Wellbeing`.
-2. **Sharing relationship:** define the explicit Identity/Coaching public contract
-   that authorizes `shared_with_coach`; do not infer it from the `admin` role.
-3. **Personal availability:** allow every authenticated role to use personal Journal
-   surfaces. A future independent-user onboarding model should add capabilities and
-   optional relationships without rewriting historical role values in this rollout.
-4. **Projection consistency:** use transactional local writes and durable,
-   idempotent event/projector jobs for cross-context timeline updates; REST remains
-   the source of full payload truth and channels only invalidate/refetch.
+The path selects tenant context but never grants access. Every organization-scoped
+HTTP, Channel, job, cache, search, and object-storage operation validates the active
+membership. Personal operations validate the global user and applicable grants.
+Hidden selected-organization session state is not authoritative, so bookmarks,
+refreshes, and tabs may safely use different organizations.
 
-The first three phases of the implementation plan are blocked until ADR-068 is
-accepted. Product/UI prototyping may proceed against fixtures, but no production
-schema should encode an unresolved ownership or privacy assumption.
+Independent users may register at the personal application without an organization
+membership and later join organizations through invitations.
 
-## 14. Success Criteria
+`Workouts` becomes the canonical owner of the existing movement catalog. The same
+movement identity is used by personal workout rows and PR definitions. A versioned
+JSON seed is loaded idempotently into PostgreSQL, and Meilisearch provides fuzzy
+suggestions over approved canonical terms and aliases.
+
+Unmatched text is always retained in the user's record but excluded from analytics
+until approved. Source-backed submissions enter the source organization's moderation
+queue; independent submissions enter the platform queue. Tenant approval makes a
+term analytics-valid only inside that tenant. An audited platform-owner promotion
+makes it global. Rejection never removes the user's original text.
+
+## 14. Required Architecture Decisions
+
+Before the first Journal migration, accepted ADRs must codify these approved choices:
+
+1. Add `MilosTraining.TrainingJournal` for independent workouts, recovery, personal
+   notes, links, revisions, grants, suppressions, trash, and the timeline projection.
+2. Treat Journal-native records, self-authored Wellbeing facts, and Pantheon PRs as
+   global user-owned resources protected by user-scoped RLS. Optional organization
+   provenance never changes their owner.
+3. Keep Execution, Scheduling, Feedback, and organization-authored Wellbeing facts
+   tenant-owned and accessible only through public context contracts.
+4. Use mutually accepted Coaching relationships plus explicit Journal shares and
+   scoped access grants; never infer Journal access from an organization role.
+5. Use transactional local writes and durable, idempotent projector jobs for timeline
+   updates. REST is the full-payload source of truth; Channels invalidate/refetch.
+6. Transfer canonical movement-catalog ownership from Analytics to Workouts without
+   creating a duplicate catalog table.
+
+The multi-tenant implementation and ADRs must be completed first. Journal
+implementation branches from that accepted foundation; no Journal schema should
+encode a tenant-only personal ownership assumption.
+
+## 15. Success Criteria
 
 The redesign succeeds when:
 
@@ -384,6 +476,12 @@ The redesign succeeds when:
 - a stale offline edit never silently overwrites a newer server version;
 - private linked records are not leaked through Journal cards or sharing;
 - existing execution, injury, feedback, PR, and coach-note histories remain intact;
+- independent users can register and use the personal app without a synthetic tenant;
+- organization navigation stays in one browser origin and never depends on manually
+  typed URLs or hidden tenant state;
+- chosen-coach, explicit-share, and requested-access permissions match the approved
+  matrix and revoke immediately;
+- custom movement text remains visible while analytics include only appropriately
+  approved catalog identities;
 - personal users understand Milos Training's first screen without needing a gym or
   coach relationship.
-

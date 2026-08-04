@@ -75,24 +75,31 @@ defmodule MilosTrainingWeb.AdminWorkoutFolderController do
     responses: [no_content: "Deleted"]
   )
 
-  def index(conn, _params), do: json(conn, %{folders: Workouts.list_folders()})
+  def index(conn, _params),
+    do: json(conn, %{folders: Workouts.list_folders(conn.assigns.tenant_context)})
 
   def create(conn, _params) do
     admin = Guardian.Plug.current_resource(conn)
 
-    with {:ok, folder} <- Workouts.create_folder(admin.id, conn.body_params) do
+    with {:ok, folder} <-
+           Workouts.create_folder(conn.assigns.tenant_context, admin.id, conn.body_params) do
       conn |> put_status(:created) |> json(folder)
     end
   end
 
   def update(conn, params) do
-    with {:ok, folder} <- Workouts.update_folder(params["id"] || params[:id], conn.body_params) do
+    with {:ok, folder} <-
+           Workouts.update_folder(
+             conn.assigns.tenant_context,
+             params["id"] || params[:id],
+             conn.body_params
+           ) do
       json(conn, folder)
     end
   end
 
   def delete(conn, params) do
-    with :ok <- Workouts.delete_folder(params["id"] || params[:id]) do
+    with :ok <- Workouts.delete_folder(conn.assigns.tenant_context, params["id"] || params[:id]) do
       send_resp(conn, :no_content, "")
     end
   end

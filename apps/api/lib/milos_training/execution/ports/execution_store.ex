@@ -14,5 +14,6 @@ defmodule MilosTraining.Execution.Ports.ExecutionStore do
               {:ok, map()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
   @callback get_execution(binary()) :: map() | nil
   @callback list_executions_for_user(binary()) :: [map()]
+  @callback list_executions_for_coaching(binary()) :: [map()]
   @callback progress_operation_applied?(binary(), binary(), binary()) :: boolean()
 end

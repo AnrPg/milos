@@ -14,13 +14,14 @@ defmodule MilosTraining.Messaging.Application.SendMessage do
          {:ok, message} <-
            MessageStore.create_message_with_delivery(
              %{
+               organization_id: thread.organization_id,
                thread_id: thread_id,
                sender_id: sender_id,
                body: body,
                message_type: message_type,
                client_operation_id: client_operation_id
              },
-             delivery
+             Map.put(delivery, :organization_id, thread.organization_id)
            ) do
       {:ok, message}
     end

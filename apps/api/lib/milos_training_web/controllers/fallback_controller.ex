@@ -28,19 +28,16 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "invalid_current_password", error: "Current password is incorrect"})
   end
 
+  def call(conn, {:error, :invalid_password}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_password", error: "Password is incorrect"})
+  end
+
   def call(conn, {:error, :invalid_credentials}) do
     conn
     |> put_status(:unauthorized)
     |> json(%{code: "invalid_credentials", error: "Invalid credentials"})
-  end
-
-  def call(conn, {:error, :invalid_admin_registration_code}) do
-    conn
-    |> put_status(:unauthorized)
-    |> json(%{
-      code: "invalid_admin_registration_code",
-      error: "Invalid admin registration code"
-    })
   end
 
   def call(conn, {:error, :invalid_refresh_token}) do
@@ -86,6 +83,12 @@ defmodule MilosTrainingWeb.FallbackController do
     conn
     |> put_status(:not_found)
     |> json(%{code: "not_found", error: "Not found"})
+  end
+
+  def call(conn, {:error, :invalid_invitation}) do
+    conn
+    |> put_status(:not_found)
+    |> json(%{code: "invalid_invitation", error: "Invitation is invalid or unavailable"})
   end
 
   def call(conn, {:error, :stale_dsl_revision}) do

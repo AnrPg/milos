@@ -14,6 +14,8 @@ defmodule MilosTraining.Notifications.Commands.DispatchNotification do
     with {:ok, notification} <-
            CreateNotification.call(%{
              user_id: user_id,
+             organization_id:
+               Map.get(payload, :organization_id) || Map.get(payload, "organization_id"),
              type: type,
              dedupe_key: Map.get(payload, :dedupe_key) || Map.get(payload, "dedupe_key"),
              payload: normalized_payload

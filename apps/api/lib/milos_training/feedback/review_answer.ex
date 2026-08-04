@@ -6,6 +6,7 @@ defmodule MilosTraining.Feedback.ReviewAnswer do
   @foreign_key_type :binary_id
 
   schema "review_answers" do
+    field :organization_id, :binary_id
     field :review_id, :binary_id
     field :question_key, :string
     field :question_text, :string

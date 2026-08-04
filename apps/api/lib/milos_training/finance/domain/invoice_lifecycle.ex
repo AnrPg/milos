@@ -102,22 +102,52 @@ defmodule MilosTraining.Finance.Domain.InvoiceLifecycle do
       ),
       do: {:error, :invalid_payment_reversal_amount}
 
-  def status(total_cents, paid_cents, credit_applied_cents, due_date, today, current_status)
+  def status(
+        total_cents,
+        paid_cents,
+        credit_applied_cents,
+        due_date,
+        today,
+        current_status,
+        invoice_params \\ %{}
+      )
 
-  def status(_total_cents, _paid_cents, _credit_applied_cents, _due_date, _today, "void"),
-    do: "void"
+  def status(
+        _total_cents,
+        _paid_cents,
+        _credit_applied_cents,
+        _due_date,
+        _today,
+        "void",
+        _params
+      ),
+      do: "void"
 
-  def status(total_cents, paid_cents, credit_applied_cents, due_date, today, _current_status) do
+  def status(
+        total_cents,
+        paid_cents,
+        credit_applied_cents,
+        due_date,
+        today,
+        _current_status,
+        params
+      ) do
     applied_cents = paid_cents + credit_applied_cents
 
     cond do
       total_cents <= 0 -> "paid"
       applied_cents >= total_cents -> "paid"
+      receipt?(params) and applied_cents <= 0 -> "refunded"
+      receipt?(params) -> "partially_refunded"
       due_date && Date.compare(today, due_date) == :gt -> "overdue"
       applied_cents > 0 -> "partially_paid"
       true -> "issued"
     end
   end
+
+  defp receipt?(%{"document_kind" => "receipt"}), do: true
+  defp receipt?(%{document_kind: "receipt"}), do: true
+  defp receipt?(_params), do: false
 
   def entitlement(%{
         membership_status: membership_status,

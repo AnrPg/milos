@@ -8,6 +8,7 @@ defmodule MilosTraining.Workouts.AssignedWorkout do
   @foreign_key_type :binary_id
 
   schema "assigned_workouts" do
+    field :organization_id, :binary_id
     field :scheduled_for, :date
     field :admin_notes, :string
 

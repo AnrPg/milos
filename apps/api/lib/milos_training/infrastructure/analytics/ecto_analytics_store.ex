@@ -14,6 +14,7 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
   }
 
   alias MilosTraining.Execution.WorkoutExecution
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Workouts.MasterWorkout
   alias MilosTraining.Repo
 
@@ -78,6 +79,7 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
   @impl true
   def get_attendance_for_user_class(user_id, scheduled_class_id) do
     AttendanceRecord
+    |> scoped_to_tenant()
     |> where(
       [record],
       record.user_id == ^user_id and record.scheduled_class_id == ^scheduled_class_id
@@ -181,6 +183,7 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
   defp event_summary(since) do
     rows =
       AnalyticsEvent
+      |> scoped_to_tenant()
       |> where([event], event.occurred_at >= ^since)
       |> group_by([event], event.event_name)
       |> select([event], {event.event_name, count(event.id)})
@@ -196,6 +199,7 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
   defp notification_click_summary(since) do
     total =
       NotificationClickEvent
+      |> scoped_to_tenant()
       |> where([event], event.clicked_at >= ^since)
       |> Repo.aggregate(:count)
 
@@ -205,6 +209,7 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
   defp push_dispatch_summary(since) do
     rows =
       PushDispatchAttempt
+      |> scoped_to_tenant()
       |> where([attempt], attempt.attempted_at >= ^since)
       |> group_by([attempt], attempt.status)
       |> select([attempt], {attempt.status, count(attempt.id)})
@@ -216,6 +221,7 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
   defp attendance_summary(since) do
     rows =
       AttendanceRecord
+      |> scoped_to_tenant()
       |> where([record], record.marked_at >= ^since)
       |> group_by([record], record.status)
       |> select([record], {record.status, count(record.id)})
@@ -227,6 +233,7 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
   defp communication_summary(since) do
     direction_rows =
       CommunicationMessage
+      |> scoped_to_tenant()
       |> where([message], message.sent_at >= ^since)
       |> group_by([message], message.direction)
       |> select([message], {message.direction, count(message.id)})
@@ -234,6 +241,7 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
 
     channel_rows =
       CommunicationMessage
+      |> scoped_to_tenant()
       |> where([message], message.sent_at >= ^since)
       |> group_by([message], message.channel)
       |> select([message], {message.channel, count(message.id)})
@@ -241,6 +249,7 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
 
     thread_rows =
       CommunicationThread
+      |> scoped_to_tenant()
       |> group_by([thread], thread.status)
       |> select([thread], {thread.status, count(thread.id)})
       |> Repo.all()
@@ -267,6 +276,7 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
     rows =
       WorkoutExecution
       |> join(:inner, [e], w in MasterWorkout, on: e.master_workout_id == w.id)
+      |> scoped_to_execution_tenant()
       |> where([e, _w], not is_nil(e.completed_at_utc) and e.completed_at_utc >= ^since)
       |> group_by([e, w], [e.user_id, w.is_team_workout])
       |> select([e, w], {e.user_id, w.is_team_workout, count(e.id)})
@@ -429,7 +439,7 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
       |> CommunicationThread.changeset(attrs)
       |> Repo.insert(
         on_conflict: :nothing,
-        conflict_target: [:context_type, :context_id]
+        conflict_target: [:organization_id, :context_type, :context_id]
       )
 
     case result do
@@ -453,6 +463,7 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
 
   defp find_communication_thread(context_type, context_id) do
     CommunicationThread
+    |> scoped_to_tenant()
     |> where([thread], thread.context_type == ^context_type and thread.context_id == ^context_id)
     |> order_by([thread], desc: thread.inserted_at)
     |> limit(1)
@@ -485,5 +496,25 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
 
   defp string_key_map(params) when is_map(params) do
     Map.new(params, fn {key, value} -> {to_string(key), value} end)
+  end
+
+  defp scoped_to_tenant(query) do
+    case RepoContext.current_setting("app.organization_id") do
+      organization_id when is_binary(organization_id) ->
+        where(query, [row], row.organization_id == ^organization_id)
+
+      _missing_scope ->
+        query
+    end
+  end
+
+  defp scoped_to_execution_tenant(query) do
+    case RepoContext.current_setting("app.organization_id") do
+      organization_id when is_binary(organization_id) ->
+        where(query, [execution, _workout], execution.organization_id == ^organization_id)
+
+      _missing_scope ->
+        query
+    end
   end
 end

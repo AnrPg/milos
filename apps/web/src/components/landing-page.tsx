@@ -12,7 +12,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { fetchExecution, listMyExecutions, type WorkoutExecution } from "@/api/executions";
+import { fetchExecution, isFreeTextModification, listMyExecutions, type WorkoutExecution } from "@/api/executions";
 import { fetchAssignedWorkoutWeek } from "@/api/assigned-workouts";
 import { fetchSchedule } from "@/api/schedule";
 import { PantheonSection } from "@/components/pantheon/PantheonSection";
@@ -1149,8 +1149,8 @@ export function LandingPage() {
                                 : i18n("inProgressb6bd42e")}
                             </p>
                             <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
-                              {execution.exercise_notes.length} {i18n("notec51048b")}{execution.exercise_notes.length === 1 ? "" : i18n("sa0f1490")} ·{" "}
-                              {execution.section_scores.length} {i18n("score75ebcb3")}{execution.section_scores.length === 1 ? "" : i18n("sa0f1490")}
+                              {i18n("executionNoteCount", { count: execution.exercise_notes.length })} ·{" "}
+                              {i18n("executionScoreCount", { count: execution.section_scores.length })}
                             </p>
                           </div>
                         </button>
@@ -1177,12 +1177,10 @@ export function LandingPage() {
         {activeInfoModal === "streak" ? (
           <InfoModal title={i18n("currentStreak031c4ed")} onClose={() => setActiveInfoModal(null)}>
             <p>
-              <strong style={{ color: "var(--text)" }}>{i18n("whatItMeasuresbbab752")}</strong> {i18n("theNumberOfConsecutiveUserRelativeTrainingWeeks23b79ed")} {weeklyWorkoutTarget}{" "}
-              {i18n("workoutc872925")}{weeklyWorkoutTarget === 1 ? "" : i18n("sa0f1490")}.
+              <strong style={{ color: "var(--text)" }}>{i18n("whatItMeasuresbbab752")}</strong> {i18n("theNumberOfConsecutiveUserRelativeTrainingWeeks23b79ed")} {i18n("workoutCount", { count: weeklyWorkoutTarget })}.
             </p>
             <p>
-              <strong style={{ color: "var(--text)" }}>{i18n("howToImprove1fadc66")}</strong> {i18n("completeAtLeastfd38f65")}{" "}
-              {weeklyWorkoutTarget} {i18n("workoutc872925")}{weeklyWorkoutTarget === 1 ? "" : i18n("sa0f1490")} {i18n("eachTrainingWeekAStreakShieldCanProtecte2b0f06")}
+              <strong style={{ color: "var(--text)" }}>{i18n("howToImprove1fadc66")}</strong> {i18n("completeAtLeastfd38f65")} {i18n("workoutCount", { count: weeklyWorkoutTarget })} {i18n("eachTrainingWeekAStreakShieldCanProtecte2b0f06")}
             </p>
             <p>
               <strong style={{ color: "var(--text)" }}>{i18n("whyItMatterscdfa2a6")}</strong> {i18n("streaksBuildTheHabitOfRegularWeeklyTraining48e3b44")}
@@ -1210,11 +1208,10 @@ export function LandingPage() {
         {activeInfoModal === "volume" ? (
           <InfoModal title={i18n("consistencyScore4c4624c")} onClose={() => setActiveInfoModal(null)}>
             <p>
-              <strong style={{ color: "var(--text)" }}>{i18n("whatItMeasuresbbab752")}</strong> {i18n("thePercentageOfWeeksInTheLast12b38b745")} {weeklyWorkoutTarget} {i18n("workoutc872925")}
-              {weeklyWorkoutTarget === 1 ? "" : i18n("sa0f1490")}.
+              <strong style={{ color: "var(--text)" }}>{i18n("whatItMeasuresbbab752")}</strong> {i18n("thePercentageOfWeeksInTheLast12b38b745")} {i18n("workoutCount", { count: weeklyWorkoutTarget })}.
             </p>
             <p>
-              <strong style={{ color: "var(--text)" }}>{i18n("howToImprove1fadc66")}</strong> {i18n("showUpConsistentlyCompleteAtLeast7695825")} {weeklyWorkoutTarget} {i18n("workoutc872925")}{weeklyWorkoutTarget === 1 ? "" : i18n("sa0f1490")} {i18n("perWeekToCountThatWeekTowardYourc1cfc10")}
+              <strong style={{ color: "var(--text)" }}>{i18n("howToImprove1fadc66")}</strong> {i18n("showUpConsistentlyCompleteAtLeast7695825")} {i18n("workoutCount", { count: weeklyWorkoutTarget })} {i18n("perWeekToCountThatWeekTowardYourc1cfc10")}
             </p>
             <p>
               <strong style={{ color: "var(--text)" }}>{i18n("whyItMatterscdfa2a6")}</strong> {i18n("consistencyOverTimePredictsLongTermAthleticProgress04e2415")}
@@ -1329,13 +1326,21 @@ export function LandingPage() {
                           className="rounded px-3 py-2"
                           style={{ background: "color-mix(in srgb, var(--warning) 10%, transparent)", borderInlineStart: "4px solid color-mix(in srgb, var(--warning) 55%, transparent)" }}
                         >
-                          <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-                            {modification.exercise_name ?? modification.section_name ?? modification.section_id}
-                          </p>
-                          <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
-                            {modification.field}: {String(modification.canonical_value)} → {String(modification.actual_value)}
-                            {modification.set_index ? ` · ${i18n("setLabel")} ${modification.set_index}` : ""}
-                          </p>
+                          {!isFreeTextModification(modification) ? (
+                            <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+                              {modification.exercise_name ?? modification.section_name ?? modification.section_id}
+                            </p>
+                          ) : null}
+                          {isFreeTextModification(modification) ? (
+                            <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-6" style={{ color: "var(--muted)" }}>
+                              {String(modification.actual_value)}
+                            </p>
+                          ) : (
+                            <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
+                              {modification.field}: {String(modification.canonical_value)} → {String(modification.actual_value)}
+                              {modification.set_index ? ` · ${i18n("setLabel")} ${modification.set_index}` : ""}
+                            </p>
+                          )}
                         </div>
                       ))}
                       {selectedExecution.exercise_notes.length > 0 ? (

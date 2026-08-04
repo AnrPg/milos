@@ -3,6 +3,7 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoPushSubscriptionStore d
 
   import Ecto.Query
 
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Notifications.PushSubscription
   alias MilosTraining.Repo
 
@@ -13,7 +14,9 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoPushSubscriptionStore d
 
     existing? =
       Repo.exists?(
-        from(subscription in PushSubscription, where: subscription.endpoint == ^endpoint)
+        PushSubscription
+        |> scoped_to_user()
+        |> where([subscription], subscription.endpoint == ^endpoint)
       )
 
     changeset =
@@ -45,6 +48,7 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoPushSubscriptionStore d
   @impl true
   def list_push_subscriptions(user_id) do
     PushSubscription
+    |> scoped_to_user()
     |> where([subscription], subscription.user_id == ^user_id)
     |> order_by([subscription], desc: subscription.updated_at)
     |> Repo.all()
@@ -54,6 +58,7 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoPushSubscriptionStore d
   @impl true
   def get_push_subscription(user_id, endpoint) do
     PushSubscription
+    |> scoped_to_user()
     |> where(
       [subscription],
       subscription.user_id == ^user_id and subscription.endpoint == ^endpoint
@@ -67,8 +72,11 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoPushSubscriptionStore d
 
   @impl true
   def delete_push_subscription(user_id, endpoint) do
-    from(subscription in PushSubscription,
-      where: subscription.user_id == ^user_id and subscription.endpoint == ^endpoint
+    PushSubscription
+    |> scoped_to_user()
+    |> where(
+      [subscription],
+      subscription.user_id == ^user_id and subscription.endpoint == ^endpoint
     )
     |> Repo.delete_all()
     |> elem(0)
@@ -88,5 +96,12 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoPushSubscriptionStore d
       inserted_at: subscription.inserted_at,
       updated_at: subscription.updated_at
     }
+  end
+
+  defp scoped_to_user(query) do
+    case RepoContext.current_setting("app.user_id") do
+      user_id when is_binary(user_id) -> where(query, [row], row.user_id == ^user_id)
+      _missing_scope -> query
+    end
   end
 end

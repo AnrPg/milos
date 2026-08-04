@@ -11,9 +11,14 @@ defmodule MilosTraining.Infrastructure.Search.MeilisearchPRIndex do
 
   @impl true
   def enqueue_upsert(pr) do
-    pr
-    |> serialize()
-    |> then(&SyncPRSearchJob.new(%{"operation" => "upsert", "pr" => &1}))
+    document = serialize(pr)
+
+    %{
+      "operation" => "upsert",
+      "owner_user_id" => document.user_id,
+      "pr" => document
+    }
+    |> SyncPRSearchJob.new()
     |> Repo.insert()
     |> case do
       {:ok, _job} -> :ok
@@ -22,8 +27,8 @@ defmodule MilosTraining.Infrastructure.Search.MeilisearchPRIndex do
   end
 
   @impl true
-  def enqueue_delete(id) do
-    %{"operation" => "delete", "id" => id}
+  def enqueue_delete(id, owner_user_id) do
+    %{"operation" => "delete", "id" => id, "owner_user_id" => owner_user_id}
     |> SyncPRSearchJob.new()
     |> Repo.insert()
     |> case do

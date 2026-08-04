@@ -8,6 +8,7 @@ defmodule MilosTraining.Execution do
 
   alias MilosTraining.Execution.Domain.TimerSequenceBuilder
   alias MilosTraining.Execution.Queries.GetExecution
+  alias MilosTraining.Execution.ExecutionStore
 
   defdelegate start_execution(user_id, params), to: StartExecution, as: :call
   defdelegate complete_execution(id, user_id, params), to: CompleteExecution, as: :call
@@ -21,5 +22,9 @@ defmodule MilosTraining.Execution do
   defdelegate get_execution(id), to: GetExecution, as: :by_id
   defdelegate get_execution_for_user(id, user_id), to: GetExecution, as: :by_id_for_user
   defdelegate list_executions_for_user(user_id), to: GetExecution, as: :for_user
+
+  def list_executions_for_coaching(user_id),
+    do: ExecutionStore.list_executions_for_coaching(user_id)
+
   defdelegate build_timer_sequence(workout), to: TimerSequenceBuilder, as: :build
 end

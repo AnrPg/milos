@@ -7,15 +7,19 @@ defmodule MilosTraining.Application.DispatchMessageDelivery do
 
   alias MilosTraining.{Finance, Identity, Messaging, Notifications}
 
-  def call(%{"message_id" => message_id} = delivery) do
+  def call(%{"message_id" => message_id, "organization_id" => organization_id} = delivery) do
     with %{} = message <- Messaging.get_message(message_id) || {:error, :not_found},
          {:ok, thread} <- Messaging.get_thread(message.thread_id, message.sender_id),
+         true <- thread.organization_id == organization_id,
          :ok <- finalize_reservations(Map.get(delivery, "reservations", []), message),
          :ok <- notify_participants(thread, message),
          :ok <- invalidate_landing(thread, message),
          :ok <- record_analytics(message, thread),
-         :ok <- publish(message) do
+         :ok <- publish(message, thread) do
       :ok
+    else
+      false -> {:error, :organization_scope_mismatch}
+      error -> error
     end
   end
 
@@ -34,15 +38,19 @@ defmodule MilosTraining.Application.DispatchMessageDelivery do
     end)
   end
 
-  defp publish(message) do
-    RealtimePublisher.broadcast("chat:thread:#{message.thread_id}", "new_message", %{
-      id: message.id,
-      thread_id: message.thread_id,
-      sender_id: message.sender_id,
-      body: message.body,
-      message_type: message.message_type,
-      inserted_at: message.inserted_at
-    })
+  defp publish(message, thread) do
+    RealtimePublisher.broadcast(
+      "chat:#{thread.organization_id}:thread:#{message.thread_id}",
+      "new_message",
+      %{
+        id: message.id,
+        thread_id: message.thread_id,
+        sender_id: message.sender_id,
+        body: message.body,
+        message_type: message.message_type,
+        inserted_at: message.inserted_at
+      }
+    )
   end
 
   defp notify_participants(thread, message) do

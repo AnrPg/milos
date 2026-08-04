@@ -2,6 +2,12 @@ defmodule MilosTraining.Application.MarkInjuryHealed do
   alias MilosTraining.Application.{BroadcastUserSync, RecordAnalyticsEvent}
   alias MilosTraining.{Identity, Wellbeing}
 
+  def call(context, actor_id, injury_report_id, params),
+    do:
+      MilosTraining.Wellbeing.WellbeingStore.with_context(context, fn ->
+        call(actor_id, injury_report_id, params)
+      end)
+
   def call(actor_id, injury_report_id, params \\ %{}) do
     healed_on = params["healed_on"] || params[:healed_on]
 

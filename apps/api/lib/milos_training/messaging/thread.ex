@@ -8,6 +8,7 @@ defmodule MilosTraining.Messaging.Thread do
   @foreign_key_type :binary_id
 
   schema "messaging_threads" do
+    field :organization_id, :binary_id
     field :context_type, Ecto.Enum, values: @context_types
     field :context_id, :binary_id
     field :direct_key, :string
@@ -21,10 +22,10 @@ defmodule MilosTraining.Messaging.Thread do
 
   def changeset(thread, attrs) do
     thread
-    |> cast(attrs, [:context_type, :context_id, :direct_key, :created_by_id])
+    |> cast(attrs, [:organization_id, :context_type, :context_id, :direct_key, :created_by_id])
     |> validate_required([:context_type, :created_by_id])
     |> validate_context_id()
-    |> unique_constraint(:direct_key, name: :messaging_threads_direct_key_index)
+    |> unique_constraint(:direct_key, name: :messaging_threads_organization_direct_key_index)
     |> foreign_key_constraint(:created_by_id)
   end
 

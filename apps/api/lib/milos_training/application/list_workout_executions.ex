@@ -1,6 +1,10 @@
 defmodule MilosTraining.Application.ListWorkoutExecutions do
   alias MilosTraining.Execution
+  alias MilosTraining.Execution.ExecutionStore
   alias MilosTraining.Workouts
+
+  def call(context, user_id),
+    do: ExecutionStore.with_user_context(context, fn -> call(user_id) end)
 
   def call(user_id) do
     executions =
@@ -9,6 +13,12 @@ defmodule MilosTraining.Application.ListWorkoutExecutions do
       |> Enum.map(&attach_workout_summary/1)
 
     {:ok, executions}
+  end
+
+  def for_coaching(user_id) do
+    user_id
+    |> Execution.list_executions_for_coaching()
+    |> Enum.map(&attach_workout_summary/1)
   end
 
   defp attach_workout_summary(execution) do

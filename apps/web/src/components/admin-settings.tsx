@@ -17,6 +17,11 @@ import {
   type NotificationPushSettings,
   type SchedulingSettings,
 } from "@/api/settings";
+import {
+  fetchFinanceCleanupRecords,
+  purgeFinanceRecord,
+  type FinanceCleanupRecord,
+} from "@/api/finance";
 import { listScaleLevels, replaceScaleLevels, type ScaleLevel } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { THEME_UPDATED_EVENT } from "@/components/theme-provider";
@@ -636,8 +641,214 @@ function FinanceSection({ token }: { token: string }) {
         onSave={() => saveMutation.mutate()}
         onReset={() => setForm({ paymentReminderIntervalDays: serverDays, documentMode: serverMode })}
       />
+
+      <FinanceCleanupSection token={token} />
     </div>
   );
+}
+
+function FinanceCleanupSection({ token }: { token: string }) {
+  const i18n = useUiTranslations();
+  const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState<FinanceCleanupRecord | null>(null);
+  const [password, setPassword] = useState("");
+  const [reason, setReason] = useState("");
+
+  const recordsQuery = useQuery({
+    queryKey: ["admin", "finance", "cleanup-records", search],
+    queryFn: () => fetchFinanceCleanupRecords(token, { q: search, limit: "50" }),
+    enabled: open,
+  });
+
+  const purgeMutation = useMutation({
+    mutationFn: () => {
+      if (!selected) throw new Error("finance_cleanup_record_missing");
+
+      return purgeFinanceRecord(token, selected.id, {
+        record_type: selected.record_type,
+        password,
+        reason: reason.trim() || i18n("featureFinanceCleanupDefaultReason"),
+      });
+    },
+    onSuccess: () => {
+      setSelected(null);
+      setPassword("");
+      setReason("");
+      void queryClient.invalidateQueries({ queryKey: ["admin", "finance"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin", "finance", "cleanup-records"] });
+    },
+  });
+
+  const records = recordsQuery.data?.records ?? [];
+  const canPurge = Boolean(selected && password.trim() && !purgeMutation.isPending);
+  const errorMessage = purgeMutation.error instanceof Error ? localizeError(purgeMutation.error, i18n) : null;
+
+  return (
+    <div
+      className="rounded-[1.4rem] border p-4"
+      style={{ background: "var(--panel-muted)", borderColor: "var(--border)" }}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+            {i18n("featureFinanceCleanupTitle")}
+          </p>
+          <p className="mt-1 text-xs leading-5" style={{ color: "var(--dim)" }}>
+            {i18n("featureFinanceCleanupDescription")}
+          </p>
+        </div>
+        <button
+          className="rounded-full px-4 py-2 text-sm font-semibold"
+          style={{ background: "var(--danger)", color: "white" }}
+          type="button"
+          onClick={() => setOpen(true)}
+        >
+          {i18n("featureFinanceCleanupOpen")}
+        </button>
+      </div>
+
+      {open ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
+          <button
+            aria-label={i18n("featureFinanceCleanupCloseAria")}
+            className="absolute inset-0 bg-black/70"
+            type="button"
+            onClick={() => setOpen(false)}
+          />
+          <div
+            className="relative flex max-h-[86vh] w-full max-w-4xl flex-col overflow-hidden rounded-[1.6rem] shadow-2xl"
+            style={{ background: "var(--panel)", border: "1px solid var(--border-strong)" }}
+          >
+            <div className="flex flex-wrap items-start justify-between gap-4 border-b p-5" style={{ borderColor: "var(--border)" }}>
+              <div>
+                <p className="text-lg font-semibold" style={{ color: "var(--text)" }}>
+                  {i18n("featureFinanceCleanupModalTitle")}
+                </p>
+                <p className="mt-1 max-w-2xl text-xs leading-5" style={{ color: "var(--dim)" }}>
+                  {i18n("featureFinanceCleanupModalDescription")}
+                </p>
+              </div>
+              <button
+                className="rounded-full px-4 py-2 text-sm font-semibold"
+                style={{ background: "var(--panel-muted)", color: "var(--muted)" }}
+                type="button"
+                onClick={() => setOpen(false)}
+              >
+                {i18n("featureFinanceCleanupClose")}
+              </button>
+            </div>
+
+            <div className="grid min-h-0 flex-1 gap-4 overflow-auto p-5 lg:grid-cols-[1.35fr_0.85fr]">
+              <div className="space-y-3">
+                <input
+                  className="w-full rounded-2xl border px-4 py-3 text-sm outline-none"
+                  placeholder={i18n("featureFinanceCleanupSearchPlaceholder")}
+                  style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                />
+                <div className="space-y-2">
+                  {recordsQuery.isLoading ? (
+                    <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
+                  ) : records.length === 0 ? (
+                    <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("featureFinanceCleanupEmpty")}</p>
+                  ) : (
+                    records.map((record) => {
+                      const active = selected?.id === record.id;
+                      return (
+                        <button
+                          key={`${record.record_type}-${record.id}`}
+                          className="w-full rounded-2xl border p-4 text-start transition-colors"
+                          style={{
+                            background: active
+                              ? "color-mix(in srgb, var(--danger) 10%, var(--panel-muted))"
+                              : "var(--panel-muted)",
+                            borderColor: active ? "var(--danger)" : "var(--border)",
+                          }}
+                          type="button"
+                          onClick={() => {
+                            setSelected(record);
+                            purgeMutation.reset();
+                          }}
+                        >
+                          <span className="flex flex-wrap items-center justify-between gap-3">
+                            <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+                              {record.code || record.label}
+                            </span>
+                            <span className="rounded-full px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.16em]" style={{ background: "var(--bg)", color: "var(--dim)" }}>
+                              {record.record_type}
+                            </span>
+                          </span>
+                          <span className="mt-2 block text-xs leading-5" style={{ color: "var(--dim)" }}>
+                            {formatCleanupAmount(record)} · {record.status ?? i18n("featureFinanceCleanupUnknown")} · {record.issued_on ?? record.paid_on ?? record.inserted_at ?? ""}
+                          </span>
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-4 rounded-2xl border p-4" style={{ background: "var(--panel-muted)", borderColor: "var(--border)" }}>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+                    {selected ? selected.code || selected.label : i18n("featureFinanceCleanupNoSelection")}
+                  </p>
+                  <p className="mt-1 text-xs leading-5" style={{ color: "var(--dim)" }}>
+                    {i18n("featureFinanceCleanupImpact")}
+                  </p>
+                </div>
+                <label className="block space-y-2">
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+                    {i18n("featureFinanceCleanupReason")}
+                  </span>
+                  <textarea
+                    className="min-h-24 w-full rounded-2xl border px-4 py-3 text-sm outline-none"
+                    style={{ background: "var(--bg)", borderColor: "var(--border)", color: "var(--text)" }}
+                    value={reason}
+                    onChange={(event) => setReason(event.target.value)}
+                  />
+                </label>
+                <label className="block space-y-2">
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+                    {i18n("featureFinanceCleanupPassword")}
+                  </span>
+                  <input
+                    className="w-full rounded-2xl border px-4 py-3 text-sm outline-none"
+                    style={{ background: "var(--bg)", borderColor: "var(--border)", color: "var(--text)" }}
+                    type="password"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                  />
+                </label>
+                {errorMessage ? <p className="text-sm" style={{ color: "var(--danger)" }}>{errorMessage}</p> : null}
+                {purgeMutation.isSuccess ? (
+                  <p className="text-sm" style={{ color: "var(--success)" }}>{i18n("featureFinanceCleanupSuccess")}</p>
+                ) : null}
+                <button
+                  className="w-full rounded-full px-4 py-3 text-sm font-semibold disabled:opacity-50"
+                  disabled={!canPurge}
+                  style={{ background: "var(--danger)", color: "white" }}
+                  type="button"
+                  onClick={() => purgeMutation.mutate()}
+                >
+                  {purgeMutation.isPending ? i18n("featureFinanceCleanupPending") : i18n("featureFinanceCleanupSubmit")}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function formatCleanupAmount(record: FinanceCleanupRecord) {
+  const cents = typeof record.amount_cents === "number" ? record.amount_cents : 0;
+  const currency = record.currency || "EUR";
+  return new Intl.NumberFormat("el-GR", { style: "currency", currency }).format(cents / 100);
 }
 
 function SchedulingDefaultsSection({ token }: { token: string }) {

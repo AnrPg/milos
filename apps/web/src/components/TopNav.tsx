@@ -18,6 +18,7 @@ import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useSession } from "@/components/session-provider";
 import { subscribeToTopic } from "@/lib/realtime";
 import { SemanticLabel } from "@/components/semantic-label";
+import { OrganizationSelector } from "@/components/organization-selector";
 
 const CANVAS_PATHS = ["/login"];
 
@@ -256,6 +257,7 @@ export function TopNav() {
       }}
     >
       <div className="flex w-full items-center gap-2 px-2 sm:gap-4 sm:px-5">
+        <OrganizationSelector />
         <Link
           href="/"
           className="hidden shrink-0 text-xs font-bold uppercase tracking-[0.28em] sm:block"

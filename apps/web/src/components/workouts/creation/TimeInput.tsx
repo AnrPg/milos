@@ -87,7 +87,7 @@ export function TimeInput({ value, onChange }: Props) {
         min={0}
         max={59}
       />
-      <span className="text-xs" style={{ color: "var(--muted)" }}>{i18n("sa0f1490")}</span>
+      <span className="text-xs" style={{ color: "var(--muted)" }}>{i18n("semanticSeconds")}</span>
     </div>
   );
 }

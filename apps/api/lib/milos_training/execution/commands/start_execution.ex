@@ -9,6 +9,7 @@ defmodule MilosTraining.Execution.Commands.StartExecution do
     with :ok <- validate_workout(workout_id, scale_slug),
          started_at_utc <- DateTime.utc_now(),
          execution_params <- %{
+           organization_id: params[:organization_id] || params["organization_id"],
            user_id: user_id,
            master_workout_id: workout_id,
            scale_level_slug: scale_slug,

@@ -53,4 +53,21 @@ defmodule MilosTraining.Execution.Domain.ModificationPatchValidatorTest do
                }
              ])
   end
+
+  test "normalizes one unstructured modification note for a free-text workout" do
+    assert {:ok, [patch]} =
+             ModificationPatchValidator.normalize_many([
+               %{
+                 "patch_id" => "free-text:modification",
+                 "type" => "other",
+                 "field" => "note",
+                 "section_id" => "free_text",
+                 "canonical_value" => "",
+                 "actual_value" => "Used a lighter sandbag.\nStopped after four rounds."
+               }
+             ])
+
+    assert patch["exercise_id"] == nil
+    assert patch["actual_value"] == "Used a lighter sandbag.\nStopped after four rounds."
+  end
 end

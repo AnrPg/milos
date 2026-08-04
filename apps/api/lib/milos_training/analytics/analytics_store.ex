@@ -1,7 +1,12 @@
 defmodule MilosTraining.Analytics.AnalyticsStore do
   @behaviour MilosTraining.Analytics.Ports.AnalyticsStore
 
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
+
   @default_adapter MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore
+
+  def with_tenant_context(context, fun) when is_function(fun, 0),
+    do: RepoContext.run(context, fun)
 
   def record_event(params), do: adapter().record_event(params)
   def record_notification_click(params), do: adapter().record_notification_click(params)
