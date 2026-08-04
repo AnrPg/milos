@@ -6,8 +6,11 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
     ChangeOrganizationLifecycle,
     ChangeOrganizationSettings,
     DeleteOrganization,
+    IssuePlatformOrganizationInvitation,
+    ListPlatformOrganizationAccess,
     ListProvisionedOrganizations,
-    ProvisionOrganization
+    ProvisionOrganization,
+    UpdatePlatformOrganizationMembershipRole
   }
 
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
@@ -97,6 +100,62 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
     responses: [no_content: "Organization permanently deleted"]
   )
 
+  operation(:access,
+    summary: "List tenant memberships for platform access management",
+    parameters: [@organization_id],
+    responses: [ok: {"Organization access", "application/json", @organization_schema}]
+  )
+
+  operation(:invite,
+    summary: "Issue a tenant invitation from the platform console",
+    parameters: [@organization_id],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{
+              role: %Schema{type: :string, enum: ~w(owner admin coach member athlete)},
+              lifetime_seconds: %Schema{type: :integer, minimum: 300, maximum: 604_800},
+              intended_email: %Schema{type: :string}
+            },
+            required: [:role]
+          }
+        }
+      }
+    },
+    responses: [created: {"Invitation token", "application/json", @organization_schema}]
+  )
+
+  operation(:membership_role,
+    summary: "Update a tenant membership role from the platform console",
+    parameters: [
+      @organization_id,
+      %Parameter{
+        name: :membership_id,
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, format: :uuid}
+      }
+    ],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{
+              role: %Schema{type: :string, enum: ~w(owner admin coach member athlete)}
+            },
+            required: [:role]
+          }
+        }
+      }
+    },
+    responses: [ok: {"Membership", "application/json", @organization_schema}]
+  )
+
   def index(conn, _params) do
     with {:ok, organizations} <-
            ListProvisionedOrganizations.call(conn.assigns.platform_context) do
@@ -151,6 +210,47 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
     end
   end
 
+  def access(conn, %{"id" => organization_id}) do
+    with {:ok, result} <-
+           ListPlatformOrganizationAccess.call(conn.assigns.platform_context, organization_id) do
+      json(conn, %{
+        organization: serialize_organization(result.organization),
+        memberships: Enum.map(result.memberships, &serialize_access_membership/1)
+      })
+    end
+  end
+
+  def invite(conn, %{"id" => organization_id}) do
+    with {:ok, result} <-
+           IssuePlatformOrganizationInvitation.call(
+             conn.assigns.platform_context,
+             organization_id,
+             conn.body_params
+           ) do
+      conn
+      |> put_status(:created)
+      |> json(%{
+        invitation: %{
+          token: result.token,
+          expires_at: result.invitation.expires_at,
+          role: result.invitation.role
+        }
+      })
+    end
+  end
+
+  def membership_role(conn, %{"id" => organization_id, "membership_id" => membership_id}) do
+    with {:ok, membership} <-
+           UpdatePlatformOrganizationMembershipRole.call(
+             conn.assigns.platform_context,
+             organization_id,
+             membership_id,
+             conn.body_params
+           ) do
+      json(conn, %{membership: serialize_membership(membership)})
+    end
+  end
+
   defp serialize_entry(%{organization: organization, settings: settings}) do
     %{
       organization: serialize_organization(organization),
@@ -182,6 +282,35 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
       brand_logo_url: settings.brand_logo_url,
       brand_primary_color: settings.brand_primary_color,
       settings: settings.settings
+    }
+  end
+
+  defp serialize_access_membership(%{membership: membership, user: user}) do
+    membership
+    |> serialize_membership()
+    |> Map.put(:user, serialize_user(user))
+  end
+
+  defp serialize_membership(membership) do
+    %{
+      id: membership.id,
+      user_id: membership.user_id,
+      role: membership.role,
+      status: membership.status,
+      joined_at: membership.joined_at,
+      inserted_at: membership.inserted_at,
+      updated_at: membership.updated_at
+    }
+  end
+
+  defp serialize_user(nil), do: nil
+
+  defp serialize_user(user) do
+    %{
+      id: user.id,
+      nickname: user.nickname,
+      role: user.role,
+      avatar_url: user.avatar_url
     }
   end
 end

@@ -7,8 +7,11 @@ import { PlatformOrganizationsPage } from "@/components/platform/PlatformOrganiz
 import {
   changePlatformOrganizationLifecycle,
   deletePlatformOrganization,
+  fetchPlatformOrganizationAccess,
+  issuePlatformOrganizationInvitation,
   listPlatformOrganizations,
   provisionPlatformOrganization,
+  updatePlatformOrganizationMembershipRole,
 } from "@/api/platform-organizations";
 
 vi.mock("@/components/session-provider", () => ({
@@ -25,8 +28,11 @@ vi.mock("@/api/platform-organizations", async (importOriginal) => {
     ...actual,
     changePlatformOrganizationLifecycle: vi.fn(),
     deletePlatformOrganization: vi.fn(),
+    fetchPlatformOrganizationAccess: vi.fn(),
+    issuePlatformOrganizationInvitation: vi.fn(),
     listPlatformOrganizations: vi.fn(),
     provisionPlatformOrganization: vi.fn(),
+    updatePlatformOrganizationMembershipRole: vi.fn(),
     changePlatformOrganizationSettings: vi.fn(),
   };
 });
@@ -74,6 +80,45 @@ describe("PlatformOrganizationsPage", () => {
       organization: { ...organization.organization, status: "archived" },
     });
     vi.mocked(deletePlatformOrganization).mockResolvedValue(undefined);
+    vi.mocked(fetchPlatformOrganizationAccess).mockResolvedValue({
+      organization: organization.organization,
+      memberships: [
+        {
+          id: "membership-1",
+          user_id: "user-1",
+          role: "member",
+          status: "active",
+          joined_at: "2026-08-04T00:00:00Z",
+          inserted_at: "2026-08-04T00:00:00Z",
+          updated_at: "2026-08-04T00:00:00Z",
+          user: {
+            id: "user-1",
+            nickname: "maria",
+            role: "member",
+            avatar_url: null,
+          },
+        },
+      ],
+    });
+    vi.mocked(issuePlatformOrganizationInvitation).mockResolvedValue({
+      invitation: {
+        token: "coach-invite-token",
+        expires_at: "2026-08-11T00:00:00Z",
+        role: "coach",
+      },
+    });
+    vi.mocked(updatePlatformOrganizationMembershipRole).mockResolvedValue({
+      membership: {
+        id: "membership-1",
+        user_id: "user-1",
+        role: "athlete",
+        status: "active",
+        joined_at: "2026-08-04T00:00:00Z",
+        inserted_at: "2026-08-04T00:00:00Z",
+        updated_at: "2026-08-04T00:00:00Z",
+        user: null,
+      },
+    });
     vi.mocked(provisionPlatformOrganization).mockResolvedValue({
       organization: { ...organization.organization, id: "org-2", name: "Atlas Gym", slug: "atlas" },
       settings: { ...organization.settings, organization_id: "org-2", brand_name: "Atlas Gym" },
@@ -148,6 +193,46 @@ describe("PlatformOrganizationsPage", () => {
 
     await waitFor(() => {
       expect(deletePlatformOrganization).toHaveBeenCalledWith("token", "org-1");
+    });
+  });
+
+  it("manages tenant access with role-specific invitations and membership roles", async () => {
+    renderPage();
+
+    const article = await screen.findByText("North Harbor Strength");
+    const row = article.closest("article");
+    expect(row).not.toBeNull();
+
+    fireEvent.click(within(row!).getByRole("button", { name: "Manage access" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Access" });
+    expect(await within(dialog).findByText("maria")).toBeInTheDocument();
+
+    fireEvent.change(within(dialog).getByLabelText("Invite role"), { target: { value: "coach" } });
+    fireEvent.change(within(dialog).getByLabelText("Email hint (optional)"), {
+      target: { value: "coach@example.test" },
+    });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Invite" }));
+
+    await waitFor(() => {
+      expect(issuePlatformOrganizationInvitation).toHaveBeenCalledWith("token", "org-1", {
+        role: "coach",
+        intended_email: "coach@example.test",
+        lifetime_seconds: 604_800,
+      });
+    });
+
+    expect(await within(dialog).findByText("coach-invite-token")).toBeInTheDocument();
+
+    fireEvent.change(within(dialog).getByLabelText("Tenant role"), { target: { value: "athlete" } });
+
+    await waitFor(() => {
+      expect(updatePlatformOrganizationMembershipRole).toHaveBeenCalledWith(
+        "token",
+        "org-1",
+        "membership-1",
+        "athlete",
+      );
     });
   });
 });

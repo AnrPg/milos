@@ -21,7 +21,9 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   @callback get_organization_by_slug(String.t()) :: Organization.t() | nil
   @callback get_organization_by_domain(String.t()) :: Organization.t() | nil
   @callback get_membership(Ecto.UUID.t(), Ecto.UUID.t()) :: OrganizationMembership.t() | nil
+  @callback get_membership_by_id(Ecto.UUID.t(), Ecto.UUID.t()) :: OrganizationMembership.t() | nil
   @callback list_memberships(Ecto.UUID.t()) :: [map()]
+  @callback list_organization_memberships(Ecto.UUID.t()) :: [OrganizationMembership.t()]
   @callback list_active_membership_user_ids(Ecto.UUID.t()) :: [Ecto.UUID.t()]
   @callback get_invitation_by_digest(binary()) :: RegistrationInvitation.t() | nil
   @callback get_invitation_with_organization(binary()) :: map() | nil
@@ -38,4 +40,6 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   @callback get_organization_settings(Ecto.UUID.t()) :: OrganizationSetting.t() | nil
   @callback update_organization_settings(Ecto.UUID.t(), map(), Ecto.UUID.t(), DateTime.t()) ::
               {:ok, OrganizationSetting.t()} | {:error, term()}
+  @callback update_membership_role(Ecto.UUID.t(), Ecto.UUID.t(), atom()) ::
+              {:ok, OrganizationMembership.t()} | {:error, term()}
 end

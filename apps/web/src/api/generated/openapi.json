@@ -15664,6 +15664,79 @@
         ]
       }
     },
+    "/api/platform/organizations/{id}/memberships/{membership_id}/role": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationController.membership_role",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "membership_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "role": {
+                    "enum": [
+                      "owner",
+                      "admin",
+                      "coach",
+                      "member",
+                      "athlete"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "role"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Membership"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update a tenant membership role from the platform console",
+        "tags": [
+          "Platform Organizations"
+        ]
+      }
+    },
     "/api/prs/{id}/share": {
       "post": {
         "callbacks": {},
@@ -26234,6 +26307,78 @@
         ]
       }
     },
+    "/api/platform/organizations/{id}/invitations": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationController.invite",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "intended_email": {
+                    "type": "string"
+                  },
+                  "lifetime_seconds": {
+                    "maximum": 604800,
+                    "minimum": 300,
+                    "type": "integer"
+                  },
+                  "role": {
+                    "enum": [
+                      "owner",
+                      "admin",
+                      "coach",
+                      "member",
+                      "athlete"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "role"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invitation token"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Issue a tenant invitation from the platform console",
+        "tags": [
+          "Platform Organizations"
+        ]
+      }
+    },
     "/api/calendar/export-links": {
       "get": {
         "callbacks": {},
@@ -27193,6 +27338,45 @@
         "summary": "Get timer sequence for a workout",
         "tags": [
           "Execution"
+        ]
+      }
+    },
+    "/api/platform/organizations/{id}/access": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationController.access",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Organization access"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List tenant memberships for platform access management",
+        "tags": [
+          "Platform Organizations"
         ]
       }
     },

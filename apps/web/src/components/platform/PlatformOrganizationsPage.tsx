@@ -8,11 +8,16 @@ import {
   changePlatformOrganizationLifecycle,
   changePlatformOrganizationSettings,
   deletePlatformOrganization,
+  fetchPlatformOrganizationAccess,
+  issuePlatformOrganizationInvitation,
   listPlatformOrganizations,
   provisionPlatformOrganization,
+  updatePlatformOrganizationMembershipRole,
+  type OrganizationMembershipRole,
   type OrganizationSettings,
   type OrganizationStatus,
   type PlatformOrganization,
+  type PlatformInvitationResult,
   type ProvisionOrganizationInput,
   type ProvisionOrganizationResult,
 } from "@/api/platform-organizations";
@@ -34,6 +39,8 @@ const defaultForm: ProvisionOrganizationInput = {
   brand_primary_color: "#1f6f5f",
 };
 
+const membershipRoles: OrganizationMembershipRole[] = ["owner", "admin", "coach", "member", "athlete"];
+
 export function PlatformOrganizationsPage() {
   const locale = useUiLocale();
   const copy = platformOrganizationsCopy(locale);
@@ -44,6 +51,7 @@ export function PlatformOrganizationsPage() {
   const [invitation, setInvitation] = useState<ProvisionOrganizationResult | null>(null);
   const [copied, setCopied] = useState<"token" | "link" | null>(null);
   const [editing, setEditing] = useState<PlatformOrganization | null>(null);
+  const [managingAccess, setManagingAccess] = useState<PlatformOrganization | null>(null);
   const [provisioningOpen, setProvisioningOpen] = useState(false);
   const [confirmingArchive, setConfirmingArchive] = useState<PlatformOrganization | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState<PlatformOrganization | null>(null);
@@ -259,6 +267,9 @@ export function PlatformOrganizationsPage() {
                     <button type="button" onClick={() => setEditing(entry)} className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold">
                       {copy.edit}
                     </button>
+                    <button type="button" onClick={() => setManagingAccess(entry)} className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold">
+                      {copy.manageAccess}
+                    </button>
                     {entry.organization.status === "active" ? (
                       <button
                         type="button"
@@ -308,6 +319,14 @@ export function PlatformOrganizationsPage() {
           organization={editing}
           onCancel={() => setEditing(null)}
           onSave={saveSettings}
+        />
+      ) : null}
+      {managingAccess ? (
+        <AccessDialog
+          accessToken={accessToken}
+          copy={copy}
+          organization={managingAccess}
+          onCancel={() => setManagingAccess(null)}
         />
       ) : null}
       {provisioningOpen ? (
@@ -382,6 +401,142 @@ function TextField({ label, value, onChange, type = "text", ...inputProps }: {
 
 function Detail({ label, value }: { label: string; value: string }) {
   return <div><dt className="text-xs font-semibold uppercase text-[var(--text-soft)]">{label}</dt><dd className="mt-1 break-words text-[var(--text)]">{value}</dd></div>;
+}
+
+function AccessDialog({ accessToken, copy, organization, onCancel }: {
+  accessToken: string | undefined;
+  copy: ReturnType<typeof platformOrganizationsCopy>;
+  organization: PlatformOrganization;
+  onCancel: () => void;
+}) {
+  const [role, setRole] = useState<OrganizationMembershipRole>("member");
+  const [email, setEmail] = useState("");
+  const [lifetimeHours, setLifetimeHours] = useState("168");
+  const [invitePending, setInvitePending] = useState(false);
+  const [rolePending, setRolePending] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [invitation, setInvitation] = useState<PlatformInvitationResult["invitation"] | null>(null);
+  const [copied, setCopied] = useState<"token" | "link" | null>(null);
+
+  const accessQuery = useQuery({
+    queryKey: ["platform-organization-access", accessToken, organization.organization.id],
+    enabled: Boolean(accessToken),
+    queryFn: () => fetchPlatformOrganizationAccess(accessToken!, organization.organization.id),
+  });
+
+  async function invite(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!accessToken) return;
+    setInvitePending(true);
+    setError(null);
+
+    try {
+      const result = await issuePlatformOrganizationInvitation(accessToken, organization.organization.id, {
+        role,
+        intended_email: email.trim() || undefined,
+        lifetime_seconds: Math.max(1, Number(lifetimeHours) || 168) * 3600,
+      });
+      setInvitation(result.invitation);
+      setCopied(null);
+      setEmail("");
+    } catch {
+      setError(copy.inviteError);
+    } finally {
+      setInvitePending(false);
+    }
+  }
+
+  async function changeRole(membershipId: string, nextRole: OrganizationMembershipRole) {
+    if (!accessToken) return;
+    setRolePending(membershipId);
+    setError(null);
+
+    try {
+      await updatePlatformOrganizationMembershipRole(
+        accessToken,
+        organization.organization.id,
+        membershipId,
+        nextRole,
+      );
+      await accessQuery.refetch();
+    } catch {
+      setError(copy.roleError);
+    } finally {
+      setRolePending(null);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label={copy.accessTitle}>
+      <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto bg-[var(--surface)] p-6 shadow-xl">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-semibold text-[var(--text)]">{copy.accessTitle}</h2>
+            <p className="mt-1 text-sm text-[var(--text-soft)]">{organization.organization.name}</p>
+          </div>
+          <button type="button" onClick={onCancel} className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold">{copy.cancel}</button>
+        </div>
+
+        {error ? <p className="mt-4 border-l-4 border-red-700 bg-red-50 px-4 py-3 text-sm font-semibold text-red-900">{error}</p> : null}
+        {accessQuery.isError ? <p className="mt-4 border-l-4 border-red-700 bg-red-50 px-4 py-3 text-sm font-semibold text-red-900">{copy.accessError}</p> : null}
+
+        <form className="mt-5 grid gap-3 border-y border-[var(--border)] py-5 sm:grid-cols-[1fr_1fr_1fr_auto]" onSubmit={invite}>
+          <label className="text-sm font-medium text-[var(--text)]">
+            <span className="mb-1.5 block">{copy.inviteRole}</span>
+            <select
+              className="w-full border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2.5"
+              value={role}
+              onChange={(event) => setRole(event.target.value as OrganizationMembershipRole)}
+            >
+              {membershipRoles.map((entry) => <option key={entry} value={entry}>{entry}</option>)}
+            </select>
+          </label>
+          <TextField label={copy.inviteEmail} type="email" value={email} onChange={setEmail} />
+          <TextField label={copy.inviteLifetime} type="number" min={1} value={lifetimeHours} required onChange={setLifetimeHours} />
+          <button type="submit" disabled={invitePending} className="self-end bg-[var(--accent)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-50">
+            {invitePending ? copy.issuingInvite : copy.invite}
+          </button>
+        </form>
+
+        {invitation ? (
+          <section className="mt-4 border border-amber-400 bg-amber-50 p-4 text-amber-950">
+            <p className="text-sm font-semibold">{copy.ownerSetupLink}</p>
+            <code className="mt-2 block break-all border border-amber-300 bg-white px-3 py-2 text-sm">{ownerSetupUrl(invitation.token)}</code>
+            <code className="mt-3 block break-all border border-amber-300 bg-white px-3 py-2 text-sm">{invitation.token}</code>
+            <p className="mt-2 text-xs">{copy.expires}: {new Date(invitation.expires_at).toLocaleString()}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button type="button" onClick={async () => { await navigator.clipboard.writeText(invitation.token); setCopied("token"); }} className="border border-amber-900 px-3 py-2 text-sm font-semibold">{copied === "token" ? copy.copied : copy.copyToken}</button>
+              <button type="button" onClick={async () => { await navigator.clipboard.writeText(ownerSetupUrl(invitation.token)); setCopied("link"); }} className="border border-amber-900 px-3 py-2 text-sm font-semibold">{copied === "link" ? copy.copied : copy.copyOwnerSetupLink}</button>
+            </div>
+          </section>
+        ) : null}
+
+        <div className="mt-5 divide-y divide-[var(--border)] border-y border-[var(--border)]">
+          {accessQuery.isLoading ? <p className="py-5 text-sm text-[var(--text-soft)]">{copy.loading}</p> : null}
+          {(accessQuery.data?.memberships ?? []).map((membership) => (
+            <div key={membership.id} className="grid gap-3 py-4 sm:grid-cols-[1fr_10rem_12rem] sm:items-center">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-[var(--text)]">{membership.user?.nickname ?? membership.user_id}</p>
+                <p className="mt-1 text-xs text-[var(--text-soft)]">{copy.globalAccountType}: {membership.user?.role ?? "-"}</p>
+              </div>
+              <p className="text-sm text-[var(--text-soft)]">{membership.status}</p>
+              <label className="text-xs font-semibold text-[var(--text-soft)]">
+                <span className="mb-1 block">{copy.membershipRole}</span>
+                <select
+                  className="w-full border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-sm"
+                  disabled={rolePending === membership.id}
+                  value={membership.role}
+                  onChange={(event) => void changeRole(membership.id, event.target.value as OrganizationMembershipRole)}
+                >
+                  {membershipRoles.map((entry) => <option key={entry} value={entry}>{entry}</option>)}
+                </select>
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function ProvisionDialog({ copy, form, submitting, onCancel, onChange, onSubmit }: {

@@ -1326,6 +1326,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/platform/organizations/{id}/memberships/{membership_id}/role": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update a tenant membership role from the platform console */
+        patch: operations["MilosTrainingWeb.PlatformOrganizationController.membership_role"];
+        trace?: never;
+    };
     "/api/prs/{id}/share": {
         parameters: {
             query?: never;
@@ -2120,6 +2137,23 @@ export interface paths {
         patch: operations["MilosTrainingWeb.MyWorkoutController.reschedule"];
         trace?: never;
     };
+    "/api/platform/organizations/{id}/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Issue a tenant invitation from the platform console */
+        post: operations["MilosTrainingWeb.PlatformOrganizationController.invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/calendar/export-links": {
         parameters: {
             query?: never;
@@ -2302,6 +2336,23 @@ export interface paths {
         };
         /** Get timer sequence for a workout */
         get: operations["MilosTrainingWeb.ExecutionController.timer_sequence"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/organizations/{id}/access": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List tenant memberships for platform access management */
+        get: operations["MilosTrainingWeb.PlatformOrganizationController.access"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8472,6 +8523,38 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PlatformOrganizationController.membership_role": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                membership_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    role: "owner" | "admin" | "coach" | "member" | "athlete";
+                };
+            };
+        };
+        responses: {
+            /** @description Membership */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.PRController.share": {
         parameters: {
             query?: never;
@@ -12355,6 +12438,39 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PlatformOrganizationController.invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    intended_email?: string;
+                    lifetime_seconds?: number;
+                    /** @enum {string} */
+                    role: "owner" | "admin" | "coach" | "member" | "athlete";
+                };
+            };
+        };
+        responses: {
+            /** @description Invitation token */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.CalendarFeedController.links": {
         parameters: {
             query?: never;
@@ -12826,6 +12942,30 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformOrganizationController.access": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Organization access */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };

@@ -106,6 +106,66 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
            )
   end
 
+  test "platform owner manages tenant invitations and membership roles", context do
+    {:ok, organization} = Organizations.create_organization(%{name: "Access Gym"})
+    member = user_fixture(%{nickname: "access_member", role: :member})
+
+    {:ok, membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: member.id,
+        role: :member,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    conn = put_bearer_token(context.conn, context.platform_user)
+
+    access = get(conn, "/api/platform/organizations/#{organization.id}/access")
+
+    assert %{"memberships" => memberships} = json_response(access, 200)
+
+    assert Enum.any?(memberships, fn entry ->
+             entry["id"] == membership.id and entry["role"] == "member" and
+               entry["user"]["nickname"] == "access_member"
+           end)
+
+    invited =
+      context.conn
+      |> recycle()
+      |> put_bearer_token(context.platform_user)
+      |> post("/api/platform/organizations/#{organization.id}/invitations", %{
+        role: "coach",
+        intended_email: "coach@example.test",
+        lifetime_seconds: 3_600
+      })
+
+    assert %{"invitation" => %{"token" => token, "role" => "coach"}} =
+             json_response(invited, 201)
+
+    assert {:ok, %{organization: %{id: organization_id}, role: :coach}} =
+             Organizations.inspect_invitation(token)
+
+    assert organization_id == organization.id
+
+    updated =
+      context.conn
+      |> recycle()
+      |> put_bearer_token(context.platform_user)
+      |> patch(
+        "/api/platform/organizations/#{organization.id}/memberships/#{membership.id}/role",
+        %{
+          role: "athlete"
+        }
+      )
+
+    assert %{"membership" => %{"id" => membership_id, "role" => "athlete"}} =
+             json_response(updated, 200)
+
+    assert membership_id == membership.id
+    assert Repo.get!(OrganizationMembership, membership.id).role == :athlete
+  end
+
   test "lifecycle and settings changes are audited and suspended tenants cannot resolve",
        context do
     {:ok, organization} = Organizations.create_organization(%{name: "Lifecycle Gym"})

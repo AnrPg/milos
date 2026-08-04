@@ -26,7 +26,15 @@ defmodule MilosTraining.Organizations.OrganizationStore do
     do: impl().get_membership(organization_id, user_id)
 
   @impl true
+  def get_membership_by_id(organization_id, membership_id),
+    do: impl().get_membership_by_id(organization_id, membership_id)
+
+  @impl true
   def list_memberships(user_id), do: impl().list_memberships(user_id)
+
+  @impl true
+  def list_organization_memberships(organization_id),
+    do: impl().list_organization_memberships(organization_id)
 
   @impl true
   def list_active_membership_user_ids(organization_id),
@@ -84,6 +92,10 @@ defmodule MilosTraining.Organizations.OrganizationStore do
         platform_user_id,
         changed_at
       )
+
+  @impl true
+  def update_membership_role(organization_id, membership_id, role),
+    do: impl().update_membership_role(organization_id, membership_id, role)
 
   defp impl, do: Application.fetch_env!(:milos_training, :organization_store)
 end

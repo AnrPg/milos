@@ -93,3 +93,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-085 | Tenant-scoped coaching projections | Accepted |
 | ADR-086 | TrainingJournal product shell and tenant branding | Accepted |
 | ADR-087 | Platform owner tenant entry and permanent organization deletion | Accepted |
+| ADR-088 | Platform tenant access management | Accepted |

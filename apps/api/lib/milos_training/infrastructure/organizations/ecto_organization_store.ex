@@ -136,6 +136,14 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   end
 
   @impl true
+  def get_membership_by_id(organization_id, membership_id) do
+    Repo.get_by(OrganizationMembership,
+      id: membership_id,
+      organization_id: organization_id
+    )
+  end
+
+  @impl true
   def list_memberships(user_id) do
     OrganizationMembership
     |> join(:inner, [membership], organization in Organization,
@@ -155,6 +163,14 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
       organization: organization,
       settings: settings
     })
+    |> Repo.all()
+  end
+
+  @impl true
+  def list_organization_memberships(organization_id) do
+    OrganizationMembership
+    |> where([membership], membership.organization_id == ^organization_id)
+    |> order_by([membership], asc: membership.inserted_at)
     |> Repo.all()
   end
 
@@ -350,6 +366,20 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
       |> unwrap_or_rollback()
 
       updated
+    end)
+    |> flatten_transaction()
+  end
+
+  @impl true
+  def update_membership_role(organization_id, membership_id, role) do
+    Repo.transaction(fn ->
+      membership = get_membership_by_id(organization_id, membership_id)
+      if is_nil(membership), do: Repo.rollback(:not_found)
+
+      membership
+      |> OrganizationMembership.changeset(%{role: role})
+      |> Repo.update()
+      |> unwrap_or_rollback()
     end)
     |> flatten_transaction()
   end

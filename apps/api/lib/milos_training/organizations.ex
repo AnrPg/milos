@@ -6,10 +6,12 @@ defmodule MilosTraining.Organizations do
     CreateOrganization,
     DeleteOrganization,
     IssueInvitation,
+    IssuePlatformInvitation,
     ProvisionOrganization,
     RedeemInvitation,
     RevokeInvitation,
     UpdateOrganizationLifecycle,
+    UpdateMembershipRole,
     UpdateOrganizationSettings
   }
 
@@ -18,6 +20,7 @@ defmodule MilosTraining.Organizations do
     InspectInvitation,
     ListActiveMembershipUserIds,
     ListMemberships,
+    ListOrganizationMemberships,
     ListProvisionedOrganizations,
     ResolvePlatformContext,
     ResolveTenantContext
@@ -37,6 +40,14 @@ defmodule MilosTraining.Organizations do
 
   def issue_invitation(context, params, issued_at \\ DateTime.utc_now()),
     do: IssueInvitation.call(context, params, issued_at)
+
+  def issue_platform_invitation(
+        context,
+        organization_id,
+        params,
+        issued_at \\ DateTime.utc_now()
+      ),
+      do: IssuePlatformInvitation.call(context, organization_id, params, issued_at)
 
   def revoke_invitation(context, invitation_id, revoked_at \\ DateTime.utc_now()),
     do: RevokeInvitation.call(context, invitation_id, revoked_at)
@@ -60,6 +71,12 @@ defmodule MilosTraining.Organizations do
 
   def list_provisioned_organizations(context),
     do: ListProvisionedOrganizations.call(context)
+
+  def list_organization_memberships(context, organization_id),
+    do: ListOrganizationMemberships.call(context, organization_id)
+
+  def update_membership_role(context, organization_id, membership_id, params),
+    do: UpdateMembershipRole.call(context, organization_id, membership_id, params)
 
   def delete_organization(context, organization_id, deleted_at \\ DateTime.utc_now()),
     do: DeleteOrganization.call(context, organization_id, deleted_at)
