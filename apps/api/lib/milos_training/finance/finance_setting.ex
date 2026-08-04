@@ -6,7 +6,7 @@ defmodule MilosTraining.Finance.FinanceSetting do
   @foreign_key_type :binary_id
 
   schema "finance_settings" do
-    field :organization_id, :binary_id
+    field :organization_id, :binary_id, read_after_writes: true
     field :payment_reminder_interval_days, :integer, default: 7
     field :entitlement_enforcement_mode, :string, default: "observe"
     field :entitlement_timezone, :string, default: "Europe/Athens"

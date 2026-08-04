@@ -22,6 +22,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
     GetFinanceMemberProfile,
     GenerateFinanceRenewalInvoice,
     IssueFinanceInvoice,
+    ListFinanceCleanupRecords,
     ListFinanceMembers,
     ListFinancePackages,
     ListFinancePromotionCodes,
@@ -30,6 +31,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
     ListFinanceReferrals,
     ListFinanceReferralRewards,
     RecordFinancePayment,
+    PurgeFinanceRecord,
     RedeemFinancePromotion,
     ReverseFinanceCreditLedgerEntry,
     ReverseFinancePayment,
@@ -47,6 +49,12 @@ defmodule MilosTrainingWeb.AdminFinanceController do
   alias MilosTrainingWeb.Schemas.AdminDrillDown
 
   action_fallback MilosTrainingWeb.FallbackController
+
+  def action(conn, _) do
+    MilosTraining.Finance.with_tenant_context(conn.assigns.tenant_context, fn ->
+      apply(__MODULE__, action_name(conn), [conn, conn.params])
+    end)
+  end
 
   tags(["Admin Finance"])
   security([%{"bearerAuth" => []}])
@@ -472,6 +480,28 @@ defmodule MilosTrainingWeb.AdminFinanceController do
     }
   }
 
+  @purge_request_body %RequestBody{
+    required: true,
+    content: %{
+      "application/json" => %MediaType{
+        schema: %Schema{
+          type: :object,
+          additionalProperties: false,
+          required: [:record_type, :password],
+          properties: %{
+            record_type: %Schema{
+              type: :string,
+              enum: ["invoice", "receipt", "payment", "transaction"]
+            },
+            password: %Schema{type: :string, minLength: 1},
+            reason: %Schema{type: :string, nullable: true},
+            deletion_reason: %Schema{type: :string, nullable: true}
+          }
+        }
+      }
+    }
+  }
+
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true]
        when action in [
@@ -489,8 +519,45 @@ defmodule MilosTrainingWeb.AdminFinanceController do
               :apply_credit_to_payment,
               :apply_credit_to_invoice,
               :reverse_payment,
-              :reverse_credit_ledger_entry
+              :reverse_credit_ledger_entry,
+              :purge_record
             ]
+
+  operation(:cleanup_records,
+    summary: "Search active finance records eligible for audited soft deletion",
+    parameters: [
+      %Parameter{name: :q, in: :query, schema: %Schema{type: :string}},
+      %Parameter{name: :limit, in: :query, schema: %Schema{type: :integer, minimum: 1}}
+    ],
+    responses: [ok: {"Finance cleanup records", "application/json", @list_response}]
+  )
+
+  def cleanup_records(conn, params) do
+    with {:ok, payload} <- ListFinanceCleanupRecords.call(params) do
+      json(conn, payload)
+    end
+  end
+
+  operation(:purge_record,
+    summary: "Soft-delete a finance invoice, receipt, or payment after password re-entry",
+    parameters: [@id_parameter],
+    request_body: @purge_request_body,
+    responses: [ok: {"Soft-deleted finance record", "application/json", @open_object}]
+  )
+
+  def purge_record(conn, params) do
+    body = body_params(conn, params)
+
+    with {:ok, result} <-
+           PurgeFinanceRecord.call(
+             current_user_id(conn),
+             body["record_type"] || body[:record_type],
+             param_id(params),
+             body
+           ) do
+      json(conn, result)
+    end
+  end
 
   operation(:summary,
     summary: "Fetch finance analytics summary",
@@ -1120,19 +1187,25 @@ defmodule MilosTrainingWeb.AdminFinanceController do
   )
 
   def invoice_upload_url(conn, params) do
+    context = conn.assigns.tenant_context
     invoice_id = param_id(params)
     body = body_params(conn, params)
     file_name = body["file_name"] || body[:file_name] || ""
     content_type = body["content_type"] || body[:content_type] || "application/octet-stream"
     ext = Path.extname(file_name)
-    key = "invoices/#{invoice_id}/#{Ecto.UUID.generate()}#{ext}"
+    relative_key = "invoices/#{invoice_id}/#{Ecto.UUID.generate()}#{ext}"
 
-    with {:ok, upload_url} <- DocumentStorage.presigned_upload_url(key),
-         {:ok, invoice} <- MilosTraining.Finance.get_invoice(invoice_id),
+    with {:ok, invoice} <- MilosTraining.Finance.get_invoice(invoice_id),
+         true <- invoice.organization_id == context.organization_id,
+         {:ok, %{url: upload_url, key: key}} <-
+           DocumentStorage.tenant_upload_url(context, relative_key),
          updated_params <-
            Map.merge(invoice.params || %{}, %{"file_key" => key, "file_name" => file_name}),
          {:ok, _} <- MilosTraining.Finance.update_invoice_params(invoice_id, updated_params) do
       json(conn, %{upload_url: upload_url, file_key: key, content_type: content_type})
+    else
+      false -> {:error, :forbidden}
+      error -> error
     end
   end
 
@@ -1143,15 +1216,18 @@ defmodule MilosTrainingWeb.AdminFinanceController do
   )
 
   def invoice_download_url(conn, params) do
+    context = conn.assigns.tenant_context
     invoice_id = param_id(params)
 
     with {:ok, invoice} <- MilosTraining.Finance.get_invoice(invoice_id),
+         true <- invoice.organization_id == context.organization_id,
          file_key when is_binary(file_key) <- (invoice.params || %{})["file_key"],
-         {:ok, download_url} <- DocumentStorage.presigned_download_url(file_key) do
+         {:ok, download_url} <- DocumentStorage.tenant_download_url(context, file_key) do
       file_name = (invoice.params || %{})["file_name"] || Path.basename(file_key)
       json(conn, %{download_url: download_url, file_name: file_name})
     else
       nil -> {:error, :not_found}
+      false -> {:error, :forbidden}
       err -> err
     end
   end

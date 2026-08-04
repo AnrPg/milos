@@ -6,7 +6,7 @@ defmodule MilosTraining.Finance.PromotionCode do
   @foreign_key_type :binary_id
 
   schema "promotion_codes" do
-    field :organization_id, :binary_id
+    field :organization_id, :binary_id, read_after_writes: true
     field :promotion_campaign_id, :binary_id
     field :code, :string
     field :discount_type, :string
@@ -41,7 +41,9 @@ defmodule MilosTraining.Finance.PromotionCode do
     |> validate_number(:discount_value, greater_than_or_equal_to: 0)
     |> validate_percent_limit()
     |> validate_number(:max_redemptions, greater_than: 0)
-    |> unique_constraint(:code)
+    |> unique_constraint([:organization_id, :code],
+      name: :promotion_codes_organization_code_index
+    )
     |> foreign_key_constraint(:promotion_campaign_id)
   end
 

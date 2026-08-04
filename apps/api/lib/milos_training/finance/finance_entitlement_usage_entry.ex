@@ -6,7 +6,7 @@ defmodule MilosTraining.Finance.FinanceEntitlementUsageEntry do
   @foreign_key_type :binary_id
 
   schema "finance_entitlement_usage_entries" do
-    field :organization_id, :binary_id
+    field :organization_id, :binary_id, read_after_writes: true
     field :membership_id, :binary_id
     field :membership_package_subscription_id, :binary_id
     field :allowance_key, :string

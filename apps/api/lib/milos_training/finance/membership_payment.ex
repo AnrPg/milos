@@ -6,7 +6,7 @@ defmodule MilosTraining.Finance.MembershipPayment do
   @foreign_key_type :binary_id
 
   schema "membership_payments" do
-    field :organization_id, :binary_id
+    field :organization_id, :binary_id, read_after_writes: true
     field :membership_id, :binary_id
     field :membership_package_subscription_id, :binary_id
     field :finance_invoice_id, :binary_id
@@ -16,6 +16,9 @@ defmodule MilosTraining.Finance.MembershipPayment do
     field :payment_method, :string, default: "cash"
     field :payment_status, :string, default: "paid"
     field :notes, :string
+    field :deleted_at, :utc_datetime_usec
+    field :deleted_by_id, :binary_id
+    field :deletion_reason, :string
     field :params, :map, default: %{}
 
     timestamps(type: :utc_datetime_usec)
@@ -33,6 +36,9 @@ defmodule MilosTraining.Finance.MembershipPayment do
       :payment_method,
       :payment_status,
       :notes,
+      :deleted_at,
+      :deleted_by_id,
+      :deletion_reason,
       :params
     ])
     |> validate_required([

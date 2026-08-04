@@ -6,7 +6,7 @@ defmodule MilosTraining.Finance.FinancePaymentReversal do
   @foreign_key_type :binary_id
 
   schema "finance_payment_reversals" do
-    field :organization_id, :binary_id
+    field :organization_id, :binary_id, read_after_writes: true
     field :membership_id, :binary_id
     field :user_id, :binary_id
     field :membership_payment_id, :binary_id
@@ -19,6 +19,9 @@ defmodule MilosTraining.Finance.FinancePaymentReversal do
     field :reason, :string
     field :created_by_id, :binary_id
     field :idempotency_key, :string
+    field :deleted_at, :utc_datetime_usec
+    field :deleted_by_id, :binary_id
+    field :deletion_reason, :string
     field :params, :map, default: %{}
 
     timestamps(type: :utc_datetime_usec)
@@ -39,6 +42,9 @@ defmodule MilosTraining.Finance.FinancePaymentReversal do
       :reason,
       :created_by_id,
       :idempotency_key,
+      :deleted_at,
+      :deleted_by_id,
+      :deletion_reason,
       :params
     ])
     |> validate_required([

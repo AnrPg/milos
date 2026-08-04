@@ -38,6 +38,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   }
 
   alias MilosTraining.Repo
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
 
   @impl true
   def create_package(params) do
@@ -153,6 +154,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   @impl true
   def list_packages do
     MembershipPackage
+    |> tenant_scope()
     |> order_by([package], asc: package.code)
     |> Repo.all()
     |> Enum.map(&normalize_package/1)
@@ -160,7 +162,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def get_package(id) do
-    case Repo.get(MembershipPackage, id) do
+    case tenant_scope(MembershipPackage) |> where([package], package.id == ^id) |> Repo.one() do
       nil -> nil
       %MembershipPackage{} = package -> normalize_package(package)
     end
@@ -176,7 +178,9 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
     Repo.transaction(fn ->
       membership =
-        case Repo.get_by(Membership, user_id: user_id) do
+        case tenant_scope(Membership)
+             |> where([membership], membership.user_id == ^user_id)
+             |> Repo.one() do
           nil ->
             %Membership{}
             |> Membership.changeset(params)
@@ -193,13 +197,20 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         end
 
       refresh_entitlement_snapshot(membership.id)
-      Membership |> Repo.get!(membership.id) |> normalize_membership()
+
+      Membership
+      |> tenant_scope()
+      |> where([m], m.id == ^membership.id)
+      |> Repo.one!()
+      |> normalize_membership()
     end)
   end
 
   @impl true
   def get_member_profile(user_id) do
-    case Repo.get_by(Membership, user_id: user_id) do
+    case tenant_scope(Membership)
+         |> where([membership], membership.user_id == ^user_id)
+         |> Repo.one() do
       nil ->
         nil
 
@@ -225,7 +236,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     user_ids = normalize_uuid_list(params["user_ids"])
     limit = parse_integer(params["limit"], 50) |> min(100_000) |> max(1)
 
-    from(membership in Membership, as: :membership)
+    from(membership in tenant_scope(Membership), as: :membership)
     |> maybe_filter_user_ids(user_ids)
     |> maybe_filter_membership_status(params["membership_status"])
     |> maybe_filter_user_type(params["user_type"])
@@ -241,7 +252,10 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   def assign_package(membership_id, package_id, params) do
     Repo.transaction(fn ->
       with %Membership{} = membership <- locked_membership(membership_id),
-           %MembershipPackage{} = package <- Repo.get(MembershipPackage, package_id),
+           %MembershipPackage{} = package <-
+             tenant_scope(MembershipPackage)
+             |> where([package], package.id == ^package_id)
+             |> Repo.one(),
            :ok <- validate_package_active(package) do
         params =
           params
@@ -316,7 +330,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       invoice_params = %{
         "invoice_type" => "manual",
         "issue_date" => paid_on,
-        "due_date" => paid_on,
+        "due_date" => nil,
         "currency" => currency,
         "amount_cents" => amount_cents,
         "description" => description,
@@ -331,7 +345,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       with true <- amount_cents > 0 || {:error, :invalid_receipt_amount},
            {:ok, invoice} <- create_invoice(membership_id, invoice_params),
            {:ok, _issued_invoice} <-
-             issue_invoice(invoice.id, %{"issue_date" => paid_on, "due_date" => paid_on}),
+             issue_invoice(invoice.id, %{"issue_date" => paid_on}),
            {:ok, payment} <-
              record_payment(membership_id, %{
                "finance_invoice_id" => invoice.id,
@@ -572,6 +586,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   def get_invoice(invoice_id) do
     case Repo.get(FinanceInvoice, invoice_id) do
       nil -> {:error, :not_found}
+      %FinanceInvoice{deleted_at: deleted_at} when not is_nil(deleted_at) -> {:error, :not_found}
       invoice -> {:ok, invoice}
     end
   end
@@ -580,6 +595,9 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   def update_invoice_params(invoice_id, params) do
     case Repo.get(FinanceInvoice, invoice_id) do
       nil ->
+        {:error, :not_found}
+
+      %FinanceInvoice{deleted_at: deleted_at} when not is_nil(deleted_at) ->
         {:error, :not_found}
 
       invoice ->
@@ -596,6 +614,9 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
     case Repo.get(FinanceInvoice, invoice_id) do
       nil ->
+        {:error, :not_found}
+
+      %FinanceInvoice{deleted_at: deleted_at} when not is_nil(deleted_at) ->
         {:error, :not_found}
 
       %FinanceInvoice{} = invoice ->
@@ -635,14 +656,57 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     {_, _} =
       FinanceInvoice
       |> where([i], i.status == "issued" and not is_nil(i.due_date) and i.due_date < ^today)
+      |> where([i], is_nil(i.deleted_at))
+      |> where([i], fragment("COALESCE(?->>'document_kind', '') <> 'receipt'", i.params))
       |> Repo.update_all(set: [status: "overdue"])
 
     {_, _} =
       FinanceInvoice
       |> where([i], i.status == "overdue" and not is_nil(i.due_date) and i.due_date >= ^today)
+      |> where([i], is_nil(i.deleted_at))
       |> Repo.update_all(set: [status: "issued"])
 
     :ok
+  end
+
+  @impl true
+  def list_finance_cleanup_records(params) do
+    params = string_key_map(params || %{})
+    search = params["q"] || params["search"] || ""
+    limit = parse_integer(params["limit"], 50) |> min(100) |> max(1)
+
+    invoice_records =
+      FinanceInvoice
+      |> where([invoice], is_nil(invoice.deleted_at))
+      |> maybe_search_cleanup_invoice(search)
+      |> order_by([invoice], desc: invoice.inserted_at)
+      |> limit(^limit)
+      |> Repo.all()
+      |> Enum.map(&cleanup_invoice_record/1)
+
+    payment_records =
+      MembershipPayment
+      |> where([payment], is_nil(payment.deleted_at))
+      |> maybe_search_cleanup_payment(search)
+      |> order_by([payment], desc: payment.inserted_at)
+      |> limit(^limit)
+      |> Repo.all()
+      |> Enum.map(&cleanup_payment_record/1)
+
+    (invoice_records ++ payment_records)
+    |> Enum.sort_by(& &1.inserted_at, {:desc, DateTime})
+    |> Enum.take(limit)
+  end
+
+  @impl true
+  def soft_delete_finance_record(record_type, record_id, admin_id, params) do
+    params = string_key_map(params || %{})
+
+    case normalize_cleanup_record_type(record_type) do
+      :invoice -> soft_delete_invoice_record(record_id, admin_id, params)
+      :payment -> soft_delete_payment_record(record_id, admin_id, params)
+      :unknown -> {:error, :bad_request}
+    end
   end
 
   @impl true
@@ -775,7 +839,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
           |> FinanceInvoice.changeset(%{
             status: "issued",
             issue_date: params["issue_date"] || invoice.issue_date || Date.utc_today(),
-            due_date: params["due_date"] || invoice.due_date || Date.utc_today()
+            due_date: params["due_date"] || invoice.due_date || default_invoice_due_date(invoice)
           })
           |> Repo.update()
           |> case do
@@ -880,7 +944,9 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def get_entitlement(user_id) do
-    case Repo.get_by(Membership, user_id: user_id) do
+    case tenant_scope(Membership)
+         |> where([membership], membership.user_id == ^user_id)
+         |> Repo.one() do
       nil -> nil
       %Membership{} = membership -> entitlement_for_membership(membership)
     end
@@ -888,7 +954,9 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def get_effective_entitlement(user_id) do
-    case Repo.get_by(Membership, user_id: user_id) do
+    case tenant_scope(Membership)
+         |> where([membership], membership.user_id == ^user_id)
+         |> Repo.one() do
       nil -> nil
       %Membership{} = membership -> effective_entitlement(membership, Date.utc_today())
     end
@@ -902,12 +970,18 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       Repo.transaction(fn ->
         idempotency_key = Map.fetch!(request, :idempotency_key)
 
-        case Repo.get_by(FinanceEntitlementUsageEntry, idempotency_key: idempotency_key) do
+        case tenant_scope(FinanceEntitlementUsageEntry)
+             |> where([entry], entry.idempotency_key == ^idempotency_key)
+             |> Repo.one() do
           %FinanceEntitlementUsageEntry{} = existing ->
             normalize_usage_entry(existing)
 
           nil ->
-            case Repo.one(from m in Membership, where: m.user_id == ^user_id, lock: "FOR UPDATE") do
+            case Repo.one(
+                   from m in tenant_scope(Membership),
+                     where: m.user_id == ^user_id,
+                     lock: "FOR UPDATE"
+                 ) do
               nil -> authorize_missing_profile!(request)
               %Membership{} = membership -> reserve_for_membership!(membership, request)
             end
@@ -936,7 +1010,9 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
     Repo.transaction(fn ->
       membership =
-        Repo.one(from m in Membership, where: m.user_id == ^user_id, lock: "FOR UPDATE") ||
+        Repo.one(
+          from m in tenant_scope(Membership), where: m.user_id == ^user_id, lock: "FOR UPDATE"
+        ) ||
           Repo.rollback(:finance_profile_missing)
 
       occurred_on = Map.get(params, :occurred_on, Date.utc_today())
@@ -984,7 +1060,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
     Repo.transaction(fn ->
       grant =
-        from(entry in FinanceEntitlementUsageEntry,
+        from(entry in tenant_scope(FinanceEntitlementUsageEntry),
           join: membership in Membership,
           on: membership.id == entry.membership_id,
           where: entry.id == ^grant_id and membership.user_id == ^user_id,
@@ -1031,7 +1107,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   @impl true
   def release_stale_entitlement_reservations(cutoff) do
     reservations =
-      from(entry in FinanceEntitlementUsageEntry, as: :entry)
+      from(entry in tenant_scope(FinanceEntitlementUsageEntry), as: :entry)
       |> where([entry], entry.event_type == "reserve" and entry.inserted_at < ^cutoff)
       |> where(
         [entry],
@@ -1186,14 +1262,16 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     Repo.transaction(fn ->
       idempotency_key = Map.fetch!(params, :idempotency_key)
 
-      case Repo.get_by(FinanceEntitlementUsageEntry, idempotency_key: idempotency_key) do
+      case tenant_scope(FinanceEntitlementUsageEntry)
+           |> where([entry], entry.idempotency_key == ^idempotency_key)
+           |> Repo.one() do
         %FinanceEntitlementUsageEntry{} = existing ->
           normalize_usage_entry(existing)
 
         nil ->
           reservation =
             Repo.one(
-              from entry in FinanceEntitlementUsageEntry,
+              from entry in tenant_scope(FinanceEntitlementUsageEntry),
                 where: entry.id == ^reservation_id,
                 lock: "FOR UPDATE"
             ) || Repo.rollback(:not_found)
@@ -1202,7 +1280,9 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
             do: Repo.rollback(:invalid_entitlement_reservation)
 
           terminal =
-            Repo.get_by(FinanceEntitlementUsageEntry, parent_entry_id: reservation.id)
+            tenant_scope(FinanceEntitlementUsageEntry)
+            |> where([entry], entry.parent_entry_id == ^reservation.id)
+            |> Repo.one()
 
           if terminal, do: Repo.rollback(:entitlement_reservation_already_closed)
 
@@ -1319,7 +1399,9 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   end
 
   defp insert_usage_entry!(params) do
-    case Repo.get_by(FinanceEntitlementUsageEntry, idempotency_key: params.idempotency_key) do
+    case tenant_scope(FinanceEntitlementUsageEntry)
+         |> where([entry], entry.idempotency_key == ^params.idempotency_key)
+         |> Repo.one() do
       %FinanceEntitlementUsageEntry{} = entry ->
         normalize_usage_entry(entry)
 
@@ -1337,6 +1419,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp normalize_usage_entry(entry) do
     %{
       id: entry.id,
+      organization_id: entry.organization_id,
       membership_id: entry.membership_id,
       membership_package_subscription_id: entry.membership_package_subscription_id,
       allowance_key: entry.allowance_key,
@@ -1815,6 +1898,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp referral_reward_credit_total(reward_id) do
     FinanceCreditLedgerEntry
     |> where([entry], entry.referral_reward_id == ^reward_id)
+    |> where([entry], is_nil(entry.deleted_at))
     |> Repo.aggregate(:sum, :amount_cents)
     |> case do
       nil -> 0
@@ -1845,6 +1929,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     FinanceCreditLedgerEntry
     |> where([entry], entry.referral_reward_id == ^reward_id)
     |> where([entry], entry.amount_cents > 0)
+    |> where([entry], is_nil(entry.deleted_at))
     |> order_by([entry], desc: entry.occurred_at, desc: entry.inserted_at)
     |> limit(1)
     |> Repo.one()
@@ -1865,6 +1950,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   defp locked_membership(membership_id) do
     Membership
+    |> tenant_scope()
     |> where([membership], membership.id == ^membership_id)
     |> lock("FOR UPDATE")
     |> Repo.one()
@@ -1872,23 +1958,210 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   defp locked_payment(payment_id) do
     MembershipPayment
+    |> tenant_scope()
     |> where([payment], payment.id == ^payment_id)
+    |> where([payment], is_nil(payment.deleted_at))
     |> lock("FOR UPDATE")
     |> Repo.one()
   end
 
   defp locked_credit_ledger_entry(entry_id) do
     FinanceCreditLedgerEntry
+    |> tenant_scope()
     |> where([entry], entry.id == ^entry_id)
+    |> where([entry], is_nil(entry.deleted_at))
     |> lock("FOR UPDATE")
     |> Repo.one()
   end
 
   defp locked_invoice(invoice_id) do
     FinanceInvoice
+    |> tenant_scope()
+    |> where([invoice], invoice.id == ^invoice_id)
+    |> where([invoice], is_nil(invoice.deleted_at))
+    |> lock("FOR UPDATE")
+    |> Repo.one()
+  end
+
+  defp locked_invoice_for_purge(invoice_id) do
+    FinanceInvoice
+    |> tenant_scope()
     |> where([invoice], invoice.id == ^invoice_id)
     |> lock("FOR UPDATE")
     |> Repo.one()
+  end
+
+  defp locked_payment_for_purge(payment_id) do
+    MembershipPayment
+    |> tenant_scope()
+    |> where([payment], payment.id == ^payment_id)
+    |> lock("FOR UPDATE")
+    |> Repo.one()
+  end
+
+  defp normalize_cleanup_record_type(value) when value in [:invoice, :receipt], do: :invoice
+  defp normalize_cleanup_record_type(value) when value in [:payment, :transaction], do: :payment
+
+  defp normalize_cleanup_record_type(value) when is_binary(value) do
+    case String.downcase(value) do
+      value when value in ["invoice", "receipt"] -> :invoice
+      value when value in ["payment", "transaction"] -> :payment
+      _ -> :unknown
+    end
+  end
+
+  defp normalize_cleanup_record_type(_value), do: :unknown
+
+  defp soft_delete_invoice_record(invoice_id, admin_id, params) do
+    Repo.transaction(fn ->
+      case locked_invoice_for_purge(invoice_id) do
+        nil ->
+          Repo.rollback(:not_found)
+
+        %FinanceInvoice{deleted_at: deleted_at} when not is_nil(deleted_at) ->
+          Repo.rollback(:not_found)
+
+        %FinanceInvoice{} = invoice ->
+          deletion_params = deletion_params(admin_id, params)
+
+          deleted_invoice =
+            invoice
+            |> FinanceInvoice.changeset(deletion_params)
+            |> Repo.update()
+            |> case do
+              {:ok, updated} -> updated
+              {:error, reason} -> Repo.rollback(reason)
+            end
+
+          soft_delete_invoice_payments!(invoice.id, deletion_params)
+          soft_delete_invoice_reversals!(invoice.id, deletion_params)
+          soft_delete_invoice_credit_entries!(invoice.id, deletion_params)
+          refresh_entitlement_snapshot(invoice.membership_id)
+
+          %{
+            record: cleanup_invoice_record(deleted_invoice),
+            purged_linked_records: linked_finance_record_counts(invoice.id)
+          }
+      end
+    end)
+  end
+
+  defp soft_delete_payment_record(payment_id, admin_id, params) do
+    Repo.transaction(fn ->
+      case locked_payment_for_purge(payment_id) do
+        nil ->
+          Repo.rollback(:not_found)
+
+        %MembershipPayment{deleted_at: deleted_at} when not is_nil(deleted_at) ->
+          Repo.rollback(:not_found)
+
+        %MembershipPayment{} = payment ->
+          deletion_params = deletion_params(admin_id, params)
+
+          deleted_payment =
+            payment
+            |> MembershipPayment.changeset(deletion_params)
+            |> Repo.update()
+            |> case do
+              {:ok, updated} -> updated
+              {:error, reason} -> Repo.rollback(reason)
+            end
+
+          soft_delete_payment_reversals!(payment.id, deletion_params)
+          soft_delete_payment_credit_entries!(payment.id, deletion_params)
+          refresh_invoice_and_entitlement(payment.finance_invoice_id, payment.membership_id)
+
+          %{record: cleanup_payment_record(deleted_payment)}
+      end
+    end)
+  end
+
+  defp deletion_params(admin_id, params) do
+    %{
+      "deleted_at" => utc_now(),
+      "deleted_by_id" => admin_id,
+      "deletion_reason" => params["reason"] || params["deletion_reason"] || "Admin purge"
+    }
+  end
+
+  defp soft_delete_invoice_payments!(invoice_id, deletion_params) do
+    MembershipPayment
+    |> where([payment], payment.finance_invoice_id == ^invoice_id)
+    |> where([payment], is_nil(payment.deleted_at))
+    |> Repo.all()
+    |> Enum.each(fn payment ->
+      payment
+      |> MembershipPayment.changeset(deletion_params)
+      |> Repo.update!()
+    end)
+  end
+
+  defp soft_delete_invoice_reversals!(invoice_id, deletion_params) do
+    FinancePaymentReversal
+    |> where([reversal], reversal.finance_invoice_id == ^invoice_id)
+    |> where([reversal], is_nil(reversal.deleted_at))
+    |> Repo.all()
+    |> Enum.each(fn reversal ->
+      reversal
+      |> FinancePaymentReversal.changeset(deletion_params)
+      |> Repo.update!()
+    end)
+  end
+
+  defp soft_delete_invoice_credit_entries!(invoice_id, deletion_params) do
+    FinanceCreditLedgerEntry
+    |> where([entry], entry.finance_invoice_id == ^invoice_id)
+    |> where([entry], is_nil(entry.deleted_at))
+    |> Repo.all()
+    |> Enum.each(fn entry ->
+      entry
+      |> FinanceCreditLedgerEntry.changeset(deletion_params)
+      |> Repo.update!()
+    end)
+  end
+
+  defp soft_delete_payment_reversals!(payment_id, deletion_params) do
+    FinancePaymentReversal
+    |> where([reversal], reversal.membership_payment_id == ^payment_id)
+    |> where([reversal], is_nil(reversal.deleted_at))
+    |> Repo.all()
+    |> Enum.each(fn reversal ->
+      reversal
+      |> FinancePaymentReversal.changeset(deletion_params)
+      |> Repo.update!()
+    end)
+  end
+
+  defp soft_delete_payment_credit_entries!(payment_id, deletion_params) do
+    FinanceCreditLedgerEntry
+    |> where([entry], entry.membership_payment_id == ^payment_id)
+    |> where([entry], is_nil(entry.deleted_at))
+    |> Repo.all()
+    |> Enum.each(fn entry ->
+      entry
+      |> FinanceCreditLedgerEntry.changeset(deletion_params)
+      |> Repo.update!()
+    end)
+  end
+
+  defp linked_finance_record_counts(invoice_id) do
+    %{
+      payments:
+        MembershipPayment
+        |> where([payment], payment.finance_invoice_id == ^invoice_id)
+        |> where([payment], not is_nil(payment.deleted_at))
+        |> Repo.aggregate(:count),
+      reversals:
+        FinancePaymentReversal
+        |> where([reversal], reversal.finance_invoice_id == ^invoice_id)
+        |> where([reversal], not is_nil(reversal.deleted_at))
+        |> Repo.aggregate(:count),
+      credit_ledger_entries:
+        FinanceCreditLedgerEntry
+        |> where([entry], entry.finance_invoice_id == ^invoice_id)
+        |> where([entry], not is_nil(entry.deleted_at))
+        |> Repo.aggregate(:count)
+    }
   end
 
   defp scoped_idempotency_key(action, membership_id, params) do
@@ -1922,6 +2195,13 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   defp payment_reversal_type(%MembershipPayment{payment_status: "waived"}), do: "waiver_reversal"
   defp payment_reversal_type(%MembershipPayment{}), do: "refund"
+
+  defp default_invoice_due_date(%FinanceInvoice{} = invoice) do
+    if receipt_invoice?(invoice), do: nil, else: Date.utc_today()
+  end
+
+  defp receipt_invoice?(%FinanceInvoice{} = invoice),
+    do: (invoice.params || %{})["document_kind"] == "receipt"
 
   defp create_payment_reversal(params) do
     case existing_payment_reversal(params["idempotency_key"] || params[:idempotency_key]) do
@@ -1982,6 +2262,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp list_credit_ledger_entries(membership_id) do
     FinanceCreditLedgerEntry
     |> where([entry], entry.membership_id == ^membership_id)
+    |> where([entry], is_nil(entry.deleted_at))
     |> order_by([entry], desc: entry.occurred_at, desc: entry.inserted_at)
     |> Repo.all()
     |> Enum.map(&normalize_credit_ledger_entry/1)
@@ -1990,6 +2271,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp list_payment_reversals(membership_id) do
     FinancePaymentReversal
     |> where([reversal], reversal.membership_id == ^membership_id)
+    |> where([reversal], is_nil(reversal.deleted_at))
     |> order_by([reversal], desc: reversal.occurred_at, desc: reversal.inserted_at)
     |> Repo.all()
     |> Enum.map(&normalize_payment_reversal/1)
@@ -1998,6 +2280,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp list_invoices(membership_id) do
     FinanceInvoice
     |> where([invoice], invoice.membership_id == ^membership_id)
+    |> where([invoice], is_nil(invoice.deleted_at))
     |> order_by([invoice], desc: invoice.inserted_at)
     |> Repo.all()
     |> Enum.map(&normalize_invoice_with_balance/1)
@@ -2163,7 +2446,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         where: invoice.invoice_type == "renewal",
         where: invoice.service_period_start == ^period_start,
         where: invoice.service_period_end == ^period_end,
-        where: invoice.status != "void"
+        where: invoice.status != "void",
+        where: is_nil(invoice.deleted_at)
       )
     )
   end
@@ -2173,6 +2457,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       MembershipPayment
       |> where([payment], payment.finance_invoice_id == ^invoice_id)
       |> where([payment], payment.payment_status in ["paid", "waived"])
+      |> where([payment], is_nil(payment.deleted_at))
       |> Repo.aggregate(:sum, :amount_cents)
       |> case do
         nil -> 0
@@ -2187,6 +2472,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       FinanceCreditLedgerEntry
       |> where([entry], entry.finance_invoice_id == ^invoice_id)
       |> where([entry], entry.entry_type in ["invoice_offset", "reversal"])
+      |> where([entry], is_nil(entry.deleted_at))
       |> Repo.aggregate(:sum, :amount_cents)
       |> case do
         nil -> 0
@@ -2199,6 +2485,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp payment_reversed_cents(payment_id) do
     FinancePaymentReversal
     |> where([reversal], reversal.membership_payment_id == ^payment_id)
+    |> where([reversal], is_nil(reversal.deleted_at))
     |> Repo.aggregate(:sum, :amount_cents)
     |> case do
       nil -> 0
@@ -2209,6 +2496,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp invoice_payment_reversed_cents(invoice_id) do
     FinancePaymentReversal
     |> where([reversal], reversal.finance_invoice_id == ^invoice_id)
+    |> where([reversal], is_nil(reversal.deleted_at))
     |> Repo.aggregate(:sum, :amount_cents)
     |> case do
       nil -> 0
@@ -2220,6 +2508,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     FinanceCreditLedgerEntry
     |> where([entry], entry.reversed_credit_ledger_entry_id == ^entry_id)
     |> where([entry], entry.amount_cents > 0)
+    |> where([entry], is_nil(entry.deleted_at))
     |> Repo.aggregate(:sum, :amount_cents)
     |> case do
       nil -> 0
@@ -2233,6 +2522,9 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         0
 
       %FinanceInvoice{status: "void"} ->
+        0
+
+      %FinanceInvoice{deleted_at: deleted_at} when not is_nil(deleted_at) ->
         0
 
       %FinanceInvoice{} = invoice ->
@@ -2270,7 +2562,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
               invoice_credit_applied_cents(invoice.id),
               invoice.due_date,
               Date.utc_today(),
-              invoice.status
+              invoice.status,
+              invoice.params
             )
 
           invoice
@@ -2297,6 +2590,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       FinanceInvoice
       |> where([invoice], invoice.membership_id == ^membership.id)
       |> where([invoice], invoice.status in ^open_statuses)
+      |> where([invoice], is_nil(invoice.deleted_at))
       |> Repo.all()
 
     today = Date.utc_today()
@@ -2368,6 +2662,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp credit_balance(membership_id) do
     FinanceCreditLedgerEntry
     |> where([entry], entry.membership_id == ^membership_id)
+    |> where([entry], is_nil(entry.deleted_at))
     |> Repo.aggregate(:sum, :amount_cents)
     |> case do
       nil -> 0
@@ -2380,6 +2675,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       FinanceCreditLedgerEntry
       |> where([entry], entry.membership_payment_id == ^payment.id)
       |> where([entry], entry.amount_cents < 0)
+      |> where([entry], is_nil(entry.deleted_at))
       |> Repo.aggregate(:sum, :amount_cents)
       |> case do
         nil -> 0
@@ -2460,6 +2756,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     last_payments_by_membership_id =
       from(p in MembershipPayment,
         where: p.membership_id in ^membership_ids,
+        where: is_nil(p.deleted_at),
         distinct: p.membership_id,
         order_by: [asc: p.membership_id, desc: p.inserted_at],
         select: %{
@@ -2558,6 +2855,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp list_payments(membership_id) do
     MembershipPayment
     |> where([payment], payment.membership_id == ^membership_id)
+    |> where([payment], is_nil(payment.deleted_at))
     |> order_by([payment], desc: payment.paid_on, desc: payment.inserted_at)
     |> Repo.all()
     |> Enum.map(&normalize_payment/1)
@@ -2682,6 +2980,9 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       nil ->
         {:error, :not_found}
 
+      %MembershipPayment{deleted_at: deleted_at} when not is_nil(deleted_at) ->
+        {:error, :not_found}
+
       %MembershipPayment{} = payment ->
         MembershipLinks.validate_optional_link(
           :membership_payment_id,
@@ -2697,6 +2998,9 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp validate_invoice_link(membership_id, invoice_id) do
     case Repo.get(FinanceInvoice, invoice_id) do
       nil ->
+        {:error, :not_found}
+
+      %FinanceInvoice{deleted_at: deleted_at} when not is_nil(deleted_at) ->
         {:error, :not_found}
 
       %FinanceInvoice{} = invoice ->
@@ -2864,6 +3168,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp total_paid_revenue_cents(since) do
     payment_reversals =
       from(reversal in FinancePaymentReversal,
+        where: is_nil(reversal.deleted_at),
         group_by: reversal.membership_payment_id,
         select: %{
           membership_payment_id: reversal.membership_payment_id,
@@ -2874,11 +3179,16 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     MembershipPayment
     |> where([payment], payment.payment_status == "paid")
     |> where([payment], payment.paid_on >= ^since)
-    |> join(:left, [payment], reversal in subquery(payment_reversals),
+    |> where([payment], is_nil(payment.deleted_at))
+    |> join(:left, [payment], invoice in FinanceInvoice,
+      on: invoice.id == payment.finance_invoice_id
+    )
+    |> where([payment, invoice], is_nil(payment.finance_invoice_id) or is_nil(invoice.deleted_at))
+    |> join(:left, [payment, _invoice], reversal in subquery(payment_reversals),
       on: reversal.membership_payment_id == payment.id
     )
     |> select(
-      [payment, reversal],
+      [payment, _invoice, reversal],
       sum(
         fragment("GREATEST(? - COALESCE(?, 0), 0)", payment.amount_cents, reversal.reversed_cents)
       )
@@ -2892,6 +3202,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   defp total_credit_balance_cents do
     FinanceCreditLedgerEntry
+    |> where([entry], is_nil(entry.deleted_at))
     |> Repo.aggregate(:sum, :amount_cents)
     |> case do
       nil -> 0
@@ -2903,6 +3214,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     FinanceCreditLedgerEntry
     |> where([entry], not is_nil(entry.finance_invoice_id))
     |> where([entry], entry.source_type in ["invoice_offset", "reversal"])
+    |> where([entry], is_nil(entry.deleted_at))
     |> select(
       [entry],
       fragment(
@@ -2926,12 +3238,14 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       FinanceInvoice
       |> where([invoice], invoice.invoice_type == "renewal")
       |> where([invoice], invoice.status in ["issued", "partially_paid", "paid", "overdue"])
+      |> where([invoice], is_nil(invoice.deleted_at))
       |> Repo.aggregate(:count)
 
     paid_count =
       FinanceInvoice
       |> where([invoice], invoice.invoice_type == "renewal")
       |> where([invoice], invoice.status == "paid")
+      |> where([invoice], is_nil(invoice.deleted_at))
       |> Repo.aggregate(:count)
 
     conversion_percent =
@@ -2951,6 +3265,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp total_outstanding_invoice_balance_cents do
     FinanceInvoice
     |> where([invoice], invoice.status in ["issued", "partially_paid", "overdue"])
+    |> where([invoice], is_nil(invoice.deleted_at))
     |> Repo.all()
     |> Enum.reduce(0, fn invoice, acc -> acc + invoice_balance_due(invoice.id) end)
   end
@@ -2959,6 +3274,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     FinanceInvoice
     |> where([invoice], invoice.status in ["issued", "partially_paid", "overdue"])
     |> where([invoice], not is_nil(invoice.due_date) and invoice.due_date < ^Date.utc_today())
+    |> where([invoice], is_nil(invoice.deleted_at))
     |> Repo.all()
     |> Enum.reduce(0, fn invoice, acc -> acc + invoice_balance_due(invoice.id) end)
   end
@@ -2966,6 +3282,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp list_pending_payments(limit) do
     MembershipPayment
     |> where([payment], payment.payment_status in ["pending", "failed"])
+    |> where([payment], is_nil(payment.deleted_at))
     |> order_by([payment], desc: payment.paid_on, desc: payment.inserted_at)
     |> limit(^limit)
     |> Repo.all()
@@ -2976,6 +3293,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     FinanceInvoice
     |> where([invoice], invoice.status in ["issued", "partially_paid", "overdue"])
     |> where([invoice], not is_nil(invoice.due_date) and invoice.due_date < ^Date.utc_today())
+    |> where([invoice], is_nil(invoice.deleted_at))
     |> order_by([invoice], asc: invoice.due_date)
     |> limit(^limit)
     |> Repo.all()
@@ -3140,9 +3458,20 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp normalize_result({:error, %Ecto.Changeset{} = changeset}, _normalizer),
     do: {:error, changeset}
 
+  defp tenant_scope(queryable) do
+    case RepoContext.current_setting("app.organization_id") do
+      organization_id when is_binary(organization_id) and organization_id != "" ->
+        from(row in queryable, where: field(row, :organization_id) == ^organization_id)
+
+      _ ->
+        queryable
+    end
+  end
+
   defp normalize_package(%MembershipPackage{} = package) do
     %{
       id: package.id,
+      organization_id: package.organization_id,
       code: package.code,
       name: package.name,
       description: package.description,
@@ -3161,6 +3490,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp normalize_membership(%Membership{} = membership) do
     %{
       id: membership.id,
+      organization_id: membership.organization_id,
       user_id: membership.user_id,
       user_type_snapshot: membership.user_type_snapshot,
       status: membership.status,
@@ -3184,6 +3514,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
     %{
       id: subscription.id,
+      organization_id: subscription.organization_id,
       membership_id: subscription.membership_id,
       membership_package_id: subscription.membership_package_id,
       status: subscription.status,
@@ -3206,6 +3537,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
     %{
       id: payment.id,
+      organization_id: payment.organization_id,
       membership_id: payment.membership_id,
       membership_package_subscription_id: payment.membership_package_subscription_id,
       finance_invoice_id: payment.finance_invoice_id,
@@ -3226,6 +3558,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp normalize_payment_reversal(%FinancePaymentReversal{} = reversal) do
     %{
       id: reversal.id,
+      organization_id: reversal.organization_id,
       membership_id: reversal.membership_id,
       user_id: reversal.user_id,
       membership_payment_id: reversal.membership_payment_id,
@@ -3247,6 +3580,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp normalize_promotion_campaign(%PromotionCampaign{} = campaign) do
     %{
       id: campaign.id,
+      organization_id: campaign.organization_id,
       name: campaign.name,
       description: campaign.description,
       starts_on: campaign.starts_on,
@@ -3261,6 +3595,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp normalize_promotion_code(%PromotionCode{} = code) do
     %{
       id: code.id,
+      organization_id: code.organization_id,
       promotion_campaign_id: code.promotion_campaign_id,
       code: code.code,
       discount_type: code.discount_type,
@@ -3276,6 +3611,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp normalize_promotion_redemption(%PromotionRedemption{} = redemption) do
     %{
       id: redemption.id,
+      organization_id: redemption.organization_id,
       promotion_campaign_id: redemption.promotion_campaign_id,
       promotion_code_id: redemption.promotion_code_id,
       membership_id: redemption.membership_id,
@@ -3291,6 +3627,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp normalize_referral_program(%ReferralProgram{} = program) do
     %{
       id: program.id,
+      organization_id: program.organization_id,
       name: program.name,
       description: program.description,
       active: program.active,
@@ -3305,6 +3642,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp normalize_referral_event(%ReferralEvent{} = event) do
     %{
       id: event.id,
+      organization_id: event.organization_id,
       referral_program_id: event.referral_program_id,
       referrer_user_id: event.referrer_user_id,
       referred_user_id: event.referred_user_id,
@@ -3321,6 +3659,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp normalize_referral_reward(%ReferralReward{} = reward) do
     %{
       id: reward.id,
+      organization_id: reward.organization_id,
       referral_event_id: reward.referral_event_id,
       recipient_user_id: reward.recipient_user_id,
       membership_id: reward.membership_id,
@@ -3344,6 +3683,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
     %{
       id: entry.id,
+      organization_id: entry.organization_id,
       membership_id: entry.membership_id,
       user_id: entry.user_id,
       membership_payment_id: entry.membership_payment_id,
@@ -3392,7 +3732,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         credit_applied_cents,
         invoice.due_date,
         Date.utc_today(),
-        invoice.status
+        invoice.status,
+        invoice.params
       )
     )
     |> Map.put(:paid_cents, paid_cents)
@@ -3404,6 +3745,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp normalize_invoice(%FinanceInvoice{} = invoice) do
     %{
       id: invoice.id,
+      organization_id: invoice.organization_id,
       membership_id: invoice.membership_id,
       user_id: invoice.user_id,
       membership_package_subscription_id: invoice.membership_package_subscription_id,
@@ -3420,10 +3762,89 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       currency: invoice.currency,
       notes: invoice.notes,
       voided_at: invoice.voided_at,
+      deleted_at: invoice.deleted_at,
+      deleted_by_id: invoice.deleted_by_id,
+      deletion_reason: invoice.deletion_reason,
       params: invoice.params || %{},
       inserted_at: invoice.inserted_at,
       updated_at: invoice.updated_at
     }
+  end
+
+  defp cleanup_invoice_record(%FinanceInvoice{} = invoice) do
+    document_kind = (invoice.params || %{})["document_kind"]
+
+    %{
+      id: invoice.id,
+      organization_id: invoice.organization_id,
+      record_type: if(document_kind == "receipt", do: "receipt", else: "invoice"),
+      code: invoice.invoice_number,
+      label: invoice.invoice_number,
+      membership_id: invoice.membership_id,
+      user_id: invoice.user_id,
+      amount_cents: invoice.total_cents,
+      currency: invoice.currency,
+      status: invoice.status,
+      issued_on: invoice.issue_date,
+      due_on: invoice.due_date,
+      inserted_at: invoice.inserted_at,
+      deleted_at: invoice.deleted_at
+    }
+  end
+
+  defp cleanup_payment_record(%MembershipPayment{} = payment) do
+    invoice =
+      if payment.finance_invoice_id do
+        Repo.get(FinanceInvoice, payment.finance_invoice_id)
+      end
+
+    %{
+      id: payment.id,
+      organization_id: payment.organization_id,
+      record_type: "payment",
+      code: payment_code(payment, invoice),
+      label: payment_code(payment, invoice),
+      membership_id: payment.membership_id,
+      user_id: invoice && invoice.user_id,
+      finance_invoice_id: payment.finance_invoice_id,
+      amount_cents: payment.amount_cents,
+      currency: payment.currency,
+      status: payment.payment_status,
+      paid_on: payment.paid_on,
+      inserted_at: payment.inserted_at,
+      deleted_at: payment.deleted_at
+    }
+  end
+
+  defp payment_code(%MembershipPayment{} = payment, %FinanceInvoice{} = invoice),
+    do: "#{invoice.invoice_number} / payment #{String.slice(payment.id, 0, 8)}"
+
+  defp payment_code(%MembershipPayment{} = payment, _invoice),
+    do: "payment #{String.slice(payment.id, 0, 8)}"
+
+  defp maybe_search_cleanup_invoice(query, value) when value in [nil, ""], do: query
+
+  defp maybe_search_cleanup_invoice(query, value) do
+    term = "%#{String.trim(value)}%"
+
+    where(
+      query,
+      [invoice],
+      ilike(invoice.invoice_number, ^term) or fragment("?::text ILIKE ?", invoice.id, ^term)
+    )
+  end
+
+  defp maybe_search_cleanup_payment(query, value) when value in [nil, ""], do: query
+
+  defp maybe_search_cleanup_payment(query, value) do
+    term = "%#{String.trim(value)}%"
+
+    where(
+      query,
+      [payment],
+      fragment("?::text ILIKE ?", payment.id, ^term) or
+        fragment("?::text ILIKE ?", payment.finance_invoice_id, ^term)
+    )
   end
 
   defp list_invoice_lines(invoice_id) do
@@ -3437,6 +3858,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp normalize_invoice_line(%FinanceInvoiceLine{} = line) do
     %{
       id: line.id,
+      organization_id: line.organization_id,
       finance_invoice_id: line.finance_invoice_id,
       membership_package_subscription_id: line.membership_package_subscription_id,
       line_type: line.line_type,
@@ -3575,6 +3997,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp normalize_finance_settings(%FinanceSetting{} = s) do
     %{
       id: s.id,
+      organization_id: s.organization_id,
       payment_reminder_interval_days: s.payment_reminder_interval_days,
       entitlement_enforcement_mode: s.entitlement_enforcement_mode,
       entitlement_timezone: s.entitlement_timezone,
@@ -3602,10 +4025,12 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
               FROM membership_payments p
               WHERE p.finance_invoice_id = fi.id
                 AND p.payment_status IN ('paid', 'waived')
+                AND p.deleted_at IS NULL
             ), 0) - COALESCE((
               SELECT SUM(r.amount_cents)
               FROM finance_payment_reversals r
               WHERE r.finance_invoice_id = fi.id
+                AND r.deleted_at IS NULL
             ), 0),
             0
           )
@@ -3615,6 +4040,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
               FROM finance_credit_ledger_entries e
               WHERE e.finance_invoice_id = fi.id
                 AND e.entry_type IN ('invoice_offset', 'reversal')
+                AND e.deleted_at IS NULL
             ), 0),
             0
           ),
@@ -3624,6 +4050,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     FROM finance_invoices fi
     WHERE fi.membership_id = ANY($1::uuid[])
       AND fi.status IN ('issued', 'partially_paid', 'overdue')
+      AND fi.deleted_at IS NULL
     GROUP BY fi.membership_id
     """
 
@@ -3659,10 +4086,12 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
             FROM membership_payments p
             WHERE p.finance_invoice_id = fi.id
               AND p.payment_status IN ('paid', 'waived')
+              AND p.deleted_at IS NULL
           ), 0) - COALESCE((
             SELECT SUM(r.amount_cents)
             FROM finance_payment_reversals r
             WHERE r.finance_invoice_id = fi.id
+              AND r.deleted_at IS NULL
           ), 0),
           0
         )
@@ -3672,6 +4101,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
             FROM finance_credit_ledger_entries e
             WHERE e.finance_invoice_id = fi.id
               AND e.entry_type IN ('invoice_offset', 'reversal')
+              AND e.deleted_at IS NULL
           ), 0),
           0
         ),
@@ -3680,6 +4110,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     FROM finance_invoices fi
     WHERE fi.id = ANY($1::uuid[])
       AND fi.status NOT IN ('void', 'draft')
+      AND fi.deleted_at IS NULL
     """
 
     case Repo.query(sql, [db_invoice_ids]) do
@@ -3741,10 +4172,12 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
             FROM membership_payments p
             WHERE p.finance_invoice_id = fi.id
               AND p.payment_status IN ('paid', 'waived')
+              AND p.deleted_at IS NULL
           ), 0) - COALESCE((
             SELECT SUM(r.amount_cents)
             FROM finance_payment_reversals r
             WHERE r.finance_invoice_id = fi.id
+              AND r.deleted_at IS NULL
           ), 0),
           0
         )
@@ -3754,6 +4187,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
             FROM finance_credit_ledger_entries e
             WHERE e.finance_invoice_id = fi.id
               AND e.entry_type IN ('invoice_offset', 'reversal')
+              AND e.deleted_at IS NULL
           ), 0),
           0
         ),
@@ -3761,6 +4195,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     )), 0)
     FROM finance_invoices fi
     WHERE fi.status NOT IN ('void', 'draft')
+      AND fi.deleted_at IS NULL
     """
 
     case Repo.query(sql, []) do
