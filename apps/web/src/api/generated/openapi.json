@@ -24424,6 +24424,37 @@
         ]
       }
     },
+    "/api/platform/organizations/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationController.delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Organization permanently deleted"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Permanently delete an organization",
+        "tags": [
+          "Platform Organizations"
+        ]
+      }
+    },
     "/api/admin/finance/members/{id}/receipts": {
       "post": {
         "callbacks": {},

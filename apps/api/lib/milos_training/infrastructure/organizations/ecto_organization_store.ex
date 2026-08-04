@@ -222,12 +222,22 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
       |> Map.put(:issued_by_user_id, platform_user_id)
       |> then(&RegistrationInvitation.issue_changeset(%RegistrationInvitation{}, &1, issued_at))
     end)
+    |> Multi.insert(:owner_membership, fn %{organization: organization} ->
+      OrganizationMembership.changeset(%{
+        organization_id: organization.id,
+        user_id: platform_user_id,
+        role: :owner,
+        status: :active,
+        joined_at: issued_at,
+        invited_by_user_id: platform_user_id
+      })
+    end)
     |> Multi.insert(:event, fn %{organization: organization} ->
       OrganizationProvisioningEvent.changeset(%{
         organization_id: organization.id,
         platform_owner_user_id: platform_user_id,
         event: "organization_provisioned",
-        metadata: %{initial_owner_invitation: true}
+        metadata: %{initial_owner_invitation: true, provisioning_owner_membership: true}
       })
     end)
     |> Repo.transaction()
@@ -246,6 +256,39 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     |> order_by([organization, _settings], asc: organization.name)
     |> select([organization, settings], %{organization: organization, settings: settings})
     |> Repo.all()
+  end
+
+  @impl true
+  def delete_organization(organization_id, platform_user_id, deleted_at) do
+    Repo.transaction(fn ->
+      organization =
+        Organization
+        |> where([organization], organization.id == ^organization_id)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      if is_nil(organization), do: Repo.rollback(:not_found)
+
+      %OrganizationProvisioningEvent{}
+      |> OrganizationProvisioningEvent.changeset(%{
+        organization_id: organization_id,
+        platform_owner_user_id: platform_user_id,
+        event: "organization_permanently_deleted",
+        metadata: %{deleted_at: DateTime.to_iso8601(deleted_at)}
+      })
+      |> Repo.insert()
+      |> unwrap_or_rollback()
+
+      from(event in OrganizationProvisioningEvent,
+        where: event.organization_id == ^organization_id
+      )
+      |> Repo.delete_all()
+
+      organization
+      |> Repo.delete()
+      |> unwrap_or_rollback()
+    end)
+    |> flatten_transaction()
   end
 
   @impl true

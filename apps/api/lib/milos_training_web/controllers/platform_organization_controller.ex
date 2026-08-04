@@ -5,6 +5,7 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
   alias MilosTraining.Application.{
     ChangeOrganizationLifecycle,
     ChangeOrganizationSettings,
+    DeleteOrganization,
     ListProvisionedOrganizations,
     ProvisionOrganization
   }
@@ -90,6 +91,12 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
     responses: [ok: {"Organization settings", "application/json", @organization_schema}]
   )
 
+  operation(:delete,
+    summary: "Permanently delete an organization",
+    parameters: [@organization_id],
+    responses: [no_content: "Organization permanently deleted"]
+  )
+
   def index(conn, _params) do
     with {:ok, organizations} <-
            ListProvisionedOrganizations.call(conn.assigns.platform_context) do
@@ -134,6 +141,13 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
              conn.body_params
            ) do
       json(conn, %{settings: serialize_settings(settings)})
+    end
+  end
+
+  def delete(conn, %{"id" => organization_id}) do
+    with {:ok, _organization} <-
+           DeleteOrganization.call(conn.assigns.platform_context, organization_id) do
+      send_resp(conn, :no_content, "")
     end
   end
 

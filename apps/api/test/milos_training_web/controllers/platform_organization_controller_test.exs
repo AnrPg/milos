@@ -2,7 +2,14 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
   alias MilosTraining.Organizations
-  alias MilosTraining.Organizations.{OrganizationProvisioningEvent, RegistrationInvitation}
+
+  alias MilosTraining.Organizations.{
+    Organization,
+    OrganizationMembership,
+    OrganizationProvisioningEvent,
+    RegistrationInvitation
+  }
+
   alias MilosTraining.Repo
 
   import Ecto.Query
@@ -49,6 +56,15 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
     assert response["settings"]["brand_name"] == "North Harbor"
     assert is_binary(token)
 
+    assert Repo.exists?(
+             from membership in OrganizationMembership,
+               where:
+                 membership.organization_id == ^organization_id and
+                   membership.user_id == ^context.platform_user.id and
+                   membership.role == :owner and
+                   membership.status == :active
+           )
+
     assert {:ok, %{organization: %{id: ^organization_id}, role: :owner}} =
              Organizations.inspect_invitation(token)
 
@@ -61,6 +77,32 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
                where:
                  event.organization_id == ^organization_id and
                    event.event == "organization_provisioned"
+           )
+  end
+
+  test "permanently deletes an organization created by mistake", context do
+    {:ok, organization} = Organizations.create_organization(%{name: "Mistake Gym"})
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: context.platform_user.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    conn =
+      context.conn
+      |> put_bearer_token(context.platform_user)
+      |> delete("/api/platform/organizations/#{organization.id}")
+
+    assert response(conn, 204) == ""
+    refute Repo.get(Organization, organization.id)
+
+    refute Repo.exists?(
+             from membership in OrganizationMembership,
+               where: membership.organization_id == ^organization.id
            )
   end
 

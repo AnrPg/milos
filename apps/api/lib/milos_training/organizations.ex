@@ -4,6 +4,7 @@ defmodule MilosTraining.Organizations do
   alias MilosTraining.Organizations.Commands.{
     AddMembership,
     CreateOrganization,
+    DeleteOrganization,
     IssueInvitation,
     ProvisionOrganization,
     RedeemInvitation,
@@ -59,6 +60,9 @@ defmodule MilosTraining.Organizations do
 
   def list_provisioned_organizations(context),
     do: ListProvisionedOrganizations.call(context)
+
+  def delete_organization(context, organization_id, deleted_at \\ DateTime.utc_now()),
+    do: DeleteOrganization.call(context, organization_id, deleted_at)
 
   def update_organization_lifecycle(
         context,

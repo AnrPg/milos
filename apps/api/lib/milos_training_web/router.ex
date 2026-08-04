@@ -137,6 +137,7 @@ defmodule MilosTrainingWeb.Router do
 
     get("/organizations", PlatformOrganizationController, :index)
     post("/organizations", PlatformOrganizationController, :create)
+    delete("/organizations/:id", PlatformOrganizationController, :delete)
     patch("/organizations/:id/lifecycle", PlatformOrganizationController, :lifecycle)
     patch("/organizations/:id/settings", PlatformOrganizationController, :settings)
   end
