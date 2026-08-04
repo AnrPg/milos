@@ -84,3 +84,11 @@ export function changePlatformOrganizationSettings(
     { method: "PATCH", token, body: settings },
   );
 }
+
+export function deletePlatformOrganization(token: string, organizationId: string) {
+  return apiRequest<void>(
+    `/platform/organizations/${organizationId}`,
+    { method: "DELETE", token },
+    false,
+  );
+}

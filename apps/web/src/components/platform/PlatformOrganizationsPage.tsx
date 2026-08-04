@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   changePlatformOrganizationLifecycle,
   changePlatformOrganizationSettings,
+  deletePlatformOrganization,
   listPlatformOrganizations,
   provisionPlatformOrganization,
   type OrganizationSettings,
@@ -16,6 +17,7 @@ import {
   type ProvisionOrganizationResult,
 } from "@/api/platform-organizations";
 import { ApiError } from "@/api/client";
+import { SELECTED_ORGANIZATION_SLUG_KEY } from "@/api/client";
 import { useSession } from "@/components/session-provider";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { platformOrganizationsCopy } from "@/i18n/platform-organizations";
@@ -44,7 +46,9 @@ export function PlatformOrganizationsPage() {
   const [editing, setEditing] = useState<PlatformOrganization | null>(null);
   const [provisioningOpen, setProvisioningOpen] = useState(false);
   const [confirmingArchive, setConfirmingArchive] = useState<PlatformOrganization | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState<PlatformOrganization | null>(null);
   const [lifecycleSubmitting, setLifecycleSubmitting] = useState<string | null>(null);
+  const [deleteSubmitting, setDeleteSubmitting] = useState<string | null>(null);
 
   const accessToken = tokens?.access_token;
   const organizationsQuery = useQuery({
@@ -105,6 +109,22 @@ export function PlatformOrganizationsPage() {
       setEditing(null);
     } catch {
       setError(copy.settingsError);
+    }
+  }
+
+  async function deleteOrganization(organizationId: string) {
+    if (!accessToken) return;
+    setError(null);
+    setDeleteSubmitting(organizationId);
+
+    try {
+      await deletePlatformOrganization(accessToken, organizationId);
+      await organizationsQuery.refetch();
+      setConfirmingDelete(null);
+    } catch {
+      setError(copy.deleteError);
+    } finally {
+      setDeleteSubmitting(null);
     }
   }
 
@@ -228,7 +248,11 @@ export function PlatformOrganizationsPage() {
                   </dl>
                   <div className="mt-4 flex flex-wrap gap-3">
                     {entry.organization.status === "active" ? (
-                      <Link href={entry.canonical_path} className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold">
+                      <Link
+                        href="/admin"
+                        className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold"
+                        onClick={() => rememberSelectedOrganization(entry.organization.slug)}
+                      >
                         {copy.open}
                       </Link>
                     ) : null}
@@ -263,6 +287,13 @@ export function PlatformOrganizationsPage() {
                         {copy.archive}
                       </button>
                     ) : null}
+                    <button
+                      type="button"
+                      onClick={() => setConfirmingDelete(entry)}
+                      className="border border-red-900 bg-red-50 px-3 py-2 text-sm font-semibold text-red-900"
+                    >
+                      {copy.delete}
+                    </button>
                   </div>
                 </article>
               ))}
@@ -298,6 +329,15 @@ export function PlatformOrganizationsPage() {
           onConfirm={() => void updateLifecycle(confirmingArchive.organization.id, "archived")}
         />
       ) : null}
+      {confirmingDelete ? (
+        <DeleteDialog
+          copy={copy}
+          organization={confirmingDelete}
+          submitting={deleteSubmitting === confirmingDelete.organization.id}
+          onCancel={() => setConfirmingDelete(null)}
+          onConfirm={() => void deleteOrganization(confirmingDelete.organization.id)}
+        />
+      ) : null}
     </main>
   );
 }
@@ -312,6 +352,12 @@ function ownerSetupUrl(token: string) {
   const path = `/set-admin?token=${encodeURIComponent(token)}`;
   if (typeof window === "undefined") return path;
   return `${window.location.origin}${path}`;
+}
+
+function rememberSelectedOrganization(slug: string) {
+  try {
+    window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, slug);
+  } catch {}
 }
 
 function TextField({ label, value, onChange, type = "text", ...inputProps }: {
@@ -399,6 +445,30 @@ function ArchiveDialog({ copy, organization, submitting, onCancel, onConfirm }: 
           <button type="button" onClick={onCancel} className="border border-[var(--border-strong)] px-4 py-2 text-sm font-semibold">{copy.cancel}</button>
           <button type="button" disabled={submitting} onClick={onConfirm} className="bg-red-700 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
             {copy.archiveConfirm}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DeleteDialog({ copy, organization, submitting, onCancel, onConfirm }: {
+  copy: ReturnType<typeof platformOrganizationsCopy>;
+  organization: PlatformOrganization;
+  submitting: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label={copy.deleteTitle}>
+      <div className="w-full max-w-md bg-[var(--surface)] p-6 shadow-xl">
+        <h2 className="text-xl font-semibold text-[var(--text)]">{copy.deleteTitle}</h2>
+        <p className="mt-2 font-semibold text-[var(--text)]">{organization.organization.name}</p>
+        <p className="mt-3 text-sm leading-6 text-[var(--text-soft)]">{copy.deleteBody}</p>
+        <div className="mt-6 flex justify-end gap-3">
+          <button type="button" onClick={onCancel} className="border border-[var(--border-strong)] px-4 py-2 text-sm font-semibold">{copy.cancel}</button>
+          <button type="button" disabled={submitting} onClick={onConfirm} className="bg-red-800 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+            {copy.deleteConfirm}
           </button>
         </div>
       </div>

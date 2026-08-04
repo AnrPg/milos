@@ -6,6 +6,7 @@ import { PlatformOrganizationsPage } from "@/components/platform/PlatformOrganiz
 
 import {
   changePlatformOrganizationLifecycle,
+  deletePlatformOrganization,
   listPlatformOrganizations,
   provisionPlatformOrganization,
 } from "@/api/platform-organizations";
@@ -23,6 +24,7 @@ vi.mock("@/api/platform-organizations", async (importOriginal) => {
   return {
     ...actual,
     changePlatformOrganizationLifecycle: vi.fn(),
+    deletePlatformOrganization: vi.fn(),
     listPlatformOrganizations: vi.fn(),
     provisionPlatformOrganization: vi.fn(),
     changePlatformOrganizationSettings: vi.fn(),
@@ -66,10 +68,12 @@ function renderPage() {
 describe("PlatformOrganizationsPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.localStorage.clear();
     vi.mocked(listPlatformOrganizations).mockResolvedValue({ organizations: [organization] });
     vi.mocked(changePlatformOrganizationLifecycle).mockResolvedValue({
       organization: { ...organization.organization, status: "archived" },
     });
+    vi.mocked(deletePlatformOrganization).mockResolvedValue(undefined);
     vi.mocked(provisionPlatformOrganization).mockResolvedValue({
       organization: { ...organization.organization, id: "org-2", name: "Atlas Gym", slug: "atlas" },
       settings: { ...organization.settings, organization_id: "org-2", brand_name: "Atlas Gym" },
@@ -111,6 +115,39 @@ describe("PlatformOrganizationsPage", () => {
 
     await waitFor(() => {
       expect(changePlatformOrganizationLifecycle).toHaveBeenCalledWith("token", "org-1", "archived");
+    });
+  });
+
+  it("opens an active organization by selecting it and entering the admin dashboard", async () => {
+    renderPage();
+
+    const article = await screen.findByText("North Harbor Strength");
+    const row = article.closest("article");
+    expect(row).not.toBeNull();
+
+    const openLink = within(row!).getByRole("link", { name: "Open organization" });
+    expect(openLink).toHaveAttribute("href", "/admin");
+
+    fireEvent.click(openLink);
+
+    expect(window.localStorage.getItem("milos:selected-organization-slug")).toBe("north-harbor");
+  });
+
+  it("permanently deletes an organization only after explicit confirmation", async () => {
+    renderPage();
+
+    const article = await screen.findByText("North Harbor Strength");
+    const row = article.closest("article");
+    expect(row).not.toBeNull();
+
+    fireEvent.click(within(row!).getByRole("button", { name: "Delete permanently" }));
+    expect(deletePlatformOrganization).not.toHaveBeenCalled();
+
+    const dialog = screen.getByRole("dialog", { name: "Permanently delete organization" });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Delete permanently" }));
+
+    await waitFor(() => {
+      expect(deletePlatformOrganization).toHaveBeenCalledWith("token", "org-1");
     });
   });
 });
