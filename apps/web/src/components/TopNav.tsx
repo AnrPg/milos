@@ -19,6 +19,7 @@ import { DirectMessagesPanel } from "@/components/chat/DirectMessagesPanel";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useSession } from "@/components/session-provider";
 import { subscribeToTopic } from "@/lib/realtime";
+import { showsTenantSelfServiceSurfaces } from "@/lib/account-surfaces";
 import { SemanticLabel } from "@/components/semantic-label";
 import { OrganizationSelector } from "@/components/organization-selector";
 
@@ -227,6 +228,7 @@ export function TopNav() {
 
   const role = (currentUser?.role ?? "") as UserRole;
   const isPlatformOwner = Boolean(currentUser?.platform_owner);
+  const showSelfServiceSurfaces = showsTenantSelfServiceSurfaces(currentUser);
   const initials = currentUser?.nickname
     ? currentUser.nickname.slice(0, 2).toUpperCase()
     : "?";
@@ -234,7 +236,7 @@ export function TopNav() {
 
   const financeQuery = useQuery({
     queryKey: ["my", "finance"],
-    enabled: authenticated && role !== "admin",
+    enabled: authenticated && role !== "admin" && showSelfServiceSurfaces,
     queryFn: () => fetchMyFinance(tokens!.access_token),
     staleTime: 2 * 60 * 1000,
   });
@@ -293,19 +295,19 @@ export function TopNav() {
       style={{
         background: "var(--bg)",
         borderBottom: "1px solid var(--border)",
-        height: "3.25rem",
+        minHeight: "3.25rem",
       }}
     >
-      <div className="flex w-full items-center gap-2 px-2 sm:gap-4 sm:px-5">
+      <div className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 px-2 py-1 sm:gap-x-4 sm:px-5">
         <Link
           href="/"
-          className="hidden shrink-0 text-xs font-bold uppercase tracking-[0.28em] sm:block"
+          className="block min-w-0 max-w-full shrink-0 whitespace-normal break-words text-xs font-bold uppercase sm:max-w-[32rem]"
           style={{ color: "var(--text)" }}
         >
           {brandName}
         </Link>
 
-        <nav className="flex min-w-0 flex-1 items-center gap-0.5 overflow-visible sm:gap-1">
+        <nav className="flex min-w-0 flex-1 flex-wrap items-center gap-0.5 overflow-visible sm:gap-1">
           {isPlatformOwner ? (
             <Link
               href="/platform/organizations"
@@ -338,7 +340,7 @@ export function TopNav() {
                   );
                 })
               : null}
-            {showTenantShell && NAV_LINKS.filter((link) => link.roles.includes(role)).map((link) => {
+            {showTenantShell && showSelfServiceSurfaces && NAV_LINKS.filter((link) => link.roles.includes(role)).map((link) => {
               const active = pathActive(pathname, link.href);
               const showBalanceBadge = link.href === "/account/billing" && outstandingCents > 0;
               return (
@@ -449,7 +451,7 @@ export function TopNav() {
                   {t("profile")}
                 </Link>
                 <OrganizationSelector variant="menu" onSelect={() => setMenuOpen(false)} />
-                {role !== "admin" ? (
+                {role !== "admin" && showSelfServiceSurfaces ? (
                   <Link
                     href="/account/billing"
                     className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[var(--border)]"

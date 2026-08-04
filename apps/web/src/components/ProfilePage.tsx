@@ -21,6 +21,7 @@ import { isSupportedAvatarSource } from "@/components/profile/avatar-crop";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { showsTenantSelfServiceSurfaces } from "@/lib/account-surfaces";
 import {
   isAppLocale,
   LOCALE_NAMES,
@@ -112,6 +113,7 @@ type CurrentUserWithAvatar = {
   role: string;
   avatar_url?: string | null;
   preferred_locale: string;
+  platform_owner?: boolean | null;
 };
 
 export function ProfilePage() {
@@ -125,6 +127,7 @@ export function ProfilePage() {
   const tProfile = useTranslations("Profile");
   const { tokens, currentUser, signOut } = useSession();
   const user = currentUser as CurrentUserWithAvatar | null;
+  const showSelfServiceSurfaces = showsTenantSelfServiceSurfaces(user);
   const push = usePushNotifications(tokens?.access_token);
 
   const [nicknameValue, setNicknameValue] = useState(user?.nickname ?? "");
@@ -148,13 +151,13 @@ export function ProfilePage() {
 
   const reviewsQuery = useQuery({
     queryKey: ["my", "reviews"],
-    enabled: Boolean(tokens?.access_token),
+    enabled: Boolean(tokens?.access_token) && showSelfServiceSurfaces,
     queryFn: async () => fetchMyReviews(tokens!.access_token),
   });
 
   const prefsQuery = useQuery({
     queryKey: ["gamification", "preferences"],
-    enabled: Boolean(tokens?.access_token),
+    enabled: Boolean(tokens?.access_token) && showSelfServiceSurfaces,
     queryFn: async () => fetchGamificationPreferences(tokens!.access_token),
   });
 
@@ -482,46 +485,48 @@ export function ProfilePage() {
           </form>
         </CollapsibleSection>
 
-        <CollapsibleSection
-          id="training-schedule"
-          title={i18n("trainingSchedule80e51e2")}
-          description={i18n("markYourWeeklyRestDaysUpTo5ee5b72a")}
-        >
-          <div className="space-y-5">
-            <p className="text-sm" style={{ color: "var(--muted)" }}>
-              {i18n("offDaysAreTransparentToYourStreakMissingb808660")}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {dayLabels.map((label, dow) => {
-                const selected = offDays.includes(dow);
-                const disabled = !selected && offDays.length >= 5;
-                return (
-                  <button
-                    key={dow}
-                    type="button"
-                    disabled={disabled || updatePrefsMutation.isPending}
-                    onClick={() => toggleOffDay(dow)}
-                    className="rounded-xl px-4 py-2 text-sm font-semibold transition-opacity disabled:opacity-40"
-                    style={{
-                      background: selected ? "var(--primary)" : "var(--panel-muted)",
-                      color: selected ? "var(--primary-contrast)" : "var(--text-soft)",
-                      border: selected
-                        ? "1px solid var(--primary)"
-                        : "1px solid var(--border)",
-                    }}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
-            {updatePrefsMutation.isError && (
-              <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>
-                {i18n("failedToSavePleaseTryAgainb68b7e7")}
+        {showSelfServiceSurfaces ? (
+          <CollapsibleSection
+            id="training-schedule"
+            title={i18n("trainingSchedule80e51e2")}
+            description={i18n("markYourWeeklyRestDaysUpTo5ee5b72a")}
+          >
+            <div className="space-y-5">
+              <p className="text-sm" style={{ color: "var(--muted)" }}>
+                {i18n("offDaysAreTransparentToYourStreakMissingb808660")}
               </p>
-            )}
-          </div>
-        </CollapsibleSection>
+              <div className="flex flex-wrap gap-2">
+                {dayLabels.map((label, dow) => {
+                  const selected = offDays.includes(dow);
+                  const disabled = !selected && offDays.length >= 5;
+                  return (
+                    <button
+                      key={dow}
+                      type="button"
+                      disabled={disabled || updatePrefsMutation.isPending}
+                      onClick={() => toggleOffDay(dow)}
+                      className="rounded-xl px-4 py-2 text-sm font-semibold transition-opacity disabled:opacity-40"
+                      style={{
+                        background: selected ? "var(--primary)" : "var(--panel-muted)",
+                        color: selected ? "var(--primary-contrast)" : "var(--text-soft)",
+                        border: selected
+                          ? "1px solid var(--primary)"
+                          : "1px solid var(--border)",
+                      }}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+              {updatePrefsMutation.isError && (
+                <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>
+                  {i18n("failedToSavePleaseTryAgainb68b7e7")}
+                </p>
+              )}
+            </div>
+          </CollapsibleSection>
+        ) : null}
 
         <CollapsibleSection id="avatar" title={i18n("avatar7631b26")} description={i18n("profilePictureaeb8371")}>
           <div className="space-y-5">
@@ -588,24 +593,26 @@ export function ProfilePage() {
           />
         ) : null}
 
-        <CollapsibleSection
-          id="account-activity"
-          title={i18n("accountActivity2263296")}
-          description={i18n("yourReviewsAndHistory4a3fb33")}
-        >
-          <div className="space-y-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--muted)" }}>
-              {i18n("myReviewsHistorycdeb034")}
-            </p>
-            {reviewsQuery.isLoading ? (
-              <p className="text-sm" style={{ color: "var(--dim)" }}>
-                {i18n("loadingReviews1c4171c")}
+        {showSelfServiceSurfaces ? (
+          <CollapsibleSection
+            id="account-activity"
+            title={i18n("accountActivity2263296")}
+            description={i18n("yourReviewsAndHistory4a3fb33")}
+          >
+            <div className="space-y-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--muted)" }}>
+                {i18n("myReviewsHistorycdeb034")}
               </p>
-            ) : (
-              <ReviewList reviews={(reviewsQuery.data?.reviews ?? []) as Parameters<typeof ReviewList>[0]["reviews"]} />
-            )}
-          </div>
-        </CollapsibleSection>
+              {reviewsQuery.isLoading ? (
+                <p className="text-sm" style={{ color: "var(--dim)" }}>
+                  {i18n("loadingReviews1c4171c")}
+                </p>
+              ) : (
+                <ReviewList reviews={(reviewsQuery.data?.reviews ?? []) as Parameters<typeof ReviewList>[0]["reviews"]} />
+              )}
+            </div>
+          </CollapsibleSection>
+        ) : null}
       </div>
     </main>
   );
