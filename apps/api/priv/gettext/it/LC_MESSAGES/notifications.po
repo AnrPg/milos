@@ -82,7 +82,7 @@ msgstr "Nuovo messaggio"
 msgid "You received a new message."
 msgstr "Hai ricevuto un nuovo messaggio."
 
-msgid "Milos Training"
+msgid "TrainingJournal"
 msgstr "Allenamento di Milo"
 
 msgid "You have a new notification."

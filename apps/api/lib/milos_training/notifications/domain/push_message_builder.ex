@@ -212,7 +212,7 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
 
   def build(_type, payload, localize) do
     %{
-      title: localize.("Milos Training", %{}),
+      title: localize.("TrainingJournal", %{}),
       body: payload["body"] || localize.("You have a new notification.", %{}),
       url: payload["url"] || "/"
     }

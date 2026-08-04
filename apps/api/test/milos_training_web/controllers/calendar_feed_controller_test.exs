@@ -77,7 +77,7 @@ defmodule MilosTrainingWeb.CalendarFeedControllerTest do
       |> get("/api/calendar/feed.ics", %{token: links["token"]})
       |> response(200)
 
-    assert feed =~ "UID:class-series-#{series.id}@milos-training"
+    assert feed =~ "UID:class-series-#{series.id}@trainingjournal"
 
     assert feed =~
              "DTSTART;TZID=Etc/UTC:#{Calendar.strftime(first_occurrence_on, "%Y%m%d")}T170000"

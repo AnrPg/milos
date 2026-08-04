@@ -68,7 +68,7 @@ defmodule MilosTrainingWeb.CalendarFeedController do
   def feed(_conn, _params), do: {:error, :unauthorized}
 
   defp maybe_download(conn, %{"download" => value}) when value in ["1", "true"] do
-    put_resp_header(conn, "content-disposition", ~s(attachment; filename="milos-training.ics"))
+    put_resp_header(conn, "content-disposition", ~s(attachment; filename="trainingjournal.ics"))
   end
 
   defp maybe_download(conn, _params), do: conn

@@ -25,11 +25,11 @@ msgstr "Назначена тренировка"
 msgid "Workout: %{title}"
 msgstr "Тренировка: %{title}"
 
-msgid "Assigned workout in Milos Training."
-msgstr "Назначена тренировка в Milos Training."
+msgid "Assigned workout in TrainingJournal."
+msgstr "Назначена тренировка в TrainingJournal."
 
-msgid "Scheduled %{name} class in Milos Training."
-msgstr "Планиран %{name} клас в Milos Training."
+msgid "Scheduled %{name} class in TrainingJournal."
+msgstr "Планиран %{name} клас в TrainingJournal."
 
 msgid "Pending"
 msgstr "В очакване"
@@ -40,5 +40,5 @@ msgstr "Одобрено"
 msgid "Scheduled"
 msgstr "Планирано"
 
-msgid "Milos Training class booking status: %{status}."
-msgstr "Състояние на резервацията за курс на Milos Training: %{status}."
+msgid "TrainingJournal class booking status: %{status}."
+msgstr "Състояние на резервацията за курс на TrainingJournal: %{status}."

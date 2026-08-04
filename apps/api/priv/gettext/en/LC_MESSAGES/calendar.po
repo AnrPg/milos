@@ -25,11 +25,11 @@ msgstr "Assigned workout"
 msgid "Workout: %{title}"
 msgstr "Workout: %{title}"
 
-msgid "Assigned workout in Milos Training."
-msgstr "Assigned workout in Milos Training."
+msgid "Assigned workout in TrainingJournal."
+msgstr "Assigned workout in TrainingJournal."
 
-msgid "Scheduled %{name} class in Milos Training."
-msgstr "Scheduled %{name} class in Milos Training."
+msgid "Scheduled %{name} class in TrainingJournal."
+msgstr "Scheduled %{name} class in TrainingJournal."
 
 msgid "Pending"
 msgstr "Pending"
@@ -40,5 +40,5 @@ msgstr "Approved"
 msgid "Scheduled"
 msgstr "Scheduled"
 
-msgid "Milos Training class booking status: %{status}."
-msgstr "Milos Training class booking status: %{status}."
+msgid "TrainingJournal class booking status: %{status}."
+msgstr "TrainingJournal class booking status: %{status}."

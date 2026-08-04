@@ -55,7 +55,7 @@ defmodule MilosTraining.Application.GetCalendarFeed do
 
   defp class_event(slot, user, locale) do
     %{
-      uid: "class-#{slot.id}@milos-training",
+      uid: "class-#{slot.id}@trainingjournal",
       title: translate(locale, "Class: %{name}", %{name: class_name(slot)}),
       starts_at: slot.scheduled_at,
       ends_at: DateTime.add(slot.scheduled_at, slot.duration_minutes * 60, :second),
@@ -67,7 +67,7 @@ defmodule MilosTraining.Application.GetCalendarFeed do
     series = slot.class_series
 
     %{
-      uid: "class-series-#{series.id}@milos-training",
+      uid: "class-series-#{series.id}@trainingjournal",
       title: translate(locale, "Class: %{name}", %{name: series.name}),
       recurrence: series,
       starts_at: slot.scheduled_at,
@@ -101,11 +101,11 @@ defmodule MilosTraining.Application.GetCalendarFeed do
       end
 
     %{
-      uid: "assigned-workout-#{assignment.id}@milos-training",
+      uid: "assigned-workout-#{assignment.id}@trainingjournal",
       title: title,
       starts_on: scheduled_for,
       ends_on: Date.add(scheduled_for, 1),
-      description: translate(locale, "Assigned workout in Milos Training.")
+      description: translate(locale, "Assigned workout in TrainingJournal.")
     }
   end
 
@@ -121,7 +121,7 @@ defmodule MilosTraining.Application.GetCalendarFeed do
   end
 
   defp class_description(slot, %{role: :admin}, locale) do
-    translate(locale, "Scheduled %{name} class in Milos Training.", %{name: class_name(slot)})
+    translate(locale, "Scheduled %{name} class in TrainingJournal.", %{name: class_name(slot)})
   end
 
   defp class_description(slot, user, locale) do
@@ -133,7 +133,7 @@ defmodule MilosTraining.Application.GetCalendarFeed do
     status = if booking, do: booking.status, else: "scheduled"
     localized_status = translate(locale, status_message(status))
 
-    translate(locale, "Milos Training class booking status: %{status}.", %{
+    translate(locale, "TrainingJournal class booking status: %{status}.", %{
       status: localized_status
     })
   end
@@ -143,10 +143,10 @@ defmodule MilosTraining.Application.GetCalendarFeed do
       [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
-        "PRODID:-//Milos Training//Calendar Feed//EN",
+        "PRODID:-//TrainingJournal//Calendar Feed//EN",
         "CALSCALE:GREGORIAN",
         "METHOD:PUBLISH",
-        "X-WR-CALNAME:Milos Training",
+        "X-WR-CALNAME:TrainingJournal",
         Enum.map(events, &event_lines(&1, now)),
         "END:VCALENDAR"
       ]
