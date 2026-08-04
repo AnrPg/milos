@@ -94,6 +94,9 @@ MilosTraining.Messaging      → direct/contextual threads, participants, messag
 MilosTraining.Pantheon       → personal records and score history
 MilosTraining.Organizations  → tenants, memberships, domains, settings,
                         and one-time registration invitations
+MilosTraining.TrainingJournal → journal-native workouts, recovery, personal notes,
+                        links, revisions, grants, suppressions, trash, and
+                        owner-scoped timeline projections
 ```
 
 These post-MVP contexts are authoritative, not auxiliary folders. They follow the

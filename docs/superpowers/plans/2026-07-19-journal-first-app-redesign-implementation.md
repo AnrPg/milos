@@ -66,23 +66,28 @@ an implementation baseline before schema work.
 ADR-042, ADR-043, ADR-044, ADR-050, ADR-051, ADR-052, ADR-064, ADR-067; TD-013,
 TD-033, and TD-035.
 
-- [ ] Review and accept/adjust Gates A-D with the product owner.
-- [ ] Write `ADR-086-journal-context-and-timeline-ownership.md` before code.
-- [ ] Add `TrainingJournal` to the authoritative bounded-context catalogue and
+- [x] Review and accept/adjust Gates A-D with the product owner.
+- [x] Write `ADR-086-journal-context-and-timeline-ownership.md` before code.
+- [x] Add `TrainingJournal` to the authoritative bounded-context catalogue and
       architecture allowlists only after ADR acceptance.
-- [ ] Define a domain glossary: planned candidate, prescription snapshot, actual
+- [x] Define a domain glossary: planned candidate, prescription snapshot, actual
       workout, performance row, timeline item, body update, source link, visibility.
-- [ ] Record invariants as executable domain-test names before migrations.
-- [ ] Inventory existing capture/read routes and APIs:
+- [x] Record invariants as executable domain-test names before migrations.
+- [x] Inventory existing capture/read routes and APIs:
       `/`, `/my-workouts`, execution finish/detail, `/wellbeing`, `/reviews`, Pantheon,
       Coaching dossier, schedule/booking, and Messaging.
-- [ ] Produce a legacy-surface matrix with `retain`, `embed`, `redirect`, `read-only`,
+- [x] Produce a legacy-surface matrix with `retain`, `embed`, `redirect`, `read-only`,
       and `remove after migration` classifications.
-- [ ] Confirm retention/export requirements and timezone semantics.
-- [ ] Define rollout feature flags and rollback behavior.
+- [x] Confirm retention/export requirements and timezone semantics.
+- [x] Define rollout feature flags and rollback behavior.
 
 **Exit criteria:** ADR-086 accepted; no unresolved ownership/privacy assumptions;
 surface inventory and invariants are reviewed.
+
+Phase 0 note: the current architecture gate pattern-scans layer paths and tenant
+scope rules rather than maintaining a static bounded-context allowlist. The
+authoritative design catalogue now includes `TrainingJournal`; Phase 1 must run
+`mix milos.architecture` after adding the first modules.
 
 **Commit:** `docs(journal): accept context ownership - keep canonical domains intact`
 
