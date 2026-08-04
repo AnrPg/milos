@@ -21,7 +21,7 @@ defmodule MilosTraining.Organizations do
     ResolveTenantContext
   }
 
-  @legacy_organization %{name: "Legacy Milos Training", slug: "legacy-milos-training"}
+  @legacy_organization %{name: "Milos Training", slug: "legacy-milos-training"}
 
   def legacy_organization_slug, do: @legacy_organization.slug
 

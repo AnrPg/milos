@@ -77,7 +77,7 @@ defmodule MilosTraining.Repo.Migrations.AddT4OwnershipFoundation do
     VALUES (
       gen_random_uuid(),
       'legacy-milos-training',
-      'Legacy Milos Training',
+      'Milos Training',
       'active',
       timezone('utc', now()),
       timezone('utc', now())

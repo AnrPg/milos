@@ -127,5 +127,6 @@ defmodule MilosTraining.OrganizationsTest do
     assert {:ok, second} = Organizations.ensure_legacy_organization()
     assert first.id == second.id
     assert first.slug == "legacy-milos-training"
+    assert first.name == "Milos Training"
   end
 end
