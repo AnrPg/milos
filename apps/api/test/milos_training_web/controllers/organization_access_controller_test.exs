@@ -1,7 +1,8 @@
 defmodule MilosTrainingWeb.OrganizationAccessControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
-  alias MilosTraining.Organizations
+  alias MilosTraining.{Organizations, Repo}
+  alias MilosTraining.Organizations.OrganizationSetting
 
   import MilosTraining.TestFixtures
 
@@ -45,6 +46,19 @@ defmodule MilosTrainingWeb.OrganizationAccessControllerTest do
     assert %{"role" => "member", "organization" => %{"slug" => slug}} =
              json_response(redeemed, 201)
 
+    %OrganizationSetting{}
+    |> OrganizationSetting.changeset(%{
+      organization_id: context.organization.id,
+      timezone: "Europe/Athens",
+      default_locale: "el",
+      invitation_lifetime_seconds: 604_800,
+      brand_name: "Context Gym App",
+      brand_logo_url: "https://cdn.example.test/context-gym.png",
+      brand_primary_color: "#336699",
+      settings: %{}
+    })
+    |> Repo.insert!()
+
     memberships =
       context.conn
       |> recycle()
@@ -52,7 +66,10 @@ defmodule MilosTrainingWeb.OrganizationAccessControllerTest do
       |> get("/api/memberships")
 
     assert Enum.any?(json_response(memberships, 200), fn entry ->
-             entry["organization"]["slug"] == slug and entry["role"] == "member"
+             entry["organization"]["slug"] == slug and entry["role"] == "member" and
+               entry["settings"]["brand_name"] == "Context Gym App" and
+               entry["settings"]["brand_logo_url"] == "https://cdn.example.test/context-gym.png" and
+               entry["settings"]["brand_primary_color"] == "#336699"
            end)
   end
 

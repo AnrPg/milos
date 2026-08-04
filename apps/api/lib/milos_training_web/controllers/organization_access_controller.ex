@@ -41,6 +41,16 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
     required: [:id, :name, :slug]
   }
 
+  @organization_settings_schema %Schema{
+    type: :object,
+    nullable: true,
+    properties: %{
+      brand_name: %Schema{type: :string, nullable: true},
+      brand_logo_url: %Schema{type: :string, nullable: true},
+      brand_primary_color: %Schema{type: :string, nullable: true}
+    }
+  }
+
   @invitation_schema %Schema{
     type: :object,
     properties: %{
@@ -57,7 +67,8 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
     properties: %{
       id: %Schema{type: :string, format: :uuid},
       role: %Schema{type: :string},
-      organization: @organization_schema
+      organization: @organization_schema,
+      settings: @organization_settings_schema
     },
     required: [:id, :role, :organization]
   }
@@ -173,11 +184,22 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
     |> then(fn value -> if value.token, do: value, else: Map.delete(value, :token) end)
   end
 
-  defp serialize_membership(%{membership: membership, organization: organization}) do
+  defp serialize_membership(%{membership: membership, organization: organization} = entry) do
     %{
       id: membership.id,
       role: to_string(membership.role),
-      organization: %{id: organization.id, name: organization.name, slug: organization.slug}
+      organization: %{id: organization.id, name: organization.name, slug: organization.slug},
+      settings: serialize_settings(Map.get(entry, :settings))
+    }
+  end
+
+  defp serialize_settings(nil), do: nil
+
+  defp serialize_settings(settings) do
+    %{
+      brand_name: settings.brand_name,
+      brand_logo_url: settings.brand_logo_url,
+      brand_primary_color: settings.brand_primary_color
     }
   end
 end

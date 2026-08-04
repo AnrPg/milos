@@ -141,13 +141,20 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     |> join(:inner, [membership], organization in Organization,
       on: organization.id == membership.organization_id
     )
+    |> join(:left, [_membership, organization], settings in OrganizationSetting,
+      on: settings.organization_id == organization.id
+    )
     |> where(
-      [membership, organization],
+      [membership, organization, _settings],
       membership.user_id == ^user_id and membership.status == :active and
         organization.status == :active
     )
-    |> order_by([_membership, organization], asc: organization.name)
-    |> select([membership, organization], %{membership: membership, organization: organization})
+    |> order_by([_membership, organization, _settings], asc: organization.name)
+    |> select([membership, organization, settings], %{
+      membership: membership,
+      organization: organization,
+      settings: settings
+    })
     |> Repo.all()
   end
 

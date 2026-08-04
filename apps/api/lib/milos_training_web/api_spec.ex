@@ -5,9 +5,9 @@ defmodule MilosTrainingWeb.ApiSpec do
   def spec do
     %OpenApi{
       info: %Info{
-        title: "Milos Training API",
+        title: "TrainingJournal API",
         version: "0.1.0",
-        description: "Contract for the Milos Training backend API."
+        description: "Contract for the TrainingJournal backend API."
       },
       servers: [
         %Server{url: "/"}
