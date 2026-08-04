@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 const pages = [
-  { path: "/about", heading: /milos training/i },
+  { path: "/about", heading: /trainingjournal/i },
   { path: "/register", heading: /create your account/i },
 ];
 

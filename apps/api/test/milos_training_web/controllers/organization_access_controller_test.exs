@@ -46,9 +46,9 @@ defmodule MilosTrainingWeb.OrganizationAccessControllerTest do
     assert %{"role" => "member", "organization" => %{"slug" => slug}} =
              json_response(redeemed, 201)
 
-    %OrganizationSetting{}
+    OrganizationSetting
+    |> Repo.get_by!(organization_id: context.organization.id)
     |> OrganizationSetting.changeset(%{
-      organization_id: context.organization.id,
       timezone: "Europe/Athens",
       default_locale: "el",
       invitation_lifetime_seconds: 604_800,
@@ -57,7 +57,7 @@ defmodule MilosTrainingWeb.OrganizationAccessControllerTest do
       brand_primary_color: "#336699",
       settings: %{}
     })
-    |> Repo.insert!()
+    |> Repo.update!()
 
     memberships =
       context.conn
