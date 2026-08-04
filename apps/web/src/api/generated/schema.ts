@@ -1000,6 +1000,23 @@ export interface paths {
         patch: operations["MilosTrainingWeb.AdminWellbeingController.heal"];
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/athletes/{id}/drill-down": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fetch an athlete coaching drill-down */
+        get: operations["MilosTrainingWeb.AdminCoachingController.drill_down (2)"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/users": {
         parameters: {
             query?: never;
@@ -6367,6 +6384,139 @@ export interface operations {
                             /** @enum {string} */
                             visibility: "admin_only" | "user_and_admin";
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCoachingController.drill_down (2)": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Athlete ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Athlete coaching drill-down */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        drill_down: {
+                            actions: {
+                                available: boolean;
+                                key: string;
+                                reason: string | null;
+                            }[];
+                            assigned_workouts: {
+                                admin_notes?: string | null;
+                                execution_scores: {
+                                    [key: string]: unknown;
+                                }[];
+                                /** Format: uuid */
+                                id: string | null;
+                                /** Format: uuid */
+                                master_workout_id?: string | null;
+                                /** Format: date */
+                                scheduled_for: string | null;
+                                /** @enum {string} */
+                                status: "completed" | "upcoming" | "overdue" | "rejected";
+                                workout: {
+                                    [key: string]: unknown;
+                                };
+                            }[];
+                            attention_cues: ({
+                                reason: string;
+                                /** @enum {string} */
+                                severity: "high" | "medium" | "low";
+                                title: string;
+                                type: string;
+                            } & {
+                                [key: string]: unknown;
+                            })[];
+                            execution_history: {
+                                /** Format: date-time */
+                                completed_at_utc?: string | null;
+                                exercise_note_count: number;
+                                /** Format: uuid */
+                                id: string | null;
+                                /** Format: uuid */
+                                master_workout_id?: string | null;
+                                section_scores: {
+                                    [key: string]: unknown;
+                                }[];
+                                source?: string | null;
+                                /** Format: date-time */
+                                started_at_utc?: string | null;
+                                status: string | null;
+                                workout_title?: string | null;
+                                workout_type?: string | null;
+                            }[];
+                            identity: {
+                                nickname: string | null;
+                                role: string | null;
+                                /** Format: uuid */
+                                user_id: string | null;
+                                user_type?: string | null;
+                            };
+                            notes_context: ({
+                                body: string | null;
+                                /** Format: uuid */
+                                id?: string | null;
+                                /** Format: date-time */
+                                inserted_at: string | null;
+                                type: string;
+                            } & {
+                                [key: string]: unknown;
+                            })[];
+                            recent_activity: {
+                                completed_workouts_last_14_days: number;
+                                completed_workouts_last_30_days: number;
+                                /** Format: date-time */
+                                last_completed_at: string | null;
+                                /** Format: date-time */
+                                last_started_at: string | null;
+                                reason: string;
+                                /** @enum {string} */
+                                state: "active" | "drifting" | "inactive";
+                                /** @enum {string} */
+                                urgency: "urgent" | "attention" | "normal";
+                            };
+                            score_trends: {
+                                entries: {
+                                    [key: string]: unknown;
+                                }[];
+                                workout_type: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
                     };
                 };
             };

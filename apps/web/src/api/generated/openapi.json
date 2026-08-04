@@ -9307,6 +9307,406 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/athletes/{id}/drill-down": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminCoachingController.drill_down (2)",
+        "parameters": [
+          {
+            "description": "Athlete ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "drill_down": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "actions": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "available": {
+                                "type": "boolean"
+                              },
+                              "key": {
+                                "type": "string"
+                              },
+                              "reason": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "key",
+                              "available",
+                              "reason"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "assigned_workouts": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "admin_notes": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "execution_scores": {
+                                "items": {
+                                  "additionalProperties": true,
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "master_workout_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "scheduled_for": {
+                                "format": "date",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "completed",
+                                  "upcoming",
+                                  "overdue",
+                                  "rejected"
+                                ],
+                                "type": "string"
+                              },
+                              "workout": {
+                                "additionalProperties": true,
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "scheduled_for",
+                              "status",
+                              "workout",
+                              "execution_scores"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "attention_cues": {
+                          "items": {
+                            "additionalProperties": true,
+                            "properties": {
+                              "reason": {
+                                "type": "string"
+                              },
+                              "severity": {
+                                "enum": [
+                                  "high",
+                                  "medium",
+                                  "low"
+                                ],
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "severity",
+                              "reason",
+                              "title"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "execution_history": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "completed_at_utc": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "exercise_note_count": {
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "master_workout_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "section_scores": {
+                                "items": {
+                                  "additionalProperties": true,
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "source": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "started_at_utc": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "status": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "workout_title": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "workout_type": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "status",
+                              "section_scores",
+                              "exercise_note_count"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "identity": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "role": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "user_type": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "user_id",
+                            "nickname",
+                            "role"
+                          ],
+                          "type": "object"
+                        },
+                        "notes_context": {
+                          "items": {
+                            "additionalProperties": true,
+                            "properties": {
+                              "body": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "inserted_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "body",
+                              "inserted_at"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "recent_activity": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "completed_workouts_last_14_days": {
+                              "type": "integer"
+                            },
+                            "completed_workouts_last_30_days": {
+                              "type": "integer"
+                            },
+                            "last_completed_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "last_started_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "reason": {
+                              "type": "string"
+                            },
+                            "state": {
+                              "enum": [
+                                "active",
+                                "drifting",
+                                "inactive"
+                              ],
+                              "type": "string"
+                            },
+                            "urgency": {
+                              "enum": [
+                                "urgent",
+                                "attention",
+                                "normal"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "state",
+                            "reason",
+                            "urgency",
+                            "completed_workouts_last_14_days",
+                            "completed_workouts_last_30_days",
+                            "last_completed_at",
+                            "last_started_at"
+                          ],
+                          "type": "object"
+                        },
+                        "score_trends": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "entries": {
+                                "items": {
+                                  "additionalProperties": true,
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "workout_type": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "workout_type",
+                              "entries"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "identity",
+                        "recent_activity",
+                        "assigned_workouts",
+                        "execution_history",
+                        "score_trends",
+                        "notes_context",
+                        "attention_cues",
+                        "actions"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "drill_down"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Athlete coaching drill-down"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Fetch an athlete coaching drill-down",
+        "tags": [
+          "Admin Coaching"
+        ]
+      }
+    },
     "/api/admin/users": {
       "get": {
         "callbacks": {},
