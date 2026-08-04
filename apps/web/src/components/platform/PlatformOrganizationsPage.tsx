@@ -40,7 +40,7 @@ export function PlatformOrganizationsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [invitation, setInvitation] = useState<ProvisionOrganizationResult | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<"token" | "link" | null>(null);
   const [editing, setEditing] = useState<PlatformOrganization | null>(null);
 
   const accessToken = tokens?.access_token;
@@ -61,7 +61,7 @@ export function PlatformOrganizationsPage() {
     try {
       const result = await provisionPlatformOrganization(accessToken, compact(form));
       setInvitation(result);
-      setCopied(false);
+      setCopied(null);
       setForm(defaultForm);
       await organizationsQuery.refetch();
     } catch {
@@ -144,6 +144,10 @@ export function PlatformOrganizationsPage() {
         <section className="mt-6 border border-amber-400 bg-amber-50 p-5 text-amber-950">
           <h2 className="text-lg font-semibold">{copy.copyTokenTitle}</h2>
           <p className="mt-1 text-sm">{copy.copyTokenWarning}</p>
+          <p className="mt-4 text-xs font-semibold uppercase">{copy.ownerSetupLink}</p>
+          <code className="mt-1 block break-all border border-amber-300 bg-white px-3 py-3 text-sm">
+            {ownerSetupUrl(invitation.initial_owner_invitation.token)}
+          </code>
           <code className="mt-4 block break-all border border-amber-300 bg-white px-3 py-3 text-sm">
             {invitation.initial_owner_invitation.token}
           </code>
@@ -155,11 +159,21 @@ export function PlatformOrganizationsPage() {
               type="button"
               onClick={async () => {
                 await navigator.clipboard.writeText(invitation.initial_owner_invitation.token);
-                setCopied(true);
+                setCopied("token");
               }}
               className="border border-amber-900 bg-amber-900 px-4 py-2 text-sm font-semibold text-white"
             >
-              {copied ? copy.copied : copy.copyToken}
+              {copied === "token" ? copy.copied : copy.copyToken}
+            </button>
+            <button
+              type="button"
+              onClick={async () => {
+                await navigator.clipboard.writeText(ownerSetupUrl(invitation.initial_owner_invitation.token));
+                setCopied("link");
+              }}
+              className="border border-amber-900 bg-amber-900 px-4 py-2 text-sm font-semibold text-white"
+            >
+              {copied === "link" ? copy.copied : copy.copyOwnerSetupLink}
             </button>
             <button
               type="button"
@@ -262,6 +276,12 @@ function compact(input: ProvisionOrganizationInput): ProvisionOrganizationInput 
   return Object.fromEntries(
     Object.entries(input).filter(([, value]) => value !== "" && value !== undefined),
   ) as ProvisionOrganizationInput;
+}
+
+function ownerSetupUrl(token: string) {
+  const path = `/set-admin?token=${encodeURIComponent(token)}`;
+  if (typeof window === "undefined") return path;
+  return `${window.location.origin}${path}`;
 }
 
 function TextField({ label, value, onChange, type = "text", ...inputProps }: {
