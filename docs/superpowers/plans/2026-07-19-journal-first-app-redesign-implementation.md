@@ -67,7 +67,7 @@ ADR-042, ADR-043, ADR-044, ADR-050, ADR-051, ADR-052, ADR-064, ADR-067; TD-013,
 TD-033, and TD-035.
 
 - [ ] Review and accept/adjust Gates A-D with the product owner.
-- [ ] Write `ADR-068-journal-context-and-timeline-ownership.md` before code.
+- [ ] Write `ADR-086-journal-context-and-timeline-ownership.md` before code.
 - [ ] Add `TrainingJournal` to the authoritative bounded-context catalogue and
       architecture allowlists only after ADR acceptance.
 - [ ] Define a domain glossary: planned candidate, prescription snapshot, actual
@@ -81,7 +81,7 @@ TD-033, and TD-035.
 - [ ] Confirm retention/export requirements and timezone semantics.
 - [ ] Define rollout feature flags and rollback behavior.
 
-**Exit criteria:** ADR-068 accepted; no unresolved ownership/privacy assumptions;
+**Exit criteria:** ADR-086 accepted; no unresolved ownership/privacy assumptions;
 surface inventory and invariants are reviewed.
 
 **Commit:** `docs(journal): accept context ownership - keep canonical domains intact`
@@ -90,7 +90,7 @@ surface inventory and invariants are reviewed.
 
 **Goal:** Add the journal-owned aggregate without changing existing records or routes.
 
-**ADR:** update ADR-068 with the final relational model before migration.
+**ADR:** update ADR-086 with the final relational model before migration.
 
 ### Domain tests first
 
@@ -171,14 +171,14 @@ format, and full backend tests pass.
 
 **Goal:** Show one coherent history without copying ownership or leaking permissions.
 
-- [ ] Write `ADR-069-journal-timeline-projection.md` if projector details extend
-      ADR-068 materially.
+- [ ] Write `ADR-087-journal-timeline-projection.md` if projector details extend
+      ADR-086 materially.
 - [ ] Define plain event payloads for Execution, Wellbeing, Feedback, Pantheon, and
       sparse Gamification milestones.
 - [ ] Add durable idempotent projector workers with source-unique upserts.
 - [ ] Enqueue projection work transactionally from each owning context where required.
 - [ ] Project existing TrainingJournal writes in their local transaction or through
-      the same durable mechanism chosen in ADR-068.
+      the same durable mechanism chosen in ADR-086.
 - [ ] Add source authorization resolvers through context public APIs; never import
       foreign schemas.
 - [ ] Omit/redact inaccessible linked details while preserving the authorized parent.
@@ -446,4 +446,3 @@ surface remains, and all live-test evidence is recorded.
 12. `feat(coaching): share selected journal entries - preserve private boundaries`
 13. `refactor(web): adopt journal-first navigation - support independent users`
 14. `chore(journal): backfill and roll out - preserve existing history`
-
