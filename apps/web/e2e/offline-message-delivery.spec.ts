@@ -67,6 +67,7 @@ async function mockAuthenticatedApi(
 
     if (path === "/api/auth/refresh") return json(route, { access_token: "test-token" });
     if (path === "/api/auth/me") return json(route, user);
+    if (path === "/api/memberships") return json(route, []);
     if (path === "/api/threads/unread-count") return json(route, { unread_count: 0 });
     if (path === "/api/threads" && method === "GET") return json(route, { threads: [thread] });
 

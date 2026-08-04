@@ -31,11 +31,15 @@ export function OrganizationSelector() {
   });
 
   const pathSlug = pathname.match(/^\/org\/([^/]+)/)?.[1] ?? "";
-  const membershipsBySlug = useMemo(
-    () => new Map((memberships.data ?? []).map((entry) => [entry.organization.slug, entry])),
+  const membershipList = useMemo(
+    () => (Array.isArray(memberships.data) ? memberships.data : []),
     [memberships.data],
   );
-  const fallbackSlug = memberships.data?.[0]?.organization.slug ?? "";
+  const membershipsBySlug = useMemo(
+    () => new Map(membershipList.map((entry) => [entry.organization.slug, entry])),
+    [membershipList],
+  );
+  const fallbackSlug = membershipList[0]?.organization.slug ?? "";
   const selectedSlug =
     pathSlug && membershipsBySlug.has(pathSlug)
       ? pathSlug
@@ -51,7 +55,7 @@ export function OrganizationSelector() {
     } catch {}
   }, [selectedSlug, storedSlug]);
 
-  if (!memberships.data?.length) return null;
+  if (!membershipList.length) return null;
 
   return (
     <select
@@ -77,7 +81,7 @@ export function OrganizationSelector() {
       value={selectedSlug}
     >
       <option value="">{i18n("organization")}</option>
-      {memberships.data.map((entry) => (
+      {membershipList.map((entry) => (
         <option key={entry.id} value={entry.organization.slug}>
           {entry.organization.name}
         </option>
