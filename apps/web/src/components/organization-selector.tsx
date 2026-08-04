@@ -10,6 +10,11 @@ import { fetchOrganizationMemberships } from "@/api/organizations";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 
+type OrganizationSelectorProps = {
+  variant?: "nav" | "menu";
+  onSelect?: () => void;
+};
+
 function organizationDisplayName(entry: {
   organization: { name: string };
   settings?: { brand_name?: string | null } | null;
@@ -17,7 +22,7 @@ function organizationDisplayName(entry: {
   return entry.settings?.brand_name?.trim() || entry.organization.name;
 }
 
-export function OrganizationSelector() {
+export function OrganizationSelector({ variant = "nav", onSelect }: OrganizationSelectorProps) {
   const i18n = useUiTranslations();
   const pathname = usePathname();
   const router = useRouter();
@@ -65,10 +70,19 @@ export function OrganizationSelector() {
     } catch {}
   }, [selectedSlug, storedSlug]);
 
-  if (!membershipList.length) return null;
+  if (membershipList.length <= 1) return null;
+
+  const wrapperClassName =
+    variant === "menu"
+      ? "flex items-center gap-2 border-t px-4 py-2.5"
+      : "flex max-w-56 shrink-0 items-center gap-2";
+  const selectClassName =
+    variant === "menu"
+      ? "min-w-0 flex-1 rounded-md px-2 py-1.5 text-xs outline-none"
+      : "min-w-0 max-w-40 rounded-md px-2 py-1 text-xs outline-none";
 
   return (
-    <div className="flex max-w-56 shrink-0 items-center gap-2">
+    <div className={wrapperClassName} style={variant === "menu" ? { borderColor: "var(--border)" } : undefined}>
       {selectedLogoUrl ? (
         <Image
           alt=""
@@ -82,7 +96,7 @@ export function OrganizationSelector() {
       ) : null}
       <select
         aria-label={i18n("organization")}
-        className="min-w-0 max-w-40 rounded-md px-2 py-1 text-xs outline-none"
+        className={selectClassName}
         onChange={(event) => {
           const slug = event.target.value;
           const membership = membershipsBySlug.get(slug);
@@ -98,6 +112,7 @@ export function OrganizationSelector() {
               ? "/admin"
               : `/org/${slug}`,
           );
+          onSelect?.();
         }}
         style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
         value={selectedSlug}

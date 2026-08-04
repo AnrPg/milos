@@ -257,7 +257,6 @@ export function TopNav() {
       }}
     >
       <div className="flex w-full items-center gap-2 px-2 sm:gap-4 sm:px-5">
-        <OrganizationSelector />
         <Link
           href="/"
           className="hidden shrink-0 text-xs font-bold uppercase tracking-[0.28em] sm:block"
@@ -395,6 +394,7 @@ export function TopNav() {
                 >
                   {t("profile")}
                 </Link>
+                <OrganizationSelector variant="menu" onSelect={() => setMenuOpen(false)} />
                 {role !== "admin" ? (
                   <Link
                     href="/account/billing"
