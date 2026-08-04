@@ -427,7 +427,31 @@ defmodule MilosTrainingWeb.AuthControllerTest do
       assert body["id"] == user.id
       assert body["nickname"] == "ares"
       assert body["role"] == "member"
+      assert body["platform_owner"] == false
       assert body["preferred_locale"] == "en"
+    end
+
+    test "marks platform owner accounts", %{conn: conn} do
+      {:ok, user} =
+        Identity.register(%{
+          nickname: "platform_me",
+          password: "S3cur3P@ss!",
+          role: :member
+        })
+
+      {:ok, user} = Identity.update_role(user, :admin)
+      {:ok, _owner} = Organizations.grant_platform_owner(user.id)
+
+      {:ok, access_token, _claims} =
+        Guardian.encode_and_sign(user, %{"sv" => user.security_version}, token_type: "access")
+
+      body =
+        conn
+        |> put_req_header("authorization", "Bearer " <> access_token)
+        |> get("/api/auth/me")
+        |> json_response(200)
+
+      assert body["platform_owner"] == true
     end
   end
 

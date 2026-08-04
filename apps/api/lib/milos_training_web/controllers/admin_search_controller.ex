@@ -58,7 +58,7 @@ defmodule MilosTrainingWeb.AdminSearchController do
   )
 
   def index(conn, params) do
-    with {:ok, payload} <- AdminSearchUsers.call(params) do
+    with {:ok, payload} <- AdminSearchUsers.call(params, conn.assigns.tenant_context) do
       json(conn, payload)
     end
   end

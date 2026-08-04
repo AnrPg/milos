@@ -2,7 +2,15 @@ defmodule MilosTrainingWeb.MeController do
   use MilosTrainingWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias MilosTraining.Application.{RequestAvatarUpload, SearchUsers, UpdateAvatar, UpdateProfile}
+  alias MilosTraining.Application.{
+    RequestAvatarUpload,
+    ResolvePlatformContext,
+    ResolveTenantContext,
+    SearchUsers,
+    UpdateAvatar,
+    UpdateProfile
+  }
+
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
   action_fallback MilosTrainingWeb.FallbackController
@@ -136,7 +144,7 @@ defmodule MilosTrainingWeb.MeController do
   )
 
   operation(:search_users,
-    summary: "Search all users by nickname",
+    summary: "Search visible users by nickname",
     parameters: [
       %Parameter{
         name: :q,
@@ -206,14 +214,46 @@ defmodule MilosTrainingWeb.MeController do
   end
 
   def search_users(conn, params) do
+    user = Guardian.Plug.current_resource(conn)
     query = params["q"] || ""
-    users = SearchUsers.call(query)
 
-    json(conn, %{
-      users:
-        Enum.map(users, fn u ->
-          %{id: u.id, nickname: u.nickname, role: to_string(u.role)}
-        end)
-    })
+    with {:ok, users} <- search_visible_users(conn, user, query) do
+      json(conn, %{
+        users:
+          Enum.map(users, fn u ->
+            %{id: u.id, nickname: u.nickname, role: to_string(u.role)}
+          end)
+      })
+    end
+  end
+
+  defp search_visible_users(conn, user, query) do
+    if platform_owner?(user) do
+      {:ok, SearchUsers.call(query)}
+    else
+      with {:ok, slug} <- organization_slug(conn),
+           {:ok, tenant_context} <- ResolveTenantContext.call(user, slug, request_metadata(conn)) do
+        {:ok, SearchUsers.call(query, tenant_context)}
+      end
+    end
+  end
+
+  defp platform_owner?(user) do
+    match?({:ok, _context}, ResolvePlatformContext.call(user, %{}))
+  end
+
+  defp organization_slug(conn) do
+    case List.first(get_req_header(conn, "x-organization-slug")) do
+      slug when is_binary(slug) and slug != "" -> {:ok, slug}
+      _missing -> {:error, :organization_context_required}
+    end
+  end
+
+  defp request_metadata(conn) do
+    %{
+      transport: :http,
+      method: conn.method,
+      request_id: List.first(get_resp_header(conn, "x-request-id"))
+    }
   end
 end

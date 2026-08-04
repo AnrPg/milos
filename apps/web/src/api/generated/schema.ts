@@ -1162,7 +1162,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Search all users by nickname */
+        /** Search visible users by nickname */
         get: operations["MilosTrainingWeb.MeController.search_users"];
         put?: never;
         post?: never;
@@ -7018,6 +7018,7 @@ export interface operations {
                         /** Format: uuid */
                         id: string;
                         nickname: string;
+                        platform_owner: boolean;
                         /** @enum {string} */
                         preferred_locale: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
                         role: string;

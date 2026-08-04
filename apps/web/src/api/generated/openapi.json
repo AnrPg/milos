@@ -10915,7 +10915,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Search all users by nickname",
+        "summary": "Search visible users by nickname",
         "tags": [
           "Me"
         ]
@@ -10943,6 +10943,9 @@
                     "nickname": {
                       "type": "string"
                     },
+                    "platform_owner": {
+                      "type": "boolean"
+                    },
                     "preferred_locale": {
                       "enum": [
                         "en",
@@ -10968,6 +10971,7 @@
                     "id",
                     "nickname",
                     "role",
+                    "platform_owner",
                     "preferred_locale"
                   ],
                   "type": "object"

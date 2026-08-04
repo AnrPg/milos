@@ -2,6 +2,7 @@ defmodule MilosTrainingWeb.MeControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
   alias MilosTraining.Identity
+  alias MilosTraining.Organizations
   alias MilosTraining.Infrastructure.Auth.Guardian
 
   describe "PATCH /api/me/avatar" do
@@ -135,5 +136,84 @@ defmodule MilosTrainingWeb.MeControllerTest do
 
       assert Identity.find_by_id(user.id).preferred_locale == "en"
     end
+  end
+
+  describe "GET /api/me/search/users" do
+    test "tenant users only see users in the selected organization", %{conn: conn} do
+      {:ok, organization} = Organizations.create_organization(%{name: "Tenant Search One"})
+      {:ok, other_organization} = Organizations.create_organization(%{name: "Tenant Search Two"})
+
+      searcher = register_search_user("tenant_searcher")
+      visible = register_search_user("tenant_visible")
+      hidden = register_search_user("tenant_hidden")
+
+      add_membership(organization.id, searcher.id)
+      add_membership(organization.id, visible.id)
+      add_membership(other_organization.id, hidden.id)
+
+      body =
+        conn
+        |> put_bearer_token(searcher)
+        |> put_req_header("x-organization-slug", organization.slug)
+        |> get("/api/me/search/users?q=tenant_")
+        |> json_response(200)
+
+      ids = Enum.map(body["users"], & &1["id"])
+      assert visible.id in ids
+      assert searcher.id in ids
+      refute hidden.id in ids
+    end
+
+    test "platform owners can search across organizations", %{conn: conn} do
+      {:ok, organization} = Organizations.create_organization(%{name: "Platform Search One"})
+
+      {:ok, other_organization} =
+        Organizations.create_organization(%{name: "Platform Search Two"})
+
+      platform_owner = register_search_user("platform_searcher", :admin)
+      visible = register_search_user("platform_visible")
+      hidden = register_search_user("platform_hidden")
+
+      {:ok, _owner} = Organizations.grant_platform_owner(platform_owner.id)
+      add_membership(organization.id, visible.id)
+      add_membership(other_organization.id, hidden.id)
+
+      body =
+        conn
+        |> put_bearer_token(platform_owner)
+        |> get("/api/me/search/users?q=platform_")
+        |> json_response(200)
+
+      ids = Enum.map(body["users"], & &1["id"])
+      assert visible.id in ids
+      assert hidden.id in ids
+    end
+  end
+
+  defp register_search_user(nickname, role \\ :member) do
+    {:ok, user} =
+      Identity.register(%{
+        nickname: nickname,
+        password: "S3cur3P@ss!",
+        role: :member
+      })
+
+    if role == :admin do
+      {:ok, admin} = Identity.update_role(user, :admin)
+      admin
+    else
+      user
+    end
+  end
+
+  defp add_membership(organization_id, user_id) do
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization_id,
+        user_id: user_id,
+        role: :member,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
   end
 end

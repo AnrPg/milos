@@ -1,10 +1,15 @@
 defmodule MilosTraining.Application.AdminSearchUsers do
   alias MilosTraining.Application.{AdminMemberSearchDocuments, AdminMemberSearchIndex}
-  alias MilosTraining.{Finance, Identity, Identity.RegistrationPolicy}
+  alias MilosTraining.{Finance, Identity, Identity.RegistrationPolicy, Organizations}
 
   def call(params) do
+    call(params, nil)
+  end
+
+  def call(params, tenant_context) do
     query = normalize_query(params["q"] || params[:q])
     role = normalize_role(params["role"] || params[:role] || "all")
+    allowed_user_ids = allowed_user_ids(tenant_context)
 
     membership_status =
       normalize_filter(params["membership_status"] || params[:membership_status])
@@ -17,19 +22,24 @@ defmodule MilosTraining.Application.AdminSearchUsers do
     if empty_search?(query, role, membership_status, package_code, package_family, user_type) do
       {:ok, %{users: [], meta: %{limit: limit, empty_search: true}}}
     else
-      search_params = %{
-        query: query,
-        role: role,
-        membership_status: membership_status,
-        package_code: package_code,
-        package_family: package_family,
-        user_type: user_type,
-        limit: limit
-      }
+      search_params =
+        %{
+          query: query,
+          role: role,
+          membership_status: membership_status,
+          package_code: package_code,
+          package_family: package_family,
+          user_type: user_type,
+          limit: limit
+        }
+        |> maybe_put_allowed_user_ids(allowed_user_ids)
 
       case search_with_index(search_params) do
         {:ok, payload} ->
-          {:ok, put_in(payload, [:meta, :empty_search], false)}
+          {:ok,
+           payload
+           |> filter_index_payload(Map.get(search_params, :allowed_user_ids))
+           |> put_in([:meta, :empty_search], false)}
 
         {:error, _reason} ->
           {:ok, fallback_search(search_params)}
@@ -50,6 +60,7 @@ defmodule MilosTraining.Application.AdminSearchUsers do
     candidates =
       Identity.list_all_users()
       |> Enum.reject(&(&1.role == :admin))
+      |> filter_allowed_users(Map.get(search_params, :allowed_user_ids))
       |> filter_role(search_params.role)
       |> filter_query(search_params.query)
 
@@ -80,6 +91,33 @@ defmodule MilosTraining.Application.AdminSearchUsers do
         search_backend: "postgres_fallback"
       }
     }
+  end
+
+  defp allowed_user_ids(nil), do: nil
+
+  defp allowed_user_ids(tenant_context) do
+    tenant_context
+    |> Organizations.list_active_membership_user_ids()
+    |> MapSet.new()
+  end
+
+  defp maybe_put_allowed_user_ids(search_params, nil), do: search_params
+
+  defp maybe_put_allowed_user_ids(search_params, allowed_user_ids),
+    do: Map.put(search_params, :allowed_user_ids, allowed_user_ids)
+
+  defp filter_index_payload(payload, nil), do: payload
+
+  defp filter_index_payload(payload, allowed_user_ids) do
+    Map.update(payload, :users, [], fn users ->
+      Enum.filter(users, fn user -> MapSet.member?(allowed_user_ids, user.id) end)
+    end)
+  end
+
+  defp filter_allowed_users(users, nil), do: users
+
+  defp filter_allowed_users(users, allowed_user_ids) do
+    Enum.filter(users, &MapSet.member?(allowed_user_ids, &1.id))
   end
 
   defp filter_role(users, "all"), do: users

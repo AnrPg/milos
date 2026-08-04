@@ -22,7 +22,9 @@ export type InvitationInspection =
 export type AuthTokens =
   paths["/api/auth/login"]["post"]["responses"]["200"]["content"]["application/json"];
 export type CurrentUser =
-  paths["/api/auth/me"]["get"]["responses"]["200"]["content"]["application/json"];
+  paths["/api/auth/me"]["get"]["responses"]["200"]["content"]["application/json"] & {
+    platform_owner?: boolean;
+  };
 
 export function registerUser(payload: RegisterRequest) {
   return apiRequest<AuthTokens>("/auth/register", { method: "POST", body: payload });

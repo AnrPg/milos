@@ -991,6 +991,15 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "forbidden", error: "Forbidden"})
   end
 
+  def call(conn, {:error, :organization_context_required}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "organization_context_required",
+      error: "An organization context is required"
+    })
+  end
+
   def call(conn, {:error, :slot_full}) do
     conn
     |> put_status(:conflict)

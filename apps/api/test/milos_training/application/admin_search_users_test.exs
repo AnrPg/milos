@@ -3,6 +3,7 @@ defmodule MilosTraining.Application.AdminSearchUsersTest do
 
   alias MilosTraining.Application.AdminSearchUsers
   alias MilosTraining.Finance
+  alias MilosTraining.Organizations
   alias MilosTraining.TestFixtures
 
   setup do
@@ -135,6 +136,30 @@ defmodule MilosTraining.Application.AdminSearchUsersTest do
     assert meta.empty_search == false
   end
 
+  test "filters fallback results to the selected organization membership" do
+    Application.put_env(:milos_training, :admin_member_search_index, __MODULE__.FailingIndex)
+
+    admin = TestFixtures.user_fixture(%{nickname: "scope_admin"})
+    visible = TestFixtures.user_fixture(%{role: :member, nickname: "scoped_visible"})
+    hidden = TestFixtures.user_fixture(%{role: :member, nickname: "scoped_hidden"})
+
+    {:ok, organization} = Organizations.create_organization(%{name: "Scoped Search"})
+    {:ok, other_organization} = Organizations.create_organization(%{name: "Other Scoped Search"})
+
+    add_org_membership(organization.id, admin.id, :owner)
+    add_org_membership(organization.id, visible.id, :member)
+    add_org_membership(other_organization.id, hidden.id, :member)
+
+    {:ok, tenant_context} = Organizations.resolve_tenant_context(admin, organization.slug)
+
+    assert {:ok, %{users: users}} =
+             AdminSearchUsers.call(%{"q" => "scoped_", "role" => "member"}, tenant_context)
+
+    ids = Enum.map(users, & &1.id)
+    assert visible.id in ids
+    refute hidden.id in ids
+  end
+
   defmodule FailingIndex do
     @behaviour MilosTraining.Application.Ports.AdminMemberSearchIndex
 
@@ -176,5 +201,16 @@ defmodule MilosTraining.Application.AdminSearchUsersTest do
     end
 
     def search(_params), do: {:error, :unexpected_params}
+  end
+
+  defp add_org_membership(organization_id, user_id, role) do
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization_id,
+        user_id: user_id,
+        role: role,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
   end
 end

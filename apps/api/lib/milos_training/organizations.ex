@@ -15,6 +15,7 @@ defmodule MilosTraining.Organizations do
   alias MilosTraining.Organizations.Queries.{
     FindOrganization,
     InspectInvitation,
+    ListActiveMembershipUserIds,
     ListMemberships,
     ListProvisionedOrganizations,
     ResolvePlatformContext,
@@ -31,6 +32,7 @@ defmodule MilosTraining.Organizations do
   defdelegate get_by_slug(slug), to: FindOrganization, as: :by_slug
   defdelegate get_by_domain(host), to: FindOrganization, as: :by_domain
   defdelegate list_memberships(user_id), to: ListMemberships, as: :call
+  defdelegate list_active_membership_user_ids(context), to: ListActiveMembershipUserIds, as: :call
 
   def issue_invitation(context, params, issued_at \\ DateTime.utc_now()),
     do: IssueInvitation.call(context, params, issued_at)
