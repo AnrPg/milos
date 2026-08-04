@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Milos Training">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="TrainingJournal">
   <rect width="512" height="512" fill="#0b0d10"/>
   <circle cx="256" cy="256" r="184" fill="#151a20"/>
   <path d="M128 210h40v92h-40zm216 0h40v92h-40zM96 228h24v56H96zm296 0h24v56h-24zM176 246h160v20H176z" fill="#c9ff45"/>

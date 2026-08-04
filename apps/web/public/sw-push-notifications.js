@@ -9,7 +9,7 @@ self.addEventListener("push", (event) => {
   const notificationId = data.notification_id ?? null;
 
   event.waitUntil(
-    self.registration.showNotification(data.title ?? "Milos Training", {
+    self.registration.showNotification(data.title ?? "TrainingJournal", {
       body: data.body ?? "",
       lang: data.locale ?? "en",
       dir: data.locale === "ar" || data.locale === "he" ? "rtl" : "ltr",

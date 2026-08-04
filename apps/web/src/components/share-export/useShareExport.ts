@@ -38,7 +38,7 @@ export function useShareExport() {
       formatCsv: i18n("shareExportFormatCsv"),
     },
     labels: {
-      appName: "Milos Training",
+      appName: "TrainingJournal",
       finance: i18n("finance1b48d3f"),
       members: i18n("members1cb449c"),
       plan: i18n("planae2f98a"),

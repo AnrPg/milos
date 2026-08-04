@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 
@@ -8,6 +9,13 @@ import { SELECTED_ORGANIZATION_SLUG_KEY } from "@/api/client";
 import { fetchOrganizationMemberships } from "@/api/organizations";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
+
+function organizationDisplayName(entry: {
+  organization: { name: string };
+  settings?: { brand_name?: string | null } | null;
+}) {
+  return entry.settings?.brand_name?.trim() || entry.organization.name;
+}
 
 export function OrganizationSelector() {
   const i18n = useUiTranslations();
@@ -46,6 +54,8 @@ export function OrganizationSelector() {
       : storedSlug && membershipsBySlug.has(storedSlug)
         ? storedSlug
         : fallbackSlug;
+  const selectedMembership = selectedSlug ? membershipsBySlug.get(selectedSlug) : null;
+  const selectedLogoUrl = selectedMembership?.settings?.brand_logo_url?.trim() || "";
 
   useEffect(() => {
     if (!selectedSlug || selectedSlug === storedSlug) return;
@@ -58,34 +68,47 @@ export function OrganizationSelector() {
   if (!membershipList.length) return null;
 
   return (
-    <select
-      aria-label={i18n("organization")}
-      className="max-w-40 rounded-md px-2 py-1 text-xs outline-none"
-      onChange={(event) => {
-        const slug = event.target.value;
-        const membership = membershipsBySlug.get(slug);
-        if (!membership) return;
+    <div className="flex max-w-56 shrink-0 items-center gap-2">
+      {selectedLogoUrl ? (
+        <Image
+          alt=""
+          aria-hidden="true"
+          className="h-7 w-7 rounded-md object-contain"
+          height={28}
+          src={selectedLogoUrl}
+          unoptimized
+          width={28}
+        />
+      ) : null}
+      <select
+        aria-label={i18n("organization")}
+        className="min-w-0 max-w-40 rounded-md px-2 py-1 text-xs outline-none"
+        onChange={(event) => {
+          const slug = event.target.value;
+          const membership = membershipsBySlug.get(slug);
+          if (!membership) return;
 
-        try {
-          window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, slug);
-        } catch {}
-        setStoredSlug(slug);
+          try {
+            window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, slug);
+          } catch {}
+          setStoredSlug(slug);
 
-        router.push(
-          ["owner", "admin", "coach"].includes(membership.role)
-            ? "/admin"
-            : `/org/${slug}`,
-        );
-      }}
-      style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-      value={selectedSlug}
-    >
-      <option value="">{i18n("organization")}</option>
-      {membershipList.map((entry) => (
-        <option key={entry.id} value={entry.organization.slug}>
-          {entry.organization.name}
-        </option>
-      ))}
-    </select>
+          router.push(
+            ["owner", "admin", "coach"].includes(membership.role)
+              ? "/admin"
+              : `/org/${slug}`,
+          );
+        }}
+        style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+        value={selectedSlug}
+      >
+        <option value="">{i18n("organization")}</option>
+        {membershipList.map((entry) => (
+          <option key={entry.id} value={entry.organization.slug}>
+            {organizationDisplayName(entry)}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 }
