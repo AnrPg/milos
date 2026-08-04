@@ -782,8 +782,8 @@
     }
   },
   "info": {
-    "description": "Contract for the Milos Training backend API.",
-    "title": "Milos Training API",
+    "description": "Contract for the TrainingJournal backend API.",
+    "title": "TrainingJournal API",
     "version": "0.1.0"
   },
   "openapi": "3.0.0",
@@ -1463,6 +1463,24 @@
                     },
                     "role": {
                       "type": "string"
+                    },
+                    "settings": {
+                      "nullable": true,
+                      "properties": {
+                        "brand_logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
                     }
                   },
                   "required": [
@@ -26471,6 +26489,24 @@
                       },
                       "role": {
                         "type": "string"
+                      },
+                      "settings": {
+                        "nullable": true,
+                        "properties": {
+                          "brand_logo_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "brand_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "brand_primary_color": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
                       }
                     },
                     "required": [

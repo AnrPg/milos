@@ -3258,6 +3258,11 @@ export interface operations {
                             slug: string;
                         };
                         role: string;
+                        settings?: {
+                            brand_logo_url?: string | null;
+                            brand_name?: string | null;
+                            brand_primary_color?: string | null;
+                        } | null;
                     };
                 };
             };
@@ -12494,6 +12499,11 @@ export interface operations {
                             slug: string;
                         };
                         role: string;
+                        settings?: {
+                            brand_logo_url?: string | null;
+                            brand_name?: string | null;
+                            brand_primary_color?: string | null;
+                        } | null;
                     }[];
                 };
             };
