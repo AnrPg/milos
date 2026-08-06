@@ -218,6 +218,9 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
     %{
       id: notification.id,
       user_id: notification.user_id,
+      # The inbox deliberately spans organizations (F-28), so clients need the
+      # origin in order to mark anything raised outside the active tenant.
+      organization_id: notification.organization_id,
       type: to_string(notification.type),
       payload: notification.payload || %{},
       read_at: notification.read_at,

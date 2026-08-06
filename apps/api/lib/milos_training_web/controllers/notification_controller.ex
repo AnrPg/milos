@@ -38,6 +38,7 @@ defmodule MilosTrainingWeb.NotificationController do
     properties: %{
       id: %Schema{type: :string, format: :uuid},
       user_id: %Schema{type: :string, format: :uuid},
+      organization_id: %Schema{type: :string, format: :uuid, nullable: true},
       type: %Schema{type: :string},
       payload: %Schema{type: :object, additionalProperties: true},
       read_at: %Schema{type: :string, format: :"date-time", nullable: true},

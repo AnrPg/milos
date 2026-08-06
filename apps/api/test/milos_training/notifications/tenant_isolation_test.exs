@@ -1,8 +1,6 @@
 defmodule MilosTraining.Notifications.TenantIsolationTest do
   use MilosTraining.DataCase, async: false
 
-  import Ecto.Query
-
   alias MilosTraining.Notifications.NotificationStore
   alias MilosTraining.{Organizations, TestFixtures}
 
@@ -26,11 +24,8 @@ defmodule MilosTraining.Notifications.TenantIsolationTest do
 
     refute notification_a.id == notification_b.id
 
-    # normalize_notification/1 does not surface organization_id, so assert the
-    # persisted column directly - this is the tenant boundary every scoped
-    # query depends on.
-    assert stored_organization_id(notification_a.id) == context_a.organization_id
-    assert stored_organization_id(notification_b.id) == context_b.organization_id
+    assert notification_a.organization_id == context_a.organization_id
+    assert notification_b.organization_id == context_b.organization_id
   end
 
   test "the organization-scoped delete path only reaches its own tenant's rows", %{
@@ -57,20 +52,19 @@ defmodule MilosTraining.Notifications.TenantIsolationTest do
     end)
 
     # Org B's identically-keyed notification must survive a delete issued by
-    # org A. The inbox read is not org-partitioned (see the known-gap test
-    # below), so assert on the surviving rows' organization_id column instead.
+    # org A. The inbox read is not org-partitioned (deliberately - see below),
+    # so discriminate on each surviving row's origin organization.
     surviving =
       context_b
       |> user_notifications(member)
       |> Enum.filter(&(to_string(&1.type) == "booking_pending"))
-      |> Enum.map(&stored_organization_id(&1.id))
+      |> Enum.map(& &1.organization_id)
 
     assert context_b.organization_id in surviving
     refute context_a.organization_id in surviving
   end
 
-  @tag :documents_current_behaviour
-  test "KNOWN GAP: the personal inbox is user-scoped only, so it spans organizations", %{
+  test "the personal inbox spans organizations and labels each item's origin", %{
     member: member,
     context_a: context_a,
     context_b: context_b
@@ -78,28 +72,28 @@ defmodule MilosTraining.Notifications.TenantIsolationTest do
     {:ok, _} = create_notification(context_a, member, "org-a body")
     {:ok, _} = create_notification(context_b, member, "org-b body")
 
-    # Every inbox read in EctoNotificationStore applies scoped_to_user/1 but not
-    # scoped_to_organization/1, so a member reading their inbox while org B is
-    # open still sees the notification raised in org A. Recorded here so the
-    # behaviour is visible rather than assumed; whether a personal inbox should
-    # be partitioned per organization is a product decision, not a code fix to
-    # make silently. See F-14 follow-up in the audit findings.
-    bodies =
-      context_b
-      |> user_notifications(member)
-      |> Enum.map(& &1.payload["body"])
+    # PRODUCT DECISION (2026-08-07, F-28): the inbox is deliberately not
+    # partitioned - a member should not miss a notification just because they
+    # have a different gym selected. Inbox reads therefore apply
+    # scoped_to_user/1 without scoped_to_organization/1.
+    #
+    # The corresponding requirement is that each item carries its origin so the
+    # client can visually flag anything raised outside the active organization.
+    # Without organization_id on the payload that is impossible, so assert it.
+    notifications = user_notifications(context_b, member)
+    bodies = Enum.map(notifications, & &1.payload["body"])
 
     assert "org-b body" in bodies
     assert "org-a body" in bodies
-  end
 
-  defp stored_organization_id(notification_id) do
-    MilosTraining.Repo.one!(
-      from(n in "notifications",
-        where: n.id == type(^notification_id, :binary_id),
-        select: type(n.organization_id, :binary_id)
-      )
-    )
+    origins =
+      Map.new(notifications, fn notification ->
+        {notification.payload["body"], notification.organization_id}
+      end)
+
+    assert origins["org-a body"] == context_a.organization_id
+    assert origins["org-b body"] == context_b.organization_id
+    refute origins["org-a body"] == origins["org-b body"]
   end
 
   defp user_notifications(context, member) do
