@@ -92,7 +92,7 @@ defmodule MilosTraining.Application.PublishWorkout do
          workout
        ) do
     broadcast_assignment_sync(assignment_targets, "workout_republished", workout.id)
-    broadcast_schedule_refresh(slot_ids, workout.id)
+    broadcast_schedule_refresh(slot_ids, workout)
   end
 
   defp maybe_broadcast_view_refresh(
@@ -119,7 +119,7 @@ defmodule MilosTraining.Application.PublishWorkout do
          _slot_ids,
          workout
        ) do
-    broadcast_schedule_refresh([slot_id], workout.id)
+    broadcast_schedule_refresh([slot_id], workout)
   end
 
   defp maybe_broadcast_view_refresh(
@@ -149,13 +149,18 @@ defmodule MilosTraining.Application.PublishWorkout do
     )
   end
 
-  defp broadcast_schedule_refresh([], _workout_id), do: :ok
+  defp broadcast_schedule_refresh([], _workout), do: :ok
 
-  defp broadcast_schedule_refresh(slot_ids, workout_id) do
+  defp broadcast_schedule_refresh(slot_ids, workout) do
     Phoenix.PubSub.broadcast(
       MilosTraining.PubSub,
       "schedule:workout_updated",
-      {:schedule_workout_updated, %{workout_id: workout_id, slot_ids: slot_ids}}
+      {:schedule_workout_updated,
+       %{
+         workout_id: workout.id,
+         organization_id: workout.organization_id,
+         slot_ids: slot_ids
+       }}
     )
   end
 

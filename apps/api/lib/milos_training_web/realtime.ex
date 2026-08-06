@@ -1,17 +1,26 @@
 defmodule MilosTrainingWeb.Realtime do
+  require Logger
+
   alias MilosTraining.Organizations
   alias MilosTrainingWeb.Endpoint
 
   def broadcast_schedule_refresh(event, payload \\ %{}) do
     organization_id =
-      Map.get(payload, :organization_id) ||
-        Map.get(payload, "organization_id") ||
-        legacy_organization_id()
+      Map.get(payload, :organization_id) || Map.get(payload, "organization_id") ||
+        fallback_to_legacy_organization_id(event)
 
     Endpoint.broadcast("schedule:#{organization_id}", "schedule:refresh", %{
       event: event,
       payload: payload
     })
+  end
+
+  defp fallback_to_legacy_organization_id(event) do
+    Logger.warning(
+      "Realtime.broadcast_schedule_refresh: payload for event=#{event} omitted organization_id, falling back to the legacy organization"
+    )
+
+    legacy_organization_id()
   end
 
   def broadcast_notification_changed(user_id) do

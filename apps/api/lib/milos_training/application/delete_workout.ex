@@ -2,6 +2,7 @@ defmodule MilosTraining.Application.DeleteWorkout do
   require Logger
 
   alias MilosTraining.Application.BroadcastUserSync
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.{Identity, Scheduling, Workouts}
   alias MilosTraining.Notifications
 
@@ -12,7 +13,7 @@ defmodule MilosTraining.Application.DeleteWorkout do
          {:ok, deleted_slot_ids} <- Scheduling.delete_slots_for_workout(id),
          :ok <- Scheduling.delete_class_series_for_workout(id),
          :ok <- Workouts.delete_workout(id) do
-      broadcast_deleted_slots(deleted_slot_ids)
+      broadcast_deleted_slots(deleted_slot_ids, RepoContext.current_setting("app.organization_id"))
       notify_assignment_targets(assignment_targets)
       notify_booking_targets(booking_targets)
       broadcast_assignment_refresh(assignment_targets, id)
@@ -24,12 +25,12 @@ defmodule MilosTraining.Application.DeleteWorkout do
     end
   end
 
-  defp broadcast_deleted_slots(slot_ids) do
+  defp broadcast_deleted_slots(slot_ids, organization_id) do
     Enum.each(slot_ids, fn slot_id ->
       Phoenix.PubSub.broadcast(
         MilosTraining.PubSub,
         "schedule:slot_deleted",
-        {:schedule_slot_deleted, %{slot_id: slot_id}}
+        {:schedule_slot_deleted, %{slot_id: slot_id, organization_id: organization_id}}
       )
     end)
   end

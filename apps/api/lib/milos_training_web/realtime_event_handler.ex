@@ -28,7 +28,8 @@ defmodule MilosTrainingWeb.RealtimeEventHandler do
   def handle_info({:booking_submitted, booking}, state) do
     Realtime.broadcast_schedule_refresh("booking_submitted", %{
       slot_id: booking.scheduled_class_id,
-      booking_id: booking.id
+      booking_id: booking.id,
+      organization_id: booking.organization_id
     })
 
     {:noreply, state}
@@ -38,7 +39,8 @@ defmodule MilosTrainingWeb.RealtimeEventHandler do
     Realtime.broadcast_schedule_refresh("booking_resolved", %{
       slot_id: booking.scheduled_class_id,
       booking_id: booking.id,
-      status: booking.status
+      status: booking.status,
+      organization_id: booking.organization_id
     })
 
     {:noreply, state}
@@ -47,24 +49,37 @@ defmodule MilosTrainingWeb.RealtimeEventHandler do
   def handle_info({:booking_timed_out, booking}, state) do
     Realtime.broadcast_schedule_refresh("booking_timed_out", %{
       slot_id: booking.scheduled_class_id,
-      booking_id: booking.id
+      booking_id: booking.id,
+      organization_id: booking.organization_id
     })
 
     {:noreply, state}
   end
 
   def handle_info({:schedule_slot_created, slot}, state) do
-    Realtime.broadcast_schedule_refresh("slot_created", %{slot_id: slot.id})
+    Realtime.broadcast_schedule_refresh("slot_created", %{
+      slot_id: slot.id,
+      organization_id: slot.organization_id
+    })
+
     {:noreply, state}
   end
 
   def handle_info({:schedule_slot_updated, slot}, state) do
-    Realtime.broadcast_schedule_refresh("slot_updated", %{slot_id: slot.id})
+    Realtime.broadcast_schedule_refresh("slot_updated", %{
+      slot_id: slot.id,
+      organization_id: slot.organization_id
+    })
+
     {:noreply, state}
   end
 
-  def handle_info({:schedule_slot_deleted, %{slot_id: slot_id}}, state) do
-    Realtime.broadcast_schedule_refresh("slot_deleted", %{slot_id: slot_id})
+  def handle_info({:schedule_slot_deleted, %{slot_id: slot_id, organization_id: organization_id}}, state) do
+    Realtime.broadcast_schedule_refresh("slot_deleted", %{
+      slot_id: slot_id,
+      organization_id: organization_id
+    })
+
     {:noreply, state}
   end
 
