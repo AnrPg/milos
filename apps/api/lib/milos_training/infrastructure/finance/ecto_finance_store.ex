@@ -654,14 +654,14 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     today = Date.utc_today()
 
     {_, _} =
-      FinanceInvoice
+      tenant_scope(FinanceInvoice)
       |> where([i], i.status == "issued" and not is_nil(i.due_date) and i.due_date < ^today)
       |> where([i], is_nil(i.deleted_at))
       |> where([i], fragment("COALESCE(?->>'document_kind', '') <> 'receipt'", i.params))
       |> Repo.update_all(set: [status: "overdue"])
 
     {_, _} =
-      FinanceInvoice
+      tenant_scope(FinanceInvoice)
       |> where([i], i.status == "overdue" and not is_nil(i.due_date) and i.due_date >= ^today)
       |> where([i], is_nil(i.deleted_at))
       |> Repo.update_all(set: [status: "issued"])
@@ -4139,7 +4139,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     threshold = DateTime.add(DateTime.utc_now(), -interval_days * 86_400, :second)
 
     memberships =
-      Membership
+      tenant_scope(Membership)
       |> where(
         [m],
         is_nil(m.last_payment_reminder_sent_at) or m.last_payment_reminder_sent_at < ^threshold
@@ -4162,7 +4162,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def update_membership_reminder_timestamp(membership_id) do
-    Membership
+    tenant_scope(Membership)
     |> where([m], m.id == ^membership_id)
     |> Repo.update_all(set: [last_payment_reminder_sent_at: DateTime.utc_now()])
 
