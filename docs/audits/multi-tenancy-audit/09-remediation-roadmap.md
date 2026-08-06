@@ -101,6 +101,13 @@ blocking. P1–P3 remain open.
 - **Dependency:** product decision required first (is email-binding actually intended?).
 
 ### P2.9 — Fix realtime broadcast silent-fallback-to-legacy-org (F-19)
+- **STATUS: FIXED** (2026-08-06). Chose the warning-only grace-period mode
+  flagged as an open question below, rather than a hard raise: threaded
+  `organization_id` through the booking/slot/workout payloads that were
+  previously omitting it, and the one remaining legacy call path
+  (`DeleteWorkout.call/1`) now reads it from the `app.organization_id`
+  session GUC. The fallback still exists but now logs a warning instead of
+  being silent — see F-19 in `04-findings.md`.
 - **Dependency:** should land after P1.1 or it will start raising instead of silently misbehaving — decide whether that's acceptable immediately or needs a grace-period warning-only mode first.
 
 ## P3 — Low priority / cleanup

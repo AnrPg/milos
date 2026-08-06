@@ -1307,6 +1307,24 @@ additional non-legacy tenants that would depend on that functionality.
 
 ## F-19 — Realtime broadcast helpers silently default to the legacy organization when a payload omits `organization_id`
 
+**STATUS: FIXED** (2026-08-06). The finding undersold the scope: every
+booking/slot event relayed through `RealtimeEventHandler` (`booking_submitted`,
+`booking_resolved`, `booking_timed_out`, `slot_created`, `slot_updated`,
+`slot_deleted`) omitted `organization_id` unconditionally, not just as an edge
+case — so schedule realtime events for every non-legacy organization were
+being silently misrouted to the legacy org's PubSub topic. Fixed by threading
+`organization_id` from the already-available `booking`/`slot`/`workout`
+structs (all of which carry the field) into the PubSub payloads in
+`realtime_event_handler.ex` and `publish_workout.ex`. The one remaining
+legacy call path, `DeleteWorkout.call/1` (no tenant context, part of the
+F-18 legacy-arity debt), now reads `organization_id` from the
+`app.organization_id` session GUC via `RepoContext.current_setting/1` instead
+of the admin DTO map (which doesn't carry that field at all). Chose
+"log a warning, keep the fallback" over a hard raise, since the fallback is
+still legitimately needed for that one remaining legacy-arity call site and a
+raise there would turn a Medium silent-misrouting bug into a hard outage for
+it. Covered by `test/milos_training/application/schedule_realtime_test.exs`.
+
 **Severity:** Medium · **Confidence:** Confirmed (read directly)
 
 **Evidence:** `apps/api/lib/milos_training_web/realtime.ex:5-15,52-54` and
