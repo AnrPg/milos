@@ -56,7 +56,7 @@ blocking. P1–P3 remain open.
 - **Tests required before merge:** test-gap-plan #4, #11, plus a frontend integration test for the cross-tab/stale-cache scenarios described in F-09.
 - **Deployment considerations:** Largest-surface-area change in this roadmap (~140 backend routes + the entire admin frontend). Recommend a feature-flagged parallel rollout (old and new routes coexist during migration) rather than a flag-day cutover, consistent with this codebase's existing expand/contract migration discipline.
 
-### P1.5 — Add non-superuser RLS-enforcing test/CI lane (F-07) — **PARTIALLY DONE 2026-08-06**: reusable `RLSCase` helper + boot-time `PrivilegeGuard` health check landed; only Execution (F-23) uses `RLSCase` so far. See `04-findings.md`.
+### P1.5 — Add non-superuser RLS-enforcing test/CI lane (F-07) — **FIXED 2026-08-06**: `RLSCase` helper + boot-time `PrivilegeGuard` health check + a genuine RLS-enforcement test for all 8 T4 contexts (Execution, Scheduling, Messaging, Workouts, Feedback, Analytics, Gamification, Finance). See `04-findings.md`.
 - **Dependency:** should land early since it makes every subsequent fix's tests actually trustworthy.
 - **Affected modules:** `config/test.exs`, `.github/workflows/ci.yml`, possibly a new `docker-compose.test.yml` provisioning a `milos_runtime`-equivalent role for CI.
 - **Approach:** Add a CI job (or extend the existing one) that provisions a non-superuser, non-BYPASSRLS role for at least the isolation-test subset; add a startup/health check that fails if the production runtime connection is a superuser or has BYPASSRLS.

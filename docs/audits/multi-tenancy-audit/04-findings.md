@@ -819,24 +819,31 @@ but the current code enforces neither restriction).
 
 ## F-07 — Dev, test, and CI database connections run as PostgreSQL superuser, which unconditionally bypasses Row-Level Security (CONFIRMED NOT to extend to production)
 
-**STATUS (2026-08-06): Partially addressed, not closed.** Two concrete
-pieces landed: (1) `test/support/rls_case.ex` — a reusable `ExUnit` case
-template (`MilosTraining.RLSCase`) that self-provisions a dedicated
-non-superuser, non-BYPASSRLS Postgres role and hands tests a raw `Postgrex`
-connection that genuinely enforces RLS, used so far by
-`test/milos_training/execution/tenant_isolation_test.exs` (F-23); (2)
-`MilosTraining.Infrastructure.Tenancy.PrivilegeGuard`, a boot-time check
-wired into `MilosTraining.Application.start/2` that queries
+**STATUS (2026-08-06): FIXED for verification integrity.** Three pieces
+landed: (1) `test/support/rls_case.ex` — a reusable `ExUnit` case template
+(`MilosTraining.RLSCase`) that self-provisions a dedicated non-superuser,
+non-BYPASSRLS Postgres role and hands tests a raw `Postgrex` connection that
+genuinely enforces RLS; (2) `MilosTraining.Infrastructure.Tenancy.PrivilegeGuard`,
+a boot-time check wired into `MilosTraining.Application.start/2` that queries
 `rolsuper`/`rolbypassrls` for the running connection and **raises (refuses to
 boot) if the app is running in `:prod` with a superuser/bypassrls
 connection**; it only warns outside prod, since dev/test/CI are expected to
-run as superuser today. **Not done:** migrating the other six
-`tenant_isolation_test.exs` files (Scheduling, Messaging, Workouts, Feedback,
-Analytics, Finance) to `RLSCase` — those still pass regardless of RLS policy
-correctness, same as before. A full CI lane provisioning this role
-automatically (rather than the test self-provisioning it) also remains
-undone. Extending `RLSCase` coverage to the rest of the T4 contexts is the
-natural next increment of this finding.
+run as superuser today; (3) a genuine RLS-enforcement test added for every
+T4 context that previously had none: Execution (F-23, from the earlier fix),
+Scheduling (`class_types`), Messaging (`messaging_threads`), Workouts
+(`master_workouts`), Feedback (`reviews`), Analytics (`analytics_events`),
+Gamification (`seasonal_challenges`), and Finance (`memberships`) — 8 tests
+total, each proving cross-org access and no-context access both return zero
+rows via a real non-superuser connection, not the superuser-backed suite. To
+confirm these tests are meaningful and not just always-green, one
+(`messaging_threads`) was verified to genuinely fail when RLS was manually
+disabled on that table, then restored and reconfirmed green. **Deliberately
+not done, and reasonably out of scope for "fully fix":** a dedicated CI job
+that provisions the non-superuser role ahead of time rather than each test
+self-provisioning it idempotently on first use — functionally equivalent for
+correctness, but the self-provisioning approach means the very first test in
+a fresh CI run pays a small one-time role-creation cost instead of a
+separate pipeline step doing it up front.
 
 **Severity:** Critical for dev/test/CI's verification integrity (undermines confidence in every RLS-based claim in this audit and in TD-038) · **Downgraded to Informational for production specifically, per live verification below** · **Confidence:** Confirmed (live `pg_roles` query against both the local dev DB and, on 2026-08-05, live production)
 **Invariant affected:** "Do not treat passing tests as proof of tenant isolation."
