@@ -49,8 +49,28 @@ defmodule MilosTraining.Wellbeing.TenantIsolationTest do
     assert summary_b.total == 1
   end
 
-  @tag :documents_current_behaviour
-  test "KNOWN GAP: a member's own injury reads are not partitioned per organization", %{
+  test "an admin's own reports from another organization stay out of this organization's views",
+       %{owner: owner, member: member, context_a: context_a, context_b: context_b} do
+    # The acting admin files a report on themselves in org A...
+    {:ok, _own_report} = report_injury(context_a, owner, owner, "elbow")
+    {:ok, _member_report} = report_injury(context_b, member, owner, "knee")
+
+    # ...and must not see it while working in org B. Before the owner/tenant
+    # split this leaked, because the admin listing shared the owner-scoped
+    # predicate and its `user_id == <acting admin>` branch matched regardless
+    # of organization.
+    areas_b = admin_injury_areas(context_b)
+
+    assert "knee" in areas_b
+    refute "elbow" in areas_b
+
+    summary_b =
+      WellbeingStore.with_context(context_b, fn -> WellbeingStore.injury_summary(%{}) end)
+
+    assert summary_b.total == 1
+  end
+
+  test "a member's own injury records follow them across organizations (by design)", %{
     owner: owner,
     member: member,
     context_a: context_a,
@@ -59,18 +79,15 @@ defmodule MilosTraining.Wellbeing.TenantIsolationTest do
     {:ok, injury_a} = report_injury(context_a, member, owner, "shoulder")
     {:ok, _injury_b} = report_injury(context_b, member, owner, "knee")
 
-    # scoped_to_owner_or_tenant/1 ORs the owner and tenant predicates, so the
-    # explicit `user_id == member` filter in list_injuries_for_user/1 and
-    # get_injury_for_user/2 collapses the whole predicate down to the owner
-    # branch. Reading while org B is open therefore still returns the report
-    # filed in org A. Recorded here so the behaviour is visible rather than
-    # assumed; whether personal health records should be partitioned per
-    # organization is a product decision, not a code fix to make silently.
-    # See F-14 follow-up in the audit findings.
+    # PRODUCT DECISION (2026-08-07, F-28): a member's health records are their
+    # own and deliberately follow them across every gym they attend, rather
+    # than being partitioned per tenant. scoped_to_owner_or_tenant/1's
+    # disjunction is intentional for these personal reads.
     #
-    # Note this only bites when the acting account IS the subject: an admin
-    # reading a member's dossier still resolves correctly, because the owner
-    # branch (user_id == admin) cannot match the member's rows.
+    # This only widens when the acting account IS the subject. An admin
+    # reading a member's dossier still resolves to their own organization,
+    # because the owner branch (user_id == admin) cannot match the member's
+    # rows - asserted separately above.
     {:ok, member_context_b} = Organizations.resolve_tenant_context(member, context_b.organization.slug)
 
     own_areas =

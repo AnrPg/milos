@@ -3,11 +3,16 @@ defmodule MilosTraining.Wellbeing.RLSEnforcementTest do
   Proves what `injury_reports_owner_or_tenant_policy` actually enforces against
   a genuine non-superuser connection. The rest of the suite runs as a Postgres
   superuser and never exercises the policy at all (see MilosTraining.RLSCase),
-  which is exactly how the gap asserted here stayed invisible.
+  so without this the policy's real behaviour is never observed.
+
+  The policy's owner branch is deliberately permissive across organizations
+  (F-28 product decision): a member's health records follow them between gyms.
+  This locks that in at the database layer, where it is easy to tighten by
+  accident while fixing something else.
   """
   use MilosTraining.RLSCase, async: false
 
-  test "the policy's OR lets a member read an injury report from an organization they do not have open",
+  test "a member reads their own injury reports across organizations, by design",
        %{conn: conn} do
     {user_id_s, user_id} = uuid()
     {org_a_id_s, org_a_id} = uuid()
@@ -66,18 +71,18 @@ defmodule MilosTraining.Wellbeing.RLSEnforcementTest do
 
     assert "knee" in areas
 
-    # CONFIRMED CROSS-TENANT READ. The policy is
+    # INTENTIONAL (F-28, decided 2026-08-07). The policy is
     #   user_id = app.user_id OR organization_id = app.organization_id
-    # so the owner branch alone satisfies it and organization A's report comes
-    # back while only organization B is open. EctoWellbeingStore's
-    # scoped_to_owner_or_tenant/1 has the identical OR, so neither layer
-    # constrains the other: this reaches production.
+    # so the owner branch alone satisfies it and organization A's report is
+    # returned while only organization B is open. Health records belong to the
+    # member, not the gym, so they travel with them.
     #
-    # Asserted as-is to lock current behaviour. Flipping this to `refute` is
-    # the regression test once the boundary is decided - it needs both an
-    # application-layer change and a migration replacing the policy, and it
-    # turns on a product question (should personal health records follow the
-    # member across organizations, or be partitioned per tenant?).
+    # This is the ONLY sanctioned cross-organization read in the tenancy model.
+    # It is safe specifically because the owner branch can only ever match the
+    # acting account's own rows - it cannot expose another member's records.
+    # Organization-scoped views (the admin injury list and analytics summary)
+    # deliberately do NOT use this predicate; see
+    # EctoWellbeingStore.scoped_to_tenant/1.
     assert "shoulder" in areas
 
     as_session(conn, user_id_s, nil, false, fn ->

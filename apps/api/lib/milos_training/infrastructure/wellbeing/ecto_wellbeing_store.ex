@@ -108,7 +108,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
     filters = string_key_map(filters || %{})
 
     InjuryReport
-    |> scoped_to_owner_or_tenant()
+    |> scoped_to_tenant()
     |> maybe_filter(:status, filters["status"])
     |> maybe_filter(:severity, filters["severity"])
     |> maybe_filter(:body_area, filters["body_area"])
@@ -188,7 +188,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
 
   defp count_injuries(since) do
     InjuryReport
-    |> scoped_to_owner_or_tenant()
+    |> scoped_to_tenant()
     |> where([injury], injury.inserted_at >= ^since)
     |> Repo.aggregate(:count)
   end
@@ -208,7 +208,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
 
   defp count_status(status, since) do
     InjuryReport
-    |> scoped_to_owner_or_tenant()
+    |> scoped_to_tenant()
     |> where([injury], injury.status == ^status)
     |> where([injury], injury.inserted_at >= ^since)
     |> Repo.aggregate(:count)
@@ -216,7 +216,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
 
   defp count_injuries_by(field, since) do
     InjuryReport
-    |> scoped_to_owner_or_tenant()
+    |> scoped_to_tenant()
     |> where([injury], injury.inserted_at >= ^since)
     |> group_by([injury], field(injury, ^field))
     |> select([injury], {field(injury, ^field), count(injury.id)})
@@ -237,6 +237,26 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
     end
   end
 
+  # Organization-scoped reads: the admin injury list and the analytics summary
+  # describe ONE organization, so they must never widen to the acting admin's
+  # own reports filed elsewhere. Fails closed with no organization open rather
+  # than reading across every tenant.
+  defp scoped_to_tenant(query) do
+    case RepoContext.current_setting("app.organization_id") do
+      organization_id when is_binary(organization_id) ->
+        where(query, [row], row.organization_id == ^organization_id)
+
+      _missing_scope ->
+        where(query, [row], false)
+    end
+  end
+
+  # Owner-scoped reads: personal injury records deliberately follow the member
+  # across every organization they belong to (product decision, 2026-08-07 -
+  # see F-28). The disjunction is intentional here: `user_id` matches the
+  # member's own records regardless of which gym they were filed in, while
+  # `organization_id` covers an admin reading a member's dossier within their
+  # own tenant. Do NOT reuse this for organization-scoped listings.
   defp scoped_to_owner_or_tenant(query) do
     user_id = RepoContext.current_setting("app.user_id")
     organization_id = RepoContext.current_setting("app.organization_id")
