@@ -5710,7 +5710,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** Format: email */
-                    email?: string | null;
+                    email: string;
                     nickname: string;
                     password: string;
                     /** @enum {string} */
@@ -7071,6 +7071,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** Format: email */
+                    email: string;
                     invitation_token: string;
                     nickname: string;
                     password: string;
@@ -13273,7 +13275,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** Format: email */
-                    email?: string | null;
+                    email: string;
                     invitation_token: string;
                     nickname: string;
                     password: string;

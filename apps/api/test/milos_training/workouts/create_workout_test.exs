@@ -10,7 +10,8 @@ defmodule MilosTraining.Workouts.CreateWorkoutTest do
         Identity.register(%{
           nickname: "coach_workouts",
           password: "S3cur3P@ss!",
-          role: :member
+          role: :member,
+          email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
       {:ok, admin} = Identity.update_role(admin, :admin)
@@ -188,7 +189,8 @@ defmodule MilosTraining.Workouts.CreateWorkoutTest do
       Identity.register(%{
         nickname: nickname,
         password: "S3cur3P@ss!",
-        role: :member
+        role: :member,
+        email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
       })
 
     {:ok, admin} = Identity.update_role(user, :admin)

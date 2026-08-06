@@ -26,7 +26,7 @@ defmodule MilosTraining.Identity.User do
   def registration_changeset(user \\ %__MODULE__{}, params) do
     user
     |> cast(params, [:nickname, :password, :role, :email])
-    |> validate_required([:nickname, :password, :role])
+    |> validate_required([:nickname, :password, :role, :email])
     |> maybe_validate_email()
     |> validate_nickname()
     |> normalize_and_preserve_nickname()

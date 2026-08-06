@@ -8,7 +8,8 @@ defmodule MilosTraining.TestFixtures do
       %{
         nickname: "user_#{unique}",
         password: "S3cur3P@ss!",
-        role: :member
+        role: :member,
+        email: "user_#{unique}@placeholder.invalid"
       }
       |> Map.merge(attrs)
 

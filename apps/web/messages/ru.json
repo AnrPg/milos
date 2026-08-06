@@ -2558,6 +2558,8 @@
     "featureFinanceCleanupSuccess": "The record was purged.",
     "featureFinanceCleanupPending": "Purging...",
     "featureFinanceCleanupSubmit": "Permanent purge",
-    "anotherOrganization": "Другая организация"
+    "anotherOrganization": "Другая организация",
+    "emailAddress": "Адрес электронной почты",
+    "emailAddressPlaceholder": "vy@example.com"
   }
 }

@@ -21,8 +21,8 @@ defmodule MilosTraining.Wellbeing.RLSEnforcementTest do
     Postgrex.query!(
       conn,
       """
-      INSERT INTO users (id, nickname, display_nickname, password_hash, role, inserted_at, updated_at)
-      VALUES ($1, $2, $2, 'x', 'member', now(), now())
+      INSERT INTO users (id, nickname, display_nickname, password_hash, role, email, inserted_at, updated_at)
+      VALUES ($1, $2::text, $2::text, 'x', 'member', $2::text || '@placeholder.invalid', now(), now())
       """,
       [user_id, "rls_wellbeing_user_#{System.unique_integer([:positive])}"]
     )

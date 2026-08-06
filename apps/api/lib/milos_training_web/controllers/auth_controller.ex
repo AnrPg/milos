@@ -44,9 +44,9 @@ defmodule MilosTrainingWeb.AuthController do
               nickname: %Schema{type: :string},
               password: %Schema{type: :string, minLength: 4},
               role: %Schema{type: :string, enum: ["member", "athlete"]},
-              email: %Schema{type: :string, format: :email, nullable: true},
+              email: %Schema{type: :string, format: :email}
             },
-            required: [:nickname, :password, :role]
+            required: [:nickname, :password, :role, :email]
           }
         }
       }
@@ -166,9 +166,9 @@ defmodule MilosTrainingWeb.AuthController do
               nickname: %Schema{type: :string},
               password: %Schema{type: :string, minLength: 4},
               invitation_token: %Schema{type: :string, minLength: 20, maxLength: 256},
-              email: %Schema{type: :string, format: :email, nullable: true},
+              email: %Schema{type: :string, format: :email}
             },
-            required: [:nickname, :password, :invitation_token]
+            required: [:nickname, :password, :invitation_token, :email]
           }
         }
       }
@@ -224,9 +224,10 @@ defmodule MilosTrainingWeb.AuthController do
             properties: %{
               nickname: %Schema{type: :string},
               password: %Schema{type: :string, minLength: 4},
-              invitation_token: %Schema{type: :string, minLength: 20, maxLength: 256}
+              invitation_token: %Schema{type: :string, minLength: 20, maxLength: 256},
+              email: %Schema{type: :string, format: :email}
             },
-            required: [:nickname, :password, :invitation_token]
+            required: [:nickname, :password, :invitation_token, :email]
           }
         }
       }

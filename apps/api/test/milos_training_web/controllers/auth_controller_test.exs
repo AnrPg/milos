@@ -14,7 +14,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
 
   describe "POST /api/auth/register" do
     test "returns tokens on valid registration", %{conn: conn} do
-      params = %{nickname: "zeus", password: "S3cur3P@ss!", role: "member"}
+      params = %{nickname: "zeus", password: "S3cur3P@ss!", role: "member", email: "zeus@placeholder.invalid"}
 
       conn =
         conn
@@ -28,7 +28,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
     end
 
     test "returns 422 on duplicate nickname", %{conn: conn} do
-      params = %{nickname: "zeus", password: "S3cur3P@ss!", role: "member"}
+      params = %{nickname: "zeus", password: "S3cur3P@ss!", role: "member", email: "zeus@placeholder.invalid"}
 
       _ =
         conn
@@ -61,7 +61,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         |> put_req_header("content-type", "application/json")
         |> post(
           "/api/auth/register",
-          Jason.encode!(%{nickname: "hephaestus", password: "S3cur3P@ss!", role: "member"})
+          Jason.encode!(%{nickname: "hephaestus", password: "S3cur3P@ss!", role: "member", email: "hephaestus@placeholder.invalid"})
         )
 
       assert %{"error" => "Authentication service unavailable"} = json_response(conn, 500)
@@ -97,7 +97,8 @@ defmodule MilosTrainingWeb.AuthControllerTest do
       params = %{
         nickname: "athena_admin",
         password: "S3cur3P@ss!",
-        invitation_token: token
+        invitation_token: token,
+        email: "athena_admin@placeholder.invalid"
       }
 
       conn =
@@ -173,7 +174,8 @@ defmodule MilosTrainingWeb.AuthControllerTest do
       params = %{
         nickname: "false_admin",
         password: "S3cur3P@ss!",
-        invitation_token: String.duplicate("x", 43)
+        invitation_token: String.duplicate("x", 43),
+        email: "false_admin@placeholder.invalid"
       }
 
       conn =
@@ -192,7 +194,8 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         Identity.register(%{
           nickname: "hermes",
           password: "S3cur3P@ss!",
-          role: :member
+          role: :member,
+          email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
       :ok
@@ -349,7 +352,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         |> put_req_header("content-type", "application/json")
         |> post(
           "/api/auth/register",
-          Jason.encode!(%{nickname: "apollo", password: "S3cur3P@ss!", role: "member"})
+          Jason.encode!(%{nickname: "apollo", password: "S3cur3P@ss!", role: "member", email: "apollo@placeholder.invalid"})
         )
 
       refresh_token = register_conn.resp_cookies["milos_refresh"].value
@@ -381,7 +384,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         |> put_req_header("content-type", "application/json")
         |> post(
           "/api/auth/register",
-          Jason.encode!(%{nickname: "odin", password: "S3cur3P@ss!", role: "member"})
+          Jason.encode!(%{nickname: "odin", password: "S3cur3P@ss!", role: "member", email: "odin@placeholder.invalid"})
         )
 
       refresh_token = register_conn.resp_cookies["milos_refresh"].value
@@ -427,7 +430,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         |> put_req_header("content-type", "application/json")
         |> post(
           "/api/auth/register",
-          Jason.encode!(%{nickname: "security_family", password: "S3cur3P@ss!", role: "member"})
+          Jason.encode!(%{nickname: "security_family", password: "S3cur3P@ss!", role: "member", email: "security_family@placeholder.invalid"})
         )
 
       %{"access_token" => access_token} = json_response(login_conn, 201)
@@ -462,7 +465,8 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         Identity.register(%{
           nickname: "ares",
           password: "S3cur3P@ss!",
-          role: :member
+          role: :member,
+          email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
       {:ok, access_token, _claims} = Guardian.encode_and_sign(user, %{}, token_type: "access")
@@ -485,7 +489,8 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         Identity.register(%{
           nickname: "platform_me",
           password: "S3cur3P@ss!",
-          role: :member
+          role: :member,
+          email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
       {:ok, user} = Identity.update_role(user, :admin)
@@ -510,7 +515,8 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         Identity.register(%{
           nickname: "hera",
           password: "S3cur3P@ss!",
-          role: :member
+          role: :member,
+          email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
       {:ok, admin} = Identity.update_role(admin, :admin)
@@ -520,7 +526,8 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         Identity.register(%{
           nickname: "poseidon",
           password: "S3cur3P@ss!",
-          role: :member
+          role: :member,
+          email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
       {:ok, access_token, _claims} =
@@ -543,7 +550,8 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         Identity.register(%{
           nickname: "demeter",
           password: "S3cur3P@ss!",
-          role: :member
+          role: :member,
+          email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
       {:ok, _membership} = Organizations.ensure_legacy_membership(member, :member)
@@ -552,7 +560,8 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         Identity.register(%{
           nickname: "artemis",
           password: "S3cur3P@ss!",
-          role: :athlete
+          role: :athlete,
+          email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
       {:ok, access_token, _claims} = Guardian.encode_and_sign(member, %{}, token_type: "access")
@@ -571,7 +580,8 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         Identity.register(%{
           nickname: "athena",
           password: "S3cur3P@ss!",
-          role: :member
+          role: :member,
+          email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
       {:ok, admin} = Identity.update_role(admin, :admin)

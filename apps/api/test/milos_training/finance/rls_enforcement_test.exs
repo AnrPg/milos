@@ -24,8 +24,8 @@ defmodule MilosTraining.Finance.RLSEnforcementTest do
     """, [other_org_id, "rls-finance-other-#{System.unique_integer([:positive])}"])
 
     Postgrex.query!(conn, """
-    INSERT INTO users (id, nickname, display_nickname, password_hash, role, inserted_at, updated_at)
-    VALUES ($1, $2, $2, 'x', 'member', now(), now())
+    INSERT INTO users (id, nickname, display_nickname, password_hash, role, email, inserted_at, updated_at)
+    VALUES ($1, $2::text, $2::text, 'x', 'member', $2::text || '@placeholder.invalid', now(), now())
     """, [user_id, "rls_finance_user_#{System.unique_integer([:positive])}"])
 
     as_session(conn, user_id_s, org_id_s, false, fn ->

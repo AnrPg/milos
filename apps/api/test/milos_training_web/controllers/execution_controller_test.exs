@@ -74,7 +74,8 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
         Identity.register(%{
           nickname: "execution_inactive_athlete",
           password: "S3cur3P@ss!",
-          role: :member
+          role: :member,
+          email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
       assert {:ok, _membership} =
@@ -664,7 +665,9 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
 
   defp create_user!(role, nickname) do
     {:ok, user} =
-      Identity.register(%{nickname: nickname, password: "S3cur3P@ss!", role: role})
+      Identity.register(%{nickname: nickname, password: "S3cur3P@ss!", role: role,
+email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
+})
 
     user
   end
@@ -674,7 +677,8 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
       Identity.register(%{
         nickname: nickname,
         password: "S3cur3P@ss!",
-        role: :member
+        role: :member,
+        email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
       })
 
     {:ok, admin} = Identity.update_role(user, :admin)

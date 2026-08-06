@@ -2558,6 +2558,8 @@
     "featureFinanceCleanupSuccess": "Η εγγραφή εκκαθαρίστηκε.",
     "featureFinanceCleanupPending": "Εκκαθάριση...",
     "featureFinanceCleanupSubmit": "Οριστική εκκαθάριση",
-    "anotherOrganization": "Άλλος οργανισμός"
+    "anotherOrganization": "Άλλος οργανισμός",
+    "emailAddress": "Διεύθυνση email",
+    "emailAddressPlaceholder": "esy@example.com"
   }
 }

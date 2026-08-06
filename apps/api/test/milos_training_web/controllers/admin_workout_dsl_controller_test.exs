@@ -50,7 +50,8 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
       Identity.register(%{
         nickname: "dsl_preview_member",
         password: "S3cur3P@ss!",
-        role: :member
+        role: :member,
+        email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
       })
 
     {:ok, _membership} = Organizations.ensure_legacy_membership(member)
@@ -175,7 +176,8 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
       Identity.register(%{
         nickname: nickname,
         password: "S3cur3P@ss!",
-        role: :member
+        role: :member,
+        email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
       })
 
     {:ok, admin} = Identity.update_role(user, :admin)

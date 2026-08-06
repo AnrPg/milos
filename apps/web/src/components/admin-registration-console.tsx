@@ -16,6 +16,7 @@ import { useUiTranslations } from "@/i18n/ui";
 const INITIAL_FORM: AdminRegisterRequest = {
   nickname: "",
   password: "",
+  email: "",
   invitation_token: "",
 };
 
@@ -102,6 +103,18 @@ export function AdminRegistrationConsole() {
               style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
               value={form.nickname}
               onChange={(event) => setForm((current) => ({ ...current, nickname: event.target.value }))}
+            />
+          </label>
+
+          <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
+            {i18n("emailAddress")}
+            <input
+              autoComplete="email"
+              className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
+              style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
+              type="email"
+              value={form.email}
+              onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
             />
           </label>
 

@@ -20,7 +20,8 @@ defmodule MilosTrainingWeb.MeControllerTest do
         Identity.register(%{
           nickname: "avatar_contract_member",
           password: "S3cur3P@ss!",
-          role: :member
+          role: :member,
+          email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
       conn
@@ -38,7 +39,8 @@ defmodule MilosTrainingWeb.MeControllerTest do
         Identity.register(%{
           nickname: "avatar_finalize_member",
           password: "S3cur3P@ss!",
-          role: :member
+          role: :member,
+          email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
       avatar_key = "avatars/#{user.id}/finalized.jpg"
@@ -60,7 +62,8 @@ defmodule MilosTrainingWeb.MeControllerTest do
         Identity.register(%{
           nickname: "avatar_clear_member",
           password: "S3cur3P@ss!",
-          role: :member
+          role: :member,
+          email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
       body =
@@ -96,7 +99,8 @@ defmodule MilosTrainingWeb.MeControllerTest do
         Identity.register(%{
           nickname: "polyglot_member",
           password: "S3cur3P@ss!",
-          role: :member
+          role: :member,
+          email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
       {:ok, access_token, _claims} =
@@ -120,7 +124,8 @@ defmodule MilosTrainingWeb.MeControllerTest do
         Identity.register(%{
           nickname: "locale_guard",
           password: "S3cur3P@ss!",
-          role: :athlete
+          role: :athlete,
+          email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
       {:ok, access_token, _claims} =
@@ -195,7 +200,8 @@ defmodule MilosTrainingWeb.MeControllerTest do
       Identity.register(%{
         nickname: nickname,
         password: "S3cur3P@ss!",
-        role: :member
+        role: :member,
+        email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
       })
 
     if role == :admin do

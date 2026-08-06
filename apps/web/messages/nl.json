@@ -2558,6 +2558,8 @@
     "featureFinanceCleanupSuccess": "The record was purged.",
     "featureFinanceCleanupPending": "Purging...",
     "featureFinanceCleanupSubmit": "Permanent purge",
-    "anotherOrganization": "Andere organisatie"
+    "anotherOrganization": "Andere organisatie",
+    "emailAddress": "E-mailadres",
+    "emailAddressPlaceholder": "jij@example.com"
   }
 }

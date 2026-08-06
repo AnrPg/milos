@@ -2558,6 +2558,8 @@
     "featureFinanceCleanupSuccess": "The record was purged.",
     "featureFinanceCleanupPending": "Purging...",
     "featureFinanceCleanupSubmit": "Permanent purge",
-    "anotherOrganization": "ארגון אחר"
+    "anotherOrganization": "ארגון אחר",
+    "emailAddress": "כתובת דוא\"ל",
+    "emailAddressPlaceholder": "you@example.com"
   }
 }

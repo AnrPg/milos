@@ -7281,7 +7281,6 @@
                 "properties": {
                   "email": {
                     "format": "email",
-                    "nullable": true,
                     "type": "string"
                   },
                   "nickname": {
@@ -7302,7 +7301,8 @@
                 "required": [
                   "nickname",
                   "password",
-                  "role"
+                  "role",
+                  "email"
                 ],
                 "type": "object"
               }
@@ -10671,6 +10671,10 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "email": {
+                    "format": "email",
+                    "type": "string"
+                  },
                   "invitation_token": {
                     "maxLength": 256,
                     "minLength": 20,
@@ -10687,7 +10691,8 @@
                 "required": [
                   "nickname",
                   "password",
-                  "invitation_token"
+                  "invitation_token",
+                  "email"
                 ],
                 "type": "object"
               }
@@ -27744,7 +27749,6 @@
                 "properties": {
                   "email": {
                     "format": "email",
-                    "nullable": true,
                     "type": "string"
                   },
                   "invitation_token": {
@@ -27763,7 +27767,8 @@
                 "required": [
                   "nickname",
                   "password",
-                  "invitation_token"
+                  "invitation_token",
+                  "email"
                 ],
                 "type": "object"
               }

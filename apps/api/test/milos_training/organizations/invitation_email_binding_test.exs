@@ -86,22 +86,24 @@ defmodule MilosTraining.Organizations.InvitationEmailBindingTest do
     assert {:ok, _redemption} = Organizations.redeem_invitation(token, invitee.id)
   end
 
-  test "an account with no email cannot redeem a bound invitation", %{context: context} do
+  test "an account whose address was never the invited one cannot redeem", %{context: context} do
     {:ok, %{token: token}} =
       Organizations.issue_invitation(context, %{role: "member", intended_email: "invited@example.com"})
 
-    emailless = TestFixtures.user_fixture(%{role: :member})
+    # Fixture accounts get a generated placeholder address, so this covers the
+    # ordinary "some other member clicked the link" case.
+    unrelated = TestFixtures.user_fixture(%{role: :member})
 
     assert {:error, :invitation_email_mismatch} =
-             Organizations.redeem_invitation(token, emailless.id)
+             Organizations.redeem_invitation(token, unrelated.id)
   end
 
   test "an invitation issued without an address stays open to any account", %{context: context} do
     {:ok, %{token: token}} = Organizations.issue_invitation(context, %{role: "member"})
 
-    emailless = TestFixtures.user_fixture(%{role: :member})
+    unrelated = TestFixtures.user_fixture(%{role: :member})
 
-    assert {:ok, _redemption} = Organizations.redeem_invitation(token, emailless.id)
+    assert {:ok, _redemption} = Organizations.redeem_invitation(token, unrelated.id)
   end
 
   test "email addresses are unique across accounts, case-insensitively" do
@@ -116,6 +118,34 @@ defmodule MilosTraining.Organizations.InvitationEmailBindingTest do
              })
 
     assert changeset.errors[:email]
+  end
+
+  test "email is mandatory for new accounts" do
+    assert {:error, changeset} =
+             Identity.register(%{
+               nickname: "no_email_#{System.unique_integer([:positive])}",
+               password: "S3cur3P@ss!",
+               role: :member
+             })
+
+    assert "can't be blank" in errors_on(changeset).email
+  end
+
+  test "a malformed address is rejected" do
+    assert {:error, changeset} =
+             Identity.register(%{
+               nickname: "bad_email_#{System.unique_integer([:positive])}",
+               password: "S3cur3P@ss!",
+               role: :member,
+               email: "not-an-email"
+             })
+
+    assert changeset.errors[:email]
+  end
+
+  test "addresses are stored normalized so the digest comparison is stable" do
+    user = register_with_email("  MiXeD@Example.COM ")
+    assert user.email == "mixed@example.com"
   end
 
   defp register_with_email(email) do

@@ -20,13 +20,13 @@ defmodule MilosTraining.Execution.TenantIsolationTest do
     """, [org_id, "rls-verify-org-#{System.unique_integer([:positive])}"])
 
     Postgrex.query!(conn, """
-    INSERT INTO users (id, nickname, display_nickname, password_hash, role, inserted_at, updated_at)
-    VALUES ($1, $2, $2, 'x', 'member', now(), now())
+    INSERT INTO users (id, nickname, display_nickname, password_hash, role, email, inserted_at, updated_at)
+    VALUES ($1, $2::text, $2::text, 'x', 'member', $2::text || '@placeholder.invalid', now(), now())
     """, [owner_id, "rls_owner_#{System.unique_integer([:positive])}"])
 
     Postgrex.query!(conn, """
-    INSERT INTO users (id, nickname, display_nickname, password_hash, role, inserted_at, updated_at)
-    VALUES ($1, $2, $2, 'x', 'admin', now(), now())
+    INSERT INTO users (id, nickname, display_nickname, password_hash, role, email, inserted_at, updated_at)
+    VALUES ($1, $2::text, $2::text, 'x', 'admin', $2::text || '@placeholder.invalid', now(), now())
     """, [admin_id, "rls_admin_#{System.unique_integer([:positive])}"])
 
     as_session(conn, owner_id_s, org_id_s, false, fn ->

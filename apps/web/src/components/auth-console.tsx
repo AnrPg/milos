@@ -23,7 +23,7 @@ import { useSession } from "@/components/session-provider";
 type Mode = "register" | "login";
 type FieldErrors = Record<string, string[]>;
 
-const initialRegister: RegisterRequest = { nickname: "", password: "", role: "member" };
+const initialRegister: RegisterRequest = { nickname: "", password: "", role: "member", email: "" };
 const initialLogin: LoginRequest = { nickname: "", password: "" };
 
 function flatFieldErrors(
@@ -162,6 +162,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
   }
 
   const nicknameErrors = fieldErrors.nickname ?? [];
+  const emailErrors = fieldErrors.email ?? [];
   const passwordErrors = fieldErrors.password ?? [];
   const roleErrors = fieldErrors.role ?? [];
   const nicknameInvalid = nicknameErrors.length > 0;
@@ -295,6 +296,30 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                   )}
                 </label>
 
+                {/* Email */}
+                <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
+                  <span>{i18n("emailAddress")}</span>
+                  <input
+                    className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
+                    style={{
+                      background: "var(--bg)",
+                      border: `1px solid ${emailErrors.length > 0 ? "var(--danger)" : "var(--border)"}`,
+                      color: "var(--text)",
+                    }}
+                    type="email"
+                    autoComplete="email"
+                    value={registerForm.email}
+                    placeholder={i18n("emailAddressPlaceholder")}
+                    aria-invalid={emailErrors.length > 0}
+                    onChange={(e) => setRegisterForm((f) => ({ ...f, email: e.target.value }))}
+                  />
+                  {emailErrors.length > 0 && (
+                    <span className="mt-1.5 block rounded-xl px-3 py-2 text-xs leading-5" role="alert" style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", color: "var(--danger)", border: "1px solid color-mix(in srgb, var(--danger) 35%, transparent)" }}>
+                      {emailErrors.join(", ")}
+                    </span>
+                  )}
+                </label>
+
                 {/* Password */}
                 <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
                   {i18n("password8be3c94")}
@@ -399,6 +424,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                         await signUpInvited({
                           nickname: registerForm.nickname,
                           password: registerForm.password,
+                          email: registerForm.email,
                           invitation_token: invitationToken.trim(),
                         });
                       } else {

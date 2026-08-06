@@ -16,8 +16,8 @@ defmodule MilosTraining.Execution.RLSEnforcementTest do
     {execution_id_s, execution_id} = uuid()
 
     Postgrex.query!(conn, """
-    INSERT INTO users (id, nickname, display_nickname, password_hash, role, inserted_at, updated_at)
-    VALUES ($1, $2, $2, 'x', 'member', now(), now())
+    INSERT INTO users (id, nickname, display_nickname, password_hash, role, email, inserted_at, updated_at)
+    VALUES ($1, $2::text, $2::text, 'x', 'member', $2::text || '@placeholder.invalid', now(), now())
     """, [owner_id, "rls_execution_user_#{System.unique_integer([:positive])}"])
 
     as_session(conn, owner_id_s, nil, false, fn ->

@@ -5,7 +5,7 @@ defmodule MilosTraining.Identity.RegisterUserTest do
 
   describe "call/1" do
     test "creates user with valid params" do
-      params = %{nickname: "atlas", password: "S3cur3P@ss!", role: :member}
+      params = %{nickname: "atlas", password: "S3cur3P@ss!", role: :member, email: "atlas@placeholder.invalid"}
 
       assert {:ok, user} = RegisterUser.call(params)
       assert user.nickname == "atlas"
@@ -14,7 +14,7 @@ defmodule MilosTraining.Identity.RegisterUserTest do
     end
 
     test "rejects duplicate nickname" do
-      params = %{nickname: "atlas", password: "S3cur3P@ss!", role: :member}
+      params = %{nickname: "atlas", password: "S3cur3P@ss!", role: :member, email: "atlas@placeholder.invalid"}
 
       {:ok, _user} = RegisterUser.call(params)
 
@@ -24,7 +24,12 @@ defmodule MilosTraining.Identity.RegisterUserTest do
 
     test "preserves a display nickname while normalizing it before uniqueness checks" do
       {:ok, user} =
-        RegisterUser.call(%{nickname: "Atlas", password: "S3cur3P@ss!", role: :member})
+        RegisterUser.call(%{
+          nickname: "Atlas",
+          password: "S3cur3P@ss!",
+          role: :member,
+          email: "atlas2@placeholder.invalid"
+        })
 
       assert user.nickname == "Atlas"
       assert user.normalized_nickname == "atlas"
@@ -33,21 +38,22 @@ defmodule MilosTraining.Identity.RegisterUserTest do
                RegisterUser.call(%{
                  nickname: "ATLAS",
                  password: "S3cur3P@ss!",
-                 role: :member
+                 role: :member,
+                 email: "atlas3@placeholder.invalid"
                })
 
       assert "has already been taken" in errors_on(changeset).nickname
     end
 
     test "rejects invalid role" do
-      params = %{nickname: "atlas", password: "S3cur3P@ss!", role: :admin}
+      params = %{nickname: "atlas", password: "S3cur3P@ss!", role: :admin, email: "atlas4@placeholder.invalid"}
 
       assert {:error, changeset} = RegisterUser.call(params)
       assert "is invalid" in errors_on(changeset).role
     end
 
     test "rejects weak password" do
-      params = %{nickname: "atlas", password: "123", role: :member}
+      params = %{nickname: "atlas", password: "123", role: :member, email: "atlas5@placeholder.invalid"}
 
       assert {:error, changeset} = RegisterUser.call(params)
       assert errors_on(changeset).password != []
@@ -60,8 +66,8 @@ defmodule MilosTraining.Identity.RegisterUserTest do
         Ecto.Adapters.SQL.query!(
           Repo,
           """
-          INSERT INTO users (id, nickname, password_hash, role, leaderboard_opt_in, inserted_at, updated_at)
-          VALUES ($1, $2, $3, $4, $5, $6, $7)
+          INSERT INTO users (id, nickname, password_hash, role, leaderboard_opt_in, email, inserted_at, updated_at)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
           """,
           [
             Ecto.UUID.dump!(Ecto.UUID.generate()),
@@ -69,6 +75,7 @@ defmodule MilosTraining.Identity.RegisterUserTest do
             "hashed",
             "owner",
             false,
+            "raw_insert_user@placeholder.invalid",
             now,
             now
           ]
