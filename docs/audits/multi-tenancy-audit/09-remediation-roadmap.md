@@ -49,7 +49,7 @@ blocking. P1–P3 remain open.
 - **Approach:** Reject any requested `role` that exceeds (or, per product decision, equals) the issuer's own membership role.
 - **Tests required before merge:** test-gap-plan #6, #16. **Requires a product decision first**: can an `admin` create peer `admin`s, or only `owner` can create `admin`s? Flag to product before implementing.
 
-### P1.4 — Fix legacy `/api/admin/*` header-trust tenant resolution (F-01) + frontend org-in-URL migration (F-09) — **EXPAND PHASE ONLY, 2026-08-06**: backend mirror routes exist; frontend migration and legacy-route/header removal still open. See `04-findings.md`.
+### P1.4 — Fix legacy `/api/admin/*` header-trust tenant resolution (F-01) + frontend org-in-URL migration (F-09) — **EXPAND PHASE ONLY, 2026-08-06**: backend mirror routes exist; frontend migration and legacy-route/header removal still open. See `04-findings.md`. **Before cutover**, also audit every mirrored controller's `operation/2` OpenApiSpex specs for the `organization_slug` `CastAndValidate` gap found and fixed for Messaging during F-25 (P2.4) — untested POST/PATCH mirrored routes likely reject every request today.
 - **Dependency:** these two should ship together (backend without frontend migration breaks the admin console; frontend without backend fix doesn't remove the vulnerability).
 - **Affected modules:** `router.ex`, `resolve_tenant_context.ex`, `me_controller.ex`, `apps/web/src/app/admin/*`, `apps/web/src/api/client.ts`, `apps/web/src/lib/realtime.ts`, `apps/web/src/components/organization-selector.tsx`.
 - **Approach:** Introduce `/api/org/:organization_slug/admin/*` mirroring existing routes; migrate the frontend admin console to `/org/:slug/admin/*` URLs; remove the `x-organization-slug` header fallback and the legacy-org default from `ResolveTenantContext`; add `organization_id`/slug to every admin-surface TanStack Query key; invalidate/clear the query cache on organization switch; unify REST/WebSocket org-resolution into one shared source of truth.
@@ -82,8 +82,12 @@ blocking. P1–P3 remain open.
 - **Tests required before merge:** test-gap-plan #8. ✅ done (3 new job tests).
 
 ### P2.4 — Fix Messaging Application layer to open tenant context (F-25)
+- **STATUS: FIXED** (2026-08-06). Mirrored `/api/threads/*` under
+  `/api/org/:organization_slug/me`; also fixed a `CastAndValidate` gap this
+  surfaced that likely affects other P1.4-mirrored POST/PATCH routes too —
+  see F-25 in `04-findings.md`.
 - **Dependency:** same sequencing note as P2.3.
-- **Tests required before merge:** test-gap-plan #9.
+- **Tests required before merge:** test-gap-plan #9. ✅ done.
 
 ### P2.5 — Fix `ProcessWorkoutCompletionJob` tenant/owner context (F-26) — confirm first via direct read
 - **Dependency:** none.

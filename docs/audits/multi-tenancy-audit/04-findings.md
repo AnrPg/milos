@@ -347,6 +347,35 @@ organization; run the job; assert it transitions to `overdue`.
 
 ## F-25 — Messaging's Application layer never opens a tenant context anywhere; the feature is likely non-functional for every organization except the legacy one
 
+**STATUS: FIXED** (2026-08-06). Confirmed by direct read: neither the
+`messaging/application/*.ex` modules nor the top-level
+`application/*_messaging_thread.ex` / `application/send_message.ex`
+orchestration wrappers the controller actually calls ever opened a tenant
+context. Worse than the original finding stated — since F-04 already removed
+the RLS legacy-org `COALESCE` fallback earlier in this same remediation pass,
+messaging now failed closed for **every** organization, including the
+legacy one, not just non-legacy tenants. Fixed by mirroring the same
+expand-phase pattern already used for Finance (`MyFinanceController`):
+added `Messaging.with_tenant_context/2`, mirrored `/api/threads/*` under the
+existing `/api/org/:organization_slug/me` (`tenant_member`) scope, and gave
+`MessagingController` an `action/2` that wraps the whole action in
+`Messaging.with_tenant_context/2` when `conn.assigns.tenant_context` is
+present — the legacy flat `/api/threads/*` routes are left as-is (same
+known F-01/P1.4 debt as everywhere else). Covered by
+`test/milos_training_web/controllers/messaging_controller_tenant_context_test.exs`.
+
+**Follow-up systemic gap discovered while fixing this (relevant to P1.4):**
+`OpenApiSpex.Plug.CastAndValidate` rejects any request under a mirrored
+`/api/org/:organization_slug/...` route with `"Unexpected field:
+organization_slug"` unless the controller's `operation/2` spec explicitly
+declares `organization_slug` as a path parameter. This was fixed for
+Messaging's three `CastAndValidate`-guarded actions, but the ~90 admin
+routes mirrored during F-01's expand phase likely have the same gap on any
+POST/PATCH action — none of them have been exercised with a request body by
+an automated test yet (only GETs), so this has been silently latent. Needs
+a systematic audit of every mirrored controller's `operation/2` specs before
+the frontend cuts over to the org-scoped URLs.
+
 **Severity:** High · **Confidence:** Confirmed by delegated research (not independently re-read; recommend a direct read of `apps/api/lib/milos_training/messaging/application/*.ex` before remediation) · **Invariant affected:** tenant feature parity, not leakage (fails closed)
 
 **Evidence (as reported):** None of `get_thread.ex`, `list_threads.ex`,
