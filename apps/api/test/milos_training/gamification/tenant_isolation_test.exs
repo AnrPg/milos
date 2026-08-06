@@ -50,6 +50,96 @@ defmodule MilosTraining.Gamification.TenantIsolationTest do
            end)
   end
 
+  test "weekly leaderboard is isolated by organization context" do
+    admin = TestFixtures.admin_fixture()
+    member_a = TestFixtures.user_fixture(%{role: :member})
+    member_b = TestFixtures.user_fixture(%{role: :member})
+    context_a = tenant_context_fixture(admin, "Leaderboard Gym A")
+    context_b = tenant_context_fixture(admin, "Leaderboard Gym B")
+
+    assert {:ok, true} =
+             GamificationStore.with_tenant_context(context_a, fn ->
+               GamificationStore.set_leaderboard_opt_in(member_a.id, true)
+             end)
+
+    assert {:ok, true} =
+             GamificationStore.with_tenant_context(context_b, fn ->
+               GamificationStore.set_leaderboard_opt_in(member_b.id, true)
+             end)
+
+    assert :ok = GamificationStore.refresh_leaderboard()
+
+    leaderboard_a =
+      GamificationStore.with_tenant_context(context_a, fn ->
+        GamificationStore.get_leaderboard("weekly", 10)
+      end)
+
+    leaderboard_b =
+      GamificationStore.with_tenant_context(context_b, fn ->
+        GamificationStore.get_leaderboard("weekly", 10)
+      end)
+
+    assert Enum.map(leaderboard_a, & &1.user_id) == [member_a.id]
+    assert Enum.map(leaderboard_b, & &1.user_id) == [member_b.id]
+  end
+
+  test "weekly leaderboard prs_this_month is isolated by organization context" do
+    admin = TestFixtures.admin_fixture()
+    member_a = TestFixtures.user_fixture(%{role: :member})
+    member_b = TestFixtures.user_fixture(%{role: :member})
+    context_a = tenant_context_fixture(admin, "PR Isolation Gym A")
+    context_b = tenant_context_fixture(admin, "PR Isolation Gym B")
+
+    assert {:ok, true} =
+             GamificationStore.with_tenant_context(context_a, fn ->
+               GamificationStore.set_leaderboard_opt_in(member_a.id, true)
+             end)
+
+    assert {:ok, true} =
+             GamificationStore.with_tenant_context(context_b, fn ->
+               GamificationStore.set_leaderboard_opt_in(member_b.id, true)
+             end)
+
+    assert {:ok, _} =
+             GamificationStore.create_achievement(%{
+               user_id: member_a.id,
+               organization_id: context_a.organization_id,
+               badge_key: "pr_event:#{Ecto.UUID.generate()}:main",
+               earned_at: DateTime.utc_now()
+             })
+
+    assert {:ok, _} =
+             GamificationStore.create_achievement(%{
+               user_id: member_a.id,
+               organization_id: context_a.organization_id,
+               badge_key: "pr_event:#{Ecto.UUID.generate()}:main",
+               earned_at: DateTime.utc_now()
+             })
+
+    assert {:ok, _} =
+             GamificationStore.create_achievement(%{
+               user_id: member_b.id,
+               organization_id: context_b.organization_id,
+               badge_key: "pr_event:#{Ecto.UUID.generate()}:main",
+               earned_at: DateTime.utc_now()
+             })
+
+    assert :ok = GamificationStore.refresh_leaderboard()
+
+    entry_a =
+      GamificationStore.with_tenant_context(context_a, fn ->
+        Enum.find(GamificationStore.get_leaderboard("weekly", 10), &(&1.user_id == member_a.id))
+      end)
+
+    entry_b =
+      GamificationStore.with_tenant_context(context_b, fn ->
+        Enum.find(GamificationStore.get_leaderboard("weekly", 10), &(&1.user_id == member_b.id))
+      end)
+
+    assert entry_a.prs_this_month == 2
+    assert entry_b.prs_this_month == 1
+  end
+
   defp challenge_params(context, admin, title) do
     %{
       organization_id: context.organization_id,

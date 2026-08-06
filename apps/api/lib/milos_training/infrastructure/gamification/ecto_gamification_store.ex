@@ -337,15 +337,17 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
   @weekly_leaderboard_query """
   SELECT user_id, nickname, workouts_this_week, prs_this_month
   FROM weekly_leaderboard
+  WHERE organization_id = $1::uuid
   ORDER BY workouts_this_week DESC, nickname ASC
-  LIMIT $1
+  LIMIT $2
   """
 
   @monthly_leaderboard_query """
   SELECT user_id, nickname, workouts_this_week, prs_this_month
   FROM weekly_leaderboard
+  WHERE organization_id = $1::uuid
   ORDER BY prs_this_month DESC, nickname ASC
-  LIMIT $1
+  LIMIT $2
   """
 
   @impl true
@@ -356,22 +358,23 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
         _ -> @weekly_leaderboard_query
       end
 
-    case Repo.query(query, [limit]) do
-      {:ok, %{rows: rows}} ->
-        rows
-        |> Enum.with_index(1)
-        |> Enum.map(fn {[user_id, nickname, workouts_this_week, prs_this_month], rank} ->
-          %{
-            rank: rank,
-            user_id: normalize_uuid(user_id),
-            nickname: nickname,
-            workouts_this_week: workouts_this_week,
-            prs_this_month: prs_this_month
-          }
-        end)
-
-      {:error, _reason} ->
-        []
+    with organization_id when is_binary(organization_id) <-
+           RepoContext.current_setting("app.organization_id"),
+         {:ok, %{rows: rows}} <-
+           Repo.query(query, [Ecto.UUID.dump!(organization_id), limit]) do
+      rows
+      |> Enum.with_index(1)
+      |> Enum.map(fn {[user_id, nickname, workouts_this_week, prs_this_month], rank} ->
+        %{
+          rank: rank,
+          user_id: normalize_uuid(user_id),
+          nickname: nickname,
+          workouts_this_week: workouts_this_week,
+          prs_this_month: prs_this_month
+        }
+      end)
+    else
+      _missing_scope_or_error -> []
     end
   end
 

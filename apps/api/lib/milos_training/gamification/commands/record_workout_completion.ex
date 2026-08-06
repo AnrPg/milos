@@ -13,7 +13,12 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
 
   def call(%{
         execution:
-          %{id: execution_id, user_id: user_id, completed_at_utc: completed_at} = execution,
+          %{
+            id: execution_id,
+            user_id: user_id,
+            organization_id: organization_id,
+            completed_at_utc: completed_at
+          } = execution,
         completed_executions: completed_executions,
         workout_lookup: workout_lookup,
         account: account,
@@ -83,7 +88,8 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
     }
 
     GamificationStore.transaction(fn ->
-      with {:ok, _pr_events} <- persist_pr_events(user_id, execution_id, pr_scores, completed_at),
+      with {:ok, _pr_events} <-
+             persist_pr_events(user_id, organization_id, execution_id, pr_scores, completed_at),
            total_prs <- GamificationStore.count_achievements_by_prefix(user_id, "pr_event:"),
            stats <-
              build_stats(
@@ -99,11 +105,13 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
              persist_achievements(
                AchievementRules.milestone_badges(stats, type_counts),
                user_id,
+               organization_id,
                completed_at
              ),
            {:ok, challenge_result} <-
              persist_challenge_progress(
                user_id,
+               organization_id,
                current_execution,
                completion_facts,
                completed_at
@@ -134,16 +142,17 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
     }
   end
 
-  defp persist_pr_events(user_id, execution_id, pr_scores, completed_at) do
+  defp persist_pr_events(user_id, organization_id, execution_id, pr_scores, completed_at) do
     pr_scores
     |> Enum.map(&"pr_event:#{execution_id}:#{&1.section_id}")
-    |> persist_achievements(user_id, completed_at)
+    |> persist_achievements(user_id, organization_id, completed_at)
   end
 
-  defp persist_achievements(badge_keys, user_id, completed_at) do
+  defp persist_achievements(badge_keys, user_id, organization_id, completed_at) do
     Enum.reduce_while(badge_keys, {:ok, []}, fn badge_key, {:ok, acc} ->
       case GamificationStore.create_achievement(%{
              user_id: user_id,
+             organization_id: organization_id,
              badge_key: badge_key,
              earned_at: completed_at
            }) do
@@ -157,7 +166,13 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
     end
   end
 
-  defp persist_challenge_progress(user_id, _execution, completion_facts, completed_at) do
+  defp persist_challenge_progress(
+         user_id,
+         organization_id,
+         _execution,
+         completion_facts,
+         completed_at
+       ) do
     completion_date = DateTime.to_date(completed_at)
 
     GamificationStore.list_active_challenges(completion_date)
@@ -212,6 +227,7 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
 
             maybe_complete_challenge(
               user_id,
+              organization_id,
               challenge,
               current_progress,
               update.completed?,
@@ -231,6 +247,7 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
 
   defp maybe_complete_challenge(
          user_id,
+         organization_id,
          challenge,
          current_progress,
          true,
@@ -241,6 +258,7 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
        when is_nil(current_progress.completed_at) do
     case GamificationStore.create_achievement(%{
            user_id: user_id,
+           organization_id: organization_id,
            badge_key: challenge.badge_key,
            earned_at: completed_at
          }) do
@@ -267,6 +285,7 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
 
   defp maybe_complete_challenge(
          _user_id,
+         _organization_id,
          _challenge,
          _current_progress,
          _completed?,

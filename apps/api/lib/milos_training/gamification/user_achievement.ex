@@ -9,11 +9,12 @@ defmodule MilosTraining.Gamification.UserAchievement do
     field :badge_key, :string
     field :earned_at, :utc_datetime_usec
     field :user_id, :binary_id
+    field :organization_id, :binary_id
   end
 
   def changeset(user_achievement \\ %__MODULE__{}, params) do
     user_achievement
-    |> cast(params, [:user_id, :badge_key, :earned_at])
+    |> cast(params, [:user_id, :badge_key, :earned_at, :organization_id])
     |> validate_required([:user_id, :badge_key, :earned_at])
     |> unique_constraint([:user_id, :badge_key])
     |> foreign_key_constraint(:user_id)

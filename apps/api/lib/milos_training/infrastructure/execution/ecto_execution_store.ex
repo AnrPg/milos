@@ -174,6 +174,7 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
     %{
       id: execution.id,
       user_id: execution.user_id,
+      organization_id: execution.organization_id,
       master_workout_id: execution.master_workout_id,
       scale_level_slug: execution.scale_level_slug,
       source: to_string(execution.source),

@@ -6,10 +6,13 @@ defmodule MilosTraining.Gamification.RecordWorkoutCompletionTest do
   alias MilosTraining.Application.CompleteWorkout
   alias MilosTraining.Execution
   alias MilosTraining.Gamification
+  alias MilosTraining.Gamification.GamificationStore
+  alias MilosTraining.Organizations
 
   test "completion updates stats, awards PR events, advances challenges, and refreshes the leaderboard" do
     admin = admin_fixture()
     athlete = user_fixture(%{role: :athlete})
+    context = tenant_context_fixture(admin, "Completion Flow Gym")
 
     {:ok, challenge} =
       Gamification.create_seasonal_challenge(admin.id, %{
@@ -24,22 +27,31 @@ defmodule MilosTraining.Gamification.RecordWorkoutCompletionTest do
       })
 
     {workout, section_id} = scoreable_workout!(admin)
-    {:ok, _preference} = Gamification.set_leaderboard_opt_in(athlete.id, true)
 
-    execution_one = complete_execution!(athlete.id, workout.id, section_id, 300)
+    {:ok, _preference} =
+      GamificationStore.with_tenant_context(context, fn ->
+        Gamification.set_leaderboard_opt_in(athlete.id, true)
+      end)
+
+    execution_one = complete_execution!(context, athlete.id, workout.id, section_id, 300)
     wait_for_gamification(athlete.id, fn stats -> stats.total_workouts == 1 end)
 
-    execution_two = complete_execution!(athlete.id, workout.id, section_id, 250)
+    execution_two = complete_execution!(context, athlete.id, workout.id, section_id, 250)
 
     wait_for_gamification(athlete.id, fn stats ->
       stats.total_workouts == 2 and stats.total_prs >= 1
     end)
 
-    wait_for_leaderboard(athlete.id)
+    wait_for_leaderboard(context, athlete.id)
 
     stats = Gamification.get_user_stats(athlete.id)
     badges = Gamification.list_visible_achievements(athlete.id)
-    leaderboard = Gamification.get_leaderboard("weekly", 5)
+
+    leaderboard =
+      GamificationStore.with_tenant_context(context, fn ->
+        Gamification.get_leaderboard("weekly", 5)
+      end)
+
     progress = Gamification.challenge_progress(athlete.id, challenge.id)
 
     assert execution_one.id != execution_two.id
@@ -57,29 +69,55 @@ defmodule MilosTraining.Gamification.RecordWorkoutCompletionTest do
   test "leaderboard counts are not multiplied by joined achievements" do
     admin = admin_fixture()
     athlete = user_fixture(%{role: :athlete})
+    context = tenant_context_fixture(admin, "No Multiply Leaderboard Gym")
     {workout, section_id} = scoreable_workout!(admin)
 
-    {:ok, _preference} = Gamification.set_leaderboard_opt_in(athlete.id, true)
+    {:ok, _preference} =
+      GamificationStore.with_tenant_context(context, fn ->
+        Gamification.set_leaderboard_opt_in(athlete.id, true)
+      end)
 
-    _first = complete_execution!(athlete.id, workout.id, section_id, "05:00")
-    _second = complete_execution!(athlete.id, workout.id, section_id, "04:40")
+    _first = complete_execution!(context, athlete.id, workout.id, section_id, "05:00")
+    _second = complete_execution!(context, athlete.id, workout.id, section_id, "04:40")
 
     wait_for_gamification(athlete.id, fn stats ->
       stats.total_workouts == 2 and stats.total_prs >= 1
     end)
 
-    _ = Gamification.refresh_leaderboard()
+    _ =
+      GamificationStore.with_tenant_context(context, fn ->
+        Gamification.refresh_leaderboard()
+      end)
 
     leaderboard_entry =
-      Enum.find(Gamification.get_leaderboard("weekly", 5), &(&1.user_id == athlete.id))
+      GamificationStore.with_tenant_context(context, fn ->
+        Enum.find(Gamification.get_leaderboard("weekly", 5), &(&1.user_id == athlete.id))
+      end)
 
     assert leaderboard_entry.workouts_this_week == 2
     assert leaderboard_entry.prs_this_month == 1
   end
 
-  defp complete_execution!(user_id, workout_id, section_id, score_value) do
+  defp tenant_context_fixture(owner, name) do
+    {:ok, organization} = Organizations.create_organization(%{name: name})
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: owner.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    {:ok, context} = Organizations.resolve_tenant_context(owner, organization.slug)
+    context
+  end
+
+  defp complete_execution!(context, user_id, workout_id, section_id, score_value) do
     {:ok, execution} =
       Execution.start_execution(user_id, %{
+        organization_id: context.organization_id,
         master_workout_id: workout_id,
         source: "self_selected",
         timezone: "UTC"
@@ -112,20 +150,23 @@ defmodule MilosTraining.Gamification.RecordWorkoutCompletionTest do
   defp wait_for_gamification(_user_id, _predicate, 0),
     do: flunk("gamification event did not finish in time")
 
-  defp wait_for_leaderboard(user_id, attempts \\ 20)
+  defp wait_for_leaderboard(context, user_id, attempts \\ 20)
 
-  defp wait_for_leaderboard(user_id, attempts) when attempts > 0 do
-    leaderboard = Gamification.get_leaderboard("weekly", 5)
+  defp wait_for_leaderboard(context, user_id, attempts) when attempts > 0 do
+    leaderboard =
+      GamificationStore.with_tenant_context(context, fn ->
+        Gamification.get_leaderboard("weekly", 5)
+      end)
 
     if Enum.any?(leaderboard, &(&1.user_id == user_id)) do
       :ok
     else
       Process.sleep(20)
-      wait_for_leaderboard(user_id, attempts - 1)
+      wait_for_leaderboard(context, user_id, attempts - 1)
     end
   end
 
-  defp wait_for_leaderboard(_user_id, 0),
+  defp wait_for_leaderboard(_context, _user_id, 0),
     do: flunk("leaderboard refresh did not finish in time")
 
   defp scoreable_workout!(admin) do
