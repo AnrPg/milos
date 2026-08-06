@@ -41,4 +41,23 @@ defmodule MilosTraining.Workers.ProcessWorkoutCompletionJobTest do
       args: %{"execution_id" => execution.id}
     )
   end
+
+  test "the enqueued job successfully processes the completion instead of cancelling with :execution_not_found" do
+    admin = admin_fixture()
+    member = user_fixture(%{role: :member})
+    workout = workout_fixture(admin)
+
+    assert {:ok, execution} =
+             Execution.start_execution(member.id, %{
+               master_workout_id: workout.id,
+               source: :self_selected,
+               started_at_utc: DateTime.utc_now(),
+               started_at_tz: "UTC"
+             })
+
+    assert {:ok, _completed} = CompleteWorkout.call(execution.id, member.id, %{})
+
+    assert :ok =
+             perform_job(ProcessWorkoutCompletionJob, %{"execution_id" => execution.id})
+  end
 end

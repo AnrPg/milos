@@ -10,6 +10,11 @@ defmodule MilosTraining.Infrastructure.Tenancy.RepoContext do
     with_settings(contextual_settings(context), fun)
   end
 
+  def run(%{execution_authorization_check: true} = context, fun)
+      when is_function(fun, 0) do
+    with_settings(contextual_settings(context), fun)
+  end
+
   def run(_context, _fun), do: {:error, :missing_ownership_scope}
 
   def current_setting(name)
