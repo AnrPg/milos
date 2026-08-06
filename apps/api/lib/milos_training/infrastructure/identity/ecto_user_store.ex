@@ -314,6 +314,7 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
       security_version: user.security_version || 1,
       avatar_url: user.avatar_url,
       preferred_locale: user.preferred_locale || "en",
+      email: user.email,
       inserted_at: user.inserted_at
     }
   end

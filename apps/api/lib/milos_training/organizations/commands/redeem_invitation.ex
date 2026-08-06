@@ -1,11 +1,46 @@
 defmodule MilosTraining.Organizations.Commands.RedeemInvitation do
-  alias MilosTraining.Organizations.Domain.InvitationToken
+  alias MilosTraining.Identity
+  alias MilosTraining.Organizations.Domain.{InvitationEmail, InvitationToken}
   alias MilosTraining.Organizations.OrganizationStore
 
   def call(token, user_id, redeemed_at) do
-    with {:ok, digest} <- InvitationToken.decode(token) do
+    with {:ok, digest} <- InvitationToken.decode(token),
+         :ok <- authorize_intended_email(digest, user_id) do
       OrganizationStore.redeem_invitation(digest, user_id, redeemed_at)
       |> hide_invitation_state()
+    end
+  end
+
+  # F-10: an invitation issued to a specific address may only be redeemed by
+  # an account holding that address. Invitations issued without one carry a
+  # nil digest and stay open to whoever holds the token.
+  #
+  # Checked here rather than inside the store transaction so a mismatch cannot
+  # consume the invitation: a wrong account must leave it redeemable by the
+  # right one.
+  defp authorize_intended_email(digest, user_id) do
+    case OrganizationStore.get_invitation_by_digest(digest) do
+      # Let the store's own transaction produce the not-found error, so this
+      # check never becomes an oracle for which tokens exist.
+      nil ->
+        :ok
+
+      %{intended_email_digest: nil} ->
+        :ok
+
+      %{intended_email_digest: intended} ->
+        if InvitationEmail.matches?(intended, account_email(user_id)) do
+          :ok
+        else
+          {:error, :invitation_email_mismatch}
+        end
+    end
+  end
+
+  defp account_email(user_id) do
+    case Identity.find_by_id(user_id) do
+      %{email: email} -> email
+      _missing -> nil
     end
   end
 

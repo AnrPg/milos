@@ -2,6 +2,7 @@ defmodule MilosTraining.Identity.User do
   use Ecto.Schema
   import Ecto.Changeset
   alias MilosTraining.Identity.{Domain.Locale, RegistrationPolicy}
+  alias MilosTraining.Organizations.Domain.InvitationEmail
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -16,14 +17,17 @@ defmodule MilosTraining.Identity.User do
     field :security_version, :integer, default: 1
     field :avatar_url, :string
     field :preferred_locale, :string, default: "en"
+    # Nullable: every account created before F-10 predates this column.
+    field :email, :string
 
     timestamps()
   end
 
   def registration_changeset(user \\ %__MODULE__{}, params) do
     user
-    |> cast(params, [:nickname, :password, :role])
+    |> cast(params, [:nickname, :password, :role, :email])
     |> validate_required([:nickname, :password, :role])
+    |> maybe_validate_email()
     |> validate_nickname()
     |> normalize_and_preserve_nickname()
     |> validate_inclusion(:role, RegistrationPolicy.self_register_roles())
@@ -71,7 +75,8 @@ defmodule MilosTraining.Identity.User do
 
   def profile_changeset(user, params) do
     user
-    |> cast(params, [:nickname, :password, :preferred_locale])
+    |> cast(params, [:nickname, :password, :preferred_locale, :email])
+    |> maybe_validate_email()
     |> maybe_normalize_nickname()
     |> maybe_validate_nickname()
     |> maybe_validate_password()
@@ -94,6 +99,24 @@ defmodule MilosTraining.Identity.User do
     user
     |> change(security_version: version)
     |> validate_number(:security_version, greater_than: 0)
+  end
+
+  # Applied only when the caller actually supplied an address, so accounts
+  # without one keep working and an unrelated profile edit never has to
+  # invent a value.
+  defp maybe_validate_email(changeset) do
+    case get_change(changeset, :email) do
+      nil ->
+        changeset
+
+      _email ->
+        changeset
+        |> update_change(:email, &InvitationEmail.normalize/1)
+        |> validate_format(:email, ~r/^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+          message: "must be a valid email address"
+        )
+        |> unique_constraint(:email, name: :users_email_unique_index)
+    end
   end
 
   defp validate_nickname(changeset) do

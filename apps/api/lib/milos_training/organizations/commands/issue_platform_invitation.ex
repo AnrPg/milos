@@ -1,5 +1,5 @@
 defmodule MilosTraining.Organizations.Commands.IssuePlatformInvitation do
-  alias MilosTraining.Organizations.Domain.{InvitationToken, MembershipPolicy}
+  alias MilosTraining.Organizations.Domain.{InvitationEmail, InvitationToken, MembershipPolicy}
   alias MilosTraining.Organizations.{OrganizationStore, PlatformContext}
 
   @default_lifetime_seconds 604_800
@@ -21,7 +21,7 @@ defmodule MilosTraining.Organizations.Commands.IssuePlatformInvitation do
                role: role,
                expires_at: DateTime.add(issued_at, lifetime, :second),
                issued_by_user_id: context.user_id,
-               intended_email_digest: intended_email_digest(value(params, :intended_email))
+               intended_email_digest: InvitationEmail.digest(value(params, :intended_email))
              },
              issued_at
            ) do
@@ -37,13 +37,6 @@ defmodule MilosTraining.Organizations.Commands.IssuePlatformInvitation do
 
   def call(_context, _organization_id, _params, _issued_at),
     do: {:error, :vendor_required}
-
-  defp intended_email_digest(nil), do: nil
-  defp intended_email_digest(""), do: nil
-
-  defp intended_email_digest(email) when is_binary(email) do
-    email |> String.trim() |> String.downcase() |> then(&:crypto.hash(:sha256, &1))
-  end
 
   defp normalize_role(role) when is_atom(role), do: role
 

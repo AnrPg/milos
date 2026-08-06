@@ -5,6 +5,7 @@ defmodule MilosTraining.Organizations.Commands.IssueInvitation do
     TenantAuthorization
   }
 
+  alias MilosTraining.Organizations.Domain.InvitationEmail
   alias MilosTraining.Organizations.OrganizationStore
 
   @default_lifetime_seconds 604_800
@@ -22,7 +23,7 @@ defmodule MilosTraining.Organizations.Commands.IssueInvitation do
         role: role,
         expires_at: DateTime.add(issued_at, lifetime, :second),
         issued_by_user_id: context.user_id,
-        intended_email_digest: intended_email_digest(value(params, :intended_email))
+        intended_email_digest: InvitationEmail.digest(value(params, :intended_email))
       }
 
       case OrganizationStore.issue_invitation(invitation_params, issued_at) do
@@ -40,13 +41,6 @@ defmodule MilosTraining.Organizations.Commands.IssueInvitation do
     end
   end
 
-  defp intended_email_digest(nil), do: nil
-  defp intended_email_digest(""), do: nil
-
-  defp intended_email_digest(email) when is_binary(email) do
-    normalized = email |> String.trim() |> String.downcase()
-    :crypto.hash(:sha256, normalized)
-  end
 
   defp normalize_role(role) when is_atom(role), do: role
 

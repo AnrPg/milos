@@ -12,6 +12,10 @@ defmodule MilosTraining.Identity.Account do
     :security_version,
     :avatar_url,
     :preferred_locale,
+    # Nullable: accounts created before F-10 have none. Carried on the domain
+    # struct so invitation email binding can be checked without reaching for
+    # the Ecto schema.
+    :email,
     :inserted_at
   ]
 end
