@@ -406,23 +406,48 @@ organization member; confirm it can be read back and replied to.
 
 ## F-01 — Legacy `/api/admin/*` surface (~140 endpoints) resolves tenant identity from a client-controlled request header, not the URL
 
-**STATUS (2026-08-06): EXPAND PHASE DONE, CONTRACT PHASE NOT STARTED — the
-vulnerability is not yet closed.** Added `/api/org/:organization_slug/admin/*`
-mirroring all ~90 remaining `/api/admin/*` routes (3 already existed),
-reusing the same controllers unchanged - these new routes resolve their
-tenant from the URL path, not the header, so they are safe. The legacy
-`/api/admin/*` scope and `ResolveTenantContext`'s header/legacy-org fallback
-are deliberately left in place: `apps/web/src/api/client.ts` confirmed every
-frontend request still calls the legacy paths and sends
-`X-Organization-Slug` derived from the URL, `localStorage`, or JWT claims -
-removing the fallback now would break the app outright, not just the
-vulnerable path. **The actual fix - migrating the frontend admin console to
-the new paths, then removing the legacy scope and the header/fallback logic
-from `ResolveTenantContext` - is unstarted.** It touches most of the admin
-console, needs its own TanStack Query key work (see F-09), and needs live
-browser verification no automated test in this repo provides. Until that
-lands, F-01's exploit path remains live: any authenticated admin can still
-set `X-Organization-Slug` to an arbitrary org and reach `/api/admin/*`.
+**STATUS: FIXED — CONTRACT PHASE COMPLETE (2026-08-06).**
+`ResolveTenantContext` no longer reads `X-Organization-Slug` or falls back to
+the legacy organization; a request whose path lacks `organization_slug` is
+now rejected with `organization_context_required` instead of being silently
+scoped. The legacy `/api/admin/*` scope was deleted outright (every one of
+its 97 routes already had an exact mirror under
+`/api/org/:organization_slug/admin/*` from the expand phase - verified by
+diffing the full route list before deleting). The frontend's `apiRequest`
+(`apps/web/src/api/client.ts`) now transparently rewrites any `/admin/*` or
+`/me/search/users` request to the org-scoped backend path using the same
+slug it already resolved for the (now-removed) header, so none of the ~15
+`api/*.ts` call sites needed individual changes.
+
+Fixing the plug surfaced two things beyond the original finding's named
+scope:
+1. Three more flat routes shared the same `ResolveTenantContext`-dependent
+   pipelines but were never part of the "admin console" framing: `GET
+   /api/schedule`, `POST`/`DELETE /api/bookings`, `GET`/`POST`/`PATCH
+   /api/my-workouts/*`, and `GET /api/workouts/:id[/scales]`. These were
+   equally vulnerable to the same header-spoofing attack for
+   member/athlete-facing data, not just admin data. Mirrored them under
+   `/api/org/:organization_slug/...` and deleted the flat versions the same
+   way.
+2. A latent `OpenApiSpex.Plug.CastAndValidate` bug (first found while fixing
+   F-25): every org-scoped mirrored route with a request body rejected as
+   `"Unexpected field: organization_slug"`, since no operation spec declared
+   it as a path parameter. Fixed generically (not per-controller) by having
+   `ResolveTenantContext` strip `organization_slug` from `path_params`/`params`
+   after resolving it into `tenant_context` - the parameter has served its
+   purpose by then and no controller reads it directly.
+
+`me_controller.ex`'s `search_users` (evidence below) now prefers
+`conn.assigns.tenant_context` when present (set on the new
+`/api/org/:organization_slug/me/search/users` mirror), falling back to the
+header only on the still-mounted legacy `/api/me/search/users` route.
+
+Frontend (F-09) fixed alongside this - see F-09 below for the mechanism
+(the app already had a proxy that rewrites `/org/:slug/<path>` to `<path>`,
+so no page files needed to move).
+
+~130 backend test call sites across 18 files were updated to hit the
+org-scoped paths.
 
 **Severity:** Critical · **Confidence:** Confirmed (read directly)
 **Invariant affected:** Tenant resolution must never trust body/header/cookie/token-supplied organization identifiers (ADR-058); authorization must depend on `membership(U,A)` derived from trusted server context.
@@ -1025,15 +1050,44 @@ checked table list so a future regression here is caught automatically.
 
 ## F-09 — Frontend admin console has no organization identifier in the URL; tenant scoping depends entirely on a shared, mutable `localStorage` key and an attacker-controllable request header
 
-**STATUS (2026-08-06): NOT STARTED.** F-01's expand-phase backend routes
-(`/api/org/:organization_slug/admin/*`) now exist for the frontend to
-migrate to, but no frontend code has changed. `organizationSlugFromPath()`
-in `apps/web/src/api/client.ts` already knows how to read a slug out of a
-`/org/:slug` URL prefix - it's just that nothing in the admin console
-currently produces such a URL. This remains open work: route the admin
-console under `/org/:slug/admin/*`, switch its API calls off the header, and
-scope TanStack Query keys by organization so switching tenants doesn't
-surface stale cached data from the previous one.
+**STATUS: FIXED (2026-08-06), with one gap noted below.** Discovered
+`apps/web/src/proxy.ts` already transparently rewrites any
+`/org/:slug/<path>` request to serve the page at `<path>` (it strips the
+`/org/:slug` prefix and rewrites, browser URL bar unaffected) - so the admin
+console's page files under `src/app/admin/*` did **not** need to move; they
+were already reachable at both `/admin/*` and `/org/:slug/admin/*`. What was
+actually missing was every in-app navigation source producing a
+slug-prefixed URL in the first place:
+
+- `organization-selector.tsx`'s switch handler pushed to bare `/admin` for
+  admin-capable roles, unconditionally dropping the org slug on every
+  switch - this was the direct cause of the cross-tab-bleed failure
+  scenario. Now pushes to `/org/:slug/admin` and calls `queryClient.clear()`
+  on every switch (chosen over per-key `staleTime`/namespace surgery across
+  ~164 query keys - see "gap" below).
+- `TopNav.tsx`'s admin nav links, the dashboard dropdown, and its
+  active-path matching now resolve and preserve the current organization
+  slug (path → `localStorage` → first membership - the same fallback chain
+  `organization-selector.tsx` already used) so navigating between admin
+  sections keeps the URL, and therefore `apiRequest`'s tenant resolution,
+  pinned to the organization the user is actually in.
+
+**Gap not closed:** `queryClient.clear()` on switch closes the practical
+stale-cross-tenant-data risk the finding's evidence described, but it is a
+blunt instrument (clears everything, not just the switched org's data) and
+doesn't address the ~10 component files (`AdminDashboard.tsx`,
+`admin-finance.tsx`, `AdminUserProfile.tsx`, etc., ~80+ occurrences) that
+still build **internal deep links** with bare `/admin/...` hrefs (e.g. a
+user-profile panel linking to `/admin/workouts`). Clicking one of those
+drops the user out of the `/org/:slug/...` URL space back to bare `/admin`,
+where `apiRequest` correctly falls back to `localStorage`/JWT (not a
+regression from today's behavior, and correct in the common single-org-per-
+user case), but it reopens the cross-tab-bleed window for multi-org users
+until they navigate via a TopNav link again. Backend-generated deep links in
+push notifications (`push_message_builder.ex`,
+`admin_profile_policy.ex`) have the same bare-path gap. Systematically
+slug-prefixing every internal admin link was judged disproportionate to
+finish in this pass; tracked as follow-up in the roadmap.
 
 **Severity:** High · **Confidence:** Confirmed (frontend code read directly)
 **Invariant affected:** ADR-058's `/org/:slug` path-identifies-context model; "changing tenants must not leave data from the previous tenant visible or actionable."

@@ -49,12 +49,19 @@ blocking. P1–P3 remain open.
 - **Approach:** Reject any requested `role` that exceeds (or, per product decision, equals) the issuer's own membership role.
 - **Tests required before merge:** test-gap-plan #6, #16. **Requires a product decision first**: can an `admin` create peer `admin`s, or only `owner` can create `admin`s? Flag to product before implementing.
 
-### P1.4 — Fix legacy `/api/admin/*` header-trust tenant resolution (F-01) + frontend org-in-URL migration (F-09) — **EXPAND PHASE ONLY, 2026-08-06**: backend mirror routes exist; frontend migration and legacy-route/header removal still open. See `04-findings.md`. **Before cutover**, also audit every mirrored controller's `operation/2` OpenApiSpex specs for the `organization_slug` `CastAndValidate` gap found and fixed for Messaging during F-25 (P2.4) — untested POST/PATCH mirrored routes likely reject every request today.
-- **Dependency:** these two should ship together (backend without frontend migration breaks the admin console; frontend without backend fix doesn't remove the vulnerability).
-- **Affected modules:** `router.ex`, `resolve_tenant_context.ex`, `me_controller.ex`, `apps/web/src/app/admin/*`, `apps/web/src/api/client.ts`, `apps/web/src/lib/realtime.ts`, `apps/web/src/components/organization-selector.tsx`.
-- **Approach:** Introduce `/api/org/:organization_slug/admin/*` mirroring existing routes; migrate the frontend admin console to `/org/:slug/admin/*` URLs; remove the `x-organization-slug` header fallback and the legacy-org default from `ResolveTenantContext`; add `organization_id`/slug to every admin-surface TanStack Query key; invalidate/clear the query cache on organization switch; unify REST/WebSocket org-resolution into one shared source of truth.
-- **Tests required before merge:** test-gap-plan #4, #11, plus a frontend integration test for the cross-tab/stale-cache scenarios described in F-09.
-- **Deployment considerations:** Largest-surface-area change in this roadmap (~140 backend routes + the entire admin frontend). Recommend a feature-flagged parallel rollout (old and new routes coexist during migration) rather than a flag-day cutover, consistent with this codebase's existing expand/contract migration discipline.
+### P1.4 — Fix legacy `/api/admin/*` header-trust tenant resolution (F-01) + frontend org-in-URL migration (F-09) — **FIXED, CONTRACT PHASE COMPLETE (2026-08-06)**. See F-01/F-09 in `04-findings.md`.
+- **Dependency:** these two shipped together as planned (backend contract phase + frontend navigation fix in the same session).
+- **Affected modules:** `router.ex`, `resolve_tenant_context.ex`, `me_controller.ex`, `apps/web/src/api/client.ts`, `apps/web/src/components/TopNav.tsx`, `apps/web/src/components/organization-selector.tsx`. `apps/web/src/app/admin/*` did **not** need to move — the existing `apps/web/src/proxy.ts` already rewrites `/org/:slug/<path>` to `<path>` transparently.
+- **Approach actually taken:** deleted the legacy `/api/admin/*` scope (every route had an exact org-scoped mirror already); hardened `ResolveTenantContext` to reject path-less requests instead of falling back to the header or legacy org; `apiRequest` now rewrites `/admin/*` and `/me/search/users` calls to the org-scoped path transparently for every existing caller; `organization-selector.tsx` now navigates to `/org/:slug/admin` and calls `queryClient.clear()` on switch instead of namespacing all ~164 query keys individually; `TopNav.tsx` resolves and preserves the org slug across admin nav.
+- **Known remaining gap:** ~80+ internal deep-link hrefs across ~10 admin component files (and two backend push-notification link builders) still emit bare `/admin/...` paths. These don't reopen the backend vulnerability (closed unconditionally) but can still drop a multi-org user out of the `/org/:slug/...` URL space, reopening the cross-tab-bleed window until they navigate via TopNav again. Not fixed in this pass — see P1.6 below.
+- **Tests required before merge:** test-gap-plan #4, #11 — backend: ~130 test call sites updated across 18 files, all green. Frontend: `client.test.ts`, `TopNav.test.ts`, `organization-selector.test.tsx` updated and green; **no live-browser verification was performed** — this still needs a manual/Playwright pass before considering the frontend side fully proven, per this file's own past guidance that automated tests here can't cover this class of change.
+- **Deployment considerations:** Largest-surface-area change in this roadmap (~140 backend routes + the frontend admin shell). Shipped as a single cutover rather than a feature-flagged parallel rollout — justified here because the legacy routes had zero remaining callers once `apiRequest` was fixed in the same change, so there was no window where old and new needed to coexist.
+
+### P1.6 — Slug-prefix the remaining internal admin deep links (follow-up from P1.4/F-09)
+- **Dependency:** none; purely additive polish on top of the P1.4 fix.
+- **Affected modules:** `AdminDashboard.tsx`, `AnalyticsMarketingHub.tsx`, `admin-analytics.tsx`, `admin-coaching.tsx`, `admin/finance/FinanceDashboard.tsx`, `admin/finance/FinanceOperations.tsx`, `admin-finance-member-profile.tsx`, `admin-finance-package-detail.tsx`, `admin-finance.tsx`, `admin-home.tsx`, `admin/users/AdminUserProfile.tsx`, `admin/users/AdminUsersDirectory.tsx`, plus `push_message_builder.ex` and `admin_profile_policy.ex` on the backend.
+- **Approach:** thread `useParams<{organization_slug}>()` (client components already have it, no prop drilling needed since they render under `/org/:slug/admin/*`) through each file's hrefs; for the two backend link builders, thread the organization slug through to the URL builder the same way `organization_id` is already threaded through their calling context.
+- **Tests required before merge:** none of the existing tests exercise these hrefs directly; add targeted tests per file as they're touched.
 
 ### P1.5 — Add non-superuser RLS-enforcing test/CI lane (F-07) — **FIXED 2026-08-06**: `RLSCase` helper + boot-time `PrivilegeGuard` health check + a genuine RLS-enforcement test for all 8 T4 contexts (Execution, Scheduling, Messaging, Workouts, Feedback, Analytics, Gamification, Finance). See `04-findings.md`.
 - **Dependency:** should land early since it makes every subsequent fix's tests actually trustworthy.
@@ -84,8 +91,8 @@ blocking. P1–P3 remain open.
 ### P2.4 — Fix Messaging Application layer to open tenant context (F-25)
 - **STATUS: FIXED** (2026-08-06). Mirrored `/api/threads/*` under
   `/api/org/:organization_slug/me`; also fixed a `CastAndValidate` gap this
-  surfaced that likely affects other P1.4-mirrored POST/PATCH routes too —
-  see F-25 in `04-findings.md`.
+  surfaced — later fixed generically for every org-scoped route (not just
+  Messaging's) as part of P1.4's contract phase — see F-25 in `04-findings.md`.
 - **Dependency:** same sequencing note as P2.3.
 - **Tests required before merge:** test-gap-plan #9. ✅ done.
 
@@ -142,6 +149,6 @@ P1.1 (remove COALESCE fallback) ─┬─► P2.3 (Finance jobs)
                                   └─► P2.9 (realtime fallback)
 P1.2 (Finance predicates) ───────────────────────────────► independent, high value
 P1.3 (invitation role ceiling) ──────────────────────────► independent, needs product input
-P1.4 (admin routes + frontend) ──────────────────────────► largest single change, own release train
+P1.4 (admin routes + frontend) ──────────────────────────► FIXED 2026-08-06; P1.6 (deep links) is the deferred remainder
 P2.1, P2.2, P2.5, P2.6, P2.7, P2.8, P2.9, P3.x ──────────► parallelizable, no hard cross-dependencies beyond what's noted
 ```
