@@ -30,6 +30,7 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   @callback get_invitation_with_organization(binary()) :: map() | nil
   @callback grant_vendor(Ecto.UUID.t()) ::
               {:ok, Vendor.t()} | {:error, Ecto.Changeset.t()}
+  @callback revoke_vendor(Ecto.UUID.t()) :: {:ok, Vendor.t()} | {:error, term()}
   @callback get_vendor(Ecto.UUID.t()) :: Vendor.t() | nil
   @callback provision_organization(map(), map(), Ecto.UUID.t(), DateTime.t()) ::
               {:ok, map()} | {:error, term()}
@@ -41,6 +42,8 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   @callback get_organization_settings(Ecto.UUID.t()) :: OrganizationSetting.t() | nil
   @callback update_organization_settings(Ecto.UUID.t(), map(), Ecto.UUID.t(), DateTime.t()) ::
               {:ok, OrganizationSetting.t()} | {:error, term()}
+  @callback update_membership_status(Ecto.UUID.t(), Ecto.UUID.t(), atom()) ::
+              {:ok, OrganizationMembership.t()} | {:error, term()}
   @callback update_membership_role(Ecto.UUID.t(), Ecto.UUID.t(), atom()) ::
               {:ok, OrganizationMembership.t()} | {:error, term()}
 end

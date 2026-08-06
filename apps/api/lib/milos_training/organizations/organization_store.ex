@@ -54,6 +54,9 @@ defmodule MilosTraining.Organizations.OrganizationStore do
   def grant_vendor(user_id), do: impl().grant_vendor(user_id)
 
   @impl true
+  def revoke_vendor(user_id), do: impl().revoke_vendor(user_id)
+
+  @impl true
   def get_vendor(user_id), do: impl().get_vendor(user_id)
 
   @impl true
@@ -100,6 +103,10 @@ defmodule MilosTraining.Organizations.OrganizationStore do
   @impl true
   def update_membership_role(organization_id, membership_id, role),
     do: impl().update_membership_role(organization_id, membership_id, role)
+
+  @impl true
+  def update_membership_status(organization_id, membership_id, status),
+    do: impl().update_membership_status(organization_id, membership_id, status)
 
   defp impl, do: Application.fetch_env!(:milos_training, :organization_store)
 end

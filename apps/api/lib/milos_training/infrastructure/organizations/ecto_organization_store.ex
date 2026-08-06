@@ -224,6 +224,19 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   end
 
   @impl true
+  def revoke_vendor(user_id) do
+    case Repo.get_by(Vendor, user_id: user_id) do
+      nil ->
+        {:error, :not_found}
+
+      %Vendor{} = vendor ->
+        vendor
+        |> Vendor.changeset(%{status: :revoked})
+        |> Repo.update()
+    end
+  end
+
+  @impl true
   def get_vendor(user_id),
     do: Repo.get_by(Vendor, user_id: user_id, status: :active)
 
@@ -390,6 +403,20 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
 
       membership
       |> OrganizationMembership.changeset(%{role: role})
+      |> Repo.update()
+      |> unwrap_or_rollback()
+    end)
+    |> flatten_transaction()
+  end
+
+  @impl true
+  def update_membership_status(organization_id, membership_id, status) do
+    Repo.transaction(fn ->
+      membership = get_membership_by_id(organization_id, membership_id)
+      if is_nil(membership), do: Repo.rollback(:not_found)
+
+      membership
+      |> OrganizationMembership.changeset(%{status: status})
       |> Repo.update()
       |> unwrap_or_rollback()
     end)
