@@ -280,6 +280,38 @@ belonging to a user in Org X; must be rejected.
 
 ## F-24 — Finance's cron/Oban automations never open a tenant context; they operate only on the legacy organization's data via the RLS fallback, silently no-op-ing for every other tenant
 
+**STATUS: FIXED** (2026-08-06). `mark_overdue_invoices_job.ex`,
+`payment_reminder_job.ex`, and `reconcile_entitlement_reservations_job.ex` now
+iterate every active organization from `OrganizationStore.list_organizations/0`
+and call the Finance store functions once per organization context (see
+remediation direction below, now implemented as described). Covered by
+`test/milos_training/workers/mark_overdue_invoices_job_test.exs`,
+`payment_reminder_job_test.exs`, and
+`reconcile_entitlement_reservations_job_test.exs`, each asserting the job
+mutates a *non-legacy* organization's data.
+
+**Additional finding discovered during remediation (beyond original scope):**
+this was not merely a "silent no-op for non-legacy orgs" bug. The
+`finance_invoices_apply_tenant_context` DB trigger (`BEFORE INSERT/UPDATE` on
+`finance_invoices`, backed by `milos_apply_tenant_context()`) unconditionally
+overwrites `NEW.organization_id` with the current `app.organization_id`
+session GUC whenever that GUC is set. `mark_overdue_invoices/0`,
+`memberships_needing_payment_reminder/1`, and
+`update_membership_reminder_timestamp/1` in `ecto_finance_store.ex` ran
+`Repo.update_all` with **no explicit `organization_id` predicate** — safe only
+because RLS was also restricting the affected rows. Once a per-organization
+`RepoContext.run` wrapper is added (as this fix does) and the session GUC is
+set, that same lack of an explicit predicate becomes a **cross-tenant data
+corruption bug**: the bulk update's `WHERE` clause was still unscoped, so if
+the RLS predicate ever failed to restrict the row set to the correct org
+(e.g. a superuser/RLS-bypassing connection, or a future policy regression),
+the trigger would silently reassign unrelated invoices/memberships to the
+job's current org. Fixed by adding `tenant_scope/1` (explicit
+`organization_id = ^session_org` predicate) to all three functions, making
+the query itself tenant-safe independent of RLS/trigger behavior.
+`release_stale_entitlement_reservations/1` was already correctly scoped and
+did not need this change.
+
 **Severity:** High · **Confidence:** Confirmed by delegated research (migration/RLS mechanics independently verified via F-04/F-05; the specific job call chains below were not independently re-read line-by-line and should get a follow-up direct read before remediation work begins)
 
 **Evidence (as reported):** `mark_overdue_invoices_job.ex` → `Finance.mark_overdue_invoices/0`,

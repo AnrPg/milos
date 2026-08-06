@@ -74,8 +74,12 @@ blocking. P1–P3 remain open.
 - **Tests required before merge:** test-gap-plan #18 (currently impossible to write — this item unblocks it).
 
 ### P2.3 — Fix Finance cron/Oban jobs to iterate per-organization (F-24)
+- **STATUS: FIXED** (2026-08-06). Jobs now iterate active organizations and
+  run scoped per-org. Also closed a cross-tenant `Repo.update_all`
+  corruption vector discovered during remediation — see F-24 in
+  `04-findings.md` for the full writeup.
 - **Dependency:** should land after P1.1 (COALESCE removal) or the jobs will start failing closed instead of silently no-op-ing — sequence carefully, ideally together.
-- **Tests required before merge:** test-gap-plan #8.
+- **Tests required before merge:** test-gap-plan #8. ✅ done (3 new job tests).
 
 ### P2.4 — Fix Messaging Application layer to open tenant context (F-25)
 - **Dependency:** same sequencing note as P2.3.
