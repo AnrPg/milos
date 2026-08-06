@@ -170,17 +170,17 @@ defmodule MilosTrainingWeb.MeControllerTest do
       {:ok, other_organization} =
         Organizations.create_organization(%{name: "Platform Search Two"})
 
-      platform_owner = register_search_user("platform_searcher", :admin)
+      vendor = register_search_user("platform_searcher", :admin)
       visible = register_search_user("platform_visible")
       hidden = register_search_user("platform_hidden")
 
-      {:ok, _owner} = Organizations.grant_platform_owner(platform_owner.id)
+      {:ok, _vendor} = Organizations.grant_vendor(vendor.id)
       add_membership(organization.id, visible.id)
       add_membership(other_organization.id, hidden.id)
 
       body =
         conn
-        |> put_bearer_token(platform_owner)
+        |> put_bearer_token(vendor)
         |> get("/api/me/search/users?q=platform_")
         |> json_response(200)
 

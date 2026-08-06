@@ -427,11 +427,11 @@ defmodule MilosTrainingWeb.AuthControllerTest do
       assert body["id"] == user.id
       assert body["nickname"] == "ares"
       assert body["role"] == "member"
-      assert body["platform_owner"] == false
+      assert body["vendor"] == false
       assert body["preferred_locale"] == "en"
     end
 
-    test "marks platform owner accounts", %{conn: conn} do
+    test "marks vendor accounts", %{conn: conn} do
       {:ok, user} =
         Identity.register(%{
           nickname: "platform_me",
@@ -440,7 +440,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         })
 
       {:ok, user} = Identity.update_role(user, :admin)
-      {:ok, _owner} = Organizations.grant_platform_owner(user.id)
+      {:ok, _vendor} = Organizations.grant_vendor(user.id)
 
       {:ok, access_token, _claims} =
         Guardian.encode_and_sign(user, %{"sv" => user.security_version}, token_type: "access")
@@ -451,7 +451,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         |> get("/api/auth/me")
         |> json_response(200)
 
-      assert body["platform_owner"] == true
+      assert body["vendor"] == true
     end
   end
 

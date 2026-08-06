@@ -62,8 +62,8 @@ defmodule MilosTrainingWeb.Router do
     plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin])
   end
 
-  pipeline :platform_owner do
-    plug(MilosTrainingWeb.Plugs.RequirePlatformOwner)
+  pipeline :vendor do
+    plug(MilosTrainingWeb.Plugs.RequireVendor)
   end
 
   scope "/api" do
@@ -281,7 +281,7 @@ defmodule MilosTrainingWeb.Router do
   end
 
   scope "/api/platform", MilosTrainingWeb do
-    pipe_through([:api, :authenticated, :platform_owner])
+    pipe_through([:api, :authenticated, :vendor])
 
     get("/organizations", PlatformOrganizationController, :index)
     post("/organizations", PlatformOrganizationController, :create)

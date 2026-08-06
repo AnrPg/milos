@@ -3,8 +3,8 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
     Organization,
     OrganizationMembership,
     OrganizationSetting,
-    PlatformOwner,
-    RegistrationInvitation
+    RegistrationInvitation,
+    Vendor
   }
 
   @callback create_organization(map()) ::
@@ -27,9 +27,9 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   @callback list_active_membership_user_ids(Ecto.UUID.t()) :: [Ecto.UUID.t()]
   @callback get_invitation_by_digest(binary()) :: RegistrationInvitation.t() | nil
   @callback get_invitation_with_organization(binary()) :: map() | nil
-  @callback grant_platform_owner(Ecto.UUID.t()) ::
-              {:ok, PlatformOwner.t()} | {:error, Ecto.Changeset.t()}
-  @callback get_platform_owner(Ecto.UUID.t()) :: PlatformOwner.t() | nil
+  @callback grant_vendor(Ecto.UUID.t()) ::
+              {:ok, Vendor.t()} | {:error, Ecto.Changeset.t()}
+  @callback get_vendor(Ecto.UUID.t()) :: Vendor.t() | nil
   @callback provision_organization(map(), map(), Ecto.UUID.t(), DateTime.t()) ::
               {:ok, map()} | {:error, term()}
   @callback list_organizations() :: [map()]

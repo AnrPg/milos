@@ -18,18 +18,18 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
   setup do
     platform_user = user_fixture(%{nickname: "platform_operator"})
     ordinary_user = user_fixture(%{nickname: "tenant_operator"})
-    {:ok, _owner} = Organizations.grant_platform_owner(platform_user.id)
+    {:ok, _vendor} = Organizations.grant_vendor(platform_user.id)
 
     %{platform_user: platform_user, ordinary_user: ordinary_user}
   end
 
-  test "only a platform owner can access provisioning", context do
+  test "only a vendor can access provisioning", context do
     conn =
       context.conn
       |> put_bearer_token(context.ordinary_user)
       |> get("/api/platform/organizations")
 
-    assert %{"code" => "platform_owner_required"} = json_response(conn, 403)
+    assert %{"code" => "vendor_required"} = json_response(conn, 403)
   end
 
   test "provisions organization, settings, audit event, and a copy-once owner token", context do

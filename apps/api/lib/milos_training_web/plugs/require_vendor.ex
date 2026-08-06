@@ -1,4 +1,4 @@
-defmodule MilosTrainingWeb.Plugs.RequirePlatformOwner do
+defmodule MilosTrainingWeb.Plugs.RequireVendor do
   import Plug.Conn
   import Phoenix.Controller, only: [json: 2]
 
@@ -15,7 +15,7 @@ defmodule MilosTrainingWeb.Plugs.RequirePlatformOwner do
       {:error, _reason} ->
         conn
         |> put_status(:forbidden)
-        |> json(%{code: "platform_owner_required", error: "Forbidden"})
+        |> json(%{code: "vendor_required", error: "Forbidden"})
         |> halt()
     end
   end

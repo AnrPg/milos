@@ -47,10 +47,10 @@ defmodule MilosTraining.Organizations.OrganizationStore do
     do: impl().get_invitation_with_organization(digest)
 
   @impl true
-  def grant_platform_owner(user_id), do: impl().grant_platform_owner(user_id)
+  def grant_vendor(user_id), do: impl().grant_vendor(user_id)
 
   @impl true
-  def get_platform_owner(user_id), do: impl().get_platform_owner(user_id)
+  def get_vendor(user_id), do: impl().get_vendor(user_id)
 
   @impl true
   def provision_organization(organization_params, invitation_params, platform_user_id, issued_at),

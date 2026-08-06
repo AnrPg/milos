@@ -12,8 +12,8 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     OrganizationMembership,
     OrganizationProvisioningEvent,
     OrganizationSetting,
-    PlatformOwner,
-    RegistrationInvitation
+    RegistrationInvitation,
+    Vendor
   }
 
   alias MilosTraining.Repo
@@ -201,9 +201,9 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   end
 
   @impl true
-  def grant_platform_owner(user_id) do
-    %PlatformOwner{}
-    |> PlatformOwner.changeset(%{user_id: user_id, status: :active})
+  def grant_vendor(user_id) do
+    %Vendor{}
+    |> Vendor.changeset(%{user_id: user_id, status: :active})
     |> Repo.insert(
       on_conflict: {:replace, [:status, :updated_at]},
       conflict_target: [:user_id],
@@ -212,8 +212,8 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   end
 
   @impl true
-  def get_platform_owner(user_id),
-    do: Repo.get_by(PlatformOwner, user_id: user_id, status: :active)
+  def get_vendor(user_id),
+    do: Repo.get_by(Vendor, user_id: user_id, status: :active)
 
   @impl true
   def provision_organization(organization_params, invitation_params, platform_user_id, issued_at) do
@@ -251,7 +251,7 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     |> Multi.insert(:event, fn %{organization: organization} ->
       OrganizationProvisioningEvent.changeset(%{
         organization_id: organization.id,
-        platform_owner_user_id: platform_user_id,
+        vendor_user_id: platform_user_id,
         event: "organization_provisioned",
         metadata: %{initial_owner_invitation: true, provisioning_owner_membership: true}
       })
@@ -288,7 +288,7 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
       %OrganizationProvisioningEvent{}
       |> OrganizationProvisioningEvent.changeset(%{
         organization_id: organization_id,
-        platform_owner_user_id: platform_user_id,
+        vendor_user_id: platform_user_id,
         event: "organization_permanently_deleted",
         metadata: %{deleted_at: DateTime.to_iso8601(deleted_at)}
       })
@@ -327,7 +327,7 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
       %OrganizationProvisioningEvent{}
       |> OrganizationProvisioningEvent.changeset(%{
         organization_id: organization_id,
-        platform_owner_user_id: platform_user_id,
+        vendor_user_id: platform_user_id,
         event: "organization_#{status}",
         metadata: %{changed_at: DateTime.to_iso8601(changed_at)}
       })
@@ -358,7 +358,7 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
       %OrganizationProvisioningEvent{}
       |> OrganizationProvisioningEvent.changeset(%{
         organization_id: organization_id,
-        platform_owner_user_id: platform_user_id,
+        vendor_user_id: platform_user_id,
         event: "organization_settings_updated",
         metadata: %{changed_at: DateTime.to_iso8601(changed_at)}
       })

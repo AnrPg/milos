@@ -28,7 +28,7 @@ defmodule MilosTraining.Organizations.Commands.ProvisionOrganization do
     end
   end
 
-  def call(_context, _params, _issued_at), do: {:error, :platform_owner_required}
+  def call(_context, _params, _issued_at), do: {:error, :vendor_required}
 
   defp intended_email_digest(nil), do: nil
   defp intended_email_digest(""), do: nil

@@ -113,7 +113,7 @@ type CurrentUserWithAvatar = {
   role: string;
   avatar_url?: string | null;
   preferred_locale: string;
-  platform_owner?: boolean | null;
+  vendor?: boolean | null;
 };
 
 export function ProfilePage() {

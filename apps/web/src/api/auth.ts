@@ -23,7 +23,7 @@ export type AuthTokens =
   paths["/api/auth/login"]["post"]["responses"]["200"]["content"]["application/json"];
 export type CurrentUser =
   paths["/api/auth/me"]["get"]["responses"]["200"]["content"]["application/json"] & {
-    platform_owner?: boolean;
+    vendor?: boolean;
   };
 
 export function registerUser(payload: RegisterRequest) {

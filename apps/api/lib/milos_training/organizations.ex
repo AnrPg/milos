@@ -64,7 +64,7 @@ defmodule MilosTraining.Organizations do
   def resolve_platform_context(account, request_metadata \\ %{}),
     do: ResolvePlatformContext.call(account, request_metadata)
 
-  def grant_platform_owner(user_id), do: OrganizationStore.grant_platform_owner(user_id)
+  def grant_vendor(user_id), do: OrganizationStore.grant_vendor(user_id)
 
   def provision_organization(context, params, issued_at \\ DateTime.utc_now()),
     do: ProvisionOrganization.call(context, params, issued_at)

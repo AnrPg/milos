@@ -1,5 +1,13 @@
 # Executive Summary — Multi-Tenancy Security Audit
 
+> **Terminology note (2026-08-06):** this audit (dated 2026-08-05) refers to
+> the installation-wide `platform_owners` authority as "platform owner" or
+> "SaaS owner" throughout. That concept was renamed to **Vendor** by
+> [ADR-089](../../adr/ADR-089-rename-platform-owner-to-vendor.md) to remove its
+> collision with the unrelated, tenant-scoped `organization_memberships.role
+> == :owner`. Read "platform owner"/"SaaS owner" below as "vendor"; the
+> tenant-level `owner`/`admin` roles discussed in this audit are unaffected.
+
 Date: 2026-08-05 (updated same day with a production verification pass).
 Repository: `/home/rodochrousbisbiki/MyApps/milos`. Full findings:
 `04-findings.md`. Production verification detail: `10-production-verification.md`.

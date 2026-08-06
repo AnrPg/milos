@@ -227,7 +227,7 @@ export function TopNav() {
   const authenticated = status === "authenticated" && Boolean(tokens?.access_token) && Boolean(currentUser);
 
   const role = (currentUser?.role ?? "") as UserRole;
-  const isPlatformOwner = Boolean(currentUser?.platform_owner);
+  const isVendor = Boolean(currentUser?.vendor);
   const showSelfServiceSurfaces = showsTenantSelfServiceSurfaces(currentUser);
   const initials = currentUser?.nickname
     ? currentUser.nickname.slice(0, 2).toUpperCase()
@@ -308,7 +308,7 @@ export function TopNav() {
         </Link>
 
         <nav className="flex min-w-0 flex-1 flex-wrap items-center gap-0.5 overflow-visible sm:gap-1">
-          {isPlatformOwner ? (
+          {isVendor ? (
             <Link
               href="/platform/organizations"
               className="whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold transition-colors sm:px-3 sm:text-sm"

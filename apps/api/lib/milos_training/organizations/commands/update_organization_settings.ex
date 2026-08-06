@@ -23,7 +23,7 @@ defmodule MilosTraining.Organizations.Commands.UpdateOrganizationSettings do
   end
 
   def call(_context, _organization_id, _params, _changed_at),
-    do: {:error, :platform_owner_required}
+    do: {:error, :vendor_required}
 
   defp sanitize(params) when is_map(params) do
     Enum.reduce(params, %{}, fn {key, value}, acc ->

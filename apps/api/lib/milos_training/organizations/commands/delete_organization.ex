@@ -7,5 +7,5 @@ defmodule MilosTraining.Organizations.Commands.DeleteOrganization do
   end
 
   def call(%PlatformContext{}, _organization_id, _deleted_at), do: {:error, :not_found}
-  def call(_context, _organization_id, _deleted_at), do: {:error, :platform_owner_required}
+  def call(_context, _organization_id, _deleted_at), do: {:error, :vendor_required}
 end

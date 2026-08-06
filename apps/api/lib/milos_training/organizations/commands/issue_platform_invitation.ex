@@ -36,7 +36,7 @@ defmodule MilosTraining.Organizations.Commands.IssuePlatformInvitation do
   def call(%PlatformContext{}, _organization_id, _params, _issued_at), do: {:error, :not_found}
 
   def call(_context, _organization_id, _params, _issued_at),
-    do: {:error, :platform_owner_required}
+    do: {:error, :vendor_required}
 
   defp intended_email_digest(nil), do: nil
   defp intended_email_digest(""), do: nil

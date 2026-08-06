@@ -327,13 +327,13 @@ defmodule MilosTrainingWeb.AuthController do
              nickname: %Schema{type: :string},
              role: %Schema{type: :string},
              avatar_url: %Schema{type: :string, nullable: true},
-             platform_owner: %Schema{type: :boolean},
+             vendor: %Schema{type: :boolean},
              preferred_locale: %Schema{
                type: :string,
                enum: MilosTraining.Identity.supported_locales()
              }
            },
-           required: [:id, :nickname, :role, :platform_owner, :preferred_locale]
+           required: [:id, :nickname, :role, :vendor, :preferred_locale]
          }},
       unauthorized:
         {"Unauthorized", "application/json",
@@ -447,12 +447,12 @@ defmodule MilosTrainingWeb.AuthController do
       nickname: user.nickname,
       role: to_string(user.role),
       avatar_url: user.avatar_url,
-      platform_owner: platform_owner?(user),
+      vendor: vendor?(user),
       preferred_locale: user.preferred_locale
     })
   end
 
-  defp platform_owner?(user) do
+  defp vendor?(user) do
     match?({:ok, _context}, ResolvePlatformContext.call(user, %{}))
   end
 

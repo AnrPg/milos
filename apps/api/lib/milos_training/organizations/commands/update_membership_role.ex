@@ -17,7 +17,7 @@ defmodule MilosTraining.Organizations.Commands.UpdateMembershipRole do
     do: {:error, :not_found}
 
   def call(_context, _organization_id, _membership_id, _params),
-    do: {:error, :platform_owner_required}
+    do: {:error, :vendor_required}
 
   defp normalize_role(role) when is_atom(role), do: role
 

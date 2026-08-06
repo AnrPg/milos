@@ -228,7 +228,7 @@ defmodule MilosTrainingWeb.MeController do
   end
 
   defp search_visible_users(conn, user, query) do
-    if platform_owner?(user) do
+    if vendor?(user) do
       {:ok, SearchUsers.call(query)}
     else
       with {:ok, slug} <- organization_slug(conn),
@@ -238,7 +238,7 @@ defmodule MilosTrainingWeb.MeController do
     end
   end
 
-  defp platform_owner?(user) do
+  defp vendor?(user) do
     match?({:ok, _context}, ResolvePlatformContext.call(user, %{}))
   end
 

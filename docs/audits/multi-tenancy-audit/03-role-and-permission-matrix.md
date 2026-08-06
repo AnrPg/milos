@@ -1,5 +1,12 @@
 # Role and Permission Matrix
 
+> **Terminology note (2026-08-06):** "platform owner" / "SaaS owner" /
+> `platform_owners` below were renamed to **Vendor** / `vendors` by
+> [ADR-089](../../adr/ADR-089-rename-platform-owner-to-vendor.md). This page
+> is left as originally written; read those terms as "vendor". The
+> tenant-scoped `owner`/`admin` roles in §3 below are a separate, unrenamed
+> concept.
+
 Date: 2026-08-05. Built from direct code inspection of `apps/api/lib/milos_training/organizations/`,
 `apps/api/lib/milos_training/identity/`, `apps/api/lib/milos_training_web/router.ex`,
 `apps/api/lib/milos_training_web/plugs/`.

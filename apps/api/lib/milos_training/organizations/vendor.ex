@@ -1,10 +1,10 @@
-defmodule MilosTraining.Organizations.PlatformOwner do
+defmodule MilosTraining.Organizations.Vendor do
   use Ecto.Schema
   import Ecto.Changeset
 
   @primary_key {:id, :binary_id, autogenerate: true}
 
-  schema "platform_owners" do
+  schema "vendors" do
     field :user_id, :binary_id
     field :status, Ecto.Enum, values: [:active, :revoked], default: :active
     timestamps(type: :utc_datetime_usec)
@@ -18,8 +18,8 @@ defmodule MilosTraining.Organizations.PlatformOwner do
           updated_at: DateTime.t() | nil
         }
 
-  def changeset(owner \\ %__MODULE__{}, params) do
-    owner
+  def changeset(vendor \\ %__MODULE__{}, params) do
+    vendor
     |> cast(params, [:user_id, :status])
     |> validate_required([:user_id, :status])
     |> unique_constraint(:user_id)

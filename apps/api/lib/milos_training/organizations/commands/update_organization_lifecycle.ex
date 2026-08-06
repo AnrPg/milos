@@ -15,7 +15,7 @@ defmodule MilosTraining.Organizations.Commands.UpdateOrganizationLifecycle do
   end
 
   def call(_context, _organization_id, _status, _changed_at),
-    do: {:error, :platform_owner_required}
+    do: {:error, :vendor_required}
 
   defp normalize_status(status) when status in @statuses, do: {:ok, status}
 

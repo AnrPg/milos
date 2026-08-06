@@ -15,5 +15,5 @@ defmodule MilosTraining.Organizations.Queries.ListOrganizationMemberships do
     end
   end
 
-  def call(_context, _organization_id), do: {:error, :platform_owner_required}
+  def call(_context, _organization_id), do: {:error, :vendor_required}
 end
