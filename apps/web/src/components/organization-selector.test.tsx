@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { OrganizationSelector } from "@/components/organization-selector";
 
 const push = vi.fn();
+const clear = vi.fn();
 let membershipData: unknown[] = [];
 
 vi.mock("next/navigation", () => ({
@@ -13,6 +14,7 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("@tanstack/react-query", () => ({
   useQuery: () => ({ data: membershipData }),
+  useQueryClient: () => ({ clear }),
 }));
 
 vi.mock("@/components/session-provider", () => ({
@@ -62,7 +64,8 @@ describe("OrganizationSelector", () => {
       target: { value: "atlas" },
     });
 
-    expect(push).toHaveBeenCalledWith("/admin");
+    expect(push).toHaveBeenCalledWith("/org/atlas/admin");
+    expect(clear).toHaveBeenCalledOnce();
     expect(onSelect).toHaveBeenCalledOnce();
   });
 });

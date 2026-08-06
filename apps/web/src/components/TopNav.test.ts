@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { pathActive, tenantBrandName } from "@/components/TopNav";
+import { adminHref, pathActive, tenantBrandName } from "@/components/TopNav";
 
 describe("pathActive", () => {
   it("only marks Home active on the root page", () => {
@@ -12,6 +12,23 @@ describe("pathActive", () => {
   it("keeps section links active for their nested pages", () => {
     expect(pathActive("/admin/users/123", "/admin/users")).toBe(true);
     expect(pathActive("/admin/coaching-assignments", "/admin/coaching-assignments")).toBe(true);
+  });
+
+  it("matches organization-scoped paths against bare admin hrefs", () => {
+    expect(pathActive("/org/atlas-gym/admin/users/123", "/admin/users")).toBe(true);
+    expect(pathActive("/org/atlas-gym/admin/finance", "/admin/users")).toBe(false);
+  });
+});
+
+describe("adminHref", () => {
+  it("prefixes admin links with the resolved organization slug", () => {
+    expect(adminHref("/admin/users", "atlas-gym")).toBe("/org/atlas-gym/admin/users");
+    expect(adminHref("/admin", "atlas-gym")).toBe("/org/atlas-gym/admin");
+  });
+
+  it("leaves home unprefixed and falls back to the bare href without a slug", () => {
+    expect(adminHref("/", "atlas-gym")).toBe("/");
+    expect(adminHref("/admin/users", null)).toBe("/admin/users");
   });
 });
 

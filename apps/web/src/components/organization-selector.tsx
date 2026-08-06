@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { SELECTED_ORGANIZATION_SLUG_KEY } from "@/api/client";
 import { fetchOrganizationMemberships } from "@/api/organizations";
@@ -26,6 +26,7 @@ export function OrganizationSelector({ variant = "nav", onSelect }: Organization
   const i18n = useUiTranslations();
   const pathname = usePathname();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { tokens } = useSession();
   const [storedSlug, setStoredSlug] = useState(() => {
     if (typeof window === "undefined") return "";
@@ -106,10 +107,11 @@ export function OrganizationSelector({ variant = "nav", onSelect }: Organization
             window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, slug);
           } catch {}
           setStoredSlug(slug);
+          queryClient.clear();
 
           router.push(
             ["owner", "admin", "coach"].includes(membership.role)
-              ? "/admin"
+              ? `/org/${slug}/admin`
               : `/org/${slug}`,
           );
           onSelect?.();

@@ -57,15 +57,28 @@ type DashboardCategory = {
   items: { href: string; labelKey?: string; label?: string; description: string }[];
 };
 
+function stripOrganizationPrefix(pathname: string) {
+  return pathname.replace(/^\/org\/[^/]+(?=\/|$)/, "") || "/";
+}
+
+export function adminHref(href: string, organizationSlug: string | null) {
+  if (href === "/") return "/";
+  if (!organizationSlug) return href;
+  return `/org/${organizationSlug}${href}`;
+}
+
 export function pathActive(pathname: string, href: string) {
-  if (href === "/") return pathname === "/";
-  if (href === "/admin") return pathname === "/admin";
-  if (href === "/admin/metrics") {
+  const relativePathname = stripOrganizationPrefix(pathname);
+  const relativeHref = stripOrganizationPrefix(href);
+
+  if (relativeHref === "/") return relativePathname === "/";
+  if (relativeHref === "/admin") return relativePathname === "/admin";
+  if (relativeHref === "/admin/metrics") {
     return ["/admin/metrics", "/admin/challenges", "/admin/reviews", "/admin/wellbeing"].some(
-      (path) => pathname.startsWith(path),
+      (path) => relativePathname.startsWith(path),
     );
   }
-  return pathname.startsWith(href);
+  return relativePathname.startsWith(relativeHref);
 }
 
 export function tenantBrandName(
@@ -89,7 +102,13 @@ function storedOrganizationSlug() {
   }
 }
 
-function DashboardDropdown({ pathname }: { pathname: string }) {
+function DashboardDropdown({
+  pathname,
+  organizationSlug,
+}: {
+  pathname: string;
+  organizationSlug: string | null;
+}) {
   const i18n = useUiTranslations();
   const DASHBOARD_CATEGORIES: DashboardCategory[] = [
     {
@@ -122,7 +141,7 @@ function DashboardDropdown({ pathname }: { pathname: string }) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
-  const isAdminActive = pathname === "/admin";
+  const isAdminActive = stripOrganizationPrefix(pathname) === "/admin";
   const openMenu = () => {
     setOpen(true);
     setActiveCategory((current) => current ?? DASHBOARD_CATEGORIES[0]?.labelKey ?? null);
@@ -147,7 +166,7 @@ function DashboardDropdown({ pathname }: { pathname: string }) {
         style={{ background: isAdminActive ? "var(--border)" : "transparent" }}
       >
         <Link
-          href="/admin"
+          href={adminHref("/admin", organizationSlug)}
           className="whitespace-nowrap py-1 ps-2 text-xs font-semibold transition-colors sm:px-3 sm:text-sm"
           style={{ color: isAdminActive ? "var(--text)" : "var(--dim)" }}
         >
@@ -197,11 +216,11 @@ function DashboardDropdown({ pathname }: { pathname: string }) {
               {DASHBOARD_CATEGORIES.find((c) => c.labelKey === activeCategory)?.items.map((item) => (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  href={adminHref(item.href, organizationSlug)}
                   className="block px-4 py-2.5 transition-colors hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)]"
                   onClick={() => { setOpen(false); setActiveCategory(null); }}
                 >
-                  <p className="text-sm font-semibold" style={{ color: pathname.startsWith(item.href) ? "var(--primary)" : "var(--text)" }}>
+                  <p className="text-sm font-semibold" style={{ color: pathActive(pathname, item.href) ? "var(--primary)" : "var(--text)" }}>
                     {item.labelKey ? t(item.labelKey) : item.label}
                   </p>
                   <p className="mt-0.5 text-xs" style={{ color: "var(--dim)" }}>{item.description}</p>
@@ -250,7 +269,8 @@ export function TopNav() {
   });
   const memberships = Array.isArray(membershipsQuery.data) ? membershipsQuery.data : [];
   const pathOrganizationSlug = pathname.match(/^\/org\/([^/]+)/)?.[1] ?? null;
-  const selectedOrganizationSlug = pathOrganizationSlug ?? storedOrganizationSlug();
+  const selectedOrganizationSlug =
+    pathOrganizationSlug ?? storedOrganizationSlug() ?? memberships[0]?.organization.slug ?? null;
   const brandName = tenantBrandName(memberships, selectedOrganizationSlug) ?? i18n("milosTraining5b1a1c1");
   const hasTenantMembership = memberships.length > 0;
   const showTenantShell = hasTenantMembership;
@@ -320,7 +340,9 @@ export function TopNav() {
               {t("platform")}
             </Link>
           ) : null}
-          {showTenantShell && role === "admin" ? <DashboardDropdown pathname={pathname} /> : null}
+          {showTenantShell && role === "admin" ? (
+            <DashboardDropdown pathname={pathname} organizationSlug={selectedOrganizationSlug} />
+          ) : null}
           <div className="flex min-w-0 items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-1">
             {showTenantShell && role === "admin"
               ? ADMIN_NAV_LINKS.map((link) => {
@@ -328,7 +350,7 @@ export function TopNav() {
                   return (
                     <Link
                       key={link.href}
-                      href={link.href}
+                      href={adminHref(link.href, selectedOrganizationSlug)}
                       className={(link.mobileVisible ? "" : "hidden md:block") + " whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold transition-colors sm:px-3 sm:text-sm"}
                       style={{
                         background: active ? "var(--border)" : "transparent",
