@@ -19,7 +19,7 @@ describe("apiRequest tenant headers", () => {
     await apiRequest<{ ok: boolean }>("/admin/users", { token: "token" });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      "/api/admin/users",
+      "/api/org/atlas-gym/admin/users",
       expect.objectContaining({
         headers: expect.objectContaining({ "X-Organization-Slug": "atlas-gym" }),
       }),
@@ -36,7 +36,7 @@ describe("apiRequest tenant headers", () => {
     await apiRequest<{ ok: boolean }>("/admin/users", { token: "token" });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      "/api/admin/users",
+      "/api/org/selected-gym/admin/users",
       expect.objectContaining({
         headers: expect.objectContaining({ "X-Organization-Slug": "selected-gym" }),
       }),
@@ -55,10 +55,35 @@ describe("apiRequest tenant headers", () => {
     await apiRequest<{ ok: boolean }>("/admin/users", { token: `header.${payload}.signature` });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      "/api/admin/users",
+      "/api/org/token-gym/admin/users",
       expect.objectContaining({
         headers: expect.objectContaining({ "X-Organization-Slug": "token-gym" }),
       }),
+    );
+  });
+
+  it("does not rewrite the path when no organization slug can be resolved", async () => {
+    window.history.replaceState(null, "", "/admin/users");
+    const fetchMock = vi.spyOn(window, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), { status: 200 }),
+    );
+
+    await apiRequest<{ ok: boolean }>("/admin/users", { token: null });
+
+    expect(fetchMock).toHaveBeenCalledWith("/api/admin/users", expect.anything());
+  });
+
+  it("scopes /me/search/users under the resolved organization", async () => {
+    window.history.replaceState(null, "", "/org/atlas-gym/admin");
+    const fetchMock = vi.spyOn(window, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), { status: 200 }),
+    );
+
+    await apiRequest<{ ok: boolean }>("/me/search/users?q=abc", { token: "token" });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/org/atlas-gym/me/search/users?q=abc",
+      expect.anything(),
     );
   });
 });

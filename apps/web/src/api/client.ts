@@ -85,6 +85,19 @@ function organizationSlugForRequest(token?: string | null) {
   return organizationSlugFromPath() ?? selectedOrganizationSlug() ?? organizationSlugFromToken(token);
 }
 
+const TENANT_SCOPED_PREFIXES = ["/admin", "/me/search/users"];
+
+function tenantScopedPath(path: string, organizationSlug: string | null) {
+  if (!organizationSlug) return path;
+
+  const isTenantScoped = TENANT_SCOPED_PREFIXES.some(
+    (prefix) => path === prefix || path.startsWith(`${prefix}/`) || path.startsWith(`${prefix}?`),
+  );
+  if (!isTenantScoped) return path;
+
+  return `/org/${organizationSlug}${path}`;
+}
+
 let refreshPromise: Promise<string | null> | null = null;
 let sessionUser: unknown | null = null;
 let latestSharedAccessToken: string | null = null;
@@ -213,8 +226,9 @@ export async function apiRequest<T>(
       ? (await refreshAccessToken()) ?? options.token
       : options.token;
   const organizationSlug = organizationSlugForRequest(token);
+  const requestPath = tenantScopedPath(path, organizationSlug);
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(`${API_BASE_URL}${requestPath}`, {
     method: options.method ?? "GET",
     headers: {
       "Content-Type": "application/json",
