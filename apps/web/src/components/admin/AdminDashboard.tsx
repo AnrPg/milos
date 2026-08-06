@@ -19,6 +19,7 @@ import { fetchLandingPayload, type AdminMetrics } from "@/api/landing";
 import { fetchSchedule } from "@/api/schedule";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 type AlertCategory = "finance" | "coaching" | "training";
 
@@ -159,6 +160,7 @@ export function AdminDashboard() {
     },
   ];
   const { currentUser, tokens } = useSession();
+  const organizationSlug = useOrganizationSlug();
   const [configOpen, setConfigOpen] = useState(false);
   const [activeCategories, setActiveCategories] = useState<AlertCategory[]>(DEFAULT_CATEGORIES);
 
@@ -315,7 +317,7 @@ export function AdminDashboard() {
         <div className="flex justify-end">
           <Link
             aria-label={i18n("appConfigurationse0effaa")}
-            href="/admin/settings"
+            href={adminHref("/admin/settings", organizationSlug)}
             title={i18n("appConfigurationse0effaa")}
             className="group flex items-center overflow-hidden rounded-full px-3 py-2 text-sm font-semibold"
             style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
@@ -344,14 +346,14 @@ export function AdminDashboard() {
             </div>
             <div className="flex flex-wrap gap-3">
               <Link
-                href="/admin/finance"
+                href={adminHref("/admin/finance", organizationSlug)}
                 className="rounded-2xl px-5 py-3 text-sm font-semibold text-center"
                 style={{ background: "var(--text)", color: "var(--bg)" }}
               >
                 {i18n("finance1b48d3f")}
               </Link>
               <Link
-                href="/admin/class-schedule"
+                href={adminHref("/admin/class-schedule", organizationSlug)}
                 className="rounded-2xl px-5 py-3 text-sm font-semibold text-center"
                 style={{ background: "var(--border)", border: "1px solid var(--border-strong)", color: "var(--text-soft)" }}
               >
@@ -365,14 +367,14 @@ export function AdminDashboard() {
         {/* Finance KPIs */}
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {financeKpis.map(([label, value, warn, href]) => (
-            <AdminMetricChip key={label} label={label} value={value} href={href} danger={warn} loading={financeLoading} />
+            <AdminMetricChip key={label} label={label} value={value} href={adminHref(href, organizationSlug)} danger={warn} loading={financeLoading} />
           ))}
         </section>
 
         {/* Operational KPIs (from landing/admin_metrics) */}
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {operationalKpis.map(([label, value, warn, href]) => (
-            <AdminMetricChip key={label} label={label} value={value} href={href} danger={warn} loading={landingLoading} />
+            <AdminMetricChip key={label} label={label} value={value} href={adminHref(href, organizationSlug)} danger={warn} loading={landingLoading} />
           ))}
         </section>
 
@@ -388,7 +390,7 @@ export function AdminDashboard() {
               </h2>
             </div>
             <Link
-              href="/admin/challenges"
+              href={adminHref("/admin/challenges", organizationSlug)}
               className="rounded-full px-4 py-2 text-sm font-semibold"
               style={{ background: "var(--border)", border: "1px solid var(--border-strong)", color: "var(--text-soft)" }}
             >
@@ -468,7 +470,7 @@ export function AdminDashboard() {
                     {group.items.map((alert) => (
                       <li key={alert.text}>
                         <Link
-                          href={alert.href}
+                          href={adminHref(alert.href, organizationSlug)}
                           className="flex items-center justify-between gap-4 rounded-[1rem] px-4 py-3 text-sm transition-opacity hover:opacity-80"
                           style={{ background: "color-mix(in srgb, var(--primary) 7%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 15%, transparent)" }}
                         >
@@ -494,7 +496,7 @@ export function AdminDashboard() {
                 {group.items.map((item) => (
                   <Link
                     key={item.href}
-                    href={item.href}
+                    href={adminHref(item.href, organizationSlug)}
                     className="flex items-center justify-between rounded-[1.3rem] px-4 py-3 text-sm font-semibold transition-opacity hover:opacity-80"
                     style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                   >

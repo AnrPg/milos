@@ -14,11 +14,13 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchAdminAnalyticsSummary } from "@/api/analytics";
 import { fetchFinanceSummary } from "@/api/finance";
 import { useSession } from "@/components/session-provider";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 export function AdminHome() {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const { currentUser, signOut, tokens } = useSession();
+  const organizationSlug = useOrganizationSlug();
   const [activeTab, setActiveTab] = useState<"finance" | "coaching">("finance");
 
   const financeQuery = useQuery({
@@ -95,9 +97,9 @@ export function AdminHome() {
                 [i18n("paidRevenue64c34e5"), cents(uiLocale, financeTotals.paid_revenue_cents)],
               ]}
               links={[
-                [i18n("financeConsole35f368f"), "/admin/finance"],
-                [i18n("metricsddf6a1f"), "/admin/metrics"],
-                [i18n("searchbce0641"), "/admin/finance"],
+                [i18n("financeConsole35f368f"), adminHref("/admin/finance", organizationSlug)],
+                [i18n("metricsddf6a1f"), adminHref("/admin/metrics", organizationSlug)],
+                [i18n("searchbce0641"), adminHref("/admin/finance", organizationSlug)],
               ]}
               pending={financeQuery.isLoading}
             />
@@ -109,9 +111,9 @@ export function AdminHome() {
                 [i18n("injuries698c06d"), coachingDashboard.injury_count],
               ]}
               links={[
-                [i18n("coachingNotes5c7da9f"), "/admin/coaching"],
-                [i18n("reviewsb83c4cd"), "/admin/reviews"],
-                [i18n("wellbeinga85b236"), "/admin/wellbeing"],
+                [i18n("coachingNotes5c7da9f"), adminHref("/admin/coaching", organizationSlug)],
+                [i18n("reviewsb83c4cd"), adminHref("/admin/reviews", organizationSlug)],
+                [i18n("wellbeinga85b236"), adminHref("/admin/wellbeing", organizationSlug)],
               ]}
               pending={analyticsQuery.isLoading}
             />
@@ -136,7 +138,7 @@ export function AdminHome() {
               key={href}
               className="rounded-[1.8rem] p-6 transition-colors"
               style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-              href={href}
+              href={adminHref(href, organizationSlug)}
             >
               <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>{label}</p>
               <p className="mt-3 text-xl font-semibold" style={{ color: "var(--text)" }}>{route}</p>

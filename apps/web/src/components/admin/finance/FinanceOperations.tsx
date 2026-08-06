@@ -20,6 +20,7 @@ import { QueuesTab } from "@/components/admin/finance/tabs/QueuesTab";
 import { ReferralsTab } from "@/components/admin/finance/tabs/ReferralsTab";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 type Tab = "members" | "packages" | "promotions" | "referrals" | "queues";
 
@@ -36,6 +37,7 @@ export function FinanceOperations() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { tokens } = useSession();
+  const organizationSlug = useOrganizationSlug();
   const token = tokens?.access_token;
   const requestedTab = searchParams.get("tab");
   const activeTab: Tab = TABS.some(({ id }) => id === requestedTab) ? (requestedTab as Tab) : "members";
@@ -58,17 +60,17 @@ export function FinanceOperations() {
     {
       label: i18n("overdueInvoices747a2d8"),
       count: (queues.overdue_invoices ?? []).length,
-      href: "/admin/finance?tab=queues",
+      href: adminHref("/admin/finance?tab=queues", organizationSlug),
     },
     {
       label: i18n("pendingPaymentsb4ebfb2"),
       count: (queues.pending_payments ?? []).length,
-      href: "/admin/finance?tab=queues",
+      href: adminHref("/admin/finance?tab=queues", organizationSlug),
     },
     {
       label: i18n("referralRewards22d6a91"),
       count: (queues.pending_referral_rewards ?? []).length,
-      href: "/admin/finance?tab=referrals",
+      href: adminHref("/admin/finance?tab=referrals", organizationSlug),
     },
   ].filter((item) => item.count > 0);
 
@@ -98,7 +100,7 @@ export function FinanceOperations() {
               </p>
             </div>
             <Link
-              href="/admin/metrics/finance"
+              href={adminHref("/admin/metrics/finance", organizationSlug)}
               className="rounded-2xl px-5 py-3 text-sm font-semibold text-center self-start"
               style={{ background: "var(--border)", border: "1px solid var(--border-strong)", color: "var(--text-soft)" }}
             >

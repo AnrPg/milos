@@ -15,9 +15,11 @@ import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { SemanticLabel } from "@/components/semantic-label";
 import { localizeError } from "@/i18n/presentation";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 export function AdminUsersDirectory() {
   const i18n = useUiTranslations();
+  const organizationSlug = useOrganizationSlug();
   const FILTERS = [
     ["all", i18n("all6a72085")],
     ["member", i18n("members1cb449c")],
@@ -85,7 +87,7 @@ export function AdminUsersDirectory() {
           {users.map((user) => (
             <Link
               key={user.id}
-              href={`/admin/users/${user.id}`}
+              href={adminHref(`/admin/users/${user.id}`, organizationSlug)}
               className="grid items-center gap-3 rounded-[1.6rem] p-5 transition-transform hover:-translate-y-0.5 md:grid-cols-[1fr_auto_auto_auto]"
               style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
             >

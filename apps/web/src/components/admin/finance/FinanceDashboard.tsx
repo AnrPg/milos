@@ -23,6 +23,7 @@ import { fetchFinanceQueues, fetchFinanceSummary, type FinanceRecord } from "@/a
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 function money(uiLocale: string, cents: unknown) {
   const amount = typeof cents === "number" ? cents : Number(cents ?? 0);
@@ -54,6 +55,7 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const { tokens } = useSession();
+  const organizationSlug = useOrganizationSlug();
   const token = tokens?.access_token;
   const enabled = Boolean(token);
 
@@ -74,14 +76,14 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
   const queues = (queuesQuery.data?.queues ?? {}) as Record<string, FinanceRecord[]>;
 
   const kpis: Array<[string, string, string]> = [
-    [i18n("activeMemberships0d117fb"), String(totals.active_memberships ?? 0), "/admin/finance"],
-    [i18n("expiring30Daysbfdf986"), String(totals.expiring_memberships ?? 0), "/admin/finance?tab=queues"],
-    [i18n("revenueMtd3ffc292"), money(uiLocale, totals.paid_revenue_cents), "/admin/metrics/finance"],
-    [i18n("creditBalance471f025"), money(uiLocale, totals.credit_balance_cents), "/admin/finance"],
-    [i18n("pendingInvoices12d9ca8"), money(uiLocale, totals.outstanding_invoice_balance_cents), "/admin/finance?tab=queues"],
-    [i18n("overdueInvoices747a2d8"), money(uiLocale, totals.overdue_invoice_balance_cents), "/admin/finance?tab=queues"],
-    [i18n("renewalRatef4370c2"), percent(totals.renewal_conversion_percent), "/admin/metrics/finance"],
-    [i18n("invoiceCreditOffsets9fc1210"), money(uiLocale, totals.invoice_credit_offset_cents), "/admin/metrics/finance"],
+    [i18n("activeMemberships0d117fb"), String(totals.active_memberships ?? 0), adminHref("/admin/finance", organizationSlug)],
+    [i18n("expiring30Daysbfdf986"), String(totals.expiring_memberships ?? 0), adminHref("/admin/finance?tab=queues", organizationSlug)],
+    [i18n("revenueMtd3ffc292"), money(uiLocale, totals.paid_revenue_cents), adminHref("/admin/metrics/finance", organizationSlug)],
+    [i18n("creditBalance471f025"), money(uiLocale, totals.credit_balance_cents), adminHref("/admin/finance", organizationSlug)],
+    [i18n("pendingInvoices12d9ca8"), money(uiLocale, totals.outstanding_invoice_balance_cents), adminHref("/admin/finance?tab=queues", organizationSlug)],
+    [i18n("overdueInvoices747a2d8"), money(uiLocale, totals.overdue_invoice_balance_cents), adminHref("/admin/finance?tab=queues", organizationSlug)],
+    [i18n("renewalRatef4370c2"), percent(totals.renewal_conversion_percent), adminHref("/admin/metrics/finance", organizationSlug)],
+    [i18n("invoiceCreditOffsets9fc1210"), money(uiLocale, totals.invoice_credit_offset_cents), adminHref("/admin/metrics/finance", organizationSlug)],
   ];
 
   const loading = summaryQuery.isLoading;
@@ -109,14 +111,14 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
             </div>
             <div className="flex flex-wrap gap-3">
               <Link
-                href="/admin/finance"
+                href={adminHref("/admin/finance", organizationSlug)}
                 className="rounded-2xl px-5 py-3 text-sm font-semibold text-center"
                 style={{ background: "var(--text)", color: "var(--bg)" }}
               >
                 {i18n("openFinanceOperationscffd9ab")}
               </Link>
               <Link
-                href={analyticsMode ? "/admin/metrics" : "/admin"}
+                href={adminHref(analyticsMode ? "/admin/metrics" : "/admin", organizationSlug)}
                 className="rounded-2xl px-5 py-3 text-sm font-semibold text-center"
                 style={{ background: "var(--border)", border: "1px solid var(--border-strong)", color: "var(--text-soft)" }}
               >
@@ -176,7 +178,7 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
         <section className="grid gap-6 md:grid-cols-2">
           <QueuePanel
             title={i18n("expiringSoon50b61e0")}
-            href="/admin/finance?tab=queues"
+            href={adminHref("/admin/finance?tab=queues", organizationSlug)}
             rows={queues.expiring_memberships ?? []}
             renderRow={(row) => (
               <>
@@ -187,7 +189,7 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
           />
           <QueuePanel
             title={i18n("overdueInvoices739b616")}
-            href="/admin/finance?tab=queues"
+            href={adminHref("/admin/finance?tab=queues", organizationSlug)}
             rows={queues.overdue_invoices ?? []}
             renderRow={(row) => (
               <>
@@ -200,7 +202,7 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
           />
           <QueuePanel
             title={i18n("pendingPayments9126c11")}
-            href="/admin/finance?tab=queues"
+            href={adminHref("/admin/finance?tab=queues", organizationSlug)}
             rows={queues.pending_payments ?? []}
             renderRow={(row) => (
               <>
@@ -211,7 +213,7 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
           />
           <QueuePanel
             title={i18n("pendingRewardse6d6885")}
-            href="/admin/finance?tab=referrals"
+            href={adminHref("/admin/finance?tab=referrals", organizationSlug)}
             rows={queues.pending_referral_rewards ?? []}
             renderRow={(row) => (
               <>

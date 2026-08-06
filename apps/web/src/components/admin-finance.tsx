@@ -42,6 +42,7 @@ import {
   type FinanceRecord,
 } from "@/api/finance";
 import { useSession } from "@/components/session-provider";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -74,6 +75,7 @@ export function AdminFinance() {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const { tokens } = useSession();
+  const organizationSlug = useOrganizationSlug();
   const queryClient = useQueryClient();
   const token = tokens?.access_token;
   const [packageForm, setPackageForm] = useState({
@@ -446,7 +448,7 @@ export function AdminFinance() {
               {packages.map((item) => (
                 <Link
                   key={field(item, "id")}
-                  href={`/admin/finance/packages/${field(item, "id")}`}
+                  href={adminHref(`/admin/finance/packages/${field(item, "id")}`, organizationSlug)}
                   className="rounded-2xl border border-[var(--border)] p-4 transition hover:border-[var(--text)]"
                 >
                   <div className="flex items-start justify-between gap-4">
@@ -483,7 +485,7 @@ export function AdminFinance() {
                 return (
                   <Link
                     key={field(user, "id")}
-                    href={`/admin/finance/members/${field(user, "id")}`}
+                    href={adminHref(`/admin/finance/members/${field(user, "id")}`, organizationSlug)}
                     className="rounded-2xl border border-[var(--border)] p-4 transition hover:border-[var(--text)]"
                   >
                     <p className="font-bold">{field(user, "nickname")}</p>

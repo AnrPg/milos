@@ -35,6 +35,7 @@ import { LocalizedScore } from "@/components/localized-score";
 import { formatPRCardDetails } from "@/components/pantheon/pr-card-details";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { localizeError, semanticLabel } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
@@ -459,6 +460,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   const i18n = useUiTranslations();
   const { tokens, currentUser } = useSession();
   const token = tokens?.access_token;
+  const organizationSlug = useOrganizationSlug();
   const router = useRouter();
   const queryClient = useQueryClient();
   const profileQuery = useDossierQuery(token, userId, "profile", fetchAdminUserProfile);
@@ -480,7 +482,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
     mutationFn: () => deleteAdminUser(token!, userId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
-      router.push("/admin/users");
+      router.push(adminHref("/admin/users", organizationSlug));
     },
   });
 
@@ -538,7 +540,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-6xl space-y-6">
-        <Link href="/admin/users" className="text-sm font-semibold" style={{ color: "var(--primary)" }}>← {i18n("users206fc04")}</Link>
+        <Link href={adminHref("/admin/users", organizationSlug)} className="text-sm font-semibold" style={{ color: "var(--primary)" }}>← {i18n("users206fc04")}</Link>
         <section className="flex flex-col gap-6 rounded-[2.4rem] p-8 md:flex-row md:items-center" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <Avatar user={profile.identity} />
           <div className="min-w-0 flex-1">
@@ -557,17 +559,17 @@ export function AdminUserProfile({ userId }: { userId: string }) {
 
           {sections.has("finance") ? <Panel id="finance" title={i18n("finance1b48d3f")}>{finance.data && token ? <FinanceDetails finance={finance.data} token={token} userId={userId} effectiveEntitlement={effectiveEntitlement} creditBalance={finance.data?.summary?.credit_balance ?? 0} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
 
-          {sections.has("training_history") ? <Panel id="training_history" title={i18n("trainingHistorya512053")} href="/admin/workouts"><p>{training.data?.summary.completed_count ?? 0} {i18n("completedOf88964ae")} {training.data?.summary.execution_count ?? 0} {i18n("executions8319d6e")}</p><div className="mt-3 grid gap-3">{executions.length ? executions.slice(0, 8).map((item) => <ExecutionCard key={item.id} item={item} href="/admin/workouts" />) : <Empty>{i18n("noWorkoutExecutionsRecorded0a0b1d0")}</Empty>}</div></Panel> : null}
+          {sections.has("training_history") ? <Panel id="training_history" title={i18n("trainingHistorya512053")} href={adminHref("/admin/workouts", organizationSlug)}><p>{training.data?.summary.completed_count ?? 0} {i18n("completedOf88964ae")} {training.data?.summary.execution_count ?? 0} {i18n("executions8319d6e")}</p><div className="mt-3 grid gap-3">{executions.length ? executions.slice(0, 8).map((item) => <ExecutionCard key={item.id} item={item} href={adminHref("/admin/workouts", organizationSlug)} />) : <Empty>{i18n("noWorkoutExecutionsRecorded0a0b1d0")}</Empty>}</div></Panel> : null}
 
           {sections.has("prs") ? <Panel id="prs" title={i18n("personalRecords05223a0")}><div className="grid gap-3">{prs.data?.prs.length ? prs.data.prs.map((pr) => <PRCard key={pr.id} pr={pr} />) : <Empty>{i18n("noPersonalRecordsRecorded22a0fce")}</Empty>}</div></Panel> : null}
 
           {sections.has("scores") ? <Panel id="scores" title={i18n("scores126cb93")}><div className="grid gap-3">{scores.length ? scores.slice(0, 10).map((score, index) => <GenericRecordCard key={`${String(score.execution_id)}-${index}`} title={String(score.section_name ?? i18n("workoutSection881e276"))} meta={`${date(score.completed_at_utc)} · ${String(score.workout_title ?? "—")}`} value={<LocalizedScore value={score.value ?? "—"} unit={valueText(score.unit)} />} />) : <Empty>{i18n("noScoredWorkoutSectionsRecordedcfa7742")}</Empty>}</div></Panel> : null}
 
-          {sections.has("health_incidents") ? <Panel id="health_incidents" title={i18n("healthIncidentse3ca869")} href="/admin/metrics#health-incidents"><p>{incidents.data?.summary.active ?? 0} {i18n("active4c71073")} {incidents.data?.summary.total ?? 0} {i18n("total5a537e2")}</p><div className="mt-3 grid gap-3">{incidents.data?.incidents.length ? incidents.data.incidents.map((incident) => <GenericRecordCard key={incident.id} title={incident.body_area} meta={<><SemanticLabel value={incident.severity} /> · <SemanticLabel value={incident.status} /> · {date(incident.started_on)}</>} detail={incident.training_limitations ? <p style={{ color: "var(--muted)" }}>{incident.training_limitations}</p> : null} href="/admin/metrics#health-incidents" />) : <Empty>{i18n("noHealthIncidentsRecorded91c9d4e")}</Empty>}</div></Panel> : null}
+          {sections.has("health_incidents") ? <Panel id="health_incidents" title={i18n("healthIncidentse3ca869")} href={adminHref("/admin/metrics#health-incidents", organizationSlug)}><p>{incidents.data?.summary.active ?? 0} {i18n("active4c71073")} {incidents.data?.summary.total ?? 0} {i18n("total5a537e2")}</p><div className="mt-3 grid gap-3">{incidents.data?.incidents.length ? incidents.data.incidents.map((incident) => <GenericRecordCard key={incident.id} title={incident.body_area} meta={<><SemanticLabel value={incident.severity} /> · <SemanticLabel value={incident.status} /> · {date(incident.started_on)}</>} detail={incident.training_limitations ? <p style={{ color: "var(--muted)" }}>{incident.training_limitations}</p> : null} href={adminHref("/admin/metrics#health-incidents", organizationSlug)} />) : <Empty>{i18n("noHealthIncidentsRecorded91c9d4e")}</Empty>}</div></Panel> : null}
 
-          {sections.has("coaching_context") ? <Panel id="coaching_context" title={i18n("coachingContexteb3075d")} href="/admin/coaching-assignments"><CoachingContextSummary drillDown={coaching.data?.drill_down} /></Panel> : null}
+          {sections.has("coaching_context") ? <Panel id="coaching_context" title={i18n("coachingContexteb3075d")} href={adminHref("/admin/coaching-assignments", organizationSlug)}><CoachingContextSummary drillDown={coaching.data?.drill_down} /></Panel> : null}
 
-          {sections.has("class_participation") ? <Panel id="class_participation" title={i18n("classParticipation9ef4001")} href="/admin/class-schedule"><div className="grid gap-3">{training.data?.class_participation.length ? training.data.class_participation.map((item) => <ExecutionCard key={item.id} item={item} href="/admin/class-schedule" />) : <Empty>{i18n("noClassLinkedWorkoutExecutionsRecordedf8ca7a6")}</Empty>}</div></Panel> : null}
+          {sections.has("class_participation") ? <Panel id="class_participation" title={i18n("classParticipation9ef4001")} href={adminHref("/admin/class-schedule", organizationSlug)}><div className="grid gap-3">{training.data?.class_participation.length ? training.data.class_participation.map((item) => <ExecutionCard key={item.id} item={item} href={adminHref("/admin/class-schedule", organizationSlug)} />) : <Empty>{i18n("noClassLinkedWorkoutExecutionsRecordedf8ca7a6")}</Empty>}</div></Panel> : null}
 
           {sections.has("messages") ? <Panel id="messages" title={i18n("chat2ced57f")} href="/account/activity/chats"><p>{messages.data?.summary.thread_count ?? 0} {i18n("threadS2bddeec")} {messages.data?.summary.unread_thread_count ?? 0} {i18n("unread1b9aebd")}</p><div className="mt-3 grid gap-3">{messages.data?.threads.length ? messages.data.threads.slice(0, 6).map((thread) => <GenericRecordCard key={thread.id} title={<SemanticLabel value={thread.context_type} />} meta={`${thread.message_count} ${i18n("threadS2bddeec")} · ${date(thread.latest_message?.inserted_at)}`} detail={<p>{thread.latest_message?.body ?? i18n("emptyThreadfee51b1")}</p>} href="/account/activity/chats" />) : <Empty>{i18n("noConversationsRecordedd525265")}</Empty>}</div></Panel> : null}
 

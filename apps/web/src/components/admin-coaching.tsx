@@ -18,6 +18,7 @@ import {
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { SemanticLabel } from "@/components/semantic-label";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 function asRecord(v: unknown): Record<string, unknown> {
   return v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
@@ -116,6 +117,7 @@ function DrillDownPanel({ drillDown }: { drillDown: AthleteDrillDown }) {
 export function AdminCoaching() {
   const i18n = useUiTranslations();
   const { tokens } = useSession();
+  const organizationSlug = useOrganizationSlug();
   const [selectedAthleteId, setSelectedAthleteId] = useState("");
   const [noteBody, setNoteBody] = useState("");
   const [showDrillDown, setShowDrillDown] = useState(false);
@@ -165,7 +167,7 @@ export function AdminCoaching() {
           </p>
           <Link
             className="mt-6 inline-flex rounded-full px-4 py-2 text-sm font-semibold"
-            href="/admin"
+            href={adminHref("/admin", organizationSlug)}
             style={{ background: "var(--border)", color: "var(--text-soft)" }}
           >
             {i18n("backToAdminHome941355d")}

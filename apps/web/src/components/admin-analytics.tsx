@@ -17,6 +17,7 @@ import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { SemanticLabel } from "@/components/semantic-label";
 import { HelpTooltip } from "@/components/HelpTooltip";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
@@ -154,6 +155,7 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
     },
   };
   const { tokens } = useSession();
+  const organizationSlug = useOrganizationSlug();
 
   const summaryQuery = useQuery({
     queryKey: ["admin", "analytics", "summary"],
@@ -195,7 +197,7 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
           </p>
           <Link
             className="mt-5 inline-flex rounded-full px-4 py-2 text-sm font-semibold"
-            href="/admin/metrics"
+            href={adminHref("/admin/metrics", organizationSlug)}
             style={{ background: "var(--panel-muted)", color: "var(--text-soft)" }}
           >
             {i18n("analyticsMarketing0ecf7f0")}
@@ -214,22 +216,22 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
             label={i18n("paidRevenue64c34e5")}
             value={formatMoney(uiLocale, metricNumber(financeTotals, "paid_revenue_cents"))}
             helper={(formatCount(uiLocale, metricNumber(dashboardFinance, "active_memberships"))) + i18n("activeMemberships6d55ee8")}
-            href="/admin/metrics/finance"
+            href={adminHref("/admin/metrics/finance", organizationSlug)}
           />
-          <KpiCard label={i18n("reviewsb83c4cd")} value={formatCount(uiLocale, metricNumber(feedback, "total"))} insight={copy.body} href="/admin/reviews" />
+          <KpiCard label={i18n("reviewsb83c4cd")} value={formatCount(uiLocale, metricNumber(feedback, "total"))} insight={copy.body} href={adminHref("/admin/reviews", organizationSlug)} />
           <KpiCard
             label={i18n("activeInjuriesdaecfa6")}
             value={formatCount(uiLocale, metricNumber(wellbeing, "active_count"))}
             helper={(formatCount(uiLocale, metricNumber(wellbeing, "total"))) + i18n("totalReportsdfd4b9e")}
             insight={copy.body}
-            href="/admin/metrics/health"
+            href={adminHref("/admin/metrics/health", organizationSlug)}
           />
           <KpiCard
             label={i18n("notificationClicks02c5775")}
             value={formatCount(uiLocale, metricNumber(notificationClicks, "total"))}
             helper={(formatCount(uiLocale, metricNumber(events, "total"))) + i18n("trackedEvents398d5c2")}
             insight={copy.body}
-            href="/admin/metrics/engagement"
+            href={adminHref("/admin/metrics/engagement", organizationSlug)}
           />
         </section> : null}
 
@@ -281,7 +283,7 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--primary)]">{i18n("coachingAnalyticsb6ddda1")}</p>
               <h2 className="mt-2 text-xl font-black">{i18n("athleteActivityAndFollowUp5a9fe9c")}</h2>
             </div>
-            <Link className="text-sm font-bold text-[var(--primary)]" href="/admin/coaching-assignments">
+            <Link className="text-sm font-bold text-[var(--primary)]" href={adminHref("/admin/coaching-assignments", organizationSlug)}>
               {i18n("openPersonalCoachingf4be893")}
             </Link>
           </div>
@@ -298,7 +300,7 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--primary)]">{i18n("healthIncidentsb8da1fe")}</p>
               <h2 className="mt-2 text-xl font-black">{i18n("injuryAndLimitationSignalsfc3b586")}</h2>
             </div>
-            <Link className="text-sm font-bold text-[var(--primary)]" href="/admin/wellbeing">
+            <Link className="text-sm font-bold text-[var(--primary)]" href={adminHref("/admin/wellbeing", organizationSlug)}>
               {i18n("openIncidentRecords7447df1")}
             </Link>
           </div>

@@ -8,9 +8,11 @@ import {useUiTranslations} from "@/i18n/ui";
 import Link from "next/link";
 
 import { TransientHero } from "@/components/TransientHero";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 export function AnalyticsMarketingHub() {
   const i18n = useUiTranslations();
+  const organizationSlug = useOrganizationSlug();
   const SECTIONS = [
     {
       title: i18n("overview0efc2e6"),
@@ -81,7 +83,7 @@ export function AnalyticsMarketingHub() {
           {SECTIONS.map((section) => (
             <Link
               key={section.title}
-              href={section.href}
+              href={adminHref(section.href, organizationSlug)}
               className="group flex min-h-52 flex-col rounded-[2rem] p-6 transition-transform hover:-translate-y-0.5"
               style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
             >

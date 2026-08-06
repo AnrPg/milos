@@ -14,14 +14,16 @@ import { useTranslations } from "next-intl";
 import { fetchMyFinance } from "@/api/my-finance";
 import { fetchUnreadCount } from "@/api/messaging";
 import { fetchOrganizationMemberships } from "@/api/organizations";
-import { SELECTED_ORGANIZATION_SLUG_KEY } from "@/api/client";
 import { DirectMessagesPanel } from "@/components/chat/DirectMessagesPanel";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useSession } from "@/components/session-provider";
 import { subscribeToTopic } from "@/lib/realtime";
 import { showsTenantSelfServiceSurfaces } from "@/lib/account-surfaces";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { SemanticLabel } from "@/components/semantic-label";
 import { OrganizationSelector } from "@/components/organization-selector";
+
+export { adminHref } from "@/lib/organization-slug";
 
 const CANVAS_PATHS = ["/login"];
 
@@ -61,12 +63,6 @@ function stripOrganizationPrefix(pathname: string) {
   return pathname.replace(/^\/org\/[^/]+(?=\/|$)/, "") || "/";
 }
 
-export function adminHref(href: string, organizationSlug: string | null) {
-  if (href === "/") return "/";
-  if (!organizationSlug) return href;
-  return `/org/${organizationSlug}${href}`;
-}
-
 export function pathActive(pathname: string, href: string) {
   const relativePathname = stripOrganizationPrefix(pathname);
   const relativeHref = stripOrganizationPrefix(href);
@@ -90,16 +86,6 @@ export function tenantBrandName(
   const membership = selectedMembership ?? memberships[0];
 
   return membership?.settings?.brand_name?.trim() || membership?.organization.name.trim() || null;
-}
-
-function storedOrganizationSlug() {
-  if (typeof window === "undefined") return null;
-
-  try {
-    return window.localStorage.getItem(SELECTED_ORGANIZATION_SLUG_KEY);
-  } catch {
-    return null;
-  }
 }
 
 function DashboardDropdown({
@@ -268,9 +254,7 @@ export function TopNav() {
     staleTime: 60_000,
   });
   const memberships = Array.isArray(membershipsQuery.data) ? membershipsQuery.data : [];
-  const pathOrganizationSlug = pathname.match(/^\/org\/([^/]+)/)?.[1] ?? null;
-  const selectedOrganizationSlug =
-    pathOrganizationSlug ?? storedOrganizationSlug() ?? memberships[0]?.organization.slug ?? null;
+  const selectedOrganizationSlug = useOrganizationSlug();
   const brandName = tenantBrandName(memberships, selectedOrganizationSlug) ?? i18n("milosTraining5b1a1c1");
   const hasTenantMembership = memberships.length > 0;
   const showTenantShell = hasTenantMembership;

@@ -46,6 +46,7 @@ import {
 } from "@/components/admin-finance-receipt";
 import { useSession } from "@/components/session-provider";
 import { generateExportFile, type ExportDocument } from "@/lib/document-export";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 const MANUAL_RECEIPT_PURPOSE = "__manual_receipt_purpose__";
 
@@ -141,6 +142,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const { tokens } = useSession();
+  const organizationSlug = useOrganizationSlug();
   const queryClient = useQueryClient();
   const token = tokens?.access_token;
   const receiptExportCopy = (reference: string): ReceiptExportCopy => ({
@@ -493,7 +495,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
   return (
     <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-6xl space-y-6">
-        <Link className="text-sm font-bold text-[var(--primary)]" href="/admin/finance">
+        <Link className="text-sm font-bold text-[var(--primary)]" href={adminHref("/admin/finance", organizationSlug)}>
           {i18n("backToFinance2de0820")}
         </Link>
         <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--panel)] p-8">

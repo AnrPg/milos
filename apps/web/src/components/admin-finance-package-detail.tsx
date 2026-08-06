@@ -13,6 +13,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchFinancePackage, updateFinancePackage, type FinanceRecord } from "@/api/finance";
 import { useSession } from "@/components/session-provider";
 import { SemanticLabel } from "@/components/semantic-label";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 function value(record: FinanceRecord | undefined, key: string, fallback = "") {
   const field = record?.[key];
@@ -23,6 +24,7 @@ function value(record: FinanceRecord | undefined, key: string, fallback = "") {
 export function AdminFinancePackageDetail({ packageId }: { packageId: string }) {
   const i18n = useUiTranslations();
   const { tokens } = useSession();
+  const organizationSlug = useOrganizationSlug();
   const queryClient = useQueryClient();
   const token = tokens?.access_token;
   const [formOverrides, setFormOverrides] = useState<
@@ -76,7 +78,7 @@ export function AdminFinancePackageDetail({ packageId }: { packageId: string }) 
   return (
     <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-4xl space-y-6">
-        <Link className="text-sm font-bold text-[var(--primary)]" href="/admin/finance">
+        <Link className="text-sm font-bold text-[var(--primary)]" href={adminHref("/admin/finance", organizationSlug)}>
           {i18n("backToFinance2de0820")}
         </Link>
         <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--panel)] p-8">
