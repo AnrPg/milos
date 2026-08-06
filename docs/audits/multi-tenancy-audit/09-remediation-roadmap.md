@@ -93,7 +93,27 @@ blocking. P1–P3 remain open.
   unfixed behaviour, tagged `:documents_current_behaviour`.
 - **Tests required before merge:** test-gap-plan pattern applied to these three contexts. ✅ done.
 
-### P1.7 — Constrain owner-scoped reads to the tenant boundary (F-28) — **NEEDS A PRODUCT DECISION FIRST**
+### P1.7 — Constrain owner-scoped reads to the tenant boundary (F-28) — **RESOLVED 2026-08-07**
+- **Product decision:** personal records **follow the member** across every
+  organization they belong to, rather than being partitioned per tenant. Health
+  records belong to the member, not the gym.
+- **Wellbeing:** the owner branch is therefore intentional and is now documented
+  as such at both the application layer and in `rls_enforcement_test.exs`. It is
+  the tenancy model's one sanctioned cross-organization read, safe because it
+  can only ever match the acting account's own rows.
+- **A real defect the original writeup folded in with it, now fixed:** the admin
+  injury list and analytics summary shared that owner-scoped predicate, so an
+  admin's own reports filed at another gym appeared in this organization's
+  listing and inflated its counts. Split out to a fail-closed
+  `scoped_to_tenant/1`.
+- **Notifications:** the inbox stays cross-organization (a member should not
+  miss a notification because they had a different gym selected). The
+  compensating requirement is provenance: `organization_id` is now exposed on
+  inbox payloads and the client badges anything raised outside the active
+  organization, colour-coded by that gym's own `brand_primary_color`.
+- **RLS policy left as-is** — with this decision the `OR` is correct.
+
+### P1.7 (original, superseded) — Constrain owner-scoped reads to the tenant boundary (F-28)
 - **Priority note:** filed under P1 rather than P2 because the Wellbeing half is
   a confirmed cross-tenant read of member-identifiable medical data that is
   **not** backstopped by RLS — the policy carries the same permissive `OR` as
@@ -167,8 +187,28 @@ blocking. P1–P3 remain open.
 - **Dependency:** valuable to land early since it would have caught several of the above findings automatically, but not blocking for any of them.
 - **Approach:** Add root tenant tables, `users`, materialized views to the audit's table list (with an explicit "platform-administered" classification where RLS isn't applicable); add COALESCE-fallback detection to the RLS policy check; extend the architecture task's tenant-scope check beyond Scheduling to every T4 context.
 
-### P2.8 — Fix `intended_email_digest` enforcement or remove it (F-10)
-- **Dependency:** product decision required first (is email-binding actually intended?).
+### P2.8 — Fix `intended_email_digest` enforcement or remove it (F-10) — **FIXED 2026-08-07**
+- **Product decision:** enforce it, and add email to accounts to make that
+  possible.
+- **Why this was bigger than the finding implied:** `intended_email_digest` was
+  the *only* email-related column in the entire schema — accounts are identified
+  by nickname and carried no email at all, so the digest had nothing to compare
+  against. Enforcement required adding `users.email` first.
+- **Approach:** nullable `users.email` with a case-insensitive partial unique
+  index. Nullable is deliberate — every existing account predates the column and
+  there is nothing to backfill from, so enforcement keys off "does this account
+  hold a matching address", not "does every account have one". An account
+  without an email cannot redeem a bound invitation; invitations issued without
+  an address keep their existing open behaviour.
+- **Normalization consolidated** into `Domain.InvitationEmail`; issuing and
+  redemption previously had separate copies, and they must agree byte-for-byte
+  or the comparison silently never matches.
+- **Checked before the store transaction** so a wrong account cannot consume the
+  invitation and deny the legitimate invitee, and returns `:ok` for unknown
+  tokens so it never becomes an oracle for which tokens exist.
+- **Follow-up not done:** email is optional at registration. Making it mandatory
+  is a separate product/UX decision, and existing accounts would need a prompt
+  to supply one.
 
 ### P2.9 — Fix realtime broadcast silent-fallback-to-legacy-org (F-19)
 - **STATUS: FIXED** (2026-08-06). Chose the warning-only grace-period mode
