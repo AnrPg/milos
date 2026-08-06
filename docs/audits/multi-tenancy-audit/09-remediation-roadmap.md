@@ -105,9 +105,18 @@ blocking. P1–P3 remain open.
   `notifications/tenant_isolation_test.exs` from `assert` to `refute`.
 
 ### P2.2 — Add membership suspend/revoke commands (F-11) and platform-owner revoke task (F-12)
+- **STATUS: FIXED** (2026-08-07). `Commands.SetMembershipStatus` (owner/admin
+  gated, F-06 role ceiling, refuses self-change to prevent owner lockout) and
+  `Organizations.revoke_vendor/1` + `mix milos.platform.revoke_vendor`.
+- **Naming note:** the task is `revoke_vendor`, not `revoke_owner` as written
+  below — `platform_owners` was renamed to `vendors` (ADR-089) after this
+  roadmap was drafted, because "platform owner" collided with the
+  tenant-scoped `owner` role.
+- **No migration needed:** both `status` enums already carried the required
+  values (`:suspended`/`:revoked` and `:revoked`); only application code was
+  missing, exactly as F-11/F-12 described.
 - **Dependency:** none.
-- **Affected modules:** `organizations/commands/`, `organizations/ports/organization_store.ex`, Ecto adapter, a new `mix milos.platform.revoke_owner` task.
-- **Tests required before merge:** test-gap-plan #18 (currently impossible to write — this item unblocks it).
+- **Tests required before merge:** test-gap-plan #18 (was impossible to write — this item unblocked it). ✅ done, 11 new tests.
 
 ### P2.3 — Fix Finance cron/Oban jobs to iterate per-organization (F-24)
 - **STATUS: FIXED** (2026-08-06). Jobs now iterate active organizations and
