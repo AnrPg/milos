@@ -679,6 +679,15 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  def call(conn, {:error, :role_ceiling_exceeded}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "role_ceiling_exceeded",
+      error: "You cannot invite someone to a role more privileged than your own"
+    })
+  end
+
   def call(conn, {:error, :finance_entitlement_blocked}) do
     conn
     |> put_status(:forbidden)

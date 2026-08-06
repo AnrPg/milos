@@ -103,6 +103,58 @@ defmodule MilosTraining.OrganizationsTest do
              Organizations.issue_invitation(member_context, %{role: :member})
   end
 
+  test "an admin cannot invite someone to owner, but can invite up to admin", context do
+    {:ok, admin_membership} =
+      Organizations.add_membership(%{
+        organization_id: context.organization.id,
+        user_id: context.member.id,
+        role: :admin,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    admin_context = %TenantContext{
+      organization: context.organization,
+      membership: admin_membership,
+      account: context.member,
+      organization_id: context.organization.id,
+      membership_id: admin_membership.id,
+      user_id: context.member.id,
+      role: :admin,
+      request_metadata: %{}
+    }
+
+    assert {:error, :role_ceiling_exceeded} =
+             Organizations.issue_invitation(admin_context, %{role: :owner})
+
+    assert {:ok, %{invitation: invitation}} =
+             Organizations.issue_invitation(admin_context, %{role: :admin})
+
+    assert invitation.role == :admin
+  end
+
+  test "an owner can invite a peer owner" do
+    owner = user_fixture()
+    {:ok, organization} = Organizations.create_organization(%{name: "Owner Ceiling Gym"})
+
+    {:ok, owner_membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: owner.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    {:ok, context} = Organizations.resolve_tenant_context(owner, organization.slug)
+    assert context.membership_id == owner_membership.id
+
+    assert {:ok, %{invitation: invitation}} =
+             Organizations.issue_invitation(context, %{role: :owner})
+
+    assert invitation.role == :owner
+  end
+
   test "concurrent redemption consumes an invitation exactly once", context do
     other_member = user_fixture()
     now = DateTime.utc_now() |> DateTime.truncate(:microsecond)

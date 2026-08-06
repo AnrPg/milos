@@ -10,14 +10,16 @@ defmodule MilosTraining.Organizations.Commands.IssueInvitation do
   @default_lifetime_seconds 604_800
 
   def call(context, params, issued_at) do
-    with :ok <- TenantAuthorization.authorize(context, [:owner, :admin]) do
+    with :ok <- TenantAuthorization.authorize(context, [:owner, :admin]),
+         role <- normalize_role(value(params, :role)),
+         :ok <- authorize_role_ceiling(context.role, role) do
       token = InvitationToken.generate()
       lifetime = value(params, :lifetime_seconds) || @default_lifetime_seconds
 
       invitation_params = %{
         organization_id: context.organization_id,
         token_digest: InvitationToken.digest(token),
-        role: normalize_role(value(params, :role)),
+        role: role,
         expires_at: DateTime.add(issued_at, lifetime, :second),
         issued_by_user_id: context.user_id,
         intended_email_digest: intended_email_digest(value(params, :intended_email))
@@ -27,6 +29,14 @@ defmodule MilosTraining.Organizations.Commands.IssueInvitation do
         {:ok, invitation} -> {:ok, %{invitation: invitation, token: token}}
         error -> error
       end
+    end
+  end
+
+  defp authorize_role_ceiling(issuer_role, target_role) do
+    if MembershipPolicy.can_grant_role?(issuer_role, target_role) do
+      :ok
+    else
+      {:error, :role_ceiling_exceeded}
     end
   end
 
