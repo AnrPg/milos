@@ -57,7 +57,19 @@ blocking. P1–P3 remain open.
 - **Tests required before merge:** test-gap-plan #4, #11 — backend: ~130 test call sites updated across 18 files, all green. Frontend: `client.test.ts`, `TopNav.test.ts`, `organization-selector.test.tsx` updated and green; **no live-browser verification was performed** — this still needs a manual/Playwright pass before considering the frontend side fully proven, per this file's own past guidance that automated tests here can't cover this class of change.
 - **Deployment considerations:** Largest-surface-area change in this roadmap (~140 backend routes + the frontend admin shell). Shipped as a single cutover rather than a feature-flagged parallel rollout — justified here because the legacy routes had zero remaining callers once `apiRequest` was fixed in the same change, so there was no window where old and new needed to coexist.
 
-### P1.6 — Slug-prefix the remaining internal admin deep links (follow-up from P1.4/F-09)
+### P1.6 — Slug-prefix the remaining internal admin deep links (follow-up from P1.4/F-09) — **FIXED 2026-08-07**
+- **Approach actually taken:** rather than `useParams`, added a shared
+  `useOrganizationSlug()`/`adminHref()` in
+  `apps/web/src/lib/organization-slug.ts` and pointed all 12 components plus
+  `TopNav.tsx` at it — `useParams` would not have worked, since the admin pages
+  live at `src/app/admin/*` and are reached through the `proxy.ts` rewrite, so
+  `organization_slug` is never a route param in their scope. The hook resolves
+  URL → localStorage → first membership, matching what TopNav already did.
+- **Backend:** added `Organizations.Domain.AdminPath` as the server-side mirror
+  of `adminHref` (same degrade-to-bare-path behaviour) and threaded the slug
+  from `conn.assigns.tenant_context` into the dossier endpoints and from the
+  notification payload's `organization_id` at dispatch time.
+- **Still not verified in a live browser** — same caveat as P1.4.
 - **Dependency:** none; purely additive polish on top of the P1.4 fix.
 - **Affected modules:** `AdminDashboard.tsx`, `AnalyticsMarketingHub.tsx`, `admin-analytics.tsx`, `admin-coaching.tsx`, `admin/finance/FinanceDashboard.tsx`, `admin/finance/FinanceOperations.tsx`, `admin-finance-member-profile.tsx`, `admin-finance-package-detail.tsx`, `admin-finance.tsx`, `admin-home.tsx`, `admin/users/AdminUserProfile.tsx`, `admin/users/AdminUsersDirectory.tsx`, plus `push_message_builder.ex` and `admin_profile_policy.ex` on the backend.
 - **Approach:** thread `useParams<{organization_slug}>()` (client components already have it, no prop drilling needed since they render under `/org/:slug/admin/*`) through each file's hrefs; for the two backend link builders, thread the organization slug through to the URL builder the same way `organization_id` is already threaded through their calling context.
