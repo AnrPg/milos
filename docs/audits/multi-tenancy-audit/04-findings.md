@@ -1380,6 +1380,24 @@ back to the legacy org ID.
 
 ## F-26 — `ProcessWorkoutCompletionJob` fetches its execution record with no tenant/owner context; likely fails silently for every execution once Oban is enabled
 
+**STATUS: FIXED** (2026-08-06). Confirmed by direct read exactly as
+reported. `ExecutionStore.with_authorization_context/2` and the
+`app.execution_authorization_check` RLS bypass clause on `workout_executions`
+already existed for exactly this case, but `RepoContext.run/2` had no clause
+that accepted `execution_authorization_check` without an accompanying
+`organization_id`/`user_id` — the job's only identifying data is
+`execution_id`, so calling it with an otherwise-empty context always hit
+`{:error, :missing_ownership_scope}` and never reached the closure, meaning
+the RLS bypass was reachable at the DB level but not from any Elixir call
+site. Added the missing `RepoContext.run/2` clause and wired the job to use
+`with_authorization_context/2`. Proved with two tests since an ordinary
+`mix test` run (Postgres superuser, bypasses RLS) can't catch this class of
+bug at all: a direct `RepoContext.run/2` unit test
+(`test/milos_training/infrastructure/tenancy/repo_context_test.exs`), and an
+`RLSCase`-based test against a real non-superuser connection showing the
+execution is invisible without the GUC and visible with it
+(`test/milos_training/execution/rls_enforcement_test.exs`).
+
 **Severity:** Medium (functional regression, not a leak) · **Confidence:** Reported by delegated research, not independently re-verified — recommend confirming against `apps/api/lib/milos_training/workers/process_workout_completion_job.ex` and `execution/queries/get_execution.ex` directly before acting.
 
 **Evidence (as reported):** `ProcessWorkoutCompletionJob` calls

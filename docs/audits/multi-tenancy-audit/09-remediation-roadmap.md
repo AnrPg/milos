@@ -90,8 +90,12 @@ blocking. P1–P3 remain open.
 - **Tests required before merge:** test-gap-plan #9. ✅ done.
 
 ### P2.5 — Fix `ProcessWorkoutCompletionJob` tenant/owner context (F-26) — confirm first via direct read
+- **STATUS: FIXED** (2026-08-06). Confirmed exactly as reported. Added the
+  missing `RepoContext.run/2` clause so `ExecutionStore.with_authorization_context/2`
+  (already built, never reachable) actually works with no
+  organization_id/user_id in context — see F-26 in `04-findings.md`.
 - **Dependency:** none.
-- **Tests required before merge:** an Oban-enabled integration test confirming the job completes successfully (not `:execution_not_found`).
+- **Tests required before merge:** an Oban-enabled integration test confirming the job completes successfully (not `:execution_not_found`). ✅ done, plus an RLSCase proof against real (non-superuser) RLS enforcement.
 
 ### P2.6 — Enforce Meilisearch member-index tenant scoping at the query layer (F-27) — confirm first via direct read
 - **Dependency:** none.
