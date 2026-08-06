@@ -3,7 +3,7 @@ import type { paths } from "@/api/generated/schema";
 import type { EffectiveEntitlement } from "@/api/my-finance";
 
 export type AllowanceExtensionRequest = NonNullable<
-  paths["/api/admin/users/{id}/allowance-extensions"]["post"]["requestBody"]
+  paths["/api/org/{organization_slug}/admin/users/{id}/allowance-extensions"]["post"]["requestBody"]
 >["content"]["application/json"];
 
 export type AdminUserDirectoryEntry = {

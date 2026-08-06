@@ -2557,6 +2557,7 @@
     "featureFinanceCleanupPassword": "Κωδικός admin",
     "featureFinanceCleanupSuccess": "Η εγγραφή εκκαθαρίστηκε.",
     "featureFinanceCleanupPending": "Εκκαθάριση...",
-    "featureFinanceCleanupSubmit": "Οριστική εκκαθάριση"
+    "featureFinanceCleanupSubmit": "Οριστική εκκαθάριση",
+    "anotherOrganization": "Άλλος οργανισμός"
   }
 }

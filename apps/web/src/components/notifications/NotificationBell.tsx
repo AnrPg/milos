@@ -10,7 +10,7 @@
 
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -25,6 +25,12 @@ import { useSession } from "@/components/session-provider";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { subscribeToTopic } from "@/lib/realtime";
 import { notificationTargetUrl } from "@/components/notifications/notification-links";
+import {
+  notificationOrigin,
+  type NotificationOrigin,
+} from "@/components/notifications/notification-origin";
+import { fetchOrganizationMemberships } from "@/api/organizations";
+import { useOrganizationSlug } from "@/lib/organization-slug";
 
 function formatTimestamp(uiLocale: string, isoString: string) {
   return new Intl.DateTimeFormat(uiLocale, {
@@ -39,10 +45,12 @@ function NotificationCard({
   notification,
   targetUrl,
   onClick,
+  origin,
 }: {
   notification: NotificationRecord;
   targetUrl: string | null;
   onClick: () => void;
+  origin: NotificationOrigin | null;
 }) {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
@@ -249,6 +257,11 @@ function NotificationCard({
         border: notification.read_at ? "1px solid var(--border)" : "1px solid color-mix(in srgb, var(--primary) 30%, transparent)",
         background: notification.read_at ? "var(--panel-muted)" : "color-mix(in srgb, var(--primary) 6%, transparent)",
         cursor: clickable ? "pointer" : "default",
+        // Anything raised outside the active organization gets a colour spine
+        // in that gym's own brand colour, so repeat senders stay recognisable.
+        ...(origin
+          ? { borderInlineStart: `4px solid ${origin.color ?? "var(--dim)"}` }
+          : {}),
       }}
       tabIndex={clickable ? 0 : undefined}
       onKeyDown={
@@ -264,6 +277,29 @@ function NotificationCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
+          {origin ? (
+            <span
+              className="mb-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold"
+              style={{
+                background: origin.color
+                  ? `color-mix(in srgb, ${origin.color} 14%, transparent)`
+                  : "var(--border)",
+                color: origin.color ?? "var(--text-soft)",
+                border: `1px solid ${
+                  origin.color
+                    ? `color-mix(in srgb, ${origin.color} 40%, transparent)`
+                    : "var(--border-strong)"
+                }`,
+              }}
+            >
+              <span
+                aria-hidden="true"
+                className="inline-block h-2 w-2 shrink-0 rounded-full"
+                style={{ background: origin.color ?? "var(--dim)" }}
+              />
+              {origin.name}
+            </span>
+          ) : null}
           <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
             {titleFromPayload(notification)}
           </p>
@@ -310,6 +346,39 @@ export function NotificationBell() {
   const router = useRouter();
   const { status, tokens, currentUser } = useSession();
   const queryClient = useQueryClient();
+  const activeOrganizationSlug = useOrganizationSlug();
+
+  // Shares TanStack's cache with TopNav's identical query, so this costs no
+  // extra request. Needed to resolve a notification's organization_id into a
+  // name and brand colour.
+  const membershipsQuery = useQuery({
+    queryKey: ["organization-memberships", tokens?.access_token],
+    enabled: status === "authenticated" && Boolean(tokens?.access_token),
+    queryFn: () => fetchOrganizationMemberships(tokens!.access_token),
+    staleTime: 60_000,
+  });
+
+  const organizations = useMemo(
+    () =>
+      (Array.isArray(membershipsQuery.data) ? membershipsQuery.data : []).map((membership) => ({
+        id: membership.organization.id,
+        name: membership.settings?.brand_name?.trim() || membership.organization.name,
+        brandColor: membership.settings?.brand_primary_color ?? null,
+        slug: membership.organization.slug,
+      })),
+    [membershipsQuery.data],
+  );
+
+  const activeOrganizationId =
+    organizations.find((entry) => entry.slug === activeOrganizationSlug)?.id ?? null;
+
+  const originFor = (notification: NotificationRecord) =>
+    notificationOrigin(
+      notification.organization_id,
+      activeOrganizationId,
+      organizations,
+      i18n("anotherOrganization"),
+    );
   const [open, setOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
   const [pushHelpOpen, setPushHelpOpen] = useState(false);
@@ -657,6 +726,7 @@ export function NotificationBell() {
                           notification={notification}
                           targetUrl={notificationTargetUrl(notification, currentUser?.role)}
                           onClick={() => handleNotificationClick(notification)}
+                          origin={originFor(notification)}
                         />
                       ))}
                     </div>
@@ -687,6 +757,7 @@ export function NotificationBell() {
                           notification={notification}
                           targetUrl={notificationTargetUrl(notification, currentUser?.role)}
                           onClick={() => handleNotificationClick(notification)}
+                          origin={originFor(notification)}
                         />
                       ))}
                     </div>

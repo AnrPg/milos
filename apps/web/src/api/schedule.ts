@@ -2,7 +2,7 @@ import { apiRequest } from "@/api/client";
 import type { paths } from "@/api/generated/schema";
 
 type ScheduleQuery = NonNullable<
-  paths["/api/schedule"]["get"]["parameters"]["query"]
+  paths["/api/org/{organization_slug}/schedule"]["get"]["parameters"]["query"]
 >;
 export type ClassTypeRecord = {
   id: string;

@@ -2557,6 +2557,7 @@
     "featureFinanceCleanupPassword": "Admin password",
     "featureFinanceCleanupSuccess": "The record was purged.",
     "featureFinanceCleanupPending": "Purging...",
-    "featureFinanceCleanupSubmit": "Permanent purge"
+    "featureFinanceCleanupSubmit": "Permanent purge",
+    "anotherOrganization": "ארגון אחר"
   }
 }
