@@ -64,6 +64,20 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilderTest do
     assert message.url == "/admin/reviews"
   end
 
+  test "scopes admin deep links to the organization the notification belongs to" do
+    assert PushMessageBuilder.build("review_submitted", %{
+             "rating" => 4,
+             "target_type" => "class_slot",
+             "organization_slug" => "atlas-gym"
+           }).url == "/org/atlas-gym/admin/reviews"
+
+    assert PushMessageBuilder.build("workout_assignment_requested", %{
+             "athlete_nickname" => "Atlas",
+             "requested_for" => "2026-07-21",
+             "organization_slug" => "atlas-gym"
+           }).url == "/org/atlas-gym/admin/coaching-assignments?date=2026-07-21"
+  end
+
   test "renders system copy through the supplied locale function while preserving authored text" do
     localize = fn message, bindings ->
       "el:" <>

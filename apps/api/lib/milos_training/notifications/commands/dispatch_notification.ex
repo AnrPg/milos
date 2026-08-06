@@ -4,11 +4,13 @@ defmodule MilosTraining.Notifications.Commands.DispatchNotification do
   alias MilosTraining.Notifications.Domain.{PayloadNormalizer, PushMessageBuilder}
   alias MilosTraining.Notifications.PushConfig
   alias MilosTraining.Localization
+  alias MilosTraining.Organizations.OrganizationStore
 
   def call(user_id, type, payload, locale \\ "en") do
     normalized_payload =
       payload
       |> PayloadNormalizer.normalize()
+      |> put_organization_slug(payload)
       |> enrich_payload(type, locale)
 
     with {:ok, notification} <-
@@ -38,6 +40,18 @@ defmodule MilosTraining.Notifications.Commands.DispatchNotification do
       EnqueuePushDispatch.call(notification)
     else
       :ok
+    end
+  end
+
+  # Push deep links must land inside /org/:slug/... or a multi-org recipient
+  # gets bounced out of the tenant they were notified about (F-09).
+  defp put_organization_slug(normalized_payload, source_payload) do
+    organization_id =
+      Map.get(source_payload, :organization_id) || Map.get(source_payload, "organization_id")
+
+    case organization_id && OrganizationStore.get_organization_by_id(organization_id) do
+      %{slug: slug} -> Map.put_new(normalized_payload, "organization_slug", slug)
+      _missing -> normalized_payload
     end
   end
 

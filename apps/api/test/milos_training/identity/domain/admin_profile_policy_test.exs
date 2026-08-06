@@ -17,4 +17,12 @@ defmodule MilosTraining.Identity.Domain.AdminProfilePolicyTest do
     assert links.personal_coaching == "/admin/coaching-assignments"
     refute Map.has_key?(links, :classes)
   end
+
+  test "operational links stay inside the organization when a slug is known" do
+    links = AdminProfilePolicy.operational_links(%{id: "member-id", role: :member}, "atlas-gym")
+
+    assert links.finance == "/org/atlas-gym/admin/finance"
+    assert links.classes == "/org/atlas-gym/admin/class-schedule"
+    assert links.messages == "/account/activity/chats"
+  end
 end

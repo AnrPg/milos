@@ -507,12 +507,31 @@ defmodule MilosTrainingWeb.AdminUserController do
   end
 
   def show(conn, params) do
-    with {:ok, payload} <- GetAdminUserProfile.call(params["id"] || params[:id]) do
+    with {:ok, payload} <-
+           GetAdminUserProfile.call(
+             params["id"] || params[:id],
+             tenant_organization_slug(conn)
+           ) do
       json(conn, payload)
     end
   end
 
-  def finance(conn, params), do: render_service(conn, GetAdminUserFinance, params)
+  defp tenant_organization_slug(conn) do
+    case conn.assigns[:tenant_context] do
+      %{organization: %{slug: slug}} -> slug
+      _missing -> nil
+    end
+  end
+
+  def finance(conn, params) do
+    with {:ok, payload} <-
+           GetAdminUserFinance.call(
+             params["id"] || params[:id],
+             tenant_organization_slug(conn)
+           ) do
+      json(conn, payload)
+    end
+  end
 
   def training_history(conn, params),
     do: render_service(conn, GetAdminUserTrainingHistory, params)

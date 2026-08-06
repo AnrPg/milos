@@ -4,7 +4,7 @@ defmodule MilosTraining.Application.GetAdminUserProfile do
   alias MilosTraining.Identity
   alias MilosTraining.Identity.Domain.AdminProfilePolicy
 
-  def call(user_id) do
+  def call(user_id, organization_slug \\ nil) do
     case Identity.find_by_id(user_id) do
       nil ->
         {:error, :not_found}
@@ -23,7 +23,8 @@ defmodule MilosTraining.Application.GetAdminUserProfile do
              account_status: "active",
              available_sections: AdminProfilePolicy.sections(user.role),
              attention: [],
-             operational_links: AdminProfilePolicy.operational_links(user)
+             operational_links:
+               AdminProfilePolicy.operational_links(user, organization_slug)
            }
          }}
     end

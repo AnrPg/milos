@@ -74,7 +74,8 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     finance = get_as_admin(conn, admin, member.id, "finance")
     assert finance["user_id"] == member.id
     assert finance["summary"]["credit_balance"] == 0
-    assert finance["operational_links"]["workspace"] == "/admin/finance"
+    assert finance["operational_links"]["workspace"] ==
+             "/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance"
 
     training = get_as_admin(build_conn(), admin, member.id, "training-history")
     assert training["executions"] == []

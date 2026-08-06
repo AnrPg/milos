@@ -1,4 +1,6 @@
 defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
+  alias MilosTraining.Organizations.Domain.AdminPath
+
   @type localizer :: (String.t(), map() -> String.t())
 
   def build(type, payload, localize \\ &default_localize/2)
@@ -117,7 +119,7 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
       body: append_note(body, note),
       url:
         payload["url"] ||
-          "/admin/coaching-assignments?date=#{requested_for}"
+          admin_url("/admin/coaching-assignments?date=#{requested_for}", payload)
     }
   end
 
@@ -138,7 +140,7 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     %{
       title: localize.("New review submitted", %{}),
       body: payload["body"] || body,
-      url: payload["url"] || "/admin/reviews"
+      url: payload["url"] || admin_url("/admin/reviews", payload)
     }
   end
 
@@ -217,6 +219,9 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
       url: payload["url"] || "/"
     }
   end
+
+  defp admin_url(path, payload),
+    do: AdminPath.admin_url(path, payload["organization_slug"])
 
   defp booking_body(payload, localize) do
     [payload["class_type_name"], payload["admin_message"]]

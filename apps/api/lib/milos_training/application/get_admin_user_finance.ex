@@ -4,8 +4,9 @@ defmodule MilosTraining.Application.GetAdminUserFinance do
   alias MilosTraining.Application.GetFinanceMemberProfile
   alias MilosTraining.{Finance, Identity}
   alias MilosTraining.Identity.Domain.AdminProfilePolicy
+  alias MilosTraining.Organizations.Domain.AdminPath
 
-  def call(user_id) do
+  def call(user_id, organization_slug \\ nil) do
     with %{} = user <- Identity.find_by_id(user_id) || {:error, :not_found} do
       if AdminProfilePolicy.finance_available?(user.role) do
         with {:ok, profile} <- GetFinanceMemberProfile.call(user_id) do
@@ -26,8 +27,9 @@ defmodule MilosTraining.Application.GetAdminUserFinance do
              details: details,
              drill_down: profile.drill_down,
              operational_links: %{
-               workspace: "/admin/finance",
-               member: "/admin/finance?member=#{user_id}"
+               workspace: AdminPath.admin_url("/admin/finance", organization_slug),
+               member:
+                 AdminPath.admin_url("/admin/finance?member=#{user_id}", organization_slug)
              }
            }}
         end
