@@ -186,6 +186,18 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   end
 
   @impl true
+  def list_membership_organization_ids(user_ids) do
+    OrganizationMembership
+    |> where([membership], membership.user_id in ^user_ids and membership.status == :active)
+    |> select([membership], {membership.user_id, membership.organization_id})
+    |> Repo.all()
+    |> Enum.group_by(fn {user_id, _organization_id} -> user_id end, fn {_user_id,
+                                                                        organization_id} ->
+      organization_id
+    end)
+  end
+
+  @impl true
   def get_invitation_by_digest(digest),
     do: Repo.get_by(RegistrationInvitation, token_digest: digest)
 

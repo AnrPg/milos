@@ -32,6 +32,7 @@ defmodule MilosTraining.Application.AdminSearchUsers do
           user_type: user_type,
           limit: limit
         }
+        |> maybe_put_organization_id(tenant_context)
         |> maybe_put_allowed_user_ids(allowed_user_ids)
 
       case search_with_index(search_params) do
@@ -100,6 +101,13 @@ defmodule MilosTraining.Application.AdminSearchUsers do
     |> Organizations.list_active_membership_user_ids()
     |> MapSet.new()
   end
+
+  defp maybe_put_organization_id(search_params, %Organizations.TenantContext{
+         organization_id: organization_id
+       }),
+       do: Map.put(search_params, :organization_id, organization_id)
+
+  defp maybe_put_organization_id(search_params, _tenant_context), do: search_params
 
   defp maybe_put_allowed_user_ids(search_params, nil), do: search_params
 

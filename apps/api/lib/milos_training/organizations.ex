@@ -38,6 +38,9 @@ defmodule MilosTraining.Organizations do
   defdelegate list_memberships(user_id), to: ListMemberships, as: :call
   defdelegate list_active_membership_user_ids(context), to: ListActiveMembershipUserIds, as: :call
 
+  def list_membership_organization_ids(user_ids),
+    do: OrganizationStore.list_membership_organization_ids(user_ids)
+
   def issue_invitation(context, params, issued_at \\ DateTime.utc_now()),
     do: IssueInvitation.call(context, params, issued_at)
 

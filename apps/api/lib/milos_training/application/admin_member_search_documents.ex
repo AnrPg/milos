@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.AdminMemberSearchDocuments do
-  alias MilosTraining.{Finance, Identity}
+  alias MilosTraining.{Finance, Identity, Organizations}
 
   def build_all do
     users =
@@ -12,10 +12,19 @@ defmodule MilosTraining.Application.AdminMemberSearchDocuments do
         limit: length(users)
       })
 
-    Enum.map(users, &document(&1, Map.get(finance_summaries, &1.id)))
+    organization_ids_by_user =
+      Organizations.list_membership_organization_ids(Enum.map(users, & &1.id))
+
+    Enum.map(users, fn user ->
+      document(
+        user,
+        Map.get(finance_summaries, user.id),
+        Map.get(organization_ids_by_user, user.id, [])
+      )
+    end)
   end
 
-  defp document(user, nil) do
+  defp document(user, nil, organization_ids) do
     %{
       id: user.id,
       nickname: user.nickname,
@@ -27,13 +36,14 @@ defmodule MilosTraining.Application.AdminMemberSearchDocuments do
       package_codes: [],
       package_families: [],
       package_tags: [],
+      organization_ids: organization_ids,
       membership: nil,
       package_subscriptions: [],
       active_package_subscription: nil
     }
   end
 
-  defp document(user, profile) do
+  defp document(user, profile, organization_ids) do
     subscriptions = profile.package_subscriptions || []
 
     %{
@@ -46,6 +56,7 @@ defmodule MilosTraining.Application.AdminMemberSearchDocuments do
       package_codes: subscription_field_values(subscriptions, :package_code_snapshot),
       package_families: subscription_field_values(subscriptions, :package_family_snapshot),
       package_tags: package_tags(subscriptions),
+      organization_ids: organization_ids,
       membership: profile.membership,
       package_subscriptions: subscriptions,
       active_package_subscription: profile.active_package_subscription

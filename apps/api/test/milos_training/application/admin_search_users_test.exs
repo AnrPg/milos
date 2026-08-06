@@ -160,6 +160,32 @@ defmodule MilosTraining.Application.AdminSearchUsersTest do
     refute hidden.id in ids
   end
 
+  test "passes the caller's organization_id to the index search so filtering happens at the query layer" do
+    Application.put_env(:milos_training, :admin_member_search_index, __MODULE__.OrgCapturingIndex)
+
+    admin = TestFixtures.user_fixture(%{nickname: "org_filter_admin"})
+    {:ok, organization} = Organizations.create_organization(%{name: "Org Filter Search"})
+    add_org_membership(organization.id, admin.id, :owner)
+    {:ok, tenant_context} = Organizations.resolve_tenant_context(admin, organization.slug)
+
+    assert {:ok, %{meta: %{organization_id_seen: organization_id}}} =
+             AdminSearchUsers.call(%{"q" => "org_filter"}, tenant_context)
+
+    assert organization_id == organization.id
+  end
+
+  defmodule OrgCapturingIndex do
+    @behaviour MilosTraining.Application.Ports.AdminMemberSearchIndex
+
+    @impl true
+    def replace_documents(_documents), do: :ok
+
+    @impl true
+    def search(params) do
+      {:ok, %{users: [], meta: %{organization_id_seen: Map.get(params, :organization_id)}}}
+    end
+  end
+
   defmodule FailingIndex do
     @behaviour MilosTraining.Application.Ports.AdminMemberSearchIndex
 

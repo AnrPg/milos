@@ -25,6 +25,7 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   @callback list_memberships(Ecto.UUID.t()) :: [map()]
   @callback list_organization_memberships(Ecto.UUID.t()) :: [OrganizationMembership.t()]
   @callback list_active_membership_user_ids(Ecto.UUID.t()) :: [Ecto.UUID.t()]
+  @callback list_membership_organization_ids([Ecto.UUID.t()]) :: %{Ecto.UUID.t() => [Ecto.UUID.t()]}
   @callback get_invitation_by_digest(binary()) :: RegistrationInvitation.t() | nil
   @callback get_invitation_with_organization(binary()) :: map() | nil
   @callback grant_vendor(Ecto.UUID.t()) ::

@@ -9,7 +9,8 @@ defmodule MilosTraining.Infrastructure.Search.MeilisearchMemberIndex do
     "user_type",
     "package_codes",
     "package_families",
-    "package_tags"
+    "package_tags",
+    "organization_ids"
   ]
 
   @searchable_attributes ["nickname", "searchable_text"]
@@ -177,6 +178,7 @@ defmodule MilosTraining.Infrastructure.Search.MeilisearchMemberIndex do
 
   defp filters(params) do
     [
+      equality_filter("organization_ids", Map.get(params, :organization_id), nil),
       equality_filter("identity_role", params.role, "all"),
       equality_filter("membership_status", params.membership_status, nil),
       equality_filter("user_type", params.user_type, nil),
