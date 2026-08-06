@@ -1274,6 +1274,13 @@ audit tooling until fixed, then passing once fixed.
 
 ## F-14 — No dedicated cross-tenant isolation test exists for Notifications, Wellbeing, or Coaching, despite TD-038 claiming "two-tenant tests" for adjacent contexts
 
+**STATUS: FIXED 2026-08-07.** Added `coaching/tenant_isolation_test.exs`,
+`notifications/tenant_isolation_test.exs`, and
+`wellbeing/tenant_isolation_test.exs`. Coaching and the organization-scoped
+Notifications paths verified clean. Writing the tests surfaced **two gaps the
+finding did not anticipate** — see **F-28** below, one of which is a confirmed
+cross-tenant read of medical data that survives RLS in production.
+
 **Severity:** Medium · **Confidence:** Confirmed (directory listing + content grep)
 
 **Evidence:** `apps/api/test/milos_training/` contains
@@ -1548,3 +1555,98 @@ authorization is unaffected since it never trusts these claims.
 **Recommended remediation direction:** Consider triggering token reissuance
 (not just a realtime broadcast) on membership/role change for UX freshness;
 low priority given no security impact.
+
+---
+
+## F-28 — Owner-scoped reads are not constrained by the tenant boundary: a member reads their own records across every organization they belong to
+
+**Severity:** High for `injury_reports` (medical data, confirmed to survive RLS
+in production); Medium for `notifications` · **Confidence:** Confirmed
+(reproduced under real non-superuser RLS in
+`apps/api/test/milos_training/wellbeing/rls_enforcement_test.exs`)
+
+**Discovered:** 2026-08-07, while implementing F-14's isolation tests. Not
+anticipated by F-14, which assumed these contexts were correct-but-untested.
+
+### Wellbeing (`injury_reports`) — confirmed cross-tenant read
+
+Both the application layer and the RLS policy express the owner/tenant scope as
+a disjunction, and the two are **identical**, so neither constrains the other:
+
+`apps/api/lib/milos_training/infrastructure/wellbeing/ecto_wellbeing_store.ex`
+(`scoped_to_owner_or_tenant/1`):
+
+```elixir
+where(query, [row], row.user_id == ^user_id or row.organization_id == ^organization_id)
+```
+
+`injury_reports_owner_or_tenant_policy`
+(`priv/repo/migrations/20260804160000_finalize_personal_and_wellbeing_t4_boundaries.exs`):
+
+```sql
+USING (
+  user_id = NULLIF(current_setting('app.user_id', true), '')::uuid
+  OR organization_id = NULLIF(current_setting('app.organization_id', true), '')::uuid
+)
+```
+
+Because `list_injuries_for_user/1` and `get_injury_for_user/2` then add an
+explicit `user_id == ^user_id` filter, the whole predicate collapses to the
+owner branch and the organization term never applies.
+
+**Failure scenario (reproduced):** a member belongs to Org A and Org B and has
+filed an injury report in each. Reading with only Org B open returns **both**,
+including Org A's. `get_injury_for_user/2` likewise returns the Org A record by
+ID — a cross-tenant IDOR on medical data.
+
+**Why RLS does not save this:** the policy carries the same `OR`, so the leak is
+present in production against a correctly-provisioned non-superuser role. This
+is materially different from F-05, where RLS was at least a partial backstop.
+
+**Does not affect the admin path:** when an admin reads a member's dossier, the
+owner branch (`user_id = <admin>`) cannot match the member's rows, so the
+organization term is the only one that can satisfy the predicate and scoping is
+correct. Confirmed by test.
+
+### Notifications — same shape, lower blast radius
+
+Every inbox read in
+`apps/api/lib/milos_training/infrastructure/notifications/ecto_notification_store.ex`
+(`list_for_user/1`, `list_inbox_page/2`, `count_unread_inbox/1`,
+`mark_all_read/1`, `mark_read/2`) applies `scoped_to_user/1` but never
+`scoped_to_organization/1` — which exists in the same module and is used at
+exactly one call site (`delete_booking_pending_for_booking/1`). A member's inbox
+therefore spans organizations, surfacing Org A notification titles/bodies in an
+Org B session.
+
+**Impact:** Cross-tenant disclosure of personal health records (Wellbeing) and
+of notification content (Notifications). For a gym operator this is
+member-identifiable health data crossing a customer boundary.
+
+### Requires a product decision before remediation
+
+The correct boundary is **not** self-evident, which is why this is filed rather
+than fixed:
+
+- **Partition per tenant** — a member's records belong to the organization they
+  were filed in. Strictest, matches the rest of the tenancy model, but changes
+  what existing users see and needs a backfill story for records already filed.
+- **Follow the member** — health records are the member's own data, deliberately
+  portable across the gyms they attend. Defensible for a health record, harder
+  to defend for notifications, and needs an explicit exemption in the tenancy
+  model rather than an accidental `OR`.
+
+**Recommended remediation direction (assuming partition-per-tenant):** change
+both layers together — `AND` the organization term rather than `OR`-ing it in
+`scoped_to_owner_or_tenant/1`, add `scoped_to_organization/1` to the
+notification inbox reads, and ship a migration replacing
+`injury_reports_owner_or_tenant_policy` (and the matching
+`injury_status_events` policy). Shipping only the application-layer half would
+leave the policy permissive; only the policy half would break self-service reads
+where no organization is open.
+
+**Validation tests:** already written and currently asserting the *unfixed*
+behaviour, tagged `:documents_current_behaviour` —
+`wellbeing/tenant_isolation_test.exs`, `notifications/tenant_isolation_test.exs`,
+and `wellbeing/rls_enforcement_test.exs`. Flipping those assertions to `refute`
+is the regression test for the fix.

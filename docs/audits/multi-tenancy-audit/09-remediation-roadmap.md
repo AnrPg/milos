@@ -72,8 +72,37 @@ blocking. P1–P3 remain open.
 ## P2 — Medium priority
 
 ### P2.1 — Add missing two-organization isolation tests: Notifications, Wellbeing, Coaching (F-14)
-- **Dependency:** none; can proceed in parallel with anything else.
-- **Tests required before merge:** test-gap-plan pattern applied to these three contexts.
+- **STATUS: FIXED** (2026-08-07). All three `tenant_isolation_test.exs` files
+  added. Coaching and the org-scoped Notifications paths verified clean.
+- **Surfaced a new finding — see P1.7 / F-28 below.** Writing the tests exposed
+  that owner-scoped reads are not constrained by the tenant boundary in
+  Wellbeing (confirmed cross-tenant read of medical data, survives RLS) and
+  Notifications (inbox spans organizations). The tests currently assert the
+  unfixed behaviour, tagged `:documents_current_behaviour`.
+- **Tests required before merge:** test-gap-plan pattern applied to these three contexts. ✅ done.
+
+### P1.7 — Constrain owner-scoped reads to the tenant boundary (F-28) — **NEEDS A PRODUCT DECISION FIRST**
+- **Priority note:** filed under P1 rather than P2 because the Wellbeing half is
+  a confirmed cross-tenant read of member-identifiable medical data that is
+  **not** backstopped by RLS — the policy carries the same permissive `OR` as
+  the application layer.
+- **Blocked on:** whether personal records (injury reports, notifications)
+  should be partitioned per organization or deliberately follow the member
+  across the organizations they belong to. See F-28 for the two options and
+  their trade-offs. Do not implement before this is answered — the two
+  directions have opposite implementations.
+- **Affected modules:** `ecto_wellbeing_store.ex` (`scoped_to_owner_or_tenant/1`),
+  `ecto_notification_store.ex` (five inbox reads missing
+  `scoped_to_organization/1`), plus a migration replacing
+  `injury_reports_owner_or_tenant_policy` and the matching
+  `injury_status_events` policy.
+- **Sequencing:** both layers must change together — application-layer only
+  leaves the policy permissive; policy-only breaks self-service reads where no
+  organization is open.
+- **Tests required before merge:** flip the `:documents_current_behaviour`
+  assertions in `wellbeing/tenant_isolation_test.exs`,
+  `wellbeing/rls_enforcement_test.exs`, and
+  `notifications/tenant_isolation_test.exs` from `assert` to `refute`.
 
 ### P2.2 — Add membership suspend/revoke commands (F-11) and platform-owner revoke task (F-12)
 - **Dependency:** none.
