@@ -584,7 +584,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def get_invoice(invoice_id) do
-    case Repo.get(FinanceInvoice, invoice_id) do
+    case (FinanceInvoice |> tenant_scope() |> Repo.get(invoice_id)) do
       nil -> {:error, :not_found}
       %FinanceInvoice{deleted_at: deleted_at} when not is_nil(deleted_at) -> {:error, :not_found}
       invoice -> {:ok, invoice}
@@ -593,7 +593,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def update_invoice_params(invoice_id, params) do
-    case Repo.get(FinanceInvoice, invoice_id) do
+    case (FinanceInvoice |> tenant_scope() |> Repo.get(invoice_id)) do
       nil ->
         {:error, :not_found}
 
@@ -612,7 +612,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   def update_invoice(invoice_id, params) do
     params = string_key_map(params)
 
-    case Repo.get(FinanceInvoice, invoice_id) do
+    case (FinanceInvoice |> tenant_scope() |> Repo.get(invoice_id)) do
       nil ->
         {:error, :not_found}
 
@@ -713,7 +713,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   def create_invoice(membership_id, params) do
     params = string_key_map(params)
 
-    with %Membership{} = membership <- Repo.get(Membership, membership_id),
+    with %Membership{} = membership <- (Membership |> tenant_scope() |> Repo.get(membership_id)),
          {:ok, params} <- maybe_prefill_invoice_from_subscription(membership.id, params),
          :ok <- validate_invoice_subscription_link(membership.id, params),
          {:ok, line_params} <- invoice_line_params(params),
@@ -766,7 +766,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   def generate_renewal_invoice(membership_id, params) do
     params = string_key_map(params)
 
-    with %Membership{} = membership <- Repo.get(Membership, membership_id),
+    with %Membership{} = membership <- (Membership |> tenant_scope() |> Repo.get(membership_id)),
          %MembershipPackageSubscription{} = subscription <-
            renewal_subscription(membership.id, params["membership_package_subscription_id"]) do
       period_start = parse_date(params["service_period_start"], Date.utc_today())
@@ -1528,29 +1528,35 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     first_month = Date.utc_today() |> Date.beginning_of_month() |> Date.shift(month: -23)
 
     {aggregate_status, aggregate_error, aggregate_rows} =
-      case Repo.query(
-             """
-             SELECT period_start, user_type_snapshot, package_code, package_family,
-                    membership_count, active_membership_count, expiring_membership_count,
-                    paid_revenue_cents, pending_revenue_cents, promotion_redemption_count,
-                    promotion_percent_redemption_count,
-                    promotion_fixed_amount_redemption_count,
-                    promotion_free_period_redemption_count,
-                    promotion_manual_redemption_count,
-                    promotion_realized_discount_cents,
-                    referral_signup_count, pending_referral_reward_count,
-                    credit_granted_cents, credit_applied_cents, credit_balance_cents
-             FROM finance_aggregates
-             WHERE period_start >= $1
-             ORDER BY period_start DESC, package_code ASC
-             """,
-             [first_month]
-           ) do
-        {:ok, %{rows: rows}} ->
-          {"available", nil, Enum.map(rows, &normalize_finance_aggregate_row/1)}
+      case RepoContext.current_setting("app.organization_id") do
+        organization_id when is_binary(organization_id) ->
+          case Repo.query(
+                 """
+                 SELECT period_start, user_type_snapshot, package_code, package_family,
+                        membership_count, active_membership_count, expiring_membership_count,
+                        paid_revenue_cents, pending_revenue_cents, promotion_redemption_count,
+                        promotion_percent_redemption_count,
+                        promotion_fixed_amount_redemption_count,
+                        promotion_free_period_redemption_count,
+                        promotion_manual_redemption_count,
+                        promotion_realized_discount_cents,
+                        referral_signup_count, pending_referral_reward_count,
+                        credit_granted_cents, credit_applied_cents, credit_balance_cents
+                 FROM finance_aggregates
+                 WHERE organization_id = $1::uuid AND period_start >= $2
+                 ORDER BY period_start DESC, package_code ASC
+                 """,
+                 [Ecto.UUID.dump!(organization_id), first_month]
+               ) do
+            {:ok, %{rows: rows}} ->
+              {"available", nil, Enum.map(rows, &normalize_finance_aggregate_row/1)}
 
-        {:error, reason} ->
-          {"unavailable", inspect(reason), []}
+            {:error, reason} ->
+              {"unavailable", inspect(reason), []}
+          end
+
+        _missing_scope ->
+          {"unavailable", "missing_organization_scope", []}
       end
 
     %{
@@ -1592,7 +1598,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def create_promotion_code(campaign_id, params) do
-    case Repo.get(PromotionCampaign, campaign_id) do
+    case (PromotionCampaign |> tenant_scope() |> Repo.get(campaign_id)) do
       nil ->
         {:error, :not_found}
 
@@ -1657,7 +1663,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def update_referral_program(id, params) do
-    case Repo.get(ReferralProgram, id) do
+    case (ReferralProgram |> tenant_scope() |> Repo.get(id)) do
       nil ->
         {:error, :not_found}
 
@@ -1700,7 +1706,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def update_referral_status(id, status) do
-    case Repo.get(ReferralEvent, id) do
+    case (ReferralEvent |> tenant_scope() |> Repo.get(id)) do
       nil ->
         {:error, :not_found}
 
@@ -1724,7 +1730,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def create_referral_reward(referral_event_id, params) do
-    case Repo.get(ReferralEvent, referral_event_id) do
+    case (ReferralEvent |> tenant_scope() |> Repo.get(referral_event_id)) do
       nil ->
         {:error, :not_found}
 
@@ -1762,7 +1768,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def update_referral_reward_status(id, status) do
-    case Repo.get(ReferralReward, id) do
+    case (ReferralReward |> tenant_scope() |> Repo.get(id)) do
       nil ->
         {:error, :not_found}
 
@@ -2296,7 +2302,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
          %{"membership_package_subscription_id" => subscription_id} = params
        )
        when is_binary(subscription_id) and subscription_id != "" do
-    case Repo.get(MembershipPackageSubscription, subscription_id) do
+    case (MembershipPackageSubscription |> tenant_scope() |> Repo.get(subscription_id)) do
       nil ->
         {:error, :not_found}
 
@@ -2412,7 +2418,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp renewal_subscription(membership_id, ""), do: renewal_subscription(membership_id, nil)
 
   defp renewal_subscription(membership_id, subscription_id) do
-    case Repo.get(MembershipPackageSubscription, subscription_id) do
+    case (MembershipPackageSubscription |> tenant_scope() |> Repo.get(subscription_id)) do
       nil ->
         nil
 
@@ -2517,7 +2523,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   end
 
   defp invoice_balance_due(invoice_id) do
-    case Repo.get(FinanceInvoice, invoice_id) do
+    case (FinanceInvoice |> tenant_scope() |> Repo.get(invoice_id)) do
       nil ->
         0
 
@@ -2639,7 +2645,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp refresh_entitlement_snapshot(nil), do: :ok
 
   defp refresh_entitlement_snapshot(membership_id) do
-    case Repo.get(Membership, membership_id) do
+    case (Membership |> tenant_scope() |> Repo.get(membership_id)) do
       nil ->
         :ok
 
@@ -2686,7 +2692,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   end
 
   defp get_reward_event(%ReferralReward{} = reward) do
-    case Repo.get(ReferralEvent, reward.referral_event_id) do
+    case (ReferralEvent |> tenant_scope() |> Repo.get(reward.referral_event_id)) do
       nil -> {:error, :not_found}
       %ReferralEvent{} = event -> {:ok, event}
     end
@@ -2889,7 +2895,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       :not_requested ->
         if is_binary(params["promotion_campaign_id"]) do
           with %PromotionCampaign{} = campaign <-
-                 Repo.get(PromotionCampaign, params["promotion_campaign_id"]),
+                 (PromotionCampaign |> tenant_scope() |> Repo.get(params["promotion_campaign_id"])),
                :ok <- validate_campaign_active(campaign),
                :ok <- validate_campaign_window(campaign, Date.utc_today()),
                {:ok, {discount_type, discount_value}} <-
@@ -2963,7 +2969,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp validate_subscription_link(_membership_id, "", _field), do: :ok
 
   defp validate_subscription_link(membership_id, subscription_id, field) do
-    case Repo.get(MembershipPackageSubscription, subscription_id) do
+    case (MembershipPackageSubscription |> tenant_scope() |> Repo.get(subscription_id)) do
       nil ->
         {:error, :not_found}
 
@@ -2996,7 +3002,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp validate_invoice_link(_membership_id, ""), do: :ok
 
   defp validate_invoice_link(membership_id, invoice_id) do
-    case Repo.get(FinanceInvoice, invoice_id) do
+    case (FinanceInvoice |> tenant_scope() |> Repo.get(invoice_id)) do
       nil ->
         {:error, :not_found}
 
@@ -3033,7 +3039,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp referral_membership_user_id(""), do: {:error, :referral_membership_required}
 
   defp referral_membership_user_id(membership_id) do
-    case Repo.get(Membership, membership_id) do
+    case (Membership |> tenant_scope() |> Repo.get(membership_id)) do
       nil -> {:error, :not_found}
       %Membership{} = membership -> {:ok, membership.user_id}
     end
@@ -3095,7 +3101,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   defp validate_promotion_code(%PromotionCode{} = code) do
     with %PromotionCampaign{} = campaign <-
-           Repo.get(PromotionCampaign, code.promotion_campaign_id),
+           (PromotionCampaign |> tenant_scope() |> Repo.get(code.promotion_campaign_id)),
          :ok <- validate_campaign_active(campaign),
          :ok <- validate_campaign_window(campaign, Date.utc_today()),
          :ok <- validate_code_redemption_limit(code) do
@@ -3144,7 +3150,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp active_referral_program(""), do: {:error, :referral_program_required}
 
   defp active_referral_program(program_id) do
-    case Repo.get(ReferralProgram, program_id) do
+    case (ReferralProgram |> tenant_scope() |> Repo.get(program_id)) do
       nil -> {:error, :not_found}
       %ReferralProgram{active: false} -> {:error, :referral_program_inactive}
       %ReferralProgram{} = program -> {:ok, program}
@@ -3795,7 +3801,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp cleanup_payment_record(%MembershipPayment{} = payment) do
     invoice =
       if payment.finance_invoice_id do
-        Repo.get(FinanceInvoice, payment.finance_invoice_id)
+        (FinanceInvoice |> tenant_scope() |> Repo.get(payment.finance_invoice_id))
       end
 
     %{
@@ -3963,7 +3969,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def get_finance_settings do
-    case Repo.one(from s in FinanceSetting, limit: 1) do
+    case FinanceSetting |> tenant_scope() |> limit(1) |> Repo.one() do
       nil ->
         %{
           payment_reminder_interval_days: 7,
@@ -3979,10 +3985,12 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def update_finance_settings(params) do
-    case Repo.one(from s in FinanceSetting, limit: 1) do
+    case FinanceSetting |> tenant_scope() |> limit(1) |> Repo.one() do
       nil ->
+        organization_id = RepoContext.current_setting("app.organization_id")
+
         %FinanceSetting{}
-        |> FinanceSetting.changeset(params)
+        |> FinanceSetting.changeset(Map.put(params, :organization_id, organization_id))
         |> Repo.insert()
         |> normalize_result(&normalize_finance_settings/1)
 
@@ -4212,4 +4220,5 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     |> Repo.one()
     |> Kernel.||(0)
   end
+
 end

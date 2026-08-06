@@ -1,8 +1,24 @@
 defmodule MilosTraining.FinanceTest do
   use MilosTraining.DataCase
 
-  alias MilosTraining.Finance
+  alias MilosTraining.{Finance, Organizations}
   alias MilosTraining.TestFixtures
+
+  defp tenant_context_fixture(owner, name) do
+    {:ok, organization} = Organizations.create_organization(%{name: name})
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: owner.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    {:ok, context} = Organizations.resolve_tenant_context(owner, organization.slug)
+    context
+  end
 
   test "records received money as an immediately issued paid receipt" do
     user = TestFixtures.user_fixture(%{role: :member})
@@ -357,31 +373,33 @@ defmodule MilosTraining.FinanceTest do
   end
 
   test "finance aggregate revenue is net of payment reversals" do
+    owner = TestFixtures.admin_fixture()
     user = TestFixtures.user_fixture(%{role: :member})
+    context = tenant_context_fixture(owner, "Reversal Gym")
 
     assert {:ok, membership} =
-             Finance.upsert_membership(user.id, %{
+             Finance.upsert_membership(context, user.id, %{
                user_type_snapshot: "member",
                status: "active",
                signup_source: "direct"
              })
 
     assert {:ok, payment} =
-             Finance.record_payment(membership.id, %{
+             Finance.record_payment(context, membership.id, %{
                amount_cents: 10_000,
                payment_method: "cash",
                payment_status: "paid"
              })
 
     assert {:ok, _reversal} =
-             Finance.reverse_payment(membership.id, payment.id, %{
+             Finance.reverse_payment(context, membership.id, payment.id, %{
                amount_cents: 3_000,
                reason: "Refund regression"
              })
 
-    assert :ok = Finance.refresh_aggregates()
+    assert :ok = Finance.refresh_aggregates(context)
 
-    summary = Finance.financial_summary()
+    summary = Finance.financial_summary(context, %{})
 
     aggregate_paid =
       summary.aggregates
@@ -818,45 +836,47 @@ defmodule MilosTraining.FinanceTest do
   end
 
   test "finance credit analytics are net of invoice credit restorations" do
+    owner = TestFixtures.admin_fixture()
     user = TestFixtures.user_fixture(%{role: :member})
+    context = tenant_context_fixture(owner, "Credit Analytics Gym")
 
     assert {:ok, membership} =
-             Finance.upsert_membership(user.id, %{
+             Finance.upsert_membership(context, user.id, %{
                user_type_snapshot: "member",
                status: "active",
                signup_source: "direct"
              })
 
     assert {:ok, _grant} =
-             Finance.create_manual_credit(membership.id, %{
+             Finance.create_manual_credit(context, membership.id, %{
                amount_cents: 5_000,
                description: "Credit analytics regression"
              })
 
     assert {:ok, invoice} =
-             Finance.create_invoice(membership.id, %{
+             Finance.create_invoice(context, membership.id, %{
                amount_cents: 4_000,
                description: "Credit analytics invoice",
                due_date: Date.add(Date.utc_today(), 7)
              })
 
-    assert {:ok, invoice} = Finance.issue_invoice(invoice.id)
+    assert {:ok, invoice} = Finance.issue_invoice(context, invoice.id, %{})
 
     assert {:ok, application} =
-             Finance.apply_credit_to_invoice(membership.id, invoice.id, %{
+             Finance.apply_credit_to_invoice(context, membership.id, invoice.id, %{
                amount_cents: 3_000,
                description: "Apply credit"
              })
 
     assert {:ok, _reversal} =
-             Finance.reverse_credit_ledger_entry(membership.id, application.id, %{
+             Finance.reverse_credit_ledger_entry(context, membership.id, application.id, %{
                amount_cents: 1_000,
                reason: "Restore credit"
              })
 
-    assert :ok = Finance.refresh_aggregates()
+    assert :ok = Finance.refresh_aggregates(context)
 
-    summary = Finance.financial_summary()
+    summary = Finance.financial_summary(context, %{})
 
     aggregate_totals =
       Enum.reduce(summary.aggregates, %{granted: 0, applied: 0, balance: 0}, fn row, acc ->
@@ -1420,110 +1440,120 @@ defmodule MilosTraining.FinanceTest do
   end
 
   test "finance aggregates do not multiply payment or discount facts across child joins" do
+    owner = TestFixtures.admin_fixture()
     user = TestFixtures.user_fixture(%{role: :member})
     referrer = TestFixtures.user_fixture(%{role: :member})
+    context = tenant_context_fixture(owner, "No Multiply Gym")
 
-    assert {:ok, _referrer_membership} =
-             Finance.upsert_membership(referrer.id, %{
-               user_type_snapshot: "member",
-               status: "active",
-               signup_source: "direct"
-             })
+    membership =
+      Finance.with_tenant_context(context, fn ->
+        assert {:ok, _referrer_membership} =
+                 Finance.upsert_membership(referrer.id, %{
+                   user_type_snapshot: "member",
+                   status: "active",
+                   signup_source: "direct"
+                 })
 
-    assert {:ok, membership} =
-             Finance.upsert_membership(user.id, %{
-               user_type_snapshot: "member",
-               status: "active",
-               signup_source: "promo"
-             })
+        assert {:ok, membership} =
+                 Finance.upsert_membership(user.id, %{
+                   user_type_snapshot: "member",
+                   status: "active",
+                   signup_source: "promo"
+                 })
 
-    assert {:ok, package_a} =
-             Finance.create_package(%{
-               code: "aggregate_a",
-               name: "Aggregate A",
-               family: "hybrid",
-               billing_period: "monthly",
-               base_price_cents: 1000
-             })
+        assert {:ok, package_a} =
+                 Finance.create_package(%{
+                   code: "aggregate_a",
+                   name: "Aggregate A",
+                   family: "hybrid",
+                   billing_period: "monthly",
+                   base_price_cents: 1000
+                 })
 
-    assert {:ok, package_b} =
-             Finance.create_package(%{
-               code: "aggregate_b",
-               name: "Aggregate B",
-               family: "hybrid",
-               billing_period: "monthly",
-               base_price_cents: 2000
-             })
+        assert {:ok, package_b} =
+                 Finance.create_package(%{
+                   code: "aggregate_b",
+                   name: "Aggregate B",
+                   family: "hybrid",
+                   billing_period: "monthly",
+                   base_price_cents: 2000
+                 })
 
-    assert {:ok, _subscription_a} = Finance.assign_package(membership.id, package_a.id, %{})
-    assert {:ok, _subscription_b} = Finance.assign_package(membership.id, package_b.id, %{})
+        assert {:ok, _subscription_a} = Finance.assign_package(membership.id, package_a.id, %{})
+        assert {:ok, _subscription_b} = Finance.assign_package(membership.id, package_b.id, %{})
 
-    assert {:ok, _payment} =
-             Finance.record_payment(membership.id, %{
-               amount_cents: 12_500,
-               payment_method: "cash",
-               payment_status: "paid"
-             })
+        assert {:ok, _payment} =
+                 Finance.record_payment(membership.id, %{
+                   amount_cents: 12_500,
+                   payment_method: "cash",
+                   payment_status: "paid"
+                 })
 
-    assert {:ok, campaign} =
-             Finance.create_promotion_campaign(%{
-               name: "Aggregate Promo",
-               starts_on: Date.add(Date.utc_today(), -1),
-               ends_on: Date.add(Date.utc_today(), 1)
-             })
+        assert {:ok, campaign} =
+                 Finance.create_promotion_campaign(%{
+                   name: "Aggregate Promo",
+                   starts_on: Date.add(Date.utc_today(), -1),
+                   ends_on: Date.add(Date.utc_today(), 1)
+                 })
 
-    assert {:ok, _code_a} =
-             Finance.create_promotion_code(campaign.id, %{
-               code: "aggregate one",
-               discount_type: "fixed_amount",
-               discount_value: 100
-             })
+        assert {:ok, _code_a} =
+                 Finance.create_promotion_code(campaign.id, %{
+                   code: "aggregate one",
+                   discount_type: "fixed_amount",
+                   discount_value: 100
+                 })
 
-    assert {:ok, _code_b} =
-             Finance.create_promotion_code(campaign.id, %{
-               code: "aggregate two",
-               discount_type: "fixed_amount",
-               discount_value: 200
-             })
+        assert {:ok, _code_b} =
+                 Finance.create_promotion_code(campaign.id, %{
+                   code: "aggregate two",
+                   discount_type: "fixed_amount",
+                   discount_value: 200
+                 })
 
-    assert {:ok, _redemption_a} =
-             Finance.redeem_promotion(membership.id, %{promotion_code: "AGGREGATE-ONE"})
+        assert {:ok, _redemption_a} =
+                 Finance.redeem_promotion(membership.id, %{promotion_code: "AGGREGATE-ONE"})
 
-    assert {:ok, _redemption_b} =
-             Finance.redeem_promotion(membership.id, %{
-               promotion_code: "AGGREGATE-TWO",
-               params: %{realized_discount_cents: 200}
-             })
+        assert {:ok, _redemption_b} =
+                 Finance.redeem_promotion(membership.id, %{
+                   promotion_code: "AGGREGATE-TWO",
+                   params: %{realized_discount_cents: 200}
+                 })
 
-    assert {:ok, program} =
-             Finance.create_referral_program(%{
-               name: "Aggregate referrals",
-               reward_type: "credit",
-               reward_value: 500
-             })
+        assert {:ok, program} =
+                 Finance.create_referral_program(%{
+                   name: "Aggregate referrals",
+                   reward_type: "credit",
+                   reward_value: 500
+                 })
 
-    assert {:ok, event} =
-             Finance.create_referral_event(%{
-               referral_program_id: program.id,
-               referrer_user_id: referrer.id,
-               referred_user_id: user.id,
-               membership_id: membership.id,
-               referrer_role_snapshot: "member",
-               referred_role_snapshot: "member"
-             })
+        assert {:ok, event} =
+                 Finance.create_referral_event(%{
+                   referral_program_id: program.id,
+                   referrer_user_id: referrer.id,
+                   referred_user_id: user.id,
+                   membership_id: membership.id,
+                   referrer_role_snapshot: "member",
+                   referred_role_snapshot: "member"
+                 })
 
-    assert {:ok, event} = Finance.update_referral_status(event.id, "approved")
+        assert {:ok, event} = Finance.update_referral_status(event.id, "approved")
 
-    assert {:ok, reward} =
-             Finance.create_referral_reward(event.id, %{reward_type: "credit", reward_value: 500})
+        assert {:ok, reward} =
+                 Finance.create_referral_reward(event.id, %{
+                   reward_type: "credit",
+                   reward_value: 500
+                 })
 
-    assert {:ok, reward} = Finance.update_referral_reward_status(reward.id, "approved")
-    assert {:ok, _reward} = Finance.update_referral_reward_status(reward.id, "applied")
+        assert {:ok, reward} = Finance.update_referral_reward_status(reward.id, "approved")
+        assert {:ok, _reward} = Finance.update_referral_reward_status(reward.id, "applied")
 
-    assert :ok = Finance.refresh_aggregates()
+        membership
+      end)
+
+    assert :ok = Finance.refresh_aggregates(context)
 
     aggregate_totals =
-      Finance.financial_summary().aggregates
+      Finance.financial_summary(context, %{}).aggregates
       |> Enum.reduce(%{paid: 0, discounts: 0, fixed_count: 0, credit_balance: 0}, fn row, acc ->
         %{
           paid: acc.paid + row.paid_revenue_cents,
@@ -1537,7 +1567,8 @@ defmodule MilosTraining.FinanceTest do
     assert aggregate_totals.discounts == 200
     assert aggregate_totals.fixed_count == 2
     assert aggregate_totals.credit_balance == 500
-    assert length(Finance.financial_summary().monthly_revenue) == 24
+    assert length(Finance.financial_summary(context, %{}).monthly_revenue) == 24
+    assert membership.id
   end
 
   test "creates referral events and manual rewards" do
