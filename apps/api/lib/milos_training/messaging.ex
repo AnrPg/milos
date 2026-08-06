@@ -8,6 +8,11 @@ defmodule MilosTraining.Messaging do
     GetThread
   }
 
+  alias MilosTraining.Messaging.ThreadStore
+
+  def with_tenant_context(context, fun) when is_function(fun, 0),
+    do: ThreadStore.with_tenant_context(context, fun)
+
   defdelegate get_or_create_thread(params), to: GetOrCreateThread, as: :call
   defdelegate send_message(params), to: SendMessage, as: :call
   defdelegate send_message(params, delivery), to: SendMessage, as: :call

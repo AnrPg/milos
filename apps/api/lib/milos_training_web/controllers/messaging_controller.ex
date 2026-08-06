@@ -16,6 +16,18 @@ defmodule MilosTrainingWeb.MessagingController do
 
   action_fallback MilosTrainingWeb.FallbackController
 
+  def action(conn, _) do
+    case conn.assigns[:tenant_context] do
+      nil ->
+        apply(__MODULE__, action_name(conn), [conn, conn.params])
+
+      context ->
+        MilosTraining.Messaging.with_tenant_context(context, fn ->
+          apply(__MODULE__, action_name(conn), [conn, conn.params])
+        end)
+    end
+  end
+
   tags(["Messaging"])
   security([%{"bearerAuth" => []}])
 
@@ -48,6 +60,13 @@ defmodule MilosTrainingWeb.MessagingController do
     required: [:id, :context_type, :context_id, :created_by_id, :inserted_at, :participants]
   }
 
+  @organization_slug_parameter %Parameter{
+    name: :organization_slug,
+    in: :path,
+    required: false,
+    schema: %Schema{type: :string}
+  }
+
   @message_schema %Schema{
     type: :object,
     properties: %{
@@ -72,6 +91,7 @@ defmodule MilosTrainingWeb.MessagingController do
 
   operation(:create_thread,
     summary: "Create or get an existing thread",
+    parameters: [@organization_slug_parameter],
     request_body: %RequestBody{
       required: true,
       content: %{
@@ -175,6 +195,7 @@ defmodule MilosTrainingWeb.MessagingController do
   operation(:send_message,
     summary: "Send a message in a thread",
     parameters: [
+      @organization_slug_parameter,
       %Parameter{
         name: :id,
         in: :path,
@@ -227,6 +248,7 @@ defmodule MilosTrainingWeb.MessagingController do
   operation(:mark_read,
     summary: "Mark a message as read in a thread",
     parameters: [
+      @organization_slug_parameter,
       %Parameter{
         name: :id,
         in: :path,
