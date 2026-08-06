@@ -28,7 +28,10 @@ defmodule MilosTraining.Application.RegisterInvitedUser do
     %{
       nickname: value(params, :nickname),
       password: value(params, :password),
-      role: :member
+      role: :member,
+      # Carried through so an email-bound invitation can be matched against the
+      # account being created in this same request (F-10).
+      email: value(params, :email)
     }
   end
 

@@ -106,6 +106,15 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  def call(conn, {:error, :invitation_email_mismatch}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "invitation_email_mismatch",
+      error: "This invitation was issued to a different email address"
+    })
+  end
+
   def call(conn, {:error, :invalid_invitation}) do
     conn
     |> put_status(:not_found)

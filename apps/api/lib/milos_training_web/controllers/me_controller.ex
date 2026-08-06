@@ -34,6 +34,7 @@ defmodule MilosTrainingWeb.MeController do
               nickname: %Schema{type: :string, minLength: 3, maxLength: 30},
               current_password: %Schema{type: :string},
               password: %Schema{type: :string, minLength: 4},
+              email: %Schema{type: :string, format: :email, nullable: true},
               preferred_locale: %Schema{
                 type: :string,
                 enum: MilosTraining.Identity.supported_locales()

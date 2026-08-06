@@ -5727,6 +5727,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** Format: email */
+                    email?: string | null;
                     nickname: string;
                     password: string;
                     /** @enum {string} */
@@ -13059,6 +13061,8 @@ export interface operations {
             content: {
                 "application/json": {
                     current_password?: string;
+                    /** Format: email */
+                    email?: string | null;
                     nickname?: string;
                     password?: string;
                     /** @enum {string} */
@@ -13439,6 +13443,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** Format: email */
+                    email?: string | null;
                     invitation_token: string;
                     nickname: string;
                     password: string;

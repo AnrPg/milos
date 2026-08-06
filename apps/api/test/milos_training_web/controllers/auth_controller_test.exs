@@ -86,7 +86,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
       {:ok, context} = Organizations.resolve_tenant_context(owner, organization.slug)
       {:ok, %{token: token}} = Organizations.issue_invitation(context, %{role: :admin})
 
-      %{organization: organization, invitation_token: token}
+      %{organization: organization, invitation_token: token, owner: owner}
     end
 
     test "creates a tenant admin membership from an exact invitation", %{
@@ -118,6 +118,55 @@ defmodule MilosTrainingWeb.AuthControllerTest do
              ] = Organizations.list_memberships(account.id)
 
       assert organization_id == organization.id
+    end
+
+    test "an email-bound invitation admits the invited address and refuses another", %{
+      conn: conn,
+      owner: owner,
+      organization: organization
+    } do
+      {:ok, context} = Organizations.resolve_tenant_context(owner, organization.slug)
+
+      {:ok, %{token: bound_token}} =
+        Organizations.issue_invitation(context, %{
+          role: :admin,
+          intended_email: "invited@example.com"
+        })
+
+      # Wrong address: rejected, and the invitation must survive for the
+      # rightful invitee (F-10).
+      wrong =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post(
+          "/api/auth/register-admin",
+          Jason.encode!(%{
+            nickname: "wrong_person",
+            password: "S3cur3P@ss!",
+            invitation_token: bound_token,
+            email: "someone.else@example.com"
+          })
+        )
+
+      assert json_response(wrong, 403)
+      refute Identity.find_by_nickname("wrong_person")
+
+      accepted =
+        build_conn()
+        |> put_req_header("content-type", "application/json")
+        |> post(
+          "/api/auth/register-admin",
+          Jason.encode!(%{
+            nickname: "right_person",
+            password: "S3cur3P@ss!",
+            invitation_token: bound_token,
+            email: "Invited@Example.com"
+          })
+        )
+
+      assert %{"access_token" => _} = json_response(accepted, 201)
+      account = Identity.find_by_nickname("right_person")
+      assert account.email == "invited@example.com"
     end
 
     test "rejects an invalid invitation without creating an account", %{conn: conn} do

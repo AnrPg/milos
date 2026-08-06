@@ -7279,6 +7279,11 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "email": {
+                    "format": "email",
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "nickname": {
                     "type": "string"
                   },
@@ -27382,6 +27387,11 @@
                   "current_password": {
                     "type": "string"
                   },
+                  "email": {
+                    "format": "email",
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "nickname": {
                     "maxLength": 30,
                     "minLength": 3,
@@ -28211,6 +28221,11 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "email": {
+                    "format": "email",
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "invitation_token": {
                     "maxLength": 256,
                     "minLength": 20,
