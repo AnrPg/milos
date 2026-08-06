@@ -360,8 +360,6 @@ defmodule MilosTrainingWeb.Router do
     )
 
     delete("/notifications/push-subscriptions", NotificationController, :delete_push_subscription)
-    get("/reviews", ReviewController, :index)
-    post("/reviews", ReviewController, :create)
     get("/wellbeing/injuries", WellbeingController, :index)
     post("/wellbeing/injuries", WellbeingController, :create)
     patch("/wellbeing/injuries/:id/heal", WellbeingController, :heal)

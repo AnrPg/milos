@@ -9,7 +9,7 @@ defmodule MilosTrainingWeb.Phase8FeedbackWellbeingControllerTest do
     create_response =
       conn
       |> put_bearer_token(user)
-      |> post("/api/reviews", %{
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/reviews", %{
         target_type: "general",
         rating: 5,
         sentiment: "positive",
@@ -32,7 +32,7 @@ defmodule MilosTrainingWeb.Phase8FeedbackWellbeingControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(user)
-      |> get("/api/reviews")
+      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/reviews")
       |> json_response(200)
 
     assert Enum.map(list_response["reviews"], & &1["id"]) == [create_response["review"]["id"]]

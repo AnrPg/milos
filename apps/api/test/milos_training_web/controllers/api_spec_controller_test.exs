@@ -156,7 +156,7 @@ defmodule MilosTrainingWeb.ApiSpecControllerTest do
     test "publishes closed review and wellbeing response contracts", %{conn: conn} do
       body = conn |> get("/api/openapi") |> json_response(200)
 
-      review = response_item_schema(body, "/api/reviews", "get", "reviews")
+      review = response_item_schema(body, "/api/org/{organization_slug}/me/reviews", "get", "reviews")
       injury = response_item_schema(body, "/api/wellbeing/injuries", "get", "injuries")
 
       assert review["additionalProperties"] == false

@@ -963,10 +963,10 @@ export interface paths {
             cookie?: never;
         };
         /** List reviews submitted by the current user */
-        get: operations["MilosTrainingWeb.ReviewController.index (2)"];
+        get: operations["MilosTrainingWeb.ReviewController.index"];
         put?: never;
         /** Submit a review for a workout, exercise, gym parameter, or coaching target */
-        post: operations["MilosTrainingWeb.ReviewController.create (2)"];
+        post: operations["MilosTrainingWeb.ReviewController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1534,24 +1534,6 @@ export interface paths {
         put?: never;
         /** Revoke a personal allowance extension with a compensating ledger entry */
         post: operations["MilosTrainingWeb.AdminUserController.revoke_allowance"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/reviews": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List reviews submitted by the current user */
-        get: operations["MilosTrainingWeb.ReviewController.index"];
-        put?: never;
-        /** Submit a review for a workout, exercise, gym parameter, or coaching target */
-        post: operations["MilosTrainingWeb.ReviewController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6891,7 +6873,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ReviewController.index (2)": {
+    "MilosTrainingWeb.ReviewController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -6957,7 +6939,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ReviewController.create (2)": {
+    "MilosTrainingWeb.ReviewController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -10597,159 +10579,6 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
-                    };
-                };
-            };
-        };
-    };
-    "MilosTrainingWeb.ReviewController.index": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Reviews */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        reviews: {
-                            answers: {
-                                answer_text: string;
-                                /** Format: uuid */
-                                id: string;
-                                /** Format: date-time */
-                                inserted_at: string;
-                                question_key: string;
-                                question_text: string;
-                                rating_value?: number | null;
-                                /** Format: uuid */
-                                review_id: string;
-                                /** Format: date-time */
-                                updated_at: string;
-                            }[];
-                            body?: string | null;
-                            /** Format: uuid */
-                            id: string;
-                            /** Format: date-time */
-                            inserted_at: string;
-                            params: {
-                                [key: string]: unknown;
-                            };
-                            /** Format: uuid */
-                            questionnaire_id?: string | null;
-                            rating?: number | null;
-                            /** @enum {string} */
-                            sentiment: "positive" | "neutral" | "negative" | "mixed";
-                            /** @enum {string} */
-                            status: "open" | "reviewed" | "archived" | "needs_follow_up";
-                            tags: string[];
-                            /** Format: uuid */
-                            target_id?: string | null;
-                            target_snapshot: {
-                                [key: string]: unknown;
-                            };
-                            /** @enum {string} */
-                            target_type: "workout" | "execution" | "exercise" | "class_slot" | "gym_parameter" | "coaching_parameter" | "membership_package" | "app" | "general";
-                            /** Format: date-time */
-                            updated_at: string;
-                            /** Format: uuid */
-                            user_id: string;
-                            /** @enum {string} */
-                            visibility: "admin_only" | "user_visible";
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    "MilosTrainingWeb.ReviewController.create": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    answers: {
-                        answer_text: string;
-                        question_key: string;
-                        question_text: string;
-                        rating_value?: number | null;
-                    }[];
-                    body?: string | null;
-                    rating?: number | null;
-                    /** @enum {string} */
-                    sentiment: "positive" | "neutral" | "negative" | "mixed";
-                    /** Format: uuid */
-                    target_id?: string | null;
-                    /** @enum {string} */
-                    target_type: "workout" | "execution" | "exercise" | "class_slot" | "gym_parameter" | "coaching_parameter" | "membership_package" | "app" | "general";
-                    /** @enum {string|null} */
-                    visibility?: "admin_only" | "user_visible" | null;
-                };
-            };
-        };
-        responses: {
-            /** @description Review */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        review: {
-                            answers: {
-                                answer_text: string;
-                                /** Format: uuid */
-                                id: string;
-                                /** Format: date-time */
-                                inserted_at: string;
-                                question_key: string;
-                                question_text: string;
-                                rating_value?: number | null;
-                                /** Format: uuid */
-                                review_id: string;
-                                /** Format: date-time */
-                                updated_at: string;
-                            }[];
-                            body?: string | null;
-                            /** Format: uuid */
-                            id: string;
-                            /** Format: date-time */
-                            inserted_at: string;
-                            params: {
-                                [key: string]: unknown;
-                            };
-                            /** Format: uuid */
-                            questionnaire_id?: string | null;
-                            rating?: number | null;
-                            /** @enum {string} */
-                            sentiment: "positive" | "neutral" | "negative" | "mixed";
-                            /** @enum {string} */
-                            status: "open" | "reviewed" | "archived" | "needs_follow_up";
-                            tags: string[];
-                            /** Format: uuid */
-                            target_id?: string | null;
-                            target_snapshot: {
-                                [key: string]: unknown;
-                            };
-                            /** @enum {string} */
-                            target_type: "workout" | "execution" | "exercise" | "class_slot" | "gym_parameter" | "coaching_parameter" | "membership_package" | "app" | "general";
-                            /** Format: date-time */
-                            updated_at: string;
-                            /** Format: uuid */
-                            user_id: string;
-                            /** @enum {string} */
-                            visibility: "admin_only" | "user_visible";
-                        };
                     };
                 };
             };

@@ -20,11 +20,11 @@ export type UpdateReviewStatusRequest =
   operations["MilosTrainingWeb.AdminReviewController.update_status"]["requestBody"]["content"]["application/json"];
 
 export async function fetchMyReviews(token: string) {
-  return apiRequest<MyReviewsResponse>("/reviews", { token });
+  return apiRequest<MyReviewsResponse>("/me/reviews", { token });
 }
 
 export async function submitReview(token: string, body: SubmitReviewRequest) {
-  return apiRequest<SubmitReviewResponse>("/reviews", {
+  return apiRequest<SubmitReviewResponse>("/me/reviews", {
     method: "POST",
     token,
     body,

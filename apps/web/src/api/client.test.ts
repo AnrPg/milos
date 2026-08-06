@@ -86,4 +86,15 @@ describe("apiRequest tenant headers", () => {
       expect.anything(),
     );
   });
+
+  it("scopes /me/reviews under the resolved organization", async () => {
+    window.history.replaceState(null, "", "/org/atlas-gym/account");
+    const fetchMock = vi.spyOn(window, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), { status: 200 }),
+    );
+
+    await apiRequest<{ ok: boolean }>("/me/reviews", { token: "token" });
+
+    expect(fetchMock).toHaveBeenCalledWith("/api/org/atlas-gym/me/reviews", expect.anything());
+  });
 });
