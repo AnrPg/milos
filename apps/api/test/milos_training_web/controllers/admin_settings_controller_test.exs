@@ -9,7 +9,7 @@ defmodule MilosTrainingWeb.AdminSettingsControllerTest do
     payload =
       conn
       |> put_bearer_token(admin)
-      |> patch("/api/admin/settings", %{gamification: %{theme_slug: "aurora"}})
+      |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/settings", %{gamification: %{theme_slug: "aurora"}})
       |> json_response(200)
 
     assert get_in(payload, ["gamification", "theme_slug"]) == "aurora"
@@ -24,7 +24,7 @@ defmodule MilosTrainingWeb.AdminSettingsControllerTest do
     payload =
       conn
       |> put_bearer_token(admin)
-      |> patch("/api/admin/settings", %{
+      |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/settings", %{
         notifications: %{
           vapid_public_key: "public-key",
           vapid_private_key: "private-key",

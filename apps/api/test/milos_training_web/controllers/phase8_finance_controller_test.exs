@@ -29,7 +29,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
     response =
       conn
       |> put_bearer_token(admin)
-      |> post("/api/admin/finance/members/#{member.id}/receipts", %{
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/members/#{member.id}/receipts", %{
         amount_cents: 5_000,
         payment_method: "cash",
         paid_on: Date.to_iso8601(Date.utc_today()),
@@ -103,7 +103,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
     blocked_response =
       conn
       |> put_bearer_token(admin)
-      |> patch("/api/admin/finance/packages/#{source.id}", %{active: false})
+      |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/packages/#{source.id}", %{active: false})
       |> json_response(409)
 
     assert blocked_response["error"] =~ "reconciliation"
@@ -112,7 +112,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> patch("/api/admin/finance/packages/#{source.id}/retire", %{
+      |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/packages/#{source.id}/retire", %{
         replacement_package_by_role: %{
           member: member_replacement.id,
           athlete: athlete_replacement.id
@@ -139,7 +139,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
     package_response =
       conn
       |> put_bearer_token(admin)
-      |> post("/api/admin/finance/packages", %{
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/packages", %{
         code: "controller hybrid",
         name: "Controller Hybrid",
         family: "hybrid",
@@ -155,7 +155,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> get("/api/admin/finance/packages/#{package_id}")
+      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/packages/#{package_id}")
       |> json_response(200)
 
     assert package_detail_response["package"]["id"] == package_id
@@ -164,7 +164,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> patch("/api/admin/finance/members/#{member.id}", %{
+      |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/members/#{member.id}", %{
         user_type_snapshot: "member",
         status: "active",
         signup_source: "admin_created"
@@ -176,7 +176,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
     conn
     |> recycle()
     |> put_bearer_token(admin)
-    |> post("/api/admin/finance/members/#{member.id}/packages", %{
+    |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/members/#{member.id}/packages", %{
       membership_package_id: package_id
     })
     |> json_response(201)
@@ -185,7 +185,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> post("/api/admin/finance/promotions", %{name: "Controller Campaign"})
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/promotions", %{name: "Controller Campaign"})
       |> json_response(201)
 
     campaign_id = campaign_response["promotion_campaign"]["id"]
@@ -194,7 +194,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> post("/api/admin/finance/promotions/#{campaign_id}/codes", %{
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/promotions/#{campaign_id}/codes", %{
         code: "controller 10",
         discount_type: "percent",
         discount_value: 10
@@ -207,7 +207,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> post("/api/admin/finance/members/#{member.id}/promotion-redemptions", %{
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/members/#{member.id}/promotion-redemptions", %{
         promotion_code: "CONTROLLER-10"
       })
       |> json_response(201)
@@ -218,7 +218,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> post("/api/admin/finance/members/#{member.id}/payments", %{
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/members/#{member.id}/payments", %{
         amount_cents: 9900,
         payment_method: "cash",
         payment_status: "pending"
@@ -229,7 +229,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> post("/api/admin/finance/members/#{member.id}/credits", %{
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/members/#{member.id}/credits", %{
         amount_cents: 2500,
         description: "Controller goodwill credit"
       })
@@ -242,7 +242,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       |> recycle()
       |> put_bearer_token(admin)
       |> post(
-        "/api/admin/finance/members/#{member.id}/payments/#{payment_response["payment"]["id"]}/credits",
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/members/#{member.id}/payments/#{payment_response["payment"]["id"]}/credits",
         %{
           amount_cents: 1000,
           description: "Controller payment credit"
@@ -256,7 +256,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> post("/api/admin/finance/members/#{member.id}/invoices", %{
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/members/#{member.id}/invoices", %{
         amount_cents: 9900,
         description: "Controller invoice",
         due_date: Date.to_iso8601(Date.add(Date.utc_today(), 7))
@@ -270,7 +270,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> patch("/api/admin/finance/invoices/#{invoice_id}/issue", %{})
+      |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/invoices/#{invoice_id}/issue", %{})
       |> json_response(200)
 
     assert issued_response["invoice"]["status"] == "issued"
@@ -279,7 +279,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> post("/api/admin/finance/members/#{member.id}/invoices/#{invoice_id}/credits", %{
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/members/#{member.id}/invoices/#{invoice_id}/credits", %{
         amount_cents: 1000,
         description: "Controller invoice credit"
       })
@@ -291,7 +291,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> post("/api/admin/finance/members/#{member.id}/payments", %{
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/members/#{member.id}/payments", %{
         finance_invoice_id: invoice_id,
         amount_cents: 8900,
         payment_method: "cash",
@@ -306,7 +306,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       |> recycle()
       |> put_bearer_token(admin)
       |> post(
-        "/api/admin/finance/members/#{member.id}/payments/#{invoice_payment_response["payment"]["id"]}/reversals",
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/members/#{member.id}/payments/#{invoice_payment_response["payment"]["id"]}/reversals",
         %{
           amount_cents: 8900,
           reason: "Controller refund"
@@ -322,7 +322,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       |> recycle()
       |> put_bearer_token(admin)
       |> post(
-        "/api/admin/finance/members/#{member.id}/credits/#{invoice_credit_response["credit_ledger_entry"]["id"]}/reversals",
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/members/#{member.id}/credits/#{invoice_credit_response["credit_ledger_entry"]["id"]}/reversals",
         %{
           amount_cents: 1000,
           reason: "Controller credit restoration"
@@ -336,7 +336,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> get("/api/admin/finance/members/#{member.id}")
+      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/members/#{member.id}")
       |> json_response(200)
 
     assert profile_after_reversals["drill_down"]["identity"]["nickname"] == "finance_member"
@@ -361,7 +361,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> post("/api/admin/finance/members/#{member.id}/invoices/renewal", %{
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/members/#{member.id}/invoices/renewal", %{
         service_period_start: Date.to_iso8601(Date.utc_today())
       })
       |> json_response(201)
@@ -372,7 +372,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> get("/api/admin/finance/queues", %{limit: 10})
+      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/queues", %{limit: 10})
       |> json_response(200)
 
     assert length(queue_response["queues"]["pending_payments"]) >= 1
@@ -383,7 +383,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> get("/api/admin/search", %{
+      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/search", %{
         role: "all",
         membership_status: "active",
         package_code: "controller_hybrid"
@@ -412,7 +412,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
     response =
       conn
       |> put_bearer_token(admin)
-      |> post("/api/admin/finance/members/#{member.id}/packages", %{
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/members/#{member.id}/packages", %{
         membership_package_id: package.id
       })
       |> json_response(201)
@@ -448,7 +448,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
     program_response =
       conn
       |> put_bearer_token(admin)
-      |> post("/api/admin/finance/referral-programs", %{
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/referral-programs", %{
         name: "Controller referrals",
         reward_type: "credit",
         reward_value: 1500,
@@ -462,7 +462,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> get("/api/admin/finance/referral-programs")
+      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/referral-programs")
       |> json_response(200)
 
     assert Enum.any?(programs_response["referral_programs"], &(&1["id"] == program_id))
@@ -471,7 +471,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> patch("/api/admin/finance/referral-programs/#{program_id}", %{
+      |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/referral-programs/#{program_id}", %{
         name: "Controller referrals updated",
         reward_type: "credit",
         reward_value: 1750,
@@ -486,7 +486,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> post("/api/admin/finance/referrals", %{
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/referrals", %{
         referral_program_id: program_id,
         referrer_user_id: referrer.id,
         referred_user_id: referred.id,
@@ -499,7 +499,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       |> recycle()
       |> put_bearer_token(admin)
       |> post(
-        "/api/admin/finance/referrals/#{event_response["referral_event"]["id"]}/rewards",
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/referrals/#{event_response["referral_event"]["id"]}/rewards",
         %{}
       )
       |> json_response(409)
@@ -511,7 +511,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> patch("/api/admin/finance/referrals/#{event_response["referral_event"]["id"]}/status", %{
+      |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/referrals/#{event_response["referral_event"]["id"]}/status", %{
         status: "approved"
       })
       |> json_response(200)
@@ -522,7 +522,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> get("/api/admin/finance/referrals")
+      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/referrals")
       |> json_response(200)
 
     listed_event =
@@ -540,7 +540,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       |> recycle()
       |> put_bearer_token(admin)
       |> post(
-        "/api/admin/finance/referrals/#{event_response["referral_event"]["id"]}/rewards",
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/referrals/#{event_response["referral_event"]["id"]}/rewards",
         %{}
       )
       |> json_response(201)
@@ -553,7 +553,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       |> recycle()
       |> put_bearer_token(admin)
       |> post(
-        "/api/admin/finance/referrals/#{event_response["referral_event"]["id"]}/rewards",
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/referrals/#{event_response["referral_event"]["id"]}/rewards",
         %{}
       )
       |> json_response(409)
@@ -565,7 +565,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       |> recycle()
       |> put_bearer_token(admin)
       |> patch(
-        "/api/admin/finance/referral-rewards/#{reward_response["referral_reward"]["id"]}/status",
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/referral-rewards/#{reward_response["referral_reward"]["id"]}/status",
         %{
           status: "approved"
         }
@@ -579,7 +579,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       |> recycle()
       |> put_bearer_token(admin)
       |> patch(
-        "/api/admin/finance/referral-rewards/#{reward_response["referral_reward"]["id"]}/status",
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/referral-rewards/#{reward_response["referral_reward"]["id"]}/status",
         %{
           status: "applied"
         }
@@ -592,7 +592,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> get("/api/admin/finance/referral-rewards")
+      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/referral-rewards")
       |> json_response(200)
 
     listed_reward =
@@ -608,7 +608,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> get("/api/admin/finance/members/#{referrer.id}")
+      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/members/#{referrer.id}")
       |> json_response(200)
 
     assert profile_response["credit_balance"] == 1750
@@ -619,7 +619,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> get("/api/admin/finance/members")
+      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance/members")
       |> json_response(200)
 
     referrer_row =

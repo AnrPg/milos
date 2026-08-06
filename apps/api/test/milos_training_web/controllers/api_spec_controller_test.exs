@@ -10,7 +10,7 @@ defmodule MilosTrainingWeb.ApiSpecControllerTest do
       assert Map.has_key?(body["paths"], "/api/auth/login")
       assert Map.has_key?(body["paths"], "/api/auth/refresh")
       assert Map.has_key?(body["paths"], "/api/auth/me")
-      assert Map.has_key?(body["paths"], "/api/admin/users/{id}/role")
+      assert Map.has_key?(body["paths"], "/api/org/{organization_slug}/admin/users/{id}/role")
 
       assert get_in(body, ["paths", "/api/auth/register", "post", "requestBody", "required"]) ==
                true
@@ -21,7 +21,7 @@ defmodule MilosTrainingWeb.ApiSpecControllerTest do
 
       assert get_in(body, [
                "paths",
-               "/api/admin/users/{id}/role",
+               "/api/org/{organization_slug}/admin/users/{id}/role",
                "patch",
                "requestBody",
                "required"
@@ -45,7 +45,7 @@ defmodule MilosTrainingWeb.ApiSpecControllerTest do
       assert get_in(body, ["paths", "/api/auth/login", "post", "responses", "429"]) != nil
       assert get_in(body, ["paths", "/api/auth/refresh", "post", "responses", "503"]) != nil
 
-      assert get_in(body, ["paths", "/api/admin/users/{id}/role", "patch", "responses", "403"]) !=
+      assert get_in(body, ["paths", "/api/org/{organization_slug}/admin/users/{id}/role", "patch", "responses", "403"]) !=
                nil
     end
 
@@ -56,7 +56,7 @@ defmodule MilosTrainingWeb.ApiSpecControllerTest do
       finance_schema =
         get_in(body, [
           "paths",
-          "/api/admin/finance/members/{id}",
+          "/api/org/{organization_slug}/admin/finance/members/{id}",
           "get",
           "responses",
           "200",
@@ -70,7 +70,7 @@ defmodule MilosTrainingWeb.ApiSpecControllerTest do
       coaching_schema =
         get_in(body, [
           "paths",
-          "/api/admin/athletes/{id}/drill-down",
+          "/api/org/{organization_slug}/admin/athletes/{id}/drill-down",
           "get",
           "responses",
           "200",
@@ -122,7 +122,7 @@ defmodule MilosTrainingWeb.ApiSpecControllerTest do
 
       assert get_in(body, [
                "paths",
-               "/api/admin/finance/members/{id}",
+               "/api/org/{organization_slug}/admin/finance/members/{id}",
                "get",
                "responses",
                "404"
@@ -130,7 +130,7 @@ defmodule MilosTrainingWeb.ApiSpecControllerTest do
 
       assert get_in(body, [
                "paths",
-               "/api/admin/finance/members/{id}",
+               "/api/org/{organization_slug}/admin/finance/members/{id}",
                "get",
                "responses",
                "403"
@@ -138,7 +138,7 @@ defmodule MilosTrainingWeb.ApiSpecControllerTest do
 
       assert get_in(body, [
                "paths",
-               "/api/admin/athletes/{id}/drill-down",
+               "/api/org/{organization_slug}/admin/athletes/{id}/drill-down",
                "get",
                "responses",
                "404"
@@ -146,7 +146,7 @@ defmodule MilosTrainingWeb.ApiSpecControllerTest do
 
       assert get_in(body, [
                "paths",
-               "/api/admin/athletes/{id}/drill-down",
+               "/api/org/{organization_slug}/admin/athletes/{id}/drill-down",
                "get",
                "responses",
                "403"

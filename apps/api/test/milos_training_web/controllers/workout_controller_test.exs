@@ -48,12 +48,12 @@ defmodule MilosTrainingWeb.WorkoutControllerTest do
           ]
         })
 
-      show_conn = get(member_conn, "/api/workouts/#{workout.id}")
+      show_conn = get(member_conn, "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/workouts/#{workout.id}")
       show_payload = json_response(show_conn, 200)["workout"]
 
       assert show_payload["title"] == "Pull-up Sprint"
 
-      scales_conn = get(member_conn |> recycle(), "/api/workouts/#{workout.id}/scales")
+      scales_conn = get(member_conn |> recycle(), "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/workouts/#{workout.id}/scales")
       scales_payload = json_response(scales_conn, 200)
 
       assert Enum.map(scales_payload["scales"], &get_in(&1, ["scale_level", "slug"])) == [
@@ -96,12 +96,12 @@ defmodule MilosTrainingWeb.WorkoutControllerTest do
         })
 
       assert (athlete_conn
-              |> get("/api/workouts/#{workout.id}")
+              |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/workouts/#{workout.id}")
               |> json_response(403))["error"] == "Forbidden"
 
       assert (athlete_conn
               |> recycle()
-              |> get("/api/workouts/#{workout.id}/scales")
+              |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/workouts/#{workout.id}/scales")
               |> json_response(403))["error"] == "Forbidden"
     end
   end

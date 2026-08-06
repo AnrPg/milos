@@ -24,7 +24,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
 
     response =
       conn
-      |> post("/api/admin/workouts/dsl/parse", %{source: source})
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/dsl/parse", %{source: source})
       |> json_response(200)
 
     assert response["workout"]["title"] == "Quick Strength"
@@ -37,7 +37,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
 
     response =
       conn
-      |> post("/api/admin/workouts/dsl/parse", %{source: "[workout]\n[/workout]"})
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/dsl/parse", %{source: "[workout]\n[/workout]"})
       |> json_response(422)
 
     assert Enum.any?(response["diagnostics"], fn diagnostic ->
@@ -57,7 +57,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
 
     conn
     |> put_bearer_token(member)
-    |> post("/api/admin/workouts/dsl/parse", %{source: ""})
+    |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/dsl/parse", %{source: ""})
     |> json_response(403)
   end
 
@@ -65,7 +65,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
     response =
       conn
       |> authenticate_as_admin("dsl_manual_admin")
-      |> get("/api/admin/workouts/dsl/manual")
+      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/dsl/manual")
       |> json_response(200)
 
     assert response["version"] == 1
@@ -78,14 +78,14 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
     conn: conn
   } do
     admin_conn = authenticate_as_admin(conn, "dsl_revision_admin")
-    draft = admin_conn |> post("/api/admin/workouts") |> json_response(201) |> Map.fetch!("draft")
+    draft = admin_conn |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts") |> json_response(201) |> Map.fetch!("draft")
     source = valid_source("Revision safety", "Deadlift")
 
     saved =
       admin_conn
       |> recycle()
       |> put_req_header("content-type", "application/json")
-      |> patch("/api/admin/workouts/#{draft["id"]}/draft", %{
+      |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft["id"]}/draft", %{
         authoring_mode: "quick_text",
         dsl_version: 1,
         dsl_source: source,
@@ -102,7 +102,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
       admin_conn
       |> recycle()
       |> put_req_header("content-type", "application/json")
-      |> patch("/api/admin/workouts/#{draft["id"]}/draft", %{
+      |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft["id"]}/draft", %{
         dsl_source: String.replace(source, "Revision safety", "Stale overwrite"),
         expected_source_revision: 0
       })
@@ -113,7 +113,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
     retained =
       admin_conn
       |> recycle()
-      |> get("/api/admin/workouts/#{draft["id"]}/dsl")
+      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft["id"]}/dsl")
       |> json_response(200)
 
     assert retained["source"] == source
@@ -125,14 +125,14 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
     conn: conn
   } do
     admin_conn = authenticate_as_admin(conn, "dsl_publish_admin")
-    draft = admin_conn |> post("/api/admin/workouts") |> json_response(201) |> Map.fetch!("draft")
+    draft = admin_conn |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts") |> json_response(201) |> Map.fetch!("draft")
     source = valid_source("Alias warning", "Conventional Deadlift")
 
     saved =
       admin_conn
       |> recycle()
       |> put_req_header("content-type", "application/json")
-      |> patch("/api/admin/workouts/#{draft["id"]}/draft", %{
+      |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft["id"]}/draft", %{
         authoring_mode: "quick_text",
         dsl_version: 1,
         dsl_source: source,
@@ -146,7 +146,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
       admin_conn
       |> recycle()
       |> put_req_header("content-type", "application/json")
-      |> post("/api/admin/workouts/#{draft["id"]}/dsl/publish", %{
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft["id"]}/dsl/publish", %{
         source: source,
         document: %{type: "doc"},
         expected_source_revision: saved["dsl_source_revision"],

@@ -481,7 +481,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         conn
         |> put_req_header("authorization", "Bearer " <> access_token)
         |> put_req_header("content-type", "application/json")
-        |> patch("/api/admin/users/#{athlete.id}/role", Jason.encode!(%{role: "athlete"}))
+        |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{athlete.id}/role", Jason.encode!(%{role: "athlete"}))
 
       body = json_response(conn, 200)
       assert body["id"] == athlete.id
@@ -512,7 +512,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         conn
         |> put_req_header("authorization", "Bearer " <> access_token)
         |> put_req_header("content-type", "application/json")
-        |> patch("/api/admin/users/#{athlete.id}/role", Jason.encode!(%{role: "member"}))
+        |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{athlete.id}/role", Jason.encode!(%{role: "member"}))
 
       assert %{"error" => "Forbidden"} = json_response(conn, 403)
     end
@@ -536,7 +536,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
         |> put_req_header("authorization", "Bearer " <> access_token)
         |> put_req_header("content-type", "application/json")
         |> patch(
-          "/api/admin/users/#{Ecto.UUID.generate()}/role",
+          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{Ecto.UUID.generate()}/role",
           Jason.encode!(%{role: "member"})
         )
 

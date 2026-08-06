@@ -93,7 +93,7 @@ defmodule MilosTrainingWeb.Phase8FeedbackWellbeingControllerTest do
     create_response =
       conn
       |> put_bearer_token(admin)
-      |> post("/api/admin/wellbeing/users/#{user.id}/injuries", %{
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/wellbeing/users/#{user.id}/injuries", %{
         body_area: "back",
         severity: "moderate",
         training_limitations: "Coach-managed limitation",
@@ -123,7 +123,7 @@ defmodule MilosTrainingWeb.Phase8FeedbackWellbeingControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> patch("/api/admin/wellbeing/injuries/#{injury_id}/heal", %{})
+      |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/wellbeing/injuries/#{injury_id}/heal", %{})
       |> json_response(200)
 
     assert admin_heal_response["injury"]["status"] == "healed"

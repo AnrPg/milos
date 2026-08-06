@@ -14,7 +14,7 @@ defmodule MilosTrainingWeb.AdminAssignedWorkoutControllerTest do
       |> put_bearer_token(admin)
       |> put_req_header("content-type", "application/json")
       |> post(
-        "/api/admin/assigned-workouts",
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/assigned-workouts",
         Jason.encode!(%{
           master_workout_id: workout.id,
           athlete_ids: [athlete_one.id, athlete_two.id],
@@ -40,7 +40,7 @@ defmodule MilosTrainingWeb.AdminAssignedWorkoutControllerTest do
       |> put_bearer_token(admin)
       |> put_req_header("content-type", "application/json")
       |> post(
-        "/api/admin/assigned-workouts",
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/assigned-workouts",
         Jason.encode!(%{
           master_workout_id: workout.id,
           athlete_ids: [athlete_one.id],
@@ -58,7 +58,7 @@ defmodule MilosTrainingWeb.AdminAssignedWorkoutControllerTest do
       |> put_bearer_token(admin)
       |> put_req_header("content-type", "application/json")
       |> patch(
-        "/api/admin/assigned-workouts/#{assignment["id"]}",
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/assigned-workouts/#{assignment["id"]}",
         Jason.encode!(%{
           athlete_ids: [athlete_one.id, athlete_two.id],
           scheduled_for: updated_date,

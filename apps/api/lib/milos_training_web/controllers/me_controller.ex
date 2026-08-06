@@ -231,9 +231,16 @@ defmodule MilosTrainingWeb.MeController do
     if vendor?(user) do
       {:ok, SearchUsers.call(query)}
     else
-      with {:ok, slug} <- organization_slug(conn),
-           {:ok, tenant_context} <- ResolveTenantContext.call(user, slug, request_metadata(conn)) do
-        {:ok, SearchUsers.call(query, tenant_context)}
+      case conn.assigns[:tenant_context] do
+        nil ->
+          with {:ok, slug} <- organization_slug(conn),
+               {:ok, tenant_context} <-
+                 ResolveTenantContext.call(user, slug, request_metadata(conn)) do
+            {:ok, SearchUsers.call(query, tenant_context)}
+          end
+
+        tenant_context ->
+          {:ok, SearchUsers.call(query, tenant_context)}
       end
     end
   end

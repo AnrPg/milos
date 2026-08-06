@@ -18,7 +18,7 @@ defmodule MilosTrainingWeb.AdminAnalyticsControllerTest do
     response =
       conn
       |> put_bearer_token(admin)
-      |> get("/api/admin/analytics/summary", %{days: 30})
+      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/analytics/summary", %{days: 30})
       |> json_response(200)
 
     assert response["analytics"]["events"]["by_name"]["payment_recorded"] >= 1

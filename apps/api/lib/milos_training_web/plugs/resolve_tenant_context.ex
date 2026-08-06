@@ -10,21 +10,38 @@ defmodule MilosTrainingWeb.Plugs.ResolveTenantContext do
   def call(conn, _opts) do
     account = GuardianPlug.current_resource(conn)
 
-    slug =
-      conn.path_params["organization_slug"] ||
-        List.first(get_req_header(conn, "x-organization-slug")) ||
-        MilosTraining.Organizations.legacy_organization_slug()
+    case conn.path_params["organization_slug"] do
+      slug when is_binary(slug) and slug != "" ->
+        case ResolveTenantContext.call(account, slug, request_metadata(conn)) do
+          {:ok, context} ->
+            conn
+            |> assign(:tenant_context, context)
+            |> drop_organization_slug_path_param()
 
-    case ResolveTenantContext.call(account, slug, request_metadata(conn)) do
-      {:ok, context} ->
-        assign(conn, :tenant_context, context)
+          {:error, _reason} ->
+            conn
+            |> put_status(:not_found)
+            |> json(%{code: "organization_context_not_found", error: "Organization not found"})
+            |> halt()
+        end
 
-      {:error, _reason} ->
+      _missing ->
         conn
-        |> put_status(:not_found)
-        |> json(%{code: "organization_context_not_found", error: "Organization not found"})
+        |> put_status(:bad_request)
+        |> json(%{
+          code: "organization_context_required",
+          error: "Organization must be identified in the request path"
+        })
         |> halt()
     end
+  end
+
+  defp drop_organization_slug_path_param(conn) do
+    %{
+      conn
+      | path_params: Map.delete(conn.path_params, "organization_slug"),
+        params: Map.delete(conn.params, "organization_slug")
+    }
   end
 
   defp request_metadata(conn) do

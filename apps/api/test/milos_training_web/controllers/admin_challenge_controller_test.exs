@@ -9,7 +9,7 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
 
     created =
       authed
-      |> post_json("/api/admin/challenges", %{
+      |> post_json("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges", %{
         title: "Streak Week",
         description: "Hit two sessions",
         criteria_type: "workout_count",
@@ -26,7 +26,7 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
     listing =
       authed
       |> recycle()
-      |> get("/api/admin/challenges")
+      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges")
       |> json_response(200)
 
     assert Enum.any?(listing["challenges"], &(&1["badge_key"] == "challenge_streak_week"))
@@ -40,7 +40,7 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
       authed
       |> recycle()
       |> put_bearer_token(admin)
-      |> post_json("/api/admin/challenges", %{
+      |> post_json("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges", %{
         title: "Challenge #{idx}",
         criteria_type: "workout_count",
         criteria_value: %{count: 2},
@@ -56,7 +56,7 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
       authed
       |> recycle()
       |> put_bearer_token(admin)
-      |> post_json("/api/admin/challenges", %{
+      |> post_json("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges", %{
         title: "Too Many",
         criteria_type: "workout_count",
         criteria_value: %{count: 2},
@@ -85,7 +85,7 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
       authed
       |> recycle()
       |> put_bearer_token(admin)
-      |> post_json("/api/admin/challenges", %{
+      |> post_json("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges", %{
         title: "Challenge #{suffix}",
         criteria_type: "workout_count",
         criteria_value: %{count: 2},
@@ -101,7 +101,7 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
       authed
       |> recycle()
       |> put_bearer_token(admin)
-      |> post_json("/api/admin/challenges", %{
+      |> post_json("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges", %{
         title: "Bridge",
         criteria_type: "workout_count",
         criteria_value: %{count: 2},
