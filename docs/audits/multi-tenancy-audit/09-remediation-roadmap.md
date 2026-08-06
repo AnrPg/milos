@@ -43,13 +43,13 @@ blocking. P1–P3 remain open.
 - **Approach:** Mirror the `scoped_to_tenant/1` helper pattern already used correctly in Messaging/Gamification/Feedback/Workouts.
 - **Tests required before merge:** new Finance IDOR-style tests (an Org-B context attempting to fetch an Org-A invoice/membership/subscription by ID via every public Finance function, not just the controller).
 
-### P1.3 — Fix `IssueInvitation` role-ceiling check (F-06)
+### P1.3 — Fix `IssueInvitation` role-ceiling check (F-06) — **FIXED 2026-08-06** (product decision: an account can never grant a role more privileged than its own, uniformly across all roles). See `04-findings.md`.
 - **Dependency:** none.
 - **Affected modules:** `organizations/commands/issue_invitation.ex`, `organizations/domain/membership_policy.ex` (wire up the existing `can_manage_invitations?/1` or add a proper role-ceiling comparator).
 - **Approach:** Reject any requested `role` that exceeds (or, per product decision, equals) the issuer's own membership role.
 - **Tests required before merge:** test-gap-plan #6, #16. **Requires a product decision first**: can an `admin` create peer `admin`s, or only `owner` can create `admin`s? Flag to product before implementing.
 
-### P1.4 — Fix legacy `/api/admin/*` header-trust tenant resolution (F-01) + frontend org-in-URL migration (F-09)
+### P1.4 — Fix legacy `/api/admin/*` header-trust tenant resolution (F-01) + frontend org-in-URL migration (F-09) — **EXPAND PHASE ONLY, 2026-08-06**: backend mirror routes exist; frontend migration and legacy-route/header removal still open. See `04-findings.md`.
 - **Dependency:** these two should ship together (backend without frontend migration breaks the admin console; frontend without backend fix doesn't remove the vulnerability).
 - **Affected modules:** `router.ex`, `resolve_tenant_context.ex`, `me_controller.ex`, `apps/web/src/app/admin/*`, `apps/web/src/api/client.ts`, `apps/web/src/lib/realtime.ts`, `apps/web/src/components/organization-selector.tsx`.
 - **Approach:** Introduce `/api/org/:organization_slug/admin/*` mirroring existing routes; migrate the frontend admin console to `/org/:slug/admin/*` URLs; remove the `x-organization-slug` header fallback and the legacy-org default from `ResolveTenantContext`; add `organization_id`/slug to every admin-surface TanStack Query key; invalidate/clear the query cache on organization switch; unify REST/WebSocket org-resolution into one shared source of truth.

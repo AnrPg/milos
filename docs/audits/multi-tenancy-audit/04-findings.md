@@ -345,6 +345,24 @@ organization member; confirm it can be read back and replied to.
 
 ## F-01 — Legacy `/api/admin/*` surface (~140 endpoints) resolves tenant identity from a client-controlled request header, not the URL
 
+**STATUS (2026-08-06): EXPAND PHASE DONE, CONTRACT PHASE NOT STARTED — the
+vulnerability is not yet closed.** Added `/api/org/:organization_slug/admin/*`
+mirroring all ~90 remaining `/api/admin/*` routes (3 already existed),
+reusing the same controllers unchanged - these new routes resolve their
+tenant from the URL path, not the header, so they are safe. The legacy
+`/api/admin/*` scope and `ResolveTenantContext`'s header/legacy-org fallback
+are deliberately left in place: `apps/web/src/api/client.ts` confirmed every
+frontend request still calls the legacy paths and sends
+`X-Organization-Slug` derived from the URL, `localStorage`, or JWT claims -
+removing the fallback now would break the app outright, not just the
+vulnerable path. **The actual fix - migrating the frontend admin console to
+the new paths, then removing the legacy scope and the header/fallback logic
+from `ResolveTenantContext` - is unstarted.** It touches most of the admin
+console, needs its own TanStack Query key work (see F-09), and needs live
+browser verification no automated test in this repo provides. Until that
+lands, F-01's exploit path remains live: any authenticated admin can still
+set `X-Organization-Slug` to an arbitrary org and reach `/api/admin/*`.
+
 **Severity:** Critical · **Confidence:** Confirmed (read directly)
 **Invariant affected:** Tenant resolution must never trust body/header/cookie/token-supplied organization identifiers (ADR-058); authorization must depend on `membership(U,A)` derived from trusted server context.
 
@@ -735,6 +753,16 @@ for every one, run under a **non-superuser** database role (see F-08).
 
 ## F-06 — Tenant admin can issue a valid `owner`-role invitation with no role-ceiling check (privilege escalation)
 
+**STATUS (2026-08-06): FIXED.** Product decision (explicitly asked, not
+inferred): an account can never grant a role more privileged than its own,
+applied uniformly across owner/admin/coach/member/athlete, not just at the
+admin/owner boundary. `MembershipPolicy.can_grant_role?/2` implements this
+via the existing `@roles` ordering, wired into `IssueInvitation` as a check
+ahead of persisting the invitation. Verified failing-then-passing: an admin
+inviting an owner is rejected with `{:error, :role_ceiling_exceeded}` (403
+`role_ceiling_exceeded` at the HTTP layer), while an admin inviting up to
+admin, and an owner inviting a peer owner, both still succeed.
+
 **Severity:** Critical · **Confidence:** Confirmed (read directly)
 **Invariant affected:** "Gym administrators must not be able to escalate themselves or another account into a role equal to or greater than their own."
 
@@ -928,6 +956,16 @@ checked table list so a future regression here is caught automatically.
 ---
 
 ## F-09 — Frontend admin console has no organization identifier in the URL; tenant scoping depends entirely on a shared, mutable `localStorage` key and an attacker-controllable request header
+
+**STATUS (2026-08-06): NOT STARTED.** F-01's expand-phase backend routes
+(`/api/org/:organization_slug/admin/*`) now exist for the frontend to
+migrate to, but no frontend code has changed. `organizationSlugFromPath()`
+in `apps/web/src/api/client.ts` already knows how to read a slug out of a
+`/org/:slug` URL prefix - it's just that nothing in the admin console
+currently produces such a URL. This remains open work: route the admin
+console under `/org/:slug/admin/*`, switch its API calls off the header, and
+scope TanStack Query keys by organization so switching tenants doesn't
+surface stale cached data from the previous one.
 
 **Severity:** High · **Confidence:** Confirmed (frontend code read directly)
 **Invariant affected:** ADR-058's `/org/:slug` path-identifies-context model; "changing tenants must not leave data from the previous tenant visible or actionable."
