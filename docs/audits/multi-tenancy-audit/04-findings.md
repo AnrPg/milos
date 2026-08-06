@@ -1426,6 +1426,22 @@ execution rather than cancelling with `:execution_not_found`.
 
 ## F-27 — Shared, unfiltered Meilisearch member search index relies entirely on one call site's post-filter for tenant isolation
 
+**STATUS: FIXED** (2026-08-06). Confirmed by direct read exactly as
+reported, including the dead-code `call/1` no-filter fallback and the
+correct `MeilisearchPRIndex` pattern to mirror. Added a bulk
+`Organizations.list_membership_organization_ids/1` query, tagged every
+search document with `organization_ids`, added it as a filterable
+attribute, and `AdminSearchUsers.call/2` now passes the caller's
+`organization_id` into the index filter so isolation is enforced at the
+query layer — the existing post-filter stays in place as defense-in-depth,
+not removed. Real Meilisearch isn't reachable in this environment (no
+running instance), so this couldn't be proven end-to-end over HTTP; instead
+proved with two narrower tests that don't need it: the existing
+fake-index (`OrgCapturingIndex`) pattern already used by
+`admin_search_users_test.exs`, confirming `organization_id` actually reaches
+the search params, and a direct test of `AdminMemberSearchDocuments.build_all/0`
+confirming documents carry the right `organization_ids`.
+
 **Severity:** Medium · **Confidence:** Reported by delegated research, not independently re-verified — recommend confirming against `apps/api/lib/milos_training/infrastructure/search/meilisearch_member_index.ex` and `application/admin_search_users.ex` directly.
 
 **Evidence (as reported):** `MeilisearchMemberIndex` uses one platform-wide

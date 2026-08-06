@@ -98,6 +98,11 @@ blocking. P1–P3 remain open.
 - **Tests required before merge:** an Oban-enabled integration test confirming the job completes successfully (not `:execution_not_found`). ✅ done, plus an RLSCase proof against real (non-superuser) RLS enforcement.
 
 ### P2.6 — Enforce Meilisearch member-index tenant scoping at the query layer (F-27) — confirm first via direct read
+- **STATUS: FIXED** (2026-08-06). Mirrored the PR index's filter pattern via
+  a new `organization_ids` filterable attribute — see F-27 in
+  `04-findings.md`. Not provable end-to-end (no Meilisearch instance in this
+  environment); proved via the params reaching the index and the documents
+  carrying the right data instead.
 - **Dependency:** none.
 - **Approach:** Mirror the PR index's `filter: "organization_id = ..."` pattern instead of relying solely on the application post-filter.
 
