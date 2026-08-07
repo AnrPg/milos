@@ -1195,7 +1195,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
     ext = Path.extname(file_name)
     relative_key = "invoices/#{invoice_id}/#{Ecto.UUID.generate()}#{ext}"
 
-    with {:ok, invoice} <- MilosTraining.Finance.get_invoice(invoice_id),
+    with {:ok, invoice} <- MilosTraining.Finance.get_invoice(context, invoice_id),
          true <- invoice.organization_id == context.organization_id,
          {:ok, %{url: upload_url, key: key}} <-
            DocumentStorage.tenant_upload_url(context, relative_key),
@@ -1219,7 +1219,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
     context = conn.assigns.tenant_context
     invoice_id = param_id(params)
 
-    with {:ok, invoice} <- MilosTraining.Finance.get_invoice(invoice_id),
+    with {:ok, invoice} <- MilosTraining.Finance.get_invoice(context, invoice_id),
          true <- invoice.organization_id == context.organization_id,
          file_key when is_binary(file_key) <- (invoice.params || %{})["file_key"],
          {:ok, download_url} <- DocumentStorage.tenant_download_url(context, file_key) do

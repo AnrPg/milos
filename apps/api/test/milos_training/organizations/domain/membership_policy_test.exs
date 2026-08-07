@@ -15,10 +15,9 @@ defmodule MilosTraining.Organizations.Domain.MembershipPolicyTest do
     refute MembershipPolicy.authorized_status?(:revoked)
   end
 
-  test "only organization owners and admins may manage invitations" do
-    assert MembershipPolicy.can_manage_invitations?(:owner)
-    assert MembershipPolicy.can_manage_invitations?(:admin)
-    refute MembershipPolicy.can_manage_invitations?(:coach)
-    refute MembershipPolicy.can_manage_invitations?(:member)
-  end
+  # The "only owners and admins may manage invitations" rule used to be
+  # asserted here against can_manage_invitations?/1, which nothing called. It
+  # is now asserted against the live paths instead - see
+  # organizations_test.exs ("a member cannot issue invitations") and
+  # set_membership_role_test.exs ("a coach cannot change roles at all").
 end

@@ -26,7 +26,8 @@ defmodule Mix.Tasks.Milos.Architecture do
         scan("lib/milos_training/*/application/**/*.ex", @application_forbidden, "application") ++
         scan("lib/milos_training/*/domain/**/*.ex", @domain_forbidden, "domain") ++
         scan("lib/milos_training_web/controllers/**/*.ex", @controller_forbidden, "interface") ++
-        tenant_scope_violations()
+        tenant_scope_violations() ++
+        materialized_view_violations()
 
     case violations do
       [] ->
@@ -99,6 +100,57 @@ defmodule Mix.Tasks.Milos.Architecture do
       "lib/milos_training/infrastructure/scheduling/ecto_scheduling_store.ex",
       "tenant-predicate"
     )
+  end
+
+  # Materialized views cannot carry RLS, so their only tenant boundary is the
+  # organization_id predicate in the query text itself. F-21/F-22 were exactly
+  # this predicate going missing. This is the permanent guardrail the
+  # retirement plan (Phase 7) asks for: any raw SQL naming one of these views
+  # must also name organization_id.
+  @tenant_materialized_views ~w(finance_aggregates coaching_aggregates weekly_leaderboard)
+
+  defp materialized_view_violations do
+    "lib/milos_training/**/*.ex"
+    |> Path.wildcard()
+    |> Enum.flat_map(fn path ->
+      source = File.read!(path)
+
+      @tenant_materialized_views
+      |> Enum.filter(&String.contains?(source, &1))
+      |> Enum.flat_map(fn view ->
+        if unscoped_view_query?(source, view) do
+          ["  #{path} [materialized-view] queries #{view} without an organization_id predicate"]
+        else
+          []
+        end
+      end)
+    end)
+  end
+
+  # For each line naming the view, look at the surrounding lines for the
+  # organization_id predicate. A window is used rather than whole-file matching
+  # so one query's predicate cannot vouch for another's.
+  #
+  # Exempt: REFRESH MATERIALIZED VIEW and the refresh_view/1 helper, which
+  # rebuild the whole view as a platform operation and carry no row predicate.
+  @view_window 8
+
+  defp unscoped_view_query?(source, view) do
+    lines = String.split(source, "\n")
+
+    lines
+    |> Enum.with_index()
+    |> Enum.filter(fn {line, _i} -> String.contains?(line, view) end)
+    |> Enum.reject(fn {line, _i} ->
+      String.contains?(line, "REFRESH MATERIALIZED VIEW") or
+        String.contains?(line, "refresh_view(")
+    end)
+    |> Enum.any?(fn {_line, i} ->
+      lines
+      |> Enum.slice(max(i - @view_window, 0), @view_window * 2 + 1)
+      |> Enum.join("\n")
+      |> then(&(not String.contains?(&1, "organization_id")))
+    end)
   end
 
   defp require_source(violations, source, required, path, label) do

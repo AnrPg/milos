@@ -101,6 +101,9 @@ defmodule MilosTraining.OrganizationsTest do
 
     assert {:error, :forbidden} =
              Organizations.issue_invitation(member_context, %{role: :member})
+
+    assert {:error, :forbidden} =
+             Organizations.issue_invitation(%{member_context | role: :coach}, %{role: :member})
   end
 
   test "an admin cannot invite someone to owner, but can invite up to admin", context do

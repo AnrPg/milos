@@ -3,12 +3,18 @@ defmodule MilosTraining.Organizations.Domain.MembershipPolicy do
 
   @roles [:owner, :admin, :coach, :member, :athlete]
   @statuses [:invited, :active, :suspended, :revoked]
-  @invitation_managers [:owner, :admin]
 
   def roles, do: @roles
   def statuses, do: @statuses
   def authorized_status?(status), do: status == :active
-  def can_manage_invitations?(role), do: role in @invitation_managers
+
+  # `can_manage_invitations?/1` lived here unused. The retirement plan expected
+  # F-06 to make it live, but that fix went through can_grant_role?/2 instead,
+  # and membership-management authorization is now expressed uniformly as
+  # TenantAuthorization.authorize(context, [:owner, :admin]) in IssueInvitation,
+  # SetMembershipRole and SetMembershipStatus. A second, unused spelling of the
+  # same rule is what made RequireRole (F-02) dangerous, so it is removed
+  # rather than left as a plausible-looking alternative.
 
   @doc """
   Whether `issuer_role` is allowed to grant `target_role` to someone else.
