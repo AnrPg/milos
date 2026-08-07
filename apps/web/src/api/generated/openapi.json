@@ -31715,9 +31715,11 @@
                 "properties": {
                   "role": {
                     "enum": [
+                      "owner",
+                      "admin",
+                      "coach",
                       "member",
-                      "athlete",
-                      "admin"
+                      "athlete"
                     ],
                     "type": "string"
                   }

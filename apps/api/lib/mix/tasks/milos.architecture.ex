@@ -54,18 +54,46 @@ defmodule Mix.Tasks.Milos.Architecture do
     end)
   end
 
-  defp tenant_scope_violations do
-    scheduling_store = "lib/milos_training/scheduling/scheduling_store.ex"
-    source = File.read!(scheduling_store)
+  # Every context that owns tenant data must route its reads and writes through
+  # a RepoContext-opened session, or its store silently runs with whatever
+  # session GUCs happen to be set. F-13: this used to check Scheduling alone,
+  # so the other ten contexts could drift without the task noticing.
+  @tenant_scoped_stores ~w(
+    scheduling/scheduling_store
+    workouts/workout_store
+    messaging/thread_store
+    feedback/feedback_store
+    analytics/analytics_store
+    gamification/gamification_store
+    finance/finance_store
+    execution/execution_store
+    wellbeing/wellbeing_store
+    notifications/notification_store
+    coaching/coaching_store
+  )
 
-    []
-    |> require_source(
-      source,
-      "MilosTraining.Infrastructure.Tenancy.RepoContext.run",
-      scheduling_store,
-      "tenant-scope"
-    )
-    |> require_source(
+  defp tenant_scope_violations do
+    store_violations =
+      Enum.reduce(@tenant_scoped_stores, [], fn store, violations ->
+        path = "lib/milos_training/#{store}.ex"
+
+        cond do
+          not File.exists?(path) ->
+            ["  #{path} [tenant-scope] store facade is missing" | violations]
+
+          true ->
+            require_source(
+              violations,
+              File.read!(path),
+              "RepoContext.run",
+              path,
+              "tenant-scope"
+            )
+        end
+      end)
+
+    require_source(
+      store_violations,
       File.read!("lib/milos_training/infrastructure/scheduling/ecto_scheduling_store.ex"),
       "for_organization(organization_id)",
       "lib/milos_training/infrastructure/scheduling/ecto_scheduling_store.ex",

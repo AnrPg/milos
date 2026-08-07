@@ -766,6 +766,9 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
     normalized = %{
       id: workout.id,
+      # Callers need the owning organization for tenant-scoped side effects
+      # (e.g. broadcast targeting) without reaching into the session GUC.
+      organization_id: workout.organization_id,
       title: workout.title,
       subtitle: workout.subtitle,
       description: workout.description,

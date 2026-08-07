@@ -14800,7 +14800,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @enum {string} */
-                    role: "member" | "athlete" | "admin";
+                    role: "owner" | "admin" | "coach" | "member" | "athlete";
                 };
             };
         };

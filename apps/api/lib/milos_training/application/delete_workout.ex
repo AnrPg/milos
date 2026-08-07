@@ -2,18 +2,20 @@ defmodule MilosTraining.Application.DeleteWorkout do
   require Logger
 
   alias MilosTraining.Application.BroadcastUserSync
-  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.{Identity, Scheduling, Workouts}
   alias MilosTraining.Notifications
 
   def call(id) do
-    with %{id: ^id} <- Workouts.get_workout_for_admin(id),
+    with %{id: ^id} = workout <- Workouts.get_workout_for_admin(id),
          assignment_targets <- Workouts.list_workout_change_targets(id),
          booking_targets <- Scheduling.list_workout_change_targets(id),
          {:ok, deleted_slot_ids} <- Scheduling.delete_slots_for_workout(id),
          :ok <- Scheduling.delete_class_series_for_workout(id),
          :ok <- Workouts.delete_workout(id) do
-      broadcast_deleted_slots(deleted_slot_ids, RepoContext.current_setting("app.organization_id"))
+      # Taken from the workout being deleted rather than the session GUC: the
+      # owning organization is the correct broadcast scope, and reading it here
+      # kept an Infrastructure dependency in the application layer (F-19).
+      broadcast_deleted_slots(deleted_slot_ids, workout.organization_id)
       notify_assignment_targets(assignment_targets)
       notify_booking_targets(booking_targets)
       broadcast_assignment_refresh(assignment_targets, id)
