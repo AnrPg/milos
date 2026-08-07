@@ -25,6 +25,7 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
       |> string_key_map()
       |> Map.put_new("occurred_at", DateTime.utc_now())
       |> normalize_context_id()
+      |> put_organization_id()
 
     %AnalyticsEvent{}
     |> AnalyticsEvent.changeset(params)
@@ -38,6 +39,7 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
       params
       |> string_key_map()
       |> Map.put_new("clicked_at", DateTime.utc_now())
+      |> put_organization_id()
 
     %NotificationClickEvent{}
     |> NotificationClickEvent.changeset(params)
@@ -51,11 +53,30 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
       params
       |> string_key_map()
       |> Map.put_new("attempted_at", DateTime.utc_now())
+      |> put_organization_id()
 
     %PushDispatchAttempt{}
     |> PushDispatchAttempt.changeset(params)
     |> Repo.insert()
     |> normalize_result(&normalize_push_attempt/1)
+  end
+
+  # None of record_event/3, get_or_create_communication_thread/1's callers pass
+  # organization_id explicitly - every write path they're called from already
+  # runs inside a RepoContext.run/2 session, so the tenant is on the connection,
+  # just not in the params map. Without this every analytics/communication row
+  # was persisted with organization_id = NULL: invisible to the org-scoped
+  # summary read (silent undercounting, not a leak), and for
+  # communication_threads worse - its de-duplication unique constraint is
+  # (organization_id, context_type, context_id), and Postgres treats NULL as
+  # distinct from NULL, so the dedup silently stopped working.
+  #
+  # An explicit caller-supplied value (if one is ever added) still wins.
+  defp put_organization_id(params) do
+    case Map.get(params, "organization_id") do
+      nil -> Map.put(params, "organization_id", RepoContext.current_setting("app.organization_id"))
+      _present -> params
+    end
   end
 
   @impl true
@@ -354,6 +375,7 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
   defp normalize_event(%AnalyticsEvent{} = event) do
     %{
       id: event.id,
+      organization_id: event.organization_id,
       event_name: event.event_name,
       user_id: event.user_id,
       actor_role_snapshot: event.actor_role_snapshot,
@@ -425,6 +447,7 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
 
   defp get_or_create_communication_thread(params) do
     attrs = %{
+      organization_id: RepoContext.current_setting("app.organization_id"),
       context_type: params["context_type"],
       context_id: params["context_id"],
       status: Map.get(params, "thread_status", "open"),
@@ -434,40 +457,28 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
       params: Map.get(params, "thread_params", %{})
     }
 
-    result =
-      %CommunicationThread{}
-      |> CommunicationThread.changeset(attrs)
-      |> Repo.insert(
-        on_conflict: :nothing,
-        conflict_target: [:organization_id, :context_type, :context_id]
-      )
-
-    case result do
-      {:ok, %CommunicationThread{id: nil}} ->
-        # Conflict: another process won the race; fetch the existing thread.
-        case find_communication_thread(params["context_type"], params["context_id"]) do
-          %CommunicationThread{} = thread -> {:ok, thread}
-          nil -> {:error, :thread_not_found}
-        end
-
-      {:ok, thread} ->
-        {:ok, thread}
-
-      {:error, reason} ->
-        {:error, reason}
-    end
-  end
-
-  defp find_communication_thread(nil, _context_id), do: nil
-  defp find_communication_thread(_context_type, nil), do: nil
-
-  defp find_communication_thread(context_type, context_id) do
-    CommunicationThread
-    |> scoped_to_tenant()
-    |> where([thread], thread.context_type == ^context_type and thread.context_id == ^context_id)
-    |> order_by([thread], desc: thread.inserted_at)
-    |> limit(1)
-    |> Repo.one()
+    # on_conflict: :nothing would leave `id` looking populated even when no
+    # row was actually written - CommunicationThread's id is a client-generated
+    # binary_id (autogenerate: true), not a DB default, so it's never nil just
+    # because the insert no-opped. {:replace, [:updated_at]} instead forces a
+    # real UPDATE on conflict, so RETURNING always reflects the true
+    # persisted row (the pre-existing thread's real id on conflict, the new
+    # one otherwise).
+    # returning: true is load-bearing, not cosmetic: CommunicationThread's id
+    # and timestamps are all app-generated (client-side autogenerate, not DB
+    # defaults), so without it Ecto has nothing it needs from the database and
+    # skips RETURNING entirely - the struct it hands back is what we *tried*
+    # to insert, not what's actually in the table. On conflict, that silently
+    # returns a fabricated row (the never-persisted new id) instead of the
+    # real pre-existing one, which is exactly the FK violation this was
+    # causing downstream in record_communication_message/1.
+    %CommunicationThread{}
+    |> CommunicationThread.changeset(attrs)
+    |> Repo.insert(
+      on_conflict: {:replace, [:updated_at]},
+      conflict_target: [:organization_id, :context_type, :context_id],
+      returning: true
+    )
   end
 
   defp update_thread_last_message(thread, sent_at) do
