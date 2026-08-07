@@ -530,6 +530,8 @@ defmodule MilosTrainingWeb.AuthControllerTest do
           email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
+      {:ok, _athlete_membership} = Organizations.ensure_legacy_membership(athlete, :member)
+
       {:ok, access_token, _claims} =
         Guardian.encode_and_sign(admin, %{"sv" => admin.security_version}, token_type: "access")
 

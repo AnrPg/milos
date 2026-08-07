@@ -10,6 +10,7 @@ defmodule MilosTraining.Organizations do
     ProvisionOrganization,
     RedeemInvitation,
     RevokeInvitation,
+    SetMembershipRole,
     SetMembershipStatus,
     UpdateOrganizationLifecycle,
     UpdateMembershipRole,
@@ -86,6 +87,9 @@ defmodule MilosTraining.Organizations do
 
   def set_membership_status(context, membership_id, status),
     do: SetMembershipStatus.call(context, membership_id, status)
+
+  def set_membership_role(context, user_id, role),
+    do: SetMembershipRole.call(context, user_id, role)
 
   def delete_organization(context, organization_id, deleted_at \\ DateTime.utc_now()),
     do: DeleteOrganization.call(context, organization_id, deleted_at)

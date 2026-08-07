@@ -16,8 +16,7 @@ defmodule MilosTrainingWeb.AdminUserController do
     ListAdminUsers,
     ListAthletes,
     ProgramUserWorkout,
-    RevokeUserAllowance,
-    UpdateUserRole
+    RevokeUserAllowance
   }
 
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
@@ -354,7 +353,10 @@ defmodule MilosTrainingWeb.AdminUserController do
           schema: %Schema{
             type: :object,
             properties: %{
-              role: %Schema{type: :string, enum: ["member", "athlete", "admin"]}
+              role: %Schema{
+                type: :string,
+                enum: ["owner", "admin", "coach", "member", "athlete"]
+              }
             },
             required: [:role]
           }
@@ -446,10 +448,19 @@ defmodule MilosTrainingWeb.AdminUserController do
 
   def update_role(conn, params) do
     id = params["id"] || params[:id]
+    role = Map.get(conn.body_params, "role") || Map.get(conn.body_params, :role)
 
-    case UpdateUserRole.call(id, conn.body_params) do
-      {:ok, user} ->
-        json(conn, %{id: user.id, nickname: user.nickname, role: to_string(user.role)})
+    # Role is a property of the membership, not of the account (F-29): this
+    # only ever changes what the target is inside the acting organization.
+    case MilosTraining.Organizations.set_membership_role(conn.assigns.tenant_context, id, role) do
+      {:ok, membership} ->
+        user = MilosTraining.Identity.find_by_id(membership.user_id)
+
+        json(conn, %{
+          id: membership.user_id,
+          nickname: user && user.nickname,
+          role: to_string(membership.role)
+        })
 
       error ->
         error
