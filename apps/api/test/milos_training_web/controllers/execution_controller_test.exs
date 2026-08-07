@@ -67,6 +67,63 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
       assert response["error"] == "Invalid scale level"
     end
 
+    test "a client-supplied organization_id is ignored in favour of the workout's own", %{
+      conn: conn
+    } do
+      admin = create_admin!("execution_forgery_admin")
+      member = create_user!(:member, "execution_forgery_member")
+      workout = workout_with_scale!(admin)
+
+      {:ok, other_org} =
+        MilosTraining.Organizations.create_organization(%{name: "Execution Forgery Gym"})
+
+      execution =
+        conn
+        |> put_bearer_token(member)
+        |> post("/api/executions", %{
+          master_workout_id: workout.id,
+          scale_level_slug: "scaled",
+          source: "self_selected",
+          organization_id: other_org.id
+        })
+        |> json_response(201)
+        |> Map.fetch!("execution")
+
+      # F-03: the persisted organization is derived from the workout, never
+      # from the request body.
+      refute execution["organization_id"] == other_org.id
+
+      assert execution["organization_id"] ==
+               MilosTraining.Workouts.WorkoutStore.workout_organization_id(workout.id)
+    end
+
+    test "self-selection is refused for an account with no membership in the workout's gym", %{
+      conn: conn
+    } do
+      admin = create_admin!("execution_outsider_admin")
+      workout = workout_with_scale!(admin)
+
+      {:ok, outsider} =
+        Identity.register(%{
+          nickname: "execution_outsider",
+          password: "S3cur3P@ss!",
+          role: :member,
+          email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
+        })
+
+      response =
+        conn
+        |> put_bearer_token(outsider)
+        |> post("/api/executions", %{
+          master_workout_id: workout.id,
+          scale_level_slug: "scaled",
+          source: "self_selected"
+        })
+        |> json_response(403)
+
+      assert response["code"] == "execution_source_forbidden"
+    end
+
     test "inactive managed memberships cannot start workout execution", %{conn: conn} do
       admin = create_admin!("execution_entitlement_admin")
 
@@ -77,6 +134,10 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
           role: :member,
           email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
+
+      # Needs an organization membership to reach the entitlement check at all
+      # (F-03); the assertion below is about finance entitlement, not tenancy.
+      {:ok, _org_membership} = MilosTraining.Organizations.ensure_legacy_membership(member)
 
       assert {:ok, _membership} =
                Finance.upsert_membership(member.id, %{
@@ -665,9 +726,17 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
 
   defp create_user!(role, nickname) do
     {:ok, user} =
-      Identity.register(%{nickname: nickname, password: "S3cur3P@ss!", role: role,
-email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
-})
+      Identity.register(%{
+        nickname: nickname,
+        password: "S3cur3P@ss!",
+        role: role,
+        email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
+      })
+
+    # Executing a gym's workout requires belonging to that gym (F-03). These
+    # users previously had no membership at all and only passed because the
+    # source check looked at the account-wide role.
+    {:ok, _membership} = MilosTraining.Organizations.ensure_legacy_membership(user)
 
     user
   end

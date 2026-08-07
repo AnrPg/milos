@@ -474,7 +474,10 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
     |> select([booking, slot], %{
       booking_id: booking.id,
       status: booking.status,
-      master_workout_id: slot.master_workout_id
+      master_workout_id: slot.master_workout_id,
+      # Server-derived tenancy for the execution created from this booking
+      # (F-03) - the client must not get to name the organization.
+      organization_id: booking.organization_id
     })
     |> Repo.one()
     |> case do

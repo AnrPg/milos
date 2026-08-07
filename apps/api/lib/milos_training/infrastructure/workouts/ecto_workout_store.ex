@@ -149,6 +149,18 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   end
 
   @impl true
+  def workout_organization_id(id) do
+    # Deliberately un-scoped: this exists to *derive* the tenant for a workout
+    # execution (F-03), so it cannot itself require a tenant already be open.
+    # It exposes only which organization owns a workout id, and every caller
+    # must follow it with a membership check.
+    MasterWorkout
+    |> where([workout], workout.id == ^id)
+    |> select([workout], workout.organization_id)
+    |> Repo.one()
+  end
+
+  @impl true
   def get_workout(id) do
     MasterWorkout
     |> scoped_to_tenant()

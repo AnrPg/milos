@@ -149,6 +149,9 @@ defmodule MilosTraining.Workouts.WorkoutStore do
     do: adapter().archive_active_assignments_for_athlete(athlete_id)
 
   @impl true
+  def workout_organization_id(id), do: adapter().workout_organization_id(id)
+
+  @impl true
   def archive_active_assignments_for_athlete(context, athlete_id),
     do: adapter().archive_active_assignments_for_athlete(context, athlete_id)
 
