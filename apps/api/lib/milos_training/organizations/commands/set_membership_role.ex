@@ -13,6 +13,7 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipRole do
   """
 
   alias MilosTraining.Organizations.Domain.{MembershipPolicy, TenantAuthorization}
+  alias MilosTraining.Application.BroadcastUserSync
   alias MilosTraining.Organizations.OrganizationStore
   alias MilosTraining.{Scheduling, Workouts}
 
@@ -24,15 +25,45 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipRole do
          :ok <- authorize_role_ceiling(context.role, role),
          :ok <- authorize_role_ceiling(context.role, membership.role),
          :ok <- reconcile_role_owned_state(context, membership, role) do
-      OrganizationStore.update_membership_role(
-        context.organization_id,
-        membership.id,
-        role
-      )
+      context.organization_id
+      |> OrganizationStore.update_membership_role(membership.id, role)
+      |> broadcast_change(context)
     end
   end
 
   def call(_context, _user_id, _role), do: {:error, :not_found}
+
+  # Restores the notification UpdateUserRole used to send, now carrying the
+  # organization: a role only changed inside one tenant, so telling admins of
+  # every other organization about it would be a small cross-tenant leak.
+  defp broadcast_change({:ok, membership} = result, context) do
+    BroadcastUserSync.for_user(membership.user_id, ["session"],
+      reason: "role_changed",
+      payload: %{
+        role: to_string(membership.role),
+        organization_id: context.organization_id
+      }
+    )
+
+    admin_ids =
+      context.organization_id
+      |> OrganizationStore.list_organization_memberships()
+      |> Enum.filter(&(&1.role in [:owner, :admin] and &1.status == :active))
+      |> Enum.map(& &1.user_id)
+
+    BroadcastUserSync.for_users(admin_ids, ["admin_athletes", "admin_finance"],
+      reason: "user_role_changed",
+      payload: %{
+        user_id: membership.user_id,
+        role: to_string(membership.role),
+        organization_id: context.organization_id
+      }
+    )
+
+    result
+  end
+
+  defp broadcast_change(result, _context), do: result
 
   defp fetch_membership(context, user_id) do
     case OrganizationStore.get_membership(context.organization_id, user_id) do

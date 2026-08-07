@@ -13,6 +13,7 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipStatus do
   """
 
   alias MilosTraining.Organizations.Domain.{MembershipPolicy, TenantAuthorization}
+  alias MilosTraining.Application.BroadcastUserSync
   alias MilosTraining.Organizations.OrganizationStore
 
   @settable_statuses [:active, :suspended, :revoked]
@@ -23,15 +24,30 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipStatus do
          {:ok, membership} <- fetch_membership(context, membership_id),
          :ok <- refuse_self_change(context, membership),
          :ok <- authorize_role_ceiling(context.role, membership.role) do
-      OrganizationStore.update_membership_status(
-        context.organization_id,
-        membership_id,
-        status
-      )
+      context.organization_id
+      |> OrganizationStore.update_membership_status(membership_id, status)
+      |> broadcast_change(context)
     end
   end
 
   def call(_context, _membership_id, _status), do: {:error, :not_found}
+
+  # A suspended or revoked member keeps a valid access token until it expires;
+  # TenantAuthorization will refuse them on the next request, but the client
+  # should find out now rather than through a confusing failure.
+  defp broadcast_change({:ok, membership} = result, context) do
+    BroadcastUserSync.for_user(membership.user_id, ["session"],
+      reason: "membership_status_changed",
+      payload: %{
+        status: to_string(membership.status),
+        organization_id: context.organization_id
+      }
+    )
+
+    result
+  end
+
+  defp broadcast_change(result, _context), do: result
 
   defp fetch_membership(context, membership_id) do
     case OrganizationStore.get_membership_by_id(context.organization_id, membership_id) do

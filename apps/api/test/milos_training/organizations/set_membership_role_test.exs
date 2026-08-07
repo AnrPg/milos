@@ -166,6 +166,22 @@ defmodule MilosTraining.Organizations.SetMembershipRoleTest do
     end
   end
 
+  test "the affected account and this organization's admins are told, and no one else", %{
+    member: member,
+    org_a: org_a,
+    context_a: context_a
+  } do
+    Phoenix.PubSub.subscribe(MilosTraining.PubSub, "user:sync")
+
+    assert {:ok, _} = Organizations.set_membership_role(context_a, member.id, :coach)
+
+    assert_receive {:user_sync, %{user_id: user_id, reason: "role_changed", payload: payload}}
+    assert user_id == member.id
+    assert payload.role == "coach"
+    # Without this the client cannot tell which of its organizations changed.
+    assert payload.organization_id == org_a.id
+  end
+
   test "an unknown role is rejected", %{member: member, context_a: context_a} do
     assert {:error, [role: "is invalid"]} =
              Organizations.set_membership_role(context_a, member.id, "sysadmin")
