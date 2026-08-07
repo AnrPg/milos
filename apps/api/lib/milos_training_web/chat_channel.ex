@@ -11,7 +11,10 @@ defmodule MilosTrainingWeb.ChatChannel do
 
     with [organization_id, "thread", thread_id] <- String.split(topic_suffix, ":", parts: 3),
          {:ok, context} <- TenantChannelContext.refresh(socket, organization_id),
-         {:ok, thread} <- Messaging.get_thread(thread_id, user_id),
+         {:ok, thread} <-
+           Messaging.with_tenant_context(context, fn ->
+             Messaging.get_thread(thread_id, user_id)
+           end),
          ^organization_id <- thread.organization_id do
       socket = socket |> assign(:tenant_context, context) |> assign(:thread_id, thread.id)
       {:ok, %{thread_id: thread.id}, socket}
@@ -28,13 +31,18 @@ defmodule MilosTrainingWeb.ChatChannel do
     message_type = parse_message_type(Map.get(params, "message_type", "chat"))
     client_operation_id = Map.get(params, "client_operation_id")
 
-    case SendMessage.call(socket.assigns.current_user, %{
-           thread_id: thread_id,
-           sender_id: user_id,
-           body: body,
-           message_type: message_type,
-           client_operation_id: client_operation_id
-         }) do
+    result =
+      Messaging.with_tenant_context(socket.assigns.tenant_context, fn ->
+        SendMessage.call(socket.assigns.current_user, %{
+          thread_id: thread_id,
+          sender_id: user_id,
+          body: body,
+          message_type: message_type,
+          client_operation_id: client_operation_id
+        })
+      end)
+
+    case result do
       {:ok, message} ->
         {:reply, {:ok, serialize_message(message)}, socket}
 
@@ -57,7 +65,9 @@ defmodule MilosTrainingWeb.ChatChannel do
     user_id = socket.assigns.current_user.id
     thread_id = socket.assigns.thread_id
 
-    case Messaging.mark_read(thread_id, user_id, message_id) do
+    case Messaging.with_tenant_context(socket.assigns.tenant_context, fn ->
+           Messaging.mark_read(thread_id, user_id, message_id)
+         end) do
       {:ok, result} -> {:reply, {:ok, result}, socket}
       {:error, reason} -> {:reply, {:error, %{reason: to_string(reason)}}, socket}
     end

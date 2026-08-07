@@ -364,6 +364,23 @@ present — the legacy flat `/api/threads/*` routes are left as-is (same
 known F-01/P1.4 debt as everywhere else). Covered by
 `test/milos_training_web/controllers/messaging_controller_tenant_context_test.exs`.
 
+**Follow-up gap found 2026-08-08 during the full audit-doc sweep: the WebSocket
+chat channel was missed by this fix.** `MessagingController`'s `action/2`
+covers the REST surface, but `MilosTrainingWeb.ChatChannel` calls
+`Messaging.get_thread/2` (in `join/3`), `SendMessage.call/2` (in
+`handle_in("send_message", ...)`), and `Messaging.mark_read/3` (in
+`handle_in("mark_read", ...)`) directly, with no `with_tenant_context/2`
+wrapper — so `app.organization_id` was never set on the connection for any of
+these calls. Same failure mode as the rest of F-25: with the RLS
+`COALESCE`-to-legacy-org fallback removed, real-time chat send/mark-read
+would fail RLS's `WITH CHECK`/`USING` in production for every organization.
+Fixed by wrapping all three call sites in
+`Messaging.with_tenant_context(socket.assigns.tenant_context, fn -> ... end)`,
+mirroring the controller's pattern; `join/3`'s own thread-lookup now also
+resolves inside the freshly-refreshed tenant context rather than before it.
+No existing test caught this — `chat_channel_test.exs` runs as the Postgres
+superuser, so RLS enforcement was never exercised there either.
+
 **Follow-up systemic gap discovered while fixing this (relevant to P1.4):**
 `OpenApiSpex.Plug.CastAndValidate` rejects any request under a mirrored
 `/api/org/:organization_slug/...` route with `"Unexpected field:
