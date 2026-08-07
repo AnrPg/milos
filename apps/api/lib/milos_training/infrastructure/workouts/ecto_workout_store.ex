@@ -69,7 +69,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   @impl true
   def update_draft(id, params) do
-    case Repo.get(MasterWorkout, id) do
+    case MasterWorkout |> scoped_to_tenant() |> Repo.get(id) do
       nil ->
         {:error, :not_found}
 
@@ -105,7 +105,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   @impl true
   def delete_workout(id) do
-    case Repo.get(MasterWorkout, id) do
+    case MasterWorkout |> scoped_to_tenant() |> Repo.get(id) do
       nil ->
         {:error, :not_found}
 
@@ -270,7 +270,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   @impl true
   def update_folder(id, params) do
-    case Repo.get(WorkoutFolder, id) do
+    case WorkoutFolder |> scoped_to_tenant() |> Repo.get(id) do
       nil ->
         {:error, :not_found}
 
@@ -284,7 +284,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   @impl true
   def delete_folder(id) do
-    case Repo.get(WorkoutFolder, id) do
+    case WorkoutFolder |> scoped_to_tenant() |> Repo.get(id) do
       nil ->
         {:error, :not_found}
 
@@ -307,7 +307,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   @impl true
   def update_library_metadata(id, params) do
-    case Repo.get(MasterWorkout, id) do
+    case MasterWorkout |> scoped_to_tenant() |> Repo.get(id) do
       nil ->
         {:error, :not_found}
 
@@ -404,7 +404,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       |> Map.get(:athlete_ids, Map.get(params, "athlete_ids", []))
       |> Enum.uniq()
 
-    case Repo.get(AssignedWorkout, id) do
+    case AssignedWorkout |> scoped_to_tenant() |> Repo.get(id) do
       nil ->
         {:error, :not_found}
 
@@ -435,7 +435,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   @impl true
   def delete_assigned_workout(id) do
-    case Repo.get(AssignedWorkout, id) do
+    case AssignedWorkout |> scoped_to_tenant() |> Repo.get(id) do
       nil ->
         {:error, :not_found}
 
@@ -1691,7 +1691,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         |> Repo.update()
         |> case do
           {:ok, updated_link} ->
-            case Repo.get(AssignedWorkout, assignment_id) do
+            case AssignedWorkout |> scoped_to_tenant() |> Repo.get(assignment_id) do
               nil ->
                 {:error, :not_found}
 
@@ -1733,7 +1733,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   @impl true
   def reopen_workout(id) do
-    case Repo.get(MasterWorkout, id) do
+    case MasterWorkout |> scoped_to_tenant() |> Repo.get(id) do
       nil ->
         {:error, :not_found}
 
@@ -1759,7 +1759,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   @impl true
   def get_assigned_workout(id) do
-    case Repo.get(AssignedWorkout, id) do
+    case AssignedWorkout |> scoped_to_tenant() |> Repo.get(id) do
       nil ->
         nil
 
@@ -1805,7 +1805,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   @impl true
   def duplicate_workout(id, title_suffix, attrs) do
-    case Repo.get(MasterWorkout, id) do
+    case MasterWorkout |> scoped_to_tenant() |> Repo.get(id) do
       nil ->
         {:error, :not_found}
 
@@ -1856,16 +1856,25 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     folder_id = folder && folder.id
 
     cond do
-      is_nil(parent_id) or parent_id == "" -> :ok
-      parent_id == folder_id -> {:error, :folder_cycle}
-      is_nil(Repo.get(WorkoutFolder, parent_id)) -> {:error, :folder_parent_not_found}
-      folder_id && descendant_folder?(parent_id, folder_id) -> {:error, :folder_cycle}
-      true -> :ok
+      is_nil(parent_id) or parent_id == "" ->
+        :ok
+
+      parent_id == folder_id ->
+        {:error, :folder_cycle}
+
+      is_nil(WorkoutFolder |> scoped_to_tenant() |> Repo.get(parent_id)) ->
+        {:error, :folder_parent_not_found}
+
+      folder_id && descendant_folder?(parent_id, folder_id) ->
+        {:error, :folder_cycle}
+
+      true ->
+        :ok
     end
   end
 
   defp descendant_folder?(candidate_id, ancestor_id) do
-    case Repo.get(WorkoutFolder, candidate_id) do
+    case WorkoutFolder |> scoped_to_tenant() |> Repo.get(candidate_id) do
       nil -> false
       %{parent_id: nil} -> false
       %{parent_id: ^ancestor_id} -> true
@@ -1905,12 +1914,12 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   @impl true
   def substitute_assignment_workout(assignment_id, new_workout_id) do
-    case Repo.get(AssignedWorkout, assignment_id) do
+    case AssignedWorkout |> scoped_to_tenant() |> Repo.get(assignment_id) do
       nil ->
         {:error, :not_found}
 
       %AssignedWorkout{} = assignment ->
-        case Repo.get(MasterWorkout, new_workout_id) do
+        case MasterWorkout |> scoped_to_tenant() |> Repo.get(new_workout_id) do
           nil ->
             {:error, :workout_not_found}
 
@@ -1928,28 +1937,19 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     end
   end
 
+  # Auth used to be decided here via the caller's *global* `role`, which let
+  # any account with the global :admin role (not just staff of this
+  # assignment's own organization) into the messaging thread it authorizes -
+  # a cross-tenant IDOR. Authorization now happens in the caller
+  # (GetOrCreateMessagingThread), which can check the actor's organization
+  # membership; this just fetches.
   @impl true
-  def get_assignment_with_auth(assignment_id, actor) do
+  def get_assignment(assignment_id) do
     case AssignedWorkout
          |> Repo.get(assignment_id)
          |> Repo.preload(:athlete_links) do
-      nil ->
-        {:error, :not_found}
-
-      %AssignedWorkout{} = assignment ->
-        cond do
-          actor.role == :admin ->
-            {:ok, assignment}
-
-          Enum.any?(
-            assignment.athlete_links,
-            &(&1.athlete_id == actor.id and &1.athlete_status != :archived)
-          ) ->
-            {:ok, assignment}
-
-          true ->
-            {:error, :forbidden}
-        end
+      nil -> {:error, :not_found}
+      %AssignedWorkout{} = assignment -> {:ok, assignment}
     end
   end
 

@@ -41,8 +41,7 @@ defmodule MilosTraining.Workouts.Ports.WorkoutStore do
               {:ok, map()} | {:error, :not_found}
   @callback substitute_assignment_workout(Ecto.UUID.t(), Ecto.UUID.t()) ::
               {:ok, map()} | {:error, :not_found}
-  @callback get_assignment_with_auth(Ecto.UUID.t(), map()) ::
-              {:ok, map()} | {:error, :not_found | :forbidden}
+  @callback get_assignment(Ecto.UUID.t()) :: {:ok, map()} | {:error, :not_found}
   @callback update_assignment_date(Ecto.UUID.t(), Ecto.UUID.t(), Date.t()) ::
               {:ok, map()} | {:error, :not_found | Ecto.Changeset.t()}
   @callback delete_superseded_drafts(String.t(), String.t()) :: :ok

@@ -186,6 +186,18 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   end
 
   @impl true
+  def list_staff_user_ids(organization_id) do
+    OrganizationMembership
+    |> where(
+      [membership],
+      membership.organization_id == ^organization_id and membership.status == :active and
+        membership.role in [:owner, :admin, :coach]
+    )
+    |> select([membership], membership.user_id)
+    |> Repo.all()
+  end
+
+  @impl true
   def list_membership_organization_ids(user_ids) do
     OrganizationMembership
     |> where([membership], membership.user_id in ^user_ids and membership.status == :active)

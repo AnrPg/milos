@@ -43,6 +43,9 @@ defmodule MilosTraining.Organizations do
   def list_membership_organization_ids(user_ids),
     do: OrganizationStore.list_membership_organization_ids(user_ids)
 
+  def list_staff_user_ids(organization_id),
+    do: OrganizationStore.list_staff_user_ids(organization_id)
+
   def issue_invitation(context, params, issued_at \\ DateTime.utc_now()),
     do: IssueInvitation.call(context, params, issued_at)
 

@@ -1606,8 +1606,10 @@ either requires an org filter parameter or returns no results without one.
 embeds a `"memberships"` claims array at token-issue time; confirmed by
 repo-wide grep that it is **never read back for authorization** anywhere
 (`TenantContext` is always rebuilt from live DB state per request). Role
-changes trigger a best-effort `"role_changed"` realtime broadcast
-(`application/update_user_role.ex:38-48`) but not token reissuance;
+changes trigger a best-effort `"role_changed"` realtime broadcast (now
+`organizations/commands/set_membership_role.ex` — `UpdateUserRole` was
+deleted and replaced by the org-scoped `SetMembershipRole` as part of F-29)
+but not token reissuance;
 `security_version` (the actual invalidation mechanism) is bumped only by
 explicit `sign_out_all_devices`. Additionally, `guardian.ex:34-37` accepts
 tokens with **no `"sv"` claim at all** for any user whose `security_version`

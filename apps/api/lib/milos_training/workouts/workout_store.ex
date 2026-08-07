@@ -174,8 +174,7 @@ defmodule MilosTraining.Workouts.WorkoutStore do
     do: adapter().substitute_assignment_workout(assignment_id, new_workout_id)
 
   @impl true
-  def get_assignment_with_auth(assignment_id, actor),
-    do: adapter().get_assignment_with_auth(assignment_id, actor)
+  def get_assignment(assignment_id), do: adapter().get_assignment(assignment_id)
 
   @impl true
   def update_assignment_date(id, athlete_id, new_date),

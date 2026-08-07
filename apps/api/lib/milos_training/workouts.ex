@@ -141,8 +141,8 @@ defmodule MilosTraining.Workouts do
     end
   end
 
-  def get_assignment_with_auth(assignment_id, actor) do
-    MilosTraining.Workouts.WorkoutStore.get_assignment_with_auth(assignment_id, actor)
+  def get_assignment(assignment_id) do
+    MilosTraining.Workouts.WorkoutStore.get_assignment(assignment_id)
   end
 
   def update_assignment_date(id, from_date, new_date) do
