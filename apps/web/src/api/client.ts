@@ -85,7 +85,7 @@ function organizationSlugForRequest(token?: string | null) {
   return organizationSlugFromPath() ?? selectedOrganizationSlug() ?? organizationSlugFromToken(token);
 }
 
-const TENANT_SCOPED_PREFIXES = ["/admin", "/me/search/users", "/me/reviews"];
+const TENANT_SCOPED_PREFIXES = ["/admin", "/me/search/users", "/me/reviews", "/me/threads"];
 
 function tenantScopedPath(path: string, organizationSlug: string | null) {
   if (!organizationSlug) return path;

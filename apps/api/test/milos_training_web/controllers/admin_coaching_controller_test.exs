@@ -24,7 +24,7 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
     response =
       conn
       |> put_bearer_token(admin)
-      |> post("/api/threads/#{thread.id}/messages", %{
+      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread.id}/messages", %{
         body: "Keep your squat tempo controlled this week.",
         message_type: "coaching_note"
       })

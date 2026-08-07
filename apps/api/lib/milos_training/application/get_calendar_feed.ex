@@ -1,6 +1,7 @@
 defmodule MilosTraining.Application.GetCalendarFeed do
   alias MilosTraining.Application.CalendarFeedToken
-  alias MilosTraining.{Scheduling, Workouts}
+  alias MilosTraining.{Organizations, Scheduling}
+  alias MilosTraining.Workouts.WorkoutStore
   alias MilosTraining.Localization
 
   @past_days 30
@@ -20,50 +21,81 @@ defmodule MilosTraining.Application.GetCalendarFeed do
     start_at = DateTime.new!(start_date, ~T[00:00:00], "Etc/UTC")
     end_at = DateTime.new!(Date.add(end_date, 1), ~T[00:00:00], "Etc/UTC")
 
+    # A personal calendar spans the gyms its owner attends (F-28), but each
+    # gym's data must still be read under that gym's tenant context. Previously
+    # this called the un-scoped arities, which resolve to the legacy
+    # organization - so every user's feed carried the legacy gym's classes, and
+    # a global admin's carried every athlete's assignments (F-18/F-29).
     events =
-      class_events(user, start_at, end_at, locale) ++
-        assignment_events(user, start_date, end_date, locale)
+      user
+      |> active_tenant_contexts()
+      |> Enum.flat_map(fn context ->
+        class_events(context, user, start_at, end_at, locale) ++
+          assignment_events(context, user, start_date, end_date, locale)
+      end)
 
     render_ics(events, now)
   end
 
-  defp class_events(%{role: :athlete}, _start_at, _end_at, _locale), do: []
+  defp active_tenant_contexts(user) do
+    user.id
+    |> Organizations.list_memberships()
+    |> Enum.filter(&(&1.membership.status == :active))
+    |> Enum.flat_map(fn %{organization: organization} ->
+      case Organizations.resolve_tenant_context(user, organization.slug) do
+        {:ok, context} -> [context]
+        _unavailable -> []
+      end
+    end)
+  end
 
-  defp class_events(user, start_at, end_at, locale) do
+  # Role comes from the membership in this organization, never the account.
+  defp organization_admin?(context), do: context.role in [:owner, :admin, :coach]
+
+  defp class_events(context, user, start_at, end_at, locale) do
+    if context.role == :athlete do
+      []
+    else
+      do_class_events(context, user, start_at, end_at, locale)
+    end
+  end
+
+  defp do_class_events(context, user, start_at, end_at, locale) do
     slots =
-      %{start_at: start_at, end_at: end_at}
-      |> Scheduling.get_calendar_week()
-      |> Enum.filter(&include_slot?(&1, user))
+      Scheduling.get_calendar_week(context, %{start_at: start_at, end_at: end_at})
+      |> Enum.filter(&include_slot?(&1, user, organization_admin?(context)))
 
-    if user.role == :admin do
+    if organization_admin?(context) do
       recurring_events =
         slots
         |> Enum.filter(& &1.class_series_id)
         |> Enum.group_by(& &1.class_series_id)
-        |> Enum.map(fn {_series_id, [slot | _]} -> recurring_class_event(slot, user, locale) end)
+        |> Enum.map(fn {_series_id, [slot | _]} ->
+          recurring_class_event(slot, user, locale, true)
+        end)
 
       one_off_events =
         slots
         |> Enum.reject(& &1.class_series_id)
-        |> Enum.map(&class_event(&1, user, locale))
+        |> Enum.map(&class_event(&1, user, locale, true))
 
       recurring_events ++ one_off_events
     else
-      Enum.map(slots, &class_event(&1, user, locale))
+      Enum.map(slots, &class_event(&1, user, locale, false))
     end
   end
 
-  defp class_event(slot, user, locale) do
+  defp class_event(slot, user, locale, admin?) do
     %{
       uid: "class-#{slot.id}@trainingjournal",
       title: translate(locale, "Class: %{name}", %{name: class_name(slot)}),
       starts_at: slot.scheduled_at,
       ends_at: DateTime.add(slot.scheduled_at, slot.duration_minutes * 60, :second),
-      description: class_description(slot, user, locale)
+      description: class_description(slot, user, locale, admin?)
     }
   end
 
-  defp recurring_class_event(slot, user, locale) do
+  defp recurring_class_event(slot, user, locale, admin?) do
     series = slot.class_series
 
     %{
@@ -72,20 +104,23 @@ defmodule MilosTraining.Application.GetCalendarFeed do
       recurrence: series,
       starts_at: slot.scheduled_at,
       duration_minutes: series.duration_minutes,
-      description: class_description(slot, user, locale)
+      description: class_description(slot, user, locale, admin?)
     }
   end
 
-  defp assignment_events(%{role: :member}, _start_date, _end_date, _locale), do: []
+  defp assignment_events(context, user, start_date, end_date, locale) do
+    cond do
+      context.role == :member ->
+        []
 
-  defp assignment_events(%{role: :admin}, start_date, end_date, locale) do
-    Workouts.list_assigned_workouts_for_admin(start_date, end_date)
-    |> Enum.map(&assignment_event(&1, locale))
-  end
+      organization_admin?(context) ->
+        WorkoutStore.list_assigned_workouts_for_admin(context, start_date, end_date)
+        |> Enum.map(&assignment_event(&1, locale))
 
-  defp assignment_events(user, start_date, end_date, locale) do
-    Workouts.list_assigned_workouts_for_athlete(user.id, start_date, end_date)
-    |> Enum.map(&assignment_event(&1, locale))
+      true ->
+        WorkoutStore.list_assigned_workouts_for_athlete(context, user.id, start_date, end_date)
+        |> Enum.map(&assignment_event(&1, locale))
+    end
   end
 
   defp assignment_event(assignment, locale) do
@@ -112,19 +147,19 @@ defmodule MilosTraining.Application.GetCalendarFeed do
   defp date_value(%Date{} = date), do: date
   defp date_value(value) when is_binary(value), do: Date.from_iso8601!(value)
 
-  defp include_slot?(_slot, %{role: :admin}), do: true
+  defp include_slot?(_slot, _user, true = _admin?), do: true
 
-  defp include_slot?(slot, user) do
+  defp include_slot?(slot, user, _admin?) do
     Enum.any?(slot.bookings || [], fn booking ->
       booking.user_id == user.id and booking.status in [:pending, :approved]
     end)
   end
 
-  defp class_description(slot, %{role: :admin}, locale) do
+  defp class_description(slot, _user, locale, true = _admin?) do
     translate(locale, "Scheduled %{name} class in TrainingJournal.", %{name: class_name(slot)})
   end
 
-  defp class_description(slot, user, locale) do
+  defp class_description(slot, user, locale, _admin?) do
     booking =
       Enum.find(slot.bookings || [], fn booking ->
         booking.user_id == user.id and booking.status in [:pending, :approved]

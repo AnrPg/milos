@@ -288,10 +288,10 @@ export interface paths {
             cookie?: never;
         };
         /** List threads for the current user */
-        get: operations["MilosTrainingWeb.MessagingController.list_threads (2)"];
+        get: operations["MilosTrainingWeb.MessagingController.list_threads"];
         put?: never;
         /** Create or get an existing thread */
-        post: operations["MilosTrainingWeb.MessagingController.create_thread (2)"];
+        post: operations["MilosTrainingWeb.MessagingController.create_thread"];
         delete?: never;
         options?: never;
         head?: never;
@@ -546,7 +546,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get a single thread */
-        get: operations["MilosTrainingWeb.MessagingController.show_thread (2)"];
+        get: operations["MilosTrainingWeb.MessagingController.show_thread"];
         put?: never;
         post?: never;
         delete?: never;
@@ -823,10 +823,10 @@ export interface paths {
             cookie?: never;
         };
         /** List messages in a thread */
-        get: operations["MilosTrainingWeb.MessagingController.list_messages (2)"];
+        get: operations["MilosTrainingWeb.MessagingController.list_messages"];
         put?: never;
         /** Send a message in a thread */
-        post: operations["MilosTrainingWeb.MessagingController.send_message (2)"];
+        post: operations["MilosTrainingWeb.MessagingController.send_message"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1058,23 +1058,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/threads/unread-count": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Count unread threads for the current user */
-        get: operations["MilosTrainingWeb.MessagingController.unread_count (2)"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/org/{organization_slug}/admin/users/{id}/messages": {
         parameters: {
             query?: never;
@@ -1086,24 +1069,6 @@ export interface paths {
         get: operations["MilosTrainingWeb.AdminUserController.messages"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/threads": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List threads for the current user */
-        get: operations["MilosTrainingWeb.MessagingController.list_threads"];
-        put?: never;
-        /** Create or get an existing thread */
-        post: operations["MilosTrainingWeb.MessagingController.create_thread"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1327,23 +1292,6 @@ export interface paths {
         get: operations["MilosTrainingWeb.AdminFinanceController.cleanup_records"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/threads/{id}/read": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Mark a message as read in a thread */
-        post: operations["MilosTrainingWeb.MessagingController.mark_read (2)"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2722,24 +2670,6 @@ export interface paths {
         patch: operations["MilosTrainingWeb.AdminWellbeingController.heal"];
         trace?: never;
     };
-    "/api/threads/{id}/messages": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List messages in a thread */
-        get: operations["MilosTrainingWeb.MessagingController.list_messages"];
-        put?: never;
-        /** Send a message in a thread */
-        post: operations["MilosTrainingWeb.MessagingController.send_message"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/org/{organization_slug}/admin/athletes": {
         parameters: {
             query?: never;
@@ -2826,23 +2756,6 @@ export interface paths {
         head?: never;
         /** Update a user's role */
         patch: operations["MilosTrainingWeb.AdminUserController.update_role"];
-        trace?: never;
-    };
-    "/api/threads/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a single thread */
-        get: operations["MilosTrainingWeb.MessagingController.show_thread"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
         trace?: never;
     };
 }
@@ -3922,7 +3835,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MessagingController.list_threads (2)": {
+    "MilosTrainingWeb.MessagingController.list_threads": {
         parameters: {
             query?: {
                 context_type?: "direct" | "assignment" | "class_slot";
@@ -3966,7 +3879,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MessagingController.create_thread (2)": {
+    "MilosTrainingWeb.MessagingController.create_thread": {
         parameters: {
             query?: never;
             header?: never;
@@ -5201,7 +5114,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MessagingController.show_thread (2)": {
+    "MilosTrainingWeb.MessagingController.show_thread": {
         parameters: {
             query?: never;
             header?: never;
@@ -6222,7 +6135,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MessagingController.list_messages (2)": {
+    "MilosTrainingWeb.MessagingController.list_messages": {
         parameters: {
             query?: {
                 limit?: number;
@@ -6272,7 +6185,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MessagingController.send_message (2)": {
+    "MilosTrainingWeb.MessagingController.send_message": {
         parameters: {
             query?: never;
             header?: never;
@@ -7228,28 +7141,6 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MessagingController.unread_count (2)": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Unread count */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        unread_count: number;
-                    };
-                };
-            };
-        };
-    };
     "MilosTrainingWeb.AdminUserController.messages": {
         parameters: {
             query?: never;
@@ -7285,108 +7176,6 @@ export interface operations {
                         }[];
                         /** Format: uuid */
                         user_id: string;
-                    };
-                };
-            };
-        };
-    };
-    "MilosTrainingWeb.MessagingController.list_threads": {
-        parameters: {
-            query?: {
-                context_type?: "direct" | "assignment" | "class_slot";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Threads list */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        threads: {
-                            /** Format: uuid */
-                            context_id: string | null;
-                            /** @enum {string} */
-                            context_type: "direct" | "assignment" | "class_slot";
-                            /** Format: uuid */
-                            created_by_id: string;
-                            /** Format: uuid */
-                            id: string;
-                            /** Format: date-time */
-                            inserted_at: string;
-                            participants: {
-                                /** Format: uuid */
-                                id: string;
-                                /** Format: uuid */
-                                last_read_message_id: string | null;
-                                nickname: string | null;
-                                /** Format: uuid */
-                                user_id: string;
-                            }[];
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    "MilosTrainingWeb.MessagingController.create_thread": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                organization_slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** Format: uuid */
-                    context_id?: string;
-                    /**
-                     * @default direct
-                     * @enum {string}
-                     */
-                    context_type?: "direct" | "assignment" | "class_slot";
-                    /** Format: uuid */
-                    participant_id?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description Thread */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        thread: {
-                            /** Format: uuid */
-                            context_id: string | null;
-                            /** @enum {string} */
-                            context_type: "direct" | "assignment" | "class_slot";
-                            /** Format: uuid */
-                            created_by_id: string;
-                            /** Format: uuid */
-                            id: string;
-                            /** Format: date-time */
-                            inserted_at: string;
-                            participants: {
-                                /** Format: uuid */
-                                id: string;
-                                /** Format: uuid */
-                                last_read_message_id: string | null;
-                                nickname: string | null;
-                                /** Format: uuid */
-                                user_id: string;
-                            }[];
-                        };
                     };
                 };
             };
@@ -9989,58 +9778,6 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
-                };
-            };
-        };
-    };
-    "MilosTrainingWeb.MessagingController.mark_read (2)": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                organization_slug: string;
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** Format: uuid */
-                    message_id: string;
-                };
-            };
-        };
-        responses: {
-            /** @description Marked read */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** Format: uuid */
-                        message_id: string;
-                        read: boolean;
-                    };
-                };
-            };
-            /** @description Forbidden */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description Not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
                 };
             };
         };
@@ -14491,126 +14228,6 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MessagingController.list_messages": {
-        parameters: {
-            query?: {
-                limit?: number;
-                before_id?: string;
-            };
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Chat messages */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        messages: {
-                            body: string;
-                            /** Format: uuid */
-                            client_operation_id: string | null;
-                            /** Format: uuid */
-                            id: string;
-                            /** Format: date-time */
-                            inserted_at: string;
-                            /** @enum {string} */
-                            message_type: "chat" | "coaching_note" | "system";
-                            /** Format: uuid */
-                            sender_id: string;
-                            /** Format: uuid */
-                            thread_id: string;
-                        }[];
-                    };
-                };
-            };
-            /** @description Forbidden */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
-    "MilosTrainingWeb.MessagingController.send_message": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                organization_slug: string;
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    body: string;
-                    /** Format: uuid */
-                    client_operation_id?: string;
-                    /**
-                     * @default chat
-                     * @enum {string}
-                     */
-                    message_type?: "chat" | "coaching_note";
-                };
-            };
-        };
-        responses: {
-            /** @description Message created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        message: {
-                            body: string;
-                            /** Format: uuid */
-                            client_operation_id: string | null;
-                            /** Format: uuid */
-                            id: string;
-                            /** Format: date-time */
-                            inserted_at: string;
-                            /** @enum {string} */
-                            message_type: "chat" | "coaching_note" | "system";
-                            /** Format: uuid */
-                            sender_id: string;
-                            /** Format: uuid */
-                            thread_id: string;
-                        };
-                    };
-                };
-            };
-            /** @description Forbidden */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description Not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
     "MilosTrainingWeb.AdminUserController.index_athletes": {
         parameters: {
             query?: {
@@ -14874,68 +14491,6 @@ export interface operations {
                     "application/json": {
                         error: string;
                     };
-                };
-            };
-        };
-    };
-    "MilosTrainingWeb.MessagingController.show_thread": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Thread */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        thread: {
-                            /** Format: uuid */
-                            context_id: string | null;
-                            /** @enum {string} */
-                            context_type: "direct" | "assignment" | "class_slot";
-                            /** Format: uuid */
-                            created_by_id: string;
-                            /** Format: uuid */
-                            id: string;
-                            /** Format: date-time */
-                            inserted_at: string;
-                            participants: {
-                                /** Format: uuid */
-                                id: string;
-                                /** Format: uuid */
-                                last_read_message_id: string | null;
-                                nickname: string | null;
-                                /** Format: uuid */
-                                user_id: string;
-                            }[];
-                        };
-                    };
-                };
-            };
-            /** @description Forbidden */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description Not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
                 };
             };
         };

@@ -35,6 +35,51 @@ defmodule MilosTrainingWeb.CalendarFeedControllerTest do
     assert response(feed_response, 200) =~ "SUMMARY:Class: CrossFit"
   end
 
+  test "the feed carries only the organizations the account actually belongs to", %{conn: conn} do
+    # A class exists in the legacy organization...
+    legacy_admin = admin_fixture(%{nickname: "calendar_legacy_admin"})
+    legacy_workout = workout_fixture(legacy_admin, %{title: "Legacy Burner", type: "crossfit"})
+    legacy_slot = slot_fixture(legacy_workout)
+
+    assert {:ok, _booking} =
+             Scheduling.submit_booking(
+               legacy_admin.id,
+               legacy_slot.id,
+               legacy_slot.booking_timeout_minutes
+             )
+
+    # ...and an unrelated account belongs only to a different gym.
+    {:ok, other_org} = MilosTraining.Organizations.create_organization(%{name: "Calendar Gym B"})
+    outsider = user_fixture(%{nickname: "calendar_outsider"})
+
+    {:ok, _} =
+      MilosTraining.Organizations.add_membership(%{
+        organization_id: other_org.id,
+        user_id: outsider.id,
+        role: :member,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    links =
+      conn
+      |> put_bearer_token(outsider)
+      |> get("/api/calendar/export-links")
+      |> json_response(200)
+
+    body =
+      conn
+      |> recycle()
+      |> get("/api/calendar/feed.ics", %{token: links["token"]})
+      |> response(200)
+
+    # Before the tenant-scoping fix the un-scoped arity resolved to the legacy
+    # organization, so this class appeared in every account's feed (F-18).
+    assert body =~ "BEGIN:VCALENDAR"
+    refute body =~ "Legacy Burner"
+    refute body =~ "SUMMARY:Class: CrossFit"
+  end
+
   test "calendar feed rejects invalid tokens", %{conn: conn} do
     conn = get(conn, "/api/calendar/feed.ics", %{token: "invalid"})
     assert json_response(conn, 401)

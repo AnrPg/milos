@@ -367,13 +367,6 @@ defmodule MilosTrainingWeb.Router do
     post("/challenges/:id/opt_in", ChallengeController, :opt_in)
     delete("/challenges/:id/opt_in", ChallengeController, :opt_out)
 
-    get("/threads/unread-count", MessagingController, :unread_count)
-    post("/threads", MessagingController, :create_thread)
-    get("/threads", MessagingController, :list_threads)
-    get("/threads/:id", MessagingController, :show_thread)
-    get("/threads/:id/messages", MessagingController, :list_messages)
-    post("/threads/:id/messages", MessagingController, :send_message)
-    post("/threads/:id/read", MessagingController, :mark_read)
   end
 
   scope "/api/workouts", MilosTrainingWeb do
