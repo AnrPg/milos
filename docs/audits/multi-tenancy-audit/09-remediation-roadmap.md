@@ -238,12 +238,40 @@ blocking. P1–P3 remain open.
 
 ## P3 — Low priority / cleanup
 
-- P3.1 — Migrate remaining legacy-arity Scheduling/Workouts call sites (F-18), including the two global-role readers F-29 left behind (`GetLeaderboardSnippet`, `GetCalendarFeed`).
-- P3.2 — Delete dead `RequireRole` plug (F-02).
-- P3.3 — Enable RLS on `users` or formally document it as application-layer-only (F-08 in findings numbering).
-- P3.4 — Add RLS (or an explicit documented exception) to root tenant tables (F-16).
-- P3.5 — Resolve JWT `"memberships"` claim staleness with reissuance on membership/role change (F-20).
-- P3.6 — Investigate and resolve the duplicated `ReviewController` mounting (identified in the architecture map, not independently severity-rated as a security issue).
+- P3.1 — **FIXED 2026-08-07 (partial).** `archive_active_assignments_for_athlete`
+  now has an organization-scoped arity, closing the cross-organization sweep the
+  F-29 fix depended on. **Still open:** `GetLeaderboardSnippet` and
+  `GetCalendarFeed` read the global account role, and `GetCalendarFeed` uses the
+  un-scoped `Scheduling.get_calendar_week/1`. Neither exposes another tenant's
+  data (the leaderboard is org-scoped since P0.1; the feed is token-scoped to
+  one account), so they are the remaining F-18 tail rather than a live leak.
+- P3.2 — **FIXED 2026-08-07.** Dead `RequireRole` plug deleted (F-02). It
+  authorized on the *global* `user.role`, so wiring it up would have looked
+  correct and silently bypassed the tenancy model.
+- P3.3 — **FIXED 2026-08-07.** `users_owner_policy` dropped (F-08). It had been
+  created without ever enabling RLS on the table, so it had never done anything;
+  and it was also wrong (`id = app.user_id` would break login, tenant
+  resolution, and the admin directory). `users` is application-layer-only by
+  design, and `mix milos.tenancy.audit` now states that exemption explicitly.
+- P3.4 — **FIXED 2026-08-07** via the documented-exception route (F-16). RLS on
+  the root tenant tables would be circular: resolving a tenant requires reading
+  `organizations` and `organization_memberships` *before* any session GUC
+  exists. They are now reported under `platform_administered` by the audit task,
+  so the exemption is a claim on the record rather than an absence, and
+  `unclassified_tables/0` fails the audit if a new tenant table appears
+  unclassified.
+- P3.5 — **FIXED 2026-08-07** by removing the claim rather than refreshing it
+  (F-20). The `"memberships"` claim was never read back — not for authorization
+  (`TenantContext` is rebuilt from live DB state per request) and not by the
+  client. A stale claim nobody consults invites someone to start trusting it
+  later, and it embedded the user's full organization/role list in a credential
+  that gets logged and stored.
+- P3.6 — **FIXED 2026-08-07.** The duplicate flat `/api/reviews` mount ran under
+  `:user_only` with no `ResolveTenantContext`, and `ReviewController.action/2`
+  falls through without opening a tenant scope when none is present — so it
+  wrote reviews with no organization at all. Deleted; the org-scoped mount and
+  an `apiRequest` rewrite replace it. This turned out to be a tenancy defect,
+  not the cosmetic duplication the audit assumed.
 
 ## Sequencing summary (Gantt-style dependency sketch)
 
