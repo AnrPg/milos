@@ -22,7 +22,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.AuditTest do
     assert Audit.legacy_fallback_policies() == []
   end
 
-  test "root tenant tables are reported as explicitly exempt rather than omitted" do
+  test "root tenant tables are reported as explicitly classified rather than omitted" do
     report = Audit.report()
     tables = Enum.map(report.platform_administered, & &1.table)
 
@@ -31,6 +31,23 @@ defmodule MilosTraining.Infrastructure.Tenancy.AuditTest do
     end
 
     assert Enum.all?(report.platform_administered, & &1.exempt)
+  end
+
+  test "root tenant tables carry real RLS now that the circularity is resolved (F-16)" do
+    report = Audit.report()
+    by_table = Map.new(report.platform_administered, &{&1.table, &1})
+
+    for table <- ~w(organizations organization_memberships organization_settings
+                     organization_domains registration_invitations vendors
+                     organization_provisioning_events) do
+      status = Map.fetch!(by_table, table)
+      assert status.rls_enabled, "#{table} should have RLS enabled"
+      assert status.rls_forced, "#{table} should force RLS"
+    end
+
+    # users is the deliberate exception (F-08): its policy would have to run
+    # before any session context exists, so it stays application-layer-only.
+    refute Map.fetch!(by_table, "users").rls_enabled
   end
 
   test "materialized views are reported, with RLS marked inapplicable" do

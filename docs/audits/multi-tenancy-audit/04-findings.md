@@ -1352,7 +1352,33 @@ sets `app.admin_mode`/`app.execution_authorization_check` by default.
 ## F-16 — Root tenant tables (`organizations`, `organization_memberships`, `organization_settings`, `organization_domains`, `registration_invitations`) have no Row-Level Security at all
 
 
-**STATUS: RESOLVED 2026-08-07 (P3.4)** via the documented-exception route. RLS on the tenant root would be circular - resolving a tenant requires reading `organizations` and `organization_memberships` before any session GUC exists. They are reported under `platform_administered` by the audit task, and `unclassified_tables/0` fails the audit if a new tenant table appears unclassified.
+**STATUS: FIXED 2026-08-07 (P3.4).** RLS is now enabled and forced on all six
+root tenant tables (`organizations`, `organization_memberships`,
+`organization_settings`, `organization_domains`, `registration_invitations`,
+`vendors`) plus `organization_provisioning_events` (a write-only vendor audit
+log with the same tenant shape, found while doing this). The circularity - a
+tenant resolving requires reading `organizations` before any session GUC
+exists - is resolved in application code, not avoided: `ResolveTenantContext`
+and `ResolvePlatformContext` now open a user-scoped `RepoContext.run/2` session
+before the lookup, so `app.user_id` is set while the tenant is being resolved
+and the policies key on it. Invitation inspection/redemption run under a
+narrow `app.invitation_redemption` carve-out, since the holder of an invitation
+is by definition not yet a member of the organization they are reading.
+
+Verified under a real non-superuser connection
+(`root_tables_rls_test.exs`): isolation holds (an organization, its roster, and
+its settings are invisible to an account with no membership in it; an ordinary
+member sees only their own membership row, not the whole roster) **and**
+tenant resolution continues to work (a member reads their own organization and
+membership by slug) - the second property is the one that makes this class of
+change risky, since a policy that isolates perfectly but blocks login is an
+outage, not a fix.
+
+`users` remains the one deliberate exception (F-08): enabling RLS on it would
+require a policy to run before any session context exists at all (nickname
+lookup at login, token verification), so it stays application-layer-only by
+design, and the audit task now says so explicitly rather than lumping it in
+with the tables that are actually enforced.
 **Severity:** Medium (defense-in-depth gap; these are platform-administered tables so application-layer scoping is the primary control) · **Confidence:** Confirmed (live query)
 
 **Evidence:** Live `pg_class` query during this audit: `relrowsecurity=false,

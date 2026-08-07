@@ -13,9 +13,17 @@ defmodule Mix.Tasks.Milos.Tenancy.Audit do
     Enum.each(report.transitional, &print_status("transitional", &1))
 
     Enum.each(report.platform_administered, fn status ->
+      # F-16: most of these carry real RLS now (see the enable_rls_on_root_
+      # tenant_tables migration); `users` is the deliberate exception (F-08),
+      # since its policy would have to run before any session context exists.
+      note =
+        if status.rls_enabled and status.rls_forced,
+          do: "enforced",
+          else: "exempt: application-layer-only by design"
+
       Mix.shell().info(
         "platform-administered #{status.table}: rls=#{status.rls_enabled} " <>
-          "force=#{status.rls_forced} (exempt: holds the tenancy model itself)"
+          "force=#{status.rls_forced} (#{note})"
       )
     end)
 

@@ -1,12 +1,17 @@
 defmodule MilosTraining.Organizations.Commands.RedeemInvitation do
   alias MilosTraining.Identity
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Organizations.Domain.{InvitationEmail, InvitationToken}
   alias MilosTraining.Organizations.OrganizationStore
 
   def call(token, user_id, redeemed_at) do
     with {:ok, digest} <- InvitationToken.decode(token),
          :ok <- authorize_intended_email(digest, user_id) do
-      OrganizationStore.redeem_invitation(digest, user_id, redeemed_at)
+      # The redeemer is not yet a member of the organization they are joining,
+      # so this runs under the invitation carve-out (F-16).
+      RepoContext.run(%{invitation_redemption: true, user_id: user_id}, fn ->
+        OrganizationStore.redeem_invitation(digest, user_id, redeemed_at)
+      end)
       |> hide_invitation_state()
     end
   end
@@ -19,7 +24,9 @@ defmodule MilosTraining.Organizations.Commands.RedeemInvitation do
   # consume the invitation: a wrong account must leave it redeemable by the
   # right one.
   defp authorize_intended_email(digest, user_id) do
-    case OrganizationStore.get_invitation_by_digest(digest) do
+    case RepoContext.run(%{invitation_redemption: true}, fn ->
+           OrganizationStore.get_invitation_by_digest(digest)
+         end) do
       # Let the store's own transaction produce the not-found error, so this
       # check never becomes an oracle for which tokens exist.
       nil ->

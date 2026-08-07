@@ -66,6 +66,34 @@ defmodule MilosTraining.RLSCase do
           System.get_env("DB_NAME", "milos_training_test#{System.get_env("MIX_TEST_PARTITION")}")
       )
 
+    # These tests write outside the Ecto sandbox (the raw connection is the whole
+    # point), so nothing rolls back. Without this every run left its
+    # organizations and users behind, which then skewed suite-wide count
+    # assertions elsewhere. Cleanup lives here rather than in each test so it
+    # also runs when a test fails partway through.
+    on_exit(fn ->
+      {:ok, cleanup} =
+        Postgrex.start_link(
+          hostname: System.get_env("DB_HOST", "localhost"),
+          port: String.to_integer(System.get_env("DB_PORT", "5432")),
+          username: System.get_env("DB_USER", "postgres"),
+          password: System.get_env("DB_PASSWORD", "postgres"),
+          database:
+            System.get_env("DB_NAME", "milos_training_test#{System.get_env("MIX_TEST_PARTITION")}")
+        )
+
+      Postgrex.query!(
+        cleanup,
+        "DELETE FROM organization_memberships WHERE user_id IN (SELECT id FROM users WHERE nickname LIKE 'rls\_%')",
+        []
+      )
+
+      Postgrex.query!(cleanup, "DELETE FROM users WHERE nickname LIKE 'rls\_%'", [])
+      Postgrex.query!(cleanup, "DELETE FROM organizations WHERE slug LIKE 'rls-%'", [])
+
+      GenServer.stop(cleanup)
+    end)
+
     {:ok, conn: pid}
   end
 

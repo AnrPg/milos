@@ -15,6 +15,14 @@ defmodule MilosTraining.Infrastructure.Tenancy.RepoContext do
     with_settings(contextual_settings(context), fun)
   end
 
+  # Invitation redemption is the one flow where the acting account is
+  # legitimately not yet a member of the organization it is reading, so the
+  # membership-based policies on the root tenant tables cannot apply. Narrow,
+  # explicit, and set only by RedeemInvitation/InspectInvitation.
+  def run(%{invitation_redemption: true} = context, fun) when is_function(fun, 0) do
+    with_settings(contextual_settings(context), fun)
+  end
+
   def run(_context, _fun), do: {:error, :missing_ownership_scope}
 
   def current_setting(name)
@@ -22,7 +30,8 @@ defmodule MilosTraining.Infrastructure.Tenancy.RepoContext do
              "app.organization_id",
              "app.user_id",
              "app.admin_mode",
-             "app.execution_authorization_check"
+             "app.execution_authorization_check",
+             "app.invitation_redemption"
            ] do
     case Ecto.Adapters.SQL.query(Repo, "SELECT current_setting($1, true)", [name]) do
       {:ok, %{rows: [[value]]}} when value in [nil, ""] -> nil
@@ -50,6 +59,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.RepoContext do
     |> maybe_put_user(context)
     |> maybe_put_admin_mode(context)
     |> maybe_put_execution_authorization_check(context)
+    |> maybe_put_invitation_redemption(context)
   end
 
   defp maybe_put_user(settings, %{user_id: user_id}) when is_binary(user_id),
@@ -87,6 +97,11 @@ defmodule MilosTraining.Infrastructure.Tenancy.RepoContext do
     do: [{"app.execution_authorization_check", "true"} | settings]
 
   defp maybe_put_execution_authorization_check(settings, _context), do: settings
+
+  defp maybe_put_invitation_redemption(settings, %{invitation_redemption: true}),
+    do: [{"app.invitation_redemption", "true"} | settings]
+
+  defp maybe_put_invitation_redemption(settings, _context), do: settings
 
   defp set_session(name, value) do
     Ecto.Adapters.SQL.query!(Repo, "SELECT set_config($1, $2, false)", [name, value])

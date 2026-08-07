@@ -1,10 +1,13 @@
 defmodule MilosTraining.Organizations.Queries.ResolvePlatformContext do
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Organizations.{OrganizationStore, PlatformContext}
 
   def call(account, request_metadata \\ %{})
 
   def call(%{id: user_id} = account, request_metadata) do
-    case OrganizationStore.get_vendor(user_id) do
+    # Same reason as ResolveTenantContext: the vendors policy keys on
+    # app.user_id, so the lookup has to run inside a user-scoped session.
+    case RepoContext.run(%{user_id: user_id}, fn -> OrganizationStore.get_vendor(user_id) end) do
       nil ->
         {:error, :vendor_required}
 

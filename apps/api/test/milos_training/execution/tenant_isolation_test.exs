@@ -50,13 +50,15 @@ defmodule MilosTraining.Execution.TenantIsolationTest do
     assert rows_without_membership == [],
            "admin_mode bypass leaked an execution from an organization the admin is not a member of"
 
-    as_session(conn, owner_id_s, org_id_s, false, fn ->
-      Postgrex.query!(conn, """
-      INSERT INTO organization_memberships
-        (id, organization_id, user_id, role, status, joined_at, inserted_at, updated_at)
-      VALUES ($1, $2, $3, 'coach', 'active', now(), now(), now())
-      """, [membership_id, org_id, admin_id])
-    end)
+    # Seeded as a system path (no acting user), the way provisioning and
+    # bootstrap create memberships. Inserting it while acting as an owner who
+    # holds no membership themselves is not a flow the app has, and the root
+    # tables' RLS now says so (F-16).
+    Postgrex.query!(conn, """
+    INSERT INTO organization_memberships
+      (id, organization_id, user_id, role, status, joined_at, inserted_at, updated_at)
+    VALUES ($1, $2, $3, 'coach', 'active', now(), now(), now())
+    """, [membership_id, org_id, admin_id])
 
     rows_with_membership =
       as_session(conn, admin_id_s, nil, true, fn ->
