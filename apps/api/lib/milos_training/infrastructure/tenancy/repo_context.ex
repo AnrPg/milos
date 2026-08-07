@@ -57,6 +57,22 @@ defmodule MilosTraining.Infrastructure.Tenancy.RepoContext do
 
   defp maybe_put_user(settings, _context), do: settings
 
+  # `app.admin_mode` only ever *requests* the widened execution policy; the
+  # policy itself independently requires an active owner/admin/coach membership
+  # in the execution's own organization (F-23), so this flag cannot grant
+  # anything on its own.
+  #
+  # Prefer the membership role of the organization being opened (F-29). Only
+  # where no tenant context exists - the executions routes are user-scoped, not
+  # org-scoped - does the account-wide role stand in, and there the policy's own
+  # membership check remains the authority.
+  @admin_mode_roles [:owner, :admin, :coach]
+
+  defp maybe_put_admin_mode(settings, %{role: role}) when role in @admin_mode_roles,
+    do: [{"app.admin_mode", "true"} | settings]
+
+  defp maybe_put_admin_mode(settings, %{role: _role}), do: settings
+
   defp maybe_put_admin_mode(settings, %{account: %{role: role}}) do
     if to_string(role) == "admin" do
       [{"app.admin_mode", "true"} | settings]

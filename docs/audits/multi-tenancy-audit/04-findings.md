@@ -510,6 +510,8 @@ any org.
 
 ## F-02 — Legacy global `user.role` still authorizes real behavior on multiple code paths, independent of organization membership
 
+
+**STATUS: FIXED 2026-08-07.** `RequireRole` deleted (P3.2). The application-layer global-role reads this finding lists are also resolved: see F-29 for the role model, and `GetCalendarFeed`/`GetLeaderboardSnippet`/`GetScheduleCalendar` are now membership-scoped. The remaining `users.role` reads are display/listing filters, not authorization.
 **Severity:** High · **Confidence:** Confirmed (read directly)
 **Invariant affected:** Tenant roles must be attached to membership, not treated as a global user property; a user's role in tenant A must not grant access derived from a global attribute.
 
@@ -560,6 +562,8 @@ calendar feed or elevated schedule/leaderboard views.
 
 ## F-03 — Client-supplied `organization_id` accepted with no membership validation for self-selected/class-booking workout executions
 
+
+**STATUS: FIXED 2026-08-07.** Every execution source now returns a server-derived `organization_id`; `self_selected` derives it from the workout and requires an active membership there. This finding was never carried into the roadmap, which is why it survived earlier passes.
 **Severity:** High · **Confidence:** Confirmed (read directly, refined from initial subagent report)
 **Invariant affected:** Creation must derive tenant identity from trusted server-side context, not client input.
 
@@ -1019,6 +1023,8 @@ involved, expecting zero rows.
 
 ## F-08 — `users` table has an RLS policy defined but Row-Level Security was never enabled for it
 
+
+**STATUS: FIXED 2026-08-07 (P3.3).** `users_owner_policy` dropped rather than enabled - it had never been active, and `id = app.user_id` would break login, tenant resolution and the admin directory. `users` is application-layer-only by design and the audit task now reports that exemption explicitly.
 **Severity:** High · **Confidence:** Confirmed (live `pg_class`/`pg_policies` query)
 
 **Evidence:** Policy `users_owner_policy` created in
@@ -1147,6 +1153,8 @@ scenario impossible).
 
 ## F-10 — `intended_email_digest` is computed and stored on every invitation but never checked during redemption
 
+
+**STATUS: FIXED 2026-08-07 (P2.8).** Accounts gained a mandatory, unique email; invitations bound to an address are only redeemable by an account holding it.
 **Severity:** Medium · **Confidence:** Confirmed (grep across the full write and read paths)
 
 **Evidence:** Populated at issuance in all three invitation-creation paths
@@ -1182,6 +1190,8 @@ actually happens.
 
 ## F-11 — No membership suspend/revoke command exists despite the schema's `status` enum implying one
 
+
+**STATUS: FIXED 2026-08-07 (P2.2).** `Commands.SetMembershipStatus`, owner/admin gated with the F-06 ceiling and a self-change guard.
 **Severity:** Medium · **Confidence:** Confirmed (grep across all Organizations commands/ports)
 
 **Evidence:** `organization_memberships.status ∈ {invited, active, suspended,
@@ -1212,6 +1222,8 @@ their next request to any tenant-scoped endpoint for that org is rejected.
 
 ## F-12 — No `platform_owners` revocation path exists
 
+
+**STATUS: FIXED 2026-08-07 (P2.2).** `Organizations.revoke_vendor/1` and `mix milos.platform.revoke_vendor`, mirroring the grant task's shell-only surface.
 **Severity:** Low-Medium · **Confidence:** Confirmed (grep across Organizations context)
 
 **Evidence:** `grant_platform_owner/1` exists and is correctly restricted to the
@@ -1233,6 +1245,8 @@ audited pattern as the grant task.
 
 ## F-13 — Coverage gaps in `mix milos.tenancy.audit` and `mix milos.architecture` make TD-038's "complete" claim materially overstated
 
+
+**STATUS: FIXED 2026-08-07 (P2.7).** The audit now fails on any unclassified table carrying `organization_id` (which immediately found two), reports root tables and materialized views explicitly, and guards against the COALESCE fallback returning. `mix milos.architecture` covers all eleven context stores plus a materialized-view predicate check.
 **Severity:** Medium (process/tooling — produces false confidence, not itself an exploit) · **Confidence:** Confirmed (source read directly)
 
 **Evidence:** `apps/api/lib/milos_training/infrastructure/tenancy/audit.ex:4-29`
@@ -1311,6 +1325,8 @@ Org A's rows through any public context API function.
 
 ## F-15 — `execution` RLS policy includes session-GUC bypass flags (`app.admin_mode`, `app.execution_authorization_check`) that widen the trust surface
 
+
+**STATUS: RESOLVED 2026-08-07.** Verified against the live policy: the `app.admin_mode` branch requires an active owner/admin/coach membership in the execution's *own* organization (F-23's fix), so the flag requests the widened policy but cannot grant it. `app.execution_authorization_check` is set only by `ExecutionStore.with_authorization_context/2`, reached from exactly two audited call sites. The flag is now also derived from the membership role wherever a tenant context exists.
 **Severity:** Medium · **Confidence:** Reported by delegated research, not independently re-verified against the live migration text — recommend a follow-up read of `apps/api/priv/repo/migrations/20260804161500_allow_execution_admin_and_authorization_reads.exs` and `apps/api/lib/milos_training/infrastructure/execution/ecto_execution_store.ex:254-262` before acting.
 
 **Evidence (as reported):** `scoped_to_user/1` in the execution store
@@ -1335,6 +1351,8 @@ sets `app.admin_mode`/`app.execution_authorization_check` by default.
 
 ## F-16 — Root tenant tables (`organizations`, `organization_memberships`, `organization_settings`, `organization_domains`, `registration_invitations`) have no Row-Level Security at all
 
+
+**STATUS: RESOLVED 2026-08-07 (P3.4)** via the documented-exception route. RLS on the tenant root would be circular - resolving a tenant requires reading `organizations` and `organization_memberships` before any session GUC exists. They are reported under `platform_administered` by the audit task, and `unclassified_tables/0` fails the audit if a new tenant table appears unclassified.
 **Severity:** Medium (defense-in-depth gap; these are platform-administered tables so application-layer scoping is the primary control) · **Confidence:** Confirmed (live query)
 
 **Evidence:** Live `pg_class` query during this audit: `relrowsecurity=false,
@@ -1355,6 +1373,8 @@ ownership inventory so the exception is deliberate, not an oversight.
 
 ## F-17 — Materialized views are not covered by any RLS or by `mix milos.tenancy.audit`
 
+
+**STATUS: FIXED 2026-08-07 (P2.7).** Materialized views are reported by the audit task with RLS marked inapplicable, and `mix milos.architecture` now fails any raw SQL naming one without an `organization_id` predicate - verified by injecting the F-22 regression.
 **Severity:** Low · **Confidence:** Confirmed (`pg_matviews` cannot host RLS; audit script table list checked directly)
 
 **Evidence:** `finance_aggregates`, `coaching_aggregates`, `weekly_leaderboard`
@@ -1374,6 +1394,8 @@ makes an unscoped read impossible to write.
 
 ## F-18 — Un-scoped legacy-arity Scheduling/Workouts store functions are hardcoded to operate only against the legacy organization
 
+
+**STATUS: LARGELY FIXED 2026-08-07 (P3.1).** Assignment archiving and the calendar feed now use organization-scoped arities. The legacy no-context arities remain for other callers and are labelled as such; note they resolve via a hardcoded `legacy-milos-training` slug that does not exist in production, so any surviving un-scoped path fails rather than silently reading another tenant.
 **Severity:** Low (functional inequality for new tenants, not a security leak — RLS still bounds these calls to the legacy org) · **Confidence:** Confirmed (code comment + function inspection)
 
 **Evidence:** `apps/api/lib/milos_training/workouts/workout_store.ex:10-11`:
@@ -1533,6 +1555,8 @@ either requires an org filter parameter or returns no results without one.
 
 ## F-20 — JWT `"memberships"` claims can go stale after a role/membership change with no automatic invalidation (informational)
 
+
+**STATUS: FIXED 2026-08-07 (P3.5)** by removing the claim rather than refreshing it. It was never read back - not for authorization, not by the client - and embedded the account's full organization/role list in a credential that gets logged.
 **Severity:** Low (confirmed cosmetic/UI-only, not an authorization bypass) · **Confidence:** Confirmed (read directly)
 
 **Evidence:** `apps/api/lib/milos_training/infrastructure/auth/guardian_token_issuer.ex:21-32`
@@ -1560,6 +1584,8 @@ low priority given no security impact.
 
 ## F-28 — Owner-scoped reads are not constrained by the tenant boundary: a member reads their own records across every organization they belong to
 
+
+**STATUS: RESOLVED 2026-08-07.** Product decision: personal records follow the member across organizations. The Wellbeing owner branch is intentional and documented as the tenancy model's one sanctioned cross-organization read; the notification inbox stays cross-organization but now carries its origin so the client can flag it. The admin-facing injury list and analytics summary were split onto a fail-closed `scoped_to_tenant/1` - a real defect this finding had folded in with the product question.
 **Severity:** High for `injury_reports` (medical data, confirmed to survive RLS
 in production); Medium for `notifications` · **Confidence:** Confirmed
 (reproduced under real non-superuser RLS in
@@ -1654,6 +1680,8 @@ is the regression test for the fix.
 ---
 
 ## F-29 — Tenant admin can change any account's **global** role, for accounts outside their organization, with no role ceiling
+
+**STATUS: FIXED 2026-08-07 (P1.8).**
 
 **Severity:** High (cross-tenant privilege escalation + IDOR) · **Confidence:**
 Confirmed (read directly, then reproduced in
