@@ -81,6 +81,22 @@ blocking. P1–P3 remain open.
 - **Approach:** Add a CI job (or extend the existing one) that provisions a non-superuser, non-BYPASSRLS role for at least the isolation-test subset; add a startup/health check that fails if the production runtime connection is a superuser or has BYPASSRLS.
 - **Tests required before merge:** the health check itself needs a test (connect as superuser in a test harness, assert the check fails).
 
+### P1.8 — Fix per-organization role assignment (F-29) — **FIXED 2026-08-07**
+- Tenant admins could change any account's **global** role — including accounts
+  that had never belonged to their organization, and with no role ceiling.
+  Replaced with `Commands.SetMembershipRole` (membership-scoped, ceiling-checked
+  against both the requested and the current role, self-change refused); the
+  global-role mutation path (`UpdateUserRole`) was deleted outright.
+- Also fixed `GetScheduleCalendar.booking_nickname_cache/2`, which decided
+  nickname visibility from the global role while the helper beside it already
+  resolved the tenant role correctly.
+- **Residual:** `GetLeaderboardSnippet` and `GetCalendarFeed` still read the
+  global role. Neither exposes another tenant's data, and both are entangled
+  with F-18's un-scoped arities, so they are folded into P3.1.
+- **Tests:** `set_membership_role_test.exs` (9), covering cross-org isolation,
+  the ceiling in both directions, self-change, and the previous role's state
+  reconciliation.
+
 ## P2 — Medium priority
 
 ### P2.1 — Add missing two-organization isolation tests: Notifications, Wellbeing, Coaching (F-14)
@@ -222,7 +238,7 @@ blocking. P1–P3 remain open.
 
 ## P3 — Low priority / cleanup
 
-- P3.1 — Migrate remaining legacy-arity Scheduling/Workouts call sites (F-18).
+- P3.1 — Migrate remaining legacy-arity Scheduling/Workouts call sites (F-18), including the two global-role readers F-29 left behind (`GetLeaderboardSnippet`, `GetCalendarFeed`).
 - P3.2 — Delete dead `RequireRole` plug (F-02).
 - P3.3 — Enable RLS on `users` or formally document it as application-layer-only (F-08 in findings numbering).
 - P3.4 — Add RLS (or an explicit documented exception) to root tenant tables (F-16).
