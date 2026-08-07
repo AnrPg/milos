@@ -1650,3 +1650,76 @@ behaviour, tagged `:documents_current_behaviour` —
 `wellbeing/tenant_isolation_test.exs`, `notifications/tenant_isolation_test.exs`,
 and `wellbeing/rls_enforcement_test.exs`. Flipping those assertions to `refute`
 is the regression test for the fix.
+
+---
+
+## F-29 — Tenant admin can change any account's **global** role, for accounts outside their organization, with no role ceiling
+
+**Severity:** High (cross-tenant privilege escalation + IDOR) · **Confidence:**
+Confirmed (read directly, then reproduced in
+`apps/api/test/milos_training/organizations/set_membership_role_test.exs`)
+
+**Discovered:** 2026-08-07, while auditing what still reads the global
+`users.role`. Not in the original audit.
+
+**Evidence:** `PATCH /api/org/:organization_slug/admin/users/:id/role` is
+mounted under the `admin_only` pipeline and called
+`Application.UpdateUserRole.call/2`, which resolved the target with
+`Identity.find_by_id(user_id)` and then wrote `users.role` via
+`Identity.update_role/2`.
+
+Three separate failures in one endpoint:
+
+1. **No membership check.** The target was looked up by id alone. A tenant
+   admin could change the role of an account that had never been a member of
+   their organization — an IDOR across the whole user table.
+2. **No role ceiling.** Nothing compared the requested role against the
+   acting admin's own. An `admin` could grant `admin`, or demote an `owner`,
+   contradicting the F-06 product decision that an account may never grant a
+   role more privileged than its own.
+3. **Global effect.** `users.role` is account-wide, so a change made by Org A's
+   admin applied to the account in **every** organization it belonged to.
+
+**Failure scenario:** an admin of Org A issues
+`PATCH /api/org/org-a/admin/users/<victim>/role {"role": "admin"}` for an
+account whose only membership is in Org B. The account becomes globally
+`:admin`, which Org B's surfaces then honour.
+
+**Root cause:** role was modelled twice — `users.role` (account-wide) and
+`organization_memberships.role` (per organization) — and the admin-facing
+endpoint wrote the wrong one. The tenancy model treats role as a property of a
+membership; this endpoint treated it as a property of the account.
+
+**Remediation applied (2026-08-07):** replaced with
+`Organizations.Commands.SetMembershipRole`, which:
+
+- resolves the target's membership **within `context.organization_id`**, so an
+  account outside the acting organization has no membership to find and gets
+  `:not_found`;
+- applies `MembershipPolicy.can_grant_role?/2` against **both** the requested
+  role and the target's current role, so an admin can neither promote above
+  themselves nor demote an owner;
+- refuses self-change, matching F-11's lockout guard;
+- carries over the previous role's state reconciliation (cancelling future
+  bookings when leaving `:member`, archiving assignment access when leaving
+  `:athlete`), now scoped to the acting organization.
+
+`UpdateUserRole` and its route binding were deleted outright — there is no
+longer any admin-facing path that writes the global role.
+
+**Residual:** assignment archiving still calls a legacy un-scoped arity
+(`Workouts.archive_active_assignments_for_athlete/1`) and so still reaches
+across organizations. Marked `TODO(F-18)` in the source and tracked under P3.1.
+
+**Also fixed under this finding:** `GetScheduleCalendar.booking_nickname_cache/2`
+decided whether to expose other members' nicknames from the global account
+role, bypassing the `admin_role?/2` helper beside it that correctly prefers the
+tenant membership role.
+
+**Still reading the global role (lower severity, not cross-tenant leaks):**
+`GetLeaderboardSnippet` (admins see the leaderboard regardless of opt-in — the
+leaderboard data itself is org-scoped since P0.1, so this grants a visibility
+perk, not another tenant's data) and `GetCalendarFeed` (token-authenticated,
+no tenant context in scope; its real problem is the un-scoped
+`Scheduling.get_calendar_week/1` arity, i.e. F-18). Both are tracked under
+P3.1 rather than left silent.
