@@ -141,6 +141,41 @@ defmodule MilosTraining.Organizations.SetMembershipRoleTest do
       assert Scheduling.get_booking(booking.id) == nil
     end
 
+    test "archiving assignment access does not reach another organization" do
+      admin = TestFixtures.admin_fixture()
+      athlete = TestFixtures.user_fixture(%{role: :athlete})
+      workout = TestFixtures.workout_fixture(admin)
+
+      assert {:ok, assignment} =
+               AssignWorkout.call(%{
+                 master_workout_id: workout.id,
+                 scheduled_for: Date.utc_today() |> Date.add(1) |> Date.to_iso8601(),
+                 athlete_ids: [athlete.id],
+                 admin_notes: "Cross-org coverage"
+               })
+
+      # The athlete also belongs to a second gym, where the role change happens.
+      {:ok, other_org} = Organizations.create_organization(%{name: "Other Role Gym"})
+
+      for {user, role} <- [{admin, :owner}, {athlete, :athlete}] do
+        {:ok, _} =
+          Organizations.add_membership(%{
+            organization_id: other_org.id,
+            user_id: user.id,
+            role: role,
+            status: :active,
+            joined_at: DateTime.utc_now()
+          })
+      end
+
+      {:ok, other_context} = Organizations.resolve_tenant_context(admin, other_org.slug)
+
+      assert {:ok, _} = Organizations.set_membership_role(other_context, athlete.id, :member)
+
+      # The legacy organization's assignment must survive: it was never in scope.
+      assert Workouts.get_assignment_execution_access(assignment.id, athlete.id)
+    end
+
     test "leaving :athlete archives assignment access while retaining history" do
       admin = TestFixtures.admin_fixture()
       athlete = TestFixtures.user_fixture(%{role: :athlete})

@@ -81,6 +81,10 @@ defmodule MilosTraining.Workouts do
     do:
       MilosTraining.Workouts.WorkoutStore.reject_assignment_for_athlete(assignment_id, athlete_id)
 
+  defdelegate archive_active_assignments_for_athlete(context, athlete_id),
+    to: MilosTraining.Workouts.WorkoutStore,
+    as: :archive_active_assignments_for_athlete
+
   defdelegate archive_active_assignments_for_athlete(athlete_id),
     to: ArchiveAthleteAssignments,
     as: :call

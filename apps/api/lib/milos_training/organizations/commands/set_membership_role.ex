@@ -85,10 +85,8 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipRole do
     end
   end
 
-  defp reconcile_role_owned_state(_context, %{role: :athlete, user_id: user_id}, _new_role) do
-    # TODO(F-18): only a legacy un-scoped arity exists for assignments, so this
-    # still reaches across organizations. Tracked as P3.1.
-    case Workouts.archive_active_assignments_for_athlete(user_id) do
+  defp reconcile_role_owned_state(context, %{role: :athlete, user_id: user_id}, _new_role) do
+    case Workouts.archive_active_assignments_for_athlete(context, user_id) do
       {:ok, _assignment_ids} -> :ok
       error -> error
     end

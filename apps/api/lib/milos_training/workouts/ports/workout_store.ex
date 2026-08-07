@@ -28,6 +28,8 @@ defmodule MilosTraining.Workouts.Ports.WorkoutStore do
   @callback replace_scale_levels([map()]) :: {:ok, [map()]} | {:error, Ecto.Changeset.t()}
   @callback reject_assignment_for_athlete(binary(), binary()) ::
               {:ok, map()} | {:error, :not_found | :forbidden | :already_rejected}
+  @callback archive_active_assignments_for_athlete(map(), binary()) ::
+              {:ok, [binary()]} | {:error, term()}
   @callback archive_active_assignments_for_athlete(binary()) ::
               {:ok, [Ecto.UUID.t()]} | {:error, Ecto.Changeset.t()}
   @callback reopen_workout(Ecto.UUID.t()) ::

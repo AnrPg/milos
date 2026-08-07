@@ -504,7 +504,22 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   end
 
   @impl true
+  def archive_active_assignments_for_athlete(%{organization_id: organization_id}, athlete_id) do
+    archive_active_assignments(athlete_id, organization_id)
+  end
+
+  @impl true
   def archive_active_assignments_for_athlete(athlete_id) do
+    # Legacy un-scoped arity (F-18): reaches every organization's assignments.
+    archive_active_assignments(athlete_id, nil)
+  end
+
+  defp scope_links_to_organization(query, nil), do: query
+
+  defp scope_links_to_organization(query, organization_id),
+    do: where(query, [link], link.organization_id == ^organization_id)
+
+  defp archive_active_assignments(athlete_id, organization_id) do
     Repo.transaction(fn ->
       links =
         AssignedWorkoutAthlete
@@ -513,6 +528,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           link.athlete_id == ^athlete_id and
             (is_nil(link.athlete_status) or link.athlete_status == :accepted)
         )
+        |> scope_links_to_organization(organization_id)
         |> order_by([link], asc: link.id)
         |> lock("FOR UPDATE")
         |> Repo.all()
