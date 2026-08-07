@@ -8,6 +8,8 @@ defmodule MilosTraining.Notifications.Ports.NotificationStore do
   @callback count_unread_inbox(Ecto.UUID.t()) :: non_neg_integer()
   @callback mark_all_read(Ecto.UUID.t()) :: non_neg_integer()
   @callback mark_read(Ecto.UUID.t(), Ecto.UUID.t()) :: boolean()
+  @callback get_notification_organization_id(Ecto.UUID.t(), Ecto.UUID.t()) ::
+              Ecto.UUID.t() | nil
   @callback delete_booking_pending_for_booking(Ecto.UUID.t()) :: :ok
   @callback propagate_nickname_change(String.t(), String.t()) :: :ok
   @callback get_push_settings() :: map()

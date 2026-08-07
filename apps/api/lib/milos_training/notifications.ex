@@ -63,6 +63,9 @@ defmodule MilosTraining.Notifications do
     end
   end
 
+  def get_notification_organization_id(user_id, notification_id),
+    do: NotificationStore.get_notification_organization_id(user_id, notification_id)
+
   def push_config do
     %{
       enabled: PushConfig.enabled?(),

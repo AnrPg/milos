@@ -29,6 +29,10 @@ defmodule MilosTraining.Notifications.NotificationStore do
   def mark_read(user_id, notification_id), do: adapter().mark_read(user_id, notification_id)
 
   @impl true
+  def get_notification_organization_id(user_id, notification_id),
+    do: adapter().get_notification_organization_id(user_id, notification_id)
+
+  @impl true
   def delete_booking_pending_for_booking(booking_id),
     do: adapter().delete_booking_pending_for_booking(booking_id)
 

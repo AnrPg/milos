@@ -65,6 +65,7 @@ defmodule MilosTraining.Workers.NotificationEventJobTest do
     def count_unread_inbox(_user_id), do: 0
     def mark_all_read(_user_id), do: 0
     def mark_read(_user_id, _notification_id), do: false
+    def get_notification_organization_id(_user_id, _notification_id), do: nil
     def delete_booking_pending_for_booking(_booking_id), do: :ok
     def propagate_nickname_change(_old_nickname, _new_nickname), do: :ok
     def get_push_settings, do: %{}

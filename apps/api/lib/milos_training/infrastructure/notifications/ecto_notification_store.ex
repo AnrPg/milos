@@ -110,6 +110,15 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
   end
 
   @impl true
+  def get_notification_organization_id(user_id, notification_id) do
+    Notification
+    |> scoped_to_user()
+    |> where([n], n.user_id == ^user_id and n.id == ^notification_id)
+    |> select([n], n.organization_id)
+    |> Repo.one()
+  end
+
+  @impl true
   def delete_booking_pending_for_booking(booking_id) do
     Notification
     |> scoped_to_organization()

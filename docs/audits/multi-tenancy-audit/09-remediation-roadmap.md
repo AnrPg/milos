@@ -238,13 +238,14 @@ blocking. P1–P3 remain open.
 
 ## P3 — Low priority / cleanup
 
-- P3.1 — **FIXED 2026-08-07 (partial).** `archive_active_assignments_for_athlete`
+- P3.1 — **FIXED 2026-08-07 (complete).** `archive_active_assignments_for_athlete`
   now has an organization-scoped arity, closing the cross-organization sweep the
-  F-29 fix depended on. **Still open:** `GetLeaderboardSnippet` and
-  `GetCalendarFeed` read the global account role, and `GetCalendarFeed` uses the
-  un-scoped `Scheduling.get_calendar_week/1`. Neither exposes another tenant's
-  data (the leaderboard is org-scoped since P0.1; the feed is token-scoped to
-  one account), so they are the remaining F-18 tail rather than a live leak.
+  F-29 fix depended on. `GetLeaderboardSnippet`'s global-role admin bypass was
+  removed outright (it was already inert — `get_leaderboard/2` fails closed with
+  no org open). `GetCalendarFeed` was rewritten to open a tenant context per
+  active membership (`active_tenant_contexts/1`) instead of resolving through
+  `legacy_scope()`, which had been silently routing every user's feed through
+  the legacy org regardless of which organizations they actually belonged to.
 - P3.2 — **FIXED 2026-08-07.** Dead `RequireRole` plug deleted (F-02). It
   authorized on the *global* `user.role`, so wiring it up would have looked
   correct and silently bypassed the tenancy model.
@@ -253,12 +254,21 @@ blocking. P1–P3 remain open.
   and it was also wrong (`id = app.user_id` would break login, tenant
   resolution, and the admin directory). `users` is application-layer-only by
   design, and `mix milos.tenancy.audit` now states that exemption explicitly.
-- P3.4 — **FIXED 2026-08-07** via the documented-exception route (F-16). RLS on
-  the root tenant tables would be circular: resolving a tenant requires reading
-  `organizations` and `organization_memberships` *before* any session GUC
-  exists. They are now reported under `platform_administered` by the audit task,
-  so the exemption is a claim on the record rather than an absence, and
-  `unclassified_tables/0` fails the audit if a new tenant table appears
+- P3.4 — **FIXED 2026-08-07 for real** (F-16). The circularity — resolving a
+  tenant requires reading `organizations` and `organization_memberships`
+  *before* any session GUC exists — is solved rather than documented around:
+  `ResolveTenantContext`/`ResolvePlatformContext` now run inside a user-scoped
+  `RepoContext` session so `app.user_id` is set while the tenant is being
+  resolved, and RLS is enabled and forced on all seven root tenant tables
+  (`organizations`, `organization_memberships`, `organization_settings`,
+  `organization_domains`, `registration_invitations`, `vendors`,
+  `organization_provisioning_events`) keyed on it. `users` remains the one
+  genuine `platform_administered` exemption (F-08 — login/token verification
+  must work before any session context exists). Proven under real non-superuser
+  RLS in `root_tables_rls_test.exs`: isolation holds cross-organization AND
+  tenant resolution/login continues to function. `mix milos.tenancy.audit`
+  distinguishes "enforced" from "exempt by design" accordingly, and
+  `unclassified_tables/0` still fails the audit if a new tenant table appears
   unclassified.
 - P3.5 — **FIXED 2026-08-07** by removing the claim rather than refreshing it
   (F-20). The `"memberships"` claim was never read back — not for authorization
