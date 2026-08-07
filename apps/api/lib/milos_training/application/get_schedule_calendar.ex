@@ -30,7 +30,7 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
   defp get_calendar_week(context, params), do: Scheduling.get_calendar_week(context, params)
 
   defp enrich_slots(slots, context, actor) do
-    nickname_cache = booking_nickname_cache(slots, actor)
+    nickname_cache = booking_nickname_cache(slots, admin_role?(context, actor))
 
     workout_cache =
       slots
@@ -150,8 +150,10 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
     }
   end
 
-  defp booking_nickname_cache(slots, actor) do
-    if actor.role == :admin do
+  # Takes the already-resolved decision rather than re-deriving it from the
+  # global account role, which says nothing about this organization (F-29).
+  defp booking_nickname_cache(slots, admin?) do
+    if admin? do
       slots
       |> Enum.flat_map(& &1.bookings)
       |> Enum.map(& &1.user_id)
