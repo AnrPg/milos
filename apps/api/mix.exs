@@ -10,7 +10,11 @@ defmodule MilosTraining.MixProject do
       start_permanent: Mix.env() == :prod,
       listeners: [Phoenix.CodeReloader],
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      dialyzer: [
+        plt_add_deps: :apps_direct,
+        plt_add_apps: [:ecto, :mix, :phoenix_pubsub, :plug, :telemetry]
+      ]
     ]
   end
 
@@ -41,11 +45,11 @@ defmodule MilosTraining.MixProject do
       {:phoenix, "~> 1.8.1"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.13"},
-      {:postgrex, ">= 0.0.0"},
+      {:postgrex, "~> 0.22.4"},
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:swoosh, "~> 1.16"},
-      {:req, "~> 0.5"},
-      {:castore, "~> 1.0"},
+      {:req, "~> 0.7.2"},
+      {:castore, "~> 1.0.20"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:opentelemetry, "~> 1.5"},
@@ -59,17 +63,18 @@ defmodule MilosTraining.MixProject do
       {:jason, "~> 1.2"},
       {:open_api_spex, "~> 3.18"},
       {:oban, "~> 2.22.1"},
-      {:guardian, "~> 2.3"},
+      {:guardian, "~> 2.4.1"},
       {:argon2_elixir, "~> 4.0"},
       {:ex_rated, "~> 2.1"},
       {:redix, "~> 1.3"},
       {:web_push_elixir, "~> 0.8.0"},
       {:dns_cluster, "~> 0.2.0"},
-      {:bandit, "~> 1.5"},
+      {:bandit, "~> 1.12.4"},
       {:ex_aws, "~> 2.5"},
       {:ex_aws_s3, "~> 2.5"},
-      {:hackney, "~> 4.5"},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+      {:hackney, "~> 4.7.2"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -84,6 +89,7 @@ defmodule MilosTraining.MixProject do
         "compile --warning-as-errors",
         "milos.architecture",
         "credo --strict",
+        "dialyzer",
         "deps.unlock --check-unused",
         "format --check-formatted",
         "test"
