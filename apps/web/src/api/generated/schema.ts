@@ -229,23 +229,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/me/invoices/{id}/download-url": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a presigned download URL for one of the current member's invoices */
-        get: operations["MilosTrainingWeb.MyFinanceController.invoice_download_url (2)"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/org/{organization_slug}/admin/finance/queues": {
         parameters: {
             query?: never;
@@ -519,23 +502,6 @@ export interface paths {
         head?: never;
         /** Void a finance invoice */
         patch: operations["MilosTrainingWeb.AdminFinanceController.void_invoice"];
-        trace?: never;
-    };
-    "/api/me/finance": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get the current member's finance summary */
-        get: operations["MilosTrainingWeb.MyFinanceController.index (2)"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
         trace?: never;
     };
     "/api/org/{organization_slug}/me/threads/{id}": {
@@ -1821,7 +1787,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get the current user's effective package benefits and allowance usage */
-        get: operations["MilosTrainingWeb.MyFinanceController.entitlement (2)"];
+        get: operations["MilosTrainingWeb.MyFinanceController.entitlement"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2545,23 +2511,6 @@ export interface paths {
         put?: never;
         /** Reverse an applied credit ledger entry and restore member credit */
         post: operations["MilosTrainingWeb.AdminFinanceController.reverse_credit_ledger_entry"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/me/entitlement": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get the current user's effective package benefits and allowance usage */
-        get: operations["MilosTrainingWeb.MyFinanceController.entitlement"];
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3726,48 +3675,6 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
-                };
-            };
-        };
-    };
-    "MilosTrainingWeb.MyFinanceController.invoice_download_url (2)": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Download URL */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
-                };
-            };
-            /** @description Forbidden */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description Not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
                 };
             };
         };
@@ -5097,28 +5004,6 @@ export interface operations {
         };
         responses: {
             /** @description Finance invoice */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
-                };
-            };
-        };
-    };
-    "MilosTrainingWeb.MyFinanceController.index (2)": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Member finance data */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -11623,7 +11508,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyFinanceController.entitlement (2)": {
+    "MilosTrainingWeb.MyFinanceController.entitlement": {
         parameters: {
             query?: never;
             header?: never;
@@ -13430,28 +13315,6 @@ export interface operations {
         responses: {
             /** @description Credit ledger reversal */
             201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
-                };
-            };
-        };
-    };
-    "MilosTrainingWeb.MyFinanceController.entitlement": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Effective entitlement */
-            200: {
                 headers: {
                     [name: string]: unknown;
                 };

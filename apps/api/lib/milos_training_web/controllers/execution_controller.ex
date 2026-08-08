@@ -65,7 +65,7 @@ defmodule MilosTrainingWeb.ExecutionController do
     current_user = Guardian.Plug.current_resource(conn)
 
     with {:ok, execution} <-
-           StartWorkoutExecution.call(conn.assigns.user_context, current_user, params) do
+           StartWorkoutExecution.call(execution_context(conn), current_user, params) do
       conn
       |> put_status(:created)
       |> json(%{execution: execution})
@@ -294,9 +294,16 @@ defmodule MilosTrainingWeb.ExecutionController do
     current_user = Guardian.Plug.current_resource(conn)
 
     with {:ok, segments} <-
-           GetWorkoutTimerSequence.call(conn.assigns.user_context, current_user, id, params) do
+           GetWorkoutTimerSequence.call(execution_context(conn), current_user, id, params) do
       json(conn, %{segments: segments})
     end
+  end
+
+  defp execution_context(conn) do
+    Map.merge(
+      conn.assigns.user_context,
+      Map.take(conn.assigns[:tenant_context] || %{}, [:organization_id])
+    )
   end
 
   operation(:index,

@@ -72,6 +72,30 @@ defmodule MilosTraining.Finance.TenantIsolationTest do
     assert second_membership_id == second_membership.id
   end
 
+  test "member finance reads fail closed without an organization context" do
+    owner = TestFixtures.admin_fixture()
+    member = TestFixtures.user_fixture(%{role: :member})
+    first_context = tenant_context_fixture(owner, "Missing Scope Finance Gym A")
+    second_context = tenant_context_fixture(owner, "Missing Scope Finance Gym B")
+
+    assert {:ok, _first_membership} =
+             Finance.upsert_membership(first_context, member.id, %{
+               user_type_snapshot: "member",
+               status: "active",
+               signup_source: "direct"
+             })
+
+    assert {:ok, _second_membership} =
+             Finance.upsert_membership(second_context, member.id, %{
+               user_type_snapshot: "member",
+               status: "paused",
+               signup_source: "direct"
+             })
+
+    assert Finance.get_member_profile(member.id) == nil
+    assert Finance.get_effective_entitlement(member.id) == nil
+  end
+
   test "financial_summary aggregates are isolated by organization" do
     owner = TestFixtures.admin_fixture()
     first_member = TestFixtures.user_fixture(%{role: :member})

@@ -3509,7 +3509,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         from(row in queryable, where: field(row, :organization_id) == ^organization_id)
 
       _ ->
-        queryable
+        from(row in queryable, where: false)
     end
   end
 

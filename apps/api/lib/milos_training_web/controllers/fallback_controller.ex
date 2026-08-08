@@ -1108,6 +1108,15 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  def call(conn, {:error, :organization_context_mismatch}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "organization_context_mismatch",
+      error: "The selected organization does not match this resource"
+    })
+  end
+
   def call(conn, {:error, :slot_full}) do
     conn
     |> put_status(:conflict)

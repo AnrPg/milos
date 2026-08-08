@@ -37,13 +37,10 @@ defmodule MilosTrainingWeb.MyFinanceController do
   def index(conn, _params) do
     user = GuardianPlug.current_resource(conn)
 
-    {:ok, finance} =
-      case conn.assigns[:tenant_context] do
-        nil -> GetMyFinance.call(user.id)
-        context -> GetMyFinance.call(context, user.id)
-      end
-
-    json(conn, finance)
+    with {:ok, context} <- tenant_context(conn),
+         {:ok, finance} <- GetMyFinance.call(context, user.id) do
+      json(conn, finance)
+    end
   end
 
   operation(:entitlement,
@@ -58,13 +55,10 @@ defmodule MilosTrainingWeb.MyFinanceController do
   def entitlement(conn, _params) do
     user = GuardianPlug.current_resource(conn)
 
-    entitlement =
-      case conn.assigns[:tenant_context] do
-        nil -> Finance.get_effective_entitlement(user.id)
-        context -> Finance.get_effective_entitlement(context, user.id)
-      end
-
-    json(conn, %{entitlement: entitlement})
+    with {:ok, context} <- tenant_context(conn) do
+      entitlement = Finance.get_effective_entitlement(context, user.id)
+      json(conn, %{entitlement: entitlement})
+    end
   end
 
   operation(:invoice_download_url,
@@ -88,9 +82,8 @@ defmodule MilosTrainingWeb.MyFinanceController do
   def invoice_download_url(conn, %{"id" => invoice_id}) do
     user = GuardianPlug.current_resource(conn)
 
-    context = conn.assigns[:tenant_context]
-
-    with {:ok, invoice} <- get_invoice(context, invoice_id),
+    with {:ok, context} <- tenant_context(conn),
+         {:ok, invoice} <- get_invoice(context, invoice_id),
          :ok <- verify_invoice_owner(invoice, user.id),
          file_key when is_binary(file_key) <- (invoice.params || %{})["file_key"],
          {:ok, download_url} <-
@@ -111,6 +104,15 @@ defmodule MilosTrainingWeb.MyFinanceController do
     if invoice.user_id == user_id, do: :ok, else: {:error, :forbidden}
   end
 
-  defp get_invoice(nil, invoice_id), do: Finance.get_invoice(invoice_id)
   defp get_invoice(context, invoice_id), do: Finance.get_invoice(context, invoice_id)
+
+  defp tenant_context(conn) do
+    case conn.assigns[:tenant_context] do
+      %{organization_id: organization_id} = context when is_binary(organization_id) ->
+        {:ok, context}
+
+      _missing ->
+        {:error, :organization_context_required}
+    end
+  end
 end

@@ -445,9 +445,6 @@ defmodule MilosTrainingWeb.Router do
       :search_rate_limited
     ])
 
-    get("/finance", MyFinanceController, :index)
-    get("/entitlement", MyFinanceController, :entitlement)
-    get("/invoices/:id/download-url", MyFinanceController, :invoice_download_url)
     patch("/profile", MeController, :update_profile)
     post("/avatar/upload-url", MeController, :avatar_upload_url)
     patch("/avatar", MeController, :update_avatar)

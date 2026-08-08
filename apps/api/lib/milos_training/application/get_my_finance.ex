@@ -4,9 +4,14 @@ defmodule MilosTraining.Application.GetMyFinance do
   @non_draft_statuses ~w[issued partially_paid paid overdue void]
   @outstanding_statuses ~w[issued partially_paid overdue]
 
-  def call(context, user_id), do: Finance.with_tenant_context(context, fn -> call(user_id) end)
+  def call(%{organization_id: organization_id} = context, user_id)
+      when is_binary(organization_id),
+      do: Finance.with_tenant_context(context, fn -> run(user_id) end)
 
-  def call(user_id) do
+  def call(_context, _user_id), do: {:error, :organization_context_required}
+  def call(_user_id), do: {:error, :organization_context_required}
+
+  defp run(user_id) do
     packages = Finance.list_packages()
 
     case Finance.get_member_profile(user_id) do

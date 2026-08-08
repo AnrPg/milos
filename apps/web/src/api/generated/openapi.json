@@ -2364,65 +2364,6 @@
         ]
       }
     },
-    "/api/me/invoices/{id}/download-url": {
-      "get": {
-        "callbacks": {},
-        "operationId": "MilosTrainingWeb.MyFinanceController.invoice_download_url (2)",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": true,
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Download URL"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Forbidden"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Not found"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Get a presigned download URL for one of the current member's invoices",
-        "tags": [
-          "Member Finance"
-        ]
-      }
-    },
     "/api/org/{organization_slug}/admin/finance/queues": {
       "get": {
         "callbacks": {},
@@ -6064,35 +6005,6 @@
         "summary": "Void a finance invoice",
         "tags": [
           "Admin Finance"
-        ]
-      }
-    },
-    "/api/me/finance": {
-      "get": {
-        "callbacks": {},
-        "operationId": "MilosTrainingWeb.MyFinanceController.index (2)",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": true,
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Member finance data"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Get the current member's finance summary",
-        "tags": [
-          "Member Finance"
         ]
       }
     },
@@ -24453,7 +24365,7 @@
     "/api/org/{organization_slug}/me/entitlement": {
       "get": {
         "callbacks": {},
-        "operationId": "MilosTrainingWeb.MyFinanceController.entitlement (2)",
+        "operationId": "MilosTrainingWeb.MyFinanceController.entitlement",
         "parameters": [],
         "responses": {
           "200": {
@@ -28175,35 +28087,6 @@
         "summary": "Reverse an applied credit ledger entry and restore member credit",
         "tags": [
           "Admin Finance"
-        ]
-      }
-    },
-    "/api/me/entitlement": {
-      "get": {
-        "callbacks": {},
-        "operationId": "MilosTrainingWeb.MyFinanceController.entitlement",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": true,
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Effective entitlement"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Get the current user's effective package benefits and allowance usage",
-        "tags": [
-          "Member Finance"
         ]
       }
     },

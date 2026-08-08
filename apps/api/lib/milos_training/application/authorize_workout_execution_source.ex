@@ -59,7 +59,7 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
 
   defp may_self_select?(_actor, _organization_id), do: false
 
-  defp authorize_assignment(%{id: athlete_id, role: :athlete}, workout_id, assignment_id)
+  defp authorize_assignment(%{id: athlete_id}, workout_id, assignment_id)
        when is_binary(assignment_id) do
     case Workouts.get_assignment_execution_access(assignment_id, athlete_id) do
       %{master_workout_id: ^workout_id, athlete_status: status} = access

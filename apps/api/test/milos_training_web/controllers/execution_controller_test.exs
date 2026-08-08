@@ -7,6 +7,7 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
   alias MilosTraining.Identity
   alias MilosTraining.Finance
   alias MilosTraining.Notifications
+  alias MilosTraining.Organizations
   alias MilosTraining.Workouts
 
   describe "execution ownership and lifecycle" do
@@ -137,10 +138,13 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
 
       # Needs an organization membership to reach the entitlement check at all
       # (F-03); the assertion below is about finance entitlement, not tenancy.
-      {:ok, _org_membership} = MilosTraining.Organizations.ensure_legacy_membership(member)
+      {:ok, _org_membership} = Organizations.ensure_legacy_membership(member)
+
+      {:ok, finance_context} =
+        Organizations.resolve_tenant_context(member, Organizations.legacy_organization_slug())
 
       assert {:ok, _membership} =
-               Finance.upsert_membership(member.id, %{
+               Finance.upsert_membership(finance_context, member.id, %{
                  user_type_snapshot: "member",
                  status: "paused",
                  signup_source: "direct"
@@ -159,6 +163,39 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
         |> json_response(403)
 
       assert response["error"] == "Finance entitlement inactive"
+    end
+
+    test "assigned execution uses the tenant membership instead of the account-wide role", %{
+      conn: conn
+    } do
+      admin = create_admin!("execution_assignment_tenant_admin")
+      athlete = create_user!(:member, "execution_assignment_tenant_athlete")
+      workout = workout_with_scale!(admin)
+
+      {:ok, admin_context} =
+        Organizations.resolve_tenant_context(admin, Organizations.legacy_organization_slug())
+
+      assert {:ok, _membership} =
+               Organizations.set_membership_role(admin_context, athlete.id, :athlete)
+
+      assert {:ok, assignment} =
+               Workouts.assign_workout(%{
+                 master_workout_id: workout.id,
+                 scheduled_for: Date.utc_today(),
+                 athlete_ids: [athlete.id]
+               })
+
+      response =
+        conn
+        |> put_bearer_token(athlete)
+        |> post("/api/executions", %{
+          master_workout_id: workout.id,
+          source: "assigned",
+          source_reference_id: assignment.id
+        })
+        |> json_response(201)
+
+      assert get_in(response, ["execution", "source_reference_id"]) == assignment.id
     end
 
     test "complete returns client errors for forbidden and already completed", %{conn: conn} do
@@ -751,6 +788,7 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
       })
 
     {:ok, admin} = Identity.update_role(user, :admin)
+    {:ok, _membership} = Organizations.ensure_legacy_membership(admin, :owner)
     admin
   end
 end
