@@ -3,14 +3,16 @@ defmodule MilosTraining.Application.GetFinanceMemberProfile do
   alias MilosTraining.Finance.Domain.MemberDrillDown
   alias MilosTraining.Identity
 
-  def call(user_id) do
+  def call(user_id), do: call(user_id, nil)
+
+  def call(user_id, tenant_context) do
     case Identity.find_by_id(user_id) do
       nil ->
         {:error, :not_found}
 
       user ->
         profile =
-          case Finance.get_member_profile(user_id) do
+          case get_member_profile(tenant_context, user_id) do
             nil -> empty_profile()
             profile -> profile
           end
@@ -19,6 +21,11 @@ defmodule MilosTraining.Application.GetFinanceMemberProfile do
          Map.put(profile, :drill_down, MemberDrillDown.build(user, profile, Date.utc_today()))}
     end
   end
+
+  defp get_member_profile(nil, user_id), do: Finance.get_member_profile(user_id)
+
+  defp get_member_profile(tenant_context, user_id),
+    do: Finance.get_member_profile(tenant_context, user_id)
 
   defp empty_profile do
     %{

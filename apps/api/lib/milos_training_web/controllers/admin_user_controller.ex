@@ -479,7 +479,13 @@ defmodule MilosTrainingWeb.AdminUserController do
     admin = Guardian.Plug.current_resource(conn)
     user_id = params["id"] || params[:id]
 
-    with {:ok, result} <- GrantUserAllowance.call(user_id, admin.id, conn.body_params) do
+    with {:ok, result} <-
+           GrantUserAllowance.call(
+             conn.assigns.tenant_context,
+             user_id,
+             admin.id,
+             conn.body_params
+           ) do
       conn
       |> put_status(:created)
       |> json(result)
@@ -506,13 +512,20 @@ defmodule MilosTrainingWeb.AdminUserController do
     user_id = params["id"] || params[:id]
     entry_id = params["entry_id"] || params[:entry_id]
 
-    with {:ok, result} <- RevokeUserAllowance.call(user_id, admin.id, entry_id, conn.body_params) do
+    with {:ok, result} <-
+           RevokeUserAllowance.call(
+             conn.assigns.tenant_context,
+             user_id,
+             admin.id,
+             entry_id,
+             conn.body_params
+           ) do
       conn |> put_status(:created) |> json(result)
     end
   end
 
   def index(conn, params) do
-    with {:ok, payload} <- ListAdminUsers.call(params) do
+    with {:ok, payload} <- ListAdminUsers.call(params, conn.assigns.tenant_context) do
       json(conn, payload)
     end
   end
@@ -521,6 +534,7 @@ defmodule MilosTrainingWeb.AdminUserController do
     with {:ok, payload} <-
            GetAdminUserProfile.call(
              params["id"] || params[:id],
+             conn.assigns.tenant_context,
              tenant_organization_slug(conn)
            ) do
       json(conn, payload)
@@ -538,6 +552,7 @@ defmodule MilosTrainingWeb.AdminUserController do
     with {:ok, payload} <-
            GetAdminUserFinance.call(
              params["id"] || params[:id],
+             conn.assigns.tenant_context,
              tenant_organization_slug(conn)
            ) do
       json(conn, payload)

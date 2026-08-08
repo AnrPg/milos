@@ -1,15 +1,12 @@
 defmodule MilosTraining.Application.GetAdminUserProfile do
   @moduledoc false
 
-  alias MilosTraining.Identity
+  alias MilosTraining.Application.TenantUserAccess
   alias MilosTraining.Identity.Domain.AdminProfilePolicy
 
-  def call(user_id, organization_slug \\ nil) do
-    case Identity.find_by_id(user_id) do
-      nil ->
-        {:error, :not_found}
-
-      user ->
+  def call(user_id, tenant_context, organization_slug \\ nil) do
+    case TenantUserAccess.fetch_active_user(tenant_context, user_id) do
+      {:ok, user} ->
         {:ok,
          %{
            user: %{
@@ -26,6 +23,9 @@ defmodule MilosTraining.Application.GetAdminUserProfile do
              operational_links: AdminProfilePolicy.operational_links(user, organization_slug)
            }
          }}
+
+      error ->
+        error
     end
   end
 

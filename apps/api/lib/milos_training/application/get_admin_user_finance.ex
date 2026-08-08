@@ -2,16 +2,17 @@ defmodule MilosTraining.Application.GetAdminUserFinance do
   @moduledoc false
 
   alias MilosTraining.Application.GetFinanceMemberProfile
+  alias MilosTraining.Application.TenantUserAccess
   alias MilosTraining.{Finance, Identity}
   alias MilosTraining.Identity.Domain.AdminProfilePolicy
   alias MilosTraining.Organizations.Domain.AdminPath
 
-  def call(user_id, organization_slug \\ nil) do
-    with %{} = user <- Identity.find_by_id(user_id) || {:error, :not_found} do
+  def call(user_id, tenant_context, organization_slug \\ nil) do
+    with {:ok, user} <- TenantUserAccess.fetch_active_user(tenant_context, user_id) do
       if AdminProfilePolicy.finance_available?(user.role) do
-        with {:ok, profile} <- GetFinanceMemberProfile.call(user_id) do
-          entitlement = Finance.get_effective_entitlement(user_id)
-          details = finance_details(profile, user_id)
+        with {:ok, profile} <- GetFinanceMemberProfile.call(user_id, tenant_context) do
+          entitlement = Finance.get_effective_entitlement(tenant_context, user_id)
+          details = finance_details(tenant_context, profile, user_id)
 
           {:ok,
            %{
@@ -46,9 +47,9 @@ defmodule MilosTraining.Application.GetAdminUserFinance do
     end
   end
 
-  defp finance_details(profile, user_id) do
-    events = Finance.list_referral_events()
-    rewards = Finance.list_referral_rewards()
+  defp finance_details(tenant_context, profile, user_id) do
+    events = Finance.list_referral_events(tenant_context)
+    rewards = Finance.list_referral_rewards(tenant_context)
 
     %{
       membership: serialize_membership(profile.membership),

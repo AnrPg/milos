@@ -1,11 +1,15 @@
 defmodule MilosTraining.Application.GrantUserAllowance do
   alias MilosTraining.Application.BroadcastUserSync
-  alias MilosTraining.{Finance, Identity}
+  alias MilosTraining.Application.TenantUserAccess
+  alias MilosTraining.Finance
 
-  def call(user_id, admin_id, params) do
-    with %{role: role} when role in [:member, :athlete] <- Identity.find_by_id(user_id),
-         {:ok, entry} <- Finance.grant_allowance(user_id, admin_id, normalize(params)),
-         entitlement when not is_nil(entitlement) <- Finance.get_effective_entitlement(user_id) do
+  def call(tenant_context, user_id, admin_id, params) do
+    with {:ok, %{role: role}} when role in [:member, :athlete] <-
+           TenantUserAccess.fetch_active_user(tenant_context, user_id),
+         {:ok, entry} <-
+           Finance.grant_allowance(tenant_context, user_id, admin_id, normalize(params)),
+         entitlement when not is_nil(entitlement) <-
+           Finance.get_effective_entitlement(tenant_context, user_id) do
       BroadcastUserSync.for_user(user_id, ["finance_entitlement"],
         reason: "allowance_extended",
         payload: %{allowance: entry.allowance_key, quantity: abs(entry.quantity_delta)}
@@ -13,8 +17,7 @@ defmodule MilosTraining.Application.GrantUserAllowance do
 
       {:ok, %{entry: entry, entitlement: entitlement}}
     else
-      nil -> {:error, :not_found}
-      %{role: _role} -> {:error, :finance_profile_ineligible}
+      {:ok, %{role: _role}} -> {:error, :finance_profile_ineligible}
       error -> error
     end
   end

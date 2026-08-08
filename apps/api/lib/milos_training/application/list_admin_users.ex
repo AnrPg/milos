@@ -1,25 +1,23 @@
 defmodule MilosTraining.Application.ListAdminUsers do
   @moduledoc false
 
-  alias MilosTraining.{Finance, Identity, Identity.RegistrationPolicy}
+  alias MilosTraining.{Finance, Identity.RegistrationPolicy}
+  alias MilosTraining.Application.TenantUserAccess
 
-  def call(params \\ %{}) do
+  def call(params \\ %{}, tenant_context \\ nil) do
     query = params |> field(:q) |> normalize_query()
     role = params |> field(:role) |> normalize_role()
     limit = params |> field(:limit) |> normalize_integer(25, 1, 50)
     offset = params |> field(:offset) |> normalize_integer(0, 0, 10_000)
 
     users =
-      Identity.list_all_users()
+      tenant_context
+      |> TenantUserAccess.list_active_users()
       |> filter_role(role)
       |> filter_query(query)
       |> Enum.sort_by(&String.downcase(&1.nickname))
 
-    finance =
-      Finance.search_member_summaries(%{
-        user_ids: Enum.map(users, & &1.id),
-        limit: max(length(users), 1)
-      })
+    finance = finance_summaries(tenant_context, users)
 
     entries =
       users
@@ -37,6 +35,15 @@ defmodule MilosTraining.Application.ListAdminUsers do
          has_more: offset + limit < length(users)
        }
      }}
+  end
+
+  defp finance_summaries(nil, _users), do: %{}
+
+  defp finance_summaries(tenant_context, users) do
+    Finance.search_member_summaries(tenant_context, %{
+      user_ids: Enum.map(users, & &1.id),
+      limit: max(length(users), 1)
+    })
   end
 
   defp directory_entry(user, finance) do
