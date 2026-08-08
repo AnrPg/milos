@@ -2,6 +2,7 @@ defmodule MilosTraining.Workers.BookingTimeoutJob do
   use Oban.Worker, queue: :notifications, max_attempts: 3
 
   alias MilosTraining.Application.ResolveJobTenantContext
+  alias MilosTraining.Finance
   alias MilosTraining.Scheduling
   alias MilosTrainingWeb.Realtime
 
@@ -14,7 +15,19 @@ defmodule MilosTraining.Workers.BookingTimeoutJob do
          booking when not is_nil(booking) <- Scheduling.get_booking(context, booking_id) do
       case booking do
         %{status: :pending} ->
-          with :ok <- MilosTraining.Notifications.dispatch_event(:booking_timed_out, booking) do
+          with {:ok, _entry} <-
+                 Finance.release_entitlement_source(
+                   context,
+                   booking.user_id,
+                   "scheduling",
+                   booking.scheduled_class_id,
+                   :class_visits,
+                   %{
+                     reason: "Booking request timed out",
+                     idempotency_key: "booking-timeout-release:#{booking.id}"
+                   }
+                 ),
+               :ok <- MilosTraining.Notifications.dispatch_event(:booking_timed_out, booking) do
             Realtime.broadcast_schedule_refresh("booking_timed_out", booking)
             :ok
           end

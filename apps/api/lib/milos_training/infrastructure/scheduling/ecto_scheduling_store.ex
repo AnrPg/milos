@@ -18,6 +18,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   alias MilosTraining.Scheduling.Domain.{ClassTypeArchivePolicy, RecurrenceRule}
   alias MilosTraining.Workers.BookingTimeoutJob
   alias MilosTraining.Workers.ClassSeriesExtensionJob
+  alias MilosTraining.Workers.ReconcileBookingReleaseJob
 
   @slot_preloads [:bookings, :class_type, :class_series]
 
@@ -289,12 +290,12 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       Enum.reduce_while(slots, [], fn slot, deleted_ids ->
         cancel_booking_timeout_jobs(slot.bookings)
 
-        case Repo.delete(slot) do
-          {:ok, _deleted_slot} ->
-            {:cont, [slot.id | deleted_ids]}
-
-          {:error, %Ecto.Changeset{} = changeset} ->
-            Repo.rollback(changeset)
+        with :ok <- enqueue_booking_release_jobs(slot),
+             {:ok, _deleted_slot} <- Repo.delete(slot) do
+          {:cont, [slot.id | deleted_ids]}
+        else
+          {:error, %Ecto.Changeset{} = changeset} -> Repo.rollback(changeset)
+          {:error, reason} -> Repo.rollback(reason)
         end
       end)
     end)
@@ -302,6 +303,27 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       {:ok, deleted_ids} -> {:ok, Enum.reverse(deleted_ids)}
       {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
     end
+  end
+
+  defp enqueue_booking_release_jobs(slot) do
+    slot.bookings
+    |> Enum.filter(&(&1.status in [:pending, :approved]))
+    |> Enum.reduce_while(:ok, fn booking, :ok ->
+      args = %{
+        organization_id: slot.organization_id,
+        booking_id: booking.id,
+        user_id: booking.user_id,
+        scheduled_class_id: slot.id,
+        reason: "Workout slots deleted",
+        idempotency_key: "workout-delete-booking-release:#{booking.id}",
+        delete_pending_notification: true
+      }
+
+      case Oban.insert(ReconcileBookingReleaseJob.new(args)) do
+        {:ok, _job} -> {:cont, :ok}
+        {:error, reason} -> {:halt, {:error, reason}}
+      end
+    end)
   end
 
   @impl true
@@ -342,6 +364,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       |> Enum.filter(&(&1.status in [:pending, :approved]))
       |> Enum.map(fn booking ->
         %{
+          booking_id: booking.id,
           user_id: booking.user_id,
           scheduled_class_id: slot.id,
           scheduled_at: slot.scheduled_at,
@@ -752,12 +775,23 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
         |> lock("FOR UPDATE")
         |> Repo.all()
 
-      Enum.reduce_while(bookings, [], fn booking, booking_ids ->
+      Enum.reduce_while(bookings, [], fn booking, release_facts ->
         maybe_cancel_timeout_job(booking.timeout_job_id)
 
         case Repo.delete(booking) do
-          {:ok, _deleted} -> {:cont, [booking.id | booking_ids]}
-          {:error, changeset} -> Repo.rollback(changeset)
+          {:ok, deleted} ->
+            {:cont,
+             [
+               %{
+                 booking_id: deleted.id,
+                 user_id: deleted.user_id,
+                 scheduled_class_id: deleted.scheduled_class_id
+               }
+               | release_facts
+             ]}
+
+          {:error, changeset} ->
+            Repo.rollback(changeset)
         end
       end)
       |> Enum.reverse()

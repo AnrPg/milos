@@ -4,7 +4,9 @@ defmodule MilosTraining.Scheduling.Domain.RecurrenceRule do
 
   Weekdays use ISO numbering (`1` is Monday and `7` is Sunday). Dates and the
   start time are interpreted in the series timezone before being converted to
-  UTC.
+  UTC. If a local time does not exist during a spring-forward DST transition,
+  only that occurrence is skipped. If a local time is ambiguous during a
+  fall-back transition, the first occurrence is used.
   """
 
   @max_occurrences 600
@@ -62,6 +64,9 @@ defmodule MilosTraining.Scheduling.Domain.RecurrenceRule do
           {:ok, _datetime} ->
             {:halt, {:error, :too_many_occurrences}}
 
+          :skip ->
+            {:cont, {:ok, acc}}
+
           {:error, reason} ->
             {:halt, {:error, reason}}
         end
@@ -79,7 +84,7 @@ defmodule MilosTraining.Scheduling.Domain.RecurrenceRule do
     case DateTime.new(date, time, timezone) do
       {:ok, datetime} -> {:ok, datetime}
       {:ambiguous, first, _second} -> {:ok, first}
-      {:gap, _before, _after} -> {:error, :invalid_local_start_time}
+      {:gap, _before, _after} -> :skip
       {:error, _reason} -> {:error, :invalid_timezone}
     end
   end
