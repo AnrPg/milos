@@ -4,12 +4,14 @@ defmodule MilosTraining.Application.GetAdminUserPRs do
   alias MilosTraining.Application.ListUserPRs
   alias MilosTraining.{Identity, Pantheon}
 
-  def call(user_id) do
+  def call(_context, user_id) do
     with %{} <- Identity.find_by_id(user_id) || {:error, :not_found},
          {:ok, prs} <- ListUserPRs.call(user_id) do
       {:ok, %{user_id: user_id, prs: Enum.map(prs, &serialize(&1, user_id))}}
     end
   end
+
+  def call(user_id), do: call(%{}, user_id)
 
   defp serialize(pr, user_id) do
     history =

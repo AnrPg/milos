@@ -3,10 +3,13 @@ defmodule MilosTraining.Application.GetAdminUserMessages do
 
   alias MilosTraining.{Identity, Messaging}
 
-  def call(user_id) do
+  def call(context, user_id) do
     with %{} <- Identity.find_by_id(user_id) || {:error, :not_found} do
       threads =
-        Messaging.list_threads_for_user(user_id) |> Enum.map(&serialize_thread(&1, user_id))
+        Messaging.with_tenant_context(context, fn ->
+          Messaging.list_threads_for_user(user_id)
+          |> Enum.map(&serialize_thread(&1, user_id))
+        end)
 
       {:ok,
        %{
@@ -20,6 +23,8 @@ defmodule MilosTraining.Application.GetAdminUserMessages do
        }}
     end
   end
+
+  def call(user_id), do: call(%{}, user_id)
 
   defp serialize_thread(thread, user_id) do
     messages =

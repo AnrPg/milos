@@ -3,9 +3,9 @@ defmodule MilosTraining.Application.GetAdminUserIncidents do
 
   alias MilosTraining.{Identity, Wellbeing}
 
-  def call(user_id) do
+  def call(context, user_id) do
     with %{} <- Identity.find_by_id(user_id) || {:error, :not_found} do
-      incidents = Wellbeing.list_injuries_for_user(user_id) |> Enum.map(&serialize/1)
+      incidents = Wellbeing.list_injuries_for_user(context, user_id) |> Enum.map(&serialize/1)
 
       {:ok,
        %{
@@ -18,6 +18,8 @@ defmodule MilosTraining.Application.GetAdminUserIncidents do
        }}
     end
   end
+
+  def call(user_id), do: call(%{}, user_id)
 
   defp serialize(report) do
     Map.take(report, [

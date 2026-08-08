@@ -4,9 +4,9 @@ defmodule MilosTraining.Application.GetAdminUserTrainingHistory do
   alias MilosTraining.Application.{GetCoachingAthleteDrillDown, ListWorkoutExecutions}
   alias MilosTraining.Identity
 
-  def call(user_id) do
+  def call(context, user_id) do
     with %{} = user <- Identity.find_by_id(user_id) || {:error, :not_found},
-         {:ok, executions} <- ListWorkoutExecutions.call(user_id) do
+         {:ok, executions} <- ListWorkoutExecutions.call(context, user_id) do
       history = Enum.map(executions, &execution_summary/1)
 
       {:ok,
@@ -24,6 +24,8 @@ defmodule MilosTraining.Application.GetAdminUserTrainingHistory do
        }}
     end
   end
+
+  def call(user_id), do: call(%{}, user_id)
 
   defp assigned_workouts(%{role: :athlete, id: id}) do
     case GetCoachingAthleteDrillDown.call(id) do

@@ -85,6 +85,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
     InjuryReport
     |> scoped_to_owner_or_tenant()
     |> where([injury], injury.id == ^injury_report_id and injury.user_id == ^user_id)
+    |> where([injury], injury.visibility == "user_and_admin")
     |> Repo.one()
     |> case do
       nil -> nil
