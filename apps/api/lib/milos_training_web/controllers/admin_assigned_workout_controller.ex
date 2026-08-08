@@ -102,7 +102,7 @@ defmodule MilosTrainingWeb.AdminAssignedWorkoutController do
   )
 
   def create(conn, _params) do
-    case AssignWorkout.call(conn.body_params) do
+    case AssignWorkout.call(conn.assigns.tenant_context, conn.body_params) do
       {:ok, assignment} ->
         conn
         |> put_status(:created)
@@ -116,14 +116,14 @@ defmodule MilosTrainingWeb.AdminAssignedWorkoutController do
   def update(conn, params) do
     id = Map.get(params, "id") || Map.get(params, :id)
 
-    case UpdateAssignedWorkout.call(id, conn.body_params) do
+    case UpdateAssignedWorkout.call(conn.assigns.tenant_context, id, conn.body_params) do
       {:ok, assignment} -> json(conn, %{assignment: assignment})
       error -> error
     end
   end
 
   def delete(conn, %{"id" => id}) do
-    with :ok <- DeleteAssignedWorkout.call(id) do
+    with :ok <- DeleteAssignedWorkout.call(conn.assigns.tenant_context, id) do
       send_resp(conn, :no_content, "")
     end
   end

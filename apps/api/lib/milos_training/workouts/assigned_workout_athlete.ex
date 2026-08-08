@@ -22,8 +22,8 @@ defmodule MilosTraining.Workouts.AssignedWorkoutAthlete do
 
   def changeset(link \\ %__MODULE__{}, params) do
     link
-    |> cast(params, [:assigned_workout_id, :athlete_id, :scheduled_for])
-    |> validate_required([:assigned_workout_id, :athlete_id, :scheduled_for])
+    |> cast(params, [:organization_id, :assigned_workout_id, :athlete_id, :scheduled_for])
+    |> validate_required([:organization_id, :assigned_workout_id, :athlete_id, :scheduled_for])
     |> foreign_key_constraint(:assigned_workout_id)
     |> foreign_key_constraint(:athlete_id)
     |> unique_constraint([:assigned_workout_id, :athlete_id])

@@ -46,7 +46,7 @@ defmodule MilosTrainingWeb.MyWorkoutController do
   def index(conn, params) do
     user = GuardianPlug.current_resource(conn)
 
-    case GetAssignedWorkoutWeek.call(user, params) do
+    case GetAssignedWorkoutWeek.call(conn.assigns.tenant_context, user, params) do
       {:ok, payload} -> json(conn, payload)
       error -> error
     end
@@ -164,7 +164,7 @@ defmodule MilosTrainingWeb.MyWorkoutController do
   def request_assignment(conn, params) do
     user = GuardianPlug.current_resource(conn)
 
-    case RequestWorkoutAssignment.call(user, params) do
+    case RequestWorkoutAssignment.call(conn.assigns.tenant_context, user, params) do
       {:ok, payload} ->
         conn
         |> put_status(:accepted)

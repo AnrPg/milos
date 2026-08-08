@@ -578,7 +578,12 @@ defmodule MilosTrainingWeb.AdminUserController do
     admin = Guardian.Plug.current_resource(conn)
 
     with {:ok, payload} <-
-           ProgramUserWorkout.call(admin, params["id"] || params[:id], conn.body_params) do
+           ProgramUserWorkout.call(
+             conn.assigns.tenant_context,
+             admin,
+             params["id"] || params[:id],
+             conn.body_params
+           ) do
       conn |> put_status(:created) |> json(payload)
     end
   end
@@ -604,7 +609,10 @@ defmodule MilosTrainingWeb.AdminUserController do
   end
 
   def index_athletes(conn, params) do
-    json(conn, %{athletes: ListAthletes.call(params["q"] || params[:q])})
+    case ListAthletes.call(conn.assigns.tenant_context, params["q"] || params[:q]) do
+      {:error, reason} -> {:error, reason}
+      athletes -> json(conn, %{athletes: athletes})
+    end
   end
 
   defp render_service(conn, service, params) do

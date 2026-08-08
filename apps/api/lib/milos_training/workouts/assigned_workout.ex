@@ -20,9 +20,9 @@ defmodule MilosTraining.Workouts.AssignedWorkout do
 
   def changeset(assignment \\ %__MODULE__{}, params) do
     assignment
-    |> cast(params, [:master_workout_id, :scheduled_for, :admin_notes])
+    |> cast(params, [:organization_id, :master_workout_id, :scheduled_for, :admin_notes])
     |> update_change(:admin_notes, &normalize_admin_notes/1)
-    |> validate_required([:master_workout_id, :scheduled_for])
+    |> validate_required([:organization_id, :master_workout_id, :scheduled_for])
     |> foreign_key_constraint(:master_workout_id)
     |> unique_constraint([:master_workout_id, :scheduled_for, :admin_notes],
       name: :assigned_workouts_workout_date_notes_index

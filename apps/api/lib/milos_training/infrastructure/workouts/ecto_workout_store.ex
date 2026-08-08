@@ -371,29 +371,37 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   @impl true
   def assign_workout(params) do
-    athlete_ids =
-      params
-      |> Map.get(:athlete_ids, Map.get(params, "athlete_ids", []))
-      |> Enum.uniq()
+    case RepoContext.current_setting("app.organization_id") do
+      organization_id when is_binary(organization_id) ->
+        params = put_organization(params, organization_id)
 
-    workout_id = Map.get(params, :master_workout_id) || Map.get(params, "master_workout_id")
-    scheduled_for = Map.get(params, :scheduled_for) || Map.get(params, "scheduled_for")
-    admin_notes = normalize_admin_notes_input(params)
+        athlete_ids =
+          params
+          |> Map.get(:athlete_ids, Map.get(params, "athlete_ids", []))
+          |> Enum.uniq()
 
-    case find_assignment_by_workout_date_and_notes(workout_id, scheduled_for, admin_notes) do
-      nil ->
-        %AssignedWorkout{}
-        |> AssignedWorkout.changeset(params)
-        |> validate_assignment_athletes(athlete_ids)
-        |> persist_assigned_workout(athlete_ids)
+        workout_id = Map.get(params, :master_workout_id) || Map.get(params, "master_workout_id")
+        scheduled_for = Map.get(params, :scheduled_for) || Map.get(params, "scheduled_for")
+        admin_notes = normalize_admin_notes_input(params)
 
-      %AssignedWorkout{} = assignment ->
-        merged_athlete_ids = (existing_athlete_ids(assignment) ++ athlete_ids) |> Enum.uniq()
+        case find_assignment_by_workout_date_and_notes(workout_id, scheduled_for, admin_notes) do
+          nil ->
+            %AssignedWorkout{}
+            |> AssignedWorkout.changeset(params)
+            |> validate_assignment_athletes(athlete_ids)
+            |> persist_assigned_workout(athlete_ids)
 
-        assignment
-        |> AssignedWorkout.update_changeset(params)
-        |> validate_assignment_athletes(merged_athlete_ids)
-        |> persist_assigned_workout(merged_athlete_ids)
+          %AssignedWorkout{} = assignment ->
+            merged_athlete_ids = (existing_athlete_ids(assignment) ++ athlete_ids) |> Enum.uniq()
+
+            assignment
+            |> AssignedWorkout.update_changeset(params)
+            |> validate_assignment_athletes(merged_athlete_ids)
+            |> persist_assigned_workout(merged_athlete_ids)
+        end
+
+      _missing_scope ->
+        {:error, :organization_context_required}
     end
   end
 
@@ -451,6 +459,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   def list_assigned_workouts_for_athlete(athlete_id, start_date, end_date) do
     normalized =
       AssignedWorkout
+      |> scoped_to_tenant()
       |> join(:inner, [assignment], link in AssignedWorkoutAthlete,
         on: link.assigned_workout_id == assignment.id
       )
@@ -486,6 +495,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   @impl true
   def list_assigned_workouts_for_admin(start_date, end_date) do
     AssignedWorkout
+    |> scoped_to_tenant()
     |> where(
       [assignment],
       assignment.scheduled_for >= ^start_date and assignment.scheduled_for <= ^end_date
@@ -690,7 +700,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     |> Multi.run(:published_workout, fn repo, _changes ->
       workout_id = Ecto.Changeset.get_field(changeset, :master_workout_id)
 
-      case repo.get(MasterWorkout, workout_id) do
+      case MasterWorkout |> scoped_to_tenant() |> repo.get(workout_id) do
         %MasterWorkout{status: :published} = workout ->
           {:ok, workout}
 
@@ -1334,6 +1344,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     |> Enum.reduce_while({:ok, []}, fn athlete_id, {:ok, acc} ->
       case %AssignedWorkoutAthlete{}
            |> AssignedWorkoutAthlete.changeset(%{
+             organization_id: RepoContext.current_setting("app.organization_id"),
              assigned_workout_id: assignment_id,
              athlete_id: athlete_id,
              scheduled_for: assignment_date
@@ -1443,6 +1454,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   defp find_assignment_by_workout_date_and_notes(workout_id, scheduled_for, admin_notes) do
     AssignedWorkout
+    |> scoped_to_tenant()
     |> where(
       [assignment],
       assignment.master_workout_id == ^workout_id and assignment.scheduled_for == ^scheduled_for
@@ -1456,6 +1468,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   defp find_conflicting_assignment(master_workout_id, scheduled_for, admin_notes, current_id) do
     base_query =
       AssignedWorkout
+      |> scoped_to_tenant()
       |> where(
         [assignment],
         assignment.master_workout_id == ^master_workout_id and
@@ -1836,8 +1849,14 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         where(query, [row], row.organization_id == ^organization_id)
 
       _no_tenant_context ->
-        query
+        where(query, [row], false)
     end
+  end
+
+  defp put_organization(params, organization_id) do
+    if Enum.any?(Map.keys(params), &is_binary/1),
+      do: Map.put(params, "organization_id", organization_id),
+      else: Map.put(params, :organization_id, organization_id)
   end
 
   defp normalize_folder(folder) do

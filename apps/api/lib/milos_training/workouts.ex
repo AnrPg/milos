@@ -40,10 +40,17 @@ defmodule MilosTraining.Workouts do
   def create_draft(context, admin), do: WorkoutStore.create_draft(context, admin.id)
   defdelegate delete_workout(id), to: DeleteWorkout, as: :call
   defdelegate assign_workout(params), to: AssignWorkout, as: :call
+  def assign_workout(context, params), do: WorkoutStore.assign_workout(context, params)
   defdelegate update_assigned_workout(id, params), to: UpdateAssignedWorkout, as: :call
+
+  def update_assigned_workout(context, id, params),
+    do: WorkoutStore.update_assigned_workout(context, id, params)
+
   defdelegate delete_assigned_workout(id), to: DeleteAssignedWorkout, as: :call
+  def delete_assigned_workout(context, id), do: WorkoutStore.delete_assigned_workout(context, id)
   def update_draft(id, params), do: UpdateDraftWorkout.call(id, params)
   def publish_workout(id, params), do: PublishWorkout.call(id, params)
+  def publish_workout(context, id, params), do: WorkoutStore.publish_workout(context, id, params)
   defdelegate get_workout(id), to: GetWorkout, as: :by_id
   def get_workout(context, id), do: WorkoutStore.get_workout(context, id)
   defdelegate get_workout_for_admin(id), to: GetAdminWorkout, as: :by_id
@@ -53,6 +60,9 @@ defmodule MilosTraining.Workouts do
   defdelegate list_assigned_workouts_for_admin(start_date, end_date),
     to: GetAthleteWeekView,
     as: :for_admin
+
+  def list_assigned_workouts_for_admin(context, start_date, end_date),
+    do: WorkoutStore.list_assigned_workouts_for_admin(context, start_date, end_date)
 
   defdelegate list_workout_change_targets(workout_id),
     to: ListWorkoutChangeTargets,
@@ -96,6 +106,9 @@ defmodule MilosTraining.Workouts do
 
   def duplicate_workout(id, title_suffix \\ "(copy)", attrs \\ %{}),
     do: DuplicateWorkout.call(id, title_suffix, attrs)
+
+  def duplicate_workout(context, id, title_suffix, attrs),
+    do: WorkoutStore.duplicate_workout(context, id, title_suffix, attrs)
 
   def list_folders, do: MilosTraining.Workouts.WorkoutStore.list_folders()
   def list_folders(context), do: WorkoutStore.list_folders(context)

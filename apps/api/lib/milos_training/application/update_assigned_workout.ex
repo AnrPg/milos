@@ -1,8 +1,14 @@
 defmodule MilosTraining.Application.UpdateAssignedWorkout do
   alias MilosTraining.Application.BroadcastUserSync
-  alias MilosTraining.{Identity, Workouts}
+  alias MilosTraining.{Identity, Organizations, Workouts}
 
-  def call(id, params) do
+  def call(context, id, params) do
+    update(context, id, params)
+  end
+
+  def call(_id, _params), do: {:error, :organization_context_required}
+
+  defp update(context, id, params) do
     with :ok <- reject_workout_reassignment(params) do
       athlete_ids =
         params
@@ -10,17 +16,17 @@ defmodule MilosTraining.Application.UpdateAssignedWorkout do
         |> List.wrap()
         |> Enum.uniq()
 
-      athletes = Identity.list_by_ids(athlete_ids)
+      with {:ok, athletes} <- fetch_athletes(context, athlete_ids) do
+        if valid_athletes?(context, athlete_ids, athletes) do
+          previous_assignment = get_assigned_workout(context, id)
 
-      if valid_athletes?(athlete_ids, athletes) do
-        previous_assignment = Workouts.get_assigned_workout(id)
-
-        with {:ok, assignment} <- Workouts.update_assigned_workout(id, params) do
-          broadcast_assignment_refresh(previous_assignment, assignment)
-          {:ok, assignment}
+          with {:ok, assignment} <- update_assigned_workout(context, id, params) do
+            broadcast_assignment_refresh(context, previous_assignment, assignment)
+            {:ok, assignment}
+          end
+        else
+          {:error, :invalid_athletes}
         end
-      else
-        {:error, :invalid_athletes}
       end
     end
   end
@@ -33,13 +39,31 @@ defmodule MilosTraining.Application.UpdateAssignedWorkout do
     end
   end
 
-  defp valid_athletes?(athlete_ids, athletes) do
-    MapSet.new(athlete_ids) == MapSet.new(Enum.map(athletes, & &1.id)) and
-      Enum.all?(athletes, &(&1.role == :athlete))
+  defp fetch_athletes(%{organization_id: organization_id}, athlete_ids) do
+    valid? =
+      Enum.all?(athlete_ids, fn user_id ->
+        user_id
+        |> Organizations.list_memberships()
+        |> Enum.any?(fn %{membership: membership, organization: organization} ->
+          organization.id == organization_id and membership.role == :athlete
+        end)
+      end)
+
+    if valid?, do: {:ok, Identity.list_by_ids(athlete_ids)}, else: {:error, :invalid_athletes}
   end
 
-  defp broadcast_assignment_refresh(previous_assignment, assignment) do
-    admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
+  defp fetch_athletes(_context, _athlete_ids), do: {:error, :organization_context_required}
+
+  defp valid_athletes?(_context, athlete_ids, athletes) do
+    MapSet.new(athlete_ids) == MapSet.new(Enum.map(athletes, & &1.id))
+  end
+
+  defp broadcast_assignment_refresh(
+         %{organization_id: organization_id},
+         previous_assignment,
+         assignment
+       ) do
+    admin_ids = Organizations.list_staff_user_ids(organization_id)
 
     user_ids =
       ((previous_assignment && Map.get(previous_assignment, :athlete_ids, [])) || []) ++
@@ -52,4 +76,9 @@ defmodule MilosTraining.Application.UpdateAssignedWorkout do
       payload: %{assignment_id: assignment.id}
     )
   end
+
+  defp get_assigned_workout(context, id), do: Workouts.get_assigned_workout(context, id)
+
+  defp update_assigned_workout(context, id, params),
+    do: Workouts.update_assigned_workout(context, id, params)
 end

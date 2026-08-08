@@ -1,7 +1,7 @@
 defmodule MilosTraining.Notifications do
   require Logger
 
-  alias MilosTraining.Identity
+  alias MilosTraining.{Identity, Organizations}
   alias MilosTraining.Notifications.Commands.DeletePushSubscription
   alias MilosTraining.Notifications.Commands.DispatchNotification
   alias MilosTraining.Notifications.Commands.EnqueueNotificationEvent
@@ -154,7 +154,7 @@ defmodule MilosTraining.Notifications do
     do: NotificationStore.propagate_nickname_change(old_nickname, new_nickname)
 
   def enqueue_admins_new_booking(booking),
-    do: enqueue_for_users(Identity.list_by_role(:admin), :booking_pending, booking)
+    do: enqueue_for_users(staff_recipients(booking), :booking_pending, booking)
 
   def enqueue_member_booking_approved(booking),
     do: enqueue_for_users([%{id: field(booking, :user_id)}], :booking_approved, booking)
@@ -163,10 +163,11 @@ defmodule MilosTraining.Notifications do
     do: enqueue_for_users([%{id: field(booking, :user_id)}], :booking_rejected, booking)
 
   def enqueue_booking_timeout_alert(booking),
-    do: enqueue_for_users(Identity.list_by_role(:admin), :booking_timeout, booking)
+    do: enqueue_for_users(staff_recipients(booking), :booking_timeout, booking)
 
   def enqueue_workout_note(note_payload) do
-    Identity.list_by_role(:admin)
+    note_payload
+    |> staff_recipients()
     |> Enum.each(fn admin ->
       result =
         deliver_notification(
@@ -284,7 +285,8 @@ defmodule MilosTraining.Notifications do
           "/admin/coaching-assignments?open_assignment=#{assigned_workout_id}&date=#{Date.to_iso8601(date)}"
       end
 
-    Identity.list_by_role(:admin)
+    payload
+    |> staff_recipients()
     |> Enum.each(fn admin ->
       result =
         deliver_notification(admin.id, :workout_rejected, %{
@@ -309,7 +311,8 @@ defmodule MilosTraining.Notifications do
     body = field(payload, :body)
     context_url = field(payload, :context_url) || "/"
 
-    Identity.list_by_role(:admin)
+    payload
+    |> staff_recipients()
     |> Enum.each(fn admin ->
       result =
         deliver_notification(admin.id, :athlete_message, %{
@@ -340,7 +343,8 @@ defmodule MilosTraining.Notifications do
     url =
       "/admin/coaching-assignments?open_assignment=#{assigned_workout_id}&date=#{to_date}"
 
-    Identity.list_by_role(:admin)
+    payload
+    |> staff_recipients()
     |> Enum.each(fn admin ->
       result =
         deliver_notification(admin.id, :workout_moved, %{
@@ -393,26 +397,41 @@ defmodule MilosTraining.Notifications do
     dedupe_id = request_id || "#{athlete_id}:#{requested_for}"
     url = "/admin/coaching-assignments?date=#{requested_for}"
 
-    Identity.list_by_role(:admin)
-    |> Enum.reduce_while(:ok, fn admin, :ok ->
-      result =
-        deliver_notification(admin.id, :workout_assignment_requested, %{
-          athlete_id: athlete_id,
-          athlete_nickname: athlete_nickname,
-          requested_for: requested_for,
-          note: note,
-          dedupe_key: "workout-assignment-requested:#{admin.id}:#{dedupe_id}",
-          url: url
-        })
+    payload
+    |> field(:admin_ids)
+    |> case do
+      nil -> {:error, :organization_context_required}
+      admin_ids -> List.wrap(admin_ids)
+    end
+    |> case do
+      {:error, reason} ->
+        {:error, reason}
 
-      if delivered?(result), do: {:cont, :ok}, else: {:halt, result}
-    end)
+      admin_ids ->
+        admin_ids
+        |> Enum.uniq()
+        |> Enum.reduce_while(:ok, fn admin_id, :ok ->
+          result =
+            deliver_notification(admin_id, :workout_assignment_requested, %{
+              organization_id: field(payload, :organization_id),
+              athlete_id: athlete_id,
+              athlete_nickname: athlete_nickname,
+              requested_for: requested_for,
+              note: note,
+              dedupe_key: "workout-assignment-requested:#{admin_id}:#{dedupe_id}",
+              url: url
+            })
+
+          if delivered?(result), do: {:cont, :ok}, else: {:halt, result}
+        end)
+    end
   end
 
   def enqueue_review_submitted(payload) when is_map(payload) do
     review_id = field(payload, :review_id)
 
-    Identity.list_by_role(:admin)
+    payload
+    |> staff_recipients()
     |> Enum.reduce_while(:ok, fn admin, :ok ->
       result =
         deliver_notification(admin.id, :review_submitted, %{
@@ -643,6 +662,18 @@ defmodule MilosTraining.Notifications do
 
   defp field(map, key) when is_map(map) do
     Map.get(map, key) || Map.get(map, Atom.to_string(key))
+  end
+
+  defp staff_recipients(payload) do
+    case field(payload, :organization_id) do
+      organization_id when is_binary(organization_id) ->
+        organization_id
+        |> Organizations.list_staff_user_ids()
+        |> Enum.map(&%{id: &1})
+
+      _missing ->
+        []
+    end
   end
 
   defp nested_map(map, key) do

@@ -1,19 +1,22 @@
 defmodule MilosTraining.Application.GetAssignedWorkoutWeek do
   alias MilosTraining.{Identity, Workouts}
 
-  def call(user, params \\ %{}) do
+  def call(context, user, params) do
     with {:ok, start_date} <- parse_start_date(params) do
       end_date = Date.add(start_date, 6)
 
       assignments =
-        case user.role do
-          :admin ->
-            Workouts.list_assigned_workouts_for_admin(start_date, end_date)
+        case context.role do
+          role when role in [:owner, :admin, :coach] ->
+            Workouts.list_assigned_workouts_for_admin(context, start_date, end_date)
             |> attach_athletes()
 
           :athlete ->
-            Workouts.list_assigned_workouts_for_athlete(user.id, start_date, end_date)
+            Workouts.list_assigned_workouts_for_athlete(context, user.id, start_date, end_date)
             |> strip_admin_fields()
+
+          _role ->
+            []
         end
 
       {:ok,
@@ -24,6 +27,8 @@ defmodule MilosTraining.Application.GetAssignedWorkoutWeek do
        }}
     end
   end
+
+  def call(_user, _params), do: {:error, :organization_context_required}
 
   defp parse_start_date(params) do
     case Map.get(params, "start_date") || Map.get(params, :start_date) do
