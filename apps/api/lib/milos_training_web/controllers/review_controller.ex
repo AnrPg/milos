@@ -92,7 +92,12 @@ defmodule MilosTrainingWeb.ReviewController do
   def create(conn, params) do
     current_user = Guardian.Plug.current_resource(conn)
 
-    with {:ok, review} <- SubmitReview.call(current_user.id, conn.body_params || params) do
+    with {:ok, review} <-
+           SubmitReview.call(
+             conn.assigns[:tenant_context],
+             current_user.id,
+             conn.body_params || params
+           ) do
       conn
       |> put_status(:created)
       |> json(%{review: review})

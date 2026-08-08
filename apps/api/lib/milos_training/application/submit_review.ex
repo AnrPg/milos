@@ -13,8 +13,8 @@ defmodule MilosTraining.Application.SubmitReview do
     Workouts
   }
 
-  def call(user_id, params) do
-    with {:ok, target_snapshot} <- target_snapshot(user_id, params),
+  def call(context, user_id, params) do
+    with {:ok, target_snapshot} <- target_snapshot(context, user_id, params),
          {:ok, review} <-
            Feedback.submit_review(user_id, trusted_review_params(params, target_snapshot)) do
       RecordAnalyticsEvent.call_unsafe("review_submitted", %{
@@ -37,6 +37,8 @@ defmodule MilosTraining.Application.SubmitReview do
     end
   end
 
+  def call(user_id, params), do: call(nil, user_id, params)
+
   defp dispatch_review_notification(user_id, review) do
     Notifications.dispatch_event(:review_submitted, %{
       review_id: review.id,
@@ -48,7 +50,7 @@ defmodule MilosTraining.Application.SubmitReview do
     })
   end
 
-  defp target_snapshot(user_id, params) do
+  defp target_snapshot(context, user_id, params) do
     target_type = params[:target_type] || params["target_type"]
     target_id = params[:target_id] || params["target_id"]
 
@@ -67,7 +69,7 @@ defmodule MilosTraining.Application.SubmitReview do
         {:error, :review_target_required}
 
       {"workout", id} ->
-        case {Workouts.get_workout(id), workout_execution_status(user_id, id)} do
+        case {get_workout(context, id), workout_execution_status(user_id, id)} do
           {nil, _status} -> {:error, :review_target_not_found}
           {_workout, :missing} -> {:error, :review_target_not_found}
           {_workout, :incomplete} -> {:error, :review_target_not_completed}
@@ -96,7 +98,7 @@ defmodule MilosTraining.Application.SubmitReview do
         end
 
       {"class_slot", id} ->
-        case {Scheduling.get_slot(id), class_slot_status(user_id, id)} do
+        case {get_slot(context, id), class_slot_status(context, user_id, id)} do
           {nil, _status} -> {:error, :review_target_not_found}
           {_slot, :missing} -> {:error, :review_target_not_found}
           {_slot, :incomplete} -> {:error, :review_target_not_completed}
@@ -172,11 +174,11 @@ defmodule MilosTraining.Application.SubmitReview do
     end
   end
 
-  defp class_slot_status(user_id, slot_id) do
-    case Scheduling.get_slot(slot_id) do
+  defp class_slot_status(context, user_id, slot_id) do
+    case get_slot(context, slot_id) do
       %{bookings: bookings} when is_list(bookings) ->
         if approved_booking_for_user?(bookings, user_id) do
-          slot_attendance_status(user_id, slot_id)
+          slot_attendance_status(context, user_id, slot_id)
         else
           :missing
         end
@@ -192,8 +194,8 @@ defmodule MilosTraining.Application.SubmitReview do
     end)
   end
 
-  defp slot_attendance_status(user_id, slot_id) do
-    case Analytics.get_attendance_for_user_class(user_id, slot_id) do
+  defp slot_attendance_status(context, user_id, slot_id) do
+    case get_attendance(context, user_id, slot_id) do
       attendance when not is_nil(attendance) ->
         if ReviewEligibility.attended_class?(attendance), do: :attended, else: :incomplete
 
@@ -215,6 +217,17 @@ defmodule MilosTraining.Application.SubmitReview do
   defp string_key_map(params) when is_map(params) do
     Map.new(params, fn {key, value} -> {to_string(key), value} end)
   end
+
+  defp get_workout(%{organization_id: _} = context, id), do: Workouts.get_workout(context, id)
+  defp get_workout(_context, id), do: Workouts.get_workout(id)
+
+  defp get_slot(%{organization_id: _} = context, id), do: Scheduling.get_slot(context, id)
+  defp get_slot(_context, _id), do: nil
+
+  defp get_attendance(%{organization_id: _} = context, user_id, slot_id),
+    do: Analytics.get_attendance_for_user_class(context, user_id, slot_id)
+
+  defp get_attendance(_context, _user_id, _slot_id), do: nil
 
   defp broadcast_review_submitted(user_id, review_id) do
     admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
