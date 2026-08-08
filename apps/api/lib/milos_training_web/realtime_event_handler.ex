@@ -74,7 +74,10 @@ defmodule MilosTrainingWeb.RealtimeEventHandler do
     {:noreply, state}
   end
 
-  def handle_info({:schedule_slot_deleted, %{slot_id: slot_id, organization_id: organization_id}}, state) do
+  def handle_info(
+        {:schedule_slot_deleted, %{slot_id: slot_id, organization_id: organization_id}},
+        state
+      ) do
     Realtime.broadcast_schedule_refresh("slot_deleted", %{
       slot_id: slot_id,
       organization_id: organization_id

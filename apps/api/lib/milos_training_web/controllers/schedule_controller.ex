@@ -6,6 +6,7 @@ defmodule MilosTrainingWeb.ScheduleController do
   alias MilosTraining.Application.GetScheduleCalendar
   alias MilosTraining.Application.SubmitBooking
   alias MilosTraining.Application.WithdrawBooking
+  alias MilosTrainingWeb.ParamExtractor
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
   action_fallback MilosTrainingWeb.FallbackController
@@ -162,9 +163,5 @@ defmodule MilosTrainingWeb.ScheduleController do
     end
   end
 
-  defp normalize_body_params(%{} = body_params, _params) when map_size(body_params) > 0,
-    do: body_params
-
-  defp normalize_body_params(_, params),
-    do: Map.get(params, "body") || Map.get(params, :body) || params
+  defp normalize_body_params(conn, params), do: ParamExtractor.body(%{body_params: conn}, params)
 end

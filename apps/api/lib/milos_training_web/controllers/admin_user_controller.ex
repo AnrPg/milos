@@ -550,6 +550,7 @@ defmodule MilosTrainingWeb.AdminUserController do
   def schedule(conn, params) do
     with {:ok, payload} <-
            GetAdminUserSchedule.call(
+             conn.assigns.tenant_context,
              params["id"] || params[:id],
              params["start_date"] || params[:start_date],
              params["end_date"] || params[:end_date]
@@ -568,7 +569,14 @@ defmodule MilosTrainingWeb.AdminUserController do
   end
 
   def prs(conn, params), do: render_service(conn, GetAdminUserPRs, params)
-  def incidents(conn, params), do: render_service(conn, GetAdminUserIncidents, params)
+
+  def incidents(conn, params) do
+    with {:ok, payload} <-
+           GetAdminUserIncidents.call(conn.assigns.tenant_context, params["id"] || params[:id]) do
+      json(conn, payload)
+    end
+  end
+
   def messages(conn, params), do: render_service(conn, GetAdminUserMessages, params)
 
   def coaching_context(conn, params) do
@@ -585,7 +593,7 @@ defmodule MilosTrainingWeb.AdminUserController do
   end
 
   defp render_service(conn, service, params) do
-    with {:ok, payload} <- service.call(params["id"] || params[:id]) do
+    with {:ok, payload} <- service.call(conn.assigns.tenant_context, params["id"] || params[:id]) do
       json(conn, payload)
     end
   end

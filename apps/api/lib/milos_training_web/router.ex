@@ -366,7 +366,6 @@ defmodule MilosTrainingWeb.Router do
     get("/challenges/:id/leaderboard", ChallengeController, :leaderboard)
     post("/challenges/:id/opt_in", ChallengeController, :opt_in)
     delete("/challenges/:id/opt_in", ChallengeController, :opt_out)
-
   end
 
   scope "/api/workouts", MilosTrainingWeb do

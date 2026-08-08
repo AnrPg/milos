@@ -12,6 +12,7 @@ defmodule MilosTrainingWeb.MessagingController do
   }
 
   alias MilosTraining.Application.SendMessage, as: SendMessageUseCase
+  alias MilosTrainingWeb.ParamExtractor
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
   action_fallback MilosTrainingWeb.FallbackController
@@ -300,7 +301,8 @@ defmodule MilosTrainingWeb.MessagingController do
       |> maybe_put(:participant_id, bp(conn, "participant_id"))
       |> maybe_put(:context_id, bp(conn, "context_id"))
 
-    with {:ok, thread} <- GetOrCreateMessagingThread.call(user, params) do
+    with {:ok, thread} <-
+           GetOrCreateMessagingThread.call(conn.assigns[:tenant_context] || %{}, user, params) do
       json(conn, %{thread: serialize_thread(thread)})
     end
   end
@@ -316,33 +318,34 @@ defmodule MilosTrainingWeb.MessagingController do
 
   def show_thread(conn, params) do
     user = Guardian.Plug.current_resource(conn)
-    thread_id = params["id"] || params[:id]
 
-    with {:ok, thread} <- GetMessagingThread.call(thread_id, user.id) do
+    with {:ok, thread_id} <- ParamExtractor.fetch(params, "id"),
+         {:ok, thread} <- GetMessagingThread.call(thread_id, user.id) do
       json(conn, %{thread: serialize_thread(thread)})
     end
   end
 
   def list_messages(conn, params) do
     user = Guardian.Plug.current_resource(conn)
-    thread_id = params["id"] || params[:id]
 
-    list_params =
-      %{actor_id: user.id}
-      |> maybe_put(:limit, params["limit"] || params[:limit])
-      |> maybe_put(:before_id, params["before_id"] || params[:before_id])
+    with {:ok, thread_id} <- ParamExtractor.fetch(params, "id") do
+      list_params =
+        %{actor_id: user.id}
+        |> maybe_put(:limit, ParamExtractor.get(params, "limit"))
+        |> maybe_put(:before_id, ParamExtractor.get(params, "before_id"))
 
-    with {:ok, messages} <- ListMessagingMessages.call(thread_id, list_params) do
-      json(conn, %{messages: Enum.map(messages, &serialize_message/1)})
+      with {:ok, messages} <- ListMessagingMessages.call(thread_id, list_params) do
+        json(conn, %{messages: Enum.map(messages, &serialize_message/1)})
+      end
     end
   end
 
   def send_message(conn, params) do
     user = Guardian.Plug.current_resource(conn)
-    thread_id = params["id"] || params[:id]
     message_type = parse_message_type(bp(conn, "message_type") || "chat")
 
-    with {:ok, message} <-
+    with {:ok, thread_id} <- ParamExtractor.fetch(params, "id"),
+         {:ok, message} <-
            SendMessageUseCase.call(user, %{
              thread_id: thread_id,
              sender_id: user.id,
@@ -358,10 +361,10 @@ defmodule MilosTrainingWeb.MessagingController do
 
   def mark_read(conn, params) do
     user = Guardian.Plug.current_resource(conn)
-    thread_id = params["id"] || params[:id]
     message_id = bp(conn, "message_id")
 
-    with {:ok, result} <- MarkMessagingThreadRead.call(thread_id, user.id, message_id) do
+    with {:ok, thread_id} <- ParamExtractor.fetch(params, "id"),
+         {:ok, result} <- MarkMessagingThreadRead.call(thread_id, user.id, message_id) do
       json(conn, result)
     end
   end

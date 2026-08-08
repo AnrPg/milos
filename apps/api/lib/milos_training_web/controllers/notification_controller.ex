@@ -16,6 +16,7 @@ defmodule MilosTrainingWeb.NotificationController do
   }
 
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
+  alias MilosTrainingWeb.ParamExtractor
 
   action_fallback MilosTrainingWeb.FallbackController
 
@@ -331,23 +332,21 @@ defmodule MilosTrainingWeb.NotificationController do
   def push_subscription_status(conn, params) do
     actor = GuardianPlug.current_resource(conn)
     body = normalize_body_params(conn, params)
-    endpoint = Map.get(body, "endpoint") || Map.get(body, :endpoint)
 
-    json(conn, GetPushSubscriptionStatus.call(actor.id, endpoint))
+    with {:ok, endpoint} <- ParamExtractor.fetch(body, "endpoint") do
+      json(conn, GetPushSubscriptionStatus.call(actor.id, endpoint))
+    end
   end
 
   def delete_push_subscription(conn, params) do
     actor = GuardianPlug.current_resource(conn)
     body = normalize_body_params(conn, params)
-    endpoint = Map.get(body, "endpoint") || Map.get(body, :endpoint)
-    deleted = DeletePushSubscription.call(actor.id, endpoint)
-    json(conn, %{deleted: deleted})
-  end
 
-  defp normalize_body_params(conn, params) do
-    case conn.body_params do
-      %{} = body_params when map_size(body_params) > 0 -> body_params
-      _ -> Map.get(params, "body") || Map.get(params, :body) || params
+    with {:ok, endpoint} <- ParamExtractor.fetch(body, "endpoint") do
+      deleted = DeletePushSubscription.call(actor.id, endpoint)
+      json(conn, %{deleted: deleted})
     end
   end
+
+  defp normalize_body_params(conn, params), do: ParamExtractor.body(conn, params)
 end

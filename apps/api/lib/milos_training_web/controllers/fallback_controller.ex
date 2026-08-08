@@ -97,6 +97,45 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "last_admin", error: "At least one admin account must remain"})
   end
 
+  def call(conn, {:error, :expected_source_revision_required}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "expected_source_revision_required",
+      error: "Expected source revision is required"
+    })
+  end
+
+  def call(conn, {:error, :request_id_required}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "request_id_required", error: "A stable request_id UUID is required"})
+  end
+
+  def call(conn, {:error, :push_subscription_endpoint_in_use}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "push_subscription_endpoint_in_use",
+      error: "This browser push subscription belongs to another signed-in user"
+    })
+  end
+
+  def call(conn, {:error, :credit_reversal_required}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "credit_reversal_required",
+      error: "Reverse linked credit applications before reversing this payment"
+    })
+  end
+
+  def call(conn, {:error, :bad_request}) do
+    conn
+    |> put_status(:bad_request)
+    |> json(%{code: "bad_request", error: "Required parameter is missing or invalid"})
+  end
+
   def call(conn, {:error, :user_has_restricted_history}) do
     conn
     |> put_status(:conflict)
@@ -210,12 +249,6 @@ defmodule MilosTrainingWeb.FallbackController do
     conn
     |> put_status(:unprocessable_entity)
     |> json(%{code: "class_type_not_found", error: "Class type is missing or archived"})
-  end
-
-  def call(conn, {:error, :bad_request}) do
-    conn
-    |> put_status(:bad_request)
-    |> json(%{code: "bad_request", error: "Bad request"})
   end
 
   def call(conn, {:error, :self_conversation}) do
@@ -947,27 +980,6 @@ defmodule MilosTrainingWeb.FallbackController do
     conn
     |> put_status(:unprocessable_entity)
     |> json(%{code: "substitution_failed", error: "Workout substitution failed"})
-  end
-
-  def call(conn, {:error, :last_admin}) do
-    conn
-    |> put_status(:unprocessable_entity)
-    |> json(%{code: "last_admin", error: "Cannot demote the last admin"})
-  end
-
-  def call(conn, {:error, :cannot_delete_self}) do
-    conn
-    |> put_status(:unprocessable_entity)
-    |> json(%{code: "cannot_delete_self", error: "Admins cannot delete their own account"})
-  end
-
-  def call(conn, {:error, :user_has_restricted_history}) do
-    conn
-    |> put_status(:conflict)
-    |> json(%{
-      code: "user_has_restricted_history",
-      error: "User has protected historical records and cannot be deleted"
-    })
   end
 
   def call(conn, {:error, :workout_not_published}) do
