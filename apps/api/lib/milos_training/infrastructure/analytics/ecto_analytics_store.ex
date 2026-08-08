@@ -74,8 +74,11 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
   # An explicit caller-supplied value (if one is ever added) still wins.
   defp put_organization_id(params) do
     case Map.get(params, "organization_id") do
-      nil -> Map.put(params, "organization_id", RepoContext.current_setting("app.organization_id"))
-      _present -> params
+      nil ->
+        Map.put(params, "organization_id", RepoContext.current_setting("app.organization_id"))
+
+      _present ->
+        params
     end
   end
 
@@ -92,7 +95,8 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
       on_conflict:
         {:replace,
          [:booking_id, :status, :marked_by_id, :marked_at, :notes, :params, :updated_at]},
-      conflict_target: [:scheduled_class_id, :user_id]
+      conflict_target: [:scheduled_class_id, :user_id],
+      returning: true
     )
     |> normalize_result(&normalize_attendance/1)
   end
@@ -482,9 +486,12 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
   end
 
   defp update_thread_last_message(thread, sent_at) do
-    thread
-    |> CommunicationThread.changeset(%{last_message_at: sent_at})
-    |> Repo.update()
+    CommunicationThread
+    |> where([thread], thread.id == ^thread.id)
+    |> where([thread], is_nil(thread.last_message_at) or thread.last_message_at < ^sent_at)
+    |> Repo.update_all(set: [last_message_at: sent_at, updated_at: DateTime.utc_now()])
+
+    {:ok, thread}
   end
 
   defp normalize_exercise_catalog_entry(%ExerciseCatalogEntry{} = entry) do
