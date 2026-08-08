@@ -328,15 +328,38 @@ If you encounter any of the following, **STOP and ask the human** before proceed
 - You are about to push to a remote repository
 
 
+## Graphify
+
+**MANDATORY FOR CODEX: use Graphify before broad code exploration or implementation.**
+Graphify is installed for Codex as both a skill and a shell CLI. Human operators
+may type `/graphify`; agents in this environment must use the equivalent
+`graphify` shell commands.
+
+### Workflow
+1. Before using grep/glob or broad file reads, check for `graphify-out/graph.json`.
+2. If the graph exists and the task is a natural-language question about the
+   codebase, run `graphify query "<question>"` and answer from the graph.
+3. If the graph is missing or stale for an implementation task, run the
+   appropriate Graphify command first, usually `graphify extract . --code-only`
+   for a fresh code graph or `graphify update .` for an incremental refresh.
+4. Use the graph-ranked context to identify the bounded contexts, layers, and
+   files most likely to be affected before opening individual files.
+5. Keep generated `graphify-out/` artifacts out of the final change unless the
+   human explicitly asks to keep them.
+6. If the `graphify` CLI is unavailable in the current Codex session, state that
+   explicitly and fall back to the next required project context source.
+
 ## vexp <!-- vexp v2.0.31 -->
 
-**MANDATORY: use `run_pipeline` - do NOT grep or glob the codebase.**
+**MANDATORY when the vexp MCP tools are exposed: use `run_pipeline` after
+Graphify and before grep/glob-style codebase search.**
 vexp returns pre-indexed, graph-ranked context in a single call.
 
 ### Workflow
-1. `run_pipeline` with your task description - ALWAYS FIRST (replaces all other tools)
-2. Make targeted changes based on the context returned
-3. `run_pipeline` again only if you need more context
+1. Graphify with your task description - ALWAYS FIRST for Codex
+2. `run_pipeline` with your task description when available
+3. Make targeted changes based on the context returned
+4. `run_pipeline` again only if you need more context
 
 ### Available MCP tools
 - `run_pipeline` - **PRIMARY TOOL**. Runs capsule + impact + memory in 1 call.
@@ -346,7 +369,8 @@ vexp returns pre-indexed, graph-ranked context in a single call.
 - `expand_vexp_ref` - expand V-REF placeholders in v2 output
 
 ### Agentic search
-- Do NOT use built-in file search, grep, or codebase indexing - always call `run_pipeline` first
+- Do NOT use built-in file search, grep, or codebase indexing until after
+  `graphify` and any available `run_pipeline` context pass
 - If you spawn sub-agents or background tasks, pass them the context from `run_pipeline`
   rather than letting them search the codebase independently
 
