@@ -7,6 +7,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
     ApplyFinanceCreditToInvoice,
     ApplyFinanceCreditToPayment,
     AssignFinanceMemberPackage,
+    CompleteInvoiceUpload,
     CreateFinanceInvoice,
     CreateFinanceManualCredit,
     CreateFinancePackage,
@@ -30,6 +31,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
     ListFinanceReferralPrograms,
     ListFinanceReferrals,
     ListFinanceReferralRewards,
+    PresignInvoiceUpload,
     RecordFinancePayment,
     PurgeFinanceRecord,
     RedeemFinancePromotion,
@@ -333,10 +335,37 @@ defmodule MilosTrainingWeb.AdminFinanceController do
         schema: %Schema{
           type: :object,
           properties: %{
-            file_name: %Schema{type: :string},
-            content_type: %Schema{type: :string}
+            file_name: %Schema{
+              type: :string,
+              maxLength: 180,
+              description: "Original invoice document filename"
+            },
+            content_type: %Schema{
+              type: :string,
+              enum: ["application/pdf", "image/jpeg", "image/png", "image/webp"]
+            }
           },
           required: [:file_name, :content_type],
+          additionalProperties: false
+        }
+      }
+    }
+  }
+  @invoice_upload_complete_request_body %RequestBody{
+    required: true,
+    content: %{
+      "application/json" => %MediaType{
+        schema: %Schema{
+          type: :object,
+          properties: %{
+            file_key: %Schema{type: :string},
+            file_name: %Schema{type: :string, maxLength: 180},
+            content_type: %Schema{
+              type: :string,
+              enum: ["application/pdf", "image/jpeg", "image/png", "image/webp"]
+            }
+          },
+          required: [:file_key, :file_name, :content_type],
           additionalProperties: false
         }
       }
@@ -1190,22 +1219,28 @@ defmodule MilosTrainingWeb.AdminFinanceController do
     context = conn.assigns.tenant_context
     invoice_id = param_id(params)
     body = body_params(conn, params)
-    file_name = body["file_name"] || body[:file_name] || ""
-    content_type = body["content_type"] || body[:content_type] || "application/octet-stream"
-    ext = Path.extname(file_name)
-    relative_key = "invoices/#{invoice_id}/#{Ecto.UUID.generate()}#{ext}"
 
-    with {:ok, invoice} <- MilosTraining.Finance.get_invoice(context, invoice_id),
-         true <- invoice.organization_id == context.organization_id,
-         {:ok, %{url: upload_url, key: key}} <-
-           DocumentStorage.tenant_upload_url(context, relative_key),
-         updated_params <-
-           Map.merge(invoice.params || %{}, %{"file_key" => key, "file_name" => file_name}),
-         {:ok, _} <- MilosTraining.Finance.update_invoice_params(invoice_id, updated_params) do
-      json(conn, %{upload_url: upload_url, file_key: key, content_type: content_type})
+    with {:ok, upload} <- PresignInvoiceUpload.call(context, invoice_id, body) do
+      json(conn, upload)
     else
-      false -> {:error, :forbidden}
       error -> error
+    end
+  end
+
+  operation(:invoice_upload_complete,
+    summary: "Validate and attach an uploaded invoice file",
+    parameters: [@id_parameter],
+    request_body: @invoice_upload_complete_request_body,
+    responses: [ok: {"Validated invoice upload", "application/json", @open_object}]
+  )
+
+  def invoice_upload_complete(conn, params) do
+    context = conn.assigns.tenant_context
+    invoice_id = param_id(params)
+    body = body_params(conn, params)
+
+    with {:ok, upload} <- CompleteInvoiceUpload.call(context, invoice_id, body) do
+      json(conn, %{upload: upload})
     end
   end
 

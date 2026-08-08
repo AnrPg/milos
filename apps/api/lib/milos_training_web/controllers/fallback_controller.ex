@@ -343,6 +343,84 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  def call(conn, {:error, :invalid_invoice_upload}) do
+    emit_upload_rejection(:invalid_invoice_upload)
+
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_invoice_upload",
+      error: "Use a PDF, JPG, JPEG, PNG, or WebP invoice document up to 10 MiB."
+    })
+  end
+
+  def call(conn, {:error, :unsupported_invoice_upload_type}) do
+    emit_upload_rejection(:unsupported_invoice_upload_type)
+
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "unsupported_invoice_upload_type",
+      error: "Invoice uploads only allow PDF, JPG, JPEG, PNG, and WebP documents."
+    })
+  end
+
+  def call(conn, {:error, :document_upload_missing}) do
+    emit_upload_rejection(:document_upload_missing)
+
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "document_upload_missing",
+      error: "The invoice upload was not found in storage. Upload the document again."
+    })
+  end
+
+  def call(conn, {:error, :document_upload_unverified}) do
+    emit_upload_rejection(:document_upload_unverified)
+
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "document_upload_unverified",
+      error: "Storage rejected server verification for this invoice upload."
+    })
+  end
+
+  def call(conn, {:error, :document_upload_content_type_mismatch}) do
+    emit_upload_rejection(:document_upload_content_type_mismatch)
+
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "document_upload_content_type_mismatch",
+      error: "The uploaded invoice document does not match the requested content type."
+    })
+  end
+
+  def call(conn, {:error, :document_upload_metadata_missing}) do
+    emit_upload_rejection(:document_upload_metadata_missing)
+
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "document_upload_metadata_missing",
+      error: "The uploaded invoice document is missing storage metadata. Upload it again."
+    })
+  end
+
+  def call(conn, {:error, {:document_too_large, byte_size}}) do
+    emit_upload_rejection(:document_too_large)
+
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "document_too_large",
+      params: %{byte_size: byte_size, max_bytes: 10_485_760},
+      error: "The uploaded invoice document is larger than 10 MiB."
+    })
+  end
+
   def call(conn, {:error, :invalid_execution_source}) do
     conn
     |> put_status(:unprocessable_entity)
@@ -1101,5 +1179,13 @@ defmodule MilosTrainingWeb.FallbackController do
     Enum.reduce(opts, msg, fn {key, value}, acc ->
       String.replace(acc, "%{#{key}}", to_string(value))
     end)
+  end
+
+  defp emit_upload_rejection(reason) do
+    :telemetry.execute(
+      [:milos, :upload, :rejected],
+      %{count: 1},
+      %{context: "invoice", reason: reason}
+    )
   end
 end

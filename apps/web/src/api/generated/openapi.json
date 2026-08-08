@@ -19815,6 +19815,79 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/finance/invoices/{id}/upload-complete": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFinanceController.invoice_upload_complete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "content_type": {
+                    "enum": [
+                      "application/pdf",
+                      "image/jpeg",
+                      "image/png",
+                      "image/webp"
+                    ],
+                    "type": "string"
+                  },
+                  "file_key": {
+                    "type": "string"
+                  },
+                  "file_name": {
+                    "maxLength": 180,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file_key",
+                  "file_name",
+                  "content_type"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Validated invoice upload"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Validate and attach an uploaded invoice file",
+        "tags": [
+          "Admin Finance"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/finance/referral-programs/{id}": {
       "patch": {
         "callbacks": {},
@@ -20490,9 +20563,17 @@
                 "additionalProperties": false,
                 "properties": {
                   "content_type": {
+                    "enum": [
+                      "application/pdf",
+                      "image/jpeg",
+                      "image/png",
+                      "image/webp"
+                    ],
                     "type": "string"
                   },
                   "file_name": {
+                    "description": "Original invoice document filename",
+                    "maxLength": 180,
                     "type": "string"
                   }
                 },

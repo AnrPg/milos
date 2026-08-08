@@ -27,6 +27,68 @@ defmodule MilosTrainingWeb.Router do
     plug(MilosTrainingWeb.Plugs.RateLimit, max: 10, interval: 60_000)
   end
 
+  pipeline :authenticated_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 600, interval: 60_000, bucket: "authenticated")
+  end
+
+  pipeline :tenant_write_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit,
+      max: 120,
+      interval: 60_000,
+      bucket: "tenant-writes",
+      methods: ["POST", "PATCH", "PUT", "DELETE"]
+    )
+  end
+
+  pipeline :upload_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit,
+      max: 20,
+      interval: 300_000,
+      bucket: "uploads",
+      methods: ["POST"]
+    )
+  end
+
+  pipeline :messaging_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit,
+      max: 60,
+      interval: 60_000,
+      bucket: "messaging",
+      methods: ["POST"]
+    )
+  end
+
+  pipeline :execution_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit,
+      max: 240,
+      interval: 60_000,
+      bucket: "execution",
+      methods: ["POST", "PATCH"]
+    )
+  end
+
+  pipeline :notification_write_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit,
+      max: 120,
+      interval: 60_000,
+      bucket: "notification-writes",
+      methods: ["POST", "DELETE"]
+    )
+  end
+
+  pipeline :search_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 120, interval: 60_000, bucket: "search")
+  end
+
+  pipeline :platform_write_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit,
+      max: 60,
+      interval: 60_000,
+      bucket: "platform-writes",
+      methods: ["POST", "PATCH", "DELETE"]
+    )
+  end
+
   pipeline :admin_only do
     plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
     plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin])
@@ -89,14 +151,14 @@ defmodule MilosTrainingWeb.Router do
   end
 
   scope "/api/auth", MilosTrainingWeb do
-    pipe_through([:api, :authenticated])
+    pipe_through([:api, :authenticated, :authenticated_rate_limited])
 
     get("/me", AuthController, :me)
     post("/sign-out-all", AuthController, :sign_out_all)
   end
 
   scope "/api", MilosTrainingWeb do
-    pipe_through([:api, :authenticated])
+    pipe_through([:api, :authenticated, :authenticated_rate_limited])
 
     get("/memberships", OrganizationAccessController, :memberships)
   end
@@ -108,14 +170,28 @@ defmodule MilosTrainingWeb.Router do
   end
 
   scope "/api/org/:organization_slug", MilosTrainingWeb do
-    pipe_through([:api, :authenticated, :tenant_context, :organization_admin])
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :tenant_context,
+      :organization_admin,
+      :tenant_write_rate_limited
+    ])
 
     post("/invitations", OrganizationAccessController, :issue)
     delete("/invitations/:id", OrganizationAccessController, :revoke)
   end
 
   scope "/api/org/:organization_slug/me", MilosTrainingWeb do
-    pipe_through([:api, :authenticated, :tenant_member])
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :tenant_member,
+      :messaging_rate_limited,
+      :search_rate_limited
+    ])
 
     get("/finance", MyFinanceController, :index)
     get("/entitlement", MyFinanceController, :entitlement)
@@ -134,7 +210,13 @@ defmodule MilosTrainingWeb.Router do
   end
 
   scope "/api/org/:organization_slug", MilosTrainingWeb do
-    pipe_through([:api, :authenticated, :member_or_admin])
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :member_or_admin,
+      :tenant_write_rate_limited
+    ])
 
     get("/schedule", ScheduleController, :index)
     post("/bookings", ScheduleController, :create_booking)
@@ -144,7 +226,13 @@ defmodule MilosTrainingWeb.Router do
   end
 
   scope "/api/org/:organization_slug", MilosTrainingWeb do
-    pipe_through([:api, :authenticated, :athlete_or_admin])
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :athlete_or_admin,
+      :tenant_write_rate_limited
+    ])
 
     get("/my-workouts", MyWorkoutController, :index)
     post("/my-workouts/requests", MyWorkoutController, :request_assignment)
@@ -153,7 +241,15 @@ defmodule MilosTrainingWeb.Router do
   end
 
   scope "/api/org/:organization_slug/admin", MilosTrainingWeb do
-    pipe_through([:api, :authenticated, :admin_only])
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :admin_only,
+      :tenant_write_rate_limited,
+      :upload_rate_limited,
+      :search_rate_limited
+    ])
 
     get("/users", AdminUserController, :index)
     get("/users/:id", AdminUserController, :show)
@@ -279,6 +375,13 @@ defmodule MilosTrainingWeb.Router do
     patch("/finance/invoices/:id/issue", AdminFinanceController, :issue_invoice)
     patch("/finance/invoices/:id/void", AdminFinanceController, :void_invoice)
     post("/finance/invoices/:id/upload-url", AdminFinanceController, :invoice_upload_url)
+
+    post(
+      "/finance/invoices/:id/upload-complete",
+      AdminFinanceController,
+      :invoice_upload_complete
+    )
+
     get("/finance/invoices/:id/download-url", AdminFinanceController, :invoice_download_url)
 
     post("/finance/members/:id/promotion-redemptions", AdminFinanceController, :redeem_promotion)
@@ -309,7 +412,13 @@ defmodule MilosTrainingWeb.Router do
   end
 
   scope "/api/platform", MilosTrainingWeb do
-    pipe_through([:api, :authenticated, :vendor])
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :vendor,
+      :platform_write_rate_limited
+    ])
 
     get("/organizations", PlatformOrganizationController, :index)
     post("/organizations", PlatformOrganizationController, :create)
@@ -328,7 +437,13 @@ defmodule MilosTrainingWeb.Router do
   end
 
   scope "/api/me", MilosTrainingWeb do
-    pipe_through([:api, :authenticated])
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :upload_rate_limited,
+      :search_rate_limited
+    ])
 
     get("/finance", MyFinanceController, :index)
     get("/entitlement", MyFinanceController, :entitlement)
@@ -340,7 +455,14 @@ defmodule MilosTrainingWeb.Router do
   end
 
   scope "/api", MilosTrainingWeb do
-    pipe_through([:api, :authenticated, :user_only])
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :notification_write_rate_limited,
+      :tenant_write_rate_limited
+    ])
 
     get("/calendar/export-links", CalendarFeedController, :links)
     post("/calendar/export-links/regenerate", CalendarFeedController, :regenerate_links)
@@ -369,13 +491,19 @@ defmodule MilosTrainingWeb.Router do
   end
 
   scope "/api/workouts", MilosTrainingWeb do
-    pipe_through([:api, :authenticated, :user_only])
+    pipe_through([:api, :authenticated, :authenticated_rate_limited, :user_only])
 
     get("/:id/timer-sequence", ExecutionController, :timer_sequence)
   end
 
   scope "/api/executions", MilosTrainingWeb do
-    pipe_through([:api, :authenticated, :user_only])
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :execution_rate_limited
+    ])
 
     get("/", ExecutionController, :index)
     post("/", ExecutionController, :create)
@@ -387,14 +515,26 @@ defmodule MilosTrainingWeb.Router do
   end
 
   scope "/api/gamification", MilosTrainingWeb do
-    pipe_through([:api, :authenticated, :user_only])
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :tenant_write_rate_limited
+    ])
 
     get("/preferences", GamificationPreferencesController, :show)
     put("/preferences", GamificationPreferencesController, :update)
   end
 
   scope "/api/prs", MilosTrainingWeb do
-    pipe_through([:api, :authenticated, :user_only])
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :tenant_write_rate_limited
+    ])
 
     get("/", PRController, :index)
     post("/", PRController, :create)

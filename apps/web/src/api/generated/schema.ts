@@ -1298,6 +1298,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/finance/invoices/{id}/upload-complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Validate and attach an uploaded invoice file */
+        post: operations["MilosTrainingWeb.AdminFinanceController.invoice_upload_complete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/referral-programs/{id}": {
         parameters: {
             query?: never;
@@ -9782,6 +9799,39 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminFinanceController.invoice_upload_complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                    file_key: string;
+                    file_name: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Validated invoice upload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminFinanceController.update_referral_program": {
         parameters: {
             query?: never;
@@ -10077,7 +10127,9 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    content_type: string;
+                    /** @enum {string} */
+                    content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                    /** @description Original invoice document filename */
                     file_name: string;
                 };
             };

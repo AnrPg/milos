@@ -7,9 +7,20 @@ defmodule MilosTrainingWeb.Plugs.RateLimit do
   def init(opts), do: opts
 
   def call(conn, opts) do
+    methods = Keyword.get(opts, :methods)
+
+    if methods && conn.method not in methods do
+      conn
+    else
+      check_rate(conn, opts)
+    end
+  end
+
+  defp check_rate(conn, opts) do
     max = Keyword.fetch!(opts, :max)
     interval = Keyword.fetch!(opts, :interval)
-    key = "#{conn.method}:#{conn.request_path}:#{client_identifier(conn)}"
+    bucket = Keyword.get(opts, :bucket, conn.request_path)
+    key = "#{conn.method}:#{bucket}:#{actor_identifier(conn)}:#{client_identifier(conn)}"
 
     case RateLimiter.check_rate(key, interval, max) do
       {:ok, _count} ->
@@ -26,6 +37,13 @@ defmodule MilosTrainingWeb.Plugs.RateLimit do
         |> put_status(:service_unavailable)
         |> json(%{code: "rate_limiter_unavailable", error: "Rate limiter unavailable"})
         |> halt()
+    end
+  end
+
+  defp actor_identifier(conn) do
+    case conn.assigns[:user_context] do
+      %{user_id: id} when is_binary(id) -> id
+      _other -> "anonymous"
     end
   end
 
