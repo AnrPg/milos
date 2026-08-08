@@ -39,6 +39,7 @@ defmodule MilosTraining.Workouts do
   def create_draft(admin), do: CreateDraftWorkout.call(admin.id)
   def create_draft(context, admin), do: WorkoutStore.create_draft(context, admin.id)
   defdelegate delete_workout(id), to: DeleteWorkout, as: :call
+  def delete_workout(context, id), do: WorkoutStore.delete_workout(context, id)
   defdelegate assign_workout(params), to: AssignWorkout, as: :call
   def assign_workout(context, params), do: WorkoutStore.assign_workout(context, params)
   defdelegate update_assigned_workout(id, params), to: UpdateAssignedWorkout, as: :call
@@ -140,9 +141,18 @@ defmodule MilosTraining.Workouts do
         athlete_id
       )
 
+  def get_assignment_execution_access(context, assignment_id, athlete_id),
+    do: WorkoutStore.get_assignment_execution_access(context, assignment_id, athlete_id)
+
+  def substitute_assignment_workout(context, assignment_id, new_workout_id),
+    do: WorkoutStore.substitute_assignment_workout(context, assignment_id, new_workout_id)
+
   defdelegate substitute_assignment_workout(assignment_id, new_workout_id),
     to: SubstituteAssignmentWorkout,
     as: :call
+
+  def delete_superseded_drafts(context, published_id, admin_id),
+    do: WorkoutStore.delete_superseded_drafts(context, published_id, admin_id)
 
   defdelegate delete_superseded_drafts(published_id, admin_id),
     to: MilosTraining.Workouts.WorkoutStore

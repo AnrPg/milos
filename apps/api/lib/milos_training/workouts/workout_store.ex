@@ -66,10 +66,23 @@ defmodule MilosTraining.Workouts.WorkoutStore do
   def reject_assignment_for_athlete(context, assignment_id, athlete_id),
     do: within_tenant(context, fn -> reject_assignment_for_athlete(assignment_id, athlete_id) end)
 
+  def get_assignment_execution_access(context, assignment_id, athlete_id),
+    do:
+      within_tenant(context, fn -> get_assignment_execution_access(assignment_id, athlete_id) end)
+
   def reopen_workout(context, id), do: within_tenant(context, fn -> reopen_workout(id) end)
 
   def duplicate_workout(context, id, title_suffix, attrs),
     do: within_tenant(context, fn -> duplicate_workout(id, title_suffix, attrs) end)
+
+  def substitute_assignment_workout(context, assignment_id, new_workout_id),
+    do:
+      within_tenant(context, fn ->
+        substitute_assignment_workout(assignment_id, new_workout_id)
+      end)
+
+  def delete_superseded_drafts(context, published_id, admin_id),
+    do: within_tenant(context, fn -> delete_superseded_drafts(published_id, admin_id) end)
 
   @impl true
   def create_workout(admin_id, params), do: adapter().create_workout(admin_id, params)
