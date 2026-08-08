@@ -124,9 +124,10 @@ for (const [catalogLocale, translationLocale] of Object.entries(targets)) {
 
   let completed = 0;
   for (const [batchIndex, batch] of chunks(entries, batchSize).entries()) {
-    const missing = batch.filter(([key, message]) =>
-      key.startsWith("Ui.") ? !getPath(catalog, key) : getPath(catalog, key) === message,
-    );
+    const missing = batch.filter(([key, message]) => {
+      const current = getPath(catalog, key);
+      return !current || current === message;
+    });
     if (missing.length > 0) {
       const protectedMissing = missing.map(([key, message]) => [key, protectPlaceholders(message)]);
       const values = await translateBatch(

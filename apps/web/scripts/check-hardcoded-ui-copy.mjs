@@ -78,6 +78,27 @@ function literalValue(node) {
   return null;
 }
 
+function isUtilityClassToken(token) {
+  const normalized = token
+    .replace(/^(?:sm|md|lg|xl|2xl|hover|focus|focus-visible|active|disabled|group-hover|group-focus-visible|dark|rtl|ltr|motion-safe|motion-reduce):/, "")
+    .replace(/^\[[^\]]+\]:/, "");
+
+  return /^(?:-)?(?:flex|grid|block|inline|hidden|contents|relative|absolute|fixed|sticky|static|isolate|overflow|truncate|sr-only|not-sr-only|container)$/.test(normalized)
+    || /^(?:min-|max-)?(?:h|w|size)-[\w./[\]()%,-]+$/.test(normalized)
+    || /^(?:m|mx|my|ms|me|mt|mr|mb|ml|p|px|py|ps|pe|pt|pr|pb|pl|gap|space-[xy])-[-\w./[\]()%]+$/.test(normalized)
+    || /^(?:items|content|justify|place|self)-[\w-]+$/.test(normalized)
+    || /^(?:flex|grid|shrink|grow|basis|order|col|row|auto-cols|auto-rows)-[\w./[\]%-]+$/.test(normalized)
+    || /^(?:rounded|border|divide|outline|ring|shadow|opacity|z|object|aspect|cursor|select|pointer-events|resize|snap|scroll|overscroll)-[\w./[\]()%,-]+$/.test(normalized)
+    || /^(?:bg|text|font|leading|tracking|align|whitespace|break|uppercase|lowercase|capitalize|normal-case|decoration|underline|line-through|no-underline|antialiased)-[\w./[\]()%,-]+$/.test(normalized)
+    || /^(?:transition|duration|ease|delay|animate|transform|origin|scale|rotate|translate|skew)-[-\w./[\]()%]+$/.test(normalized)
+    || /^\[[-\w:;,%#().\s]+\]$/.test(normalized);
+}
+
+function isUtilityClassList(value) {
+  const tokens = value.trim().split(/\s+/).filter(Boolean);
+  return tokens.length > 1 && tokens.every(isUtilityClassToken);
+}
+
 function isTechnicalValue(value) {
   const trimmed = value.trim();
   return /^(?:use client|https?:|\/|\.\/|\.\.\/|@\/)/.test(trimmed)
@@ -92,7 +113,8 @@ function isTechnicalValue(value) {
     || /^\([\w-]+\s*:/.test(trimmed)
     || /^[\w.+-]+\/[\w.+-]+$/.test(trimmed)
     || /\.(?:svg|ics|json|webmanifest)$/.test(trimmed)
-    || /^(?:GET|POST|PATCH|PUT|DELETE|Escape|Enter|Tab|Arrow\w+)$/.test(trimmed);
+    || /^(?:GET|POST|PATCH|PUT|DELETE|Escape|Enter|Tab|Arrow\w+)$/.test(trimmed)
+    || isUtilityClassList(trimmed);
 }
 
 function isTechnicalContext(node, sourceFile) {
@@ -114,6 +136,10 @@ function isTechnicalContext(node, sourceFile) {
       if (current.name === node) return true;
       const key = current.name.getText(sourceFile).replace(/^['"]|['"]$/g, "");
       if (technicalProperties.has(key)) return true;
+    }
+    if (ts.isVariableDeclaration(current) && current.initializer === node) {
+      const key = current.name.getText(sourceFile);
+      if (/class(?:Name)?$/i.test(key) && isUtilityClassList(node.text)) return true;
     }
     if (ts.isCallExpression(current)) {
       const callee = current.expression.getText(sourceFile).split(".").at(-1);
