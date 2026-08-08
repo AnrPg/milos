@@ -80,6 +80,9 @@ defmodule MilosTraining.Organizations.OrganizationStore do
     do: impl().delete_organization(organization_id, platform_user_id, deleted_at)
 
   @impl true
+  def transaction(fun) when is_function(fun, 0), do: impl().transaction(fun)
+
+  @impl true
   def update_organization_lifecycle(organization_id, status, platform_user_id, changed_at),
     do:
       impl().update_organization_lifecycle(

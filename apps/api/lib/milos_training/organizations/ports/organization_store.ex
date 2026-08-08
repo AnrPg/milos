@@ -26,7 +26,9 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   @callback list_organization_memberships(Ecto.UUID.t()) :: [OrganizationMembership.t()]
   @callback list_active_membership_user_ids(Ecto.UUID.t()) :: [Ecto.UUID.t()]
   @callback list_staff_user_ids(Ecto.UUID.t()) :: [Ecto.UUID.t()]
-  @callback list_membership_organization_ids([Ecto.UUID.t()]) :: %{Ecto.UUID.t() => [Ecto.UUID.t()]}
+  @callback list_membership_organization_ids([Ecto.UUID.t()]) :: %{
+              Ecto.UUID.t() => [Ecto.UUID.t()]
+            }
   @callback get_invitation_by_digest(binary()) :: RegistrationInvitation.t() | nil
   @callback get_invitation_with_organization(binary()) :: map() | nil
   @callback grant_vendor(Ecto.UUID.t()) ::
@@ -47,4 +49,5 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
               {:ok, OrganizationMembership.t()} | {:error, term()}
   @callback update_membership_role(Ecto.UUID.t(), Ecto.UUID.t(), atom()) ::
               {:ok, OrganizationMembership.t()} | {:error, term()}
+  @callback transaction((-> {:ok, term()} | {:error, term()})) :: {:ok, term()} | {:error, term()}
 end

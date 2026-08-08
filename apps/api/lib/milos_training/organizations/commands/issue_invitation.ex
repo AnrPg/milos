@@ -41,7 +41,6 @@ defmodule MilosTraining.Organizations.Commands.IssueInvitation do
     end
   end
 
-
   defp normalize_role(role) when is_atom(role), do: role
 
   defp normalize_role(role) when is_binary(role) do

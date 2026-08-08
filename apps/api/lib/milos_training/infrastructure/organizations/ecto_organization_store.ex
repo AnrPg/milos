@@ -203,8 +203,7 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     |> where([membership], membership.user_id in ^user_ids and membership.status == :active)
     |> select([membership], {membership.user_id, membership.organization_id})
     |> Repo.all()
-    |> Enum.group_by(fn {user_id, _organization_id} -> user_id end, fn {_user_id,
-                                                                        organization_id} ->
+    |> Enum.group_by(fn {user_id, _organization_id} -> user_id end, fn {_user_id, organization_id} ->
       organization_id
     end)
   end
@@ -405,6 +404,21 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
       updated
     end)
     |> flatten_transaction()
+  end
+
+  @impl true
+  def transaction(fun) when is_function(fun, 0) do
+    if Repo.in_transaction?() do
+      fun.()
+    else
+      Repo.transaction(fn ->
+        case fun.() do
+          {:ok, value} -> value
+          {:error, reason} -> Repo.rollback(reason)
+        end
+      end)
+      |> flatten_transaction()
+    end
   end
 
   @impl true

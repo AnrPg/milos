@@ -15,7 +15,7 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipRole do
   alias MilosTraining.Organizations.Domain.{MembershipPolicy, TenantAuthorization}
   alias MilosTraining.Application.BroadcastUserSync
   alias MilosTraining.Organizations.OrganizationStore
-  alias MilosTraining.{Scheduling, Workouts}
+  alias MilosTraining.{Finance, Scheduling, Workouts}
 
   def call(context, user_id, role) when is_binary(user_id) do
     with :ok <- TenantAuthorization.authorize(context, [:owner, :admin]),
@@ -23,10 +23,12 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipRole do
          {:ok, membership} <- fetch_membership(context, user_id),
          :ok <- refuse_self_change(context, membership),
          :ok <- authorize_role_ceiling(context.role, role),
-         :ok <- authorize_role_ceiling(context.role, membership.role),
-         :ok <- reconcile_role_owned_state(context, membership, role) do
-      context.organization_id
-      |> OrganizationStore.update_membership_role(membership.id, role)
+         :ok <- authorize_role_ceiling(context.role, membership.role) do
+      OrganizationStore.transaction(fn ->
+        with :ok <- reconcile_role_owned_state(context, membership, role) do
+          OrganizationStore.update_membership_role(context.organization_id, membership.id, role)
+        end
+      end)
       |> broadcast_change(context)
     end
   end
@@ -80,7 +82,7 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipRole do
 
   defp reconcile_role_owned_state(context, %{role: :member, user_id: user_id}, _new_role) do
     case Scheduling.cancel_active_future_bookings_for_user(context, user_id) do
-      {:ok, _booking_ids} -> :ok
+      {:ok, release_facts} -> release_booking_entitlements(context, release_facts)
       error -> error
     end
   end
@@ -93,6 +95,25 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipRole do
   end
 
   defp reconcile_role_owned_state(_context, _membership, _new_role), do: :ok
+
+  defp release_booking_entitlements(context, release_facts) do
+    Enum.reduce_while(release_facts, :ok, fn fact, :ok ->
+      case Finance.release_entitlement_source(
+             context,
+             fact.user_id,
+             "scheduling",
+             fact.scheduled_class_id,
+             :class_visits,
+             %{
+               reason: "Membership role changed",
+               idempotency_key: "role-transition-booking-release:#{fact.booking_id}"
+             }
+           ) do
+        {:ok, _entry} -> {:cont, :ok}
+        {:error, reason} -> {:halt, {:error, reason}}
+      end
+    end)
+  end
 
   defp refuse_self_change(context, membership) do
     if membership.user_id == context.user_id do

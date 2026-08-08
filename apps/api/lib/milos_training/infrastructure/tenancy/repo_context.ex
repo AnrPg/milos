@@ -41,9 +41,15 @@ defmodule MilosTraining.Infrastructure.Tenancy.RepoContext do
   end
 
   defp with_settings(settings, fun) do
-    Repo.checkout(fn ->
-      previous = Map.new(settings, fn {name, _value} -> {name, current_setting(name)} end)
+    runner =
+      if Repo.in_transaction?() do
+        fn callback -> callback.() end
+      else
+        &Repo.checkout/1
+      end
 
+    runner.(fn ->
+      previous = Map.new(settings, fn {name, _value} -> {name, current_setting(name)} end)
       Enum.each(settings, fn {name, value} -> set_session(name, value) end)
 
       try do
