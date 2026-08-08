@@ -83,7 +83,9 @@ defmodule MilosTraining.Identity.RegistrationPolicy do
   def valid_nickname?(_nickname), do: false
 
   def valid_password?(password) when is_binary(password) do
-    String.length(password) >= 4 and not Regex.match?(~r/\s/u, password)
+    String.length(password) >= 12 and not Regex.match?(~r/\s/u, password) and
+      Regex.match?(~r/[[:lower:]]/u, password) and Regex.match?(~r/[[:upper:]]/u, password) and
+      Regex.match?(~r/[0-9]/u, password) and Regex.match?(~r/[^[:alnum:]]/u, password)
   end
 
   def valid_password?(_password), do: false

@@ -188,11 +188,11 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
   def search_athletes(""), do: list_by_role(:athlete)
 
   def search_athletes(query) do
-    pattern = "%#{RegistrationPolicy.normalize_nickname(query)}%"
+    pattern = ilike_pattern(RegistrationPolicy.normalize_nickname(query))
 
     User
     |> where([user], user.role == :athlete)
-    |> where([user], ilike(user.nickname, ^pattern))
+    |> where([user], fragment("? ILIKE ? ESCAPE '\\'", user.nickname, ^pattern))
     |> order_by([user], asc: user.nickname)
     |> Repo.all()
     |> Enum.map(&to_account/1)
@@ -240,10 +240,10 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
   end
 
   def search_users(query) do
-    pattern = "%#{RegistrationPolicy.normalize_nickname(query)}%"
+    pattern = ilike_pattern(RegistrationPolicy.normalize_nickname(query))
 
     User
-    |> where([u], ilike(u.nickname, ^pattern))
+    |> where([u], fragment("? ILIKE ? ESCAPE '\\'", u.nickname, ^pattern))
     |> order_by([u], asc: u.nickname)
     |> limit(20)
     |> Repo.all()
@@ -260,6 +260,16 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
       password ->
         Ecto.Changeset.put_change(changeset, :password_hash, PasswordHasher.hash(password))
     end
+  end
+
+  defp ilike_pattern(value) do
+    escaped =
+      value
+      |> String.replace("\\", "\\\\")
+      |> String.replace("%", "\\%")
+      |> String.replace("_", "\\_")
+
+    "%#{escaped}%"
   end
 
   defp wrap_result({:ok, %User{} = user}), do: {:ok, to_account(user)}

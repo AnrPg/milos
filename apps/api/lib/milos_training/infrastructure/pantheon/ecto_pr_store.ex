@@ -18,14 +18,24 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
 
   @impl true
   def search_user_prs(user_id, query) do
-    search_term = "%#{String.replace(query, "%", "\\%")}%"
+    search_term = ilike_pattern(query)
 
     PRRecord
     |> where([r], r.user_id == ^user_id)
-    |> where([r], ilike(r.name, ^search_term))
+    |> where([r], fragment("? ILIKE ? ESCAPE '\\'", r.name, ^search_term))
     |> order_by([r], desc: r.beaten_on)
     |> Repo.all()
     |> Enum.map(&normalize_pr/1)
+  end
+
+  defp ilike_pattern(value) do
+    escaped =
+      value
+      |> String.replace("\\", "\\\\")
+      |> String.replace("%", "\\%")
+      |> String.replace("_", "\\_")
+
+    "%#{escaped}%"
   end
 
   @impl true

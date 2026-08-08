@@ -25,8 +25,12 @@ defmodule MilosTraining.Application.PurgeFinanceRecord do
 
   defp fetch_admin(admin_id) do
     case Identity.find_by_id(admin_id) do
-      nil -> {:error, :not_found}
-      admin -> {:ok, admin}
+      nil ->
+        PasswordVerifier.no_user_verify()
+        {:error, :not_found}
+
+      admin ->
+        {:ok, admin}
     end
   end
 
