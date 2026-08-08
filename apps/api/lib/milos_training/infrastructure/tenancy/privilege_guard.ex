@@ -14,7 +14,10 @@ defmodule MilosTraining.Infrastructure.Tenancy.PrivilegeGuard do
   def check! do
     case privileges() do
       {:ok, role, false, false} ->
-        Logger.info("PrivilegeGuard: runtime role #{role} is non-superuser, non-bypassrls - RLS enforced")
+        Logger.info(
+          "PrivilegeGuard: runtime role #{role} is non-superuser, non-bypassrls - RLS enforced"
+        )
+
         :ok
 
       {:ok, role, superuser?, bypassrls?} ->
@@ -30,7 +33,10 @@ defmodule MilosTraining.Infrastructure.Tenancy.PrivilegeGuard do
         end
 
       {:error, reason} ->
-        Logger.warning("PrivilegeGuard: could not verify runtime role privileges: #{inspect(reason)}")
+        Logger.warning(
+          "PrivilegeGuard: could not verify runtime role privileges: #{inspect(reason)}"
+        )
+
         :ok
     end
   end

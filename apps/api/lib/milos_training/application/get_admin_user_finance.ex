@@ -28,8 +28,7 @@ defmodule MilosTraining.Application.GetAdminUserFinance do
              drill_down: profile.drill_down,
              operational_links: %{
                workspace: AdminPath.admin_url("/admin/finance", organization_slug),
-               member:
-                 AdminPath.admin_url("/admin/finance?member=#{user_id}", organization_slug)
+               member: AdminPath.admin_url("/admin/finance?member=#{user_id}", organization_slug)
              }
            }}
         end

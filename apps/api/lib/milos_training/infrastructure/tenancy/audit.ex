@@ -66,8 +66,11 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
   remembered to add, so a new tenant table was invisible to it by default.
   """
   def unclassified_tables do
-    known = @ready_tenant_tables ++ @transitional_tenant_tables ++ @ready_personal_tables ++
-              @platform_administered_tables
+    known =
+      @ready_tenant_tables ++
+        @transitional_tenant_tables ++
+        @ready_personal_tables ++
+        @platform_administered_tables
 
     %{rows: rows} =
       Ecto.Adapters.SQL.query!(

@@ -23,8 +23,7 @@ defmodule MilosTraining.Application.GetAdminUserProfile do
              account_status: "active",
              available_sections: AdminProfilePolicy.sections(user.role),
              attention: [],
-             operational_links:
-               AdminProfilePolicy.operational_links(user, organization_slug)
+             operational_links: AdminProfilePolicy.operational_links(user, organization_slug)
            }
          }}
     end
