@@ -58,7 +58,10 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
         member_conn
         |> recycle()
         |> put_req_header("content-type", "application/json")
-        |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/bookings", Jason.encode!(%{slot_id: slot["id"]}))
+        |> post(
+          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/bookings",
+          Jason.encode!(%{slot_id: slot["id"]})
+        )
 
       booking = json_response(booking_response, 201)["booking"]
       assert booking["status"] == "pending"
@@ -107,7 +110,12 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
 
     slot = json_response(create_response, 201)["slot"]
 
-    delete_conn = delete(admin_conn |> recycle(), "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/schedule/slots/#{slot["id"]}")
+    delete_conn =
+      delete(
+        admin_conn |> recycle(),
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/schedule/slots/#{slot["id"]}"
+      )
+
     assert response(delete_conn, 204)
   end
 
@@ -225,19 +233,33 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
     admin_conn = put_bearer_token(conn, admin)
     class_type = class_type_fixture(%{name: "Republish Class"})
 
-    reopen_response = post(admin_conn |> recycle(), "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{workout.id}/reopen")
+    reopen_response =
+      post(
+        admin_conn |> recycle(),
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{workout.id}/reopen"
+      )
+
     assert json_response(reopen_response, 200)["draft"]["status"] == "published"
 
     member = user_fixture(%{nickname: "live_during_edit_member", role: :member})
     member_conn = put_bearer_token(conn, member)
-    still_live = get(member_conn |> recycle(), "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/workouts/#{workout.id}")
+
+    still_live =
+      get(
+        member_conn |> recycle(),
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/workouts/#{workout.id}"
+      )
+
     assert json_response(still_live, 200)["workout"]["id"] == workout.id
 
     publish_response =
       admin_conn
       |> recycle()
       |> put_req_header("content-type", "application/json")
-      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{workout.id}/publish", Jason.encode!(%{}))
+      |> post(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{workout.id}/publish",
+        Jason.encode!(%{})
+      )
 
     assert json_response(publish_response, 200)["workout"]["status"] == "published"
 

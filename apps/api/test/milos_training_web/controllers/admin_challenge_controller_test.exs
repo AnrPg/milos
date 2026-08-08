@@ -9,16 +9,19 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
 
     created =
       authed
-      |> post_json("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges", %{
-        title: "Streak Week",
-        description: "Hit two sessions",
-        criteria_type: "workout_count",
-        criteria_value: %{count: 2},
-        badge_key: "challenge_streak_week",
-        badge_label: "Streak Week",
-        starts_at: Date.to_iso8601(Date.utc_today()),
-        ends_at: Date.to_iso8601(Date.add(Date.utc_today(), 7))
-      })
+      |> post_json(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges",
+        %{
+          title: "Streak Week",
+          description: "Hit two sessions",
+          criteria_type: "workout_count",
+          criteria_value: %{count: 2},
+          badge_key: "challenge_streak_week",
+          badge_label: "Streak Week",
+          starts_at: Date.to_iso8601(Date.utc_today()),
+          ends_at: Date.to_iso8601(Date.add(Date.utc_today(), 7))
+        }
+      )
       |> json_response(201)
 
     assert get_in(created, ["challenge", "title"]) == "Streak Week"
@@ -26,7 +29,9 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
     listing =
       authed
       |> recycle()
-      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges")
+      |> get(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges"
+      )
       |> json_response(200)
 
     assert Enum.any?(listing["challenges"], &(&1["badge_key"] == "challenge_streak_week"))
@@ -40,15 +45,18 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
       authed
       |> recycle()
       |> put_bearer_token(admin)
-      |> post_json("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges", %{
-        title: "Challenge #{idx}",
-        criteria_type: "workout_count",
-        criteria_value: %{count: 2},
-        badge_key: "challenge_overlap_#{idx}",
-        badge_label: "Overlap #{idx}",
-        starts_at: Date.to_iso8601(Date.utc_today()),
-        ends_at: Date.to_iso8601(Date.add(Date.utc_today(), 7))
-      })
+      |> post_json(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges",
+        %{
+          title: "Challenge #{idx}",
+          criteria_type: "workout_count",
+          criteria_value: %{count: 2},
+          badge_key: "challenge_overlap_#{idx}",
+          badge_label: "Overlap #{idx}",
+          starts_at: Date.to_iso8601(Date.utc_today()),
+          ends_at: Date.to_iso8601(Date.add(Date.utc_today(), 7))
+        }
+      )
       |> json_response(201)
     end
 
@@ -56,15 +64,18 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
       authed
       |> recycle()
       |> put_bearer_token(admin)
-      |> post_json("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges", %{
-        title: "Too Many",
-        criteria_type: "workout_count",
-        criteria_value: %{count: 2},
-        badge_key: "challenge_overlap_limit",
-        badge_label: "Too Many",
-        starts_at: Date.to_iso8601(Date.utc_today()),
-        ends_at: Date.to_iso8601(Date.add(Date.utc_today(), 7))
-      })
+      |> post_json(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges",
+        %{
+          title: "Too Many",
+          criteria_type: "workout_count",
+          criteria_value: %{count: 2},
+          badge_key: "challenge_overlap_limit",
+          badge_label: "Too Many",
+          starts_at: Date.to_iso8601(Date.utc_today()),
+          ends_at: Date.to_iso8601(Date.add(Date.utc_today(), 7))
+        }
+      )
       |> json_response(422)
 
     assert response["error"] =~ "maximum of 3"
@@ -85,15 +96,18 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
       authed
       |> recycle()
       |> put_bearer_token(admin)
-      |> post_json("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges", %{
-        title: "Challenge #{suffix}",
-        criteria_type: "workout_count",
-        criteria_value: %{count: 2},
-        badge_key: "challenge_chain_#{suffix}",
-        badge_label: "Chain #{suffix}",
-        starts_at: Date.to_iso8601(starts_at),
-        ends_at: Date.to_iso8601(ends_at)
-      })
+      |> post_json(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges",
+        %{
+          title: "Challenge #{suffix}",
+          criteria_type: "workout_count",
+          criteria_value: %{count: 2},
+          badge_key: "challenge_chain_#{suffix}",
+          badge_label: "Chain #{suffix}",
+          starts_at: Date.to_iso8601(starts_at),
+          ends_at: Date.to_iso8601(ends_at)
+        }
+      )
       |> json_response(201)
     end)
 
@@ -101,15 +115,18 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
       authed
       |> recycle()
       |> put_bearer_token(admin)
-      |> post_json("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges", %{
-        title: "Bridge",
-        criteria_type: "workout_count",
-        criteria_value: %{count: 2},
-        badge_key: "challenge_chain_bridge",
-        badge_label: "Bridge",
-        starts_at: "2026-06-02",
-        ends_at: "2026-06-10"
-      })
+      |> post_json(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges",
+        %{
+          title: "Bridge",
+          criteria_type: "workout_count",
+          criteria_value: %{count: 2},
+          badge_key: "challenge_chain_bridge",
+          badge_label: "Bridge",
+          starts_at: "2026-06-02",
+          ends_at: "2026-06-10"
+        }
+      )
       |> json_response(201)
 
     assert get_in(response, ["challenge", "badge_key"]) == "challenge_chain_bridge"

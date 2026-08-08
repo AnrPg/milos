@@ -44,7 +44,10 @@ defmodule MilosTraining.RLSCase do
       "ALTER ROLE #{@runtime_role} NOBYPASSRLS NOSUPERUSER"
     )
 
-    Ecto.Adapters.SQL.query!(MilosTraining.Repo, "GRANT USAGE ON SCHEMA public TO #{@runtime_role}")
+    Ecto.Adapters.SQL.query!(
+      MilosTraining.Repo,
+      "GRANT USAGE ON SCHEMA public TO #{@runtime_role}"
+    )
 
     Ecto.Adapters.SQL.query!(
       MilosTraining.Repo,
@@ -79,7 +82,10 @@ defmodule MilosTraining.RLSCase do
           username: System.get_env("DB_USER", "postgres"),
           password: System.get_env("DB_PASSWORD", "postgres"),
           database:
-            System.get_env("DB_NAME", "milos_training_test#{System.get_env("MIX_TEST_PARTITION")}")
+            System.get_env(
+              "DB_NAME",
+              "milos_training_test#{System.get_env("MIX_TEST_PARTITION")}"
+            )
         )
 
       Postgrex.query!(

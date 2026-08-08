@@ -5,7 +5,12 @@ defmodule MilosTraining.Identity.RegisterUserTest do
 
   describe "call/1" do
     test "creates user with valid params" do
-      params = %{nickname: "atlas", password: "S3cur3P@ss!", role: :member, email: "atlas@placeholder.invalid"}
+      params = %{
+        nickname: "atlas",
+        password: "S3cur3P@ss!",
+        role: :member,
+        email: "atlas@placeholder.invalid"
+      }
 
       assert {:ok, user} = RegisterUser.call(params)
       assert user.nickname == "atlas"
@@ -14,7 +19,12 @@ defmodule MilosTraining.Identity.RegisterUserTest do
     end
 
     test "rejects duplicate nickname" do
-      params = %{nickname: "atlas", password: "S3cur3P@ss!", role: :member, email: "atlas@placeholder.invalid"}
+      params = %{
+        nickname: "atlas",
+        password: "S3cur3P@ss!",
+        role: :member,
+        email: "atlas@placeholder.invalid"
+      }
 
       {:ok, _user} = RegisterUser.call(params)
 
@@ -46,14 +56,24 @@ defmodule MilosTraining.Identity.RegisterUserTest do
     end
 
     test "rejects invalid role" do
-      params = %{nickname: "atlas", password: "S3cur3P@ss!", role: :admin, email: "atlas4@placeholder.invalid"}
+      params = %{
+        nickname: "atlas",
+        password: "S3cur3P@ss!",
+        role: :admin,
+        email: "atlas4@placeholder.invalid"
+      }
 
       assert {:error, changeset} = RegisterUser.call(params)
       assert "is invalid" in errors_on(changeset).role
     end
 
     test "rejects weak password" do
-      params = %{nickname: "atlas", password: "123", role: :member, email: "atlas5@placeholder.invalid"}
+      params = %{
+        nickname: "atlas",
+        password: "123",
+        role: :member,
+        email: "atlas5@placeholder.invalid"
+      }
 
       assert {:error, changeset} = RegisterUser.call(params)
       assert errors_on(changeset).password != []

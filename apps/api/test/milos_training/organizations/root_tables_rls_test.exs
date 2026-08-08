@@ -80,7 +80,10 @@ defmodule MilosTraining.Organizations.RootTablesRLSTest do
           username: "postgres",
           password: "postgres",
           database:
-            System.get_env("DB_NAME", "milos_training_test#{System.get_env("MIX_TEST_PARTITION")}")
+            System.get_env(
+              "DB_NAME",
+              "milos_training_test#{System.get_env("MIX_TEST_PARTITION")}"
+            )
         )
 
       for {table, column, ids} <- [

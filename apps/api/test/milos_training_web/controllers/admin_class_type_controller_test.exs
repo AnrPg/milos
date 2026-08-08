@@ -14,7 +14,10 @@ defmodule MilosTrainingWeb.AdminClassTypeControllerTest do
       admin_conn
       |> recycle()
       |> put_req_header("content-type", "application/json")
-      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/class-types", Jason.encode!(%{name: "Olympic Lifting"}))
+      |> post(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/class-types",
+        Jason.encode!(%{name: "Olympic Lifting"})
+      )
       |> json_response(201)
       |> Map.fetch!("class_type")
 
@@ -42,7 +45,9 @@ defmodule MilosTrainingWeb.AdminClassTypeControllerTest do
 
     assert conn
            |> put_bearer_token(member)
-           |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/class-types")
+           |> get(
+             "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/class-types"
+           )
            |> response(403)
   end
 
@@ -58,7 +63,9 @@ defmodule MilosTrainingWeb.AdminClassTypeControllerTest do
     response =
       conn
       |> put_bearer_token(admin)
-      |> delete("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/class-types/#{only_type.id}")
+      |> delete(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/class-types/#{only_type.id}"
+      )
 
     assert %{"error" => "At least one active class type must remain"} =
              json_response(response, 409)
@@ -87,7 +94,10 @@ defmodule MilosTrainingWeb.AdminClassTypeControllerTest do
     admin_conn = put_bearer_token(conn, admin)
 
     missing_mapping =
-      delete(admin_conn |> recycle(), "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/class-types/#{source.id}")
+      delete(
+        admin_conn |> recycle(),
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/class-types/#{source.id}"
+      )
 
     assert %{
              "error" => "Future classes require a replacement class type",

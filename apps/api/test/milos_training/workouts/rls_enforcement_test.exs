@@ -11,21 +11,33 @@ defmodule MilosTraining.Workouts.RLSEnforcementTest do
     {other_org_id_s, other_org_id} = uuid()
     {workout_id_s, workout_id} = uuid()
 
-    Postgrex.query!(conn, """
-    INSERT INTO organizations (id, name, slug, status, inserted_at, updated_at)
-    VALUES ($1, 'RLS Workouts Org', $2, 'active', now(), now())
-    """, [org_id, "rls-workouts-#{System.unique_integer([:positive])}"])
+    Postgrex.query!(
+      conn,
+      """
+      INSERT INTO organizations (id, name, slug, status, inserted_at, updated_at)
+      VALUES ($1, 'RLS Workouts Org', $2, 'active', now(), now())
+      """,
+      [org_id, "rls-workouts-#{System.unique_integer([:positive])}"]
+    )
 
-    Postgrex.query!(conn, """
-    INSERT INTO organizations (id, name, slug, status, inserted_at, updated_at)
-    VALUES ($1, 'RLS Workouts Other Org', $2, 'active', now(), now())
-    """, [other_org_id, "rls-workouts-other-#{System.unique_integer([:positive])}"])
+    Postgrex.query!(
+      conn,
+      """
+      INSERT INTO organizations (id, name, slug, status, inserted_at, updated_at)
+      VALUES ($1, 'RLS Workouts Other Org', $2, 'active', now(), now())
+      """,
+      [other_org_id, "rls-workouts-other-#{System.unique_integer([:positive])}"]
+    )
 
     as_session(conn, nil, org_id_s, false, fn ->
-      Postgrex.query!(conn, """
-      INSERT INTO master_workouts (id, title, type, organization_id, inserted_at, updated_at)
-      VALUES ($1, 'RLS Verify Workout', 'crossfit', $2, now(), now())
-      """, [workout_id, org_id])
+      Postgrex.query!(
+        conn,
+        """
+        INSERT INTO master_workouts (id, title, type, organization_id, inserted_at, updated_at)
+        VALUES ($1, 'RLS Verify Workout', 'crossfit', $2, now(), now())
+        """,
+        [workout_id, org_id]
+      )
     end)
 
     visible_in_own_org =

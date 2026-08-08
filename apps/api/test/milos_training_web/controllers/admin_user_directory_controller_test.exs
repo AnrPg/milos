@@ -32,7 +32,9 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     filtered =
       build_conn()
       |> put_bearer_token(admin)
-      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users?role=member&q=directory_mem")
+      |> get(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users?role=member&q=directory_mem"
+      )
       |> json_response(200)
 
     assert [%{"id" => id, "role" => "member"}] = filtered["users"]
@@ -46,7 +48,9 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     response =
       conn
       |> put_bearer_token(admin)
-      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{athlete.id}")
+      |> get(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{athlete.id}"
+      )
       |> json_response(200)
 
     assert response["user"]["identity"]["nickname"] == "profile_athlete"
@@ -61,7 +65,9 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     response =
       conn
       |> put_bearer_token(admin)
-      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{Ecto.UUID.generate()}")
+      |> get(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{Ecto.UUID.generate()}"
+      )
       |> json_response(404)
 
     assert response["error"] == "Not found"
@@ -74,6 +80,7 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     finance = get_as_admin(conn, admin, member.id, "finance")
     assert finance["user_id"] == member.id
     assert finance["summary"]["credit_balance"] == 0
+
     assert finance["operational_links"]["workspace"] ==
              "/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/finance"
 
@@ -202,12 +209,15 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     response =
       conn
       |> put_bearer_token(admin)
-      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{member.id}/allowance-extensions", %{
-        allowance: "class_visits",
-        quantity: 2,
-        period: "calendar_month",
-        reason: "Competition preparation"
-      })
+      |> post(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{member.id}/allowance-extensions",
+        %{
+          allowance: "class_visits",
+          quantity: 2,
+          period: "calendar_month",
+          reason: "Competition preparation"
+        }
+      )
       |> json_response(201)
 
     assert response["entry"]["allowance_key"] == "class_visits"
@@ -238,7 +248,9 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     response =
       conn
       |> put_bearer_token(admin)
-      |> delete("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{user.id}")
+      |> delete(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{user.id}"
+      )
 
     assert response.status == 204
     assert MilosTraining.Identity.find_by_id(user.id) == nil
@@ -265,7 +277,9 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     response =
       conn
       |> put_bearer_token(admin)
-      |> delete("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{user.id}")
+      |> delete(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{user.id}"
+      )
 
     assert response.status == 204
     assert MilosTraining.Identity.find_by_id(user.id) == nil
@@ -294,7 +308,9 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     response =
       conn
       |> put_bearer_token(admin)
-      |> delete("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{owner.id}")
+      |> delete(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{owner.id}"
+      )
 
     assert response.status == 204
     assert MilosTraining.Identity.find_by_id(owner.id) == nil
@@ -309,7 +325,9 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     response =
       conn
       |> put_bearer_token(admin)
-      |> delete("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{admin.id}")
+      |> delete(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{admin.id}"
+      )
       |> json_response(422)
 
     assert response["code"] == "cannot_delete_self"
@@ -318,7 +336,9 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
   defp get_as_admin(conn, admin, user_id, section) do
     conn
     |> put_bearer_token(admin)
-    |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{user_id}/#{section}")
+    |> get(
+      "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{user_id}/#{section}"
+    )
     |> json_response(200)
   end
 end

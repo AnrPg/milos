@@ -11,25 +11,37 @@ defmodule MilosTraining.Gamification.RLSEnforcementTest do
     {other_org_id_s, other_org_id} = uuid()
     {challenge_id_s, challenge_id} = uuid()
 
-    Postgrex.query!(conn, """
-    INSERT INTO organizations (id, name, slug, status, inserted_at, updated_at)
-    VALUES ($1, 'RLS Gamification Org', $2, 'active', now(), now())
-    """, [org_id, "rls-gamification-#{System.unique_integer([:positive])}"])
+    Postgrex.query!(
+      conn,
+      """
+      INSERT INTO organizations (id, name, slug, status, inserted_at, updated_at)
+      VALUES ($1, 'RLS Gamification Org', $2, 'active', now(), now())
+      """,
+      [org_id, "rls-gamification-#{System.unique_integer([:positive])}"]
+    )
 
-    Postgrex.query!(conn, """
-    INSERT INTO organizations (id, name, slug, status, inserted_at, updated_at)
-    VALUES ($1, 'RLS Gamification Other Org', $2, 'active', now(), now())
-    """, [other_org_id, "rls-gamification-other-#{System.unique_integer([:positive])}"])
+    Postgrex.query!(
+      conn,
+      """
+      INSERT INTO organizations (id, name, slug, status, inserted_at, updated_at)
+      VALUES ($1, 'RLS Gamification Other Org', $2, 'active', now(), now())
+      """,
+      [other_org_id, "rls-gamification-other-#{System.unique_integer([:positive])}"]
+    )
 
     as_session(conn, nil, org_id_s, false, fn ->
-      Postgrex.query!(conn, """
-      INSERT INTO seasonal_challenges
-        (id, title, criteria_type, badge_key, badge_label, starts_at, ends_at,
-         organization_id, inserted_at, updated_at)
-      VALUES
-        ($1, 'RLS Verify Challenge', 'workout_count', 'rls-verify', 'RLS Verify',
-         current_date, current_date + 7, $2, now(), now())
-      """, [challenge_id, org_id])
+      Postgrex.query!(
+        conn,
+        """
+        INSERT INTO seasonal_challenges
+          (id, title, criteria_type, badge_key, badge_label, starts_at, ends_at,
+           organization_id, inserted_at, updated_at)
+        VALUES
+          ($1, 'RLS Verify Challenge', 'workout_count', 'rls-verify', 'RLS Verify',
+           current_date, current_date + 7, $2, now(), now())
+        """,
+        [challenge_id, org_id]
+      )
     end)
 
     visible_in_own_org =

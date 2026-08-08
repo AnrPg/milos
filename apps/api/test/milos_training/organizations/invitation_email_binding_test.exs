@@ -54,7 +54,10 @@ defmodule MilosTraining.Organizations.InvitationEmailBindingTest do
 
   test "an account holding the invited address may redeem", %{context: context} do
     {:ok, %{token: token}} =
-      Organizations.issue_invitation(context, %{role: "member", intended_email: "Invited@Example.com"})
+      Organizations.issue_invitation(context, %{
+        role: "member",
+        intended_email: "Invited@Example.com"
+      })
 
     invitee = register_with_email("invited@example.com")
 
@@ -64,7 +67,10 @@ defmodule MilosTraining.Organizations.InvitationEmailBindingTest do
 
   test "casing and whitespace differences still redeem", %{context: context} do
     {:ok, %{token: token}} =
-      Organizations.issue_invitation(context, %{role: "member", intended_email: "invited@example.com"})
+      Organizations.issue_invitation(context, %{
+        role: "member",
+        intended_email: "invited@example.com"
+      })
 
     invitee = register_with_email("  INVITED@Example.com  ")
 
@@ -73,7 +79,10 @@ defmodule MilosTraining.Organizations.InvitationEmailBindingTest do
 
   test "a different account cannot redeem, and the invitation stays usable", %{context: context} do
     {:ok, %{token: token}} =
-      Organizations.issue_invitation(context, %{role: "member", intended_email: "invited@example.com"})
+      Organizations.issue_invitation(context, %{
+        role: "member",
+        intended_email: "invited@example.com"
+      })
 
     intruder = register_with_email("someone.else@example.com")
 
@@ -88,7 +97,10 @@ defmodule MilosTraining.Organizations.InvitationEmailBindingTest do
 
   test "an account whose address was never the invited one cannot redeem", %{context: context} do
     {:ok, %{token: token}} =
-      Organizations.issue_invitation(context, %{role: "member", intended_email: "invited@example.com"})
+      Organizations.issue_invitation(context, %{
+        role: "member",
+        intended_email: "invited@example.com"
+      })
 
     # Fixture accounts get a generated placeholder address, so this covers the
     # ordinary "some other member clicked the link" case.

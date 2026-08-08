@@ -13,28 +13,44 @@ defmodule MilosTraining.Finance.RLSEnforcementTest do
     {user_id_s, user_id} = uuid()
     {membership_id_s, membership_id} = uuid()
 
-    Postgrex.query!(conn, """
-    INSERT INTO organizations (id, name, slug, status, inserted_at, updated_at)
-    VALUES ($1, 'RLS Finance Org', $2, 'active', now(), now())
-    """, [org_id, "rls-finance-#{System.unique_integer([:positive])}"])
+    Postgrex.query!(
+      conn,
+      """
+      INSERT INTO organizations (id, name, slug, status, inserted_at, updated_at)
+      VALUES ($1, 'RLS Finance Org', $2, 'active', now(), now())
+      """,
+      [org_id, "rls-finance-#{System.unique_integer([:positive])}"]
+    )
 
-    Postgrex.query!(conn, """
-    INSERT INTO organizations (id, name, slug, status, inserted_at, updated_at)
-    VALUES ($1, 'RLS Finance Other Org', $2, 'active', now(), now())
-    """, [other_org_id, "rls-finance-other-#{System.unique_integer([:positive])}"])
+    Postgrex.query!(
+      conn,
+      """
+      INSERT INTO organizations (id, name, slug, status, inserted_at, updated_at)
+      VALUES ($1, 'RLS Finance Other Org', $2, 'active', now(), now())
+      """,
+      [other_org_id, "rls-finance-other-#{System.unique_integer([:positive])}"]
+    )
 
-    Postgrex.query!(conn, """
-    INSERT INTO users (id, nickname, display_nickname, password_hash, role, email, inserted_at, updated_at)
-    VALUES ($1, $2::text, $2::text, 'x', 'member', $2::text || '@placeholder.invalid', now(), now())
-    """, [user_id, "rls_finance_user_#{System.unique_integer([:positive])}"])
+    Postgrex.query!(
+      conn,
+      """
+      INSERT INTO users (id, nickname, display_nickname, password_hash, role, email, inserted_at, updated_at)
+      VALUES ($1, $2::text, $2::text, 'x', 'member', $2::text || '@placeholder.invalid', now(), now())
+      """,
+      [user_id, "rls_finance_user_#{System.unique_integer([:positive])}"]
+    )
 
     as_session(conn, user_id_s, org_id_s, false, fn ->
-      Postgrex.query!(conn, """
-      INSERT INTO memberships
-        (id, user_id, user_type_snapshot, status, signup_source, organization_id,
-         inserted_at, updated_at)
-      VALUES ($1, $2, 'member', 'active', 'direct', $3, now(), now())
-      """, [membership_id, user_id, org_id])
+      Postgrex.query!(
+        conn,
+        """
+        INSERT INTO memberships
+          (id, user_id, user_type_snapshot, status, signup_source, organization_id,
+           inserted_at, updated_at)
+        VALUES ($1, $2, 'member', 'active', 'direct', $3, now(), now())
+        """,
+        [membership_id, user_id, org_id]
+      )
     end)
 
     visible_in_own_org =

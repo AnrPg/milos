@@ -42,8 +42,11 @@ defmodule MilosTraining.Wellbeing.TenantIsolationTest do
     {:ok, _injury_a} = report_injury(context_a, member, owner, "shoulder")
     {:ok, _injury_b} = report_injury(context_b, member, owner, "knee")
 
-    summary_a = WellbeingStore.with_context(context_a, fn -> WellbeingStore.injury_summary(%{}) end)
-    summary_b = WellbeingStore.with_context(context_b, fn -> WellbeingStore.injury_summary(%{}) end)
+    summary_a =
+      WellbeingStore.with_context(context_a, fn -> WellbeingStore.injury_summary(%{}) end)
+
+    summary_b =
+      WellbeingStore.with_context(context_b, fn -> WellbeingStore.injury_summary(%{}) end)
 
     assert summary_a.total == 1
     assert summary_b.total == 1
@@ -88,7 +91,8 @@ defmodule MilosTraining.Wellbeing.TenantIsolationTest do
     # reading a member's dossier still resolves to their own organization,
     # because the owner branch (user_id == admin) cannot match the member's
     # rows - asserted separately above.
-    {:ok, member_context_b} = Organizations.resolve_tenant_context(member, context_b.organization.slug)
+    {:ok, member_context_b} =
+      Organizations.resolve_tenant_context(member, context_b.organization.slug)
 
     own_areas =
       WellbeingStore.with_context(member_context_b, fn ->

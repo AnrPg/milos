@@ -31,7 +31,9 @@ defmodule MilosTrainingWeb.MyWorkoutControllerTest do
     payload =
       conn
       |> put_bearer_token(athlete)
-      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/my-workouts?start_date=#{Date.to_iso8601(monday)}")
+      |> get(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/my-workouts?start_date=#{Date.to_iso8601(monday)}"
+      )
       |> json_response(200)
 
     assert payload["start_date"] == Date.to_iso8601(monday)
@@ -45,7 +47,9 @@ defmodule MilosTrainingWeb.MyWorkoutControllerTest do
     payload =
       conn
       |> put_bearer_token(athlete)
-      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/my-workouts?start_date=not-a-date")
+      |> get(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/my-workouts?start_date=not-a-date"
+      )
       |> json_response(400)
 
     assert payload["error"] == "Bad request"
@@ -67,7 +71,9 @@ defmodule MilosTrainingWeb.MyWorkoutControllerTest do
     payload =
       conn
       |> put_bearer_token(admin)
-      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/my-workouts?start_date=#{Date.to_iso8601(monday)}")
+      |> get(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/my-workouts?start_date=#{Date.to_iso8601(monday)}"
+      )
       |> json_response(200)
 
     [assignment] = payload["assignments"]
@@ -97,9 +103,12 @@ defmodule MilosTrainingWeb.MyWorkoutControllerTest do
     payload =
       conn
       |> put_bearer_token(athlete)
-      |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/my-workouts/assignments/#{assignment.id}/reschedule", %{
-        scheduled_for: Date.to_iso8601(new_date)
-      })
+      |> patch(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/my-workouts/assignments/#{assignment.id}/reschedule",
+        %{
+          scheduled_for: Date.to_iso8601(new_date)
+        }
+      )
       |> json_response(200)
 
     assert payload["assignment"]["id"] == assignment.id
@@ -123,9 +132,12 @@ defmodule MilosTrainingWeb.MyWorkoutControllerTest do
 
     conn
     |> put_bearer_token(athlete)
-    |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/my-workouts/assignments/#{assignment.id}/reschedule", %{
-      scheduled_for: Date.to_iso8601(new_date)
-    })
+    |> patch(
+      "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/my-workouts/assignments/#{assignment.id}/reschedule",
+      %{
+        scheduled_for: Date.to_iso8601(new_date)
+      }
+    )
     |> json_response(200)
 
     athlete_assignments =
@@ -146,10 +158,13 @@ defmodule MilosTrainingWeb.MyWorkoutControllerTest do
     payload =
       conn
       |> put_bearer_token(athlete)
-      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/my-workouts/requests", %{
-        requested_for: Date.to_iso8601(requested_for),
-        note: "Prefer strength."
-      })
+      |> post(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/my-workouts/requests",
+        %{
+          requested_for: Date.to_iso8601(requested_for),
+          note: "Prefer strength."
+        }
+      )
       |> json_response(202)
 
     assert payload["requested_for"] == Date.to_iso8601(requested_for)
@@ -173,9 +188,12 @@ defmodule MilosTrainingWeb.MyWorkoutControllerTest do
 
     conn
     |> put_bearer_token(athlete)
-    |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/my-workouts/requests", %{
-      requested_for: Date.utc_today() |> Date.add(-1) |> Date.to_iso8601()
-    })
+    |> post(
+      "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/my-workouts/requests",
+      %{
+        requested_for: Date.utc_today() |> Date.add(-1) |> Date.to_iso8601()
+      }
+    )
     |> json_response(422)
   end
 
@@ -184,9 +202,12 @@ defmodule MilosTrainingWeb.MyWorkoutControllerTest do
 
     conn
     |> put_bearer_token(admin)
-    |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/my-workouts/requests", %{
-      requested_for: Date.utc_today() |> Date.add(1) |> Date.to_iso8601()
-    })
+    |> post(
+      "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/my-workouts/requests",
+      %{
+        requested_for: Date.utc_today() |> Date.add(1) |> Date.to_iso8601()
+      }
+    )
     |> json_response(403)
   end
 

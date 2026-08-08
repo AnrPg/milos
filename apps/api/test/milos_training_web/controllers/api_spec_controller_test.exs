@@ -45,7 +45,13 @@ defmodule MilosTrainingWeb.ApiSpecControllerTest do
       assert get_in(body, ["paths", "/api/auth/login", "post", "responses", "429"]) != nil
       assert get_in(body, ["paths", "/api/auth/refresh", "post", "responses", "503"]) != nil
 
-      assert get_in(body, ["paths", "/api/org/{organization_slug}/admin/users/{id}/role", "patch", "responses", "403"]) !=
+      assert get_in(body, [
+               "paths",
+               "/api/org/{organization_slug}/admin/users/{id}/role",
+               "patch",
+               "responses",
+               "403"
+             ]) !=
                nil
     end
 
@@ -156,7 +162,9 @@ defmodule MilosTrainingWeb.ApiSpecControllerTest do
     test "publishes closed review and wellbeing response contracts", %{conn: conn} do
       body = conn |> get("/api/openapi") |> json_response(200)
 
-      review = response_item_schema(body, "/api/org/{organization_slug}/me/reviews", "get", "reviews")
+      review =
+        response_item_schema(body, "/api/org/{organization_slug}/me/reviews", "get", "reviews")
+
       injury = response_item_schema(body, "/api/wellbeing/injuries", "get", "injuries")
 
       assert review["additionalProperties"] == false

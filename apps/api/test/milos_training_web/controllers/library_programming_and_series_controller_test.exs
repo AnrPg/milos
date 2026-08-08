@@ -10,19 +10,28 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
 
     parent =
       admin_conn
-      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workout-folders", %{name: "2026", parent_id: nil})
+      |> post(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workout-folders",
+        %{name: "2026", parent_id: nil}
+      )
       |> json_response(201)
 
     child =
       admin_conn
       |> recycle()
-      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workout-folders", %{name: "Strength", parent_id: parent["id"]})
+      |> post(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workout-folders",
+        %{name: "Strength", parent_id: parent["id"]}
+      )
       |> json_response(201)
 
     metadata =
       admin_conn
       |> recycle()
-      |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{workout.id}/library", %{folder_id: child["id"]})
+      |> patch(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{workout.id}/library",
+        %{folder_id: child["id"]}
+      )
       |> json_response(200)
 
     assert metadata["folder_id"] == child["id"]
@@ -30,7 +39,9 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
     folders =
       admin_conn
       |> recycle()
-      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workout-folders")
+      |> get(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workout-folders"
+      )
       |> json_response(200)
       |> Map.fetch!("folders")
 
@@ -43,13 +54,16 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
     payload =
       conn
       |> put_bearer_token(admin)
-      |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/settings", %{
-        scheduling: %{
-          default_capacity: 18,
-          default_auto_approve: true,
-          default_booking_timeout_minutes: 25
+      |> patch(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/settings",
+        %{
+          scheduling: %{
+            default_capacity: 18,
+            default_auto_approve: true,
+            default_booking_timeout_minutes: 25
+          }
         }
-      })
+      )
       |> json_response(200)
 
     assert payload["scheduling"] == %{
@@ -72,20 +86,23 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
 
     result =
       admin_conn
-      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/schedule/slots/series", %{
-        class_type_id: class_type.id,
-        name: "Weekly Series",
-        duration_minutes: 60,
-        timezone: "Etc/UTC",
-        starts_on: Date.to_iso8601(first),
-        ends_on: Date.to_iso8601(second),
-        local_start_time: "09:00:00",
-        weekdays: [Date.day_of_week(first)],
-        excluded_dates: [],
-        capacity: 14,
-        auto_approve: false,
-        booking_timeout_minutes: 30
-      })
+      |> post(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/schedule/slots/series",
+        %{
+          class_type_id: class_type.id,
+          name: "Weekly Series",
+          duration_minutes: 60,
+          timezone: "Etc/UTC",
+          starts_on: Date.to_iso8601(first),
+          ends_on: Date.to_iso8601(second),
+          local_start_time: "09:00:00",
+          weekdays: [Date.day_of_week(first)],
+          excluded_dates: [],
+          capacity: 14,
+          auto_approve: false,
+          booking_timeout_minutes: 30
+        }
+      )
       |> json_response(201)
 
     assert result["series"]["occurrence_count"] == 2
@@ -104,7 +121,10 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
 
     folder =
       admin_conn
-      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workout-folders", %{name: "Personalized", parent_id: nil})
+      |> post(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workout-folders",
+        %{name: "Personalized", parent_id: nil}
+      )
       |> json_response(201)
 
     slot =
@@ -129,7 +149,10 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
 
     conn
     |> put_bearer_token(member)
-    |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/bookings", Jason.encode!(%{slot_id: slot["id"]}))
+    |> post(
+      "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/bookings",
+      Jason.encode!(%{slot_id: slot["id"]})
+    )
     |> json_response(201)
 
     day = DateTime.to_date(scheduled_at) |> Date.to_iso8601()
@@ -137,7 +160,9 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
     schedule =
       admin_conn
       |> recycle()
-      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{member.id}/schedule?start_date=#{day}&end_date=#{day}")
+      |> get(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{member.id}/schedule?start_date=#{day}&end_date=#{day}"
+      )
       |> json_response(200)
 
     assert [%{"id" => slot_id, "kind" => "class"}] = schedule["items"]
@@ -195,7 +220,10 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
 
     folder =
       admin_conn
-      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workout-folders", %{name: "Athlete Plans", parent_id: nil})
+      |> post(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workout-folders",
+        %{name: "Athlete Plans", parent_id: nil}
+      )
       |> json_response(201)
 
     programmed =
@@ -219,7 +247,9 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
     schedule =
       admin_conn
       |> recycle()
-      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{athlete.id}/schedule?start_date=#{day}&end_date=#{day}")
+      |> get(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{athlete.id}/schedule?start_date=#{day}&end_date=#{day}"
+      )
       |> json_response(200)
 
     assert [%{"kind" => "assignment", "workout" => %{"id" => workout_id}}] = schedule["items"]

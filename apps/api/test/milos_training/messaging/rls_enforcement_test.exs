@@ -11,21 +11,33 @@ defmodule MilosTraining.Messaging.RLSEnforcementTest do
     {other_org_id_s, other_org_id} = uuid()
     {thread_id_s, thread_id} = uuid()
 
-    Postgrex.query!(conn, """
-    INSERT INTO organizations (id, name, slug, status, inserted_at, updated_at)
-    VALUES ($1, 'RLS Messaging Org', $2, 'active', now(), now())
-    """, [org_id, "rls-messaging-#{System.unique_integer([:positive])}"])
+    Postgrex.query!(
+      conn,
+      """
+      INSERT INTO organizations (id, name, slug, status, inserted_at, updated_at)
+      VALUES ($1, 'RLS Messaging Org', $2, 'active', now(), now())
+      """,
+      [org_id, "rls-messaging-#{System.unique_integer([:positive])}"]
+    )
 
-    Postgrex.query!(conn, """
-    INSERT INTO organizations (id, name, slug, status, inserted_at, updated_at)
-    VALUES ($1, 'RLS Messaging Other Org', $2, 'active', now(), now())
-    """, [other_org_id, "rls-messaging-other-#{System.unique_integer([:positive])}"])
+    Postgrex.query!(
+      conn,
+      """
+      INSERT INTO organizations (id, name, slug, status, inserted_at, updated_at)
+      VALUES ($1, 'RLS Messaging Other Org', $2, 'active', now(), now())
+      """,
+      [other_org_id, "rls-messaging-other-#{System.unique_integer([:positive])}"]
+    )
 
     as_session(conn, nil, org_id_s, false, fn ->
-      Postgrex.query!(conn, """
-      INSERT INTO messaging_threads (id, context_type, organization_id, inserted_at)
-      VALUES ($1, 'coaching', $2, now())
-      """, [thread_id, org_id])
+      Postgrex.query!(
+        conn,
+        """
+        INSERT INTO messaging_threads (id, context_type, organization_id, inserted_at)
+        VALUES ($1, 'coaching', $2, now())
+        """,
+        [thread_id, org_id]
+      )
     end)
 
     visible_in_own_org =

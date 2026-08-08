@@ -15,17 +15,25 @@ defmodule MilosTraining.Execution.RLSEnforcementTest do
     {other_id_s, _other_id} = uuid()
     {execution_id_s, execution_id} = uuid()
 
-    Postgrex.query!(conn, """
-    INSERT INTO users (id, nickname, display_nickname, password_hash, role, email, inserted_at, updated_at)
-    VALUES ($1, $2::text, $2::text, 'x', 'member', $2::text || '@placeholder.invalid', now(), now())
-    """, [owner_id, "rls_execution_user_#{System.unique_integer([:positive])}"])
+    Postgrex.query!(
+      conn,
+      """
+      INSERT INTO users (id, nickname, display_nickname, password_hash, role, email, inserted_at, updated_at)
+      VALUES ($1, $2::text, $2::text, 'x', 'member', $2::text || '@placeholder.invalid', now(), now())
+      """,
+      [owner_id, "rls_execution_user_#{System.unique_integer([:positive])}"]
+    )
 
     as_session(conn, owner_id_s, nil, false, fn ->
-      Postgrex.query!(conn, """
-      INSERT INTO workout_executions
-        (id, user_id, source, status, started_at_utc, started_at_tz, inserted_at)
-      VALUES ($1, $2, 'self_selected', 'completed', now(), 'UTC', now())
-      """, [execution_id, owner_id])
+      Postgrex.query!(
+        conn,
+        """
+        INSERT INTO workout_executions
+          (id, user_id, source, status, started_at_utc, started_at_tz, inserted_at)
+        VALUES ($1, $2, 'self_selected', 'completed', now(), 'UTC', now())
+        """,
+        [execution_id, owner_id]
+      )
     end)
 
     visible_to_unrelated_session =
@@ -33,9 +41,13 @@ defmodule MilosTraining.Execution.RLSEnforcementTest do
 
     visible_with_authorization_check =
       as_session(conn, other_id_s, nil, false, fn ->
-        Postgrex.query!(conn, "SELECT set_config('app.execution_authorization_check', $1, false)", [
-          "true"
-        ])
+        Postgrex.query!(
+          conn,
+          "SELECT set_config('app.execution_authorization_check', $1, false)",
+          [
+            "true"
+          ]
+        )
 
         select_ids(conn, execution_id)
       end)

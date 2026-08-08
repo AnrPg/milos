@@ -14,7 +14,12 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
           %{slug: "competition", label: "Competition", sort_order: 3}
         ])
 
-      create_conn = post(admin_conn, "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts")
+      create_conn =
+        post(
+          admin_conn,
+          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts"
+        )
+
       draft = json_response(create_conn, 201)["draft"]
       draft_id = draft["id"]
 
@@ -61,11 +66,19 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
         admin_conn
         |> recycle()
         |> put_req_header("content-type", "application/json")
-        |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft_id}/draft", Jason.encode!(draft_payload))
+        |> patch(
+          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft_id}/draft",
+          Jason.encode!(draft_payload)
+        )
 
       assert json_response(autosave_conn, 200)["draft"]["status"] == "draft"
 
-      show_conn = get(admin_conn |> recycle(), "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft_id}")
+      show_conn =
+        get(
+          admin_conn |> recycle(),
+          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft_id}"
+        )
+
       shown_workout = json_response(show_conn, 200)["workout"]
 
       assert shown_workout["status"] == "draft"
@@ -75,7 +88,10 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
         admin_conn
         |> recycle()
         |> put_req_header("content-type", "application/json")
-        |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft_id}/publish", Jason.encode!(%{}))
+        |> post(
+          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft_id}/publish",
+          Jason.encode!(%{})
+        )
 
       workout = json_response(publish_conn, 200)["workout"]
 
@@ -97,7 +113,13 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
 
     test "publishes a container whose exercises are in nested child sections", %{conn: conn} do
       admin_conn = authenticate_as_admin(conn, "nested_draft_author")
-      create_conn = post(admin_conn, "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts")
+
+      create_conn =
+        post(
+          admin_conn,
+          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts"
+        )
+
       draft_id = json_response(create_conn, 201)["draft"]["id"]
 
       draft_payload = %{
@@ -131,7 +153,10 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
         admin_conn
         |> recycle()
         |> put_req_header("content-type", "application/json")
-        |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft_id}/draft", Jason.encode!(draft_payload))
+        |> patch(
+          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft_id}/draft",
+          Jason.encode!(draft_payload)
+        )
 
       assert json_response(autosave_conn, 200)["draft"]["id"] == draft_id
 
@@ -139,7 +164,10 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
         admin_conn
         |> recycle()
         |> put_req_header("content-type", "application/json")
-        |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft_id}/publish", Jason.encode!(%{}))
+        |> post(
+          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft_id}/publish",
+          Jason.encode!(%{})
+        )
 
       assert json_response(publish_conn, 200)["workout"]["status"] == "published"
     end
@@ -148,7 +176,12 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
       admin_conn = authenticate_as_admin(conn, "free_text_author")
 
       draft_id =
-        post(admin_conn, "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts") |> json_response(201) |> get_in(["draft", "id"])
+        post(
+          admin_conn,
+          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts"
+        )
+        |> json_response(201)
+        |> get_in(["draft", "id"])
 
       draft_payload = %{
         title: "Friday Board WOD",
@@ -165,14 +198,20 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
       admin_conn
       |> recycle()
       |> put_req_header("content-type", "application/json")
-      |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft_id}/draft", Jason.encode!(draft_payload))
+      |> patch(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft_id}/draft",
+        Jason.encode!(draft_payload)
+      )
       |> json_response(200)
 
       workout =
         admin_conn
         |> recycle()
         |> put_req_header("content-type", "application/json")
-        |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft_id}/publish", Jason.encode!(%{}))
+        |> post(
+          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft_id}/publish",
+          Jason.encode!(%{})
+        )
         |> json_response(200)
         |> Map.fetch!("workout")
 
@@ -187,7 +226,12 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
       admin_conn = authenticate_as_admin(conn, "structured_set_author")
 
       draft_id =
-        post(admin_conn, "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts") |> json_response(201) |> get_in(["draft", "id"])
+        post(
+          admin_conn,
+          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts"
+        )
+        |> json_response(201)
+        |> get_in(["draft", "id"])
 
       superset_group_id = Ecto.UUID.generate()
       alternating_group_id = Ecto.UUID.generate()
@@ -239,14 +283,20 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
       admin_conn
       |> recycle()
       |> put_req_header("content-type", "application/json")
-      |> patch("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft_id}/draft", Jason.encode!(draft_payload))
+      |> patch(
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft_id}/draft",
+        Jason.encode!(draft_payload)
+      )
       |> json_response(200)
 
       workout =
         admin_conn
         |> recycle()
         |> put_req_header("content-type", "application/json")
-        |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft_id}/publish", Jason.encode!(%{}))
+        |> post(
+          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft_id}/publish",
+          Jason.encode!(%{})
+        )
         |> json_response(200)
         |> Map.fetch!("workout")
 
