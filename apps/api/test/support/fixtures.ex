@@ -1,5 +1,5 @@
 defmodule MilosTraining.TestFixtures do
-  alias MilosTraining.{Identity, Scheduling, Workouts}
+  alias MilosTraining.{Identity, Organizations, Scheduling, Workouts}
 
   def user_fixture(attrs \\ %{}) do
     unique = System.unique_integer([:positive])
@@ -53,6 +53,7 @@ defmodule MilosTraining.TestFixtures do
 
   def class_type_fixture(attrs \\ %{}) do
     unique = System.unique_integer([:positive])
+    context = Map.get(attrs, :tenant_context) || legacy_tenant_context()
 
     params = %{
       name: Map.get(attrs, :name, "Class Type #{unique}"),
@@ -60,12 +61,13 @@ defmodule MilosTraining.TestFixtures do
       sort_order: Map.get(attrs, :sort_order, unique)
     }
 
-    {:ok, class_type} = Scheduling.create_class_type(params)
+    {:ok, class_type} = Scheduling.create_class_type(context, params)
     class_type
   end
 
   def slot_fixture(workout, attrs \\ %{}) do
-    default_class_type = Scheduling.list_class_types() |> List.first()
+    context = Map.get(attrs, :tenant_context) || workout_tenant_context(workout)
+    default_class_type = Scheduling.list_class_types(context) |> List.first()
 
     params =
       %{
@@ -78,9 +80,28 @@ defmodule MilosTraining.TestFixtures do
         booking_timeout_minutes: 60
       }
       |> Map.merge(attrs)
+      |> Map.delete(:tenant_context)
 
-    {:ok, slot} = MilosTraining.Scheduling.create_slot(params)
+    {:ok, slot} = MilosTraining.Scheduling.create_slot(context, params)
     slot
+  end
+
+  defp workout_tenant_context(%{organization_id: organization_id})
+       when is_binary(organization_id),
+       do: system_tenant_context(organization_id, :workout_fixture)
+
+  defp workout_tenant_context(_workout), do: legacy_tenant_context()
+
+  defp legacy_tenant_context do
+    {:ok, organization} = Organizations.ensure_legacy_organization_for_migration()
+    system_tenant_context(organization.id, :legacy_test_fixture)
+  end
+
+  defp system_tenant_context(organization_id, source) do
+    {:ok, context} =
+      Organizations.resolve_system_tenant_context(organization_id, source, %{service: __MODULE__})
+
+    context
   end
 
   defp deep_merge(left, right) do
