@@ -36,9 +36,16 @@ defmodule MilosTraining.Application.GetOrCreateMessagingThread do
     end
   end
 
-  def call(actor, %{context_type: :class_slot, context_id: slot_id}) do
-    with %{} = slot <- Scheduling.get_slot(slot_id) || {:error, :not_found},
-         :ok <- authorize_class_slot(actor, slot) do
+  def call(_actor, %{context_type: :class_slot}), do: {:error, :organization_context_required}
+
+  def call(_actor, _params), do: {:error, :bad_request}
+
+  def call(%{organization_id: _} = context, actor, %{
+        context_type: :class_slot,
+        context_id: slot_id
+      }) do
+    with %{} = slot <- Scheduling.get_slot(context, slot_id) || {:error, :not_found},
+         :ok <- authorize_class_slot(context, actor, slot) do
       participant_ids =
         slot
         |> Map.get(:bookings, [])
@@ -54,8 +61,6 @@ defmodule MilosTraining.Application.GetOrCreateMessagingThread do
       })
     end
   end
-
-  def call(_actor, _params), do: {:error, :bad_request}
 
   def call(%{organization_id: organization_id} = context, actor, %{
         context_type: :direct,
@@ -90,9 +95,9 @@ defmodule MilosTraining.Application.GetOrCreateMessagingThread do
     end
   end
 
-  defp authorize_class_slot(%{id: actor_id}, %{organization_id: organization_id} = slot) do
+  defp authorize_class_slot(context, %{id: actor_id}, %{organization_id: organization_id} = slot) do
     if organization_staff?(actor_id, organization_id) or
-         Scheduling.get_approved_booking_for_class(actor_id, slot.id) do
+         Scheduling.get_approved_booking_for_class(context, actor_id, slot.id) do
       :ok
     else
       {:error, :forbidden}
