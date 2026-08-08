@@ -94,3 +94,5 @@ must have an ADR. See `template.md` for the format.
 | ADR-086 | TrainingJournal product shell and tenant branding | Accepted |
 | ADR-087 | Platform owner tenant entry and permanent organization deletion | Accepted |
 | ADR-088 | Platform tenant access management | Accepted |
+| ADR-089 | Rename platform owner to vendor | Accepted |
+| ADR-090 | Cross-layer quality gates and booking timeouts | Accepted |
