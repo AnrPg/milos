@@ -14,9 +14,13 @@ defmodule MilosTraining.Infrastructure.Readiness.Live do
       object_storage: object_storage_status()
     }
 
-    if Enum.all?(checks, fn {_name, status} -> status == :ok end) do
+    if Enum.all?(checks, fn {_name, status} -> ready?(status) end) do
       {:ok, checks}
     else
+      :telemetry.execute([:milos, :readiness, :failure], %{count: 1}, %{
+        failed: failed_checks(checks)
+      })
+
       {:error, checks}
     end
   end
@@ -24,7 +28,7 @@ defmodule MilosTraining.Infrastructure.Readiness.Live do
   defp database_status do
     case SQL.query(Repo, "SELECT 1", []) do
       {:ok, _result} -> :ok
-      {:error, _reason} -> :error
+      {:error, reason} -> dependency_error(reason)
     end
   end
 
@@ -32,7 +36,7 @@ defmodule MilosTraining.Infrastructure.Readiness.Live do
     if Application.get_env(:milos_training, :start_redix, true) do
       case Redix.command(:redix, ["PING"]) do
         {:ok, "PONG"} -> :ok
-        {:error, _reason} -> :error
+        {:error, reason} -> dependency_error(reason)
       end
     else
       :ok
@@ -42,7 +46,7 @@ defmodule MilosTraining.Infrastructure.Readiness.Live do
   defp jobs_status do
     if Application.get_env(:milos_training, :start_oban, true) do
       case Oban.Registry.whereis(Oban) do
-        nil -> :error
+        nil -> dependency_error(:oban_registry_missing)
         _pid -> :ok
       end
     else
@@ -56,14 +60,27 @@ defmodule MilosTraining.Infrastructure.Readiness.Live do
 
     case Req.get(url, receive_timeout: 1_000, retry: false) do
       {:ok, %Req.Response{status: status}} when status in 200..299 -> :ok
-      _other -> :error
+      {:ok, %Req.Response{status: status}} -> dependency_error({:http_status, status})
+      {:error, reason} -> dependency_error(reason)
     end
   end
 
   defp object_storage_status do
     case MilosTraining.Infrastructure.Storage.MinioStorage.health_status() do
       :ok -> :ok
-      _other -> :error
+      other -> dependency_error(other)
     end
+  end
+
+  defp ready?(:ok), do: true
+  defp ready?(%{status: :ok}), do: true
+  defp ready?(_status), do: false
+
+  defp dependency_error(reason), do: %{status: :error, reason: inspect(reason)}
+
+  defp failed_checks(checks) do
+    checks
+    |> Enum.reject(fn {_name, status} -> ready?(status) end)
+    |> Map.new()
   end
 end

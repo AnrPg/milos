@@ -76,6 +76,12 @@ defmodule MilosTrainingWeb.HealthController do
   end
 
   defp stringify_checks(checks) do
-    Map.new(checks, fn {name, status} -> {name, Atom.to_string(status)} end)
+    Map.new(checks, fn
+      {name, status} when is_atom(status) ->
+        {name, Atom.to_string(status)}
+
+      {name, %{status: status, reason: reason}} ->
+        {name, %{status: Atom.to_string(status), reason: reason}}
+    end)
   end
 end

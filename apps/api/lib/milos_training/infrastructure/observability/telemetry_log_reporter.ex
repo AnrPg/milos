@@ -11,6 +11,14 @@ defmodule MilosTraining.Infrastructure.Observability.TelemetryLogReporter do
     [:phoenix, :channel_handled_in],
     [:milos_training, :repo, :query],
     [:milos, :communication, :message_recorded],
+    [:milos, :readiness, :failure],
+    [:milos, :upload, :rejected],
+    [:milos, :outbox, :age],
+    [:milos, :auth, :anomaly],
+    [:milos, :cache, :state],
+    [:oban, :job, :exception],
+    [:oban, :job, :discard],
+    [:oban, :job, :stop],
     [:milos, :runtime]
   ]
 
@@ -32,7 +40,19 @@ defmodule MilosTraining.Infrastructure.Observability.TelemetryLogReporter do
   def handle_cast({:measurement, event, measurements, metadata}, state) do
     tags =
       metadata
-      |> Map.take([:route, :event, :result, :queue])
+      |> Map.take([
+        :route,
+        :event,
+        :result,
+        :queue,
+        :worker,
+        :state,
+        :reason,
+        :context,
+        :dependency,
+        :cache,
+        :failed
+      ])
       |> Enum.reduce(%{}, fn {key, value}, tags ->
         case normalize_tag(value) do
           {:ok, normalized} -> Map.put(tags, key, normalized)
@@ -81,5 +101,6 @@ defmodule MilosTraining.Infrastructure.Observability.TelemetryLogReporter do
     do: {:ok, value}
 
   defp normalize_tag(value) when is_atom(value), do: {:ok, Atom.to_string(value)}
+  defp normalize_tag(value) when is_map(value) or is_list(value), do: {:ok, Jason.encode!(value)}
   defp normalize_tag(_value), do: :drop
 end
