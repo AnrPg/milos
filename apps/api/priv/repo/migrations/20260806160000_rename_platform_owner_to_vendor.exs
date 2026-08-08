@@ -9,8 +9,21 @@ defmodule MilosTraining.Repo.Migrations.RenamePlatformOwnerToVendor do
     rename table(:organization_provisioning_events), :platform_owner_user_id, to: :vendor_user_id
 
     rename_if_exists("platform_owners_user_id_index", "vendors_user_id_index", :index)
-    rename_if_exists("platform_owners_status_check", "vendors_status_check", :constraint, "vendors")
-    rename_if_exists("platform_owners_user_id_fkey", "vendors_user_id_fkey", :constraint, "vendors")
+
+    rename_if_exists(
+      "platform_owners_status_check",
+      "vendors_status_check",
+      :constraint,
+      "vendors"
+    )
+
+    rename_if_exists(
+      "platform_owners_user_id_fkey",
+      "vendors_user_id_fkey",
+      :constraint,
+      "vendors"
+    )
+
     rename_if_exists("platform_owners_pkey", "vendors_pkey", :constraint, "vendors")
 
     rename_if_exists(
@@ -30,8 +43,21 @@ defmodule MilosTraining.Repo.Migrations.RenamePlatformOwnerToVendor do
     )
 
     rename_if_exists("vendors_pkey", "platform_owners_pkey", :constraint, "vendors")
-    rename_if_exists("vendors_user_id_fkey", "platform_owners_user_id_fkey", :constraint, "vendors")
-    rename_if_exists("vendors_status_check", "platform_owners_status_check", :constraint, "vendors")
+
+    rename_if_exists(
+      "vendors_user_id_fkey",
+      "platform_owners_user_id_fkey",
+      :constraint,
+      "vendors"
+    )
+
+    rename_if_exists(
+      "vendors_status_check",
+      "platform_owners_status_check",
+      :constraint,
+      "vendors"
+    )
+
     rename_if_exists("vendors_user_id_index", "platform_owners_user_id_index", :index)
 
     rename table(:organization_provisioning_events), :vendor_user_id, to: :platform_owner_user_id
