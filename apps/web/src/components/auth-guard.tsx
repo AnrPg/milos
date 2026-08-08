@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 import { useSession } from "@/components/session-provider";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
 
 type AuthGuardProps = {
   children: React.ReactNode;
@@ -24,6 +25,7 @@ export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { status, currentUser } = useSession();
+  const { role } = useSelectedMembershipRole();
 
   useEffect(() => {
     if (status === "guest") {
@@ -32,17 +34,17 @@ export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
     }
 
     if (status === "authenticated" && currentUser) {
-      const roleKey = currentUser.role as "member" | "athlete" | "admin";
+      const roleKey = role;
       const redirect = roleRedirects?.[roleKey];
       if (redirect) {
         router.replace(redirect);
         return;
       }
-      if (roles && (!isAllowedRole(currentUser.role) || !roles.includes(currentUser.role))) {
+      if (roles && (!isAllowedRole(role) || !roles.includes(role))) {
         router.replace("/");
       }
     }
-  }, [currentUser, pathname, roles, roleRedirects, router, status]);
+  }, [currentUser, pathname, role, roles, roleRedirects, router, status]);
 
   if (status === "loading") {
     return (
@@ -56,11 +58,11 @@ export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
 
   if (status === "guest") return null;
 
-  if (roles && currentUser && (!isAllowedRole(currentUser.role) || !roles.includes(currentUser.role))) {
+  if (roles && currentUser && (!isAllowedRole(role) || !roles.includes(role))) {
     return null;
   }
 
-  const roleKey = currentUser?.role as "member" | "athlete" | "admin" | undefined;
+  const roleKey = currentUser ? role : undefined;
   if (roleKey && roleRedirects?.[roleKey]) return null;
 
   return <>{children}</>;

@@ -38,6 +38,7 @@ import { workoutCta } from "@/components/workout-cta";
 import { ShareExportDialog } from "@/components/share-export/ShareExportDialog";
 import { InAppShareDialog } from "@/components/share-export/InAppShareDialog";
 import { useShareExport } from "@/components/share-export/useShareExport";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { buildExecutionDocument, buildExecutionHistoryDocument, renderText } from "@/lib/document-export";
 
 // ── Badge helpers ─────────────────────────────────────────────────────────────
@@ -439,6 +440,7 @@ export function LandingPage() {
   const [showDateRangeModal, setShowDateRangeModal] = useState(false);
   const [modalDateFrom, setModalDateFrom] = useState<string>("");
   const [modalDateTo, setModalDateTo] = useState<string>(new Date().toISOString().slice(0, 10));
+  const { role } = useSelectedMembershipRole();
   const queryClient = useQueryClient();
   const ctaNow = useMemo(() => new Date(), []);
   const ctaScheduleWindow = useMemo(() => ({
@@ -457,7 +459,7 @@ export function LandingPage() {
 
   const ctaScheduleQuery = useQuery({
     queryKey: ["landing", "workout-cta", "schedule", ctaScheduleWindow.startAt],
-    enabled: Boolean(tokens?.access_token) && currentUser?.role === "member",
+    enabled: Boolean(tokens?.access_token) && role === "member",
     queryFn: () =>
       fetchSchedule(tokens!.access_token, {
         startAt: ctaScheduleWindow.startAt,
@@ -470,7 +472,7 @@ export function LandingPage() {
 
   const ctaAssignmentsQuery = useQuery({
     queryKey: ["landing", "workout-cta", "assignments", formatLocalIsoDate(ctaNow)],
-    enabled: Boolean(tokens?.access_token) && currentUser?.role === "athlete",
+    enabled: Boolean(tokens?.access_token) && role === "athlete",
     queryFn: () => fetchAssignedWorkoutWeek(tokens!.access_token, formatLocalIsoDate(ctaNow)),
     staleTime: 60_000,
   });
@@ -584,7 +586,7 @@ export function LandingPage() {
 
   const stats = landing.gamification.stats;
   const weeklyWorkoutTarget = landing.gamification.settings.weekly_workout_target;
-  const isAdmin = currentUser?.role === "admin";
+  const isAdmin = role === "admin";
   const selectedExecution = selectedExecutionQuery.data;
   const leaderboardVisible = landing.gamification.leaderboard.visible;
   const leaderboardOptedIn = landing.gamification.leaderboard.opted_in;
@@ -592,7 +594,7 @@ export function LandingPage() {
   const showChallenges = isAdmin || hasActiveChallenges;
   const collapseLeaderboard = !isAdmin && !leaderboardOptedIn;
   const logWorkoutCta = workoutCta({
-    role: currentUser?.role,
+    role,
     now: ctaNow,
     executions: landing.recent_executions,
     scheduleSlots: ctaScheduleQuery.data?.slots ?? [],

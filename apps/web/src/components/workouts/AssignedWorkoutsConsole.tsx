@@ -34,6 +34,7 @@ import {
   type AssignedWorkoutRecord,
   type AthleteOption,
 } from "@/api/assigned-workouts";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { ViewModeSelector } from "@/components/calendar/ViewModeSelector";
@@ -360,7 +361,7 @@ export function AssignedWorkoutsConsole({
   const uiLocale = useUiLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { currentUser, tokens, signOut } = useSession();
+  const { tokens, signOut } = useSession();
   const initExecution = useExecutionStore((state) => state.initExecution);
   const [refDate, setRefDate] = useState<Date>(() => new Date());
   const [viewMode, setViewMode] = useState<ViewMode>("3day");
@@ -392,8 +393,9 @@ export function AssignedWorkoutsConsole({
   const [requestStatus, setRequestStatus] = useState<string | null>(null);
   const [requestError, setRequestError] = useState<string | null>(null);
   const [requestedDates, setRequestedDates] = useState<string[]>([]);
+  const { role } = useSelectedMembershipRole();
 
-  const isAdmin = currentUser?.role === "admin";
+  const isAdmin = role === "admin";
 
   const openParamId = searchParams.get("open_assignment") ?? searchParams.get("open");
   const openParamDate = searchParams.get("date");

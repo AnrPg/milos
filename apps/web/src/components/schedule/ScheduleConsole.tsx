@@ -33,6 +33,7 @@ import { CalendarView } from "@/components/schedule/CalendarView";
 import { buildScheduleWindow } from "@/components/schedule/calendar-window";
 import { SlotPopup } from "@/components/schedule/SlotPopup";
 import { TypeFilterChips } from "@/components/schedule/TypeFilterChips";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { organizationTopic, subscribeToTopic } from "@/lib/realtime";
 import { useScheduleStore } from "@/stores/schedule";
 import { IntegerInput } from "@/components/integer-input";
@@ -96,7 +97,7 @@ export function ScheduleConsole({
   const t = useTranslations("Schedule");
   const common = useTranslations("Common");
   const locale = useLocale();
-  const { tokens, currentUser } = useSession();
+  const { tokens } = useSession();
   const { days, setDays, shiftWindow, resetWindow, startDate, classTypeIds, setClassTypeIds } = useScheduleStore();
   const [schedule, setSchedule] = useState<ScheduleSlot[]>([]);
   const [classTypes, setClassTypes] = useState<ClassTypeRecord[]>([]);
@@ -115,8 +116,9 @@ export function ScheduleConsole({
   const [schedulingDefaults, setSchedulingDefaults] = useState<SchedulingSettings | undefined>();
   const appliedMobileDefault = useRef(false);
   const initialOpenHandledRef = useRef(false);
+  const { role } = useSelectedMembershipRole();
 
-  const isAdmin = currentUser?.role === "admin";
+  const isAdmin = role === "admin";
   const calendarWindow = useMemo(() => buildScheduleWindow(startDate, days), [days, startDate]);
   const title = pageTitle ?? t("title");
 

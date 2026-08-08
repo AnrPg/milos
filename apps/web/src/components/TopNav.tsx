@@ -20,6 +20,7 @@ import { useSession } from "@/components/session-provider";
 import { subscribeToTopic } from "@/lib/realtime";
 import { showsTenantSelfServiceSurfaces } from "@/lib/account-surfaces";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { selectedMembership, surfaceRoleForMembership } from "@/lib/membership-role";
 import { SemanticLabel } from "@/components/semantic-label";
 import { OrganizationSelector } from "@/components/organization-selector";
 
@@ -231,21 +232,11 @@ export function TopNav() {
   const menuRef = useRef<HTMLDivElement>(null);
   const authenticated = status === "authenticated" && Boolean(tokens?.access_token) && Boolean(currentUser);
 
-  const role = (currentUser?.role ?? "") as UserRole;
   const isVendor = Boolean(currentUser?.vendor);
-  const showSelfServiceSurfaces = showsTenantSelfServiceSurfaces(currentUser);
   const initials = currentUser?.nickname
     ? currentUser.nickname.slice(0, 2).toUpperCase()
     : "?";
   const avatarUrl = currentUser?.avatar_url ?? null;
-
-  const financeQuery = useQuery({
-    queryKey: ["my", "finance"],
-    enabled: authenticated && role !== "admin" && showSelfServiceSurfaces,
-    queryFn: () => fetchMyFinance(tokens!.access_token),
-    staleTime: 2 * 60 * 1000,
-  });
-  const outstandingCents = financeQuery.data?.total_outstanding_balance_cents ?? 0;
 
   const membershipsQuery = useQuery({
     queryKey: ["organization-memberships", tokens?.access_token],
@@ -255,6 +246,18 @@ export function TopNav() {
   });
   const memberships = Array.isArray(membershipsQuery.data) ? membershipsQuery.data : [];
   const selectedOrganizationSlug = useOrganizationSlug();
+  const currentMembership = selectedMembership(memberships, selectedOrganizationSlug);
+  const role = surfaceRoleForMembership(currentMembership) as UserRole;
+  const showSelfServiceSurfaces =
+    role !== "admin" && Boolean(currentUser) && showsTenantSelfServiceSurfaces(currentUser);
+  const financeQuery = useQuery({
+    queryKey: ["my", "finance"],
+    enabled: authenticated && showSelfServiceSurfaces,
+    queryFn: () => fetchMyFinance(tokens!.access_token),
+    staleTime: 2 * 60 * 1000,
+  });
+  const outstandingCents = financeQuery.data?.total_outstanding_balance_cents ?? 0;
+
   const brandName = tenantBrandName(memberships, selectedOrganizationSlug) ?? i18n("milosTraining5b1a1c1");
   const hasTenantMembership = memberships.length > 0;
   const showTenantShell = hasTenantMembership;
@@ -445,7 +448,7 @@ export function TopNav() {
                     {currentUser.nickname}
                   </p>
                   <p className="mt-0.5 text-xs uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                    <SemanticLabel value={currentUser.role} />
+                    <SemanticLabel value={currentMembership?.role ?? currentUser.role} />
                   </p>
                 </div>
                 <Link

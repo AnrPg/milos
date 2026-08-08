@@ -32,12 +32,14 @@ import { SemanticLabel } from "@/components/semantic-label";
 import { ShareExportDialog } from "@/components/share-export/ShareExportDialog";
 import { useShareExport } from "@/components/share-export/useShareExport";
 import { buildWorkoutDocument } from "@/lib/document-export";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
 
 export function WorkoutAdminConsole() {
   const i18n = useUiTranslations();
   const shareExport = useShareExport();
   const router = useRouter();
   const { currentUser, signOut, status, tokens } = useSession();
+  const { role } = useSelectedMembershipRole();
   const [workouts, setWorkouts] = useState<WorkoutRecord[]>([]);
   const [folders, setFolders] = useState<WorkoutFolder[]>([]);
   const [viewMode, setViewMode] = useState<"folders" | "tiles" | "list">("folders");
@@ -62,7 +64,7 @@ export function WorkoutAdminConsole() {
 
   const reloadAdminData = useCallback(async () => {
     if (status !== "authenticated" || !tokens?.access_token || !currentUser) return;
-    if (currentUser.role !== "admin") return;
+    if (role !== "admin") return;
 
     try {
       const [workoutList, folderList] = await Promise.all([
@@ -83,7 +85,7 @@ export function WorkoutAdminConsole() {
 
       setError(loadError instanceof Error ? localizeError(loadError, i18n) : i18n("failedToLoadAdminWorkoutData3641095"));
     }
-  }, [currentUser, i18n, router, signOut, status, tokens]);
+  }, [currentUser, i18n, role, router, signOut, status, tokens]);
 
   useEffect(() => {
     queueMicrotask(() => {
