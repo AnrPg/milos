@@ -114,6 +114,16 @@ services:
 
   postgres:
     image: postgres:16-alpine
+    command:
+      - postgres
+      - -c
+      - wal_level=replica
+      - -c
+      - archive_mode=on
+      - -c
+      - archive_timeout=300s
+      - -c
+      - archive_command=test ! -f /var/lib/postgresql/wal_archive/%f && cp %p /var/lib/postgresql/wal_archive/%f
     environment:
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
@@ -122,6 +132,7 @@ services:
       POSTGRES_RUNTIME_PASSWORD: ${DB_RUNTIME_PASSWORD:?set DB_RUNTIME_PASSWORD in your environment or .env}
     volumes:
       - ./.postgres-data:/var/lib/postgresql/data
+      - ./.postgres-wal-archive:/var/lib/postgresql/wal_archive
       - ./ops/postgres/init:/docker-entrypoint-initdb.d:ro
     networks: [app]
     healthcheck:
@@ -129,6 +140,46 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+
+  postgres-backup:
+    image: postgres:16-alpine
+    profiles: ["backup"]
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGDATABASE: ${DB_NAME:-milos_training_dev}
+      PGUSER: ${DB_USER:-postgres}
+      PGPASSWORD: ${DB_PASSWORD:-postgres}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-14}
+      BACKUP_MIN_FREE_PERCENT: ${BACKUP_MIN_FREE_PERCENT:-15}
+      WAL_ARCHIVE: /wal-archive
+    volumes:
+      - ./ops/postgres/backup:/backup:ro
+      - ./.postgres-backups:/backups/postgres
+      - ./.postgres-wal-archive:/wal-archive:ro
+    command: /backup/run-backup.sh
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [app]
+    restart: "no"
+
+  postgres-restore-drill:
+    image: postgres:16-alpine
+    profiles: ["backup"]
+    environment:
+      BACKUP_ROOT: /backups/postgres
+      WAL_ARCHIVE: /wal-archive
+    volumes:
+      - ./ops/postgres/backup:/backup:ro
+      - ./.postgres-backups:/backups/postgres:ro
+      - ./.postgres-wal-archive:/wal-archive:ro
+    command: /backup/restore-drill.sh
+    depends_on:
+      postgres-backup:
+        condition: service_completed_successfully
+    networks: [app]
+    restart: "no"
 
   redis:
     image: redis:7-alpine

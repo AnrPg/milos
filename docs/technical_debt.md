@@ -18,7 +18,7 @@ the original wording and dates for traceability.
 | TD-012–TD-013 | Open |
 | TD-014–TD-015 | In progress |
 | TD-016–TD-018 | Resolved |
-| TD-019 | Open |
+| TD-019 | Resolved |
 | TD-020 | Resolved |
 | TD-021 | In progress |
 | TD-022–TD-023 | Open |
@@ -33,6 +33,7 @@ the original wording and dates for traceability.
 | TD-038–TD-039 | Resolved |
 | TD-040 | Open |
 | TD-041 | Open |
+| TD-042 | Open |
 
 ## Detailed Ledger
 
@@ -57,7 +58,7 @@ the original wording and dates for traceability.
 | TD-016 | Phase 8 | Resolved 2026-06-12 by ADR-019: Finance now has append-only admin payment reversal and invoice-credit-restoration workflows, and allocated invoices can be voided after net allocations are reversed | Kept in ledger for traceability of the Phase 8 accounting hardening gap | Low | 2026-06-11 |
 | TD-017 | Phase 8 | Resolved 2026-07-15 by ADR-040: versioned package contracts now enforce channels, capabilities, class visits and coaching touchpoints through a concurrency-safe allowance ledger; legacy profiles have idempotent dry-run/apply backfill and admins can grant or revoke audited per-user extensions | Kept in ledger for traceability of the entitlement enforcement gap | Low | 2026-06-12 |
 | TD-018 | Cross-cutting | Resolved 2026-06-13 by ADR-029: durable workout-completion projections now run through an atomic Oban handoff, and the global PubSub database handler was removed | Kept in ledger for traceability of the asynchronous teardown and durability gap | Low | 2026-06-12 |
-| TD-019 | Cross-cutting | Next.js currently brings a transitive PostCSS `<8.5.10` advisory (`GHSA-qx2v-qp2m-jg93`), reported as two moderate production vulnerabilities by npm audit | npm currently offers only `audit fix --force` with a breaking Next.js downgrade; wait for and apply a compatible patched Next.js/PostCSS release | Medium | 2026-06-12 |
+| TD-019 | Cross-cutting | Resolved 2026-08-08: Next.js was upgraded to 16.3.0 with matching ESLint config, clearing the production Next/PostCSS/sharp/nanoid audit findings under `npm audit --omit=dev` | Kept in the ledger for traceability of the original production dependency advisory | Low | 2026-06-12 |
 | TD-020 | Phase 8 | Resolved 2026-06-13 by ADR-025: Scheduling now owns `class_attendance_records`, while Analytics attendance remains a projection/read compatibility table | Kept in ledger for traceability of the attendance ownership migration | Low | 2026-06-12 |
 | TD-021 | Phase 8 | Partially resolved 2026-07-16: Reviews and Wellbeing now publish closed response schemas and their API helpers, filters, mutations, and UI state consume generated operation types; Finance still has broad handwritten records | The contract-first migration is complete for two bounded contexts, while Finance's much larger response surface requires its own schema-hardening pass | Medium | 2026-06-12 |
 | TD-022 | Phase 8 | Finance refund/reversal workflows do not yet generate refund receipts, external payment-provider reconciliation records, or accounting-export artifacts | The MVP is still manual-payment first; provider and accounting integrations should attach to the append-only reversal facts without changing the core schema | Medium | 2026-06-12 |
@@ -79,3 +80,4 @@ the original wording and dates for traceability.
 | TD-039 | Multi-tenant object migration | Resolved 2026-08-04: `mix milos.storage.migrate_legacy_objects` provides dry-run/apply migration for legacy `invoices/...` and avatar URLs into `organizations/<organization_id>/...` and `users/<user_id>/avatars/...`, with destination byte-checksum verification before persisted key updates | Kept in ledger for traceability of the operator-controlled object migration path | Low | 2026-08-03 |
 | TD-040 | Tenant branding | Add first-class tenant logo upload with tenant-scoped object storage, validation, preview, audit events, and UI consumption across branded surfaces | Organization settings currently store `brand_logo_url`; gym owners need direct upload rather than operator-managed URLs | Medium | 2026-08-04 |
 | TD-041 | Platform tenant lifecycle | Add a reviewed full tenant purge/export workflow for organizations with protected cross-context records | The platform delete action now removes mistaken/test organizations when database constraints allow it; production tenant destruction still needs export, retention review, object cleanup, and context-owned purge policies | High | 2026-08-04 |
+| TD-042 | Web tooling | `openapi-typescript` still carries a dev-only `@redocly/openapi-core`/`js-yaml` advisory under full `npm audit`, but forcing patched `js-yaml` breaks OpenAPI generation | Production audit is clean; keep CI release gate on `npm audit --omit=dev --audit-level=high` and upgrade the generator when an upstream-compatible patched release is available | Medium | 2026-08-08 |

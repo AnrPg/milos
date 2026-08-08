@@ -13,6 +13,8 @@ apps/web/.env*.local
 
 # Docker
 .postgres-data/
+.postgres-backups/
+.postgres-wal-archive/
 .redis-data/
 .meilisearch-data/
 .minio-data/

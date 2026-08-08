@@ -34,6 +34,15 @@ jobs:
           DB_NAME: milos_training_test
           DB_PASSWORD: postgres
           DB_USER: postgres
+      - run: mix hex.audit
+        working-directory: apps/api
+      - run: mix dialyzer
+        working-directory: apps/api
+        env:
+          DB_HOST: localhost
+          DB_NAME: milos_training_test
+          DB_PASSWORD: postgres
+          DB_USER: postgres
       - name: Verify latest migration is reversible
         run: mix ecto.rollback --step 1 && mix ecto.migrate
         working-directory: apps/api
@@ -68,11 +77,13 @@ jobs:
         working-directory: apps/web
       - run: npm run lint
         working-directory: apps/web
+      - run: npm run i18n:check
+        working-directory: apps/web
       - run: npm run type-check
         working-directory: apps/web
       - run: npm run test
         working-directory: apps/web
-      - run: npm audit --audit-level=high
+      - run: npm audit --omit=dev --audit-level=high
         working-directory: apps/web
       - run: npx playwright install chromium
         working-directory: apps/web
@@ -81,9 +92,50 @@ jobs:
       - run: npm run build
         working-directory: apps/web
 
+  backup-drill:
+    runs-on: self-hosted
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: milos_training_backup_drill
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres -d milos_training_backup_drill"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate backup scripts
+        run: sh -n ops/postgres/backup/run-backup.sh && sh -n ops/postgres/backup/restore-drill.sh
+      - name: Run base-backup and restore drill
+        run: |
+          mkdir -p /tmp/milos-ci-backups /tmp/milos-ci-wal
+          docker run --rm --network host \
+            -e PGHOST=127.0.0.1 \
+            -e PGDATABASE=milos_training_backup_drill \
+            -e PGUSER=postgres \
+            -e PGPASSWORD=postgres \
+            -e BACKUP_ROOT=/backups/postgres \
+            -e WAL_ARCHIVE=/wal-archive \
+            -v "$PWD/ops/postgres/backup:/backup:ro" \
+            -v "/tmp/milos-ci-backups:/backups/postgres" \
+            -v "/tmp/milos-ci-wal:/wal-archive" \
+            postgres:16-alpine /backup/run-backup.sh
+          touch /tmp/milos-ci-wal/000000010000000000000001
+          docker run --rm \
+            -e BACKUP_ROOT=/backups/postgres \
+            -e WAL_ARCHIVE=/wal-archive \
+            -v "$PWD/ops/postgres/backup:/backup:ro" \
+            -v "/tmp/milos-ci-backups:/backups/postgres:ro" \
+            -v "/tmp/milos-ci-wal:/wal-archive:ro" \
+            postgres:16-alpine /backup/restore-drill.sh
+
   image-build:
     runs-on: self-hosted
-    needs: [api-test, web-test]
+    needs: [api-test, web-test, backup-drill]
     strategy:
       matrix:
         include:

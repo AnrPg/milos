@@ -66,20 +66,29 @@ passes for every shipped context.
 Every lifecycle and settings change creates an `organization_provisioning_events`
 record identifying the platform owner.
 
-## Backup
+## Backup and PITR
 
-Back up PostgreSQL and both MinIO buckets in the same maintenance window. Record the
-database snapshot time and object version/copy time together.
+Production PostgreSQL runs with WAL archiving enabled in Compose. Base backups are
+created with `pg_basebackup`, verified with `pg_verifybackup`, retained locally under
+`.postgres-backups/`, and paired with archived WAL segments under
+`.postgres-wal-archive/`.
+
+Run an operator backup:
 
 ```bash
-docker compose exec -T postgres \
-  pg_dump --format=custom --no-owner --file=/tmp/milos.dump "$DB_NAME"
-docker cp "$(docker compose ps -q postgres):/tmp/milos.dump" ./backups/milos.dump
+docker compose --profile backup run --rm postgres-backup
+docker compose --profile backup run --rm postgres-restore-drill
 ```
 
-Mirror the invoice/document and avatar buckets with an S3-compatible client. Encrypt
-backup media, restrict access to platform operators, and apply the installation's
-retention policy.
+The backup job refuses to run when free space falls below
+`BACKUP_MIN_FREE_PERCENT` and prunes base backups older than
+`BACKUP_RETENTION_DAYS`. Keep the WAL archive on storage with at least the same
+retention window as the base backups, and alert on archive growth or copy failures.
+
+Mirror the invoice/document and avatar buckets with an S3-compatible client during
+the same maintenance window. Encrypt backup media, restrict access to platform
+operators, and record the base-backup timestamp, WAL archive range, object copy
+timestamp, and checksum report together.
 
 ## Tenant export
 
@@ -99,10 +108,18 @@ Tenant export is an operator-reviewed process until a dedicated export service l
 
 Run restore drills in an isolated environment, never over production.
 
-1. Restore PostgreSQL with the migration-owner account.
-2. Restore MinIO buckets and preserve object keys.
-3. Run all migrations.
-4. Re-provision the runtime database role for an existing restored volume.
+1. Run `docker compose --profile backup run --rm postgres-backup`.
+2. Run `docker compose --profile backup run --rm postgres-restore-drill`.
+3. Restore PostgreSQL from the selected base backup plus WAL archive into an
+   isolated data directory.
+4. Restore MinIO buckets and preserve object keys.
+5. Run all migrations.
+6. Re-provision the runtime database role for an existing restored volume.
+7. Record the drill result, backup timestamp, WAL range, elapsed recovery time, and
+   any corrective action.
+
+CI runs the same backup script syntax checks and a containerized base-backup/restore
+drill gate before image builds.
 5. Run `mix milos.tenancy.audit` and the architecture gate.
 6. Verify two organizations cannot read each other's HTTP, socket, job, cache,
    search, storage, analytics, or export data.

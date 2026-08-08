@@ -35,6 +35,10 @@ enforcement.
   (restore drill) since the T4 rollout landed (2026-08-03/04) — the runbook's
   own drill checklist (`mix milos.tenancy.audit`, two-organization
   cross-surface verification) has never actually validated RLS given F-07.
+  2026-08-08 update: Compose now provides PostgreSQL WAL archiving,
+  `postgres-backup`, and `postgres-restore-drill` services, and CI runs the
+  backup script syntax checks plus a containerized base-backup/restore-drill
+  gate. Production still needs its first recorded operator drill entry.
 - Add the production role-hygiene check from F-07's remediation (fail startup
   or page if the runtime DB role is superuser/has BYPASSRLS) before touching
   anything else — this is the single highest-leverage safety net for every
