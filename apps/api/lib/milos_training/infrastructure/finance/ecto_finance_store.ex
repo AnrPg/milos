@@ -53,6 +53,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     Repo.transaction(fn ->
       package =
         MembershipPackage
+        |> tenant_scope()
         |> where([candidate], candidate.id == ^id)
         |> lock("FOR UPDATE")
         |> Repo.one()
@@ -81,6 +82,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     Repo.transaction(fn ->
       source =
         MembershipPackage
+        |> tenant_scope()
         |> where([package], package.id == ^id)
         |> lock("FOR UPDATE")
         |> Repo.one()
@@ -101,7 +103,13 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       replacement_packages =
         Map.new(affected_roles, fn role ->
           replacement_id = replacements[role]
-          replacement = replacement_id && Repo.get(MembershipPackage, replacement_id)
+
+          replacement =
+            replacement_id &&
+              MembershipPackage
+              |> tenant_scope()
+              |> where([package], package.id == ^replacement_id)
+              |> Repo.one()
 
           if is_nil(replacement_id), do: Repo.rollback({:package_replacement_required, role})
 
@@ -1738,6 +1746,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   @impl true
   def list_referral_events do
     ReferralEvent
+    |> tenant_scope()
     |> order_by([event], desc: event.inserted_at)
     |> Repo.all()
     |> Enum.map(&normalize_referral_event/1)
@@ -1776,6 +1785,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   @impl true
   def list_referral_rewards do
     ReferralReward
+    |> tenant_scope()
     |> order_by([reward], desc: reward.inserted_at)
     |> Repo.all()
     |> Enum.map(&normalize_referral_reward/1)
@@ -1869,7 +1879,9 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       reward
     else
       with %Membership{} = membership <-
-             Repo.get_by(Membership, user_id: reward.recipient_user_id),
+             Membership
+             |> tenant_scope()
+             |> Repo.get_by(user_id: reward.recipient_user_id),
            {:ok, _entry} <-
              create_referral_reward_credit_adjustment(
                reward,
@@ -3555,7 +3567,10 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   end
 
   defp normalize_subscription(%MembershipPackageSubscription{} = subscription) do
-    package = Repo.get(MembershipPackage, subscription.membership_package_id)
+    package =
+      MembershipPackage
+      |> tenant_scope()
+      |> Repo.get(subscription.membership_package_id)
 
     %{
       id: subscription.id,
