@@ -7,6 +7,19 @@ function payloadUrl(notification: LinkableNotification) {
   return typeof notification.payload.url === "string" ? notification.payload.url : null;
 }
 
+function localTarget(rawUrl: string) {
+  const origin = "http://milos.local";
+
+  try {
+    const parsed = new URL(rawUrl, origin);
+
+    if (parsed.origin !== origin || !parsed.pathname.startsWith("/")) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
 export function notificationTargetUrl(
   notification: LinkableNotification,
   role: string | null | undefined,
@@ -21,10 +34,13 @@ export function notificationTargetUrl(
     return `/account/activity/chats?thread=${encodeURIComponent(notification.payload.thread_id)}`;
   }
 
-  if (!rawUrl || !rawUrl.startsWith("/")) return null;
-  if (!isAdmin) return rawUrl;
+  if (!rawUrl) return null;
+  const parsed = localTarget(rawUrl);
+  if (!parsed) return null;
 
-  const parsed = new URL(rawUrl, "http://milos.local");
+  const localUrl = `${parsed.pathname}${parsed.search}${parsed.hash}`;
+  if (!isAdmin) return localUrl;
+
   const params = parsed.searchParams;
 
   if (
@@ -56,5 +72,5 @@ export function notificationTargetUrl(
     return `/admin/class-schedule${query ? `?${query}` : ""}`;
   }
 
-  return rawUrl;
+  return localUrl;
 }

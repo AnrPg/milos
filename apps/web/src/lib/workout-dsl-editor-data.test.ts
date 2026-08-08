@@ -24,4 +24,13 @@ describe("sanitizeWorkoutDslPaste", () => {
     expect(sanitized).toContain('href="https://example.test"');
     expect(sanitized).toContain('href="mailto:coach@example.test"');
   });
+
+  it("removes protocol-relative URLs from rich editor paste content", () => {
+    const sanitized = sanitizeWorkoutDslPaste(
+      '<a href="//evil.example/phish">bad</a><img src="//evil.example/pixel.png"><a href="/workouts/1">local</a>',
+    );
+
+    expect(sanitized).not.toContain("//evil.example");
+    expect(sanitized).toContain('href="/workouts/1"');
+  });
 });

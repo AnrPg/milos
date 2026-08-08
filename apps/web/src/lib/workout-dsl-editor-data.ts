@@ -40,10 +40,30 @@ export function sanitizeWorkoutDslPaste(html: string) {
       const name = attribute.name.toLowerCase();
       const value = attribute.value.trim();
       if (name.startsWith("on") || name === "style") node.removeAttribute(attribute.name);
-      if ((name === "href" || name === "src") && !/^(https?:|mailto:|\/|#)/i.test(value)) {
+      if ((name === "href" || name === "src") && !isSafeEditorUrl(value)) {
         node.removeAttribute(attribute.name);
       }
     }
   });
   return document.body.innerHTML;
+}
+
+function isSafeEditorUrl(value: string) {
+  if (!value) return false;
+  if (value.startsWith("#")) return true;
+  if (/^mailto:/i.test(value)) return true;
+  if (/^https?:/i.test(value)) return true;
+
+  if (value.startsWith("/")) {
+    const origin = "http://milos.local";
+
+    try {
+      const parsed = new URL(value, origin);
+      return parsed.origin === origin && parsed.pathname.startsWith("/");
+    } catch {
+      return false;
+    }
+  }
+
+  return false;
 }

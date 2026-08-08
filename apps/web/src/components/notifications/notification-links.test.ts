@@ -43,4 +43,22 @@ describe("notificationTargetUrl", () => {
       ),
     ).toBe("/schedule");
   });
+
+  it("rejects protocol-relative notification URLs", () => {
+    expect(
+      notificationTargetUrl(
+        { type: "booking_approved", payload: { url: "//evil.example/phish" } },
+        "member",
+      ),
+    ).toBeNull();
+  });
+
+  it("rejects absolute cross-origin notification URLs", () => {
+    expect(
+      notificationTargetUrl(
+        { type: "booking_approved", payload: { url: "https://evil.example/phish" } },
+        "admin",
+      ),
+    ).toBeNull();
+  });
 });
