@@ -157,8 +157,14 @@ defmodule MilosTraining.Application.SubmitBookingTest do
     assert {:error, :finance_allowance_exhausted, %{limit: 1, committed: 1}} =
              SubmitBooking.call(member.id, second_slot.id)
 
+    {:ok, tenant_context} =
+      MilosTraining.Organizations.resolve_tenant_context(
+        member,
+        MilosTraining.Organizations.legacy_organization_slug()
+      )
+
     assert {:ok, _withdrawn} =
-             MilosTraining.Application.WithdrawBooking.call(member.id, booking.id)
+             MilosTraining.Application.WithdrawBooking.call(tenant_context, member.id, booking.id)
 
     assert {:ok, _second_booking} = SubmitBooking.call(member.id, second_slot.id)
   end

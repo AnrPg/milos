@@ -69,6 +69,10 @@ defmodule MilosTraining.Scheduling.Ports.SchedulingStore do
               {:ok, map()} | {:error, term()}
   @callback attach_timeout_job(TenantContext.t(), Ecto.UUID.t(), integer()) ::
               {:ok, map()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
+  @callback timeout_booking(TenantContext.t(), Ecto.UUID.t()) ::
+              {:ok, map()}
+              | {:error, Ecto.Changeset.t()}
+              | {:error, :not_found | :booking_not_pending}
   @callback withdraw_booking(TenantContext.t(), Ecto.UUID.t()) ::
               {:ok, map()} | {:error, :not_found | :booking_not_withdrawable}
   @callback withdraw_booking_with_reconciliation(TenantContext.t(), Ecto.UUID.t(), map()) ::

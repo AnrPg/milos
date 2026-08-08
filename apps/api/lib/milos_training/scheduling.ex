@@ -14,6 +14,7 @@ defmodule MilosTraining.Scheduling do
     RejectBooking,
     SubmitBooking,
     SubmitAutoApprovedBooking,
+    TimeoutBooking,
     ArchiveClassType,
     UpdateClassType,
     UpdateSlot,
@@ -155,13 +156,13 @@ defmodule MilosTraining.Scheduling do
   defdelegate reject_booking(id, admin_message, reconciliation), to: RejectBooking, as: :call
   defdelegate attach_timeout_job(context, booking_id, job_id), to: AttachTimeoutJob, as: :call
   defdelegate attach_timeout_job(booking_id, job_id), to: AttachTimeoutJob, as: :call
+  defdelegate timeout_booking(context, booking_id), to: TimeoutBooking, as: :call
+  defdelegate timeout_booking(booking_id), to: TimeoutBooking, as: :call
 
   def withdraw_booking(%{organization_id: _} = context, id),
     do: WithdrawBooking.call(context, id)
 
-  defdelegate withdraw_booking(id), to: WithdrawBooking, as: :call
   defdelegate withdraw_booking(context, id, reconciliation), to: WithdrawBooking, as: :call
-  defdelegate withdraw_booking(id, reconciliation), to: WithdrawBooking, as: :call
 
   defdelegate cancel_active_future_bookings_for_user(context, user_id),
     to: CancelUserBookingsForRoleTransition,

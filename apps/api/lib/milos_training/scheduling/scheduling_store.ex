@@ -216,15 +216,15 @@ defmodule MilosTraining.Scheduling.SchedulingStore do
     do: attach_timeout_job(legacy_scope(), booking_id, job_id)
 
   @impl true
+  def timeout_booking(context, id), do: tenant_call(context, :timeout_booking, [id])
+  def timeout_booking(id), do: timeout_booking(legacy_scope(), id)
+
+  @impl true
   def withdraw_booking(context, id), do: tenant_call(context, :withdraw_booking, [id])
-  def withdraw_booking(id), do: withdraw_booking(legacy_scope(), id)
 
   @impl true
   def withdraw_booking_with_reconciliation(context, id, reconciliation),
     do: tenant_call(context, :withdraw_booking_with_reconciliation, [id, reconciliation])
-
-  def withdraw_booking_with_reconciliation(id, reconciliation),
-    do: withdraw_booking_with_reconciliation(legacy_scope(), id, reconciliation)
 
   @impl true
   def cancel_active_future_bookings_for_user(context, user_id),

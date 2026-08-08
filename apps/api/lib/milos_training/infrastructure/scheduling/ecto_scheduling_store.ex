@@ -700,6 +700,14 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
+  def timeout_booking(%{organization_id: organization_id}, id) do
+    resolve_booking(organization_id, id, %{
+      status: :cancelled,
+      admin_message: "Booking request timed out"
+    })
+  end
+
+  @impl true
   def withdraw_booking(%{organization_id: organization_id}, id) do
     case Repo.get_by(Booking, id: id, organization_id: organization_id) do
       nil ->
@@ -884,15 +892,20 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
         Repo.rollback(:slot_full)
 
       true ->
-        case booking |> Booking.resolution_changeset(params) |> Repo.update() do
+        case booking |> booking_resolution_changeset(params) |> Repo.update() do
           {:ok, updated_booking} -> {:ok, updated_booking}
           {:error, %Ecto.Changeset{} = changeset} -> Repo.rollback(changeset)
         end
     end
   end
 
+  defp booking_resolution_changeset(booking, %{status: :cancelled} = params),
+    do: Booking.timeout_changeset(booking, params)
+
+  defp booking_resolution_changeset(booking, params),
+    do: Booking.resolution_changeset(booking, params)
+
   defp approving?(%{status: :approved}), do: true
-  defp approving?(%{"status" => :approved}), do: true
   defp approving?(_), do: false
 
   defp slot_at_capacity?(organization_id, scheduled_class_id) do

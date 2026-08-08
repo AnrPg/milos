@@ -35,6 +35,13 @@ defmodule MilosTraining.Scheduling.Booking do
     |> validate_inclusion(:status, [:approved, :rejected])
   end
 
+  def timeout_changeset(booking, params) do
+    booking
+    |> cast(params, [:status, :admin_message])
+    |> validate_required([:status])
+    |> validate_inclusion(:status, [:cancelled])
+  end
+
   def timeout_job_changeset(booking, job_id) do
     booking
     |> change(timeout_job_id: job_id)

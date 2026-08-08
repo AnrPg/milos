@@ -7,7 +7,7 @@ defmodule MilosTraining.TestFixtures do
     params =
       %{
         nickname: "user_#{unique}",
-        password: "S3cur3P@ss!",
+        password: "S3cur3P@ss!42",
         role: :member,
         email: "user_#{unique}@placeholder.invalid"
       }
