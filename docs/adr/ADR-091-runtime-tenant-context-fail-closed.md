@@ -43,3 +43,10 @@ the active repo context, and a forward migration removes the legacy organization
 default from new assignment rows. Frontend tenant surfaces derive admin/member/
 athlete behavior from the selected organization membership instead of global
 account role.
+
+The T4 foundation migration now uses expand/backfill/enforce without leaving a
+legacy default, and the follow-up default-drop migration removes existing tenant
+table defaults in already-migrated databases. The central Notifications fanout no
+longer falls back to global admins; remaining direct application-level
+`Identity.list_by_role(:admin)` call sites need event-specific tenant payload
+threading before `users.role` can be fully demoted.

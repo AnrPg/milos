@@ -35,6 +35,7 @@ the original wording and dates for traceability.
 | TD-041 | Open |
 | TD-042 | Open |
 | TD-043 | Open |
+| TD-044 | Open |
 
 ## Detailed Ledger
 
@@ -83,3 +84,4 @@ the original wording and dates for traceability.
 | TD-041 | Platform tenant lifecycle | Add a reviewed full tenant purge/export workflow for organizations with protected cross-context records | The platform delete action now removes mistaken/test organizations when database constraints allow it; production tenant destruction still needs export, retention review, object cleanup, and context-owned purge policies | High | 2026-08-04 |
 | TD-042 | Web tooling | `openapi-typescript` still carries a dev-only `@redocly/openapi-core`/`js-yaml` advisory under full `npm audit`, but forcing patched `js-yaml` breaks OpenAPI generation | Production audit is clean; keep CI release gate on `npm audit --omit=dev --audit-level=high` and upgrade the generator when an upstream-compatible patched release is available | Medium | 2026-08-08 |
 | TD-043 | Backend static analysis | Resolve the inherited Dialyzer warning baseline in `.dialyzer_ignore.exs` across ports, storage adapters, readiness, and unreachable pattern clauses | This pass made Dialyzer release-blocking without hiding new warnings; paying down the existing 98-warning baseline needs focused context-owned fixes to avoid mixing behavior changes into gate rollout | High | 2026-08-08 |
+| TD-044 | Multi-tenancy | Retire remaining direct application-level `Identity.list_by_role(:admin)` fanout call sites after threading organization_id through each event payload | Central Notifications fanout is tenant-scoped, but older app services need event-specific payload and recipient changes to avoid mixing behavior into this fail-closed boundary pass | High | 2026-08-08 |
