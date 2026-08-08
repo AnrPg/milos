@@ -76,16 +76,16 @@ async function mockAuthenticatedApi(
 ) {
   await context.route("**/api/**", async (route) => {
     const url = new URL(route.request().url());
-    const path = url.pathname;
+    const path = tenantlessApiPath(url.pathname);
     const method = route.request().method();
 
     if (path === "/api/auth/refresh") return json(route, { access_token: "test-token" });
     if (path === "/api/auth/me") return json(route, user);
     if (path === "/api/memberships") return json(route, [membership]);
-    if (path === "/api/threads/unread-count") return json(route, { unread_count: 0 });
-    if (path === "/api/threads" && method === "GET") return json(route, { threads: [thread] });
+    if (path === "/api/me/threads/unread-count") return json(route, { unread_count: 0 });
+    if (path === "/api/me/threads" && method === "GET") return json(route, { threads: [thread] });
 
-    if (path === `/api/threads/${thread.id}/messages` && method === "POST") {
+    if (path === `/api/me/threads/${thread.id}/messages` && method === "POST") {
       const payload = route.request().postDataJSON() as Record<string, unknown>;
       const message = {
         id: "66666666-6666-4666-8666-666666666666",
@@ -100,7 +100,7 @@ async function mockAuthenticatedApi(
       return json(route, { message }, 201);
     }
 
-    if (path === `/api/threads/${thread.id}/messages` && method === "GET") {
+    if (path === `/api/me/threads/${thread.id}/messages` && method === "GET") {
       return json(route, { messages: deliveredMessages });
     }
 
@@ -112,6 +112,10 @@ async function mockAuthenticatedApi(
 
     return json(route, {});
   });
+}
+
+function tenantlessApiPath(path: string) {
+  return path.replace(/^\/api\/org\/[^/]+/, "/api");
 }
 
 function json(route: Route, body: unknown, status = 200) {

@@ -8,6 +8,16 @@ const admin = {
   avatar_url: null,
   preferred_locale: "en",
 };
+const adminMembership = {
+  id: "33333333-3333-4333-8333-333333333333",
+  role: "admin",
+  organization: {
+    id: "44444444-4444-4444-8444-444444444444",
+    name: "Demo Gym",
+    slug: "demo-gym",
+    settings: {},
+  },
+};
 
 const source = `[workout]
 dsl-version: 1
@@ -127,14 +137,14 @@ async function mockWorkoutApi(
 ) {
   await context.route("**/api/**", async (route) => {
     const url = new URL(route.request().url());
-    const path = url.pathname;
+    const path = tenantlessApiPath(url.pathname);
     const method = route.request().method();
 
     if (path === "/api/auth/refresh") return json(route, { access_token: "test-token" });
     if (path === "/api/auth/me") return json(route, admin);
-    if (path === "/api/memberships") return json(route, []);
+    if (path === "/api/memberships") return json(route, [adminMembership]);
     if (path === "/api/theme") return json(route, {});
-    if (path === "/api/threads/unread-count") return json(route, { unread_count: 0 });
+    if (path === "/api/me/threads/unread-count") return json(route, { unread_count: 0 });
     if (path.startsWith("/api/notifications")) {
       return json(route, { notifications: [], unread_count: 0 });
     }
@@ -204,6 +214,10 @@ async function mockWorkoutApi(
     if (path === "/api/admin/workouts" && method === "GET") return json(route, { workouts: [] });
     return json(route, {});
   });
+}
+
+function tenantlessApiPath(path: string) {
+  return path.replace(/^\/api\/org\/[^/]+/, "/api");
 }
 
 function json(route: Route, body: unknown, status = 200) {

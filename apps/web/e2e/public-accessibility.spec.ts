@@ -121,7 +121,7 @@ async function stubApi(page: Page, user?: { id: string; nickname: string; role: 
   await page.route("**/api/org/*/me/threads/unread-count", (route) =>
     route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ unread_count: 0 }) }),
   );
-  await page.route("**/api/landing", (route) =>
+  await page.route(/\/api(?:\/org\/[^/]+)?\/landing$/, (route) =>
     route.fulfill({
       status: 200,
       contentType: "application/json",
