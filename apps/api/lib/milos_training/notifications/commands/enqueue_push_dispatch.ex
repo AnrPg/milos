@@ -5,15 +5,19 @@ defmodule MilosTraining.Notifications.Commands.EnqueuePushDispatch do
   def call(notification) do
     notification.user_id
     |> ListPushSubscriptions.call()
-    |> Enum.reduce_while(:ok, fn subscription, :ok ->
+    |> Enum.reduce([], fn subscription, errors ->
       notification
       |> build_job(subscription.endpoint)
       |> insert_job()
       |> case do
-        {:ok, _job} -> {:cont, :ok}
-        {:error, reason} -> {:halt, {:error, reason}}
+        {:ok, _job} -> errors
+        {:error, reason} -> [reason | errors]
       end
     end)
+    |> case do
+      [] -> :ok
+      errors -> {:error, {:push_enqueue_partial_failure, Enum.reverse(errors)}}
+    end
   end
 
   defp build_job(notification, endpoint) do

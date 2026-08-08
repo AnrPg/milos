@@ -265,7 +265,7 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
   defp scoped_to_user(query) do
     case RepoContext.current_setting("app.user_id") do
       user_id when is_binary(user_id) -> where(query, [row], row.user_id == ^user_id)
-      _missing_scope -> query
+      _missing_scope -> where(query, [row], false)
     end
   end
 
@@ -275,7 +275,7 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
         where(query, [row], row.organization_id == ^organization_id)
 
       _missing_scope ->
-        query
+        where(query, [row], false)
     end
   end
 end

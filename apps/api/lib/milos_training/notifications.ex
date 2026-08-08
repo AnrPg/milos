@@ -138,6 +138,7 @@ defmodule MilosTraining.Notifications do
   def process_event("challenge_completed", payload), do: enqueue_challenge_completed(payload)
   def process_event("workout_rejected", payload), do: enqueue_workout_rejected(payload)
   def process_event("athlete_message_sent", payload), do: enqueue_athlete_message(payload)
+  def process_event("chat_message", payload), do: enqueue_chat_message(payload)
   def process_event("workout_moved", payload), do: enqueue_workout_moved(payload)
   def process_event("workout_assigned", payload), do: enqueue_workout_assigned(payload)
 
@@ -207,6 +208,24 @@ defmodule MilosTraining.Notifications do
         )
 
         error
+    end
+  end
+
+  def enqueue_chat_message(payload) when is_map(payload) do
+    user_id = field(payload, :user_id)
+
+    payload =
+      payload
+      |> Map.put_new(
+        :dedupe_key,
+        field(payload, :dedupe_key) || "chat-message:#{field(payload, :message_id)}"
+      )
+      |> Map.put_new(:url, "/account/activity/chats?thread=#{field(payload, :thread_id)}")
+
+    case deliver_notification(user_id, :chat_message, payload) do
+      {:ok, _notification} -> :ok
+      :ok -> :ok
+      {:error, reason} -> {:error, reason}
     end
   end
 
