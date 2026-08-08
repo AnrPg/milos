@@ -6,6 +6,7 @@ import {useUiTranslations} from "@/i18n/ui";
 import {
   fetchPushNotificationConfig,
   fetchPushSubscriptionStatus,
+  markNotificationClicked,
   savePushSubscription,
   type PushNotificationConfig,
   type PushSubscriptionPayload,
@@ -44,19 +45,21 @@ function toPayload(subscription: PushSubscription): PushSubscriptionPayload {
   };
 }
 
-async function storeTokenForSW(token: string): Promise<void> {
-  await new Promise<void>((resolve, reject) => {
+async function clearStoredServiceWorkerToken(): Promise<void> {
+  await new Promise<void>((resolve) => {
     const req = indexedDB.open("milos-sw", 1);
     req.onupgradeneeded = () => {
-      req.result.createObjectStore("config", { keyPath: "key" });
+      if (!req.result.objectStoreNames.contains("config")) {
+        req.result.createObjectStore("config", { keyPath: "key" });
+      }
     };
     req.onsuccess = () => {
       const tx = req.result.transaction("config", "readwrite");
-      tx.objectStore("config").put({ key: "access_token", value: token });
+      tx.objectStore("config").delete("access_token");
       tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
+      tx.onerror = () => resolve();
     };
-    req.onerror = () => reject(req.error);
+    req.onerror = () => resolve();
   });
 }
 
@@ -218,12 +221,13 @@ export function usePushNotifications(accessToken: string | null | undefined) {
   }, [i18n]);
 
   useEffect(() => {
-    if (!accessToken || !supported) return;
+    if (!accessToken || !supported) {
+      void clearStoredServiceWorkerToken();
+      return;
+    }
 
     const token = accessToken;
     let cancelled = false;
-
-    void storeTokenForSW(token);
 
     async function syncExistingSubscription() {
       try {
@@ -259,6 +263,13 @@ export function usePushNotifications(accessToken: string | null | undefined) {
           setState("error");
           setError(caught instanceof ApiError ? localizeError(caught, i18n) : i18n("pushSynchronizationError"));
         });
+      }
+
+      if (
+        event.data?.type === "milos:notification-clicked" &&
+        typeof event.data.notificationId === "string"
+      ) {
+        void markNotificationClicked(token, event.data.notificationId, event.data.url ?? null);
       }
     }
 

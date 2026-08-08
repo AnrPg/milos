@@ -37,8 +37,6 @@ function formatTime(locale: string, isoString: string) {
   return new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" }).format(new Date(isoString));
 }
 
-const todayKey = localDateKey(new Date());
-
 function slotClassType(slot: ScheduleSlot) {
   return {
     name: slot.class_type?.name ?? slot.class_type_id ?? "—",
@@ -49,6 +47,7 @@ function slotClassType(slot: ScheduleSlot) {
 export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, onCreateSlot }: CalendarViewProps) {
   const i18n = useUiTranslations();
   const locale = useLocale();
+  const todayKey = localDateKey(new Date());
   const { currentMonthKey, visibleDates, monthLabel } = buildScheduleWindow(startDate, days);
   const slotMap = visibleDates.reduce<Record<string, ScheduleSlot[]>>((acc, date) => {
     acc[date] = [];
@@ -72,7 +71,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
         {/* Day-of-week header */}
         <div className="mb-1 grid grid-cols-7 gap-1">
           {Array.from({ length: 7 }, (_, index) => {
-            const date = new Date(2026, 5, 1 + index, 12, 0, 0);
+            const date = parseLocalDate(visibleDates[index] ?? visibleDates[0]);
             return new Intl.DateTimeFormat(locale, { weekday: "short" }).format(date);
           }).map((label) => (
             <div key={label} className="py-1 text-center text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>

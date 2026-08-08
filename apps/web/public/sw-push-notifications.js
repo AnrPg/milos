@@ -20,20 +20,6 @@ self.addEventListener("push", (event) => {
   );
 });
 
-async function readTokenFromDb() {
-  return new Promise((resolve) => {
-    const req = indexedDB.open("milos-sw", 1);
-    req.onupgradeneeded = () => req.result.createObjectStore("config", { keyPath: "key" });
-    req.onsuccess = () => {
-      const tx = req.result.transaction("config", "readonly");
-      const get = tx.objectStore("config").get("access_token");
-      get.onsuccess = () => resolve(get.result?.value ?? null);
-      get.onerror = () => resolve(null);
-    };
-    req.onerror = () => resolve(null);
-  });
-}
-
 self.addEventListener("pushsubscriptionchange", (event) => {
   event.waitUntil(handlePushSubscriptionChange());
 });
@@ -49,27 +35,10 @@ async function handleNotificationClick(data) {
   const notificationId = data.notification_id || null;
 
   if (notificationId) {
-    await recordNotificationClick(notificationId, url);
+    await broadcastToClients({ type: "milos:notification-clicked", notificationId, url });
   }
 
   await clients.openWindow(url);
-}
-
-async function recordNotificationClick(notificationId, url) {
-  const token = await readTokenFromDb();
-
-  if (!token) {
-    return;
-  }
-
-  await fetch(`${self.location.origin}/api/notifications/${notificationId}/click`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ url }),
-  }).catch(() => {});
 }
 
 const PUSH_CONFIG_CACHE = "milos-push-config-v1";

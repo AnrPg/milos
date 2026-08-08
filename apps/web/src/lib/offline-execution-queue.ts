@@ -135,11 +135,14 @@ export async function reconcileOfflineCheckoffs(
   let current = await fetchExecution(token, executionId);
 
   for (const item of queued) {
+    let applied = false;
+
     for (let attempt = 0; attempt < 3; attempt += 1) {
       try {
         current = await updateExecutionProgress(token, executionId, rebaseQueuedCheckoff(item, current));
         await removeQueued(item.operationId);
         onProgress(current);
+        applied = true;
         break;
       } catch (error) {
         if (error instanceof ApiError && error.status === 409) {
@@ -148,6 +151,13 @@ export async function reconcileOfflineCheckoffs(
         }
         throw error;
       }
+    }
+
+    if (!applied) {
+      throw new ApiError(409, "Offline checkoff conflict could not be reconciled", {
+        code: "offline_checkoff_conflict",
+        error: "Your saved checkoff could not be reconciled automatically. Refresh and try again.",
+      });
     }
   }
 }

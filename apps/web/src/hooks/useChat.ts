@@ -49,6 +49,13 @@ export function useChat({ threadId, accessToken, currentUserId }: UseChatOptions
   const queryClient = useQueryClient();
 
   const channelRef = useRef<ReturnType<typeof joinChannelWithPush> | null>(null);
+  const accessTokenRef = useRef<string | null>(accessToken ?? null);
+  const tokenReady = Boolean(accessToken);
+
+  useEffect(() => {
+    accessTokenRef.current = accessToken ?? null;
+  }, [accessToken]);
+
   const messages = useMemo(
     () => mergeMessagesWithPending(serverMessages, queuedMessages),
     [queuedMessages, serverMessages],
@@ -112,17 +119,19 @@ export function useChat({ threadId, accessToken, currentUserId }: UseChatOptions
 
   // Connect Phoenix Channel
   useEffect(() => {
-    if (!threadId || !accessToken) return;
+    const token = accessTokenRef.current;
+    if (!threadId || !token) return;
 
-    const topic = organizationTopic(accessToken, `chat:thread:${threadId}`);
+    const topic = organizationTopic(token, `chat:thread:${threadId}`);
     if (!topic) return;
 
-    const channel = joinChannelWithPush(accessToken, topic, {
+    const channel = joinChannelWithPush(token, topic, {
       new_message: (payload) => {
         const message = payload as ChatMessage;
         setServerMessages((previous) => upsertServerMessage(previous, message));
-        if (message.sender_id !== currentUserId && accessToken) {
-          void markThreadRead(accessToken, threadId, message.id).then(invalidateUnreadCount);
+        const readToken = accessTokenRef.current;
+        if (message.sender_id !== currentUserId && readToken) {
+          void markThreadRead(readToken, threadId, message.id).then(invalidateUnreadCount);
         }
       },
       typing: (payload) => {
@@ -148,7 +157,7 @@ export function useChat({ threadId, accessToken, currentUserId }: UseChatOptions
       channel.leave();
       channelRef.current = null;
     };
-  }, [threadId, accessToken, currentUserId, invalidateUnreadCount]);
+  }, [threadId, tokenReady, currentUserId, invalidateUnreadCount]);
 
   const sendMessage = useCallback(
     async (body: string, messageType = "chat") => {
