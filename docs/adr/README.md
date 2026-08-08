@@ -96,3 +96,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-088 | Platform tenant access management | Accepted |
 | ADR-089 | Rename platform owner to vendor | Accepted |
 | ADR-090 | Cross-layer quality gates and booking timeouts | Accepted |
+| ADR-091 | Runtime tenant context must fail closed | Accepted |

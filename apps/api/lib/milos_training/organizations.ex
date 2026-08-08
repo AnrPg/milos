@@ -38,7 +38,11 @@ defmodule MilosTraining.Organizations do
   defdelegate get_by_slug(slug), to: FindOrganization, as: :by_slug
   defdelegate get_by_domain(host), to: FindOrganization, as: :by_domain
   defdelegate list_memberships(user_id), to: ListMemberships, as: :call
-  defdelegate list_active_membership_user_ids(context), to: ListActiveMembershipUserIds, as: :call
+
+  def list_active_membership_user_ids(organization_id) when is_binary(organization_id),
+    do: OrganizationStore.list_active_membership_user_ids(organization_id)
+
+  def list_active_membership_user_ids(context), do: ListActiveMembershipUserIds.call(context)
 
   def list_membership_organization_ids(user_ids),
     do: OrganizationStore.list_membership_organization_ids(user_ids)
@@ -130,15 +134,21 @@ defmodule MilosTraining.Organizations do
     end
   end
 
-  def ensure_legacy_organization do
+  def ensure_legacy_organization,
+    do: {:error, :legacy_organization_migration_tool_required}
+
+  def ensure_legacy_membership(_account, _role \\ nil),
+    do: {:error, :legacy_organization_migration_tool_required}
+
+  def ensure_legacy_organization_for_migration do
     case get_by_slug(@legacy_organization.slug) do
       nil -> create_legacy_organization()
       organization -> {:ok, organization}
     end
   end
 
-  def ensure_legacy_membership(account, role \\ nil) do
-    with {:ok, organization} <- ensure_legacy_organization() do
+  def ensure_legacy_membership_for_migration(account, role \\ nil) do
+    with {:ok, organization} <- ensure_legacy_organization_for_migration() do
       add_membership(%{
         organization_id: organization.id,
         user_id: account.id,

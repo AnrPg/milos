@@ -7,7 +7,7 @@ defmodule Mix.Tasks.Milos.Organizations.EnsureLegacy do
   def run(_args) do
     Mix.Task.run("app.start")
 
-    case MilosTraining.Organizations.ensure_legacy_organization() do
+    case MilosTraining.Organizations.ensure_legacy_organization_for_migration() do
       {:ok, organization} ->
         Mix.shell().info("Legacy organization ready: #{organization.slug} (#{organization.id})")
 
