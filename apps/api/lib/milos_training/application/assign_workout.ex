@@ -149,7 +149,7 @@ defmodule MilosTraining.Application.AssignWorkout do
     workout = Map.get(assignment, :workout) || %{}
 
     Notifications.dispatch_event(:workout_assigned, %{
-      organization_id: context && Map.get(context, :organization_id),
+      organization_id: context.organization_id,
       assignment_id: assignment.id,
       athlete_ids: Map.get(assignment, :athlete_ids, []) || [],
       workout_title: Map.get(workout, :title) || Map.get(workout, "title"),
