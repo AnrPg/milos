@@ -7,6 +7,14 @@ defmodule MilosTraining.Application.DispatchMessageDelivery do
 
   alias MilosTraining.{Finance, Identity, Messaging, Notifications}
 
+  def call(tenant_context, %{"organization_id" => organization_id} = delivery) do
+    with true <- tenant_organization_id(tenant_context) == organization_id do
+      Messaging.with_tenant_context(tenant_context, fn -> call(delivery) end)
+    else
+      false -> {:error, :organization_scope_mismatch}
+    end
+  end
+
   def call(%{"message_id" => message_id, "organization_id" => organization_id} = delivery) do
     with %{} = message <- Messaging.get_message(message_id) || {:error, :not_found},
          {:ok, thread} <- Messaging.get_thread(message.thread_id, message.sender_id),
@@ -22,6 +30,9 @@ defmodule MilosTraining.Application.DispatchMessageDelivery do
       error -> error
     end
   end
+
+  defp tenant_organization_id(%{organization_id: organization_id}), do: organization_id
+  defp tenant_organization_id(_context), do: nil
 
   defp finalize_reservations(reservations, message) do
     Enum.reduce_while(reservations, :ok, fn reservation, :ok ->

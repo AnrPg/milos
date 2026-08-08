@@ -6,9 +6,7 @@ defmodule MilosTrainingWeb.Plugs.RestoreRemoteIp do
   @default_headers ["x-forwarded-for"]
   @default_proxies [
     {127, 0, 0, 1},
-    {10, 0, 0, 0, 8},
-    {172, 16, 0, 0, 12},
-    {192, 168, 0, 0, 16}
+    {0, 0, 0, 0, 0, 0, 0, 1}
   ]
 
   def init(opts), do: opts

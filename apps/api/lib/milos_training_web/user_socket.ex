@@ -3,6 +3,7 @@ defmodule MilosTrainingWeb.UserSocket do
 
   alias MilosTraining.Infrastructure.Auth.Guardian
   alias MilosTraining.Application.ResolveTenantContext
+  alias MilosTraining.Identity.UserContext
 
   channel "schedule:*", MilosTrainingWeb.ScheduleChannel
   channel "notifications:*", MilosTrainingWeb.NotificationChannel
@@ -14,7 +15,11 @@ defmodule MilosTrainingWeb.UserSocket do
   def connect(%{"token" => token} = params, socket, _connect_info) when is_binary(token) do
     with {:ok, claims} <- Guardian.decode_and_verify(token, %{"typ" => "access"}),
          {:ok, user} <- Guardian.resource_from_claims(claims) do
-      socket = assign(socket, :current_user, user)
+      socket =
+        socket
+        |> assign(:current_user, user)
+        |> assign(:user_context, UserContext.new(user, %{transport: :socket}))
+
       assign_optional_tenant(socket, user, Map.get(params, "organization_slug"))
     else
       _error -> :error
@@ -26,16 +31,7 @@ defmodule MilosTrainingWeb.UserSocket do
   @impl true
   def id(socket), do: "user_socket:#{socket.assigns.current_user.id}"
 
-  defp assign_optional_tenant(socket, user, nil) do
-    case ResolveTenantContext.call(
-           user,
-           MilosTraining.Organizations.legacy_organization_slug(),
-           %{transport: :socket, compatibility: :legacy_path}
-         ) do
-      {:ok, context} -> {:ok, assign(socket, :tenant_context, context)}
-      {:error, _reason} -> {:ok, socket}
-    end
-  end
+  defp assign_optional_tenant(_socket, _user, nil), do: :error
 
   defp assign_optional_tenant(socket, user, slug) do
     case ResolveTenantContext.call(user, slug, %{transport: :socket}) do

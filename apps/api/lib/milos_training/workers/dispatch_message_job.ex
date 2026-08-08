@@ -6,11 +6,19 @@ defmodule MilosTraining.Workers.DispatchMessageJob do
 
   alias MilosTraining.Application.DispatchMessageDelivery
   alias MilosTraining.Application.OwnershipKeys
+  alias MilosTraining.Organizations
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: args}) do
-    with {:ok, _args} <- OwnershipKeys.require_tenant_args(args) do
-      DispatchMessageDelivery.call(args)
+    with {:ok, %{"organization_id" => organization_id}} <-
+           OwnershipKeys.require_tenant_args(args),
+         {:ok, tenant_context} <-
+           Organizations.resolve_system_tenant_context(
+             organization_id,
+             :dispatch_message_delivery,
+             %{transport: :oban, worker: __MODULE__ |> Atom.to_string()}
+           ) do
+      DispatchMessageDelivery.call(tenant_context, args)
     end
   end
 end
