@@ -12,14 +12,17 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
   alias MilosTraining.{Organizations, Scheduling, Workouts}
   alias MilosTraining.Workouts.WorkoutStore
 
-  def call(actor, workout_id, source, source_reference_id) do
+  def call(context, actor, workout_id, source, source_reference_id) do
     case normalize_source(source) do
       "self_selected" -> authorize_self_selected(actor, workout_id, source_reference_id)
-      "assigned" -> authorize_assignment(actor, workout_id, source_reference_id)
-      "class_booking" -> authorize_booking(actor, workout_id, source_reference_id)
+      "assigned" -> authorize_assignment(context, actor, workout_id, source_reference_id)
+      "class_booking" -> authorize_booking(context, actor, workout_id, source_reference_id)
       _source -> {:error, :invalid_execution_source}
     end
   end
+
+  def call(actor, workout_id, source, source_reference_id),
+    do: call(nil, actor, workout_id, source, source_reference_id)
 
   defp authorize_self_selected(actor, workout_id, reference) when reference in [nil, ""] do
     # The organization comes from the workout being executed, and the actor must
@@ -59,9 +62,9 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
 
   defp may_self_select?(_actor, _organization_id), do: false
 
-  defp authorize_assignment(%{id: athlete_id}, workout_id, assignment_id)
+  defp authorize_assignment(context, %{id: athlete_id}, workout_id, assignment_id)
        when is_binary(assignment_id) do
-    case Workouts.get_assignment_execution_access(assignment_id, athlete_id) do
+    case assignment_execution_access(context, assignment_id, athlete_id) do
       %{master_workout_id: ^workout_id, athlete_status: status} = access
       when status in [nil, "accepted"] ->
         {:ok,
@@ -82,11 +85,12 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
     end
   end
 
-  defp authorize_assignment(_actor, _workout_id, _assignment_id),
+  defp authorize_assignment(_context, _actor, _workout_id, _assignment_id),
     do: {:error, :execution_source_forbidden}
 
-  defp authorize_booking(%{id: user_id}, workout_id, booking_id) when is_binary(booking_id) do
-    case Scheduling.get_booking_execution_access(booking_id, user_id) do
+  defp authorize_booking(%{organization_id: _} = context, %{id: user_id}, workout_id, booking_id)
+       when is_binary(booking_id) do
+    case Scheduling.get_booking_execution_access(context, booking_id, user_id) do
       %{master_workout_id: ^workout_id, status: "approved"} = access ->
         {:ok,
          %{
@@ -106,8 +110,14 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
     end
   end
 
-  defp authorize_booking(_actor, _workout_id, _booking_id),
+  defp authorize_booking(_context, _actor, _workout_id, _booking_id),
     do: {:error, :execution_source_forbidden}
+
+  defp assignment_execution_access(%{organization_id: _} = context, assignment_id, athlete_id),
+    do: Workouts.get_assignment_execution_access(context, assignment_id, athlete_id)
+
+  defp assignment_execution_access(_context, assignment_id, athlete_id),
+    do: Workouts.get_assignment_execution_access(assignment_id, athlete_id)
 
   defp normalize_source(source) when is_atom(source), do: Atom.to_string(source)
   defp normalize_source(source) when is_binary(source), do: source

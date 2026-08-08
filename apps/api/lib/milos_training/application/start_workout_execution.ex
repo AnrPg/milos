@@ -22,6 +22,7 @@ defmodule MilosTraining.Application.StartWorkoutExecution do
 
     with {:ok, authorized_source} <-
            AuthorizeWorkoutExecutionSource.call(
+             context,
              actor,
              workout_id,
              source,

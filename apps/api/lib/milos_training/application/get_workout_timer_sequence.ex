@@ -16,13 +16,14 @@ defmodule MilosTraining.Application.GetWorkoutTimerSequence do
 
     with {:ok, authorized_source} <-
            AuthorizeWorkoutExecutionSource.call(
+             context,
              actor,
              workout_id,
              source,
              source_reference_id
            ),
          :ok <- authorize_entitlement(context, actor, authorized_source),
-         workout when not is_nil(workout) <- Workouts.get_workout(workout_id),
+         workout when not is_nil(workout) <- get_workout(context, workout_id),
          {:ok, materialized_workout} <- materialize_workout(workout, scale_slug) do
       {:ok, Execution.build_timer_sequence(materialized_workout)}
     else
@@ -78,4 +79,9 @@ defmodule MilosTraining.Application.GetWorkoutTimerSequence do
       {:error, :invalid_scale_level}
     end
   end
+
+  defp get_workout(%{organization_id: _} = context, workout_id),
+    do: Workouts.get_workout(context, workout_id)
+
+  defp get_workout(_context, workout_id), do: Workouts.get_workout(workout_id)
 end
