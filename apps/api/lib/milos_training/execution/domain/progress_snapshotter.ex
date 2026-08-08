@@ -546,9 +546,10 @@ defmodule MilosTraining.Execution.Domain.ProgressSnapshotter do
     step_reps = timer_config[:step_reps] || timer_config["step_reps"] || 1
 
     ascending =
-      step_reps..peak_reps
-      |> Enum.to_list()
-      |> Enum.take_every(step_reps)
+      Stream.iterate(step_reps, &(&1 + step_reps))
+      |> Enum.take_while(&(&1 < peak_reps))
+      |> Kernel.++([peak_reps])
+      |> Enum.uniq()
 
     descending = ascending |> Enum.reverse() |> tl()
     rounds = ascending ++ descending

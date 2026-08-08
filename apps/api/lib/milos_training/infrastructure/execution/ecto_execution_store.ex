@@ -264,7 +264,7 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
         where(query, [row], row.user_id == ^user_id)
 
       true ->
-        query
+        where(query, [row], false)
     end
   end
 

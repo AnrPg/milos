@@ -1,4 +1,5 @@
 defmodule MilosTraining.Execution.Commands.UpdateExecutionProgress do
+  alias MilosTraining.Execution.Commands.Params
   alias MilosTraining.Execution.Domain.{ProgressSnapshotter, ProgressValidator}
   alias MilosTraining.Execution.ExecutionStore
 
@@ -45,23 +46,11 @@ defmodule MilosTraining.Execution.Commands.UpdateExecutionProgress do
   end
 
   defp normalize_operation_id(params) do
-    case params[:operation_id] || params["operation_id"] do
-      value when is_binary(value) ->
-        case Ecto.UUID.cast(value) do
-          {:ok, uuid} -> {:ok, uuid}
-          :error -> {:error, :bad_request}
-        end
-
-      _other ->
-        {:error, :bad_request}
-    end
+    Params.uuid(params, :operation_id)
   end
 
   defp normalize_expected_version(params) do
-    case params[:expected_version] || params["expected_version"] do
-      value when is_integer(value) and value >= 1 -> {:ok, value}
-      _other -> {:error, :bad_request}
-    end
+    Params.positive_integer(params, :expected_version)
   end
 
   defp ensure_current_version(%{lock_version: version}, version), do: :ok

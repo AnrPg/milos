@@ -1,25 +1,26 @@
 defmodule MilosTraining.Execution.Commands.StartExecution do
+  alias MilosTraining.Execution.Commands.Params
   alias MilosTraining.Execution.ExecutionStore
   alias MilosTraining.Workouts
 
   def call(user_id, params) do
-    workout_id = params[:master_workout_id] || params["master_workout_id"]
-    scale_slug = params[:scale_level_slug] || params["scale_level_slug"]
+    workout_id = Params.get(params, :master_workout_id)
+    scale_slug = Params.get(params, :scale_level_slug)
 
     with :ok <- validate_workout(workout_id, scale_slug),
          started_at_utc <- DateTime.utc_now(),
          execution_params <- %{
            # Always server-derived by AuthorizeWorkoutExecutionSource, which
            # Map.merge/2 puts ahead of anything the client sent (F-03).
-           organization_id: params[:organization_id],
+           organization_id: Params.get(params, :organization_id),
            user_id: user_id,
            master_workout_id: workout_id,
            scale_level_slug: scale_slug,
-           source: params[:source] || params["source"],
-           source_reference_id: params[:source_reference_id] || params["source_reference_id"],
+           source: Params.get(params, :source),
+           source_reference_id: Params.get(params, :source_reference_id),
            status: :active,
            started_at_utc: started_at_utc,
-           started_at_tz: params[:timezone] || params["timezone"] || "UTC",
+           started_at_tz: Params.get(params, :timezone) || "UTC",
            current_segment_index: 0,
            segment_started_at_utc: started_at_utc,
            paused_elapsed_ms: 0,
