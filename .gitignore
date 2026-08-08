@@ -25,6 +25,7 @@ apps/web/.env*.local
 .claude/scheduled_tasks.lock
 .repomap.tags.cache.v1/
 .vexp/
+graphify-out/
 .vscode/
 .playwright-mcp/
 docs/HANDOFF_CODEX.md
