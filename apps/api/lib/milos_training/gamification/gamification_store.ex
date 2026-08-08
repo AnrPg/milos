@@ -14,6 +14,9 @@ defmodule MilosTraining.Gamification.GamificationStore do
   def get_user_stats(user_id), do: adapter().get_user_stats(user_id)
 
   @impl true
+  def lock_user_stats(user_id), do: adapter().lock_user_stats(user_id)
+
+  @impl true
   def get_settings, do: adapter().get_settings()
 
   @impl true

@@ -1,5 +1,6 @@
 defmodule MilosTraining.Gamification.Ports.GamificationStore do
   @callback get_user_stats(Ecto.UUID.t()) :: map() | nil
+  @callback lock_user_stats(Ecto.UUID.t()) :: map() | nil
   @callback get_settings() :: map()
   @callback update_settings(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback upsert_user_stats(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}

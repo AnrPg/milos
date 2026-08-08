@@ -34,20 +34,10 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
       )
 
     pr_scores = PRDetector.detect(current_scores, previous_scores)
-    existing_stats = GamificationStore.get_user_stats(user_id) || %{longest_streak: 0}
     completed_dates = Enum.map(completed_executions, &DateTime.to_date(&1.completed_at_utc))
     prefs = GamificationStore.get_user_preferences(user_id) || %{}
     off_days = Map.get(prefs, :off_days, [])
     today = Date.utc_today()
-
-    streaks =
-      StreakCalculator.update(existing_stats,
-        completed_dates: completed_dates,
-        current_date: today,
-        anchor_date: signup_anchor_date(account, completed_dates),
-        target: settings.weekly_workout_target,
-        shield_reset_day: settings.streak_shield_reset_day
-      )
 
     day_streaks = DayStreakCalculator.calculate(completed_dates, off_days, today)
 
@@ -61,33 +51,42 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
         today
       )
 
-    advancement_count = existing_stats[:advancement_count] || 0
-
     type_counts = workout_type_counts(completed_executions, workout_lookup)
     current_type = get_workout_type(current_execution, workout_lookup)
     total_prev = max(0, length(completed_executions) - 1)
     prev_type_count = max(0, Map.get(type_counts, current_type, 0) - 1)
 
-    completion_facts = %{
-      workout_type: current_type,
-      pr_count: length(pr_scores),
-      scale_level_slug: current_execution.scale_level_slug,
-      consistency_score: streaks.consistency_score,
-      prev_type_count: prev_type_count,
-      total_prev_completions: total_prev,
-      team_workout_count_fn: fn challenge ->
-        team_workout_count_for_challenge(challenge, completed_executions, workout_lookup)
-      end
-    }
-
-    extra_scores = %{
-      motivation_score: motivation_score,
-      perseverance_score: perseverance_score,
-      advancement_count: advancement_count,
-      day_streaks: day_streaks
-    }
-
     GamificationStore.transaction(fn ->
+      existing_stats = GamificationStore.lock_user_stats(user_id) || %{longest_streak: 0}
+
+      streaks =
+        StreakCalculator.update(existing_stats,
+          completed_dates: completed_dates,
+          current_date: today,
+          anchor_date: signup_anchor_date(account, completed_dates),
+          target: settings.weekly_workout_target,
+          shield_reset_day: settings.streak_shield_reset_day
+        )
+
+      completion_facts = %{
+        workout_type: current_type,
+        pr_count: length(pr_scores),
+        scale_level_slug: current_execution.scale_level_slug,
+        consistency_score: streaks.consistency_score,
+        prev_type_count: prev_type_count,
+        total_prev_completions: total_prev,
+        team_workout_count_fn: fn challenge ->
+          team_workout_count_for_challenge(challenge, completed_executions, workout_lookup)
+        end
+      }
+
+      extra_scores = %{
+        motivation_score: motivation_score,
+        perseverance_score: perseverance_score,
+        advancement_count: existing_stats[:advancement_count] || 0,
+        day_streaks: day_streaks
+      }
+
       with {:ok, _pr_events} <-
              persist_pr_events(user_id, organization_id, execution_id, pr_scores, completed_at),
            total_prs <- GamificationStore.count_achievements_by_prefix(user_id, "pr_event:"),
@@ -185,10 +184,7 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
         update =
           ChallengeProgress.advance(challenge, current_progress.progress || 0, completion_facts)
 
-        opted_in = GamificationStore.challenge_leaderboard_opted_in?(user_id, challenge.id)
-
-        next_progress =
-          if opted_in, do: update.progress, else: min(update.progress, update.target)
+        next_progress = update.progress
 
         next_completed_at =
           if is_nil(current_progress.completed_at) and update.completed?,
@@ -320,8 +316,17 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
   end
 
   defp previous_scores(executions, current_execution_id, workout_lookup) do
+    current_completed_at =
+      executions
+      |> Enum.find(&(&1.id == current_execution_id))
+      |> then(&(&1 && &1.completed_at_utc))
+
     executions
     |> Enum.reject(&(&1.id == current_execution_id))
+    |> Enum.filter(fn execution ->
+      is_nil(current_completed_at) or
+        DateTime.compare(execution.completed_at_utc, current_completed_at) == :lt
+    end)
     |> Enum.flat_map(fn execution ->
       enrich_scores(execution.section_scores || [], workout_lookup[execution.master_workout_id])
     end)

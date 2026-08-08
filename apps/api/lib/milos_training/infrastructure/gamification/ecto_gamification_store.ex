@@ -26,6 +26,20 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
   end
 
   @impl true
+  def lock_user_stats(user_id) do
+    Repo.query!("SELECT pg_advisory_xact_lock(hashtextextended($1, 0))", [user_id])
+
+    UserStat
+    |> where([stats], stats.user_id == ^user_id)
+    |> lock("FOR UPDATE")
+    |> Repo.one()
+    |> case do
+      nil -> nil
+      stats -> normalize_stats(stats)
+    end
+  end
+
+  @impl true
   def get_settings do
     case Repo.one(from settings in scoped_to_tenant(GamificationSetting), limit: 1) do
       nil ->
@@ -429,6 +443,9 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
       current_streak_shields: stats.current_streak_shields,
       last_workout_at: stats.last_workout_at,
       consistency_score: stats.consistency_score,
+      motivation_score: stats.motivation_score,
+      perseverance_score: stats.perseverance_score,
+      advancement_count: stats.advancement_count,
       updated_at: stats.updated_at
     }
   end
