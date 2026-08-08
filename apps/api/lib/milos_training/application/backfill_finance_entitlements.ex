@@ -6,19 +6,20 @@ defmodule MilosTraining.Application.BackfillFinanceEntitlements do
   Finance only through their public APIs and never imports either context's schemas.
   """
 
-  alias MilosTraining.{Finance, Identity}
+  alias MilosTraining.{Finance, Identity, Organizations}
   alias MilosTraining.Finance.Domain.EntitlementPlan
 
-  def call(params) when is_map(params) do
+  def call(%{organization_id: organization_id} = context, params) when is_map(params) do
     dry_run? = value(params, :dry_run, true)
     packages = value(params, :package_by_role, %{})
 
     with {:ok, targets} <- validate_packages(packages) do
       users =
-        Identity.list_all_users()
-        |> Enum.filter(&(normalize_role(&1.role) in ["member", "athlete"]))
+        organization_id
+        |> membership_targets()
+        |> Identity.list_by_ids()
 
-      actions = Enum.map(users, &classify(&1, targets))
+      actions = Enum.map(users, &classify(context, &1, targets))
 
       if dry_run? do
         {:ok, report(actions, true, 0, [])}
@@ -28,6 +29,8 @@ defmodule MilosTraining.Application.BackfillFinanceEntitlements do
       end
     end
   end
+
+  def call(_params), do: {:error, :organization_context_required}
 
   defp validate_packages(packages) do
     Enum.reduce_while(packages, {:ok, %{}}, fn {role, package_id}, {:ok, acc} ->
@@ -48,9 +51,9 @@ defmodule MilosTraining.Application.BackfillFinanceEntitlements do
     end)
   end
 
-  defp classify(user, targets) do
-    role = normalize_role(user.role)
-    profile = Finance.get_member_profile(user.id)
+  defp classify(context, user, targets) do
+    role = tenant_role(context, user.id)
+    profile = Finance.get_member_profile(context, user.id)
     package_id = Map.get(targets, role)
 
     action =
@@ -61,7 +64,34 @@ defmodule MilosTraining.Application.BackfillFinanceEntitlements do
         true -> :assign
       end
 
-    %{user_id: user.id, role: role, action: action, package_id: package_id, profile: profile}
+    %{
+      context: context,
+      user_id: user.id,
+      role: role,
+      action: action,
+      package_id: package_id,
+      profile: profile
+    }
+  end
+
+  defp membership_targets(organization_id) do
+    organization_id
+    |> Organizations.list_active_membership_user_ids()
+    |> Enum.filter(fn user_id ->
+      tenant_role(%{organization_id: organization_id}, user_id) in ["member", "athlete"]
+    end)
+  end
+
+  defp tenant_role(%{organization_id: organization_id}, user_id) do
+    user_id
+    |> Organizations.list_memberships()
+    |> Enum.find(fn %{membership: membership, organization: organization} ->
+      organization.id == organization_id and membership.status == :active
+    end)
+    |> case do
+      %{membership: %{role: role}} -> normalize_role(role)
+      _missing -> nil
+    end
   end
 
   defp apply_actions(actions) do
@@ -85,7 +115,7 @@ defmodule MilosTraining.Application.BackfillFinanceEntitlements do
   defp apply_action(action) do
     with {:ok, membership} <- ensure_membership(action),
          {:ok, subscription} <-
-           Finance.assign_package(membership.id, action.package_id, %{
+           Finance.assign_package(action.context, membership.id, action.package_id, %{
              starts_on: Date.utc_today(),
              status: "active",
              params: %{
@@ -100,7 +130,7 @@ defmodule MilosTraining.Application.BackfillFinanceEntitlements do
   defp ensure_membership(%{profile: %{membership: membership}}), do: {:ok, membership}
 
   defp ensure_membership(action) do
-    Finance.upsert_membership(action.user_id, %{
+    Finance.upsert_membership(action.context, action.user_id, %{
       user_type_snapshot: action.role,
       status: "active",
       signup_source: "migrated",

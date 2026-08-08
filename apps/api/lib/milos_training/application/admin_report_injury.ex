@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.AdminReportInjury do
   alias MilosTraining.Application.{BroadcastUserSync, RecordAnalyticsEvent}
-  alias MilosTraining.{Identity, Wellbeing}
+  alias MilosTraining.{Identity, Organizations, Wellbeing}
 
   def call(%{organization_id: organization_id} = context, admin_id, user_id, params)
       when is_binary(organization_id) do
@@ -29,7 +29,7 @@ defmodule MilosTraining.Application.AdminReportInjury do
         }
       })
 
-      broadcast_injury_reported(user_id, injury.id)
+      broadcast_injury_reported(params[:organization_id], user_id, injury.id)
       {:ok, injury}
     end
   end
@@ -42,8 +42,8 @@ defmodule MilosTraining.Application.AdminReportInjury do
     end
   end
 
-  defp broadcast_injury_reported(user_id, injury_id) do
-    admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
+  defp broadcast_injury_reported(organization_id, user_id, injury_id) do
+    admin_ids = Organizations.list_staff_user_ids(organization_id)
 
     BroadcastUserSync.for_user(user_id, ["my_wellbeing"],
       reason: "injury_reported",

@@ -680,7 +680,11 @@ defmodule MilosTrainingWeb.AdminFinanceController do
   )
 
   def backfill_entitlements(conn, params) do
-    with {:ok, report} <- BackfillFinanceEntitlements.call(body_params(conn, params)) do
+    with {:ok, report} <-
+           BackfillFinanceEntitlements.call(
+             conn.assigns.tenant_context,
+             body_params(conn, params)
+           ) do
       json(conn, report)
     end
   end
@@ -733,7 +737,11 @@ defmodule MilosTrainingWeb.AdminFinanceController do
 
   def update_member(conn, params) do
     with {:ok, membership} <-
-           UpdateFinanceMember.call(param_id(params), body_params(conn, params)) do
+           UpdateFinanceMember.call(
+             conn.assigns.tenant_context,
+             param_id(params),
+             body_params(conn, params)
+           ) do
       json(conn, %{membership: membership})
     end
   end
