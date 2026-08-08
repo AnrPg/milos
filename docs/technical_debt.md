@@ -34,6 +34,7 @@ the original wording and dates for traceability.
 | TD-040 | Open |
 | TD-041 | Open |
 | TD-042 | Open |
+| TD-043 | Open |
 
 ## Detailed Ledger
 
@@ -81,3 +82,4 @@ the original wording and dates for traceability.
 | TD-040 | Tenant branding | Add first-class tenant logo upload with tenant-scoped object storage, validation, preview, audit events, and UI consumption across branded surfaces | Organization settings currently store `brand_logo_url`; gym owners need direct upload rather than operator-managed URLs | Medium | 2026-08-04 |
 | TD-041 | Platform tenant lifecycle | Add a reviewed full tenant purge/export workflow for organizations with protected cross-context records | The platform delete action now removes mistaken/test organizations when database constraints allow it; production tenant destruction still needs export, retention review, object cleanup, and context-owned purge policies | High | 2026-08-04 |
 | TD-042 | Web tooling | `openapi-typescript` still carries a dev-only `@redocly/openapi-core`/`js-yaml` advisory under full `npm audit`, but forcing patched `js-yaml` breaks OpenAPI generation | Production audit is clean; keep CI release gate on `npm audit --omit=dev --audit-level=high` and upgrade the generator when an upstream-compatible patched release is available | Medium | 2026-08-08 |
+| TD-043 | Backend static analysis | Resolve the inherited Dialyzer warning baseline in `.dialyzer_ignore.exs` across ports, storage adapters, readiness, and unreachable pattern clauses | This pass made Dialyzer release-blocking without hiding new warnings; paying down the existing 98-warning baseline needs focused context-owned fixes to avoid mixing behavior changes into gate rollout | High | 2026-08-08 |

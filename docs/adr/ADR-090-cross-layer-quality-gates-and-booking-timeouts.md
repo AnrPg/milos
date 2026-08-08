@@ -71,4 +71,24 @@ pending, freeing active-booking uniqueness and entitlement allowance in the
 same observable lifecycle.
 
 ## Implementation Notes
-To be filled in after implementation and verification.
+Implemented 2026-08-08.
+
+- Dialyxir is now a dev/test backend dependency and `mix dialyzer
+  --list-unused-filters` is part of both backend precommit and CI. The PLT uses
+  direct dependencies plus explicit boundary apps (`:ecto`, `:mix`,
+  `:phoenix_pubsub`, `:plug`, and `:telemetry`) so the gate is practical on the
+  self-hosted runner without losing type information for framework-facing code.
+- The first real Dialyzer run exposed an inherited warning backlog. Those
+  warnings are captured in `.dialyzer_ignore.exs`; unused-filter checking keeps
+  the baseline honest and makes new warnings fail the gate. The backlog is
+  tracked as TD-043.
+- CI now runs `mix hex.audit`, backend Dialyzer, and the web i18n gate.
+- The broader hardening slice also added the deterministic non-English catalog
+  prose check, utility-class-aware UI copy scanning, expanded authenticated axe
+  coverage with color contrast enabled, and Scheduling-owned timeout expiry
+  through `MilosTraining.Application.TimeoutBooking`.
+- Verification completed: `mix compile --warnings-as-errors`,
+  `mix milos.architecture`, `mix credo --strict --format oneline`,
+  `mix hex.audit`, `mix dialyzer --list-unused-filters`, targeted booking
+  timeout tests, `npm run lint`, `npm run type-check`, `npm run i18n:check`,
+  and `npx playwright test e2e/public-accessibility.spec.ts`.

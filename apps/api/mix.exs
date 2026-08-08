@@ -13,7 +13,8 @@ defmodule MilosTraining.MixProject do
       deps: deps(),
       dialyzer: [
         plt_add_deps: :apps_direct,
-        plt_add_apps: [:ecto, :mix, :phoenix_pubsub, :plug, :telemetry]
+        plt_add_apps: [:ecto, :mix, :phoenix_pubsub, :plug, :telemetry],
+        ignore_warnings: ".dialyzer_ignore.exs"
       ]
     ]
   end
@@ -89,7 +90,7 @@ defmodule MilosTraining.MixProject do
         "compile --warning-as-errors",
         "milos.architecture",
         "credo --strict",
-        "dialyzer",
+        "dialyzer --list-unused-filters",
         "deps.unlock --check-unused",
         "format --check-formatted",
         "test"
