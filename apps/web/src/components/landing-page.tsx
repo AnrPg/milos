@@ -546,7 +546,7 @@ export function LandingPage() {
     );
   }
 
-  if (landingQuery.isError || !landing) {
+  if (landingQuery.isError || !landing?.gamification) {
     const message =
       landingQuery.error instanceof Error
         ? localizeError(landingQuery.error, i18n)

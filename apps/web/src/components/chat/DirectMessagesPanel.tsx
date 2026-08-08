@@ -50,7 +50,9 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
 
   useEffect(() => {
     if (!accessToken) return;
-    void fetchThreads(accessToken, "direct").then((d) => setThreads(d.threads));
+    void fetchThreads(accessToken, "direct")
+      .then((d) => setThreads(Array.isArray(d.threads) ? d.threads : []))
+      .catch(() => setThreads([]));
   }, [accessToken]);
 
   useEffect(() => {
