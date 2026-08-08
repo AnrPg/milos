@@ -53,5 +53,6 @@ export function useSelectedMembershipRole() {
     membership,
     memberships,
     selectedOrganizationSlug,
+    isLoading: membershipsQuery.isLoading,
   };
 }

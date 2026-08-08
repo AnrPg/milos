@@ -25,7 +25,7 @@ export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { status, currentUser } = useSession();
-  const { role } = useSelectedMembershipRole();
+  const { isLoading: membershipRoleLoading, role } = useSelectedMembershipRole();
 
   useEffect(() => {
     if (status === "guest") {
@@ -33,7 +33,7 @@ export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
       return;
     }
 
-    if (status === "authenticated" && currentUser) {
+    if (status === "authenticated" && currentUser && !membershipRoleLoading) {
       const roleKey = role;
       const redirect = roleRedirects?.[roleKey];
       if (redirect) {
@@ -44,9 +44,9 @@ export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
         router.replace("/");
       }
     }
-  }, [currentUser, pathname, role, roles, roleRedirects, router, status]);
+  }, [currentUser, membershipRoleLoading, pathname, role, roles, roleRedirects, router, status]);
 
-  if (status === "loading") {
+  if (status === "loading" || (status === "authenticated" && roles && membershipRoleLoading)) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[var(--bg)] px-6">
         <p className="text-sm font-medium uppercase tracking-[0.24em] text-black/45">
