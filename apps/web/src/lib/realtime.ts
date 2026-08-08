@@ -2,6 +2,8 @@
 
 import { Socket, type Channel } from "phoenix";
 
+import { SELECTED_ORGANIZATION_SLUG_KEY } from "@/api/client";
+
 let activeSocket: Socket | null = null;
 let activeToken: string | null = null;
 let activeOrganizationSlug: string | null = null;
@@ -46,7 +48,18 @@ function organizationSlug(token: string) {
       ? null
       : window.location.pathname.match(/^\/org\/([^/]+)/)?.[1] ?? null;
 
-  return pathSlug ?? membershipClaims(token)[0]?.organization_slug ?? null;
+  return pathSlug ?? selectedOrganizationSlug() ?? membershipClaims(token)[0]?.organization_slug ?? null;
+}
+
+function selectedOrganizationSlug() {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const slug = window.localStorage.getItem(SELECTED_ORGANIZATION_SLUG_KEY);
+    return slug && slug.length > 0 ? slug : null;
+  } catch {
+    return null;
+  }
 }
 
 export function organizationTopic(token: string, suffix: string) {

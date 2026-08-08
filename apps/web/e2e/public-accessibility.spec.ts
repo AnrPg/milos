@@ -72,7 +72,7 @@ async function stubApi(page: Page, user?: { id: string; nickname: string; role: 
   await page.route("**/api/theme", (route) =>
     route.fulfill({ status: 200, contentType: "application/json", body: "{}" }),
   );
-  await page.route("**/api/schedule?**", (route) =>
+  await page.route("**/api/org/*/schedule?**", (route) =>
     route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -91,7 +91,7 @@ async function stubApi(page: Page, user?: { id: string; nickname: string; role: 
       ]),
     }),
   );
-  await page.route("**/api/me/finance", (route) =>
+  await page.route("**/api/org/*/me/finance", (route) =>
     route.fulfill({
       status: 200,
       contentType: "application/json",

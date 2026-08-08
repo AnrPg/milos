@@ -97,4 +97,39 @@ describe("apiRequest tenant headers", () => {
 
     expect(fetchMock).toHaveBeenCalledWith("/api/org/atlas-gym/me/reviews", expect.anything());
   });
+
+  it.each([
+    ["/schedule?days=7", "/api/org/atlas-gym/schedule?days=7"],
+    ["/bookings", "/api/org/atlas-gym/bookings"],
+    ["/my-workouts?start_date=2026-08-08", "/api/org/atlas-gym/my-workouts?start_date=2026-08-08"],
+    ["/workouts/workout-1", "/api/org/atlas-gym/workouts/workout-1"],
+    ["/workouts/workout-1/scales", "/api/org/atlas-gym/workouts/workout-1/scales"],
+    ["/me/finance", "/api/org/atlas-gym/me/finance"],
+    ["/me/entitlement", "/api/org/atlas-gym/me/entitlement"],
+  ])("scopes org-only member path %s", async (path, expectedPath) => {
+    window.history.replaceState(null, "", "/org/atlas-gym/schedule");
+    const fetchMock = vi.spyOn(window, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), { status: 200 }),
+    );
+
+    await apiRequest<{ ok: boolean }>(path, { token: "token" });
+
+    expect(fetchMock).toHaveBeenCalledWith(expectedPath, expect.anything());
+  });
+
+  it("keeps the execution timer endpoint on its user-scoped route", async () => {
+    window.history.replaceState(null, "", "/org/atlas-gym/workouts/workout-1");
+    const fetchMock = vi.spyOn(window, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), { status: 200 }),
+    );
+
+    await apiRequest<{ ok: boolean }>("/workouts/workout-1/timer-sequence?source=self_selected", {
+      token: "token",
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/workouts/workout-1/timer-sequence?source=self_selected",
+      expect.anything(),
+    );
+  });
 });

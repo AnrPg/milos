@@ -1,7 +1,7 @@
 import { apiRequest } from "@/api/client";
 import type { paths } from "@/api/generated/schema";
 
-export type MyEntitlementOperation = paths["/api/me/entitlement"]["get"];
+export type MyEntitlementOperation = paths["/api/org/{organization_slug}/me/entitlement"]["get"];
 
 export type AllowanceUsage = {
   limit: number | "unlimited";

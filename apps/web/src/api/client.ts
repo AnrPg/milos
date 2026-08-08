@@ -85,14 +85,33 @@ function organizationSlugForRequest(token?: string | null) {
   return organizationSlugFromPath() ?? selectedOrganizationSlug() ?? organizationSlugFromToken(token);
 }
 
-const TENANT_SCOPED_PREFIXES = ["/admin", "/me/search/users", "/me/reviews", "/me/threads"];
+const TENANT_SCOPED_PREFIXES = [
+  "/admin",
+  "/bookings",
+  "/me/entitlement",
+  "/me/finance",
+  "/me/invoices",
+  "/me/reviews",
+  "/me/search/users",
+  "/me/threads",
+  "/my-workouts",
+  "/schedule",
+];
+
+function pathMatchesPrefix(path: string, prefix: string) {
+  return path === prefix || path.startsWith(`${prefix}/`) || path.startsWith(`${prefix}?`);
+}
+
+function isMemberWorkoutPath(path: string) {
+  if (!pathMatchesPrefix(path, "/workouts")) return false;
+  return !/^\/workouts\/[^/?]+\/timer-sequence(?:\?|$)/.test(path);
+}
 
 function tenantScopedPath(path: string, organizationSlug: string | null) {
   if (!organizationSlug) return path;
 
-  const isTenantScoped = TENANT_SCOPED_PREFIXES.some(
-    (prefix) => path === prefix || path.startsWith(`${prefix}/`) || path.startsWith(`${prefix}?`),
-  );
+  const isTenantScoped =
+    TENANT_SCOPED_PREFIXES.some((prefix) => pathMatchesPrefix(path, prefix)) || isMemberWorkoutPath(path);
   if (!isTenantScoped) return path;
 
   return `/org/${organizationSlug}${path}`;

@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { SELECTED_ORGANIZATION_SLUG_KEY } from "@/api/client";
+
 const phoenix = vi.hoisted(() => {
   type Receiver = (payload?: unknown) => void;
   const channels: MockChannel[] = [];
@@ -69,12 +71,14 @@ const phoenix = vi.hoisted(() => {
 
 vi.mock("phoenix", () => ({ Socket: phoenix.Socket }));
 
-import { ChannelPushError, joinChannelWithPush, resetRealtimeSocket } from "@/lib/realtime";
+import { ChannelPushError, joinChannelWithPush, organizationTopic, resetRealtimeSocket } from "@/lib/realtime";
 
 describe("joinChannelWithPush", () => {
   beforeEach(() => {
     phoenix.channels.length = 0;
     resetRealtimeSocket();
+    window.localStorage.clear();
+    window.history.replaceState(null, "", "/");
   });
 
   it("resolves push replies when the channel acknowledges ok", async () => {
@@ -107,4 +111,18 @@ describe("joinChannelWithPush", () => {
 
     await expect(promise).rejects.toBeInstanceOf(ChannelPushError);
   });
+
+  it("uses the selected organization for topics when the URL is not tenant-prefixed", () => {
+    window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, "second-gym");
+    const token = tokenWithMemberships([
+      { organization_id: "org-1", organization_slug: "first-gym" },
+      { organization_id: "org-2", organization_slug: "second-gym" },
+    ]);
+
+    expect(organizationTopic(token, "schedule")).toBe("schedule:org-2");
+  });
 });
+
+function tokenWithMemberships(memberships: Array<{ organization_id: string; organization_slug: string }>) {
+  return `header.${window.btoa(JSON.stringify({ memberships }))}.signature`;
+}
