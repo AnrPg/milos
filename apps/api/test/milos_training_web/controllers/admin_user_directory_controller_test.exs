@@ -4,8 +4,10 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
   import MilosTraining.TestFixtures
 
   alias MilosTraining.{
+    Finance,
     Gamification,
     Messaging,
+    Organizations,
     Repo,
     Workouts,
     Workouts.MasterWorkout,
@@ -39,6 +41,84 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
 
     assert [%{"id" => id, "role" => "member"}] = filtered["users"]
     assert id == member.id
+  end
+
+  test "tenant admin cannot list, open, finance, or mutate users from another org", %{
+    conn: conn
+  } do
+    admin = admin_fixture(%{nickname: "tenant_directory_admin"})
+    target = user_fixture(%{role: :member, nickname: "tenant_directory_foreign"})
+
+    {_org_a, context_a} = tenant_fixture(admin, "Admin Directory A")
+    {org_b, context_b} = tenant_fixture(target, "Admin Directory B", :member)
+
+    {:ok, package} =
+      Finance.create_package(context_b, %{
+        code: "tenant_directory_foreign",
+        name: "Tenant directory foreign",
+        family: "limited-visits",
+        billing_period: "monthly",
+        params: %{
+          "entitlement_version" => 1,
+          "channels" => ["in_person"],
+          "capabilities" => ["book_classes"],
+          "allowances" => %{
+            "class_visits" => %{"limit" => 4, "period" => "calendar_month"}
+          }
+        }
+      })
+
+    {:ok, membership} =
+      Finance.upsert_membership(context_b, target.id, %{
+        user_type_snapshot: "member",
+        status: "active",
+        signup_source: "admin_created"
+      })
+
+    {:ok, _subscription} =
+      Finance.assign_package(context_b, membership.id, package.id, %{starts_on: Date.utc_today()})
+
+    listing =
+      conn
+      |> put_bearer_token(admin)
+      |> get("/api/org/#{context_a.organization.slug}/admin/users?q=tenant_directory_foreign")
+      |> json_response(200)
+
+    assert listing["users"] == []
+
+    for path <- [
+          "/api/org/#{context_a.organization.slug}/admin/users/#{target.id}",
+          "/api/org/#{context_a.organization.slug}/admin/users/#{target.id}/finance"
+        ] do
+      response =
+        build_conn()
+        |> put_bearer_token(admin)
+        |> get(path)
+        |> json_response(404)
+
+      assert response["code"] == "not_found"
+    end
+
+    allowance_response =
+      build_conn()
+      |> put_bearer_token(admin)
+      |> post(
+        "/api/org/#{context_a.organization.slug}/admin/users/#{target.id}/allowance-extensions",
+        %{
+          allowance: "class_visits",
+          quantity: 1,
+          period: "calendar_month",
+          reason: "Should not cross tenants"
+        }
+      )
+      |> json_response(404)
+
+    assert allowance_response["code"] == "not_found"
+
+    assert Finance.get_effective_entitlement(context_b, target.id).allowances.class_visits.extensions ==
+             0
+
+    assert org_b.id == context_b.organization_id
   end
 
   test "admin opens a role-aware common profile shell", %{conn: conn} do
@@ -340,5 +420,24 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
       "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{user_id}/#{section}"
     )
     |> json_response(200)
+  end
+
+  defp tenant_fixture(user, name, role \\ :owner) do
+    {:ok, organization} =
+      Organizations.create_organization(%{
+        name: "#{name} #{System.unique_integer([:positive])}"
+      })
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: user.id,
+        role: role,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    {:ok, context} = Organizations.resolve_tenant_context(user, organization.slug)
+    {organization, context}
   end
 end

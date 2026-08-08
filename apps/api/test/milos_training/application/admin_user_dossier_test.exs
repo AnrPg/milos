@@ -3,8 +3,9 @@ defmodule MilosTraining.Application.AdminUserDossierTest do
 
   import MilosTraining.TestFixtures
 
+  alias MilosTraining.Finance
   alias MilosTraining.Finance.{ReferralEvent, ReferralReward}
-  alias MilosTraining.{Pantheon, Repo}
+  alias MilosTraining.{Organizations, Pantheon, Repo}
 
   alias MilosTraining.Application.{
     GetAdminUserCoachingContext,
@@ -17,8 +18,15 @@ defmodule MilosTraining.Application.AdminUserDossierTest do
 
   test "member dossier services share a stable user key and safe empty collections" do
     member = user_fixture(%{role: :member})
+    tenant_context = legacy_tenant_context(member)
 
-    assert {:ok, %{user_id: id, available: true}} = GetAdminUserFinance.call(member.id)
+    assert {:ok, %{user_id: id, available: true}} =
+             GetAdminUserFinance.call(
+               member.id,
+               tenant_context,
+               Organizations.legacy_organization_slug()
+             )
+
     assert id == member.id
 
     assert {:ok, %{user_id: ^id, executions: [], scores: []}} =
@@ -35,28 +43,37 @@ defmodule MilosTraining.Application.AdminUserDossierTest do
   test "finance dossier includes package, referral, and referred-member context" do
     member = user_fixture(%{role: :member})
     referred = user_fixture(%{role: :member})
+    tenant_context = legacy_tenant_context(member)
 
-    referral =
-      %ReferralEvent{}
-      |> ReferralEvent.changeset(%{
-        referrer_user_id: member.id,
-        referred_user_id: referred.id,
-        status: "approved",
-        signup_source_snapshot: "referral"
+    Finance.with_tenant_context(tenant_context, fn ->
+      referral =
+        %ReferralEvent{}
+        |> ReferralEvent.changeset(%{
+          referrer_user_id: member.id,
+          referred_user_id: referred.id,
+          status: "approved",
+          signup_source_snapshot: "referral"
+        })
+        |> Repo.insert!()
+
+      %ReferralReward{}
+      |> ReferralReward.changeset(%{
+        referral_event_id: referral.id,
+        recipient_user_id: member.id,
+        reward_type: "credit",
+        reward_value: 1_000,
+        status: "approved"
       })
       |> Repo.insert!()
+    end)
 
-    %ReferralReward{}
-    |> ReferralReward.changeset(%{
-      referral_event_id: referral.id,
-      recipient_user_id: member.id,
-      reward_type: "credit",
-      reward_value: 1_000,
-      status: "approved"
-    })
-    |> Repo.insert!()
+    assert {:ok, %{details: details}} =
+             GetAdminUserFinance.call(
+               member.id,
+               tenant_context,
+               Organizations.legacy_organization_slug()
+             )
 
-    assert {:ok, %{details: details}} = GetAdminUserFinance.call(member.id)
     assert details.membership == nil
     assert details.package_subscriptions == []
 
@@ -95,9 +112,9 @@ defmodule MilosTraining.Application.AdminUserDossierTest do
 
   test "all focused reads return the same not-found boundary" do
     missing_id = Ecto.UUID.generate()
+    tenant_context = legacy_tenant_context(admin_fixture())
 
     for service <- [
-          GetAdminUserFinance,
           GetAdminUserTrainingHistory,
           GetAdminUserPRs,
           GetAdminUserIncidents,
@@ -106,6 +123,20 @@ defmodule MilosTraining.Application.AdminUserDossierTest do
       assert {:error, :not_found} = service.call(missing_id)
     end
 
+    assert {:error, :not_found} =
+             GetAdminUserFinance.call(
+               missing_id,
+               tenant_context,
+               Organizations.legacy_organization_slug()
+             )
+
     assert {:error, :not_found} = GetAdminUserCoachingContext.call(missing_id)
+  end
+
+  defp legacy_tenant_context(user) do
+    {:ok, context} =
+      Organizations.resolve_tenant_context(user, Organizations.legacy_organization_slug())
+
+    context
   end
 end

@@ -1,7 +1,7 @@
 defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
-  alias MilosTraining.Finance
+  alias MilosTraining.{Finance, Organizations}
 
   import MilosTraining.TestFixtures
 
@@ -707,5 +707,161 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
 
     assert referrer_row["credit_balance"] == 1750
     assert referrer_row["credit_balance_cents"] == 1750
+  end
+
+  test "admin finance package and referral actions stay inside the selected org", %{conn: conn} do
+    admin_a = admin_fixture(%{nickname: "finance_tenant_admin_a"})
+    admin_b = admin_fixture(%{nickname: "finance_tenant_admin_b"})
+    referrer = user_fixture(%{role: :member, nickname: "finance_tenant_referrer"})
+    referred = user_fixture(%{role: :member, nickname: "finance_tenant_referred"})
+
+    {_org_a, context_a} = tenant_fixture(admin_a, "Finance Tenant A")
+    {_org_b, context_b} = tenant_fixture(admin_b, "Finance Tenant B")
+    add_tenant_member(context_a.organization, referrer, :member)
+    add_tenant_member(context_b.organization, referrer, :member)
+    add_tenant_member(context_b.organization, referred, :member)
+
+    {:ok, package_a} = Finance.create_package(context_a, package_params("finance_tenant_a"))
+    {:ok, replacement_b} = Finance.create_package(context_b, package_params("finance_tenant_b"))
+
+    {:ok, referrer_membership_a} =
+      Finance.upsert_membership(context_a, referrer.id, finance_membership_params())
+
+    {:ok, referrer_membership_b} =
+      Finance.upsert_membership(context_b, referrer.id, finance_membership_params())
+
+    {:ok, referred_membership_b} =
+      Finance.upsert_membership(context_b, referred.id, finance_membership_params())
+
+    {:ok, _subscription_a} =
+      Finance.assign_package(context_a, referrer_membership_a.id, package_a.id, %{
+        starts_on: Date.utc_today()
+      })
+
+    {:ok, program_b} =
+      Finance.create_referral_program(context_b, %{
+        name: "Tenant B referrals",
+        reward_type: "credit",
+        reward_value: 750,
+        active: true
+      })
+
+    {:ok, event_b} =
+      Finance.create_referral_event(context_b, %{
+        referral_program_id: program_b.id,
+        referrer_user_id: referrer.id,
+        referred_user_id: referred.id,
+        membership_id: referred_membership_b.id,
+        referrer_role_snapshot: "member",
+        referred_role_snapshot: "member",
+        status: "approved"
+      })
+
+    {:ok, reward_b} = Finance.create_referral_reward(context_b, event_b.id, %{})
+
+    update_foreign_package =
+      conn
+      |> put_bearer_token(admin_a)
+      |> patch(
+        "/api/org/#{context_a.organization.slug}/admin/finance/packages/#{replacement_b.id}",
+        %{
+          name: "Cross tenant rename"
+        }
+      )
+      |> json_response(404)
+
+    assert update_foreign_package["code"] == "not_found"
+
+    retire_with_foreign_replacement =
+      build_conn()
+      |> put_bearer_token(admin_a)
+      |> patch(
+        "/api/org/#{context_a.organization.slug}/admin/finance/packages/#{package_a.id}/retire",
+        %{
+          replacement_package_by_role: %{member: replacement_b.id}
+        }
+      )
+      |> json_response(422)
+
+    assert retire_with_foreign_replacement["code"] == "invalid_package_replacement"
+
+    referrals_a =
+      build_conn()
+      |> put_bearer_token(admin_a)
+      |> get("/api/org/#{context_a.organization.slug}/admin/finance/referrals")
+      |> json_response(200)
+
+    refute Enum.any?(referrals_a["referral_events"], &(&1["id"] == event_b.id))
+
+    rewards_a =
+      build_conn()
+      |> put_bearer_token(admin_a)
+      |> get("/api/org/#{context_a.organization.slug}/admin/finance/referral-rewards")
+      |> json_response(200)
+
+    refute Enum.any?(rewards_a["referral_rewards"], &(&1["id"] == reward_b.id))
+
+    applied_b =
+      build_conn()
+      |> put_bearer_token(admin_b)
+      |> patch(
+        "/api/org/#{context_b.organization.slug}/admin/finance/referral-rewards/#{reward_b.id}/status",
+        %{
+          status: "applied"
+        }
+      )
+      |> json_response(200)
+
+    assert applied_b["referral_reward"]["status"] == "applied"
+    assert Finance.get_member_profile(context_a, referrer.id).credit_balance == 0
+    assert Finance.get_member_profile(context_b, referrer.id).credit_balance == 750
+    assert referrer_membership_b.id != referrer_membership_a.id
+  end
+
+  defp tenant_fixture(user, name) do
+    {:ok, organization} =
+      Organizations.create_organization(%{
+        name: "#{name} #{System.unique_integer([:positive])}"
+      })
+
+    add_tenant_member(organization, user, :owner)
+    {:ok, context} = Organizations.resolve_tenant_context(user, organization.slug)
+    {organization, context}
+  end
+
+  defp add_tenant_member(organization, user, role) do
+    {:ok, membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: user.id,
+        role: role,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    membership
+  end
+
+  defp finance_membership_params do
+    %{
+      user_type_snapshot: "member",
+      status: "active",
+      signup_source: "admin_created"
+    }
+  end
+
+  defp package_params(code) do
+    %{
+      code: code,
+      name: code,
+      family: "limited-visits",
+      billing_period: "monthly",
+      params: %{
+        "entitlement_version" => 1,
+        "channels" => ["in_person"],
+        "capabilities" => ["book_classes"],
+        "allowances" => %{"class_visits" => %{"limit" => 4, "period" => "calendar_month"}}
+      }
+    }
   end
 end
