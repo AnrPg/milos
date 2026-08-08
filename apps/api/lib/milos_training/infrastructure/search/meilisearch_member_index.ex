@@ -16,6 +16,35 @@ defmodule MilosTraining.Infrastructure.Search.MeilisearchMemberIndex do
   @searchable_attributes ["nickname", "searchable_text"]
   @displayed_attributes ["*"]
   @task_timeout_ms 1_500
+  @known_nested_keys %{
+    "id" => :id,
+    "organization_id" => :organization_id,
+    "user_id" => :user_id,
+    "user_type_snapshot" => :user_type_snapshot,
+    "status" => :status,
+    "signup_source" => :signup_source,
+    "starts_on" => :starts_on,
+    "expires_on" => :expires_on,
+    "notes" => :notes,
+    "referred_by_user_id" => :referred_by_user_id,
+    "entitlement_status" => :entitlement_status,
+    "entitlement_source" => :entitlement_source,
+    "entitlement_expires_on" => :entitlement_expires_on,
+    "entitlement_updated_at" => :entitlement_updated_at,
+    "params" => :params,
+    "membership_id" => :membership_id,
+    "membership_package_id" => :membership_package_id,
+    "ends_on" => :ends_on,
+    "package_name" => :package_name,
+    "package_code_snapshot" => :package_code_snapshot,
+    "package_family_snapshot" => :package_family_snapshot,
+    "billing_period_snapshot" => :billing_period_snapshot,
+    "price_cents_snapshot" => :price_cents_snapshot,
+    "params_snapshot" => :params_snapshot,
+    "referral_reward_applied" => :referral_reward_applied,
+    "inserted_at" => :inserted_at,
+    "updated_at" => :updated_at
+  }
 
   @impl true
   def replace_documents(documents) when is_list(documents) do
@@ -208,7 +237,21 @@ defmodule MilosTraining.Infrastructure.Search.MeilisearchMemberIndex do
   defp atomize_known_map(nil), do: nil
 
   defp atomize_known_map(map) when is_map(map) do
-    Map.new(map, fn {key, value} -> {String.to_atom(key), value} end)
+    map
+    |> Enum.flat_map(fn
+      {key, value} when is_binary(key) ->
+        case Map.fetch(@known_nested_keys, key) do
+          {:ok, atom_key} -> [{atom_key, value}]
+          :error -> []
+        end
+
+      {key, value} when is_atom(key) ->
+        if key in Map.values(@known_nested_keys), do: [{key, value}], else: []
+
+      _other ->
+        []
+    end)
+    |> Map.new()
   end
 
   defp request(method, path, opts \\ []) do
