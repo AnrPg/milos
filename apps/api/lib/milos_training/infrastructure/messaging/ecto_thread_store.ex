@@ -274,7 +274,7 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoThreadStore do
         where(query, [row], row.organization_id == ^organization_id)
 
       _missing_scope ->
-        query
+        where(query, [row], false)
     end
   end
 
@@ -286,7 +286,7 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoThreadStore do
         Map.put_new(attrs, :organization_id, organization_id)
 
       _missing_scope ->
-        attrs
+        Map.put_new(attrs, :organization_id, nil)
     end
   end
 end

@@ -2,7 +2,7 @@ defmodule MilosTraining.Messaging.Application.MarkRead do
   alias MilosTraining.Messaging.Domain.ThreadPolicy
   alias MilosTraining.Messaging.ThreadStore
 
-  def call(_thread_id, _user_id, nil), do: :ok
+  def call(_thread_id, _user_id, nil), do: {:ok, %{read: true, message_id: nil}}
 
   def call(thread_id, user_id, message_id) do
     case ThreadStore.get_thread_with_participants(thread_id) do

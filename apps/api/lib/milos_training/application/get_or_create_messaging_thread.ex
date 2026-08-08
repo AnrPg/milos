@@ -57,6 +57,19 @@ defmodule MilosTraining.Application.GetOrCreateMessagingThread do
 
   def call(_actor, _params), do: {:error, :bad_request}
 
+  def call(%{organization_id: organization_id} = context, actor, %{
+        context_type: :direct,
+        participant_id: participant_id
+      })
+      when is_binary(organization_id) do
+    with %{} <- Identity.find_by_id(participant_id) || {:error, :not_found},
+         :ok <- ensure_direct_participants_share_tenant(context, actor.id, participant_id) do
+      call(actor, %{context_type: :direct, participant_id: participant_id})
+    end
+  end
+
+  def call(_context, actor, params), do: call(actor, params)
+
   # Assignments belong to one organization; an actor is authorized either as
   # a (non-archived) participant on it, or as owner/admin/coach staff of that
   # same organization - never by the account's global role (that let any
@@ -90,6 +103,25 @@ defmodule MilosTraining.Application.GetOrCreateMessagingThread do
     Enum.any?(Organizations.list_memberships(actor_id), fn %{membership: membership} ->
       membership.organization_id == organization_id and
         membership.role in [:owner, :admin, :coach] and membership.status == :active
+    end)
+  end
+
+  defp ensure_direct_participants_share_tenant(
+         %{organization_id: organization_id},
+         actor_id,
+         participant_id
+       ) do
+    with true <- active_member?(actor_id, organization_id),
+         true <- active_member?(participant_id, organization_id) do
+      :ok
+    else
+      _ -> {:error, :forbidden}
+    end
+  end
+
+  defp active_member?(user_id, organization_id) do
+    Enum.any?(Organizations.list_memberships(user_id), fn %{membership: membership} ->
+      membership.organization_id == organization_id and membership.status == :active
     end)
   end
 

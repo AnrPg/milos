@@ -157,7 +157,7 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoMessageStore do
         where(query, [row], row.organization_id == ^organization_id)
 
       _missing_scope ->
-        query
+        where(query, [row], false)
     end
   end
 end

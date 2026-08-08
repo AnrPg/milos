@@ -57,21 +57,18 @@ defmodule MilosTraining.Application.DispatchMessageDelivery do
     thread.participants
     |> Enum.reject(&(&1.user_id == message.sender_id))
     |> Enum.reduce_while(:ok, fn participant, :ok ->
-      case Notifications.create_notification(%{
+      case Notifications.dispatch_event(:chat_message, %{
              user_id: participant.user_id,
-             type: :chat_message,
+             organization_id: thread.organization_id,
              dedupe_key: "chat-message:#{message.id}",
-             payload: %{
-               thread_id: thread.id,
-               context_type: thread.context_type,
-               context_id: thread.context_id,
-               message_id: message.id,
-               sender_id: message.sender_id,
-               body: String.slice(message.body, 0, 100),
-               url: "/account/activity/chats?thread=#{thread.id}"
-             }
+             thread_id: thread.id,
+             context_type: thread.context_type,
+             context_id: thread.context_id,
+             message_id: message.id,
+             sender_id: message.sender_id,
+             body: String.slice(message.body, 0, 100),
+             url: "/account/activity/chats?thread=#{thread.id}"
            }) do
-        {:ok, _notification} -> {:cont, :ok}
         :ok -> {:cont, :ok}
         {:error, reason} -> {:halt, {:error, reason}}
       end
