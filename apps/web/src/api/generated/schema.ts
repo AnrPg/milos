@@ -764,23 +764,6 @@ export interface paths {
         patch: operations["MilosTrainingWeb.MeController.update_avatar"];
         trace?: never;
     };
-    "/api/landing": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Fetch the authenticated landing page payload */
-        get: operations["MilosTrainingWeb.LandingController.show"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/org/{organization_slug}/me/threads/{id}/messages": {
         parameters: {
             query?: never;
@@ -1961,6 +1944,23 @@ export interface paths {
         put?: never;
         /** Start a workout execution */
         post: operations["MilosTrainingWeb.ExecutionController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/landing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fetch the authenticated landing page payload */
+        get: operations["MilosTrainingWeb.LandingController.show"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -5976,63 +5976,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
-    "MilosTrainingWeb.LandingController.show": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Landing payload */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        coach_notes: {
-                            /** Format: uuid */
-                            admin_id: string;
-                            /** Format: uuid */
-                            athlete_id: string;
-                            body: string;
-                            /** Format: uuid */
-                            id: string;
-                            /** Format: date-time */
-                            inserted_at: string;
-                        }[];
-                        gamification: {
-                            settings: {
-                                leaderboard_enabled: boolean;
-                                streak_shield_reset_day?: number | null;
-                                /** @enum {string} */
-                                theme_slug: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
-                                weekly_workout_target: number;
-                            };
-                        } & {
-                            [key: string]: unknown;
-                        };
-                        membership: {
-                            amount?: number | null;
-                            currency: string;
-                            entitlement_source: string;
-                            entitlement_status: string;
-                            /** Format: date */
-                            expiration_date?: string | null;
-                            /** Format: date */
-                            last_paid?: string | null;
-                            notes?: string | null;
-                            package_code?: string | null;
-                            package_name?: string | null;
-                        } | null;
-                        recent_executions: Record<string, never>[];
-                    };
                 };
             };
         };
@@ -10110,6 +10053,8 @@ export interface operations {
                     excluded_dates?: string[];
                     /** Format: time */
                     local_start_time: string;
+                    /** Format: uuid */
+                    master_workout_id?: string | null;
                     name: string;
                     /** Format: date */
                     starts_on: string;
@@ -11963,6 +11908,63 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.LandingController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Landing payload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        coach_notes: {
+                            /** Format: uuid */
+                            admin_id: string;
+                            /** Format: uuid */
+                            athlete_id: string;
+                            body: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                        }[];
+                        gamification: {
+                            settings: {
+                                leaderboard_enabled: boolean;
+                                streak_shield_reset_day?: number | null;
+                                /** @enum {string} */
+                                theme_slug: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
+                                weekly_workout_target: number;
+                            };
+                        } & {
+                            [key: string]: unknown;
+                        };
+                        membership: {
+                            amount?: number | null;
+                            currency: string;
+                            entitlement_source: string;
+                            entitlement_status: string;
+                            /** Format: date */
+                            expiration_date?: string | null;
+                            /** Format: date */
+                            last_paid?: string | null;
+                            notes?: string | null;
+                            package_code?: string | null;
+                            package_name?: string | null;
+                        } | null;
+                        recent_executions: Record<string, never>[];
+                    };
                 };
             };
         };

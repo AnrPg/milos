@@ -8281,176 +8281,6 @@
         ]
       }
     },
-    "/api/landing": {
-      "get": {
-        "callbacks": {},
-        "operationId": "MilosTrainingWeb.LandingController.show",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "coach_notes": {
-                      "items": {
-                        "properties": {
-                          "admin_id": {
-                            "format": "uuid",
-                            "type": "string"
-                          },
-                          "athlete_id": {
-                            "format": "uuid",
-                            "type": "string"
-                          },
-                          "body": {
-                            "type": "string"
-                          },
-                          "id": {
-                            "format": "uuid",
-                            "type": "string"
-                          },
-                          "inserted_at": {
-                            "format": "date-time",
-                            "type": "string"
-                          }
-                        },
-                        "required": [
-                          "id",
-                          "admin_id",
-                          "athlete_id",
-                          "body",
-                          "inserted_at"
-                        ],
-                        "type": "object"
-                      },
-                      "type": "array"
-                    },
-                    "gamification": {
-                      "additionalProperties": true,
-                      "properties": {
-                        "settings": {
-                          "properties": {
-                            "leaderboard_enabled": {
-                              "type": "boolean"
-                            },
-                            "streak_shield_reset_day": {
-                              "maximum": 28,
-                              "minimum": 1,
-                              "nullable": true,
-                              "type": "integer"
-                            },
-                            "theme_slug": {
-                              "enum": [
-                                "ember",
-                                "sage",
-                                "steel",
-                                "aurora",
-                                "royal",
-                                "volt",
-                                "noir",
-                                "daybreak",
-                                "paper",
-                                "lagoon",
-                                "sunset"
-                              ],
-                              "type": "string"
-                            },
-                            "weekly_workout_target": {
-                              "minimum": 1,
-                              "type": "integer"
-                            }
-                          },
-                          "required": [
-                            "weekly_workout_target",
-                            "leaderboard_enabled",
-                            "theme_slug"
-                          ],
-                          "type": "object"
-                        }
-                      },
-                      "required": [
-                        "settings"
-                      ],
-                      "type": "object"
-                    },
-                    "membership": {
-                      "nullable": true,
-                      "properties": {
-                        "amount": {
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "currency": {
-                          "type": "string"
-                        },
-                        "entitlement_source": {
-                          "type": "string"
-                        },
-                        "entitlement_status": {
-                          "type": "string"
-                        },
-                        "expiration_date": {
-                          "format": "date",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "last_paid": {
-                          "format": "date",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "notes": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "package_code": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "package_name": {
-                          "nullable": true,
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "currency",
-                        "entitlement_status",
-                        "entitlement_source"
-                      ],
-                      "type": "object"
-                    },
-                    "recent_executions": {
-                      "items": {
-                        "type": "object"
-                      },
-                      "type": "array"
-                    }
-                  },
-                  "required": [
-                    "gamification",
-                    "coach_notes",
-                    "membership",
-                    "recent_executions"
-                  ],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Landing payload"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Fetch the authenticated landing page payload",
-        "tags": [
-          "Landing"
-        ]
-      }
-    },
     "/api/org/{organization_slug}/me/threads/{id}/messages": {
       "get": {
         "callbacks": {},
@@ -20670,6 +20500,11 @@
                     "format": "time",
                     "type": "string"
                   },
+                  "master_workout_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "name": {
                     "maxLength": 120,
                     "minLength": 1,
@@ -25328,6 +25163,176 @@
         "summary": "Start a workout execution",
         "tags": [
           "Execution"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/landing": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.LandingController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "coach_notes": {
+                      "items": {
+                        "properties": {
+                          "admin_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "athlete_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "body": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "admin_id",
+                          "athlete_id",
+                          "body",
+                          "inserted_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "gamification": {
+                      "additionalProperties": true,
+                      "properties": {
+                        "settings": {
+                          "properties": {
+                            "leaderboard_enabled": {
+                              "type": "boolean"
+                            },
+                            "streak_shield_reset_day": {
+                              "maximum": 28,
+                              "minimum": 1,
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "theme_slug": {
+                              "enum": [
+                                "ember",
+                                "sage",
+                                "steel",
+                                "aurora",
+                                "royal",
+                                "volt",
+                                "noir",
+                                "daybreak",
+                                "paper",
+                                "lagoon",
+                                "sunset"
+                              ],
+                              "type": "string"
+                            },
+                            "weekly_workout_target": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "weekly_workout_target",
+                            "leaderboard_enabled",
+                            "theme_slug"
+                          ],
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "settings"
+                      ],
+                      "type": "object"
+                    },
+                    "membership": {
+                      "nullable": true,
+                      "properties": {
+                        "amount": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "entitlement_source": {
+                          "type": "string"
+                        },
+                        "entitlement_status": {
+                          "type": "string"
+                        },
+                        "expiration_date": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "last_paid": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "notes": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "package_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "package_name": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "currency",
+                        "entitlement_status",
+                        "entitlement_source"
+                      ],
+                      "type": "object"
+                    },
+                    "recent_executions": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "gamification",
+                    "coach_notes",
+                    "membership",
+                    "recent_executions"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Landing payload"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Fetch the authenticated landing page payload",
+        "tags": [
+          "Landing"
         ]
       }
     },
