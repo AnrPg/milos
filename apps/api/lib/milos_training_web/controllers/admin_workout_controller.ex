@@ -205,14 +205,14 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
   def publish(conn, params) do
     id = params[:id] || params["id"]
 
-    case PublishWorkout.call(id, conn.body_params) do
+    case PublishWorkout.call(conn.assigns.tenant_context, id, conn.body_params) do
       {:ok, workout} -> json(conn, %{workout: workout})
       error -> error
     end
   end
 
   def delete(conn, %{"id" => id}) do
-    with :ok <- DeleteWorkout.call(id) do
+    with :ok <- DeleteWorkout.call(conn.assigns.tenant_context, id) do
       send_resp(conn, :no_content, "")
     end
   end
@@ -221,7 +221,11 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
     id = params["id"] || params[:id]
 
     with {:ok, metadata} <-
-           MilosTraining.Workouts.update_library_metadata(id, conn.body_params) do
+           MilosTraining.Workouts.update_library_metadata(
+             conn.assigns.tenant_context,
+             id,
+             conn.body_params
+           ) do
       json(conn, metadata)
     end
   end

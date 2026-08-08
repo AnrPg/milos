@@ -2,22 +2,20 @@ defmodule MilosTraining.Application.PublishWorkout do
   require Logger
 
   alias MilosTraining.Application.BroadcastUserSync
-  alias MilosTraining.{Identity, Notifications, Scheduling, Workouts}
+  alias MilosTraining.{Identity, Notifications, Organizations, Scheduling, Workouts}
 
-  def call(id, params) do
+  def call(%{organization_id: _} = context, id, params) do
     substitute_for = parse_substitute_for(params)
-    substitute_context = load_substitute_context(substitute_for)
+    substitute_context = load_substitute_context(context, substitute_for)
 
-    # Gather affected users before publish so we capture pre-publish assignment/booking state.
-    # For substitutes the duplicate has no existing assignments so these will be empty.
     assignment_targets = Workouts.list_workout_change_targets(id)
-    booking_targets = Scheduling.list_workout_change_targets(id)
-    slot_ids = Scheduling.list_slot_ids_for_workout(id)
+    booking_targets = Scheduling.list_workout_change_targets(context, id)
+    slot_ids = Scheduling.list_slot_ids_for_workout(context, id)
     is_republish = assignment_targets != [] or booking_targets != []
 
-    with {:ok, workout} <- Workouts.publish_workout(id, params),
-         :ok <- apply_substitution(substitute_for, workout.id) do
-      Workouts.delete_superseded_drafts(id, workout.created_by_id)
+    with {:ok, workout} <- Workouts.publish_workout(context, id, params),
+         :ok <- apply_substitution(context, substitute_for, workout.id) do
+      Workouts.delete_superseded_drafts(context, id, workout.created_by_id)
       maybe_notify(is_republish, substitute_for, assignment_targets, booking_targets, workout)
       broadcast_admin_workout_refresh(workout.id)
 
@@ -34,6 +32,21 @@ defmodule MilosTraining.Application.PublishWorkout do
     end
   end
 
+  def call(id, params) do
+    case Workouts.get_workout_for_admin(id) do
+      %{organization_id: organization_id} ->
+        with {:ok, context} <-
+               Organizations.resolve_system_tenant_context(organization_id, :workout_publish, %{
+                 service: __MODULE__
+               }) do
+          call(context, id, params)
+        end
+
+      nil ->
+        {:error, :not_found}
+    end
+  end
+
   defp parse_substitute_for(params) do
     case Map.get(params, "substitute_for") do
       %{"type" => "assignment", "id" => id} when is_binary(id) -> {:assignment, id}
@@ -42,31 +55,31 @@ defmodule MilosTraining.Application.PublishWorkout do
     end
   end
 
-  defp apply_substitution({:assignment, assignment_id}, new_workout_id) do
-    case Workouts.substitute_assignment_workout(assignment_id, new_workout_id) do
+  defp apply_substitution(context, {:assignment, assignment_id}, new_workout_id) do
+    case Workouts.substitute_assignment_workout(context, assignment_id, new_workout_id) do
       {:ok, _} -> :ok
       {:error, reason} -> {:error, {:substitution_failed, reason}}
     end
   end
 
-  defp apply_substitution({:slot, slot_id}, new_workout_id) do
-    case Scheduling.substitute_slot_workout(slot_id, new_workout_id) do
+  defp apply_substitution(context, {:slot, slot_id}, new_workout_id) do
+    case Scheduling.substitute_slot_workout(context, slot_id, new_workout_id) do
       {:ok, _} -> :ok
       {:error, reason} -> {:error, {:substitution_failed, reason}}
     end
   end
 
-  defp apply_substitution(nil, _new_workout_id), do: :ok
+  defp apply_substitution(_context, nil, _new_workout_id), do: :ok
 
-  defp load_substitute_context({:assignment, assignment_id}) do
-    %{assignment: Workouts.get_assigned_workout(assignment_id)}
+  defp load_substitute_context(context, {:assignment, assignment_id}) do
+    %{assignment: Workouts.get_assigned_workout(context, assignment_id)}
   end
 
-  defp load_substitute_context({:slot, slot_id}) do
+  defp load_substitute_context(_context, {:slot, slot_id}) do
     %{slot_id: slot_id}
   end
 
-  defp load_substitute_context(nil), do: %{}
+  defp load_substitute_context(_context, nil), do: %{}
 
   # On global re-publish (no substitute context) notify all affected users.
   defp maybe_notify(true, nil, assignment_targets, booking_targets, workout) do

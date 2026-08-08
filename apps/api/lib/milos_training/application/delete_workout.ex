@@ -5,16 +5,13 @@ defmodule MilosTraining.Application.DeleteWorkout do
   alias MilosTraining.{Identity, Scheduling, Workouts}
   alias MilosTraining.Notifications
 
-  def call(id) do
-    with %{id: ^id} = workout <- Workouts.get_workout_for_admin(id),
+  def call(%{organization_id: _} = context, id) do
+    with %{id: ^id} = workout <- Workouts.get_workout_for_admin(context, id),
          assignment_targets <- Workouts.list_workout_change_targets(id),
-         booking_targets <- Scheduling.list_workout_change_targets(id),
-         {:ok, deleted_slot_ids} <- Scheduling.delete_slots_for_workout(id),
-         :ok <- Scheduling.delete_class_series_for_workout(id),
-         :ok <- Workouts.delete_workout(id) do
-      # Taken from the workout being deleted rather than the session GUC: the
-      # owning organization is the correct broadcast scope, and reading it here
-      # kept an Infrastructure dependency in the application layer (F-19).
+         booking_targets <- Scheduling.list_workout_change_targets(context, id),
+         {:ok, deleted_slot_ids} <- Scheduling.delete_slots_for_workout(context, id),
+         :ok <- Scheduling.delete_class_series_for_workout(context, id),
+         :ok <- Workouts.delete_workout(context, id) do
       broadcast_deleted_slots(deleted_slot_ids, workout.organization_id)
       notify_assignment_targets(assignment_targets)
       notify_booking_targets(booking_targets)
@@ -24,6 +21,23 @@ defmodule MilosTraining.Application.DeleteWorkout do
     else
       nil -> {:error, :not_found}
       {:error, reason} -> {:error, reason}
+    end
+  end
+
+  def call(id) do
+    case Workouts.get_workout_for_admin(id) do
+      %{organization_id: organization_id} ->
+        with {:ok, context} <-
+               MilosTraining.Organizations.resolve_system_tenant_context(
+                 organization_id,
+                 :workout_deletion,
+                 %{service: __MODULE__}
+               ) do
+          call(context, id)
+        end
+
+      nil ->
+        {:error, :not_found}
     end
   end
 
