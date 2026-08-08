@@ -61,12 +61,7 @@ defmodule MilosTraining.Application.AdminRecordAttendance do
     Map.new(params, fn {key, value} -> {to_string(key), value} end)
   end
 
-  defp approved_booking(nil, slot_id, user_id) do
-    case Scheduling.get_approved_booking_for_class(user_id, slot_id) do
-      nil -> {:error, :attendance_requires_approved_booking}
-      booking -> {:ok, booking}
-    end
-  end
+  defp approved_booking(nil, _slot_id, _user_id), do: {:error, :organization_context_required}
 
   defp approved_booking(context, slot_id, user_id) do
     case Scheduling.get_approved_booking_for_class(context, user_id, slot_id) do
