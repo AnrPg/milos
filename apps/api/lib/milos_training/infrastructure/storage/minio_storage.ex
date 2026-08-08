@@ -29,14 +29,30 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
   end
 
   @impl MilosTraining.Application.Ports.DocumentStorage
-  def presigned_upload_url(key) do
+  def presigned_upload_post(key, policy) do
     {storage_config, url_config, bucket} = ex_aws_config()
+    content_type = Map.fetch!(policy, :content_type)
+    max_bytes = Map.fetch!(policy, :max_bytes)
 
     with :ok <- ensure_bucket(storage_config, bucket) do
-      ExAws.S3.presigned_url(url_config, :put, bucket, key,
-        expires_in: @expires_seconds,
-        virtual_host: false
-      )
+      upload =
+        ExAws.S3.presigned_post(url_config, bucket, key,
+          expires_in: @expires_seconds,
+          virtual_host: false,
+          content_length_range: [1, max_bytes],
+          custom_conditions: [%{"Content-Type" => content_type}]
+        )
+
+      {:ok,
+       %{
+         url: upload.url,
+         fields: Map.put(upload.fields, "Content-Type", content_type),
+         required_headers: %{},
+         expires_in: @expires_seconds,
+         max_bytes: max_bytes,
+         content_type: content_type,
+         method: "POST"
+       }}
     end
   end
 
@@ -48,6 +64,29 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
       expires_in: @expires_seconds,
       virtual_host: false
     )
+  end
+
+  @impl MilosTraining.Application.Ports.DocumentStorage
+  def validate_uploaded_document(key, policy) do
+    {storage_config, _url_config, bucket} = ex_aws_config()
+    expected_content_type = Map.fetch!(policy, :content_type)
+    max_bytes = Map.fetch!(policy, :max_bytes)
+
+    case ExAws.S3.head_object(bucket, key) |> ExAws.request(storage_config) do
+      {:ok, %{headers: headers}} ->
+        with {:ok, content_type} <- normalized_header_value(headers, "content-type"),
+             :ok <- validate_document_content_type(content_type, expected_content_type),
+             {:ok, byte_size} <- document_byte_size(headers),
+             :ok <- validate_document_size(byte_size, max_bytes) do
+          {:ok, %{content_type: content_type, byte_size: byte_size}}
+        end
+
+      {:error, {:http_error, 404, _body}} ->
+        {:error, :document_upload_missing}
+
+      {:error, _reason} ->
+        {:error, :document_upload_unverified}
+    end
   end
 
   @impl true
@@ -149,6 +188,30 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
        do: :ok
 
   defp validate_avatar_size(byte_size), do: {:error, {:avatar_too_large, byte_size}}
+
+  defp validate_document_content_type(content_type, expected_content_type) do
+    if content_type == expected_content_type,
+      do: :ok,
+      else: {:error, :document_upload_content_type_mismatch}
+  end
+
+  defp document_byte_size(headers) do
+    case header_value(headers, "content-length") do
+      {:ok, value} ->
+        case Integer.parse(value) do
+          {byte_size, ""} when byte_size > 0 -> {:ok, byte_size}
+          _other -> {:error, :document_upload_metadata_missing}
+        end
+
+      :error ->
+        {:error, :document_upload_metadata_missing}
+    end
+  end
+
+  defp validate_document_size(byte_size, max_bytes) when byte_size <= max_bytes, do: :ok
+
+  defp validate_document_size(byte_size, _max_bytes),
+    do: {:error, {:document_too_large, byte_size}}
 
   defp avatar_validation_reason({:error, {:http_error, 404, _response}}),
     do: :avatar_upload_missing
@@ -282,6 +345,24 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
 
       true ->
         {:error, :avatar_upload_metadata_missing}
+    end
+  end
+
+  defp normalized_header_value(headers, header) do
+    with {:ok, value} <- header_value(headers, header) do
+      {:ok, normalize_content_type(value)}
+    end
+  end
+
+  defp header_value(headers, header) do
+    normalized =
+      Map.new(headers, fn {key, value} ->
+        {String.downcase(to_string(key)), to_string(value)}
+      end)
+
+    case normalized[String.downcase(header)] do
+      value when is_binary(value) and value != "" -> {:ok, value}
+      _other -> :error
     end
   end
 
