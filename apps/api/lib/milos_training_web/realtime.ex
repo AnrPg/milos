@@ -1,26 +1,23 @@
 defmodule MilosTrainingWeb.Realtime do
   require Logger
 
-  alias MilosTraining.Organizations
   alias MilosTrainingWeb.Endpoint
 
   def broadcast_schedule_refresh(event, payload \\ %{}) do
-    organization_id =
-      Map.get(payload, :organization_id) || Map.get(payload, "organization_id") ||
-        fallback_to_legacy_organization_id(event)
+    case Map.get(payload, :organization_id) || Map.get(payload, "organization_id") do
+      organization_id when is_binary(organization_id) ->
+        Endpoint.broadcast("schedule:#{organization_id}", "schedule:refresh", %{
+          event: event,
+          payload: payload
+        })
 
-    Endpoint.broadcast("schedule:#{organization_id}", "schedule:refresh", %{
-      event: event,
-      payload: payload
-    })
-  end
+      _missing ->
+        Logger.error(
+          "Realtime.broadcast_schedule_refresh: payload for event=#{event} omitted organization_id"
+        )
 
-  defp fallback_to_legacy_organization_id(event) do
-    Logger.warning(
-      "Realtime.broadcast_schedule_refresh: payload for event=#{event} omitted organization_id, falling back to the legacy organization"
-    )
-
-    legacy_organization_id()
+        {:error, :organization_context_required}
+    end
   end
 
   def broadcast_notification_changed(user_id) do
@@ -56,9 +53,5 @@ defmodule MilosTrainingWeb.Realtime do
 
   def broadcast_execution_completed(execution_id, payload) do
     Endpoint.broadcast("execution:#{execution_id}", "execution:completed", payload)
-  end
-
-  defp legacy_organization_id do
-    Organizations.get_by_slug(Organizations.legacy_organization_slug()).id
   end
 end

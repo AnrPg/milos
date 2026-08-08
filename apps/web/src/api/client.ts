@@ -88,6 +88,7 @@ function organizationSlugForRequest(token?: string | null) {
 const TENANT_SCOPED_PREFIXES = [
   "/admin",
   "/bookings",
+  "/landing",
   "/me/entitlement",
   "/me/finance",
   "/me/invoices",

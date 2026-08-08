@@ -9,12 +9,7 @@ defmodule MilosTraining.Application.DeleteScheduledSlot do
     end
   end
 
-  def call(id) do
-    with :ok <- Scheduling.delete_slot(id) do
-      broadcast_slot_deleted(nil, id)
-      :ok
-    end
-  end
+  def call(_id), do: {:error, :organization_context_required}
 
   defp broadcast_slot_deleted(organization_id, slot_id) do
     ScheduleRealtime.broadcast("slot_deleted", %{

@@ -219,6 +219,7 @@ defmodule MilosTrainingWeb.Router do
     ])
 
     get("/schedule", ScheduleController, :index)
+    get("/landing", LandingController, :show)
     post("/bookings", ScheduleController, :create_booking)
     delete("/bookings/:id", ScheduleController, :delete_booking)
     get("/workouts/:id", WorkoutController, :show)
@@ -463,7 +464,6 @@ defmodule MilosTrainingWeb.Router do
 
     get("/calendar/export-links", CalendarFeedController, :links)
     post("/calendar/export-links/regenerate", CalendarFeedController, :regenerate_links)
-    get("/landing", LandingController, :show)
     post("/landing/leaderboard-opt-in", LandingController, :update_leaderboard_preference)
     get("/notifications", NotificationController, :index)
     post("/notifications/read-all", NotificationController, :mark_all_read)

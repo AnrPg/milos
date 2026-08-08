@@ -1,16 +1,21 @@
 defmodule MilosTraining.Application.GetLandingPage do
   alias MilosTraining.Application.{GetLeaderboardSnippet, ListWorkoutExecutions}
-  alias MilosTraining.{Finance, Gamification, Identity, Messaging, Scheduling}
+  alias MilosTraining.{Finance, Gamification, Messaging, Organizations, Scheduling}
   alias MilosTraining.Gamification.Domain.{ChallengeCriteria, ChallengeProgress}
   alias MilosTraining.Application.LandingCache
 
-  def call(user) do
-    cached = LandingCache.get_or_fetch(user.id, fn -> build_cached_payload(user) end)
+  def call(context, user) do
+    cached =
+      LandingCache.get_or_fetch(context, user.id, fn -> build_cached_payload(context, user) end)
+
     quote = training_quote(user)
     {:ok, Map.put(cached, "quote", quote)}
   end
 
-  defp build_cached_payload(%{role: :admin} = _user) do
+  def call(_user), do: {:error, :organization_context_required}
+
+  defp build_cached_payload(%{role: role} = context, _user)
+       when role in [:owner, :admin, :coach] do
     empty_stats = %{
       "current_streak" => 0,
       "longest_streak" => 0,
@@ -26,7 +31,7 @@ defmodule MilosTraining.Application.GetLandingPage do
 
     %{
       "role" => "admin",
-      "admin_metrics" => admin_metrics(),
+      "admin_metrics" => admin_metrics(context),
       "gamification" => %{
         "settings" => Gamification.get_settings(),
         "stats" => empty_stats,
@@ -46,7 +51,7 @@ defmodule MilosTraining.Application.GetLandingPage do
     }
   end
 
-  defp build_cached_payload(user) do
+  defp build_cached_payload(context, user) do
     stats =
       Gamification.get_user_stats(user.id) ||
         %{
@@ -121,6 +126,7 @@ defmodule MilosTraining.Application.GetLandingPage do
     {:ok, executions} = ListWorkoutExecutions.call(user.id)
 
     %{
+      "role" => to_string(context.role),
       "gamification" => %{
         "settings" => Gamification.get_settings(),
         "stats" => stats,
@@ -129,8 +135,8 @@ defmodule MilosTraining.Application.GetLandingPage do
         "active_challenges" => active_challenges,
         "leaderboard" => GetLeaderboardSnippet.call(user)
       },
-      "coach_notes" => coach_notes_payload(user),
-      "membership" => membership_payload(user.id),
+      "coach_notes" => coach_notes_payload(context, user),
+      "membership" => membership_payload(context, user.id),
       "recent_executions" =>
         executions
         |> Enum.filter(& &1.completed_at_utc)
@@ -139,12 +145,12 @@ defmodule MilosTraining.Application.GetLandingPage do
     }
   end
 
-  defp admin_metrics do
+  defp admin_metrics(context) do
     %{
-      "member_count" => Identity.count_by_role(:member),
-      "total_outstanding_cents" => Finance.total_outstanding_balance_cents(),
-      "pending_referral_approvals" => Finance.count_pending_referral_approvals(),
-      "classes_today" => Scheduling.count_classes_today()
+      "member_count" => Organizations.list_active_membership_user_ids(context) |> length(),
+      "total_outstanding_cents" => Finance.total_outstanding_balance_cents(context),
+      "pending_referral_approvals" => Finance.count_pending_referral_approvals(context),
+      "classes_today" => Scheduling.count_classes_today(context)
     }
   end
 
@@ -157,14 +163,14 @@ defmodule MilosTraining.Application.GetLandingPage do
     end
   end
 
-  defp coach_notes_payload(%{role: :athlete, id: user_id}) do
+  defp coach_notes_payload(%{role: :athlete}, %{id: user_id}) do
     Messaging.list_recent_coaching_notes(user_id, 5)
   end
 
-  defp coach_notes_payload(_user), do: []
+  defp coach_notes_payload(_context, _user), do: []
 
-  defp membership_payload(user_id) do
-    case Finance.get_member_profile(user_id) do
+  defp membership_payload(context, user_id) do
+    case Finance.get_member_profile(context, user_id) do
       nil ->
         nil
 

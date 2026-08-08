@@ -26,28 +26,10 @@ defmodule MilosTraining.Application.AdminRecordAttendance do
   def call(%{organization_id: _} = context, slot_id, user_id, admin_id),
     do: call(context, slot_id, user_id, admin_id, %{})
 
-  def call(slot_id, user_id, admin_id, params) do
-    with {:ok, approved_booking} <- approved_booking(nil, slot_id, user_id),
-         :ok <- AttendancePolicy.can_record_admin_attendance?(approved_booking) do
-      attendance_params =
-        params
-        |> string_key_map()
-        |> Map.merge(%{
-          "scheduled_class_id" => slot_id,
-          "booking_id" => approved_booking.id,
-          "user_id" => user_id,
-          "marked_by_id" => admin_id,
-          "status" => params["status"] || params[:status] || "attended"
-        })
+  def call(_slot_id, _user_id, _admin_id, _params),
+    do: {:error, :organization_context_required}
 
-      with {:ok, attendance} <- Scheduling.record_attendance(attendance_params),
-           {:ok, _transition} <- reconcile_visit(attendance) do
-        {:ok, attendance}
-      end
-    end
-  end
-
-  def call(slot_id, user_id, admin_id), do: call(slot_id, user_id, admin_id, %{})
+  def call(_slot_id, _user_id, _admin_id), do: {:error, :organization_context_required}
 
   defp reconcile_visit(%{status: "cancelled"} = attendance) do
     Finance.release_entitlement_source(

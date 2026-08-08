@@ -52,6 +52,7 @@ defmodule MilosTraining.Scheduling.ClassSeries do
     ])
     |> validate_required([
       :organization_id,
+      :master_workout_id,
       :class_type_id,
       :name,
       :duration_minutes,

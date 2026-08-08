@@ -7,7 +7,7 @@ defmodule MilosTraining.Application.UpdateScheduledSlot do
     master_workout_id = params[:master_workout_id] || params["master_workout_id"]
     class_type_id = params[:class_type_id] || params["class_type_id"]
 
-    with {:ok, _workout} <- fetch_workout(master_workout_id),
+    with {:ok, _workout} <- fetch_workout(context, master_workout_id),
          {:ok, _class_type} <- fetch_class_type(context, class_type_id),
          {:ok, slot} <- update_slot(context, id, params) do
       broadcast_slot_updated(slot)
@@ -17,28 +17,21 @@ defmodule MilosTraining.Application.UpdateScheduledSlot do
     end
   end
 
-  def call(id, params), do: call(nil, id, params)
+  def call(_id, _params), do: {:error, :organization_context_required}
 
-  defp update_slot(nil, id, params), do: Scheduling.update_slot(id, params)
   defp update_slot(context, id, params), do: Scheduling.update_slot(context, id, params)
 
-  defp fetch_workout(id) do
-    case Workouts.get_workout(id) do
+  defp fetch_workout(context, id) do
+    case Workouts.get_workout(context, id) do
       nil -> {:error, :workout_not_found}
       workout -> {:ok, workout}
-    end
-  end
-
-  defp fetch_class_type(nil, id) do
-    case Scheduling.get_class_type(id) do
-      nil -> {:error, :class_type_not_found}
-      class_type -> {:ok, class_type}
     end
   end
 
   defp fetch_class_type(context, id) do
     case Scheduling.get_class_type(context, id) do
       nil -> {:error, :class_type_not_found}
+      {:error, reason} -> {:error, reason}
       class_type -> {:ok, class_type}
     end
   end

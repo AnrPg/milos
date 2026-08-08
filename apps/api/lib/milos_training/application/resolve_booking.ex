@@ -25,24 +25,13 @@ defmodule MilosTraining.Application.ResolveBooking do
     end
   end
 
-  def call(booking_id, params), do: call(nil, booking_id, params)
-
-  defp run_resolution(nil, :approve, booking_id, admin_message),
-    do: Scheduling.approve_booking(booking_id, admin_message)
+  def call(_booking_id, _params), do: {:error, :organization_context_required}
 
   defp run_resolution(context, :approve, booking_id, admin_message),
     do: Scheduling.approve_booking(context, booking_id, admin_message)
 
   defp run_resolution(context, "approve", booking_id, admin_message),
     do: run_resolution(context, :approve, booking_id, admin_message)
-
-  defp run_resolution(nil, :reject, booking_id, admin_message),
-    do:
-      Scheduling.reject_booking(
-        booking_id,
-        admin_message,
-        reconciliation(nil, "Booking rejected", "booking-rejected", booking_id)
-      )
 
   defp run_resolution(context, :reject, booking_id, admin_message),
     do:
@@ -57,12 +46,6 @@ defmodule MilosTraining.Application.ResolveBooking do
     do: run_resolution(context, :reject, booking_id, admin_message)
 
   defp run_resolution(_context, _, _booking_id, _admin_message), do: :error
-
-  defp reconciliation(nil, reason, idempotency_prefix, booking_id) do
-    booking = Scheduling.get_booking(booking_id)
-
-    reconciliation_payload(booking, reason, idempotency_prefix)
-  end
 
   defp reconciliation(context, reason, idempotency_prefix, booking_id) do
     booking = Scheduling.get_booking(context, booking_id)

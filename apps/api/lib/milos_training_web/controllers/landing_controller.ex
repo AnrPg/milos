@@ -97,7 +97,7 @@ defmodule MilosTrainingWeb.LandingController do
   def show(conn, _params) do
     user = GuardianPlug.current_resource(conn)
 
-    with {:ok, payload} <- GetLandingPage.call(user) do
+    with {:ok, payload} <- GetLandingPage.call(conn.assigns.tenant_context, user) do
       json(conn, payload)
     end
   end

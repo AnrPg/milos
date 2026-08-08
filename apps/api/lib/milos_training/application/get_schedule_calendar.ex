@@ -24,9 +24,8 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
     end
   end
 
-  def call(actor, params), do: call(nil, actor, params)
+  def call(_actor, _params), do: {:error, :organization_context_required}
 
-  defp get_calendar_week(nil, params), do: Scheduling.get_calendar_week(params)
   defp get_calendar_week(context, params), do: Scheduling.get_calendar_week(context, params)
 
   defp enrich_slots(slots, context, actor) do
@@ -38,7 +37,7 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
       |> Enum.reject(&is_nil/1)
       |> Enum.uniq()
       |> Enum.reduce(%{}, fn workout_id, acc ->
-        Map.put(acc, workout_id, Workouts.get_workout(workout_id))
+        Map.put(acc, workout_id, Workouts.get_workout(context, workout_id))
       end)
 
     Enum.map(slots, fn slot ->
@@ -72,7 +71,6 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
     end)
   end
 
-  defp admin_role?(nil, actor), do: actor.role == :admin
   defp admin_role?(context, _actor), do: context.role in [:owner, :admin, :coach]
 
   defp preview_workout(nil), do: nil
@@ -169,10 +167,7 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
 
   defp schedule_class_types(context, slots) do
     active =
-      case context do
-        nil -> Scheduling.list_class_types()
-        _ -> Scheduling.list_class_types(context)
-      end
+      Scheduling.list_class_types(context)
 
     referenced_archived =
       slots

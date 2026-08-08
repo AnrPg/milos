@@ -6,9 +6,7 @@ defmodule MilosTraining.Application.UpdateAdminSettings do
     do_call(context, params)
   end
 
-  def call(params) do
-    do_call(nil, params)
-  end
+  def call(_params), do: {:error, :organization_context_required}
 
   defp do_call(context, params) do
     gamification_params = gamification_params(params)
@@ -51,12 +49,6 @@ defmodule MilosTraining.Application.UpdateAdminSettings do
   end
 
   defp maybe_update_notifications(params), do: Notifications.update_push_settings(params)
-
-  defp maybe_update_scheduling(nil, params) when map_size(params) == 0 do
-    {:ok, Scheduling.get_settings()}
-  end
-
-  defp maybe_update_scheduling(nil, params), do: Scheduling.update_settings(params)
 
   defp maybe_update_scheduling(context, params) when map_size(params) == 0 do
     {:ok, Scheduling.get_settings(context)}
