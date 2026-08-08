@@ -4,6 +4,20 @@ defmodule MilosTraining.FinanceTest do
   alias MilosTraining.{Finance, Organizations}
   alias MilosTraining.TestFixtures
 
+  setup do
+    owner = TestFixtures.user_fixture(%{role: :admin})
+    context = tenant_context_fixture(owner, "Finance Test #{System.unique_integer([:positive])}")
+
+    Repo.query!("SELECT set_config($1, $2, false)", [
+      "app.organization_id",
+      context.organization_id
+    ])
+
+    Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", owner.id])
+
+    %{tenant_context: context, tenant_owner: owner}
+  end
+
   defp tenant_context_fixture(owner, name) do
     {:ok, organization} = Organizations.create_organization(%{name: name})
 
