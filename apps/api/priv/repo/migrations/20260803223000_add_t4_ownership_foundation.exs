@@ -235,10 +235,13 @@ defmodule MilosTraining.Repo.Migrations.AddT4OwnershipFoundation do
   defp add_tenant_ownership(table) do
     execute("""
     ALTER TABLE #{table}
-    ADD COLUMN organization_id uuid NOT NULL
-      DEFAULT milos_legacy_organization_id()
+    ADD COLUMN organization_id uuid
       REFERENCES organizations(id) ON DELETE RESTRICT
     """)
+
+    execute("UPDATE #{table} SET organization_id = milos_legacy_organization_id()")
+
+    execute("ALTER TABLE #{table} ALTER COLUMN organization_id SET NOT NULL")
 
     execute("CREATE INDEX #{table}_organization_id_index ON #{table} (organization_id)")
 
