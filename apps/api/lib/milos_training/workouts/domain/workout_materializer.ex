@@ -25,7 +25,10 @@ defmodule MilosTraining.Workouts.Domain.WorkoutMaterializer do
   values unless a variation exists for the requested scale.
   """
   def materialize(workout, scale_slug) do
-    scale_level = Enum.find(available_scales(workout), &(&1.slug == scale_slug))
+    scale_level =
+      Enum.find(available_scales(workout), &(&1.slug == scale_slug)) ||
+        %{slug: scale_slug, label: scale_slug, sort_order: 0}
+
     materialize_with_scale(workout, scale_level)
   end
 

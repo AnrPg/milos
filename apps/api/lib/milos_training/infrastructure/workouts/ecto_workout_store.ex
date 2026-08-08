@@ -1067,18 +1067,14 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   defp validate_expected_revision(workout, params) do
     case get_map_value(params, :expected_source_revision) do
-      nil -> :ok
+      nil -> {:error, :expected_source_revision_required}
       revision when revision == workout.dsl_source_revision -> :ok
       _revision -> {:error, :stale_dsl_revision}
     end
   end
 
-  defp maybe_lock_dsl_revision(changeset, params) do
-    if get_map_value(params, :expected_source_revision) == nil do
-      changeset
-    else
-      Ecto.Changeset.optimistic_lock(changeset, :dsl_source_revision)
-    end
+  defp maybe_lock_dsl_revision(changeset, _params) do
+    Ecto.Changeset.optimistic_lock(changeset, :dsl_source_revision)
   end
 
   defp draft_summary(workout) do
@@ -1510,6 +1506,10 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
        ) do
     current_assignment = changeset.data
 
+    reset_scheduled_for? =
+      Ecto.Changeset.get_change(changeset, :scheduled_for, current_assignment.scheduled_for) !=
+        current_assignment.scheduled_for
+
     merged_athlete_ids =
       (existing_athlete_ids(current_assignment) ++
          existing_athlete_ids(conflicting_assignment) ++ athlete_ids)
@@ -1519,7 +1519,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     |> Multi.delete(:conflicting_assignment, conflicting_assignment)
     |> Multi.update(:assignment, changeset)
     |> Multi.run(:athlete_links, fn repo, %{assignment: assignment} ->
-      sync_athlete_links(repo, assignment.id, merged_athlete_ids, false)
+      sync_athlete_links(repo, assignment.id, merged_athlete_ids, reset_scheduled_for?)
     end)
     |> Repo.transaction()
     |> case do
@@ -1981,6 +1981,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   @impl true
   def delete_superseded_drafts(published_id, admin_id) do
     MasterWorkout
+    |> scoped_to_tenant()
     |> where(
       [w],
       w.status == :draft and w.created_by_id == ^admin_id and w.id != ^published_id

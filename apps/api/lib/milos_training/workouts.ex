@@ -62,6 +62,9 @@ defmodule MilosTraining.Workouts do
     to: GetAthleteWeekView,
     as: :for_athlete
 
+  def list_assigned_workouts_for_athlete(context, athlete_id, start_date, end_date),
+    do: WorkoutStore.list_assigned_workouts_for_athlete(context, athlete_id, start_date, end_date)
+
   defdelegate list_workouts, to: ListAdminWorkouts, as: :all
   def list_workouts(context), do: WorkoutStore.list_workouts(context)
   defdelegate list_scale_levels, to: ListScaleLevels, as: :all
