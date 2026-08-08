@@ -43,10 +43,11 @@ defmodule MilosTraining.Application.ScheduleRealtimeTest do
     refute_received %Phoenix.Socket.Broadcast{topic: ^legacy_topic}
   end
 
-  test "logs a warning instead of silently falling back when organization_id is missing" do
+  test "fails closed instead of falling back when organization_id is missing" do
     log =
       capture_log(fn ->
-        ScheduleRealtime.broadcast("slot_created", %{slot_id: "some-slot-id"})
+        assert {:error, :missing_organization_id} =
+                 ScheduleRealtime.broadcast("slot_created", %{slot_id: "some-slot-id"})
       end)
 
     assert log =~ "omitted organization_id"

@@ -2,28 +2,21 @@ defmodule MilosTraining.Application.ScheduleRealtime do
   require Logger
 
   alias MilosTraining.Application.RealtimePublisher
-  alias MilosTraining.Organizations
 
   def broadcast(event, payload \\ %{}) when is_binary(event) and is_map(payload) do
-    organization_id =
-      Map.get(payload, :organization_id) || Map.get(payload, "organization_id") ||
-        fallback_to_legacy_organization_id(event)
+    case Map.get(payload, :organization_id) || Map.get(payload, "organization_id") do
+      organization_id when is_binary(organization_id) and organization_id != "" ->
+        RealtimePublisher.broadcast("schedule:#{organization_id}", "schedule:refresh", %{
+          event: event,
+          payload: payload
+        })
 
-    RealtimePublisher.broadcast("schedule:#{organization_id}", "schedule:refresh", %{
-      event: event,
-      payload: payload
-    })
-  end
+      _missing ->
+        Logger.error(
+          "ScheduleRealtime.broadcast: payload for event=#{event} omitted organization_id"
+        )
 
-  defp fallback_to_legacy_organization_id(event) do
-    Logger.warning(
-      "ScheduleRealtime.broadcast: payload for event=#{event} omitted organization_id, falling back to the legacy organization"
-    )
-
-    legacy_organization_id()
-  end
-
-  defp legacy_organization_id do
-    Organizations.get_by_slug(Organizations.legacy_organization_slug()).id
+        {:error, :missing_organization_id}
+    end
   end
 end
