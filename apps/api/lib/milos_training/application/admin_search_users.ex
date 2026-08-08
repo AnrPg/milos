@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.AdminSearchUsers do
-  alias MilosTraining.Application.{AdminMemberSearchDocuments, AdminMemberSearchIndex}
+  alias MilosTraining.Application.AdminMemberSearchIndex
   alias MilosTraining.{Finance, Identity, Identity.RegistrationPolicy, Organizations}
 
   def call(params) do
@@ -49,10 +49,7 @@ defmodule MilosTraining.Application.AdminSearchUsers do
   end
 
   defp search_with_index(search_params) do
-    documents = AdminMemberSearchDocuments.build_all()
-
-    with :ok <- AdminMemberSearchIndex.replace_documents(documents),
-         {:ok, %{users: users, meta: meta}} <- AdminMemberSearchIndex.search(search_params) do
+    with {:ok, %{users: users, meta: meta}} <- AdminMemberSearchIndex.search(search_params) do
       {:ok, %{users: users, meta: Map.merge(%{limit: search_params.limit}, meta)}}
     end
   end

@@ -178,7 +178,7 @@ defmodule MilosTraining.Application.AdminSearchUsersTest do
     @behaviour MilosTraining.Application.Ports.AdminMemberSearchIndex
 
     @impl true
-    def replace_documents(_documents), do: :ok
+    def replace_documents(_documents), do: {:error, :unexpected_reindex}
 
     @impl true
     def search(params) do
@@ -200,13 +200,7 @@ defmodule MilosTraining.Application.AdminSearchUsersTest do
     @behaviour MilosTraining.Application.Ports.AdminMemberSearchIndex
 
     @impl true
-    def replace_documents(documents) do
-      if Enum.any?(documents, &(&1.nickname == "indexed_member")) do
-        :ok
-      else
-        {:error, :missing_document}
-      end
-    end
+    def replace_documents(_documents), do: {:error, :unexpected_reindex}
 
     @impl true
     def search(%{query: "indexed", role: "member", limit: 5}) do
