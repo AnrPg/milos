@@ -10,6 +10,7 @@ defmodule MilosTraining.Feedback.Review do
     field :user_id, :binary_id
     field :target_type, :string
     field :target_id, :binary_id
+    field :review_identity_key, :string
     field :target_snapshot, :map, default: %{}
     field :questionnaire_id, :binary_id
     field :rating, :integer
@@ -55,8 +56,22 @@ defmodule MilosTraining.Feedback.Review do
     |> validate_inclusion(:sentiment, ["positive", "neutral", "negative", "mixed"])
     |> validate_inclusion(:visibility, ["admin_only", "user_visible"])
     |> validate_inclusion(:status, ["open", "reviewed", "archived", "needs_follow_up"])
+    |> put_review_identity_key()
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:questionnaire_id)
+    |> unique_constraint(:target_id, name: :reviews_one_per_user_target_index)
+  end
+
+  defp put_review_identity_key(changeset) do
+    user_id = get_field(changeset, :user_id)
+    target_type = get_field(changeset, :target_type)
+    target_id = get_field(changeset, :target_id)
+
+    if user_id && target_type && target_id do
+      put_change(changeset, :review_identity_key, "#{user_id}:#{target_type}:#{target_id}")
+    else
+      changeset
+    end
   end
 
   defp normalize_params(params) when is_map(params) do
