@@ -108,7 +108,7 @@ function AdminChallengeCard({ challenge }: { challenge: AdminChallengeRecord }) 
         </div>
         <span
           className="shrink-0 rounded-full px-2 py-1 text-[10px] font-semibold"
-          style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", color: "var(--primary)" }}
+          style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", color: "var(--primary-strong)" }}
         >
           {challenge.badge_label}
         </span>
@@ -334,7 +334,7 @@ export function AdminDashboard() {
         <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
+              <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary-strong)" }}>
                 {i18n("admin4e7afeb")}
               </p>
               <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
@@ -475,7 +475,7 @@ export function AdminDashboard() {
                           style={{ background: "color-mix(in srgb, var(--primary) 7%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 15%, transparent)" }}
                         >
                           <span style={{ color: "var(--text)" }}>{alert.text}</span>
-                          <span style={{ color: "var(--primary)" }}>→</span>
+                          <span style={{ color: "var(--primary-strong)" }}>→</span>
                         </Link>
                       </li>
                     ))}
@@ -491,7 +491,7 @@ export function AdminDashboard() {
         <section className="grid gap-6 lg:grid-cols-3">
           {NAV_GROUPS.map((group) => (
             <div key={group.label} className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-              <p className="text-xs font-semibold uppercase tracking-[0.26em]" style={{ color: "var(--primary)" }}>{group.label}</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.26em]" style={{ color: "var(--primary-strong)" }}>{group.label}</p>
               <div className="mt-4 space-y-2">
                 {group.items.map((item) => (
                   <Link
