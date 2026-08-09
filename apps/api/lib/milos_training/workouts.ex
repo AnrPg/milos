@@ -31,6 +31,9 @@ defmodule MilosTraining.Workouts do
 
   alias MilosTraining.Workouts.WorkoutStore
 
+  def with_tenant_context(context, fun) when is_function(fun, 0),
+    do: WorkoutStore.with_tenant_context(context, fun)
+
   def create_workout(admin, params), do: CreateWorkout.call(admin.id, params)
 
   def create_workout(context, admin, params),
@@ -173,5 +176,14 @@ defmodule MilosTraining.Workouts do
 
   def update_assignment_date(id, from_date, new_date) do
     MilosTraining.Workouts.WorkoutStore.update_assignment_date(id, from_date, new_date)
+  end
+
+  def update_assignment_date(context, id, from_date, new_date) do
+    MilosTraining.Workouts.WorkoutStore.update_assignment_date(
+      context,
+      id,
+      from_date,
+      new_date
+    )
   end
 end

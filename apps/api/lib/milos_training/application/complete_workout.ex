@@ -129,12 +129,21 @@ defmodule MilosTraining.Application.CompleteWorkout do
 
   defp timer_sequence_for_execution(%{
          master_workout_id: workout_id,
-         scale_level_slug: scale_slug
+         scale_level_slug: scale_slug,
+         organization_id: organization_id,
+         user_id: user_id
        }) do
-    case resolve_workout(workout_id, scale_slug) do
-      nil -> {:ok, []}
-      workout -> {:ok, Execution.build_timer_sequence(workout)}
-    end
+    # See MilosTraining.Application.UpdateExecutionProgress: the /api/executions
+    # routes are user-scoped, not org-scoped, so the outer context here never
+    # carries an organization_id. Re-open the tenant scope using the
+    # execution's own organization so the workout lookup below can see it,
+    # instead of silently completing against zero timer segments.
+    Workouts.with_tenant_context(%{organization_id: organization_id, user_id: user_id}, fn ->
+      case resolve_workout(workout_id, scale_slug) do
+        nil -> {:ok, []}
+        workout -> {:ok, Execution.build_timer_sequence(workout)}
+      end
+    end)
   end
 
   defp resolve_workout(workout_id, nil), do: Workouts.get_workout(workout_id)

@@ -107,7 +107,7 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
       {:ok, outsider} =
         Identity.register(%{
           nickname: "execution_outsider",
-          password: "S3cur3P@ss!",
+          password: "S3cur3P@ss!42",
           role: :member,
           email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
@@ -131,14 +131,14 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
       {:ok, member} =
         Identity.register(%{
           nickname: "execution_inactive_athlete",
-          password: "S3cur3P@ss!",
+          password: "S3cur3P@ss!42",
           role: :member,
           email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
       # Needs an organization membership to reach the entitlement check at all
       # (F-03); the assertion below is about finance entitlement, not tenancy.
-      {:ok, _org_membership} = Organizations.ensure_legacy_membership(member)
+      {:ok, _org_membership} = Organizations.ensure_legacy_membership_for_migration(member)
 
       {:ok, finance_context} =
         Organizations.resolve_tenant_context(member, Organizations.legacy_organization_slug())
@@ -168,8 +168,8 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
     test "assigned execution uses the tenant membership instead of the account-wide role", %{
       conn: conn
     } do
-      admin = create_admin!("execution_assignment_tenant_admin")
-      athlete = create_user!(:member, "execution_assignment_tenant_athlete")
+      admin = create_admin!("exec_assign_tenant_admin")
+      athlete = create_user!(:member, "exec_assign_tenant_athlete")
       workout = workout_with_scale!(admin)
 
       {:ok, admin_context} =
@@ -179,7 +179,7 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
                Organizations.set_membership_role(admin_context, athlete.id, :athlete)
 
       assert {:ok, assignment} =
-               Workouts.assign_workout(%{
+               Workouts.assign_workout(admin_context, %{
                  master_workout_id: workout.id,
                  scheduled_for: Date.utc_today(),
                  athlete_ids: [athlete.id]
@@ -245,8 +245,11 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
       athlete_conn = put_bearer_token(conn, athlete)
       workout = workout_with_scale!(admin)
 
+      {:ok, admin_context} =
+        Organizations.resolve_tenant_context(admin, Organizations.legacy_organization_slug())
+
       assert {:ok, assignment} =
-               Workouts.assign_workout(%{
+               Workouts.assign_workout(admin_context, %{
                  master_workout_id: workout.id,
                  scheduled_for: Date.utc_today(),
                  athlete_ids: [athlete.id]
@@ -312,7 +315,10 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
       workout = workout_with_scale!(admin)
       slot = slot_fixture(workout, %{auto_approve: true})
 
-      assert {:ok, booking} = SubmitBooking.call(member.id, slot.id)
+      {:ok, member_context} =
+        Organizations.resolve_tenant_context(member, Organizations.legacy_organization_slug())
+
+      assert {:ok, booking} = SubmitBooking.call(member_context, member, slot.id)
       assert booking.status == :approved
 
       execution =
@@ -555,14 +561,7 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
       athlete_conn = authenticate_as_member(conn, "execution_note_athlete")
       workout = workout_with_scale!(admin)
 
-      exercise_id =
-        workout.id
-        |> Workouts.materialize_workout_for_scale("scaled")
-        |> Map.fetch!(:sections)
-        |> hd()
-        |> Map.fetch!(:exercises)
-        |> hd()
-        |> Map.fetch!(:id)
+      exercise_id = workout.sections |> hd() |> Map.fetch!(:exercises) |> hd() |> Map.fetch!(:id)
 
       execution_id =
         athlete_conn
@@ -765,7 +764,7 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
     {:ok, user} =
       Identity.register(%{
         nickname: nickname,
-        password: "S3cur3P@ss!",
+        password: "S3cur3P@ss!42",
         role: role,
         email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
       })
@@ -773,7 +772,7 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
     # Executing a gym's workout requires belonging to that gym (F-03). These
     # users previously had no membership at all and only passed because the
     # source check looked at the account-wide role.
-    {:ok, _membership} = MilosTraining.Organizations.ensure_legacy_membership(user)
+    {:ok, _membership} = MilosTraining.Organizations.ensure_legacy_membership_for_migration(user)
 
     user
   end
@@ -782,13 +781,13 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
     {:ok, user} =
       Identity.register(%{
         nickname: nickname,
-        password: "S3cur3P@ss!",
+        password: "S3cur3P@ss!42",
         role: :member,
         email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
       })
 
     {:ok, admin} = Identity.update_role(user, :admin)
-    {:ok, _membership} = Organizations.ensure_legacy_membership(admin, :owner)
+    {:ok, _membership} = Organizations.ensure_legacy_membership_for_migration(admin, :owner)
     admin
   end
 end

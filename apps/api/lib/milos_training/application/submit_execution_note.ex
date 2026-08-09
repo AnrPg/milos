@@ -30,13 +30,25 @@ defmodule MilosTraining.Application.SubmitExecutionNote do
 
   defp resolve_workout(%{master_workout_id: nil}), do: nil
 
-  defp resolve_workout(%{master_workout_id: workout_id, scale_level_slug: nil}),
-    do: Workouts.get_workout(workout_id)
+  defp resolve_workout(%{
+         master_workout_id: workout_id,
+         scale_level_slug: scale_slug,
+         organization_id: organization_id,
+         user_id: user_id
+       }) do
+    # See MilosTraining.Application.UpdateExecutionProgress: the /api/executions
+    # routes are user-scoped, not org-scoped, so the outer context here never
+    # carries an organization_id. Re-open the tenant scope using the
+    # execution's own organization so the workout lookup below can see it.
+    Workouts.with_tenant_context(%{organization_id: organization_id, user_id: user_id}, fn ->
+      resolve_workout_in_tenant(workout_id, scale_slug)
+    end)
+  end
 
-  defp resolve_workout(%{master_workout_id: workout_id, scale_level_slug: ""}),
-    do: Workouts.get_workout(workout_id)
+  defp resolve_workout_in_tenant(workout_id, nil), do: Workouts.get_workout(workout_id)
+  defp resolve_workout_in_tenant(workout_id, ""), do: Workouts.get_workout(workout_id)
 
-  defp resolve_workout(%{master_workout_id: workout_id, scale_level_slug: scale_slug}),
+  defp resolve_workout_in_tenant(workout_id, scale_slug),
     do: Workouts.materialize_workout_for_scale(workout_id, scale_slug)
 
   defp ensure_note_id(%{} = params) do
@@ -62,16 +74,21 @@ defmodule MilosTraining.Application.SubmitExecutionNote do
          execution_id: execution.id,
          user_id: execution.user_id,
          master_workout_id: execution.master_workout_id,
+         organization_id: execution.organization_id,
          note: note
        }}
     )
   end
 
   defp enqueue_notification(execution, note) do
+    # Notifications.staff_recipients/1 (used by enqueue_workout_note/1) looks
+    # up admins by `organization_id`; without it here the recipient list is
+    # always empty and no admin is ever notified of a submitted note.
     MilosTraining.Notifications.dispatch_event(:workout_note_submitted, %{
       execution_id: execution.id,
       user_id: execution.user_id,
       master_workout_id: execution.master_workout_id,
+      organization_id: execution.organization_id,
       note: note
     })
   end

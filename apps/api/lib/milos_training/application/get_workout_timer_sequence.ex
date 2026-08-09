@@ -22,24 +22,30 @@ defmodule MilosTraining.Application.GetWorkoutTimerSequence do
              source,
              source_reference_id
            ),
-         :ok <- authorize_entitlement(context, actor, authorized_source),
-         workout when not is_nil(workout) <- get_workout(context, workout_id),
-         {:ok, materialized_workout} <- materialize_workout(workout, scale_slug) do
-      {:ok, Execution.build_timer_sequence(materialized_workout)}
-    else
-      nil -> {:error, :not_found}
-      error -> error
+         {:ok, execution_context} <- finance_context(context, authorized_source),
+         :ok <- authorize_entitlement(execution_context, actor, authorized_source) do
+      # The /api/workouts/:id/timer-sequence route is user-scoped, not
+      # org-scoped, so `context` never carries an organization_id. Re-open
+      # the tenant scope using the organization AuthorizeWorkoutExecutionSource
+      # just derived so the workout lookup below can see it.
+      Workouts.with_tenant_context(execution_context, fn ->
+        with workout when not is_nil(workout) <- Workouts.get_workout(workout_id),
+             {:ok, materialized_workout} <- materialize_workout(workout, scale_slug) do
+          {:ok, Execution.build_timer_sequence(materialized_workout)}
+        else
+          nil -> {:error, :not_found}
+          error -> error
+        end
+      end)
     end
   end
 
-  defp authorize_entitlement(context, actor, authorized_source) do
+  defp authorize_entitlement(execution_context, actor, authorized_source) do
     request = AuthorizeFinanceEntitlement.execution_request(authorized_source)
 
-    with {:ok, finance_context} <- finance_context(context, authorized_source) do
-      case AuthorizeFinanceEntitlement.call(finance_context, actor, request) do
-        {:ok, _decision} -> :ok
-        result -> result
-      end
+    case AuthorizeFinanceEntitlement.call(execution_context, actor, request) do
+      {:ok, _decision} -> :ok
+      result -> result
     end
   end
 
@@ -79,9 +85,4 @@ defmodule MilosTraining.Application.GetWorkoutTimerSequence do
       {:error, :invalid_scale_level}
     end
   end
-
-  defp get_workout(%{organization_id: _} = context, workout_id),
-    do: Workouts.get_workout(context, workout_id)
-
-  defp get_workout(_context, workout_id), do: Workouts.get_workout(workout_id)
 end

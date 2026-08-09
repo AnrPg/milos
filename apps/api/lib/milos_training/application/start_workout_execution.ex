@@ -7,6 +7,7 @@ defmodule MilosTraining.Application.StartWorkoutExecution do
   alias MilosTraining.Execution
   alias MilosTraining.Execution.ExecutionStore
   alias MilosTraining.Organizations
+  alias MilosTraining.Workouts
 
   def call(context, actor, params),
     do: ExecutionStore.with_user_context(context, fn -> run(context, actor, params) end)
@@ -28,19 +29,26 @@ defmodule MilosTraining.Application.StartWorkoutExecution do
              source,
              source_reference_id
            ),
-         :ok <- authorize_entitlement(context, actor, authorized_source) do
-      Execution.start_execution(actor.id, Map.merge(params, authorized_source))
+         {:ok, execution_context} <- finance_context(context, authorized_source),
+         :ok <- authorize_entitlement(execution_context, actor, authorized_source) do
+      # The workout being executed lives in `authorized_source.organization_id`,
+      # which - for the user-scoped (not org-scoped) /api/executions routes -
+      # is only known *after* AuthorizeWorkoutExecutionSource resolves it above.
+      # Re-open the tenant scope here so the workout lookup inside
+      # StartExecution (and the execution insert itself) can see rows owned by
+      # that organization; the outer `call/3` context never carried it.
+      Workouts.with_tenant_context(execution_context, fn ->
+        Execution.start_execution(actor.id, Map.merge(params, authorized_source))
+      end)
     end
   end
 
-  defp authorize_entitlement(context, actor, authorized_source) do
+  defp authorize_entitlement(execution_context, actor, authorized_source) do
     request = AuthorizeFinanceEntitlement.execution_request(authorized_source)
 
-    with {:ok, finance_context} <- finance_context(context, authorized_source) do
-      case AuthorizeFinanceEntitlement.call(finance_context, actor, request) do
-        {:ok, _decision} -> :ok
-        result -> result
-      end
+    case AuthorizeFinanceEntitlement.call(execution_context, actor, request) do
+      {:ok, _decision} -> :ok
+      result -> result
     end
   end
 

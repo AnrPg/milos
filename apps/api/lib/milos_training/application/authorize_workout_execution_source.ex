@@ -110,6 +110,28 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
     end
   end
 
+  # Unlike assignments, `Scheduling.get_booking_execution_access/3` has no
+  # unscoped fallback (bookings carry no analogue of `workout_organization_id`).
+  # The /api/executions routes are user-scoped, not org-scoped, so `context`
+  # never carries an organization_id here. Derive the tenant the same safe way
+  # `authorize_self_selected/3` does - from the workout being executed - then
+  # retry the lookup inside that scope.
+  defp authorize_booking(_context, %{id: _user_id} = actor, workout_id, booking_id)
+       when is_binary(booking_id) do
+    with organization_id when is_binary(organization_id) <-
+           WorkoutStore.workout_organization_id(workout_id),
+         {:ok, tenant_context} <-
+           Organizations.resolve_system_tenant_context(
+             organization_id,
+             :execution_authorization,
+             %{service: __MODULE__}
+           ) do
+      authorize_booking(tenant_context, actor, workout_id, booking_id)
+    else
+      _denied -> {:error, :execution_source_forbidden}
+    end
+  end
+
   defp authorize_booking(_context, _actor, _workout_id, _booking_id),
     do: {:error, :execution_source_forbidden}
 

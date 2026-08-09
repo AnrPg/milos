@@ -31,12 +31,22 @@ defmodule MilosTraining.Application.UpdateExecutionProgress do
 
   defp timer_sequence_for_execution(%{
          master_workout_id: workout_id,
-         scale_level_slug: scale_slug
+         scale_level_slug: scale_slug,
+         organization_id: organization_id,
+         user_id: user_id
        }) do
-    case resolve_workout(workout_id, scale_slug) do
-      nil -> {:ok, []}
-      workout -> {:ok, Execution.build_timer_sequence(workout)}
-    end
+    # The execution's own organization is the tenant that owns its workout.
+    # This runs inside the outer ExecutionStore.with_user_context/2 wrap from
+    # call/4, which - for the user-scoped /api/executions routes - never
+    # carries an organization_id, so the workout lookup below would otherwise
+    # silently see nothing (F-03 scoping) and this progress update would be
+    # validated against zero timer segments.
+    Workouts.with_tenant_context(%{organization_id: organization_id, user_id: user_id}, fn ->
+      case resolve_workout(workout_id, scale_slug) do
+        nil -> {:ok, []}
+        workout -> {:ok, Execution.build_timer_sequence(workout)}
+      end
+    end)
   end
 
   defp resolve_workout(workout_id, nil), do: Workouts.get_workout(workout_id)

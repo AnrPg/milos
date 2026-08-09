@@ -3,6 +3,9 @@ defmodule MilosTraining.Workouts.WorkoutStore do
 
   alias MilosTraining.Infrastructure.Tenancy.RepoContext
 
+  def with_tenant_context(context, fun) when is_function(fun, 0),
+    do: RepoContext.run(context, fun)
+
   defp adapter do
     Application.fetch_env!(:milos_training, :workout_store)
   end
@@ -47,6 +50,9 @@ defmodule MilosTraining.Workouts.WorkoutStore do
 
   def update_assigned_workout(context, id, params),
     do: within_tenant(context, fn -> update_assigned_workout(id, params) end)
+
+  def update_assignment_date(context, id, athlete_id, new_date),
+    do: within_tenant(context, fn -> update_assignment_date(id, athlete_id, new_date) end)
 
   def delete_assigned_workout(context, id),
     do: within_tenant(context, fn -> delete_assigned_workout(id) end)
