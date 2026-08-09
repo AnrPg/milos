@@ -114,7 +114,23 @@ defmodule MilosTraining.Gamification.RecordWorkoutCompletionTest do
     context
   end
 
+  # `scoreable_workout!/1` creates its workout through the unscoped
+  # `Workouts.create_workout/2` path, so the row lands under whichever
+  # organization the DB column default assigns (the seeded legacy
+  # organization) rather than under `context`. Looking it up again inside
+  # `Execution.start_execution/2` (and scoping the execution lookup inside
+  # `Execution.complete_execution/3`) is tenant-scoped, so the legacy
+  # organization and the acting user must be set in the session first.
   defp complete_execution!(context, user_id, workout_id, section_id, score_value) do
+    legacy_organization = Organizations.get_by_slug(Organizations.legacy_organization_slug())
+
+    Repo.query!("SELECT set_config($1, $2, false)", [
+      "app.organization_id",
+      legacy_organization.id
+    ])
+
+    Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", user_id])
+
     {:ok, execution} =
       Execution.start_execution(user_id, %{
         organization_id: context.organization_id,

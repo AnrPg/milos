@@ -4,6 +4,8 @@ defmodule MilosTraining.Workers.ProcessWorkoutCompletionJobTest do
 
   alias MilosTraining.Application.CompleteWorkout
   alias MilosTraining.Execution
+  alias MilosTraining.Organizations
+  alias MilosTraining.Repo
   alias MilosTraining.Workers.ProcessWorkoutCompletionJob
 
   import MilosTraining.TestFixtures
@@ -20,10 +22,31 @@ defmodule MilosTraining.Workers.ProcessWorkoutCompletionJobTest do
     :ok
   end
 
+  # `workout_fixture/1` creates workouts through the unscoped
+  # `Workouts.create_workout/2` path, so the row lands with whatever
+  # organization the DB column default assigns (the seeded legacy
+  # organization). Reading it back through `Workouts.get_workout/1` is
+  # tenant-scoped, so tests that need to look the workout up (e.g. via
+  # `Execution.start_execution/2`) — and executions back up through
+  # `Execution.get_execution/1`, which is scoped by `app.user_id` — must set
+  # that same organization/user context in the session first.
+  defp set_legacy_tenant_context!(user) do
+    legacy_organization = Organizations.get_by_slug(Organizations.legacy_organization_slug())
+
+    Repo.query!("SELECT set_config($1, $2, false)", [
+      "app.organization_id",
+      legacy_organization.id
+    ])
+
+    Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", user.id])
+    :ok
+  end
+
   test "completion is acknowledged only after a durable processing job is enqueued" do
     admin = admin_fixture()
     member = user_fixture(%{role: :member})
     workout = workout_fixture(admin)
+    set_legacy_tenant_context!(member)
 
     assert {:ok, execution} =
              Execution.start_execution(member.id, %{
@@ -46,6 +69,7 @@ defmodule MilosTraining.Workers.ProcessWorkoutCompletionJobTest do
     admin = admin_fixture()
     member = user_fixture(%{role: :member})
     workout = workout_fixture(admin)
+    set_legacy_tenant_context!(member)
 
     assert {:ok, execution} =
              Execution.start_execution(member.id, %{

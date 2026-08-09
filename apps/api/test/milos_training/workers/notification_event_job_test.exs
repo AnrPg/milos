@@ -1,6 +1,7 @@
 defmodule MilosTraining.Workers.NotificationEventJobTest do
   use MilosTraining.DataCase, async: false
 
+  alias MilosTraining.Organizations
   alias MilosTraining.Workers.NotificationEventJob
 
   import ExUnit.CaptureLog
@@ -23,14 +24,28 @@ defmodule MilosTraining.Workers.NotificationEventJobTest do
 
   test "booking fanout preserves recipient failures for Oban retry" do
     failing_admin = admin_fixture()
-    _healthy_admin = admin_fixture()
+    healthy_admin = admin_fixture()
     Process.put(:fail_user_id, failing_admin.id)
+
+    {:ok, organization} = Organizations.create_organization(%{name: "Notification Fanout Gym"})
+
+    for staff <- [failing_admin, healthy_admin] do
+      {:ok, _membership} =
+        Organizations.add_membership(%{
+          organization_id: organization.id,
+          user_id: staff.id,
+          role: :owner,
+          status: :active,
+          joined_at: DateTime.utc_now()
+        })
+    end
 
     booking = %{
       "id" => Ecto.UUID.generate(),
       "user_id" => Ecto.UUID.generate(),
       "scheduled_class_id" => Ecto.UUID.generate(),
       "status" => "pending",
+      "organization_id" => organization.id,
       "scheduled_class" => %{
         "scheduled_at" => "2026-06-13T10:00:00Z",
         "training_type" => "crossfit"
@@ -41,7 +56,11 @@ defmodule MilosTraining.Workers.NotificationEventJobTest do
       capture_log(fn ->
         assert {:error, {:notification_failed, :store_down}} =
                  NotificationEventJob.perform(%Oban.Job{
-                   args: %{"event" => "booking_timed_out", "payload" => booking}
+                   args: %{
+                     "event" => "booking_timed_out",
+                     "payload" => booking,
+                     "organization_id" => organization.id
+                   }
                  })
       end)
 

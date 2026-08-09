@@ -12,6 +12,8 @@ defmodule MilosTraining.Application.RealtimeSyncTest do
   }
 
   alias MilosTraining.Messaging
+  alias MilosTraining.Organizations
+  alias MilosTraining.Repo
   alias MilosTraining.Workers.DispatchMessageJob
 
   setup do
@@ -22,6 +24,8 @@ defmodule MilosTraining.Application.RealtimeSyncTest do
   test "sending a coaching note via messaging emits landing sync for the athlete" do
     admin = admin_fixture()
     athlete = user_fixture(%{role: :athlete})
+    context = legacy_tenant_context!(admin, :owner)
+    set_legacy_session!(context, admin)
 
     {:ok, thread} =
       Messaging.get_or_create_thread(%{
@@ -52,9 +56,11 @@ defmodule MilosTraining.Application.RealtimeSyncTest do
     admin = admin_fixture(%{nickname: "sync_assign_admin"})
     athlete = user_fixture(%{nickname: "sync_assign_athlete", role: :athlete})
     workout = workout_fixture(admin)
+    context = legacy_tenant_context!(admin, :owner)
+    add_legacy_membership!(athlete, :athlete)
 
     assert {:ok, assignment} =
-             AssignWorkout.call(%{
+             AssignWorkout.call(context, %{
                master_workout_id: workout.id,
                athlete_ids: [athlete.id],
                scheduled_for: Date.utc_today()
@@ -79,9 +85,10 @@ defmodule MilosTraining.Application.RealtimeSyncTest do
   test "updating admin settings emits landing sync for users and settings sync for admins" do
     admin = admin_fixture(%{nickname: "sync_settings_admin"})
     athlete = user_fixture(%{nickname: "sync_settings_athlete", role: :athlete})
+    context = legacy_tenant_context!(admin, :owner)
 
     assert {:ok, _settings} =
-             UpdateAdminSettings.call(%{
+             UpdateAdminSettings.call(context, %{
                gamification: %{
                  weekly_workout_target: 3,
                  streak_shield_reset_day: 7,
@@ -131,10 +138,14 @@ defmodule MilosTraining.Application.RealtimeSyncTest do
 
     assert {:ok, draft} = CreateDraftWorkout.call(admin)
 
+    context = legacy_tenant_context!(admin, :owner)
+    set_legacy_session!(context, admin)
+
     assert {:ok, updated_draft} =
              UpdateDraftWorkout.call(draft.id, %{
                title: "Updated title",
-               editor_session_id: editor_session_id
+               editor_session_id: editor_session_id,
+               expected_source_revision: draft.dsl_source_revision
              })
 
     assert updated_draft.id == draft.id
@@ -153,6 +164,49 @@ defmodule MilosTraining.Application.RealtimeSyncTest do
         payload: %{draft_id: draft.id, editor_session_id: editor_session_id}
       }
     ])
+  end
+
+  # Fixtures such as `workout_fixture/1` and `CreateDraftWorkout.call/1` create
+  # rows through unscoped command paths, so those rows land under whatever
+  # organization the DB column default assigns (the seeded legacy
+  # organization) rather than under a freshly created test organization.
+  # Reading/mutating them back through tenant-scoped queries therefore
+  # requires operating within that same legacy organization's context.
+  defp legacy_organization,
+    do: Organizations.get_by_slug(Organizations.legacy_organization_slug())
+
+  defp add_legacy_membership!(user, role) do
+    organization = legacy_organization()
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: user.id,
+        role: role,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    organization
+  end
+
+  defp legacy_tenant_context!(user, role) do
+    add_legacy_membership!(user, role)
+
+    {:ok, context} =
+      Organizations.resolve_tenant_context(user, Organizations.legacy_organization_slug())
+
+    context
+  end
+
+  defp set_legacy_session!(context, user) do
+    Repo.query!("SELECT set_config($1, $2, false)", [
+      "app.organization_id",
+      context.organization_id
+    ])
+
+    Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", user.id])
+    :ok
   end
 
   defp assert_user_syncs(expected_events, timeout \\ 1_000) do

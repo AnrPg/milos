@@ -3,6 +3,7 @@ defmodule MilosTrainingWeb.NotificationControllerTest do
 
   alias MilosTraining.Analytics
   alias MilosTraining.Notifications
+  alias MilosTraining.Organizations
 
   import MilosTraining.TestFixtures
 
@@ -143,8 +144,20 @@ defmodule MilosTrainingWeb.NotificationControllerTest do
     admin = admin_fixture()
     assignment_id = Ecto.UUID.generate()
 
+    {:ok, organization} = Organizations.create_organization(%{name: "Notification Deep Link Gym"})
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: admin.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
     assert :ok =
              Notifications.enqueue_workout_rejected(%{
+               organization_id: organization.id,
                assigned_workout_id: assignment_id,
                athlete_nickname: "atlas",
                workout_title: "Tempo Pull",
@@ -153,6 +166,7 @@ defmodule MilosTrainingWeb.NotificationControllerTest do
 
     assert :ok =
              Notifications.enqueue_workout_moved(%{
+               organization_id: organization.id,
                assigned_workout_id: assignment_id,
                athlete_nickname: "atlas",
                workout_title: "Tempo Pull",
