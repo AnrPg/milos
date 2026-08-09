@@ -11,7 +11,7 @@ defmodule MilosTraining.Organizations.T4OwnershipFoundationTest do
     assert %{id: legacy_organization_id} =
              Organizations.get_by_slug("legacy-milos-training")
 
-    {:ok, _membership} = Organizations.ensure_legacy_membership(user, :owner)
+    {:ok, _membership} = Organizations.ensure_legacy_membership_for_migration(user, :owner)
 
     assert [%{membership: %{role: :owner}, organization: %{id: ^legacy_organization_id}}] =
              Organizations.list_memberships(user.id)

@@ -124,12 +124,12 @@ defmodule MilosTrainingWeb.WorkoutControllerTest do
     {:ok, member} =
       Identity.register(%{
         nickname: nickname,
-        password: "S3cur3P@ss!",
+        password: "S3cur3P@ss!42",
         role: :member,
         email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
       })
 
-    {:ok, _membership} = Organizations.ensure_legacy_membership(member)
+    {:ok, _membership} = Organizations.ensure_legacy_membership_for_migration(member)
     put_bearer_token(conn, member)
   end
 
@@ -137,13 +137,13 @@ defmodule MilosTrainingWeb.WorkoutControllerTest do
     {:ok, user} =
       Identity.register(%{
         nickname: nickname,
-        password: "S3cur3P@ss!",
+        password: "S3cur3P@ss!42",
         role: :member,
         email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
       })
 
     {:ok, admin} = Identity.update_role(user, :admin)
-    {:ok, _membership} = Organizations.ensure_legacy_membership(admin, :owner)
+    {:ok, _membership} = Organizations.ensure_legacy_membership_for_migration(admin, :owner)
     admin
   end
 
@@ -151,12 +151,12 @@ defmodule MilosTrainingWeb.WorkoutControllerTest do
     {:ok, athlete} =
       Identity.register(%{
         nickname: nickname,
-        password: "S3cur3P@ss!",
+        password: "S3cur3P@ss!42",
         role: :athlete,
         email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
       })
 
-    {:ok, _membership} = Organizations.ensure_legacy_membership(athlete)
+    {:ok, _membership} = Organizations.ensure_legacy_membership_for_migration(athlete)
     put_bearer_token(conn, athlete)
   end
 end

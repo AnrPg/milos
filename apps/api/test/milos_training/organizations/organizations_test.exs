@@ -178,8 +178,8 @@ defmodule MilosTraining.OrganizationsTest do
   end
 
   test "legacy organization creation is idempotent" do
-    assert {:ok, first} = Organizations.ensure_legacy_organization()
-    assert {:ok, second} = Organizations.ensure_legacy_organization()
+    assert {:ok, first} = Organizations.ensure_legacy_organization_for_migration()
+    assert {:ok, second} = Organizations.ensure_legacy_organization_for_migration()
     assert first.id == second.id
     assert first.slug == "legacy-milos-training"
     assert first.name == "Milos Training"

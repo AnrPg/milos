@@ -16,7 +16,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
     test "returns tokens on valid registration", %{conn: conn} do
       params = %{
         nickname: "zeus",
-        password: "S3cur3P@ss!",
+        password: "S3cur3P@ss!42",
         role: "member",
         email: "zeus@placeholder.invalid"
       }
@@ -35,7 +35,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
     test "returns 422 on duplicate nickname", %{conn: conn} do
       params = %{
         nickname: "zeus",
-        password: "S3cur3P@ss!",
+        password: "S3cur3P@ss!42",
         role: "member",
         email: "zeus@placeholder.invalid"
       }
@@ -73,7 +73,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
           "/api/auth/register",
           Jason.encode!(%{
             nickname: "hephaestus",
-            password: "S3cur3P@ss!",
+            password: "S3cur3P@ss!42",
             role: "member",
             email: "hephaestus@placeholder.invalid"
           })
@@ -111,7 +111,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
     } do
       params = %{
         nickname: "athena_admin",
-        password: "S3cur3P@ss!",
+        password: "S3cur3P@ss!42",
         invitation_token: token,
         email: "athena_admin@placeholder.invalid"
       }
@@ -158,7 +158,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
           "/api/auth/register-admin",
           Jason.encode!(%{
             nickname: "wrong_person",
-            password: "S3cur3P@ss!",
+            password: "S3cur3P@ss!42",
             invitation_token: bound_token,
             email: "someone.else@example.com"
           })
@@ -174,7 +174,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
           "/api/auth/register-admin",
           Jason.encode!(%{
             nickname: "right_person",
-            password: "S3cur3P@ss!",
+            password: "S3cur3P@ss!42",
             invitation_token: bound_token,
             email: "Invited@Example.com"
           })
@@ -188,7 +188,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
     test "rejects an invalid invitation without creating an account", %{conn: conn} do
       params = %{
         nickname: "false_admin",
-        password: "S3cur3P@ss!",
+        password: "S3cur3P@ss!42",
         invitation_token: String.duplicate("x", 43),
         email: "false_admin@placeholder.invalid"
       }
@@ -208,7 +208,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
       {:ok, _user} =
         Identity.register(%{
           nickname: "hermes",
-          password: "S3cur3P@ss!",
+          password: "S3cur3P@ss!42",
           role: :member,
           email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
@@ -220,7 +220,10 @@ defmodule MilosTrainingWeb.AuthControllerTest do
       conn =
         conn
         |> put_req_header("content-type", "application/json")
-        |> post("/api/auth/login", Jason.encode!(%{nickname: "hermes", password: "S3cur3P@ss!"}))
+        |> post(
+          "/api/auth/login",
+          Jason.encode!(%{nickname: "hermes", password: "S3cur3P@ss!42"})
+        )
 
       assert json_response(conn, 200)["access_token"]
       refute Map.has_key?(json_response(conn, 200), "refresh_token")
@@ -345,7 +348,10 @@ defmodule MilosTrainingWeb.AuthControllerTest do
       conn =
         conn
         |> put_req_header("content-type", "application/json")
-        |> post("/api/auth/login", Jason.encode!(%{nickname: "hermes", password: "S3cur3P@ss!"}))
+        |> post(
+          "/api/auth/login",
+          Jason.encode!(%{nickname: "hermes", password: "S3cur3P@ss!42"})
+        )
 
       assert %{"error" => "Authentication service unavailable"} = json_response(conn, 500)
     end
@@ -369,7 +375,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
           "/api/auth/register",
           Jason.encode!(%{
             nickname: "apollo",
-            password: "S3cur3P@ss!",
+            password: "S3cur3P@ss!42",
             role: "member",
             email: "apollo@placeholder.invalid"
           })
@@ -406,7 +412,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
           "/api/auth/register",
           Jason.encode!(%{
             nickname: "odin",
-            password: "S3cur3P@ss!",
+            password: "S3cur3P@ss!42",
             role: "member",
             email: "odin@placeholder.invalid"
           })
@@ -457,7 +463,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
           "/api/auth/register",
           Jason.encode!(%{
             nickname: "security_family",
-            password: "S3cur3P@ss!",
+            password: "S3cur3P@ss!42",
             role: "member",
             email: "security_family@placeholder.invalid"
           })
@@ -494,7 +500,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
       {:ok, user} =
         Identity.register(%{
           nickname: "ares",
-          password: "S3cur3P@ss!",
+          password: "S3cur3P@ss!42",
           role: :member,
           email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
@@ -518,7 +524,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
       {:ok, user} =
         Identity.register(%{
           nickname: "platform_me",
-          password: "S3cur3P@ss!",
+          password: "S3cur3P@ss!42",
           role: :member,
           email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
@@ -544,23 +550,24 @@ defmodule MilosTrainingWeb.AuthControllerTest do
       {:ok, admin} =
         Identity.register(%{
           nickname: "hera",
-          password: "S3cur3P@ss!",
+          password: "S3cur3P@ss!42",
           role: :member,
           email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
       {:ok, admin} = Identity.update_role(admin, :admin)
-      {:ok, _membership} = Organizations.ensure_legacy_membership(admin, :owner)
+      {:ok, _membership} = Organizations.ensure_legacy_membership_for_migration(admin, :owner)
 
       {:ok, athlete} =
         Identity.register(%{
           nickname: "poseidon",
-          password: "S3cur3P@ss!",
+          password: "S3cur3P@ss!42",
           role: :member,
           email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
-      {:ok, _athlete_membership} = Organizations.ensure_legacy_membership(athlete, :member)
+      {:ok, _athlete_membership} =
+        Organizations.ensure_legacy_membership_for_migration(athlete, :member)
 
       {:ok, access_token, _claims} =
         Guardian.encode_and_sign(admin, %{"sv" => admin.security_version}, token_type: "access")
@@ -584,17 +591,17 @@ defmodule MilosTrainingWeb.AuthControllerTest do
       {:ok, member} =
         Identity.register(%{
           nickname: "demeter",
-          password: "S3cur3P@ss!",
+          password: "S3cur3P@ss!42",
           role: :member,
           email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
-      {:ok, _membership} = Organizations.ensure_legacy_membership(member, :member)
+      {:ok, _membership} = Organizations.ensure_legacy_membership_for_migration(member, :member)
 
       {:ok, athlete} =
         Identity.register(%{
           nickname: "artemis",
-          password: "S3cur3P@ss!",
+          password: "S3cur3P@ss!42",
           role: :athlete,
           email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
@@ -617,13 +624,13 @@ defmodule MilosTrainingWeb.AuthControllerTest do
       {:ok, admin} =
         Identity.register(%{
           nickname: "athena",
-          password: "S3cur3P@ss!",
+          password: "S3cur3P@ss!42",
           role: :member,
           email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
 
       {:ok, admin} = Identity.update_role(admin, :admin)
-      {:ok, _membership} = Organizations.ensure_legacy_membership(admin, :owner)
+      {:ok, _membership} = Organizations.ensure_legacy_membership_for_migration(admin, :owner)
 
       {:ok, access_token, _claims} =
         Guardian.encode_and_sign(admin, %{"sv" => admin.security_version}, token_type: "access")
