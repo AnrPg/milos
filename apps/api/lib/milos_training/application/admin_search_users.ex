@@ -63,14 +63,17 @@ defmodule MilosTraining.Application.AdminSearchUsers do
       |> filter_query(search_params.query)
 
     finance_summaries =
-      Finance.search_member_summaries(%{
-        user_ids: Enum.map(candidates, & &1.id),
-        membership_status: search_params.membership_status,
-        user_type: search_params.user_type,
-        package_code: search_params.package_code,
-        package_family: search_params.package_family,
-        limit: max(length(candidates), search_params.limit)
-      })
+      search_member_summaries(
+        Map.get(search_params, :organization_id),
+        %{
+          user_ids: Enum.map(candidates, & &1.id),
+          membership_status: search_params.membership_status,
+          user_type: search_params.user_type,
+          package_code: search_params.package_code,
+          package_family: search_params.package_family,
+          limit: max(length(candidates), search_params.limit)
+        }
+      )
 
     users =
       candidates
@@ -90,6 +93,11 @@ defmodule MilosTraining.Application.AdminSearchUsers do
       }
     }
   end
+
+  defp search_member_summaries(nil, filters), do: Finance.search_member_summaries(filters)
+
+  defp search_member_summaries(organization_id, filters) when is_binary(organization_id),
+    do: Finance.search_member_summaries(%{organization_id: organization_id}, filters)
 
   defp allowed_user_ids(nil), do: nil
 

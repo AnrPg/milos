@@ -30,11 +30,11 @@ defmodule MilosTraining.Application.AdminUserDossierTest do
     assert id == member.id
 
     assert {:ok, %{user_id: ^id, executions: [], scores: []}} =
-             GetAdminUserTrainingHistory.call(id)
+             GetAdminUserTrainingHistory.call(tenant_context, id)
 
-    assert {:ok, %{user_id: ^id, prs: []}} = GetAdminUserPRs.call(id)
-    assert {:ok, %{user_id: ^id, incidents: []}} = GetAdminUserIncidents.call(id)
-    assert {:ok, %{user_id: ^id, threads: []}} = GetAdminUserMessages.call(id)
+    assert {:ok, %{user_id: ^id, prs: []}} = GetAdminUserPRs.call(tenant_context, id)
+    assert {:ok, %{user_id: ^id, incidents: []}} = GetAdminUserIncidents.call(tenant_context, id)
+    assert {:ok, %{user_id: ^id, threads: []}} = GetAdminUserMessages.call(tenant_context, id)
 
     assert {:ok, %{user_id: ^id, available: false, drill_down: nil}} =
              GetAdminUserCoachingContext.call(id)
@@ -134,9 +134,21 @@ defmodule MilosTraining.Application.AdminUserDossierTest do
   end
 
   defp legacy_tenant_context(user) do
-    {:ok, context} =
-      Organizations.resolve_tenant_context(user, Organizations.legacy_organization_slug())
+    {:ok, organization} =
+      Organizations.create_organization(%{
+        name: "Dossier Test Gym #{System.unique_integer([:positive])}"
+      })
 
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: user.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    {:ok, context} = Organizations.resolve_tenant_context(user, organization.slug)
     context
   end
 end

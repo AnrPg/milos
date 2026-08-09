@@ -27,6 +27,7 @@ defmodule MilosTraining.Application.AdminSearchUsersTest do
 
     member = TestFixtures.user_fixture(%{role: :member, nickname: "slice_member"})
     athlete = TestFixtures.user_fixture(%{role: :athlete, nickname: "slice_athlete"})
+    set_ambient_tenant_context(member)
 
     assert {:ok, package} =
              Finance.create_package(%{
@@ -67,6 +68,7 @@ defmodule MilosTraining.Application.AdminSearchUsersTest do
     Application.put_env(:milos_training, :admin_member_search_index, __MODULE__.FailingIndex)
 
     target = TestFixtures.user_fixture(%{role: :member, nickname: "package_limit_00_target"})
+    set_ambient_tenant_context(target)
 
     assert {:ok, target_package} =
              Finance.create_package(%{
@@ -221,6 +223,20 @@ defmodule MilosTraining.Application.AdminSearchUsersTest do
     end
 
     def search(_params), do: {:error, :unexpected_params}
+  end
+
+  defp set_ambient_tenant_context(owner) do
+    {:ok, organization} =
+      Organizations.create_organization(%{
+        name: "Search Slice Gym #{System.unique_integer([:positive])}"
+      })
+
+    add_org_membership(organization.id, owner.id, :owner)
+
+    Repo.query!("SELECT set_config($1, $2, false)", ["app.organization_id", organization.id])
+    Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", owner.id])
+
+    organization
   end
 
   defp add_org_membership(organization_id, user_id, role) do
