@@ -1,7 +1,7 @@
 defmodule MilosTrainingWeb.AdminAnalyticsControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
-  alias MilosTraining.{Analytics, Organizations}
+  alias MilosTraining.{Analytics, Organizations, Repo}
 
   import MilosTraining.TestFixtures
 
@@ -18,6 +18,9 @@ defmodule MilosTrainingWeb.AdminAnalyticsControllerTest do
         status: :active,
         joined_at: DateTime.utc_now()
       })
+
+    Repo.query!("SELECT set_config($1, $2, false)", ["app.organization_id", organization.id])
+    Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", admin.id])
 
     {:ok, _event} =
       Analytics.record_event(%{

@@ -10,6 +10,11 @@ defmodule MilosTraining.AnalyticsTest do
   test "records analytics events and summarizes them by name" do
     user = TestFixtures.user_fixture()
 
+    set_tenant_session!(
+      tenant_context_fixture(TestFixtures.admin_fixture(), "Events Gym"),
+      user.id
+    )
+
     assert {:ok, event} =
              Analytics.record_event(%{
                event_name: "review_submitted",
@@ -65,6 +70,11 @@ defmodule MilosTraining.AnalyticsTest do
   test "records durable communication threads and messages for analytics" do
     user = TestFixtures.user_fixture()
 
+    set_tenant_session!(
+      tenant_context_fixture(TestFixtures.admin_fixture(), "Comms Gym"),
+      user.id
+    )
+
     assert {:ok, message} =
              Analytics.record_communication_message(%{
                context_type: "general",
@@ -114,6 +124,11 @@ defmodule MilosTraining.AnalyticsTest do
 
   test "records analytics when notifications are bulk marked read" do
     user = TestFixtures.user_fixture()
+
+    set_tenant_session!(
+      tenant_context_fixture(TestFixtures.admin_fixture(), "Notif Gym"),
+      user.id
+    )
 
     assert {:ok, _notification} =
              Notifications.create_notification(%{
