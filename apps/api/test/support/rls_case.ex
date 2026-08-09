@@ -31,33 +31,59 @@ defmodule MilosTraining.RLSCase do
     pid = Ecto.Adapters.SQL.Sandbox.start_owner!(MilosTraining.Repo, shared: false)
     on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
 
-    Ecto.Adapters.SQL.query!(MilosTraining.Repo, """
-    DO $$ BEGIN
-      IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '#{@runtime_role}') THEN
-        CREATE ROLE #{@runtime_role} LOGIN PASSWORD '#{@runtime_password}';
-      END IF;
-    END $$;
-    """)
+    # Provisioning the runtime role has to happen on a connection outside the
+    # Ecto sandbox: `MilosTraining.Repo` runs every query inside a transaction
+    # that's rolled back when the owner above stops, so CREATE ROLE/GRANT
+    # issued through it never durably take effect. The separate `conn` this
+    # test gets below is a genuinely different physical connection/role and
+    # needs privileges that actually persisted.
+    {:ok, admin_conn} =
+      Postgrex.start_link(
+        hostname: System.get_env("DB_HOST", "localhost"),
+        port: String.to_integer(System.get_env("DB_PORT", "5432")),
+        username: System.get_env("DB_USER", "postgres"),
+        password: System.get_env("DB_PASSWORD", "postgres"),
+        database:
+          System.get_env("DB_NAME", "milos_training_test#{System.get_env("MIX_TEST_PARTITION")}")
+      )
 
-    Ecto.Adapters.SQL.query!(
-      MilosTraining.Repo,
-      "ALTER ROLE #{@runtime_role} NOBYPASSRLS NOSUPERUSER"
+    Postgrex.query!(
+      admin_conn,
+      """
+      DO $$ BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '#{@runtime_role}') THEN
+          CREATE ROLE #{@runtime_role} LOGIN PASSWORD '#{@runtime_password}';
+        END IF;
+      END $$;
+      """,
+      []
     )
 
-    Ecto.Adapters.SQL.query!(
-      MilosTraining.Repo,
-      "GRANT USAGE ON SCHEMA public TO #{@runtime_role}"
+    Postgrex.query!(
+      admin_conn,
+      "ALTER ROLE #{@runtime_role} NOBYPASSRLS NOSUPERUSER",
+      []
     )
 
-    Ecto.Adapters.SQL.query!(
-      MilosTraining.Repo,
-      "GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO #{@runtime_role}"
+    Postgrex.query!(
+      admin_conn,
+      "GRANT USAGE ON SCHEMA public TO #{@runtime_role}",
+      []
     )
 
-    Ecto.Adapters.SQL.query!(
-      MilosTraining.Repo,
-      "GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO #{@runtime_role}"
+    Postgrex.query!(
+      admin_conn,
+      "GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO #{@runtime_role}",
+      []
     )
+
+    Postgrex.query!(
+      admin_conn,
+      "GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO #{@runtime_role}",
+      []
+    )
+
+    GenServer.stop(admin_conn)
 
     {:ok, pid} =
       Postgrex.start_link(
