@@ -16,7 +16,10 @@ defmodule MilosTraining.Application.SubmitReview do
   def call(context, user_id, params) do
     with {:ok, target_snapshot} <- target_snapshot(context, user_id, params),
          {:ok, review} <-
-           Feedback.submit_review(user_id, trusted_review_params(params, target_snapshot)) do
+           Feedback.submit_review(
+             user_id,
+             trusted_review_params(params, target_snapshot, context)
+           ) do
       RecordAnalyticsEvent.call_unsafe("review_submitted", %{
         user_id: user_id,
         context_type: "review",
@@ -43,6 +46,7 @@ defmodule MilosTraining.Application.SubmitReview do
     Notifications.dispatch_event(:review_submitted, %{
       review_id: review.id,
       user_id: user_id,
+      organization_id: review.organization_id,
       target_type: review.target_type,
       target_id: review.target_id,
       rating: review.rating,
@@ -122,12 +126,19 @@ defmodule MilosTraining.Application.SubmitReview do
     end
   end
 
-  defp trusted_review_params(params, target_snapshot) do
+  defp trusted_review_params(params, target_snapshot, context) do
     params
     |> string_key_map()
     |> Map.drop(["target_snapshot"])
     |> Map.put("target_snapshot", target_snapshot)
+    |> put_organization_id(context)
   end
+
+  defp put_organization_id(params, %{organization_id: organization_id})
+       when is_binary(organization_id),
+       do: Map.put(params, "organization_id", organization_id)
+
+  defp put_organization_id(params, _context), do: params
 
   defp snapshot(type, id, label) do
     %{

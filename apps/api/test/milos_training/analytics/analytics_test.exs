@@ -4,6 +4,7 @@ defmodule MilosTraining.AnalyticsTest do
   alias MilosTraining.Analytics
   alias MilosTraining.Application.MarkNotificationsRead
   alias MilosTraining.Notifications
+  alias MilosTraining.Organizations
   alias MilosTraining.TestFixtures
 
   test "records analytics events and summarizes them by name" do
@@ -27,8 +28,11 @@ defmodule MilosTraining.AnalyticsTest do
   test "records push attempts and attendance facts for summary reads" do
     user = TestFixtures.user_fixture()
     admin = TestFixtures.admin_fixture()
+    context = tenant_context_fixture(admin, "Attendance Analytics Gym")
+    set_tenant_session!(context, admin.id)
     workout = TestFixtures.workout_fixture(admin)
-    slot = TestFixtures.slot_fixture(workout)
+    TestFixtures.class_type_fixture(%{tenant_context: context})
+    slot = TestFixtures.slot_fixture(workout, %{tenant_context: context})
 
     assert {:ok, _attempt} =
              Analytics.record_push_attempt(%{
@@ -38,7 +42,7 @@ defmodule MilosTraining.AnalyticsTest do
              })
 
     assert {:ok, _attendance} =
-             Analytics.record_attendance(%{
+             Analytics.record_attendance(context, %{
                scheduled_class_id: slot.id,
                user_id: user.id,
                status: "attended",
@@ -50,11 +54,11 @@ defmodule MilosTraining.AnalyticsTest do
     assert summary.attendance.by_status["attended"] >= 1
 
     scheduling_attendance =
-      MilosTraining.Scheduling.get_attendance_for_user_class(user.id, slot.id)
+      MilosTraining.Scheduling.get_attendance_for_user_class(context, user.id, slot.id)
 
     assert scheduling_attendance.status == "attended"
 
-    analytics_attendance = Analytics.get_attendance_for_user_class(user.id, slot.id)
+    analytics_attendance = Analytics.get_attendance_for_user_class(context, user.id, slot.id)
     assert analytics_attendance.status == "attended"
   end
 
@@ -84,18 +88,22 @@ defmodule MilosTraining.AnalyticsTest do
     member = TestFixtures.user_fixture()
     other_member = TestFixtures.user_fixture()
     admin = TestFixtures.admin_fixture()
+    context = tenant_context_fixture(admin, "Attendance Mismatch Gym")
+    set_tenant_session!(context, admin.id)
     workout = TestFixtures.workout_fixture(admin)
-    slot = TestFixtures.slot_fixture(workout)
+    TestFixtures.class_type_fixture(%{tenant_context: context})
+    slot = TestFixtures.slot_fixture(workout, %{tenant_context: context})
 
     assert {:ok, booking} =
              MilosTraining.Scheduling.submit_booking(
+               context,
                member.id,
                slot.id,
                slot.booking_timeout_minutes
              )
 
     assert {:error, :attendance_booking_mismatch} =
-             Analytics.record_attendance(%{
+             Analytics.record_attendance(context, %{
                booking_id: booking.id,
                scheduled_class_id: slot.id,
                user_id: other_member.id,
@@ -118,5 +126,30 @@ defmodule MilosTraining.AnalyticsTest do
 
     summary = Analytics.analytics_summary(%{})
     assert summary.events.by_name["notification_read"] >= 1
+  end
+
+  defp tenant_context_fixture(owner, name) do
+    {:ok, organization} = Organizations.create_organization(%{name: name})
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: owner.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    {:ok, context} = Organizations.resolve_tenant_context(owner, organization.slug)
+    context
+  end
+
+  defp set_tenant_session!(context, user_id) do
+    MilosTraining.Repo.query!("SELECT set_config($1, $2, false)", [
+      "app.organization_id",
+      context.organization_id
+    ])
+
+    MilosTraining.Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", user_id])
   end
 end

@@ -27,6 +27,7 @@ defmodule MilosTraining.Feedback.Review do
   def changeset(review \\ %__MODULE__{}, params) do
     review
     |> cast(normalize_params(params), [
+      :organization_id,
       :user_id,
       :target_type,
       :target_id,

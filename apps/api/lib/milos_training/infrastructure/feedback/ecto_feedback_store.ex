@@ -188,6 +188,7 @@ defmodule MilosTraining.Infrastructure.Feedback.EctoFeedbackStore do
     %{
       id: review.id,
       user_id: review.user_id,
+      organization_id: review.organization_id,
       target_type: review.target_type,
       target_id: review.target_id,
       target_snapshot: review.target_snapshot || %{},

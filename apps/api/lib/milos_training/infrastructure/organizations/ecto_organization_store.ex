@@ -186,6 +186,8 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   end
 
   @impl true
+  def list_staff_user_ids(nil), do: []
+
   def list_staff_user_ids(organization_id) do
     OrganizationMembership
     |> where(

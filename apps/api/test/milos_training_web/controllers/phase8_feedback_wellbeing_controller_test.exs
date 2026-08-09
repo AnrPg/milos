@@ -3,13 +3,34 @@ defmodule MilosTrainingWeb.Phase8FeedbackWellbeingControllerTest do
 
   import MilosTraining.TestFixtures
 
+  alias MilosTraining.Organizations
+
+  defp org_with_athlete!(athlete) do
+    {:ok, organization} =
+      Organizations.create_organization(%{
+        name: "Reviews Gym #{System.unique_integer([:positive])}"
+      })
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: athlete.id,
+        role: :athlete,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    organization
+  end
+
   test "user can submit and list reviews", %{conn: conn} do
     user = user_fixture(%{role: :athlete})
+    organization = org_with_athlete!(user)
 
     create_response =
       conn
       |> put_bearer_token(user)
-      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/reviews", %{
+      |> post("/api/org/#{organization.slug}/me/reviews", %{
         target_type: "general",
         rating: 5,
         sentiment: "positive",
@@ -32,7 +53,7 @@ defmodule MilosTrainingWeb.Phase8FeedbackWellbeingControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(user)
-      |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/reviews")
+      |> get("/api/org/#{organization.slug}/me/reviews")
       |> json_response(200)
 
     assert Enum.map(list_response["reviews"], & &1["id"]) == [create_response["review"]["id"]]
@@ -90,11 +111,27 @@ defmodule MilosTrainingWeb.Phase8FeedbackWellbeingControllerTest do
     admin = admin_fixture()
     user = user_fixture(%{role: :athlete})
 
+    {:ok, organization} =
+      Organizations.create_organization(%{
+        name: "Injuries Gym #{System.unique_integer([:positive])}"
+      })
+
+    for {member, role} <- [{admin, :owner}, {user, :athlete}] do
+      {:ok, _membership} =
+        Organizations.add_membership(%{
+          organization_id: organization.id,
+          user_id: member.id,
+          role: role,
+          status: :active,
+          joined_at: DateTime.utc_now()
+        })
+    end
+
     create_response =
       conn
       |> put_bearer_token(admin)
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/wellbeing/users/#{user.id}/injuries",
+        "/api/org/#{organization.slug}/admin/wellbeing/users/#{user.id}/injuries",
         %{
           body_area: "back",
           severity: "moderate",
@@ -127,7 +164,7 @@ defmodule MilosTrainingWeb.Phase8FeedbackWellbeingControllerTest do
       |> recycle()
       |> put_bearer_token(admin)
       |> patch(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/wellbeing/injuries/#{injury_id}/heal",
+        "/api/org/#{organization.slug}/admin/wellbeing/injuries/#{injury_id}/heal",
         %{}
       )
       |> json_response(200)

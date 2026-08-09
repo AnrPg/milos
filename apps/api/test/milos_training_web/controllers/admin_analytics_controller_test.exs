@@ -1,12 +1,23 @@
 defmodule MilosTrainingWeb.AdminAnalyticsControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
-  alias MilosTraining.Analytics
+  alias MilosTraining.{Analytics, Organizations}
 
   import MilosTraining.TestFixtures
 
   test "admin can fetch analytics summary backed by persisted facts", %{conn: conn} do
     admin = admin_fixture()
+
+    {:ok, organization} = Organizations.create_organization(%{name: "Analytics Summary Gym"})
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: admin.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
 
     {:ok, _event} =
       Analytics.record_event(%{
@@ -19,7 +30,7 @@ defmodule MilosTrainingWeb.AdminAnalyticsControllerTest do
       conn
       |> put_bearer_token(admin)
       |> get(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/analytics/summary",
+        "/api/org/#{organization.slug}/admin/analytics/summary",
         %{days: 30}
       )
       |> json_response(200)

@@ -1,9 +1,43 @@
 defmodule MilosTraining.FeedbackTest do
   use MilosTraining.DataCase
+  use Oban.Testing, repo: MilosTraining.Repo
 
   alias MilosTraining.Application.SubmitReview
-  alias MilosTraining.{Analytics, Execution, Feedback, Notifications}
+  alias MilosTraining.{Analytics, Execution, Feedback, Notifications, Organizations}
   alias MilosTraining.TestFixtures
+
+  # `workout_fixture/2` and `slot_fixture/2` write through the legacy,
+  # session-scoped path, which resolves its target organization from the
+  # `app.organization_id` GUC. Set it once here so workouts/slots always land
+  # in the legacy organization regardless of prior session state, matching
+  # the pattern established in submit_booking_test.exs.
+  setup do
+    start_supervised!(
+      {Oban, Keyword.put(Application.fetch_env!(:milos_training, Oban), :testing, :manual)}
+    )
+
+    {:ok, legacy_organization} = Organizations.ensure_legacy_organization_for_migration()
+
+    Repo.query!("SELECT set_config($1, $2, false)", [
+      "app.organization_id",
+      legacy_organization.id
+    ])
+
+    %{legacy_organization: legacy_organization}
+  end
+
+  defp legacy_tenant_context(actor, role \\ nil) do
+    {:ok, _membership} = Organizations.ensure_legacy_membership_for_migration(actor, role)
+
+    {:ok, context} =
+      Organizations.resolve_tenant_context(actor, Organizations.legacy_organization_slug())
+
+    context
+  end
+
+  defp set_current_user(user_id) do
+    Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", user_id])
+  end
 
   test "submits a review with questionnaire answers and updates status" do
     user = TestFixtures.user_fixture()
@@ -153,8 +187,12 @@ defmodule MilosTraining.FeedbackTest do
 
   test "application submission writes trusted target snapshots" do
     admin = TestFixtures.admin_fixture()
+    legacy_tenant_context(admin, :owner)
+
     user = TestFixtures.user_fixture()
     workout = TestFixtures.workout_fixture(admin, %{title: "Trusted Snapshot Workout"})
+
+    set_current_user(user.id)
 
     assert {:ok, execution} =
              Execution.start_execution(user.id, %{
@@ -187,15 +225,27 @@ defmodule MilosTraining.FeedbackTest do
 
   test "application submission creates an actionable admin review notification" do
     admin = TestFixtures.admin_fixture()
+    legacy_tenant_context(admin, :owner)
+
     user = TestFixtures.user_fixture()
+    context = legacy_tenant_context(user)
+
+    Repo.query!("SELECT set_config($1, $2, false)", [
+      "app.organization_id",
+      context.organization_id
+    ])
+
+    set_current_user(user.id)
 
     assert {:ok, _review} =
-             SubmitReview.call(user.id, %{
+             SubmitReview.call(context, user.id, %{
                target_type: "general",
                rating: 4,
                sentiment: "positive",
                body: "The new class flow is much clearer."
              })
+
+    Oban.drain_queue(queue: :notifications, with_safety: false)
 
     assert [notification] = Notifications.list_for_user(admin.id)
     assert notification.type == "review_submitted"
@@ -204,8 +254,12 @@ defmodule MilosTraining.FeedbackTest do
 
   test "application review submission requires completed executions" do
     admin = TestFixtures.admin_fixture()
+    legacy_tenant_context(admin, :owner)
+
     user = TestFixtures.user_fixture()
     workout = TestFixtures.workout_fixture(admin)
+
+    set_current_user(user.id)
 
     assert {:ok, execution} =
              Execution.start_execution(user.id, %{
@@ -235,11 +289,14 @@ defmodule MilosTraining.FeedbackTest do
 
   test "application review submission requires attended class slots" do
     admin = TestFixtures.admin_fixture()
+    legacy_tenant_context(admin, :owner)
+
     user = TestFixtures.user_fixture()
+    context = legacy_tenant_context(user)
     workout = TestFixtures.workout_fixture(admin)
     slot = TestFixtures.slot_fixture(workout, %{auto_approve: true})
 
-    assert {:ok, booking} = MilosTraining.Application.SubmitBooking.call(user.id, slot.id)
+    assert {:ok, booking} = MilosTraining.Application.SubmitBooking.call(context, user, slot.id)
     assert booking.status == :approved
 
     params = %{
@@ -255,17 +312,17 @@ defmodule MilosTraining.FeedbackTest do
       ]
     }
 
-    assert {:error, :review_target_not_completed} = SubmitReview.call(user.id, params)
+    assert {:error, :review_target_not_completed} = SubmitReview.call(context, user.id, params)
 
     assert {:ok, _attendance} =
-             Analytics.record_attendance(%{
+             Analytics.record_attendance(context, %{
                scheduled_class_id: slot.id,
                user_id: user.id,
                status: "attended",
                marked_by_id: admin.id
              })
 
-    assert {:ok, review} = SubmitReview.call(user.id, params)
+    assert {:ok, review} = SubmitReview.call(context, user.id, params)
     assert review.target_snapshot["target_type"] == "class_slot"
   end
 end
