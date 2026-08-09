@@ -5,7 +5,7 @@ defmodule MilosTraining.FinanceTest do
   alias MilosTraining.TestFixtures
 
   setup do
-    owner = TestFixtures.user_fixture(%{role: :admin})
+    owner = TestFixtures.admin_fixture()
     context = tenant_context_fixture(owner, "Finance Test #{System.unique_integer([:positive])}")
 
     Repo.query!("SELECT set_config($1, $2, false)", [
@@ -108,6 +108,7 @@ defmodule MilosTraining.FinanceTest do
 
     assert {:ok, _reversal} =
              Finance.reverse_payment(membership.id, receipt.payment.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 4_500,
                reason: "Admin correction"
              })
@@ -407,6 +408,7 @@ defmodule MilosTraining.FinanceTest do
 
     assert {:ok, _reversal} =
              Finance.reverse_payment(context, membership.id, payment.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 3_000,
                reason: "Refund regression"
              })
@@ -448,6 +450,7 @@ defmodule MilosTraining.FinanceTest do
 
     assert {:ok, _reversal} =
              Finance.reverse_payment(membership.id, old_payment.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 3_000,
                reason: "Old period refund"
              })
@@ -510,11 +513,13 @@ defmodule MilosTraining.FinanceTest do
 
     assert {:error, :payment_not_creditable} =
              Finance.apply_credit_to_payment(membership.id, failed_payment.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 100
              })
 
     assert {:ok, application} =
              Finance.apply_credit_to_payment(membership.id, payment.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 1200,
                description: "Apply credit to payment"
              })
@@ -528,16 +533,23 @@ defmodule MilosTraining.FinanceTest do
     assert Enum.map(profile.credit_ledger_entries, & &1.id) == [application.id, credit.id]
 
     assert {:error, :insufficient_credit_balance} =
-             Finance.apply_credit_to_payment(membership.id, payment.id, %{amount_cents: 4000})
+             Finance.apply_credit_to_payment(membership.id, payment.id, %{
+               request_id: Ecto.UUID.generate(),
+               amount_cents: 4000
+             })
 
     assert {:ok, _extra_credit} =
              Finance.create_manual_credit(membership.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 5000,
                description: "Capacity test credit"
              })
 
     assert {:error, :credit_exceeds_payment_amount} =
-             Finance.apply_credit_to_payment(membership.id, payment.id, %{amount_cents: 3900})
+             Finance.apply_credit_to_payment(membership.id, payment.id, %{
+               request_id: Ecto.UUID.generate(),
+               amount_cents: 3900
+             })
   end
 
   test "reverses payment credit applications and restores member credit balance" do
@@ -552,6 +564,7 @@ defmodule MilosTraining.FinanceTest do
 
     assert {:ok, _credit} =
              Finance.create_manual_credit(membership.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 2000,
                description: "Payment reversal credit"
              })
@@ -565,6 +578,7 @@ defmodule MilosTraining.FinanceTest do
 
     assert {:ok, application} =
              Finance.apply_credit_to_payment(membership.id, payment.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 1200,
                description: "Apply credit to payment"
              })
@@ -580,6 +594,7 @@ defmodule MilosTraining.FinanceTest do
 
     assert {:ok, reversal} =
              Finance.reverse_credit_ledger_entry(membership.id, application.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 1200,
                reason: "Admin correction"
              })
@@ -598,7 +613,10 @@ defmodule MilosTraining.FinanceTest do
     assert restored_entry.remaining_reversible_cents == 0
 
     assert {:error, :credit_reversal_exceeds_application} =
-             Finance.reverse_credit_ledger_entry(membership.id, application.id, %{amount_cents: 1})
+             Finance.reverse_credit_ledger_entry(membership.id, application.id, %{
+               request_id: Ecto.UUID.generate(),
+               amount_cents: 1
+             })
   end
 
   test "creates invoices, applies payments and credits, and derives entitlement" do
@@ -646,12 +664,14 @@ defmodule MilosTraining.FinanceTest do
 
     assert {:ok, _credit} =
              Finance.create_manual_credit(membership.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 3000,
                description: "Invoice credit"
              })
 
     assert {:ok, credit_application} =
              Finance.apply_credit_to_invoice(membership.id, invoice.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 3000,
                description: "Apply credit to renewal"
              })
@@ -682,7 +702,8 @@ defmodule MilosTraining.FinanceTest do
     assert summary.totals.invoice_credit_offset_cents == 3000
   end
 
-  test "package-linked invoice partial payments keep balance due visible across finance read models" do
+  test "package-linked invoice partial payments keep balance due visible across finance read models",
+       %{tenant_context: context} do
     user = TestFixtures.user_fixture(%{role: :member})
 
     assert {:ok, package} =
@@ -750,7 +771,12 @@ defmodule MilosTraining.FinanceTest do
 
     assert member_summary.outstanding_balance_cents == 6_000
 
-    assert {:ok, my_finance} = MilosTraining.Application.GetMyFinance.call(user.id)
+    assert {:ok, my_finance} =
+             MilosTraining.Application.GetMyFinance.call(
+               %{organization_id: context.organization_id},
+               user.id
+             )
+
     assert my_finance.total_outstanding_balance_cents == 6_000
 
     assert Enum.any?(
@@ -785,12 +811,16 @@ defmodule MilosTraining.FinanceTest do
 
     assert {:ok, _credit} =
              Finance.create_manual_credit(membership.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 1000,
                description: "Refundable invoice credit"
              })
 
     assert {:ok, credit_application} =
-             Finance.apply_credit_to_invoice(membership.id, invoice.id, %{amount_cents: 1000})
+             Finance.apply_credit_to_invoice(membership.id, invoice.id, %{
+               request_id: Ecto.UUID.generate(),
+               amount_cents: 1000
+             })
 
     assert {:ok, payment} =
              Finance.record_payment(membership.id, %{
@@ -806,6 +836,7 @@ defmodule MilosTraining.FinanceTest do
 
     assert {:ok, payment_reversal} =
              Finance.reverse_payment(membership.id, payment.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 5000,
                reason: "Cash refund"
              })
@@ -822,10 +853,14 @@ defmodule MilosTraining.FinanceTest do
     assert [^payment_reversal] = refunded_profile.payment_reversals
 
     assert {:error, :payment_reversal_exceeds_payment_amount} =
-             Finance.reverse_payment(membership.id, payment.id, %{amount_cents: 1})
+             Finance.reverse_payment(membership.id, payment.id, %{
+               request_id: Ecto.UUID.generate(),
+               amount_cents: 1
+             })
 
     assert {:ok, credit_reversal} =
              Finance.reverse_credit_ledger_entry(membership.id, credit_application.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 1000,
                reason: "Restore credit"
              })
@@ -863,6 +898,7 @@ defmodule MilosTraining.FinanceTest do
 
     assert {:ok, _grant} =
              Finance.create_manual_credit(context, membership.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 5_000,
                description: "Credit analytics regression"
              })
@@ -878,12 +914,14 @@ defmodule MilosTraining.FinanceTest do
 
     assert {:ok, application} =
              Finance.apply_credit_to_invoice(context, membership.id, invoice.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 3_000,
                description: "Apply credit"
              })
 
     assert {:ok, _reversal} =
              Finance.reverse_credit_ledger_entry(context, membership.id, application.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 1_000,
                reason: "Restore credit"
              })
@@ -1133,6 +1171,7 @@ defmodule MilosTraining.FinanceTest do
 
     assert {:ok, _credit} =
              Finance.create_manual_credit(membership.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 1000,
                description: "Draft invoice credit"
              })
@@ -1144,7 +1183,10 @@ defmodule MilosTraining.FinanceTest do
              })
 
     assert {:error, :invoice_not_issued} =
-             Finance.apply_credit_to_invoice(membership.id, invoice.id, %{amount_cents: 500})
+             Finance.apply_credit_to_invoice(membership.id, invoice.id, %{
+               request_id: Ecto.UUID.generate(),
+               amount_cents: 500
+             })
   end
 
   test "rejects voiding invoices with attached payments or credit offsets" do
@@ -1185,12 +1227,14 @@ defmodule MilosTraining.FinanceTest do
 
     assert {:ok, _credit} =
              Finance.create_manual_credit(membership.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 1000,
                description: "Invoice allocation credit"
              })
 
     assert {:ok, _credit_application} =
              Finance.apply_credit_to_invoice(membership.id, credit_invoice.id, %{
+               request_id: Ecto.UUID.generate(),
                amount_cents: 500
              })
 
