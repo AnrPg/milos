@@ -1,19 +1,35 @@
 defmodule MilosTrainingWeb.CalendarFeedControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
-  alias MilosTraining.{Identity, Scheduling}
+  alias MilosTraining.{Identity, Organizations, Scheduling}
   alias MilosTraining.Application.CreateRecurringClassSeries
 
   import MilosTraining.TestFixtures
 
+  # Booking/series creation now runs through the tenant-scoped write path,
+  # which requires an explicit context resolved from a real membership. The
+  # fixtures in this suite create their workouts/slots/class types under the
+  # legacy organization by default, so grant the actor legacy membership and
+  # resolve the matching tenant context to act with.
+  defp legacy_tenant_context(actor, role \\ nil) do
+    {:ok, _membership} = Organizations.ensure_legacy_membership_for_migration(actor, role)
+
+    {:ok, context} =
+      Organizations.resolve_tenant_context(actor, Organizations.legacy_organization_slug())
+
+    context
+  end
+
   test "authenticated users can fetch signed links and public calendar feed", %{conn: conn} do
     admin = admin_fixture(%{nickname: "calendar_admin"})
     member = user_fixture(%{nickname: "calendar_member"})
+    legacy_tenant_context(admin, :owner)
+    context = legacy_tenant_context(member)
     workout = workout_fixture(admin, %{title: "Calendar Burner", type: "crossfit"})
     slot = slot_fixture(workout)
 
     assert {:ok, _booking} =
-             Scheduling.submit_booking(member.id, slot.id, slot.booking_timeout_minutes)
+             Scheduling.submit_booking(context, member.id, slot.id, slot.booking_timeout_minutes)
 
     links =
       conn
@@ -38,11 +54,13 @@ defmodule MilosTrainingWeb.CalendarFeedControllerTest do
   test "the feed carries only the organizations the account actually belongs to", %{conn: conn} do
     # A class exists in the legacy organization...
     legacy_admin = admin_fixture(%{nickname: "calendar_legacy_admin"})
+    legacy_context = legacy_tenant_context(legacy_admin, :owner)
     legacy_workout = workout_fixture(legacy_admin, %{title: "Legacy Burner", type: "crossfit"})
     legacy_slot = slot_fixture(legacy_workout)
 
     assert {:ok, _booking} =
              Scheduling.submit_booking(
+               legacy_context,
                legacy_admin.id,
                legacy_slot.id,
                legacy_slot.booking_timeout_minutes
@@ -87,6 +105,7 @@ defmodule MilosTrainingWeb.CalendarFeedControllerTest do
 
   test "admin feed keeps recurring classes as recurring iCalendar events", %{conn: conn} do
     admin = admin_fixture(%{nickname: "calendar_series_admin"})
+    context = legacy_tenant_context(admin, :owner)
     workout = workout_fixture(admin, %{title: "Series Workout"})
     class_type = class_type_fixture(%{name: "CrossFit"})
     starts_on = Date.add(Date.utc_today(), 1)
@@ -94,7 +113,7 @@ defmodule MilosTrainingWeb.CalendarFeedControllerTest do
     excluded_on = Date.add(first_occurrence_on, 7)
 
     assert {:ok, series} =
-             CreateRecurringClassSeries.call(%{
+             CreateRecurringClassSeries.call(context, %{
                master_workout_id: workout.id,
                class_type_id: class_type.id,
                name: "CrossFit beginners",
@@ -136,12 +155,14 @@ defmodule MilosTrainingWeb.CalendarFeedControllerTest do
   test "calendar links and feed system copy use the recipient locale", %{conn: conn} do
     admin = admin_fixture(%{nickname: "calendar_locale_admin"})
     member = user_fixture(%{nickname: "calendar_locale_member"})
+    legacy_tenant_context(admin, :owner)
+    context = legacy_tenant_context(member)
     assert {:ok, member} = Identity.update_profile(member.id, %{preferred_locale: "el"})
     workout = workout_fixture(admin, %{title: "Author supplied title", type: "crossfit"})
     slot = slot_fixture(workout)
 
     assert {:ok, _booking} =
-             Scheduling.submit_booking(member.id, slot.id, slot.booking_timeout_minutes)
+             Scheduling.submit_booking(context, member.id, slot.id, slot.booking_timeout_minutes)
 
     links =
       conn

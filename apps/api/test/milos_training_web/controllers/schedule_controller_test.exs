@@ -2,7 +2,7 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
   use Oban.Testing, repo: MilosTraining.Repo
 
-  alias MilosTraining.Notifications
+  alias MilosTraining.{Notifications, Organizations, Repo}
   alias Oban.Testing
 
   import MilosTraining.TestFixtures
@@ -12,6 +12,18 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
       {Oban, Keyword.put(Application.fetch_env!(:milos_training, Oban), :testing, :manual)}
     )
 
+    # Fixtures like `workout_fixture/2` create records through the legacy,
+    # session-scoped write path (no explicit tenant context argument), which
+    # resolves the target organization from the `app.organization_id` GUC.
+    # Set it deterministically instead of depending on an earlier HTTP
+    # request in the same shared sandbox connection having already set it.
+    {:ok, legacy_organization} = Organizations.ensure_legacy_organization_for_migration()
+
+    Repo.query!("SELECT set_config($1, $2, false)", [
+      "app.organization_id",
+      legacy_organization.id
+    ])
+
     :ok
   end
 
@@ -19,6 +31,8 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
     Testing.with_testing_mode(:manual, fn ->
       admin = admin_fixture(%{nickname: "sched_admin"})
       member = user_fixture(%{nickname: "sched_member"})
+      {:ok, _} = Organizations.ensure_legacy_membership_for_migration(admin, :owner)
+      {:ok, _} = Organizations.ensure_legacy_membership_for_migration(member)
       workout = workout_fixture(admin, %{title: "Morning Burner"})
       class_type = class_type_fixture(%{name: "Morning Class"})
 
@@ -87,6 +101,7 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
 
   test "admin can delete an empty slot", %{conn: conn} do
     admin = admin_fixture(%{nickname: "slot_admin"})
+    {:ok, _} = Organizations.ensure_legacy_membership_for_migration(admin, :owner)
     workout = workout_fixture(admin)
     class_type = class_type_fixture(%{name: "Open Gym"})
     admin_conn = put_bearer_token(conn, admin)
@@ -121,6 +136,7 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
 
   test "admin creates a recurring series with exclusions and overlapping classes", %{conn: conn} do
     admin = admin_fixture(%{nickname: "series_admin"})
+    {:ok, _} = Organizations.ensure_legacy_membership_for_migration(admin, :owner)
     workout = workout_fixture(admin, %{title: "Beginner CrossFit"})
     class_type = class_type_fixture(%{name: "CrossFit"})
     admin_conn = put_bearer_token(conn, admin)
@@ -136,6 +152,7 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
       |> post(
         "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/schedule/slots/series",
         Jason.encode!(%{
+          master_workout_id: workout.id,
           class_type_id: class_type.id,
           name: "CrossFit beginners",
           duration_minutes: 75,
@@ -154,9 +171,11 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
     assert %{
              "series" => %{
                "occurrence_count" => 2,
-               "master_workout_id" => nil
+               "master_workout_id" => workout_id
              }
            } = json_response(series_response, 201)
+
+    assert workout_id == workout.id
 
     first_start = DateTime.new!(starts_on, ~T[17:00:00], "Etc/UTC")
 
@@ -200,6 +219,7 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
 
   test "schedule preview survives republished workouts with scale overrides", %{conn: conn} do
     admin = admin_fixture(%{nickname: "edited_schedule_admin"})
+    {:ok, _} = Organizations.ensure_legacy_membership_for_migration(admin, :owner)
 
     {:ok, _levels} =
       MilosTraining.Workouts.replace_scale_levels([
@@ -239,9 +259,11 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
         "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{workout.id}/reopen"
       )
 
-    assert json_response(reopen_response, 200)["draft"]["status"] == "published"
+    reopened_draft = json_response(reopen_response, 200)["draft"]
+    assert reopened_draft["status"] == "published"
 
     member = user_fixture(%{nickname: "live_during_edit_member", role: :member})
+    {:ok, _} = Organizations.ensure_legacy_membership_for_migration(member)
     member_conn = put_bearer_token(conn, member)
 
     still_live =
@@ -252,13 +274,22 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
 
     assert json_response(still_live, 200)["workout"]["id"] == workout.id
 
+    admin_draft =
+      get(
+        admin_conn |> recycle(),
+        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{workout.id}"
+      )
+      |> json_response(200)
+
     publish_response =
       admin_conn
       |> recycle()
       |> put_req_header("content-type", "application/json")
       |> post(
         "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{workout.id}/publish",
-        Jason.encode!(%{})
+        Jason.encode!(%{
+          expected_source_revision: admin_draft["workout"]["dsl_source_revision"]
+        })
       )
 
     assert json_response(publish_response, 200)["workout"]["status"] == "published"

@@ -3,16 +3,38 @@ defmodule MilosTraining.Workers.BookingTimeoutJobTest do
   use Oban.Testing, repo: MilosTraining.Repo
 
   alias MilosTraining.Application.SubmitBooking
-  alias MilosTraining.Finance
+  alias MilosTraining.{Finance, Organizations}
   alias MilosTraining.Notifications
   alias MilosTraining.Scheduling
   alias MilosTraining.Workers.BookingTimeoutJob
 
   import MilosTraining.TestFixtures
 
+  setup do
+    {:ok, legacy_organization} = Organizations.ensure_legacy_organization_for_migration()
+
+    Repo.query!("SELECT set_config($1, $2, false)", [
+      "app.organization_id",
+      legacy_organization.id
+    ])
+
+    :ok
+  end
+
+  defp legacy_tenant_context(actor, role \\ nil) do
+    {:ok, _membership} = Organizations.ensure_legacy_membership_for_migration(actor, role)
+
+    {:ok, context} =
+      Organizations.resolve_tenant_context(actor, Organizations.legacy_organization_slug())
+
+    context
+  end
+
   test "cancels pending booking, releases entitlement reservation, and sends alert" do
     admin = admin_fixture()
     member = user_fixture()
+    legacy_tenant_context(admin, :owner)
+    context = legacy_tenant_context(member)
     workout = workout_fixture(admin)
     slot = slot_fixture(workout, %{auto_approve: false})
 
@@ -24,10 +46,10 @@ defmodule MilosTraining.Workers.BookingTimeoutJobTest do
 
     provision_single_visit_package(member)
 
-    assert {:ok, booking} = SubmitBooking.call(member.id, slot.id)
+    assert {:ok, booking} = SubmitBooking.call(context, member, slot.id)
 
     assert {:error, :finance_allowance_exhausted, %{limit: 1, committed: 1}} =
-             SubmitBooking.call(member.id, second_slot.id)
+             SubmitBooking.call(context, member, second_slot.id)
 
     assert :ok =
              perform_job(BookingTimeoutJob, %{
@@ -38,20 +60,22 @@ defmodule MilosTraining.Workers.BookingTimeoutJobTest do
     notifications = wait_for_notifications(admin.id)
     assert Enum.any?(notifications, &(&1.type == "booking_timeout"))
 
-    assert %{status: :cancelled} = Scheduling.get_booking(booking.id)
-    assert {:ok, %{status: :pending}} = SubmitBooking.call(member.id, second_slot.id)
+    assert %{status: :cancelled} = Scheduling.get_booking(context, booking.id)
+    assert {:ok, %{status: :pending}} = SubmitBooking.call(context, member, second_slot.id)
   end
 
   test "no-ops when booking already resolved" do
     admin = admin_fixture()
     member = user_fixture()
+    legacy_tenant_context(admin, :owner)
+    context = legacy_tenant_context(member)
     workout = workout_fixture(admin)
     slot = slot_fixture(workout)
 
     {:ok, booking} =
-      Scheduling.submit_booking(member.id, slot.id, slot.booking_timeout_minutes)
+      Scheduling.submit_booking(context, member.id, slot.id, slot.booking_timeout_minutes)
 
-    {:ok, _resolved} = Scheduling.approve_booking(booking.id, nil)
+    {:ok, _resolved} = Scheduling.approve_booking(context, booking.id, nil)
 
     assert :ok =
              perform_job(BookingTimeoutJob, %{
@@ -61,7 +85,7 @@ defmodule MilosTraining.Workers.BookingTimeoutJobTest do
 
     notifications = wait_for_notifications(admin.id)
     refute Enum.any?(notifications, &(&1.type == "booking_timeout"))
-    assert %{status: :approved} = Scheduling.get_booking(booking.id)
+    assert %{status: :approved} = Scheduling.get_booking(context, booking.id)
   end
 
   defp provision_single_visit_package(member) do

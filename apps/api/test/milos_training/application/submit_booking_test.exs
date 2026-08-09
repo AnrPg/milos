@@ -3,7 +3,7 @@ defmodule MilosTraining.Application.SubmitBookingTest do
   use Oban.Testing, repo: MilosTraining.Repo
 
   alias MilosTraining.Application.SubmitBooking
-  alias MilosTraining.Finance
+  alias MilosTraining.{Finance, Organizations}
   alias MilosTraining.Notifications
   alias MilosTraining.Workers.BookingTimeoutJob
   alias Oban.Testing
@@ -26,17 +26,41 @@ defmodule MilosTraining.Application.SubmitBookingTest do
       end
     end)
 
-    :ok
+    # `workout_fixture/2` and `slot_fixture/2` write through the legacy,
+    # session-scoped path, which resolves its target organization from the
+    # `app.organization_id` GUC. Set it once here so slots always land in
+    # the legacy organization regardless of prior session state, and expose
+    # a helper for tests that need an actual tenant context to call the
+    # scoped application/domain functions with.
+    {:ok, legacy_organization} = Organizations.ensure_legacy_organization_for_migration()
+
+    MilosTraining.Repo.query!("SELECT set_config($1, $2, false)", [
+      "app.organization_id",
+      legacy_organization.id
+    ])
+
+    %{legacy_organization: legacy_organization}
+  end
+
+  defp legacy_tenant_context(actor, role \\ nil) do
+    {:ok, _membership} = Organizations.ensure_legacy_membership_for_migration(actor, role)
+
+    {:ok, context} =
+      Organizations.resolve_tenant_context(actor, Organizations.legacy_organization_slug())
+
+    context
   end
 
   test "submitting a pending booking creates an admin notification and timeout job" do
     Testing.with_testing_mode(:manual, fn ->
       admin = admin_fixture()
       member = user_fixture()
+      legacy_tenant_context(admin, :owner)
+      context = legacy_tenant_context(member)
       workout = workout_fixture(admin)
       slot = slot_fixture(workout, %{auto_approve: false})
 
-      assert {:ok, booking} = SubmitBooking.call(member.id, slot.id)
+      assert {:ok, booking} = SubmitBooking.call(context, member, slot.id)
       assert booking.status == :pending
 
       assert_enqueued(worker: BookingTimeoutJob, args: %{"booking_id" => booking.id})
@@ -52,10 +76,12 @@ defmodule MilosTraining.Application.SubmitBookingTest do
     Testing.with_testing_mode(:manual, fn ->
       admin = admin_fixture()
       member = user_fixture()
+      legacy_tenant_context(admin, :owner)
+      context = legacy_tenant_context(member)
       workout = workout_fixture(admin)
       slot = slot_fixture(workout, %{auto_approve: true})
 
-      assert {:ok, booking} = SubmitBooking.call(member.id, slot.id)
+      assert {:ok, booking} = SubmitBooking.call(context, member, slot.id)
       assert booking.status == :approved
 
       Oban.drain_queue(queue: :notifications, with_safety: false)
@@ -71,15 +97,18 @@ defmodule MilosTraining.Application.SubmitBookingTest do
       admin = admin_fixture()
       first_member = user_fixture()
       second_member = user_fixture()
+      legacy_tenant_context(admin, :owner)
+      first_context = legacy_tenant_context(first_member)
+      second_context = legacy_tenant_context(second_member)
       workout = workout_fixture(admin)
       slot = slot_fixture(workout, %{auto_approve: true, capacity: 1})
 
-      assert {:ok, first_booking} = SubmitBooking.call(first_member.id, slot.id)
+      assert {:ok, first_booking} = SubmitBooking.call(first_context, first_member, slot.id)
       assert first_booking.status == :approved
 
-      assert {:error, :slot_full} = SubmitBooking.call(second_member.id, slot.id)
+      assert {:error, :slot_full} = SubmitBooking.call(second_context, second_member, slot.id)
 
-      refreshed_slot = MilosTraining.Scheduling.get_slot(slot.id)
+      refreshed_slot = MilosTraining.Scheduling.get_slot(first_context, slot.id)
 
       refute Enum.any?(
                refreshed_slot.bookings,
@@ -93,6 +122,8 @@ defmodule MilosTraining.Application.SubmitBookingTest do
   test "inactive managed memberships cannot book classes" do
     admin = admin_fixture()
     member = user_fixture()
+    legacy_tenant_context(admin, :owner)
+    context = legacy_tenant_context(member)
     workout = workout_fixture(admin)
     slot = slot_fixture(workout, %{auto_approve: true})
 
@@ -104,12 +135,14 @@ defmodule MilosTraining.Application.SubmitBookingTest do
              })
 
     assert {:error, :finance_entitlement_inactive} =
-             SubmitBooking.call(member.id, slot.id)
+             SubmitBooking.call(context, member, slot.id)
   end
 
   test "package visit quota is reserved across different slots and withdrawal restores it" do
     admin = admin_fixture()
     member = user_fixture()
+    legacy_tenant_context(admin, :owner)
+    context = legacy_tenant_context(member)
     workout = workout_fixture(admin)
     first_slot = slot_fixture(workout, %{auto_approve: true})
 
@@ -152,21 +185,15 @@ defmodule MilosTraining.Application.SubmitBookingTest do
     {:ok, _subscription} =
       Finance.assign_package(membership.id, package.id, %{starts_on: Date.utc_today()})
 
-    assert {:ok, booking} = SubmitBooking.call(member.id, first_slot.id)
+    assert {:ok, booking} = SubmitBooking.call(context, member, first_slot.id)
 
     assert {:error, :finance_allowance_exhausted, %{limit: 1, committed: 1}} =
-             SubmitBooking.call(member.id, second_slot.id)
-
-    {:ok, tenant_context} =
-      MilosTraining.Organizations.resolve_tenant_context(
-        member,
-        MilosTraining.Organizations.legacy_organization_slug()
-      )
+             SubmitBooking.call(context, member, second_slot.id)
 
     assert {:ok, _withdrawn} =
-             MilosTraining.Application.WithdrawBooking.call(tenant_context, member.id, booking.id)
+             MilosTraining.Application.WithdrawBooking.call(context, member.id, booking.id)
 
-    assert {:ok, _second_booking} = SubmitBooking.call(member.id, second_slot.id)
+    assert {:ok, _second_booking} = SubmitBooking.call(context, member, second_slot.id)
   end
 
   test "returns the committed booking when notification dispatch fails" do
@@ -174,15 +201,17 @@ defmodule MilosTraining.Application.SubmitBookingTest do
 
     admin = admin_fixture()
     member = user_fixture()
+    legacy_tenant_context(admin, :owner)
+    context = legacy_tenant_context(member)
     workout = workout_fixture(admin)
     slot = slot_fixture(workout, %{auto_approve: false})
 
     log =
       capture_log(fn ->
-        assert {:ok, booking} = SubmitBooking.call(member.id, slot.id)
+        assert {:ok, booking} = SubmitBooking.call(context, member, slot.id)
         assert booking.status == :pending
 
-        refreshed_slot = MilosTraining.Scheduling.get_slot(slot.id)
+        refreshed_slot = MilosTraining.Scheduling.get_slot(context, slot.id)
         assert Enum.any?(refreshed_slot.bookings, &(&1.id == booking.id))
       end)
 

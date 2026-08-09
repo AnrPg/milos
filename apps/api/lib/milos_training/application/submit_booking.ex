@@ -5,7 +5,7 @@ defmodule MilosTraining.Application.SubmitBooking do
   alias MilosTraining.Scheduling.Domain.BookingPolicy
 
   def call(context, %{id: user_id} = actor, slot_id) do
-    with slot when not is_nil(slot) <- get_slot(context, slot_id),
+    with {:ok, slot} <- fetch_slot(context, slot_id),
          :ok <- BookingPolicy.can_book?(slot, user_id: user_id, now: DateTime.utc_now()),
          {:ok, reservation} <- reserve_visit(context, actor, slot) do
       case create_booking(context, slot, user_id) do
@@ -20,7 +20,6 @@ defmodule MilosTraining.Application.SubmitBooking do
           {:error, reason}
       end
     else
-      nil -> {:error, :not_found}
       {:error, reason} -> {:error, reason}
       {:error, reason, details} -> {:error, reason, details}
     end
@@ -80,6 +79,18 @@ defmodule MilosTraining.Application.SubmitBooking do
 
   defp get_slot(nil, slot_id), do: Scheduling.get_slot(slot_id)
   defp get_slot(context, slot_id), do: Scheduling.get_slot(context, slot_id)
+
+  # `get_slot/2` can return a slot, `nil` (not found), or an `{:error, reason}`
+  # tuple (e.g. `:organization_context_required` when no tenant context is
+  # available). Normalize all three into a tagged tuple so a failed lookup
+  # can never be mistaken for a slot and passed into `BookingPolicy.can_book?/2`.
+  defp fetch_slot(context, slot_id) do
+    case get_slot(context, slot_id) do
+      nil -> {:error, :not_found}
+      {:error, reason} -> {:error, reason}
+      slot -> {:ok, slot}
+    end
+  end
 
   defp create_booking(nil, %{auto_approve: true, id: slot_id}, user_id),
     do: Scheduling.submit_auto_approved_booking(user_id, slot_id)
