@@ -7,7 +7,7 @@ defmodule MilosTraining.Identity.RegisterUserTest do
     test "creates user with valid params" do
       params = %{
         nickname: "atlas",
-        password: "S3cur3P@ss!",
+        password: "S3cur3P@ss!42",
         role: :member,
         email: "atlas@placeholder.invalid"
       }
@@ -15,13 +15,13 @@ defmodule MilosTraining.Identity.RegisterUserTest do
       assert {:ok, user} = RegisterUser.call(params)
       assert user.nickname == "atlas"
       assert user.role == :member
-      refute user.password_hash == "S3cur3P@ss!"
+      refute user.password_hash == "S3cur3P@ss!42"
     end
 
     test "rejects duplicate nickname" do
       params = %{
         nickname: "atlas",
-        password: "S3cur3P@ss!",
+        password: "S3cur3P@ss!42",
         role: :member,
         email: "atlas@placeholder.invalid"
       }
@@ -36,7 +36,7 @@ defmodule MilosTraining.Identity.RegisterUserTest do
       {:ok, user} =
         RegisterUser.call(%{
           nickname: "Atlas",
-          password: "S3cur3P@ss!",
+          password: "S3cur3P@ss!42",
           role: :member,
           email: "atlas2@placeholder.invalid"
         })
@@ -47,7 +47,7 @@ defmodule MilosTraining.Identity.RegisterUserTest do
       assert {:error, changeset} =
                RegisterUser.call(%{
                  nickname: "ATLAS",
-                 password: "S3cur3P@ss!",
+                 password: "S3cur3P@ss!42",
                  role: :member,
                  email: "atlas3@placeholder.invalid"
                })
@@ -58,7 +58,7 @@ defmodule MilosTraining.Identity.RegisterUserTest do
     test "rejects invalid role" do
       params = %{
         nickname: "atlas",
-        password: "S3cur3P@ss!",
+        password: "S3cur3P@ss!42",
         role: :admin,
         email: "atlas4@placeholder.invalid"
       }

@@ -18,7 +18,7 @@ defmodule MilosTraining.Application.UpdateAvatarTest do
     {:ok, user} =
       Identity.register(%{
         nickname: "avatar_member",
-        password: "S3cur3P@ss!",
+        password: "S3cur3P@ss!42",
         role: :member,
         email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
       })

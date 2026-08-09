@@ -19,7 +19,7 @@ defmodule MilosTrainingWeb.MeControllerTest do
       {:ok, user} =
         Identity.register(%{
           nickname: "avatar_contract_member",
-          password: "S3cur3P@ss!",
+          password: "S3cur3P@ss!42",
           role: :member,
           email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
@@ -38,7 +38,7 @@ defmodule MilosTrainingWeb.MeControllerTest do
       {:ok, user} =
         Identity.register(%{
           nickname: "avatar_finalize_member",
-          password: "S3cur3P@ss!",
+          password: "S3cur3P@ss!42",
           role: :member,
           email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
@@ -61,7 +61,7 @@ defmodule MilosTrainingWeb.MeControllerTest do
       {:ok, user} =
         Identity.register(%{
           nickname: "avatar_clear_member",
-          password: "S3cur3P@ss!",
+          password: "S3cur3P@ss!42",
           role: :member,
           email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
@@ -98,7 +98,7 @@ defmodule MilosTrainingWeb.MeControllerTest do
       {:ok, user} =
         Identity.register(%{
           nickname: "polyglot_member",
-          password: "S3cur3P@ss!",
+          password: "S3cur3P@ss!42",
           role: :member,
           email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
@@ -123,7 +123,7 @@ defmodule MilosTrainingWeb.MeControllerTest do
       {:ok, user} =
         Identity.register(%{
           nickname: "locale_guard",
-          password: "S3cur3P@ss!",
+          password: "S3cur3P@ss!42",
           role: :athlete,
           email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
         })
@@ -199,7 +199,7 @@ defmodule MilosTrainingWeb.MeControllerTest do
     {:ok, user} =
       Identity.register(%{
         nickname: nickname,
-        password: "S3cur3P@ss!",
+        password: "S3cur3P@ss!42",
         role: :member,
         email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
       })

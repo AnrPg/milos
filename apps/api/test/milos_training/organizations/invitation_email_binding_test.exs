@@ -124,7 +124,7 @@ defmodule MilosTraining.Organizations.InvitationEmailBindingTest do
     assert {:error, changeset} =
              Identity.register(%{
                nickname: "dup_#{System.unique_integer([:positive])}",
-               password: "S3cur3P@ss!",
+               password: "S3cur3P@ss!42",
                role: :member,
                email: "TAKEN@example.com"
              })
@@ -136,7 +136,7 @@ defmodule MilosTraining.Organizations.InvitationEmailBindingTest do
     assert {:error, changeset} =
              Identity.register(%{
                nickname: "no_email_#{System.unique_integer([:positive])}",
-               password: "S3cur3P@ss!",
+               password: "S3cur3P@ss!42",
                role: :member
              })
 
@@ -147,7 +147,7 @@ defmodule MilosTraining.Organizations.InvitationEmailBindingTest do
     assert {:error, changeset} =
              Identity.register(%{
                nickname: "bad_email_#{System.unique_integer([:positive])}",
-               password: "S3cur3P@ss!",
+               password: "S3cur3P@ss!42",
                role: :member,
                email: "not-an-email"
              })
@@ -164,7 +164,7 @@ defmodule MilosTraining.Organizations.InvitationEmailBindingTest do
     {:ok, user} =
       Identity.register(%{
         nickname: "invitee_#{System.unique_integer([:positive])}",
-        password: "S3cur3P@ss!",
+        password: "S3cur3P@ss!42",
         role: :member,
         email: email
       })
