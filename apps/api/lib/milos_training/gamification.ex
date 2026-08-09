@@ -25,6 +25,9 @@ defmodule MilosTraining.Gamification do
     ListUserAchievements
   }
 
+  def with_tenant_context(context, fun) when is_function(fun, 0),
+    do: GamificationStore.with_tenant_context(context, fun)
+
   defdelegate record_workout_completion(execution), to: RecordWorkoutCompletion, as: :call
   defdelegate create_seasonal_challenge(admin_id, params), to: CreateSeasonalChallenge, as: :call
   defdelegate update_seasonal_challenge(id, params), to: UpdateSeasonalChallenge, as: :call

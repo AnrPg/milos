@@ -12,6 +12,7 @@ defmodule MilosTrainingWeb.AdminChallengeController do
     UpdateSeasonalChallenge
   }
 
+  alias MilosTraining.Gamification
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
   action_fallback MilosTrainingWeb.FallbackController
@@ -143,7 +144,10 @@ defmodule MilosTrainingWeb.AdminChallengeController do
   )
 
   def index(conn, _params) do
-    with {:ok, challenges} <- ListAdminChallenges.call() do
+    with {:ok, challenges} <-
+           Gamification.with_tenant_context(conn.assigns.tenant_context, fn ->
+             ListAdminChallenges.call()
+           end) do
       json(conn, %{challenges: challenges})
     end
   end
@@ -177,7 +181,10 @@ defmodule MilosTrainingWeb.AdminChallengeController do
   def create(conn, params) do
     admin = GuardianPlug.current_resource(conn)
 
-    with {:ok, challenge} <- CreateSeasonalChallenge.call(admin.id, body_params(conn, params)) do
+    with {:ok, challenge} <-
+           Gamification.with_tenant_context(conn.assigns.tenant_context, fn ->
+             CreateSeasonalChallenge.call(admin.id, body_params(conn, params))
+           end) do
       conn
       |> put_status(:created)
       |> json(%{challenge: challenge})

@@ -14,7 +14,7 @@ defmodule MilosTraining.Application.UpdateAdminSettings do
     notification_params = notification_params(params)
     scheduling_params = scheduling_params(params)
 
-    with {:ok, gamification_settings} <- maybe_update_gamification(gamification_params),
+    with {:ok, gamification_settings} <- maybe_update_gamification(context, gamification_params),
          {:ok, finance_settings} <- maybe_update_finance(finance_params),
          {:ok, notification_settings} <- maybe_update_notifications(notification_params),
          {:ok, scheduling_settings} <- maybe_update_scheduling(context, scheduling_params) do
@@ -32,11 +32,13 @@ defmodule MilosTraining.Application.UpdateAdminSettings do
     end
   end
 
-  defp maybe_update_gamification(params) when map_size(params) == 0 do
+  defp maybe_update_gamification(_context, params) when map_size(params) == 0 do
     {:ok, Gamification.get_settings()}
   end
 
-  defp maybe_update_gamification(params), do: Gamification.update_settings(params)
+  defp maybe_update_gamification(context, params) do
+    Gamification.with_tenant_context(context, fn -> Gamification.update_settings(params) end)
+  end
 
   defp maybe_update_finance(params) when map_size(params) == 0 do
     {:ok, Finance.get_finance_settings()}
