@@ -670,7 +670,7 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
     :ok = ensure_scale_level!("scaled", "Scaled")
 
     {:ok, workout} =
-      Workouts.create_workout(admin, %{
+      Workouts.create_workout(legacy_context!(admin), admin, %{
         title: "Execution Workout",
         type: "crossfit",
         sections: [
@@ -703,7 +703,7 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
     :ok = ensure_scale_level!("scaled", "Scaled")
 
     {:ok, workout} =
-      Workouts.create_workout(admin, %{
+      Workouts.create_workout(legacy_context!(admin), admin, %{
         title: "Measured For Time",
         type: "crossfit",
         sections: [
@@ -775,6 +775,13 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
     {:ok, _membership} = MilosTraining.Organizations.ensure_legacy_membership_for_migration(user)
 
     user
+  end
+
+  defp legacy_context!(admin) do
+    {:ok, context} =
+      Organizations.resolve_tenant_context(admin, Organizations.legacy_organization_slug())
+
+    context
   end
 
   defp create_admin!(nickname) do

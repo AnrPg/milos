@@ -1,7 +1,7 @@
 defmodule MilosTraining.Workouts.CreateWorkoutTest do
   use MilosTraining.DataCase, async: false
 
-  alias MilosTraining.Identity
+  alias MilosTraining.{Identity, Organizations, Repo}
   alias MilosTraining.Workouts
 
   describe "create_workout/1" do
@@ -15,6 +15,7 @@ defmodule MilosTraining.Workouts.CreateWorkoutTest do
         })
 
       {:ok, admin} = Identity.update_role(admin, :admin)
+      set_legacy_session!(admin.id)
 
       {:ok, _levels} =
         Workouts.replace_scale_levels([
@@ -194,6 +195,13 @@ defmodule MilosTraining.Workouts.CreateWorkoutTest do
       })
 
     {:ok, admin} = Identity.update_role(user, :admin)
+    set_legacy_session!(admin.id)
     admin
+  end
+
+  defp set_legacy_session!(user_id) do
+    {:ok, organization} = Organizations.ensure_legacy_organization_for_migration()
+    Repo.query!("SELECT set_config($1, $2, false)", ["app.organization_id", organization.id])
+    Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", user_id])
   end
 end

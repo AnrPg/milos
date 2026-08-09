@@ -144,6 +144,16 @@ defmodule MilosTrainingWeb.WorkoutControllerTest do
 
     {:ok, admin} = Identity.update_role(user, :admin)
     {:ok, _membership} = Organizations.ensure_legacy_membership_for_migration(admin, :owner)
+
+    {:ok, organization} = Organizations.ensure_legacy_organization_for_migration()
+
+    MilosTraining.Repo.query!("SELECT set_config($1, $2, false)", [
+      "app.organization_id",
+      organization.id
+    ])
+
+    MilosTraining.Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", admin.id])
+
     admin
   end
 
