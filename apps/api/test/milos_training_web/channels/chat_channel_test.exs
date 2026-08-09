@@ -5,32 +5,67 @@ defmodule MilosTrainingWeb.ChatChannelTest do
   import Phoenix.ChannelTest
 
   alias MilosTraining.Application.GetOrCreateMessagingThread
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
+  alias MilosTraining.{Messaging, Organizations}
   alias MilosTrainingWeb.{ChatChannel, UserSocket}
+
+  defp tenant_context_fixture(owner, name) do
+    {:ok, organization} = Organizations.create_organization(%{name: name})
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: owner.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    {:ok, context} = Organizations.resolve_tenant_context(owner, organization.slug)
+    context
+  end
+
+  defp add_member(organization_id, user, role) do
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization_id,
+        user_id: user.id,
+        role: role,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    :ok
+  end
 
   test "a foreign assignment id cannot be used to join its channel" do
     admin = admin_fixture()
     athlete = user_fixture(%{role: :athlete})
     outsider = user_fixture(%{role: :athlete})
-    workout = workout_fixture(admin)
+
+    context = tenant_context_fixture(admin, "Chat Channel Assignment Gym")
+    :ok = add_member(context.organization_id, athlete, :athlete)
+    :ok = add_member(context.organization_id, outsider, :athlete)
+
+    {:ok, outsider_context} =
+      Organizations.resolve_tenant_context(outsider, context.organization.slug)
+
+    workout = RepoContext.run(context, fn -> workout_fixture(admin) end)
 
     {:ok, assignment} =
-      MilosTraining.Workouts.assign_workout(%{
+      MilosTraining.Workouts.assign_workout(context, %{
         master_workout_id: workout.id,
         athlete_ids: [athlete.id],
         scheduled_for: Date.utc_today()
       })
 
     {:ok, thread} =
-      GetOrCreateMessagingThread.call(athlete, %{
-        context_type: :assignment,
-        context_id: assignment.id
-      })
-
-    {:ok, outsider_context} =
-      MilosTraining.Organizations.resolve_tenant_context(
-        outsider,
-        MilosTraining.Organizations.legacy_organization_slug()
-      )
+      Messaging.with_tenant_context(context, fn ->
+        GetOrCreateMessagingThread.call(athlete, %{
+          context_type: :assignment,
+          context_id: assignment.id
+        })
+      end)
 
     outsider_socket =
       socket(UserSocket, "user:#{outsider.id}", %{
@@ -50,20 +85,19 @@ defmodule MilosTrainingWeb.ChatChannelTest do
     admin = admin_fixture()
     athlete = user_fixture(%{role: :athlete})
 
-    {:ok, thread} =
-      GetOrCreateMessagingThread.call(admin, %{context_type: :direct, participant_id: athlete.id})
-
-    {:ok, admin_context} =
-      MilosTraining.Organizations.resolve_tenant_context(
-        admin,
-        MilosTraining.Organizations.legacy_organization_slug()
-      )
+    admin_context = tenant_context_fixture(admin, "Chat Channel Typing Gym")
+    :ok = add_member(admin_context.organization_id, athlete, :athlete)
 
     {:ok, athlete_context} =
-      MilosTraining.Organizations.resolve_tenant_context(
-        athlete,
-        MilosTraining.Organizations.legacy_organization_slug()
-      )
+      Organizations.resolve_tenant_context(athlete, admin_context.organization.slug)
+
+    {:ok, thread} =
+      Messaging.with_tenant_context(admin_context, fn ->
+        GetOrCreateMessagingThread.call(admin, %{
+          context_type: :direct,
+          participant_id: athlete.id
+        })
+      end)
 
     admin_socket =
       socket(UserSocket, "user:#{admin.id}", %{

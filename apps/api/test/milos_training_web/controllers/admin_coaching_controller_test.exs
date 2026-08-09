@@ -8,11 +8,41 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
 
   import MilosTraining.TestFixtures
 
+  defp legacy_org_with_members!(members) do
+    legacy_organization = Organizations.get_by_slug(Organizations.legacy_organization_slug())
+
+    for {user, role} <- members do
+      case Organizations.OrganizationStore.get_membership(legacy_organization.id, user.id) do
+        nil ->
+          {:ok, _membership} =
+            Organizations.add_membership(%{
+              organization_id: legacy_organization.id,
+              user_id: user.id,
+              role: role,
+              status: :active,
+              joined_at: DateTime.utc_now()
+            })
+
+        _existing ->
+          :ok
+      end
+    end
+
+    legacy_organization
+  end
+
+  defp set_tenant_session!(organization_id, user_id) do
+    Repo.query!("SELECT set_config($1, $2, false)", ["app.organization_id", organization_id])
+    Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", user_id])
+  end
+
   test "admin can send a coaching note and create a hidden chat delivery record", %{
     conn: conn
   } do
     admin = admin_fixture()
     athlete = user_fixture(%{role: :athlete})
+    legacy_organization = legacy_org_with_members!([{admin, :owner}, {athlete, :athlete}])
+    set_tenant_session!(legacy_organization.id, admin.id)
 
     {:ok, thread} =
       Messaging.get_or_create_thread(%{
@@ -25,7 +55,7 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
       conn
       |> put_bearer_token(admin)
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread.id}/messages",
+        "/api/org/#{legacy_organization.slug}/me/threads/#{thread.id}/messages",
         %{
           body: "Keep your squat tempo controlled this week.",
           message_type: "coaching_note"
@@ -60,16 +90,22 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
   test "admin can fetch an athlete coaching drill-down", %{conn: conn} do
     admin = admin_fixture()
     athlete = user_fixture(%{role: :athlete, nickname: "coaching_drill_athlete"})
+    legacy_organization = legacy_org_with_members!([{admin, :owner}, {athlete, :athlete}])
+    set_tenant_session!(legacy_organization.id, admin.id)
     workout = workout_fixture(admin, %{title: "Coaching Drill Workout", type: :strength})
-    legacy_organization = Organizations.get_by_slug(Organizations.legacy_organization_slug())
+
+    {:ok, tenant_context} =
+      Organizations.resolve_tenant_context(admin, legacy_organization.slug)
 
     assert {:ok, assignment} =
-             Workouts.assign_workout(%{
+             Workouts.assign_workout(tenant_context, %{
                master_workout_id: workout.id,
                scheduled_for: Date.utc_today(),
                athlete_ids: [athlete.id],
                admin_notes: "Focus on pacing."
              })
+
+    set_tenant_session!(legacy_organization.id, athlete.id)
 
     assert {:ok, execution} =
              Execution.start_execution(athlete.id, %{
@@ -103,6 +139,8 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
                  }
                ]
              })
+
+    set_tenant_session!(legacy_organization.id, admin.id)
 
     {:ok, thread} =
       Messaging.get_or_create_thread(%{

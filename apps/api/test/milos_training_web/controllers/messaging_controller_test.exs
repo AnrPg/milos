@@ -4,16 +4,40 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
   import Ecto.Query
   import MilosTraining.TestFixtures
 
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
+  alias MilosTraining.Organizations
+
+  defp create_org_with_members(members) do
+    {:ok, organization} =
+      Organizations.create_organization(%{
+        name: "Messaging Ctrl Gym #{System.unique_integer([:positive])}"
+      })
+
+    Enum.each(members, fn {user, role} ->
+      {:ok, _membership} =
+        Organizations.add_membership(%{
+          organization_id: organization.id,
+          user_id: user.id,
+          role: role,
+          status: :active,
+          joined_at: DateTime.utc_now()
+        })
+    end)
+
+    organization
+  end
+
   describe "POST /api/threads (direct)" do
     test "admin can create a direct thread with an athlete", %{conn: conn} do
       admin = admin_fixture()
       athlete = user_fixture(%{role: :athlete})
+      organization = create_org_with_members([{admin, :owner}, {athlete, :athlete}])
 
       response =
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads",
+          "/api/org/#{organization.slug}/me/threads",
           %{context_type: "direct", participant_id: athlete.id}
         )
         |> json_response(200)
@@ -25,12 +49,13 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
     test "calling twice returns the same thread", %{conn: conn} do
       admin = admin_fixture()
       athlete = user_fixture(%{role: :athlete})
+      organization = create_org_with_members([{admin, :owner}, {athlete, :athlete}])
 
       r1 =
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads",
+          "/api/org/#{organization.slug}/me/threads",
           %{context_type: "direct", participant_id: athlete.id}
         )
         |> json_response(200)
@@ -39,7 +64,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads",
+          "/api/org/#{organization.slug}/me/threads",
           %{context_type: "direct", participant_id: athlete.id}
         )
         |> json_response(200)
@@ -49,10 +74,11 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
 
     test "rejects self conversations", %{conn: conn} do
       member = user_fixture()
+      organization = create_org_with_members([{member, :member}])
 
       conn
       |> put_bearer_token(member)
-      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads", %{
+      |> post("/api/org/#{organization.slug}/me/threads", %{
         context_type: "direct",
         participant_id: member.id
       })
@@ -65,10 +91,20 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       admin = admin_fixture()
       athlete = user_fixture(%{role: :athlete})
       outsider = user_fixture(%{role: :athlete})
-      workout = workout_fixture(admin)
+
+      organization =
+        create_org_with_members([
+          {admin, :owner},
+          {athlete, :athlete},
+          {outsider, :athlete}
+        ])
+
+      {:ok, context} = Organizations.resolve_tenant_context(admin, organization.slug)
+
+      workout = RepoContext.run(context, fn -> workout_fixture(admin) end)
 
       {:ok, assignment} =
-        MilosTraining.Workouts.assign_workout(%{
+        MilosTraining.Workouts.assign_workout(context, %{
           master_workout_id: workout.id,
           athlete_ids: [athlete.id],
           scheduled_for: Date.utc_today()
@@ -76,7 +112,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
 
       conn
       |> put_bearer_token(outsider)
-      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads", %{
+      |> post("/api/org/#{organization.slug}/me/threads", %{
         context_type: "assignment",
         context_id: assignment.id
       })
@@ -86,7 +122,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
         conn
         |> put_bearer_token(athlete)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads",
+          "/api/org/#{organization.slug}/me/threads",
           %{context_type: "assignment", context_id: assignment.id}
         )
         |> json_response(200)
@@ -97,7 +133,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
 
       conn
       |> put_bearer_token(outsider)
-      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads", %{
+      |> post("/api/org/#{organization.slug}/me/threads", %{
         context_type: "assignment",
         context_id: assignment.id
       })
@@ -108,13 +144,26 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       admin = admin_fixture()
       member = user_fixture()
       outsider = user_fixture()
-      workout = workout_fixture(admin)
-      slot = slot_fixture(workout, %{auto_approve: true})
-      {:ok, _booking} = MilosTraining.Scheduling.submit_auto_approved_booking(member.id, slot.id)
+
+      organization =
+        create_org_with_members([
+          {admin, :owner},
+          {member, :member},
+          {outsider, :member}
+        ])
+
+      {:ok, context} = Organizations.resolve_tenant_context(admin, organization.slug)
+
+      workout = RepoContext.run(context, fn -> workout_fixture(admin) end)
+      class_type_fixture(%{tenant_context: context})
+      slot = slot_fixture(workout, %{auto_approve: true, tenant_context: context})
+
+      {:ok, _booking} =
+        MilosTraining.Scheduling.submit_auto_approved_booking(context, member.id, slot.id)
 
       conn
       |> put_bearer_token(outsider)
-      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads", %{
+      |> post("/api/org/#{organization.slug}/me/threads", %{
         context_type: "class_slot",
         context_id: slot.id
       })
@@ -124,7 +173,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
         conn
         |> put_bearer_token(member)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads",
+          "/api/org/#{organization.slug}/me/threads",
           %{context_type: "class_slot", context_id: slot.id}
         )
         |> json_response(200)
@@ -139,10 +188,11 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
     test "returns threads for the current user", %{conn: conn} do
       admin = admin_fixture()
       athlete = user_fixture(%{role: :athlete})
+      organization = create_org_with_members([{admin, :owner}, {athlete, :athlete}])
 
       conn
       |> put_bearer_token(admin)
-      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads", %{
+      |> post("/api/org/#{organization.slug}/me/threads", %{
         context_type: "direct",
         participant_id: athlete.id
       })
@@ -151,7 +201,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       response =
         conn
         |> put_bearer_token(admin)
-        |> get("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads")
+        |> get("/api/org/#{organization.slug}/me/threads")
         |> json_response(200)
 
       assert length(response["threads"]) == 1
@@ -160,10 +210,11 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
     test "can filter by context_type", %{conn: conn} do
       admin = admin_fixture()
       athlete = user_fixture(%{role: :athlete})
+      organization = create_org_with_members([{admin, :owner}, {athlete, :athlete}])
 
       conn
       |> put_bearer_token(admin)
-      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads", %{
+      |> post("/api/org/#{organization.slug}/me/threads", %{
         context_type: "direct",
         participant_id: athlete.id
       })
@@ -172,9 +223,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       response =
         conn
         |> put_bearer_token(admin)
-        |> get(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads?context_type=direct"
-        )
+        |> get("/api/org/#{organization.slug}/me/threads?context_type=direct")
         |> json_response(200)
 
       assert length(response["threads"]) == 1
@@ -182,9 +231,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       empty =
         conn
         |> put_bearer_token(admin)
-        |> get(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads?context_type=assignment"
-        )
+        |> get("/api/org/#{organization.slug}/me/threads?context_type=assignment")
         |> json_response(200)
 
       assert empty["threads"] == []
@@ -195,12 +242,13 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
     test "counts only incoming unread thread activity", %{conn: conn} do
       admin = admin_fixture()
       athlete = user_fixture(%{role: :athlete})
+      organization = create_org_with_members([{admin, :owner}, {athlete, :athlete}])
 
       %{"thread" => thread} =
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads",
+          "/api/org/#{organization.slug}/me/threads",
           %{context_type: "direct", participant_id: athlete.id}
         )
         |> json_response(200)
@@ -209,7 +257,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/messages",
+          "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/messages",
           %{body: "Outbound only"}
         )
         |> json_response(201)
@@ -217,9 +265,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       own_unread =
         conn
         |> put_bearer_token(admin)
-        |> get(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/unread-count"
-        )
+        |> get("/api/org/#{organization.slug}/me/threads/unread-count")
         |> json_response(200)
 
       assert own_unread["unread_count"] == 0
@@ -228,7 +274,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
         conn
         |> put_bearer_token(athlete)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/messages",
+          "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/messages",
           %{body: "Incoming"}
         )
         |> json_response(201)
@@ -236,9 +282,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       incoming_unread =
         conn
         |> put_bearer_token(admin)
-        |> get(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/unread-count"
-        )
+        |> get("/api/org/#{organization.slug}/me/threads/unread-count")
         |> json_response(200)
 
       assert incoming_unread["unread_count"] == 1
@@ -246,7 +290,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       conn
       |> put_bearer_token(admin)
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/read",
+        "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/read",
         %{message_id: incoming_message["id"]}
       )
       |> json_response(200)
@@ -254,7 +298,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       conn
       |> put_bearer_token(admin)
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/messages",
+        "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/messages",
         %{body: "Reply after reading"}
       )
       |> json_response(201)
@@ -262,9 +306,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       read_unread =
         conn
         |> put_bearer_token(admin)
-        |> get(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/unread-count"
-        )
+        |> get("/api/org/#{organization.slug}/me/threads/unread-count")
         |> json_response(200)
 
       assert own_message["sender_id"] == admin.id
@@ -276,12 +318,13 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
     test "sends a message in a thread", %{conn: conn} do
       admin = admin_fixture()
       athlete = user_fixture(%{role: :athlete})
+      organization = create_org_with_members([{admin, :owner}, {athlete, :athlete}])
 
       %{"thread" => thread} =
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads",
+          "/api/org/#{organization.slug}/me/threads",
           %{context_type: "direct", participant_id: athlete.id}
         )
         |> json_response(200)
@@ -290,7 +333,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/messages",
+          "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/messages",
           %{
             body: "Great session today!",
             message_type: "chat"
@@ -306,13 +349,14 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
     test "replays a client operation without duplicating the message", %{conn: conn} do
       admin = admin_fixture()
       athlete = user_fixture(%{role: :athlete})
+      organization = create_org_with_members([{admin, :owner}, {athlete, :athlete}])
       operation_id = Ecto.UUID.generate()
 
       %{"thread" => thread} =
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads",
+          "/api/org/#{organization.slug}/me/threads",
           %{context_type: "direct", participant_id: athlete.id}
         )
         |> json_response(200)
@@ -327,7 +371,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/messages",
+          "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/messages",
           payload
         )
         |> json_response(201)
@@ -336,7 +380,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/messages",
+          "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/messages",
           payload
         )
         |> json_response(201)
@@ -359,12 +403,13 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
     test "admin can send a coaching_note", %{conn: conn} do
       admin = admin_fixture()
       athlete = user_fixture(%{role: :athlete})
+      organization = create_org_with_members([{admin, :owner}, {athlete, :athlete}])
 
       %{"thread" => thread} =
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads",
+          "/api/org/#{organization.slug}/me/threads",
           %{context_type: "direct", participant_id: athlete.id}
         )
         |> json_response(200)
@@ -373,7 +418,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/messages",
+          "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/messages",
           %{
             body: "Focus on your form this week.",
             message_type: "coaching_note"
@@ -389,11 +434,14 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       athlete = user_fixture(%{role: :athlete})
       outsider = admin_fixture()
 
+      organization =
+        create_org_with_members([{admin, :owner}, {athlete, :athlete}, {outsider, :admin}])
+
       %{"thread" => thread} =
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads",
+          "/api/org/#{organization.slug}/me/threads",
           %{context_type: "direct", participant_id: athlete.id}
         )
         |> json_response(200)
@@ -401,7 +449,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       conn
       |> put_bearer_token(outsider)
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/messages",
+        "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/messages",
         %{body: "Intruder!"}
       )
       |> json_response(403)
@@ -412,12 +460,13 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
     test "returns messages in a thread", %{conn: conn} do
       admin = admin_fixture()
       athlete = user_fixture(%{role: :athlete})
+      organization = create_org_with_members([{admin, :owner}, {athlete, :athlete}])
 
       %{"thread" => thread} =
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads",
+          "/api/org/#{organization.slug}/me/threads",
           %{context_type: "direct", participant_id: athlete.id}
         )
         |> json_response(200)
@@ -425,7 +474,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       conn
       |> put_bearer_token(admin)
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/messages",
+        "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/messages",
         %{body: "Hello!"}
       )
       |> json_response(201)
@@ -433,9 +482,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       response =
         conn
         |> put_bearer_token(athlete)
-        |> get(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/messages"
-        )
+        |> get("/api/org/#{organization.slug}/me/threads/#{thread["id"]}/messages")
         |> json_response(200)
 
       assert length(response["messages"]) == 1
@@ -447,11 +494,14 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       athlete = user_fixture(%{role: :athlete})
       other = user_fixture()
 
+      organization =
+        create_org_with_members([{admin, :owner}, {athlete, :athlete}, {other, :member}])
+
       %{"thread" => thread} =
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads",
+          "/api/org/#{organization.slug}/me/threads",
           %{context_type: "direct", participant_id: athlete.id}
         )
         |> json_response(200)
@@ -460,7 +510,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads",
+          "/api/org/#{organization.slug}/me/threads",
           %{context_type: "direct", participant_id: other.id}
         )
         |> json_response(200)
@@ -470,7 +520,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
           conn
           |> put_bearer_token(admin)
           |> post(
-            "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/messages",
+            "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/messages",
             %{body: body}
           )
           |> json_response(201)
@@ -481,7 +531,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{other_thread["id"]}/messages",
+          "/api/org/#{organization.slug}/me/threads/#{other_thread["id"]}/messages",
           %{body: "foreign"}
         )
         |> json_response(201)
@@ -490,7 +540,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
         conn
         |> put_bearer_token(athlete)
         |> get(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/messages?limit=1&before_id=#{List.last(messages)["id"]}"
+          "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/messages?limit=1&before_id=#{List.last(messages)["id"]}"
         )
         |> json_response(200)
 
@@ -505,9 +555,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
           ] do
         conn
         |> put_bearer_token(athlete)
-        |> get(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/messages?#{query}"
-        )
+        |> get("/api/org/#{organization.slug}/me/threads/#{thread["id"]}/messages?#{query}")
         |> json_response(400)
       end
     end
@@ -517,12 +565,13 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
     test "marks a message as read", %{conn: conn} do
       admin = admin_fixture()
       athlete = user_fixture(%{role: :athlete})
+      organization = create_org_with_members([{admin, :owner}, {athlete, :athlete}])
 
       %{"thread" => thread} =
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads",
+          "/api/org/#{organization.slug}/me/threads",
           %{context_type: "direct", participant_id: athlete.id}
         )
         |> json_response(200)
@@ -531,7 +580,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/messages",
+          "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/messages",
           %{body: "Read me!"}
         )
         |> json_response(201)
@@ -539,7 +588,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       conn
       |> put_bearer_token(athlete)
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/read",
+        "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/read",
         %{message_id: message["id"]}
       )
       |> json_response(200)
@@ -551,11 +600,14 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       athlete = user_fixture(%{role: :athlete})
       other = user_fixture()
 
+      organization =
+        create_org_with_members([{admin, :owner}, {athlete, :athlete}, {other, :member}])
+
       %{"thread" => thread} =
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads",
+          "/api/org/#{organization.slug}/me/threads",
           %{context_type: "direct", participant_id: athlete.id}
         )
         |> json_response(200)
@@ -564,7 +616,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads",
+          "/api/org/#{organization.slug}/me/threads",
           %{context_type: "direct", participant_id: other.id}
         )
         |> json_response(200)
@@ -573,7 +625,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/messages",
+          "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/messages",
           %{body: "older"}
         )
         |> json_response(201)
@@ -582,7 +634,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/messages",
+          "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/messages",
           %{body: "newer"}
         )
         |> json_response(201)
@@ -591,7 +643,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
         conn
         |> put_bearer_token(admin)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{other_thread["id"]}/messages",
+          "/api/org/#{organization.slug}/me/threads/#{other_thread["id"]}/messages",
           %{body: "foreign"}
         )
         |> json_response(201)
@@ -599,7 +651,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       conn
       |> put_bearer_token(athlete)
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/read",
+        "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/read",
         %{message_id: foreign["id"]}
       )
       |> json_response(422)
@@ -607,7 +659,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
       conn
       |> put_bearer_token(athlete)
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/read",
+        "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/read",
         %{message_id: newer["id"]}
       )
       |> json_response(200)
@@ -616,7 +668,7 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
         conn
         |> put_bearer_token(athlete)
         |> post(
-          "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/me/threads/#{thread["id"]}/read",
+          "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/read",
           %{message_id: older["id"]}
         )
         |> json_response(200)
