@@ -106,6 +106,45 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
            )
   end
 
+  test "permanently deletes an organization that has real tenant data (previously RESTRICT-only tables)",
+       context do
+    alias MilosTraining.Gamification.GamificationSetting
+
+    {:ok, organization} = Organizations.create_organization(%{name: "Used Gym"})
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: context.platform_user.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    {:ok, _gamification_settings} =
+      %GamificationSetting{}
+      |> GamificationSetting.changeset(%{
+        organization_id: organization.id,
+        weekly_workout_target: 3,
+        leaderboard_enabled: true,
+        theme_slug: "ember"
+      })
+      |> Repo.insert()
+
+    conn =
+      context.conn
+      |> put_bearer_token(context.platform_user)
+      |> delete("/api/platform/organizations/#{organization.id}")
+
+    assert response(conn, 204) == ""
+    refute Repo.get(Organization, organization.id)
+
+    refute Repo.exists?(
+             from settings in GamificationSetting,
+               where: settings.organization_id == ^organization.id
+           )
+  end
+
   test "platform owner manages tenant invitations and membership roles", context do
     {:ok, organization} = Organizations.create_organization(%{name: "Access Gym"})
     member = user_fixture(%{nickname: "access_member", role: :member})
