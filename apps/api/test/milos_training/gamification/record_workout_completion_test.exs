@@ -15,18 +15,20 @@ defmodule MilosTraining.Gamification.RecordWorkoutCompletionTest do
     context = tenant_context_fixture(admin, "Completion Flow Gym")
 
     {:ok, challenge} =
-      Gamification.create_seasonal_challenge(admin.id, %{
-        title: "June Builder",
-        description: "Complete two workouts",
-        criteria_type: "workout_count",
-        criteria_value: %{count: 2},
-        badge_key: "challenge_june_builder",
-        badge_label: "June Builder",
-        starts_at: Date.utc_today(),
-        ends_at: Date.add(Date.utc_today(), 7)
-      })
+      GamificationStore.with_tenant_context(context, fn ->
+        Gamification.create_seasonal_challenge(admin.id, %{
+          title: "June Builder",
+          description: "Complete two workouts",
+          criteria_type: "workout_count",
+          criteria_value: %{count: 2},
+          badge_key: "challenge_june_builder",
+          badge_label: "June Builder",
+          starts_at: Date.utc_today(),
+          ends_at: Date.add(Date.utc_today(), 7)
+        })
+      end)
 
-    {workout, section_id} = scoreable_workout!(admin)
+    {workout, section_id} = scoreable_workout!(admin, context)
 
     {:ok, _preference} =
       GamificationStore.with_tenant_context(context, fn ->
@@ -70,7 +72,7 @@ defmodule MilosTraining.Gamification.RecordWorkoutCompletionTest do
     admin = admin_fixture()
     athlete = user_fixture(%{role: :athlete})
     context = tenant_context_fixture(admin, "No Multiply Leaderboard Gym")
-    {workout, section_id} = scoreable_workout!(admin)
+    {workout, section_id} = scoreable_workout!(admin, context)
 
     {:ok, _preference} =
       GamificationStore.with_tenant_context(context, fn ->
@@ -114,19 +116,14 @@ defmodule MilosTraining.Gamification.RecordWorkoutCompletionTest do
     context
   end
 
-  # `scoreable_workout!/1` creates its workout through the unscoped
-  # `Workouts.create_workout/2` path, so the row lands under whichever
-  # organization the DB column default assigns (the seeded legacy
-  # organization) rather than under `context`. Looking it up again inside
-  # `Execution.start_execution/2` (and scoping the execution lookup inside
-  # `Execution.complete_execution/3`) is tenant-scoped, so the legacy
-  # organization and the acting user must be set in the session first.
+  # `Execution.start_execution/2` looks the workout up through a
+  # tenant-scoped read (and `Execution.complete_execution/3` scopes the
+  # execution lookup the same way), so `context`'s organization and the
+  # acting user must be set in the session first.
   defp complete_execution!(context, user_id, workout_id, section_id, score_value) do
-    legacy_organization = Organizations.get_by_slug(Organizations.legacy_organization_slug())
-
     Repo.query!("SELECT set_config($1, $2, false)", [
       "app.organization_id",
-      legacy_organization.id
+      context.organization_id
     ])
 
     Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", user_id])
@@ -185,9 +182,9 @@ defmodule MilosTraining.Gamification.RecordWorkoutCompletionTest do
   defp wait_for_leaderboard(_context, _user_id, 0),
     do: flunk("leaderboard refresh did not finish in time")
 
-  defp scoreable_workout!(admin) do
+  defp scoreable_workout!(admin, context) do
     {:ok, workout} =
-      MilosTraining.Workouts.create_workout(admin, %{
+      MilosTraining.Workouts.create_workout(context, admin, %{
         title: "Scoreable Hero",
         type: :crossfit,
         sections: [

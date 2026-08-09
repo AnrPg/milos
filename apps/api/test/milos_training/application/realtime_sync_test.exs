@@ -106,6 +106,8 @@ defmodule MilosTraining.Application.RealtimeSyncTest do
   test "creating a seasonal challenge emits landing sync for users and challenge sync for admins" do
     admin = admin_fixture(%{nickname: "sync_challenge_admin"})
     athlete = user_fixture(%{nickname: "sync_challenge_athlete", role: :athlete})
+    context = legacy_tenant_context!(admin, :owner)
+    set_legacy_session!(context, admin)
 
     params = %{
       title: "Realtime Week",
@@ -136,10 +138,10 @@ defmodule MilosTraining.Application.RealtimeSyncTest do
     admin = admin_fixture(%{nickname: "sync_draft_admin"})
     editor_session_id = "editor-tab-1"
 
-    assert {:ok, draft} = CreateDraftWorkout.call(admin)
-
     context = legacy_tenant_context!(admin, :owner)
     set_legacy_session!(context, admin)
+
+    assert {:ok, draft} = CreateDraftWorkout.call(admin)
 
     assert {:ok, updated_draft} =
              UpdateDraftWorkout.call(draft.id, %{
