@@ -2,34 +2,87 @@ defmodule MilosTraining.Application.BackfillFinanceEntitlementsTest do
   use MilosTraining.DataCase, async: false
 
   alias MilosTraining.Application.BackfillFinanceEntitlements
-  alias MilosTraining.Finance
+  alias MilosTraining.{Finance, Organizations}
 
   import MilosTraining.TestFixtures
 
-  test "dry-run reports missing profiles without mutating and apply is idempotent" do
+  setup do
+    owner = admin_fixture()
+
+    {:ok, organization} =
+      Organizations.create_organization(%{
+        name: "Backfill Test #{System.unique_integer([:positive])}"
+      })
+
+    {:ok, _owner_membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: owner.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    Repo.query!("SELECT set_config($1, $2, false)", [
+      "app.organization_id",
+      organization.id
+    ])
+
+    Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", owner.id])
+
+    %{organization: organization, context: %{organization_id: organization.id}}
+  end
+
+  defp join_org(organization, user, role) do
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: user.id,
+        role: role,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    :ok
+  end
+
+  test "dry-run reports missing profiles without mutating and apply is idempotent", %{
+    organization: organization,
+    context: context
+  } do
     member = user_fixture()
     athlete = user_fixture(%{role: :athlete})
+    join_org(organization, member, :member)
+    join_org(organization, athlete, :athlete)
     package = package_fixture("legacy_all_access")
 
     params = %{package_by_role: %{member: package.id, athlete: package.id}}
 
-    assert {:ok, dry_run} = BackfillFinanceEntitlements.call(Map.put(params, :dry_run, true))
+    assert {:ok, dry_run} =
+             BackfillFinanceEntitlements.call(context, Map.put(params, :dry_run, true))
+
     assert dry_run.ready == false
     assert dry_run.counts.create_and_assign == 2
     assert Finance.get_member_profile(member.id) == nil
 
-    assert {:ok, applied} = BackfillFinanceEntitlements.call(Map.put(params, :dry_run, false))
+    assert {:ok, applied} =
+             BackfillFinanceEntitlements.call(context, Map.put(params, :dry_run, false))
+
     assert applied.counts.applied == 2
     assert Finance.get_member_profile(member.id).active_package_subscription
     assert Finance.get_member_profile(athlete.id).active_package_subscription
 
-    assert {:ok, repeated} = BackfillFinanceEntitlements.call(Map.put(params, :dry_run, false))
+    assert {:ok, repeated} =
+             BackfillFinanceEntitlements.call(context, Map.put(params, :dry_run, false))
+
     assert repeated.ready
     assert repeated.counts.unchanged == 2
     assert repeated.counts.applied == 0
   end
 
-  test "rejects a legacy target package without a versioned entitlement plan" do
+  test "rejects a legacy target package without a versioned entitlement plan", %{
+    context: context
+  } do
     _member = user_fixture()
 
     {:ok, package} =
@@ -41,7 +94,7 @@ defmodule MilosTraining.Application.BackfillFinanceEntitlementsTest do
       })
 
     assert {:error, {:invalid_backfill_package, "member", :unsupported_entitlement_version}} =
-             BackfillFinanceEntitlements.call(%{
+             BackfillFinanceEntitlements.call(context, %{
                dry_run: true,
                package_by_role: %{member: package.id}
              })

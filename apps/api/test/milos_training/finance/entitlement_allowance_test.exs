@@ -1,8 +1,35 @@
 defmodule MilosTraining.Finance.EntitlementAllowanceTest do
   use MilosTraining.DataCase
 
-  alias MilosTraining.Finance
+  alias MilosTraining.{Finance, Organizations}
   alias MilosTraining.TestFixtures
+
+  setup do
+    owner = TestFixtures.admin_fixture()
+
+    {:ok, organization} =
+      Organizations.create_organization(%{
+        name: "Entitlement Allowance Test #{System.unique_integer([:positive])}"
+      })
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: owner.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    Repo.query!("SELECT set_config($1, $2, false)", [
+      "app.organization_id",
+      organization.id
+    ])
+
+    Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", owner.id])
+
+    %{organization: organization}
+  end
 
   @plan %{
     "entitlement_version" => 1,

@@ -755,7 +755,11 @@ defmodule MilosTrainingWeb.AdminFinanceController do
 
   def assign_package(conn, params) do
     with {:ok, subscription} <-
-           AssignFinanceMemberPackage.call(param_id(params), body_params(conn, params)) do
+           AssignFinanceMemberPackage.call(
+             conn.assigns.tenant_context,
+             param_id(params),
+             body_params(conn, params)
+           ) do
       conn
       |> put_status(:created)
       |> json(%{package_subscription: subscription})
