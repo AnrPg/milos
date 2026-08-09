@@ -3,11 +3,12 @@ defmodule MilosTrainingWeb.AdminClassTypeControllerTest do
 
   import MilosTraining.TestFixtures
 
-  alias MilosTraining.Repo
+  alias MilosTraining.{Organizations, Repo}
   alias MilosTraining.Scheduling.{ClassType, ScheduledClass}
 
   test "admin creates and renames a class type", %{conn: conn} do
     admin = admin_fixture(%{nickname: "class_type_admin"})
+    %{organization: organization} = tenant_fixture(admin, "Class Type Admin Gym")
     admin_conn = put_bearer_token(conn, admin)
 
     created =
@@ -15,7 +16,7 @@ defmodule MilosTrainingWeb.AdminClassTypeControllerTest do
       |> recycle()
       |> put_req_header("content-type", "application/json")
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/class-types",
+        "/api/org/#{organization.slug}/admin/class-types",
         Jason.encode!(%{name: "Olympic Lifting"})
       )
       |> json_response(201)
@@ -30,7 +31,7 @@ defmodule MilosTrainingWeb.AdminClassTypeControllerTest do
       |> recycle()
       |> put_req_header("content-type", "application/json")
       |> patch(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/class-types/#{created["id"]}",
+        "/api/org/#{organization.slug}/admin/class-types/#{created["id"]}",
         Jason.encode!(%{name: "Olympic Weightlifting"})
       )
       |> json_response(200)
@@ -41,31 +42,40 @@ defmodule MilosTrainingWeb.AdminClassTypeControllerTest do
   end
 
   test "class type configuration is admin-only", %{conn: conn} do
+    admin = admin_fixture(%{nickname: "class_type_member_owner"})
+    %{organization: organization} = tenant_fixture(admin, "Class Type Member-Only Gym")
     member = user_fixture(%{nickname: "class_type_member"})
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: member.id,
+        role: :member,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
 
     assert conn
            |> put_bearer_token(member)
-           |> get(
-             "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/class-types"
-           )
+           |> get("/api/org/#{organization.slug}/admin/class-types")
            |> response(403)
   end
 
   test "the final active class type cannot be archived", %{conn: conn} do
     admin = admin_fixture(%{nickname: "last_class_type_admin"})
+    %{organization: organization, context: context} = tenant_fixture(admin, "Last Class Type Gym")
 
     Repo.update_all(ClassType,
       set: [archived_at: DateTime.utc_now() |> DateTime.truncate(:second)]
     )
 
-    only_type = class_type_fixture(%{name: "Only Active", slug: "only-active"})
+    only_type =
+      class_type_fixture(%{name: "Only Active", slug: "only-active", tenant_context: context})
 
     response =
       conn
       |> put_bearer_token(admin)
-      |> delete(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/class-types/#{only_type.id}"
-      )
+      |> delete("/api/org/#{organization.slug}/admin/class-types/#{only_type.id}")
 
     assert %{"error" => "At least one active class type must remain"} =
              json_response(response, 409)
@@ -75,12 +85,21 @@ defmodule MilosTrainingWeb.AdminClassTypeControllerTest do
 
   test "archival maps future classes while preserving past class history", %{conn: conn} do
     admin = admin_fixture(%{nickname: "class_type_archive_admin"})
-    workout = workout_fixture(admin)
-    source = class_type_fixture(%{name: "Legacy Class", slug: "legacy-class"})
-    replacement = class_type_fixture(%{name: "Current Class", slug: "current-class"})
+
+    %{organization: organization, context: context} =
+      tenant_fixture(admin, "Class Type Archive Gym")
+
+    workout = tenant_workout_fixture(admin, context, %{})
+
+    source =
+      class_type_fixture(%{name: "Legacy Class", slug: "legacy-class", tenant_context: context})
+
+    replacement =
+      class_type_fixture(%{name: "Current Class", slug: "current-class", tenant_context: context})
 
     past_slot =
       Repo.insert!(%ScheduledClass{
+        organization_id: organization.id,
         master_workout_id: workout.id,
         class_type_id: source.id,
         scheduled_at:
@@ -90,13 +109,15 @@ defmodule MilosTrainingWeb.AdminClassTypeControllerTest do
         booking_timeout_minutes: 60
       })
 
-    future_slot = slot_fixture(workout, %{class_type_id: source.id})
+    future_slot =
+      slot_fixture(workout, %{class_type_id: source.id, tenant_context: context})
+
     admin_conn = put_bearer_token(conn, admin)
 
     missing_mapping =
       delete(
         admin_conn |> recycle(),
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/class-types/#{source.id}"
+        "/api/org/#{organization.slug}/admin/class-types/#{source.id}"
       )
 
     assert %{
@@ -108,7 +129,7 @@ defmodule MilosTrainingWeb.AdminClassTypeControllerTest do
     archived =
       delete(
         admin_conn |> recycle(),
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/class-types/#{source.id}?replacement_class_type_id=#{replacement.id}"
+        "/api/org/#{organization.slug}/admin/class-types/#{source.id}?replacement_class_type_id=#{replacement.id}"
       )
       |> json_response(200)
 
@@ -122,10 +143,37 @@ defmodule MilosTrainingWeb.AdminClassTypeControllerTest do
     conn: conn
   } do
     admin = admin_fixture(%{nickname: "class_type_schedule_admin"})
+
+    %{organization: organization, context: context} =
+      tenant_fixture(admin, "Class Type Schedule Gym")
+
     member = user_fixture(%{nickname: "class_type_schedule_member"})
-    workout = workout_fixture(admin)
-    strength = class_type_fixture(%{name: "Strength Class", slug: "strength-class"})
-    recovery = class_type_fixture(%{name: "Recovery Class", slug: "recovery-class"})
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: member.id,
+        role: :member,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    workout = tenant_workout_fixture(admin, context, %{})
+
+    strength =
+      class_type_fixture(%{
+        name: "Strength Class",
+        slug: "strength-class",
+        tenant_context: context
+      })
+
+    recovery =
+      class_type_fixture(%{
+        name: "Recovery Class",
+        slug: "recovery-class",
+        tenant_context: context
+      })
+
     admin_conn = put_bearer_token(conn, admin)
 
     missing_type =
@@ -133,7 +181,7 @@ defmodule MilosTrainingWeb.AdminClassTypeControllerTest do
       |> recycle()
       |> put_req_header("content-type", "application/json")
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/schedule/slots",
+        "/api/org/#{organization.slug}/admin/schedule/slots",
         Jason.encode!(%{
           master_workout_id: workout.id,
           scheduled_at: DateTime.add(DateTime.utc_now(), 3_600, :second),
@@ -145,11 +193,12 @@ defmodule MilosTrainingWeb.AdminClassTypeControllerTest do
 
     assert response(missing_type, 422)
 
-    first = slot_fixture(workout, %{class_type_id: strength.id})
+    first = slot_fixture(workout, %{class_type_id: strength.id, tenant_context: context})
 
     second =
       slot_fixture(workout, %{
         class_type_id: recovery.id,
+        tenant_context: context,
         scheduled_at:
           DateTime.add(DateTime.utc_now() |> DateTime.truncate(:second), 7_200, :second)
       })
@@ -157,7 +206,7 @@ defmodule MilosTrainingWeb.AdminClassTypeControllerTest do
     response =
       get(
         put_bearer_token(conn, member),
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/schedule?start_date=#{Date.utc_today()}&days=7&class_type_ids[]=#{strength.id}&class_type_ids[]=#{recovery.id}"
+        "/api/org/#{organization.slug}/schedule?start_date=#{Date.utc_today()}&days=7&class_type_ids[]=#{strength.id}&class_type_ids[]=#{recovery.id}"
       )
       |> json_response(200)
 
@@ -165,5 +214,33 @@ defmodule MilosTrainingWeb.AdminClassTypeControllerTest do
     assert first.id in ids
     assert second.id in ids
     assert Enum.any?(response["class_types"], &(&1["id"] == strength.id))
+  end
+
+  defp tenant_fixture(admin, name) do
+    {:ok, organization} = Organizations.create_organization(%{name: name})
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: admin.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    {:ok, context} = Organizations.resolve_tenant_context(admin, organization.slug)
+
+    %{organization: organization, context: context}
+  end
+
+  defp tenant_workout_fixture(admin, context, attrs) do
+    Repo.query!("SELECT set_config($1, $2, false)", [
+      "app.organization_id",
+      context.organization_id
+    ])
+
+    Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", admin.id])
+
+    workout_fixture(admin, attrs)
   end
 end

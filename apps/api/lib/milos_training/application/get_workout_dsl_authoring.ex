@@ -6,24 +6,32 @@ defmodule MilosTraining.Application.GetWorkoutDslAuthoring do
 
   alias MilosTraining.Workouts
 
+  def call(context, id) do
+    context
+    |> Workouts.get_workout_for_admin(id)
+    |> build_result()
+  end
+
   def call(id) do
-    case Workouts.get_workout_for_admin(id) do
-      nil ->
-        {:error, :not_found}
+    id
+    |> Workouts.get_workout_for_admin()
+    |> build_result()
+  end
 
-      workout ->
-        source = workout.dsl_source || source_from_workout(workout)
+  defp build_result(nil), do: {:error, :not_found}
 
-        {:ok,
-         %{
-           version: workout.dsl_version || 1,
-           source: source,
-           document: workout.dsl_document,
-           source_revision: workout.dsl_source_revision || 0,
-           authoring_mode: workout.authoring_mode || "structured",
-           diagnostics: workout.last_dsl_diagnostics || []
-         }}
-    end
+  defp build_result(workout) do
+    source = workout.dsl_source || source_from_workout(workout)
+
+    {:ok,
+     %{
+       version: workout.dsl_version || 1,
+       source: source,
+       document: workout.dsl_document,
+       source_revision: workout.dsl_source_revision || 0,
+       authoring_mode: workout.authoring_mode || "structured",
+       diagnostics: workout.last_dsl_diagnostics || []
+     }}
   end
 
   defp source_from_workout(%{status: "draft", draft_data: draft_data})

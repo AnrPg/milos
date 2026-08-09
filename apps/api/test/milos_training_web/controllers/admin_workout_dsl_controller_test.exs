@@ -4,7 +4,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
   alias MilosTraining.{Identity, Organizations}
 
   test "admin can parse and canonically format Quick Text", %{conn: conn} do
-    conn = authenticate_as_admin(conn, "dsl_preview_admin")
+    {conn, organization} = authenticate_as_admin(conn, "dsl_preview_admin")
 
     source = """
     [workout]
@@ -25,7 +25,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
     response =
       conn
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/dsl/parse",
+        "/api/org/#{organization.slug}/admin/workouts/dsl/parse",
         %{source: source}
       )
       |> json_response(200)
@@ -36,12 +36,12 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
   end
 
   test "invalid Quick Text returns source-positioned diagnostics", %{conn: conn} do
-    conn = authenticate_as_admin(conn, "dsl_diagnostic_admin")
+    {conn, organization} = authenticate_as_admin(conn, "dsl_diagnostic_admin")
 
     response =
       conn
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/dsl/parse",
+        "/api/org/#{organization.slug}/admin/workouts/dsl/parse",
         %{source: "[workout]\n[/workout]"}
       )
       |> json_response(422)
@@ -55,29 +55,37 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
     {:ok, member} =
       Identity.register(%{
         nickname: "dsl_preview_member",
-        password: "S3cur3P@ss!",
+        password: "S3cur3P@ss!42",
         role: :member,
         email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
       })
 
-    {:ok, _membership} = Organizations.ensure_legacy_membership(member)
+    {:ok, organization} = Organizations.create_organization(%{name: "DSL Member Gym"})
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: member.id,
+        role: :member,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
 
     conn
     |> put_bearer_token(member)
     |> post(
-      "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/dsl/parse",
+      "/api/org/#{organization.slug}/admin/workouts/dsl/parse",
       %{source: ""}
     )
     |> json_response(403)
   end
 
   test "admin can load the generated manual and all format templates", %{conn: conn} do
+    {conn, organization} = authenticate_as_admin(conn, "dsl_manual_admin")
+
     response =
       conn
-      |> authenticate_as_admin("dsl_manual_admin")
-      |> get(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/dsl/manual"
-      )
+      |> get("/api/org/#{organization.slug}/admin/workouts/dsl/manual")
       |> json_response(200)
 
     assert response["version"] == 1
@@ -89,11 +97,11 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
   test "revisioned autosave rejects a stale editor and retained source can be reloaded", %{
     conn: conn
   } do
-    admin_conn = authenticate_as_admin(conn, "dsl_revision_admin")
+    {admin_conn, organization} = authenticate_as_admin(conn, "dsl_revision_admin")
 
     draft =
       admin_conn
-      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts")
+      |> post("/api/org/#{organization.slug}/admin/workouts")
       |> json_response(201)
       |> Map.fetch!("draft")
 
@@ -104,7 +112,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
       |> recycle()
       |> put_req_header("content-type", "application/json")
       |> patch(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft["id"]}/draft",
+        "/api/org/#{organization.slug}/admin/workouts/#{draft["id"]}/draft",
         %{
           authoring_mode: "quick_text",
           dsl_version: 1,
@@ -124,7 +132,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
       |> recycle()
       |> put_req_header("content-type", "application/json")
       |> patch(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft["id"]}/draft",
+        "/api/org/#{organization.slug}/admin/workouts/#{draft["id"]}/draft",
         %{
           dsl_source: String.replace(source, "Revision safety", "Stale overwrite"),
           expected_source_revision: 0
@@ -137,9 +145,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
     retained =
       admin_conn
       |> recycle()
-      |> get(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft["id"]}/dsl"
-      )
+      |> get("/api/org/#{organization.slug}/admin/workouts/#{draft["id"]}/dsl")
       |> json_response(200)
 
     assert retained["source"] == source
@@ -150,11 +156,11 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
   test "direct publish retains free-text exercise source without warning acknowledgement", %{
     conn: conn
   } do
-    admin_conn = authenticate_as_admin(conn, "dsl_publish_admin")
+    {admin_conn, organization} = authenticate_as_admin(conn, "dsl_publish_admin")
 
     draft =
       admin_conn
-      |> post("/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts")
+      |> post("/api/org/#{organization.slug}/admin/workouts")
       |> json_response(201)
       |> Map.fetch!("draft")
 
@@ -165,7 +171,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
       |> recycle()
       |> put_req_header("content-type", "application/json")
       |> patch(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft["id"]}/draft",
+        "/api/org/#{organization.slug}/admin/workouts/#{draft["id"]}/draft",
         %{
           authoring_mode: "quick_text",
           dsl_version: 1,
@@ -182,7 +188,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
       |> recycle()
       |> put_req_header("content-type", "application/json")
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{draft["id"]}/dsl/publish",
+        "/api/org/#{organization.slug}/admin/workouts/#{draft["id"]}/dsl/publish",
         %{
           source: source,
           document: %{type: "doc"},
@@ -212,14 +218,24 @@ defmodule MilosTrainingWeb.AdminWorkoutDslControllerTest do
     {:ok, user} =
       Identity.register(%{
         nickname: nickname,
-        password: "S3cur3P@ss!",
+        password: "S3cur3P@ss!42",
         role: :member,
         email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
       })
 
     {:ok, admin} = Identity.update_role(user, :admin)
-    {:ok, _membership} = Organizations.ensure_legacy_membership(admin, :owner)
-    put_bearer_token(conn, admin)
+    {:ok, organization} = Organizations.create_organization(%{name: "#{nickname} Gym"})
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: admin.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    {put_bearer_token(conn, admin), organization}
   end
 
   defp valid_source(title, exercise_name) do

@@ -20,6 +20,8 @@ defmodule MilosTraining.Application.CreateRecurringClassSeries do
 
   defp create_series(context, params), do: Scheduling.create_class_series(context, params)
 
+  defp fetch_workout(_context, nil), do: {:ok, nil}
+
   defp fetch_workout(context, id) do
     case Workouts.get_workout(context, id) do
       nil -> {:error, :workout_not_found}

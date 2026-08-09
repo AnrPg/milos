@@ -94,7 +94,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslController do
   def show_authoring(conn, params) do
     id = params[:id] || params["id"]
 
-    with {:ok, authoring} <- GetWorkoutDslAuthoring.call(id) do
+    with {:ok, authoring} <- GetWorkoutDslAuthoring.call(conn.assigns.tenant_context, id) do
       json(conn, authoring)
     end
   end
@@ -137,7 +137,7 @@ defmodule MilosTrainingWeb.AdminWorkoutDslController do
   def publish(conn, params) do
     id = params[:id] || params["id"]
 
-    case PublishWorkoutDsl.call(id, conn.body_params) do
+    case PublishWorkoutDsl.call(conn.assigns.tenant_context, id, conn.body_params) do
       {:ok, result} ->
         json(conn, json_publish_result(result))
 

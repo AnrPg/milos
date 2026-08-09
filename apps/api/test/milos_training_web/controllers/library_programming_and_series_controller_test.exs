@@ -3,15 +3,18 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
 
   import MilosTraining.TestFixtures
 
+  alias MilosTraining.{Finance, Organizations, Repo}
+
   test "admin organizes workouts in nested folders and moves a workout", %{conn: conn} do
     admin = admin_fixture(%{nickname: "folder_admin"})
-    workout = workout_fixture(admin, %{title: "Folder WOD"})
+    %{organization: organization, context: context} = tenant_fixture(admin, "Folder Gym")
+    workout = tenant_workout_fixture(admin, context, %{title: "Folder WOD"})
     admin_conn = put_bearer_token(conn, admin)
 
     parent =
       admin_conn
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workout-folders",
+        "/api/org/#{organization.slug}/admin/workout-folders",
         %{name: "2026", parent_id: nil}
       )
       |> json_response(201)
@@ -20,7 +23,7 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
       admin_conn
       |> recycle()
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workout-folders",
+        "/api/org/#{organization.slug}/admin/workout-folders",
         %{name: "Strength", parent_id: parent["id"]}
       )
       |> json_response(201)
@@ -29,7 +32,7 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
       admin_conn
       |> recycle()
       |> patch(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workouts/#{workout.id}/library",
+        "/api/org/#{organization.slug}/admin/workouts/#{workout.id}/library",
         %{folder_id: child["id"]}
       )
       |> json_response(200)
@@ -39,9 +42,7 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
     folders =
       admin_conn
       |> recycle()
-      |> get(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workout-folders"
-      )
+      |> get("/api/org/#{organization.slug}/admin/workout-folders")
       |> json_response(200)
       |> Map.fetch!("folders")
 
@@ -50,12 +51,13 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
 
   test "admin settings persist class creation defaults", %{conn: conn} do
     admin = admin_fixture(%{nickname: "defaults_admin"})
+    %{organization: organization} = tenant_fixture(admin, "Defaults Gym")
 
     payload =
       conn
       |> put_bearer_token(admin)
       |> patch(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/settings",
+        "/api/org/#{organization.slug}/admin/settings",
         %{
           scheduling: %{
             default_capacity: 18,
@@ -79,7 +81,9 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
 
   test "admin batch creates explicit class occurrences", %{conn: conn} do
     admin = admin_fixture(%{nickname: "series_admin"})
-    class_type = class_type_fixture(%{name: "Series Class"})
+    %{organization: organization, context: context} = tenant_fixture(admin, "Series Gym")
+    class_type = class_type_fixture(%{name: "Series Class", tenant_context: context})
+    workout = tenant_workout_fixture(admin, context, %{title: "Series WOD"})
     admin_conn = put_bearer_token(conn, admin)
     first = Date.utc_today() |> Date.add(1)
     second = Date.add(first, 7)
@@ -87,9 +91,10 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
     result =
       admin_conn
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/schedule/slots/series",
+        "/api/org/#{organization.slug}/admin/schedule/slots/series",
         %{
           class_type_id: class_type.id,
+          master_workout_id: workout.id,
           name: "Weekly Series",
           duration_minutes: 60,
           timezone: "Etc/UTC",
@@ -106,23 +111,26 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
       |> json_response(201)
 
     assert result["series"]["occurrence_count"] == 2
-    assert result["series"]["master_workout_id"] == nil
+    assert result["series"]["master_workout_id"] == workout.id
   end
 
   test "member profile schedule can copy a WOD into a folder and attach it to the booked class",
        %{conn: conn} do
     admin = admin_fixture(%{nickname: "profile_program_admin"})
+    %{organization: organization, context: context} = tenant_fixture(admin, "Profile Program Gym")
     member = user_fixture(%{nickname: "profile_program_member", role: :member})
     unbooked_member = user_fixture(%{nickname: "unbooked_profile_member", role: :member})
-    source = workout_fixture(admin, %{title: "Reusable Template"})
-    class_type = class_type_fixture(%{name: "Profile Class"})
+    add_membership(organization, member, :member)
+    add_membership(organization, unbooked_member, :member)
+    source = tenant_workout_fixture(admin, context, %{title: "Reusable Template"})
+    class_type = class_type_fixture(%{name: "Profile Class", tenant_context: context})
     admin_conn = put_bearer_token(conn, admin)
     scheduled_at = DateTime.utc_now() |> DateTime.add(86_400) |> DateTime.truncate(:second)
 
     folder =
       admin_conn
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workout-folders",
+        "/api/org/#{organization.slug}/admin/workout-folders",
         %{name: "Personalized", parent_id: nil}
       )
       |> json_response(201)
@@ -132,7 +140,7 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
       |> recycle()
       |> put_req_header("content-type", "application/json")
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/schedule/slots",
+        "/api/org/#{organization.slug}/admin/schedule/slots",
         Jason.encode!(%{
           master_workout_id: source.id,
           class_type_id: class_type.id,
@@ -150,7 +158,7 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
     conn
     |> put_bearer_token(member)
     |> post(
-      "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/bookings",
+      "/api/org/#{organization.slug}/bookings",
       Jason.encode!(%{slot_id: slot["id"]})
     )
     |> json_response(201)
@@ -161,7 +169,7 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
       admin_conn
       |> recycle()
       |> get(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{member.id}/schedule?start_date=#{day}&end_date=#{day}"
+        "/api/org/#{organization.slug}/admin/users/#{member.id}/schedule?start_date=#{day}&end_date=#{day}"
       )
       |> json_response(200)
 
@@ -173,7 +181,7 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
       |> recycle()
       |> put_req_header("content-type", "application/json")
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{unbooked_member.id}/programming",
+        "/api/org/#{organization.slug}/admin/users/#{unbooked_member.id}/programming",
         Jason.encode!(%{
           master_workout_id: source.id,
           folder_id: folder["id"],
@@ -185,14 +193,14 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
       |> json_response(422)
 
     assert rejected["code"] == "slot_not_booked_by_member"
-    assert MilosTraining.Scheduling.get_slot(slot["id"]).master_workout_id == source.id
+    assert MilosTraining.Scheduling.get_slot(context, slot["id"]).master_workout_id == source.id
 
     programmed =
       admin_conn
       |> recycle()
       |> put_req_header("content-type", "application/json")
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{member.id}/programming",
+        "/api/org/#{organization.slug}/admin/users/#{member.id}/programming",
         Jason.encode!(%{
           master_workout_id: source.id,
           folder_id: folder["id"],
@@ -206,22 +214,26 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
     copied = programmed["workout"]
     assert copied["source_workout_id"] == source.id
     assert copied["folder_id"] == folder["id"]
-    assert MilosTraining.Scheduling.get_slot(slot["id"]).master_workout_id == copied["id"]
+
+    assert MilosTraining.Scheduling.get_slot(context, slot["id"]).master_workout_id ==
+             copied["id"]
   end
 
   test "athlete profile can save a newly-created WOD in a folder and assign that same copy",
        %{conn: conn} do
     admin = admin_fixture(%{nickname: "athlete_program_admin"})
+    %{organization: organization, context: context} = tenant_fixture(admin, "Athlete Program Gym")
     athlete = user_fixture(%{nickname: "profile_program_athlete", role: :athlete})
-    workout = workout_fixture(admin, %{title: "Athlete-only WOD"})
-    provision_programming_entitlement(athlete)
+    add_membership(organization, athlete, :athlete)
+    workout = tenant_workout_fixture(admin, context, %{title: "Athlete-only WOD"})
+    provision_programming_entitlement(context, athlete)
     admin_conn = put_bearer_token(conn, admin)
     day = Date.utc_today() |> Date.add(2) |> Date.to_iso8601()
 
     folder =
       admin_conn
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/workout-folders",
+        "/api/org/#{organization.slug}/admin/workout-folders",
         %{name: "Athlete Plans", parent_id: nil}
       )
       |> json_response(201)
@@ -231,7 +243,7 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
       |> recycle()
       |> put_req_header("content-type", "application/json")
       |> post(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{athlete.id}/programming",
+        "/api/org/#{organization.slug}/admin/users/#{athlete.id}/programming",
         Jason.encode!(%{
           master_workout_id: workout.id,
           folder_id: folder["id"],
@@ -248,7 +260,7 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
       admin_conn
       |> recycle()
       |> get(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/users/#{athlete.id}/schedule?start_date=#{day}&end_date=#{day}"
+        "/api/org/#{organization.slug}/admin/users/#{athlete.id}/schedule?start_date=#{day}&end_date=#{day}"
       )
       |> json_response(200)
 
@@ -256,11 +268,52 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
     assert workout_id == workout.id
   end
 
-  defp provision_programming_entitlement(athlete) do
+  defp tenant_fixture(admin, name) do
+    {:ok, organization} = Organizations.create_organization(%{name: name})
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: admin.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    {:ok, context} = Organizations.resolve_tenant_context(admin, organization.slug)
+
+    %{organization: organization, context: context}
+  end
+
+  defp add_membership(organization, user, role) do
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: user.id,
+        role: role,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    :ok
+  end
+
+  defp tenant_workout_fixture(admin, context, attrs) do
+    Repo.query!("SELECT set_config($1, $2, false)", [
+      "app.organization_id",
+      context.organization_id
+    ])
+
+    Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", admin.id])
+
+    workout_fixture(admin, attrs)
+  end
+
+  defp provision_programming_entitlement(context, athlete) do
     code = "profile-programming-#{System.unique_integer([:positive])}"
 
     {:ok, package} =
-      MilosTraining.Finance.create_package(%{
+      Finance.create_package(context, %{
         code: code,
         name: "Profile programming",
         family: "online",
@@ -279,14 +332,14 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
       })
 
     {:ok, membership} =
-      MilosTraining.Finance.upsert_membership(athlete.id, %{
+      Finance.upsert_membership(context, athlete.id, %{
         user_type_snapshot: "athlete",
         status: "active",
         signup_source: "admin_created"
       })
 
     {:ok, _subscription} =
-      MilosTraining.Finance.assign_package(membership.id, package.id, %{
+      Finance.assign_package(context, membership.id, package.id, %{
         starts_on: Date.utc_today()
       })
   end

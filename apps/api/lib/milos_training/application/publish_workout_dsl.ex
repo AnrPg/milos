@@ -6,7 +6,19 @@ defmodule MilosTraining.Application.PublishWorkoutDsl do
   alias MilosTraining.Application.PublishWorkout
   alias MilosTraining.{Execution, Workouts}
 
+  def call(context, id, params) do
+    with_parsed_publish(params, fn publish_params ->
+      PublishWorkout.call(context, id, publish_params)
+    end)
+  end
+
   def call(id, params) do
+    with_parsed_publish(params, fn publish_params ->
+      PublishWorkout.call(id, publish_params)
+    end)
+  end
+
+  defp with_parsed_publish(params, publish_fun) do
     source = value(params, :source)
     acknowledge_warnings? = value(params, :acknowledge_warnings, false) == true
 
@@ -15,7 +27,7 @@ defmodule MilosTraining.Application.PublishWorkoutDsl do
          :ok <- preflight(parsed.workout),
          {:ok, execution_preview} <- build_execution_preview(parsed.workout),
          publish_params <- publish_params(parsed, params),
-         {:ok, workout} <- PublishWorkout.call(id, publish_params) do
+         {:ok, workout} <- publish_fun.(publish_params) do
       {:ok,
        %{
          workout: workout,
