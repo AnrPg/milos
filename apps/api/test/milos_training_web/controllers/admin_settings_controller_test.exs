@@ -3,14 +3,17 @@ defmodule MilosTrainingWeb.AdminSettingsControllerTest do
 
   import MilosTraining.TestFixtures
 
+  alias MilosTraining.Organizations
+
   test "admin can patch only the global theme", %{conn: conn} do
     admin = admin_fixture()
+    organization = org_with_owner!(admin)
 
     payload =
       conn
       |> put_bearer_token(admin)
       |> patch(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/settings",
+        "/api/org/#{organization.slug}/admin/settings",
         %{gamification: %{theme_slug: "aurora"}}
       )
       |> json_response(200)
@@ -23,12 +26,13 @@ defmodule MilosTrainingWeb.AdminSettingsControllerTest do
 
   test "admin can configure browser push service settings", %{conn: conn} do
     admin = admin_fixture()
+    organization = org_with_owner!(admin)
 
     payload =
       conn
       |> put_bearer_token(admin)
       |> patch(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/settings",
+        "/api/org/#{organization.slug}/admin/settings",
         %{
           notifications: %{
             vapid_public_key: "public-key",
@@ -51,5 +55,23 @@ defmodule MilosTrainingWeb.AdminSettingsControllerTest do
       |> json_response(200)
 
     assert push_config == %{"enabled" => true, "vapid_public_key" => "public-key"}
+  end
+
+  defp org_with_owner!(owner) do
+    {:ok, organization} =
+      Organizations.create_organization(%{
+        name: "Settings Gym #{System.unique_integer([:positive])}"
+      })
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: owner.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    organization
   end
 end

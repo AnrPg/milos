@@ -127,27 +127,69 @@ defmodule MilosTraining.Organizations.SetMembershipRoleTest do
     test "leaving :member cancels that member's active future bookings" do
       admin = TestFixtures.admin_fixture()
       member = TestFixtures.user_fixture(%{role: :member})
+      {:ok, organization} = Organizations.create_organization(%{name: "State Owned Booking Gym"})
+
+      for {user, role} <- [{admin, :owner}, {member, :member}] do
+        {:ok, _} =
+          Organizations.add_membership(%{
+            organization_id: organization.id,
+            user_id: user.id,
+            role: role,
+            status: :active,
+            joined_at: DateTime.utc_now()
+          })
+      end
+
+      {:ok, context} = Organizations.resolve_tenant_context(admin, organization.slug)
+
+      Repo.query!("SELECT set_config($1, $2, false)", [
+        "app.organization_id",
+        context.organization_id
+      ])
+
+      Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", member.id])
+
       workout = TestFixtures.workout_fixture(admin)
-      slot = TestFixtures.slot_fixture(workout, %{auto_approve: false})
+      TestFixtures.class_type_fixture(%{tenant_context: context})
+      slot = TestFixtures.slot_fixture(workout, %{auto_approve: false, tenant_context: context})
 
-      assert {:ok, booking} = SubmitBooking.call(member.id, slot.id)
+      assert {:ok, booking} = SubmitBooking.call(context, member, slot.id)
       assert booking.status == :pending
-
-      {:ok, context} =
-        Organizations.resolve_tenant_context(admin, Organizations.legacy_organization_slug())
 
       assert {:ok, updated} = Organizations.set_membership_role(context, member.id, :athlete)
       assert updated.role == :athlete
-      assert Scheduling.get_booking(booking.id) == nil
+      assert Scheduling.get_booking(context, booking.id) == nil
     end
 
     test "archiving assignment access does not reach another organization" do
       admin = TestFixtures.admin_fixture()
       athlete = TestFixtures.user_fixture(%{role: :athlete})
+      {:ok, home_org} = Organizations.create_organization(%{name: "Home Assignment Gym"})
+
+      for {user, role} <- [{admin, :owner}, {athlete, :athlete}] do
+        {:ok, _} =
+          Organizations.add_membership(%{
+            organization_id: home_org.id,
+            user_id: user.id,
+            role: role,
+            status: :active,
+            joined_at: DateTime.utc_now()
+          })
+      end
+
+      {:ok, home_context} = Organizations.resolve_tenant_context(admin, home_org.slug)
+
+      Repo.query!("SELECT set_config($1, $2, false)", [
+        "app.organization_id",
+        home_context.organization_id
+      ])
+
+      Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", admin.id])
+
       workout = TestFixtures.workout_fixture(admin)
 
       assert {:ok, assignment} =
-               AssignWorkout.call(%{
+               AssignWorkout.call(home_context, %{
                  master_workout_id: workout.id,
                  scheduled_for: Date.utc_today() |> Date.add(1) |> Date.to_iso8601(),
                  athlete_ids: [athlete.id],
@@ -179,10 +221,32 @@ defmodule MilosTraining.Organizations.SetMembershipRoleTest do
     test "leaving :athlete archives assignment access while retaining history" do
       admin = TestFixtures.admin_fixture()
       athlete = TestFixtures.user_fixture(%{role: :athlete})
+      {:ok, organization} = Organizations.create_organization(%{name: "Athlete Role Gym"})
+
+      for {user, role} <- [{admin, :owner}, {athlete, :athlete}] do
+        {:ok, _} =
+          Organizations.add_membership(%{
+            organization_id: organization.id,
+            user_id: user.id,
+            role: role,
+            status: :active,
+            joined_at: DateTime.utc_now()
+          })
+      end
+
+      {:ok, context} = Organizations.resolve_tenant_context(admin, organization.slug)
+
+      Repo.query!("SELECT set_config($1, $2, false)", [
+        "app.organization_id",
+        context.organization_id
+      ])
+
+      Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", admin.id])
+
       workout = TestFixtures.workout_fixture(admin)
 
       assert {:ok, assignment} =
-               AssignWorkout.call(%{
+               AssignWorkout.call(context, %{
                  master_workout_id: workout.id,
                  scheduled_for: Date.utc_today() |> Date.add(1) |> Date.to_iso8601(),
                  athlete_ids: [athlete.id],
@@ -190,9 +254,6 @@ defmodule MilosTraining.Organizations.SetMembershipRoleTest do
                })
 
       assert Workouts.get_assignment_execution_access(assignment.id, athlete.id)
-
-      {:ok, context} =
-        Organizations.resolve_tenant_context(admin, Organizations.legacy_organization_slug())
 
       assert {:ok, updated} = Organizations.set_membership_role(context, athlete.id, :member)
       assert updated.role == :member

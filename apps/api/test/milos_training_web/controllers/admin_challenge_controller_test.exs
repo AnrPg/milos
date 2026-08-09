@@ -3,14 +3,35 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
 
   import MilosTraining.TestFixtures
 
+  alias MilosTraining.Organizations
+
+  defp org_with_owner!(owner) do
+    {:ok, organization} =
+      Organizations.create_organization(%{
+        name: "Challenge Gym #{System.unique_integer([:positive])}"
+      })
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: owner.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    organization
+  end
+
   test "admin can create and list seasonal challenges", %{conn: conn} do
     admin = admin_fixture()
+    organization = org_with_owner!(admin)
     authed = put_bearer_token(conn, admin)
 
     created =
       authed
       |> post_json(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges",
+        "/api/org/#{organization.slug}/admin/challenges",
         %{
           title: "Streak Week",
           description: "Hit two sessions",
@@ -29,9 +50,7 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
     listing =
       authed
       |> recycle()
-      |> get(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges"
-      )
+      |> get("/api/org/#{organization.slug}/admin/challenges")
       |> json_response(200)
 
     assert Enum.any?(listing["challenges"], &(&1["badge_key"] == "challenge_streak_week"))
@@ -39,6 +58,7 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
 
   test "rejects a fourth overlapping active challenge", %{conn: conn} do
     admin = admin_fixture()
+    organization = org_with_owner!(admin)
     authed = put_bearer_token(conn, admin)
 
     for idx <- 1..3 do
@@ -46,7 +66,7 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
       |> recycle()
       |> put_bearer_token(admin)
       |> post_json(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges",
+        "/api/org/#{organization.slug}/admin/challenges",
         %{
           title: "Challenge #{idx}",
           criteria_type: "workout_count",
@@ -65,7 +85,7 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
       |> recycle()
       |> put_bearer_token(admin)
       |> post_json(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges",
+        "/api/org/#{organization.slug}/admin/challenges",
         %{
           title: "Too Many",
           criteria_type: "workout_count",
@@ -85,6 +105,7 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
     conn: conn
   } do
     admin = admin_fixture()
+    organization = org_with_owner!(admin)
     authed = put_bearer_token(conn, admin)
 
     [
@@ -97,7 +118,7 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
       |> recycle()
       |> put_bearer_token(admin)
       |> post_json(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges",
+        "/api/org/#{organization.slug}/admin/challenges",
         %{
           title: "Challenge #{suffix}",
           criteria_type: "workout_count",
@@ -116,7 +137,7 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
       |> recycle()
       |> put_bearer_token(admin)
       |> post_json(
-        "/api/org/#{MilosTraining.Organizations.legacy_organization_slug()}/admin/challenges",
+        "/api/org/#{organization.slug}/admin/challenges",
         %{
           title: "Bridge",
           criteria_type: "workout_count",

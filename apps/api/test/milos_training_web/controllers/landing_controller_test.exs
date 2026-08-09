@@ -7,10 +7,31 @@ defmodule MilosTrainingWeb.LandingControllerTest do
   alias MilosTraining.Finance
   alias MilosTraining.Gamification
   alias MilosTraining.Gamification.GamificationStore
+  alias MilosTraining.Organizations
 
   test "shows the landing payload and updates leaderboard opt-in", %{conn: conn} do
     athlete = user_fixture(%{role: :athlete})
     admin = admin_fixture()
+    {:ok, organization} = Organizations.create_organization(%{name: "Landing Gym"})
+
+    for {user, role} <- [{admin, :owner}, {athlete, :member}] do
+      {:ok, _membership} =
+        Organizations.add_membership(%{
+          organization_id: organization.id,
+          user_id: user.id,
+          role: role,
+          status: :active,
+          joined_at: DateTime.utc_now()
+        })
+    end
+
+    MilosTraining.Repo.query!("SELECT set_config($1, $2, false)", [
+      "app.organization_id",
+      organization.id
+    ])
+
+    MilosTraining.Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", athlete.id])
+
     workout = workout_fixture(admin)
     section_id = workout.sections |> List.first() |> Map.fetch!(:id)
 
@@ -93,7 +114,7 @@ defmodule MilosTrainingWeb.LandingControllerTest do
     landing =
       conn
       |> put_bearer_token(athlete)
-      |> get("/api/landing")
+      |> get("/api/org/#{organization.slug}/landing")
       |> json_response(200)
 
     assert get_in(landing, ["gamification", "stats", "current_streak"]) == 1
