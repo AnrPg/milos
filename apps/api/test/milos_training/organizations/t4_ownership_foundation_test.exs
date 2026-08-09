@@ -16,12 +16,21 @@ defmodule MilosTraining.Organizations.T4OwnershipFoundationTest do
     assert [%{membership: %{role: :owner}, organization: %{id: ^legacy_organization_id}}] =
              Organizations.list_memberships(user.id)
 
+    # Writes are fail-closed by design (F-XX/e3c8ae5): the legacy org is no
+    # longer an implicit default for unscoped inserts, it's just an ordinary
+    # organization that a write can be explicitly scoped to, same as any
+    # other tenant. class_types has no BEFORE INSERT tenant-context trigger,
+    # so a raw SQL insert (unlike an Ecto changeset going through the app's
+    # write paths) must supply organization_id itself.
     %{rows: [[organization_id]]} =
-      Repo.query!("""
-      INSERT INTO class_types (id, name, slug, sort_order, inserted_at, updated_at)
-      VALUES (gen_random_uuid(), 'Legacy Test', 'legacy-test', 0, now(), now())
-      RETURNING organization_id
-      """)
+      Repo.query!(
+        """
+        INSERT INTO class_types (id, name, slug, sort_order, organization_id, inserted_at, updated_at)
+        VALUES (gen_random_uuid(), 'Legacy Test', 'legacy-test', 0, $1, now(), now())
+        RETURNING organization_id
+        """,
+        [Ecto.UUID.dump!(legacy_organization_id)]
+      )
 
     assert {:ok, ^legacy_organization_id} = Ecto.UUID.load(organization_id)
   end
