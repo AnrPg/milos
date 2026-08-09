@@ -118,7 +118,12 @@ defmodule MilosTrainingWeb.MyWorkoutController do
     user = GuardianPlug.current_resource(conn)
     new_date = params["scheduled_for"] || ""
 
-    case RescheduleAssignedWorkout.call(assignment_id, user.id, new_date) do
+    case RescheduleAssignedWorkout.call(
+           conn.assigns.tenant_context,
+           assignment_id,
+           user.id,
+           new_date
+         ) do
       {:ok, assignment} -> json(conn, %{assignment: assignment})
       {:error, :not_found} -> {:error, :not_found}
       {:error, :forbidden} -> {:error, :forbidden}

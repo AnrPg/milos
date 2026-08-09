@@ -4,6 +4,25 @@ defmodule MilosTraining.Application.RescheduleAssignedWorkout do
   alias MilosTraining.Application.BroadcastUserSync
   alias MilosTraining.{Identity, Notifications, Workouts}
 
+  def call(context, assignment_id, athlete_id, new_date_str) do
+    with {:ok, new_date} <- parse_date(new_date_str),
+         :ok <- guard_future_date(new_date),
+         assignment when not is_nil(assignment) <-
+           Workouts.get_assigned_workout(context, assignment_id),
+         :ok <- verify_athlete_access(assignment, athlete_id),
+         {:ok, updated} <-
+           Workouts.update_assignment_date(context, assignment_id, athlete_id, new_date) do
+      notify_admins_workout_moved(assignment, updated, athlete_id)
+      broadcast_assignment_refresh(assignment, athlete_id)
+      {:ok, updated}
+    else
+      nil -> {:error, :not_found}
+      {:error, :past_date} = e -> e
+      {:error, :forbidden} = e -> e
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
   def call(assignment_id, athlete_id, new_date_str) do
     with {:ok, new_date} <- parse_date(new_date_str),
          :ok <- guard_future_date(new_date),
