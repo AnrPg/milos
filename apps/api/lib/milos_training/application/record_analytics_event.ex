@@ -34,6 +34,11 @@ defmodule MilosTraining.Application.RecordAnalyticsEvent do
       :ok -> :ok
       {:error, _reason} -> :ok
     end
+  rescue
+    # Analytics is a best-effort side effect: a DB-level failure recording it
+    # (e.g. no tenant context available to satisfy analytics_events'
+    # organization_id) must never take down the caller's primary action.
+    _error -> :ok
   end
 
   defp telemetry_event(event_name),
