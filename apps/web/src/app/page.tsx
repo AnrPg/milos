@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export default function Home() {
   return (
-    <AuthGuard roleRedirects={{ admin: "/admin" }}>
+    <AuthGuard roleRedirects={{ admin: "/admin" }} vendorRedirect="/platform/organizations">
       <LandingPage />
     </AuthGuard>
   );

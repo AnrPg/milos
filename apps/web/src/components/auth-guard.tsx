@@ -12,6 +12,8 @@ type AuthGuardProps = {
   children: React.ReactNode;
   roles?: Array<"member" | "athlete" | "admin">;
   roleRedirects?: Partial<Record<"member" | "athlete" | "admin", string>>;
+  /** Redirect vendors (SaaS operators, `currentUser.vendor`) here instead of the tenant-role homepage. */
+  vendorRedirect?: string;
 };
 
 type AllowedRole = NonNullable<AuthGuardProps["roles"]>[number];
@@ -20,7 +22,7 @@ function isAllowedRole(value: string): value is AllowedRole {
   return value === "member" || value === "athlete" || value === "admin";
 }
 
-export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
+export function AuthGuard({ children, roles, roleRedirects, vendorRedirect }: AuthGuardProps) {
   const i18n = useUiTranslations();
   const router = useRouter();
   const pathname = usePathname();
@@ -34,6 +36,11 @@ export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
     }
 
     if (status === "authenticated" && currentUser && !membershipRoleLoading) {
+      if (vendorRedirect && currentUser.vendor && pathname !== vendorRedirect) {
+        router.replace(vendorRedirect);
+        return;
+      }
+
       const roleKey = role;
       const redirect = roleRedirects?.[roleKey];
       if (redirect) {
@@ -44,7 +51,7 @@ export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
         router.replace("/");
       }
     }
-  }, [currentUser, membershipRoleLoading, pathname, role, roles, roleRedirects, router, status]);
+  }, [currentUser, membershipRoleLoading, pathname, role, roles, roleRedirects, router, status, vendorRedirect]);
 
   if (status === "loading" || (status === "authenticated" && roles && membershipRoleLoading)) {
     return (
@@ -61,6 +68,8 @@ export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
   if (roles && currentUser && (!isAllowedRole(role) || !roles.includes(role))) {
     return null;
   }
+
+  if (vendorRedirect && currentUser?.vendor && pathname !== vendorRedirect) return null;
 
   const roleKey = currentUser ? role : undefined;
   if (roleKey && roleRedirects?.[roleKey]) return null;

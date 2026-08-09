@@ -1,29 +1,31 @@
 @import "tailwindcss";
 
 :root {
+  --bg: #0B0807;
+  --panel: #150F0D;
+  --panel-raised: #1E1512;
+  --panel-muted: #110C0A;
+  --card: #1A1210;
+  --border: #2C201B;
+  --border-strong: #4A362C;
+  --text: #FBF3EE;
+  --text-soft: #E0CFC5;
+  --muted: #A0897C;
+  --dim: #6B564A;
+  --primary: #D9743D;
+  --primary-strong: #F0985C;
+  --success: #6FCB8B;
+  --warning: #F0B94C;
+  --danger: #F2604D;
+  --info: #6EC6D9;
+
   --background: var(--bg);
   --foreground: var(--text);
   --surface: var(--panel);
   --accent: var(--primary);
   --accent-strong: var(--primary-strong);
-  --bg: var(--bg);
-  --panel: var(--panel);
-  --panel-raised: var(--panel-raised);
-  --panel-muted: var(--panel-muted);
-  --card: var(--card);
-  --border: var(--border);
-  --border-strong: var(--border-strong);
-  --primary: var(--primary);
-  --primary-strong: var(--primary-strong);
   --primary-contrast: var(--bg);
-  --success: var(--success);
-  --danger: var(--danger);
-  --info: #6EC6D9;
   --amber: var(--warning);
-  --text: var(--text);
-  --text-soft: var(--text-soft);
-  --muted: var(--muted);
-  --dim: var(--dim);
   --lime: var(--success);
   --red: var(--danger);
   --scale-base: var(--text);
