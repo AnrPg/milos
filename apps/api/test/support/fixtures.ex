@@ -24,6 +24,9 @@ defmodule MilosTraining.TestFixtures do
   end
 
   def workout_fixture(admin, attrs \\ %{}) do
+    context =
+      Map.get(attrs, :tenant_context) || ambient_tenant_context() || legacy_tenant_context()
+
     params =
       %{
         title: "Workout #{System.unique_integer([:positive])}",
@@ -46,8 +49,9 @@ defmodule MilosTraining.TestFixtures do
         ]
       }
       |> deep_merge(attrs)
+      |> Map.delete(:tenant_context)
 
-    {:ok, workout} = Workouts.create_workout(admin, params)
+    {:ok, workout} = Workouts.create_workout(context, admin, params)
     workout
   end
 
@@ -95,6 +99,18 @@ defmodule MilosTraining.TestFixtures do
   defp legacy_tenant_context do
     {:ok, organization} = Organizations.ensure_legacy_organization_for_migration()
     system_tenant_context(organization.id, :legacy_test_fixture)
+  end
+
+  # Many tests set the RLS session GUCs (app.organization_id/app.user_id)
+  # directly before calling this fixture instead of threading a context
+  # struct through. Honor that ambient scope when present so the created
+  # workout lands in the organization the test actually set up, instead of
+  # always defaulting to the legacy org.
+  defp ambient_tenant_context do
+    case MilosTraining.Infrastructure.Tenancy.RepoContext.current_setting("app.organization_id") do
+      nil -> nil
+      organization_id -> system_tenant_context(organization_id, :workout_fixture_ambient)
+    end
   end
 
   defp system_tenant_context(organization_id, source) do
