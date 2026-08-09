@@ -398,19 +398,28 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     admin = admin_fixture(%{nickname: "remaining_content_admin"})
     {_organization, context} = tenant_fixture(admin, "Detached Content Deletion")
 
-    {:ok, folder} = Workouts.create_folder(owner.id, %{name: "Owner folder"})
-    {:ok, draft} = Workouts.create_draft(owner)
+    Repo.query!("SELECT set_config($1, $2, false)", [
+      "app.organization_id",
+      context.organization_id
+    ])
+
+    Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", owner.id])
+
+    {:ok, folder} = Workouts.create_folder(context, owner.id, %{name: "Owner folder"})
+    {:ok, draft} = Workouts.create_draft(context, owner)
 
     {:ok, challenge} =
-      Gamification.create_seasonal_challenge(owner.id, %{
-        "title" => "Owner challenge",
-        "criteria_type" => "workout_count",
-        "criteria_value" => %{"count" => 3},
-        "badge_key" => "owner_delete_badge",
-        "badge_label" => "Owner Delete",
-        "starts_at" => Date.utc_today(),
-        "ends_at" => Date.add(Date.utc_today(), 7)
-      })
+      Gamification.with_tenant_context(context, fn ->
+        Gamification.create_seasonal_challenge(owner.id, %{
+          "title" => "Owner challenge",
+          "criteria_type" => "workout_count",
+          "criteria_value" => %{"count" => 3},
+          "badge_key" => "owner_delete_badge",
+          "badge_label" => "Owner Delete",
+          "starts_at" => Date.utc_today(),
+          "ends_at" => Date.add(Date.utc_today(), 7)
+        })
+      end)
 
     response =
       conn
