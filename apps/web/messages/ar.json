@@ -327,6 +327,7 @@
     "activeCampaignCount": "{count, plural, one {# حملة نشطة} other {# حملات نشطة}}",
     "adminRegistration": "تسجيل المسؤول",
     "organization": "المؤسسة",
+    "yourOrganizations": "مؤسساتك",
     "adminRegistrationCode": "رمز تسجيل المسؤول",
     "adminRegistrationCodeHelp": "لا يمكن إنشاء حساب مسؤول إلا لمن يملك الرمز الصادر عن المالك.",
     "createAdminAccount": "إنشاء حساب مسؤول",

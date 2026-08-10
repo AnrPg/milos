@@ -327,6 +327,7 @@
     "activeCampaignCount": "{count, plural, one {# campaña activa} other {# campañas activas}}",
     "adminRegistration": "Registro de administrador",
     "organization": "Organización",
+    "yourOrganizations": "Tus organizaciones",
     "adminRegistrationCode": "Código de registro de administrador",
     "adminRegistrationCodeHelp": "Solo quienes tengan el código proporcionado por el propietario pueden crear una cuenta de administrador.",
     "createAdminAccount": "Crear cuenta de administrador",

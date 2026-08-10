@@ -19,7 +19,7 @@ import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useSession } from "@/components/session-provider";
 import { subscribeToTopic } from "@/lib/realtime";
 import { showsTenantSelfServiceSurfaces } from "@/lib/account-surfaces";
-import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { adminHref, membershipWorkspaceHref, rememberSelectedOrganization, useOrganizationSlug } from "@/lib/organization-slug";
 import { selectedMembership, surfaceRoleForMembership } from "@/lib/membership-role";
 import { SemanticLabel } from "@/components/semantic-label";
 import { OrganizationSelector } from "@/components/organization-selector";
@@ -460,14 +460,39 @@ export function TopNav() {
                   {t("profile")}
                 </Link>
                 {isVendor ? (
-                  <Link
-                    href="/platform/organizations"
-                    className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[var(--border)]"
-                    style={{ color: "var(--text-soft)" }}
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {t("platform")}
-                  </Link>
+                  <>
+                    <Link
+                      href="/platform/organizations"
+                      className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[var(--border)]"
+                      style={{ color: "var(--text-soft)" }}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {t("platform")}
+                    </Link>
+                    {memberships.length > 0 ? (
+                      <div className="border-t px-4 py-2.5" style={{ borderColor: "var(--border)" }}>
+                        <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+                          {i18n("yourOrganizations")}
+                        </p>
+                        <div className="mt-1.5 space-y-1">
+                          {memberships.map((membership) => (
+                            <Link
+                              key={membership.id}
+                              href={membershipWorkspaceHref(membership)}
+                              onClick={() => {
+                                rememberSelectedOrganization(membership.organization.slug);
+                                setMenuOpen(false);
+                              }}
+                              className="block truncate text-sm font-semibold transition-colors hover:opacity-80"
+                              style={{ color: "var(--text-soft)" }}
+                            >
+                              {membership.organization.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+                  </>
                 ) : (
                   <>
                     <OrganizationSelector variant="menu" onSelect={() => setMenuOpen(false)} />

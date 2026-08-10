@@ -22,10 +22,11 @@ import {
   type ProvisionOrganizationResult,
 } from "@/api/platform-organizations";
 import { ApiError } from "@/api/client";
-import { SELECTED_ORGANIZATION_SLUG_KEY } from "@/api/client";
+import { fetchOrganizationMemberships } from "@/api/organizations";
 import { useSession } from "@/components/session-provider";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { platformOrganizationsCopy } from "@/i18n/platform-organizations";
+import { membershipWorkspaceHref, rememberSelectedOrganization } from "@/lib/organization-slug";
 
 const defaultForm: ProvisionOrganizationInput = {
   name: "",
@@ -66,6 +67,22 @@ export function PlatformOrganizationsPage() {
   });
   const organizations = organizationsQuery.data?.organizations ?? [];
   const forbidden = organizationsQuery.error instanceof ApiError && organizationsQuery.error.status === 403;
+
+  // A vendor who also holds a real membership somewhere (owner/admin/coach/
+  // member/athlete) needs a way back into that tenant's own workspace -
+  // provisioning/settings here don't substitute for actually using the app
+  // as a member. /admin requires a genuine membership row server-side, so
+  // this list - not "every active org" - is what's actually openable.
+  const myMembershipsQuery = useQuery({
+    queryKey: ["organization-memberships", accessToken],
+    queryFn: () => fetchOrganizationMemberships(accessToken!),
+    enabled: Boolean(accessToken),
+  });
+  const myMemberships = myMembershipsQuery.data ?? [];
+  const myMembershipByOrgId = useMemo(
+    () => new Map(myMemberships.map((entry) => [entry.organization.id, entry])),
+    [myMemberships],
+  );
 
   async function provision(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -231,6 +248,29 @@ export function PlatformOrganizationsPage() {
         </section>
       ) : null}
 
+      {myMemberships.length > 0 ? (
+        <section className="mt-8" aria-labelledby="my-memberships-title">
+          <h2 id="my-memberships-title" className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--dim)]">
+            {copy.myMemberships}
+          </h2>
+          <div className="mt-3 flex flex-wrap gap-3">
+            {myMemberships.map((membership) => (
+              <Link
+                key={membership.id}
+                href={membershipWorkspaceHref(membership)}
+                onClick={() => rememberSelectedOrganization(membership.organization.slug)}
+                className="flex items-center gap-2 border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold text-[var(--text)]"
+              >
+                {membership.organization.name}
+                <span className="text-xs font-normal uppercase tracking-[0.1em] text-[var(--dim)]">
+                  {membership.role}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       <div className="mt-8">
         <section aria-labelledby="organization-list-title">
           <h2 id="organization-list-title" className="sr-only">{copy.title}</h2>
@@ -255,9 +295,9 @@ export function PlatformOrganizationsPage() {
                     <Detail label={copy.brandName} value={entry.settings?.brand_name ?? entry.organization.name} />
                   </dl>
                   <div className="mt-4 flex flex-wrap gap-3">
-                    {entry.organization.status === "active" ? (
+                    {entry.organization.status === "active" && myMembershipByOrgId.has(entry.organization.id) ? (
                       <Link
-                        href="/admin"
+                        href={membershipWorkspaceHref(myMembershipByOrgId.get(entry.organization.id)!)}
                         className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold"
                         onClick={() => rememberSelectedOrganization(entry.organization.slug)}
                       >
@@ -373,11 +413,6 @@ function ownerSetupUrl(token: string) {
   return `${window.location.origin}${path}`;
 }
 
-function rememberSelectedOrganization(slug: string) {
-  try {
-    window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, slug);
-  } catch {}
-}
 
 function TextField({ label, value, onChange, type = "text", ...inputProps }: {
   label: string;

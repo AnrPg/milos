@@ -13,6 +13,7 @@ import {
   provisionPlatformOrganization,
   updatePlatformOrganizationMembershipRole,
 } from "@/api/platform-organizations";
+import { fetchOrganizationMemberships } from "@/api/organizations";
 
 vi.mock("@/components/session-provider", () => ({
   useSession: () => ({ tokens: { access_token: "token" } }),
@@ -21,6 +22,14 @@ vi.mock("@/components/session-provider", () => ({
 vi.mock("@/i18n/use-ui-locale", () => ({
   useUiLocale: () => "en",
 }));
+
+vi.mock("@/api/organizations", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/api/organizations")>();
+  return {
+    ...actual,
+    fetchOrganizationMemberships: vi.fn(),
+  };
+});
 
 vi.mock("@/api/platform-organizations", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/api/platform-organizations")>();
@@ -75,6 +84,7 @@ describe("PlatformOrganizationsPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     window.localStorage.clear();
+    vi.mocked(fetchOrganizationMemberships).mockResolvedValue([]);
     vi.mocked(listPlatformOrganizations).mockResolvedValue({ organizations: [organization] });
     vi.mocked(changePlatformOrganizationLifecycle).mockResolvedValue({
       organization: { ...organization.organization, status: "archived" },
@@ -163,15 +173,38 @@ describe("PlatformOrganizationsPage", () => {
     });
   });
 
-  it("opens an active organization by selecting it and entering the admin dashboard", async () => {
+  it("does not offer to open an organization the vendor has no membership in", async () => {
     renderPage();
 
     const article = await screen.findByText("North Harbor Strength");
     const row = article.closest("article");
     expect(row).not.toBeNull();
 
+    expect(within(row!).queryByRole("link", { name: "Open organization" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Your memberships")).not.toBeInTheDocument();
+  });
+
+  it("opens an organization the vendor is a member of, routed by their role there", async () => {
+    vi.mocked(fetchOrganizationMemberships).mockResolvedValue([
+      {
+        id: "membership-vendor-1",
+        role: "owner",
+        organization: { id: "org-1", slug: "north-harbor", name: "North Harbor Strength" },
+      },
+    ]);
+
+    renderPage();
+
+    await screen.findByText("Your memberships");
+    const quickLink = screen.getByRole("link", { name: /North Harbor Strength/ });
+    expect(quickLink).toHaveAttribute("href", "/org/north-harbor/admin");
+
+    const mentions = await screen.findAllByText("North Harbor Strength");
+    const row = mentions.map((node) => node.closest("article")).find((node) => node !== null);
+    expect(row).not.toBeNull();
+
     const openLink = within(row!).getByRole("link", { name: "Open organization" });
-    expect(openLink).toHaveAttribute("href", "/admin");
+    expect(openLink).toHaveAttribute("href", "/org/north-harbor/admin");
 
     fireEvent.click(openLink);
 

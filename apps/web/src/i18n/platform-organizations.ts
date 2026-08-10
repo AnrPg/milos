@@ -63,6 +63,7 @@ const en = {
   accessError: "Access details could not be loaded.",
   edit: "Edit settings",
   cancel: "Cancel",
+  myMemberships: "Your memberships",
 };
 
 export type PlatformOrganizationsCopy = { [Key in keyof typeof en]: string };
@@ -132,6 +133,7 @@ const el: PlatformOrganizationsCopy = {
   accessError: "Δεν ήταν δυνατή η φόρτωση πρόσβασης.",
   edit: "Επεξεργασία ρυθμίσεων",
   cancel: "Ακύρωση",
+  myMemberships: "Οι συμμετοχές σου",
 };
 
 export function platformOrganizationsCopy(locale: string): PlatformOrganizationsCopy {

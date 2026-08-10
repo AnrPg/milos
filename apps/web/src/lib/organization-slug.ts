@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchOrganizationMemberships } from "@/api/organizations";
+import { fetchOrganizationMemberships, type OrganizationMembership } from "@/api/organizations";
 import { SELECTED_ORGANIZATION_SLUG_KEY } from "@/api/client";
 import { useSession } from "@/components/session-provider";
 
@@ -11,6 +11,21 @@ export function adminHref(href: string, organizationSlug: string | null) {
   if (href === "/") return "/";
   if (!organizationSlug) return href;
   return `/org/${organizationSlug}${href}`;
+}
+
+export function rememberSelectedOrganization(slug: string) {
+  try {
+    window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, slug);
+  } catch {}
+}
+
+// Admin-ish roles land in the tenant's admin dashboard, everyone else lands
+// on their ordinary homepage - both under the /org/:slug prefix, which is
+// what tells Home to render the tenant workspace instead of the platform
+// console for a vendor account.
+export function membershipWorkspaceHref(membership: OrganizationMembership) {
+  const slug = membership.organization.slug;
+  return ["owner", "admin", "coach"].includes(membership.role) ? `/org/${slug}/admin` : `/org/${slug}`;
 }
 
 function storedOrganizationSlug() {
