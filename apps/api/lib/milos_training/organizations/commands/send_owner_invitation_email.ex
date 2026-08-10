@@ -1,4 +1,6 @@
 defmodule MilosTraining.Organizations.Commands.SendOwnerInvitationEmail do
+  require Logger
+
   alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Mailer
   alias MilosTraining.Organizations.{OrganizationStore, PlatformContext}
@@ -36,7 +38,7 @@ defmodule MilosTraining.Organizations.Commands.SendOwnerInvitationEmail do
         token: token
       })
 
-    with {:ok, _metadata} <- Mailer.deliver(built_email) do
+    with {:ok, _metadata} <- safe_deliver(built_email) do
       RepoContext.run(%{user_id: platform_user_id}, fn ->
         OrganizationStore.record_invitation_email_sent(
           organization.id,
@@ -45,5 +47,20 @@ defmodule MilosTraining.Organizations.Commands.SendOwnerInvitationEmail do
         )
       end)
     end
+  end
+
+  # Swoosh's Local adapter (the config default, meant only for the dev
+  # mailbox preview) talks to a GenServer that isn't started in a compiled
+  # release - Mailer.deliver/1 doesn't return {:error, _} for that, it exits
+  # the calling process, which without this would surface as a raw
+  # unhandled-exception 500 instead of a clean error response. Any real
+  # provider outage/timeout would raise the same way, so this is worth
+  # having regardless of which adapter ends up configured for prod.
+  defp safe_deliver(email) do
+    Mailer.deliver(email)
+  catch
+    :exit, reason ->
+      Logger.error("MilosTraining.Mailer.deliver/1 exited: #{inspect(reason)}")
+      {:error, :mail_delivery_unavailable}
   end
 end

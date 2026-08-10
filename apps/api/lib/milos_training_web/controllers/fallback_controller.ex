@@ -1038,6 +1038,15 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "invalid_email", error: "A recipient email and setup token are required"})
   end
 
+  def call(conn, {:error, :mail_delivery_unavailable}) do
+    conn
+    |> put_status(:service_unavailable)
+    |> json(%{
+      code: "mail_delivery_unavailable",
+      error: "Email delivery is not currently available"
+    })
+  end
+
   def call(conn, {:error, :owner_email_required}) do
     conn
     |> put_status(:unprocessable_entity)
