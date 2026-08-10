@@ -1,5 +1,6 @@
 defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
+  import Swoosh.TestAssertions
 
   alias MilosTraining.Organizations
 
@@ -78,6 +79,71 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
                  event.organization_id == ^organization_id and
                    event.event == "organization_provisioned"
            )
+  end
+
+  test "requires an initial owner email to provision an organization", context do
+    conn =
+      context.conn
+      |> put_bearer_token(context.platform_user)
+      |> post("/api/platform/organizations", %{
+        name: "No Email Gym",
+        timezone: "Europe/Athens",
+        default_locale: "el"
+      })
+
+    assert %{"code" => "owner_email_required"} = json_response(conn, 422)
+    refute Repo.exists?(from organization in Organization, where: organization.name == "No Email Gym")
+  end
+
+  test "emails the initial owner their setup link and audits the send", context do
+    conn =
+      context.conn
+      |> put_bearer_token(context.platform_user)
+      |> post("/api/platform/organizations", %{
+        name: "Emailed Gym",
+        timezone: "Europe/Athens",
+        default_locale: "el",
+        initial_owner_email: "owner@example.test"
+      })
+
+    %{"organization" => %{"id" => organization_id}, "initial_owner_invitation" => %{"token" => token}} =
+      json_response(conn, 201)
+
+    email_conn =
+      context.conn
+      |> recycle()
+      |> put_bearer_token(context.platform_user)
+      |> post("/api/platform/organizations/#{organization_id}/invitations/email", %{
+        email: "Owner@Example.test",
+        token: token
+      })
+
+    assert response(email_conn, 204) == ""
+
+    assert_email_sent(fn email ->
+      assert email.to == [{"", "owner@example.test"}]
+      assert email.subject =~ "Emailed Gym"
+      assert email.text_body =~ token
+      assert email.html_body =~ token
+    end)
+
+    assert Repo.exists?(
+             from event in OrganizationProvisioningEvent,
+               where:
+                 event.organization_id == ^organization_id and
+                   event.event == "organization_invitation_emailed"
+           )
+  end
+
+  test "rejects sending an invitation email without an email or token", context do
+    {:ok, organization} = Organizations.create_organization(%{name: "Missing Fields Gym"})
+
+    conn =
+      context.conn
+      |> put_bearer_token(context.platform_user)
+      |> post("/api/platform/organizations/#{organization.id}/invitations/email", %{token: "abc"})
+
+    assert %{"code" => "invalid_email"} = json_response(conn, 422)
   end
 
   test "permanently deletes an organization created by mistake", context do

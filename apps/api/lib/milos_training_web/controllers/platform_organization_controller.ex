@@ -58,7 +58,7 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
               brand_logo_url: %Schema{type: :string},
               brand_primary_color: %Schema{type: :string}
             },
-            required: [:name]
+            required: [:name, :initial_owner_email]
           }
         }
       }
@@ -288,6 +288,17 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
           role: result.invitation.role
         }
       })
+    end
+  end
+
+  def invitation_email(conn, %{"id" => organization_id}) do
+    with {:ok, _event} <-
+           SendOwnerInvitationEmail.call(
+             conn.assigns.platform_context,
+             organization_id,
+             conn.body_params
+           ) do
+      send_resp(conn, :no_content, "")
     end
   end
 

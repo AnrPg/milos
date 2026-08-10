@@ -1032,6 +1032,21 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "invalid_cursor", error: "Invalid pagination cursor"})
   end
 
+  def call(conn, {:error, :invalid_email}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_email", error: "A recipient email and setup token are required"})
+  end
+
+  def call(conn, {:error, :owner_email_required}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "owner_email_required",
+      error: "An initial owner email is required to provision an organization"
+    })
+  end
+
   def call(conn, {:error, :invalid_athletes}) do
     conn
     |> put_status(:unprocessable_entity)

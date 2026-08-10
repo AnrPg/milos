@@ -15,7 +15,9 @@ defmodule MilosTraining.Organizations.Emails.OwnerInvitationEmail do
 
   def build(%{organization_name: organization_name, to: to, token: token}) do
     setup_url = "#{PublicURL.base_url()}/set-admin?token=#{URI.encode_www_form(token)}"
-    %{name: from_name, address: from_address} = Application.fetch_env!(:milos_training, :mail_from)
+    from_config = Application.fetch_env!(:milos_training, :mail_from)
+    from_name = Keyword.fetch!(from_config, :name)
+    from_address = Keyword.fetch!(from_config, :address)
 
     new()
     |> to(to)
@@ -64,7 +66,7 @@ defmodule MilosTraining.Organizations.Emails.OwnerInvitationEmail do
     """
   end
 
-  defp from_product_name, do: Application.fetch_env!(:milos_training, :mail_from).name
+  defp from_product_name, do: Keyword.fetch!(Application.fetch_env!(:milos_training, :mail_from), :name)
 
   defp escape(value) do
     value
