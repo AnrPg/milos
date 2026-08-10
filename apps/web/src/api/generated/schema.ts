@@ -1539,6 +1539,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/platform/organizations/{id}/invitations/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Email an already-issued invitation's setup link to its recipient */
+        post: operations["MilosTrainingWeb.PlatformOrganizationController.invitation_email"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/referral-rewards/{id}/status": {
         parameters: {
             query?: never;
@@ -2154,6 +2171,23 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/platform/organizations/{id}/name": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Rename an organization's canonical display name */
+        patch: operations["MilosTrainingWeb.PlatformOrganizationController.rename"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/finance/members/{id}/packages": {
@@ -10010,7 +10044,7 @@ export interface operations {
                     brand_name?: string;
                     brand_primary_color?: string;
                     default_locale?: string;
-                    initial_owner_email?: string;
+                    initial_owner_email: string;
                     invitation_lifetime_seconds?: number;
                     name: string;
                     slug?: string;
@@ -10913,6 +10947,33 @@ export interface operations {
                         [key: string]: unknown;
                     };
                 };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformOrganizationController.invitation_email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    email: string;
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Invitation email sent */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -12397,6 +12458,36 @@ export interface operations {
         responses: {
             /** @description Promotion redemption */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformOrganizationController.rename": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Organization */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };

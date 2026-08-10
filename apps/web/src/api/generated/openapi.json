@@ -20420,7 +20420,8 @@
                   }
                 },
                 "required": [
-                  "name"
+                  "name",
+                  "initial_owner_email"
                 ],
                 "type": "object"
               }
@@ -23132,6 +23133,59 @@
         "summary": "Search users with finance membership metadata",
         "tags": [
           "Admin Search"
+        ]
+      }
+    },
+    "/api/platform/organizations/{id}/invitations/email": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationController.invitation_email",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Invitation email sent"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Email an already-issued invitation's setup link to its recipient",
+        "tags": [
+          "Platform Organizations"
         ]
       }
     },
@@ -26218,6 +26272,65 @@
         "summary": "Record a promotion redemption for a user's membership",
         "tags": [
           "Admin Finance"
+        ]
+      }
+    },
+    "/api/platform/organizations/{id}/name": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationController.rename",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "maxLength": 120,
+                    "minLength": 2,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Organization"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Rename an organization's canonical display name",
+        "tags": [
+          "Platform Organizations"
         ]
       }
     },
