@@ -11,6 +11,7 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
     ListProvisionedOrganizations,
     ProvisionOrganization,
     RenameOrganization,
+    SendOwnerInvitationEmail,
     UpdatePlatformOrganizationMembershipRole
   }
 
@@ -145,6 +146,27 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
       }
     },
     responses: [created: {"Invitation token", "application/json", @organization_schema}]
+  )
+
+  operation(:invitation_email,
+    summary: "Email an already-issued invitation's setup link to its recipient",
+    parameters: [@organization_id],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{
+              email: %Schema{type: :string},
+              token: %Schema{type: :string}
+            },
+            required: [:email, :token]
+          }
+        }
+      }
+    },
+    responses: [no_content: "Invitation email sent"]
   )
 
   operation(:membership_role,
