@@ -35,7 +35,17 @@ defmodule MilosTraining.Infrastructure.Security.MemoryRateLimiter do
   defp ensure_table! do
     case :ets.whereis(@table) do
       :undefined ->
-        :ets.new(@table, [:named_table, :public, read_concurrency: true, write_concurrency: true])
+        # :ets.whereis/:ets.new is check-then-create, not atomic - concurrent
+        # callers (many async test cases hit this via the rate-limit plug)
+        # can both see :undefined and race to create the named table. The
+        # loser's :ets.new raises ArgumentError; the table it lost the race
+        # for is exactly the one it wanted, so that's a success, not a
+        # failure.
+        try do
+          :ets.new(@table, [:named_table, :public, read_concurrency: true, write_concurrency: true])
+        rescue
+          ArgumentError -> @table
+        end
 
       _table ->
         @table

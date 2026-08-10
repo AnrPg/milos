@@ -15,7 +15,8 @@ defmodule MilosTraining.Application do
         MilosTraining.Repo,
         {DNSCluster, query: Application.get_env(:milos_training, :dns_cluster_query) || :ignore},
         {Phoenix.PubSub, name: MilosTraining.PubSub},
-        MilosTrainingWeb.RealtimeEventHandler
+        MilosTrainingWeb.RealtimeEventHandler,
+        MilosTraining.Infrastructure.Security.MemoryRateLimiter.TableOwner
       ]
       |> maybe_add_oban()
       |> maybe_add_redix()
