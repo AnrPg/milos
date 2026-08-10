@@ -12,8 +12,6 @@ type AuthGuardProps = {
   children: React.ReactNode;
   roles?: Array<"member" | "athlete" | "admin">;
   roleRedirects?: Partial<Record<"member" | "athlete" | "admin", string>>;
-  /** Redirect vendors (SaaS operators, `currentUser.vendor`) here instead of the tenant-role homepage. */
-  vendorRedirect?: string;
 };
 
 type AllowedRole = NonNullable<AuthGuardProps["roles"]>[number];
@@ -22,7 +20,10 @@ function isAllowedRole(value: string): value is AllowedRole {
   return value === "member" || value === "athlete" || value === "admin";
 }
 
-export function AuthGuard({ children, roles, roleRedirects, vendorRedirect }: AuthGuardProps) {
+// Vendors (SaaS operators, `currentUser.vendor`) are exempt from
+// roleRedirects: their tenant-membership role (if any) is irrelevant to
+// where they land, since the platform console is their home regardless.
+export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
   const i18n = useUiTranslations();
   const router = useRouter();
   const pathname = usePathname();
@@ -36,22 +37,19 @@ export function AuthGuard({ children, roles, roleRedirects, vendorRedirect }: Au
     }
 
     if (status === "authenticated" && currentUser && !membershipRoleLoading) {
-      if (vendorRedirect && currentUser.vendor && pathname !== vendorRedirect) {
-        router.replace(vendorRedirect);
-        return;
-      }
-
-      const roleKey = role;
-      const redirect = roleRedirects?.[roleKey];
-      if (redirect) {
-        router.replace(redirect);
-        return;
+      if (!currentUser.vendor) {
+        const roleKey = role;
+        const redirect = roleRedirects?.[roleKey];
+        if (redirect) {
+          router.replace(redirect);
+          return;
+        }
       }
       if (roles && (!isAllowedRole(role) || !roles.includes(role))) {
         router.replace("/");
       }
     }
-  }, [currentUser, membershipRoleLoading, pathname, role, roles, roleRedirects, router, status, vendorRedirect]);
+  }, [currentUser, membershipRoleLoading, pathname, role, roles, roleRedirects, router, status]);
 
   if (status === "loading" || (status === "authenticated" && roles && membershipRoleLoading)) {
     return (
@@ -69,9 +67,7 @@ export function AuthGuard({ children, roles, roleRedirects, vendorRedirect }: Au
     return null;
   }
 
-  if (vendorRedirect && currentUser?.vendor && pathname !== vendorRedirect) return null;
-
-  const roleKey = currentUser ? role : undefined;
+  const roleKey = currentUser && !currentUser.vendor ? role : undefined;
   if (roleKey && roleRedirects?.[roleKey]) return null;
 
   return <>{children}</>;

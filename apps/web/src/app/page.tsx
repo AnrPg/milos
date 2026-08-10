@@ -1,12 +1,12 @@
 import { AuthGuard } from "@/components/auth-guard";
-import { LandingPage } from "@/components/landing-page";
+import { Home } from "@/components/home";
 
 export const dynamic = "force-dynamic";
 
-export default function Home() {
+export default function HomeRoute() {
   return (
-    <AuthGuard roleRedirects={{ admin: "/admin" }} vendorRedirect="/platform/organizations">
-      <LandingPage />
+    <AuthGuard roleRedirects={{ admin: "/admin" }}>
+      <Home />
     </AuthGuard>
   );
 }

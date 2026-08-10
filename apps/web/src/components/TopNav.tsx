@@ -448,7 +448,7 @@ export function TopNav() {
                     {currentUser.nickname}
                   </p>
                   <p className="mt-0.5 text-xs uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                    <SemanticLabel value={currentMembership?.role ?? currentUser.role} />
+                    {isVendor ? t("platform") : <SemanticLabel value={currentMembership?.role ?? currentUser.role} />}
                   </p>
                 </div>
                 <Link
@@ -459,17 +459,30 @@ export function TopNav() {
                 >
                   {t("profile")}
                 </Link>
-                <OrganizationSelector variant="menu" onSelect={() => setMenuOpen(false)} />
-                {role !== "admin" && showSelfServiceSurfaces ? (
+                {isVendor ? (
                   <Link
-                    href="/account/billing"
+                    href="/platform/organizations"
                     className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[var(--border)]"
                     style={{ color: "var(--text-soft)" }}
                     onClick={() => setMenuOpen(false)}
                   >
-                    {t("billing")}
+                    {t("platform")}
                   </Link>
-                ) : null}
+                ) : (
+                  <>
+                    <OrganizationSelector variant="menu" onSelect={() => setMenuOpen(false)} />
+                    {role !== "admin" && showSelfServiceSurfaces ? (
+                      <Link
+                        href="/account/billing"
+                        className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[var(--border)]"
+                        style={{ color: "var(--text-soft)" }}
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        {t("billing")}
+                      </Link>
+                    ) : null}
+                  </>
+                )}
                 <button
                   className="w-full px-4 py-2.5 text-start text-sm font-semibold transition-colors hover:bg-[var(--border)]"
                   style={{ color: "var(--primary)" }}
