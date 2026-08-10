@@ -104,6 +104,13 @@ export function changePlatformOrganizationLifecycle(
   );
 }
 
+export function renamePlatformOrganization(token: string, organizationId: string, name: string) {
+  return apiRequest<{ organization: PlatformOrganization["organization"] }>(
+    `/platform/organizations/${organizationId}/name`,
+    { method: "PATCH", token, body: { name } },
+  );
+}
+
 export function changePlatformOrganizationSettings(
   token: string,
   organizationId: string,

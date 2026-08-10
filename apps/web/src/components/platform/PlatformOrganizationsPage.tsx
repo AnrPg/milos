@@ -12,6 +12,7 @@ import {
   issuePlatformOrganizationInvitation,
   listPlatformOrganizations,
   provisionPlatformOrganization,
+  renamePlatformOrganization,
   updatePlatformOrganizationMembershipRole,
   type OrganizationMembershipRole,
   type OrganizationSettings,
@@ -120,11 +121,14 @@ export function PlatformOrganizationsPage() {
     }
   }
 
-  async function saveSettings(settings: OrganizationSettings) {
+  async function saveSettings(name: string, settings: OrganizationSettings) {
     if (!accessToken || !editing) return;
     setError(null);
 
     try {
+      if (name !== editing.organization.name) {
+        await renamePlatformOrganization(accessToken, editing.organization.id, name);
+      }
       await changePlatformOrganizationSettings(
         accessToken,
         editing.organization.id,
@@ -670,8 +674,9 @@ function SettingsDialog({ copy, organization, onCancel, onSave }: {
   copy: ReturnType<typeof platformOrganizationsCopy>;
   organization: PlatformOrganization;
   onCancel: () => void;
-  onSave: (settings: OrganizationSettings) => Promise<void>;
+  onSave: (name: string, settings: OrganizationSettings) => Promise<void>;
 }) {
+  const [name, setName] = useState(organization.organization.name);
   const [settings, setSettings] = useState(organization.settings!);
   const [saving, setSaving] = useState(false);
 
@@ -682,12 +687,13 @@ function SettingsDialog({ copy, organization, onCancel, onSave }: {
         onSubmit={async (event) => {
           event.preventDefault();
           setSaving(true);
-          await onSave(settings);
+          await onSave(name, settings);
           setSaving(false);
         }}
       >
         <h2 className="text-xl font-semibold text-[var(--text)]">{organization.organization.name}</h2>
         <div className="mt-5 space-y-4">
+          <TextField label={copy.name} value={name} required onChange={setName} />
           <TextField label={copy.timezone} value={settings.timezone} required onChange={(timezone) => setSettings({ ...settings, timezone })} />
           <TextField label={copy.locale} value={settings.default_locale} required onChange={(default_locale) => setSettings({ ...settings, default_locale })} />
           <TextField label={copy.invitationLifetime} type="number" min={1} value={String(settings.invitation_lifetime_seconds / 3600)} required onChange={(hours) => setSettings({ ...settings, invitation_lifetime_seconds: Number(hours) * 3600 })} />
