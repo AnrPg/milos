@@ -13,6 +13,7 @@ import {
   listPlatformOrganizations,
   provisionPlatformOrganization,
   renamePlatformOrganization,
+  sendOwnerInvitationEmail,
   updatePlatformOrganizationMembershipRole,
   type OrganizationMembershipRole,
   type OrganizationSettings,
@@ -51,7 +52,11 @@ export function PlatformOrganizationsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [invitation, setInvitation] = useState<ProvisionOrganizationResult | null>(null);
+  const [invitationEmail, setInvitationEmail] = useState<string | null>(null);
   const [copied, setCopied] = useState<"token" | "link" | null>(null);
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [emailSendError, setEmailSendError] = useState<string | null>(null);
+  const [emailSent, setEmailSent] = useState(false);
   const [editing, setEditing] = useState<PlatformOrganization | null>(null);
   const [managingAccess, setManagingAccess] = useState<PlatformOrganization | null>(null);
   const [provisioningOpen, setProvisioningOpen] = useState(false);
@@ -94,7 +99,10 @@ export function PlatformOrganizationsPage() {
     try {
       const result = await provisionPlatformOrganization(accessToken, compact(form));
       setInvitation(result);
+      setInvitationEmail(form.initial_owner_email ?? null);
       setCopied(null);
+      setEmailSent(false);
+      setEmailSendError(null);
       setForm(defaultForm);
       setProvisioningOpen(false);
       await organizationsQuery.refetch();
@@ -102,6 +110,24 @@ export function PlatformOrganizationsPage() {
       setError(copy.provisionError);
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function sendInvitationEmail() {
+    if (!accessToken || !invitation || !invitationEmail) return;
+    setSendingEmail(true);
+    setEmailSendError(null);
+
+    try {
+      await sendOwnerInvitationEmail(accessToken, invitation.organization.id, {
+        email: invitationEmail,
+        token: invitation.initial_owner_invitation.token,
+      });
+      setEmailSent(true);
+    } catch {
+      setEmailSendError(copy.sendEmailError);
+    } finally {
+      setSendingEmail(false);
     }
   }
 
@@ -249,6 +275,23 @@ export function PlatformOrganizationsPage() {
               {copy.dismiss}
             </button>
           </div>
+          {invitationEmail ? (
+            <div className="mt-4 border-t border-amber-300 pt-4">
+              <button
+                type="button"
+                disabled={sendingEmail || emailSent}
+                onClick={() => void sendInvitationEmail()}
+                className="border border-amber-900 bg-amber-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+              >
+                {emailSent
+                  ? copy.emailSent
+                  : sendingEmail
+                    ? copy.sendingEmail
+                    : `${copy.sendEmail} ${invitationEmail}`}
+              </button>
+              {emailSendError ? <p className="mt-2 text-sm text-red-900">{emailSendError}</p> : null}
+            </div>
+          ) : null}
         </section>
       ) : null}
 
@@ -606,7 +649,7 @@ function ProvisionDialog({ copy, form, submitting, onCancel, onChange, onSubmit 
             required
             onChange={(hours) => onChange({ ...form, invitation_lifetime_seconds: Number(hours) * 3600 })}
           />
-          <TextField label={copy.ownerEmail} type="email" value={form.initial_owner_email ?? ""} onChange={(initial_owner_email) => onChange({ ...form, initial_owner_email })} />
+          <TextField label={copy.ownerEmail} type="email" required value={form.initial_owner_email ?? ""} onChange={(initial_owner_email) => onChange({ ...form, initial_owner_email })} />
           <TextField label={copy.brandName} value={form.brand_name ?? ""} onChange={(brand_name) => onChange({ ...form, brand_name })} />
           <TextField label={copy.brandLogo} type="url" value={form.brand_logo_url ?? ""} onChange={(brand_logo_url) => onChange({ ...form, brand_logo_url })} />
           <TextField label={copy.brandColor} value={form.brand_primary_color ?? ""} onChange={(brand_primary_color) => onChange({ ...form, brand_primary_color })} />

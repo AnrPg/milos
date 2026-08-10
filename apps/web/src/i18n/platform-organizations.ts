@@ -7,7 +7,7 @@ const en = {
   timezone: "Timezone",
   locale: "Default locale",
   invitationLifetime: "Invitation lifetime (hours)",
-  ownerEmail: "Initial owner email (optional)",
+  ownerEmail: "Initial owner email",
   brandName: "Brand name (optional)",
   brandLogo: "Brand logo URL (optional)",
   brandColor: "Primary color (optional)",
@@ -64,6 +64,10 @@ const en = {
   edit: "Edit settings",
   cancel: "Cancel",
   myMemberships: "Your memberships",
+  sendEmail: "Email the setup link to",
+  sendingEmail: "Sending...",
+  emailSent: "Email sent",
+  sendEmailError: "The invitation email could not be sent.",
 };
 
 export type PlatformOrganizationsCopy = { [Key in keyof typeof en]: string };
@@ -77,7 +81,7 @@ const el: PlatformOrganizationsCopy = {
   timezone: "Ζώνη ώρας",
   locale: "Προεπιλεγμένη γλώσσα",
   invitationLifetime: "Διάρκεια πρόσκλησης (ώρες)",
-  ownerEmail: "Email αρχικού owner (προαιρετικό)",
+  ownerEmail: "Email αρχικού owner",
   brandName: "Όνομα brand (προαιρετικό)",
   brandLogo: "URL λογοτύπου (προαιρετικό)",
   brandColor: "Κύριο χρώμα (προαιρετικό)",
@@ -134,6 +138,10 @@ const el: PlatformOrganizationsCopy = {
   edit: "Επεξεργασία ρυθμίσεων",
   cancel: "Ακύρωση",
   myMemberships: "Οι συμμετοχές σου",
+  sendEmail: "Αποστολή συνδέσμου εγκατάστασης στο",
+  sendingEmail: "Αποστολή...",
+  emailSent: "Το email στάλθηκε",
+  sendEmailError: "Δεν ήταν δυνατή η αποστολή του email πρόσκλησης.",
 };
 
 export function platformOrganizationsCopy(locale: string): PlatformOrganizationsCopy {

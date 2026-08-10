@@ -13,6 +13,7 @@ import {
   listPlatformOrganizations,
   provisionPlatformOrganization,
   renamePlatformOrganization,
+  sendOwnerInvitationEmail,
   updatePlatformOrganizationMembershipRole,
 } from "@/api/platform-organizations";
 import { fetchOrganizationMemberships } from "@/api/organizations";
@@ -46,6 +47,7 @@ vi.mock("@/api/platform-organizations", async (importOriginal) => {
     updatePlatformOrganizationMembershipRole: vi.fn(),
     changePlatformOrganizationSettings: vi.fn(),
     renamePlatformOrganization: vi.fn(),
+    sendOwnerInvitationEmail: vi.fn(),
   };
 });
 
@@ -93,6 +95,7 @@ describe("PlatformOrganizationsPage", () => {
       organization: { ...organization.organization, status: "archived" },
     });
     vi.mocked(deletePlatformOrganization).mockResolvedValue(undefined);
+    vi.mocked(sendOwnerInvitationEmail).mockResolvedValue(undefined);
     vi.mocked(renamePlatformOrganization).mockResolvedValue({
       organization: { ...organization.organization, name: "North Harbor Strength" },
     });
@@ -160,6 +163,43 @@ describe("PlatformOrganizationsPage", () => {
     const dialog = screen.getByRole("dialog", { name: "Create organization" });
     expect(within(dialog).getByLabelText("Organization name")).toBeInTheDocument();
     expect(within(dialog).getByRole("button", { name: "Provision organization" })).toBeInTheDocument();
+  });
+
+  it("requires an owner email before provisioning, and offers to email the setup link afterward", async () => {
+    renderPage();
+
+    await screen.findByText("North Harbor Strength");
+    fireEvent.click(screen.getByRole("button", { name: "Create organization" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Create organization" });
+    expect(within(dialog).getByLabelText("Initial owner email")).toBeRequired();
+
+    fireEvent.change(within(dialog).getByLabelText("Organization name"), {
+      target: { value: "Atlas Gym" },
+    });
+    fireEvent.change(within(dialog).getByLabelText("Initial owner email"), {
+      target: { value: "owner@atlas.test" },
+    });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Provision organization" }));
+
+    await waitFor(() => {
+      expect(provisionPlatformOrganization).toHaveBeenCalledWith(
+        "token",
+        expect.objectContaining({ name: "Atlas Gym", initial_owner_email: "owner@atlas.test" }),
+      );
+    });
+
+    const sendButton = await screen.findByRole("button", { name: /owner@atlas\.test/ });
+    fireEvent.click(sendButton);
+
+    await waitFor(() => {
+      expect(sendOwnerInvitationEmail).toHaveBeenCalledWith("token", "org-2", {
+        email: "owner@atlas.test",
+        token: "invite-token",
+      });
+    });
+
+    expect(await screen.findByRole("button", { name: "Email sent" })).toBeInTheDocument();
   });
 
   it("archives an organization only after explicit confirmation", async () => {

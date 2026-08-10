@@ -148,6 +148,18 @@ export function issuePlatformOrganizationInvitation(
   });
 }
 
+export function sendOwnerInvitationEmail(
+  token: string,
+  organizationId: string,
+  input: { email: string; token: string },
+) {
+  return apiRequest<void>(`/platform/organizations/${organizationId}/invitations/email`, {
+    method: "POST",
+    token,
+    body: input,
+  });
+}
+
 export function updatePlatformOrganizationMembershipRole(
   token: string,
   organizationId: string,
