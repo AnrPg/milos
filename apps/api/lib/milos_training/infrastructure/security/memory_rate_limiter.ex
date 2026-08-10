@@ -42,7 +42,12 @@ defmodule MilosTraining.Infrastructure.Security.MemoryRateLimiter do
         # for is exactly the one it wanted, so that's a success, not a
         # failure.
         try do
-          :ets.new(@table, [:named_table, :public, read_concurrency: true, write_concurrency: true])
+          :ets.new(@table, [
+            :named_table,
+            :public,
+            read_concurrency: true,
+            write_concurrency: true
+          ])
         rescue
           ArgumentError -> @table
         end

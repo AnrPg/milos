@@ -92,7 +92,10 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
       })
 
     assert %{"code" => "owner_email_required"} = json_response(conn, 422)
-    refute Repo.exists?(from organization in Organization, where: organization.name == "No Email Gym")
+
+    refute Repo.exists?(
+             from organization in Organization, where: organization.name == "No Email Gym"
+           )
   end
 
   test "emails the initial owner their setup link and audits the send", context do
@@ -106,7 +109,10 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
         initial_owner_email: "owner@example.test"
       })
 
-    %{"organization" => %{"id" => organization_id}, "initial_owner_invitation" => %{"token" => token}} =
+    %{
+      "organization" => %{"id" => organization_id},
+      "initial_owner_invitation" => %{"token" => token}
+    } =
       json_response(conn, 201)
 
     email_conn =
@@ -333,7 +339,8 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
     assert %{"organization" => %{"name" => "New Name Gym", "slug" => ^original_slug}} =
              json_response(conn, 200)
 
-    assert %{name: "New Name Gym", slug: ^original_slug} = Repo.get!(Organization, organization.id)
+    assert %{name: "New Name Gym", slug: ^original_slug} =
+             Repo.get!(Organization, organization.id)
 
     assert Repo.exists?(
              from event in OrganizationProvisioningEvent,

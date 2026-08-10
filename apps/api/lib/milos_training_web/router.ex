@@ -426,7 +426,12 @@ defmodule MilosTrainingWeb.Router do
     delete("/organizations/:id", PlatformOrganizationController, :delete)
     get("/organizations/:id/access", PlatformOrganizationController, :access)
     post("/organizations/:id/invitations", PlatformOrganizationController, :invite)
-    post("/organizations/:id/invitations/email", PlatformOrganizationController, :invitation_email)
+
+    post(
+      "/organizations/:id/invitations/email",
+      PlatformOrganizationController,
+      :invitation_email
+    )
 
     patch(
       "/organizations/:id/memberships/:membership_id/role",

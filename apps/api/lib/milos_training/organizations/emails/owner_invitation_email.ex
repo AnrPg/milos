@@ -66,7 +66,8 @@ defmodule MilosTraining.Organizations.Emails.OwnerInvitationEmail do
     """
   end
 
-  defp from_product_name, do: Keyword.fetch!(Application.fetch_env!(:milos_training, :mail_from), :name)
+  defp from_product_name,
+    do: Keyword.fetch!(Application.fetch_env!(:milos_training, :mail_from), :name)
 
   defp escape(value) do
     value
