@@ -84,7 +84,7 @@ export function PlatformOrganizationsPage() {
     queryFn: () => fetchOrganizationMemberships(accessToken!),
     enabled: Boolean(accessToken),
   });
-  const myMemberships = myMembershipsQuery.data ?? [];
+  const myMemberships = useMemo(() => myMembershipsQuery.data ?? [], [myMembershipsQuery.data]);
   const myMembershipByOrgId = useMemo(
     () => new Map(myMemberships.map((entry) => [entry.organization.id, entry])),
     [myMemberships],
