@@ -49,6 +49,7 @@ defmodule MilosTraining.MixProject do
       {:postgrex, "~> 0.22.4"},
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:swoosh, "~> 1.16"},
+      {:gen_smtp, "~> 1.2"},
       {:req, "~> 0.7.2"},
       {:castore, "~> 1.0.20"},
       {:telemetry_metrics, "~> 1.0"},

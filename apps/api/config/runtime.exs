@@ -150,6 +150,24 @@ if config_env() == :prod do
     name: System.get_env("MAIL_FROM_NAME") || "TrainingJournal",
     address: System.get_env("MAIL_FROM_ADDRESS") || "no-reply@#{host}"
 
+  # Optional on purpose: absent SMTP_RELAY must not crash boot over a
+  # feature (owner-invitation email) the app worked without until now.
+  # Falls back to config.exs's Local adapter - dev-mailbox-only, and every
+  # caller already treats a delivery failure as a clean {:error, _} rather
+  # than crashing (see SendOwnerInvitationEmail.safe_deliver/1) - so this
+  # stays a degraded feature, not an outage, until these are set.
+  if smtp_relay = System.get_env("SMTP_RELAY") do
+    config :milos_training, MilosTraining.Mailer,
+      adapter: Swoosh.Adapters.SMTP,
+      relay: smtp_relay,
+      port: String.to_integer(System.get_env("SMTP_PORT") || "587"),
+      username: System.get_env("SMTP_USERNAME"),
+      password: System.get_env("SMTP_PASSWORD"),
+      tls: :always,
+      auth: :always,
+      ssl: System.get_env("SMTP_SSL") in ~w(true 1)
+  end
+
   config :milos_training, MilosTrainingWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     http: [
