@@ -97,6 +97,10 @@ defmodule MilosTraining.Organizations.OrganizationStore do
     do: impl().rename_organization(organization_id, name, platform_user_id, changed_at)
 
   @impl true
+  def record_invitation_email_sent(organization_id, platform_user_id, email_digest),
+    do: impl().record_invitation_email_sent(organization_id, platform_user_id, email_digest)
+
+  @impl true
   def get_organization_settings(organization_id),
     do: impl().get_organization_settings(organization_id)
 

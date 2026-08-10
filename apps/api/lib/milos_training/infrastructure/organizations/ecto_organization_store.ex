@@ -424,6 +424,24 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   end
 
   @impl true
+  def record_invitation_email_sent(organization_id, platform_user_id, email_digest) do
+    %OrganizationProvisioningEvent{}
+    |> OrganizationProvisioningEvent.changeset(%{
+      organization_id: organization_id,
+      vendor_user_id: platform_user_id,
+      event: "organization_invitation_emailed",
+      metadata: %{
+        # Hex, not the raw digest bytes - :map casts to jsonb, which can't
+        # hold arbitrary binary. Never the address itself (InvitationEmail
+        # digests are one-way by design elsewhere in this module).
+        to_digest: email_digest && Base.encode16(email_digest, case: :lower),
+        sent_at: DateTime.to_iso8601(DateTime.utc_now())
+      }
+    })
+    |> Repo.insert()
+  end
+
+  @impl true
   def get_organization_settings(organization_id),
     do: Repo.get_by(OrganizationSetting, organization_id: organization_id)
 

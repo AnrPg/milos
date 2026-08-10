@@ -11,6 +11,7 @@ defmodule MilosTraining.Organizations do
     RedeemInvitation,
     RenameOrganization,
     RevokeInvitation,
+    SendOwnerInvitationEmail,
     SetMembershipRole,
     SetMembershipStatus,
     UpdateOrganizationLifecycle,
@@ -112,6 +113,9 @@ defmodule MilosTraining.Organizations do
 
   def rename_organization(context, organization_id, name),
     do: RenameOrganization.call(context, organization_id, name)
+
+  def send_owner_invitation_email(context, organization_id, params),
+    do: SendOwnerInvitationEmail.call(context, organization_id, params)
 
   def update_organization_settings(
         context,
