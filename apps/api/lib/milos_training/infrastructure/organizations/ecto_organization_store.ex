@@ -392,11 +392,15 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
 
       updated =
         organization
-        # Pin :slug to its current value - Organization.changeset derives the
-        # slug from :name whenever :slug is absent, which would otherwise
-        # silently break canonical_path/:org routing and any bookmarked links
-        # as a side effect of a display-name-only rename.
-        |> Organization.changeset(%{name: name, slug: organization.slug})
+        |> Organization.changeset(%{name: name})
+        # Organization.changeset derives :slug from :name whenever :slug is
+        # absent from the params - and since the slug's *value* isn't
+        # actually changing, casting it explicitly doesn't register as a
+        # change either (Ecto no-ops same-value casts), so derive_slug still
+        # fires. Force the slug back after the fact instead: this is a
+        # display-name-only rename, canonical_path/:org routing and any
+        # bookmarked links must not move as a side effect of it.
+        |> Ecto.Changeset.put_change(:slug, organization.slug)
         |> Repo.update()
         |> unwrap_or_rollback()
 
