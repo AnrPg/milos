@@ -36,6 +36,7 @@ the original wording and dates for traceability.
 | TD-042 | Open |
 | TD-043 | Open |
 | TD-044 | Open |
+| TD-045 | Open |
 
 ## Detailed Ledger
 
@@ -85,3 +86,4 @@ the original wording and dates for traceability.
 | TD-042 | Web tooling | `openapi-typescript` still carries a dev-only `@redocly/openapi-core`/`js-yaml` advisory under full `npm audit`, but forcing patched `js-yaml` breaks OpenAPI generation | Production audit is clean; keep CI release gate on `npm audit --omit=dev --audit-level=high` and upgrade the generator when an upstream-compatible patched release is available | Medium | 2026-08-08 |
 | TD-043 | Backend static analysis | Resolve the inherited Dialyzer warning baseline in `.dialyzer_ignore.exs` across ports, storage adapters, readiness, and unreachable pattern clauses | This pass made Dialyzer release-blocking without hiding new warnings; paying down the existing 98-warning baseline needs focused context-owned fixes to avoid mixing behavior changes into gate rollout | High | 2026-08-08 |
 | TD-044 | Multi-tenancy | Retire remaining direct application-level `Identity.list_by_role(:admin)` fanout call sites after threading organization_id through each event payload | Central Notifications fanout is tenant-scoped, but older app services need event-specific payload and recipient changes to avoid mixing behavior into this fail-closed boundary pass | High | 2026-08-08 |
+| TD-045 | Platform tenant lifecycle | No update path exists for parameters the vendor set at provisioning time and cannot revisit afterward: the canonical `organization.name` and path `slug` in particular have no edit UI or command, even though the `Organization` Ecto changeset already casts both. "Edit settings" on `/platform/organizations` only covers the separate `organization_settings` row (timezone, default locale, invitation lifetime, brand name/logo/color) | Provisioning treated name/slug as durable identity so the platform console could ship with settings-editing first; a slug rename ripples into `canonical_path`, the `/org/:slug` proxy routing, and any bookmarked/shared invitation or dashboard links, so it needs redirect/alias handling and an admin confirmation step, not just a form field | Medium | 2026-08-10 |
