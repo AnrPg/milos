@@ -1,13 +1,16 @@
 defmodule MilosTraining.Organizations.Commands.UpdateMembershipRole do
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Organizations.Domain.MembershipPolicy
   alias MilosTraining.Organizations.{OrganizationStore, PlatformContext}
 
-  def call(%PlatformContext{}, organization_id, membership_id, params)
+  def call(%PlatformContext{} = context, organization_id, membership_id, params)
       when is_binary(organization_id) and is_binary(membership_id) do
     role = normalize_role(value(params, :role))
 
     if role in MembershipPolicy.roles() do
-      OrganizationStore.update_membership_role(organization_id, membership_id, role)
+      RepoContext.run(%{user_id: context.user_id}, fn ->
+        OrganizationStore.update_membership_role(organization_id, membership_id, role)
+      end)
     else
       {:error, [role: "is invalid"]}
     end

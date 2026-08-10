@@ -1,16 +1,19 @@
 defmodule MilosTraining.Organizations.Commands.UpdateOrganizationLifecycle do
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Organizations.{OrganizationStore, PlatformContext}
 
   @statuses [:active, :suspended, :archived]
 
   def call(%PlatformContext{} = context, organization_id, status, changed_at) do
     with {:ok, status} <- normalize_status(status) do
-      OrganizationStore.update_organization_lifecycle(
-        organization_id,
-        status,
-        context.user_id,
-        changed_at
-      )
+      RepoContext.run(%{user_id: context.user_id}, fn ->
+        OrganizationStore.update_organization_lifecycle(
+          organization_id,
+          status,
+          context.user_id,
+          changed_at
+        )
+      end)
     end
   end
 

@@ -1,4 +1,5 @@
 defmodule MilosTraining.Organizations.Commands.UpdateOrganizationSettings do
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Organizations.{OrganizationStore, PlatformContext}
 
   @allowed_fields %{
@@ -14,12 +15,14 @@ defmodule MilosTraining.Organizations.Commands.UpdateOrganizationSettings do
   def call(%PlatformContext{} = context, organization_id, params, changed_at) do
     sanitized = sanitize(params)
 
-    OrganizationStore.update_organization_settings(
-      organization_id,
-      sanitized,
-      context.user_id,
-      changed_at
-    )
+    RepoContext.run(%{user_id: context.user_id}, fn ->
+      OrganizationStore.update_organization_settings(
+        organization_id,
+        sanitized,
+        context.user_id,
+        changed_at
+      )
+    end)
   end
 
   def call(_context, _organization_id, _params, _changed_at),
