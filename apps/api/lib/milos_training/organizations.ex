@@ -9,6 +9,7 @@ defmodule MilosTraining.Organizations do
     IssuePlatformInvitation,
     ProvisionOrganization,
     RedeemInvitation,
+    RenameOrganization,
     RevokeInvitation,
     SetMembershipRole,
     SetMembershipStatus,
@@ -108,6 +109,9 @@ defmodule MilosTraining.Organizations do
         changed_at \\ DateTime.utc_now()
       ),
       do: UpdateOrganizationLifecycle.call(context, organization_id, status, changed_at)
+
+  def rename_organization(context, organization_id, name),
+    do: RenameOrganization.call(context, organization_id, name)
 
   def update_organization_settings(
         context,

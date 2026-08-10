@@ -42,6 +42,8 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
               {:ok, Organization.t()} | {:error, term()}
   @callback update_organization_lifecycle(Ecto.UUID.t(), atom(), Ecto.UUID.t(), DateTime.t()) ::
               {:ok, Organization.t()} | {:error, term()}
+  @callback rename_organization(Ecto.UUID.t(), String.t(), Ecto.UUID.t(), DateTime.t()) ::
+              {:ok, Organization.t()} | {:error, term()}
   @callback get_organization_settings(Ecto.UUID.t()) :: OrganizationSetting.t() | nil
   @callback update_organization_settings(Ecto.UUID.t(), map(), Ecto.UUID.t(), DateTime.t()) ::
               {:ok, OrganizationSetting.t()} | {:error, term()}

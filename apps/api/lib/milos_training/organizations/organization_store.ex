@@ -93,6 +93,10 @@ defmodule MilosTraining.Organizations.OrganizationStore do
       )
 
   @impl true
+  def rename_organization(organization_id, name, platform_user_id, changed_at),
+    do: impl().rename_organization(organization_id, name, platform_user_id, changed_at)
+
+  @impl true
   def get_organization_settings(organization_id),
     do: impl().get_organization_settings(organization_id)
 

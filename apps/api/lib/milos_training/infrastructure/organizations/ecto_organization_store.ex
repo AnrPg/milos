@@ -378,6 +378,48 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   end
 
   @impl true
+  def rename_organization(organization_id, name, platform_user_id, changed_at) do
+    Repo.transaction(fn ->
+      organization =
+        Organization
+        |> where([organization], organization.id == ^organization_id)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      if is_nil(organization), do: Repo.rollback(:not_found)
+
+      previous_name = organization.name
+
+      updated =
+        organization
+        # Pin :slug to its current value - Organization.changeset derives the
+        # slug from :name whenever :slug is absent, which would otherwise
+        # silently break canonical_path/:org routing and any bookmarked links
+        # as a side effect of a display-name-only rename.
+        |> Organization.changeset(%{name: name, slug: organization.slug})
+        |> Repo.update()
+        |> unwrap_or_rollback()
+
+      %OrganizationProvisioningEvent{}
+      |> OrganizationProvisioningEvent.changeset(%{
+        organization_id: organization_id,
+        vendor_user_id: platform_user_id,
+        event: "organization_renamed",
+        metadata: %{
+          previous_name: previous_name,
+          name: updated.name,
+          changed_at: DateTime.to_iso8601(changed_at)
+        }
+      })
+      |> Repo.insert()
+      |> unwrap_or_rollback()
+
+      updated
+    end)
+    |> flatten_transaction()
+  end
+
+  @impl true
   def get_organization_settings(organization_id),
     do: Repo.get_by(OrganizationSetting, organization_id: organization_id)
 
