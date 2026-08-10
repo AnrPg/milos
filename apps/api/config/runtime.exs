@@ -146,6 +146,10 @@ if config_env() == :prod do
   config :milos_training, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
   config :milos_training, :public_base_url, "https://#{host}"
 
+  config :milos_training, :mail_from,
+    name: System.get_env("MAIL_FROM_NAME") || "TrainingJournal",
+    address: System.get_env("MAIL_FROM_ADDRESS") || "no-reply@#{host}"
+
   config :milos_training, MilosTrainingWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     http: [

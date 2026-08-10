@@ -155,6 +155,10 @@ config :milos_training, MilosTrainingWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :milos_training, MilosTraining.Mailer, adapter: Swoosh.Adapters.Local
 
+# Overridden for prod in runtime.exs (MAIL_FROM_NAME/MAIL_FROM_ADDRESS); this
+# default is fine for dev/test, where mail never actually leaves the box.
+config :milos_training, :mail_from, name: "TrainingJournal", address: "no-reply@example.com"
+
 # Configures Elixir's Logger
 config :logger, :default_formatter,
   format: "timestamp=$time level=$level $metadata message=\"$message\"\n",
