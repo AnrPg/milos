@@ -314,11 +314,12 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
     end
   end
 
-  defp serialize_entry(%{organization: organization, settings: settings}) do
+  defp serialize_entry(%{organization: organization, settings: settings} = entry) do
     %{
       organization: serialize_organization(organization),
       settings: serialize_settings(settings),
-      canonical_path: "/org/#{organization.slug}"
+      canonical_path: "/org/#{organization.slug}",
+      pending_registration: Map.get(entry, :pending_registration, false)
     }
   end
 

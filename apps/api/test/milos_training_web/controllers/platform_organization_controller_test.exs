@@ -81,6 +81,52 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
            )
   end
 
+  test "lists a newly-provisioned organization as pending until its owner invitation is redeemed",
+       context do
+    conn =
+      context.conn
+      |> put_bearer_token(context.platform_user)
+      |> post("/api/platform/organizations", %{
+        name: "Pending Gym",
+        timezone: "Europe/Athens",
+        default_locale: "el",
+        initial_owner_email: "owner@example.test"
+      })
+
+    %{
+      "organization" => %{"id" => organization_id},
+      "initial_owner_invitation" => %{"token" => token}
+    } =
+      json_response(conn, 201)
+
+    pending_index =
+      context.conn
+      |> recycle()
+      |> put_bearer_token(context.platform_user)
+      |> get("/api/platform/organizations")
+
+    entry =
+      json_response(pending_index, 200)["organizations"]
+      |> Enum.find(&(&1["organization"]["id"] == organization_id))
+
+    assert entry["pending_registration"] == true
+
+    new_owner = user_fixture(%{nickname: "pending_gym_owner", email: "owner@example.test"})
+    assert {:ok, _membership} = Organizations.redeem_invitation(token, new_owner.id)
+
+    redeemed_index =
+      context.conn
+      |> recycle()
+      |> put_bearer_token(context.platform_user)
+      |> get("/api/platform/organizations")
+
+    entry =
+      json_response(redeemed_index, 200)["organizations"]
+      |> Enum.find(&(&1["organization"]["id"] == organization_id))
+
+    assert entry["pending_registration"] == false
+  end
+
   test "requires an initial owner email to provision an organization", context do
     conn =
       context.conn

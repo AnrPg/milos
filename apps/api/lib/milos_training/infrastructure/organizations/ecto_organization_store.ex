@@ -303,12 +303,32 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
 
   @impl true
   def list_organizations do
+    # An org is "pending" while its initial owner invitation is still
+    # unredeemed - provisioning always succeeds immediately (it's how the
+    # vendor gets a token/link to send), but nobody has actually logged in
+    # to run the tenant yet.
+    pending_owner_invitations =
+      from(invitation in RegistrationInvitation,
+        where:
+          invitation.role == :owner and is_nil(invitation.redeemed_at) and
+            is_nil(invitation.revoked_at),
+        distinct: invitation.organization_id,
+        select: %{organization_id: invitation.organization_id}
+      )
+
     Organization
     |> join(:left, [organization], settings in OrganizationSetting,
       on: settings.organization_id == organization.id
     )
+    |> join(:left, [organization], pending in subquery(pending_owner_invitations),
+      on: pending.organization_id == organization.id
+    )
     |> order_by([organization, _settings], asc: organization.name)
-    |> select([organization, settings], %{organization: organization, settings: settings})
+    |> select([organization, settings, pending], %{
+      organization: organization,
+      settings: settings,
+      pending_registration: not is_nil(pending.organization_id)
+    })
     |> Repo.all()
   end
 
