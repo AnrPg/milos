@@ -255,6 +255,40 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
     assert "organization_suspended" in events
   end
 
+  test "renames an organization without changing its slug or canonical path", context do
+    {:ok, organization} = Organizations.create_organization(%{name: "Old Name Gym"})
+    original_slug = organization.slug
+
+    conn =
+      context.conn
+      |> put_bearer_token(context.platform_user)
+      |> patch("/api/platform/organizations/#{organization.id}/name", %{name: "New Name Gym"})
+
+    assert %{"organization" => %{"name" => "New Name Gym", "slug" => ^original_slug}} =
+             json_response(conn, 200)
+
+    assert %{name: "New Name Gym", slug: ^original_slug} = Repo.get!(Organization, organization.id)
+
+    assert Repo.exists?(
+             from event in OrganizationProvisioningEvent,
+               where:
+                 event.organization_id == ^organization.id and
+                   event.event == "organization_renamed"
+           )
+  end
+
+  test "rejects a name shorter than the minimum length", context do
+    {:ok, organization} = Organizations.create_organization(%{name: "Short Name Gym"})
+
+    conn =
+      context.conn
+      |> put_bearer_token(context.platform_user)
+      |> patch("/api/platform/organizations/#{organization.id}/name", %{name: "A"})
+
+    assert json_response(conn, 422)
+    assert Repo.get!(Organization, organization.id).name == "Short Name Gym"
+  end
+
   test "archiving an organization soft-deletes tenant access and records lifecycle audit",
        context do
     {:ok, organization} = Organizations.create_organization(%{name: "Archive Gym"})

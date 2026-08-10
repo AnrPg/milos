@@ -434,6 +434,7 @@ defmodule MilosTrainingWeb.Router do
     )
 
     patch("/organizations/:id/lifecycle", PlatformOrganizationController, :lifecycle)
+    patch("/organizations/:id/name", PlatformOrganizationController, :rename)
     patch("/organizations/:id/settings", PlatformOrganizationController, :settings)
   end
 

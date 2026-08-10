@@ -10,6 +10,7 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
     ListPlatformOrganizationAccess,
     ListProvisionedOrganizations,
     ProvisionOrganization,
+    RenameOrganization,
     UpdatePlatformOrganizationMembershipRole
   }
 
@@ -77,6 +78,24 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
               status: %Schema{type: :string, enum: ["active", "suspended", "archived"]}
             },
             required: [:status]
+          }
+        }
+      }
+    },
+    responses: [ok: {"Organization", "application/json", @organization_schema}]
+  )
+
+  operation(:rename,
+    summary: "Rename an organization's canonical display name",
+    parameters: [@organization_id],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{name: %Schema{type: :string, minLength: 2, maxLength: 120}},
+            required: [:name]
           }
         }
       }
@@ -187,6 +206,17 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
              conn.assigns.platform_context,
              organization_id,
              conn.body_params["status"]
+           ) do
+      json(conn, %{organization: serialize_organization(organization)})
+    end
+  end
+
+  def rename(conn, %{"id" => organization_id}) do
+    with {:ok, organization} <-
+           RenameOrganization.call(
+             conn.assigns.platform_context,
+             organization_id,
+             conn.body_params["name"]
            ) do
       json(conn, %{organization: serialize_organization(organization)})
     end
