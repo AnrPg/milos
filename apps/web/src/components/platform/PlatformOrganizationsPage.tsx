@@ -332,9 +332,16 @@ export function PlatformOrganizationsPage() {
                       <h3 className="truncate text-lg font-semibold text-[var(--text)]">{entry.organization.name}</h3>
                       <p className="mt-1 break-all text-sm text-[var(--text-soft)]">{entry.canonical_path}</p>
                     </div>
-                    <span className="inline-flex border border-[var(--border)] bg-[var(--surface-muted)] px-3 py-1.5 text-sm font-semibold text-[var(--text)]">
-                      {statusLabels[entry.organization.status]}
-                    </span>
+                    <div className="flex shrink-0 flex-wrap items-center gap-2">
+                      {entry.pending_registration ? (
+                        <span className="inline-flex border border-[var(--primary)] bg-[var(--surface-muted)] px-3 py-1.5 text-sm font-semibold text-[var(--primary)]">
+                          {copy.pendingRegistration}
+                        </span>
+                      ) : null}
+                      <span className="inline-flex border border-[var(--border)] bg-[var(--surface-muted)] px-3 py-1.5 text-sm font-semibold text-[var(--text)]">
+                        {statusLabels[entry.organization.status]}
+                      </span>
+                    </div>
                   </div>
                   <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
                     <Detail label={copy.timezone} value={entry.settings?.timezone ?? "-"} />

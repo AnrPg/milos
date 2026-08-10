@@ -71,6 +71,7 @@ const organization = {
     settings: {},
   },
   canonical_path: "/org/north-harbor",
+  pending_registration: false,
 };
 
 function renderPage() {
@@ -149,6 +150,29 @@ describe("PlatformOrganizationsPage", () => {
       },
       canonical_path: "/org/atlas",
     });
+  });
+
+  it("shows a pending-registration badge only for organizations awaiting owner setup", async () => {
+    vi.mocked(listPlatformOrganizations).mockResolvedValue({
+      organizations: [
+        { ...organization, pending_registration: true },
+        {
+          ...organization,
+          organization: { ...organization.organization, id: "org-2", name: "Redeemed Gym", slug: "redeemed" },
+          pending_registration: false,
+        },
+      ],
+    });
+
+    renderPage();
+
+    const pendingRow = (await screen.findByText("North Harbor Strength")).closest("article");
+    const redeemedRow = (await screen.findByText("Redeemed Gym")).closest("article");
+    expect(pendingRow).not.toBeNull();
+    expect(redeemedRow).not.toBeNull();
+
+    expect(within(pendingRow!).getByText("Pending registration")).toBeInTheDocument();
+    expect(within(redeemedRow!).queryByText("Pending registration")).not.toBeInTheDocument();
   });
 
   it("opens the organization creation form in a dialog", async () => {

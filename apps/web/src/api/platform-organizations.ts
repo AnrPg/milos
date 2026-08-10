@@ -14,6 +14,7 @@ export type PlatformOrganization = {
   };
   settings: OrganizationSettings | null;
   canonical_path: string;
+  pending_registration: boolean;
 };
 
 export type OrganizationSettings = {

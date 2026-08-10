@@ -68,6 +68,7 @@ const en = {
   sendingEmail: "Sending...",
   emailSent: "Email sent",
   sendEmailError: "The invitation email could not be sent.",
+  pendingRegistration: "Pending registration",
 };
 
 export type PlatformOrganizationsCopy = { [Key in keyof typeof en]: string };
@@ -142,6 +143,7 @@ const el: PlatformOrganizationsCopy = {
   sendingEmail: "Αποστολή...",
   emailSent: "Το email στάλθηκε",
   sendEmailError: "Δεν ήταν δυνατή η αποστολή του email πρόσκλησης.",
+  pendingRegistration: "Εκκρεμεί εγγραφή",
 };
 
 export function platformOrganizationsCopy(locale: string): PlatformOrganizationsCopy {
