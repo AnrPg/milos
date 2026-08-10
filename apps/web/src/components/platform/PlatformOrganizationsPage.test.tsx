@@ -6,11 +6,13 @@ import { PlatformOrganizationsPage } from "@/components/platform/PlatformOrganiz
 
 import {
   changePlatformOrganizationLifecycle,
+  changePlatformOrganizationSettings,
   deletePlatformOrganization,
   fetchPlatformOrganizationAccess,
   issuePlatformOrganizationInvitation,
   listPlatformOrganizations,
   provisionPlatformOrganization,
+  renamePlatformOrganization,
   updatePlatformOrganizationMembershipRole,
 } from "@/api/platform-organizations";
 import { fetchOrganizationMemberships } from "@/api/organizations";
@@ -43,6 +45,7 @@ vi.mock("@/api/platform-organizations", async (importOriginal) => {
     provisionPlatformOrganization: vi.fn(),
     updatePlatformOrganizationMembershipRole: vi.fn(),
     changePlatformOrganizationSettings: vi.fn(),
+    renamePlatformOrganization: vi.fn(),
   };
 });
 
@@ -90,6 +93,10 @@ describe("PlatformOrganizationsPage", () => {
       organization: { ...organization.organization, status: "archived" },
     });
     vi.mocked(deletePlatformOrganization).mockResolvedValue(undefined);
+    vi.mocked(renamePlatformOrganization).mockResolvedValue({
+      organization: { ...organization.organization, name: "North Harbor Strength" },
+    });
+    vi.mocked(changePlatformOrganizationSettings).mockResolvedValue({ settings: organization.settings });
     vi.mocked(fetchPlatformOrganizationAccess).mockResolvedValue({
       organization: organization.organization,
       memberships: [
@@ -227,6 +234,46 @@ describe("PlatformOrganizationsPage", () => {
     await waitFor(() => {
       expect(deletePlatformOrganization).toHaveBeenCalledWith("token", "org-1");
     });
+  });
+
+  it("renames an organization from the settings dialog only when the name actually changed", async () => {
+    renderPage();
+
+    const article = await screen.findByText("North Harbor Strength");
+    const row = article.closest("article");
+    expect(row).not.toBeNull();
+
+    fireEvent.click(within(row!).getByRole("button", { name: "Edit settings" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Settings" });
+    const nameField = within(dialog).getByLabelText("Organization name");
+    expect(nameField).toHaveValue("North Harbor Strength");
+
+    fireEvent.change(nameField, { target: { value: "North Harbor Fitness" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save settings" }));
+
+    await waitFor(() => {
+      expect(renamePlatformOrganization).toHaveBeenCalledWith("token", "org-1", "North Harbor Fitness");
+      expect(changePlatformOrganizationSettings).toHaveBeenCalled();
+    });
+  });
+
+  it("does not call rename when the settings dialog is saved with the name unchanged", async () => {
+    renderPage();
+
+    const article = await screen.findByText("North Harbor Strength");
+    const row = article.closest("article");
+    expect(row).not.toBeNull();
+
+    fireEvent.click(within(row!).getByRole("button", { name: "Edit settings" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Settings" });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save settings" }));
+
+    await waitFor(() => {
+      expect(changePlatformOrganizationSettings).toHaveBeenCalled();
+    });
+    expect(renamePlatformOrganization).not.toHaveBeenCalled();
   });
 
   it("manages tenant access with role-specific invitations and membership roles", async () => {
