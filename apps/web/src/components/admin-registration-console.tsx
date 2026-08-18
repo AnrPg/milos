@@ -51,16 +51,29 @@ export function AdminRegistrationConsole() {
     const timer = setTimeout(() => {
       void inspectInvitation(token)
         .then((result) => {
-          if (!cancelled && ["owner", "admin"].includes(result.role)) setInvitation(result);
+          if (cancelled) return;
+
+          if (["owner", "admin"].includes(result.role)) {
+            setInvitation(result);
+            setError(null);
+          } else {
+            setInvitation(null);
+            setError(i18n("apiErrorInvalidInvitation"));
+          }
         })
-        .catch(() => undefined);
+        .catch((caught) => {
+          if (!cancelled) {
+            setInvitation(null);
+            setError(localizeError(caught, i18n));
+          }
+        });
     }, 300);
 
     return () => {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [form.invitation_token]);
+  }, [form.invitation_token, i18n]);
 
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -161,6 +174,7 @@ export function AdminRegistrationConsole() {
               onChange={(event) =>
                 {
                   setInvitation(null);
+                  setError(null);
                   setForm((current) => ({ ...current, invitation_token: event.target.value }));
                 }
               }

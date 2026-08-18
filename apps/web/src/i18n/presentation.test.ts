@@ -67,6 +67,8 @@ describe("localizeError", () => {
     ["cannot_delete_self", "apiErrorCannotDeleteSelf"],
     ["last_admin", "apiErrorLastAdmin"],
     ["user_has_restricted_history", "apiErrorUserHasRestrictedHistory"],
+    ["invalid_invitation", "apiErrorInvalidInvitation"],
+    ["invitation_email_mismatch", "apiErrorInvitationEmailMismatch"],
   ])("gives an actionable assignment message for %s", (code, key) => {
     const error = new ApiError(403, "Compatibility copy", { code });
     expect(localizeError(error, translate)).toBe(key);

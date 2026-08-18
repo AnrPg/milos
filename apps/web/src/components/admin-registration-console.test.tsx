@@ -101,4 +101,13 @@ describe("AdminRegistrationConsole", () => {
 
     expect(screen.getByRole("button", { name: "createAdminAccount" })).toBeDisabled();
   });
+
+  it("shows the invite inspection error instead of silently disabling submit", async () => {
+    vi.mocked(inspectInvitation).mockRejectedValueOnce(new Error("Invitation is invalid or unavailable"));
+
+    render(<AdminRegistrationConsole />);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Invitation is invalid or unavailable");
+    expect(screen.getByRole("button", { name: "createAdminAccount" })).toBeDisabled();
+  });
 });

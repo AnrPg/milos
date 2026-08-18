@@ -77,16 +77,24 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
     const timer = setTimeout(() => {
       void inspectInvitation(token)
         .then((result) => {
-          if (!cancelled) setInvitation(result);
+          if (!cancelled) {
+            setInvitation(result);
+            setError(null);
+          }
         })
-        .catch(() => undefined);
+        .catch((caught) => {
+          if (!cancelled) {
+            setInvitation(null);
+            setError(localizeError(caught, i18n));
+          }
+        });
     }, 300);
 
     return () => {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [invitationToken]);
+  }, [invitationToken, i18n]);
 
   // Stored in a ref so the post-registration upload effect doesn't need it as a dep
   const pendingAvatarRef = useRef<File | null>(null);
@@ -350,6 +358,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                     value={invitationToken}
                     onChange={(event) => {
                       setInvitation(null);
+                      setError(null);
                       setInvitationToken(event.target.value);
                     }}
                   />

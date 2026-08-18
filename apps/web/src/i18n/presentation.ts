@@ -220,6 +220,8 @@ const SEMANTIC_KEYS: Record<string, string> = {
 
 const API_ERROR_KEYS: Record<string, string> = {
   invalid_admin_registration_code: "apiErrorInvalidAdminRegistrationCode",
+  invalid_invitation: "apiErrorInvalidInvitation",
+  invitation_email_mismatch: "apiErrorInvitationEmailMismatch",
   invalid_current_password: "apiErrorInvalidCurrentPassword",
   invalid_credentials: "apiErrorInvalidCredentials",
   invalid_refresh_token: "apiErrorInvalidRefreshToken",
