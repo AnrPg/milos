@@ -105,6 +105,24 @@ defmodule MilosTrainingWeb.OrganizationAccessControllerTest do
     assert {:error, :invalid_invitation} = Organizations.inspect_invitation(token)
   end
 
+  test "an owner can issue an email-bound organization invitation through the API", context do
+    conn = put_bearer_token(context.conn, context.owner)
+
+    issued =
+      post(conn, "/api/org/#{context.organization.slug}/invitations", %{
+        role: "member",
+        intended_email: "invited@example.test",
+        lifetime_seconds: 3_600
+      })
+
+    assert %{"token" => token, "role" => "member"} = json_response(issued, 201)
+
+    wrong_recipient = user_fixture(%{email: "wrong@example.test"})
+
+    assert {:error, :invitation_email_mismatch} =
+             Organizations.redeem_invitation(token, wrong_recipient.id)
+  end
+
   test "tenant review endpoints require membership and scope a member's review", context do
     member_conn =
       context.conn

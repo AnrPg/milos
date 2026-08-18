@@ -5488,7 +5488,25 @@
       "delete": {
         "callbacks": {},
         "operationId": "MilosTrainingWeb.OrganizationAccessController.revoke",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organization_slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "204": {
             "description": "Revoked"
@@ -15232,12 +15250,24 @@
       "post": {
         "callbacks": {},
         "operationId": "MilosTrainingWeb.OrganizationAccessController.issue",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organization_slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "properties": {
+                  "intended_email": {
+                    "type": "string"
+                  },
                   "lifetime_seconds": {
                     "maximum": 604800,
                     "minimum": 300,

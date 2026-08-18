@@ -4788,7 +4788,10 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                organization_slug: string;
+                id: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -8413,12 +8416,15 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                organization_slug: string;
+            };
             cookie?: never;
         };
         requestBody: {
             content: {
                 "application/json": {
+                    intended_email?: string;
                     lifetime_seconds?: number;
                     /** @enum {string} */
                     role: "owner" | "admin" | "coach" | "member" | "athlete";

@@ -383,6 +383,14 @@ describe("PlatformOrganizationsPage", () => {
   });
 
   it("keeps generated organization invitation links and tokens in collapsible access history", async () => {
+    vi.mocked(issuePlatformOrganizationInvitation).mockResolvedValueOnce({
+      invitation: {
+        token: "admin-invite-token",
+        expires_at: "2026-08-11T00:00:00Z",
+        role: "admin",
+      },
+    });
+
     renderPage();
 
     const article = await screen.findByText("North Harbor Strength");
@@ -413,8 +421,8 @@ describe("PlatformOrganizationsPage", () => {
 
     expect(historyToggle).toHaveAttribute("aria-expanded", "true");
     expect(within(dialog).getByText("admin@example.test")).toBeInTheDocument();
-    expect(within(dialog).getAllByText("coach-invite-token").length).toBeGreaterThan(0);
-    expect(within(dialog).getAllByText(/\/register\?token=coach-invite-token/).length).toBeGreaterThan(0);
+    expect(within(dialog).getAllByText("admin-invite-token").length).toBeGreaterThan(0);
+    expect(within(dialog).getAllByText(/\/set-admin\?token=admin-invite-token/).length).toBeGreaterThan(0);
 
     fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
 
@@ -426,6 +434,6 @@ describe("PlatformOrganizationsPage", () => {
     fireEvent.click(pageHistoryToggle);
 
     expect(within(pageRow!).getByText("admin@example.test")).toBeInTheDocument();
-    expect(within(pageRow!).getByText(/\/register\?token=coach-invite-token/)).toBeInTheDocument();
+    expect(within(pageRow!).getByText(/\/set-admin\?token=admin-invite-token/)).toBeInTheDocument();
   });
 });

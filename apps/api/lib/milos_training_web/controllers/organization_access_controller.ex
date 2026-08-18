@@ -12,7 +12,7 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
     RevokeRegistrationInvitation
   }
 
-  alias OpenApiSpex.{MediaType, RequestBody, Schema}
+  alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
   action_fallback MilosTrainingWeb.FallbackController
   tags(["Organizations"])
@@ -29,6 +29,20 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
         }
       }
     }
+  }
+
+  @organization_slug_parameter %Parameter{
+    name: :organization_slug,
+    in: :path,
+    required: true,
+    schema: %Schema{type: :string}
+  }
+
+  @invitation_id_parameter %Parameter{
+    name: :id,
+    in: :path,
+    required: true,
+    schema: %Schema{type: :string, format: :uuid}
   }
 
   @organization_schema %Schema{
@@ -73,8 +87,14 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
     required: [:id, :role, :organization]
   }
 
+  # Keep CastAndValidate on the body-only unauthenticated invitation endpoints.
+  # The tenant-scoped issue/revoke routes publish required path parameters in
+  # OpenAPI, while Phoenix routing and ResolveTenantContext validate the actual
+  # organization slug at runtime. Running CastAndValidate on :issue makes
+  # OpenApiSpex 3.22 validate scoped route params before they are represented in
+  # the shape it expects, causing valid tenant requests to fail with 422.
   plug OpenApiSpex.Plug.CastAndValidate,
-       [json_render_error_v2: true] when action in [:inspect, :redeem, :issue]
+       [json_render_error_v2: true] when action in [:inspect, :redeem]
 
   operation(:inspect,
     summary: "Inspect a one-time organization invitation",
@@ -100,6 +120,7 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
   operation(:issue,
     summary: "Issue a one-time organization invitation",
     security: [%{"bearerAuth" => []}],
+    parameters: [@organization_slug_parameter],
     request_body: %RequestBody{
       required: true,
       content: %{
@@ -108,7 +129,8 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
             type: :object,
             properties: %{
               role: %Schema{type: :string, enum: ~w(owner admin coach member athlete)},
-              lifetime_seconds: %Schema{type: :integer, minimum: 300, maximum: 604_800}
+              lifetime_seconds: %Schema{type: :integer, minimum: 300, maximum: 604_800},
+              intended_email: %Schema{type: :string}
             },
             required: [:role]
           }
@@ -121,6 +143,7 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
   operation(:revoke,
     summary: "Revoke an active organization invitation",
     security: [%{"bearerAuth" => []}],
+    parameters: [@organization_slug_parameter, @invitation_id_parameter],
     responses: [no_content: {"Revoked", nil, nil}]
   )
 

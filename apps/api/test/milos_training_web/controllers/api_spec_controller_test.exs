@@ -190,6 +190,26 @@ defmodule MilosTrainingWeb.ApiSpecControllerTest do
         "inserted_at"
       ])
     end
+
+    test "publishes complete organization invitation contracts", %{conn: conn} do
+      body = conn |> get("/api/openapi") |> json_response(200)
+
+      issue_operation = body["paths"]["/api/org/{organization_slug}/invitations"]["post"]
+      revoke_operation = body["paths"]["/api/org/{organization_slug}/invitations/{id}"]["delete"]
+
+      issue_properties =
+        get_in(issue_operation, [
+          "requestBody",
+          "content",
+          "application/json",
+          "schema",
+          "properties"
+        ])
+
+      assert Map.has_key?(issue_properties, "intended_email")
+      assert_required_parameter_names(issue_operation, ["organization_slug"])
+      assert_required_parameter_names(revoke_operation, ["organization_slug", "id"])
+    end
   end
 
   defp response_item_schema(spec, path, method, collection) do
@@ -212,6 +232,15 @@ defmodule MilosTrainingWeb.ApiSpecControllerTest do
     Enum.each(properties, fn property ->
       assert Map.has_key?(schema["properties"], property)
     end)
+  end
+
+  defp assert_required_parameter_names(operation, expected_names) do
+    actual_names =
+      operation["parameters"]
+      |> Enum.filter(& &1["required"])
+      |> Enum.map(& &1["name"])
+
+    assert actual_names == expected_names
   end
 
   defp assert_action_item_schema(actions_schema) do
