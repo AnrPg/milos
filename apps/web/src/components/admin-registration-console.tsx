@@ -21,6 +21,15 @@ const INITIAL_FORM: AdminRegisterRequest = {
   invitation_token: "",
 };
 
+function validRegistrationPassword(password: string) {
+  return password.length >= 12 &&
+    !/\s/u.test(password) &&
+    /[a-z]/u.test(password) &&
+    /[A-Z]/u.test(password) &&
+    /[0-9]/u.test(password) &&
+    /[^a-zA-Z0-9]/u.test(password);
+}
+
 export function AdminRegistrationConsole() {
   const i18n = useUiTranslations();
   const router = useRouter();
@@ -65,7 +74,7 @@ export function AdminRegistrationConsole() {
   }, [invitation, router, status]);
 
   const validNickname = /^[\p{L}0-9_]{3,30}$/u.test(form.nickname);
-  const validPassword = form.password.length >= 4 && !/\s/u.test(form.password);
+  const validPassword = validRegistrationPassword(form.password);
   const canSubmit = validNickname && validPassword && invitation !== null && !busy;
 
   async function submit() {

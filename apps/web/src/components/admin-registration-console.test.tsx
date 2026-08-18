@@ -83,4 +83,22 @@ describe("AdminRegistrationConsole", () => {
     expect(window.localStorage.getItem(SELECTED_ORGANIZATION_SLUG_KEY)).toBe("milos-method");
     expect(replace).toHaveBeenCalledWith("/org/milos-method/admin");
   });
+
+  it("requires a backend-compatible strong password before submitting", async () => {
+    render(<AdminRegistrationConsole />);
+
+    await screen.findByText("Milos Method");
+
+    fireEvent.change(screen.getByLabelText("nicknamece2bd99"), {
+      target: { value: "client_admin" },
+    });
+    fireEvent.change(screen.getByLabelText("emailAddress"), {
+      target: { value: "client@example.test" },
+    });
+    fireEvent.change(screen.getByLabelText("password8be3c94"), {
+      target: { value: "weakpass" },
+    });
+
+    expect(screen.getByRole("button", { name: "createAdminAccount" })).toBeDisabled();
+  });
 });
