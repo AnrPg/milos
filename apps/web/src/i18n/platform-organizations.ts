@@ -69,6 +69,13 @@ const en = {
   emailSent: "Email sent",
   sendEmailError: "The invitation email could not be sent.",
   pendingRegistration: "Pending registration",
+  generatedInvitations: "Generated invitations",
+  noGeneratedInvitations: "No generated invitations in this browser session.",
+  issued: "Issued",
+  intendedEmail: "Email",
+  role: "Role",
+  token: "Token",
+  setupLink: "Setup link",
 };
 
 export type PlatformOrganizationsCopy = { [Key in keyof typeof en]: string };
@@ -144,6 +151,13 @@ const el: PlatformOrganizationsCopy = {
   emailSent: "Το email στάλθηκε",
   sendEmailError: "Δεν ήταν δυνατή η αποστολή του email πρόσκλησης.",
   pendingRegistration: "Εκκρεμεί εγγραφή",
+  generatedInvitations: "Προσκλήσεις που δημιουργήθηκαν",
+  noGeneratedInvitations: "Δεν υπάρχουν δημιουργημένες προσκλήσεις σε αυτή τη συνεδρία.",
+  issued: "Εκδόθηκε",
+  intendedEmail: "Email",
+  role: "Ρόλος",
+  token: "Token",
+  setupLink: "Σύνδεσμος εγκατάστασης",
 };
 
 export function platformOrganizationsCopy(locale: string): PlatformOrganizationsCopy {

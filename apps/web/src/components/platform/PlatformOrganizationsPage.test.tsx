@@ -351,6 +351,7 @@ describe("PlatformOrganizationsPage", () => {
 
     const dialog = screen.getByRole("dialog", { name: "Access" });
     expect(await within(dialog).findByText("maria")).toBeInTheDocument();
+    expect(within(dialog).getByLabelText("Invite role")).toHaveValue("admin");
 
     fireEvent.change(within(dialog).getByLabelText("Invite role"), { target: { value: "coach" } });
     fireEvent.change(within(dialog).getByLabelText("Email hint (optional)"), {
@@ -367,6 +368,7 @@ describe("PlatformOrganizationsPage", () => {
     });
 
     expect(await within(dialog).findByText("coach-invite-token")).toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: /Generated invitations/ })).toBeInTheDocument();
 
     fireEvent.change(within(dialog).getByLabelText("Tenant role"), { target: { value: "athlete" } });
 
@@ -378,5 +380,52 @@ describe("PlatformOrganizationsPage", () => {
         "athlete",
       );
     });
+  });
+
+  it("keeps generated organization invitation links and tokens in collapsible access history", async () => {
+    renderPage();
+
+    const article = await screen.findByText("North Harbor Strength");
+    const row = article.closest("article");
+    expect(row).not.toBeNull();
+
+    fireEvent.click(within(row!).getByRole("button", { name: "Manage access" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Access" });
+    fireEvent.change(within(dialog).getByLabelText("Email hint (optional)"), {
+      target: { value: "admin@example.test" },
+    });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Invite" }));
+
+    await waitFor(() => {
+      expect(issuePlatformOrganizationInvitation).toHaveBeenCalledWith("token", "org-1", {
+        role: "admin",
+        intended_email: "admin@example.test",
+        lifetime_seconds: 604_800,
+      });
+    });
+
+    const historyToggle = await within(dialog).findByRole("button", { name: /Generated invitations/ });
+    expect(historyToggle).toHaveAttribute("aria-expanded", "false");
+    expect(within(dialog).queryByText("admin@example.test")).not.toBeInTheDocument();
+
+    fireEvent.click(historyToggle);
+
+    expect(historyToggle).toHaveAttribute("aria-expanded", "true");
+    expect(within(dialog).getByText("admin@example.test")).toBeInTheDocument();
+    expect(within(dialog).getAllByText("coach-invite-token").length).toBeGreaterThan(0);
+    expect(within(dialog).getAllByText(/\/register\?token=coach-invite-token/).length).toBeGreaterThan(0);
+
+    fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
+
+    const pageRow = (await screen.findByText("North Harbor Strength")).closest("article");
+    expect(pageRow).not.toBeNull();
+    const pageHistoryToggle = within(pageRow!).getByRole("button", { name: /Generated invitations/ });
+    expect(pageHistoryToggle).toHaveAttribute("aria-expanded", "false");
+
+    fireEvent.click(pageHistoryToggle);
+
+    expect(within(pageRow!).getByText("admin@example.test")).toBeInTheDocument();
+    expect(within(pageRow!).getByText(/\/register\?token=coach-invite-token/)).toBeInTheDocument();
   });
 });

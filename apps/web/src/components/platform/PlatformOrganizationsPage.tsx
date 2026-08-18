@@ -44,6 +44,12 @@ const defaultForm: ProvisionOrganizationInput = {
 
 const membershipRoles: OrganizationMembershipRole[] = ["owner", "admin", "coach", "member", "athlete"];
 
+type GeneratedInvitation = PlatformInvitationResult["invitation"] & {
+  id: string;
+  intended_email: string | null;
+  issued_at: string;
+};
+
 export function PlatformOrganizationsPage() {
   const locale = useUiLocale();
   const copy = platformOrganizationsCopy(locale);
@@ -64,6 +70,10 @@ export function PlatformOrganizationsPage() {
   const [confirmingDelete, setConfirmingDelete] = useState<PlatformOrganization | null>(null);
   const [lifecycleSubmitting, setLifecycleSubmitting] = useState<string | null>(null);
   const [deleteSubmitting, setDeleteSubmitting] = useState<string | null>(null);
+  const [generatedInvitationsByOrg, setGeneratedInvitationsByOrg] = useState<
+    Record<string, GeneratedInvitation[]>
+  >({});
+  const [expandedInvitationHistory, setExpandedInvitationHistory] = useState<Record<string, boolean>>({});
 
   const accessToken = tokens?.access_token;
   const organizationsQuery = useQuery({
@@ -105,12 +115,25 @@ export function PlatformOrganizationsPage() {
       setEmailSendError(null);
       setForm(defaultForm);
       setProvisioningOpen(false);
+      rememberGeneratedInvitation(result.organization.id, {
+        ...result.initial_owner_invitation,
+        id: `${result.organization.id}:${result.initial_owner_invitation.token}`,
+        intended_email: form.initial_owner_email || null,
+        issued_at: new Date().toISOString(),
+      });
       await organizationsQuery.refetch();
     } catch {
       setError(copy.provisionError);
     } finally {
       setSubmitting(false);
     }
+  }
+
+  function rememberGeneratedInvitation(organizationId: string, generatedInvitation: GeneratedInvitation) {
+    setGeneratedInvitationsByOrg((current) => ({
+      ...current,
+      [organizationId]: [generatedInvitation, ...(current[organizationId] ?? [])],
+    }));
   }
 
   async function sendInvitationEmail() {
@@ -400,6 +423,18 @@ export function PlatformOrganizationsPage() {
                       {copy.delete}
                     </button>
                   </div>
+                  <GeneratedInvitationsList
+                    copy={copy}
+                    invitations={generatedInvitationsByOrg[entry.organization.id] ?? []}
+                    expanded={Boolean(expandedInvitationHistory[entry.organization.id])}
+                    locale={locale}
+                    onToggle={() =>
+                      setExpandedInvitationHistory((current) => ({
+                        ...current,
+                        [entry.organization.id]: !current[entry.organization.id],
+                      }))
+                    }
+                  />
                 </article>
               ))}
             </div>
@@ -419,8 +454,12 @@ export function PlatformOrganizationsPage() {
         <AccessDialog
           accessToken={accessToken}
           copy={copy}
+          generatedInvitations={generatedInvitationsByOrg[managingAccess.organization.id] ?? []}
           organization={managingAccess}
           onCancel={() => setManagingAccess(null)}
+          onInvitationIssued={(generatedInvitation) =>
+            rememberGeneratedInvitation(managingAccess.organization.id, generatedInvitation)
+          }
         />
       ) : null}
       {provisioningOpen ? (
@@ -467,6 +506,13 @@ function ownerSetupUrl(token: string) {
   return `${window.location.origin}${path}`;
 }
 
+function invitationSetupUrl(invitation: Pick<PlatformInvitationResult["invitation"], "role" | "token">) {
+  const route = invitation.role === "owner" || invitation.role === "admin" ? "/set-admin" : "/register";
+  const path = `${route}?token=${encodeURIComponent(invitation.token)}`;
+  if (typeof window === "undefined") return path;
+  return `${window.location.origin}${path}`;
+}
+
 
 function TextField({ label, value, onChange, type = "text", ...inputProps }: {
   label: string;
@@ -492,13 +538,22 @@ function Detail({ label, value }: { label: string; value: string }) {
   return <div><dt className="text-xs font-semibold uppercase text-[var(--text-soft)]">{label}</dt><dd className="mt-1 break-words text-[var(--text)]">{value}</dd></div>;
 }
 
-function AccessDialog({ accessToken, copy, organization, onCancel }: {
+function AccessDialog({
+  accessToken,
+  copy,
+  generatedInvitations,
+  organization,
+  onCancel,
+  onInvitationIssued,
+}: {
   accessToken: string | undefined;
   copy: ReturnType<typeof platformOrganizationsCopy>;
+  generatedInvitations: GeneratedInvitation[];
   organization: PlatformOrganization;
   onCancel: () => void;
+  onInvitationIssued: (generatedInvitation: GeneratedInvitation) => void;
 }) {
-  const [role, setRole] = useState<OrganizationMembershipRole>("member");
+  const [role, setRole] = useState<OrganizationMembershipRole>("admin");
   const [email, setEmail] = useState("");
   const [lifetimeHours, setLifetimeHours] = useState("168");
   const [invitePending, setInvitePending] = useState(false);
@@ -506,6 +561,7 @@ function AccessDialog({ accessToken, copy, organization, onCancel }: {
   const [error, setError] = useState<string | null>(null);
   const [invitation, setInvitation] = useState<PlatformInvitationResult["invitation"] | null>(null);
   const [copied, setCopied] = useState<"token" | "link" | null>(null);
+  const [historyExpanded, setHistoryExpanded] = useState(false);
 
   const accessQuery = useQuery({
     queryKey: ["platform-organization-access", accessToken, organization.organization.id],
@@ -526,6 +582,12 @@ function AccessDialog({ accessToken, copy, organization, onCancel }: {
         lifetime_seconds: Math.max(1, Number(lifetimeHours) || 168) * 3600,
       });
       setInvitation(result.invitation);
+      onInvitationIssued({
+        ...result.invitation,
+        id: `${organization.organization.id}:${result.invitation.token}`,
+        intended_email: email.trim() || null,
+        issued_at: new Date().toISOString(),
+      });
       setCopied(null);
       setEmail("");
     } catch {
@@ -590,15 +652,22 @@ function AccessDialog({ accessToken, copy, organization, onCancel }: {
         {invitation ? (
           <section className="mt-4 border border-amber-400 bg-amber-50 p-4 text-amber-950">
             <p className="text-sm font-semibold">{copy.ownerSetupLink}</p>
-            <code className="mt-2 block break-all border border-amber-300 bg-white px-3 py-2 text-sm">{ownerSetupUrl(invitation.token)}</code>
+            <code className="mt-2 block break-all border border-amber-300 bg-white px-3 py-2 text-sm">{invitationSetupUrl(invitation)}</code>
             <code className="mt-3 block break-all border border-amber-300 bg-white px-3 py-2 text-sm">{invitation.token}</code>
             <p className="mt-2 text-xs">{copy.expires}: {new Date(invitation.expires_at).toLocaleString()}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" onClick={async () => { await navigator.clipboard.writeText(invitation.token); setCopied("token"); }} className="border border-amber-900 px-3 py-2 text-sm font-semibold">{copied === "token" ? copy.copied : copy.copyToken}</button>
-              <button type="button" onClick={async () => { await navigator.clipboard.writeText(ownerSetupUrl(invitation.token)); setCopied("link"); }} className="border border-amber-900 px-3 py-2 text-sm font-semibold">{copied === "link" ? copy.copied : copy.copyOwnerSetupLink}</button>
+              <button type="button" onClick={async () => { await navigator.clipboard.writeText(invitationSetupUrl(invitation)); setCopied("link"); }} className="border border-amber-900 px-3 py-2 text-sm font-semibold">{copied === "link" ? copy.copied : copy.copyOwnerSetupLink}</button>
             </div>
           </section>
         ) : null}
+
+        <GeneratedInvitationsList
+          copy={copy}
+          invitations={generatedInvitations}
+          expanded={historyExpanded}
+          onToggle={() => setHistoryExpanded((current) => !current)}
+        />
 
         <div className="mt-5 divide-y divide-[var(--border)] border-y border-[var(--border)]">
           {accessQuery.isLoading ? <p className="py-5 text-sm text-[var(--text-soft)]">{copy.loading}</p> : null}
@@ -625,6 +694,62 @@ function AccessDialog({ accessToken, copy, organization, onCancel }: {
         </div>
       </div>
     </div>
+  );
+}
+
+function GeneratedInvitationsList({
+  copy,
+  expanded,
+  invitations,
+  locale,
+  onToggle,
+}: {
+  copy: ReturnType<typeof platformOrganizationsCopy>;
+  expanded: boolean;
+  invitations: GeneratedInvitation[];
+  locale?: string;
+  onToggle: () => void;
+}) {
+  if (invitations.length === 0) return null;
+
+  return (
+    <section className="mt-4 border border-[var(--border)] bg-[var(--surface-muted)] p-3">
+      <button
+        type="button"
+        aria-expanded={expanded}
+        onClick={onToggle}
+        className="flex w-full items-center justify-between gap-3 text-left text-sm font-semibold text-[var(--text)]"
+      >
+        <span>{copy.generatedInvitations} ({invitations.length})</span>
+        <span aria-hidden="true">{expanded ? "-" : "+"}</span>
+      </button>
+      {expanded ? (
+        <div className="mt-3 space-y-2">
+          {invitations.map((invitation) => (
+            <details key={invitation.id} className="border border-[var(--border)] bg-[var(--surface)] px-3 py-2">
+              <summary className="cursor-pointer text-sm font-semibold text-[var(--text)]">
+                {invitation.role}
+                {invitation.intended_email ? ` · ${invitation.intended_email}` : ""}
+              </summary>
+              <dl className="mt-3 grid gap-3 text-xs sm:grid-cols-2">
+                <Detail label={copy.role} value={invitation.role} />
+                <Detail label={copy.intendedEmail} value={invitation.intended_email ?? "-"} />
+                <Detail label={copy.issued} value={new Date(invitation.issued_at).toLocaleString(locale)} />
+                <Detail label={copy.expires} value={new Date(invitation.expires_at).toLocaleString(locale)} />
+              </dl>
+              <p className="mt-3 text-xs font-semibold uppercase text-[var(--text-soft)]">{copy.setupLink}</p>
+              <code className="mt-1 block break-all border border-[var(--border)] bg-[var(--surface-muted)] px-3 py-2 text-xs">
+                {invitationSetupUrl(invitation)}
+              </code>
+              <p className="mt-3 text-xs font-semibold uppercase text-[var(--text-soft)]">{copy.token}</p>
+              <code className="mt-1 block break-all border border-[var(--border)] bg-[var(--surface-muted)] px-3 py-2 text-xs">
+                {invitation.token}
+              </code>
+            </details>
+          ))}
+        </div>
+      ) : null}
+    </section>
   );
 }
 

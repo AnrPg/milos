@@ -12,6 +12,7 @@ import {
 import { useSession } from "@/components/session-provider";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { rememberSelectedOrganization } from "@/lib/organization-slug";
 
 const INITIAL_FORM: AdminRegisterRequest = {
   nickname: "",
@@ -53,8 +54,15 @@ export function AdminRegistrationConsole() {
   }, [form.invitation_token]);
 
   useEffect(() => {
-    if (status === "authenticated") router.replace("/");
-  }, [router, status]);
+    if (status !== "authenticated") return;
+
+    if (invitation) {
+      rememberSelectedOrganization(invitation.organization.slug);
+      router.replace(`/org/${invitation.organization.slug}/admin`);
+    } else {
+      router.replace("/");
+    }
+  }, [invitation, router, status]);
 
   const validNickname = /^[\p{L}0-9_]{3,30}$/u.test(form.nickname);
   const validPassword = form.password.length >= 4 && !/\s/u.test(form.password);
@@ -67,6 +75,10 @@ export function AdminRegistrationConsole() {
 
     try {
       await signUpAdmin(form);
+      if (invitation) {
+        rememberSelectedOrganization(invitation.organization.slug);
+        router.replace(`/org/${invitation.organization.slug}/admin`);
+      }
     } catch (caught) {
       setError(
         caught instanceof ApiError || caught instanceof Error
