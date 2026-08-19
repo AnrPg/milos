@@ -13,6 +13,22 @@ defmodule MilosTraining.Release do
     end
   end
 
+  def purge_tenant_data_except_saas_owner do
+    load_app()
+
+    with_migration_url(MilosTraining.Repo, fn ->
+      {:ok, result, _started_apps} =
+        Ecto.Migrator.with_repo(MilosTraining.Repo, fn _repo ->
+          MilosTraining.Infrastructure.Maintenance.CleanSlatePurge.run_from_env()
+        end)
+
+      case result do
+        {:ok, summary} -> IO.puts("Clean slate purge complete: #{inspect(summary)}")
+        {:error, reason} -> raise "Clean slate purge refused: #{inspect(reason)}"
+      end
+    end)
+  end
+
   defp repos do
     Application.fetch_env!(@app, :ecto_repos)
   end
