@@ -1378,7 +1378,7 @@ export interface paths {
         /** List provisioned organizations */
         get: operations["MilosTrainingWeb.PlatformOrganizationController.index"];
         put?: never;
-        /** Provision an organization and one-time initial owner invitation */
+        /** Provision an organization and one-time initial admin invitation */
         post: operations["MilosTrainingWeb.PlatformOrganizationController.create"];
         delete?: never;
         options?: never;

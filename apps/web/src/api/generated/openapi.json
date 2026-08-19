@@ -20477,7 +20477,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Provision an organization and one-time initial owner invitation",
+        "summary": "Provision an organization and one-time initial admin invitation",
         "tags": [
           "Platform Organizations"
         ]

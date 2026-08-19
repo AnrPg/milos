@@ -46,7 +46,7 @@ export type ProvisionOrganizationResult = {
   initial_owner_invitation: {
     token: string;
     expires_at: string;
-    role: "owner";
+    role: "admin";
   };
   canonical_path: string;
 };
