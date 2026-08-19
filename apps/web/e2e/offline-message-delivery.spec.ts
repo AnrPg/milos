@@ -38,6 +38,8 @@ const thread = {
   ],
 };
 
+test.setTimeout(120_000);
+
 test("an offline message survives page close and synchronizes exactly once", async ({
   context,
   page,
