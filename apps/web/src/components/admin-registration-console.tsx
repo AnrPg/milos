@@ -88,10 +88,24 @@ export function AdminRegistrationConsole() {
 
   const validNickname = /^[\p{L}0-9_]{3,30}$/u.test(form.nickname);
   const validPassword = validRegistrationPassword(form.password);
-  const canSubmit = validNickname && validPassword && invitation !== null && !busy;
+  const fieldsComplete =
+    form.nickname.trim().length > 0 &&
+    form.email.trim().length > 0 &&
+    form.password.length > 0 &&
+    invitation !== null;
+  const canSubmit = fieldsComplete && !busy;
 
   async function submit() {
     if (!canSubmit) return;
+    if (!validNickname) {
+      setError(i18n("usernameRules4b5de12"));
+      return;
+    }
+    if (!validPassword) {
+      setError(i18n("passwordRules0c63f14"));
+      return;
+    }
+
     setBusy(true);
     setError(null);
 
@@ -155,6 +169,7 @@ export function AdminRegistrationConsole() {
           <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
             {i18n("password8be3c94")}
             <input
+              aria-describedby="admin-registration-password-help"
               autoComplete="new-password"
               className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
               style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -163,6 +178,9 @@ export function AdminRegistrationConsole() {
               onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
             />
           </label>
+          <p id="admin-registration-password-help" className="-mt-3 text-xs" style={{ color: "var(--muted)" }}>
+            {i18n("passwordRules0c63f14")}
+          </p>
 
           <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
             {i18n("adminRegistrationCode")}

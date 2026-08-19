@@ -146,13 +146,13 @@ describe("PlatformOrganizationsPage", () => {
       initial_owner_invitation: {
         token: "invite-token",
         expires_at: "2026-08-11T00:00:00Z",
-        role: "owner",
+        role: "admin",
       },
       canonical_path: "/org/atlas",
     });
   });
 
-  it("shows a pending-registration badge only for organizations awaiting owner setup", async () => {
+  it("shows a pending-registration badge only for organizations awaiting admin setup", async () => {
     vi.mocked(listPlatformOrganizations).mockResolvedValue({
       organizations: [
         { ...organization, pending_registration: true },
@@ -189,19 +189,19 @@ describe("PlatformOrganizationsPage", () => {
     expect(within(dialog).getByRole("button", { name: "Provision organization" })).toBeInTheDocument();
   });
 
-  it("requires an owner email before provisioning, and offers to email the setup link afterward", async () => {
+  it("requires an admin email before provisioning, and offers to email the setup link afterward", async () => {
     renderPage();
 
     await screen.findByText("North Harbor Strength");
     fireEvent.click(screen.getByRole("button", { name: "Create organization" }));
 
     const dialog = screen.getByRole("dialog", { name: "Create organization" });
-    expect(within(dialog).getByLabelText("Initial owner email")).toBeRequired();
+    expect(within(dialog).getByLabelText("Initial admin email")).toBeRequired();
 
     fireEvent.change(within(dialog).getByLabelText("Organization name"), {
       target: { value: "Atlas Gym" },
     });
-    fireEvent.change(within(dialog).getByLabelText("Initial owner email"), {
+    fireEvent.change(within(dialog).getByLabelText("Initial admin email"), {
       target: { value: "owner@atlas.test" },
     });
     fireEvent.click(within(dialog).getByRole("button", { name: "Provision organization" }));
@@ -259,7 +259,7 @@ describe("PlatformOrganizationsPage", () => {
     vi.mocked(fetchOrganizationMemberships).mockResolvedValue([
       {
         id: "membership-vendor-1",
-        role: "owner",
+        role: "admin",
         organization: { id: "org-1", slug: "north-harbor", name: "North Harbor Strength" },
       },
     ]);

@@ -99,7 +99,13 @@ describe("AdminRegistrationConsole", () => {
       target: { value: "weakpass" },
     });
 
-    expect(screen.getByRole("button", { name: "createAdminAccount" })).toBeDisabled();
+    const submit = screen.getByRole("button", { name: "createAdminAccount" });
+    expect(submit).toBeEnabled();
+
+    fireEvent.click(submit);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("passwordRules0c63f14");
+    expect(signUpAdmin).not.toHaveBeenCalled();
   });
 
   it("shows the invite inspection error instead of silently disabling submit", async () => {
