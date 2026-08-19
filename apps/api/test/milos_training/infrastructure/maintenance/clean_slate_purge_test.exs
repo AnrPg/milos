@@ -73,6 +73,29 @@ defmodule MilosTraining.Infrastructure.Maintenance.CleanSlatePurgeTest do
     refute Repo.exists?(from vendor in Vendor, where: vendor.user_id == ^extra_vendor.id)
   end
 
+  test "repairs a missing SaaS owner vendor grant while purging stale data" do
+    owner = user_fixture(%{nickname: "prod_owner_regas"})
+    stale_client = user_fixture(%{nickname: "stale_client", email: "stale@example.test"})
+    {:ok, _organization} = Organizations.create_organization(%{name: "Stale Tenant"})
+
+    refute Repo.exists?(from vendor in Vendor, where: vendor.user_id == ^owner.id)
+
+    assert {:ok, summary} = CleanSlatePurge.purge_postgres_except_saas_owner("PROD_OWNER_REGAS")
+
+    assert summary.preserved_owner_id == owner.id
+    assert summary.preserved_owner_vendor_id
+    assert Repo.exists?(from user in MilosTraining.Identity.User, where: user.id == ^owner.id)
+
+    refute Repo.exists?(
+             from user in MilosTraining.Identity.User, where: user.id == ^stale_client.id
+           )
+
+    assert Repo.exists?(
+             from vendor in Vendor,
+               where: vendor.user_id == ^owner.id and vendor.status == :active
+           )
+  end
+
   defp restore_env(name, nil), do: System.delete_env(name)
   defp restore_env(name, value), do: System.put_env(name, value)
 end

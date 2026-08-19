@@ -36,24 +36,23 @@ defmodule MilosTraining.Infrastructure.Maintenance.CleanSlatePurge do
     Repo.transaction(fn ->
       owner =
         User
-        |> join(:inner, [user], vendor in Vendor,
-          on: vendor.user_id == user.id and vendor.status == :active
-        )
-        |> where([user, _vendor], user.nickname == ^normalized_nickname)
+        |> where([user], user.nickname == ^normalized_nickname)
         |> lock("FOR UPDATE")
         |> Repo.one()
 
       if is_nil(owner) do
-        Repo.rollback({:saas_owner_not_found_or_not_active_vendor, normalized_nickname})
+        Repo.rollback({:saas_owner_not_found, normalized_nickname})
       end
 
       purged_tables = purge_runtime_tables()
       purged_vendors = purge_non_owner_vendors(owner.id)
+      owner_vendor = ensure_owner_vendor(owner.id)
       purged_users = purge_non_owner_users(owner.id)
 
       %{
         preserved_owner_id: owner.id,
         preserved_owner_nickname: owner.nickname,
+        preserved_owner_vendor_id: owner_vendor.id,
         purged_runtime_tables: purged_tables,
         purged_non_owner_vendors: purged_vendors,
         purged_non_owner_users: purged_users
@@ -109,6 +108,23 @@ defmodule MilosTraining.Infrastructure.Maintenance.CleanSlatePurge do
     SQL.query!(Repo, "DELETE FROM vendors WHERE user_id <> $1 OR status <> 'active'", [
       Ecto.UUID.dump!(owner_id)
     ]).num_rows
+  end
+
+  defp ensure_owner_vendor(owner_id) do
+    case Repo.get_by(Vendor, user_id: owner_id) do
+      nil ->
+        %Vendor{}
+        |> Vendor.changeset(%{user_id: owner_id, status: :active})
+        |> Repo.insert!()
+
+      %Vendor{status: :active} = vendor ->
+        vendor
+
+      %Vendor{} = vendor ->
+        vendor
+        |> Vendor.changeset(%{status: :active})
+        |> Repo.update!()
+    end
   end
 
   defp purge_non_owner_users(owner_id) do

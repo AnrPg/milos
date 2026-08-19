@@ -17,8 +17,10 @@ indexes, deletes every non-owner Postgres user, and preserves only the SaaS
 owner's user row, active vendor grant, migration history, and static reference
 seed tables.
 
-The purge refuses to run unless `MILOS_SAAS_OWNER_NICKNAME` identifies an active
-vendor and `MILOS_CONFIRM_PROD_PURGE` equals the exact confirmation phrase.
+The purge refuses to run unless `MILOS_SAAS_OWNER_NICKNAME` identifies the
+account to preserve and `MILOS_CONFIRM_PROD_PURGE` equals the exact confirmation
+phrase. If that account is missing an active vendor grant, the purge recreates
+one while removing every other vendor row.
 
 ## Rationale
 A Kubernetes Job can run the existing production API image through the Phoenix
@@ -44,6 +46,9 @@ entrypoint.
 The release entrypoint lives in `MilosTraining.Release` and delegates to
 `MilosTraining.Infrastructure.Maintenance.CleanSlatePurge`. The GitOps manifest
 is a one-shot Kubernetes Job using the same API image policy and secrets as the
-API Deployment. MinIO object cleanup is intentionally not included because the
-current object key layout does not expose a complete tenant-safe inventory for a
-blanket delete from this recovery job.
+API Deployment. The first production run refused to execute because the selected
+nickname was wrong and the live owner account had no vendor row; the retry job
+therefore uses the observed owner nickname and relies on the release task to
+repair the missing vendor grant. MinIO object cleanup is intentionally not
+included because the current object key layout does not expose a complete
+tenant-safe inventory for a blanket delete from this recovery job.
