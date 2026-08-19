@@ -40,7 +40,7 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
   )
 
   operation(:create,
-    summary: "Provision an organization and one-time initial owner invitation",
+    summary: "Provision an organization and one-time initial admin invitation",
     request_body: %RequestBody{
       required: true,
       content: %{

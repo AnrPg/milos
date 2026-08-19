@@ -2,7 +2,7 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
   import Swoosh.TestAssertions
 
-  alias MilosTraining.Organizations
+  alias MilosTraining.{Identity, Organizations}
 
   alias MilosTraining.Organizations.{
     Organization,
@@ -33,7 +33,7 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
     assert %{"code" => "vendor_required"} = json_response(conn, 403)
   end
 
-  test "provisions organization, settings, audit event, and a copy-once owner token", context do
+  test "provisions organization, settings, audit event, and a copy-once admin token", context do
     conn =
       context.conn
       |> put_bearer_token(context.platform_user)
@@ -66,7 +66,9 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
                    membership.status == :active
            )
 
-    assert {:ok, %{organization: %{id: ^organization_id}, role: :owner}} =
+    assert response["initial_owner_invitation"]["role"] == "admin"
+
+    assert {:ok, %{organization: %{id: ^organization_id}, role: :admin}} =
              Organizations.inspect_invitation(token)
 
     invitation = Repo.one!(from invitation in RegistrationInvitation, limit: 1)
@@ -81,7 +83,7 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
            )
   end
 
-  test "lists a newly-provisioned organization as pending until its owner invitation is redeemed",
+  test "lists a newly-provisioned organization as pending until its admin invitation is redeemed",
        context do
     conn =
       context.conn
@@ -111,8 +113,10 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
 
     assert entry["pending_registration"] == true
 
-    new_owner = user_fixture(%{nickname: "pending_gym_owner", email: "owner@example.test"})
-    assert {:ok, _membership} = Organizations.redeem_invitation(token, new_owner.id)
+    new_admin = user_fixture(%{nickname: "pending_gym_admin", email: "owner@example.test"})
+
+    assert {:ok, %{membership: %{role: :admin}}} =
+             Organizations.redeem_invitation(token, new_admin.id)
 
     redeemed_index =
       context.conn
@@ -127,7 +131,49 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
     assert entry["pending_registration"] == false
   end
 
-  test "requires an initial owner email to provision an organization", context do
+  test "the provisioned initial admin invitation registers a client through the setup link endpoint",
+       context do
+    conn =
+      context.conn
+      |> put_bearer_token(context.platform_user)
+      |> post("/api/platform/organizations", %{
+        name: "Client Setup Gym",
+        timezone: "Europe/Athens",
+        default_locale: "el",
+        initial_owner_email: "client@example.test"
+      })
+
+    %{
+      "organization" => %{"id" => organization_id},
+      "initial_owner_invitation" => %{"token" => token, "role" => "admin"}
+    } =
+      json_response(conn, 201)
+
+    register_conn =
+      build_conn()
+      |> put_req_header("content-type", "application/json")
+      |> post(
+        "/api/auth/register-admin",
+        Jason.encode!(%{
+          nickname: "client_admin",
+          password: "S3cur3P@ss!42",
+          invitation_token: token,
+          email: "client@example.test"
+        })
+      )
+
+    assert %{"access_token" => _} = json_response(register_conn, 201)
+    account = Identity.find_by_nickname("client_admin")
+
+    assert [
+             %{
+               membership: %{role: :admin, status: :active},
+               organization: %{id: ^organization_id}
+             }
+           ] = Organizations.list_memberships(account.id)
+  end
+
+  test "requires an initial admin email to provision an organization", context do
     conn =
       context.conn
       |> put_bearer_token(context.platform_user)

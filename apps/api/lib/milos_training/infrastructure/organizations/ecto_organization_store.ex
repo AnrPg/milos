@@ -291,7 +291,7 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
         organization_id: organization.id,
         vendor_user_id: platform_user_id,
         event: "organization_provisioned",
-        metadata: %{initial_owner_invitation: true, provisioning_owner_membership: true}
+        metadata: %{initial_admin_invitation: true, provisioning_owner_membership: true}
       })
     end)
     |> Repo.transaction()
@@ -303,14 +303,14 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
 
   @impl true
   def list_organizations do
-    # An org is "pending" while its initial owner invitation is still
+    # An org is "pending" while its initial tenant-operator invitation is still
     # unredeemed - provisioning always succeeds immediately (it's how the
     # vendor gets a token/link to send), but nobody has actually logged in
     # to run the tenant yet.
-    pending_owner_invitations =
+    pending_initial_operator_invitations =
       from(invitation in RegistrationInvitation,
         where:
-          invitation.role == :owner and is_nil(invitation.redeemed_at) and
+          invitation.role in [:owner, :admin] and is_nil(invitation.redeemed_at) and
             is_nil(invitation.revoked_at),
         distinct: invitation.organization_id,
         select: %{organization_id: invitation.organization_id}
@@ -320,7 +320,7 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     |> join(:left, [organization], settings in OrganizationSetting,
       on: settings.organization_id == organization.id
     )
-    |> join(:left, [organization], pending in subquery(pending_owner_invitations),
+    |> join(:left, [organization], pending in subquery(pending_initial_operator_invitations),
       on: pending.organization_id == organization.id
     )
     |> order_by([organization, _settings], asc: organization.name)

@@ -1052,7 +1052,7 @@ defmodule MilosTrainingWeb.FallbackController do
     |> put_status(:unprocessable_entity)
     |> json(%{
       code: "owner_email_required",
-      error: "An initial owner email is required to provision an organization"
+      error: "An initial admin email is required to provision an organization"
     })
   end
 

@@ -4,13 +4,13 @@ defmodule MilosTraining.Organizations.Commands.ProvisionOrganization do
 
   def call(%PlatformContext{} = context, params, issued_at) do
     with {:ok, owner_email} <- require_owner_email(value(params, :initial_owner_email)),
-         true <- :owner in MembershipPolicy.roles() do
+         true <- :admin in MembershipPolicy.roles() do
       token = InvitationToken.generate()
       lifetime = value(params, :invitation_lifetime_seconds) || 604_800
 
       invitation_params = %{
         token_digest: InvitationToken.digest(token),
-        role: :owner,
+        role: :admin,
         expires_at: DateTime.add(issued_at, lifetime, :second),
         intended_email_digest: intended_email_digest(owner_email)
       }
@@ -25,7 +25,7 @@ defmodule MilosTraining.Organizations.Commands.ProvisionOrganization do
         {:ok, Map.put(result, :initial_owner_token, token)}
       end
     else
-      false -> {:error, :owner_role_unavailable}
+      false -> {:error, :admin_role_unavailable}
       error -> error
     end
   end
