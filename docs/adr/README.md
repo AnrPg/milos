@@ -98,3 +98,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-090 | Cross-layer quality gates and booking timeouts | Accepted |
 | ADR-091 | Runtime tenant context must fail closed | Accepted |
 | ADR-092 | Initial tenant admin invitation | Accepted |
+| ADR-093 | Tenant delete purges eligible client accounts | Accepted |

@@ -270,6 +270,88 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
            )
   end
 
+  test "permanent delete purges tenant-only accounts so invited client emails can register again",
+       context do
+    {:ok, organization} = Organizations.create_organization(%{name: "Reusable Email Gym"})
+
+    stale_client =
+      user_fixture(%{
+        nickname: "reusable_email_admin",
+        email: "reusable@example.test"
+      })
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: stale_client.id,
+        role: :admin,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    conn =
+      context.conn
+      |> put_bearer_token(context.platform_user)
+      |> delete("/api/platform/organizations/#{organization.id}")
+
+    assert response(conn, 204) == ""
+    refute Repo.get(Organization, organization.id)
+    refute Identity.find_by_id(stale_client.id)
+
+    assert {:ok, fresh_client} =
+             Identity.register(%{
+               nickname: "fresh_reusable_admin",
+               email: "reusable@example.test",
+               password: "S3cur3P@ss!42",
+               role: :member
+             })
+
+    assert fresh_client.email == "reusable@example.test"
+  end
+
+  test "permanent delete keeps SaaS owner and accounts that still belong to another organization",
+       context do
+    {:ok, doomed_organization} = Organizations.create_organization(%{name: "Doomed Gym"})
+    {:ok, survivor_organization} = Organizations.create_organization(%{name: "Survivor Gym"})
+    shared_user = admin_fixture(%{nickname: "shared_tenant_admin"})
+
+    for organization <- [doomed_organization, survivor_organization] do
+      {:ok, _membership} =
+        Organizations.add_membership(%{
+          organization_id: organization.id,
+          user_id: shared_user.id,
+          role: :admin,
+          status: :active,
+          joined_at: DateTime.utc_now()
+        })
+    end
+
+    {:ok, _owner_membership} =
+      Organizations.add_membership(%{
+        organization_id: doomed_organization.id,
+        user_id: context.platform_user.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    conn =
+      context.conn
+      |> put_bearer_token(context.platform_user)
+      |> delete("/api/platform/organizations/#{doomed_organization.id}")
+
+    assert response(conn, 204) == ""
+    assert Identity.find_by_id(context.platform_user.id)
+    assert Identity.find_by_id(shared_user.id)
+
+    assert Repo.exists?(
+             from membership in OrganizationMembership,
+               where:
+                 membership.organization_id == ^survivor_organization.id and
+                   membership.user_id == ^shared_user.id
+           )
+  end
+
   test "permanently deletes an organization that has real tenant data (previously RESTRICT-only tables)",
        context do
     alias MilosTraining.Gamification.GamificationSetting

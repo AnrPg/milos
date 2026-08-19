@@ -48,6 +48,10 @@ defmodule MilosTraining.Organizations.OrganizationStore do
     do: impl().list_membership_organization_ids(user_ids)
 
   @impl true
+  def list_deletable_organization_user_ids(organization_id, platform_user_id),
+    do: impl().list_deletable_organization_user_ids(organization_id, platform_user_id)
+
+  @impl true
   def get_invitation_by_digest(digest), do: impl().get_invitation_by_digest(digest)
   @impl true
   def get_invitation_with_organization(digest),

@@ -211,6 +211,30 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   end
 
   @impl true
+  def list_deletable_organization_user_ids(organization_id, platform_user_id) do
+    other_memberships =
+      from(other in OrganizationMembership,
+        where:
+          other.user_id == parent_as(:candidate).user_id and
+            other.organization_id != ^organization_id
+      )
+
+    active_vendor =
+      from(vendor in Vendor,
+        where: vendor.user_id == parent_as(:candidate).user_id and vendor.status == :active
+      )
+
+    from(candidate in OrganizationMembership, as: :candidate)
+    |> where([candidate], candidate.organization_id == ^organization_id)
+    |> where([candidate], candidate.user_id != ^platform_user_id)
+    |> where([candidate], not exists(other_memberships))
+    |> where([candidate], not exists(active_vendor))
+    |> select([candidate], candidate.user_id)
+    |> distinct(true)
+    |> Repo.all()
+  end
+
+  @impl true
   def get_invitation_by_digest(digest),
     do: Repo.get_by(RegistrationInvitation, token_digest: digest)
 

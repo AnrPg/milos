@@ -23,6 +23,7 @@ defmodule MilosTraining.Organizations do
     FindOrganization,
     InspectInvitation,
     ListActiveMembershipUserIds,
+    ListDeletableOrganizationUserIds,
     ListMemberships,
     ListOrganizationMemberships,
     ListProvisionedOrganizations,
@@ -90,6 +91,9 @@ defmodule MilosTraining.Organizations do
 
   def list_organization_memberships(context, organization_id),
     do: ListOrganizationMemberships.call(context, organization_id)
+
+  def list_deletable_organization_user_ids(context, organization_id),
+    do: ListDeletableOrganizationUserIds.call(context, organization_id)
 
   def update_membership_role(context, organization_id, membership_id, params),
     do: UpdateMembershipRole.call(context, organization_id, membership_id, params)
