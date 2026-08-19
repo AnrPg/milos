@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AdminRegistrationConsole } from "@/components/admin-registration-console";
 import { inspectInvitation } from "@/api/auth";
-import { SELECTED_ORGANIZATION_SLUG_KEY } from "@/api/client";
+import { ApiError, SELECTED_ORGANIZATION_SLUG_KEY } from "@/api/client";
 
 const replace = vi.fn();
 const signUpAdmin = vi.fn();
@@ -115,5 +115,38 @@ describe("AdminRegistrationConsole", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Invitation is invalid or unavailable");
     expect(screen.getByRole("button", { name: "createAdminAccount" })).toBeDisabled();
+  });
+
+  it("shows backend field validation next to the blocked value", async () => {
+    signUpAdmin.mockRejectedValueOnce(
+      new ApiError(422, "Check the highlighted values and try again.", {
+        code: "validation_failed",
+        errors: { email: ["has already been taken"] },
+      }),
+    );
+
+    render(<AdminRegistrationConsole />);
+
+    await screen.findByText("Milos Method");
+
+    fireEvent.change(screen.getByLabelText("nicknamece2bd99"), {
+      target: { value: "client_admin" },
+    });
+    fireEvent.change(screen.getByLabelText("emailAddress"), {
+      target: { value: "client@example.test" },
+    });
+    fireEvent.change(screen.getByLabelText("password8be3c94"), {
+      target: { value: "S3cur3P@ss!42" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "createAdminAccount" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "emailAddress: has already been taken",
+    );
+    expect(screen.getByText("has already been taken")).toBeInTheDocument();
+    expect(screen.getByLabelText("emailAddress")).toHaveAttribute(
+      "style",
+      expect.stringContaining("var(--danger)"),
+    );
   });
 });

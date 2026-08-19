@@ -14,6 +14,8 @@ import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { rememberSelectedOrganization } from "@/lib/organization-slug";
 
+type FieldErrors = Record<string, string[]>;
+
 const INITIAL_FORM: AdminRegisterRequest = {
   nickname: "",
   password: "",
@@ -30,6 +32,23 @@ function validRegistrationPassword(password: string) {
     /[^a-zA-Z0-9]/u.test(password);
 }
 
+function flatFieldErrors(errors: Record<string, unknown> | undefined): FieldErrors {
+  if (!errors) return {};
+
+  return Object.fromEntries(
+    Object.entries(errors).filter((entry): entry is [string, string[]] => {
+      const [, messages] = entry;
+      return Array.isArray(messages) && messages.every((message) => typeof message === "string");
+    }),
+  );
+}
+
+function summarizeFieldErrors(errors: FieldErrors, fieldLabels: Record<string, string>) {
+  return Object.entries(errors)
+    .map(([field, messages]) => `${fieldLabels[field] ?? field}: ${messages.join(", ")}`)
+    .join(" ");
+}
+
 export function AdminRegistrationConsole() {
   const i18n = useUiTranslations();
   const router = useRouter();
@@ -42,6 +61,7 @@ export function AdminRegistrationConsole() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [invitation, setInvitation] = useState<InvitationInspection | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   useEffect(() => {
     const token = form.invitation_token.trim();
@@ -99,15 +119,18 @@ export function AdminRegistrationConsole() {
     if (!canSubmit) return;
     if (!validNickname) {
       setError(i18n("usernameRules4b5de12"));
+      setFieldErrors({ nickname: [i18n("usernameRules4b5de12")] });
       return;
     }
     if (!validPassword) {
       setError(i18n("passwordRules0c63f14"));
+      setFieldErrors({ password: [i18n("passwordRules0c63f14")] });
       return;
     }
 
     setBusy(true);
     setError(null);
+    setFieldErrors({});
 
     try {
       await signUpAdmin(form);
@@ -116,15 +139,35 @@ export function AdminRegistrationConsole() {
         router.replace(`/org/${invitation.organization.slug}/admin`);
       }
     } catch (caught) {
-      setError(
-        caught instanceof ApiError || caught instanceof Error
-          ? localizeError(caught, i18n)
-          : i18n("unexpectedRequestFailurea7ffd06"),
-      );
+      if (caught instanceof ApiError) {
+        const nextFieldErrors = flatFieldErrors(caught.payload.errors);
+        setFieldErrors(nextFieldErrors);
+        setError(
+          Object.keys(nextFieldErrors).length > 0
+            ? summarizeFieldErrors(nextFieldErrors, {
+                email: i18n("emailAddress"),
+                nickname: i18n("nicknamece2bd99"),
+                password: i18n("password8be3c94"),
+                invitation_token: i18n("adminRegistrationCode"),
+              })
+            : localizeError(caught, i18n),
+        );
+      } else {
+        setError(
+          caught instanceof Error
+            ? localizeError(caught, i18n)
+            : i18n("unexpectedRequestFailurea7ffd06"),
+        );
+      }
     } finally {
       setBusy(false);
     }
   }
+
+  const nicknameErrors = fieldErrors.nickname ?? [];
+  const emailErrors = fieldErrors.email ?? [];
+  const passwordErrors = fieldErrors.password ?? [];
+  const tokenErrors = fieldErrors.invitation_token ?? [];
 
   return (
     <main className="flex min-h-screen items-center justify-center px-6 py-10" style={{ background: "var(--bg)" }}>
@@ -142,29 +185,61 @@ export function AdminRegistrationConsole() {
           {i18n("adminRegistrationCodeHelp")}
         </p>
 
-        <div className="mt-6 space-y-4">
+        <form
+          className="mt-6 space-y-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void submit();
+          }}
+        >
           <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
             {i18n("nicknamece2bd99")}
             <input
               autoComplete="username"
               className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
-              style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
+              style={{
+                background: "var(--bg)",
+                border: `1px solid ${nicknameErrors.length > 0 ? "var(--danger)" : "var(--border)"}`,
+                color: "var(--text)",
+              }}
               value={form.nickname}
-              onChange={(event) => setForm((current) => ({ ...current, nickname: event.target.value }))}
+              onChange={(event) => {
+                setError(null);
+                setFieldErrors((current) => ({ ...current, nickname: [] }));
+                setForm((current) => ({ ...current, nickname: event.target.value }));
+              }}
             />
           </label>
+          {nicknameErrors.length > 0 ? (
+            <p className="-mt-3 text-xs" style={{ color: "var(--danger)" }}>
+              {nicknameErrors.join(", ")}
+            </p>
+          ) : null}
 
           <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
             {i18n("emailAddress")}
             <input
               autoComplete="email"
               className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
-              style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
+              style={{
+                background: "var(--bg)",
+                border: `1px solid ${emailErrors.length > 0 ? "var(--danger)" : "var(--border)"}`,
+                color: "var(--text)",
+              }}
               type="email"
               value={form.email}
-              onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
+              onChange={(event) => {
+                setError(null);
+                setFieldErrors((current) => ({ ...current, email: [] }));
+                setForm((current) => ({ ...current, email: event.target.value }));
+              }}
             />
           </label>
+          {emailErrors.length > 0 ? (
+            <p className="-mt-3 text-xs" style={{ color: "var(--danger)" }}>
+              {emailErrors.join(", ")}
+            </p>
+          ) : null}
 
           <label className="block text-sm font-medium" style={{ color: "var(--text-soft)" }}>
             {i18n("password8be3c94")}
@@ -172,10 +247,18 @@ export function AdminRegistrationConsole() {
               aria-describedby="admin-registration-password-help"
               autoComplete="new-password"
               className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
-              style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
+              style={{
+                background: "var(--bg)",
+                border: `1px solid ${passwordErrors.length > 0 ? "var(--danger)" : "var(--border)"}`,
+                color: "var(--text)",
+              }}
               type="password"
               value={form.password}
-              onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
+              onChange={(event) => {
+                setError(null);
+                setFieldErrors((current) => ({ ...current, password: [] }));
+                setForm((current) => ({ ...current, password: event.target.value }));
+              }}
             />
           </label>
           <p id="admin-registration-password-help" className="-mt-3 text-xs" style={{ color: "var(--muted)" }}>
@@ -187,17 +270,25 @@ export function AdminRegistrationConsole() {
             <input
               autoComplete="off"
               className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
-              style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
               value={form.invitation_token}
-              onChange={(event) =>
-                {
-                  setInvitation(null);
-                  setError(null);
-                  setForm((current) => ({ ...current, invitation_token: event.target.value }));
-                }
-              }
+              onChange={(event) => {
+                setInvitation(null);
+                setError(null);
+                setFieldErrors((current) => ({ ...current, invitation_token: [] }));
+                setForm((current) => ({ ...current, invitation_token: event.target.value }));
+              }}
+              style={{
+                background: "var(--bg)",
+                border: `1px solid ${tokenErrors.length > 0 ? "var(--danger)" : "var(--border)"}`,
+                color: "var(--text)",
+              }}
             />
           </label>
+          {tokenErrors.length > 0 ? (
+            <p className="-mt-3 text-xs" style={{ color: "var(--danger)" }}>
+              {tokenErrors.join(", ")}
+            </p>
+          ) : null}
 
           {invitation ? (
             <div
@@ -228,13 +319,12 @@ export function AdminRegistrationConsole() {
           <button
             className="w-full rounded-2xl px-4 py-3 font-semibold disabled:opacity-50"
             disabled={!canSubmit}
-            onClick={() => void submit()}
             style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-            type="button"
+            type="submit"
           >
             {busy ? i18n("creatingAccountbaab5b8") : i18n("createAdminAccount")}
           </button>
-        </div>
+        </form>
       </section>
     </main>
   );
