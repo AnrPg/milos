@@ -60,6 +60,23 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
   end
 
   @impl true
+  def delete_tenant_scoped_user(user) do
+    case User |> where([schema], schema.id == ^user.id) |> Repo.one() do
+      nil ->
+        :ok
+
+      %User{} = schema ->
+        case Repo.delete(schema) do
+          {:ok, _deleted_user} -> :ok
+          {:error, reason} -> {:error, reason}
+        end
+    end
+  rescue
+    _error in Ecto.ConstraintError ->
+      {:error, :user_has_restricted_history}
+  end
+
+  @impl true
   def update_user_role(%Account{} = user, role), do: update_user_role(user.id, role)
 
   def update_user_role(user_id, role) do

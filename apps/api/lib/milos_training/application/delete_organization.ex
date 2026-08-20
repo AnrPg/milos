@@ -18,7 +18,7 @@ defmodule MilosTraining.Application.DeleteOrganization do
           {:cont, :ok}
 
         user ->
-          case Identity.delete(user) do
+          case Identity.delete_tenant_scoped_user(user) do
             :ok -> {:cont, :ok}
             {:error, reason} -> {:halt, {:error, reason}}
           end

@@ -12,6 +12,7 @@ defmodule MilosTraining.Identity do
   defdelegate list_all_users(), to: FindUser, as: :list_all
   defdelegate search_athletes(query), to: FindUser, as: :search_athletes
   defdelegate delete(user), to: UserStore, as: :delete_user
+  defdelegate delete_tenant_scoped_user(user), to: UserStore
   defdelegate update_role(user, role), to: UpdateRole, as: :call
   defdelegate regenerate_calendar_feed_token(user), to: UserStore
   defdelegate update_profile(user_id, params), to: UserStore

@@ -303,22 +303,12 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
       |> Map.put(:issued_by_user_id, platform_user_id)
       |> then(&RegistrationInvitation.issue_changeset(%RegistrationInvitation{}, &1, issued_at))
     end)
-    |> Multi.insert(:owner_membership, fn %{organization: organization} ->
-      OrganizationMembership.changeset(%{
-        organization_id: organization.id,
-        user_id: platform_user_id,
-        role: :owner,
-        status: :active,
-        joined_at: issued_at,
-        invited_by_user_id: platform_user_id
-      })
-    end)
     |> Multi.insert(:event, fn %{organization: organization} ->
       OrganizationProvisioningEvent.changeset(%{
         organization_id: organization.id,
         vendor_user_id: platform_user_id,
         event: "organization_provisioned",
-        metadata: %{initial_admin_invitation: true, provisioning_owner_membership: true}
+        metadata: %{initial_admin_invitation: true, provisioning_owner_membership: false}
       })
     end)
     |> Repo.transaction()

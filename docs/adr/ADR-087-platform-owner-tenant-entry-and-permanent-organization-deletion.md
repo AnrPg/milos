@@ -14,10 +14,10 @@ created by mistake. ADR-083 originally rejected hard deletion from the web surfa
 but the current product requirement explicitly asks for it.
 
 ## Decision
-Provisioning an organization grants the provisioning account an active tenant
-`owner` membership in the same database transaction as organization, settings,
-invitation, and audit-event creation. The `/platform` Open organization action sets
-that tenant as the selected organization and enters the tenant admin dashboard.
+Provisioning an organization creates the organization, settings, one-time initial
+admin invitation, and audit event in one transaction, but does not grant the
+platform owner tenant membership. The tenant admin is the account that redeems the
+initial admin invitation.
 
 Expose permanent organization deletion only to platform owners from `/platform`.
 The delete operation removes platform provisioning audit rows for that organization,
@@ -26,17 +26,17 @@ foreign-key constraints remain the safety boundary for tenant data that cannot b
 cascaded.
 
 ## Rationale
-Tenant-scoped owner membership is the authoritative capability fact for admin UI and
-API authorization. Granting it during provisioning avoids a second setup step and
-keeps the account that created the tenant able to manage it immediately.
+Tenant-scoped membership is the authoritative capability fact for admin UI and API
+authorization. Keeping platform ownership separate from tenant membership prevents
+the SaaS owner from appearing as a gym admin for every provisioned organization.
 
 Keeping hard delete under platform-owner authorization and database constraints
 matches the operational nature of the action while avoiding broad, hand-written
 cross-context cleanup logic.
 
 ## Alternatives Considered
-Keeping invitation-only tenant activation was rejected because it leaves the
-provisioning account without the requested tenant admin capabilities.
+Granting the provisioning account tenant `owner` membership was rejected after live
+testing because it made the SaaS owner appear inside every tenant's admin surface.
 
 Letting platform-owner authority bypass tenant membership was rejected because it
 would weaken tenant-scoped authorization and blur global platform authority with
@@ -48,16 +48,16 @@ and existing ownership constraints should prevent accidental deletion of protect
 data.
 
 ## Consequences
-Platform owners who create organizations also appear as tenant owners in those
-organizations. Future self-service organization registration can reuse the same
-membership invariant.
+Platform owners can provision and lifecycle-manage organizations from `/platform`,
+but tenant admin surfaces belong to tenant members only.
 
 Permanent deletion is intentionally narrower than archival: it can fail when
 protected dependent data exists. Operators should archive tenants for ordinary
 offboarding and reserve permanent deletion for mistaken or test organizations.
 
 ## Implementation Notes
-The initial implementation grants owner membership during platform provisioning,
-changes the platform Open action to enter `/admin` with the selected tenant slug,
-hides self-service account surfaces for platform-owner accounts, and adds a
-platform-owner delete endpoint plus confirmation flow.
+The initial implementation granted owner membership during platform provisioning,
+but the August 2026 hardening removed that coupling: platform provisioning now
+issues an admin invitation only, and permanent deletion uses a tenant-scoped user
+delete path for tenant-only invited admins so legacy global `users.role = :admin`
+does not trip the SaaS-owner last-admin guard.

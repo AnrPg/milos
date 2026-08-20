@@ -57,13 +57,11 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
     assert response["settings"]["brand_name"] == "North Harbor"
     assert is_binary(token)
 
-    assert Repo.exists?(
+    refute Repo.exists?(
              from membership in OrganizationMembership,
                where:
                  membership.organization_id == ^organization_id and
-                   membership.user_id == ^context.platform_user.id and
-                   membership.role == :owner and
-                   membership.status == :active
+                   membership.user_id == ^context.platform_user.id
            )
 
     assert response["initial_owner_invitation"]["role"] == "admin"
@@ -276,7 +274,7 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
     {:ok, organization} = Organizations.create_organization(%{name: "Reusable Email Gym"})
 
     stale_client =
-      user_fixture(%{
+      admin_fixture(%{
         nickname: "reusable_email_admin",
         email: "reusable@example.test"
       })
@@ -308,6 +306,35 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
              })
 
     assert fresh_client.email == "reusable@example.test"
+  end
+
+  test "permanent delete can purge a tenant-only admin without treating it as global last admin",
+       context do
+    {:ok, organization} = Organizations.create_organization(%{name: "Last Tenant Admin Gym"})
+
+    tenant_admin =
+      admin_fixture(%{
+        nickname: "last_tenant_admin",
+        email: "last-tenant-admin@example.test"
+      })
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: tenant_admin.id,
+        role: :admin,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    conn =
+      context.conn
+      |> put_bearer_token(context.platform_user)
+      |> delete("/api/platform/organizations/#{organization.id}")
+
+    assert response(conn, 204) == ""
+    refute Repo.get(Organization, organization.id)
+    refute Identity.find_by_id(tenant_admin.id)
   end
 
   test "permanent delete keeps SaaS owner and accounts that still belong to another organization",

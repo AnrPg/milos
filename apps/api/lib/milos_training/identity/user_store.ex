@@ -6,6 +6,8 @@ defmodule MilosTraining.Identity.UserStore do
   @impl true
   def delete_user(user), do: impl().delete_user(user)
   @impl true
+  def delete_tenant_scoped_user(user), do: impl().delete_tenant_scoped_user(user)
+  @impl true
   def update_user_role(user, role), do: impl().update_user_role(user, role)
   @impl true
   def regenerate_calendar_feed_token(user), do: impl().regenerate_calendar_feed_token(user)
