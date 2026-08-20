@@ -67,3 +67,8 @@ the old auto-created vendor tenant memberships that can be identified by the
 original provisioning audit event. This prevents the platform console from
 prefetching tenant admin routes for organizations the vendor only supervises at
 platform level.
+
+Migration `20260821093000_delete_membershipless_non_vendor_accounts` cleans up
+legacy orphan login accounts left behind by earlier failed tenant deletion flows.
+It only targets accounts with no organization memberships and no active vendor
+authority, and skips any row that still has protected foreign-key history.
