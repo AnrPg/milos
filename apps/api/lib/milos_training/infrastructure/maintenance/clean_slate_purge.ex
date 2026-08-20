@@ -11,6 +11,7 @@ defmodule MilosTraining.Infrastructure.Maintenance.CleanSlatePurge do
 
   alias Ecto.Adapters.SQL
   alias MilosTraining.Identity.{RegistrationPolicy, User}
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Organizations.Vendor
   alias MilosTraining.Repo
 
@@ -44,19 +45,21 @@ defmodule MilosTraining.Infrastructure.Maintenance.CleanSlatePurge do
         Repo.rollback({:saas_owner_not_found, normalized_nickname})
       end
 
-      purged_tables = purge_runtime_tables()
-      purged_vendors = purge_non_owner_vendors(owner.id)
-      owner_vendor = ensure_owner_vendor(owner.id)
-      purged_users = purge_non_owner_users(owner.id)
+      RepoContext.run(%{user_id: owner.id}, fn ->
+        purged_tables = purge_runtime_tables()
+        owner_vendor = ensure_owner_vendor(owner.id)
+        purged_vendors = purge_non_owner_vendors(owner.id)
+        purged_users = purge_non_owner_users(owner.id)
 
-      %{
-        preserved_owner_id: owner.id,
-        preserved_owner_nickname: owner.nickname,
-        preserved_owner_vendor_id: owner_vendor.id,
-        purged_runtime_tables: purged_tables,
-        purged_non_owner_vendors: purged_vendors,
-        purged_non_owner_users: purged_users
-      }
+        %{
+          preserved_owner_id: owner.id,
+          preserved_owner_nickname: owner.nickname,
+          preserved_owner_vendor_id: owner_vendor.id,
+          purged_runtime_tables: purged_tables,
+          purged_non_owner_vendors: purged_vendors,
+          purged_non_owner_users: purged_users
+        }
+      end)
     end)
   end
 
