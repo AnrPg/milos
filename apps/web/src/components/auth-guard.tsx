@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 import { useSession } from "@/components/session-provider";
+import { membershipWorkspaceHref } from "@/lib/organization-slug";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 
 type AuthGuardProps = {
@@ -15,9 +16,19 @@ type AuthGuardProps = {
 };
 
 type AllowedRole = NonNullable<AuthGuardProps["roles"]>[number];
+type SelectedMembership = ReturnType<typeof useSelectedMembershipRole>["membership"];
 
 function isAllowedRole(value: string): value is AllowedRole {
   return value === "member" || value === "athlete" || value === "admin";
+}
+
+export function resolveRoleRedirect(
+  configuredRedirect: string | undefined,
+  membership: SelectedMembership,
+) {
+  return configuredRedirect === "/admin" && membership
+    ? membershipWorkspaceHref(membership)
+    : configuredRedirect;
 }
 
 // Vendors (SaaS operators, `currentUser.vendor`) are exempt from
@@ -28,7 +39,7 @@ export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { status, currentUser } = useSession();
-  const { isLoading: membershipRoleLoading, role } = useSelectedMembershipRole();
+  const { isLoading: membershipRoleLoading, membership, role } = useSelectedMembershipRole();
 
   useEffect(() => {
     if (status === "guest") {
@@ -39,7 +50,8 @@ export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
     if (status === "authenticated" && currentUser && !membershipRoleLoading) {
       if (!currentUser.vendor) {
         const roleKey = role;
-        const redirect = roleRedirects?.[roleKey];
+        const configuredRedirect = roleRedirects?.[roleKey];
+        const redirect = resolveRoleRedirect(configuredRedirect, membership);
         if (redirect) {
           router.replace(redirect);
           return;
@@ -49,7 +61,7 @@ export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
         router.replace("/");
       }
     }
-  }, [currentUser, membershipRoleLoading, pathname, role, roles, roleRedirects, router, status]);
+  }, [currentUser, membership, membershipRoleLoading, pathname, role, roles, roleRedirects, router, status]);
 
   if (status === "loading" || (status === "authenticated" && roles && membershipRoleLoading)) {
     return (
