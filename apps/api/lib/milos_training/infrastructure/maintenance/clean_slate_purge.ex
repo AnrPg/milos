@@ -16,6 +16,7 @@ defmodule MilosTraining.Infrastructure.Maintenance.CleanSlatePurge do
   alias MilosTraining.Repo
 
   @confirmation "PURGE_ALL_TENANT_DATA_KEEP_SAAS_OWNER"
+  @finch MilosTraining.MaintenanceFinch
   @preserved_tables ~w(schema_migrations users vendors scale_levels training_quotes)
 
   def run_from_env do
@@ -190,6 +191,33 @@ defmodule MilosTraining.Infrastructure.Maintenance.CleanSlatePurge do
   end
 
   defp purge_meilisearch do
+    with {:ok, _started_apps} <- Application.ensure_all_started(:finch),
+         {:ok, finch} <- start_meilisearch_finch() do
+      try do
+        purge_meilisearch_indexes()
+      after
+        stop_meilisearch_finch(finch)
+      end
+    else
+      {:error, reason} -> {:error, {:meilisearch_purge_failed, reason}}
+    end
+  end
+
+  defp start_meilisearch_finch do
+    case Finch.start_link(name: @finch) do
+      {:ok, finch} -> {:ok, finch}
+      {:error, {:already_started, finch}} -> {:ok, finch}
+      {:error, reason} -> {:error, {:finch_start_failed, reason}}
+    end
+  end
+
+  defp stop_meilisearch_finch(finch) when is_pid(finch) do
+    if Process.alive?(finch) do
+      GenServer.stop(finch)
+    end
+  end
+
+  defp purge_meilisearch_indexes do
     indexes = meilisearch_indexes()
 
     results =
@@ -197,7 +225,8 @@ defmodule MilosTraining.Infrastructure.Maintenance.CleanSlatePurge do
         case Req.delete(meilisearch_url("/indexes/#{index}"),
                headers: meilisearch_headers(),
                retry: false,
-               receive_timeout: 5_000
+               receive_timeout: 5_000,
+               finch: [name: @finch]
              ) do
           {:ok, %{status: status}} when status in 200..299 or status == 404 ->
             {:ok, index}
