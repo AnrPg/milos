@@ -262,9 +262,9 @@ export function TopNav() {
   const hasTenantMembership = memberships.length > 0;
   const showTenantShell = hasTenantMembership;
   const unreadQuery = useQuery({
-    queryKey: ["messages", "unread"],
-    enabled: authenticated && showTenantShell,
-    queryFn: () => fetchUnreadCount(tokens!.access_token),
+    queryKey: ["messages", "unread", selectedOrganizationSlug],
+    enabled: authenticated && showTenantShell && Boolean(selectedOrganizationSlug),
+    queryFn: () => fetchUnreadCount(tokens!.access_token, selectedOrganizationSlug),
     staleTime: 15 * 1000,
   });
   const unreadCount = unreadQuery.data?.unread_count ?? 0;
@@ -275,10 +275,10 @@ export function TopNav() {
     if (!tokens?.access_token || !currentUser?.id) return;
     return subscribeToTopic(tokens.access_token, `notifications:${currentUser.id}`, {
       "notifications:changed": () => {
-        void queryClient.invalidateQueries({ queryKey: ["messages", "unread"] });
+        void queryClient.invalidateQueries({ queryKey: ["messages", "unread", selectedOrganizationSlug] });
       },
     });
-  }, [tokens?.access_token, currentUser?.id, queryClient]);
+  }, [tokens?.access_token, currentUser?.id, queryClient, selectedOrganizationSlug]);
 
   useEffect(() => {
     function handler(e: MouseEvent) {

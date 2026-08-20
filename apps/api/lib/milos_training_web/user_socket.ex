@@ -31,7 +31,7 @@ defmodule MilosTrainingWeb.UserSocket do
   @impl true
   def id(socket), do: "user_socket:#{socket.assigns.current_user.id}"
 
-  defp assign_optional_tenant(_socket, _user, nil), do: :error
+  defp assign_optional_tenant(socket, _user, nil), do: {:ok, socket}
 
   defp assign_optional_tenant(socket, user, slug) do
     case ResolveTenantContext.call(user, slug, %{transport: :socket}) do

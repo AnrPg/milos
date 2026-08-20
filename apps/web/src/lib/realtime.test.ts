@@ -5,6 +5,7 @@ import { SELECTED_ORGANIZATION_SLUG_KEY } from "@/api/client";
 const phoenix = vi.hoisted(() => {
   type Receiver = (payload?: unknown) => void;
   const channels: MockChannel[] = [];
+  const sockets: MockSocket[] = [];
 
   class MockChannel {
     handlers: Record<string, Receiver> = {};
@@ -16,6 +17,11 @@ const phoenix = vi.hoisted(() => {
     }
 
     join() {
+      return this;
+    }
+
+    receive(status: string, handler: Receiver) {
+      this.receivers[status] = handler;
       return this;
     }
 
@@ -49,7 +55,9 @@ const phoenix = vi.hoisted(() => {
     constructor(
       readonly endpoint: string,
       readonly options: unknown,
-    ) {}
+    ) {
+      sockets.push(this);
+    }
 
     connect() {
       this.connected = true;
@@ -66,16 +74,23 @@ const phoenix = vi.hoisted(() => {
     }
   }
 
-  return { Socket: MockSocket, channels };
+  return { Socket: MockSocket, channels, sockets };
 });
 
 vi.mock("phoenix", () => ({ Socket: phoenix.Socket }));
 
-import { ChannelPushError, joinChannelWithPush, organizationTopic, resetRealtimeSocket } from "@/lib/realtime";
+import {
+  ChannelPushError,
+  joinChannelWithPush,
+  organizationTopic,
+  resetRealtimeSocket,
+  subscribeToTopic,
+} from "@/lib/realtime";
 
 describe("joinChannelWithPush", () => {
   beforeEach(() => {
     phoenix.channels.length = 0;
+    phoenix.sockets.length = 0;
     resetRealtimeSocket();
     window.localStorage.clear();
     window.history.replaceState(null, "", "/");
@@ -120,6 +135,16 @@ describe("joinChannelWithPush", () => {
     ]);
 
     expect(organizationTopic(token, "schedule")).toBe("schedule:org-2");
+  });
+
+  it("does not send stale tenant context for user-wide notification topics", () => {
+    window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, "stale-gym");
+
+    const unsubscribe = subscribeToTopic("token", "notifications:user-1", {});
+
+    expect(phoenix.sockets[0].options).toEqual({ params: { token: "token" } });
+
+    unsubscribe();
   });
 });
 

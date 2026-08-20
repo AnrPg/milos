@@ -82,8 +82,12 @@ export async function markThreadRead(token: string, threadId: string, lastMessag
   });
 }
 
-export async function fetchUnreadCount(token: string) {
-  return apiRequest<{ unread_count: number }>("/me/threads/unread-count", { token });
+export async function fetchUnreadCount(token: string, organizationSlug?: string | null) {
+  const path = organizationSlug
+    ? `/org/${encodeURIComponent(organizationSlug)}/me/threads/unread-count`
+    : "/me/threads/unread-count";
+
+  return apiRequest<{ unread_count: number }>(path, { token });
 }
 
 export async function searchUsers(token: string, query: string) {

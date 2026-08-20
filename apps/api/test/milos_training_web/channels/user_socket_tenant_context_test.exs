@@ -6,7 +6,28 @@ defmodule MilosTrainingWeb.UserSocketTenantContextTest do
   alias MilosTraining.Infrastructure.Auth.Guardian
   alias MilosTraining.Organizations
   alias MilosTrainingWeb.UserSocket
-  alias MilosTrainingWeb.ScheduleChannel
+  alias MilosTrainingWeb.{NotificationChannel, ScheduleChannel}
+
+  test "socket can connect without tenant context for user-wide notification channels" do
+    user = user_fixture()
+
+    {:ok, token, _claims} =
+      Guardian.encode_and_sign(user, %{"sv" => user.security_version || 1}, token_type: "access")
+
+    assert {:ok, socket} =
+             Phoenix.ChannelTest.connect(UserSocket, %{
+               "token" => token
+             })
+
+    refute Map.has_key?(socket.assigns, :tenant_context)
+
+    assert {:ok, _reply, _socket} =
+             Phoenix.ChannelTest.subscribe_and_join(
+               socket,
+               NotificationChannel,
+               "notifications:#{user.id}"
+             )
+  end
 
   test "socket organization context is resolved from current membership, not JWT claims" do
     user = user_fixture()

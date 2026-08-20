@@ -87,6 +87,20 @@ describe("apiRequest tenant headers", () => {
     );
   });
 
+  it("does not double-prefix an explicitly tenant-scoped path", async () => {
+    window.history.replaceState(null, "", "/org/atlas-gym/admin");
+    const fetchMock = vi.spyOn(window, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), { status: 200 }),
+    );
+
+    await apiRequest<{ ok: boolean }>("/org/atlas-gym/me/threads/unread-count", { token: "token" });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/org/atlas-gym/me/threads/unread-count",
+      expect.anything(),
+    );
+  });
+
   it("scopes /me/reviews under the resolved organization", async () => {
     window.history.replaceState(null, "", "/org/atlas-gym/account");
     const fetchMock = vi.spyOn(window, "fetch").mockResolvedValue(

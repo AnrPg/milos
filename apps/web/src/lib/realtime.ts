@@ -74,8 +74,12 @@ export function organizationTopic(token: string, suffix: string) {
   return `org:${membership.organization_id}:${suffix}`;
 }
 
-function ensureSocket(token: string) {
-  const nextOrganizationSlug = organizationSlug(token);
+function topicNeedsTenantContext(topic: string) {
+  return topic.startsWith("schedule:") || topic.startsWith("chat:") || topic.startsWith("org:");
+}
+
+function ensureSocket(token: string, needsTenantContext: boolean) {
+  const nextOrganizationSlug = needsTenantContext ? organizationSlug(token) : null;
 
   if (
     activeSocket &&
@@ -92,7 +96,7 @@ function ensureSocket(token: string) {
   activeToken = token;
   activeOrganizationSlug = nextOrganizationSlug;
   activeSocket = new Socket(socketEndpoint(), {
-    params: { token, organization_slug: nextOrganizationSlug },
+    params: nextOrganizationSlug ? { token, organization_slug: nextOrganizationSlug } : { token },
   });
   activeSocket.connect();
   return activeSocket;
@@ -116,7 +120,7 @@ export function joinChannelWithPush(
   push: <T>(event: string, payload: Record<string, unknown>) => Promise<T>;
   leave: () => void;
 } {
-  const socket = ensureSocket(token);
+  const socket = ensureSocket(token, topicNeedsTenantContext(topic));
   const channel = socket.channel(topic, {});
 
   Object.entries(handlers).forEach(([event, handler]) => {
@@ -165,7 +169,7 @@ export function subscribeToTopic(
   handlers: Record<string, (payload: unknown) => void>,
   lifecycle: LifecycleHandlers = {},
 ) {
-  const socket = ensureSocket(token);
+  const socket = ensureSocket(token, topicNeedsTenantContext(topic));
   const channel: Channel = socket.channel(topic, {});
 
   Object.entries(handlers).forEach(([event, handler]) => {

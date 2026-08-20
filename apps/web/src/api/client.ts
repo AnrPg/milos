@@ -110,6 +110,7 @@ function isMemberWorkoutPath(path: string) {
 
 function tenantScopedPath(path: string, organizationSlug: string | null) {
   if (!organizationSlug) return path;
+  if (path === "/org" || path.startsWith("/org/")) return path;
 
   const isTenantScoped =
     TENANT_SCOPED_PREFIXES.some((prefix) => pathMatchesPrefix(path, prefix)) || isMemberWorkoutPath(path);

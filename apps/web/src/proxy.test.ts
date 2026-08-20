@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { configuredMediaOrigins } from "@/proxy";
+import { config, configuredMediaOrigins } from "@/proxy";
 
 describe("configuredMediaOrigins", () => {
   test("uses the explicit public media origin allowlist first", () => {
@@ -18,5 +18,9 @@ describe("configuredMediaOrigins", () => {
         MINIO_PUBLIC_ENDPOINT: "https://s3-milos.4kq.net",
       })
     ).toBe("https://s3-milos.4kq.net");
+  });
+
+  test("rewrites tenant-prefixed RSC and prefetch requests too", () => {
+    expect(config.matcher[0]).not.toHaveProperty("missing");
   });
 });

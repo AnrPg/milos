@@ -199,8 +199,8 @@ export function PlatformOrganizationsPage() {
       await deletePlatformOrganization(accessToken, organizationId);
       await organizationsQuery.refetch();
       setConfirmingDelete(null);
-    } catch {
-      setError(copy.deleteError);
+    } catch (error) {
+      setError(error instanceof ApiError ? error.message : copy.deleteError);
     } finally {
       setDeleteSubmitting(null);
     }
