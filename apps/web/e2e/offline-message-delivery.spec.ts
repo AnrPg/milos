@@ -1,4 +1,4 @@
-import { expect, test, type BrowserContext, type Route } from "@playwright/test";
+import { expect, test, type Page, type Route } from "@playwright/test";
 
 const user = {
   id: "11111111-1111-4111-8111-111111111111",
@@ -45,7 +45,7 @@ test("an offline message survives page close and synchronizes exactly once", asy
   page,
 }) => {
   const deliveredMessages: Array<Record<string, unknown>> = [];
-  await mockAuthenticatedApi(context, deliveredMessages);
+  await mockAuthenticatedApi(page, deliveredMessages);
 
   await page.goto("/about");
   await page.getByRole("button", { name: "Chat", exact: true }).click();
@@ -63,6 +63,7 @@ test("an offline message survives page close and synchronizes exactly once", asy
   await context.setOffline(false);
 
   const reopened = await context.newPage();
+  await mockAuthenticatedApi(reopened, deliveredMessages);
   await reopened.goto("/about");
   await expect.poll(() => deliveredMessages.length).toBe(1);
 
@@ -73,10 +74,10 @@ test("an offline message survives page close and synchronizes exactly once", asy
 });
 
 async function mockAuthenticatedApi(
-  context: BrowserContext,
+  page: Page,
   deliveredMessages: Array<Record<string, unknown>>,
 ) {
-  await context.route("**/api/**", async (route) => {
+  await page.route("**/api/**", async (route) => {
     const url = new URL(route.request().url());
     const path = tenantlessApiPath(url.pathname);
     const method = route.request().method();
