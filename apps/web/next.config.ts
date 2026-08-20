@@ -17,6 +17,10 @@ const nextConfig: NextConfig = {
 
     return [
       {
+        source: "/org/:organization_slug/:path*",
+        destination: "/:path*",
+      },
+      {
         source: "/api/:path*",
         destination: `${proxyTarget}/api/:path*`,
       },

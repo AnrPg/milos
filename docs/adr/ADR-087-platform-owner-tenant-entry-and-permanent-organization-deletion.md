@@ -61,3 +61,9 @@ but the August 2026 hardening removed that coupling: platform provisioning now
 issues an admin invitation only, and permanent deletion uses a tenant-scoped user
 delete path for tenant-only invited admins so legacy global `users.role = :admin`
 does not trip the SaaS-owner last-admin guard.
+
+Migration `20260821090000_remove_auto_provisioned_vendor_memberships` removes only
+the old auto-created vendor tenant memberships that can be identified by the
+original provisioning audit event. This prevents the platform console from
+prefetching tenant admin routes for organizations the vendor only supervises at
+platform level.
