@@ -28,6 +28,9 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
         timezone: value(params, :timezone) || "UTC",
         default_locale: value(params, :default_locale) || "en",
         invitation_lifetime_seconds: value(params, :invitation_lifetime_seconds) || 604_800,
+        brand_name: value(params, :brand_name) || organization.name,
+        brand_logo_url: value(params, :brand_logo_url),
+        brand_primary_color: value(params, :brand_primary_color),
         settings: value(params, :settings) || %{}
       })
     end)
@@ -288,7 +291,7 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
         default_locale: value(organization_params, :default_locale) || "en",
         invitation_lifetime_seconds:
           value(organization_params, :invitation_lifetime_seconds) || 604_800,
-        brand_name: value(organization_params, :brand_name),
+        brand_name: value(organization_params, :brand_name) || organization.name,
         brand_logo_url: value(organization_params, :brand_logo_url),
         brand_primary_color: value(organization_params, :brand_primary_color),
         settings: value(organization_params, :settings) || %{}

@@ -164,6 +164,7 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
 
     assert %{"access_token" => _} = json_response(register_conn, 201)
     account = Identity.find_by_nickname("client_admin")
+    assert account.role == :admin
 
     assert [
              %{

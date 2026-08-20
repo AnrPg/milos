@@ -124,7 +124,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
       assert %{"access_token" => _} = json_response(conn, 201)
       assert conn.resp_cookies["milos_refresh"].http_only
       account = Identity.find_by_nickname("athena_admin")
-      assert account.role == :member
+      assert account.role == :admin
 
       assert [
                %{
@@ -183,6 +183,7 @@ defmodule MilosTrainingWeb.AuthControllerTest do
       assert %{"access_token" => _} = json_response(accepted, 201)
       account = Identity.find_by_nickname("right_person")
       assert account.email == "invited@example.com"
+      assert account.role == :admin
     end
 
     test "rejects an invalid invitation without creating an account", %{conn: conn} do

@@ -1,7 +1,8 @@
 defmodule MilosTraining.OrganizationsTest do
   use MilosTraining.DataCase, async: false
 
-  alias MilosTraining.Organizations
+  alias MilosTraining.{Organizations, Repo}
+  alias MilosTraining.Organizations.OrganizationSetting
   alias MilosTraining.Organizations.TenantContext
 
   import MilosTraining.TestFixtures
@@ -43,6 +44,13 @@ defmodule MilosTraining.OrganizationsTest do
 
     assert %TenantContext{membership_id: membership_id} = context.context
     assert membership_id == context.owner_membership.id
+  end
+
+  test "creates tenant settings with a brand fallback" do
+    assert {:ok, organization} = Organizations.create_organization(%{name: "Brand Fallback Gym"})
+
+    assert %{brand_name: "Brand Fallback Gym"} =
+             Repo.get_by(OrganizationSetting, organization_id: organization.id)
   end
 
   test "issues, inspects, revokes, and redeems opaque invitations", context do
