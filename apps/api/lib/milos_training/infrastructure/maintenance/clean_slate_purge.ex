@@ -105,26 +105,17 @@ defmodule MilosTraining.Infrastructure.Maintenance.CleanSlatePurge do
   end
 
   defp purge_non_owner_vendors(owner_id) do
-    SQL.query!(Repo, "DELETE FROM vendors WHERE user_id <> $1 OR status <> 'active'", [
-      Ecto.UUID.dump!(owner_id)
-    ]).num_rows
+    SQL.query!(Repo, "DELETE FROM vendors WHERE user_id <> $1", [Ecto.UUID.dump!(owner_id)]).num_rows
   end
 
   defp ensure_owner_vendor(owner_id) do
-    case Repo.get_by(Vendor, user_id: owner_id) do
-      nil ->
-        %Vendor{}
-        |> Vendor.changeset(%{user_id: owner_id, status: :active})
-        |> Repo.insert!()
-
-      %Vendor{status: :active} = vendor ->
-        vendor
-
-      %Vendor{} = vendor ->
-        vendor
-        |> Vendor.changeset(%{status: :active})
-        |> Repo.update!()
-    end
+    %Vendor{}
+    |> Vendor.changeset(%{user_id: owner_id, status: :active})
+    |> Repo.insert!(
+      on_conflict: {:replace, [:status, :updated_at]},
+      conflict_target: [:user_id],
+      returning: true
+    )
   end
 
   defp purge_non_owner_users(owner_id) do

@@ -54,23 +54,25 @@ defmodule MilosTraining.Infrastructure.Maintenance.CleanSlatePurgeTest do
     assert Repo.get(Organization, organization.id) == nil
 
     refute Repo.exists?(
-             from membership in OrganizationMembership,
+             from(membership in OrganizationMembership,
                where: membership.organization_id == ^organization.id
+             )
            )
 
-    assert Repo.exists?(from user in MilosTraining.Identity.User, where: user.id == ^owner.id)
-    refute Repo.exists?(from user in MilosTraining.Identity.User, where: user.id == ^client.id)
+    assert Repo.exists?(from(user in MilosTraining.Identity.User, where: user.id == ^owner.id))
+    refute Repo.exists?(from(user in MilosTraining.Identity.User, where: user.id == ^client.id))
 
     refute Repo.exists?(
-             from user in MilosTraining.Identity.User, where: user.id == ^extra_vendor.id
+             from(user in MilosTraining.Identity.User, where: user.id == ^extra_vendor.id)
            )
 
     assert Repo.exists?(
-             from vendor in Vendor,
+             from(vendor in Vendor,
                where: vendor.user_id == ^owner.id and vendor.status == :active
+             )
            )
 
-    refute Repo.exists?(from vendor in Vendor, where: vendor.user_id == ^extra_vendor.id)
+    refute Repo.exists?(from(vendor in Vendor, where: vendor.user_id == ^extra_vendor.id))
   end
 
   test "repairs a missing SaaS owner vendor grant while purging stale data" do
@@ -78,21 +80,47 @@ defmodule MilosTraining.Infrastructure.Maintenance.CleanSlatePurgeTest do
     stale_client = user_fixture(%{nickname: "stale_client", email: "stale@example.test"})
     {:ok, _organization} = Organizations.create_organization(%{name: "Stale Tenant"})
 
-    refute Repo.exists?(from vendor in Vendor, where: vendor.user_id == ^owner.id)
+    refute Repo.exists?(from(vendor in Vendor, where: vendor.user_id == ^owner.id))
 
     assert {:ok, summary} = CleanSlatePurge.purge_postgres_except_saas_owner("PROD_OWNER_REGAS")
 
     assert summary.preserved_owner_id == owner.id
     assert summary.preserved_owner_vendor_id
-    assert Repo.exists?(from user in MilosTraining.Identity.User, where: user.id == ^owner.id)
+    assert Repo.exists?(from(user in MilosTraining.Identity.User, where: user.id == ^owner.id))
 
     refute Repo.exists?(
-             from user in MilosTraining.Identity.User, where: user.id == ^stale_client.id
+             from(user in MilosTraining.Identity.User, where: user.id == ^stale_client.id)
            )
 
     assert Repo.exists?(
-             from vendor in Vendor,
+             from(vendor in Vendor,
                where: vendor.user_id == ^owner.id and vendor.status == :active
+             )
+           )
+  end
+
+  test "reactivates an existing SaaS owner vendor grant without recreating it" do
+    owner = user_fixture(%{nickname: "prod_owner_regas"})
+    stale_client = user_fixture(%{nickname: "stale_client", email: "stale@example.test"})
+
+    {:ok, revoked_vendor} = Organizations.grant_vendor(owner.id)
+    {:ok, _revoked_vendor} = Organizations.revoke_vendor(owner.id)
+
+    assert {:ok, summary} = CleanSlatePurge.purge_postgres_except_saas_owner("PROD_OWNER_REGAS")
+
+    assert summary.preserved_owner_id == owner.id
+    assert summary.preserved_owner_vendor_id == revoked_vendor.id
+
+    assert Repo.exists?(
+             from(vendor in Vendor,
+               where:
+                 vendor.id == ^revoked_vendor.id and vendor.user_id == ^owner.id and
+                   vendor.status == :active
+             )
+           )
+
+    refute Repo.exists?(
+             from(user in MilosTraining.Identity.User, where: user.id == ^stale_client.id)
            )
   end
 
