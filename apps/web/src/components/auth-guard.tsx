@@ -17,6 +17,7 @@ type AuthGuardProps = {
 
 type AllowedRole = NonNullable<AuthGuardProps["roles"]>[number];
 type SelectedMembership = ReturnType<typeof useSelectedMembershipRole>["membership"];
+type RedirectRole = "member" | "athlete" | "admin";
 
 function isAllowedRole(value: string): value is AllowedRole {
   return value === "member" || value === "athlete" || value === "admin";
@@ -40,6 +41,15 @@ export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
   const pathname = usePathname();
   const { status, currentUser } = useSession();
   const { isLoading: membershipRoleLoading, membership, role } = useSelectedMembershipRole();
+  const accountRole = currentUser?.role;
+  const redirectRole =
+    membership || !isAllowedRole(accountRole ?? "") ? role : (accountRole as RedirectRole);
+  const awaitingTenantAdminMembership =
+    status === "authenticated" &&
+    !currentUser?.vendor &&
+    accountRole === "admin" &&
+    roleRedirects?.admin === "/admin" &&
+    !membership;
 
   useEffect(() => {
     if (status === "guest") {
@@ -49,7 +59,7 @@ export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
 
     if (status === "authenticated" && currentUser && !membershipRoleLoading) {
       if (!currentUser.vendor) {
-        const roleKey = role;
+        const roleKey = redirectRole;
         const configuredRedirect = roleRedirects?.[roleKey];
         const redirect = resolveRoleRedirect(configuredRedirect, membership);
         if (redirect) {
@@ -57,13 +67,27 @@ export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
           return;
         }
       }
-      if (roles && (!isAllowedRole(role) || !roles.includes(role))) {
+      if (roles && (!isAllowedRole(redirectRole) || !roles.includes(redirectRole))) {
         router.replace("/");
       }
     }
-  }, [currentUser, membership, membershipRoleLoading, pathname, role, roles, roleRedirects, router, status]);
+  }, [
+    currentUser,
+    membership,
+    membershipRoleLoading,
+    pathname,
+    redirectRole,
+    roles,
+    roleRedirects,
+    router,
+    status,
+  ]);
 
-  if (status === "loading" || (status === "authenticated" && roles && membershipRoleLoading)) {
+  if (
+    status === "loading" ||
+    (status === "authenticated" && roles && membershipRoleLoading) ||
+    awaitingTenantAdminMembership
+  ) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[var(--bg)] px-6">
         <p className="text-sm font-medium uppercase tracking-[0.24em] text-black/45">
@@ -75,11 +99,11 @@ export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
 
   if (status === "guest") return null;
 
-  if (roles && currentUser && (!isAllowedRole(role) || !roles.includes(role))) {
+  if (roles && currentUser && (!isAllowedRole(redirectRole) || !roles.includes(redirectRole))) {
     return null;
   }
 
-  const roleKey = currentUser && !currentUser.vendor ? role : undefined;
+  const roleKey = currentUser && !currentUser.vendor ? redirectRole : undefined;
   if (roleKey && roleRedirects?.[roleKey]) return null;
 
   return <>{children}</>;

@@ -46,3 +46,8 @@ keep stale `member` session semantics.
 The web root guard now resolves the legacy `/admin` redirect through the
 selected tenant membership, preserving `/org/:slug/admin` as the admin landing
 surface.
+
+The membership selector query must also run inside a user-scoped RepoContext.
+Without `app.user_id`, production RLS returns an empty membership list even
+when the membership row exists, leaving the web shell without tenant role or
+brand context.

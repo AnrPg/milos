@@ -73,6 +73,38 @@ defmodule MilosTrainingWeb.OrganizationAccessControllerTest do
            end)
   end
 
+  test "membership selector reads through user-scoped RLS context", context do
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: context.organization.id,
+        user_id: context.member.id,
+        role: :admin,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    OrganizationSetting
+    |> Repo.get_by!(organization_id: context.organization.id)
+    |> OrganizationSetting.changeset(%{brand_name: "Context Admin Brand"})
+    |> Repo.update!()
+
+    Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", ""])
+
+    memberships =
+      context.conn
+      |> recycle()
+      |> put_bearer_token(context.member)
+      |> get("/api/memberships")
+
+    assert [
+             %{
+               "role" => "admin",
+               "organization" => %{"slug" => "context-gym"},
+               "settings" => %{"brand_name" => "Context Admin Brand"}
+             }
+           ] = json_response(memberships, 200)
+  end
+
   test "organization paths validate membership instead of trusting the slug", context do
     foreign =
       context.conn
