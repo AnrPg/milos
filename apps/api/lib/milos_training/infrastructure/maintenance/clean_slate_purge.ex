@@ -135,8 +135,18 @@ defmodule MilosTraining.Infrastructure.Maintenance.CleanSlatePurge do
           {:ok, connection} ->
             try do
               case Redix.command(connection, ["FLUSHDB"]) do
-                {:ok, "OK"} -> {:ok, :flushed_current_database}
-                {:error, reason} -> {:error, {:redis_purge_failed, reason}}
+                {:ok, "OK"} ->
+                  {:ok, :flushed_current_database}
+
+                {:error, %Redix.Error{message: message}} when is_binary(message) ->
+                  if String.contains?(message, "unknown command") do
+                    purge_redis_by_scan(connection)
+                  else
+                    {:error, {:redis_purge_failed, message}}
+                  end
+
+                {:error, reason} ->
+                  {:error, {:redis_purge_failed, reason}}
               end
             after
               GenServer.stop(connection)
@@ -145,6 +155,37 @@ defmodule MilosTraining.Infrastructure.Maintenance.CleanSlatePurge do
           {:error, reason} ->
             {:error, {:redis_purge_failed, reason}}
         end
+    end
+  end
+
+  defp purge_redis_by_scan(connection) do
+    with {:ok, deleted} <- scan_delete_redis_keys(connection, "0", 0) do
+      {:ok, {:deleted_keys, deleted}}
+    end
+  end
+
+  defp scan_delete_redis_keys(connection, cursor, deleted) do
+    case Redix.command(connection, ["SCAN", cursor, "COUNT", "1000"]) do
+      {:ok, [next_cursor, keys]} ->
+        with {:ok, deleted_count} <- delete_redis_keys(connection, keys) do
+          if next_cursor == "0" do
+            {:ok, deleted + deleted_count}
+          else
+            scan_delete_redis_keys(connection, next_cursor, deleted + deleted_count)
+          end
+        end
+
+      {:error, reason} ->
+        {:error, {:redis_purge_failed, reason}}
+    end
+  end
+
+  defp delete_redis_keys(_connection, []), do: {:ok, 0}
+
+  defp delete_redis_keys(connection, keys) do
+    case Redix.command(connection, ["DEL" | keys]) do
+      {:ok, count} when is_integer(count) -> {:ok, count}
+      {:error, reason} -> {:error, {:redis_purge_failed, reason}}
     end
   end
 
