@@ -204,7 +204,7 @@ defmodule MilosTraining.Infrastructure.Maintenance.CleanSlatePurge do
   end
 
   defp start_meilisearch_finch do
-    case Finch.start_link(name: @finch) do
+    case apply(Finch, :start_link, [[name: @finch]]) do
       {:ok, finch} -> {:ok, finch}
       {:error, {:already_started, finch}} -> {:ok, finch}
       {:error, reason} -> {:error, {:finch_start_failed, reason}}
