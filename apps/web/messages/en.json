@@ -2389,6 +2389,7 @@
     "editorBold": "Bold",
     "editorItalic": "Italic",
     "editorHeading": "Heading",
+    "editorParagraph": "Paragraph",
     "editorBulletList": "Bullet list",
     "editorOrderedList": "Numbered list",
     "editorUndo": "Undo",

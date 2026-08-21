@@ -2389,6 +2389,7 @@
     "editorBold": "Жирный",
     "editorItalic": "Курсив",
     "editorHeading": "Заголовок",
+    "editorParagraph": "Абзац",
     "editorBulletList": "Маркированный список",
     "editorOrderedList": "Нумерованный список",
     "editorUndo": "Отменить",

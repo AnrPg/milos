@@ -347,6 +347,7 @@ function FreeTextToolbar({ editor }: { editor: Editor | null }) {
   const headingLevels = [1, 2, 3, 4, 5] as const;
   const selectedTextColor = editor.getAttributes("textColor").color as string | undefined;
   const colorPickerValue = /^#[0-9a-f]{6}$/i.test(selectedTextColor ?? "") ? selectedTextColor! : "#f4efe8";
+  const activeHeadingLevel = headingLevels.find((level) => editor.isActive("heading", { level }));
   const textActions = [
     toolbarButton(i18n("editorBold"), i18n("editorBold"), editor.isActive("bold"), () => editor.chain().focus().toggleBold().run()),
     toolbarButton(i18n("editorItalic"), i18n("editorItalic"), editor.isActive("italic"), () => editor.chain().focus().toggleItalic().run()),
@@ -372,59 +373,50 @@ function FreeTextToolbar({ editor }: { editor: Editor | null }) {
   ];
 
   return (
-    <div className="space-y-2 px-4 py-3" style={{ background: "color-mix(in srgb, var(--bg) 96%, transparent)" }}>
-      <ToolbarRow actions={textActions} />
-      <div className="grid gap-2 xl:grid-cols-[minmax(0,1fr)_auto]">
-        <div
-          className="flex flex-wrap items-center gap-1 rounded-xl border p-1.5"
-          style={{ borderColor: "var(--dim)", background: "var(--card)" }}
-          role="group"
+    <div className="px-4 py-2" style={{ background: "color-mix(in srgb, var(--bg) 96%, transparent)" }}>
+      <div
+        className="flex flex-wrap items-center gap-1.5 rounded-lg border p-1.5"
+        style={{ borderColor: "var(--dim)", background: "var(--card)" }}
+      >
+        <ToolbarGroup actions={textActions} />
+        <div className="h-7 w-px" style={{ background: "var(--dim)" }} aria-hidden="true" />
+        <label className="sr-only" htmlFor="free-text-heading-select">
+          {i18n("editorHeading")}
+        </label>
+        <select
+          id="free-text-heading-select"
+          className="h-8 min-w-32 rounded-md border px-2 text-sm font-bold outline-none"
+          style={{ background: "var(--bg)", borderColor: "var(--dim)", color: "var(--text)" }}
           aria-label={i18n("editorHeading")}
-        >
-          {headingLevels.map((level) => {
-            const active = editor.isActive("heading", { level });
+          value={activeHeadingLevel ? `heading-${activeHeadingLevel}` : "paragraph"}
+          onChange={(event) => {
+            const value = event.target.value;
+            if (value === "paragraph") {
+              editor.chain().focus().setParagraph().run();
+              return;
+            }
 
-            return (
-              <button
-                type="button"
-                key={level}
-                aria-label={`${i18n("editorHeading")} ${level}`}
-                title={`${i18n("editorHeading")} ${level}`}
-                onClick={() => editor.chain().focus().toggleHeading({ level }).run()}
-                className="min-w-9 rounded-lg px-2 py-1.5 text-sm font-black"
-                style={{
-                  background: active ? "var(--primary)" : "transparent",
-                  color: active ? "var(--primary-foreground, white)" : "var(--text)",
-                  fontSize: `${Math.max(0.78, 1.18 - (level * 0.08))}rem`,
-                }}
-              >
-                {level}
-              </button>
-            );
-          })}
-          <button
-            type="button"
-            aria-label={i18n("editorHeading")}
-            title={i18n("editorHeading")}
-            onClick={() => editor.chain().focus().setParagraph().run()}
-            className="min-w-9 rounded-lg px-2 py-1.5 text-sm font-bold"
-            style={{
-              background: editor.isActive("paragraph") ? "var(--primary)" : "transparent",
-              color: editor.isActive("paragraph") ? "var(--primary-foreground, white)" : "var(--text)",
-            }}
-          >
-            ¶
-          </button>
-        </div>
+            const level = Number(value.replace("heading-", "")) as 1 | 2 | 3 | 4 | 5;
+            editor.chain().focus().setHeading({ level }).run();
+          }}
+        >
+          <option value="paragraph">{i18n("editorParagraph")}</option>
+          {headingLevels.map((level) => (
+            <option key={level} value={`heading-${level}`}>
+              {i18n("editorHeading")} {level}
+            </option>
+          ))}
+        </select>
+        <ToolbarGroup actions={blockActions} />
+        <ToolbarGroup actions={layoutActions} />
         <div
-          className="flex items-center gap-1 rounded-xl border p-1.5"
-          style={{ borderColor: "var(--dim)", background: "var(--card)" }}
+          className="flex items-center gap-1 rounded-md px-1"
           role="group"
           aria-label={i18n("editorTextColor")}
         >
           <label
-            className="grid h-9 w-9 cursor-pointer place-items-center rounded-lg border"
-            style={{ background: "var(--bg)", borderColor: "var(--dim)" }}
+            className="grid h-8 w-8 cursor-pointer place-items-center rounded-md border"
+            style={{ background: "var(--bg)", borderColor: selectedTextColor ? "var(--primary)" : "var(--dim)" }}
             title={i18n("editorTextColor")}
             aria-label={i18n("editorTextColor")}
           >
@@ -437,7 +429,7 @@ function FreeTextToolbar({ editor }: { editor: Editor | null }) {
                   editor.chain().focus().setMark("textColor", { color: nextColor }).run();
                 }
               }}
-              className="h-6 w-6 cursor-pointer rounded border-0 bg-transparent p-0"
+              className="h-5 w-5 cursor-pointer rounded border-0 bg-transparent p-0"
               aria-label={i18n("editorTextColor")}
               title={i18n("editorTextColor")}
             />
@@ -447,7 +439,7 @@ function FreeTextToolbar({ editor }: { editor: Editor | null }) {
             aria-label={i18n("editorClearTextColor")}
             title={i18n("editorClearTextColor")}
             onClick={() => editor.chain().focus().unsetMark("textColor").run()}
-            className="min-w-9 rounded-lg px-2 py-1.5 text-sm font-bold"
+            className="h-8 min-w-8 rounded-md px-2 text-sm font-bold"
             style={{
               background: selectedTextColor ? "var(--primary)" : "transparent",
               color: selectedTextColor ? "var(--primary-foreground, white)" : "var(--text)",
@@ -456,21 +448,18 @@ function FreeTextToolbar({ editor }: { editor: Editor | null }) {
             ×
           </button>
         </div>
-      </div>
-      <ToolbarRow actions={blockActions} />
-      <div className="grid gap-2 lg:grid-cols-[minmax(0,1fr)_auto]">
-        <ToolbarRow actions={layoutActions} />
-        <ToolbarRow actions={historyActions} />
+        <div className="ms-auto flex min-w-fit">
+          <ToolbarGroup actions={historyActions} />
+        </div>
       </div>
     </div>
   );
 }
 
-function ToolbarRow({ actions }: { actions: ReturnType<typeof toolbarButton>[] }) {
+function ToolbarGroup({ actions }: { actions: ReturnType<typeof toolbarButton>[] }) {
   return (
     <div
-      className="flex flex-wrap items-center gap-1 rounded-xl border p-1.5"
-      style={{ borderColor: "var(--dim)", background: "var(--card)" }}
+      className="flex flex-wrap items-center gap-1"
     >
       {actions.map((action) => (
         <button
@@ -479,7 +468,7 @@ function ToolbarRow({ actions }: { actions: ReturnType<typeof toolbarButton>[] }
           aria-label={action.label}
           title={action.label}
           onClick={action.run}
-          className="min-w-9 rounded-lg px-2 py-1.5 text-sm font-bold"
+          className="h-8 min-w-8 rounded-md px-2 text-sm font-bold"
           style={{
             background: action.active ? "var(--primary)" : "transparent",
             color: action.active ? "var(--primary-foreground, white)" : "var(--text)",
