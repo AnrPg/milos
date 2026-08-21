@@ -25,7 +25,7 @@ defmodule MilosTraining.Repo.Migrations.DeleteMembershiplessNonVendorAccounts do
         BEGIN
           DELETE FROM users
           WHERE users.id = candidate_id;
-        EXCEPTION WHEN foreign_key_violation THEN
+        EXCEPTION WHEN foreign_key_violation OR restrict_violation THEN
           NULL;
         END;
       END LOOP;
