@@ -192,6 +192,11 @@ function applyFreeTextMarks(text: string, rawMarks: unknown, key: string | numbe
         return <s key={markKey}>{content}</s>;
       case "highlight":
         return <mark key={markKey}>{content}</mark>;
+      case "textColor": {
+        const attrs = (mark.attrs && typeof mark.attrs === "object" ? mark.attrs : {}) as Record<string, unknown>;
+        const color = freeTextMarkColor(attrs.color);
+        return color ? <span key={markKey} style={{ color }}>{content}</span> : content;
+      }
       case "link": {
         const attrs = (mark.attrs && typeof mark.attrs === "object" ? mark.attrs : {}) as Record<string, unknown>;
         const href = typeof attrs.href === "string" && /^(https?:|mailto:)/i.test(attrs.href) ? attrs.href : undefined;
@@ -203,6 +208,12 @@ function applyFreeTextMarks(text: string, rawMarks: unknown, key: string | numbe
         return content;
     }
   }, text);
+}
+
+function freeTextMarkColor(value: unknown) {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return /^#[0-9a-f]{6}$/i.test(trimmed) ? trimmed.toLowerCase() : null;
 }
 
 function sectionScaleOptions(section: PreviewSection) {

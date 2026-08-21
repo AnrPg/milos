@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useUiTranslations } from "@/i18n/ui";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
@@ -19,6 +19,46 @@ export function WorkoutAuthoringModes() {
   const mode = requestedMode === "quick-text" || requestedMode === "free-text" ? requestedMode : "structured";
   const draftId = searchParams.get("draft") ?? storeDraftId;
   const [modeBarVisible, setModeBarVisible] = useState(false);
+  const hideTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    function clearHideTimer() {
+      if (hideTimerRef.current !== null) {
+        window.clearTimeout(hideTimerRef.current);
+        hideTimerRef.current = null;
+      }
+    }
+
+    function revealTemporarily() {
+      clearHideTimer();
+      setModeBarVisible(true);
+      hideTimerRef.current = window.setTimeout(() => {
+        setModeBarVisible(false);
+      }, 1_400);
+    }
+
+    window.addEventListener("scroll", revealTemporarily, { capture: true, passive: true });
+    return () => {
+      window.removeEventListener("scroll", revealTemporarily, { capture: true });
+      clearHideTimer();
+    };
+  }, []);
+
+  function revealModeBar() {
+    if (hideTimerRef.current !== null) {
+      window.clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+    setModeBarVisible(true);
+  }
+
+  function hideModeBar() {
+    if (hideTimerRef.current !== null) {
+      window.clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+    setModeBarVisible(false);
+  }
 
   function selectMode(nextMode: "structured" | "quick-text" | "free-text", selectedDraftId = draftId) {
     const params = new URLSearchParams(searchParams.toString());
@@ -34,20 +74,28 @@ export function WorkoutAuthoringModes() {
   return (
     <div className="flex min-h-[calc(100dvh-3.25rem)] flex-col" style={{ background: "var(--bg)" }}>
       <div
-        className="fixed inset-x-0 top-[3.25rem] z-30 h-16"
-        onFocus={() => setModeBarVisible(true)}
-        onMouseEnter={() => setModeBarVisible(true)}
+        className="fixed inset-x-0 top-[3.25rem] z-40 h-3"
+        onFocus={revealModeBar}
+        onMouseEnter={revealModeBar}
         aria-hidden
       />
       <div
-        className="fixed inset-x-0 top-[7.25rem] z-30 flex items-center justify-center gap-1 border-b px-4 py-2 transition-transform duration-200"
-        onFocus={() => setModeBarVisible(true)}
-        onMouseEnter={() => setModeBarVisible(true)}
-        onMouseLeave={() => setModeBarVisible(false)}
+        className="fixed inset-x-0 top-[3.25rem] z-50 flex items-center justify-center gap-1 border-b px-4 py-2 shadow-lg transition-[opacity,transform] duration-200"
+        onFocus={revealModeBar}
+        onMouseEnter={revealModeBar}
+        onMouseLeave={hideModeBar}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+            hideModeBar();
+          }
+        }}
         style={{
           background: "var(--panel)",
           borderColor: "var(--dim)",
-          transform: modeBarVisible ? "translateY(0)" : "translateY(-110%)",
+          boxShadow: "0 10px 24px color-mix(in srgb, var(--bg) 65%, transparent)",
+          opacity: modeBarVisible ? 1 : 0,
+          pointerEvents: modeBarVisible ? "auto" : "none",
+          transform: modeBarVisible ? "translateY(0)" : "translateY(calc(-100% - 1px))",
         }}
         data-visible={modeBarVisible}
         role="tablist"

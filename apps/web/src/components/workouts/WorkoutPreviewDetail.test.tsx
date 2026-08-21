@@ -43,6 +43,14 @@ describe("WorkoutPreviewDetail composition groups", () => {
               content: [{ type: "text", text: "AMRAP 20", marks: [{ type: "bold" }] }],
             },
             {
+              type: "paragraph",
+              content: [{ type: "text", text: "Red zone", marks: [{ type: "textColor", attrs: { color: "#ef4444" } }] }],
+            },
+            {
+              type: "paragraph",
+              content: [{ type: "text", text: "Safe color", marks: [{ type: "textColor", attrs: { color: "javascript:red" } }] }],
+            },
+            {
               type: "orderedList",
               content: [
                 {
@@ -59,6 +67,8 @@ describe("WorkoutPreviewDetail composition groups", () => {
 
     expect(screen.getByText("AMRAP 20").tagName).toBe("STRONG");
     expect(screen.getByText("AMRAP 20").closest("p")).toHaveStyle({ textAlign: "center" });
+    expect(screen.getByText("Red zone")).toHaveStyle({ color: "#ef4444" });
+    expect(screen.getByText("Safe color")).not.toHaveAttribute("style");
     expect(screen.getByText("10 pull-ups").tagName).toBe("MARK");
     expect(screen.getByRole("list")).toBeInTheDocument();
   });

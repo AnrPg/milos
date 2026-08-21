@@ -170,8 +170,36 @@ input[type="number"] {
   color: var(--text);
 }
 
-.free-text-rich-content :where(p, ul, ol, blockquote, pre, h1, h2, h3) {
+.free-text-rich-content :where(p, ul, ol, blockquote, pre, h1, h2, h3, h4, h5) {
   margin-block: 0.65rem;
+}
+
+.free-text-rich-content :where(h1, h2, h3, h4, h5) {
+  color: var(--text);
+  font-weight: 900;
+  line-height: 1.12;
+}
+
+.free-text-rich-content :where(h1) {
+  font-size: 2rem;
+}
+
+.free-text-rich-content :where(h2) {
+  font-size: 1.65rem;
+}
+
+.free-text-rich-content :where(h3) {
+  font-size: 1.35rem;
+}
+
+.free-text-rich-content :where(h4) {
+  font-size: 1.12rem;
+}
+
+.free-text-rich-content :where(h5) {
+  font-size: 0.98rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .free-text-rich-content :where(strong) {
