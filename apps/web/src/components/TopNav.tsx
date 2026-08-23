@@ -242,6 +242,102 @@ function DashboardDropdown({
   );
 }
 
+function MobileMemberNavDropdown({
+  links,
+  outstandingCents,
+}: {
+  links: NavLink[];
+  outstandingCents: number;
+}) {
+  const t = useTranslations("Navigation");
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<"training" | "account">("training");
+  const ref = useRef<HTMLDivElement>(null);
+  const trainingLinks = links.filter((link) => link.href !== "/account/billing");
+  const accountLinks = links.filter((link) => link.href === "/account/billing");
+  const categories = [
+    { id: "training" as const, label: t("myWorkouts"), items: trainingLinks },
+    { id: "account" as const, label: t("profile"), items: accountLinks },
+  ].filter((category) => category.items.length > 0);
+  const activeItems = categories.find((category) => category.id === activeCategory)?.items ?? categories[0]?.items ?? [];
+
+  useEffect(() => {
+    if (!open) return;
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  if (categories.length === 0) return null;
+
+  return (
+    <div ref={ref} className="relative shrink-0 sm:hidden">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-label={t("openDashboard")}
+        title={t("openDashboard")}
+        className="grid h-8 min-w-8 place-items-center rounded-full px-2 text-xs font-semibold"
+        style={{ background: open ? "var(--border)" : "transparent", color: open ? "var(--text)" : "var(--dim)" }}
+        onClick={() => setOpen((value) => !value)}
+      >
+        ☰
+      </button>
+      {open ? (
+        <div
+          className="absolute start-0 top-full mt-1 flex max-w-[calc(100vw-1rem)] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7)]"
+          style={{ background: "var(--panel)", border: "1px solid var(--border)", zIndex: 100 }}
+        >
+          <div className="w-32 border-e py-1.5" style={{ borderColor: "var(--border)" }}>
+            {categories.map((category) => (
+              <button
+                key={category.id}
+                type="button"
+                className="flex w-full items-center justify-between gap-2 px-4 py-2 text-start text-xs font-semibold transition-colors"
+                style={{
+                  color: activeCategory === category.id ? "var(--text)" : "var(--muted)",
+                  background: activeCategory === category.id ? "color-mix(in srgb, var(--text) 5%, transparent)" : "transparent",
+                }}
+                onMouseEnter={() => setActiveCategory(category.id)}
+                onClick={() => setActiveCategory(category.id)}
+              >
+                {category.label}
+                <span className="rtl:rotate-180" style={{ color: "var(--dim)" }}>›</span>
+              </button>
+            ))}
+          </div>
+          <div className="w-48 py-1.5">
+            {activeItems.map((link) => {
+              const showBalanceBadge = link.href === "/account/billing" && outstandingCents > 0;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)]"
+                  style={{ color: pathActive(pathname, link.href) ? "var(--primary)" : "var(--text)" }}
+                  onClick={() => setOpen(false)}
+                >
+                  <span>{t(link.labelKey)}</span>
+                  {showBalanceBadge ? (
+                    <span className="rounded-full px-1.5 text-[10px] font-bold" style={{ background: "var(--danger)", color: "#fff" }}>
+                      !
+                    </span>
+                  ) : null}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function TopNav() {
   const i18n = useUiTranslations();
   const t = useTranslations("Navigation");
@@ -329,14 +425,14 @@ export function TopNav() {
       <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 px-2 py-1 sm:flex sm:flex-wrap sm:gap-x-4 sm:px-5">
         <Link
           href="/"
-          className="block min-w-0 truncate text-xs font-bold uppercase sm:max-w-[32rem] sm:shrink-0 sm:whitespace-normal sm:break-words"
+          className="col-span-2 block min-w-0 whitespace-normal break-words text-xs font-bold uppercase leading-tight sm:col-span-1 sm:max-w-[32rem] sm:shrink-0"
           style={{ color: "var(--text)" }}
           title={brandName}
         >
           {brandName}
         </Link>
 
-        <nav className="order-3 col-span-2 flex min-w-0 flex-1 flex-wrap items-center gap-0.5 overflow-visible sm:order-none sm:col-span-1 sm:gap-1">
+        <nav className="order-3 col-start-1 row-start-2 flex min-w-0 flex-1 flex-wrap items-center gap-0.5 overflow-visible sm:order-none sm:col-span-1 sm:row-start-auto sm:gap-1">
           {isVendor ? (
             <Link
               href="/platform/organizations"
@@ -352,7 +448,13 @@ export function TopNav() {
           {showTenantShell && role === "admin" ? (
             <DashboardDropdown pathname={pathname} organizationSlug={selectedOrganizationSlug} />
           ) : null}
-          <div className="flex min-w-0 flex-wrap items-center gap-0.5 overflow-visible sm:gap-1">
+          {showTenantShell && showSelfServiceSurfaces ? (
+            <MobileMemberNavDropdown
+              links={NAV_LINKS.filter((link) => link.roles.includes(role))}
+              outstandingCents={outstandingCents}
+            />
+          ) : null}
+          <div className="hidden min-w-0 flex-wrap items-center gap-0.5 overflow-visible sm:flex sm:gap-1">
             {showTenantShell && role === "admin"
               ? ADMIN_NAV_LINKS.map((link) => {
                   const active = pathActive(pathname, link.href);
@@ -406,7 +508,7 @@ export function TopNav() {
           </div>
         </nav>
 
-        <div className="ms-auto flex shrink-0 items-center gap-1 sm:gap-2">
+        <div className="col-start-2 row-start-2 ms-auto flex shrink-0 items-center gap-1 justify-self-end sm:row-start-auto sm:gap-2">
           {showTenantShell ? <NotificationBell /> : null}
 
           {showTenantShell ? (
