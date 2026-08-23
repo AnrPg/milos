@@ -143,10 +143,7 @@ defmodule MilosTraining.Identity.User do
     validate_change(changeset, :password, fn :password, password ->
       if RegistrationPolicy.valid_password?(password),
         do: [],
-        else: [
-          password:
-            "must be at least 12 characters and include uppercase, lowercase, a number, a symbol, and no whitespace"
-        ]
+        else: [password: "must be at least 4 characters"]
     end)
   end
 end

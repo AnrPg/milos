@@ -13,7 +13,7 @@ also need to be available after opt-in without occupying the notification inbox.
 Store a display username alongside the existing normalized username. The
 normalized value remains the unique lookup key; display values are returned to
 clients. Registration accepts letters, numbers, and underscores only, with a
-minimum of three characters. Passwords require four or more non-whitespace
+minimum of three characters. Passwords require any string with four or more
 characters.
 
 The inbox shows browser-push setup only until the current device is enabled.
@@ -43,3 +43,8 @@ values. Greek and Cyrillic transliteration is supported at the domain boundary.
 Implemented with a non-destructive backfill migration, pure registration-policy
 validation, and client-side per-field validation tooltips. Existing users retain
 their current lower-case nickname as their display value until they edit it.
+
+Amended 2026-08-23: password validation was simplified from four or more
+non-whitespace characters to any string with at least four characters, so spaces
+and weak-looking strings are intentionally accepted by registration and password
+change surfaces.

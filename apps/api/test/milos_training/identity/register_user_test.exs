@@ -67,7 +67,7 @@ defmodule MilosTraining.Identity.RegisterUserTest do
       assert "is invalid" in errors_on(changeset).role
     end
 
-    test "rejects weak password" do
+    test "rejects passwords shorter than four characters" do
       params = %{
         nickname: "atlas",
         password: "123",
@@ -77,6 +77,18 @@ defmodule MilosTraining.Identity.RegisterUserTest do
 
       assert {:error, changeset} = RegisterUser.call(params)
       assert errors_on(changeset).password != []
+    end
+
+    test "accepts simple and whitespace-containing passwords with at least four characters" do
+      params = %{
+        nickname: "simple_pass",
+        password: "a b ",
+        role: :member,
+        email: "simple-pass@placeholder.invalid"
+      }
+
+      assert {:ok, user} = RegisterUser.call(params)
+      refute user.password_hash == "a b "
     end
 
     test "database rejects invalid roles outside Ecto changesets" do

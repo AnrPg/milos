@@ -24,12 +24,7 @@ const INITIAL_FORM: AdminRegisterRequest = {
 };
 
 function validRegistrationPassword(password: string) {
-  return password.length >= 12 &&
-    !/\s/u.test(password) &&
-    /[a-z]/u.test(password) &&
-    /[A-Z]/u.test(password) &&
-    /[0-9]/u.test(password) &&
-    /[^a-zA-Z0-9]/u.test(password);
+  return password.length >= 4;
 }
 
 function flatFieldErrors(errors: Record<string, unknown> | undefined): FieldErrors {

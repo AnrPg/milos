@@ -84,7 +84,7 @@ describe("AdminRegistrationConsole", () => {
     expect(replace).toHaveBeenCalledWith("/org/milos-method/admin");
   });
 
-  it("requires a backend-compatible strong password before submitting", async () => {
+  it("requires only the backend-compatible minimum password length before submitting", async () => {
     render(<AdminRegistrationConsole />);
 
     await screen.findByText("Milos Method");
@@ -96,13 +96,40 @@ describe("AdminRegistrationConsole", () => {
       target: { value: "client@example.test" },
     });
     fireEvent.change(screen.getByLabelText("password8be3c94"), {
-      target: { value: "weakpass" },
+      target: { value: "a b " },
     });
 
     const submit = screen.getByRole("button", { name: "createAdminAccount" });
     expect(submit).toBeEnabled();
 
     fireEvent.click(submit);
+
+    await waitFor(() => {
+      expect(signUpAdmin).toHaveBeenCalledWith({
+        nickname: "client_admin",
+        email: "client@example.test",
+        password: "a b ",
+        invitation_token: "admin-token-1234567890",
+      });
+    });
+  });
+
+  it("shows password guidance when the password is shorter than four characters", async () => {
+    render(<AdminRegistrationConsole />);
+
+    await screen.findByText("Milos Method");
+
+    fireEvent.change(screen.getByLabelText("nicknamece2bd99"), {
+      target: { value: "client_admin" },
+    });
+    fireEvent.change(screen.getByLabelText("emailAddress"), {
+      target: { value: "client@example.test" },
+    });
+    fireEvent.change(screen.getByLabelText("password8be3c94"), {
+      target: { value: "abc" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "createAdminAccount" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("passwordRules0c63f14");
     expect(signUpAdmin).not.toHaveBeenCalled();

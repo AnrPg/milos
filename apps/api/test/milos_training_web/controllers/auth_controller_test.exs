@@ -13,10 +13,10 @@ defmodule MilosTrainingWeb.AuthControllerTest do
   end
 
   describe "POST /api/auth/register" do
-    test "returns tokens on valid registration", %{conn: conn} do
+    test "returns tokens on valid registration with a simple password", %{conn: conn} do
       params = %{
         nickname: "zeus",
-        password: "S3cur3P@ss!42",
+        password: "a b ",
         role: "member",
         email: "zeus@placeholder.invalid"
       }

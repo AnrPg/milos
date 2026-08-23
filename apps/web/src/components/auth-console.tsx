@@ -43,7 +43,7 @@ function invalidCredentialFields(nickname: string, password: string, i18n: (key:
   const errors: FieldErrors = {};
 
   if (!/^[\p{L}0-9_]{3,30}$/u.test(nickname)) errors.nickname = [i18n("usernameRules4b5de12")];
-  if (password.length < 4 || /\s/u.test(password)) errors.password = [i18n("passwordRules0c63f14")];
+  if (password.length < 4) errors.password = [i18n("passwordRules0c63f14")];
 
   return errors;
 }
