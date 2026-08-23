@@ -23,6 +23,7 @@ import {
 } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { FREE_TEXT_EDITOR_CLASS, sanitizeWorkoutDslPaste } from "@/lib/workout-dsl-editor-data";
 import type { WorkoutType } from "@/types/workout";
 
@@ -46,6 +47,7 @@ const WORKOUT_TYPES: WorkoutType[] = [
 export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
   const i18n = useUiTranslations();
   const router = useRouter();
+  const organizationSlug = useOrganizationSlug();
   const { tokens } = useSession();
   const accessToken = tokens?.access_token;
   const [title, setTitle] = useState("");
@@ -159,6 +161,8 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
     return () => window.clearTimeout(timer);
   }, [body, draftId, saveDraft, title, type]);
 
+  const canPublish = Boolean(accessToken && draftId && editor && title.trim() && body.trim() && !publishing);
+
   async function publish() {
     if (!accessToken || !draftId || !editor || !title.trim() || !body.trim()) return;
     setPublishing(true);
@@ -167,7 +171,7 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
       const payload = buildPayload({ title, type, body, document: editor.getJSON() });
       await updateDraftWorkout(accessToken, draftId, payload);
       await publishWorkoutDraft(accessToken, draftId, payload);
-      router.push("/admin/workouts");
+      router.push(adminHref("/admin/workouts", organizationSlug));
     } catch {
       setSaveStatus("error");
     } finally {
@@ -256,7 +260,7 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
           </span>
           <button
             type="button"
-            disabled={publishing || !title.trim() || !body.trim()}
+            disabled={!canPublish}
             onClick={() => void publish()}
             className="rounded-xl px-5 py-2 text-sm font-black disabled:opacity-40"
             style={{ background: "var(--success, var(--primary))", color: "var(--bg)", boxShadow: "0 10px 24px color-mix(in srgb, var(--primary) 22%, transparent)" }}

@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { duplicateWorkout, reopenWorkout } from "@/api/workouts";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 type GlobalContext = {
   kind: "global";
@@ -39,6 +40,7 @@ export function WorkoutEditModal({
 }: Props) {
   const i18n = useUiTranslations();
   const router = useRouter();
+  const organizationSlug = useOrganizationSlug();
   const [busy, setBusy] = useState<"reopen" | "duplicate" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const firstButtonRef = useRef<HTMLButtonElement>(null);
@@ -53,7 +55,7 @@ export function WorkoutEditModal({
     setError(null);
     try {
       await reopenWorkout(accessToken, workoutId);
-      router.push(`/admin/workouts/new?draft=${workoutId}&is_reopen=true&mode=${mode}`);
+      router.push(adminHref(`/admin/workouts/new?draft=${workoutId}&is_reopen=true&mode=${mode}`, organizationSlug));
     } catch (err) {
       setError(err instanceof Error ? localizeError(err, i18n) : i18n("failedToReopenWorkoutf279a52"));
       setBusy(null);
@@ -77,7 +79,7 @@ export function WorkoutEditModal({
           : context.kind === "slot"
             ? "&substitute_for_slot=" + (context.sourceId)
             : "";
-      router.push(`/admin/workouts/new?draft=${draft.id}${substituteParam}&mode=${mode}`);
+      router.push(adminHref(`/admin/workouts/new?draft=${draft.id}${substituteParam}&mode=${mode}`, organizationSlug));
     } catch (err) {
       setError(err instanceof Error ? localizeError(err, i18n) : i18n("failedToDuplicateWorkouta77970b"));
       setBusy(null);

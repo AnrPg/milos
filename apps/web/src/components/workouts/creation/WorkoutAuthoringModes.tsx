@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { useUiTranslations } from "@/i18n/ui";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 
 import { FreeTextWorkoutEditor } from "./FreeTextWorkoutEditor";
@@ -13,6 +14,7 @@ import { WorkoutCreationCanvas } from "./WorkoutCreationCanvas";
 export function WorkoutAuthoringModes() {
   const i18n = useUiTranslations();
   const router = useRouter();
+  const organizationSlug = useOrganizationSlug();
   const searchParams = useSearchParams();
   const storeDraftId = useWorkoutCreationStore((state) => state.draftId);
   const requestedMode = searchParams.get("mode");
@@ -68,7 +70,7 @@ export function WorkoutAuthoringModes() {
       params.set("draft", selectedDraftId);
     }
 
-    router.replace(`/admin/workouts/new?${params.toString()}`);
+    router.replace(adminHref(`/admin/workouts/new?${params.toString()}`, organizationSlug));
   }
 
   return (

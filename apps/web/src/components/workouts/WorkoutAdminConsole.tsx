@@ -33,11 +33,13 @@ import { ShareExportDialog } from "@/components/share-export/ShareExportDialog";
 import { useShareExport } from "@/components/share-export/useShareExport";
 import { buildWorkoutDocument } from "@/lib/document-export";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 export function WorkoutAdminConsole() {
   const i18n = useUiTranslations();
   const shareExport = useShareExport();
   const router = useRouter();
+  const organizationSlug = useOrganizationSlug();
   const { currentUser, signOut, status, tokens } = useSession();
   const { role } = useSelectedMembershipRole();
   const [workouts, setWorkouts] = useState<WorkoutRecord[]>([]);
@@ -79,7 +81,7 @@ export function WorkoutAdminConsole() {
       if (loadError instanceof ApiError && (loadError.status === 401 || loadError.status === 403)) {
         clearAdminData();
         signOut();
-        router.replace("/login?next=/admin/workouts");
+        router.replace(`/login?next=${encodeURIComponent(adminHref("/admin/workouts", organizationSlug))}`);
         return;
       }
 
@@ -131,7 +133,7 @@ export function WorkoutAdminConsole() {
       if (actionError instanceof ApiError) {
         if (actionError.status === 401 || actionError.status === 403) {
           signOut();
-          router.replace("/login?next=/admin/workouts");
+          router.replace(`/login?next=${encodeURIComponent(adminHref("/admin/workouts", organizationSlug))}`);
           return;
         }
 
@@ -283,7 +285,7 @@ export function WorkoutAdminConsole() {
                   <Link
                     className="rounded-full px-4 py-2 text-sm font-semibold"
                     style={{ background: "var(--text)", color: "var(--bg)" }}
-                    href="/admin/workouts/new"
+                    href={adminHref("/admin/workouts/new", organizationSlug)}
                   >
                     {i18n("newWorkout5fc6e4c")}
                   </Link>
@@ -426,7 +428,7 @@ export function WorkoutAdminConsole() {
                         <Link
                           className="rounded-full px-3 py-1 text-xs font-semibold"
                           style={{ background: "var(--text)", color: "var(--bg)" }}
-                          href={`/admin/workouts/new?draft=${workout.id}`}
+                          href={adminHref(`/admin/workouts/new?draft=${workout.id}`, organizationSlug)}
                           onClick={(e) => e.stopPropagation()}
                         >
                           {i18n("continueEditingb101465")}

@@ -12,6 +12,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { publishWorkoutDraft, type WorkoutRecord } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { completionSummary, isPublishReady, useWorkoutCreationStore } from "@/stores/workout-creation";
 import { FORMAT_EXERCISE_CONTEXT, type WorkoutType } from "@/types/workout";
 
@@ -109,6 +110,7 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
     recovery: i18n("recoveryea924f7"),
   };
   const router = useRouter();
+  const organizationSlug = useOrganizationSlug();
   const searchParams = useSearchParams();
   const { tokens } = useSession();
   const { draftId, title, type, isTeamWorkout, sections, setTitle, setType, setIsTeamWorkout } = useWorkoutCreationStore();
@@ -122,6 +124,7 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
   const isSubstitute = Boolean(substituteForAssignment ?? substituteForSlot);
 
   const ready = isPublishReady({ title, type, sections });
+  const canPublish = Boolean(draftId && tokens?.access_token && ready && !publishing);
   const summary = completionSummary(sections, i18n);
   const publishMessages = publishValidationMessages({ title, type, sections });
 
@@ -147,7 +150,7 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
       if (onPublished) {
         onPublished(workout);
       } else {
-        router.push("/admin/workouts");
+        router.push(adminHref("/admin/workouts", organizationSlug));
       }
     } catch (error: unknown) {
       setPublishError(error instanceof Error ? localizeError(error, i18n) : i18n("publishFailed0b74ccb"));
@@ -243,7 +246,7 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
       <div className="group relative">
         <button
           onClick={handlePublish}
-          disabled={!ready || publishing}
+          disabled={!canPublish}
           className="rounded-3xl px-6 py-2 text-sm font-bold transition-opacity"
           style={{
             background: ready ? "var(--lime)" : "var(--dim)",

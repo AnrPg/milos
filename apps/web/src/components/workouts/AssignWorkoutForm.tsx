@@ -15,6 +15,7 @@ import { assignWorkout, listAthletes, type AthleteOption } from "@/api/assigned-
 import { deleteWorkout, fetchAdminWorkout, type WorkoutRecord } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { formatLocalDate } from "@/lib/local-date";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { SemanticLabel } from "@/components/semantic-label";
 
 type AssignWorkoutFormProps = {
@@ -24,6 +25,7 @@ type AssignWorkoutFormProps = {
 export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
   const i18n = useUiTranslations();
   const router = useRouter();
+  const organizationSlug = useOrganizationSlug();
   const { tokens, signOut } = useSession();
   const [workout, setWorkout] = useState<WorkoutRecord | null>(null);
   const [athletes, setAthletes] = useState<AthleteOption[]>([]);
@@ -57,7 +59,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
 
         if (requestError instanceof ApiError && (requestError.status === 401 || requestError.status === 403)) {
           signOut();
-          router.replace("/login?next=/admin/workouts");
+          router.replace(`/login?next=${encodeURIComponent(adminHref("/admin/workouts", organizationSlug))}`);
           return;
         }
 
@@ -87,7 +89,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
 
           if (requestError instanceof ApiError && (requestError.status === 401 || requestError.status === 403)) {
             signOut();
-            router.replace("/login?next=/admin/workouts");
+            router.replace(`/login?next=${encodeURIComponent(adminHref("/admin/workouts", organizationSlug))}`);
             return;
           }
 
@@ -140,7 +142,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
 
     try {
       await deleteWorkout(tokens.access_token, workout.id);
-      router.push("/admin/workouts");
+      router.push(adminHref("/admin/workouts", organizationSlug));
     } catch (requestError) {
       setError(requestError instanceof Error ? localizeError(requestError, i18n) : i18n("couldNotDeleteWorkout234fe2c"));
       setDeleting(false);
@@ -177,7 +179,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
               <Link
                 className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
                 style={{ background: "var(--border)", color: "var(--text-soft)" }}
-                href="/admin/workouts"
+                href={adminHref("/admin/workouts", organizationSlug)}
               >
                 {i18n("backToWorkoutsdc51930")}
               </Link>

@@ -34,6 +34,7 @@ import {
 } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import {
   COMMON_WORKOUT_WORDS,
   DEFAULT_WORKOUT_DSL_SOURCE,
@@ -83,6 +84,7 @@ export function QuickTextWorkoutEditor({
 }: Props) {
   const i18n = useUiTranslations();
   const router = useRouter();
+  const organizationSlug = useOrganizationSlug();
   const { tokens } = useSession();
   const accessToken = tokens?.access_token;
   const [source, setSource] = useState(DEFAULT_WORKOUT_DSL_SOURCE);
@@ -494,7 +496,7 @@ export function QuickTextWorkoutEditor({
         expected_source_revision: revision,
         acknowledge_warnings: warningsAcknowledged,
       });
-      router.push("/admin/workouts");
+      router.push(adminHref("/admin/workouts", organizationSlug));
     } catch (error) {
       if (
         error instanceof ApiError &&
@@ -507,6 +509,17 @@ export function QuickTextWorkoutEditor({
       setPublishing(false);
     }
   }
+
+  const canPublish = Boolean(
+    tokens?.access_token &&
+      draftId &&
+      editor &&
+      preview &&
+      errors.length === 0 &&
+      saveStatus !== "conflict" &&
+      (warnings.length === 0 || warningsAcknowledged) &&
+      !publishing,
+  );
 
   return (
     <div className={correctionsOpen ? "grid h-full min-h-[calc(100dvh-6.5rem)] grid-cols-1 lg:grid-cols-[minmax(0,1.25fr)_minmax(20rem,0.75fr)]" : "grid h-full min-h-[calc(100dvh-6.5rem)] grid-cols-1"}>
@@ -621,13 +634,7 @@ export function QuickTextWorkoutEditor({
             </button>
             <button
               type="button"
-              disabled={
-                publishing ||
-                !preview ||
-                errors.length > 0 ||
-                saveStatus === "conflict" ||
-                (warnings.length > 0 && !warningsAcknowledged)
-              }
+              disabled={!canPublish}
               onClick={publish}
               className="rounded-xl px-5 py-2 text-sm font-black disabled:opacity-40"
               style={{ background: "var(--primary)", color: "var(--primary-foreground, white)" }}

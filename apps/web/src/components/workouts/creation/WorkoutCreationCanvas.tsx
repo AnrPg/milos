@@ -27,6 +27,7 @@ import {
 
 import { createDraftWorkout, fetchAdminWorkout, listScaleLevels, type ScaleLevel, type WorkoutRecord, updateDraftWorkout } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import { FORMAT_EXERCISE_CONTEXT, type DraftExercise, type DraftSection } from "@/types/workout";
@@ -153,6 +154,7 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
   const i18n = useUiTranslations();
   const { tokens } = useSession();
   const router = useRouter();
+  const organizationSlug = useOrganizationSlug();
   const searchParams = useSearchParams();
   const urlDraftId = embedded ? null : searchParams.get("draft");
   const draftId = useWorkoutCreationStore((state) => state.draftId);
@@ -271,7 +273,7 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
           initDraft(draft.id);
           draftLoadedRef.current = true;
           if (!embedded) {
-            router.replace(`/admin/workouts/new?draft=${draft.id}`);
+            router.replace(adminHref(`/admin/workouts/new?draft=${draft.id}`, organizationSlug));
           }
         })
         .catch(() => {
