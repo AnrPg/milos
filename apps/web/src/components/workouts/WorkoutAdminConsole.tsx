@@ -88,7 +88,7 @@ export function WorkoutAdminConsole() {
 
       setError(loadError instanceof Error ? localizeError(loadError, i18n) : i18n("failedToLoadAdminWorkoutData3641095"));
     }
-  }, [currentUser, i18n, role, router, signOut, status, tokens]);
+  }, [currentUser, i18n, organizationSlug, role, router, signOut, status, tokens]);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -185,7 +185,7 @@ export function WorkoutAdminConsole() {
     return parts;
   })();
   const orderedFolders = [...folders].sort((a, b) => folderLabel(a).localeCompare(folderLabel(b)));
-  const viewModeIcon = viewMode === "folders" ? "▦" : viewMode === "tiles" ? "▣" : "≡";
+  const viewModeIcon = viewMode === "folders" ? "📁" : viewMode === "tiles" ? "▦" : "☰";
   const viewModeLabel = i18n(`featureView${viewMode[0].toUpperCase()}${viewMode.slice(1)}`);
   const cycleViewMode = () => {
     setViewMode((current) => current === "folders" ? "tiles" : current === "tiles" ? "list" : "folders");
@@ -282,16 +282,12 @@ export function WorkoutAdminConsole() {
             ) : null}
 
             <section className="rounded-[2rem] p-4 sm:p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-2xl font-semibold" style={{ color: "var(--text)" }}>{i18n("semanticWorkoutLibrary")}</h2>
-                </div>
-
-                <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-2" aria-label={i18n("semanticWorkoutLibrary")}>
                   <Link
                     aria-label={i18n("newWorkout5fc6e4c")}
                     title={i18n("newWorkout5fc6e4c")}
-                    className="grid h-10 w-10 place-items-center rounded-full text-lg font-black"
+                    className="grid h-10 w-10 place-items-center rounded-full text-xl font-black"
                     style={{ background: "var(--text)", color: "var(--bg)" }}
                     href={adminHref("/admin/workouts/new", organizationSlug)}
                   >
@@ -301,15 +297,18 @@ export function WorkoutAdminConsole() {
                     type="button"
                     aria-label={i18n("featureNewFolder")}
                     title={i18n("featureNewFolder")}
-                    className="grid h-10 w-10 place-items-center rounded-full text-lg font-black"
+                    className="grid h-10 w-10 place-items-center rounded-full text-base font-black"
                     style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                     onClick={() => {
                       setFolderParentId(currentFolder?.id ?? "");
                       setFolderModalOpen(true);
                     }}
                   >
-                    ⊞
+                    📁+
                   </button>
+                </div>
+
+                <div className="flex items-center gap-2" aria-label={viewModeLabel}>
                   <button
                     type="button"
                     aria-expanded={libraryToolsOpen}
@@ -360,7 +359,7 @@ export function WorkoutAdminConsole() {
                         style={{ background: viewMode === mode ? "var(--text)" : "var(--panel)", color: viewMode === mode ? "var(--bg)" : "var(--text-soft)", border: "1px solid var(--border)" }}
                         onClick={() => setViewMode(mode)}
                       >
-                        {mode === "folders" ? "▦" : mode === "tiles" ? "▣" : "≡"}
+                        {mode === "folders" ? "📁" : mode === "tiles" ? "▦" : "☰"}
                       </button>
                     ))}
                     <button

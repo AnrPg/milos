@@ -112,6 +112,28 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
              ]
     end
 
+    test "admin can delete a draft without surfacing a post-delete broadcast error", %{conn: conn} do
+      {admin_conn, organization} = authenticate_as_admin(conn, "admin_draft_deleter")
+
+      draft_id =
+        admin_conn
+        |> post("/api/org/#{organization.slug}/admin/workouts")
+        |> json_response(201)
+        |> get_in(["draft", "id"])
+
+      delete_conn =
+        admin_conn
+        |> recycle()
+        |> delete("/api/org/#{organization.slug}/admin/workouts/#{draft_id}")
+
+      assert response(delete_conn, 204) == ""
+
+      admin_conn
+      |> recycle()
+      |> get("/api/org/#{organization.slug}/admin/workouts/#{draft_id}")
+      |> json_response(404)
+    end
+
     test "publishes a container whose exercises are in nested child sections", %{conn: conn} do
       {admin_conn, organization} = authenticate_as_admin(conn, "nested_draft_author")
 

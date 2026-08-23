@@ -12,7 +12,9 @@ defmodule MilosTraining.Application.DeleteWorkout do
          {:ok, deleted_slot_ids} <- Scheduling.delete_slots_for_workout(context, id),
          :ok <- Scheduling.delete_class_series_for_workout(context, id),
          :ok <- Workouts.delete_workout(context, id) do
-      broadcast_deleted_slots(deleted_slot_ids, workout.organization_id)
+      organization_id = Map.get(workout, :organization_id, context.organization_id)
+
+      broadcast_deleted_slots(deleted_slot_ids, organization_id)
       notify_assignment_targets(assignment_targets)
       notify_booking_targets(booking_targets)
       broadcast_assignment_refresh(assignment_targets, id)
