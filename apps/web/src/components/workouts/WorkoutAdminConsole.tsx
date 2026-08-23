@@ -50,6 +50,7 @@ export function WorkoutAdminConsole() {
   const [folderName, setFolderName] = useState("");
   const [folderParentId, setFolderParentId] = useState<string>("");
   const [folderModalOpen, setFolderModalOpen] = useState(false);
+  const [libraryToolsOpen, setLibraryToolsOpen] = useState(false);
   const [moveMenuWorkoutId, setMoveMenuWorkoutId] = useState<string | null>(null);
   const [draggedWorkoutId, setDraggedWorkoutId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -184,6 +185,11 @@ export function WorkoutAdminConsole() {
     return parts;
   })();
   const orderedFolders = [...folders].sort((a, b) => folderLabel(a).localeCompare(folderLabel(b)));
+  const viewModeIcon = viewMode === "folders" ? "▦" : viewMode === "tiles" ? "▣" : "≡";
+  const viewModeLabel = i18n(`featureView${viewMode[0].toUpperCase()}${viewMode.slice(1)}`);
+  const cycleViewMode = () => {
+    setViewMode((current) => current === "folders" ? "tiles" : current === "tiles" ? "list" : "folders");
+  };
   const visibleFolders = viewMode === "folders"
     ? orderedFolders.filter((folder) => selectedFolderId === "all" ? !folder.parent_id : folder.parent_id === selectedFolderId)
     : [];
@@ -275,55 +281,101 @@ export function WorkoutAdminConsole() {
               </section>
             ) : null}
 
-            <section className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-              <div className="flex flex-wrap items-center justify-between gap-4">
+            <section className="rounded-[2rem] p-4 sm:p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <h2 className="text-2xl font-semibold" style={{ color: "var(--text)" }}>{i18n("semanticWorkoutLibrary")}</h2>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-2">
                   <Link
-                    className="rounded-full px-4 py-2 text-sm font-semibold"
+                    aria-label={i18n("newWorkout5fc6e4c")}
+                    title={i18n("newWorkout5fc6e4c")}
+                    className="grid h-10 w-10 place-items-center rounded-full text-lg font-black"
                     style={{ background: "var(--text)", color: "var(--bg)" }}
                     href={adminHref("/admin/workouts/new", organizationSlug)}
                   >
-                    {i18n("newWorkout5fc6e4c")}
+                    +
                   </Link>
                   <button
                     type="button"
-                    className="rounded-full px-4 py-2 text-sm font-semibold"
+                    aria-label={i18n("featureNewFolder")}
+                    title={i18n("featureNewFolder")}
+                    className="grid h-10 w-10 place-items-center rounded-full text-lg font-black"
                     style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                     onClick={() => {
                       setFolderParentId(currentFolder?.id ?? "");
                       setFolderModalOpen(true);
                     }}
                   >
-                    {i18n("featureNewFolder")}
+                    ⊞
+                  </button>
+                  <button
+                    type="button"
+                    aria-expanded={libraryToolsOpen}
+                    aria-label={viewModeLabel}
+                    title={viewModeLabel}
+                    className="grid h-10 w-10 place-items-center rounded-full text-base font-black"
+                    style={{ background: "var(--panel-muted)", color: "var(--text-soft)", border: "1px solid var(--border)" }}
+                    onClick={() => {
+                      if (libraryToolsOpen) {
+                        cycleViewMode();
+                      } else {
+                        setLibraryToolsOpen(true);
+                      }
+                    }}
+                    onDoubleClick={cycleViewMode}
+                  >
+                    {viewModeIcon}
                   </button>
                 </div>
               </div>
 
-              <div className="mt-6 grid gap-4 rounded-[1.5rem] p-4 lg:grid-cols-[1fr_auto]" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
-                <div className="flex min-w-0 flex-wrap items-center gap-2">
-                  <nav aria-label={i18n("featureFilterByFolder")} className="flex min-w-0 flex-wrap items-center gap-1 text-sm">
-                    <button type="button" className="rounded-full px-3 py-1.5 font-semibold" style={{ background: selectedFolderId === "all" ? "var(--text)" : "var(--panel)", color: selectedFolderId === "all" ? "var(--bg)" : "var(--text-soft)", border: "1px solid var(--border)" }} onClick={() => setSelectedFolderId("all")}>
-                      {i18n("featureLibraryRoot")}
-                    </button>
-                    {folderPath.map((folder) => (
-                      <span key={folder.id} className="inline-flex items-center gap-1">
-                        <span style={{ color: "var(--dim)" }}>/</span>
-                        <button type="button" className="rounded-full px-3 py-1.5 font-semibold" style={{ background: folder.id === selectedFolderId ? "var(--text)" : "var(--panel)", color: folder.id === selectedFolderId ? "var(--bg)" : "var(--text-soft)", border: "1px solid var(--border)" }} onClick={() => setSelectedFolderId(folder.id)}>
-                          {folder.name}
-                        </button>
-                      </span>
+              {libraryToolsOpen ? (
+                <div className="mt-4 grid gap-4 rounded-[1.2rem] p-3 sm:p-4 lg:grid-cols-[1fr_auto]" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
+                  <div className="flex min-w-0 flex-wrap items-center gap-2">
+                    <nav aria-label={i18n("featureFilterByFolder")} className="flex min-w-0 flex-wrap items-center gap-1 text-sm">
+                      <button type="button" className="rounded-full px-3 py-1.5 font-semibold" style={{ background: selectedFolderId === "all" ? "var(--text)" : "var(--panel)", color: selectedFolderId === "all" ? "var(--bg)" : "var(--text-soft)", border: "1px solid var(--border)" }} onClick={() => setSelectedFolderId("all")}>
+                        {i18n("featureLibraryRoot")}
+                      </button>
+                      {folderPath.map((folder) => (
+                        <span key={folder.id} className="inline-flex min-w-0 items-center gap-1">
+                          <span style={{ color: "var(--dim)" }}>/</span>
+                          <button type="button" className="max-w-[10rem] truncate rounded-full px-3 py-1.5 font-semibold" style={{ background: folder.id === selectedFolderId ? "var(--text)" : "var(--panel)", color: folder.id === selectedFolderId ? "var(--bg)" : "var(--text-soft)", border: "1px solid var(--border)" }} onClick={() => setSelectedFolderId(folder.id)}>
+                            {folder.name}
+                          </button>
+                        </span>
+                      ))}
+                    </nav>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {(["folders", "tiles", "list"] as const).map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        aria-pressed={viewMode === mode}
+                        aria-label={i18n(`featureView${mode[0].toUpperCase()}${mode.slice(1)}`)}
+                        title={i18n(`featureView${mode[0].toUpperCase()}${mode.slice(1)}`)}
+                        className="grid h-9 w-9 place-items-center rounded-full text-sm font-black"
+                        style={{ background: viewMode === mode ? "var(--text)" : "var(--panel)", color: viewMode === mode ? "var(--bg)" : "var(--text-soft)", border: "1px solid var(--border)" }}
+                        onClick={() => setViewMode(mode)}
+                      >
+                        {mode === "folders" ? "▦" : mode === "tiles" ? "▣" : "≡"}
+                      </button>
                     ))}
-                  </nav>
+                    <button
+                      type="button"
+                      aria-label={i18n("hide34d8b60")}
+                      title={i18n("hide34d8b60")}
+                      className="grid h-9 w-9 place-items-center rounded-full text-sm font-black"
+                      style={{ background: "var(--panel)", color: "var(--dim)", border: "1px solid var(--border)" }}
+                      onClick={() => setLibraryToolsOpen(false)}
+                    >
+                      ×
+                    </button>
+                  </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>{i18n("featureViewLabel")}</span>
-                  {(["folders", "tiles", "list"] as const).map((mode) => <button key={mode} type="button" aria-pressed={viewMode === mode} className="rounded-full px-3 py-2 text-sm font-semibold capitalize" style={{ background: viewMode === mode ? "var(--text)" : "var(--panel)", color: viewMode === mode ? "var(--bg)" : "var(--text-soft)", border: "1px solid var(--border)" }} onClick={() => setViewMode(mode)}>{i18n(`featureView${mode[0].toUpperCase()}${mode.slice(1)}`)}</button>)}
-                </div>
-              </div>
+              ) : null}
 
               <div className="mt-4 flex flex-wrap items-center gap-3">
                 {viewMode === "folders" && selectedFolderId !== "all" ? (

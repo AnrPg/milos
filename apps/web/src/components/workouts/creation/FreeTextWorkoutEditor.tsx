@@ -180,8 +180,8 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
   }
 
   return (
-    <div className={previewOpen ? "grid min-h-[calc(100dvh-6.5rem)] grid-cols-1 lg:grid-cols-[minmax(0,1fr)_24rem]" : "grid min-h-[calc(100dvh-6.5rem)] grid-cols-1 lg:grid-cols-[minmax(0,1fr)_4rem]"}>
-      <section className="flex min-h-0 flex-col border-e" style={{ borderColor: "var(--dim)" }}>
+    <div className={previewOpen ? "grid min-h-[calc(100dvh-6.5rem)] min-w-0 grid-cols-1 overflow-x-clip lg:grid-cols-[minmax(0,1fr)_24rem]" : "grid min-h-[calc(100dvh-6.5rem)] min-w-0 grid-cols-1 overflow-x-clip lg:grid-cols-[minmax(0,1fr)_4rem]"}>
+      <section className="flex min-h-0 min-w-0 flex-col border-e" style={{ borderColor: "var(--dim)" }}>
         <CollapsibleRibbon
           label={i18n("freeTextTitle")}
           collapsed={collapsedRibbons.overview}
@@ -250,11 +250,11 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
           <FreeTextToolbar editor={editor} />
         </CollapsibleRibbon>
 
-        <div className="min-h-0 flex-1 overflow-auto">
+        <div className="min-h-0 min-w-0 flex-1 overflow-auto overflow-x-clip">
           <EditorContent editor={editor} />
         </div>
 
-        <footer className="flex flex-wrap items-center justify-between gap-3 border-t px-5 py-3" style={{ borderColor: "var(--dim)" }}>
+        <footer className="flex flex-wrap items-center justify-between gap-3 border-t px-4 py-3 sm:px-5" style={{ borderColor: "var(--dim)" }}>
           <span className="text-xs" style={{ color: "var(--muted)" }}>
             {i18n("quickTextCharacterCount", { count: editor?.storage.characterCount.characters() ?? 0 })}
           </span>
@@ -262,7 +262,7 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
             type="button"
             disabled={!canPublish}
             onClick={() => void publish()}
-            className="rounded-xl px-5 py-2 text-sm font-black disabled:opacity-40"
+            className="min-w-0 rounded-xl px-5 py-2 text-sm font-black disabled:opacity-40"
             style={{ background: "var(--success, var(--primary))", color: "var(--bg)", boxShadow: "0 10px 24px color-mix(in srgb, var(--primary) 22%, transparent)" }}
           >
             {publishing ? i18n("quickTextPublishing") : i18n("quickTextPublish")}
@@ -270,7 +270,7 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
         </footer>
       </section>
 
-      <aside className="min-h-0 overflow-auto p-4" style={{ background: "var(--panel)" }}>
+      <aside className="min-h-0 min-w-0 overflow-auto overflow-x-clip p-4" style={{ background: "var(--panel)" }}>
         <div className="flex items-center justify-between gap-3">
           {previewOpen ? (
             <h2 className="text-lg font-black" style={{ color: "var(--text)" }}>
@@ -322,21 +322,21 @@ function CollapsibleRibbon({
   children: ReactNode;
 }) {
   return (
-    <section className="border-b" style={{ borderColor: "var(--dim)" }}>
+    <section className="min-w-0 border-b" style={{ borderColor: "var(--dim)" }}>
       <button
         type="button"
-        className="flex w-full items-center justify-between gap-3 px-4 py-2 text-start text-xs font-black uppercase tracking-[0.18em]"
+        className="flex w-full min-w-0 items-center justify-between gap-3 px-4 py-2 text-start text-xs font-black uppercase tracking-[0.18em]"
         style={{ background: "var(--bg)", color: "var(--muted)" }}
         aria-expanded={!collapsed}
         onClick={onToggle}
       >
-        <span>{label}</span>
+        <span className="min-w-0 truncate">{label}</span>
         <span aria-hidden="true" className="text-base leading-none" style={{ color: "var(--primary)" }}>
           {collapsed ? "+" : "−"}
         </span>
       </button>
       {collapsed ? null : (
-        <div className="border-t" style={{ borderColor: "color-mix(in srgb, var(--dim) 70%, transparent)" }}>
+        <div className="min-w-0 border-t overflow-x-clip" style={{ borderColor: "color-mix(in srgb, var(--dim) 70%, transparent)" }}>
           {children}
         </div>
       )}
@@ -377,9 +377,9 @@ function FreeTextToolbar({ editor }: { editor: Editor | null }) {
   ];
 
   return (
-    <div className="px-4 py-2" style={{ background: "color-mix(in srgb, var(--bg) 96%, transparent)" }}>
+    <div className="min-w-0 px-3 py-2 sm:px-4" style={{ background: "color-mix(in srgb, var(--bg) 96%, transparent)" }}>
       <div
-        className="flex flex-wrap items-center gap-1.5 rounded-lg border p-1.5"
+        className="flex min-w-0 flex-wrap items-center gap-1.5 rounded-lg border p-1.5"
         style={{ borderColor: "var(--dim)", background: "var(--card)" }}
       >
         <ToolbarGroup actions={textActions} />
@@ -389,7 +389,7 @@ function FreeTextToolbar({ editor }: { editor: Editor | null }) {
         </label>
         <select
           id="free-text-heading-select"
-          className="h-8 min-w-32 rounded-md border px-2 text-sm font-bold outline-none"
+          className="h-8 min-w-0 max-w-full flex-1 rounded-md border px-2 text-sm font-bold outline-none sm:min-w-32 sm:flex-none"
           style={{ background: "var(--bg)", borderColor: "var(--dim)", color: "var(--text)" }}
           aria-label={i18n("editorHeading")}
           value={activeHeadingLevel ? `heading-${activeHeadingLevel}` : "paragraph"}
@@ -414,7 +414,7 @@ function FreeTextToolbar({ editor }: { editor: Editor | null }) {
         <ToolbarGroup actions={blockActions} />
         <ToolbarGroup actions={layoutActions} />
         <div
-          className="flex items-center gap-1 rounded-md px-1"
+          className="flex flex-wrap items-center gap-1 rounded-md px-1"
           role="group"
           aria-label={i18n("editorTextColor")}
         >
@@ -452,7 +452,7 @@ function FreeTextToolbar({ editor }: { editor: Editor | null }) {
             ×
           </button>
         </div>
-        <div className="ms-auto flex min-w-fit">
+        <div className="flex sm:ms-auto">
           <ToolbarGroup actions={historyActions} />
         </div>
       </div>
@@ -463,7 +463,7 @@ function FreeTextToolbar({ editor }: { editor: Editor | null }) {
 function ToolbarGroup({ actions }: { actions: ReturnType<typeof toolbarButton>[] }) {
   return (
     <div
-      className="flex flex-wrap items-center gap-1"
+      className="flex min-w-0 flex-wrap items-center gap-1"
     >
       {actions.map((action) => (
         <button

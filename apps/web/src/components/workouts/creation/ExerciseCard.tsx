@@ -400,9 +400,9 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions, s
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div ref={setNodeRef} style={{ ...style, overflow: "visible" }}>
+    <div ref={setNodeRef} className="min-w-0" style={{ ...style, overflow: "visible" }}>
       <div
-        className="rounded-2xl"
+        className="min-w-0 rounded-2xl"
         onMouseEnter={() => setDetailsHovered(true)}
         onMouseLeave={() => setDetailsHovered(false)}
         style={{
@@ -411,7 +411,7 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions, s
           boxShadow: groupColor ? `inset 3px 0 0 ${groupColor}` : "none",
         }}
       >
-        <div className="flex flex-wrap items-center gap-3 px-4 py-3" onClick={() => setDetailsPinned((current) => !current)}>
+        <div className="flex min-w-0 flex-wrap items-center gap-2 px-3 py-3 sm:gap-3 sm:px-4" onClick={() => setDetailsPinned((current) => !current)}>
           <input
             aria-label={i18n("selectExerciseForGrouping")}
             checked={selected}
@@ -437,12 +437,12 @@ export function ExerciseCard({ exercise, section, scaleLevels, sectionOptions, s
             onChange={(event) => update({ name: event.target.value })}
             onClick={(event) => event.stopPropagation()}
             placeholder={i18n("exerciseName9a5c1af")}
-            className="min-w-[10rem] flex-1 bg-transparent text-base font-bold outline-none"
+            className="min-w-0 flex-[1_1_9rem] bg-transparent text-base font-bold outline-none"
             style={{ color: "var(--text)" }}
           />
 
           {ctx.showSets && !grouped && detailsOpen ? (
-            <div className="flex shrink-0 items-center gap-1">
+            <div className="flex shrink-0 flex-wrap items-center gap-1">
               <NumberStepper
                 value={exercise.sets}
                 onChange={(value) =>

@@ -60,6 +60,24 @@ type DashboardCategory = {
   items: { href: string; labelKey?: string; label?: string; description: string }[];
 };
 
+const ADMIN_NAV_ICONS: Record<string, string> = {
+  "/": "⌂",
+  "/admin/users": "◎",
+  "/admin/finance": "$",
+  "/admin/class-schedule": "▦",
+  "/admin/coaching-assignments": "◇",
+  "/admin/workouts": "▣",
+  "/admin/metrics": "⌁",
+};
+
+const MEMBER_NAV_ICONS: Record<string, string> = {
+  "/": "⌂",
+  "/schedule": "▦",
+  "/my-workouts": "▣",
+  "/my-workouts/pantheon": "★",
+  "/account/billing": "$",
+};
+
 function stripOrganizationPrefix(pathname: string) {
   return pathname.replace(/^\/org\/[^/]+(?=\/|$)/, "") || "/";
 }
@@ -154,15 +172,18 @@ function DashboardDropdown({
       >
         <Link
           href={adminHref("/admin", organizationSlug)}
-          className="whitespace-nowrap py-1 ps-2 text-xs font-semibold transition-colors sm:px-3 sm:text-sm"
+          className="grid h-8 min-w-8 place-items-center rounded-full px-2 text-xs font-semibold transition-colors sm:h-auto sm:min-w-0 sm:px-3 sm:py-1 sm:text-sm"
           style={{ color: isAdminActive ? "var(--text)" : "var(--dim)" }}
+          aria-label={t("dashboard")}
+          title={t("dashboard")}
         >
-          {t("dashboard")}
+          <span aria-hidden="true" className="sm:hidden">⌂</span>
+          <span className="hidden sm:inline">{t("dashboard")}</span>
         </Link>
         <button
           aria-expanded={open}
           aria-label={t("openDashboard")}
-          className="px-1.5 py-1 text-xs sm:pe-2"
+          className="h-8 px-1.5 text-xs sm:h-auto sm:py-1 sm:pe-2"
           style={{ color: isAdminActive ? "var(--text)" : "var(--dim)" }}
           onClick={() => setOpen((value) => !value)}
           type="button"
@@ -298,23 +319,24 @@ export function TopNav() {
 
   return (
     <header
-      className="sticky top-0 z-50 flex items-center"
+      className="sticky top-0 z-50 flex items-center overflow-x-clip"
       style={{
         background: "var(--bg)",
         borderBottom: "1px solid var(--border)",
         minHeight: "3.25rem",
       }}
     >
-      <div className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 px-2 py-1 sm:gap-x-4 sm:px-5">
+      <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 px-2 py-1 sm:flex sm:flex-wrap sm:gap-x-4 sm:px-5">
         <Link
           href="/"
-          className="block min-w-0 max-w-full shrink-0 whitespace-normal break-words text-xs font-bold uppercase sm:max-w-[32rem]"
+          className="block min-w-0 truncate text-xs font-bold uppercase sm:max-w-[32rem] sm:shrink-0 sm:whitespace-normal sm:break-words"
           style={{ color: "var(--text)" }}
+          title={brandName}
         >
           {brandName}
         </Link>
 
-        <nav className="flex min-w-0 flex-1 flex-wrap items-center gap-0.5 overflow-visible sm:gap-1">
+        <nav className="order-3 col-span-2 flex min-w-0 flex-1 flex-wrap items-center gap-0.5 overflow-visible sm:order-none sm:col-span-1 sm:gap-1">
           {isVendor ? (
             <Link
               href="/platform/organizations"
@@ -330,21 +352,25 @@ export function TopNav() {
           {showTenantShell && role === "admin" ? (
             <DashboardDropdown pathname={pathname} organizationSlug={selectedOrganizationSlug} />
           ) : null}
-          <div className="flex min-w-0 items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-1">
+          <div className="flex min-w-0 flex-wrap items-center gap-0.5 overflow-visible sm:gap-1">
             {showTenantShell && role === "admin"
               ? ADMIN_NAV_LINKS.map((link) => {
                   const active = pathActive(pathname, link.href);
+                  const icon = ADMIN_NAV_ICONS[link.href] ?? "•";
                   return (
                     <Link
                       key={link.href}
                       href={adminHref(link.href, selectedOrganizationSlug)}
-                      className={(link.mobileVisible ? "" : "hidden md:block") + " whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold transition-colors sm:px-3 sm:text-sm"}
+                      className={(link.mobileVisible ? "" : "hidden md:block") + " grid h-8 min-w-8 place-items-center rounded-full px-2 text-xs font-semibold transition-colors sm:h-auto sm:min-w-0 sm:px-3 sm:py-1 sm:text-sm"}
                       style={{
                         background: active ? "var(--border)" : "transparent",
                         color: active ? "var(--text)" : "var(--dim)",
                       }}
+                      aria-label={t(link.labelKey)}
+                      title={t(link.labelKey)}
                     >
-                      {t(link.labelKey)}
+                      <span aria-hidden="true" className="sm:hidden">{icon}</span>
+                      <span className="hidden sm:inline">{t(link.labelKey)}</span>
                     </Link>
                   );
                 })
@@ -356,13 +382,16 @@ export function TopNav() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="relative whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold transition-colors sm:px-3 sm:text-sm"
+                  className="relative grid h-8 min-w-8 place-items-center rounded-full px-2 text-xs font-semibold transition-colors sm:h-auto sm:min-w-0 sm:px-3 sm:py-1 sm:text-sm"
                   style={{
                     background: active ? "var(--border)" : "transparent",
                     color: active ? "var(--text)" : "var(--dim)",
                   }}
+                  aria-label={t(link.labelKey)}
+                  title={t(link.labelKey)}
                 >
-                  {t(link.labelKey)}
+                  <span aria-hidden="true" className="sm:hidden">{MEMBER_NAV_ICONS[link.href] ?? "•"}</span>
+                  <span className="hidden sm:inline">{t(link.labelKey)}</span>
                   {showBalanceBadge ? (
                     <span
                       className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold"
@@ -384,14 +413,17 @@ export function TopNav() {
             <div className="relative shrink-0">
               <button
                 type="button"
-                className="relative whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold transition-colors sm:px-3 sm:text-sm"
+                className="relative grid h-8 min-w-8 place-items-center rounded-full px-2 text-xs font-semibold transition-colors sm:h-auto sm:min-w-0 sm:px-3 sm:py-1 sm:text-sm"
                 style={{
                   background: msgOpen ? "var(--border)" : "transparent",
                   color: msgOpen ? "var(--text)" : "var(--dim)",
                 }}
                 onClick={() => setMsgOpen((value) => !value)}
+                aria-label={t("chat")}
+                title={t("chat")}
               >
-                {t("chat")}
+                <span aria-hidden="true" className="sm:hidden">✉</span>
+                <span className="hidden sm:inline">{t("chat")}</span>
                 {unreadCount > 0 ? (
                   <span
                     className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold"

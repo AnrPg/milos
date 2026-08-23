@@ -189,14 +189,14 @@ export function MiddlePanel({ scaleLevels }: Props) {
   }
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden" style={{ background: "var(--bg)" }}>
+    <div className="flex min-w-0 flex-1 flex-col overflow-hidden overflow-x-clip" style={{ background: "var(--bg)" }}>
       {selectedSection ? (
         <div
-          className="flex shrink-0 flex-col border-b px-6 py-3"
+          className="flex min-w-0 shrink-0 flex-col border-b px-4 py-3 sm:px-6"
           style={{ borderColor: "var(--dim)" }}
         >
-          <div className="flex items-center gap-3">
-            <h2 className="text-xl font-extrabold" style={{ color: "var(--text)" }}>
+          <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
+            <h2 className="min-w-0 truncate text-xl font-extrabold" style={{ color: "var(--text)" }}>
               {selectedSection.name || i18n("unnamedSection109fa70")}
             </h2>
             <FormatTooltip format={selectedSection.format}>
@@ -224,7 +224,7 @@ export function MiddlePanel({ scaleLevels }: Props) {
         </div>
       ) : (
         <div
-          className="flex shrink-0 items-center gap-3 border-b px-6 py-3"
+          className="flex min-w-0 shrink-0 items-center gap-3 border-b px-4 py-3 sm:px-6"
           style={{ borderColor: "var(--dim)" }}
         >
           <h2 className="text-lg font-bold" style={{ color: "var(--muted)" }}>
@@ -233,7 +233,7 @@ export function MiddlePanel({ scaleLevels }: Props) {
         </div>
       )}
 
-      <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-6 py-4">
+      <div className="flex min-w-0 flex-1 flex-col gap-3 overflow-y-auto overflow-x-clip px-3 py-4 sm:px-6">
         {selectedSection && selectedExerciseIds.size > 0 ? (
           <div
             className="sticky top-0 z-10 flex flex-wrap items-center gap-2 px-3 py-2"
