@@ -73,6 +73,65 @@ describe("apiRequest tenant headers", () => {
     expect(fetchMock).toHaveBeenCalledWith("/api/admin/users", expect.anything());
   });
 
+  it("hydrates the selected organization before tenant admin requests without a path slug", async () => {
+    window.history.replaceState(null, "", "/admin/workouts/new");
+    const fetchMock = vi.spyOn(window, "fetch")
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify([
+            { role: "admin", organization: { slug: "milos-method" } },
+          ]),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(new Response(JSON.stringify({ draft: { id: "draft-1" } }), { status: 201 }));
+
+    await apiRequest<{ draft: { id: string } }>("/admin/workouts", {
+      method: "POST",
+      token: "token",
+    });
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      "/api/memberships",
+      expect.objectContaining({
+        headers: expect.objectContaining({ Authorization: "Bearer token" }),
+      }),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      "/api/org/milos-method/admin/workouts",
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({ "X-Organization-Slug": "milos-method" }),
+      }),
+    );
+    expect(window.localStorage.getItem(SELECTED_ORGANIZATION_SLUG_KEY)).toBe("milos-method");
+  });
+
+  it("hydrates the selected organization before tenant member finance requests", async () => {
+    window.history.replaceState(null, "", "/admin/workouts/new");
+    const fetchMock = vi.spyOn(window, "fetch")
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify([
+            { role: "member", organization: { slug: "milos-method" } },
+          ]),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(new Response(JSON.stringify({ credit_balance: 0 }), { status: 200 }));
+
+    await apiRequest<{ credit_balance: number }>("/me/finance", { token: "token" });
+
+    expect(fetchMock).toHaveBeenNthCalledWith(1, "/api/memberships", expect.anything());
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      "/api/org/milos-method/me/finance",
+      expect.anything(),
+    );
+  });
+
   it("scopes /me/search/users under the resolved organization", async () => {
     window.history.replaceState(null, "", "/org/atlas-gym/admin");
     const fetchMock = vi.spyOn(window, "fetch").mockResolvedValue(

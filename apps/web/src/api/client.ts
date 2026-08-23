@@ -108,21 +108,79 @@ function isMemberWorkoutPath(path: string) {
   return !/^\/workouts\/[^/?]+\/timer-sequence(?:\?|$)/.test(path);
 }
 
+function isTenantScopedRequest(path: string) {
+  return (
+    TENANT_SCOPED_PREFIXES.some((prefix) => pathMatchesPrefix(path, prefix)) ||
+    isMemberWorkoutPath(path)
+  );
+}
+
 function tenantScopedPath(path: string, organizationSlug: string | null) {
   if (!organizationSlug) return path;
   if (path === "/org" || path.startsWith("/org/")) return path;
 
-  const isTenantScoped =
-    TENANT_SCOPED_PREFIXES.some((prefix) => pathMatchesPrefix(path, prefix)) || isMemberWorkoutPath(path);
-  if (!isTenantScoped) return path;
+  if (!isTenantScopedRequest(path)) return path;
 
   return `/org/${organizationSlug}${path}`;
+}
+
+function rememberOrganizationSlug(slug: string) {
+  if (typeof window === "undefined") return;
+
+  try {
+    window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, slug);
+  } catch {}
 }
 
 let refreshPromise: Promise<string | null> | null = null;
 let sessionUser: unknown | null = null;
 let latestSharedAccessToken: string | null = null;
 let sessionChannel: BroadcastChannel | null = null;
+let membershipSlugPromise: Promise<string | null> | null = null;
+
+async function fetchMembershipOrganizationSlug(token: string) {
+  const response = await fetch(`${API_BASE_URL}/memberships`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    credentials: "same-origin",
+  });
+
+  if (!response.ok) return null;
+
+  const memberships = (await response.json().catch(() => [])) as Array<{
+    organization?: { slug?: unknown };
+    role?: unknown;
+  }>;
+  const adminMembership =
+    memberships.find((membership) =>
+      ["owner", "admin", "coach"].includes(String(membership.role)),
+    ) ?? memberships[0];
+  const slug = adminMembership?.organization?.slug;
+
+  if (typeof slug !== "string" || slug.length === 0) return null;
+
+  rememberOrganizationSlug(slug);
+  return slug;
+}
+
+async function resolveOrganizationSlugForRequest(path: string, token?: string | null) {
+  const knownSlug = organizationSlugForRequest(token);
+
+  if (knownSlug || !token || !isTenantScopedRequest(path)) {
+    return knownSlug;
+  }
+
+  membershipSlugPromise ??= fetchMembershipOrganizationSlug(token);
+
+  try {
+    return await membershipSlugPromise;
+  } finally {
+    membershipSlugPromise = null;
+  }
+}
 
 function getSessionChannel() {
   if (typeof window === "undefined" || !("BroadcastChannel" in window)) return null;
@@ -246,7 +304,7 @@ export async function apiRequest<T>(
     allowRefresh && options.token && tokenExpiresSoon(options.token)
       ? (await refreshAccessToken()) ?? options.token
       : options.token;
-  const organizationSlug = organizationSlugForRequest(token);
+  const organizationSlug = await resolveOrganizationSlugForRequest(path, token);
   const requestPath = tenantScopedPath(path, organizationSlug);
 
   const response = await fetch(`${API_BASE_URL}${requestPath}`, {
