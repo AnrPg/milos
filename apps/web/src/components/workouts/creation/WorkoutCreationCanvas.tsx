@@ -162,6 +162,7 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
   const resetDraft = useWorkoutCreationStore((state) => state.resetDraft);
   const loadFromDraftData = useWorkoutCreationStore((state) => state.loadFromDraftData);
   const setSaveStatus = useWorkoutCreationStore((state) => state.setSaveStatus);
+  const setDraftRevision = useWorkoutCreationStore((state) => state.setDraftRevision);
   const title = useWorkoutCreationStore((state) => state.title);
   const type = useWorkoutCreationStore((state) => state.type);
   const sections = useWorkoutCreationStore((state) => state.sections);
@@ -270,7 +271,7 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
     } else {
       createDraftWorkout(tokens.access_token)
         .then((draft) => {
-          initDraft(draft.id);
+          initDraft(draft.id, draft.dsl_source_revision ?? 0);
           draftLoadedRef.current = true;
           if (!embedded) {
             router.replace(adminHref(`/admin/workouts/new?draft=${draft.id}`, organizationSlug));
@@ -280,7 +281,7 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
           setSaveStatus("error");
         });
     }
-  }, [draftId, embedded, initDraft, loadFromDraftData, router, setSaveStatus, tokens?.access_token, urlDraftId]);
+  }, [draftId, embedded, initDraft, loadFromDraftData, organizationSlug, router, setSaveStatus, tokens?.access_token, urlDraftId]);
 
   // On remount (navigated away and back to the same draft URL), draftId is already set in
   // the Zustand store but draftLoadedRef is false (refs reset on unmount). Re-fetch to
@@ -382,12 +383,15 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
 
     saveTimerRef.current = setTimeout(async () => {
       try {
-        await updateDraftWorkout(
+        const draft = await updateDraftWorkout(
           tokens.access_token,
           draftId,
           toApiPayload(),
           { editorSessionId: editorSessionIdRef.current },
         );
+        if (typeof draft.dsl_source_revision === "number") {
+          setDraftRevision(draft.dsl_source_revision);
+        }
         setSaveStatus("saved");
       } catch {
         setSaveStatus("error");
@@ -397,7 +401,7 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
-  }, [draftId, sections, setSaveStatus, title, toApiPayload, tokens?.access_token, type]);
+  }, [draftId, sections, setDraftRevision, setSaveStatus, title, toApiPayload, tokens?.access_token, type]);
 
   function handleDragStart({ active, activatorEvent }: DragStartEvent) {
     const dragType = active.data.current?.type as "section" | "exercise" | undefined;

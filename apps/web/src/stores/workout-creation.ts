@@ -28,9 +28,10 @@ type WorkoutCreationStore = DraftWorkoutState & {
   leftCollapsed: boolean;
   rightCollapsed: boolean;
   mobileView: MobileView;
-  initDraft: (id: string) => void;
+  initDraft: (id: string, revision?: number | null) => void;
   resetDraft: () => void;
   loadFromDraftData: (data: unknown) => void;
+  setDraftRevision: (revision: number | null) => void;
   setTitle: (title: string) => void;
   setType: (type: WorkoutType) => void;
   setIsTeamWorkout: (value: boolean) => void;
@@ -279,6 +280,7 @@ function parseWorkoutType(value: unknown): WorkoutType | null {
 
 export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) => ({
   draftId: null,
+  draftRevision: null,
   title: "",
   type: null,
   isTeamWorkout: false,
@@ -290,10 +292,10 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
   rightCollapsed: false,
   mobileView: "sections",
 
-  initDraft: (id) => set({ draftId: id }),
+  initDraft: (id, revision = null) => set({ draftId: id, draftRevision: revision }),
 
   resetDraft: () =>
-    set({ draftId: null, title: "", type: null, isTeamWorkout: false, sections: [], selectedSectionId: null, sectionConfigOpen: false }),
+    set({ draftId: null, draftRevision: null, title: "", type: null, isTeamWorkout: false, sections: [], selectedSectionId: null, sectionConfigOpen: false }),
 
   loadFromDraftData: (data) => {
     if (!data || typeof data !== "object") return;
@@ -305,6 +307,7 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
         : null;
     const source = nestedDraft && Array.isArray(nestedDraft.sections) ? nestedDraft : record;
     set({
+      draftRevision: typeof record.dsl_source_revision === "number" ? record.dsl_source_revision : get().draftRevision,
       title: typeof source.title === "string" ? source.title : (typeof record.title === "string" ? record.title : ""),
       type: parseWorkoutType(source.type ?? record.type),
       isTeamWorkout: Boolean(record.is_team_workout),
@@ -312,6 +315,7 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
     });
   },
 
+  setDraftRevision: (draftRevision) => set({ draftRevision }),
   setTitle: (title) => set({ title }),
   setType: (type) => set({ type }),
   setIsTeamWorkout: (isTeamWorkout) => set({ isTeamWorkout }),
@@ -684,7 +688,7 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
   setRightCollapsed: (rightCollapsed) => set({ rightCollapsed }),
 
   toApiPayload: () => {
-    const { title, type, isTeamWorkout, sections } = get();
+    const { title, type, isTeamWorkout, sections, draftRevision } = get();
 
     function deriveLadderTimerParams(section: DraftSection): Record<string, number> {
       const first = section.exercises[0];
@@ -712,6 +716,7 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
       title,
       type,
       is_team_workout: isTeamWorkout,
+      expected_source_revision: draftRevision,
       sections: sections.map((section) => ({
         name: section.name,
         timer_config: {

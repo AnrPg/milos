@@ -347,8 +347,13 @@ function mapLegacyCreatePayload(payload: CreateWorkoutRequest) {
 
 export async function createWorkout(token: string, payload: CreateWorkoutRequest) {
   const draft = await createDraftWorkout(token);
-  await updateDraftWorkout(token, draft.id, mapLegacyCreatePayload(payload));
-  return publishWorkout(token, draft.id);
+  const updatedDraft = await updateDraftWorkout(token, draft.id, {
+    ...mapLegacyCreatePayload(payload),
+    expected_source_revision: draft.dsl_source_revision ?? 0,
+  });
+  return publishWorkoutDraft(token, draft.id, {
+    expected_source_revision: updatedDraft.dsl_source_revision ?? draft.dsl_source_revision ?? 0,
+  });
 }
 
 export async function createDraftWorkout(

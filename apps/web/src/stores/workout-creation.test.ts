@@ -42,4 +42,27 @@ describe("workout creation draft hydration", () => {
       3,
     ]);
   });
+
+  it("includes the latest draft revision in autosave payloads", () => {
+    useWorkoutCreationStore.getState().loadFromDraftData({
+      title: "Revision demo",
+      type: "crossfit",
+      dsl_source_revision: 7,
+      draft_data: {
+        title: "Revision demo",
+        type: "crossfit",
+        sections: [],
+      },
+    });
+
+    expect(useWorkoutCreationStore.getState().toApiPayload()).toMatchObject({
+      expected_source_revision: 7,
+    });
+
+    useWorkoutCreationStore.getState().setDraftRevision(8);
+
+    expect(useWorkoutCreationStore.getState().toApiPayload()).toMatchObject({
+      expected_source_revision: 8,
+    });
+  });
 });

@@ -63,6 +63,7 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
     tools: false,
   });
   const loadedDraftRef = useRef<string | null>(null);
+  const revisionRef = useRef<number | null>(null);
 
   function toggleRibbon(key: RibbonKey) {
     setCollapsedRibbons((current) => ({ ...current, [key]: !current[key] }));
@@ -108,7 +109,10 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
 
     loadedDraftRef.current = "creating";
     createDraftWorkout(accessToken)
-      .then((draft) => onDraftReady(draft.id))
+      .then((draft) => {
+        revisionRef.current = draft.dsl_source_revision ?? 0;
+        onDraftReady(draft.id);
+      })
       .catch(() => {
         loadedDraftRef.current = null;
         setSaveStatus("error");
@@ -126,6 +130,7 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
           setType(workout.type as WorkoutType);
         }
         const nextBody = workout.free_text_body ?? "";
+        revisionRef.current = workout.dsl_source_revision ?? 0;
         setBody(nextBody);
         editor.commands.setContent(workout.free_text_document ?? textToDocument(nextBody));
         setHtml(editor.getHTML());
@@ -141,12 +146,14 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
     setSaveStatus("saving");
 
     try {
-      await updateDraftWorkout(accessToken, draftId, buildPayload({
+      const draft = await updateDraftWorkout(accessToken, draftId, buildPayload({
         title,
         type,
         body,
         document: editor.getJSON(),
+        expectedSourceRevision: revisionRef.current,
       }));
+      revisionRef.current = draft.dsl_source_revision ?? revisionRef.current;
       setSaveStatus("saved");
     } catch {
       setSaveStatus("error");
@@ -168,9 +175,13 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
     setPublishing(true);
 
     try {
-      const payload = buildPayload({ title, type, body, document: editor.getJSON() });
-      await updateDraftWorkout(accessToken, draftId, payload);
-      await publishWorkoutDraft(accessToken, draftId, payload);
+      const payload = buildPayload({ title, type, body, document: editor.getJSON(), expectedSourceRevision: revisionRef.current });
+      const draft = await updateDraftWorkout(accessToken, draftId, payload);
+      revisionRef.current = draft.dsl_source_revision ?? revisionRef.current;
+      await publishWorkoutDraft(accessToken, draftId, {
+        ...payload,
+        expected_source_revision: revisionRef.current,
+      });
       router.push(adminHref("/admin/workouts", organizationSlug));
     } catch {
       setSaveStatus("error");
@@ -589,11 +600,13 @@ function buildPayload({
   type,
   body,
   document,
+  expectedSourceRevision,
 }: {
   title: string;
   type: WorkoutType;
   body: string;
   document: JSONContent;
+  expectedSourceRevision?: number | null;
 }) {
   return {
     title,
@@ -601,6 +614,7 @@ function buildPayload({
     authoring_mode: "free_text",
     free_text_body: body,
     free_text_document: document,
+    expected_source_revision: expectedSourceRevision,
     draft_data: {
       title,
       type,

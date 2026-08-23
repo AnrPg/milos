@@ -166,6 +166,7 @@ export type DraftSection = {
 
 export type DraftWorkoutState = {
   draftId: string | null;
+  draftRevision: number | null;
   title: string;
   type: WorkoutType | null;
   isTeamWorkout: boolean;
