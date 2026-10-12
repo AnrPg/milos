@@ -309,7 +309,7 @@ defmodule MilosTraining.Workouts.Domain.FreeTextAnalysis do
     end
   end
 
-  # A score the format allows marks the section scoreable (ADR-101).
+  # A score the format allows marks the section scoreable (ADR-110).
   defp normalize_score(raw, timer_config) do
     format = timer_config && Map.get(timer_config, "type")
     score = raw |> map_value_raw("score") |> to_key()

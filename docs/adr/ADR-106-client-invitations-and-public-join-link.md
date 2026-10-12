@@ -1,4 +1,4 @@
-# ADR-097: Client Invitations and Public Join Link
+# ADR-106: Client Invitations and Public Join Link
 Date: 2026-10-12
 Status: Accepted
 

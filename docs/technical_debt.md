@@ -39,11 +39,11 @@ the original wording and dates for traceability.
 | TD-045 | Open |
 | TD-046 | Open |
 | TD-047 | Open |
-| TD-048 | Open |
-| TD-049–TD-050 | Resolved |
-| TD-051 | Open |
-| TD-052 | Resolved |
-| TD-053 | Open |
+| TD-057 | Open |
+| TD-058–TD-059 | Resolved |
+| TD-060 | Open |
+| TD-061 | Resolved |
+| TD-062 | Open |
 
 ## Detailed Ledger
 
@@ -96,9 +96,9 @@ the original wording and dates for traceability.
 | TD-045 | Platform tenant lifecycle | No update path exists for parameters the vendor set at provisioning time and cannot revisit afterward: the canonical `organization.name` and path `slug` in particular have no edit UI or command, even though the `Organization` Ecto changeset already casts both. "Edit settings" on `/platform/organizations` only covers the separate `organization_settings` row (timezone, default locale, invitation lifetime, brand name/logo/color) | Provisioning treated name/slug as durable identity so the platform console could ship with settings-editing first; a slug rename ripples into `canonical_path`, the `/org/:slug` proxy routing, and any bookmarked/shared invitation or dashboard links, so it needs redirect/alias handling and an admin confirmation step, not just a form field | Medium | 2026-08-10 |
 | TD-046 | Backend testing / multi-tenancy | The local/CI test database role is a Postgres superuser with `rolbypassrls=true`, so every RLS-dependent code path is structurally untestable by the existing suite - including the class of bug where a command reads/writes a root tenant table (`organizations`, `vendors`, `organization_memberships`, `registration_invitations`) without wrapping the query in `RepoContext.run/2`, which resolves fine locally and returns nothing in prod. This exact gap let all nine `PlatformOrganizationController` commands ship, pass 685/685 tests, and stay silently broken in prod until manually diagnosed live | `PrivilegeGuard.check!/0` already fails startup if a non-dev/test environment connects as a superuser, so the guard exists - what's missing is the inverse: a way to run at least the platform-organization (and other root-tenant-table) test files against a genuinely restricted, RLS-enforcing role, so a missing `RepoContext.run` wrap fails CI instead of prod | High | 2026-08-10 |
 | TD-047 | Platform tenant lifecycle | Add a reviewed object-storage purge inventory for tenant/user documents and avatars | The temporary clean-slate recovery job safely purges Postgres, Redis, and Meilisearch, but MinIO deletion needs a storage-owned tenant inventory to avoid blind bucket-wide object removal | High | 2026-08-19 |
-| TD-048 | Workout assistant | Add per-tenant quotas, usage metering and accept/reject telemetry for the Gemini free-text analysis | Shipped behind an admin-only endpoint first; real usage is needed to size quotas | Medium | 2026-10-12 |
-| TD-049 | Workout assistant / execution | Use the canonical sections stored for free-text workouts in execution mode (timers, scores) instead of the manual free-text timer | ADR-078 execution was kept unchanged to limit blast radius | Medium | 2026-10-12 |
-| TD-050 | Onboarding | Persist member/athlete tour completion server-side so it follows the user across devices | No generic per-user preference store exists yet; browser storage is enough for a skippable tour | Low | 2026-10-12 |
-| TD-051 | Admin users | Move users-directory search, role counts and sorting server-side for tenants above ~1,000 people | The directory is loaded once and filtered client-side, which is instant at gym scale | Low | 2026-10-12 |
-| TD-052 | Developer tooling | `priv/repo/seeds.exs` fails because the dev admin seed has no email, which `Identity.register/1` now requires | Found during live testing; out of scope for this change | Medium | 2026-10-12 |
-| TD-053 | Workout authoring | Remove the hidden Structured and Quick Text creation UIs once no drafts use them, or bring them back behind the switcher | Product asked to hide, not delete, them | Low | 2026-10-12 |
+| TD-057 | Workout assistant | Add per-tenant quotas, usage metering and accept/reject telemetry for the Gemini free-text analysis | Shipped behind an admin-only endpoint first; real usage is needed to size quotas | Medium | 2026-10-12 |
+| TD-058 | Workout assistant / execution | Use the canonical sections stored for free-text workouts in execution mode (timers, scores) instead of the manual free-text timer | ADR-078 execution was kept unchanged to limit blast radius | Medium | 2026-10-12 |
+| TD-059 | Onboarding | Persist member/athlete tour completion server-side so it follows the user across devices | No generic per-user preference store exists yet; browser storage is enough for a skippable tour | Low | 2026-10-12 |
+| TD-060 | Admin users | Move users-directory search, role counts and sorting server-side for tenants above ~1,000 people | The directory is loaded once and filtered client-side, which is instant at gym scale | Low | 2026-10-12 |
+| TD-061 | Developer tooling | `priv/repo/seeds.exs` fails because the dev admin seed has no email, which `Identity.register/1` now requires | Found during live testing; out of scope for this change | Medium | 2026-10-12 |
+| TD-062 | Workout authoring | Remove the hidden Structured and Quick Text creation UIs once no drafts use them, or bring them back behind the switcher | Product asked to hide, not delete, them | Low | 2026-10-12 |

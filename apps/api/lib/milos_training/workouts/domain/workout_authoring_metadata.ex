@@ -20,7 +20,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAuthoringMetadata do
       "source_revision" => :non_negative_integer,
       "schema_version" => :positive_integer,
       # Free-text workouts: whether the assistant inferred every section timer.
-      # "incomplete" makes execution fall back to the manual timer (ADR-100).
+      # "incomplete" makes execution fall back to the manual timer (ADR-109).
       "timer_inference" => {:enum, ~w(complete incomplete)}
     },
     section: %{

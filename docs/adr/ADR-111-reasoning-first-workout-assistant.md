@@ -1,6 +1,6 @@
-# ADR-102: Reasoning-first Workout Assistant
+# ADR-111: Reasoning-first Workout Assistant
 Date: 2026-10-12
-Status: Accepted (amends ADR-096, ADR-100, ADR-101)
+Status: Accepted (amends ADR-105, ADR-109, ADR-110)
 
 ## Context
 Coach free text does not follow a DSL. Coaches order things differently:
@@ -10,7 +10,7 @@ Coach free text does not follow a DSL. Coaches order things differently:
 
 They also use their own shorthand (RFT, KBS, 9/6, 3', b/w), mix languages, and
 leave out what "everybody knows" (Tabata = 20/10 × 8, EMOM = 60 s). The
-canonical JSON Schemas (ADR-101) describe the target, not the input. The
+canonical JSON Schemas (ADR-110) describe the target, not the input. The
 assistant must therefore *interpret* the text the way a coach would. The
 earlier prompts framed it as a parser ("convert", "never invent"). The
 proofreader also pushed coaches to rewrite their normal shorthand.

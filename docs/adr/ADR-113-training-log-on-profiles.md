@@ -1,4 +1,4 @@
-# ADR-104: Training Log on Profiles
+# ADR-113: Training Log on Profiles
 Date: 2026-10-12
 Status: Accepted
 

@@ -18,7 +18,7 @@ export function hasStructuredContent(sections: StructuredSection[] | null | unde
 }
 
 /**
- * Free text is only an authoring convenience (ADR-100): every workout runs on
+ * Free text is only an authoring convenience (ADR-109): every workout runs on
  * its structured timers. The manual timer is the fallback for free-text
  * workouts that have no runnable structure, or whose timers the assistant
  * could not infer (`workout_metadata.timer_inference = "incomplete"`).

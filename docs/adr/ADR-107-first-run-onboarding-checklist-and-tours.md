@@ -1,6 +1,6 @@
-# ADR-098: First-run Onboarding Checklist and Product Tours
+# ADR-107: First-run Onboarding Checklist and Product Tours
 Date: 2026-10-12
-Status: Accepted (amended by ADR-100: tour completion is stored per account)
+Status: Accepted (amended by ADR-109: tour completion is stored per account)
 
 ## Context
 New tenant admins landed on an empty dashboard with no guidance about what to
@@ -33,7 +33,7 @@ organization concern shared by co-admins.
 
 ## Consequences
 Tour completion for members and athletes is stored in the browser
-(TD-050). Signals are recomputed on every checklist read, which loads the
+(TD-059). Signals are recomputed on every checklist read, which loads the
 tenant's workout list (acceptable for setup-sized tenants).
 
 ## Implementation Notes

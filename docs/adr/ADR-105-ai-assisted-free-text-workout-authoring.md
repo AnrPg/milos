@@ -1,6 +1,6 @@
-# ADR-096: AI-assisted Free-text Workout Authoring
+# ADR-105: AI-assisted Free-text Workout Authoring
 Date: 2026-10-12
-Status: Accepted (amends ADR-078; amended by ADR-100)
+Status: Accepted (amends ADR-078; amended by ADR-109)
 
 ## Context
 Free text became the only way to create workouts. ADR-078 kept free-text
@@ -56,9 +56,9 @@ path.
   `GEMINI_MODEL` (default `gemini-3.8-flash`), `GEMINI_THINKING_LEVEL`
   (default `low`). Without a key the endpoint answers 503 and the editor still
   publishes text-only workouts.
-- Each check costs one LLM call; there is no per-tenant quota yet (TD-048).
+- Each check costs one LLM call; there is no per-tenant quota yet (TD-057).
 - Free-text workouts may now have sections; execution still uses the manual
-  free-text timer (TD-049).
+  free-text timer (TD-058).
 
 ## Implementation Notes
 Live testing: the default reasoning level took ~45 s for a ten-line WOD;

@@ -960,7 +960,7 @@ defmodule MilosTraining.FinanceTest do
              Finance.create_invoice(membership.id, %{
                amount_cents: 4500,
                description: "Late charge",
-               # Beyond the default 3-day grace slack (ADR-103).
+               # Beyond the default 3-day grace slack (ADR-112).
                due_date: Date.add(Date.utc_today(), -10)
              })
 

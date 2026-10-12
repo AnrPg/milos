@@ -1,4 +1,4 @@
-# ADR-103: Subscription Expiry Reminders and Grace Slack
+# ADR-112: Subscription Expiry Reminders and Grace Slack
 Date: 2026-10-12
 Status: Accepted
 

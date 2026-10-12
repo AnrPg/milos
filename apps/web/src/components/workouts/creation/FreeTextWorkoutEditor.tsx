@@ -834,7 +834,7 @@ function buildPayload({
   review: ReviewState | null;
 }) {
   // Canonical fields come from the assistant review the coach accepted; the
-  // free text stays the display source of truth (ADR-078, ADR-096).
+  // free text stays the display source of truth (ADR-078, ADR-105).
   const canonical = publishFields(review);
   const workoutType = type || null;
 

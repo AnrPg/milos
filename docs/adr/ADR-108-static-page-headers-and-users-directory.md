@@ -1,4 +1,4 @@
-# ADR-099: Static Page Headers and Client-side Users Directory
+# ADR-108: Static Page Headers and Client-side Users Directory
 Date: 2026-10-12
 Status: Accepted
 
@@ -21,7 +21,7 @@ Predictable headers remove layout shift and hidden controls. Gyms have tens to
 hundreds of clients, so one fetch makes search and counts instant.
 
 ## Consequences
-Very large tenants need server-side search, counts and sorting (TD-051).
+Very large tenants need server-side search, counts and sorting (TD-060).
 
 ## Implementation Notes
 None beyond the above.

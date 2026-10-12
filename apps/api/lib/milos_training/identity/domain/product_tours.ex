@@ -1,5 +1,5 @@
 defmodule MilosTraining.Identity.Domain.ProductTours do
-  @moduledoc "Product tour audiences an account can complete (ADR-098)."
+  @moduledoc "Product tour audiences an account can complete (ADR-107)."
 
   @audiences ~w(admin member athlete)
 

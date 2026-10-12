@@ -1,6 +1,6 @@
-# ADR-101: Canonical Section Format Schemas and Structure-first Parsing
+# ADR-110: Canonical Section Format Schemas and Structure-first Parsing
 Date: 2026-10-12
-Status: Accepted (amends ADR-096, ADR-100)
+Status: Accepted (amends ADR-105, ADR-109)
 
 ## Context
 A workout is a sequence of sections. Each section has its own format, so one
@@ -105,7 +105,7 @@ Exercise rules and scoring were implicit, and the prompt guide was wrong for
   a dependency for a small subset, and the errors were less specific for
   `oneOf` sections.
 - **Gemini constrained decoding (`responseSchema`):** rejected again (see
-  ADR-100). It produced degenerate output for deeply optional schemas, and it
+  ADR-109). It produced degenerate output for deeply optional schemas, and it
   cannot express the cross-field rules.
 - **Letting the agent call `get_section_schema` as its first step instead of a
   server-orchestrated outline:** rejected. It is less deterministic, the

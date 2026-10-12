@@ -1,6 +1,6 @@
-# ADR-100: Structured-first Workouts and Workout Assistant Hardening
+# ADR-109: Structured-first Workouts and Workout Assistant Hardening
 Date: 2026-10-12
-Status: Accepted (amends ADR-078, ADR-096, ADR-098)
+Status: Accepted (amends ADR-078, ADR-105, ADR-107)
 
 ## Context
 Free text is only a way for coaches to write workouts quickly. Athletes and
