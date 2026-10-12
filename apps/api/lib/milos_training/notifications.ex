@@ -281,8 +281,10 @@ defmodule MilosTraining.Notifications do
         nil ->
           "/admin/coaching-assignments?open_assignment=#{assigned_workout_id}"
 
+        # Assignments are normalized with ISO-8601 string dates (and job args
+        # are JSON), so accept both a Date and its string form.
         date ->
-          "/admin/coaching-assignments?open_assignment=#{assigned_workout_id}&date=#{Date.to_iso8601(date)}"
+          "/admin/coaching-assignments?open_assignment=#{assigned_workout_id}&date=#{iso_date(date)}"
       end
 
     payload
@@ -305,6 +307,9 @@ defmodule MilosTraining.Notifications do
 
     :ok
   end
+
+  defp iso_date(%Date{} = date), do: Date.to_iso8601(date)
+  defp iso_date(date) when is_binary(date), do: date
 
   def enqueue_athlete_message(payload) do
     sender_nickname = field(payload, :sender_nickname)
