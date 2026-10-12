@@ -3,6 +3,10 @@ defmodule MilosTraining.Application.UpdatePR do
   alias MilosTraining.{Gamification, Pantheon}
   alias MilosTraining.Pantheon.Domain.PRResultMetrics
 
+  # Owner-only under RLS: runs in the acting user's scope (ADR-111).
+  def call(%{user_id: user_id} = context, id, params),
+    do: Pantheon.with_user_context(context, fn -> call(id, user_id, params) end)
+
   def call(id, user_id, params) do
     case Pantheon.get_record_for_user(id, user_id) do
       nil ->

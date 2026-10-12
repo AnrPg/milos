@@ -2,6 +2,11 @@ defmodule MilosTraining.Application.SharePR do
   alias MilosTraining.Pantheon.PRStore
   alias MilosTraining.{Identity, Localization}
 
+  # Single-PR sharing (in-app message / out-of-app share) is unchanged by
+  # ADR-111; only the owner may format their PR, in their own scope.
+  def call(%{user_id: user_id} = context, id),
+    do: MilosTraining.Pantheon.with_user_context(context, fn -> call(id, user_id) end)
+
   def call(id, user_id) do
     case PRStore.get_pr_for_user(id, user_id) do
       nil ->
