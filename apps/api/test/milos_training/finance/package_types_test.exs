@@ -238,6 +238,23 @@ defmodule MilosTraining.Finance.PackageTypesTest do
       assert {:error, :finance_allowance_exhausted, _} =
                Finance.reserve_entitlement(user.id, booking_request("scope:b2", @class_type_b))
 
+      # TD-050: personal grants can extend a per-class-type limit.
+      admin = TestFixtures.admin_fixture()
+
+      assert {:ok, grant} =
+               Finance.grant_allowance(user.id, admin.id, %{
+                 allowance: "class_visits:" <> @class_type_b,
+                 quantity: 1,
+                 occurred_on: Date.utc_today(),
+                 reason: "Make-up class",
+                 idempotency_key: "grant:reformer"
+               })
+
+      assert grant.allowance_key == "class_visits:" <> @class_type_b
+
+      assert {:ok, _extra} =
+               Finance.reserve_entitlement(user.id, booking_request("scope:b3", @class_type_b))
+
       assert {:ok, general} =
                Finance.reserve_entitlement(user.id, booking_request("scope:a1", @class_type_a))
 

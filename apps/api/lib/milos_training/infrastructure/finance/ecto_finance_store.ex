@@ -1080,10 +1080,19 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
           Repo.rollback(:finance_profile_missing)
 
       occurred_on = Map.get(params, :occurred_on, Date.utc_today())
-      subscription = effective_subscription(membership.id, occurred_on)
-      if is_nil(subscription), do: Repo.rollback(:finance_entitlement_inactive)
-
       allowance = Map.get(params, :allowance)
+      candidates = effective_subscriptions(membership.id, occurred_on)
+      if candidates == [], do: Repo.rollback(:finance_entitlement_inactive)
+
+      # ADR-096: with stacked subscriptions the grant extends the first one
+      # whose contract contains the allowance (per-class-type keys included).
+      subscription =
+        Enum.find(candidates, List.first(candidates), fn candidate ->
+          case EntitlementPlan.parse(candidate.params_snapshot || %{}) do
+            {:ok, plan} -> Map.has_key?(plan.allowances, allowance)
+            _ -> false
+          end
+        end)
 
       with {:ok, plan} <- EntitlementPlan.parse(subscription.params_snapshot || %{}),
            %{period: package_period} <- Map.get(plan.allowances, allowance) do

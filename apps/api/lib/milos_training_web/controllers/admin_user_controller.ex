@@ -158,7 +158,10 @@ defmodule MilosTrainingWeb.AdminUserController do
           properties: %{
             allowance: %Schema{
               type: :string,
-              enum: ["class_visits", "coaching_touchpoints"]
+              description:
+                "class_visits, coaching_touchpoints, or class_visits:<class type id> for a per-class-type limit (ADR-096)",
+              pattern:
+                "^(class_visits|coaching_touchpoints|class_visits:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$"
             },
             quantity: %Schema{type: :integer, minimum: 1, maximum: 10_000},
             period: %Schema{

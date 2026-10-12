@@ -3217,8 +3217,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    /** @enum {string} */
-                    allowance: "class_visits" | "coaching_touchpoints";
+                    /** @description class_visits, coaching_touchpoints, or class_visits:<class type id> for a per-class-type limit (ADR-096) */
+                    allowance: string;
                     idempotency_key?: string | null;
                     /** Format: date */
                     occurred_on?: string | null;
