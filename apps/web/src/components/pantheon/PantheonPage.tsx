@@ -9,7 +9,6 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { listPRs, deletePR, type PRRecord } from "@/api/gamification";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { ShareExportDialog } from "@/components/share-export/ShareExportDialog";
 import { useShareExport } from "@/components/share-export/useShareExport";
 import { useUiLocale } from "@/i18n/use-ui-locale";
@@ -71,16 +70,7 @@ export function PantheonPage() {
       <div className="mx-auto max-w-4xl space-y-8">
         {/* Header */}
         <div className="flex items-end justify-between gap-4 flex-wrap">
-          <TransientHero label={i18n("personalRecordsIntroduction54be35f")}>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
-              {i18n("hallOfFamee10f949")}
-            </p>
-            <h1 className="mt-1 text-3xl font-black" style={{ color: "var(--text)" }}>
-              {i18n("personalRecords4769a96")}
-            </h1>
-          </div>
-          </TransientHero>
+          <h1 className="text-2xl font-semibold tracking-tight md:text-3xl" style={{ color: "var(--text)" }}>{i18n("personalRecords4769a96")}</h1>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"

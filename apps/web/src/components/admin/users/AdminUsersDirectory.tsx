@@ -12,10 +12,10 @@ import { useState } from "react";
 
 import { fetchAdminUsers } from "@/api/admin-users";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { SemanticLabel } from "@/components/semantic-label";
 import { localizeError } from "@/i18n/presentation";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { PageHeader } from "@/components/PageHeader";
 
 export function AdminUsersDirectory() {
   const i18n = useUiTranslations();
@@ -42,17 +42,7 @@ export function AdminUsersDirectory() {
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-6xl space-y-6">
-        <TransientHero collapsedTitle={i18n("users57f2b18")} label={i18n("usersDirectoryIntroduction17b72fb")} timeoutMs={3000}>
-          <section className="rounded-[2.4rem] p-8" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>{i18n("users57f2b18")}</p>
-            <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>
-              {i18n("everyPersonOneDirectory0de5809")}
-            </h1>
-            <p className="mt-4 max-w-3xl text-base leading-7" style={{ color: "var(--muted)" }}>
-              {i18n("findMembersAthletesAndAdminsThenOpenTheird68819b")}
-            </p>
-          </section>
-        </TransientHero>
+        <PageHeader title={i18n("users57f2b18")} />
 
         <section className="rounded-[2rem] p-4" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">

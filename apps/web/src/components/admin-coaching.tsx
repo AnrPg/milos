@@ -16,9 +16,9 @@ import {
   type AthleteDrillDown,
 } from "@/api/admin";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { SemanticLabel } from "@/components/semantic-label";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
 
 function asRecord(v: unknown): Record<string, unknown> {
   return v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
@@ -156,24 +156,14 @@ export function AdminCoaching() {
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-6xl space-y-8">
-        <TransientHero label={i18n("coachingWorkspaceIntroductionb33101c")} timeoutMs={3000}>
-        <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">{i18n("adminCoaching44254ed")}</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-            {i18n("athleteCoachingWorkspaceae374b0")}
-          </h1>
-          <p className="mt-2 max-w-3xl text-sm leading-6" style={{ color: "var(--muted)" }}>
-            {i18n("selectAnAthleteToViewTheirDrillDownc3ad98f")}
-          </p>
-          <Link
-            className="mt-6 inline-flex rounded-full px-4 py-2 text-sm font-semibold"
-            href={adminHref("/admin", organizationSlug)}
-            style={{ background: "var(--border)", color: "var(--text-soft)" }}
-          >
-            {i18n("backToAdminHome941355d")}
-          </Link>
-        </section>
-        </TransientHero>
+        <PageHeader
+          title={i18n("athleteCoachingWorkspaceae374b0")}
+          actions={
+            <Link href={adminHref("/admin", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
+              {i18n("backToAdminHome941355d")}
+            </Link>
+          }
+        />
 
         <div className="grid gap-6 lg:grid-cols-[1fr_1.5fr]">
           {/* Athlete list */}

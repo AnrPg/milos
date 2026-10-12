@@ -19,7 +19,6 @@ import { ReviewList } from "@/components/my-reviews";
 import { AvatarEditorModal } from "@/components/profile/AvatarEditorModal";
 import { isSupportedAvatarSource } from "@/components/profile/avatar-crop";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { showsTenantSelfServiceSurfaces } from "@/lib/account-surfaces";
 import {
@@ -29,6 +28,7 @@ import {
   SUPPORTED_LOCALES,
   type AppLocale,
 } from "@/i18n/locales";
+import { PageHeader } from "@/components/PageHeader";
 
 function CollapsibleSection({
   id,
@@ -310,16 +310,7 @@ export function ProfilePage() {
   return (
     <main className="min-h-screen px-6 py-10 md:px-10" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-3xl space-y-4">
-        <TransientHero label={i18n("profileIntroductioncf30917")}>
-        <div className="mb-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
-            {tProfile("eyebrow")}
-          </p>
-          <h1 className="mt-1 text-3xl font-black" style={{ color: "var(--text)" }}>
-            {tProfile("title")}
-          </h1>
-        </div>
-        </TransientHero>
+        <PageHeader title={tProfile("title")} />
 
         <div className="flex justify-end">
           <button

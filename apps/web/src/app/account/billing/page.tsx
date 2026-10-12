@@ -11,7 +11,6 @@ import { useEffect, useRef, useState } from "react";
 
 import { fetchMyEntitlement, fetchMyFinance, getMyInvoiceDownloadUrl, type EffectiveEntitlement, type MyFinanceData } from "@/api/my-finance";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { SemanticLabel } from "@/components/semantic-label";
 import {
@@ -356,11 +355,7 @@ export default function BillingPage() {
 
         {/* header */}
         <div className="flex items-center justify-between">
-          <TransientHero label={i18n("billingIntroduction58b604b")}>
-            <h1 className="text-xl font-semibold" style={{ color: "var(--text)" }}>
-              {i18n("billingabaec45")}
-            </h1>
-          </TransientHero>
+          <h1 className="text-2xl font-semibold tracking-tight md:text-3xl" style={{ color: "var(--text)" }}>{i18n("billingabaec45")}</h1>
           <button
             type="button"
             onClick={() => setShowPackages(true)}

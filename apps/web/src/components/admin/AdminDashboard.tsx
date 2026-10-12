@@ -18,8 +18,8 @@ import { fetchFinanceQueues, fetchFinanceSummary, type FinanceRecord } from "@/a
 import { fetchLandingPayload, type AdminMetrics } from "@/api/landing";
 import { fetchSchedule } from "@/api/schedule";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
 
 type AlertCategory = "finance" | "coaching" | "training";
 
@@ -159,7 +159,7 @@ export function AdminDashboard() {
       ],
     },
   ];
-  const { currentUser, tokens } = useSession();
+  const { tokens } = useSession();
   const organizationSlug = useOrganizationSlug();
   const [configOpen, setConfigOpen] = useState(false);
   const [activeCategories, setActiveCategories] = useState<AlertCategory[]>(DEFAULT_CATEGORIES);
@@ -300,9 +300,6 @@ export function AdminDashboard() {
     saveCategories(next);
   }
 
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? i18n("goodMorning0f76892") : hour < 18 ? i18n("goodAfternoon13fd0a3") : i18n("goodEvening6a4f54e");
-
   return (
     <main
       className="min-h-screen px-6 py-10 md:px-10 md:py-14"
@@ -330,39 +327,19 @@ export function AdminDashboard() {
         </div>
 
         {/* Hero */}
-        <TransientHero collapsedTitle={i18n("dashboardd87f47b")} label={i18n("administratorDashboardIntroduction1341bd6")} timeoutMs={3000}>
-        <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary-strong)" }}>
-                {i18n("admin4e7afeb")}
-              </p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-                {greeting}, {currentUser?.nickname}.
-              </h1>
-              <p className="mt-2 text-sm leading-6" style={{ color: "var(--muted)" }}>
-                {new Date().toLocaleDateString(uiLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href={adminHref("/admin/finance", organizationSlug)}
-                className="rounded-2xl px-5 py-3 text-sm font-semibold text-center"
-                style={{ background: "var(--text)", color: "var(--bg)" }}
-              >
+        <PageHeader
+          title={i18n("dashboardd87f47b")}
+          actions={
+            <>
+              <Link href={adminHref("/admin/finance", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--text)", color: "var(--bg)" }}>
                 {i18n("finance1b48d3f")}
               </Link>
-              <Link
-                href={adminHref("/admin/class-schedule", organizationSlug)}
-                className="rounded-2xl px-5 py-3 text-sm font-semibold text-center"
-                style={{ background: "var(--border)", border: "1px solid var(--border-strong)", color: "var(--text-soft)" }}
-              >
+              <Link href={adminHref("/admin/class-schedule", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
                 {i18n("classesed1846a")}
               </Link>
-            </div>
-          </div>
-        </section>
-        </TransientHero>
+            </>
+          }
+        />
 
         {/* Finance KPIs */}
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

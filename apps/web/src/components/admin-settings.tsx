@@ -27,8 +27,8 @@ import { useSession } from "@/components/session-provider";
 import { THEME_UPDATED_EVENT } from "@/components/theme-provider";
 import { APP_THEMES, THEME_SLUGS, normalizeThemeSlug, type ThemeSlug } from "@/lib/theme";
 import { ClassTypeSettings } from "@/components/admin/ClassTypeSettings";
-import { TransientHero } from "@/components/TransientHero";
 import { IntegerInput } from "@/components/integer-input";
+import { PageHeader } from "@/components/PageHeader";
 
 // ── Shared sub-components ────────────────────────────────────────────────────
 
@@ -1113,19 +1113,7 @@ export function AdminSettingsHub() {
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-5xl space-y-6">
 
-        <TransientHero label={i18n("applicationSettingsIntroduction8f2e9b7")} timeoutMs={3000}>
-        <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-          <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
-            {i18n("appConfigurationse0effaa")}
-          </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-            {i18n("appConfigurations1e15749")}
-          </h1>
-          <p className="mt-2 max-w-3xl text-sm leading-6" style={{ color: "var(--muted)" }}>
-            {i18n("globalSettingsForAppearanceEngagementRulesAndWorkout915168c")}
-          </p>
-        </section>
-        </TransientHero>
+        <PageHeader title={i18n("appConfigurationse0effaa")} />
 
         {token ? (
           <>
