@@ -32,7 +32,8 @@ config :milos_training, Oban,
        {"*/15 * * * *", MilosTraining.Workers.RefreshCoachingAggregatesJob},
        {"0 2 * * *", MilosTraining.Workers.MarkOverdueInvoicesJob},
        {"17 * * * *", MilosTraining.Workers.ReconcileEntitlementReservationsJob},
-       {"0 9 * * *", MilosTraining.Workers.PaymentReminderJob}
+       {"0 9 * * *", MilosTraining.Workers.PaymentReminderJob},
+       {"30 8 * * *", MilosTraining.Workers.SubscriptionExpiryJob}
      ]}
   ],
   queues: [

@@ -135,3 +135,18 @@ msgstr "הוקצו אימונים חדשים"
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr "המאמן שלך הקצה לך אימון אחד או יותר."
+
+msgid "Your subscription ends soon"
+msgstr "המנוי שלך מסתיים בקרוב"
+
+msgid "Your subscription has ended"
+msgstr "המנוי שלך הסתיים"
+
+msgid "your subscription"
+msgstr "המנוי שלך"
+
+msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+msgstr "%{package} מסתיים ב־%{date} (בעוד %{days} ימים). חדשו כדי להמשיך להזמין שיעורים."
+
+msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+msgstr "%{package} הסתיים. הגישה נשמרת עד %{date}; חדשו עד אז כדי להמשיך להזמין שיעורים."

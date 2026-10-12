@@ -135,3 +135,18 @@ msgstr "Novos treinos atribuídos"
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr "O seu treinador atribuiu-lhe um ou mais treinos."
+
+msgid "Your subscription ends soon"
+msgstr "A sua subscrição termina em breve"
+
+msgid "Your subscription has ended"
+msgstr "A sua subscrição terminou"
+
+msgid "your subscription"
+msgstr "a sua subscrição"
+
+msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+msgstr "%{package} termina a %{date} (daqui a %{days} dias). Renove para continuar a reservar aulas."
+
+msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+msgstr "%{package} terminou. Mantém o acesso até %{date}; renove antes disso para continuar a reservar aulas."

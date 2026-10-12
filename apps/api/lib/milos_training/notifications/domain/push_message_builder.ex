@@ -199,6 +199,43 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  def build("subscription_expiring", payload, localize) do
+    params = %{
+      package: payload["package_name"] || localize.("your subscription", %{}),
+      date: payload["ends_on"] || "",
+      days: payload["days_left"] || 0
+    }
+
+    %{
+      title: localize.("Your subscription ends soon", %{}),
+      body:
+        payload["body"] ||
+          localize.(
+            "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes.",
+            params
+          ),
+      url: payload["url"] || "/account/billing"
+    }
+  end
+
+  def build("subscription_grace", payload, localize) do
+    params = %{
+      package: payload["package_name"] || localize.("your subscription", %{}),
+      date: payload["grace_until"] || ""
+    }
+
+    %{
+      title: localize.("Your subscription has ended", %{}),
+      body:
+        payload["body"] ||
+          localize.(
+            "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes.",
+            params
+          ),
+      url: payload["url"] || "/account/billing"
+    }
+  end
+
   def build("chat_message", payload, localize) do
     title =
       if payload["context_type"] in ["assignment", "class_slot"],

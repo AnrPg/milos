@@ -148,6 +148,13 @@ defmodule MilosTraining.Notifications do
   def process_event("review_submitted", payload), do: enqueue_review_submitted(payload)
   def process_event("invoice_issued", payload), do: enqueue_invoice_issued(payload)
   def process_event("payment_reminder", payload), do: enqueue_payment_reminder(payload)
+
+  def process_event("subscription_expiring", payload),
+    do: enqueue_subscription_notice(:subscription_expiring, payload)
+
+  def process_event("subscription_grace", payload),
+    do: enqueue_subscription_notice(:subscription_grace, payload)
+
   def process_event(_event, _payload), do: {:error, :bad_request}
 
   def propagate_nickname_change(old_nickname, new_nickname),
@@ -501,6 +508,32 @@ defmodule MilosTraining.Notifications do
           "payment_reminder delivery failed user_id=#{user_id} reason=#{inspect(reason)}"
         )
 
+        error
+    end
+  end
+
+  # Sent to the client whose subscription ends; deduplicated per subscription
+  # so a retried job never notifies twice.
+  def enqueue_subscription_notice(type, payload) when is_map(payload) do
+    user_id = field(payload, :user_id)
+
+    notification_payload =
+      payload
+      |> Map.take([:package_name, :ends_on, :days_left, :grace_days, :grace_until])
+      |> Map.merge(%{
+        url: "/account/billing",
+        dedupe_key: "#{type}:#{field(payload, :subscription_id)}"
+      })
+
+    case deliver_notification(user_id, type, notification_payload) do
+      {:ok, _notification} ->
+        :ok
+
+      :ok ->
+        :ok
+
+      {:error, reason} = error ->
+        Logger.error("#{type} delivery failed user_id=#{user_id} reason=#{inspect(reason)}")
         error
     end
   end

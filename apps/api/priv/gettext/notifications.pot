@@ -135,3 +135,18 @@ msgstr ""
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr ""
+
+msgid "Your subscription ends soon"
+msgstr ""
+
+msgid "Your subscription has ended"
+msgstr ""
+
+msgid "your subscription"
+msgstr ""
+
+msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+msgstr ""
+
+msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+msgstr ""

@@ -135,3 +135,18 @@ msgstr "Зададени са нови тренировки"
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr "Вашият треньор ви зададе една или повече тренировки."
+
+msgid "Your subscription ends soon"
+msgstr "Абонаментът ви изтича скоро"
+
+msgid "Your subscription has ended"
+msgstr "Абонаментът ви изтече"
+
+msgid "your subscription"
+msgstr "абонаментът ви"
+
+msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+msgstr "%{package} изтича на %{date} (след %{days} дни). Подновете, за да продължите да записвате часове."
+
+msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+msgstr "%{package} изтече. Запазвате достъп до %{date}; подновете дотогава, за да продължите да записвате часове."

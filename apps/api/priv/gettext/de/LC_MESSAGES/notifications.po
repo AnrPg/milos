@@ -135,3 +135,18 @@ msgstr "Neue Workouts zugewiesen"
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr "Ihr Coach hat Ihnen ein oder mehrere Workouts zugewiesen."
+
+msgid "Your subscription ends soon"
+msgstr "Ihr Abo endet bald"
+
+msgid "Your subscription has ended"
+msgstr "Ihr Abo ist abgelaufen"
+
+msgid "your subscription"
+msgstr "Ihr Abo"
+
+msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+msgstr "%{package} endet am %{date} (in %{days} Tagen). Verlängern Sie, um weiter Kurse buchen zu können."
+
+msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+msgstr "%{package} ist abgelaufen. Sie haben noch bis %{date} Zugang; verlängern Sie bis dahin, um weiter Kurse buchen zu können."

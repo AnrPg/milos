@@ -194,6 +194,17 @@ defmodule MilosTraining.Finance.FinanceStore do
     do: adapter().memberships_needing_payment_reminder(interval_days)
 
   @impl true
+  def subscriptions_needing_expiry_notice(kind, days),
+    do: adapter().subscriptions_needing_expiry_notice(kind, days)
+
+  @impl true
+  def mark_subscription_notice_sent(subscription_id, kind),
+    do: adapter().mark_subscription_notice_sent(subscription_id, kind)
+
+  @impl true
+  def refresh_entitlement_snapshots, do: adapter().refresh_entitlement_snapshots()
+
+  @impl true
   def total_outstanding_balance_cents, do: adapter().total_outstanding_balance_cents()
 
   @impl true
