@@ -95,6 +95,7 @@ const TENANT_SCOPED_PREFIXES = [
   "/me/reviews",
   "/me/search/users",
   "/me/threads",
+  "/me/training-log",
   "/my-workouts",
   "/schedule",
 ];
