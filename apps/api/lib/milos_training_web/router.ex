@@ -145,6 +145,7 @@ defmodule MilosTrainingWeb.Router do
     post("/register-member", AuthController, :register_member)
     post("/register-admin", AuthController, :register_admin)
     post("/invitations/inspect", OrganizationAccessController, :inspect)
+    get("/join/:slug", OrganizationAccessController, :inspect_join_link)
     post("/login", AuthController, :login)
     post("/refresh", AuthController, :refresh)
     post("/logout", AuthController, :logout)
@@ -167,6 +168,7 @@ defmodule MilosTrainingWeb.Router do
     pipe_through([:api, :authenticated, :invitation_rate_limited])
 
     post("/memberships/redeem", OrganizationAccessController, :redeem)
+    post("/memberships/join/:slug", OrganizationAccessController, :join)
   end
 
   scope "/api/org/:organization_slug", MilosTrainingWeb do
@@ -179,7 +181,10 @@ defmodule MilosTrainingWeb.Router do
       :tenant_write_rate_limited
     ])
 
+    get("/invitations", OrganizationAccessController, :list_invitations)
     post("/invitations", OrganizationAccessController, :issue)
+    get("/join-link", OrganizationAccessController, :show_join_link)
+    put("/join-link", OrganizationAccessController, :update_join_link)
     delete("/invitations/:id", OrganizationAccessController, :revoke)
   end
 

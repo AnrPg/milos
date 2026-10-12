@@ -160,6 +160,27 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "invalid_invitation", error: "Invitation is invalid or unavailable"})
   end
 
+  def call(conn, {:error, :join_link_unavailable}) do
+    conn
+    |> put_status(:not_found)
+    |> json(%{code: "join_link_unavailable", error: "This join link is not active"})
+  end
+
+  def call(conn, {:error, :membership_unavailable}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "membership_unavailable",
+      error: "Your membership in this organization is not active. Contact the organization."
+    })
+  end
+
+  def call(conn, {:error, :invalid_join_link}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_join_link", error: "Choose member or athlete and on or off"})
+  end
+
   def call(conn, {:error, :stale_dsl_revision}) do
     conn
     |> put_status(:conflict)
