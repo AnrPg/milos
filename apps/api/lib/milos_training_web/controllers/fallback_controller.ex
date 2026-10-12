@@ -1354,6 +1354,49 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-104 organization slug rename.
+  def call(conn, {:error, :invalid_slug}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_slug",
+      error: "Use 3-63 lowercase letters, digits and single hyphens"
+    })
+  end
+
+  def call(conn, {:error, :slug_unchanged}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "slug_unchanged", error: "The new slug matches the current slug"})
+  end
+
+  def call(conn, {:error, :slug_confirmation_mismatch}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "slug_confirmation_mismatch",
+      error: "Type the current organization slug exactly to confirm the rename"
+    })
+  end
+
+  def call(conn, {:error, :slug_taken}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "slug_taken",
+      error: "This slug belongs to another organization or is reserved as its previous slug"
+    })
+  end
+
+  def call(conn, {:error, :slug_rename_blocked_by_purge}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "slug_rename_blocked_by_purge",
+      error: "Cancel the open purge request before renaming this organization's slug"
+    })
+  end
+
   def call(conn, {:error, :purge_job_unavailable}) do
     conn
     |> put_status(:service_unavailable)

@@ -80,6 +80,16 @@ defmodule MilosTrainingWeb.Router do
     plug(MilosTrainingWeb.Plugs.RateLimit, max: 120, interval: 60_000, bucket: "search")
   end
 
+  pipeline :slug_alias_rate_limited do
+    # Called by the web proxy (one client address for every browser) and
+    # cached there, so the budget is generous; it only bounds enumeration.
+    plug(MilosTrainingWeb.Plugs.RateLimit,
+      max: 600,
+      interval: 60_000,
+      bucket: "organization-slug-aliases"
+    )
+  end
+
   pipeline :platform_write_rate_limited do
     plug(MilosTrainingWeb.Plugs.RateLimit,
       max: 60,
@@ -135,6 +145,17 @@ defmodule MilosTrainingWeb.Router do
     get("/openapi", OpenApiSpex.Plug.RenderSpec, [])
     get("/calendar/feed.ics", MilosTrainingWeb.CalendarFeedController, :feed)
     get("/theme", MilosTrainingWeb.ThemeController, :show)
+  end
+
+  # ADR-104: unauthenticated retired-slug lookup behind the web proxy's 308.
+  scope "/api" do
+    pipe_through([:api, :slug_alias_rate_limited])
+
+    get(
+      "/organization-slug-aliases/:slug",
+      MilosTrainingWeb.OrganizationSlugAliasController,
+      :show
+    )
   end
 
   scope "/api/auth", MilosTrainingWeb do
@@ -463,6 +484,9 @@ defmodule MilosTrainingWeb.Router do
 
     patch("/organizations/:id/lifecycle", PlatformOrganizationController, :lifecycle)
     patch("/organizations/:id/name", PlatformOrganizationController, :rename)
+    # ADR-104 slug rename with typed confirmation and retired-slug aliases.
+    get("/organizations/:id/slug-impact", PlatformOrganizationController, :slug_impact)
+    patch("/organizations/:id/slug", PlatformOrganizationController, :rename_slug)
     patch("/organizations/:id/settings", PlatformOrganizationController, :settings)
 
     post(
