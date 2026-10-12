@@ -124,4 +124,55 @@ Phase B and C fields exist in the catalog with defaults but cannot be changed
 until their phase implements enforcement and product surfaces.
 
 ## Implementation Notes
-To be completed when Phase A is finished.
+Phase A is implemented across all layers.
+
+Domain: `PackageCatalog` (56 closed fields with phase availability),
+`PackageType`, `PackagePresets` (complete presets plus whole-field and
+map-key locks such as `group_classes.visits.period`), `PackageContract`
+(write normaliser and v1-to-v2 presentation), `PackageCode` (ELOT 743),
+`SubscriptionSelection` (stacking order, trial eligibility, renewability) and
+`PackageCatalogDocument`. `EntitlementPlan` compiles v2 contracts into the
+ADR-040 plan; `EntitlementPolicy` enforces class-type scope.
+
+Emergent decisions:
+- Locks address either a whole field or one key of a map-valued field, so a
+  class pack locks how visits are counted while the visit count stays editable.
+- Fields of unimplemented phases are forced to the type preset on every write
+  rather than kept from the stored contract, so changing the billing period
+  (which moves period-dependent presets such as freeze days) never fails.
+- Selecting a stacked subscription evaluates each candidate under enforcement;
+  when none authorizes, the primary subscription produces the denial (or the
+  observation in observe mode).
+- Per-class-type reservations are finalized or released through the generic
+  `class_visits` source transition, so attendance and withdrawal flows did not
+  change.
+- Internal callers that still submit legacy v1 `params` are stored as
+  memberships; the public API accepts only the closed v2 contract.
+- Changing the type of a package that has effective subscribers is rejected
+  (`package_type_change_requires_copy`); the editor offers Duplicate instead.
+- Package modules are a presentation filter for the wizard and are not enforced
+  on writes, so disabling a module never invalidates existing packages.
+- Entitlement read models gain `class_type_names` from an Application service,
+  keeping Finance independent of Scheduling.
+
+Web: the create form is a four-step wizard (three for drop-ins) with a member
+preview, local draft resume, an advanced-settings pane rendered from the
+catalog, read-only locked fields with localized reasons and per-field
+"changed" markers; the package panel has a single-page editor and Duplicate.
+The legacy `/admin/finance/packages/[id]` route redirects to the panel; the
+v1 `EntitlementEditor` and an unused legacy finance page were removed.
+`family` is relabelled "Package type" in all twelve locales.
+
+Validation: backend suite 734 tests and 0 failures before the final additions
+(new focused suites: 25 domain, 8 persistence, 1 controller), architecture
+gate, Credo strict, format check and migration rollback/re-migrate; web lint,
+type check, 187 Vitest tests, i18n checks across 12 locales and a production
+build. A live test against PostgreSQL and the Next dev server created a class
+pack through the wizard (code `ten_visits`), exercised class-type scope,
+advanced settings, review, the editor and the mobile layout, and surfaced one
+defect that was fixed: choosing "only selected" class types when none exist
+produced an empty scope rejected by the API.
+
+Deferred: Phase B and C (TD-048, TD-049), per-class-type personal grants
+(TD-050), search reindex after the relabel migration (TD-051). The broken
+development seed found during the live test is TD-052.

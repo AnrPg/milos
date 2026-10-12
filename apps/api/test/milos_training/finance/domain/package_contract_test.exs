@@ -359,6 +359,25 @@ defmodule MilosTraining.Finance.Domain.PackageContractTest do
     end
   end
 
+  describe "catalog document" do
+    test "the web test fixture matches the served catalog" do
+      fixture =
+        Path.expand(
+          "../web/src/components/admin/finance/packages/__fixtures__/package-catalog.json",
+          File.cwd!()
+        )
+
+      served =
+        ["group_classes", "online_coaching"]
+        |> MilosTraining.Finance.Domain.PackageCatalogDocument.build()
+        |> Jason.encode!()
+        |> Jason.decode!()
+
+      # Regenerate with PackageCatalogDocument.build/1 when presets or locks change.
+      assert Jason.decode!(File.read!(fixture)) == served
+    end
+  end
+
   describe "package codes" do
     test "transliterates Greek names and normalizes punctuation" do
       assert PackageCode.normalize("Απεριόριστο Μηνιαίο") == "aperioristo_miniaio"
