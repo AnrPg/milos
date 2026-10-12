@@ -72,6 +72,11 @@ config :milos_training,
        MilosTraining.Infrastructure.Execution.EctoTrainingLogStore
 
 config :milos_training, :finance_store, MilosTraining.Infrastructure.Finance.EctoFinanceStore
+
+config :milos_training,
+       :finance_accounting_store,
+       MilosTraining.Infrastructure.Finance.EctoFinanceAccountingStore
+
 config :milos_training, :workout_store, MilosTraining.Infrastructure.Workouts.EctoWorkoutStore
 
 config :milos_training,

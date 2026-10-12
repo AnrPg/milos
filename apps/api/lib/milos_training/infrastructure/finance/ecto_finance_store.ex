@@ -3,6 +3,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   import Ecto.Query
 
+  alias MilosTraining.Finance.FinanceAccountingStore
+
   alias MilosTraining.Finance.{
     FinanceCreditLedgerEntry,
     FinanceEntitlementUsageEntry,
@@ -538,7 +540,12 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
                "idempotency_key" =>
                  scoped_finance_key("payment_reversal:#{payment.id}", membership.id, params),
                "params" => reversal_params(params, payment.id)
-             }) do
+             }),
+           # ADR-108: the refund receipt is issued in the same transaction as
+           # the reversal fact, so a receipt number is never consumed for a
+           # reversal that rolled back (and replays return the same receipt).
+           {:ok, _receipt} <-
+             FinanceAccountingStore.issue_refund_receipt(reversal.id, params["receipt_party"]) do
         refresh_invoice_and_entitlement(payment.finance_invoice_id, membership.id)
         reversal
       else
