@@ -1112,6 +1112,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/my-workouts/assignments/{id}/open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Athlete reports opening an assigned workout's detail (analytics, ADR-105)
+         * @description Records workout_assignment_opened once per athlete, assignment and UTC day. Repeated calls the same day are accepted and ignored.
+         */
+        post: operations["MilosTrainingWeb.MyWorkoutController.open"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/me": {
         parameters: {
             query?: never;
@@ -1917,6 +1937,26 @@ export interface paths {
         head?: never;
         /** Update organization branding, locale, timezone, and invitation lifetime */
         patch: operations["MilosTrainingWeb.PlatformOrganizationController.settings"];
+        trace?: never;
+    };
+    "/api/executions/{id}/interactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Report client-only execution interaction events (analytics, ADR-105)
+         * @description Batched, idempotent ingestion of execution interaction signals the server cannot observe (pause sheet, manual skip, round taps, adjusts, ready screen, finish wizard, cast mode). Each event dedupes on its client_event_id; retries are accepted and counted as duplicates. Any invalid event rejects the batch.
+         */
+        post: operations["MilosTrainingWeb.ExecutionController.record_interactions"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/workouts": {
@@ -3071,6 +3111,75 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ExecutionInteractionBatch */
+        ExecutionInteractionBatch: {
+            events: {
+                /** Format: uuid */
+                client_event_id: string;
+                /** @enum {string} */
+                kind: "cast_mode_toggled" | "check_off_undone" | "cues_toggled" | "finish_wizard_abandoned" | "finish_wizard_opened" | "finish_wizard_saved" | "first_segment_started" | "pause" | "ready_screen_shown" | "resume" | "round_decremented" | "round_incremented" | "rounds_adjusted" | "segment_restarted" | "segment_skipped" | "time_adjusted" | "workout_launched";
+                /** @description Typed facts allowed for the interaction kind (see ADR-105). No free text; keys not allowed for the kind reject the batch. */
+                metadata?: {
+                    countdown_seconds?: number;
+                    /** @enum {string} */
+                    cue_channel?: "sound" | "voice" | "vibration";
+                    delta_rounds?: number;
+                    delta_seconds?: number;
+                    duration_ms?: number;
+                    elapsed_ms?: number;
+                    enabled?: boolean;
+                    format?: string;
+                    /** @enum {string} */
+                    orientation?: "portrait" | "landscape";
+                    remaining_ms?: number;
+                    round_count?: number;
+                    scored_section_count?: number;
+                    section_id?: string;
+                    segment_index?: number;
+                    step?: number;
+                    /** @enum {string} */
+                    surface?: "pause_sheet" | "primary_action" | "header" | "gesture" | "keyboard" | "snackbar" | "ready_screen" | "finish_wizard" | "cast_display" | "lock_screen";
+                };
+                /** Format: date-time */
+                occurred_at: string;
+            }[];
+        };
+        /** ExecutionInteractionBatchResult */
+        ExecutionInteractionBatchResult: {
+            accepted: number;
+            duplicates: number;
+        };
+        /** ExecutionInteractionEvent */
+        ExecutionInteractionEvent: {
+            /** Format: uuid */
+            client_event_id: string;
+            /** @enum {string} */
+            kind: "cast_mode_toggled" | "check_off_undone" | "cues_toggled" | "finish_wizard_abandoned" | "finish_wizard_opened" | "finish_wizard_saved" | "first_segment_started" | "pause" | "ready_screen_shown" | "resume" | "round_decremented" | "round_incremented" | "rounds_adjusted" | "segment_restarted" | "segment_skipped" | "time_adjusted" | "workout_launched";
+            /** @description Typed facts allowed for the interaction kind (see ADR-105). No free text; keys not allowed for the kind reject the batch. */
+            metadata?: {
+                countdown_seconds?: number;
+                /** @enum {string} */
+                cue_channel?: "sound" | "voice" | "vibration";
+                delta_rounds?: number;
+                delta_seconds?: number;
+                duration_ms?: number;
+                elapsed_ms?: number;
+                enabled?: boolean;
+                format?: string;
+                /** @enum {string} */
+                orientation?: "portrait" | "landscape";
+                remaining_ms?: number;
+                round_count?: number;
+                scored_section_count?: number;
+                section_id?: string;
+                segment_index?: number;
+                step?: number;
+                /** @enum {string} */
+                surface?: "pause_sheet" | "primary_action" | "header" | "gesture" | "keyboard" | "snackbar" | "ready_screen" | "finish_wizard" | "cast_display" | "lock_screen";
+            };
+            /** Format: date-time */
+            occurred_at: string;
+        };
         /** OrganizationBranding */
         OrganizationBranding: {
             /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
@@ -8131,6 +8240,35 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.MyWorkoutController.open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Recorded (or already recorded today) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AuthController.me": {
         parameters: {
             query?: never;
@@ -12924,6 +13062,93 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ExecutionController.record_interactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Execution ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Interaction events */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    events: {
+                        /** Format: uuid */
+                        client_event_id: string;
+                        /** @enum {string} */
+                        kind: "cast_mode_toggled" | "check_off_undone" | "cues_toggled" | "finish_wizard_abandoned" | "finish_wizard_opened" | "finish_wizard_saved" | "first_segment_started" | "pause" | "ready_screen_shown" | "resume" | "round_decremented" | "round_incremented" | "rounds_adjusted" | "segment_restarted" | "segment_skipped" | "time_adjusted" | "workout_launched";
+                        /** @description Typed facts allowed for the interaction kind (see ADR-105). No free text; keys not allowed for the kind reject the batch. */
+                        metadata?: {
+                            countdown_seconds?: number;
+                            /** @enum {string} */
+                            cue_channel?: "sound" | "voice" | "vibration";
+                            delta_rounds?: number;
+                            delta_seconds?: number;
+                            duration_ms?: number;
+                            elapsed_ms?: number;
+                            enabled?: boolean;
+                            format?: string;
+                            /** @enum {string} */
+                            orientation?: "portrait" | "landscape";
+                            remaining_ms?: number;
+                            round_count?: number;
+                            scored_section_count?: number;
+                            section_id?: string;
+                            segment_index?: number;
+                            step?: number;
+                            /** @enum {string} */
+                            surface?: "pause_sheet" | "primary_action" | "header" | "gesture" | "keyboard" | "snackbar" | "ready_screen" | "finish_wizard" | "cast_display" | "lock_screen";
+                        };
+                        /** Format: date-time */
+                        occurred_at: string;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description Batch accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        accepted: number;
+                        duplicates: number;
+                    };
+                };
+            };
+            /** @description Execution not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Invalid interaction batch */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        code: "invalid_execution_interactions";
+                        errors: {
+                            index: number;
+                            reason: string;
+                        }[];
                     };
                 };
             };

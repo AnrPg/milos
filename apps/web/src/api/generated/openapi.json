@@ -2,6 +2,316 @@
   "components": {
     "responses": {},
     "schemas": {
+      "ExecutionInteractionBatch": {
+        "properties": {
+          "events": {
+            "items": {
+              "properties": {
+                "client_event_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "cast_mode_toggled",
+                    "check_off_undone",
+                    "cues_toggled",
+                    "finish_wizard_abandoned",
+                    "finish_wizard_opened",
+                    "finish_wizard_saved",
+                    "first_segment_started",
+                    "pause",
+                    "ready_screen_shown",
+                    "resume",
+                    "round_decremented",
+                    "round_incremented",
+                    "rounds_adjusted",
+                    "segment_restarted",
+                    "segment_skipped",
+                    "time_adjusted",
+                    "workout_launched"
+                  ],
+                  "type": "string"
+                },
+                "metadata": {
+                  "additionalProperties": false,
+                  "description": "Typed facts allowed for the interaction kind (see ADR-105). No free text; keys not allowed for the kind reject the batch.",
+                  "properties": {
+                    "countdown_seconds": {
+                      "maximum": 600,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "cue_channel": {
+                      "enum": [
+                        "sound",
+                        "voice",
+                        "vibration"
+                      ],
+                      "type": "string"
+                    },
+                    "delta_rounds": {
+                      "maximum": 100,
+                      "minimum": -100,
+                      "type": "integer"
+                    },
+                    "delta_seconds": {
+                      "maximum": 3600,
+                      "minimum": -3600,
+                      "type": "integer"
+                    },
+                    "duration_ms": {
+                      "maximum": 86400000,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "elapsed_ms": {
+                      "maximum": 86400000,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "format": {
+                      "pattern": "^[A-Za-z0-9_-]{1,64}$",
+                      "type": "string"
+                    },
+                    "orientation": {
+                      "enum": [
+                        "portrait",
+                        "landscape"
+                      ],
+                      "type": "string"
+                    },
+                    "remaining_ms": {
+                      "maximum": 86400000,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "round_count": {
+                      "maximum": 10000,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "scored_section_count": {
+                      "maximum": 1000,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "section_id": {
+                      "pattern": "^[A-Za-z0-9_-]{1,64}$",
+                      "type": "string"
+                    },
+                    "segment_index": {
+                      "maximum": 10000,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "step": {
+                      "maximum": 20,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "surface": {
+                      "enum": [
+                        "pause_sheet",
+                        "primary_action",
+                        "header",
+                        "gesture",
+                        "keyboard",
+                        "snackbar",
+                        "ready_screen",
+                        "finish_wizard",
+                        "cast_display",
+                        "lock_screen"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "occurred_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "client_event_id",
+                "kind",
+                "occurred_at"
+              ],
+              "title": "ExecutionInteractionEvent",
+              "type": "object"
+            },
+            "maxItems": 50,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "events"
+        ],
+        "title": "ExecutionInteractionBatch",
+        "type": "object"
+      },
+      "ExecutionInteractionBatchResult": {
+        "properties": {
+          "accepted": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "duplicates": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "accepted",
+          "duplicates"
+        ],
+        "title": "ExecutionInteractionBatchResult",
+        "type": "object"
+      },
+      "ExecutionInteractionEvent": {
+        "properties": {
+          "client_event_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "cast_mode_toggled",
+              "check_off_undone",
+              "cues_toggled",
+              "finish_wizard_abandoned",
+              "finish_wizard_opened",
+              "finish_wizard_saved",
+              "first_segment_started",
+              "pause",
+              "ready_screen_shown",
+              "resume",
+              "round_decremented",
+              "round_incremented",
+              "rounds_adjusted",
+              "segment_restarted",
+              "segment_skipped",
+              "time_adjusted",
+              "workout_launched"
+            ],
+            "type": "string"
+          },
+          "metadata": {
+            "additionalProperties": false,
+            "description": "Typed facts allowed for the interaction kind (see ADR-105). No free text; keys not allowed for the kind reject the batch.",
+            "properties": {
+              "countdown_seconds": {
+                "maximum": 600,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "cue_channel": {
+                "enum": [
+                  "sound",
+                  "voice",
+                  "vibration"
+                ],
+                "type": "string"
+              },
+              "delta_rounds": {
+                "maximum": 100,
+                "minimum": -100,
+                "type": "integer"
+              },
+              "delta_seconds": {
+                "maximum": 3600,
+                "minimum": -3600,
+                "type": "integer"
+              },
+              "duration_ms": {
+                "maximum": 86400000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "elapsed_ms": {
+                "maximum": 86400000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "format": {
+                "pattern": "^[A-Za-z0-9_-]{1,64}$",
+                "type": "string"
+              },
+              "orientation": {
+                "enum": [
+                  "portrait",
+                  "landscape"
+                ],
+                "type": "string"
+              },
+              "remaining_ms": {
+                "maximum": 86400000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "round_count": {
+                "maximum": 10000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "scored_section_count": {
+                "maximum": 1000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "section_id": {
+                "pattern": "^[A-Za-z0-9_-]{1,64}$",
+                "type": "string"
+              },
+              "segment_index": {
+                "maximum": 10000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "step": {
+                "maximum": 20,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "surface": {
+                "enum": [
+                  "pause_sheet",
+                  "primary_action",
+                  "header",
+                  "gesture",
+                  "keyboard",
+                  "snackbar",
+                  "ready_screen",
+                  "finish_wizard",
+                  "cast_display",
+                  "lock_screen"
+                ],
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "client_event_id",
+          "kind",
+          "occurred_at"
+        ],
+        "title": "ExecutionInteractionEvent",
+        "type": "object"
+      },
       "OrganizationBranding": {
         "properties": {
           "brand_logo_uploaded": {
@@ -13566,6 +13876,48 @@
         "summary": "Search visible users by nickname",
         "tags": [
           "Me"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/my-workouts/assignments/{id}/open": {
+      "post": {
+        "callbacks": {},
+        "description": "Records workout_assignment_opened once per athlete, assignment and UTC day. Repeated calls the same day are accepted and ignored.",
+        "operationId": "MilosTrainingWeb.MyWorkoutController.open",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Recorded (or already recorded today)"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Athlete reports opening an assigned workout's detail (analytics, ADR-105)",
+        "tags": [
+          "Assigned Workouts"
         ]
       }
     },
@@ -27994,6 +28346,272 @@
         "summary": "Update organization branding, locale, timezone, and invitation lifetime",
         "tags": [
           "Platform Organizations"
+        ]
+      }
+    },
+    "/api/executions/{id}/interactions": {
+      "post": {
+        "callbacks": {},
+        "description": "Batched, idempotent ingestion of execution interaction signals the server cannot observe (pause sheet, manual skip, round taps, adjusts, ready screen, finish wizard, cast mode). Each event dedupes on its client_event_id; retries are accepted and counted as duplicates. Any invalid event rejects the batch.",
+        "operationId": "MilosTrainingWeb.ExecutionController.record_interactions",
+        "parameters": [
+          {
+            "description": "Execution ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "events": {
+                    "items": {
+                      "properties": {
+                        "client_event_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "cast_mode_toggled",
+                            "check_off_undone",
+                            "cues_toggled",
+                            "finish_wizard_abandoned",
+                            "finish_wizard_opened",
+                            "finish_wizard_saved",
+                            "first_segment_started",
+                            "pause",
+                            "ready_screen_shown",
+                            "resume",
+                            "round_decremented",
+                            "round_incremented",
+                            "rounds_adjusted",
+                            "segment_restarted",
+                            "segment_skipped",
+                            "time_adjusted",
+                            "workout_launched"
+                          ],
+                          "type": "string"
+                        },
+                        "metadata": {
+                          "additionalProperties": false,
+                          "description": "Typed facts allowed for the interaction kind (see ADR-105). No free text; keys not allowed for the kind reject the batch.",
+                          "properties": {
+                            "countdown_seconds": {
+                              "maximum": 600,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "cue_channel": {
+                              "enum": [
+                                "sound",
+                                "voice",
+                                "vibration"
+                              ],
+                              "type": "string"
+                            },
+                            "delta_rounds": {
+                              "maximum": 100,
+                              "minimum": -100,
+                              "type": "integer"
+                            },
+                            "delta_seconds": {
+                              "maximum": 3600,
+                              "minimum": -3600,
+                              "type": "integer"
+                            },
+                            "duration_ms": {
+                              "maximum": 86400000,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "elapsed_ms": {
+                              "maximum": 86400000,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "enabled": {
+                              "type": "boolean"
+                            },
+                            "format": {
+                              "pattern": "^[A-Za-z0-9_-]{1,64}$",
+                              "type": "string"
+                            },
+                            "orientation": {
+                              "enum": [
+                                "portrait",
+                                "landscape"
+                              ],
+                              "type": "string"
+                            },
+                            "remaining_ms": {
+                              "maximum": 86400000,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "round_count": {
+                              "maximum": 10000,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "scored_section_count": {
+                              "maximum": 1000,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "section_id": {
+                              "pattern": "^[A-Za-z0-9_-]{1,64}$",
+                              "type": "string"
+                            },
+                            "segment_index": {
+                              "maximum": 10000,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "step": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "surface": {
+                              "enum": [
+                                "pause_sheet",
+                                "primary_action",
+                                "header",
+                                "gesture",
+                                "keyboard",
+                                "snackbar",
+                                "ready_screen",
+                                "finish_wizard",
+                                "cast_display",
+                                "lock_screen"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "occurred_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "client_event_id",
+                        "kind",
+                        "occurred_at"
+                      ],
+                      "title": "ExecutionInteractionEvent",
+                      "type": "object"
+                    },
+                    "maxItems": 50,
+                    "minItems": 1,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "events"
+                ],
+                "title": "ExecutionInteractionBatch",
+                "type": "object"
+              }
+            }
+          },
+          "description": "Interaction events",
+          "required": false
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "accepted": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "duplicates": {
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "accepted",
+                    "duplicates"
+                  ],
+                  "title": "ExecutionInteractionBatchResult",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Batch accepted"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Execution not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "invalid_execution_interactions"
+                      ],
+                      "type": "string"
+                    },
+                    "errors": {
+                      "items": {
+                        "properties": {
+                          "index": {
+                            "type": "integer"
+                          },
+                          "reason": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "index",
+                          "reason"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "errors"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid interaction batch"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Report client-only execution interaction events (analytics, ADR-105)",
+        "tags": [
+          "Execution"
         ]
       }
     },
