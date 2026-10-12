@@ -57,6 +57,10 @@ defmodule MilosTraining.Organizations do
 
   defdelegate staff?(context), to: MilosTraining.Organizations.Domain.TenantAuthorization
 
+  defdelegate roles_in(context),
+    to: MilosTraining.Organizations.Domain.TenantAuthorization,
+    as: :roles
+
   defdelegate can?(context, capability),
     to: MilosTraining.Organizations.Domain.TenantAuthorization
 
@@ -82,6 +86,27 @@ defmodule MilosTraining.Organizations do
   end
 
   def member_roles(_organization_id, _user_id), do: []
+
+  @doc "Whether a coach lets admins read their private notes (ADR-101)."
+  def notes_visible_to_admins?(organization_id, user_id) do
+    case OrganizationStore.get_membership(organization_id, user_id) do
+      %{notes_visible_to_admins: visible} -> visible != false
+      _none -> true
+    end
+  end
+
+  @doc "A coach sets whether admins may read their private notes (ADR-101)."
+  def set_notes_visibility(context, visible) when is_boolean(visible) do
+    with :ok <- authorize_capability(context, :write_coach_notes) do
+      OrganizationStore.update_membership_settings(
+        context.organization_id,
+        context.membership_id,
+        %{notes_visible_to_admins: visible}
+      )
+    end
+  end
+
+  def set_notes_visibility(_context, _visible), do: {:error, [visible: "must be true or false"]}
 
   @doc "Active owners and admins of a gym (ADR-099)."
   def list_manager_user_ids(organization_id) do
@@ -174,6 +199,16 @@ defmodule MilosTraining.Organizations do
         coach_scope: coach_scope,
         role_grants: role_grants
       )
+
+  def create_owned_organization(account, params),
+    do: MilosTraining.Organizations.Commands.OwnerOrganizationActions.create(account, params)
+
+  def transfer_ownership(context, to_user_id),
+    do:
+      MilosTraining.Organizations.Commands.OwnerOrganizationActions.transfer(context, to_user_id)
+
+  def archive_organization(context, confirm),
+    do: MilosTraining.Organizations.Commands.OwnerOrganizationActions.archive(context, confirm)
 
   def get_role_grants(context),
     do: MilosTraining.Organizations.Commands.SetRoleGrants.get(context)

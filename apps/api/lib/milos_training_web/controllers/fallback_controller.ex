@@ -1381,6 +1381,8 @@ defmodule MilosTrainingWeb.FallbackController do
     corporate_seat_billed_to_company: {:unprocessable_entity, "The company pays for this seat"},
     add_on_base_ended: {:unprocessable_entity, "The add-on's base membership has ended"},
     last_owner: {:conflict, "A gym needs at least one owner"},
+    owner_required: {:forbidden, "Only gym owners can create gyms"},
+    confirmation_mismatch: {:unprocessable_entity, "Type the gym's slug to confirm"},
     cleaning_area_archived: {:unprocessable_entity, "That area is archived"},
     cleaning_already_finished: {:conflict, "This cleaning is already finished"},
     cleaning_finished_before_start: {:unprocessable_entity, "Finish cannot be before start"},

@@ -17,6 +17,8 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     finance_corporate_invoices
     finance_corporate_payments
     coaching_relationships
+    coaching_notes
+    coaching_note_reads
     housekeeping_areas
     housekeeping_entries
     review_questionnaires reviews review_answers

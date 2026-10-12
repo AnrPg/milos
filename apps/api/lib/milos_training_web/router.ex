@@ -168,6 +168,7 @@ defmodule MilosTrainingWeb.Router do
     pipe_through([:api, :authenticated, :authenticated_rate_limited])
 
     get("/memberships", OrganizationAccessController, :memberships)
+    post("/organizations", OwnerOrganizationController, :create)
   end
 
   scope "/api", MilosTrainingWeb do
@@ -275,6 +276,12 @@ defmodule MilosTrainingWeb.Router do
     ])
 
     get("/members", StaffController, :index)
+    get("/clients/:user_id/coach-notes", CoachNotesController, :index)
+    post("/clients/:user_id/coach-notes", CoachNotesController, :create)
+    patch("/coach-notes/:id", CoachNotesController, :update)
+    delete("/coach-notes/:id", CoachNotesController, :delete)
+    get("/coach-notes/reads", CoachNotesController, :reads)
+    put("/me/notes-visibility", CoachNotesController, :visibility)
     get("/cleaning/areas", CleaningController, :areas)
     post("/cleaning/areas", CleaningController, :create_area)
     patch("/cleaning/areas/:id", CleaningController, :update_area)
@@ -335,6 +342,8 @@ defmodule MilosTrainingWeb.Router do
     put("/users/:id/roles", AdminUserController, :update_roles)
     get("/role-access", RoleAccessController, :show)
     put("/role-access/:role", RoleAccessController, :update)
+    post("/organization/transfer", OwnerOrganizationController, :transfer)
+    post("/organization/archive", OwnerOrganizationController, :archive)
     patch("/users/:id/coach-scope", AdminUserController, :update_coach_scope)
     get("/users/:id/membership-status", AdminUserController, :membership_status)
     get("/search", AdminSearchController, :index)

@@ -8,6 +8,8 @@ describe("resolveRoleRedirect", () => {
       resolveRoleRedirect("/admin", {
         id: "membership-1",
         role: "admin",
+        roles: ["admin"],
+        capabilities: {},
         organization: {
           id: "org-1",
           name: "Test1",

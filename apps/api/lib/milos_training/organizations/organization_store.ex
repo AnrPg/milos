@@ -123,6 +123,10 @@ defmodule MilosTraining.Organizations.OrganizationStore do
     do: impl().update_membership_role(organization_id, membership_id, role)
 
   @impl true
+  def set_organization_status(organization_id, status),
+    do: impl().set_organization_status(organization_id, status)
+
+  @impl true
   def put_organization_setting(organization_id, key, value),
     do: impl().put_organization_setting(organization_id, key, value)
 

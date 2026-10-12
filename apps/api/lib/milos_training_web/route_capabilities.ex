@@ -28,7 +28,8 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     W.StaffController => [:manage_coaching, :manage_appointments, :manage_schedule],
     W.PaymentModelsController => [:manage_billing],
     W.CoachingRelationshipsController => [:assign_coaches, :manage_coaching],
-    W.RoleAccessController => [:manage_settings]
+    W.RoleAccessController => [:manage_settings],
+    W.OwnerOrganizationController => [:manage_organization_lifecycle]
   }
 
   @actions %{
@@ -135,6 +136,14 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     {W.AppointmentsController, :slots} => [:manage_appointments, :book_for_clients],
     {W.AppointmentsController, :book_for_client} => [:manage_appointments, :book_for_clients],
     {W.AppointmentsController, :cancel} => [:manage_appointments, :book_for_clients],
+
+    # Private coach notes (ADR-101)
+    {W.CoachNotesController, :index} => [:write_coach_notes, :read_coach_notes],
+    {W.CoachNotesController, :create} => [:write_coach_notes],
+    {W.CoachNotesController, :update} => [:write_coach_notes],
+    {W.CoachNotesController, :delete} => [:write_coach_notes],
+    {W.CoachNotesController, :reads} => [:write_coach_notes],
+    {W.CoachNotesController, :visibility} => [:write_coach_notes],
 
     # Cleaning log (ADR-102)
     {W.CleaningController, :areas} => [:record_cleaning, :review_cleaning, :manage_cleaning_areas],

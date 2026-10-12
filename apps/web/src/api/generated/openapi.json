@@ -2,16 +2,72 @@
   "components": {
     "responses": {},
     "schemas": {
-      "AppointmentBooking": {
+      "WorkoutDslPublishResponse": {
+        "additionalProperties": false,
         "properties": {
-          "allowance": {
-            "enum": [
-              "pt_sessions",
-              "assessments"
-            ],
+          "diagnostics": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "column": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "line": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "params": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "severity": {
+                  "enum": [
+                    "error",
+                    "warning"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "code",
+                "severity",
+                "line",
+                "column",
+                "params"
+              ],
+              "title": "WorkoutDslDiagnostic",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "execution_preview": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "formatted_source": {
             "type": "string"
           },
-          "cancelled_at": {
+          "workout": {
+            "additionalProperties": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "workout",
+          "formatted_source",
+          "diagnostics",
+          "execution_preview"
+        ],
+        "title": "WorkoutDslPublishResponse",
+        "type": "object"
+      },
+      "CleaningArea": {
+        "properties": {
+          "archived_at": {
             "format": "date-time",
             "nullable": true,
             "type": "string"
@@ -20,28 +76,249 @@
             "format": "uuid",
             "type": "string"
           },
-          "late_cancellation": {
+          "last_cleaned_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "tasks": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "tasks"
+        ],
+        "title": "CleaningArea",
+        "type": "object"
+      },
+      "StaffMember": {
+        "properties": {
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "owner",
+              "admin",
+              "coach"
+            ],
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "role"
+        ],
+        "title": "StaffMember",
+        "type": "object"
+      },
+      "PRTimelineEntry": {
+        "properties": {
+          "beaten_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "change": {
+            "nullable": true,
+            "type": "number"
+          },
+          "higher_is_better": {
             "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "pr_record_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "previous_score": {
+            "nullable": true,
+            "type": "number"
+          },
+          "score": {
+            "type": "number"
+          },
+          "unit": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "pr_record_id",
+          "name",
+          "unit",
+          "beaten_on",
+          "score"
+        ],
+        "title": "PRTimelineEntry",
+        "type": "object"
+      },
+      "FormReview": {
+        "properties": {
+          "execution_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "exercise_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "feedback": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "inserted_at": {
+            "format": "date-time",
+            "type": "string"
           },
           "nickname": {
             "nullable": true,
             "type": "string"
           },
-          "slot": {
-            "additionalProperties": true,
+          "note": {
             "nullable": true,
-            "type": "object"
+            "type": "string"
           },
-          "slot_id": {
+          "reviewed_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "reviewer_id": {
             "format": "uuid",
+            "nullable": true,
             "type": "string"
           },
           "status": {
             "enum": [
-              "booked",
-              "cancelled",
-              "attended",
-              "no_show"
+              "submitted",
+              "reviewed",
+              "withdrawn"
+            ],
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "video_url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "user_id",
+          "video_url",
+          "status",
+          "inserted_at"
+        ],
+        "title": "FormReview",
+        "type": "object"
+      },
+      "CorporateSeat": {
+        "additionalProperties": true,
+        "properties": {
+          "ends_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "starts_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "user_id",
+          "status"
+        ],
+        "title": "CorporateSeat",
+        "type": "object"
+      },
+      "FacilityCheckIn": {
+        "properties": {
+          "already_checked_in": {
+            "type": "boolean"
+          },
+          "checked_in_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "checked_in_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "location_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "recorded_by_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "source": {
+            "enum": [
+              "self",
+              "staff"
             ],
             "type": "string"
           },
@@ -52,12 +329,12 @@
         },
         "required": [
           "id",
-          "slot_id",
           "user_id",
-          "status",
-          "allowance"
+          "checked_in_on",
+          "checked_in_at",
+          "source"
         ],
-        "title": "AppointmentBooking",
+        "title": "FacilityCheckIn",
         "type": "object"
       },
       "AppointmentSlot": {
@@ -193,6 +470,204 @@
         "title": "AppointmentSlot",
         "type": "object"
       },
+      "WorkoutDslParseRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "source": {
+            "maxLength": 200000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "source"
+        ],
+        "title": "WorkoutDslParseRequest",
+        "type": "object"
+      },
+      "WorkoutDslDiagnosticResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "diagnostics": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "column": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "line": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "params": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "severity": {
+                  "enum": [
+                    "error",
+                    "warning"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "code",
+                "severity",
+                "line",
+                "column",
+                "params"
+              ],
+              "title": "WorkoutDslDiagnostic",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "diagnostics"
+        ],
+        "title": "WorkoutDslDiagnosticResponse",
+        "type": "object"
+      },
+      "WorkoutDslDiagnostic": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "column": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "line": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "params": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "severity": {
+            "enum": [
+              "error",
+              "warning"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "severity",
+          "line",
+          "column",
+          "params"
+        ],
+        "title": "WorkoutDslDiagnostic",
+        "type": "object"
+      },
+      "CorporatePayment": {
+        "properties": {
+          "amount_cents": {
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "notes": {
+            "nullable": true,
+            "type": "string"
+          },
+          "paid_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "payment_method": {
+            "enum": [
+              "cash",
+              "bank_transfer",
+              "card_manual",
+              "other"
+            ],
+            "type": "string"
+          },
+          "recorded_by_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "reference": {
+            "nullable": true,
+            "type": "string"
+          },
+          "reversal_reason": {
+            "nullable": true,
+            "type": "string"
+          },
+          "reversed_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "amount_cents",
+          "payment_method",
+          "paid_on"
+        ],
+        "title": "CorporatePayment",
+        "type": "object"
+      },
+      "CoachingRelationship": {
+        "properties": {
+          "client_nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "client_user_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "coach_nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "coach_user_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "origin": {
+            "enum": [
+              "assigned",
+              "self_assigned",
+              "invited"
+            ],
+            "type": "string"
+          },
+          "started_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "coach_user_id",
+          "client_user_id",
+          "origin"
+        ],
+        "title": "CoachingRelationship",
+        "type": "object"
+      },
       "ContentVideo": {
         "properties": {
           "archived_at": {
@@ -241,225 +716,193 @@
         "title": "ContentVideo",
         "type": "object"
       },
-      "CorporateClient": {
+      "WorkoutDslParseResponse": {
+        "additionalProperties": false,
         "properties": {
-          "active_seats": {
-            "type": "integer"
-          },
-          "auto_invoice": {
-            "type": "boolean"
-          },
-          "billing_email": {
-            "nullable": true,
-            "type": "string"
-          },
-          "company_name": {
-            "type": "string"
-          },
-          "contact_name": {
-            "nullable": true,
-            "type": "string"
-          },
-          "enrollment": {
-            "enum": [
-              "invite_code",
-              "email_domain"
-            ],
-            "type": "string"
-          },
-          "enrollment_code": {
-            "type": "string"
-          },
-          "enrollment_domain": {
-            "nullable": true,
-            "type": "string"
-          },
-          "id": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "membership_package_id": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "package_name": {
-            "nullable": true,
-            "type": "string"
-          },
-          "payment_terms_days": {
-            "type": "integer"
-          },
-          "seat_billing": {
-            "enum": [
-              "agreed",
-              "used"
-            ],
-            "type": "string"
-          },
-          "seats": {
-            "nullable": true,
-            "type": "integer"
-          },
-          "status": {
-            "enum": [
-              "active",
-              "archived"
-            ],
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "membership_package_id",
-          "company_name",
-          "enrollment_code",
-          "active_seats",
-          "status"
-        ],
-        "title": "CorporateClient",
-        "type": "object"
-      },
-      "CorporateInvoice": {
-        "properties": {
-          "balance_cents": {
-            "type": "integer"
-          },
-          "corporate_client_id": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "due_on": {
-            "format": "date",
-            "type": "string"
-          },
-          "id": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "invoice_number": {
-            "nullable": true,
-            "type": "string"
-          },
-          "issued_on": {
-            "format": "date",
-            "type": "string"
-          },
-          "last_reminded_on": {
-            "format": "date",
-            "nullable": true,
-            "type": "string"
-          },
-          "paid_cents": {
-            "type": "integer"
-          },
-          "paid_on": {
-            "format": "date",
-            "nullable": true,
-            "type": "string"
-          },
-          "payments": {
+          "diagnostics": {
             "items": {
+              "additionalProperties": false,
               "properties": {
-                "amount_cents": {
+                "code": {
+                  "type": "string"
+                },
+                "column": {
+                  "minimum": 1,
                   "type": "integer"
                 },
-                "id": {
-                  "format": "uuid",
-                  "type": "string"
+                "line": {
+                  "minimum": 1,
+                  "type": "integer"
                 },
-                "notes": {
-                  "nullable": true,
-                  "type": "string"
+                "params": {
+                  "additionalProperties": true,
+                  "type": "object"
                 },
-                "paid_on": {
-                  "format": "date",
-                  "type": "string"
-                },
-                "payment_method": {
+                "severity": {
                   "enum": [
-                    "cash",
-                    "bank_transfer",
-                    "card_manual",
-                    "other"
+                    "error",
+                    "warning"
                   ],
-                  "type": "string"
-                },
-                "recorded_by_id": {
-                  "format": "uuid",
-                  "nullable": true,
-                  "type": "string"
-                },
-                "reference": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "reversal_reason": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "reversed_at": {
-                  "format": "date-time",
-                  "nullable": true,
                   "type": "string"
                 }
               },
               "required": [
-                "id",
-                "amount_cents",
-                "payment_method",
-                "paid_on"
+                "code",
+                "severity",
+                "line",
+                "column",
+                "params"
               ],
-              "title": "CorporatePayment",
+              "title": "WorkoutDslDiagnostic",
               "type": "object"
             },
             "type": "array"
           },
-          "period_end": {
-            "format": "date",
+          "formatted_source": {
             "type": "string"
           },
-          "period_start": {
-            "format": "date",
-            "type": "string"
-          },
-          "reminder_count": {
-            "type": "integer"
-          },
-          "seat_billing": {
-            "type": "string"
-          },
-          "seats_billed": {
-            "type": "integer"
-          },
-          "status": {
+          "version": {
             "enum": [
-              "issued",
-              "overdue",
-              "paid",
-              "void"
+              1
             ],
-            "type": "string"
-          },
-          "total_cents": {
             "type": "integer"
           },
-          "unit_price_cents": {
-            "type": "integer"
+          "vocabulary": {
+            "additionalProperties": false,
+            "properties": {
+              "exercise_catalog": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "aliases": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "capabilities": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "category": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "label",
+                    "category",
+                    "aliases",
+                    "capabilities"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "exercise_parameters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "format_aliases": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "format_specs": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "group_parameters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "header_parameters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "note_markers": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "scale_parameters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "section_formats": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "section_parameters": {
+                "additionalProperties": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "type": "object"
+              },
+              "version": {
+                "enum": [
+                  1
+                ],
+                "type": "integer"
+              },
+              "workout_parameters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "version",
+              "section_formats",
+              "format_aliases",
+              "format_specs",
+              "workout_parameters",
+              "exercise_parameters",
+              "group_parameters",
+              "scale_parameters",
+              "header_parameters",
+              "note_markers",
+              "section_parameters",
+              "exercise_catalog"
+            ],
+            "title": "WorkoutDslVocabulary",
+            "type": "object"
+          },
+          "workout": {
+            "additionalProperties": true,
+            "type": "object"
           }
         },
         "required": [
-          "id",
-          "period_start",
-          "period_end",
-          "seats_billed",
-          "total_cents",
-          "status",
-          "due_on",
-          "paid_cents",
-          "balance_cents",
-          "payments"
+          "version",
+          "workout",
+          "formatted_source",
+          "vocabulary",
+          "diagnostics"
         ],
-        "title": "CorporateInvoice",
+        "title": "WorkoutDslParseResponse",
         "type": "object"
       },
       "CorporateInvoiceDocument": {
@@ -696,65 +1139,362 @@
         "title": "CorporateInvoiceDocument",
         "type": "object"
       },
-      "CorporatePayment": {
+      "CoachNoteRead": {
         "properties": {
-          "amount_cents": {
-            "type": "integer"
+          "client_nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "client_user_id": {
+            "format": "uuid",
+            "type": "string"
           },
           "id": {
             "format": "uuid",
             "type": "string"
           },
-          "notes": {
+          "note_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "read_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "reader_nickname": {
             "nullable": true,
             "type": "string"
+          },
+          "reader_user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "note_id",
+          "reader_user_id",
+          "read_at"
+        ],
+        "title": "CoachNoteRead",
+        "type": "object"
+      },
+      "SemanticError": {
+        "description": "Stable machine-readable API failure with English compatibility copy.",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "code",
+          "error"
+        ],
+        "type": "object"
+      },
+      "WorkoutDslVocabulary": {
+        "additionalProperties": false,
+        "properties": {
+          "exercise_catalog": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "aliases": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "capabilities": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "category": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "label",
+                "category",
+                "aliases",
+                "capabilities"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "exercise_parameters": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "format_aliases": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "format_specs": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "group_parameters": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "header_parameters": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "note_markers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "scale_parameters": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "section_formats": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "section_parameters": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "type": "object"
+          },
+          "version": {
+            "enum": [
+              1
+            ],
+            "type": "integer"
+          },
+          "workout_parameters": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "version",
+          "section_formats",
+          "format_aliases",
+          "format_specs",
+          "workout_parameters",
+          "exercise_parameters",
+          "group_parameters",
+          "scale_parameters",
+          "header_parameters",
+          "note_markers",
+          "section_parameters",
+          "exercise_catalog"
+        ],
+        "title": "WorkoutDslVocabulary",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "code": {
+            "enum": [
+              "validation_failed"
+            ],
+            "type": "string"
+          },
+          "errors": {
+            "additionalProperties": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "code",
+          "errors"
+        ],
+        "type": "object"
+      },
+      "CorporateInvoice": {
+        "properties": {
+          "balance_cents": {
+            "type": "integer"
+          },
+          "corporate_client_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "due_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "invoice_number": {
+            "nullable": true,
+            "type": "string"
+          },
+          "issued_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "last_reminded_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "paid_cents": {
+            "type": "integer"
           },
           "paid_on": {
             "format": "date",
+            "nullable": true,
             "type": "string"
           },
-          "payment_method": {
+          "payments": {
+            "items": {
+              "properties": {
+                "amount_cents": {
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "notes": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "paid_on": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "payment_method": {
+                  "enum": [
+                    "cash",
+                    "bank_transfer",
+                    "card_manual",
+                    "other"
+                  ],
+                  "type": "string"
+                },
+                "recorded_by_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "reference": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "reversal_reason": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "reversed_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "amount_cents",
+                "payment_method",
+                "paid_on"
+              ],
+              "title": "CorporatePayment",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "period_end": {
+            "format": "date",
+            "type": "string"
+          },
+          "period_start": {
+            "format": "date",
+            "type": "string"
+          },
+          "reminder_count": {
+            "type": "integer"
+          },
+          "seat_billing": {
+            "type": "string"
+          },
+          "seats_billed": {
+            "type": "integer"
+          },
+          "status": {
             "enum": [
-              "cash",
-              "bank_transfer",
-              "card_manual",
-              "other"
+              "issued",
+              "overdue",
+              "paid",
+              "void"
             ],
             "type": "string"
           },
-          "recorded_by_id": {
-            "format": "uuid",
-            "nullable": true,
-            "type": "string"
+          "total_cents": {
+            "type": "integer"
           },
-          "reference": {
-            "nullable": true,
-            "type": "string"
-          },
-          "reversal_reason": {
-            "nullable": true,
-            "type": "string"
-          },
-          "reversed_at": {
-            "format": "date-time",
-            "nullable": true,
-            "type": "string"
+          "unit_price_cents": {
+            "type": "integer"
           }
         },
         "required": [
           "id",
-          "amount_cents",
-          "payment_method",
-          "paid_on"
+          "period_start",
+          "period_end",
+          "seats_billed",
+          "total_cents",
+          "status",
+          "due_on",
+          "paid_cents",
+          "balance_cents",
+          "payments"
         ],
-        "title": "CorporatePayment",
+        "title": "CorporateInvoice",
         "type": "object"
       },
-      "CorporateSeat": {
-        "additionalProperties": true,
+      "AppointmentBooking": {
         "properties": {
-          "ends_on": {
-            "format": "date",
+          "allowance": {
+            "enum": [
+              "pt_sessions",
+              "assessments"
+            ],
+            "type": "string"
+          },
+          "cancelled_at": {
+            "format": "date-time",
             "nullable": true,
             "type": "string"
           },
@@ -762,70 +1502,28 @@
             "format": "uuid",
             "type": "string"
           },
+          "late_cancellation": {
+            "type": "boolean"
+          },
           "nickname": {
             "nullable": true,
             "type": "string"
           },
-          "starts_on": {
-            "format": "date",
+          "slot": {
+            "additionalProperties": true,
             "nullable": true,
+            "type": "object"
+          },
+          "slot_id": {
+            "format": "uuid",
             "type": "string"
           },
           "status": {
-            "type": "string"
-          },
-          "user_id": {
-            "format": "uuid",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "user_id",
-          "status"
-        ],
-        "title": "CorporateSeat",
-        "type": "object"
-      },
-      "FacilityCheckIn": {
-        "properties": {
-          "already_checked_in": {
-            "type": "boolean"
-          },
-          "checked_in_at": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "checked_in_on": {
-            "format": "date",
-            "type": "string"
-          },
-          "id": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "location_id": {
-            "format": "uuid",
-            "nullable": true,
-            "type": "string"
-          },
-          "location_name": {
-            "nullable": true,
-            "type": "string"
-          },
-          "nickname": {
-            "nullable": true,
-            "type": "string"
-          },
-          "recorded_by_id": {
-            "format": "uuid",
-            "nullable": true,
-            "type": "string"
-          },
-          "source": {
             "enum": [
-              "self",
-              "staff"
+              "booked",
+              "cancelled",
+              "attended",
+              "no_show"
             ],
             "type": "string"
           },
@@ -836,12 +1534,90 @@
         },
         "required": [
           "id",
+          "slot_id",
           "user_id",
-          "checked_in_on",
-          "checked_in_at",
-          "source"
+          "status",
+          "allowance"
         ],
-        "title": "FacilityCheckIn",
+        "title": "AppointmentBooking",
+        "type": "object"
+      },
+      "WorkoutDslAuthoringResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "authoring_mode": {
+            "enum": [
+              "structured",
+              "quick_text"
+            ],
+            "type": "string"
+          },
+          "diagnostics": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "column": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "line": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "params": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "severity": {
+                  "enum": [
+                    "error",
+                    "warning"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "code",
+                "severity",
+                "line",
+                "column",
+                "params"
+              ],
+              "title": "WorkoutDslDiagnostic",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "document": {
+            "additionalProperties": true,
+            "nullable": true,
+            "type": "object"
+          },
+          "source": {
+            "type": "string"
+          },
+          "source_revision": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "version": {
+            "enum": [
+              1
+            ],
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "source",
+          "source_revision",
+          "authoring_mode",
+          "diagnostics"
+        ],
+        "title": "WorkoutDslAuthoringResponse",
         "type": "object"
       },
       "FacilityLocation": {
@@ -884,19 +1660,285 @@
         "title": "FacilityLocation",
         "type": "object"
       },
-      "FormReview": {
+      "WorkoutDslPublishRequest": {
+        "additionalProperties": false,
         "properties": {
-          "execution_id": {
+          "acknowledge_warnings": {
+            "default": false,
+            "type": "boolean"
+          },
+          "document": {
+            "additionalProperties": true,
+            "nullable": true,
+            "type": "object"
+          },
+          "expected_source_revision": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "source": {
+            "maxLength": 200000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "expected_source_revision"
+        ],
+        "title": "WorkoutDslPublishRequest",
+        "type": "object"
+      },
+      "WorkoutDslManualResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "markdown": {
+            "type": "string"
+          },
+          "templates": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "version": {
+            "enum": [
+              1
+            ],
+            "type": "integer"
+          },
+          "vocabulary": {
+            "additionalProperties": false,
+            "properties": {
+              "exercise_catalog": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "aliases": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "capabilities": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "category": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "label",
+                    "category",
+                    "aliases",
+                    "capabilities"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "exercise_parameters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "format_aliases": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "format_specs": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "group_parameters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "header_parameters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "note_markers": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "scale_parameters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "section_formats": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "section_parameters": {
+                "additionalProperties": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "type": "object"
+              },
+              "version": {
+                "enum": [
+                  1
+                ],
+                "type": "integer"
+              },
+              "workout_parameters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "version",
+              "section_formats",
+              "format_aliases",
+              "format_specs",
+              "workout_parameters",
+              "exercise_parameters",
+              "group_parameters",
+              "scale_parameters",
+              "header_parameters",
+              "note_markers",
+              "section_parameters",
+              "exercise_catalog"
+            ],
+            "title": "WorkoutDslVocabulary",
+            "type": "object"
+          }
+        },
+        "required": [
+          "version",
+          "markdown",
+          "templates",
+          "vocabulary"
+        ],
+        "title": "WorkoutDslManualResponse",
+        "type": "object"
+      },
+      "SubscriptionFreeze": {
+        "properties": {
+          "admin_id": {
             "format": "uuid",
             "nullable": true,
             "type": "string"
           },
-          "exercise_name": {
+          "cancel_reason": {
             "nullable": true,
             "type": "string"
           },
-          "feedback": {
+          "cancelled_at": {
+            "format": "date-time",
             "nullable": true,
+            "type": "string"
+          },
+          "ends_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "extension_days": {
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "starts_on": {
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "starts_on",
+          "ends_on",
+          "extension_days",
+          "reason",
+          "cancelled_at"
+        ],
+        "title": "SubscriptionFreeze",
+        "type": "object"
+      },
+      "SubscriptionBeneficiary": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "is_minor": {
+            "type": "boolean"
+          },
+          "membership_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "removed_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "subscription_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "subscription_id",
+          "user_id",
+          "is_minor"
+        ],
+        "title": "SubscriptionBeneficiary",
+        "type": "object"
+      },
+      "CoachNote": {
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "client_user_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "coach_nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "coach_user_id": {
+            "format": "uuid",
             "type": "string"
           },
           "id": {
@@ -907,6 +1949,113 @@
             "format": "date-time",
             "type": "string"
           },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "coach_user_id",
+          "client_user_id",
+          "body"
+        ],
+        "title": "CoachNote",
+        "type": "object"
+      },
+      "CorporateClient": {
+        "properties": {
+          "active_seats": {
+            "type": "integer"
+          },
+          "auto_invoice": {
+            "type": "boolean"
+          },
+          "billing_email": {
+            "nullable": true,
+            "type": "string"
+          },
+          "company_name": {
+            "type": "string"
+          },
+          "contact_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "enrollment": {
+            "enum": [
+              "invite_code",
+              "email_domain"
+            ],
+            "type": "string"
+          },
+          "enrollment_code": {
+            "type": "string"
+          },
+          "enrollment_domain": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "membership_package_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "package_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "payment_terms_days": {
+            "type": "integer"
+          },
+          "seat_billing": {
+            "enum": [
+              "agreed",
+              "used"
+            ],
+            "type": "string"
+          },
+          "seats": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "archived"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "membership_package_id",
+          "company_name",
+          "enrollment_code",
+          "active_seats",
+          "status"
+        ],
+        "title": "CorporateClient",
+        "type": "object"
+      },
+      "CleaningEntry": {
+        "properties": {
+          "area_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "finished_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
           "nickname": {
             "nullable": true,
             "type": "string"
@@ -915,40 +2064,29 @@
             "nullable": true,
             "type": "string"
           },
-          "reviewed_at": {
+          "started_at": {
             "format": "date-time",
-            "nullable": true,
             "type": "string"
           },
-          "reviewer_id": {
-            "format": "uuid",
-            "nullable": true,
-            "type": "string"
-          },
-          "status": {
-            "enum": [
-              "submitted",
-              "reviewed",
-              "withdrawn"
-            ],
-            "type": "string"
+          "tasks_done": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "user_id": {
             "format": "uuid",
-            "type": "string"
-          },
-          "video_url": {
+            "nullable": true,
             "type": "string"
           }
         },
         "required": [
           "id",
-          "user_id",
-          "video_url",
-          "status",
-          "inserted_at"
+          "area_id",
+          "started_at",
+          "tasks_done"
         ],
-        "title": "FormReview",
+        "title": "CleaningEntry",
         "type": "object"
       },
       "NutritionPlan": {
@@ -996,52 +2134,6 @@
           "body"
         ],
         "title": "NutritionPlan",
-        "type": "object"
-      },
-      "PRTimelineEntry": {
-        "properties": {
-          "beaten_on": {
-            "format": "date",
-            "type": "string"
-          },
-          "change": {
-            "nullable": true,
-            "type": "number"
-          },
-          "higher_is_better": {
-            "type": "boolean"
-          },
-          "id": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "pr_record_id": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "previous_score": {
-            "nullable": true,
-            "type": "number"
-          },
-          "score": {
-            "type": "number"
-          },
-          "unit": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "pr_record_id",
-          "name",
-          "unit",
-          "beaten_on",
-          "score"
-        ],
-        "title": "PRTimelineEntry",
         "type": "object"
       },
       "ProgressStats": {
@@ -1239,888 +2331,6 @@
           "pr_timeline"
         ],
         "title": "ProgressStats",
-        "type": "object"
-      },
-      "SemanticError": {
-        "description": "Stable machine-readable API failure with English compatibility copy.",
-        "properties": {
-          "code": {
-            "type": "string"
-          },
-          "error": {
-            "type": "string"
-          },
-          "params": {
-            "additionalProperties": true,
-            "type": "object"
-          }
-        },
-        "required": [
-          "code",
-          "error"
-        ],
-        "type": "object"
-      },
-      "StaffMember": {
-        "properties": {
-          "nickname": {
-            "nullable": true,
-            "type": "string"
-          },
-          "role": {
-            "enum": [
-              "owner",
-              "admin",
-              "coach"
-            ],
-            "type": "string"
-          },
-          "user_id": {
-            "format": "uuid",
-            "type": "string"
-          }
-        },
-        "required": [
-          "user_id",
-          "role"
-        ],
-        "title": "StaffMember",
-        "type": "object"
-      },
-      "SubscriptionBeneficiary": {
-        "properties": {
-          "id": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "is_minor": {
-            "type": "boolean"
-          },
-          "membership_id": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "nickname": {
-            "nullable": true,
-            "type": "string"
-          },
-          "removed_at": {
-            "format": "date-time",
-            "nullable": true,
-            "type": "string"
-          },
-          "subscription_id": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "user_id": {
-            "format": "uuid",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "subscription_id",
-          "user_id",
-          "is_minor"
-        ],
-        "title": "SubscriptionBeneficiary",
-        "type": "object"
-      },
-      "SubscriptionFreeze": {
-        "properties": {
-          "admin_id": {
-            "format": "uuid",
-            "nullable": true,
-            "type": "string"
-          },
-          "cancel_reason": {
-            "nullable": true,
-            "type": "string"
-          },
-          "cancelled_at": {
-            "format": "date-time",
-            "nullable": true,
-            "type": "string"
-          },
-          "ends_on": {
-            "format": "date",
-            "type": "string"
-          },
-          "extension_days": {
-            "type": "integer"
-          },
-          "id": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "reason": {
-            "type": "string"
-          },
-          "starts_on": {
-            "format": "date",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "starts_on",
-          "ends_on",
-          "extension_days",
-          "reason",
-          "cancelled_at"
-        ],
-        "title": "SubscriptionFreeze",
-        "type": "object"
-      },
-      "ValidationError": {
-        "properties": {
-          "code": {
-            "enum": [
-              "validation_failed"
-            ],
-            "type": "string"
-          },
-          "errors": {
-            "additionalProperties": true,
-            "type": "object"
-          }
-        },
-        "required": [
-          "code",
-          "errors"
-        ],
-        "type": "object"
-      },
-      "WorkoutDslAuthoringResponse": {
-        "additionalProperties": false,
-        "properties": {
-          "authoring_mode": {
-            "enum": [
-              "structured",
-              "quick_text"
-            ],
-            "type": "string"
-          },
-          "diagnostics": {
-            "items": {
-              "additionalProperties": false,
-              "properties": {
-                "code": {
-                  "type": "string"
-                },
-                "column": {
-                  "minimum": 1,
-                  "type": "integer"
-                },
-                "line": {
-                  "minimum": 1,
-                  "type": "integer"
-                },
-                "params": {
-                  "additionalProperties": true,
-                  "type": "object"
-                },
-                "severity": {
-                  "enum": [
-                    "error",
-                    "warning"
-                  ],
-                  "type": "string"
-                }
-              },
-              "required": [
-                "code",
-                "severity",
-                "line",
-                "column",
-                "params"
-              ],
-              "title": "WorkoutDslDiagnostic",
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "document": {
-            "additionalProperties": true,
-            "nullable": true,
-            "type": "object"
-          },
-          "source": {
-            "type": "string"
-          },
-          "source_revision": {
-            "minimum": 0,
-            "type": "integer"
-          },
-          "version": {
-            "enum": [
-              1
-            ],
-            "type": "integer"
-          }
-        },
-        "required": [
-          "version",
-          "source",
-          "source_revision",
-          "authoring_mode",
-          "diagnostics"
-        ],
-        "title": "WorkoutDslAuthoringResponse",
-        "type": "object"
-      },
-      "WorkoutDslDiagnostic": {
-        "additionalProperties": false,
-        "properties": {
-          "code": {
-            "type": "string"
-          },
-          "column": {
-            "minimum": 1,
-            "type": "integer"
-          },
-          "line": {
-            "minimum": 1,
-            "type": "integer"
-          },
-          "params": {
-            "additionalProperties": true,
-            "type": "object"
-          },
-          "severity": {
-            "enum": [
-              "error",
-              "warning"
-            ],
-            "type": "string"
-          }
-        },
-        "required": [
-          "code",
-          "severity",
-          "line",
-          "column",
-          "params"
-        ],
-        "title": "WorkoutDslDiagnostic",
-        "type": "object"
-      },
-      "WorkoutDslDiagnosticResponse": {
-        "additionalProperties": false,
-        "properties": {
-          "diagnostics": {
-            "items": {
-              "additionalProperties": false,
-              "properties": {
-                "code": {
-                  "type": "string"
-                },
-                "column": {
-                  "minimum": 1,
-                  "type": "integer"
-                },
-                "line": {
-                  "minimum": 1,
-                  "type": "integer"
-                },
-                "params": {
-                  "additionalProperties": true,
-                  "type": "object"
-                },
-                "severity": {
-                  "enum": [
-                    "error",
-                    "warning"
-                  ],
-                  "type": "string"
-                }
-              },
-              "required": [
-                "code",
-                "severity",
-                "line",
-                "column",
-                "params"
-              ],
-              "title": "WorkoutDslDiagnostic",
-              "type": "object"
-            },
-            "type": "array"
-          }
-        },
-        "required": [
-          "diagnostics"
-        ],
-        "title": "WorkoutDslDiagnosticResponse",
-        "type": "object"
-      },
-      "WorkoutDslManualResponse": {
-        "additionalProperties": false,
-        "properties": {
-          "markdown": {
-            "type": "string"
-          },
-          "templates": {
-            "additionalProperties": true,
-            "type": "object"
-          },
-          "version": {
-            "enum": [
-              1
-            ],
-            "type": "integer"
-          },
-          "vocabulary": {
-            "additionalProperties": false,
-            "properties": {
-              "exercise_catalog": {
-                "items": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "aliases": {
-                      "items": {
-                        "type": "string"
-                      },
-                      "type": "array"
-                    },
-                    "capabilities": {
-                      "items": {
-                        "type": "string"
-                      },
-                      "type": "array"
-                    },
-                    "category": {
-                      "type": "string"
-                    },
-                    "id": {
-                      "type": "string"
-                    },
-                    "label": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "label",
-                    "category",
-                    "aliases",
-                    "capabilities"
-                  ],
-                  "type": "object"
-                },
-                "type": "array"
-              },
-              "exercise_parameters": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "format_aliases": {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              "format_specs": {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              "group_parameters": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "header_parameters": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "note_markers": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "scale_parameters": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "section_formats": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "section_parameters": {
-                "additionalProperties": {
-                  "items": {
-                    "type": "string"
-                  },
-                  "type": "array"
-                },
-                "type": "object"
-              },
-              "version": {
-                "enum": [
-                  1
-                ],
-                "type": "integer"
-              },
-              "workout_parameters": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              }
-            },
-            "required": [
-              "version",
-              "section_formats",
-              "format_aliases",
-              "format_specs",
-              "workout_parameters",
-              "exercise_parameters",
-              "group_parameters",
-              "scale_parameters",
-              "header_parameters",
-              "note_markers",
-              "section_parameters",
-              "exercise_catalog"
-            ],
-            "title": "WorkoutDslVocabulary",
-            "type": "object"
-          }
-        },
-        "required": [
-          "version",
-          "markdown",
-          "templates",
-          "vocabulary"
-        ],
-        "title": "WorkoutDslManualResponse",
-        "type": "object"
-      },
-      "WorkoutDslParseRequest": {
-        "additionalProperties": false,
-        "properties": {
-          "source": {
-            "maxLength": 200000,
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "required": [
-          "source"
-        ],
-        "title": "WorkoutDslParseRequest",
-        "type": "object"
-      },
-      "WorkoutDslParseResponse": {
-        "additionalProperties": false,
-        "properties": {
-          "diagnostics": {
-            "items": {
-              "additionalProperties": false,
-              "properties": {
-                "code": {
-                  "type": "string"
-                },
-                "column": {
-                  "minimum": 1,
-                  "type": "integer"
-                },
-                "line": {
-                  "minimum": 1,
-                  "type": "integer"
-                },
-                "params": {
-                  "additionalProperties": true,
-                  "type": "object"
-                },
-                "severity": {
-                  "enum": [
-                    "error",
-                    "warning"
-                  ],
-                  "type": "string"
-                }
-              },
-              "required": [
-                "code",
-                "severity",
-                "line",
-                "column",
-                "params"
-              ],
-              "title": "WorkoutDslDiagnostic",
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "formatted_source": {
-            "type": "string"
-          },
-          "version": {
-            "enum": [
-              1
-            ],
-            "type": "integer"
-          },
-          "vocabulary": {
-            "additionalProperties": false,
-            "properties": {
-              "exercise_catalog": {
-                "items": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "aliases": {
-                      "items": {
-                        "type": "string"
-                      },
-                      "type": "array"
-                    },
-                    "capabilities": {
-                      "items": {
-                        "type": "string"
-                      },
-                      "type": "array"
-                    },
-                    "category": {
-                      "type": "string"
-                    },
-                    "id": {
-                      "type": "string"
-                    },
-                    "label": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "label",
-                    "category",
-                    "aliases",
-                    "capabilities"
-                  ],
-                  "type": "object"
-                },
-                "type": "array"
-              },
-              "exercise_parameters": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "format_aliases": {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              "format_specs": {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              "group_parameters": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "header_parameters": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "note_markers": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "scale_parameters": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "section_formats": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "section_parameters": {
-                "additionalProperties": {
-                  "items": {
-                    "type": "string"
-                  },
-                  "type": "array"
-                },
-                "type": "object"
-              },
-              "version": {
-                "enum": [
-                  1
-                ],
-                "type": "integer"
-              },
-              "workout_parameters": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              }
-            },
-            "required": [
-              "version",
-              "section_formats",
-              "format_aliases",
-              "format_specs",
-              "workout_parameters",
-              "exercise_parameters",
-              "group_parameters",
-              "scale_parameters",
-              "header_parameters",
-              "note_markers",
-              "section_parameters",
-              "exercise_catalog"
-            ],
-            "title": "WorkoutDslVocabulary",
-            "type": "object"
-          },
-          "workout": {
-            "additionalProperties": true,
-            "type": "object"
-          }
-        },
-        "required": [
-          "version",
-          "workout",
-          "formatted_source",
-          "vocabulary",
-          "diagnostics"
-        ],
-        "title": "WorkoutDslParseResponse",
-        "type": "object"
-      },
-      "WorkoutDslPublishRequest": {
-        "additionalProperties": false,
-        "properties": {
-          "acknowledge_warnings": {
-            "default": false,
-            "type": "boolean"
-          },
-          "document": {
-            "additionalProperties": true,
-            "nullable": true,
-            "type": "object"
-          },
-          "expected_source_revision": {
-            "minimum": 0,
-            "type": "integer"
-          },
-          "source": {
-            "maxLength": 200000,
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "required": [
-          "source",
-          "expected_source_revision"
-        ],
-        "title": "WorkoutDslPublishRequest",
-        "type": "object"
-      },
-      "WorkoutDslPublishResponse": {
-        "additionalProperties": false,
-        "properties": {
-          "diagnostics": {
-            "items": {
-              "additionalProperties": false,
-              "properties": {
-                "code": {
-                  "type": "string"
-                },
-                "column": {
-                  "minimum": 1,
-                  "type": "integer"
-                },
-                "line": {
-                  "minimum": 1,
-                  "type": "integer"
-                },
-                "params": {
-                  "additionalProperties": true,
-                  "type": "object"
-                },
-                "severity": {
-                  "enum": [
-                    "error",
-                    "warning"
-                  ],
-                  "type": "string"
-                }
-              },
-              "required": [
-                "code",
-                "severity",
-                "line",
-                "column",
-                "params"
-              ],
-              "title": "WorkoutDslDiagnostic",
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "execution_preview": {
-            "additionalProperties": true,
-            "type": "object"
-          },
-          "formatted_source": {
-            "type": "string"
-          },
-          "workout": {
-            "additionalProperties": true,
-            "type": "object"
-          }
-        },
-        "required": [
-          "workout",
-          "formatted_source",
-          "diagnostics",
-          "execution_preview"
-        ],
-        "title": "WorkoutDslPublishResponse",
-        "type": "object"
-      },
-      "WorkoutDslVocabulary": {
-        "additionalProperties": false,
-        "properties": {
-          "exercise_catalog": {
-            "items": {
-              "additionalProperties": false,
-              "properties": {
-                "aliases": {
-                  "items": {
-                    "type": "string"
-                  },
-                  "type": "array"
-                },
-                "capabilities": {
-                  "items": {
-                    "type": "string"
-                  },
-                  "type": "array"
-                },
-                "category": {
-                  "type": "string"
-                },
-                "id": {
-                  "type": "string"
-                },
-                "label": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "id",
-                "label",
-                "category",
-                "aliases",
-                "capabilities"
-              ],
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "exercise_parameters": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "format_aliases": {
-            "additionalProperties": true,
-            "type": "object"
-          },
-          "format_specs": {
-            "additionalProperties": true,
-            "type": "object"
-          },
-          "group_parameters": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "header_parameters": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "note_markers": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "scale_parameters": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "section_formats": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "section_parameters": {
-            "additionalProperties": {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            },
-            "type": "object"
-          },
-          "version": {
-            "enum": [
-              1
-            ],
-            "type": "integer"
-          },
-          "workout_parameters": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          }
-        },
-        "required": [
-          "version",
-          "section_formats",
-          "format_aliases",
-          "format_specs",
-          "workout_parameters",
-          "exercise_parameters",
-          "group_parameters",
-          "scale_parameters",
-          "header_parameters",
-          "note_markers",
-          "section_parameters",
-          "exercise_catalog"
-        ],
-        "title": "WorkoutDslVocabulary",
         "type": "object"
       }
     },
@@ -3240,6 +3450,20 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "capabilities": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "description": "capability => scope (all, own, status), ADR-099",
+                      "type": "object"
+                    },
+                    "coach_scope": {
+                      "enum": [
+                        "own",
+                        "all"
+                      ],
+                      "type": "string"
+                    },
                     "id": {
                       "format": "uuid",
                       "type": "string"
@@ -3267,6 +3491,12 @@
                     "role": {
                       "type": "string"
                     },
+                    "roles": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
                     "settings": {
                       "nullable": true,
                       "properties": {
@@ -3289,6 +3519,8 @@
                   "required": [
                     "id",
                     "role",
+                    "roles",
+                    "capabilities",
                     "organization"
                   ],
                   "type": "object"
@@ -3330,6 +3562,11 @@
                   },
                   "class_type_id": {
                     "format": "uuid",
+                    "type": "string"
+                  },
+                  "coach_user_id": {
+                    "format": "uuid",
+                    "nullable": true,
                     "type": "string"
                   },
                   "duration_minutes": {
@@ -9329,6 +9566,88 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/cleaning/areas/{id}/archive": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CleaningController.archive_area",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "area": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_cleaned_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "tasks": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "tasks"
+                      ],
+                      "title": "CleaningArea",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "area"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Area"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Archive an area",
+        "tags": [
+          "Cleaning log"
+        ]
+      }
+    },
     "/api/executions/{id}/notes": {
       "post": {
         "callbacks": {},
@@ -9433,6 +9752,115 @@
         "summary": "Submit an execution note and notify admins",
         "tags": [
           "Execution"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/users/{id}/roles": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminUserController.update_roles",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "roles": {
+                    "items": {
+                      "enum": [
+                        "owner",
+                        "admin",
+                        "coach",
+                        "front_desk",
+                        "accountant",
+                        "janitor",
+                        "member",
+                        "athlete"
+                      ],
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "roles"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "membership": {
+                      "properties": {
+                        "coach_scope": {
+                          "enum": [
+                            "own",
+                            "all"
+                          ],
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        },
+                        "roles": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "user_id",
+                        "role",
+                        "roles",
+                        "coach_scope"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "membership"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Membership"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set every role a person holds in this gym (ADR-099)",
+        "tags": [
+          "Admin Users"
         ]
       }
     },
@@ -11899,6 +12327,73 @@
         ]
       }
     },
+    "/api/organizations": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OwnerOrganizationController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "status"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Gym"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "An owner creates another gym and owns it",
+        "tags": [
+          "Organization ownership"
+        ]
+      }
+    },
     "/api/auth/register": {
       "post": {
         "callbacks": {},
@@ -13743,6 +14238,93 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/coaching-relationships/{id}/end": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachingRelationshipsController.finish",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "relationship": {
+                      "properties": {
+                        "client_nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "client_user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "coach_nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "coach_user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "origin": {
+                          "enum": [
+                            "assigned",
+                            "self_assigned",
+                            "invited"
+                          ],
+                          "type": "string"
+                        },
+                        "started_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "coach_user_id",
+                        "client_user_id",
+                        "origin"
+                      ],
+                      "title": "CoachingRelationship",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "relationship"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Relationship"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "End a coaching relationship",
+        "tags": [
+          "Coaching relationships"
+        ]
+      }
+    },
     "/api/theme": {
       "get": {
         "callbacks": {},
@@ -14744,6 +15326,11 @@
                     "format": "uuid",
                     "type": "string"
                   },
+                  "coach_user_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "duration_minutes": {
                     "maximum": 1440,
                     "minimum": 1,
@@ -14811,6 +15398,134 @@
         "summary": "Update a scheduled class slot",
         "tags": [
           "Admin Schedule"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/role-access": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.RoleAccessController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "grantable": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": "object"
+                    },
+                    "grants": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "grants",
+                    "grantable"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Role access"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Capabilities this gym unlocked per role, and what can be unlocked",
+        "tags": [
+          "Role access"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/coach-notes/reads": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachNotesController.reads",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "reads": {
+                      "items": {
+                        "properties": {
+                          "client_nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "client_user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "note_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "read_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "reader_nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "reader_user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "note_id",
+                          "reader_user_id",
+                          "read_at"
+                        ],
+                        "title": "CoachNoteRead",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "reads"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Reads"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Who read your notes, and when",
+        "tags": [
+          "Coach notes"
         ]
       }
     },
@@ -27696,6 +28411,191 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/clients/{user_id}/coach-notes": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachNotesController.index",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "notes": {
+                      "items": {
+                        "properties": {
+                          "body": {
+                            "type": "string"
+                          },
+                          "client_user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "coach_nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "coach_user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "coach_user_id",
+                          "client_user_id",
+                          "body"
+                        ],
+                        "title": "CoachNote",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "notes"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Notes"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Private notes about a client that you may read (reads are logged)",
+        "tags": [
+          "Coach notes"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachNotesController.create",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "body": {
+                    "maxLength": 5000,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "body"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "note": {
+                      "properties": {
+                        "body": {
+                          "type": "string"
+                        },
+                        "client_user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "coach_nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "coach_user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "coach_user_id",
+                        "client_user_id",
+                        "body"
+                      ],
+                      "title": "CoachNote",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "note"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Note"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Write a private note about one of your clients",
+        "tags": [
+          "Coach notes"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/schedule/slots/series": {
       "post": {
         "callbacks": {},
@@ -27720,6 +28620,11 @@
                   },
                   "class_type_id": {
                     "format": "uuid",
+                    "type": "string"
+                  },
+                  "coach_user_id": {
+                    "format": "uuid",
+                    "nullable": true,
                     "type": "string"
                   },
                   "duration_minutes": {
@@ -27816,6 +28721,73 @@
         "summary": "Create a recurring class series",
         "tags": [
           "Admin Schedule"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/organization/archive": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OwnerOrganizationController.archive",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "confirm": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "confirm"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "status"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Gym"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Archive the gym; access closes for everyone (confirm with its slug)",
+        "tags": [
+          "Organization ownership"
         ]
       }
     },
@@ -30735,6 +31707,136 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/me/notes-visibility": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachNotesController.visibility",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "visible_to_admins": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "visible_to_admins"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "visible_to_admins": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "visible_to_admins"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Visibility"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Let admins read your notes or not (owners always can)",
+        "tags": [
+          "Coach notes"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/users/{id}/membership-status": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminUserController.membership_status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "membership_status": {
+                      "properties": {
+                        "allowances": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "expires_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "frozen_until": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "packages": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "status": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "packages",
+                        "allowances"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "membership_status"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Status"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A client's membership status without amounts (coaches, front desk)",
+        "tags": [
+          "Admin Users"
+        ]
+      }
+    },
     "/api/platform/organizations/{id}": {
       "delete": {
         "callbacks": {},
@@ -31440,6 +32542,374 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/cleaning/areas": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CleaningController.areas",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "areas": {
+                      "items": {
+                        "properties": {
+                          "archived_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "last_cleaned_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "tasks": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "tasks"
+                        ],
+                        "title": "CleaningArea",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "areas"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Areas"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Cleaning areas",
+        "tags": [
+          "Cleaning log"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CleaningController.create_area",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "location_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 80,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "tasks": {
+                    "items": {
+                      "maxLength": 120,
+                      "type": "string"
+                    },
+                    "maxItems": 30,
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "area": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_cleaned_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "tasks": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "tasks"
+                      ],
+                      "title": "CleaningArea",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "area"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Area"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Add a cleaning area",
+        "tags": [
+          "Cleaning log"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/cleaning/entries": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CleaningController.entries",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "area_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "entries": {
+                      "items": {
+                        "properties": {
+                          "area_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "finished_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "note": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "started_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "tasks_done": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "area_id",
+                          "started_at",
+                          "tasks_done"
+                        ],
+                        "title": "CleaningEntry",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "entries"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Entries"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The cleaning log: everyone's for reviewers, your own otherwise",
+        "tags": [
+          "Cleaning log"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CleaningController.start",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "area_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "area_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "entry": {
+                      "properties": {
+                        "area_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "finished_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "started_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "tasks_done": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "area_id",
+                        "started_at",
+                        "tasks_done"
+                      ],
+                      "title": "CleaningEntry",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "entry"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Entry"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Start cleaning an area",
+        "tags": [
+          "Cleaning log"
+        ]
+      }
+    },
     "/api/prs": {
       "get": {
         "callbacks": {},
@@ -31972,6 +33442,219 @@
         "summary": "Get retained or canonically generated Quick Text source",
         "tags": [
           "Admin Workouts"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/cleaning/entries/{id}/finish": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CleaningController.finish",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "note": {
+                    "maxLength": 1000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "tasks_done": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "entry": {
+                      "properties": {
+                        "area_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "finished_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "started_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "tasks_done": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "area_id",
+                        "started_at",
+                        "tasks_done"
+                      ],
+                      "title": "CleaningEntry",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "entry"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Entry"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Finish cleaning: the tasks done and an optional note",
+        "tags": [
+          "Cleaning log"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/users/{id}/coach-scope": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminUserController.update_coach_scope",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "coach_scope": {
+                    "enum": [
+                      "own",
+                      "all"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "coach_scope"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "membership": {
+                      "properties": {
+                        "coach_scope": {
+                          "enum": [
+                            "own",
+                            "all"
+                          ],
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        },
+                        "roles": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "user_id",
+                        "role",
+                        "roles",
+                        "coach_scope"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "membership"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Membership"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Make a coach a head coach (all clients) or limit them to their own (ADR-100)",
+        "tags": [
+          "Admin Users"
         ]
       }
     },
@@ -32750,6 +34433,119 @@
         "summary": "Search visible users by nickname",
         "tags": [
           "Me"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/cleaning/areas/{id}": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CleaningController.update_area",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "location_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 80,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "tasks": {
+                    "items": {
+                      "maxLength": 120,
+                      "type": "string"
+                    },
+                    "maxItems": 30,
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "area": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_cleaned_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "tasks": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "tasks"
+                      ],
+                      "title": "CleaningArea",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "area"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Area"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Rename an area or change its tasks",
+        "tags": [
+          "Cleaning log"
         ]
       }
     },
@@ -33856,6 +35652,204 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/coaching-relationships": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachingRelationshipsController.index",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "coach_user_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "client_user_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "relationships": {
+                      "items": {
+                        "properties": {
+                          "client_nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "client_user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "coach_nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "coach_user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "origin": {
+                            "enum": [
+                              "assigned",
+                              "self_assigned",
+                              "invited"
+                            ],
+                            "type": "string"
+                          },
+                          "started_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "coach_user_id",
+                          "client_user_id",
+                          "origin"
+                        ],
+                        "title": "CoachingRelationship",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "relationships"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Relationships"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Coaching relationships: a coach's own, or all for owners, admins and head coaches",
+        "tags": [
+          "Coaching relationships"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachingRelationshipsController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "client_user_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "coach_user_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "client_user_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "relationship": {
+                      "properties": {
+                        "client_nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "client_user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "coach_nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "coach_user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "origin": {
+                          "enum": [
+                            "assigned",
+                            "self_assigned",
+                            "invited"
+                          ],
+                          "type": "string"
+                        },
+                        "started_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "coach_user_id",
+                        "client_user_id",
+                        "origin"
+                      ],
+                      "title": "CoachingRelationship",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "relationship"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Relationship"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Assign a coach to a client (owners, admins) or take an athlete yourself (coaches)",
+        "tags": [
+          "Coaching relationships"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/my-workouts": {
       "get": {
         "callbacks": {},
@@ -34481,6 +36475,74 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/organization/transfer": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OwnerOrganizationController.transfer",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "user_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "user_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "status"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Gym"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Hand ownership to an active member; the former owner stays as admin",
+        "tags": [
+          "Organization ownership"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/finance/cleanup-records/{id}/purge": {
       "post": {
         "callbacks": {},
@@ -34661,6 +36723,20 @@
                 "schema": {
                   "items": {
                     "properties": {
+                      "capabilities": {
+                        "additionalProperties": {
+                          "type": "string"
+                        },
+                        "description": "capability => scope (all, own, status), ADR-099",
+                        "type": "object"
+                      },
+                      "coach_scope": {
+                        "enum": [
+                          "own",
+                          "all"
+                        ],
+                        "type": "string"
+                      },
                       "id": {
                         "format": "uuid",
                         "type": "string"
@@ -34688,6 +36764,12 @@
                       "role": {
                         "type": "string"
                       },
+                      "roles": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
                       "settings": {
                         "nullable": true,
                         "properties": {
@@ -34710,6 +36792,8 @@
                     "required": [
                       "id",
                       "role",
+                      "roles",
+                      "capabilities",
                       "organization"
                     ],
                     "type": "object"
@@ -35080,6 +37164,144 @@
         "summary": "Assign a package to a user's membership",
         "tags": [
           "Admin Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/coach-notes/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachNotesController.delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Deleted"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete your note",
+        "tags": [
+          "Coach notes"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachNotesController.update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "body": {
+                    "maxLength": 5000,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "body"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "note": {
+                      "properties": {
+                        "body": {
+                          "type": "string"
+                        },
+                        "client_user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "coach_nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "coach_user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "coach_user_id",
+                        "client_user_id",
+                        "body"
+                      ],
+                      "title": "CoachNote",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "note"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Note"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Edit your note",
+        "tags": [
+          "Coach notes"
         ]
       }
     },
@@ -40743,6 +42965,88 @@
         "summary": "Mark an injury report healed",
         "tags": [
           "Admin Wellbeing"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/role-access/{role}": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.RoleAccessController.update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "role",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "capabilities": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "capabilities"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "grantable": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": "object"
+                    },
+                    "grants": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "grants",
+                    "grantable"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Role access"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set what a role may do beyond its defaults in this gym",
+        "tags": [
+          "Role access"
         ]
       }
     },

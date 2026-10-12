@@ -539,6 +539,15 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     |> flatten_transaction()
   end
 
+  # A tenant owner archives their gym (ADR-099); the vendor purges it later.
+  @impl true
+  def set_organization_status(organization_id, status) do
+    case Repo.get(Organization, organization_id) do
+      nil -> {:error, :not_found}
+      organization -> organization |> Organization.changeset(%{status: status}) |> Repo.update()
+    end
+  end
+
   # One key of the gym's free-form settings map, e.g. role grants (ADR-099).
   @impl true
   def put_organization_setting(organization_id, key, value) do

@@ -85,6 +85,10 @@ config :milos_training,
        MilosTraining.Infrastructure.Housekeeping.EctoHousekeepingStore
 
 config :milos_training,
+       :coaching_note_store,
+       MilosTraining.Infrastructure.Coaching.EctoNoteStore
+
+config :milos_training,
        :coaching_relationship_store,
        MilosTraining.Infrastructure.Coaching.EctoRelationshipStore
 

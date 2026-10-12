@@ -1,7 +1,7 @@
 defmodule MilosTraining.Coaching do
   alias MilosTraining.Coaching.Commands.RefreshAggregates
   alias MilosTraining.Coaching.Queries.GetAggregates
-  alias MilosTraining.Coaching.{CoachingStore, FormReviewStore, RelationshipStore}
+  alias MilosTraining.Coaching.{CoachingStore, FormReviewStore, NoteStore, RelationshipStore}
 
   defdelegate get_aggregates(), to: GetAggregates, as: :call
   defdelegate get_aggregates(context), to: GetAggregates, as: :call
@@ -37,4 +37,16 @@ defmodule MilosTraining.Coaching do
         RelationshipStore.active?(context, coach_id, client_id)
 
   def list_client_ids(context, coach_id), do: RelationshipStore.client_ids(context, coach_id)
+
+  # Private coach notes (ADR-101).
+  def create_note(context, attrs), do: NoteStore.create(context, attrs)
+  def get_note(context, id), do: NoteStore.get(context, id)
+  def update_note(context, id, attrs), do: NoteStore.update(context, id, attrs)
+  def delete_note(context, id), do: NoteStore.delete(context, id)
+  def list_client_notes(context, client_id), do: NoteStore.list_for_client(context, client_id)
+
+  def record_note_reads(context, note_ids, reader_id, at),
+    do: NoteStore.record_reads(context, note_ids, reader_id, at)
+
+  def list_note_reads(context, coach_id), do: NoteStore.list_reads(context, coach_id)
 end
