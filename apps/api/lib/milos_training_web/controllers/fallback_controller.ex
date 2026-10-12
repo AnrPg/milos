@@ -1293,6 +1293,15 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  def call(conn, {:error, :idempotency_key_conflict}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "idempotency_key_conflict",
+      error: "This operation id was already used for a different request"
+    })
+  end
+
   def call(conn, {:error, :booking_not_pending}) do
     conn
     |> put_status(:conflict)

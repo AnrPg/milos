@@ -80,7 +80,9 @@ defmodule MilosTrainingWeb.TrainingLogController do
   operation(:create,
     summary: "Log a class, assigned, library, or freeform workout",
     description:
-      "Idempotent per `idempotency_key`: a replay returns the original entry with 200. " <>
+      "Idempotent per `idempotency_key`: a replay returns the original entry with 200, " <>
+        "before source authorization is re-evaluated (ADR-102). Reusing a key for a " <>
+        "different source returns 409 `idempotency_key_conflict`. " <>
         "Logging feeds the same durable completion projection as workout executions.",
     request_body: %RequestBody{
       required: true,

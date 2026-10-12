@@ -52,8 +52,23 @@ defmodule MilosTrainingWeb.AdminScheduleController do
 
   @message_schema %Schema{
     type: :object,
-    properties: %{admin_message: %Schema{type: :string}},
+    properties: %{
+      admin_message: %Schema{type: :string},
+      client_operation_id: %Schema{
+        type: :string,
+        format: :uuid,
+        nullable: true,
+        description:
+          "Stable client operation id (ADR-102). Replaying the operation that already " <>
+            "resolved the booking returns it with 200 and no new notification."
+      }
+    },
     required: []
+  }
+
+  @resolution_error %Schema{
+    type: :object,
+    properties: %{code: %Schema{type: :string}, error: %Schema{type: :string}}
   }
 
   @id_param %Parameter{
@@ -163,6 +178,10 @@ defmodule MilosTrainingWeb.AdminScheduleController do
 
   operation(:approve_booking,
     summary: "Approve a booking",
+    description:
+      "Booking resolution is never replayed blindly (ADR-102): a booking that is no longer " <>
+        "pending returns 409 `booking_not_pending` unless it was resolved by this same " <>
+        "`client_operation_id`, which returns the booking with 200.",
     parameters: [@id_param],
     request_body: %RequestBody{
       required: false,
@@ -175,12 +194,21 @@ defmodule MilosTrainingWeb.AdminScheduleController do
            type: :object,
            properties: %{booking: %Schema{type: :object, additionalProperties: true}},
            required: [:booking]
-         }}
+         }},
+      not_found: {"Booking not found", "application/json", @resolution_error},
+      conflict:
+        {"Booking no longer pending, slot full, or operation id conflict", "application/json",
+         @resolution_error},
+      unprocessable_entity: {"Invalid request", "application/json", @resolution_error}
     ]
   )
 
   operation(:reject_booking,
     summary: "Reject a booking",
+    description:
+      "Booking resolution is never replayed blindly (ADR-102): a booking that is no longer " <>
+        "pending returns 409 `booking_not_pending` unless it was resolved by this same " <>
+        "`client_operation_id`, which returns the booking with 200.",
     parameters: [@id_param],
     request_body: %RequestBody{
       required: false,
@@ -193,7 +221,12 @@ defmodule MilosTrainingWeb.AdminScheduleController do
            type: :object,
            properties: %{booking: %Schema{type: :object, additionalProperties: true}},
            required: [:booking]
-         }}
+         }},
+      not_found: {"Booking not found", "application/json", @resolution_error},
+      conflict:
+        {"Booking no longer pending, slot full, or operation id conflict", "application/json",
+         @resolution_error},
+      unprocessable_entity: {"Invalid request", "application/json", @resolution_error}
     ]
   )
 
@@ -234,10 +267,11 @@ defmodule MilosTrainingWeb.AdminScheduleController do
     id = params["id"] || params[:id]
     body = normalize_body_params(conn, params)
 
-    with {:ok, booking} <-
+    with {:ok, booking, _outcome} <-
            ResolveBooking.call(conn.assigns.tenant_context, id, %{
              action: :approve,
-             admin_message: body["admin_message"] || body[:admin_message]
+             admin_message: body["admin_message"] || body[:admin_message],
+             client_operation_id: body["client_operation_id"] || body[:client_operation_id]
            }) do
       json(conn, %{booking: booking})
     end
@@ -247,10 +281,11 @@ defmodule MilosTrainingWeb.AdminScheduleController do
     id = params["id"] || params[:id]
     body = normalize_body_params(conn, params)
 
-    with {:ok, booking} <-
+    with {:ok, booking, _outcome} <-
            ResolveBooking.call(conn.assigns.tenant_context, id, %{
              action: :reject,
-             admin_message: body["admin_message"] || body[:admin_message]
+             admin_message: body["admin_message"] || body[:admin_message],
+             client_operation_id: body["client_operation_id"] || body[:client_operation_id]
            }) do
       json(conn, %{booking: booking})
     end
