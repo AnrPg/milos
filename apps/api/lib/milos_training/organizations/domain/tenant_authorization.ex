@@ -34,6 +34,18 @@ defmodule MilosTraining.Organizations.Domain.TenantAuthorization do
   def build(_account, _organization, _membership, _request_metadata),
     do: {:error, :membership_required}
 
+  @doc """
+  ADR-111 seam: is the acting member a coach of this tenant?
+
+  Mirrors the SQL helper `milos_acting_user_coaches(org_id)` used by the PR
+  visibility RLS policies; the two must change together. Under single-role
+  memberships a coach is `role == :coach` - owners and admins are not coaches.
+  With role sets this becomes `:coach in membership.roles`; coach scope and
+  coaching relationships must not narrow it.
+  """
+  def coaches?(%TenantContext{role: role}), do: role == :coach
+  def coaches?(_context), do: false
+
   def authorize(%TenantContext{role: role}, roles) when is_list(roles) do
     if role in roles, do: :ok, else: {:error, :forbidden}
   end

@@ -40,5 +40,17 @@ defmodule MilosTraining.Pantheon.PRRecord do
     |> foreign_key_constraint(:user_id)
   end
 
+  @doc """
+  Creation also records the PR's organization provenance (ADR-111): the gym
+  the owner recorded it in, or `nil` for a personal PR. Provenance is fixed at
+  creation; updates and corrections never change it.
+  """
+  def create_changeset(params) do
+    %__MODULE__{}
+    |> changeset(params)
+    |> cast(params, [:organization_id])
+    |> foreign_key_constraint(:organization_id)
+  end
+
   def valid_units, do: @valid_units
 end

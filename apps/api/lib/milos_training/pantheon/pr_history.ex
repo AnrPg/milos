@@ -18,7 +18,14 @@ defmodule MilosTraining.Pantheon.PRHistory do
 
   def changeset(history \\ %__MODULE__{}, params) do
     history
-    |> cast(params, [:pr_record_id, :score, :beaten_on, :supporting_metrics, :notes])
+    |> cast(params, [
+      :organization_id,
+      :pr_record_id,
+      :score,
+      :beaten_on,
+      :supporting_metrics,
+      :notes
+    ])
     |> validate_required([:pr_record_id, :score, :beaten_on])
     |> validate_length(:notes, max: 2_000)
     |> foreign_key_constraint(:pr_record_id)

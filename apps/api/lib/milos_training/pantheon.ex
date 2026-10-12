@@ -29,6 +29,50 @@ defmodule MilosTraining.Pantheon do
     to: MilosTraining.Pantheon.PRStore,
     as: :get_pr_for_user
 
+  defdelegate list_organization_records(user_id, organization_id),
+    to: MilosTraining.Pantheon.PRStore,
+    as: :list_organization_prs
+
+  defdelegate list_record_history(pr_record_id),
+    to: MilosTraining.Pantheon.PRStore,
+    as: :list_pr_history
+
+  # Every Pantheon read/write is RLS-protected (ADR-111): personal operations
+  # run in the acting user's scope, coach reads in the coach's tenant scope.
+  def with_user_context(context, fun) when is_function(fun, 0),
+    do: MilosTraining.Pantheon.PRStore.with_scope(context, fun)
+
+  def with_tenant_context(context, fun) when is_function(fun, 0),
+    do: MilosTraining.Pantheon.PRStore.with_scope(context, fun)
+
+  # ADR-111 sharing: coach-visibility opt-out and explicit grants.
+  defdelegate get_sharing_preference(user_id),
+    to: MilosTraining.Pantheon.PRStore
+
+  defdelegate set_coach_visibility(user_id, enabled?),
+    to: MilosTraining.Pantheon.Commands.SetCoachVisibility,
+    as: :call
+
+  defdelegate grant_pr_access(user_id, grantee_user_id),
+    to: MilosTraining.Pantheon.Commands.GrantPRAccess,
+    as: :call
+
+  defdelegate revoke_pr_access(user_id, grant_id),
+    to: MilosTraining.Pantheon.Commands.RevokePRAccess,
+    as: :call
+
+  defdelegate list_owned_grants(user_id),
+    to: MilosTraining.Pantheon.Queries.ListPRAccessGrants,
+    as: :owned
+
+  defdelegate list_received_grants(grantee_user_id),
+    to: MilosTraining.Pantheon.Queries.ListPRAccessGrants,
+    as: :received
+
+  defdelegate read_only_view(pr, history),
+    to: MilosTraining.Pantheon.Domain.PRView,
+    as: :with_history
+
   defdelegate create_record(params), to: MilosTraining.Pantheon.PRStore, as: :create_pr
   defdelegate update_record(id, params), to: MilosTraining.Pantheon.PRStore, as: :update_pr
   defdelegate edit_record(id, params), to: MilosTraining.Pantheon.PRStore, as: :edit_pr

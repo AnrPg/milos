@@ -45,7 +45,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
   @ready_personal_tables ~w(
     workout_executions execution_progress_operations notifications push_subscriptions
     user_pr_records user_stats user_achievements user_gamification_preferences
-    injury_reports
+    injury_reports user_pr_sharing_preferences user_pr_share_grants
   )
 
   def report do

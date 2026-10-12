@@ -1,5 +1,5 @@
 defmodule MilosTraining.Organizations do
-  alias MilosTraining.Organizations.Domain.BrandLogoPolicy
+  alias MilosTraining.Organizations.Domain.{BrandLogoPolicy, TenantAuthorization}
   alias MilosTraining.Organizations.OrganizationStore
 
   alias MilosTraining.Organizations.Commands.{
@@ -85,6 +85,12 @@ defmodule MilosTraining.Organizations do
 
   def resolve_tenant_context(account, slug, request_metadata \\ %{}),
     do: ResolveTenantContext.call(account, slug, request_metadata)
+
+  @doc """
+  ADR-111: whether the tenant context's acting member is a coach of the
+  tenant. The application-level mirror of `milos_acting_user_coaches/1`.
+  """
+  def acting_user_coaches?(context), do: TenantAuthorization.coaches?(context)
 
   def resolve_platform_context(account, request_metadata \\ %{}),
     do: ResolvePlatformContext.call(account, request_metadata)
