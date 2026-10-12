@@ -181,9 +181,8 @@ authorized, metered source.
 - Variants survive slot deletion (they become personal assignments whose
   `source_slot_id` no longer resolves); class cancellation does not delete a
   member's programming.
-- Follow-up debt: member reschedule/request flows, a staff shortcut to create a
-  variant directly from the admin schedule popup, and coaching aggregates that
-  separate member from athlete programming.
+- Follow-up debt: member reschedule/request flows, and coaching aggregates
+  that separate member from athlete programming.
 
 ## Convergence With the Multi-Role / Coaching Branch
 A parallel branch (`claude/loving-franklin-vuxz19`, its ADR-098 "package
@@ -236,17 +235,30 @@ Implemented on 2026-10-12 (TD-037).
   (only creation reserves a touchpoint).
 - **Frontend**: members get "My workouts" in the navigation and route guard;
   the console hides reschedule and "request a workout" for members and badges
-  class versions. The schedule card shows "Your version" and the slot popup
-  previews it with an "Open and start" link into `/my-workouts` (the existing
-  start flow — no timer UI files were changed); staff see "Member versions" in
-  the popup. The admin profile programming dialog offers the three member
+  class versions. The schedule card shows a "Your version" badge and the slot
+  popup previews it read-only (members start it from `/my-workouts`, the
+  existing start flow — no timer UI files were changed); staff see a read-only
+  "Member versions" list in the popup. The admin profile programming dialog offers the three member
   modes; "Edit class WOD for this member" duplicates the class workout into a
   draft and opens it in the embedded canvas (new `initialDraftId` prop), and
   publishing assigns it as the member's version. Assignee pickers include
   members with a "Member" badge. The home CTA also surfaces a member's
   assignment due today.
 - **Deferred** (follow-up debt): member reschedule and "request a workout";
-  a staff shortcut to create a variant straight from the admin schedule popup
-  (today it is done from the member's profile); coaching aggregates that
+  coaching aggregates that
   separate member from athlete programming; coach scoping after the coaching
   branch merges (see the convergence table).
+
+### Owner review (2026-10-12)
+The owner accepted decisions 1–9 and changed two points:
+- **Library visibility (decision 10 reversed):** copies made for a member's
+  `personal` or `class_variant` programming are marked
+  `master_workouts.library_visibility = 'personal'` (additive column, default
+  `shared`) and are excluded from every library listing; they still resolve by
+  id for the assignment and its execution. Athlete copies and the
+  `class_workout` mode keep the ADR-071 behaviour.
+- **Single entry point:** personalized programming is started only from the
+  button in the user's profile (Users catalog). Class views get no new action:
+  the member popup's "Open and start" link was removed (the badge and preview
+  stay informational), and a staff shortcut from the schedule popup is not a
+  follow-up.

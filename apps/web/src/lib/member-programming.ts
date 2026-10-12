@@ -22,12 +22,6 @@ export function modeRequiresProgrammingEntitlement(mode: MemberProgrammingMode):
   return mode === "class_variant" || mode === "personal";
 }
 
-/** Where a member opens and starts their own version of a class. */
-export function yourVersionHref(assignmentId: string, scheduledFor: string): string {
-  const params = new URLSearchParams({ open_assignment: assignmentId, date: scheduledFor });
-  return `/my-workouts?${params.toString()}`;
-}
-
 /** Translation key for the staff-dialog success message of a programming run. */
 export function programmingSuccessKey(
   role: "member" | "athlete" | "admin",
