@@ -9,6 +9,11 @@ defmodule MilosTraining.Analytics.AnalyticsStore do
     do: RepoContext.run(context, fun)
 
   def record_event(params), do: adapter().record_event(params)
+  def record_events(params_list), do: adapter().record_events(params_list)
+
+  def list_recorded_dedupe_keys(event_name, keys),
+    do: adapter().list_recorded_dedupe_keys(event_name, keys)
+
   def record_notification_click(params), do: adapter().record_notification_click(params)
   def record_push_attempt(params), do: adapter().record_push_attempt(params)
   def record_attendance(params), do: adapter().record_attendance(params)

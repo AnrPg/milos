@@ -16,7 +16,7 @@ defmodule MilosTraining.Analytics.Domain.TenantDataPolicy do
             basis:
               "Aggregate service-usage events are kept for two years without personal identifiers; attendance, communication and delivery logs are purged.",
             retained_tables: ["analytics_events"],
-            anonymized_columns: ["user_id", "context_id", "metadata"],
+            anonymized_columns: ["user_id", "context_id", "metadata", "dedupe_key"],
             tables: [
               %{table: "attendance_records"},
               %{table: "communication_messages"},

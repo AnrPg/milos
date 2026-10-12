@@ -14,6 +14,7 @@ defmodule MilosTraining.Analytics.AnalyticsEvent do
     field :context_id, :binary_id
     field :occurred_at, :utc_datetime_usec
     field :metadata, :map, default: %{}
+    field :dedupe_key, :string
   end
 
   def changeset(event \\ %__MODULE__{}, params) do
@@ -26,9 +27,11 @@ defmodule MilosTraining.Analytics.AnalyticsEvent do
       :context_type,
       :context_id,
       :occurred_at,
-      :metadata
+      :metadata,
+      :dedupe_key
     ])
     |> validate_required([:event_name, :occurred_at])
+    |> validate_length(:dedupe_key, max: 255)
     |> foreign_key_constraint(:user_id)
   end
 end

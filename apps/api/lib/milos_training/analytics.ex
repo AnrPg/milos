@@ -8,9 +8,28 @@ defmodule MilosTraining.Analytics do
     UpsertExerciseCatalogEntry
   }
 
+  alias MilosTraining.Analytics.AnalyticsStore
+  alias MilosTraining.Analytics.Domain.{EventCatalog, ExecutionInteraction}
   alias MilosTraining.Analytics.Queries.{AnalyticsSummary, GetAttendance}
 
+  def with_tenant_context(context, fun) when is_function(fun, 0),
+    do: AnalyticsStore.with_tenant_context(context, fun)
+
   defdelegate record_event(params), to: RecordEvent, as: :call
+  defdelegate record_events(params_list), to: RecordEvent, as: :call_many
+
+  # ADR-105 event registry and client interaction allowlist.
+  defdelegate build_event(event_name, actor, subject, extra), to: EventCatalog, as: :build
+  defdelegate event_names(), to: EventCatalog
+  defdelegate execution_interaction_kinds(), to: ExecutionInteraction, as: :kinds
+
+  defdelegate validate_execution_interactions(events, now),
+    to: ExecutionInteraction,
+    as: :validate_batch
+
+  def list_recorded_dedupe_keys(event_name, keys),
+    do: AnalyticsStore.list_recorded_dedupe_keys(event_name, keys)
+
   defdelegate record_notification_click(params), to: RecordNotificationClick, as: :call
   defdelegate record_push_attempt(params), to: RecordPushAttempt, as: :call
   defdelegate record_attendance(context, params), to: RecordAttendance, as: :call
