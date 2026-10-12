@@ -40,6 +40,9 @@ defmodule MilosTraining.Application.AuthorizeFinanceEntitlement do
   def execution_request(%{source: "assigned"}),
     do: %{channel: :personal_programming, capability: :execute_assigned_workouts}
 
+  # Repeating one's own completed workout needs an active membership only (ADR-098).
+  def execution_request(%{source: "repeat"}), do: %{}
+
   def execution_request(%{source: "self_selected"}),
     do: %{channel: :workout_library, capability: :execute_library_workouts}
 

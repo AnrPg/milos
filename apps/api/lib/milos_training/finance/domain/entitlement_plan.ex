@@ -6,13 +6,21 @@ defmodule MilosTraining.Finance.Domain.EntitlementPlan do
   input. Package family and tags deliberately have no authorization meaning.
   """
 
-  @channels ~w[in_person workout_library personal_programming coach_messaging events facility]a
+  @channels ~w[
+    in_person workout_library personal_programming coach_messaging events facility
+    personal_training digital_content nutrition
+  ]a
   @capabilities ~w[
     book_classes execute_class_workouts execute_library_workouts
     execute_assigned_workouts receive_coaching_touchpoints
     book_events bring_guests open_gym
+    book_pt_sessions book_assessments request_form_reviews receive_nutrition_plan
+    watch_on_demand view_advanced_analytics
   ]a
-  @allowances ~w[class_visits coaching_touchpoints event_visits guest_passes open_gym_visits]a
+  @allowances ~w[
+    class_visits coaching_touchpoints event_visits guest_passes open_gym_visits
+    pt_sessions assessments form_reviews
+  ]a
   @periods ~w[calendar_week calendar_month subscription_period]a
 
   @class_type_allowance_prefix "class_visits:"
@@ -29,6 +37,8 @@ defmodule MilosTraining.Finance.Domain.EntitlementPlan do
 
   def parse(%__MODULE__{} = plan), do: {:ok, plan}
 
+  def parse(%{"compiled" => true} = params), do: parse_compiled(params)
+  def parse(%{compiled: true} = params), do: parse_compiled(stringify(params))
   def parse(%{"entitlement_version" => 2} = params), do: compile_v2(params)
   def parse(%{entitlement_version: 2} = params), do: compile_v2(stringify(params))
 
@@ -92,6 +102,13 @@ defmodule MilosTraining.Finance.Domain.EntitlementPlan do
       events? = fields["perks.events"] == true
       open_gym? = fields["facility.open_gym"] == true
       guests? = classes? and quota_granted?(fields["perks.guest_passes"])
+      # Phase C services (ADR-098).
+      pt? = fields["personal_training.included"] == true
+      assessments? = positive?(fields["personal_training.assessments"])
+      form_reviews? = coaching? and quota_granted?(fields["online_coaching.form_reviews"])
+      nutrition? = fields["online_coaching.nutrition_plan"] == true
+      video? = fields["content.on_demand_video"] == true
+      analytics? = fields["content.advanced_analytics"] == true
 
       channels =
         []
@@ -100,6 +117,9 @@ defmodule MilosTraining.Finance.Domain.EntitlementPlan do
         |> add_if(messaging?, :coach_messaging)
         |> add_if(events?, :events)
         |> add_if(open_gym?, :facility)
+        |> add_if(pt? or assessments?, :personal_training)
+        |> add_if(video? or analytics?, :digital_content)
+        |> add_if(nutrition?, :nutrition)
 
       capabilities =
         []
@@ -109,6 +129,12 @@ defmodule MilosTraining.Finance.Domain.EntitlementPlan do
         |> add_if(events?, [:book_events, :execute_class_workouts])
         |> add_if(guests?, :bring_guests)
         |> add_if(open_gym?, :open_gym)
+        |> add_if(pt?, :book_pt_sessions)
+        |> add_if(assessments?, :book_assessments)
+        |> add_if(form_reviews?, :request_form_reviews)
+        |> add_if(nutrition?, :receive_nutrition_plan)
+        |> add_if(video?, :watch_on_demand)
+        |> add_if(analytics?, :view_advanced_analytics)
 
       allowances =
         %{}
@@ -118,6 +144,12 @@ defmodule MilosTraining.Finance.Domain.EntitlementPlan do
         |> put_quota_if(events?, :event_visits, fields["perks.event_visits"])
         |> put_quota_if(guests?, :guest_passes, fields["perks.guest_passes"])
         |> put_quota_if(open_gym?, :open_gym_visits, fields["facility.open_gym_visits"])
+        |> put_quota_if(pt?, :pt_sessions, fields["personal_training.sessions"])
+        |> put_quota_if(assessments?, :assessments, %{
+          "limit" => fields["personal_training.assessments"],
+          "period" => "subscription_period"
+        })
+        |> put_quota_if(form_reviews?, :form_reviews, fields["online_coaching.form_reviews"])
 
       {:ok,
        %__MODULE__{
@@ -173,6 +205,8 @@ defmodule MilosTraining.Finance.Domain.EntitlementPlan do
     }
   end
 
+  defp positive?(value), do: is_integer(value) and value > 0
+
   defp quota_granted?(%{"limit" => 0}), do: false
   defp quota_granted?(%{"limit" => _}), do: true
   defp quota_granted?(_), do: false
@@ -192,9 +226,144 @@ defmodule MilosTraining.Finance.Domain.EntitlementPlan do
       joining_fee_cents: fields["terms.joining_fee_cents"] || 0,
       validity_starts: fields["terms.validity_starts"] || "purchase",
       expiry_reminder_days: fields["terms.expiry_reminder_days"] || 0,
-      validity: fields["terms.validity"]
+      validity: fields["terms.validity"],
+      auto_renew: fields["terms.auto_renew"],
+      # Phase C (ADR-098)
+      response_sla_hours: fields["online_coaching.response_sla_hours"],
+      pt_format: fields["personal_training.format"],
+      pt_group_size: fields["personal_training.group_size"],
+      pt_session_minutes: fields["personal_training.session_minutes"],
+      pt_coach_id: fields["personal_training.coach_id"],
+      compatible_package_ids: fields["terms.compatible_package_ids"] || "all",
+      beneficiaries: fields["terms.beneficiaries"] || 1,
+      quota_sharing: fields["terms.quota_sharing"] || "per_person",
+      allow_minor_beneficiaries: fields["terms.allow_minor_beneficiaries"] == true,
+      seats: fields["terms.seats"],
+      seat_billing: fields["terms.seat_billing"],
+      enrollment: fields["terms.enrollment"],
+      enrollment_domain: fields["terms.enrollment_domain"]
     }
   end
+
+  @doc """
+  JSON-safe form of a compiled plan that `parse/1` reads back unchanged, so
+  read models never recompile a contract from defaults (ADR-098).
+  """
+  def serialize(%__MODULE__{} = plan) do
+    %{
+      compiled: true,
+      entitlement_version: plan.version,
+      package_type: plan.package_type,
+      channels: plan.channels |> MapSet.to_list() |> Enum.sort(),
+      capabilities: plan.capabilities |> MapSet.to_list() |> Enum.sort(),
+      allowances:
+        Map.new(plan.allowances, fn {key, config} ->
+          {key, %{limit: config.limit, period: config.period}}
+        end),
+      class_type_scope: serialize_scope(plan.class_type_scope),
+      location_scope: serialize_scope(plan.location_scope),
+      time_windows: plan.time_windows,
+      terms: plan.terms
+    }
+  end
+
+  defp serialize_scope(:all), do: "all"
+  defp serialize_scope(scope), do: scope |> MapSet.to_list() |> Enum.sort()
+
+  defp parse_compiled(params) do
+    allowances = value(params, "allowances", %{})
+
+    with {:ok, channels} <- parse_enum_set(value(params, "channels", []), @channels, :channel),
+         {:ok, capabilities} <-
+           parse_enum_set(value(params, "capabilities", []), @capabilities, :capability),
+         {:ok, allowances} <- parse_compiled_allowances(allowances) do
+      {:ok,
+       %__MODULE__{
+         version: value(params, "entitlement_version", 2),
+         package_type: value(params, "package_type"),
+         channels: channels,
+         capabilities: capabilities,
+         allowances: allowances,
+         class_type_scope: class_type_scope(value(params, "class_type_scope", "all")),
+         location_scope: class_type_scope(value(params, "location_scope", "all")),
+         time_windows: value(params, "time_windows", []),
+         terms: atomize_terms(value(params, "terms", %{}))
+       }}
+    end
+  end
+
+  # Class-type allowances keep their string keys; named allowances are atoms.
+  defp parse_compiled_allowances(allowances) when is_map(allowances) do
+    Enum.reduce_while(allowances, {:ok, %{}}, fn {key, config}, {:ok, acc} ->
+      name = to_string(key)
+
+      allowance =
+        if class_type_allowance_key?(name), do: name, else: known_atom(name, @allowances)
+
+      with false <- is_nil(allowance),
+           {:ok, normalized} <- parse_allowance(name, config) do
+        {:cont, {:ok, Map.put(acc, allowance, normalized)}}
+      else
+        true -> {:halt, {:error, {:unknown_allowance, name}}}
+        {:error, reason} -> {:halt, {:error, reason}}
+      end
+    end)
+  end
+
+  defp parse_compiled_allowances(_), do: {:error, :invalid_entitlement_plan}
+
+  @term_keys ~w[
+    booking_window_days cancellation_cutoff_hours waitlist_priority no_show_penalty_waived
+    rollover_max freeze_days_per_year member_discount_percent member_discount_scope
+    minimum_commitment_months joining_fee_cents validity_starts expiry_reminder_days validity
+    auto_renew response_sla_hours pt_format pt_group_size pt_session_minutes pt_coach_id
+    compatible_package_ids beneficiaries quota_sharing allow_minor_beneficiaries seats
+    seat_billing enrollment enrollment_domain
+  ]a
+
+  defp atomize_terms(terms) when is_map(terms) do
+    Enum.reduce(@term_keys, %{}, fn key, acc ->
+      case Map.fetch(terms, key) do
+        {:ok, value} -> Map.put(acc, key, value)
+        :error -> Map.put(acc, key, Map.get(terms, Atom.to_string(key)))
+      end
+    end)
+  end
+
+  defp atomize_terms(_terms), do: %{}
+
+  @doc """
+  One plan for everything a member holds today (ADR-098): access and scopes are
+  the union of all plans; allowances and terms come from the first plan that
+  defines them, so the primary subscription wins. Reservations still pick the
+  subscription that pays.
+  """
+  def merge([]), do: nil
+  def merge([plan]), do: plan
+
+  def merge([primary | rest]) do
+    Enum.reduce(rest, primary, fn plan, acc ->
+      %{
+        acc
+        | channels: MapSet.union(acc.channels, plan.channels),
+          capabilities: MapSet.union(acc.capabilities, plan.capabilities),
+          allowances: Map.merge(plan.allowances, acc.allowances),
+          class_type_scope: union_scope(acc.class_type_scope, plan.class_type_scope),
+          location_scope: union_scope(acc.location_scope, plan.location_scope),
+          time_windows: union_windows(acc.time_windows, plan.time_windows),
+          terms: Map.merge(plan.terms, acc.terms, fn _key, theirs, ours -> ours || theirs end)
+      }
+    end)
+  end
+
+  defp union_scope(:all, _other), do: :all
+  defp union_scope(_scope, :all), do: :all
+  defp union_scope(left, right), do: MapSet.union(left, right)
+
+  # No windows means any time, so it wins over restricted hours.
+  defp union_windows([], _other), do: []
+  defp union_windows(_windows, []), do: []
+  defp union_windows(left, right), do: Enum.uniq(left ++ right)
 
   @doc "Whether a local weekday (1 = Monday) and time fall inside the plan's allowed windows."
   def within_time_windows?(%__MODULE__{time_windows: []}, _weekday, _time), do: true

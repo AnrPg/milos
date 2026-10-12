@@ -253,7 +253,6 @@ defmodule MilosTraining.Finance.Domain.PackageContract do
         "online_coaching.included",
         "personal_training.included",
         "facility.open_gym",
-        "content.workout_library",
         "content.on_demand_video",
         "content.advanced_analytics",
         "online_coaching.nutrition_plan",

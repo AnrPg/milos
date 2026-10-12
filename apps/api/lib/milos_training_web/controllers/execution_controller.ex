@@ -7,6 +7,7 @@ defmodule MilosTrainingWeb.ExecutionController do
     CompleteWorkout,
     GetWorkoutExecution,
     GetWorkoutTimerSequence,
+    GetWorkoutVault,
     ListWorkoutExecutions,
     StartWorkoutExecution,
     SubmitExecutionNote,
@@ -48,7 +49,7 @@ defmodule MilosTrainingWeb.ExecutionController do
            scale_level_slug: %Schema{type: :string, nullable: true},
            source: %Schema{
              type: :string,
-             enum: ["class_booking", "assigned", "self_selected"]
+             enum: ["class_booking", "assigned", "self_selected", "repeat"]
            },
            source_reference_id: %Schema{type: :string, format: :uuid, nullable: true},
            timezone: %Schema{type: :string, default: "UTC"}
@@ -274,7 +275,7 @@ defmodule MilosTrainingWeb.ExecutionController do
         required: true,
         schema: %Schema{
           type: :string,
-          enum: ["class_booking", "assigned", "self_selected"]
+          enum: ["class_booking", "assigned", "self_selected", "repeat"]
         }
       },
       %Parameter{
@@ -317,6 +318,57 @@ defmodule MilosTrainingWeb.ExecutionController do
     with {:ok, executions} <-
            ListWorkoutExecutions.call(conn.assigns.user_context, current_user.id) do
       json(conn, %{executions: executions})
+    end
+  end
+
+  @vault_entry_schema %Schema{
+    type: :object,
+    properties: %{
+      id: %Schema{type: :string, format: :uuid},
+      started_at_utc: %Schema{type: :string, format: :"date-time"},
+      completed_at_utc: %Schema{type: :string, format: :"date-time"},
+      completed_at_tz: %Schema{type: :string, nullable: true},
+      scale_level_slug: %Schema{type: :string, nullable: true},
+      source: %Schema{type: :string},
+      total_elapsed_ms: %Schema{type: :integer}
+    },
+    required: [:id, :completed_at_utc, :source]
+  }
+
+  operation(:vault,
+    summary: "My completed workouts, each with its dated entries (ADR-098)",
+    responses: [
+      ok:
+        {"Workout vault", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             workouts: %Schema{
+               type: :array,
+               items: %Schema{
+                 type: :object,
+                 properties: %{
+                   master_workout_id: %Schema{type: :string, format: :uuid},
+                   workout_title: %Schema{type: :string, nullable: true},
+                   workout_type: %Schema{type: :string, nullable: true},
+                   completed_count: %Schema{type: :integer},
+                   last_completed_at: %Schema{type: :string, format: :"date-time"},
+                   entries: %Schema{type: :array, items: @vault_entry_schema}
+                 },
+                 required: [:master_workout_id, :completed_count, :last_completed_at, :entries]
+               }
+             }
+           },
+           required: [:workouts]
+         }}
+    ]
+  )
+
+  def vault(conn, _params) do
+    current_user = Guardian.Plug.current_resource(conn)
+
+    with {:ok, workouts} <- GetWorkoutVault.call(conn.assigns.user_context, current_user.id) do
+      json(conn, %{workouts: workouts})
     end
   end
 

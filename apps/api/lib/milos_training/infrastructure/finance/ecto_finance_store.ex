@@ -1650,12 +1650,27 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
           {subscription, entitlement_for_membership(membership)}
       end
 
-    case subscription && EntitlementPlan.parse(subscription.params_snapshot || %{}) do
-      {:ok, plan} ->
+    others =
+      if subscription,
+        do:
+          membership.id
+          |> effective_subscriptions(occurred_on)
+          |> Enum.reject(&(&1.id == subscription.id)),
+        else: []
+
+    case subscription && merged_plan([subscription | others]) do
+      {:ok, plan, plans} ->
+        # Each allowance is shown from the first subscription that holds it,
+        # matching the order reservations try (ADR-098).
         allowances =
-          Map.new(plan.allowances, fn {allowance, config} ->
+          plans
+          |> Enum.flat_map(fn {sub, sub_plan} ->
+            Enum.map(sub_plan.allowances, fn {allowance, config} -> {allowance, config, sub} end)
+          end)
+          |> Enum.uniq_by(&elem(&1, 0))
+          |> Map.new(fn {allowance, config, sub} ->
             {period_start, period_end, committed, extensions, limit} =
-              allowance_state(subscription, allowance, occurred_on)
+              allowance_state(sub, allowance, occurred_on)
 
             {allowance,
              %{
@@ -1676,11 +1691,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
           |> Repo.all()
           |> Enum.map(&normalize_usage_entry/1)
 
-        stacked =
-          membership.id
-          |> effective_subscriptions(occurred_on)
-          |> Enum.reject(&(&1.id == subscription.id))
-          |> Enum.map(&normalize_subscription/1)
+        stacked = Enum.map(others, &normalize_subscription/1)
 
         base
         |> Map.put(:plan, serialize_entitlement_plan(plan))
@@ -1954,15 +1965,23 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     end)
   end
 
-  defp serialize_entitlement_plan(plan) do
-    %{
-      entitlement_version: plan.version,
-      channels: plan.channels |> MapSet.to_list() |> Enum.sort(),
-      capabilities: plan.capabilities |> MapSet.to_list() |> Enum.sort(),
-      allowances: plan.allowances,
-      terms: plan.terms,
-      time_windows: plan.time_windows
-    }
+  defp serialize_entitlement_plan(plan), do: EntitlementPlan.serialize(plan)
+
+  # Compiled plans of the effective subscriptions, primary first, merged into
+  # the plan the read model exposes. Unparseable snapshots are skipped.
+  defp merged_plan(subscriptions) do
+    plans =
+      Enum.flat_map(subscriptions, fn subscription ->
+        case EntitlementPlan.parse(subscription.params_snapshot || %{}) do
+          {:ok, plan} -> [{subscription, plan}]
+          _error -> []
+        end
+      end)
+
+    case plans do
+      [] -> nil
+      plans -> {:ok, plans |> Enum.map(&elem(&1, 1)) |> EntitlementPlan.merge(), plans}
+    end
   end
 
   defp remaining(:unlimited, _extensions, _committed), do: :unlimited

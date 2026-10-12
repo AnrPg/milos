@@ -9,7 +9,7 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
   execution could be attributed to any organization the caller named.
   """
 
-  alias MilosTraining.{Organizations, Scheduling, Workouts}
+  alias MilosTraining.{Execution, Organizations, Scheduling, Workouts}
   alias MilosTraining.Workouts.WorkoutStore
 
   def call(context, actor, workout_id, source, source_reference_id) do
@@ -17,6 +17,7 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
       "self_selected" -> authorize_self_selected(actor, workout_id, source_reference_id)
       "assigned" -> authorize_assignment(context, actor, workout_id, source_reference_id)
       "class_booking" -> authorize_booking(context, actor, workout_id, source_reference_id)
+      "repeat" -> authorize_repeat(actor, workout_id, source_reference_id)
       _source -> {:error, :invalid_execution_source}
     end
   end
@@ -61,6 +62,43 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
   end
 
   defp may_self_select?(_actor, _organization_id), do: false
+
+  # ADR-098: a client may do again any workout they completed, from their own
+  # history. The earlier execution is the proof of access; the new execution is
+  # a separate, dated entry.
+  defp authorize_repeat(%{id: user_id} = actor, workout_id, execution_id)
+       when is_binary(execution_id) do
+    case Execution.get_execution_for_user(execution_id, user_id) do
+      %{master_workout_id: ^workout_id, status: "completed", organization_id: organization_id}
+      when is_binary(organization_id) ->
+        if active_member?(actor, organization_id),
+          do:
+            {:ok,
+             %{
+               source: "repeat",
+               source_reference_id: execution_id,
+               organization_id: organization_id
+             }},
+          else: {:error, :execution_source_forbidden}
+
+      %{master_workout_id: other} when other != workout_id ->
+        {:error, :execution_source_mismatch}
+
+      _other ->
+        {:error, :execution_source_forbidden}
+    end
+  end
+
+  defp authorize_repeat(_actor, _workout_id, _execution_id),
+    do: {:error, :execution_source_forbidden}
+
+  defp active_member?(%{id: user_id}, organization_id) do
+    user_id
+    |> Organizations.list_memberships()
+    |> Enum.any?(fn %{membership: membership, organization: organization} ->
+      organization.id == organization_id and membership.status == :active
+    end)
+  end
 
   defp authorize_assignment(context, %{id: athlete_id}, workout_id, assignment_id)
        when is_binary(assignment_id) do

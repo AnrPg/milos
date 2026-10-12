@@ -525,6 +525,7 @@ defmodule MilosTrainingWeb.Router do
 
     get("/", ExecutionController, :index)
     post("/", ExecutionController, :create)
+    get("/vault", ExecutionController, :vault)
     get("/:id", ExecutionController, :show)
     patch("/:id/progress", ExecutionController, :update_progress)
     post("/:id/notes", ExecutionController, :submit_note)

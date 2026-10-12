@@ -203,7 +203,7 @@ defmodule MilosTraining.Finance.Domain.PackageCatalog do
       phase: :c
     },
     # Digital content
-    %{key: "content.workout_library", section: "content", kind: :boolean, phase: :c},
+    %{key: "content.workout_library", section: "content", kind: :boolean, phase: :retired},
     %{key: "content.on_demand_video", section: "content", kind: :boolean, phase: :c},
     %{key: "content.advanced_analytics", section: "content", kind: :boolean, phase: :c},
     # Facility

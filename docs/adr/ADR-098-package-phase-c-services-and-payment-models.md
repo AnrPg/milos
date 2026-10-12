@@ -6,7 +6,7 @@ Status: Accepted
 ADR-096 and ADR-097 shipped package Phases A and B. The remaining catalog
 fields and package types (TD-049) describe services and payment models the
 product does not have yet: personal training and assessments, form reviews, a
-coach response time, nutrition plans, a member workout library, on-demand
+coach response time, nutrition plans, on-demand
 video, advanced progress statistics, add-ons, shared memberships and corporate
 memberships. The catalog keeps them at phase `:c`, so the wizard hides them.
 
@@ -32,8 +32,9 @@ billing; each new service lives in the context that owns its data.
   capabilities `book_pt_sessions`, `book_assessments`, `request_form_reviews`,
   `receive_nutrition_plan`, `watch_on_demand`, `view_advanced_analytics`; new
   allowances `pt_sessions`, `assessments`, `form_reviews`.
-- `content.workout_library` grants `workout_library` +
-  `execute_library_workouts`.
+- `content.workout_library` is retired: clients never browse the gym's
+  workout library, so it is not sellable. The field stays readable for stored
+  contracts but is never available and grants nothing.
 - The effective entitlement merges every effective subscription (primary,
   stacked one-off packs, add-ons, shared and corporate seats): channels,
   capabilities and scopes are unions; allowances keep their per-subscription
@@ -41,15 +42,19 @@ billing; each new service lives in the context that owns its data.
 - Members can no longer send `coaching_note` messages; only staff can.
 
 ### Content (Workouts, Execution, Analytics, new `Content` context)
-- **Workout library**: admins mark published workouts as *in the member
-  library*. Members with library access browse and filter them and start
-  self-selected executions. Self-selected executions require library access in
-  every enforcement mode except `observe`.
+- **Workout vault and repeats (not sold separately)**: clients (members and
+  athletes) see their own history. Every completed execution is a dated entry
+  with a view of that day's performance and a *Do it again* action. Repeating
+  starts a new execution with source `repeat`, referencing the client's own
+  earlier execution; it is authorized by ownership and is logged as a separate
+  entry on its own date. A *Vault* tab on the client profile lists every
+  workout they have completed, with its entries. The gym's library stays
+  staff-only, and self-selected starts keep requiring library access.
 - **On-demand video**: a `Content` context stores video items (title,
   description, external video URL from YouTube/Vimeo or any HTTPS host,
   duration, tags, published). Hosting video files is out of scope; members with
   `watch_on_demand` list and open published items.
-- **Advanced statistics**: members with `view_advanced_analytics` get a
+- **Advanced statistics**: clients with `view_advanced_analytics` get a
   progress view of their own training: weekly volume and completion trend,
   score history per scoreable section, attendance consistency and PR timeline.
   Basic stats (landing, PRs, history list) stay available to everyone.

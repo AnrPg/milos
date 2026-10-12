@@ -392,7 +392,7 @@
     {
       "key": "content.workout_library",
       "kind": "boolean",
-      "phase": "c",
+      "phase": "retired",
       "available": false,
       "section": "content"
     },
