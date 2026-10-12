@@ -12,6 +12,11 @@ const nextConfig: NextConfig = {
   typescript: {
     tsconfigPath: "tsconfig.next.json",
   },
+  experimental: {
+    // Dev-only /api rewrite: the workout assistant can take longer than the
+    // 30 s default. Production routes /api straight to Phoenix via Caddy.
+    proxyTimeout: 90_000,
+  },
   async rewrites() {
     const proxyTarget = process.env.API_PROXY_TARGET ?? "http://127.0.0.1:4000";
 
