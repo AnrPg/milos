@@ -15,22 +15,31 @@ defmodule MilosTraining.Scheduling.Booking do
     field :status, Ecto.Enum, values: @statuses
     field :admin_message, :string
     field :timeout_job_id, :integer
+    field :client_operation_id, Ecto.UUID
+    field :resolution_operation_id, Ecto.UUID
 
     timestamps()
   end
 
   def create_changeset(booking \\ %__MODULE__{}, params) do
     booking
-    |> cast(params, [:organization_id, :scheduled_class_id, :user_id, :status])
+    |> cast(params, [
+      :organization_id,
+      :scheduled_class_id,
+      :user_id,
+      :status,
+      :client_operation_id
+    ])
     |> validate_required([:organization_id, :scheduled_class_id, :user_id, :status])
     |> foreign_key_constraint(:scheduled_class_id)
     |> foreign_key_constraint(:user_id)
     |> unique_constraint(:user_id, name: :bookings_slot_user_index)
+    |> unique_constraint(:client_operation_id, name: :bookings_client_operation_index)
   end
 
   def resolution_changeset(booking, params) do
     booking
-    |> cast(params, [:status, :admin_message])
+    |> cast(params, [:status, :admin_message, :resolution_operation_id])
     |> validate_required([:status])
     |> validate_inclusion(:status, [:approved, :rejected])
   end
