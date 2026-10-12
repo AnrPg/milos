@@ -1,6 +1,7 @@
 defmodule MilosTraining.Application.GetAdminUserFinance do
   @moduledoc false
 
+  alias MilosTraining.Application.EntitlementClassTypeNames
   alias MilosTraining.Application.GetFinanceMemberProfile
   alias MilosTraining.Application.TenantUserAccess
   alias MilosTraining.{Finance, Identity}
@@ -11,7 +12,12 @@ defmodule MilosTraining.Application.GetAdminUserFinance do
     with {:ok, user} <- TenantUserAccess.fetch_active_user(tenant_context, user_id) do
       if AdminProfilePolicy.finance_available?(user.role) do
         with {:ok, profile} <- GetFinanceMemberProfile.call(user_id, tenant_context) do
-          entitlement = Finance.get_effective_entitlement(tenant_context, user_id)
+          entitlement =
+            EntitlementClassTypeNames.put(
+              tenant_context,
+              Finance.get_effective_entitlement(tenant_context, user_id)
+            )
+
           details = finance_details(tenant_context, profile, user_id)
 
           {:ok,
