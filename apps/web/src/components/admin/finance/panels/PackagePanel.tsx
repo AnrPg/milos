@@ -22,7 +22,7 @@ import {
 import { useSession } from "@/components/session-provider";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
 import { BasicsStep, IncludedStep } from "@/components/admin/finance/packages/PackageWizard";
-import { AdvancedSettings, LockStrip, MemberPreview, useT } from "@/components/admin/finance/packages/package-ui";
+import { AdvancedSettings, LockStrip, MemberPreview, previewContext, useT } from "@/components/admin/finance/packages/package-ui";
 import { usePackageAuthoring } from "@/components/admin/finance/packages/use-package-authoring";
 import {
   applyLocks,
@@ -73,7 +73,7 @@ export function PackagePanel({
   });
 
   const pkg = packageQuery.data?.package ?? null;
-  const { catalog, classTypes } = usePackageAuthoring(token);
+  const { catalog, classTypes, locations } = usePackageAuthoring(token);
 
   const [form, setForm] = useState<FinanceRecord | null>(null);
   const [draft, setDraft] = useState<PackageDraft | null>(null);
@@ -257,14 +257,14 @@ export function PackagePanel({
                 catalog={catalog}
                 type={type}
                 draft={draft}
-                context={{ classTypes, packages }}
+                context={{ classTypes, packages, locations }}
                 changedCount={changedFields(catalog, draft).length}
                 onFieldChange={setField}
                 onResetAll={() => setDraft(resetAll(catalog, draft))}
               />
             </div>
           </details>
-          <MemberPreview draft={draft} classTypes={classTypes} compact />
+          <MemberPreview draft={draft} classTypes={classTypes} compact {...previewContext(catalog, draft, packages)} />
           <label className="flex items-center gap-3 text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
             <input
               type="checkbox"
@@ -285,7 +285,7 @@ export function PackagePanel({
         </div>
       ) : (
         <div className="space-y-4">
-          {catalog ? <MemberPreview draft={draftFromPackage(catalog, pkg)} classTypes={classTypes} /> : null}
+          {catalog ? <MemberPreview draft={draftFromPackage(catalog, pkg)} classTypes={classTypes} {...previewContext(catalog, draftFromPackage(catalog, pkg), packages)} /> : null}
           <div className="grid gap-4 sm:grid-cols-2">
             <Stat label={t("pkgStep_type")} value={t(typeLabelKey(field(pkg, "package_type", "membership")))} />
             <Stat label={i18n("codeadac693")} value={field(pkg, "code")} />
@@ -294,7 +294,6 @@ export function PackagePanel({
             <Stat label={i18n("statusbae7d5b")} value={pkg.active !== false ? i18n("activea733b80") : i18n("inactive09af574")} />
             <Stat label={t("pkgAdvancedSettings")} value={Array.isArray(pkg.changed_fields) && pkg.changed_fields.length > 0 ? t("pkgChangesFromSuggested", { count: pkg.changed_fields.length }) : t("pkgNoChangesFromSuggested")} />
           </div>
-          {catalog && findType(catalog, field(pkg, "package_type", "membership")) ? <LockStrip type={findType(catalog, field(pkg, "package_type", "membership"))!} /> : null}
           {Array.isArray(pkg.tags) && (pkg.tags as string[]).length > 0 && (
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: "var(--dim)" }}>{i18n("tags848eed0")}</p>
@@ -305,6 +304,11 @@ export function PackagePanel({
               </div>
             </div>
           )}
+          {catalog && findType(catalog, field(pkg, "package_type", "membership")) ? (
+            <div className="pt-6">
+              <LockStrip type={findType(catalog, field(pkg, "package_type", "membership"))!} />
+            </div>
+          ) : null}
         </div>
       )}
       {showReconciliation ? (

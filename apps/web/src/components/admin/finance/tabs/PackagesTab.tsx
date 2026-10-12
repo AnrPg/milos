@@ -61,7 +61,7 @@ export function PackagesTab() {
   const packages = packagesQuery.data?.packages ?? [];
   const activePackages = packages.filter((pkg) => pkg.active !== false);
   const inactivePackages = packages.filter((pkg) => pkg.active === false);
-  const { catalog, classTypes, error: catalogError } = usePackageAuthoring(token);
+  const { catalog, classTypes, locations, error: catalogError } = usePackageAuthoring(token);
   const [duplicateDraft, setDuplicateDraft] = useState<PackageDraft | null>(null);
 
   return (
@@ -135,6 +135,7 @@ export function PackagesTab() {
                 catalog={catalog}
                 token={token}
                 classTypes={classTypes}
+                locations={locations}
                 packages={packages}
                 initialDraft={duplicateDraft ?? undefined}
                 onClose={() => { setDuplicateDraft(null); setParam("new", null); }}

@@ -183,7 +183,7 @@ export function priceCents(price: string): number | null {
 }
 
 export function anyServiceIncluded(fields: PackageFields): boolean {
-  return fields["group_classes.included"] === true || fields["online_coaching.included"] === true;
+  return ["group_classes.included", "online_coaching.included", "facility.open_gym", "perks.events"].some((key) => fields[key] === true);
 }
 
 /** Light client-side checks; the API remains the source of truth. */
@@ -284,15 +284,25 @@ export function lockReasonKey(reason: string): string {
 
 export type SummaryLine = { key: string; params?: Record<string, string | number> };
 
-/** Member-facing description of a draft, as message keys plus parameters. */
-export function memberSummary(draft: PackageDraft, classTypeNames: Map<string, string>): SummaryLine[] {
+/**
+ * Member-facing description of a draft. Core benefits are always listed;
+ * advanced values are listed only when they differ from the type preset and
+ * read like any other benefit (members never see that they were "advanced").
+ */
+export function memberSummary(
+  draft: PackageDraft,
+  classTypeNames: Map<string, string>,
+  preset: PackageFields | null = null,
+  conversionName?: string,
+): SummaryLine[] {
   const lines: SummaryLine[] = [];
   const fields = draft.fields;
+  const changed = (key: string) => preset === null || !equal(fields[key], preset[key]);
 
   if (fields["group_classes.included"] === true) {
     const visits = fields["group_classes.visits"] as QuotaValue;
     if (visits.limit === "unlimited") {
-      lines.push({ key: visits.period === "subscription_period" ? "pkgSummaryVisitsUnlimited" : `pkgSummaryVisitsUnlimitedPer_${visits.period}` });
+      lines.push({ key: "pkgSummaryVisitsUnlimited" });
     } else {
       lines.push({
         key: visits.period === "subscription_period" ? "pkgSummaryVisitsTotal" : `pkgSummaryVisitsPer_${visits.period}`,
@@ -303,7 +313,7 @@ export function memberSummary(draft: PackageDraft, classTypeNames: Map<string, s
     const scope = fields["group_classes.class_types"];
     if (Array.isArray(scope)) {
       lines.push({
-        key: "pkgSummaryClassTypesOnly",
+        key: "pkgSummaryClassTypesList",
         params: { names: scope.map((id) => classTypeNames.get(String(id)) ?? "?").join(", ") },
       });
     } else {
@@ -322,7 +332,7 @@ export function memberSummary(draft: PackageDraft, classTypeNames: Map<string, s
     if (fields["online_coaching.assigned_programming"] === true) lines.push({ key: "pkgSummaryAssignedProgramming" });
     if (fields["online_coaching.messaging"] === true) lines.push({ key: "pkgSummaryCoachMessaging" });
     const touchpoints = fields["online_coaching.touchpoints"] as QuotaValue | undefined;
-    if (touchpoints && touchpoints.limit !== "unlimited") {
+    if (touchpoints && touchpoints.limit !== "unlimited" && changed("online_coaching.touchpoints")) {
       lines.push({ key: `pkgSummaryCheckIns_${touchpoints.period}`, params: { count: touchpoints.limit } });
     }
   }
@@ -333,10 +343,55 @@ export function memberSummary(draft: PackageDraft, classTypeNames: Map<string, s
     lines.push({ key: "pkgSummaryAmenitiesNote", params: { note: String(fields["facility.amenities_note"]) } });
   }
 
+  for (const line of phaseBSummary(fields, changed)) lines.push(line);
+
   const validity = fields["terms.validity"] as DurationValue | null | undefined;
   if (validity) lines.push({ key: `pkgSummaryValidity_${validity.unit}`, params: { count: validity.amount } });
-  if (fields["terms.once_per_person"] === true) lines.push({ key: "pkgSummaryOncePerPerson" });
+  if (fields["terms.stacking"] === true && changed("terms.stacking")) lines.push({ key: "pkgSummaryStacking" });
+  if (fields["terms.once_per_person"] === true && changed("terms.once_per_person")) lines.push({ key: "pkgSummaryOncePerPerson" });
   if (fields["terms.new_members_only"] === true) lines.push({ key: "pkgSummaryNewMembersOnly" });
   if (draft.packageType === "membership" && fields["terms.auto_renew"] === false) lines.push({ key: "pkgSummaryNoAutoRenew" });
+  if (conversionName) lines.push({ key: "pkgSummaryConversion", params: { name: conversionName } });
+  return lines;
+}
+
+/** Member-facing lines for booking privileges, perks and facility terms (Phase B). */
+function phaseBSummary(fields: PackageFields, changed: (key: string) => boolean): SummaryLine[] {
+  const lines: SummaryLine[] = [];
+  const number = (key: string) => (typeof fields[key] === "number" ? (fields[key] as number) : null);
+
+  const window = number("booking.window_days");
+  if (window !== null && changed("booking.window_days")) lines.push({ key: "pkgSummaryBookingWindow", params: { count: window } });
+  if (fields["booking.waitlist_priority"] === "high" && changed("booking.waitlist_priority")) lines.push({ key: "pkgSummaryWaitlistPriority" });
+  const cutoff = number("booking.cancellation_cutoff_hours");
+  if (cutoff !== null && changed("booking.cancellation_cutoff_hours")) lines.push({ key: "pkgSummaryCancellation", params: { count: cutoff } });
+  if (fields["booking.no_show_penalty_waived"] === true && changed("booking.no_show_penalty_waived")) lines.push({ key: "pkgSummaryNoShowWaived" });
+  const rollover = number("group_classes.rollover_max");
+  if (rollover !== null && rollover > 0) lines.push({ key: "pkgSummaryRollover", params: { count: rollover } });
+  const windows = (fields["group_classes.time_windows"] as unknown[] | undefined) ?? [];
+  if (windows.length > 0) lines.push({ key: "pkgSummaryTimeWindows" });
+
+  if (fields["facility.open_gym"] === true) {
+    const visits = fields["facility.open_gym_visits"] as QuotaValue | undefined;
+    if (!visits || visits.limit === "unlimited") lines.push({ key: "pkgSummaryOpenGymUnlimited" });
+    else lines.push({ key: `pkgSummaryOpenGym_${visits.period}`, params: { count: visits.limit } });
+  }
+  if (Array.isArray(fields["facility.location_ids"])) lines.push({ key: "pkgSummaryLocations", params: { count: (fields["facility.location_ids"] as unknown[]).length } });
+
+  const guests = fields["perks.guest_passes"] as QuotaValue | undefined;
+  if (guests && guests.limit !== 0) {
+    lines.push(guests.limit === "unlimited" ? { key: "pkgSummaryGuestPassesUnlimited" } : { key: `pkgSummaryGuestPasses_${guests.period}`, params: { count: guests.limit } });
+  }
+  const freeze = number("perks.freeze_days_per_year");
+  if (freeze !== null && freeze > 0) lines.push({ key: "pkgSummaryFreeze", params: { count: freeze } });
+  const discount = number("perks.member_discount_percent");
+  if (discount !== null && discount > 0) lines.push({ key: "pkgSummaryDiscount", params: { percent: discount } });
+  if (fields["perks.events"] === true) lines.push({ key: "pkgSummaryEvents" });
+
+  const commitment = number("terms.minimum_commitment_months");
+  if (commitment !== null && commitment > 0) lines.push({ key: "pkgSummaryCommitment", params: { count: commitment } });
+  const fee = number("terms.joining_fee_cents");
+  if (fee !== null && fee > 0) lines.push({ key: "pkgSummaryJoiningFee", params: { cents: fee } });
+  if (fields["terms.validity_starts"] === "first_use" && changed("terms.validity_starts")) lines.push({ key: "pkgSummaryValidityFromFirstUse" });
   return lines;
 }

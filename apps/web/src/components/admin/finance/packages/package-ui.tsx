@@ -2,6 +2,7 @@
 
 import { useId, useMemo, useState, type ReactNode } from "react";
 
+import type { FacilityLocation } from "@/api/facility";
 import type { FinanceRecord } from "@/api/finance";
 import type { ClassTypeRecord } from "@/api/schedule";
 import type { UiTranslator } from "@/i18n/presentation";
@@ -32,6 +33,7 @@ import {
 export type FieldContext = {
   classTypes: ClassTypeRecord[];
   packages: FinanceRecord[];
+  locations: FacilityLocation[];
 };
 
 const inputClass = "w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none";
@@ -258,20 +260,24 @@ export function QuotaControl({
   const t = useT();
   const limitLocked = isPartLocked(type, fieldKey, "limit");
   const periodLocked = isPartLocked(type, fieldKey, "period");
-  const limited = value.limit !== "unlimited";
+  const limited = value.limit !== "unlimited" && value.limit !== 0;
+  const none = value.limit === 0;
   const limitRequired = type.key === "class_pack" && fieldKey === "group_classes.visits";
+  // Perks start at none: guest passes are opt-in (ADR-097).
+  const allowNone = fieldKey === "perks.guest_passes";
 
   return (
     <div className="space-y-3">
       {limitLocked ? null : limitRequired ? null : (
         <Segmented
           label={label}
-          value={limited ? "limited" : "unlimited"}
+          value={none ? "none" : limited ? "limited" : "unlimited"}
           options={[
+            ...(allowNone ? [{ value: "none" as const, label: t("pkgNone") }] : []),
             { value: "unlimited", label: t("pkgUnlimited") },
             { value: "limited", label: t("pkgLimited") },
           ]}
-          onChange={(mode) => onChange({ ...value, limit: mode === "unlimited" ? "unlimited" : 8 })}
+          onChange={(mode) => onChange({ ...value, limit: mode === "none" ? 0 : mode === "unlimited" ? "unlimited" : allowNone ? 2 : 8 })}
         />
       )}
       {limited && !limitLocked ? (
@@ -297,7 +303,7 @@ export function QuotaControl({
           )}
         </div>
       ) : null}
-      {!limited && !periodLocked ? (
+      {!limited && !none && !periodLocked ? (
         <p className="text-xs" style={{ color: "var(--dim)" }}>{t("pkgUnlimitedHint")}</p>
       ) : null}
     </div>
@@ -314,52 +320,122 @@ export function ClassTypeScope({
   classTypes: ClassTypeRecord[];
 }) {
   const t = useT();
-  const active = classTypes.filter((type) => !type.archived_at);
+  return (
+    <IdScope
+      value={value}
+      onChange={onChange}
+      items={classTypes}
+      label={t("pkgFieldGroupClassesClassTypes")}
+      allLabel={t("pkgClassTypesAll")}
+      someLabel={t("pkgClassTypesSome")}
+      emptyText={t("pkgNoClassTypesYet")}
+    />
+  );
+}
+
+export function LocationScope({
+  value,
+  onChange,
+  locations,
+}: {
+  value: unknown;
+  onChange: (value: "all" | string[]) => void;
+  locations: FacilityLocation[];
+}) {
+  const t = useT();
+  return (
+    <IdScope
+      value={value}
+      onChange={onChange}
+      items={locations}
+      label={t("pkgFieldFacilityLocationIds")}
+      allLabel={t("pkgLocationsAll")}
+      someLabel={t("pkgLocationsSome")}
+      emptyText={t("pkgNoLocationsYet")}
+    />
+  );
+}
+
+/** "All" or a non-empty selection of named records (class types, locations). */
+function IdScope({
+  value,
+  onChange,
+  items,
+  label,
+  allLabel,
+  someLabel,
+  emptyText,
+}: {
+  value: unknown;
+  onChange: (value: "all" | string[]) => void;
+  items: Array<{ id: string; name: string; archived_at: string | null }>;
+  label: string;
+  allLabel: string;
+  someLabel: string;
+  emptyText: string;
+}) {
+  const active = items.filter((item) => !item.archived_at);
   const selected = Array.isArray(value) ? value.map(String) : [];
   const all = !Array.isArray(value);
 
-  // An empty selection is not a valid scope, so selection needs at least one class type.
+  // An empty selection is not a valid scope, so selection needs at least one item.
   if (active.length === 0 && all) {
-    return <p className="text-sm" style={{ color: "var(--dim)" }}>{t("pkgNoClassTypesYet")}</p>;
+    return <p className="text-sm" style={{ color: "var(--dim)" }}>{emptyText}</p>;
   }
 
   return (
     <div className="space-y-3">
       <Segmented
-        label={t("pkgFieldGroupClassesClassTypes")}
+        label={label}
         value={all ? "all" : "some"}
         options={[
-          { value: "all", label: t("pkgClassTypesAll") },
-          { value: "some", label: t("pkgClassTypesSome") },
+          { value: "all", label: allLabel },
+          { value: "some", label: someLabel },
         ]}
         onChange={(mode) => onChange(mode === "all" || active.length === 0 ? "all" : [active[0].id])}
       />
       {all ? null : (
-        <div className="flex flex-wrap gap-2">
-          {active.map((type) => {
-            const on = selected.includes(type.id);
-            return (
-              <button
-                key={type.id}
-                type="button"
-                aria-pressed={on}
-                onClick={() => {
-                  const next = on ? selected.filter((id) => id !== type.id) : [...selected, type.id];
-                  onChange(next.length === 0 ? "all" : next);
-                }}
-                className="min-h-[2.5rem] rounded-full px-4 text-sm font-semibold"
-                style={{
-                  background: on ? "color-mix(in srgb, var(--primary) 14%, transparent)" : "var(--bg-soft)",
-                  border: `1px solid ${on ? "var(--primary)" : "var(--border)"}`,
-                  color: on ? "var(--primary)" : "var(--text-soft)",
-                }}
-              >
-                {on ? "✓ " : ""}{type.name}
-              </button>
-            );
-          })}
-        </div>
+        <ChipList
+          options={active.map((item) => ({ value: item.id, label: item.name }))}
+          value={selected}
+          onChange={(next) => onChange(next.length === 0 ? "all" : next)}
+        />
       )}
+    </div>
+  );
+}
+
+/** Multi-select chips. */
+export function ChipList({
+  options,
+  value,
+  onChange,
+}: {
+  options: Array<{ value: string; label: string }>;
+  value: string[];
+  onChange: (value: string[]) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((option) => {
+        const on = value.includes(option.value);
+        return (
+          <button
+            key={option.value}
+            type="button"
+            aria-pressed={on}
+            onClick={() => onChange(on ? value.filter((item) => item !== option.value) : [...value, option.value])}
+            className="min-h-[2.5rem] rounded-full px-4 text-sm font-semibold"
+            style={{
+              background: on ? "color-mix(in srgb, var(--primary) 14%, transparent)" : "var(--bg-soft)",
+              border: `1px solid ${on ? "var(--primary)" : "var(--border)"}`,
+              color: on ? "var(--primary)" : "var(--text-soft)",
+            }}
+          >
+            {on ? "✓ " : ""}{option.label}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -500,29 +576,7 @@ export const VALIDITY_PRESETS: Record<string, DurationValue[]> = {
 
 export function AmenitiesControl({ value, onChange, options }: { value: string[]; onChange: (value: string[]) => void; options: string[] }) {
   const t = useT();
-  return (
-    <div className="flex flex-wrap gap-2">
-      {options.map((option) => {
-        const on = value.includes(option);
-        return (
-          <button
-            key={option}
-            type="button"
-            aria-pressed={on}
-            onClick={() => onChange(on ? value.filter((item) => item !== option) : [...value, option])}
-            className="min-h-[2.5rem] rounded-full px-4 text-sm font-semibold"
-            style={{
-              background: on ? "color-mix(in srgb, var(--primary) 14%, transparent)" : "var(--bg-soft)",
-              border: `1px solid ${on ? "var(--primary)" : "var(--border)"}`,
-              color: on ? "var(--primary)" : "var(--text-soft)",
-            }}
-          >
-            {on ? "✓ " : ""}{t(`pkgAmenity_${option}`)}
-          </button>
-        );
-      })}
-    </div>
-  );
+  return <ChipList options={options.map((option) => ({ value: option, label: t(`pkgAmenity_${option}`) }))} value={value} onChange={onChange} />;
 }
 
 /** Human text for a locked value, used in lock strips and read-only fields. */
@@ -536,6 +590,18 @@ export function lockedText(t: UiTranslator, field: string, value: unknown, part?
   return `${t(fieldLabelKey(field))}: ${String(value)}`;
 }
 
+/** Preset and follow-up membership name needed by MemberPreview for a draft. */
+export function previewContext(catalog: PackageCatalog, draft: PackageDraft, packages: FinanceRecord[]) {
+  const type = catalog.types.find((candidate) => candidate.key === draft.packageType);
+  const conversionId = draft.fields["terms.conversion_package_id"];
+  const conversion = typeof conversionId === "string" ? packages.find((pkg) => String(pkg.id) === conversionId) : undefined;
+  return {
+    preset: type ? presetFor(type, draft.billingPeriod) : undefined,
+    conversionName: conversion ? String(conversion.name) : undefined,
+  };
+}
+
+/** Quiet footnote listing what the type defines; kept out of the main form on purpose. */
 export function LockStrip({ type }: { type: CatalogType }) {
   const t = useT();
   const items = type.locks
@@ -547,16 +613,131 @@ export function LockStrip({ type }: { type: CatalogType }) {
   if (type.billing_model === "one_off") items.unshift(t("pkgOneOffPayment"));
   if (items.length === 0) return null;
   return (
-    <details className="rounded-2xl px-4 py-3 text-sm" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
-      <summary className="cursor-pointer font-semibold" style={{ color: "var(--text-soft)" }}>
-        🔒 {t("pkgDefinedByType", { type: t(typeLabelKey(type.key)) })}
+    <details className="pt-2 text-xs" style={{ color: "var(--dim)", opacity: 0.75 }}>
+      <summary className="cursor-pointer select-none list-none">
+        ⓘ {t("pkgDefinedByType", { type: t(typeLabelKey(type.key)) })}
       </summary>
-      <ul className="mt-2 list-disc space-y-1 ps-5 text-xs" style={{ color: "var(--dim)" }}>
+      <ul className="mt-1 list-disc space-y-0.5 ps-5">
         {items.map((item, index) => <li key={index}>{item}</li>)}
       </ul>
     </details>
   );
 }
+
+/** Number with the field's range; joining fees are edited in currency units. */
+function IntegerControl({ spec, value, label, onChange }: { spec: CatalogField; value: unknown; label: string; onChange: (value: number) => void }) {
+  const t = useT();
+  const locale = useUiLocale();
+  const current = typeof value === "number" ? value : 0;
+  if (spec.key === "terms.joining_fee_cents") {
+    return (
+      <div className="flex items-center gap-2">
+        <input
+          aria-label={label}
+          inputMode="decimal"
+          className={inputClass + " h-11 max-w-[9rem]"}
+          style={inputStyle}
+          defaultValue={current === 0 ? "" : String(current / 100)}
+          onBlur={(event) => {
+            const amount = Number(event.target.value.replace(",", "."));
+            onChange(Number.isFinite(amount) && amount > 0 ? Math.round(amount * 100) : 0);
+          }}
+        />
+        <span className="text-sm" style={{ color: "var(--dim)" }}>{current > 0 ? money(locale, current) : t("pkgNone")}</span>
+      </div>
+    );
+  }
+  return <Stepper label={label} value={current} min={spec.min ?? 0} max={spec.max ?? 10000} onChange={onChange} suffix={t(`${fieldLabelKey(spec.key)}Suffix`, { count: current })} />;
+}
+
+const GYM_DEFAULT_STARTS: Record<string, number> = { "booking.window_days": 7, "booking.cancellation_cutoff_hours": 12 };
+
+/** null follows the gym's scheduling default; a number overrides it for this package. */
+function GymDefaultControl({ spec, value, label, onChange }: { spec: CatalogField; value: unknown; label: string; onChange: (value: number | null) => void }) {
+  const t = useT();
+  const custom = typeof value === "number";
+  return (
+    <div className="space-y-3">
+      <Segmented
+        label={label}
+        value={custom ? "custom" : "default"}
+        options={[
+          { value: "default", label: t("pkgGymDefault") },
+          { value: "custom", label: t("pkgCustomValue") },
+        ]}
+        onChange={(mode) => onChange(mode === "default" ? null : GYM_DEFAULT_STARTS[spec.key] ?? 1)}
+      />
+      {custom ? (
+        <Stepper
+          label={label}
+          value={value}
+          min={spec.min ?? 0}
+          max={spec.max ?? 365}
+          onChange={onChange}
+          suffix={t(`${fieldLabelKey(spec.key)}Suffix`, { count: value })}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+export type TimeWindow = { days: number[]; from: string; to: string };
+
+const ISO_WEEKDAYS = [1, 2, 3, 4, 5, 6, 7];
+
+/** Short weekday names in the UI locale; ISO weekdays start on Monday. */
+function weekdayNames(locale: string) {
+  const format = new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "UTC" });
+  // 2024-01-01 was a Monday.
+  return ISO_WEEKDAYS.map((day) => format.format(new Date(Date.UTC(2024, 0, day))));
+}
+
+/** Allowed booking hours: an empty list means any time. */
+function TimeWindowsControl({ value, onChange }: { value: TimeWindow[]; onChange: (value: TimeWindow[]) => void }) {
+  const t = useT();
+  const locale = useUiLocale();
+  const names = weekdayNames(locale);
+  const update = (index: number, patch: Partial<TimeWindow>) => onChange(value.map((window, i) => (i === index ? { ...window, ...patch } : window)));
+
+  return (
+    <div className="space-y-3">
+      {value.length === 0 ? <p className="text-sm" style={{ color: "var(--dim)" }}>{t("pkgTimeWindowsAnyTime")}</p> : null}
+      {value.map((window, index) => (
+        <div key={index} className="space-y-2 rounded-xl p-3" style={{ background: "var(--bg-soft)" }}>
+          <ChipList
+            options={ISO_WEEKDAYS.map((day) => ({ value: String(day), label: names[day - 1] }))}
+            value={window.days.map(String)}
+            onChange={(days) => update(index, { days: days.map(Number).sort((a, b) => a - b) })}
+          />
+          <div className="flex flex-wrap items-center gap-2">
+            <input type="time" aria-label={t("pkgTimeWindowFrom")} className={inputClass + " h-11 max-w-[8rem]"} style={inputStyle} value={window.from} onChange={(event) => update(index, { from: event.target.value })} />
+            <span className="text-sm" style={{ color: "var(--dim)" }}>{t("pkgTimeWindowTo")}</span>
+            <input type="time" aria-label={t("pkgTimeWindowTo")} className={inputClass + " h-11 max-w-[8rem]"} style={inputStyle} value={window.to} onChange={(event) => update(index, { to: event.target.value })} />
+            <button type="button" className="ms-auto text-sm font-semibold" style={{ color: "var(--danger)" }} onClick={() => onChange(value.filter((_, i) => i !== index))}>
+              {t("pkgRemove")}
+            </button>
+          </div>
+          {window.days.length === 0 || window.from >= window.to ? <p className="text-xs" style={{ color: "var(--danger)" }}>{t("pkgTimeWindowInvalid")}</p> : null}
+        </div>
+      ))}
+      <button
+        type="button"
+        className="min-h-[2.5rem] rounded-full px-4 text-sm font-semibold"
+        style={{ background: "var(--bg-soft)", border: "1px solid var(--border)", color: "var(--text)" }}
+        onClick={() => onChange([...value, { days: [1, 2, 3, 4, 5], from: "06:00", to: "16:00" }])}
+      >
+        {t("pkgTimeWindowAdd")}
+      </button>
+    </div>
+  );
+}
+
+const QUOTA_UNITS: Record<string, string> = {
+  "group_classes.visits": "pkgVisits",
+  "facility.open_gym_visits": "pkgUnitOpenGymVisits",
+  "perks.guest_passes": "pkgUnitGuestPasses",
+  "perks.event_visits": "pkgUnitEvents",
+};
 
 /** Generic control for any available catalog field (used by advanced settings and the editor). */
 export function FieldControl({
@@ -610,7 +791,7 @@ export function FieldControl({
           value={value as QuotaValue}
           onChange={(next) => onFieldChange(spec.key, next)}
           label={label}
-          unitLabel={t(spec.key === "group_classes.visits" ? "pkgVisits" : "pkgCheckIns")}
+          unitLabel={t(QUOTA_UNITS[spec.key] ?? "pkgCheckIns")}
         />
       );
       break;
@@ -625,7 +806,31 @@ export function FieldControl({
       );
       break;
     case "scope_ids":
-      control = <ClassTypeScope value={value} classTypes={context.classTypes} onChange={(next) => onFieldChange(spec.key, next)} />;
+      control =
+        spec.key === "facility.location_ids" ? (
+          <LocationScope value={value} locations={context.locations} onChange={(next) => onFieldChange(spec.key, next)} />
+        ) : (
+          <ClassTypeScope value={value} classTypes={context.classTypes} onChange={(next) => onFieldChange(spec.key, next)} />
+        );
+      break;
+    case "integer":
+      control = <IntegerControl spec={spec} value={value} label={label} onChange={(next) => onFieldChange(spec.key, next)} />;
+      break;
+    case "gym_default_integer":
+      control = <GymDefaultControl spec={spec} value={value} label={label} onChange={(next) => onFieldChange(spec.key, next)} />;
+      break;
+    case "enum":
+      control = (
+        <Segmented
+          label={label}
+          value={String(value)}
+          options={(spec.options ?? []).map((option) => ({ value: String(option), label: t(`${fieldLabelKey(spec.key)}_${option}`) }))}
+          onChange={(next) => onFieldChange(spec.key, next)}
+        />
+      );
+      break;
+    case "time_windows":
+      control = <TimeWindowsControl value={(value as TimeWindow[]) ?? []} onChange={(next) => onFieldChange(spec.key, next)} />;
       break;
     case "quota_by_id":
       control = (
@@ -638,7 +843,16 @@ export function FieldControl({
       );
       break;
     case "enum_list":
-      control = <AmenitiesControl value={(value as string[]) ?? []} options={(spec.options ?? []).map(String)} onChange={(next) => onFieldChange(spec.key, next)} />;
+      control =
+        spec.key === "facility.amenities" ? (
+          <AmenitiesControl value={(value as string[]) ?? []} options={(spec.options ?? []).map(String)} onChange={(next) => onFieldChange(spec.key, next)} />
+        ) : (
+          <ChipList
+            options={(spec.options ?? []).map((option) => ({ value: String(option), label: t(`${fieldLabelKey(spec.key)}_${option}`) }))}
+            value={(value as string[]) ?? []}
+            onChange={(next) => onFieldChange(spec.key, next)}
+          />
+        );
       break;
     case "string_or_null":
       control = (
@@ -688,7 +902,33 @@ export function FieldControl({
   );
 }
 
-const ADVANCED_SECTIONS = ["terms", "group_classes", "online_coaching", "facility"];
+/**
+ * Phase B fields that depend on a module or another field stay out of the way
+ * until they mean something (ADR-097): open gym and events need their module,
+ * their quotas need the service switched on, and location scopes need locations.
+ */
+function phaseBFieldVisible(key: string, draft: PackageDraft, catalog: PackageCatalog, context: FieldContext) {
+  const on = (field: string) => draft.fields[field] === true;
+  const enabled = (module: string) => catalog.modules.some((candidate) => candidate.key === module && candidate.enabled);
+  switch (key) {
+    case "facility.open_gym":
+      return enabled("open_gym") || on(key);
+    case "facility.open_gym_visits":
+      return on("facility.open_gym");
+    case "perks.events":
+      return enabled("events") || on(key);
+    case "perks.event_visits":
+      return on("perks.events");
+    case "facility.location_ids":
+      return context.locations.some((location) => !location.archived_at) || Array.isArray(draft.fields[key]);
+    case "perks.member_discount_scope":
+      return typeof draft.fields["perks.member_discount_percent"] === "number" && (draft.fields["perks.member_discount_percent"] as number) > 0;
+    default:
+      return true;
+  }
+}
+
+const ADVANCED_SECTIONS = ["terms", "group_classes", "booking", "online_coaching", "facility", "perks"];
 
 /** Every available catalog field, grouped by section, with search and reset. */
 export function AdvancedSettings({
@@ -728,7 +968,8 @@ export function AdvancedSettings({
           field.section === section &&
           (normalizedQuery === "" || t(fieldLabelKey(field.key)).toLocaleLowerCase().includes(normalizedQuery)) &&
           (field.key !== "terms.conversion_package_id" || type.key === "trial") &&
-          (field.key !== "terms.validity" || type.billing_model === "one_off" || isFieldLocked(type, field.key)),
+          (field.key !== "terms.validity" || type.billing_model === "one_off" || isFieldLocked(type, field.key)) &&
+          phaseBFieldVisible(field.key, draft, catalog, context),
       ),
     }))
     .filter((group) => group.fields.length > 0);
@@ -772,11 +1013,24 @@ export function AdvancedSettings({
   );
 }
 
-export function MemberPreview({ draft, classTypes, compact }: { draft: PackageDraft; classTypes: ClassTypeRecord[]; compact?: boolean }) {
+export function MemberPreview({
+  draft,
+  classTypes,
+  compact,
+  preset,
+  conversionName,
+}: {
+  draft: PackageDraft;
+  classTypes: ClassTypeRecord[];
+  compact?: boolean;
+  /** Type preset; advanced values that differ from it are described like any other benefit. */
+  preset?: Record<string, unknown>;
+  conversionName?: string;
+}) {
   const t = useT();
   const locale = useUiLocale();
   const names = useMemo(() => new Map(classTypes.map((type) => [type.id, type.name])), [classTypes]);
-  const lines = memberSummary(draft, names);
+  const lines = memberSummary(draft, names, preset ?? null, conversionName);
   const cents = priceCents(draft.price);
   const suffix = draft.packageType === "membership" ? t(`pkgPriceSuffix_${draft.billingPeriod}`) : t("pkgPriceSuffixTotal");
 
@@ -803,7 +1057,9 @@ export function MemberPreview({ draft, classTypes, compact }: { draft: PackageDr
             <span>
               {line.key === "pkgSummaryAmenities"
                 ? t(line.key, { list: String(line.params?.list ?? "").split("|").map((item) => t(`pkgAmenity_${item}`)).join(", ") })
-                : t(line.key, line.params)}
+                : typeof line.params?.cents === "number"
+                  ? t(line.key, { amount: money(locale, line.params.cents) })
+                  : t(line.key, line.params)}
             </span>
           </li>
         ))}

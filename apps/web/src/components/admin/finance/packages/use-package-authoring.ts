@@ -2,10 +2,11 @@
 
 import { useQuery } from "@tanstack/react-query";
 
+import { listAdminLocations } from "@/api/facility";
 import { fetchPackageCatalog } from "@/api/finance";
 import { listAdminClassTypes } from "@/api/schedule";
 
-/** Catalog document and class types shared by the package wizard and editor. */
+/** Catalog document, class types and locations shared by the package wizard and editor. */
 export function usePackageAuthoring(token: string) {
   const catalogQuery = useQuery({
     queryKey: ["admin", "finance", "package-catalog"],
@@ -20,9 +21,16 @@ export function usePackageAuthoring(token: string) {
     queryFn: () => listAdminClassTypes(token),
   });
 
+  const locationsQuery = useQuery({
+    queryKey: ["admin", "locations"],
+    enabled: Boolean(token),
+    queryFn: () => listAdminLocations(token),
+  });
+
   return {
     catalog: catalogQuery.data ?? null,
     classTypes: classTypesQuery.data ?? [],
+    locations: locationsQuery.data ?? [],
     isLoading: catalogQuery.isLoading,
     error: catalogQuery.error,
   };

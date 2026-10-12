@@ -13,6 +13,7 @@ import {
   memberSummary,
   newDraft,
   perVisitCents,
+  presetFor,
   resetAll,
   selectableTypes,
   switchType,
@@ -77,7 +78,7 @@ describe("package catalog helpers", () => {
     const request = toPackageRequest(catalog, draft);
     expect(request).toMatchObject({ name: "Ten visits", package_type: "class_pack", billing_period: "one_off", base_price_cents: 9950 });
     expect(Object.keys(request.fields)).toContain("group_classes.visits");
-    expect(Object.keys(request.fields)).not.toContain("perks.guest_passes");
+    expect(Object.keys(request.fields)).not.toContain("personal_training.assessments");
     expect(perVisitCents(draft)).toBe(995);
   });
 
@@ -104,5 +105,23 @@ describe("package catalog helpers", () => {
     expect(fieldLabelKey("group_classes.class_type_limits")).toBe("pkgFieldGroupClassesClassTypeLimits");
     expect(wizardSteps("drop_in")).toEqual(["type", "basics", "review"]);
     expect(wizardSteps("membership")).toHaveLength(4);
+  });
+
+  it("names class types without restrictive wording and lists only changed advanced values", () => {
+    const draft = newDraft(catalog, "membership");
+    const type = findType(catalog, "membership")!;
+    const preset = presetFor(type, draft.billingPeriod);
+    draft.fields["group_classes.class_types"] = ["ct-1"];
+    const keys = (lines: ReturnType<typeof memberSummary>) => lines.map((line) => line.key);
+
+    const plain = memberSummary(draft, new Map([["ct-1", "Yoga"]]), preset);
+    expect(plain).toContainEqual({ key: "pkgSummaryClassTypesList", params: { names: "Yoga" } });
+    expect(keys(plain)).not.toContain("pkgSummaryWaitlistPriority");
+
+    draft.fields["booking.waitlist_priority"] = "high";
+    draft.fields["perks.guest_passes"] = { limit: 2, period: "calendar_month" };
+    draft.fields["perks.member_discount_percent"] = 10;
+    const extended = keys(memberSummary(draft, new Map(), preset));
+    expect(extended).toEqual(expect.arrayContaining(["pkgSummaryWaitlistPriority", "pkgSummaryGuestPasses_calendar_month", "pkgSummaryDiscount"]));
   });
 });

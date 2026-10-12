@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { createFinancePackage, type FinanceRecord } from "@/api/finance";
+import type { FacilityLocation } from "@/api/facility";
 import type { ClassTypeRecord } from "@/api/schedule";
 import { localizeError, type UiTranslator } from "@/i18n/presentation";
 import { useUiLocale } from "@/i18n/use-ui-locale";
@@ -14,6 +15,7 @@ import {
   FieldShell,
   LockStrip,
   MemberPreview,
+  previewContext,
   QuotaControl,
   ClassTypeScope,
   Segmented,
@@ -89,6 +91,7 @@ export function PackageWizard({
   catalog,
   token,
   classTypes,
+  locations,
   packages,
   initialDraft,
   onClose,
@@ -97,6 +100,7 @@ export function PackageWizard({
   catalog: PackageCatalog;
   token: string;
   classTypes: ClassTypeRecord[];
+  locations: FacilityLocation[];
   packages: FinanceRecord[];
   initialDraft?: PackageDraft;
   onClose: () => void;
@@ -112,7 +116,7 @@ export function PackageWizard({
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [attempted, setAttempted] = useState(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const context: FieldContext = { classTypes, packages };
+  const context: FieldContext = { classTypes, packages, locations };
 
   useEffect(() => {
     if (draft) writeStored({ step: stepIndex, draft });
@@ -258,12 +262,13 @@ export function PackageWizard({
               draft={draft}
               changed={changed}
               classTypes={classTypes}
+              packages={packages}
               onEdit={(target) => setStepIndex(steps.indexOf(target))}
               onAdvanced={() => setShowAdvanced(true)}
             />
           ) : null}
 
-          {!showAdvanced && draft && step !== "type" && step !== "review" ? <MemberPreview draft={draft} classTypes={classTypes} compact /> : null}
+          {!showAdvanced && draft && step !== "type" && step !== "review" ? <MemberPreview draft={draft} classTypes={classTypes} compact {...previewContext(catalog, draft, packages)} /> : null}
 
           {createMutation.error ? (
             <p role="alert" className="rounded-xl px-3 py-2 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", color: "var(--danger)" }}>
@@ -388,7 +393,6 @@ export function BasicsStep({
 
   return (
     <div className="space-y-5">
-      <LockStrip type={type} />
       <FieldShell label={t("pkgName")} htmlFor="pkg-name" error={issueFor(issues, "name", attempted, t)}>
         <input
           id="pkg-name"
@@ -509,6 +513,8 @@ export function IncludedStep({
   const classesLocked = isFieldLocked(type, "group_classes.included");
   const showClasses = moduleEnabled(catalog, "group_classes") || draft.fields["group_classes.included"] === true;
   const showCoaching = moduleEnabled(catalog, "online_coaching") || draft.fields["online_coaching.included"] === true;
+  const showOpenGym = moduleEnabled(catalog, "open_gym") || draft.fields["facility.open_gym"] === true;
+  const showEvents = moduleEnabled(catalog, "events") || draft.fields["perks.events"] === true;
   const visits = draft.fields["group_classes.visits"] as QuotaValue;
   const serviceError = !anyServiceIncluded(draft.fields) && attempted ? t("pkgErrorServiceRequired") : undefined;
   const coachingError = issueFor(issues, "online_coaching.included", attempted, t);
@@ -556,6 +562,48 @@ export function IncludedStep({
         </ServiceCard>
       ) : null}
 
+      {showOpenGym ? (
+        <ServiceCard
+          title={t("pkgFieldFacilityOpenGym")}
+          description={t("pkgServiceOpenGymHint")}
+          checked={draft.fields["facility.open_gym"] === true}
+          locked={false}
+          onToggle={(value) => onField("facility.open_gym", value)}
+        >
+          <FieldShell label={t("pkgFieldFacilityOpenGymVisits")}>
+            <QuotaControl
+              type={type}
+              fieldKey="facility.open_gym_visits"
+              value={draft.fields["facility.open_gym_visits"] as QuotaValue}
+              onChange={(value) => onField("facility.open_gym_visits", value)}
+              label={t("pkgFieldFacilityOpenGymVisits")}
+              unitLabel={t("pkgUnitOpenGymVisits")}
+            />
+          </FieldShell>
+        </ServiceCard>
+      ) : null}
+
+      {showEvents ? (
+        <ServiceCard
+          title={t("pkgFieldPerksEvents")}
+          description={t("pkgServiceEventsHint")}
+          checked={draft.fields["perks.events"] === true}
+          locked={false}
+          onToggle={(value) => onField("perks.events", value)}
+        >
+          <FieldShell label={t("pkgFieldPerksEventVisits")}>
+            <QuotaControl
+              type={type}
+              fieldKey="perks.event_visits"
+              value={draft.fields["perks.event_visits"] as QuotaValue}
+              onChange={(value) => onField("perks.event_visits", value)}
+              label={t("pkgFieldPerksEventVisits")}
+              unitLabel={t("pkgUnitEvents")}
+            />
+          </FieldShell>
+        </ServiceCard>
+      ) : null}
+
       {serviceError ? <p role="alert" className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{serviceError}</p> : null}
     </div>
   );
@@ -578,7 +626,6 @@ function ServiceCard({
   children: React.ReactNode;
   error?: string;
 }) {
-  const t = useT();
   return (
     <fieldset className="rounded-2xl" style={{ border: `1px solid ${checked ? "var(--primary)" : "var(--border)"}`, background: "var(--panel)" }}>
       <legend className="sr-only">{title}</legend>
@@ -587,11 +634,8 @@ function ServiceCard({
           <p className="text-base font-semibold" style={{ color: "var(--text)" }}>{title}</p>
           <p className="mt-1 text-sm" style={{ color: "var(--dim)" }}>{description}</p>
         </div>
-        {locked ? (
-          <span className="rounded-full px-3 py-1 text-xs font-semibold" title={t("pkgLockReasonTypeService")} style={{ background: "var(--bg-soft)", color: "var(--text-soft)" }}>🔒 {t("pkgIncluded")}</span>
-        ) : (
-          <Toggle label={title} checked={checked} onChange={onToggle} />
-        )}
+        {/* Type-enforced services are simply part of the package; the lock lives in advanced settings. */}
+        {locked ? null : <Toggle label={title} checked={checked} onChange={onToggle} />}
       </div>
       {checked ? <div className="space-y-5 px-4 pb-4">{children}</div> : null}
       {error ? <p role="alert" className="px-4 pb-4 text-xs font-semibold" style={{ color: "var(--danger)" }}>{error}</p> : null}
@@ -604,6 +648,7 @@ function ReviewStep({
   draft,
   changed,
   classTypes,
+  packages,
   onEdit,
   onAdvanced,
 }: {
@@ -611,6 +656,7 @@ function ReviewStep({
   draft: PackageDraft;
   changed: string[];
   classTypes: ClassTypeRecord[];
+  packages: FinanceRecord[];
   onEdit: (step: "type" | "basics" | "included" | "review") => void;
   onAdvanced: () => void;
 }) {
@@ -631,7 +677,7 @@ function ReviewStep({
 
   return (
     <div className="space-y-5">
-      <MemberPreview draft={draft} classTypes={classTypes} />
+      <MemberPreview draft={draft} classTypes={classTypes} {...previewContext(catalog, draft, packages)} />
       <dl className="divide-y rounded-2xl" style={{ border: "1px solid var(--border)", background: "var(--panel)" }}>
         {rows.map((row) => (
           <div key={row.step} className="flex items-center justify-between gap-3 px-4 py-3" style={{ borderColor: "var(--border)" }}>
@@ -661,12 +707,12 @@ function ReviewStep({
           </button>
         </div>
       </dl>
-      {type ? <LockStrip type={type} /> : null}
       {issues.length > 0 ? (
         <ul role="alert" className="space-y-1 rounded-2xl p-4 text-sm" style={{ background: "color-mix(in srgb, var(--danger) 8%, transparent)", color: "var(--danger)" }}>
           {issues.map((issue) => <li key={issue.field}>{t(issue.message)}</li>)}
         </ul>
       ) : null}
+      {type ? <LockStrip type={type} /> : null}
     </div>
   );
 }
