@@ -11,11 +11,14 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 import { ApiError } from "@/api/client";
 import {
   AdvancedSettings,
+  CompatiblePackagesScope,
   DurationControl,
+  FieldControl,
   FieldShell,
   LockStrip,
   MemberPreview,
   previewContext,
+  priceSuffix,
   QuotaControl,
   ClassTypeScope,
   Segmented,
@@ -23,7 +26,9 @@ import {
   Toggle,
   VALIDITY_PRESETS,
   money,
+  phaseCFieldVisible,
   useT,
+  withDependents,
   type FieldContext,
 } from "./package-ui";
 import {
@@ -33,12 +38,14 @@ import {
   changedFields,
   draftIssues,
   fieldLabelKey,
+  fieldSpec,
   findType,
   isFieldLocked,
   monthlyEquivalentCents,
   moduleEnabled,
   newDraft,
   perVisitCents,
+  presetFor,
   priceCents,
   resetAll,
   selectableTypes,
@@ -131,8 +138,14 @@ export function PackageWizard({
   const step = steps[Math.min(stepIndex, steps.length - 1)];
   const changed = draft ? changedFields(catalog, draft) : [];
   const issues = draft ? draftIssues(draft) : [];
+  // Each step blocks only on the issues it shows; the rest (advanced terms) surface on the review step.
+  const basicsFields = ["name", "price", "terms.validity", "terms.beneficiaries", ...(draft?.packageType === "pt_pack" ? ["personal_training.sessions"] : [])];
   const stepIssues = issues.filter((issue) =>
-    step === "basics" ? ["name", "price", "terms.validity"].includes(issue.field) : step === "included" ? !["name", "price"].includes(issue.field) : true,
+    step === "basics"
+      ? basicsFields.includes(issue.field)
+      : step === "included"
+        ? !basicsFields.includes(issue.field) && (issue.field.startsWith("group_classes.") || issue.field.startsWith("online_coaching.") || issue.field.startsWith("personal_training."))
+        : true,
   );
 
   const createMutation = useMutation({
@@ -331,7 +344,10 @@ export function PackageWizard({
 function TypeStep({ catalog, selected, onSelect }: { catalog: PackageCatalog; selected?: string; onSelect: (key: string) => void }) {
   const t = useT();
   const types = selectableTypes(catalog).sort((a, b) => TYPE_ORDER.indexOf(a.key) - TYPE_ORDER.indexOf(b.key));
+  // Types whose module is off (PT packs, corporate plans) are hidden by the catalog; say how to get them.
+  const needModule = catalog.types.filter((type) => type.available && !type.enabled).sort((a, b) => TYPE_ORDER.indexOf(a.key) - TYPE_ORDER.indexOf(b.key));
   return (
+    <div className="space-y-3">
     <div role="radiogroup" aria-label={t("pkgStepTitle_type")} className="grid gap-3 sm:grid-cols-2">
       {types.map((type) => {
         const on = selected === type.key;
@@ -355,6 +371,12 @@ function TypeStep({ catalog, selected, onSelect }: { catalog: PackageCatalog; se
           </button>
         );
       })}
+    </div>
+    {needModule.length > 0 ? (
+      <p className="text-xs" style={{ color: "var(--dim)" }}>
+        {t("pkgTypesNeedModule", { types: needModule.map((type) => t(typeLabelKey(type.key))).join(", ") })}
+      </p>
+    ) : null}
     </div>
   );
 }
@@ -388,7 +410,8 @@ export function BasicsStep({
   const monthly = monthlyEquivalentCents(draft.billingPeriod, cents);
   const perVisit = perVisitCents(draft);
   const visits = draft.fields["group_classes.visits"] as QuotaValue;
-  const suffix = draft.packageType === "membership" ? t(`pkgPriceSuffix_${draft.billingPeriod}`) : t("pkgPriceSuffixTotal");
+  const sessions = draft.fields["personal_training.sessions"] as QuotaValue;
+  const suffix = priceSuffix(t, draft.billingPeriod);
   const setField = (key: string, value: unknown) => onChange({ ...draft, fields: { ...draft.fields, [key]: value } });
 
   return (
@@ -433,6 +456,44 @@ export function BasicsStep({
         </FieldShell>
       ) : null}
 
+      {draft.packageType === "pt_pack" ? (
+        <FieldShell label={t("pkgSessionsCount")} error={issueFor(issues, "personal_training.sessions", attempted, t)}>
+          <Stepper label={t("pkgSessionsCount")} value={typeof sessions.limit === "number" ? sessions.limit : 10} min={1} onChange={(limit) => setField("personal_training.sessions", { ...sessions, limit })} suffix={t("pkgUnitSessions")} />
+        </FieldShell>
+      ) : null}
+
+      {draft.packageType === "shared" ? (
+        <FieldShell label={t("pkgFieldTermsBeneficiaries")} hint={t("pkgFieldTermsBeneficiariesHint")} error={issueFor(issues, "terms.beneficiaries", attempted, t)}>
+          <Stepper
+            label={t("pkgFieldTermsBeneficiaries")}
+            value={typeof draft.fields["terms.beneficiaries"] === "number" ? (draft.fields["terms.beneficiaries"] as number) : 2}
+            min={2}
+            max={10}
+            onChange={(value) => setField("terms.beneficiaries", value)}
+            suffix={t("pkgFieldTermsBeneficiariesSuffix", { count: Number(draft.fields["terms.beneficiaries"] ?? 2) })}
+          />
+        </FieldShell>
+      ) : null}
+
+      {draft.packageType === "corporate" ? (
+        <FieldShell label={t("pkgFieldTermsSeats")} hint={t("pkgFieldTermsSeatsHint")}>
+          <Stepper
+            label={t("pkgFieldTermsSeats")}
+            value={typeof draft.fields["terms.seats"] === "number" ? (draft.fields["terms.seats"] as number) : 10}
+            min={1}
+            max={10000}
+            onChange={(value) => setField("terms.seats", value)}
+            suffix={t("pkgFieldTermsSeatsSuffix", { count: Number(draft.fields["terms.seats"] ?? 10) })}
+          />
+        </FieldShell>
+      ) : null}
+
+      {draft.packageType === "add_on" ? (
+        <FieldShell label={t("pkgFieldTermsCompatiblePackageIds")} hint={t("pkgFieldTermsCompatiblePackageIdsHint")}>
+          <CompatiblePackagesScope value={draft.fields["terms.compatible_package_ids"]} packages={packages} onChange={(value) => setField("terms.compatible_package_ids", value)} />
+        </FieldShell>
+      ) : null}
+
       {type.billing_model === "one_off" ? (
         <FieldShell label={t(draft.packageType === "trial" ? "pkgDuration" : "pkgValidity")} hint={t("pkgValidityHint")} error={issueFor(issues, "terms.validity", attempted, t)}>
           <DurationControl
@@ -448,7 +509,7 @@ export function BasicsStep({
         label={t("pkgPrice")}
         htmlFor="pkg-price"
         error={issueFor(issues, "price", attempted, t)}
-        hint={monthly !== null ? t("pkgMonthlyEquivalent", { amount: money(locale, monthly) }) : perVisit !== null ? t("pkgPerVisit", { amount: money(locale, perVisit) }) : undefined}
+        hint={monthly !== null ? t("pkgMonthlyEquivalent", { amount: money(locale, monthly) }) : perVisit !== null ? t(draft.packageType === "pt_pack" ? "pkgPerSession" : "pkgPerVisit", { amount: money(locale, perVisit) }) : undefined}
       >
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold" style={{ color: "var(--dim)" }}>€</span>
@@ -515,9 +576,27 @@ export function IncludedStep({
   const showCoaching = moduleEnabled(catalog, "online_coaching") || draft.fields["online_coaching.included"] === true;
   const showOpenGym = moduleEnabled(catalog, "open_gym") || draft.fields["facility.open_gym"] === true;
   const showEvents = moduleEnabled(catalog, "events") || draft.fields["perks.events"] === true;
+  const ptIncluded = draft.fields["personal_training.included"] === true;
+  const showPersonalTraining = moduleEnabled(catalog, "personal_training") || ptIncluded;
+  const showNutrition = moduleEnabled(catalog, "online_coaching") || draft.fields["online_coaching.nutrition_plan"] === true;
+  const contentKeys = ["content.on_demand_video", "content.advanced_analytics"] as const;
+  const contentOn = contentKeys.some((key) => draft.fields[key] === true);
+  const showContent = moduleEnabled(catalog, "digital_content") || contentOn;
   const visits = draft.fields["group_classes.visits"] as QuotaValue;
+  const sessions = draft.fields["personal_training.sessions"] as QuotaValue;
   const serviceError = !anyServiceIncluded(draft.fields) && attempted ? t("pkgErrorServiceRequired") : undefined;
   const coachingError = issueFor(issues, "online_coaching.included", attempted, t);
+  const preset = presetFor(type, draft.billingPeriod);
+  const fieldContext: FieldContext = { classTypes, packages: [], locations: [] };
+  const change = (key: string, value: unknown) => {
+    for (const [field, next] of withDependents(key, value, draft)) onField(field, next);
+  };
+  // Phase C details reuse the advanced-settings control so limits, labels and resets stay identical.
+  const control = (key: string) => {
+    const spec = fieldSpec(catalog, key);
+    if (!spec?.available || !phaseCFieldVisible(key, draft)) return null;
+    return <FieldControl key={key} spec={spec} type={type} draft={draft} onFieldChange={change} context={fieldContext} preset={preset} />;
+  };
 
   return (
     <div className="space-y-4">
@@ -557,6 +636,63 @@ export function IncludedStep({
             <label key={key} className="flex min-h-[2.75rem] items-center gap-3 rounded-xl px-3" style={{ background: "var(--bg-soft)" }}>
               <input type="checkbox" className="h-5 w-5" checked={draft.fields[key] === true} onChange={(event) => onField(key, event.target.checked)} />
               <span className="text-sm" style={{ color: "var(--text)" }}>{t(fieldLabelKey(key))}</span>
+            </label>
+          ))}
+          {control("online_coaching.form_reviews")}
+          {control("online_coaching.response_sla_hours")}
+        </ServiceCard>
+      ) : null}
+
+      {showPersonalTraining ? (
+        <ServiceCard
+          title={t(sectionLabelKey("personal_training"))}
+          description={t("pkgServicePersonalTrainingHint")}
+          checked={ptIncluded}
+          locked={isFieldLocked(type, "personal_training.included")}
+          onToggle={(value) => {
+            onField("personal_training.included", value);
+            // Switching PT on with no sessions would sell nothing; start from a sensible limit.
+            if (value && sessions.limit === 0) onField("personal_training.sessions", { limit: 4, period: "calendar_month" });
+          }}
+          error={draft.packageType === "pt_pack" ? undefined : issueFor(issues, "personal_training.sessions", attempted, t)}
+        >
+          {draft.packageType === "pt_pack" ? null : control("personal_training.sessions")}
+          {control("personal_training.format")}
+          {control("personal_training.group_size")}
+          {control("personal_training.session_minutes")}
+          {control("personal_training.coach_id")}
+          {control("personal_training.assessments")}
+        </ServiceCard>
+      ) : null}
+
+      {showNutrition ? (
+        <ServiceCard
+          title={t("pkgFieldOnlineCoachingNutritionPlan")}
+          description={t("pkgServiceNutritionPlanHint")}
+          checked={draft.fields["online_coaching.nutrition_plan"] === true}
+          locked={false}
+          onToggle={(value) => onField("online_coaching.nutrition_plan", value)}
+        />
+      ) : null}
+
+      {showContent ? (
+        <ServiceCard
+          title={t(sectionLabelKey("content"))}
+          description={t("pkgServiceContentHint")}
+          checked={contentOn}
+          locked={false}
+          onToggle={(value) => {
+            onField("content.on_demand_video", value);
+            if (!value) onField("content.advanced_analytics", false);
+          }}
+        >
+          {contentKeys.map((key) => (
+            <label key={key} className="flex min-h-[2.75rem] items-center gap-3 rounded-xl px-3" style={{ background: "var(--bg-soft)" }}>
+              <input type="checkbox" className="h-5 w-5" checked={draft.fields[key] === true} onChange={(event) => onField(key, event.target.checked)} />
+              <span className="text-sm" style={{ color: "var(--text)" }}>
+                {t(fieldLabelKey(key))}
+                <span className="block text-xs" style={{ color: "var(--dim)" }}>{t(`${fieldLabelKey(key)}Hint`)}</span>
+              </span>
             </label>
           ))}
         </ServiceCard>
@@ -623,7 +759,7 @@ function ServiceCard({
   checked: boolean;
   locked: boolean;
   onToggle: (value: boolean) => void;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   error?: string;
 }) {
   return (
@@ -637,7 +773,7 @@ function ServiceCard({
         {/* Type-enforced services are simply part of the package; the lock lives in advanced settings. */}
         {locked ? null : <Toggle label={title} checked={checked} onChange={onToggle} />}
       </div>
-      {checked ? <div className="space-y-5 px-4 pb-4">{children}</div> : null}
+      {checked && children ? <div className="space-y-5 px-4 pb-4">{children}</div> : null}
       {error ? <p role="alert" className="px-4 pb-4 text-xs font-semibold" style={{ color: "var(--danger)" }}>{error}</p> : null}
     </fieldset>
   );
@@ -667,9 +803,9 @@ function ReviewStep({
   const rows = useMemo(
     () => [
       { step: "type" as const, label: t("pkgStep_type"), value: t(typeLabelKey(draft.packageType)) },
-      { step: "basics" as const, label: t("pkgStep_basics"), value: [draft.name || t("pkgUntitled"), draft.packageType === "membership" ? t(`pkgBilling_${draft.billingPeriod}`) : null].filter(Boolean).join(" · ") },
+      { step: "basics" as const, label: t("pkgStep_basics"), value: [draft.name || t("pkgUntitled"), draft.billingPeriod !== "one_off" ? t(`pkgBilling_${draft.billingPeriod}`) : null].filter(Boolean).join(" · ") },
       ...(steps.includes("included")
-        ? [{ step: "included" as const, label: t("pkgStep_included"), value: [draft.fields["group_classes.included"] ? t(sectionLabelKey("group_classes")) : null, draft.fields["online_coaching.included"] ? t(sectionLabelKey("online_coaching")) : null].filter(Boolean).join(" · ") }]
+        ? [{ step: "included" as const, label: t("pkgStep_included"), value: includedServiceLabels(draft, t).join(" · ") }]
         : []),
     ],
     [draft, steps, t],
@@ -715,4 +851,21 @@ function ReviewStep({
       {type ? <LockStrip type={type} /> : null}
     </div>
   );
+}
+
+/** Names of the services a draft switches on, for the review summary. */
+function includedServiceLabels(draft: PackageDraft, t: UiTranslator): string[] {
+  const labels: Record<string, string> = {
+    "group_classes.included": sectionLabelKey("group_classes"),
+    "online_coaching.included": sectionLabelKey("online_coaching"),
+    "personal_training.included": sectionLabelKey("personal_training"),
+    "online_coaching.nutrition_plan": fieldLabelKey("online_coaching.nutrition_plan"),
+    "content.on_demand_video": fieldLabelKey("content.on_demand_video"),
+    "content.advanced_analytics": fieldLabelKey("content.advanced_analytics"),
+    "facility.open_gym": fieldLabelKey("facility.open_gym"),
+    "perks.events": fieldLabelKey("perks.events"),
+  };
+  return Object.entries(labels)
+    .filter(([key]) => draft.fields[key] === true)
+    .map(([, label]) => t(label));
 }

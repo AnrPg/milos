@@ -5,6 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { listAdminLocations } from "@/api/facility";
 import { fetchPackageCatalog } from "@/api/finance";
 import { listAdminClassTypes } from "@/api/schedule";
+import { fetchGymStaff } from "@/api/staff";
+import { useSession } from "@/components/session-provider";
 
 /** Catalog document, class types and locations shared by the package wizard and editor. */
 export function usePackageAuthoring(token: string) {
@@ -34,4 +36,22 @@ export function usePackageAuthoring(token: string) {
     isLoading: catalogQuery.isLoading,
     error: catalogQuery.error,
   };
+}
+
+export type CoachOption = { id: string; name: string | null };
+
+/**
+ * Staff who can be named as a package's personal trainer: the gym's owners,
+ * admins and coaches by their role in this gym (ADR-098 gives coaches admin rights).
+ */
+export function useStaffCoaches(enabled = true): CoachOption[] {
+  const { tokens } = useSession();
+  const token = tokens?.access_token ?? "";
+  const query = useQuery({
+    queryKey: ["staff", "members"],
+    enabled: Boolean(token) && enabled,
+    queryFn: () => fetchGymStaff(token),
+    staleTime: 5 * 60 * 1000,
+  });
+  return (query.data ?? []).map((member) => ({ id: member.user_id, name: member.nickname ?? null }));
 }

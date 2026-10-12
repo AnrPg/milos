@@ -22,6 +22,8 @@ import { showsTenantSelfServiceSurfaces } from "@/lib/account-surfaces";
 import { adminHref, membershipWorkspaceHref, rememberSelectedOrganization, useOrganizationSlug } from "@/lib/organization-slug";
 import { selectedMembership, surfaceRoleForMembership } from "@/lib/membership-role";
 import { SemanticLabel } from "@/components/semantic-label";
+import { entitledFeatures, type ClientFeature } from "@/components/client/entitlement";
+import { useClientEntitlement } from "@/components/client/use-client-entitlement";
 import { OrganizationSelector } from "@/components/organization-selector";
 
 export { adminHref } from "@/lib/organization-slug";
@@ -30,7 +32,7 @@ const CANVAS_PATHS = ["/login"];
 
 type UserRole = "member" | "athlete" | "admin";
 
-type NavLink = { href: string; labelKey: string; roles: UserRole[] };
+type NavLink = { href: string; labelKey: string; roles: UserRole[]; feature?: ClientFeature };
 type AdminNavLink = { href: string; labelKey: string; mobileVisible: boolean };
 type OrganizationMembershipSummary = {
   organization: { name: string; slug: string };
@@ -41,9 +43,29 @@ const NAV_LINKS: NavLink[] = [
   { href: "/", labelKey: "home", roles: ["member", "athlete"] },
   { href: "/schedule", labelKey: "schedule", roles: ["member"] },
   { href: "/my-workouts", labelKey: "myWorkouts", roles: ["athlete"] },
+  { href: "/my-workouts/history", labelKey: "history", roles: ["member", "athlete"] },
   { href: "/my-workouts/pantheon", labelKey: "pantheon", roles: ["athlete", "member"] },
   { href: "/account/billing", labelKey: "billing", roles: ["member", "athlete"] },
 ];
+
+// Package services (ADR-098), shown only when the client's package includes them.
+const FEATURE_NAV_LINKS: NavLink[] = [
+  { href: "/videos", labelKey: "videos", roles: ["member", "athlete"], feature: "videos" },
+  { href: "/progress", labelKey: "progress", roles: ["member", "athlete"], feature: "progress" },
+  { href: "/coaching", labelKey: "coaching", roles: ["member", "athlete"], feature: "coaching" },
+  { href: "/appointments", labelKey: "appointments", roles: ["member", "athlete"], feature: "appointments" },
+];
+
+/** Member/athlete links: the bar's own links, and package services for the "More" menu. */
+export function memberNavLinks(role: string, features: ClientFeature[]) {
+  const forRole = (link: NavLink) => link.roles.includes(role as UserRole);
+  return {
+    primary: NAV_LINKS.filter(forRole),
+    more: FEATURE_NAV_LINKS.filter(
+      (link) => forRole(link) && link.feature !== undefined && features.includes(link.feature),
+    ),
+  };
+}
 
 const ADMIN_NAV_LINKS: AdminNavLink[] = [
   { href: "/", labelKey: "home", mobileVisible: true },
@@ -74,6 +96,7 @@ const MEMBER_NAV_ICONS: Record<string, string> = {
   "/": "⌂",
   "/schedule": "▦",
   "/my-workouts": "▣",
+  "/my-workouts/history": "↺",
   "/my-workouts/pantheon": "★",
   "/account/billing": "$",
 };
@@ -88,6 +111,12 @@ export function pathActive(pathname: string, href: string) {
 
   if (relativeHref === "/") return relativePathname === "/";
   if (relativeHref === "/admin") return relativePathname === "/admin";
+  if (relativeHref === "/my-workouts") {
+    return (
+      relativePathname.startsWith("/my-workouts") &&
+      !["/my-workouts/history", "/my-workouts/pantheon"].some((path) => relativePathname.startsWith(path))
+    );
+  }
   if (relativeHref === "/admin/metrics") {
     return ["/admin/metrics", "/admin/challenges", "/admin/reviews", "/admin/wellbeing"].some(
       (path) => relativePathname.startsWith(path),
@@ -124,12 +153,14 @@ function DashboardDropdown({
         { href: "/admin/class-schedule", labelKey: "classes", description: i18n("slotsBookingsAndAttendanced9c2596") },
         { href: "/admin/check-in", label: i18n("admCheckInTitle"), description: i18n("admCheckInNavDescription") },
         { href: "/admin/coaching-assignments", labelKey: "personalCoaching", description: i18n("athleteProgrammingBoard954ac27") },
+        { href: "/admin/appointments", labelKey: "appointments", description: i18n("clNavAdminAppointmentsDescription") },
       ],
     },
     {
       labelKey: "contentGrowth",
       items: [
         { href: "/admin/workouts", labelKey: "workouts", description: i18n("masterWorkoutDefinitions09554e6") },
+        { href: "/admin/content", labelKey: "onDemandContent", description: i18n("clNavAdminContentDescription") },
         { href: "/admin/metrics", labelKey: "analyticsMarketing", description: i18n("reportingEngagementAndGrowth37e1707") },
         { href: "/admin/challenges", label: i18n("challengesff38765"), description: i18n("seasonalEngagementCampaignsd11b07e") },
       ],
@@ -245,20 +276,23 @@ function DashboardDropdown({
 
 function MobileMemberNavDropdown({
   links,
+  moreLinks,
   outstandingCents,
 }: {
   links: NavLink[];
+  moreLinks: NavLink[];
   outstandingCents: number;
 }) {
   const t = useTranslations("Navigation");
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<"training" | "account">("training");
+  const [activeCategory, setActiveCategory] = useState<"training" | "more" | "account">("training");
   const ref = useRef<HTMLDivElement>(null);
   const trainingLinks = links.filter((link) => link.href !== "/account/billing");
   const accountLinks = links.filter((link) => link.href === "/account/billing");
   const categories = [
     { id: "training" as const, label: t("myWorkouts"), items: trainingLinks },
+    { id: "more" as const, label: t("more"), items: moreLinks },
     { id: "account" as const, label: t("profile"), items: accountLinks },
   ].filter((category) => category.items.length > 0);
   const activeItems = categories.find((category) => category.id === activeCategory)?.items ?? categories[0]?.items ?? [];
@@ -339,6 +373,65 @@ function MobileMemberNavDropdown({
   );
 }
 
+function MemberMoreDropdown({ links, pathname }: { links: NavLink[]; pathname: string }) {
+  const t = useTranslations("Navigation");
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const active = links.some((link) => pathActive(pathname, link.href));
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClick(event: MouseEvent) {
+      if (ref.current && !ref.current.contains(event.target as Node)) setOpen(false);
+    }
+    function handleKey(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative shrink-0">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-haspopup="true"
+        onClick={() => setOpen((value) => !value)}
+        className="rounded-full px-3 py-1 text-sm font-semibold transition-colors"
+        style={{
+          background: active || open ? "var(--border)" : "transparent",
+          color: active || open ? "var(--text)" : "var(--dim)",
+        }}
+      >
+        {t("more")} <span aria-hidden="true" className="text-xs">▾</span>
+      </button>
+      {open ? (
+        <div
+          className="absolute start-0 top-full mt-1 w-52 rounded-2xl py-1.5 shadow-[0_20px_60px_rgba(0,0,0,0.7)]"
+          style={{ background: "var(--panel)", border: "1px solid var(--border)", zIndex: 100 }}
+        >
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)]"
+              style={{ color: pathActive(pathname, link.href) ? "var(--primary)" : "var(--text)" }}
+              onClick={() => setOpen(false)}
+            >
+              {t(link.labelKey)}
+            </Link>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function TopNav() {
   const i18n = useUiTranslations();
   const t = useTranslations("Navigation");
@@ -375,6 +468,8 @@ export function TopNav() {
     staleTime: 2 * 60 * 1000,
   });
   const outstandingCents = financeQuery.data?.total_outstanding_balance_cents ?? 0;
+  const { entitlement } = useClientEntitlement(authenticated && showSelfServiceSurfaces);
+  const memberLinks = memberNavLinks(role, entitledFeatures(entitlement));
 
   const brandName = tenantBrandName(memberships, selectedOrganizationSlug) ?? i18n("milosTraining5b1a1c1");
   const hasTenantMembership = memberships.length > 0;
@@ -451,7 +546,8 @@ export function TopNav() {
           ) : null}
           {showTenantShell && showSelfServiceSurfaces ? (
             <MobileMemberNavDropdown
-              links={NAV_LINKS.filter((link) => link.roles.includes(role))}
+              links={memberLinks.primary}
+              moreLinks={memberLinks.more}
               outstandingCents={outstandingCents}
             />
           ) : null}
@@ -478,7 +574,7 @@ export function TopNav() {
                   );
                 })
               : null}
-            {showTenantShell && showSelfServiceSurfaces && NAV_LINKS.filter((link) => link.roles.includes(role)).map((link) => {
+            {showTenantShell && showSelfServiceSurfaces && memberLinks.primary.map((link) => {
               const active = pathActive(pathname, link.href);
               const showBalanceBadge = link.href === "/account/billing" && outstandingCents > 0;
               return (
@@ -506,6 +602,9 @@ export function TopNav() {
                 </Link>
               );
             })}
+            {showTenantShell && showSelfServiceSurfaces && memberLinks.more.length > 0 ? (
+              <MemberMoreDropdown links={memberLinks.more} pathname={pathname} />
+            ) : null}
           </div>
         </nav>
 

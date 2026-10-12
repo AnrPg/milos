@@ -6,7 +6,7 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -16,12 +16,14 @@ import { fetchMyReviews } from "@/api/reviews";
 import { getAvatarUploadUrl, updateAvatar, updateProfile } from "@/api/profile";
 import { fetchGamificationPreferences, updateGamificationPreferences } from "@/api/gamification";
 import { ReviewList } from "@/components/my-reviews";
+import { WorkoutVault } from "@/components/client/WorkoutVault";
 import { AvatarEditorModal } from "@/components/profile/AvatarEditorModal";
 import { isSupportedAvatarSource } from "@/components/profile/avatar-crop";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { showsTenantSelfServiceSurfaces } from "@/lib/account-surfaces";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
 import {
   isAppLocale,
   LOCALE_NAMES,
@@ -128,6 +130,21 @@ export function ProfilePage() {
   const { tokens, currentUser, signOut } = useSession();
   const user = currentUser as CurrentUserWithAvatar | null;
   const showSelfServiceSurfaces = showsTenantSelfServiceSurfaces(user);
+  const { role: surfaceRole, membership } = useSelectedMembershipRole();
+  // Clients (members and athletes) get a Vault of completed workouts (ADR-098).
+  const showVault = showSelfServiceSurfaces && Boolean(membership) && surfaceRole !== "admin";
+  const [profileTab, setProfileTab] = useState<"account" | "vault">(() =>
+    typeof window !== "undefined" && window.location.hash === "#vault" ? "vault" : "account",
+  );
+  const activeProfileTab = showVault ? profileTab : "account";
+
+  useEffect(() => {
+    function syncFromHash() {
+      if (window.location.hash === "#vault") setProfileTab("vault");
+    }
+    window.addEventListener("hashchange", syncFromHash);
+    return () => window.removeEventListener("hashchange", syncFromHash);
+  }, []);
   const push = usePushNotifications(tokens?.access_token);
 
   const [nicknameValue, setNicknameValue] = useState(user?.nickname ?? "");
@@ -320,6 +337,39 @@ export function ProfilePage() {
           </h1>
         </div>
         </TransientHero>
+
+        {showVault ? (
+          <div role="tablist" aria-label={tProfile("eyebrow")} className="flex gap-1 rounded-full p-1" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+            {(["account", "vault"] as const).map((tab) => (
+              <button
+                key={tab}
+                id={`profile-tab-${tab}`}
+                type="button"
+                role="tab"
+                aria-selected={activeProfileTab === tab}
+                aria-controls={`profile-panel-${tab}`}
+                onClick={() => {
+                  setProfileTab(tab);
+                  window.history.replaceState(null, "", tab === "vault" ? "#vault" : window.location.pathname);
+                }}
+                className="flex-1 rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+                style={{
+                  background: activeProfileTab === tab ? "var(--border)" : "transparent",
+                  color: activeProfileTab === tab ? "var(--text)" : "var(--dim)",
+                }}
+              >
+                {tab === "vault" ? i18n("clProfileTabVault") : i18n("clProfileTabAccount")}
+              </button>
+            ))}
+          </div>
+        ) : null}
+
+        {activeProfileTab === "vault" ? (
+          <div id="profile-panel-vault" role="tabpanel" aria-labelledby="profile-tab-vault">
+            <WorkoutVault />
+          </div>
+        ) : (
+        <div id="profile-panel-account" role={showVault ? "tabpanel" : undefined} aria-labelledby={showVault ? "profile-tab-account" : undefined} className="space-y-4">
 
         <div className="flex justify-end">
           <button
@@ -613,6 +663,8 @@ export function ProfilePage() {
             </div>
           </CollapsibleSection>
         ) : null}
+        </div>
+        )}
       </div>
     </main>
   );

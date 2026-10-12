@@ -12,7 +12,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchFinanceQueues, fetchFinanceSummary, type FinanceRecord } from "@/api/finance";
+import { fetchFinanceQueues, fetchFinanceSummary, fetchPackageCatalog, type FinanceRecord } from "@/api/finance";
+import { moduleEnabled } from "@/components/admin/finance/packages/package-catalog";
+import { CorporateTab } from "@/components/admin/finance/tabs/CorporateTab";
 import { MembersTab } from "@/components/admin/finance/tabs/MembersTab";
 import { PackagesTab } from "@/components/admin/finance/tabs/PackagesTab";
 import { PromotionsTab } from "@/components/admin/finance/tabs/PromotionsTab";
@@ -22,23 +24,32 @@ import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
-type Tab = "members" | "packages" | "promotions" | "referrals" | "queues";
+type Tab = "members" | "packages" | "promotions" | "referrals" | "queues" | "corporate";
 
 export function FinanceOperations() {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { tokens } = useSession();
+  const organizationSlug = useOrganizationSlug();
+  const token = tokens?.access_token;
+  // ADR-098: the Corporate tab appears once the corporate_clients module is on.
+  const catalogQuery = useQuery({
+    queryKey: ["admin", "finance", "package-catalog"],
+    enabled: Boolean(token),
+    queryFn: () => fetchPackageCatalog(token!),
+    staleTime: 60_000,
+  });
+  const corporateEnabled = catalogQuery.data ? moduleEnabled(catalogQuery.data, "corporate_clients") : false;
   const TABS: Array<{ id: Tab; label: string }> = [
     { id: "members", label: i18n("members1cb449c") },
     { id: "packages", label: i18n("packages0a99901") },
     { id: "promotions", label: i18n("promotions086e09b") },
     { id: "referrals", label: i18n("referrals2b0e3a3") },
     { id: "queues", label: i18n("queues83dbc32") },
+    ...(corporateEnabled ? [{ id: "corporate" as const, label: i18n("stfTabCorporate") }] : []),
   ];
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { tokens } = useSession();
-  const organizationSlug = useOrganizationSlug();
-  const token = tokens?.access_token;
   const requestedTab = searchParams.get("tab");
   const activeTab: Tab = TABS.some(({ id }) => id === requestedTab) ? (requestedTab as Tab) : "members";
 
@@ -142,11 +153,11 @@ export function FinanceOperations() {
         ) : null}
 
         {/* Tab switcher */}
-        <div className="flex rounded-full p-0.5 self-start" style={{ background: "var(--border)" }}>
+        <div className="flex max-w-full overflow-x-auto rounded-full p-0.5 self-start" style={{ background: "var(--border)" }}>
           {TABS.map(({ id, label }) => (
             <button
               key={id}
-              className="rounded-full px-5 py-2 text-sm font-semibold transition-colors"
+              className="shrink-0 rounded-full px-5 py-2 text-sm font-semibold transition-colors"
               style={
                 activeTab === id
                   ? { background: "var(--text)", color: "var(--bg)" }
@@ -166,6 +177,7 @@ export function FinanceOperations() {
         {activeTab === "promotions" && <PromotionsTab />}
         {activeTab === "referrals" && <ReferralsTab />}
         {activeTab === "queues" && <QueuesTab />}
+        {activeTab === "corporate" && <CorporateTab />}
 
       </div>
     </main>

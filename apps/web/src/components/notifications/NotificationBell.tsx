@@ -189,6 +189,9 @@ function NotificationCard({
       return i18n("mbNotifPackageExpiringBody", { package: packageName, date });
     }
 
+    const phaseCBody = coachingNotificationBody(notification);
+    if (phaseCBody !== null) return phaseCBody;
+
     if (notification.type === "review_submitted") {
       const rating =
         typeof notification.payload.rating === "number"
@@ -213,7 +216,41 @@ function NotificationCard({
     return parts.length > 0 ? parts.join(" · ") : i18n("openTheScheduleToReviewTheLatestBooking36c10aa");
   }
 
+  // ADR-098 coaching and appointment notifications.
+  function coachingNotificationBody(notification: NotificationRecord): string | null {
+    const text = (key: string) =>
+      typeof notification.payload[key] === "string" ? (notification.payload[key] as string) : "";
+    const when = (key: string) => {
+      const value = text(key);
+      return value && !Number.isNaN(new Date(value).getTime()) ? formatTimestamp(uiLocale, value) : "";
+    };
+    const kind = () =>
+      text("kind") === "assessment" ? i18n("stfKindAssessment") : i18n("stfKindPtSession");
+    const client = () => text("client_nickname") || i18n("stfAMember");
+
+    switch (notification.type) {
+      case "form_review_submitted":
+        return [i18n("stfNotifFormReviewSubmittedBody", { client: client() }), text("exercise_name")]
+          .filter(Boolean)
+          .join(" · ");
+      case "form_review_completed":
+        return [i18n("stfNotifFormReviewCompletedBody"), text("exercise_name")].filter(Boolean).join(" · ");
+      case "coaching_reply_overdue":
+        return i18n("stfNotifReplyOverdueBody", { client: client(), time: when("due_at") || "—" });
+      case "nutrition_plan_updated":
+        return text("title") || i18n("stfNotifNutritionPlanBody");
+      case "appointment_booked":
+        return i18n("stfNotifAppointmentBookedBody", { client: client(), kind: kind(), time: when("starts_at") || "—" });
+      case "appointment_cancelled":
+        return i18n("stfNotifAppointmentCancelledBody", { kind: kind(), time: when("starts_at") || "—" });
+      default:
+        return null;
+    }
+  }
+
   function titleFromPayload(notification: NotificationRecord) {
+    // The nutrition plan's own title is the body, not the notification title.
+    if (notification.type === "nutrition_plan_updated") return notificationTitle(notification.type);
     if (typeof notification.payload.title === "string") return notification.payload.title;
   
     if (notification.type === "chat_message") {
@@ -269,6 +306,18 @@ function NotificationCard({
         return i18n("mbNotifWaitlistPromotedTitle");
       case "package_expiring":
         return i18n("mbNotifPackageExpiringTitle");
+      case "form_review_submitted":
+        return i18n("stfNotifFormReviewSubmittedTitle");
+      case "form_review_completed":
+        return i18n("stfNotifFormReviewCompletedTitle");
+      case "coaching_reply_overdue":
+        return i18n("stfNotifReplyOverdueTitle");
+      case "nutrition_plan_updated":
+        return i18n("stfNotifNutritionPlanTitle");
+      case "appointment_booked":
+        return i18n("stfNotifAppointmentBookedTitle");
+      case "appointment_cancelled":
+        return i18n("stfNotifAppointmentCancelledTitle");
       default:
         return i18n("notificationc18f8f2");
     }
@@ -359,8 +408,30 @@ type FilterTab = "all" | "workouts" | "bookings";
 
 const FILTER_TYPES: Record<FilterTab, string[] | null> = {
   all: null,
-  workouts: ["workout_note", "workout_changed", "workout_deleted", "workout_rejected", "workout_moved", "workout_assignment_requested", "admin_note"],
-  bookings: ["booking_pending", "booking_approved", "booking_rejected", "booking_timeout", "booking_waitlist_promoted"],
+  workouts: [
+    "workout_note",
+    "workout_changed",
+    "workout_deleted",
+    "workout_rejected",
+    "workout_moved",
+    "workout_assignment_requested",
+    "admin_note",
+    // ADR-098 coaching
+    "form_review_submitted",
+    "form_review_completed",
+    "coaching_reply_overdue",
+    "nutrition_plan_updated",
+  ],
+  bookings: [
+    "booking_pending",
+    "booking_approved",
+    "booking_rejected",
+    "booking_timeout",
+    "booking_waitlist_promoted",
+    // ADR-098 appointments
+    "appointment_booked",
+    "appointment_cancelled",
+  ],
 };
 
 export function NotificationBell() {

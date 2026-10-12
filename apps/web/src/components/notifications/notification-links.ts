@@ -17,6 +17,30 @@ function preferredUrl(notification: LinkableNotification) {
   return null;
 }
 
+function isStaffRole(role: string | null | undefined) {
+  return role === "admin" || role === "coach" || role === "owner";
+}
+
+// ADR-098: coaching and appointment notifications open the Phase C screens.
+// The API stores generic URLs, so the web app picks the screen by type and by
+// whether the reader is staff (appointment_cancelled reaches both sides).
+function phaseCUrl(notification: LinkableNotification, role: string | null | undefined) {
+  switch (notification.type) {
+    case "form_review_submitted":
+      return "/admin/coaching?tab=form-reviews";
+    case "coaching_reply_overdue":
+      return "/admin/coaching?tab=replies";
+    case "form_review_completed":
+    case "nutrition_plan_updated":
+      return "/coaching";
+    case "appointment_booked":
+    case "appointment_cancelled":
+      return isStaffRole(role) ? "/admin/appointments" : "/appointments";
+    default:
+      return null;
+  }
+}
+
 function fallbackUrl(notification: LinkableNotification) {
   if (notification.type === "booking_waitlist_promoted") return "/schedule";
   if (notification.type === "package_expiring") return "/account/billing";
@@ -40,6 +64,9 @@ export function notificationTargetUrl(
   notification: LinkableNotification,
   role: string | null | undefined,
 ) {
+  const phaseC = phaseCUrl(notification, role);
+  if (phaseC) return phaseC;
+
   const rawUrl = preferredUrl(notification) ?? payloadUrl(notification) ?? fallbackUrl(notification);
   const isAdmin = role === "admin" || role === "coach";
 

@@ -1,5 +1,9 @@
 import { apiRequest } from "@/api/client";
+import type { paths } from "@/api/generated/schema";
 import type { WorkoutRecord } from "@/api/workouts";
+
+/** How an execution was started; `repeat` re-runs one of my earlier executions (ADR-098). */
+export type ExecutionSource = "class_booking" | "assigned" | "self_selected" | "repeat";
 
 export type TimerSegment = {
   segment_key: string;
@@ -167,7 +171,7 @@ export async function startExecution(
   params: {
     master_workout_id: string;
     scale_level_slug?: string | null;
-    source: "class_booking" | "assigned" | "self_selected";
+    source: ExecutionSource;
     source_reference_id?: string | null;
     timezone?: string;
   },
@@ -254,7 +258,7 @@ export async function fetchTimerSequence(
   workoutId: string,
   params: {
     scaleSlug?: string | null;
-    source: "class_booking" | "assigned" | "self_selected";
+    source: ExecutionSource;
     sourceReferenceId?: string | null;
   },
 ): Promise<TimerSegment[]> {
@@ -290,4 +294,16 @@ export async function addExecutionModifications(
     },
   );
   return data.execution;
+}
+
+type VaultResponse =
+  paths["/api/executions/vault"]["get"]["responses"][200]["content"]["application/json"];
+
+export type VaultWorkout = VaultResponse["workouts"][number];
+export type VaultEntry = VaultWorkout["entries"][number];
+
+/** My completed workouts, each with its dated entries (ADR-098). Not tenant scoped. */
+export async function fetchWorkoutVault(token: string): Promise<VaultWorkout[]> {
+  const data = await apiRequest<VaultResponse>("/executions/vault", { token });
+  return data.workouts;
 }

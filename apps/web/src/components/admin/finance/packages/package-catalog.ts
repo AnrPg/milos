@@ -182,8 +182,26 @@ export function priceCents(price: string): number | null {
   return Number.isFinite(value) && value >= 0 ? Math.round(value * 100) : null;
 }
 
+/** Mirrors the backend's "at least one service" rule (ADR-098 adds PT, nutrition and content). */
+export const SERVICE_FIELDS = [
+  "group_classes.included",
+  "online_coaching.included",
+  "personal_training.included",
+  "facility.open_gym",
+  "content.on_demand_video",
+  "content.advanced_analytics",
+  "online_coaching.nutrition_plan",
+  "perks.events",
+] as const;
+
 export function anyServiceIncluded(fields: PackageFields): boolean {
-  return ["group_classes.included", "online_coaching.included", "facility.open_gym", "perks.events"].some((key) => fields[key] === true);
+  return SERVICE_FIELDS.some((key) => fields[key] === true);
+}
+
+/** Semi-private sessions are for 2–4 people; one-to-one is always 1 (backend rule). */
+export function groupSizeForFormat(format: unknown, current: unknown): number {
+  if (format !== "semi_private") return 1;
+  return typeof current === "number" && current >= 2 && current <= 4 ? current : 2;
 }
 
 /** Light client-side checks; the API remains the source of truth. */
@@ -209,6 +227,20 @@ export function draftIssues(draft: PackageDraft): DraftIssue[] {
   const coaching = draft.fields["online_coaching.included"] === true;
   if (coaching && !draft.fields["online_coaching.assigned_programming"] && !draft.fields["online_coaching.messaging"]) {
     issues.push({ field: "online_coaching.included", message: "pkgErrorCoachingChannel" });
+  }
+  const sessions = draft.fields["personal_training.sessions"] as QuotaValue | undefined;
+  if (draft.fields["personal_training.included"] === true && sessions && typeof sessions.limit === "number" && sessions.limit < 1) {
+    issues.push({ field: "personal_training.sessions", message: "pkgErrorSessionsPositive" });
+  }
+  if (draft.packageType === "shared" && typeof draft.fields["terms.beneficiaries"] === "number" && (draft.fields["terms.beneficiaries"] as number) < 2) {
+    issues.push({ field: "terms.beneficiaries", message: "pkgErrorBeneficiariesMin" });
+  }
+  if (
+    draft.packageType === "corporate" &&
+    draft.fields["terms.enrollment"] === "email_domain" &&
+    !String(draft.fields["terms.enrollment_domain"] ?? "").trim()
+  ) {
+    issues.push({ field: "terms.enrollment_domain", message: "pkgErrorEnrollmentDomainRequired" });
   }
   return issues;
 }
@@ -254,7 +286,7 @@ export function monthlyEquivalentCents(billingPeriod: string, cents: number | nu
 
 export function perVisitCents(draft: PackageDraft): number | null {
   const cents = priceCents(draft.price);
-  const visits = draft.fields["group_classes.visits"] as QuotaValue | undefined;
+  const visits = draft.fields[draft.packageType === "pt_pack" ? "personal_training.sessions" : "group_classes.visits"] as QuotaValue | undefined;
   if (cents === null || !visits || typeof visits.limit !== "number" || visits.limit < 1) return null;
   if (!ONE_OFF_TYPES.has(draft.packageType)) return null;
   return Math.round(cents / visits.limit);
@@ -284,6 +316,14 @@ export function lockReasonKey(reason: string): string {
 
 export type SummaryLine = { key: string; params?: Record<string, string | number> };
 
+/** Names the summary cannot look up itself (coach, compatible memberships). */
+export type SummaryNames = {
+  coachName?: string;
+  compatibleNames?: string[];
+  /** False when the gym does not offer personal training: preset assessments are then not advertised. */
+  showAssessments?: boolean;
+};
+
 /**
  * Member-facing description of a draft. Core benefits are always listed;
  * advanced values are listed only when they differ from the type preset and
@@ -294,10 +334,13 @@ export function memberSummary(
   classTypeNames: Map<string, string>,
   preset: PackageFields | null = null,
   conversionName?: string,
+  names: SummaryNames = {},
 ): SummaryLine[] {
   const lines: SummaryLine[] = [];
   const fields = draft.fields;
   const changed = (key: string) => preset === null || !equal(fields[key], preset[key]);
+
+  for (const line of paymentModelSummary(draft, names)) lines.push(line);
 
   if (fields["group_classes.included"] === true) {
     const visits = fields["group_classes.visits"] as QuotaValue;
@@ -336,6 +379,8 @@ export function memberSummary(
       lines.push({ key: `pkgSummaryCheckIns_${touchpoints.period}`, params: { count: touchpoints.limit } });
     }
   }
+
+  for (const line of phaseCServiceSummary(fields, names)) lines.push(line);
 
   const amenities = (fields["facility.amenities"] as string[] | undefined) ?? [];
   if (amenities.length > 0) lines.push({ key: "pkgSummaryAmenities", params: { list: amenities.join("|") } });
@@ -393,5 +438,67 @@ function phaseBSummary(fields: PackageFields, changed: (key: string) => boolean)
   const fee = number("terms.joining_fee_cents");
   if (fee !== null && fee > 0) lines.push({ key: "pkgSummaryJoiningFee", params: { cents: fee } });
   if (fields["terms.validity_starts"] === "first_use" && changed("terms.validity_starts")) lines.push({ key: "pkgSummaryValidityFromFirstUse" });
+  return lines;
+}
+
+/** Member-facing lines for personal training, coaching extras and digital content (ADR-098). */
+function phaseCServiceSummary(fields: PackageFields, names: SummaryNames): SummaryLine[] {
+  const lines: SummaryLine[] = [];
+  if (fields["personal_training.included"] === true) {
+    const sessions = fields["personal_training.sessions"] as QuotaValue | undefined;
+    const details = {
+      minutes: typeof fields["personal_training.session_minutes"] === "number" ? (fields["personal_training.session_minutes"] as number) : 60,
+      format: String(fields["personal_training.format"] ?? "one_to_one"),
+      size: typeof fields["personal_training.group_size"] === "number" ? (fields["personal_training.group_size"] as number) : 1,
+    };
+    if (!sessions || sessions.limit === "unlimited") lines.push({ key: "pkgSummaryPtSessionsUnlimited", params: details });
+    else if (sessions.limit > 0) lines.push({ key: `pkgSummaryPtSessions_${sessions.period}`, params: { count: sessions.limit, ...details } });
+    if (typeof fields["personal_training.coach_id"] === "string") {
+      lines.push(names.coachName ? { key: "pkgSummaryPtCoach", params: { name: names.coachName } } : { key: "pkgSummaryPtCoachAssigned" });
+    }
+  }
+  const assessments = fields["personal_training.assessments"];
+  if (names.showAssessments !== false && typeof assessments === "number" && assessments > 0) lines.push({ key: "pkgSummaryAssessments", params: { count: assessments } });
+
+  if (fields["online_coaching.included"] === true) {
+    const reviews = fields["online_coaching.form_reviews"] as QuotaValue | undefined;
+    if (reviews && reviews.limit === "unlimited") lines.push({ key: "pkgSummaryFormReviewsUnlimited" });
+    else if (reviews && typeof reviews.limit === "number" && reviews.limit > 0) lines.push({ key: `pkgSummaryFormReviews_${reviews.period}`, params: { count: reviews.limit } });
+    const sla = fields["online_coaching.response_sla_hours"];
+    if (typeof sla === "number" && fields["online_coaching.messaging"] === true) lines.push({ key: "pkgSummaryResponseSla", params: { hours: sla } });
+  }
+  if (fields["online_coaching.nutrition_plan"] === true) lines.push({ key: "pkgSummaryNutritionPlan" });
+  if (fields["content.on_demand_video"] === true) lines.push({ key: "pkgSummaryOnDemandVideo" });
+  if (fields["content.advanced_analytics"] === true) lines.push({ key: "pkgSummaryAdvancedAnalytics" });
+  return lines;
+}
+
+/** How the package is held and paid for: add-on, shared or company plan (ADR-098). */
+function paymentModelSummary(draft: PackageDraft, names: SummaryNames): SummaryLine[] {
+  const fields = draft.fields;
+  const lines: SummaryLine[] = [];
+  switch (draft.packageType) {
+    case "add_on":
+      lines.push({ key: "pkgSummaryAddOn" });
+      if (Array.isArray(fields["terms.compatible_package_ids"]) && names.compatibleNames && names.compatibleNames.length > 0) {
+        lines.push({ key: "pkgSummaryAddOnFor", params: { names: names.compatibleNames.join(", ") } });
+      }
+      break;
+    case "shared": {
+      const people = typeof fields["terms.beneficiaries"] === "number" ? (fields["terms.beneficiaries"] as number) : 2;
+      lines.push({ key: "pkgSummaryShared", params: { count: people } });
+      lines.push({ key: fields["terms.quota_sharing"] === "shared" ? "pkgSummaryQuotaShared" : "pkgSummaryQuotaPerPerson" });
+      if (fields["terms.allow_minor_beneficiaries"] === true) lines.push({ key: "pkgSummaryMinorsAllowed" });
+      break;
+    }
+    case "corporate":
+      lines.push({ key: "pkgSummaryCorporate" });
+      if (fields["terms.enrollment"] === "email_domain" && typeof fields["terms.enrollment_domain"] === "string" && fields["terms.enrollment_domain"]) {
+        lines.push({ key: "pkgSummaryEnrollDomain", params: { domain: String(fields["terms.enrollment_domain"]) } });
+      } else {
+        lines.push({ key: "pkgSummaryEnrollCode" });
+      }
+      break;
+  }
   return lines;
 }

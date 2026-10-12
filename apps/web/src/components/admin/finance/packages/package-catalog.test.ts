@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import catalogJson from "./__fixtures__/package-catalog.json";
 import {
+  anyServiceIncluded,
   applyLocks,
   changeBillingPeriod,
   changedFields,
@@ -9,6 +10,7 @@ import {
   draftIssues,
   fieldLabelKey,
   findType,
+  groupSizeForFormat,
   isPartLocked,
   memberSummary,
   newDraft,
@@ -27,7 +29,8 @@ const catalog = catalogJson as unknown as PackageCatalog;
 
 describe("package catalog helpers", () => {
   it("offers only implemented and enabled types", () => {
-    expect(selectableTypes(catalog).map((type) => type.key)).toEqual(["membership", "class_pack", "drop_in", "trial"]);
+    // PT packs and corporate plans need their module; the catalog reports them as not enabled.
+    expect(selectableTypes(catalog).map((type) => type.key)).toEqual(["membership", "class_pack", "drop_in", "trial", "add_on", "shared"]);
   });
 
   it("starts drafts from the preset with locks applied", () => {
@@ -78,7 +81,8 @@ describe("package catalog helpers", () => {
     const request = toPackageRequest(catalog, draft);
     expect(request).toMatchObject({ name: "Ten visits", package_type: "class_pack", billing_period: "one_off", base_price_cents: 9950 });
     expect(Object.keys(request.fields)).toContain("group_classes.visits");
-    expect(Object.keys(request.fields)).not.toContain("personal_training.assessments");
+    expect(Object.keys(request.fields)).toContain("personal_training.assessments");
+    expect(Object.keys(request.fields)).not.toContain("content.workout_library");
     expect(perVisitCents(draft)).toBe(995);
   });
 
@@ -123,5 +127,125 @@ describe("package catalog helpers", () => {
     draft.fields["perks.member_discount_percent"] = 10;
     const extended = keys(memberSummary(draft, new Map(), preset));
     expect(extended).toEqual(expect.arrayContaining(["pkgSummaryWaitlistPriority", "pkgSummaryGuestPasses_calendar_month", "pkgSummaryDiscount"]));
+  });
+});
+
+describe("Phase C packages (ADR-098)", () => {
+  const keys = (lines: ReturnType<typeof memberSummary>) => lines.map((line) => line.key);
+  const withType = (typeKey: string) => {
+    // Disabled types (pt_pack, corporate) are still valid drafts for stored packages.
+    return newDraft(catalog, typeKey);
+  };
+
+  it("describes personal training sessions, coach and assessments", () => {
+    const draft = withType("pt_pack");
+    const lines = memberSummary(draft, new Map(), null, undefined, { coachName: "Maria" });
+    expect(lines).toContainEqual({
+      key: "pkgSummaryPtSessions_subscription_period",
+      params: { count: 10, minutes: 60, format: "one_to_one", size: 1 },
+    });
+    expect(lines).toContainEqual({ key: "pkgSummaryAssessments", params: { count: 1 } });
+    expect(keys(lines)).not.toContain("pkgSummaryPtCoach");
+
+    draft.fields["personal_training.coach_id"] = "coach-1";
+    draft.fields["personal_training.format"] = "semi_private";
+    draft.fields["personal_training.group_size"] = 3;
+    draft.fields["personal_training.session_minutes"] = 45;
+    const named = memberSummary(draft, new Map(), null, undefined, { coachName: "Maria" });
+    expect(named).toContainEqual({ key: "pkgSummaryPtCoach", params: { name: "Maria" } });
+    expect(named).toContainEqual({
+      key: "pkgSummaryPtSessions_subscription_period",
+      params: { count: 10, minutes: 45, format: "semi_private", size: 3 },
+    });
+    expect(keys(memberSummary(draft, new Map()))).toContain("pkgSummaryPtCoachAssigned");
+  });
+
+  it("describes coaching extras and digital content", () => {
+    const draft = newDraft(catalog, "membership");
+    Object.assign(draft.fields, {
+      "online_coaching.included": true,
+      "online_coaching.form_reviews": { limit: 2, period: "calendar_month" },
+      "online_coaching.response_sla_hours": 24,
+      "online_coaching.nutrition_plan": true,
+      "content.on_demand_video": true,
+      "content.advanced_analytics": true,
+    });
+    const lines = memberSummary(draft, new Map());
+    expect(lines).toContainEqual({ key: "pkgSummaryFormReviews_calendar_month", params: { count: 2 } });
+    expect(lines).toContainEqual({ key: "pkgSummaryResponseSla", params: { hours: 24 } });
+    expect(keys(lines)).toEqual(expect.arrayContaining(["pkgSummaryNutritionPlan", "pkgSummaryOnDemandVideo", "pkgSummaryAdvancedAnalytics"]));
+
+    // Form reviews and reply times belong to coaching; the nutrition plan stands alone.
+    draft.fields["online_coaching.included"] = false;
+    const without = keys(memberSummary(draft, new Map()));
+    expect(without).not.toContain("pkgSummaryFormReviews_calendar_month");
+    expect(without).not.toContain("pkgSummaryResponseSla");
+    expect(without).toContain("pkgSummaryNutritionPlan");
+  });
+
+  it("advertises preset assessments only when personal training is offered", () => {
+    const trial = newDraft(catalog, "trial");
+    expect(keys(memberSummary(trial, new Map(), null, undefined, { showAssessments: true }))).toContain("pkgSummaryAssessments");
+    expect(keys(memberSummary(trial, new Map(), null, undefined, { showAssessments: false }))).not.toContain("pkgSummaryAssessments");
+  });
+
+  it("never describes the retired workout library", () => {
+    const draft = newDraft(catalog, "membership");
+    draft.fields["content.workout_library"] = true;
+    expect(keys(memberSummary(draft, new Map())).some((key) => key.toLowerCase().includes("library"))).toBe(false);
+  });
+
+  it("describes add-on, shared and company plans", () => {
+    const addOn = withType("add_on");
+    addOn.fields["terms.compatible_package_ids"] = ["m-1"];
+    const addOnLines = memberSummary(addOn, new Map(), null, undefined, { compatibleNames: ["Unlimited"] });
+    expect(addOnLines[0]).toEqual({ key: "pkgSummaryAddOn" });
+    expect(addOnLines).toContainEqual({ key: "pkgSummaryAddOnFor", params: { names: "Unlimited" } });
+    expect(keys(addOnLines)).toContain("pkgSummaryNutritionPlan");
+
+    const shared = withType("shared");
+    shared.fields["terms.quota_sharing"] = "shared";
+    shared.fields["terms.allow_minor_beneficiaries"] = true;
+    const sharedLines = memberSummary(shared, new Map());
+    expect(sharedLines).toContainEqual({ key: "pkgSummaryShared", params: { count: 2 } });
+    expect(keys(sharedLines)).toEqual(expect.arrayContaining(["pkgSummaryQuotaShared", "pkgSummaryMinorsAllowed"]));
+
+    const corporate = withType("corporate");
+    expect(keys(memberSummary(corporate, new Map()))).toEqual(expect.arrayContaining(["pkgSummaryCorporate", "pkgSummaryEnrollCode"]));
+    corporate.fields["terms.enrollment"] = "email_domain";
+    corporate.fields["terms.enrollment_domain"] = "acme.gr";
+    expect(memberSummary(corporate, new Map())).toContainEqual({ key: "pkgSummaryEnrollDomain", params: { domain: "acme.gr" } });
+  });
+
+  it("counts Phase C services and checks payment-model rules", () => {
+    expect(anyServiceIncluded({ "content.on_demand_video": true })).toBe(true);
+    expect(anyServiceIncluded({ "online_coaching.nutrition_plan": true })).toBe(true);
+    expect(anyServiceIncluded({ "personal_training.included": true })).toBe(true);
+
+    const add = { ...withType("add_on"), name: "Nutrition", price: "20" };
+    expect(draftIssues(add)).toEqual([]);
+
+    const shared = { ...withType("shared"), name: "Couple", price: "90" };
+    shared.fields["terms.beneficiaries"] = 1;
+    expect(draftIssues(shared).map((issue) => issue.message)).toEqual(["pkgErrorBeneficiariesMin"]);
+
+    const corporate = { ...withType("corporate"), name: "Acme", price: "500" };
+    corporate.fields["terms.enrollment"] = "email_domain";
+    expect(draftIssues(corporate).map((issue) => issue.field)).toEqual(["terms.enrollment_domain"]);
+
+    const membership = { ...withType("membership"), name: "PT", price: "100" };
+    membership.fields["personal_training.included"] = true;
+    expect(draftIssues(membership).map((issue) => issue.message)).toEqual(["pkgErrorSessionsPositive"]);
+  });
+
+  it("keeps the group size valid for the session format", () => {
+    expect(groupSizeForFormat("one_to_one", 3)).toBe(1);
+    expect(groupSizeForFormat("semi_private", 1)).toBe(2);
+    expect(groupSizeForFormat("semi_private", 4)).toBe(4);
+  });
+
+  it("prices PT packs per session", () => {
+    const draft = { ...withType("pt_pack"), price: "400" };
+    expect(perVisitCents(draft)).toBe(4000);
   });
 });

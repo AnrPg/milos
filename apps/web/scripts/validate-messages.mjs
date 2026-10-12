@@ -18,10 +18,66 @@ const reference = new Map(
 );
 const failures = [];
 
+// Collects ICU argument names. Branch bodies of plural/select arguments
+// (`one {seat}`) are message text, so they are parsed as nested messages
+// rather than read as placeholders.
 function placeholders(message) {
-  return [...message.matchAll(/\{\s*([A-Za-z_][\w]*)\s*(?:[,}])/g)]
-    .map((match) => match[1])
-    .sort();
+  const names = [];
+  let index = 0;
+
+  const parseMessage = (stopAtBrace) => {
+    while (index < message.length) {
+      const char = message[index];
+      if (char === "{") {
+        index += 1;
+        parseArgument();
+      } else if (char === "}" && stopAtBrace) {
+        index += 1;
+        return;
+      } else {
+        index += 1;
+      }
+    }
+  };
+
+  const readUntil = (stops) => {
+    const begin = index;
+    while (index < message.length && !stops.includes(message[index])) index += 1;
+    return message.slice(begin, index).trim();
+  };
+
+  const parseArgument = () => {
+    const name = readUntil([",", "}"]);
+    if (/^[A-Za-z_]\w*$/.test(name)) names.push(name);
+    if (message[index] === "}") {
+      index += 1;
+      return;
+    }
+    index += 1;
+    const type = readUntil([",", "}"]);
+    if (message[index] === "}") {
+      index += 1;
+      return;
+    }
+    index += 1;
+    if (!["plural", "select", "selectordinal"].includes(type)) {
+      readUntil(["}"]);
+      index += 1;
+      return;
+    }
+    while (index < message.length) {
+      readUntil(["{", "}"]);
+      if (message[index] === "}") {
+        index += 1;
+        return;
+      }
+      index += 1;
+      parseMessage(true);
+    }
+  };
+
+  parseMessage(false);
+  return names.sort();
 }
 
 for (const locale of locales) {

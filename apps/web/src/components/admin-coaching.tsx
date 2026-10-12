@@ -7,7 +7,8 @@ import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useState } from "react";
 
 import {
   fetchAthletes,
@@ -16,6 +17,9 @@ import {
   type AthleteDrillDown,
 } from "@/api/admin";
 import { useSession } from "@/components/session-provider";
+import { FormReviewQueue } from "@/components/staff/FormReviewQueue";
+import { NutritionPlanEditor } from "@/components/staff/NutritionPlanEditor";
+import { ReplyQueue } from "@/components/staff/ReplyQueue";
 import { TransientHero } from "@/components/TransientHero";
 import { SemanticLabel } from "@/components/semantic-label";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
@@ -114,10 +118,32 @@ function DrillDownPanel({ drillDown }: { drillDown: AthleteDrillDown }) {
   );
 }
 
+// ADR-098: staff coaching work lives in tabs next to the athlete workspace.
+const COACHING_TABS = ["athletes", "form-reviews", "replies", "nutrition"] as const;
+type CoachingTab = (typeof COACHING_TABS)[number];
+
 export function AdminCoaching() {
   const i18n = useUiTranslations();
   const { tokens } = useSession();
   const organizationSlug = useOrganizationSlug();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const requestedTab = searchParams.get("tab");
+  const activeTab: CoachingTab = COACHING_TABS.includes(requestedTab as CoachingTab)
+    ? (requestedTab as CoachingTab)
+    : "athletes";
+  const tabLabels: Record<CoachingTab, string> = {
+    athletes: i18n("stfTabAthletes"),
+    "form-reviews": i18n("stfTabFormReviews"),
+    replies: i18n("stfTabReplies"),
+    nutrition: i18n("stfTabNutrition"),
+  };
+  const setTab = useCallback(
+    (tab: CoachingTab) => {
+      router.replace(`?${new URLSearchParams({ tab }).toString()}`, { scroll: false });
+    },
+    [router],
+  );
   const [selectedAthleteId, setSelectedAthleteId] = useState("");
   const [noteBody, setNoteBody] = useState("");
   const [showDrillDown, setShowDrillDown] = useState(false);
@@ -175,6 +201,32 @@ export function AdminCoaching() {
         </section>
         </TransientHero>
 
+        <div
+          aria-label={i18n("stfCoachingSections")}
+          className="flex max-w-full gap-1 overflow-x-auto rounded-full p-0.5 self-start"
+          role="tablist"
+          style={{ background: "var(--border)" }}
+        >
+          {COACHING_TABS.map((tab) => (
+            <button
+              key={tab}
+              aria-selected={activeTab === tab}
+              className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+              onClick={() => setTab(tab)}
+              role="tab"
+              style={activeTab === tab ? { background: "var(--text)", color: "var(--bg)" } : { color: "var(--dim)" }}
+              type="button"
+            >
+              {tabLabels[tab]}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === "form-reviews" ? <FormReviewQueue /> : null}
+        {activeTab === "replies" ? <ReplyQueue /> : null}
+        {activeTab === "nutrition" ? <NutritionPlanEditor /> : null}
+
+        {activeTab === "athletes" ? (
         <div className="grid gap-6 lg:grid-cols-[1fr_1.5fr]">
           {/* Athlete list */}
           <section className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
@@ -297,6 +349,7 @@ export function AdminCoaching() {
             )}
           </div>
         </div>
+        ) : null}
       </div>
     </main>
   );

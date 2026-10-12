@@ -86,3 +86,19 @@ export async function getMyInvoiceDownloadUrl(token: string, invoiceId: string) 
     { token },
   );
 }
+
+export type CorporateSeat =
+  paths["/api/org/{organization_slug}/me/corporate-enrollment"]["post"]["responses"][201]["content"]["application/json"]["seat"];
+
+/**
+ * Join my company's corporate plan (ADR-098). With a code the matching client
+ * is used; without one the API matches my account email's domain.
+ */
+export async function enrollCorporateSeat(token: string, code?: string | null) {
+  const trimmed = code?.trim();
+  return apiRequest<{ seat: CorporateSeat }>("/me/corporate-enrollment", {
+    method: "POST",
+    token,
+    body: trimmed ? { code: trimmed } : {},
+  });
+}

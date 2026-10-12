@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { adminHref, pathActive, tenantBrandName } from "@/components/TopNav";
+import { adminHref, memberNavLinks, pathActive, tenantBrandName } from "@/components/TopNav";
 
 describe("pathActive", () => {
   it("only marks Home active on the root page", () => {
@@ -64,5 +64,30 @@ describe("tenantBrandName", () => {
 
   it("returns null when the user has no tenant memberships", () => {
     expect(tenantBrandName([], null)).toBeNull();
+  });
+});
+
+describe("memberNavLinks", () => {
+  it("gives members and athletes the workout history link", () => {
+    expect(memberNavLinks("member", []).primary.map((link) => link.href)).toContain("/my-workouts/history");
+    expect(memberNavLinks("athlete", []).primary.map((link) => link.href)).toContain("/my-workouts/history");
+  });
+
+  it("only offers package services the client is entitled to", () => {
+    expect(memberNavLinks("member", []).more).toEqual([]);
+    expect(memberNavLinks("athlete", ["progress", "appointments"]).more.map((link) => link.href)).toEqual([
+      "/progress",
+      "/appointments",
+    ]);
+    expect(memberNavLinks("admin", ["videos"]).more).toEqual([]);
+  });
+});
+
+describe("pathActive for my workouts", () => {
+  it("keeps My Workouts inactive on history and pantheon pages", () => {
+    expect(pathActive("/my-workouts", "/my-workouts")).toBe(true);
+    expect(pathActive("/my-workouts/history", "/my-workouts")).toBe(false);
+    expect(pathActive("/my-workouts/history", "/my-workouts/history")).toBe(true);
+    expect(pathActive("/my-workouts/pantheon", "/my-workouts")).toBe(false);
   });
 });

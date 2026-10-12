@@ -36,6 +36,8 @@ import {
 } from "@/components/admin-finance-receipt";
 import { useSession } from "@/components/session-provider";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
+import { sharedSubscriptions } from "@/components/staff/staff-helpers";
+import { SubscriptionBeneficiaries } from "@/components/staff/SubscriptionBeneficiaries";
 import { ChargeCategorySelect } from "@/components/admin/finance/shared/ChargeCategorySelect";
 import { CHARGE_CATEGORY_LABEL_KEYS, isChargeCategory, manualInvoiceBody } from "@/components/admin/finance/shared/charge-category";
 import { generateExportFile, type ExportDocument } from "@/lib/document-export";
@@ -482,6 +484,9 @@ export function MemberPanel({
                     <p className="text-xs mt-0.5" style={{ color: "var(--dim)" }}>
                       {field(sub, "billing_period_snapshot")} · {money(uiLocale, sub.price_cents_snapshot)} {i18n("ends74f5b4d")} {field(sub, "ends_on") || "—"}
                     </p>
+                    {sharedSubscriptions([sub]).length > 0 ? (
+                      <SubscriptionBeneficiaries payerUserId={userId} subscription={sub} />
+                    ) : null}
                   </div>
                 ))}
               </div>

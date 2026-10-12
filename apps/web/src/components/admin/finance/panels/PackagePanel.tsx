@@ -22,7 +22,7 @@ import {
 import { useSession } from "@/components/session-provider";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
 import { BasicsStep, IncludedStep } from "@/components/admin/finance/packages/PackageWizard";
-import { AdvancedSettings, LockStrip, MemberPreview, previewContext, useT } from "@/components/admin/finance/packages/package-ui";
+import { AdvancedSettings, LockStrip, MemberPreview, PackageContractDetails, previewContext, useT } from "@/components/admin/finance/packages/package-ui";
 import { usePackageAuthoring } from "@/components/admin/finance/packages/use-package-authoring";
 import {
   applyLocks,
@@ -294,6 +294,7 @@ export function PackagePanel({
             <Stat label={i18n("statusbae7d5b")} value={pkg.active !== false ? i18n("activea733b80") : i18n("inactive09af574")} />
             <Stat label={t("pkgAdvancedSettings")} value={Array.isArray(pkg.changed_fields) && pkg.changed_fields.length > 0 ? t("pkgChangesFromSuggested", { count: pkg.changed_fields.length }) : t("pkgNoChangesFromSuggested")} />
           </div>
+          {catalog ? <PackageContractDetails catalog={catalog} draft={draftFromPackage(catalog, pkg)} packages={packages} /> : null}
           {Array.isArray(pkg.tags) && (pkg.tags as string[]).length > 0 && (
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: "var(--dim)" }}>{i18n("tags848eed0")}</p>

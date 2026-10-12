@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import { fetchMyEntitlement, fetchMyFinance, getMyInvoiceDownloadUrl, type EffectiveEntitlement, type MyFinanceData } from "@/api/my-finance";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
+import { CorporateEnrollmentCard } from "@/components/client/CorporateEnrollmentCard";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { SemanticLabel } from "@/components/semantic-label";
 import { allowanceLabel, semanticLabel } from "@/i18n/presentation";
@@ -340,6 +341,17 @@ export default function BillingPage() {
     return () => window.removeEventListener(USER_SYNC_EVENT, handleUserSync as EventListener);
   }, [accessToken]);
 
+  // A new corporate seat changes the package and benefits; refresh in place.
+  function refreshAfterEnrollment() {
+    if (!accessToken) return;
+    void Promise.all([fetchMyFinance(accessToken), fetchMyEntitlement(accessToken)])
+      .then(([data, entitlementData]) => {
+        setFinance(data);
+        setEntitlement(entitlementData.entitlement);
+      })
+      .catch(() => {});
+  }
+
   const membership = finance?.membership as Record<string, unknown> | null;
   const activeSub = finance?.active_package_subscription as Record<string, unknown> | null;
   const promoRedemptions = (finance?.promotion_redemptions ?? []) as Record<string, unknown>[];
@@ -440,6 +452,8 @@ export default function BillingPage() {
             </div>
 
             <EntitlementCard entitlement={entitlement} />
+
+            <CorporateEnrollmentCard onEnrolled={refreshAfterEnrollment} />
 
             {/* credits */}
             {hasCredits && (

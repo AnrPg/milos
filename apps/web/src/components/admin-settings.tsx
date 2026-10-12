@@ -532,7 +532,7 @@ function financeFormFromSettings(s: FinanceSettings) {
 
 // ADR-096: services the gym offers; the package wizard only shows enabled ones.
 const DEFAULT_PACKAGE_MODULES = ["group_classes", "online_coaching"];
-const AVAILABLE_PACKAGE_MODULES = ["group_classes", "online_coaching", "open_gym", "events"] as const;
+const AVAILABLE_PACKAGE_MODULES = ["group_classes", "online_coaching", "open_gym", "events", "personal_training", "digital_content", "corporate_clients"] as const;
 
 function FinanceSection({ token }: { token: string }) {
   const i18n = useUiTranslations();

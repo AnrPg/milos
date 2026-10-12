@@ -12,10 +12,13 @@ import {
   equal,
   fieldLabelKey,
   fieldLocks,
+  fieldSpec,
+  groupSizeForFormat,
   isFieldLocked,
   isPartLocked,
   lockReasonKey,
   memberSummary,
+  moduleEnabled,
   presetFor,
   priceCents,
   sectionLabelKey,
@@ -28,7 +31,9 @@ import {
   type PackageDraft,
   type QuotaPeriod,
   type QuotaValue,
+  type SummaryNames,
 } from "./package-catalog";
+import { useStaffCoaches, type CoachOption } from "./use-package-authoring";
 
 export type FieldContext = {
   classTypes: ClassTypeRecord[];
@@ -262,9 +267,11 @@ export function QuotaControl({
   const periodLocked = isPartLocked(type, fieldKey, "period");
   const limited = value.limit !== "unlimited" && value.limit !== 0;
   const none = value.limit === 0;
-  const limitRequired = type.key === "class_pack" && fieldKey === "group_classes.visits";
-  // Perks start at none: guest passes are opt-in (ADR-097).
-  const allowNone = fieldKey === "perks.guest_passes";
+  const limitRequired =
+    (type.key === "class_pack" && fieldKey === "group_classes.visits") ||
+    (type.key === "pt_pack" && fieldKey === "personal_training.sessions");
+  // Perks and coaching extras start at none: they are opt-in (ADR-097, ADR-098).
+  const allowNone = ["perks.guest_passes", "online_coaching.form_reviews", "personal_training.sessions"].includes(fieldKey);
 
   return (
     <div className="space-y-3">
@@ -585,12 +592,13 @@ export function lockedText(t: UiTranslator, field: string, value: unknown, part?
   if (part === "period") return t("pkgPeriodWhole");
   if (typeof value === "boolean") return `${t(fieldLabelKey(field))}: ${value ? t("pkgYes") : t("pkgNo")}`;
   if (value === null) return `${t(fieldLabelKey(field))}: ${t("pkgFollowsType")}`;
+  if (value === "all") return `${t(fieldLabelKey(field))}: ${t("pkgClassTypesAll")}`;
   if (Array.isArray(value)) return `${t(fieldLabelKey(field))}: ${value.length === 0 ? t("pkgNone") : value.join(", ")}`;
   if (field === "perks.guest_passes" || field === "perks.freeze_days_per_year") return `${t(fieldLabelKey(field))}: 0`;
   return `${t(fieldLabelKey(field))}: ${String(value)}`;
 }
 
-/** Preset and follow-up membership name needed by MemberPreview for a draft. */
+/** Preset, follow-up membership and compatible base names needed by MemberPreview for a draft. */
 export function previewContext(catalog: PackageCatalog, draft: PackageDraft, packages: FinanceRecord[]) {
   const type = catalog.types.find((candidate) => candidate.key === draft.packageType);
   const conversionId = draft.fields["terms.conversion_package_id"];
@@ -598,7 +606,79 @@ export function previewContext(catalog: PackageCatalog, draft: PackageDraft, pac
   return {
     preset: type ? presetFor(type, draft.billingPeriod) : undefined,
     conversionName: conversion ? String(conversion.name) : undefined,
+    compatibleNames: packageNames(packages, draft.fields["terms.compatible_package_ids"]),
+    showAssessments: moduleEnabled(catalog, "personal_training") || draft.fields["personal_training.included"] === true,
   };
+}
+
+/** Names of the packages a scope lists, in the scope's order; unknown ids are skipped. */
+export function packageNames(packages: FinanceRecord[], ids: unknown): string[] | undefined {
+  if (!Array.isArray(ids)) return undefined;
+  return ids
+    .map((id) => packages.find((pkg) => String(pkg.id) === String(id)))
+    .filter((pkg): pkg is FinanceRecord => Boolean(pkg))
+    .map((pkg) => String(pkg.name));
+}
+
+/** Packages an add-on can be sold with: active membership-type bases (ADR-098). */
+function basePackages(packages: FinanceRecord[]) {
+  return packages
+    .filter((pkg) => pkg.active !== false && pkg.package_type === "membership")
+    .map((pkg) => ({ id: String(pkg.id), name: String(pkg.name), archived_at: null }));
+}
+
+/** "Any membership" or a selection of membership packages an add-on may join. */
+export function CompatiblePackagesScope({ value, onChange, packages }: { value: unknown; onChange: (value: "all" | string[]) => void; packages: FinanceRecord[] }) {
+  const t = useT();
+  return (
+    <IdScope
+      value={value}
+      onChange={onChange}
+      items={basePackages(packages)}
+      label={t("pkgFieldTermsCompatiblePackageIds")}
+      allLabel={t("pkgCompatibleAll")}
+      someLabel={t("pkgCompatibleSome")}
+      emptyText={t("pkgNoMembershipsYet")}
+    />
+  );
+}
+
+/** A staff member as the package's trainer; empty means any coach. */
+export function CoachSelect({ id, value, onChange, label }: { id?: string; value: unknown; onChange: (value: string | null) => void; label: string }) {
+  const t = useT();
+  const coaches = useStaffCoaches();
+  const current = typeof value === "string" ? value : "";
+  const options: CoachOption[] = current && !coaches.some((coach) => coach.id === current) ? [...coaches, { id: current, name: t("pkgCoachCurrent") }] : coaches;
+  return (
+    <select
+      id={id}
+      aria-label={id ? undefined : label}
+      className={inputClass + " h-11"}
+      style={inputStyle}
+      value={current}
+      onChange={(event) => onChange(event.target.value === "" ? null : event.target.value)}
+    >
+      <option value="">{t("pkgCoachAny")}</option>
+      {options.map((coach) => <option key={coach.id} value={coach.id}>{coach.name || t("pkgCoachUnnamed")}</option>)}
+    </select>
+  );
+}
+
+/** Fixed numeric choices (session length, reply time); `nullable` adds a "none" choice. */
+function OptionControl({ spec, value, label, nullable, onChange }: { spec: CatalogField; value: unknown; label: string; nullable: boolean; onChange: (value: number | null) => void }) {
+  const t = useT();
+  const unit = spec.key === "online_coaching.response_sla_hours" ? "pkgHours" : "pkgMinutes";
+  return (
+    <Segmented
+      label={label}
+      value={typeof value === "number" ? String(value) : "none"}
+      options={[
+        ...(nullable ? [{ value: "none", label: t("pkgNone") }] : []),
+        ...(spec.options ?? []).map((option) => ({ value: String(option), label: t(unit, { count: Number(option) }) })),
+      ]}
+      onChange={(next) => onChange(next === "none" ? null : Number(next))}
+    />
+  );
 }
 
 /** Quiet footnote listing what the type defines; kept out of the main form on purpose. */
@@ -737,6 +817,8 @@ const QUOTA_UNITS: Record<string, string> = {
   "facility.open_gym_visits": "pkgUnitOpenGymVisits",
   "perks.guest_passes": "pkgUnitGuestPasses",
   "perks.event_visits": "pkgUnitEvents",
+  "personal_training.sessions": "pkgUnitSessions",
+  "online_coaching.form_reviews": "pkgUnitFormReviews",
 };
 
 /** Generic control for any available catalog field (used by advanced settings and the editor). */
@@ -809,12 +891,26 @@ export function FieldControl({
       control =
         spec.key === "facility.location_ids" ? (
           <LocationScope value={value} locations={context.locations} onChange={(next) => onFieldChange(spec.key, next)} />
+        ) : spec.key === "terms.compatible_package_ids" ? (
+          <CompatiblePackagesScope value={value} packages={context.packages} onChange={(next) => onFieldChange(spec.key, next)} />
         ) : (
           <ClassTypeScope value={value} classTypes={context.classTypes} onChange={(next) => onFieldChange(spec.key, next)} />
         );
       break;
     case "integer":
-      control = <IntegerControl spec={spec} value={value} label={label} onChange={(next) => onFieldChange(spec.key, next)} />;
+      control = (
+        <IntegerControl
+          // Semi-private sessions are for 2–4 people (backend rule).
+          spec={spec.key === "personal_training.group_size" && draft.fields["personal_training.format"] === "semi_private" ? { ...spec, min: 2 } : spec}
+          value={value}
+          label={label}
+          onChange={(next) => onFieldChange(spec.key, next)}
+        />
+      );
+      break;
+    case "integer_option":
+    case "integer_option_or_null":
+      control = <OptionControl spec={spec} value={value} label={label} nullable={spec.kind === "integer_option_or_null"} onChange={(next) => onFieldChange(spec.key, next)} />;
       break;
     case "gym_default_integer":
       control = <GymDefaultControl spec={spec} value={value} label={label} onChange={(next) => onFieldChange(spec.key, next)} />;
@@ -855,19 +951,41 @@ export function FieldControl({
         );
       break;
     case "string_or_null":
-      control = (
-        <input
-          id={id}
-          className={inputClass}
-          style={inputStyle}
-          maxLength={spec.max}
-          value={typeof value === "string" ? value : ""}
-          onChange={(event) => onFieldChange(spec.key, event.target.value === "" ? null : event.target.value)}
-        />
-      );
+      control =
+        spec.key === "terms.enrollment_domain" ? (
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold" style={{ color: "var(--dim)" }} aria-hidden="true">@</span>
+            <input
+              id={id}
+              className={inputClass + " h-11"}
+              style={inputStyle}
+              maxLength={spec.max}
+              inputMode="url"
+              autoCapitalize="none"
+              spellCheck={false}
+              placeholder={t("pkgFieldTermsEnrollmentDomainPlaceholder")}
+              value={typeof value === "string" ? value : ""}
+              onChange={(event) => {
+                const domain = event.target.value.trim().replace(/^@+/, "").toLowerCase();
+                onFieldChange(spec.key, domain === "" ? null : domain);
+              }}
+            />
+          </div>
+        ) : (
+          <input
+            id={id}
+            className={inputClass}
+            style={inputStyle}
+            maxLength={spec.max}
+            value={typeof value === "string" ? value : ""}
+            onChange={(event) => onFieldChange(spec.key, event.target.value === "" ? null : event.target.value)}
+          />
+        );
       break;
     case "uuid_or_null":
-      control = (
+      control = spec.key === "personal_training.coach_id" ? (
+        <CoachSelect id={id} label={label} value={value} onChange={(next) => onFieldChange(spec.key, next)} />
+      ) : (
         <select
           id={id}
           className={inputClass + " h-11"}
@@ -928,7 +1046,71 @@ function phaseBFieldVisible(key: string, draft: PackageDraft, catalog: PackageCa
   }
 }
 
-const ADVANCED_SECTIONS = ["terms", "group_classes", "booking", "online_coaching", "facility", "perks"];
+/**
+ * Phase C fields follow the same idea (ADR-098): trainer details need personal
+ * training switched on, coaching extras need coaching, and payment-model terms
+ * appear only for the type that uses them.
+ */
+export function phaseCFieldVisible(key: string, draft: PackageDraft) {
+  const on = (field: string) => draft.fields[field] === true;
+  const type = draft.packageType;
+  switch (key) {
+    case "personal_training.sessions":
+    case "personal_training.format":
+    case "personal_training.session_minutes":
+    case "personal_training.coach_id":
+      return on("personal_training.included");
+    case "personal_training.group_size":
+      return on("personal_training.included") && draft.fields["personal_training.format"] === "semi_private";
+    case "online_coaching.form_reviews":
+      return on("online_coaching.included");
+    case "online_coaching.response_sla_hours":
+      return on("online_coaching.included") && on("online_coaching.messaging");
+    case "terms.compatible_package_ids":
+      return type === "add_on";
+    case "terms.beneficiaries":
+    case "terms.quota_sharing":
+    case "terms.allow_minor_beneficiaries":
+      return type === "shared";
+    case "terms.seats":
+    case "terms.seat_billing":
+    case "terms.enrollment":
+      return type === "corporate";
+    case "terms.enrollment_domain":
+      return type === "corporate" && draft.fields["terms.enrollment"] === "email_domain";
+    default:
+      return true;
+  }
+}
+
+/** A section shows when its module is on, or when the draft already uses it (so nothing is hidden silently). */
+export function sectionVisible(section: string, draft: PackageDraft, catalog: PackageCatalog) {
+  const on = (field: string) => draft.fields[field] === true;
+  switch (section) {
+    case "group_classes":
+      return moduleEnabled(catalog, "group_classes") || on("group_classes.included");
+    case "online_coaching":
+      return moduleEnabled(catalog, "online_coaching") || on("online_coaching.included") || on("online_coaching.nutrition_plan");
+    case "personal_training":
+      // Assessments alone (the trial preset has one) do not open the section without the module.
+      return moduleEnabled(catalog, "personal_training") || on("personal_training.included");
+    case "content":
+      return moduleEnabled(catalog, "digital_content") || on("content.on_demand_video") || on("content.advanced_analytics");
+    default:
+      return true;
+  }
+}
+
+const ADVANCED_SECTIONS = ["terms", "group_classes", "booking", "personal_training", "online_coaching", "content", "facility", "perks"];
+
+/** Field changes that keep dependent values valid (switching PT format resets the group size). */
+export function withDependents(key: string, value: unknown, draft: PackageDraft): Array<[string, unknown]> {
+  const changes: Array<[string, unknown]> = [[key, value]];
+  if (key === "personal_training.format") {
+    changes.push(["personal_training.group_size", groupSizeForFormat(value, draft.fields["personal_training.group_size"])]);
+  }
+  return changes;
+}
 
 /** Every available catalog field, grouped by section, with search and reset. */
 export function AdvancedSettings({
@@ -951,25 +1133,25 @@ export function AdvancedSettings({
   const t = useT();
   const [query, setQuery] = useState("");
   const preset = useMemo(() => presetFor(type, draft.billingPeriod), [type, draft.billingPeriod]);
-  const coachingEnabled = catalog.modules.some((module) => module.key === "online_coaching" && module.enabled);
-  const classesEnabled = catalog.modules.some((module) => module.key === "group_classes" && module.enabled);
   const normalizedQuery = query.trim().toLocaleLowerCase();
+  const changeField = (key: string, value: unknown) => {
+    for (const [field, next] of withDependents(key, value, draft)) onFieldChange(field, next);
+  };
 
-  const sections = ADVANCED_SECTIONS.filter(
-    (section) =>
-      (section !== "online_coaching" || coachingEnabled || draft.fields["online_coaching.included"] === true) &&
-      (section !== "group_classes" || classesEnabled || draft.fields["group_classes.included"] === true),
-  )
+  const sections = ADVANCED_SECTIONS.filter((section) => sectionVisible(section, draft, catalog))
     .map((section) => ({
       section,
       fields: catalog.fields.filter(
         (field) =>
           field.available &&
+          // Retired fields (content.workout_library) stay readable for stored contracts but are never authored.
+          field.phase !== "retired" &&
           field.section === section &&
           (normalizedQuery === "" || t(fieldLabelKey(field.key)).toLocaleLowerCase().includes(normalizedQuery)) &&
           (field.key !== "terms.conversion_package_id" || type.key === "trial") &&
           (field.key !== "terms.validity" || type.billing_model === "one_off" || isFieldLocked(type, field.key)) &&
-          phaseBFieldVisible(field.key, draft, catalog, context),
+          phaseBFieldVisible(field.key, draft, catalog, context) &&
+          phaseCFieldVisible(field.key, draft),
       ),
     }))
     .filter((group) => group.fields.length > 0);
@@ -1004,7 +1186,7 @@ export function AdvancedSettings({
           </summary>
           <div className="space-y-5 px-4 pb-4">
             {fields.map((spec) => (
-              <FieldControl key={spec.key} spec={spec} type={type} draft={draft} onFieldChange={onFieldChange} context={context} preset={preset} />
+              <FieldControl key={spec.key} spec={spec} type={type} draft={draft} onFieldChange={changeField} context={context} preset={preset} />
             ))}
           </div>
         </details>
@@ -1019,6 +1201,8 @@ export function MemberPreview({
   compact,
   preset,
   conversionName,
+  compatibleNames,
+  showAssessments,
 }: {
   draft: PackageDraft;
   classTypes: ClassTypeRecord[];
@@ -1026,13 +1210,23 @@ export function MemberPreview({
   /** Type preset; advanced values that differ from it are described like any other benefit. */
   preset?: Record<string, unknown>;
   conversionName?: string;
+  compatibleNames?: string[];
+  /** False hides preset assessments while personal training is not offered. */
+  showAssessments?: boolean;
 }) {
   const t = useT();
   const locale = useUiLocale();
   const names = useMemo(() => new Map(classTypes.map((type) => [type.id, type.name])), [classTypes]);
-  const lines = memberSummary(draft, names, preset ?? null, conversionName);
+  const coachId = draft.fields["personal_training.coach_id"];
+  const coaches = useStaffCoaches(typeof coachId === "string");
+  const summaryNames: SummaryNames = {
+    coachName: coaches.find((coach) => coach.id === coachId)?.name ?? undefined,
+    compatibleNames,
+    showAssessments,
+  };
+  const lines = memberSummary(draft, names, preset ?? null, conversionName, summaryNames);
   const cents = priceCents(draft.price);
-  const suffix = draft.packageType === "membership" ? t(`pkgPriceSuffix_${draft.billingPeriod}`) : t("pkgPriceSuffixTotal");
+  const suffix = priceSuffix(t, draft.billingPeriod);
 
   return (
     <section
@@ -1065,5 +1259,72 @@ export function MemberPreview({
         ))}
       </ul>
     </section>
+  );
+}
+
+/** "/ month", "in total" or "with your membership", following how the package is billed. */
+export function priceSuffix(t: UiTranslator, billingPeriod: string) {
+  return billingPeriod === "one_off" ? t("pkgPriceSuffixTotal") : t(`pkgPriceSuffix_${billingPeriod}`);
+}
+
+/** Readable text for a stored field value (package detail and summaries for staff). */
+export function fieldValueText(t: UiTranslator, spec: CatalogField, value: unknown, names: { coaches: CoachOption[]; packages: FinanceRecord[] }): string {
+  if (value === null || value === undefined) return spec.key === "personal_training.coach_id" ? t("pkgCoachAny") : t("pkgNone");
+  if (typeof value === "boolean") return value ? t("pkgYes") : t("pkgNo");
+  if (spec.key === "personal_training.coach_id") {
+    const coach = names.coaches.find((candidate) => candidate.id === value);
+    return coach ? coach.name || t("pkgCoachUnnamed") : t("pkgCoachCurrent");
+  }
+  if (spec.key === "terms.compatible_package_ids") return value === "all" ? t("pkgCompatibleAll") : (packageNames(names.packages, value) ?? []).join(", ");
+  if (spec.kind === "enum") return t(`${fieldLabelKey(spec.key)}_${String(value)}`);
+  if (spec.key === "personal_training.session_minutes") return t("pkgMinutes", { count: Number(value) });
+  if (spec.key === "online_coaching.response_sla_hours") return t("pkgHours", { count: Number(value) });
+  if (spec.key === "terms.enrollment_domain") return `@${String(value)}`;
+  if (spec.kind === "quota") {
+    const quota = value as QuotaValue;
+    if (quota.limit === "unlimited") return t("pkgUnlimited");
+    if (quota.limit === 0) return t("pkgNone");
+    return `${quota.limit} ${t(QUOTA_UNITS[spec.key] ?? "pkgCheckIns")} ${t(`pkgPeriod_${quota.period}`)}`;
+  }
+  if (spec.kind === "integer") return `${String(value)} ${t(`${fieldLabelKey(spec.key)}Suffix`, { count: Number(value) })}`;
+  return String(value);
+}
+
+/** Staff-facing Phase C terms that members do not see in the preview (ADR-098). */
+const CONTRACT_DETAIL_FIELDS = [
+  "personal_training.format",
+  "personal_training.group_size",
+  "personal_training.session_minutes",
+  "personal_training.coach_id",
+  "online_coaching.response_sla_hours",
+  "terms.compatible_package_ids",
+  "terms.beneficiaries",
+  "terms.quota_sharing",
+  "terms.allow_minor_beneficiaries",
+  "terms.seats",
+  "terms.seat_billing",
+  "terms.enrollment",
+  "terms.enrollment_domain",
+];
+
+/** Personal training, add-on, shared and corporate terms of a stored package, as label/value rows. */
+export function PackageContractDetails({ catalog, draft, packages }: { catalog: PackageCatalog; draft: PackageDraft; packages: FinanceRecord[] }) {
+  const t = useT();
+  const coachId = draft.fields["personal_training.coach_id"];
+  const coaches = useStaffCoaches(typeof coachId === "string");
+  const rows = CONTRACT_DETAIL_FIELDS.map((key) => fieldSpec(catalog, key))
+    .filter((spec): spec is CatalogField => Boolean(spec?.available) && phaseCFieldVisible(spec!.key, draft))
+    .filter((spec) => spec.section !== "online_coaching" || draft.fields["online_coaching.response_sla_hours"] !== null)
+    .map((spec) => ({ key: spec.key, label: t(fieldLabelKey(spec.key)), value: fieldValueText(t, spec, draft.fields[spec.key], { coaches, packages }) }));
+  if (rows.length === 0) return null;
+  return (
+    <dl className="grid gap-4 sm:grid-cols-2">
+      {rows.map((row) => (
+        <div key={row.key}>
+          <dt className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{row.label}</dt>
+          <dd className="mt-1 text-sm font-semibold" style={{ color: "var(--text)" }}>{row.value || "—"}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }

@@ -51,6 +51,8 @@ import { CommitmentOverridePrompt } from "@/components/admin/finance/shared/Comm
 import { CHARGE_CATEGORY_LABEL_KEYS, isChargeCategory, manualInvoiceBody } from "@/components/admin/finance/shared/charge-category";
 import { commitmentConflict } from "@/components/admin/finance/shared/membership-commitment";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { sharedSubscriptions } from "@/components/staff/staff-helpers";
+import { SubscriptionBeneficiaries } from "@/components/staff/SubscriptionBeneficiaries";
 
 const MANUAL_RECEIPT_PURPOSE = "__manual_receipt_purpose__";
 
@@ -1056,6 +1058,20 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
             </form>
           </Panel>
         </section>
+
+        {sharedSubscriptions(packageSubscriptions).length > 0 ? (
+          <section aria-labelledby="shared-memberships" className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--panel)] p-6">
+            <h2 id="shared-memberships" className="text-xl font-black">{i18n("stfSharedMemberships")}</h2>
+            <div className="mt-4 grid gap-3 lg:grid-cols-2">
+              {sharedSubscriptions(packageSubscriptions).map((subscription) => (
+                <div key={field(subscription, "id")} className="rounded-2xl border border-[var(--border)] p-4">
+                  <p className="font-bold">{packageLabel(subscription)}</p>
+                  <SubscriptionBeneficiaries payerUserId={userId} subscription={subscription} />
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <section className="grid gap-6 xl:grid-cols-5">
           <InvoiceHistory
