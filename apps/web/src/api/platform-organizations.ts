@@ -1,3 +1,4 @@
+import type { paths } from "@/api/generated/schema";
 import { apiRequest } from "@/api/client";
 
 export type OrganizationStatus = "active" | "suspended" | "archived";
@@ -112,6 +113,32 @@ export function renamePlatformOrganization(token: string, organizationId: string
     `/platform/organizations/${organizationId}/name`,
     { method: "PATCH", token, body: { name } },
   );
+}
+
+// ADR-104 slug rename: impact summary, then a typed-confirmation rename that
+// keeps the previous slug as a redirecting alias.
+export type OrganizationSlugImpact =
+  paths["/api/platform/organizations/{id}/slug-impact"]["get"]["responses"]["200"]["content"]["application/json"];
+
+export type OrganizationSlugRenameResult =
+  paths["/api/platform/organizations/{id}/slug"]["patch"]["responses"]["200"]["content"]["application/json"];
+
+export function fetchOrganizationSlugImpact(token: string, organizationId: string) {
+  return apiRequest<OrganizationSlugImpact>(`/platform/organizations/${organizationId}/slug-impact`, {
+    token,
+  });
+}
+
+export function renamePlatformOrganizationSlug(
+  token: string,
+  organizationId: string,
+  input: { slug: string; confirmation: string },
+) {
+  return apiRequest<OrganizationSlugRenameResult>(`/platform/organizations/${organizationId}/slug`, {
+    method: "PATCH",
+    token,
+    body: input,
+  });
 }
 
 export function changePlatformOrganizationSettings(

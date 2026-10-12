@@ -28,9 +28,11 @@ import { fetchOrganizationMemberships } from "@/api/organizations";
 import { platformLogoApi } from "@/api/organization-branding";
 import { TenantLogoUploader } from "@/components/branding/TenantLogoUploader";
 import { OrganizationPurgeDialog } from "@/components/platform/OrganizationPurgeDialog";
+import { OrganizationSlugRenameDialog } from "@/components/platform/OrganizationSlugRenameDialog";
 import { useSession } from "@/components/session-provider";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { platformOrganizationPurgeCopy } from "@/i18n/platform-organization-purge";
+import { platformOrganizationSlugCopy } from "@/i18n/platform-organization-slug";
 import { platformOrganizationsCopy } from "@/i18n/platform-organizations";
 import { membershipWorkspaceHref, rememberSelectedOrganization } from "@/lib/organization-slug";
 
@@ -58,6 +60,7 @@ export function PlatformOrganizationsPage() {
   const locale = useUiLocale();
   const copy = platformOrganizationsCopy(locale);
   const purgeCopy = platformOrganizationPurgeCopy(locale);
+  const slugCopy = platformOrganizationSlugCopy(locale);
   const { tokens } = useSession();
   const [form, setForm] = useState(defaultForm);
   const [submitting, setSubmitting] = useState(false);
@@ -74,6 +77,7 @@ export function PlatformOrganizationsPage() {
   const [confirmingArchive, setConfirmingArchive] = useState<PlatformOrganization | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState<PlatformOrganization | null>(null);
   const [reviewingPurge, setReviewingPurge] = useState<PlatformOrganization | null>(null);
+  const [renamingSlug, setRenamingSlug] = useState<PlatformOrganization | null>(null);
   const [lifecycleSubmitting, setLifecycleSubmitting] = useState<string | null>(null);
   const [deleteSubmitting, setDeleteSubmitting] = useState<string | null>(null);
   const [generatedInvitationsByOrg, setGeneratedInvitationsByOrg] = useState<
@@ -395,6 +399,9 @@ export function PlatformOrganizationsPage() {
                     <button type="button" onClick={() => setEditing(entry)} className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold">
                       {copy.edit}
                     </button>
+                    <button type="button" onClick={() => setRenamingSlug(entry)} className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold">
+                      {slugCopy.open}
+                    </button>
                     <button type="button" onClick={() => setManagingAccess(entry)} className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold">
                       {copy.manageAccess}
                     </button>
@@ -508,6 +515,18 @@ export function PlatformOrganizationsPage() {
           organization={reviewingPurge}
           onClose={() => setReviewingPurge(null)}
           onChanged={() => void organizationsQuery.refetch()}
+        />
+      ) : null}
+      {renamingSlug ? (
+        <OrganizationSlugRenameDialog
+          accessToken={accessToken}
+          locale={locale}
+          organization={renamingSlug}
+          onClose={() => setRenamingSlug(null)}
+          onRenamed={() => {
+            void organizationsQuery.refetch();
+            void myMembershipsQuery.refetch();
+          }}
         />
       ) : null}
       {confirmingDelete ? (
