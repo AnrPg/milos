@@ -34,7 +34,18 @@ defmodule MilosTraining.Organizations.Domain.TenantAuthorization do
   def build(_account, _organization, _membership, _request_metadata),
     do: {:error, :membership_required}
 
-  def authorize(%TenantContext{role: role}, roles) when is_list(roles) do
-    if role in roles, do: :ok, else: {:error, :forbidden}
+  def authorize(%TenantContext{} = context, roles) when is_list(roles) do
+    if any_role?(context, roles), do: :ok, else: {:error, :forbidden}
   end
+
+  @doc """
+  Roles the account holds in the context's gym. A membership holds one role
+  today; checks go through this so memberships can later hold several (TD-054).
+  """
+  def roles(%{roles: roles}) when is_list(roles), do: roles
+  def roles(%{role: role}) when not is_nil(role), do: [role]
+  def roles(_context), do: []
+
+  def any_role?(context, roles) when is_list(roles),
+    do: context |> roles() |> Enum.any?(&(&1 in roles))
 end

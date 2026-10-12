@@ -5,12 +5,15 @@ defmodule MilosTraining.Application.AuthorizePackageFeature do
   """
 
   alias MilosTraining.Application.AuthorizeFinanceEntitlement
-
-  @staff_roles [:owner, :admin, :coach]
-
-  def call(%{role: role}, _actor, _capability) when role in @staff_roles, do: :ok
+  alias MilosTraining.Organizations
 
   def call(context, actor, capability) do
+    if Organizations.any_role?(context, Organizations.admin_roles()),
+      do: :ok,
+      else: authorize(context, actor, capability)
+  end
+
+  defp authorize(context, actor, capability) do
     case AuthorizeFinanceEntitlement.call(context, actor, %{capability: capability}) do
       :ok -> :ok
       {:ok, _decision} -> :ok

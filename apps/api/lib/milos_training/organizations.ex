@@ -50,6 +50,13 @@ defmodule MilosTraining.Organizations do
   def list_membership_organization_ids(user_ids),
     do: OrganizationStore.list_membership_organization_ids(user_ids)
 
+  @doc "Whether the tenant context holds any of `roles` (role-set aware, TD-054)."
+  defdelegate any_role?(context, roles),
+    to: MilosTraining.Organizations.Domain.TenantAuthorization
+
+  @doc "Roles with admin rights; coaches included until TD-054 narrows them."
+  defdelegate admin_roles(), to: MilosTraining.Organizations.Domain.MembershipPolicy
+
   def list_staff_user_ids(organization_id),
     do: OrganizationStore.list_staff_user_ids(organization_id)
 
