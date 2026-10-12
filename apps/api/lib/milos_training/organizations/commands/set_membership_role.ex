@@ -14,12 +14,23 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipRole do
 
   alias MilosTraining.Organizations.Domain.{MembershipPolicy, TenantAuthorization}
   alias MilosTraining.Application.BroadcastUserSync
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Organizations.OrganizationStore
   alias MilosTraining.{Finance, Scheduling, Workouts}
 
+  # organization_memberships is a root tenant table: the lookup and update run
+  # in the acting owner/admin's tenant scope (TD-046).
   def call(context, user_id, role) when is_binary(user_id) do
-    with :ok <- TenantAuthorization.authorize(context, [:owner, :admin]),
-         {:ok, role} <- normalize_role(role),
+    case TenantAuthorization.authorize(context, [:owner, :admin]) do
+      :ok -> RepoContext.run(context, fn -> change_role(context, user_id, role) end)
+      error -> error
+    end
+  end
+
+  def call(_context, _user_id, _role), do: {:error, :not_found}
+
+  defp change_role(context, user_id, role) do
+    with {:ok, role} <- normalize_role(role),
          {:ok, membership} <- fetch_membership(context, user_id),
          :ok <- refuse_self_change(context, membership),
          :ok <- authorize_role_ceiling(context.role, role),
@@ -32,8 +43,6 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipRole do
       |> broadcast_change(context)
     end
   end
-
-  def call(_context, _user_id, _role), do: {:error, :not_found}
 
   # Restores the notification UpdateUserRole used to send, now carrying the
   # organization: a role only changed inside one tenant, so telling admins of
