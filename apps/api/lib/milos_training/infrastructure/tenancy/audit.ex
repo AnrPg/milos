@@ -11,6 +11,8 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     referral_programs referral_events referral_rewards finance_invoices
     finance_invoice_lines finance_payment_reversals finance_credit_ledger_entries
     finance_entitlement_usage_entries finance_settings
+    finance_document_counters finance_refund_receipts finance_reconciliation_records
+    finance_accounting_exports
     review_questionnaires reviews review_answers
     messaging_threads
     messaging_participants messaging_messages seasonal_challenges
