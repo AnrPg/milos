@@ -1,17 +1,27 @@
 defmodule MilosTraining.Application.DeleteSeasonalChallenge do
-  alias MilosTraining.Application.{BroadcastUserSync, InvalidateLandingPages}
-  alias MilosTraining.{Gamification, Identity}
+  alias MilosTraining.Application.{
+    BroadcastUserSync,
+    InvalidateLandingPages,
+    TenantStaffRecipients
+  }
 
-  def call(id) do
-    with :ok <- Gamification.delete_seasonal_challenge(id) do
+  alias MilosTraining.Gamification
+
+  def call(context, id) do
+    with :ok <-
+           Gamification.with_tenant_context(context, fn ->
+             Gamification.delete_seasonal_challenge(id)
+           end) do
       InvalidateLandingPages.for_all_users()
-      broadcast_admin_refresh("challenge_deleted", id)
+      broadcast_admin_refresh(context, "challenge_deleted", id)
       :ok
     end
   end
 
-  defp broadcast_admin_refresh(reason, challenge_id) do
-    admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
+  def call(_id), do: {:error, :organization_context_required}
+
+  defp broadcast_admin_refresh(context, reason, challenge_id) do
+    admin_ids = TenantStaffRecipients.user_ids(context)
 
     BroadcastUserSync.for_users(
       admin_ids,

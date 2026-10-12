@@ -1,5 +1,10 @@
 defmodule MilosTraining.Application.CompleteWorkout do
-  alias MilosTraining.Application.{BroadcastUserSync, InvalidateLandingPages}
+  alias MilosTraining.Application.{
+    BroadcastUserSync,
+    InvalidateLandingPages,
+    TenantStaffRecipients
+  }
+
   alias MilosTraining.{Execution, Gamification, Identity, Notifications, Workouts}
   alias MilosTraining.Execution.ExecutionStore
   alias MilosTraining.Workers.ProcessWorkoutCompletionJob
@@ -38,7 +43,7 @@ defmodule MilosTraining.Application.CompleteWorkout do
       |> Enum.sort_by(&DateTime.to_unix(&1.completed_at_utc, :microsecond))
 
     workout_lookup = build_workout_lookup(completed_executions)
-    admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
+    admin_ids = TenantStaffRecipients.user_ids(execution)
 
     case Gamification.record_workout_completion(%{
            execution: execution,

@@ -74,7 +74,7 @@ defmodule MilosTrainingWeb.MyWorkoutController do
   def reject(conn, %{"id" => assignment_id}) do
     user = GuardianPlug.current_resource(conn)
 
-    case RejectAssignedWorkout.call(assignment_id, user.id) do
+    case RejectAssignedWorkout.call(conn.assigns.tenant_context, assignment_id, user.id) do
       {:ok, assignment} -> json(conn, %{assignment: assignment})
       {:error, :not_found} -> {:error, :not_found}
       {:error, :already_rejected} -> {:error, :unprocessable_entity}

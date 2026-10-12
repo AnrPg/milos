@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.DuplicateWorkout do
-  alias MilosTraining.Application.BroadcastUserSync
+  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients}
   alias MilosTraining.Identity
   alias MilosTraining.Scheduling
   alias MilosTraining.Workouts
@@ -18,7 +18,7 @@ defmodule MilosTraining.Application.DuplicateWorkout do
     attrs = opts |> Keyword.take([:folder_id]) |> Map.new()
 
     with {:ok, draft} <- duplicate_workout(context, id, title_suffix, attrs) do
-      broadcast_admin_refresh(context, "workout_duplicated", draft.id)
+      broadcast_admin_refresh(context, draft, "workout_duplicated")
       {:ok, draft}
     end
   end
@@ -63,21 +63,12 @@ defmodule MilosTraining.Application.DuplicateWorkout do
   defp format_date(date) when is_binary(date), do: date
   defp format_date(_), do: "unknown"
 
-  defp broadcast_admin_refresh(%{organization_id: organization_id}, reason, draft_id) do
-    admin_ids = MilosTraining.Organizations.list_staff_user_ids(organization_id)
+  defp broadcast_admin_refresh(context, draft, reason) do
+    admin_ids = TenantStaffRecipients.user_ids([context, draft])
 
     BroadcastUserSync.for_users(admin_ids, ["admin_workouts"],
       reason: reason,
-      payload: %{draft_id: draft_id}
-    )
-  end
-
-  defp broadcast_admin_refresh(_context, reason, draft_id) do
-    admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
-
-    BroadcastUserSync.for_users(admin_ids, ["admin_workouts"],
-      reason: reason,
-      payload: %{draft_id: draft_id}
+      payload: %{draft_id: draft.id}
     )
   end
 

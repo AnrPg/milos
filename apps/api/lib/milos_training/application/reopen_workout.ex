@@ -1,16 +1,24 @@
 defmodule MilosTraining.Application.ReopenWorkout do
-  alias MilosTraining.Application.BroadcastUserSync
-  alias MilosTraining.{Identity, Workouts}
+  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients}
+  alias MilosTraining.Workouts
 
-  def call(id) do
-    with {:ok, draft} <- Workouts.reopen_workout(id) do
-      broadcast_admin_refresh("workout_reopened", draft.id)
+  def call(context, id) do
+    with {:ok, draft} <-
+           Workouts.with_tenant_context(context, fn -> Workouts.reopen_workout(id) end) do
+      broadcast_admin_refresh([context, draft], "workout_reopened", draft.id)
       {:ok, draft}
     end
   end
 
-  defp broadcast_admin_refresh(reason, draft_id) do
-    admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
+  def call(id) do
+    with {:ok, draft} <- Workouts.reopen_workout(id) do
+      broadcast_admin_refresh([draft], "workout_reopened", draft.id)
+      {:ok, draft}
+    end
+  end
+
+  defp broadcast_admin_refresh(sources, reason, draft_id) do
+    admin_ids = TenantStaffRecipients.user_ids(sources)
 
     BroadcastUserSync.for_users(admin_ids, ["admin_workouts"],
       reason: reason,

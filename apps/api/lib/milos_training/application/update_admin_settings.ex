@@ -1,6 +1,11 @@
 defmodule MilosTraining.Application.UpdateAdminSettings do
-  alias MilosTraining.Application.{BroadcastUserSync, InvalidateLandingPages}
-  alias MilosTraining.{Finance, Gamification, Identity, Notifications, Scheduling}
+  alias MilosTraining.Application.{
+    BroadcastUserSync,
+    InvalidateLandingPages,
+    TenantStaffRecipients
+  }
+
+  alias MilosTraining.{Finance, Gamification, Notifications, Scheduling}
 
   def call(context, params) do
     do_call(context, params)
@@ -19,7 +24,7 @@ defmodule MilosTraining.Application.UpdateAdminSettings do
          {:ok, notification_settings} <- maybe_update_notifications(notification_params),
          {:ok, scheduling_settings} <- maybe_update_scheduling(context, scheduling_params) do
       InvalidateLandingPages.for_all_users()
-      admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
+      admin_ids = TenantStaffRecipients.user_ids(context)
       BroadcastUserSync.for_users(admin_ids, ["admin_settings"], reason: "admin_settings_updated")
 
       {:ok,

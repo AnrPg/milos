@@ -1,12 +1,20 @@
 defmodule MilosTraining.Application.RejectAssignedWorkout do
-  alias MilosTraining.Application.BroadcastUserSync
+  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients}
   alias MilosTraining.{Identity, Notifications, Workouts}
 
-  def call(assignment_id, athlete_id) do
+  def call(context, assignment_id, athlete_id) do
+    Workouts.with_tenant_context(context, fn ->
+      do_call(context, assignment_id, athlete_id)
+    end)
+  end
+
+  def call(assignment_id, athlete_id), do: do_call(nil, assignment_id, athlete_id)
+
+  defp do_call(context, assignment_id, athlete_id) do
     with {:ok, assignment} <- Workouts.reject_assignment_for_athlete(assignment_id, athlete_id) do
       athlete = Identity.find_by_id(athlete_id)
       dispatch_rejected_notification(assignment, athlete)
-      broadcast_assignment_refresh(assignment)
+      broadcast_assignment_refresh(context, assignment)
       {:ok, assignment}
     end
   end
@@ -27,8 +35,8 @@ defmodule MilosTraining.Application.RejectAssignedWorkout do
     })
   end
 
-  defp broadcast_assignment_refresh(assignment) do
-    admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
+  defp broadcast_assignment_refresh(context, assignment) do
+    admin_ids = TenantStaffRecipients.user_ids([context, assignment])
 
     BroadcastUserSync.for_users(
       (Map.get(assignment, :athlete_ids, []) || []) ++ admin_ids,

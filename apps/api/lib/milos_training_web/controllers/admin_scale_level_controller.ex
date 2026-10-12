@@ -115,7 +115,7 @@ defmodule MilosTrainingWeb.AdminScaleLevelController do
         Map.get(params, :scale_levels) ||
         []
 
-    case ReplaceScaleLevels.call(levels) do
+    case ReplaceScaleLevels.call(conn.assigns.tenant_context, levels) do
       {:ok, scale_levels} -> json(conn, %{scale_levels: scale_levels})
       error -> error
     end

@@ -1,8 +1,8 @@
 defmodule MilosTraining.Application.PublishWorkout do
   require Logger
 
-  alias MilosTraining.Application.BroadcastUserSync
-  alias MilosTraining.{Identity, Notifications, Organizations, Scheduling, Workouts}
+  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients}
+  alias MilosTraining.{Notifications, Organizations, Scheduling, Workouts}
 
   def call(%{organization_id: _} = context, id, params) do
     substitute_for = parse_substitute_for(params)
@@ -17,7 +17,7 @@ defmodule MilosTraining.Application.PublishWorkout do
          :ok <- apply_substitution(context, substitute_for, workout.id) do
       Workouts.delete_superseded_drafts(context, id, workout.created_by_id)
       maybe_notify(is_republish, substitute_for, assignment_targets, booking_targets, workout)
-      broadcast_admin_workout_refresh(workout.id)
+      broadcast_admin_workout_refresh(context, workout.id)
 
       maybe_broadcast_view_refresh(
         is_republish,
@@ -104,7 +104,7 @@ defmodule MilosTraining.Application.PublishWorkout do
          slot_ids,
          workout
        ) do
-    broadcast_assignment_sync(assignment_targets, "workout_republished", workout.id)
+    broadcast_assignment_sync(assignment_targets, "workout_republished", workout)
     broadcast_schedule_refresh(slot_ids, workout)
   end
 
@@ -119,7 +119,7 @@ defmodule MilosTraining.Application.PublishWorkout do
     broadcast_assignment_sync(
       Enum.map(athlete_ids, &%{user_id: &1}),
       "assignment_workout_substituted",
-      workout.id,
+      workout,
       assignment_id
     )
   end
@@ -145,11 +145,11 @@ defmodule MilosTraining.Application.PublishWorkout do
        ),
        do: :ok
 
-  defp broadcast_assignment_sync(targets, reason, workout_id, assignment_id \\ nil) do
-    admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
+  defp broadcast_assignment_sync(targets, reason, workout, assignment_id \\ nil) do
+    admin_ids = TenantStaffRecipients.user_ids(workout)
 
     payload =
-      %{workout_id: workout_id}
+      %{workout_id: workout.id}
       |> maybe_put(:assigned_workout_id, assignment_id)
 
     targets
@@ -216,8 +216,8 @@ defmodule MilosTraining.Application.PublishWorkout do
   defp maybe_put(map, _key, nil), do: map
   defp maybe_put(map, key, value), do: Map.put(map, key, value)
 
-  defp broadcast_admin_workout_refresh(workout_id) do
-    admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
+  defp broadcast_admin_workout_refresh(context, workout_id) do
+    admin_ids = TenantStaffRecipients.user_ids(context)
 
     BroadcastUserSync.for_users(admin_ids, ["admin_workouts"],
       reason: "workout_published",
