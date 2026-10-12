@@ -1,5 +1,12 @@
 import { apiRequest } from "@/api/client";
-import type { paths } from "@/api/generated/schema";
+import type { operations, paths } from "@/api/generated/schema";
+
+type CreateBookingRequest = NonNullable<
+  operations["MilosTrainingWeb.ScheduleController.create_booking"]["requestBody"]
+>["content"]["application/json"];
+type ResolveBookingRequest = NonNullable<
+  operations["MilosTrainingWeb.AdminScheduleController.approve_booking"]["requestBody"]
+>["content"]["application/json"];
 
 type ScheduleQuery = NonNullable<
   paths["/api/org/{organization_slug}/schedule"]["get"]["parameters"]["query"]
@@ -171,11 +178,28 @@ export async function archiveClassType(token: string, id: string, replacementCla
   return response.class_type;
 }
 
-export async function createBooking(token: string, slotId: string) {
-  const response = await apiRequest<{ booking: ScheduleBooking }>("/bookings", {
+/**
+ * Offline-replay options (ADR-102). `clientOperationId` makes the command
+ * idempotent on the server; `organizationSlug` pins a replay to the tenant
+ * the user acted in, even if they switched organizations meanwhile.
+ */
+export type CommandReplayOptions = {
+  clientOperationId?: string;
+  organizationSlug?: string | null;
+};
+
+function pinnedPath(path: string, options?: CommandReplayOptions) {
+  return options?.organizationSlug ? `/org/${options.organizationSlug}${path}` : path;
+}
+
+export async function createBooking(token: string, slotId: string, options?: CommandReplayOptions) {
+  const body: CreateBookingRequest = { slot_id: slotId };
+  if (options?.clientOperationId) body.client_operation_id = options.clientOperationId;
+
+  const response = await apiRequest<{ booking: ScheduleBooking }>(pinnedPath("/bookings", options), {
     method: "POST",
     token,
-    body: { slot_id: slotId },
+    body,
   });
 
   return response.booking;
@@ -231,24 +255,39 @@ export async function deleteScheduleSlot(token: string, slotId: string) {
   });
 }
 
-export async function approveBooking(token: string, bookingId: string, adminMessage?: string) {
-  const response = await apiRequest<{ booking: ScheduleBooking }>(`/admin/bookings/${bookingId}/approve`, {
-    method: "PATCH",
-    token,
-    body: adminMessage ? { admin_message: adminMessage } : {},
-  });
+export async function approveBooking(
+  token: string,
+  bookingId: string,
+  adminMessage?: string,
+  options?: CommandReplayOptions,
+) {
+  const response = await apiRequest<{ booking: ScheduleBooking }>(
+    pinnedPath(`/admin/bookings/${bookingId}/approve`, options),
+    { method: "PATCH", token, body: resolutionBody(adminMessage, options) },
+  );
 
   return response.booking;
 }
 
-export async function rejectBooking(token: string, bookingId: string, adminMessage?: string) {
-  const response = await apiRequest<{ booking: ScheduleBooking }>(`/admin/bookings/${bookingId}/reject`, {
-    method: "PATCH",
-    token,
-    body: adminMessage ? { admin_message: adminMessage } : {},
-  });
+export async function rejectBooking(
+  token: string,
+  bookingId: string,
+  adminMessage?: string,
+  options?: CommandReplayOptions,
+) {
+  const response = await apiRequest<{ booking: ScheduleBooking }>(
+    pinnedPath(`/admin/bookings/${bookingId}/reject`, options),
+    { method: "PATCH", token, body: resolutionBody(adminMessage, options) },
+  );
 
   return response.booking;
+}
+
+function resolutionBody(adminMessage: string | undefined, options?: CommandReplayOptions) {
+  const body: ResolveBookingRequest = {};
+  if (adminMessage) body.admin_message = adminMessage;
+  if (options?.clientOperationId) body.client_operation_id = options.clientOperationId;
+  return body;
 }
 
 export async function cancelBooking(token: string, bookingId: string) {

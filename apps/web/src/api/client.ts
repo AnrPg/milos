@@ -85,6 +85,11 @@ function organizationSlugForRequest(token?: string | null) {
   return organizationSlugFromPath() ?? selectedOrganizationSlug() ?? organizationSlugFromToken(token);
 }
 
+/** The organization a tenant-scoped request would target right now. */
+export function currentOrganizationSlug(token?: string | null) {
+  return organizationSlugForRequest(token);
+}
+
 const TENANT_SCOPED_PREFIXES = [
   "/admin",
   "/bookings",

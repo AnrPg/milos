@@ -35,8 +35,13 @@ export async function fetchTrainingLogSources(token: string): Promise<TrainingLo
 export async function createTrainingLogEntry(
   token: string,
   body: CreateTrainingLogRequest,
+  options?: { organizationSlug?: string | null },
 ): Promise<TrainingLogEntry> {
-  const data = await apiRequest<EntryResponse>(`${BASE}/entries`, { method: "POST", token, body });
+  // ADR-102: an outbox replay pins the tenant the entry was logged in.
+  const path = options?.organizationSlug
+    ? `/org/${options.organizationSlug}${BASE}/entries`
+    : `${BASE}/entries`;
+  const data = await apiRequest<EntryResponse>(path, { method: "POST", token, body });
   return data.entry;
 }
 
