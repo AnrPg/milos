@@ -87,6 +87,20 @@ defmodule MilosTraining.Organizations do
 
   def member_roles(_organization_id, _user_id), do: []
 
+  @doc "A member's roles and coach scope in the gym, or nil (ADR-099, ADR-100)."
+  def membership_summary(organization_id, user_id) do
+    case OrganizationStore.get_membership(organization_id, user_id) do
+      %{status: :active} = membership ->
+        %{
+          roles: Enum.map(membership.roles, &to_string/1),
+          coach_scope: to_string(membership.coach_scope || :own)
+        }
+
+      _none ->
+        nil
+    end
+  end
+
   @doc "Whether a coach lets admins read their private notes (ADR-101)."
   def notes_visible_to_admins?(organization_id, user_id) do
     case OrganizationStore.get_membership(organization_id, user_id) do

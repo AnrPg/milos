@@ -28,6 +28,10 @@ import { THEME_UPDATED_EVENT } from "@/components/theme-provider";
 import { APP_THEMES, THEME_SLUGS, normalizeThemeSlug, type ThemeSlug } from "@/lib/theme";
 import { ClassTypeSettings } from "@/components/admin/ClassTypeSettings";
 import { LocationSettings } from "@/components/admin/LocationSettings";
+import { RoleAccessSettings } from "@/components/admin/RoleAccessSettings";
+import { OrganizationOwnerSettings } from "@/components/admin/OrganizationOwnerSettings";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { can } from "@/lib/role-navigation";
 import { TransientHero } from "@/components/TransientHero";
 import { IntegerInput } from "@/components/integer-input";
 
@@ -1204,8 +1208,9 @@ function NotificationsSection({ token }: { token: string }) {
 
 export function AdminSettingsHub() {
   const i18n = useUiTranslations();
-  const { tokens } = useSession();
+  const { tokens, currentUser } = useSession();
   const token = tokens?.access_token;
+  const { membership, selectedOrganizationSlug } = useSelectedMembershipRole();
 
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
@@ -1283,6 +1288,28 @@ export function AdminSettingsHub() {
             >
               <SchedulingDefaultsSection token={token} />
             </CollapsibleSection>
+
+            {can(membership, "grant_staff_roles") ? (
+              <CollapsibleSection
+                id="role-access"
+                title={i18n("roleAccessTitle")}
+                description={i18n("roleAccessDescription")}
+                defaultOpen={false}
+              >
+                <RoleAccessSettings token={token} />
+              </CollapsibleSection>
+            ) : null}
+
+            {can(membership, "manage_organization_lifecycle") ? (
+              <CollapsibleSection
+                id="organization"
+                title={i18n("orgSettingsTitle")}
+                description={i18n("orgSettingsDescription")}
+                defaultOpen={false}
+              >
+                <OrganizationOwnerSettings token={token} slug={selectedOrganizationSlug} currentUserId={currentUser?.id} />
+              </CollapsibleSection>
+            ) : null}
 
             <CollapsibleSection
               id="level-taxonomy"

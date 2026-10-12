@@ -40,6 +40,7 @@ import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { allowanceLabel, localizeError, semanticLabel } from "@/i18n/presentation";
+import { MemberRolesEditor } from "@/components/admin/users/MemberRolesEditor";
 import { useUiTranslations } from "@/i18n/ui";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { UserProgrammingSchedule } from "@/components/admin/users/UserProgrammingSchedule";
@@ -599,6 +600,9 @@ export function AdminUserProfile({ userId }: { userId: string }) {
           {sections.has("admin_actions") ? (
             <Panel id="admin_actions" title={i18n("adminActionsfa81c61")}>
               <div className="space-y-5">
+                {profile.membership && token ? (
+                  <MemberRolesEditor token={token} userId={userId} membership={profile.membership} />
+                ) : (
                 <div>
                   <span className="block text-xs uppercase tracking-wider" style={{ color: "var(--muted)" }}>{i18n("accountRole39514a0")}</span>
                   <div className="mt-2 flex flex-wrap gap-2">
@@ -620,6 +624,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
                   </div>
                   {roleMutation.isError ? <p className="mt-2" style={{ color: "var(--danger)" }}>{i18n("roleUpdateFailed493da52")}</p> : null}
                 </div>
+                )}
                 <div className="rounded-2xl p-4" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
                   <button
                     type="button"

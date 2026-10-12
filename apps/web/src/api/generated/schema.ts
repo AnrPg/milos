@@ -5118,6 +5118,8 @@ export interface operations {
                         coach_scope?: "own" | "all";
                         /** Format: uuid */
                         id: string;
+                        /** @description ADR-101 */
+                        notes_visible_to_admins?: boolean;
                         organization: {
                             /** Format: uuid */
                             id: string;
@@ -17758,6 +17760,8 @@ export interface operations {
                         coach_scope?: "own" | "all";
                         /** Format: uuid */
                         id: string;
+                        /** @description ADR-101 */
+                        notes_visible_to_admins?: boolean;
                         organization: {
                             /** Format: uuid */
                             id: string;

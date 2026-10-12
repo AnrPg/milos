@@ -3468,6 +3468,10 @@
                       "format": "uuid",
                       "type": "string"
                     },
+                    "notes_visible_to_admins": {
+                      "description": "ADR-101",
+                      "type": "boolean"
+                    },
                     "organization": {
                       "properties": {
                         "id": {
@@ -36740,6 +36744,10 @@
                       "id": {
                         "format": "uuid",
                         "type": "string"
+                      },
+                      "notes_visible_to_admins": {
+                        "description": "ADR-101",
+                        "type": "boolean"
                       },
                       "organization": {
                         "properties": {
