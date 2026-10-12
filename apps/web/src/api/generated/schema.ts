@@ -524,6 +524,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/pr-sharing/grants/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Stop sharing my PRs with an account */
+        delete: operations["MilosTrainingWeb.PRSharingController.revoke_grant"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/workouts/dsl/manual": {
         parameters: {
             query?: never;
@@ -590,6 +607,40 @@ export interface paths {
         head?: never;
         /** Void a finance invoice */
         patch: operations["MilosTrainingWeb.AdminFinanceController.void_invoice"];
+        trace?: never;
+    };
+    "/api/pr-sharing/shared-with-me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** PRs other accounts have shared with me */
+        get: operations["MilosTrainingWeb.PRSharingController.shared_with_me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/pr-sharing/coach-visibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Allow or stop gym coaches reading my PRs */
+        put: operations["MilosTrainingWeb.PRSharingController.update_coach_visibility"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/org/{organization_slug}/me/threads/{id}": {
@@ -745,6 +796,23 @@ export interface paths {
         head?: never;
         /** Update a membership package */
         patch: operations["MilosTrainingWeb.AdminFinanceController.update_package"];
+        trace?: never;
+    };
+    "/api/pr-sharing/grants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Share all my PRs (read-only) with another account */
+        post: operations["MilosTrainingWeb.PRSharingController.create_grant"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/finance/members/{id}/credits": {
@@ -1834,6 +1902,23 @@ export interface paths {
         post?: never;
         /** Permanently delete an organization */
         delete: operations["MilosTrainingWeb.PlatformOrganizationController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/pr-sharing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get my PR sharing settings */
+        get: operations["MilosTrainingWeb.PRSharingController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -6211,6 +6296,42 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PRSharingController.revoke_grant": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Grant ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Revoked */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminWorkoutDslController.manual": {
         parameters: {
             query?: never;
@@ -6393,6 +6514,125 @@ export interface operations {
         responses: {
             /** @description Finance invoice */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PRSharingController.shared_with_me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Shared PRs */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        shared: {
+                            /** Format: uuid */
+                            grant_id: string;
+                            owner: {
+                                avatar_url?: string | null;
+                                display_nickname: string;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string;
+                            };
+                            prs: {
+                                /** Format: date */
+                                beaten_on: string;
+                                current_score: number;
+                                higher_is_better: boolean;
+                                history: {
+                                    /** Format: date */
+                                    beaten_on: string;
+                                    /** Format: uuid */
+                                    id: string;
+                                    /** Format: date-time */
+                                    inserted_at?: string;
+                                    notes?: string | null;
+                                    score: number;
+                                    supporting_metrics?: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                notes?: string | null;
+                                /** Format: uuid */
+                                organization_id?: string | null;
+                                supporting_metrics?: {
+                                    [key: string]: unknown;
+                                };
+                                unit: string;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            }[];
+                            /** Format: date-time */
+                            shared_at: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PRSharingController.update_coach_visibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Coach visibility */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    coach_visibility: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description PR sharing settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description When true (default), coaches of the gym a PR was recorded in can read it while you are an active member there. */
+                        coach_visibility: boolean;
+                        grants: {
+                            /** Format: date-time */
+                            created_at: string;
+                            grantee: {
+                                avatar_url?: string | null;
+                                display_nickname: string;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string;
+                            };
+                            /** Format: uuid */
+                            id: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description Error */
+            400: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6854,6 +7094,79 @@ export interface operations {
         responses: {
             /** @description Membership package */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PRSharingController.create_grant": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Grant */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    grantee_user_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Grant */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        created_at: string;
+                        grantee: {
+                            avatar_url?: string | null;
+                            display_nickname: string;
+                            /** Format: uuid */
+                            id: string;
+                            nickname: string;
+                        };
+                        /** Format: uuid */
+                        id: string;
+                    };
+                };
+            };
+            /** @description Error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7839,6 +8152,11 @@ export interface operations {
                         })[];
                         /** Format: uuid */
                         user_id: string;
+                        /**
+                         * @description ADR-111: `coach` - PRs recorded in this gym that the member shares with its coaches; `coach_role_required` - the caller is staff but not a coach of this gym, so no PRs are returned.
+                         * @enum {string}
+                         */
+                        visibility: "coach" | "coach_role_required";
                     };
                 };
             };
@@ -13053,6 +13371,42 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PRSharingController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description PR sharing settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description When true (default), coaches of the gym a PR was recorded in can read it while you are an active member there. */
+                        coach_visibility: boolean;
+                        grants: {
+                            /** Format: date-time */
+                            created_at: string;
+                            grantee: {
+                                avatar_url?: string | null;
+                                display_nickname: string;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string;
+                            };
+                            /** Format: uuid */
+                            id: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.PRController.index": {
         parameters: {
             query?: {
@@ -13092,6 +13446,8 @@ export interface operations {
                     higher_is_better?: boolean;
                     name: string;
                     notes?: string;
+                    /** @description Gym the PR was achieved in (ADR-111). Must be one of the caller's active memberships; the gym's coaches can then read it. Omit for a personal PR. */
+                    organization_slug?: string | null;
                     /** @description Optional typed result context. Accepted keys: reps, sets, load_kg, duration_seconds, distance_m, calories, rounds, variation. */
                     supporting_metrics?: Record<string, never>;
                     /** @enum {string} */

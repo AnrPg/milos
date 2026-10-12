@@ -8960,6 +8960,57 @@
         ]
       }
     },
+    "/api/pr-sharing/grants/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PRSharingController.revoke_grant",
+        "parameters": [
+          {
+            "description": "Grant ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Revoked"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Stop sharing my PRs with an account",
+        "tags": [
+          "Pantheon"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/workouts/dsl/manual": {
       "get": {
         "callbacks": {},
@@ -9353,6 +9404,288 @@
         "summary": "Void a finance invoice",
         "tags": [
           "Admin Finance"
+        ]
+      }
+    },
+    "/api/pr-sharing/shared-with-me": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PRSharingController.shared_with_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "shared": {
+                      "items": {
+                        "properties": {
+                          "grant_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "owner": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "display_nickname": {
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname",
+                              "display_nickname"
+                            ],
+                            "type": "object"
+                          },
+                          "prs": {
+                            "items": {
+                              "properties": {
+                                "beaten_on": {
+                                  "format": "date",
+                                  "type": "string"
+                                },
+                                "current_score": {
+                                  "type": "number"
+                                },
+                                "higher_is_better": {
+                                  "type": "boolean"
+                                },
+                                "history": {
+                                  "items": {
+                                    "properties": {
+                                      "beaten_on": {
+                                        "format": "date",
+                                        "type": "string"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "type": "string"
+                                      },
+                                      "inserted_at": {
+                                        "format": "date-time",
+                                        "type": "string"
+                                      },
+                                      "notes": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "score": {
+                                        "type": "number"
+                                      },
+                                      "supporting_metrics": {
+                                        "additionalProperties": true,
+                                        "type": "object"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "score",
+                                      "beaten_on"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "notes": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "organization_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "supporting_metrics": {
+                                  "additionalProperties": true,
+                                  "type": "object"
+                                },
+                                "unit": {
+                                  "type": "string"
+                                },
+                                "updated_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "name",
+                                "current_score",
+                                "unit",
+                                "higher_is_better",
+                                "beaten_on",
+                                "history"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "shared_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "grant_id",
+                          "shared_at",
+                          "owner",
+                          "prs"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "shared"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Shared PRs"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "PRs other accounts have shared with me",
+        "tags": [
+          "Pantheon"
+        ]
+      }
+    },
+    "/api/pr-sharing/coach-visibility": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PRSharingController.update_coach_visibility",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "coach_visibility": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "coach_visibility"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Coach visibility",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "coach_visibility": {
+                      "description": "When true (default), coaches of the gym a PR was recorded in can read it while you are an active member there.",
+                      "type": "boolean"
+                    },
+                    "grants": {
+                      "items": {
+                        "properties": {
+                          "created_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "grantee": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "display_nickname": {
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname",
+                              "display_nickname"
+                            ],
+                            "type": "object"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "created_at",
+                          "grantee"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "coach_visibility",
+                    "grants"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "PR sharing settings"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Allow or stop gym coaches reading my PRs",
+        "tags": [
+          "Pantheon"
         ]
       }
     },
@@ -10445,6 +10778,126 @@
         "summary": "Update a membership package",
         "tags": [
           "Admin Finance"
+        ]
+      }
+    },
+    "/api/pr-sharing/grants": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PRSharingController.create_grant",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "grantee_user_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "grantee_user_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Grant",
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "created_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "grantee": {
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "display_nickname": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "nickname",
+                        "display_nickname"
+                      ],
+                      "type": "object"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "created_at",
+                    "grantee"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Grant"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Share all my PRs (read-only) with another account",
+        "tags": [
+          "Pantheon"
         ]
       }
     },
@@ -12728,10 +13181,19 @@
                     "user_id": {
                       "format": "uuid",
                       "type": "string"
+                    },
+                    "visibility": {
+                      "description": "ADR-111: `coach` - PRs recorded in this gym that the member shares with its coaches; `coach_role_required` - the caller is staff but not a coach of this gym, so no PRs are returned.",
+                      "enum": [
+                        "coach",
+                        "coach_role_required"
+                      ],
+                      "type": "string"
                     }
                   },
                   "required": [
                     "user_id",
+                    "visibility",
                     "prs"
                   ],
                   "type": "object"
@@ -28459,6 +28921,89 @@
         ]
       }
     },
+    "/api/pr-sharing": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PRSharingController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "coach_visibility": {
+                      "description": "When true (default), coaches of the gym a PR was recorded in can read it while you are an active member there.",
+                      "type": "boolean"
+                    },
+                    "grants": {
+                      "items": {
+                        "properties": {
+                          "created_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "grantee": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "display_nickname": {
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname",
+                              "display_nickname"
+                            ],
+                            "type": "object"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "created_at",
+                          "grantee"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "coach_visibility",
+                    "grants"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "PR sharing settings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get my PR sharing settings",
+        "tags": [
+          "Pantheon"
+        ]
+      }
+    },
     "/api/prs": {
       "get": {
         "callbacks": {},
@@ -28519,6 +29064,11 @@
                   },
                   "notes": {
                     "maxLength": 2000,
+                    "type": "string"
+                  },
+                  "organization_slug": {
+                    "description": "Gym the PR was achieved in (ADR-111). Must be one of the caller's active memberships; the gym's coaches can then read it. Omit for a personal PR.",
+                    "nullable": true,
                     "type": "string"
                   },
                   "supporting_metrics": {
