@@ -4223,6 +4223,213 @@
         ]
       }
     },
+    "/api/platform/organizations/{id}/purge/resume": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationPurgeController.resume",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "purge": {
+                      "properties": {
+                        "approval_mode": {
+                          "enum": [
+                            "second_vendor",
+                            "typed_confirmation"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "approved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "approved_by_user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "cancelled_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "completed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "export_byte_size": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "export_completed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "export_sha256": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failed_stage": {
+                          "enum": [
+                            "export",
+                            "purge"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "organization_slug": {
+                          "type": "string"
+                        },
+                        "purge_started_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "requested_by_user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "retention_review": {
+                          "items": {
+                            "properties": {
+                              "basis": {
+                                "type": "string"
+                              },
+                              "context": {
+                                "type": "string"
+                              },
+                              "disposition": {
+                                "enum": [
+                                  "purge",
+                                  "retain",
+                                  "retain_anonymized"
+                                ],
+                                "type": "string"
+                              },
+                              "record_count": {
+                                "type": "integer"
+                              },
+                              "resources": {
+                                "items": {
+                                  "properties": {
+                                    "count": {
+                                      "type": "integer"
+                                    },
+                                    "resource": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "resource",
+                                    "count"
+                                  ],
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "retain_years": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "retained_until": {
+                                "format": "date",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "context",
+                              "disposition",
+                              "record_count",
+                              "resources"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "status": {
+                          "enum": [
+                            "requested",
+                            "exporting",
+                            "exported",
+                            "approved",
+                            "purging",
+                            "completed",
+                            "failed",
+                            "cancelled"
+                          ],
+                          "type": "string"
+                        },
+                        "steps": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "organization_id",
+                        "organization_slug",
+                        "status",
+                        "requested_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "purge"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Resumed purge"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Re-enqueue the export or purge stage of an open purge after a failure",
+        "tags": [
+          "Platform Organization Purges"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/me/threads": {
       "get": {
         "callbacks": {},
@@ -8994,6 +9201,206 @@
         ]
       }
     },
+    "/api/platform/organization-purges": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationPurgeController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "purges": {
+                      "items": {
+                        "properties": {
+                          "approval_mode": {
+                            "enum": [
+                              "second_vendor",
+                              "typed_confirmation"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "approved_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "approved_by_user_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "cancelled_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "completed_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "export_byte_size": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "export_completed_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "export_sha256": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "failed_stage": {
+                            "enum": [
+                              "export",
+                              "purge"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "failure_reason": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "organization_slug": {
+                            "type": "string"
+                          },
+                          "purge_started_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "requested_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "requested_by_user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "retention_review": {
+                            "items": {
+                              "properties": {
+                                "basis": {
+                                  "type": "string"
+                                },
+                                "context": {
+                                  "type": "string"
+                                },
+                                "disposition": {
+                                  "enum": [
+                                    "purge",
+                                    "retain",
+                                    "retain_anonymized"
+                                  ],
+                                  "type": "string"
+                                },
+                                "record_count": {
+                                  "type": "integer"
+                                },
+                                "resources": {
+                                  "items": {
+                                    "properties": {
+                                      "count": {
+                                        "type": "integer"
+                                      },
+                                      "resource": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "resource",
+                                      "count"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "retain_years": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "retained_until": {
+                                  "format": "date",
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "context",
+                                "disposition",
+                                "record_count",
+                                "resources"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "status": {
+                            "enum": [
+                              "requested",
+                              "exporting",
+                              "exported",
+                              "approved",
+                              "purging",
+                              "completed",
+                              "failed",
+                              "cancelled"
+                            ],
+                            "type": "string"
+                          },
+                          "steps": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "organization_id",
+                          "organization_slug",
+                          "status",
+                          "requested_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "purges"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Purges"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Recent purge records (audit trail that survives purged organizations)",
+        "tags": [
+          "Platform Organization Purges"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/me/invoices/{id}/download-url": {
       "get": {
         "callbacks": {},
@@ -9050,6 +9457,213 @@
         "summary": "Get a presigned download URL for one of the current member's invoices",
         "tags": [
           "Member Finance"
+        ]
+      }
+    },
+    "/api/platform/organizations/{id}/purge/cancel": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationPurgeController.cancel",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "purge": {
+                      "properties": {
+                        "approval_mode": {
+                          "enum": [
+                            "second_vendor",
+                            "typed_confirmation"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "approved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "approved_by_user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "cancelled_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "completed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "export_byte_size": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "export_completed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "export_sha256": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failed_stage": {
+                          "enum": [
+                            "export",
+                            "purge"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "organization_slug": {
+                          "type": "string"
+                        },
+                        "purge_started_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "requested_by_user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "retention_review": {
+                          "items": {
+                            "properties": {
+                              "basis": {
+                                "type": "string"
+                              },
+                              "context": {
+                                "type": "string"
+                              },
+                              "disposition": {
+                                "enum": [
+                                  "purge",
+                                  "retain",
+                                  "retain_anonymized"
+                                ],
+                                "type": "string"
+                              },
+                              "record_count": {
+                                "type": "integer"
+                              },
+                              "resources": {
+                                "items": {
+                                  "properties": {
+                                    "count": {
+                                      "type": "integer"
+                                    },
+                                    "resource": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "resource",
+                                    "count"
+                                  ],
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "retain_years": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "retained_until": {
+                                "format": "date",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "context",
+                              "disposition",
+                              "record_count",
+                              "resources"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "status": {
+                          "enum": [
+                            "requested",
+                            "exporting",
+                            "exported",
+                            "approved",
+                            "purging",
+                            "completed",
+                            "failed",
+                            "cancelled"
+                          ],
+                          "type": "string"
+                        },
+                        "steps": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "organization_id",
+                        "organization_slug",
+                        "status",
+                        "requested_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "purge"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Cancelled purge"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Cancel a purge that has not been approved and delete its export",
+        "tags": [
+          "Platform Organization Purges"
         ]
       }
     },
@@ -22827,6 +23441,443 @@
         ]
       }
     },
+    "/api/platform/organizations/{id}/purge": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationPurgeController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "export_download_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "purge": {
+                      "properties": {
+                        "approval_mode": {
+                          "enum": [
+                            "second_vendor",
+                            "typed_confirmation"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "approved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "approved_by_user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "cancelled_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "completed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "export_byte_size": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "export_completed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "export_sha256": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failed_stage": {
+                          "enum": [
+                            "export",
+                            "purge"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "organization_slug": {
+                          "type": "string"
+                        },
+                        "purge_started_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "requested_by_user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "retention_review": {
+                          "items": {
+                            "properties": {
+                              "basis": {
+                                "type": "string"
+                              },
+                              "context": {
+                                "type": "string"
+                              },
+                              "disposition": {
+                                "enum": [
+                                  "purge",
+                                  "retain",
+                                  "retain_anonymized"
+                                ],
+                                "type": "string"
+                              },
+                              "record_count": {
+                                "type": "integer"
+                              },
+                              "resources": {
+                                "items": {
+                                  "properties": {
+                                    "count": {
+                                      "type": "integer"
+                                    },
+                                    "resource": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "resource",
+                                    "count"
+                                  ],
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "retain_years": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "retained_until": {
+                                "format": "date",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "context",
+                              "disposition",
+                              "record_count",
+                              "resources"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "status": {
+                          "enum": [
+                            "requested",
+                            "exporting",
+                            "exported",
+                            "approved",
+                            "purging",
+                            "completed",
+                            "failed",
+                            "cancelled"
+                          ],
+                          "type": "string"
+                        },
+                        "steps": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "organization_id",
+                        "organization_slug",
+                        "status",
+                        "requested_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "purge",
+                    "export_download_url"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Purge status"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No purge requested"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Latest purge status, retention review, and signed export link",
+        "tags": [
+          "Platform Organization Purges"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationPurgeController.create",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "purge": {
+                      "properties": {
+                        "approval_mode": {
+                          "enum": [
+                            "second_vendor",
+                            "typed_confirmation"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "approved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "approved_by_user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "cancelled_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "completed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "export_byte_size": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "export_completed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "export_sha256": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failed_stage": {
+                          "enum": [
+                            "export",
+                            "purge"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "organization_slug": {
+                          "type": "string"
+                        },
+                        "purge_started_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "requested_by_user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "retention_review": {
+                          "items": {
+                            "properties": {
+                              "basis": {
+                                "type": "string"
+                              },
+                              "context": {
+                                "type": "string"
+                              },
+                              "disposition": {
+                                "enum": [
+                                  "purge",
+                                  "retain",
+                                  "retain_anonymized"
+                                ],
+                                "type": "string"
+                              },
+                              "record_count": {
+                                "type": "integer"
+                              },
+                              "resources": {
+                                "items": {
+                                  "properties": {
+                                    "count": {
+                                      "type": "integer"
+                                    },
+                                    "resource": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "resource",
+                                    "count"
+                                  ],
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "retain_years": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "retained_until": {
+                                "format": "date",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "context",
+                              "disposition",
+                              "record_count",
+                              "resources"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "status": {
+                          "enum": [
+                            "requested",
+                            "exporting",
+                            "exported",
+                            "approved",
+                            "purging",
+                            "completed",
+                            "failed",
+                            "cancelled"
+                          ],
+                          "type": "string"
+                        },
+                        "steps": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "organization_id",
+                        "organization_slug",
+                        "status",
+                        "requested_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "purge"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Purge request"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "An open purge already exists"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Request a reviewed tenant purge (suspends the organization and starts the export)",
+        "tags": [
+          "Platform Organization Purges"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/users/{id}/allowance-extensions/{entry_id}/revoke": {
       "post": {
         "callbacks": {},
@@ -27730,6 +28781,251 @@
         "summary": "List assigned workouts for the current athlete or all athlete assignments for admins",
         "tags": [
           "Assigned Workouts"
+        ]
+      }
+    },
+    "/api/platform/organizations/{id}/purge/approve": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationPurgeController.approve",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "confirmation": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "confirmation"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "purge": {
+                      "properties": {
+                        "approval_mode": {
+                          "enum": [
+                            "second_vendor",
+                            "typed_confirmation"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "approved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "approved_by_user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "cancelled_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "completed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "export_byte_size": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "export_completed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "export_sha256": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failed_stage": {
+                          "enum": [
+                            "export",
+                            "purge"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "organization_slug": {
+                          "type": "string"
+                        },
+                        "purge_started_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "requested_by_user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "retention_review": {
+                          "items": {
+                            "properties": {
+                              "basis": {
+                                "type": "string"
+                              },
+                              "context": {
+                                "type": "string"
+                              },
+                              "disposition": {
+                                "enum": [
+                                  "purge",
+                                  "retain",
+                                  "retain_anonymized"
+                                ],
+                                "type": "string"
+                              },
+                              "record_count": {
+                                "type": "integer"
+                              },
+                              "resources": {
+                                "items": {
+                                  "properties": {
+                                    "count": {
+                                      "type": "integer"
+                                    },
+                                    "resource": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "resource",
+                                    "count"
+                                  ],
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "retain_years": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "retained_until": {
+                                "format": "date",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "context",
+                              "disposition",
+                              "record_count",
+                              "resources"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "status": {
+                          "enum": [
+                            "requested",
+                            "exporting",
+                            "exported",
+                            "approved",
+                            "purging",
+                            "completed",
+                            "failed",
+                            "cancelled"
+                          ],
+                          "type": "string"
+                        },
+                        "steps": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "organization_id",
+                        "organization_slug",
+                        "status",
+                        "requested_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "purge"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Approved purge"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Purge is not awaiting approval"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Confirmation mismatch"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Approve an exported purge by retyping the organization slug",
+        "tags": [
+          "Platform Organization Purges"
         ]
       }
     },

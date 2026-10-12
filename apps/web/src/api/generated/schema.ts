@@ -263,6 +263,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/platform/organizations/{id}/purge/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Re-enqueue the export or purge stage of an open purge after a failure */
+        post: operations["MilosTrainingWeb.PlatformOrganizationPurgeController.resume"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/threads": {
         parameters: {
             query?: never;
@@ -693,6 +710,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/platform/organization-purges": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Recent purge records (audit trail that survives purged organizations) */
+        get: operations["MilosTrainingWeb.PlatformOrganizationPurgeController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/invoices/{id}/download-url": {
         parameters: {
             query?: never;
@@ -704,6 +738,23 @@ export interface paths {
         get: operations["MilosTrainingWeb.MyFinanceController.invoice_download_url"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/organizations/{id}/purge/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel a purge that has not been approved and delete its export */
+        post: operations["MilosTrainingWeb.PlatformOrganizationPurgeController.cancel"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1454,6 +1505,24 @@ export interface paths {
         patch: operations["MilosTrainingWeb.AdminFinanceController.issue_invoice"];
         trace?: never;
     };
+    "/api/platform/organizations/{id}/purge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Latest purge status, retention review, and signed export link */
+        get: operations["MilosTrainingWeb.PlatformOrganizationPurgeController.show"];
+        put?: never;
+        /** Request a reviewed tenant purge (suspends the organization and starts the export) */
+        post: operations["MilosTrainingWeb.PlatformOrganizationPurgeController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/users/{id}/allowance-extensions/{entry_id}/revoke": {
         parameters: {
             query?: never;
@@ -2029,6 +2098,23 @@ export interface paths {
         get: operations["MilosTrainingWeb.MyWorkoutController.index"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/organizations/{id}/purge/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve an exported purge by retyping the organization slug */
+        post: operations["MilosTrainingWeb.PlatformOrganizationPurgeController.approve"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4255,6 +4341,78 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PlatformOrganizationPurgeController.resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Resumed purge */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        purge: {
+                            /** @enum {string|null} */
+                            approval_mode?: "second_vendor" | "typed_confirmation" | null;
+                            /** Format: date-time */
+                            approved_at?: string | null;
+                            /** Format: uuid */
+                            approved_by_user_id?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            export_byte_size?: number | null;
+                            /** Format: date-time */
+                            export_completed_at?: string | null;
+                            export_sha256?: string | null;
+                            /** @enum {string|null} */
+                            failed_stage?: "export" | "purge" | null;
+                            failure_reason?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            organization_slug: string;
+                            /** Format: date-time */
+                            purge_started_at?: string | null;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** Format: uuid */
+                            requested_by_user_id?: string;
+                            retention_review?: {
+                                basis?: string;
+                                context: string;
+                                /** @enum {string} */
+                                disposition: "purge" | "retain" | "retain_anonymized";
+                                record_count: number;
+                                resources: {
+                                    count: number;
+                                    resource: string;
+                                }[];
+                                retain_years?: number | null;
+                                /** Format: date */
+                                retained_until?: string | null;
+                            }[];
+                            /** @enum {string} */
+                            status: "requested" | "exporting" | "exported" | "approved" | "purging" | "completed" | "failed" | "cancelled";
+                            steps?: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.MessagingController.list_threads": {
         parameters: {
             query?: {
@@ -6092,6 +6250,76 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PlatformOrganizationPurgeController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Purges */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        purges: {
+                            /** @enum {string|null} */
+                            approval_mode?: "second_vendor" | "typed_confirmation" | null;
+                            /** Format: date-time */
+                            approved_at?: string | null;
+                            /** Format: uuid */
+                            approved_by_user_id?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            export_byte_size?: number | null;
+                            /** Format: date-time */
+                            export_completed_at?: string | null;
+                            export_sha256?: string | null;
+                            /** @enum {string|null} */
+                            failed_stage?: "export" | "purge" | null;
+                            failure_reason?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            organization_slug: string;
+                            /** Format: date-time */
+                            purge_started_at?: string | null;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** Format: uuid */
+                            requested_by_user_id?: string;
+                            retention_review?: {
+                                basis?: string;
+                                context: string;
+                                /** @enum {string} */
+                                disposition: "purge" | "retain" | "retain_anonymized";
+                                record_count: number;
+                                resources: {
+                                    count: number;
+                                    resource: string;
+                                }[];
+                                retain_years?: number | null;
+                                /** Format: date */
+                                retained_until?: string | null;
+                            }[];
+                            /** @enum {string} */
+                            status: "requested" | "exporting" | "exported" | "approved" | "purging" | "completed" | "failed" | "cancelled";
+                            steps?: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.MyFinanceController.invoice_download_url": {
         parameters: {
             query?: never;
@@ -6130,6 +6358,78 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformOrganizationPurgeController.cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cancelled purge */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        purge: {
+                            /** @enum {string|null} */
+                            approval_mode?: "second_vendor" | "typed_confirmation" | null;
+                            /** Format: date-time */
+                            approved_at?: string | null;
+                            /** Format: uuid */
+                            approved_by_user_id?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            export_byte_size?: number | null;
+                            /** Format: date-time */
+                            export_completed_at?: string | null;
+                            export_sha256?: string | null;
+                            /** @enum {string|null} */
+                            failed_stage?: "export" | "purge" | null;
+                            failure_reason?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            organization_slug: string;
+                            /** Format: date-time */
+                            purge_started_at?: string | null;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** Format: uuid */
+                            requested_by_user_id?: string;
+                            retention_review?: {
+                                basis?: string;
+                                context: string;
+                                /** @enum {string} */
+                                disposition: "purge" | "retain" | "retain_anonymized";
+                                record_count: number;
+                                resources: {
+                                    count: number;
+                                    resource: string;
+                                }[];
+                                retain_years?: number | null;
+                                /** Format: date */
+                                retained_until?: string | null;
+                            }[];
+                            /** @enum {string} */
+                            status: "requested" | "exporting" | "exported" | "approved" | "purging" | "completed" | "failed" | "cancelled";
+                            steps?: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
                 };
             };
         };
@@ -10785,6 +11085,169 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PlatformOrganizationPurgeController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Purge status */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        export_download_url: string | null;
+                        purge: {
+                            /** @enum {string|null} */
+                            approval_mode?: "second_vendor" | "typed_confirmation" | null;
+                            /** Format: date-time */
+                            approved_at?: string | null;
+                            /** Format: uuid */
+                            approved_by_user_id?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            export_byte_size?: number | null;
+                            /** Format: date-time */
+                            export_completed_at?: string | null;
+                            export_sha256?: string | null;
+                            /** @enum {string|null} */
+                            failed_stage?: "export" | "purge" | null;
+                            failure_reason?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            organization_slug: string;
+                            /** Format: date-time */
+                            purge_started_at?: string | null;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** Format: uuid */
+                            requested_by_user_id?: string;
+                            retention_review?: {
+                                basis?: string;
+                                context: string;
+                                /** @enum {string} */
+                                disposition: "purge" | "retain" | "retain_anonymized";
+                                record_count: number;
+                                resources: {
+                                    count: number;
+                                    resource: string;
+                                }[];
+                                retain_years?: number | null;
+                                /** Format: date */
+                                retained_until?: string | null;
+                            }[];
+                            /** @enum {string} */
+                            status: "requested" | "exporting" | "exported" | "approved" | "purging" | "completed" | "failed" | "cancelled";
+                            steps?: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description No purge requested */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformOrganizationPurgeController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Purge request */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        purge: {
+                            /** @enum {string|null} */
+                            approval_mode?: "second_vendor" | "typed_confirmation" | null;
+                            /** Format: date-time */
+                            approved_at?: string | null;
+                            /** Format: uuid */
+                            approved_by_user_id?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            export_byte_size?: number | null;
+                            /** Format: date-time */
+                            export_completed_at?: string | null;
+                            export_sha256?: string | null;
+                            /** @enum {string|null} */
+                            failed_stage?: "export" | "purge" | null;
+                            failure_reason?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            organization_slug: string;
+                            /** Format: date-time */
+                            purge_started_at?: string | null;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** Format: uuid */
+                            requested_by_user_id?: string;
+                            retention_review?: {
+                                basis?: string;
+                                context: string;
+                                /** @enum {string} */
+                                disposition: "purge" | "retain" | "retain_anonymized";
+                                record_count: number;
+                                resources: {
+                                    count: number;
+                                    resource: string;
+                                }[];
+                                retain_years?: number | null;
+                                /** Format: date */
+                                retained_until?: string | null;
+                            }[];
+                            /** @enum {string} */
+                            status: "requested" | "exporting" | "exported" | "approved" | "purging" | "completed" | "failed" | "cancelled";
+                            steps?: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description An open purge already exists */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminUserController.revoke_allowance": {
         parameters: {
             query?: never;
@@ -12718,6 +13181,102 @@ export interface operations {
                         /** Format: date */
                         start_date: string;
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformOrganizationPurgeController.approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    confirmation: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Approved purge */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        purge: {
+                            /** @enum {string|null} */
+                            approval_mode?: "second_vendor" | "typed_confirmation" | null;
+                            /** Format: date-time */
+                            approved_at?: string | null;
+                            /** Format: uuid */
+                            approved_by_user_id?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            export_byte_size?: number | null;
+                            /** Format: date-time */
+                            export_completed_at?: string | null;
+                            export_sha256?: string | null;
+                            /** @enum {string|null} */
+                            failed_stage?: "export" | "purge" | null;
+                            failure_reason?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            organization_slug: string;
+                            /** Format: date-time */
+                            purge_started_at?: string | null;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** Format: uuid */
+                            requested_by_user_id?: string;
+                            retention_review?: {
+                                basis?: string;
+                                context: string;
+                                /** @enum {string} */
+                                disposition: "purge" | "retain" | "retain_anonymized";
+                                record_count: number;
+                                resources: {
+                                    count: number;
+                                    resource: string;
+                                }[];
+                                retain_years?: number | null;
+                                /** Format: date */
+                                retained_until?: string | null;
+                            }[];
+                            /** @enum {string} */
+                            status: "requested" | "exporting" | "exported" | "approved" | "purging" | "completed" | "failed" | "cancelled";
+                            steps?: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Purge is not awaiting approval */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Confirmation mismatch */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };
