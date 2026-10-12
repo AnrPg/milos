@@ -39,7 +39,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.AuditTest do
 
     for table <- ~w(organizations organization_memberships organization_settings
                      organization_domains registration_invitations vendors
-                     organization_provisioning_events) do
+                     organization_provisioning_events organization_slug_aliases) do
       status = Map.fetch!(by_table, table)
       assert status.rls_enabled, "#{table} should have RLS enabled"
       assert status.rls_forced, "#{table} should force RLS"
