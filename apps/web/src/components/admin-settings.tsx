@@ -525,8 +525,13 @@ function financeFormFromSettings(s: FinanceSettings) {
   return {
     paymentReminderIntervalDays: String(s.payment_reminder_interval_days),
     documentMode: s.document_mode,
+    packageModules: [...(s.package_modules ?? DEFAULT_PACKAGE_MODULES)].sort(),
   };
 }
+
+// ADR-096: services the gym offers; the package wizard only shows enabled ones.
+const DEFAULT_PACKAGE_MODULES = ["group_classes", "online_coaching"];
+const AVAILABLE_PACKAGE_MODULES = ["group_classes", "online_coaching"] as const;
 
 function FinanceSection({ token }: { token: string }) {
   const i18n = useUiTranslations();
@@ -534,6 +539,7 @@ function FinanceSection({ token }: { token: string }) {
   const [form, setForm] = useState({
     paymentReminderIntervalDays: "7",
     documentMode: "invoice" as "invoice" | "receipt",
+    packageModules: DEFAULT_PACKAGE_MODULES,
   });
   const [initialized, setInitialized] = useState(false);
 
@@ -555,20 +561,25 @@ function FinanceSection({ token }: { token: string }) {
         finance: {
           payment_reminder_interval_days: Number(form.paymentReminderIntervalDays),
           document_mode: form.documentMode,
+          package_modules: form.packageModules,
         },
       }),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       queryClient.setQueryData(["admin", "settings"], data);
+      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "package-catalog"] });
     },
   });
 
+  const serverModules = [...(settingsQuery.data?.finance?.package_modules ?? DEFAULT_PACKAGE_MODULES)].sort().join(",");
   const serverDays = settingsQuery.data?.finance
     ? String(settingsQuery.data.finance.payment_reminder_interval_days)
     : "7";
   const serverMode = settingsQuery.data?.finance?.document_mode ?? "invoice";
   const dirty =
     initialized &&
-    (form.paymentReminderIntervalDays !== serverDays || form.documentMode !== serverMode);
+    (form.paymentReminderIntervalDays !== serverDays ||
+      form.documentMode !== serverMode ||
+      form.packageModules.join(",") !== serverModules);
 
   return (
     <div className="space-y-5">
@@ -633,13 +644,50 @@ function FinanceSection({ token }: { token: string }) {
           ))}
         </div>
       </fieldset>
+      <fieldset className="space-y-3">
+        <legend className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
+          {i18n("pkgModulesTitle")}
+        </legend>
+        <p className="text-xs leading-5" style={{ color: "var(--dim)" }}>{i18n("pkgModulesDescription")}</p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {AVAILABLE_PACKAGE_MODULES.map((module) => {
+            const checked = form.packageModules.includes(module);
+            return (
+              <label
+                key={module}
+                className="flex cursor-pointer items-start gap-3 rounded-2xl p-4"
+                style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
+              >
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  disabled={checked && form.packageModules.length === 1}
+                  onChange={() =>
+                    setForm((current) => ({
+                      ...current,
+                      packageModules: (checked
+                        ? current.packageModules.filter((item) => item !== module)
+                        : [...current.packageModules, module]
+                      ).sort(),
+                    }))
+                  }
+                />
+                <span>
+                  <span className="block text-sm font-semibold" style={{ color: "var(--text)" }}>{i18n(`pkgModule_${module}`)}</span>
+                  <span className="mt-1 block text-xs leading-5" style={{ color: "var(--dim)" }}>{i18n(`pkgModule_${module}Hint`)}</span>
+                </span>
+              </label>
+            );
+          })}
+        </div>
+      </fieldset>
       <SaveBar
         dirty={dirty}
         pending={saveMutation.isPending}
         success={saveMutation.isSuccess}
         error={saveMutation.error}
         onSave={() => saveMutation.mutate()}
-        onReset={() => setForm({ paymentReminderIntervalDays: serverDays, documentMode: serverMode })}
+        onReset={() => setForm({ paymentReminderIntervalDays: serverDays, documentMode: serverMode, packageModules: serverModules.split(",") })}
       />
 
       <FinanceCleanupSection token={token} />

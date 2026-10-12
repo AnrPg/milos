@@ -1,0 +1,813 @@
+"use client";
+
+import { useId, useMemo, useState, type ReactNode } from "react";
+
+import type { FinanceRecord } from "@/api/finance";
+import type { ClassTypeRecord } from "@/api/schedule";
+import type { UiTranslator } from "@/i18n/presentation";
+import { useUiLocale } from "@/i18n/use-ui-locale";
+import { useUiTranslations } from "@/i18n/ui";
+import {
+  equal,
+  fieldLabelKey,
+  fieldLocks,
+  isFieldLocked,
+  isPartLocked,
+  lockReasonKey,
+  memberSummary,
+  presetFor,
+  priceCents,
+  sectionLabelKey,
+  typeLabelKey,
+  type CatalogField,
+  type CatalogType,
+  type ClassTypeLimit,
+  type DurationValue,
+  type PackageCatalog,
+  type PackageDraft,
+  type QuotaPeriod,
+  type QuotaValue,
+} from "./package-catalog";
+
+export type FieldContext = {
+  classTypes: ClassTypeRecord[];
+  packages: FinanceRecord[];
+};
+
+const inputClass = "w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none";
+const inputStyle = { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" };
+
+export function useT(): UiTranslator {
+  const i18n = useUiTranslations();
+  return i18n as unknown as UiTranslator;
+}
+
+export function money(locale: string, cents: number | null) {
+  if (cents === null) return "";
+  return new Intl.NumberFormat(locale, { style: "currency", currency: "EUR" }).format(cents / 100);
+}
+
+export function FieldShell({
+  label,
+  hint,
+  error,
+  changed,
+  onReset,
+  children,
+  htmlFor,
+}: {
+  label: string;
+  hint?: string;
+  error?: string;
+  changed?: boolean;
+  onReset?: () => void;
+  children: ReactNode;
+  htmlFor?: string;
+}) {
+  const t = useT();
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between gap-3">
+        <label htmlFor={htmlFor} className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+          {label}
+        </label>
+        {changed && onReset ? (
+          <button
+            type="button"
+            onClick={onReset}
+            className="rounded-full px-2.5 py-1 text-xs font-semibold"
+            style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", color: "var(--primary)" }}
+            title={t("pkgResetFieldHint")}
+          >
+            {t("pkgChanged")} ↺
+          </button>
+        ) : null}
+      </div>
+      {children}
+      {hint ? <p className="text-xs leading-5" style={{ color: "var(--dim)" }}>{hint}</p> : null}
+      {error ? <p className="text-xs font-semibold" role="alert" style={{ color: "var(--danger)" }}>{error}</p> : null}
+    </div>
+  );
+}
+
+export function Toggle({
+  checked,
+  onChange,
+  label,
+  disabled,
+}: {
+  checked: boolean;
+  onChange: (value: boolean) => void;
+  label: string;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      disabled={disabled}
+      onClick={() => onChange(!checked)}
+      className="relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors disabled:opacity-60"
+      style={{ background: checked ? "var(--primary)" : "var(--border)" }}
+    >
+      <span
+        className="inline-block h-5 w-5 rounded-full transition-transform"
+        style={{ background: "var(--bg)", transform: checked ? "translateX(1.55rem)" : "translateX(0.25rem)" }}
+      />
+    </button>
+  );
+}
+
+export function Segmented<T extends string>({
+  value,
+  options,
+  onChange,
+  label,
+}: {
+  value: T;
+  options: Array<{ value: T; label: string }>;
+  onChange: (value: T) => void;
+  label: string;
+}) {
+  return (
+    <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-1 rounded-2xl p-1" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+      {options.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          role="radio"
+          aria-checked={value === option.value}
+          onClick={() => onChange(option.value)}
+          className="min-h-[2.5rem] flex-1 rounded-xl px-3 text-sm font-semibold"
+          style={{
+            background: value === option.value ? "var(--panel)" : "transparent",
+            color: value === option.value ? "var(--text)" : "var(--dim)",
+            boxShadow: value === option.value ? "0 1px 3px rgba(0,0,0,0.12)" : "none",
+          }}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export function Stepper({
+  value,
+  onChange,
+  min = 0,
+  max = 10000,
+  label,
+  suffix,
+}: {
+  value: number;
+  onChange: (value: number) => void;
+  min?: number;
+  max?: number;
+  label: string;
+  suffix?: string;
+}) {
+  const clamp = (next: number) => Math.min(max, Math.max(min, next));
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        type="button"
+        aria-label={`${label} −`}
+        onClick={() => onChange(clamp(value - 1))}
+        className="h-11 w-11 shrink-0 rounded-xl text-lg font-semibold"
+        style={{ background: "var(--bg-soft)", border: "1px solid var(--border)", color: "var(--text)" }}
+      >
+        −
+      </button>
+      <input
+        aria-label={label}
+        inputMode="numeric"
+        className={inputClass + " h-11 max-w-[7rem] text-center"}
+        style={inputStyle}
+        value={String(value)}
+        onChange={(event) => {
+          const next = Number(event.target.value.replace(/\D/g, ""));
+          if (Number.isFinite(next)) onChange(clamp(next));
+        }}
+      />
+      <button
+        type="button"
+        aria-label={`${label} +`}
+        onClick={() => onChange(clamp(value + 1))}
+        className="h-11 w-11 shrink-0 rounded-xl text-lg font-semibold"
+        style={{ background: "var(--bg-soft)", border: "1px solid var(--border)", color: "var(--text)" }}
+      >
+        +
+      </button>
+      {suffix ? <span className="text-sm" style={{ color: "var(--dim)" }}>{suffix}</span> : null}
+    </div>
+  );
+}
+
+export function LockedValue({ text, reason }: { text: string; reason: string }) {
+  return (
+    <div className="flex items-start gap-2 rounded-xl px-3 py-2 text-sm" style={{ background: "var(--bg-soft)", border: "1px dashed var(--border)", color: "var(--text-soft)" }}>
+      <span aria-hidden="true">🔒</span>
+      <div>
+        <p className="font-semibold">{text}</p>
+        <p className="text-xs" style={{ color: "var(--dim)" }}>{reason}</p>
+      </div>
+    </div>
+  );
+}
+
+export function PeriodSelect({
+  value,
+  onChange,
+  periods,
+  label,
+}: {
+  value: QuotaPeriod;
+  onChange: (value: QuotaPeriod) => void;
+  periods: QuotaPeriod[];
+  label: string;
+}) {
+  const t = useT();
+  return (
+    <select aria-label={label} className={inputClass + " h-11"} style={inputStyle} value={value} onChange={(event) => onChange(event.target.value as QuotaPeriod)}>
+      {periods.map((period) => (
+        <option key={period} value={period}>{t(`pkgPeriod_${period}`)}</option>
+      ))}
+    </select>
+  );
+}
+
+/** Limit + reset period for a quota; respects partial locks. */
+export function QuotaControl({
+  type,
+  fieldKey,
+  value,
+  onChange,
+  label,
+  unitLabel,
+}: {
+  type: CatalogType;
+  fieldKey: string;
+  value: QuotaValue;
+  onChange: (value: QuotaValue) => void;
+  label: string;
+  unitLabel: string;
+}) {
+  const t = useT();
+  const limitLocked = isPartLocked(type, fieldKey, "limit");
+  const periodLocked = isPartLocked(type, fieldKey, "period");
+  const limited = value.limit !== "unlimited";
+  const limitRequired = type.key === "class_pack" && fieldKey === "group_classes.visits";
+
+  return (
+    <div className="space-y-3">
+      {limitLocked ? null : limitRequired ? null : (
+        <Segmented
+          label={label}
+          value={limited ? "limited" : "unlimited"}
+          options={[
+            { value: "unlimited", label: t("pkgUnlimited") },
+            { value: "limited", label: t("pkgLimited") },
+          ]}
+          onChange={(mode) => onChange({ ...value, limit: mode === "unlimited" ? "unlimited" : 8 })}
+        />
+      )}
+      {limited && !limitLocked ? (
+        <div className="flex flex-wrap items-center gap-3">
+          <Stepper
+            label={label}
+            value={value.limit as number}
+            min={1}
+            onChange={(limit) => onChange({ ...value, limit })}
+            suffix={unitLabel}
+          />
+          {periodLocked ? (
+            <span className="text-sm" style={{ color: "var(--dim)" }}>{t("pkgPeriodWhole")}</span>
+          ) : (
+            <div className="min-w-[10rem] flex-1">
+              <PeriodSelect
+                label={t("pkgResetsEvery")}
+                value={value.period}
+                periods={["calendar_week", "calendar_month"]}
+                onChange={(period) => onChange({ ...value, period })}
+              />
+            </div>
+          )}
+        </div>
+      ) : null}
+      {!limited && !periodLocked ? (
+        <p className="text-xs" style={{ color: "var(--dim)" }}>{t("pkgUnlimitedHint")}</p>
+      ) : null}
+    </div>
+  );
+}
+
+export function ClassTypeScope({
+  value,
+  onChange,
+  classTypes,
+}: {
+  value: unknown;
+  onChange: (value: "all" | string[]) => void;
+  classTypes: ClassTypeRecord[];
+}) {
+  const t = useT();
+  const active = classTypes.filter((type) => !type.archived_at);
+  const selected = Array.isArray(value) ? value.map(String) : [];
+  const all = !Array.isArray(value);
+
+  // An empty selection is not a valid scope, so selection needs at least one class type.
+  if (active.length === 0 && all) {
+    return <p className="text-sm" style={{ color: "var(--dim)" }}>{t("pkgNoClassTypesYet")}</p>;
+  }
+
+  return (
+    <div className="space-y-3">
+      <Segmented
+        label={t("pkgFieldGroupClassesClassTypes")}
+        value={all ? "all" : "some"}
+        options={[
+          { value: "all", label: t("pkgClassTypesAll") },
+          { value: "some", label: t("pkgClassTypesSome") },
+        ]}
+        onChange={(mode) => onChange(mode === "all" || active.length === 0 ? "all" : [active[0].id])}
+      />
+      {all ? null : (
+        <div className="flex flex-wrap gap-2">
+          {active.map((type) => {
+            const on = selected.includes(type.id);
+            return (
+              <button
+                key={type.id}
+                type="button"
+                aria-pressed={on}
+                onClick={() => {
+                  const next = on ? selected.filter((id) => id !== type.id) : [...selected, type.id];
+                  onChange(next.length === 0 ? "all" : next);
+                }}
+                className="min-h-[2.5rem] rounded-full px-4 text-sm font-semibold"
+                style={{
+                  background: on ? "color-mix(in srgb, var(--primary) 14%, transparent)" : "var(--bg-soft)",
+                  border: `1px solid ${on ? "var(--primary)" : "var(--border)"}`,
+                  color: on ? "var(--primary)" : "var(--text-soft)",
+                }}
+              >
+                {on ? "✓ " : ""}{type.name}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function ClassTypeLimits({
+  value,
+  onChange,
+  classTypes,
+  scope,
+}: {
+  value: ClassTypeLimit[];
+  onChange: (value: ClassTypeLimit[]) => void;
+  classTypes: ClassTypeRecord[];
+  scope: unknown;
+}) {
+  const t = useT();
+  const eligible = classTypes.filter(
+    (type) => !type.archived_at && (!Array.isArray(scope) || scope.includes(type.id)),
+  );
+  const unused = eligible.filter((type) => !value.some((limit) => limit.id === type.id));
+
+  return (
+    <div className="space-y-2">
+      {value.map((limit, index) => (
+        <div key={limit.id} className="flex flex-wrap items-center gap-2 rounded-xl p-2" style={{ background: "var(--bg-soft)" }}>
+          <select
+            aria-label={t("pkgClassType")}
+            className={inputClass + " h-11 min-w-[9rem] flex-1"}
+            style={inputStyle}
+            value={limit.id}
+            onChange={(event) => onChange(value.map((item, i) => (i === index ? { ...item, id: event.target.value } : item)))}
+          >
+            {eligible
+              .filter((type) => type.id === limit.id || !value.some((item) => item.id === type.id))
+              .map((type) => <option key={type.id} value={type.id}>{type.name}</option>)}
+          </select>
+          <Stepper label={t("pkgVisits")} value={limit.limit} min={1} onChange={(next) => onChange(value.map((item, i) => (i === index ? { ...item, limit: next } : item)))} />
+          <div className="min-w-[9rem]">
+            <PeriodSelect
+              label={t("pkgResetsEvery")}
+              value={limit.period}
+              periods={["calendar_week", "calendar_month"]}
+              onChange={(period) => onChange(value.map((item, i) => (i === index ? { ...item, period } : item)))}
+            />
+          </div>
+          <button
+            type="button"
+            className="rounded-full px-3 py-2 text-xs font-semibold"
+            style={{ color: "var(--danger)" }}
+            onClick={() => onChange(value.filter((_, i) => i !== index))}
+          >
+            {t("pkgRemove")}
+          </button>
+        </div>
+      ))}
+      {unused.length > 0 ? (
+        <button
+          type="button"
+          className="rounded-full px-4 py-2 text-sm font-semibold"
+          style={{ background: "var(--bg-soft)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+          onClick={() => onChange([...value, { id: unused[0].id, limit: 4, period: "calendar_month" }])}
+        >
+          + {t("pkgAddClassTypeLimit")}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+export function DurationControl({
+  value,
+  onChange,
+  label,
+  presets,
+}: {
+  value: DurationValue | null;
+  onChange: (value: DurationValue) => void;
+  label: string;
+  presets: DurationValue[];
+}) {
+  const t = useT();
+  const current = value ?? presets[0];
+  const matching = presets.find((preset) => preset.amount === current.amount && preset.unit === current.unit);
+  const [custom, setCustom] = useState(!matching);
+
+  return (
+    <div className="space-y-2">
+      <select
+        aria-label={label}
+        className={inputClass + " h-11"}
+        style={inputStyle}
+        value={custom ? "custom" : `${current.amount}:${current.unit}`}
+        onChange={(event) => {
+          if (event.target.value === "custom") {
+            setCustom(true);
+            return;
+          }
+          setCustom(false);
+          const [amount, unit] = event.target.value.split(":");
+          onChange({ amount: Number(amount), unit: unit as DurationValue["unit"] });
+        }}
+      >
+        {presets.map((preset) => (
+          <option key={`${preset.amount}:${preset.unit}`} value={`${preset.amount}:${preset.unit}`}>
+            {t(`pkgDuration_${preset.unit}`, { count: preset.amount })}
+          </option>
+        ))}
+        <option value="custom">{t("pkgDurationCustom")}</option>
+      </select>
+      {custom ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <Stepper label={label} value={current.amount} min={1} max={current.unit === "day" ? 1095 : current.unit === "week" ? 156 : 36} onChange={(amount) => onChange({ ...current, amount })} />
+          <select
+            aria-label={t("pkgDurationUnit")}
+            className={inputClass + " h-11 max-w-[10rem]"}
+            style={inputStyle}
+            value={current.unit}
+            onChange={(event) => onChange({ ...current, unit: event.target.value as DurationValue["unit"] })}
+          >
+            {(["day", "week", "month"] as const).map((unit) => <option key={unit} value={unit}>{t(`pkgUnit_${unit}`)}</option>)}
+          </select>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+export const VALIDITY_PRESETS: Record<string, DurationValue[]> = {
+  class_pack: [1, 2, 3, 6, 12].map((amount) => ({ amount, unit: "month" as const })),
+  drop_in: [
+    { amount: 1, unit: "day" },
+    { amount: 7, unit: "day" },
+    { amount: 30, unit: "day" },
+    { amount: 90, unit: "day" },
+  ],
+  trial: [3, 7, 14, 30].map((amount) => ({ amount, unit: "day" as const })),
+};
+
+export function AmenitiesControl({ value, onChange, options }: { value: string[]; onChange: (value: string[]) => void; options: string[] }) {
+  const t = useT();
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((option) => {
+        const on = value.includes(option);
+        return (
+          <button
+            key={option}
+            type="button"
+            aria-pressed={on}
+            onClick={() => onChange(on ? value.filter((item) => item !== option) : [...value, option])}
+            className="min-h-[2.5rem] rounded-full px-4 text-sm font-semibold"
+            style={{
+              background: on ? "color-mix(in srgb, var(--primary) 14%, transparent)" : "var(--bg-soft)",
+              border: `1px solid ${on ? "var(--primary)" : "var(--border)"}`,
+              color: on ? "var(--primary)" : "var(--text-soft)",
+            }}
+          >
+            {on ? "✓ " : ""}{t(`pkgAmenity_${option}`)}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Human text for a locked value, used in lock strips and read-only fields. */
+export function lockedText(t: UiTranslator, field: string, value: unknown, part?: string): string {
+  if (part === "limit") return t("pkgLockedLimit", { count: Number(value) });
+  if (part === "period") return t("pkgPeriodWhole");
+  if (typeof value === "boolean") return `${t(fieldLabelKey(field))}: ${value ? t("pkgYes") : t("pkgNo")}`;
+  if (value === null) return `${t(fieldLabelKey(field))}: ${t("pkgFollowsType")}`;
+  if (Array.isArray(value)) return `${t(fieldLabelKey(field))}: ${value.length === 0 ? t("pkgNone") : value.join(", ")}`;
+  if (field === "perks.guest_passes" || field === "perks.freeze_days_per_year") return `${t(fieldLabelKey(field))}: 0`;
+  return `${t(fieldLabelKey(field))}: ${String(value)}`;
+}
+
+export function LockStrip({ type }: { type: CatalogType }) {
+  const t = useT();
+  const items = type.locks
+    .filter((lock) => !lock.field.startsWith("perks.") && !lock.field.startsWith("facility.") && !lock.field.startsWith("personal_training."))
+    .map((lock) => {
+      const part = lock.path === lock.field ? undefined : lock.path.slice(lock.field.length + 1);
+      return lockedText(t, lock.field, lock.value, part);
+    });
+  if (type.billing_model === "one_off") items.unshift(t("pkgOneOffPayment"));
+  if (items.length === 0) return null;
+  return (
+    <details className="rounded-2xl px-4 py-3 text-sm" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+      <summary className="cursor-pointer font-semibold" style={{ color: "var(--text-soft)" }}>
+        🔒 {t("pkgDefinedByType", { type: t(typeLabelKey(type.key)) })}
+      </summary>
+      <ul className="mt-2 list-disc space-y-1 ps-5 text-xs" style={{ color: "var(--dim)" }}>
+        {items.map((item, index) => <li key={index}>{item}</li>)}
+      </ul>
+    </details>
+  );
+}
+
+/** Generic control for any available catalog field (used by advanced settings and the editor). */
+export function FieldControl({
+  spec,
+  type,
+  draft,
+  onFieldChange,
+  context,
+  preset,
+}: {
+  spec: CatalogField;
+  type: CatalogType;
+  draft: PackageDraft;
+  onFieldChange: (key: string, value: unknown) => void;
+  context: FieldContext;
+  preset: Record<string, unknown>;
+}) {
+  const t = useT();
+  const id = useId();
+  const value = draft.fields[spec.key];
+  const label = t(fieldLabelKey(spec.key));
+  const changed = !equal(value, preset[spec.key]);
+  const hint = t(`${fieldLabelKey(spec.key)}Hint`);
+
+  if (isFieldLocked(type, spec.key)) {
+    const lock = fieldLocks(type, spec.key)[0];
+    return (
+      <FieldShell label={label}>
+        <LockedValue text={lockedText(t, spec.key, lock.value)} reason={t(lockReasonKey(lock.reason))} />
+      </FieldShell>
+    );
+  }
+
+  const reset = () => onFieldChange(spec.key, preset[spec.key]);
+  let control: ReactNode;
+
+  switch (spec.kind) {
+    case "boolean":
+      control = (
+        <div className="flex items-center justify-between gap-3 rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)" }}>
+          <span className="text-sm" style={{ color: "var(--text-soft)" }}>{value === true ? t("pkgYes") : t("pkgNo")}</span>
+          <Toggle label={label} checked={value === true} onChange={(next) => onFieldChange(spec.key, next)} />
+        </div>
+      );
+      break;
+    case "quota":
+      control = (
+        <QuotaControl
+          type={type}
+          fieldKey={spec.key}
+          value={value as QuotaValue}
+          onChange={(next) => onFieldChange(spec.key, next)}
+          label={label}
+          unitLabel={t(spec.key === "group_classes.visits" ? "pkgVisits" : "pkgCheckIns")}
+        />
+      );
+      break;
+    case "duration":
+      control = (
+        <DurationControl
+          label={label}
+          value={(value as DurationValue | null) ?? null}
+          presets={VALIDITY_PRESETS[type.key] ?? VALIDITY_PRESETS.class_pack}
+          onChange={(next) => onFieldChange(spec.key, next)}
+        />
+      );
+      break;
+    case "scope_ids":
+      control = <ClassTypeScope value={value} classTypes={context.classTypes} onChange={(next) => onFieldChange(spec.key, next)} />;
+      break;
+    case "quota_by_id":
+      control = (
+        <ClassTypeLimits
+          value={(value as ClassTypeLimit[]) ?? []}
+          classTypes={context.classTypes}
+          scope={draft.fields["group_classes.class_types"]}
+          onChange={(next) => onFieldChange(spec.key, next)}
+        />
+      );
+      break;
+    case "enum_list":
+      control = <AmenitiesControl value={(value as string[]) ?? []} options={(spec.options ?? []).map(String)} onChange={(next) => onFieldChange(spec.key, next)} />;
+      break;
+    case "string_or_null":
+      control = (
+        <input
+          id={id}
+          className={inputClass}
+          style={inputStyle}
+          maxLength={spec.max}
+          value={typeof value === "string" ? value : ""}
+          onChange={(event) => onFieldChange(spec.key, event.target.value === "" ? null : event.target.value)}
+        />
+      );
+      break;
+    case "uuid_or_null":
+      control = (
+        <select
+          id={id}
+          className={inputClass + " h-11"}
+          style={inputStyle}
+          value={typeof value === "string" ? value : ""}
+          onChange={(event) => onFieldChange(spec.key, event.target.value === "" ? null : event.target.value)}
+        >
+          <option value="">{t("pkgNone")}</option>
+          {context.packages
+            .filter((pkg) => pkg.active !== false && pkg.package_type === "membership")
+            .map((pkg) => <option key={String(pkg.id)} value={String(pkg.id)}>{String(pkg.name)}</option>)}
+        </select>
+      );
+      break;
+    default:
+      control = (
+        <input
+          id={id}
+          inputMode="numeric"
+          className={inputClass}
+          style={inputStyle}
+          value={value == null ? "" : String(value)}
+          onChange={(event) => onFieldChange(spec.key, event.target.value === "" ? null : Number(event.target.value))}
+        />
+      );
+  }
+
+  return (
+    <FieldShell label={label} hint={hint} changed={changed} onReset={reset} htmlFor={id}>
+      {control}
+    </FieldShell>
+  );
+}
+
+const ADVANCED_SECTIONS = ["terms", "group_classes", "online_coaching", "facility"];
+
+/** Every available catalog field, grouped by section, with search and reset. */
+export function AdvancedSettings({
+  catalog,
+  type,
+  draft,
+  onFieldChange,
+  onResetAll,
+  context,
+  changedCount,
+}: {
+  catalog: PackageCatalog;
+  type: CatalogType;
+  draft: PackageDraft;
+  onFieldChange: (key: string, value: unknown) => void;
+  onResetAll: () => void;
+  context: FieldContext;
+  changedCount: number;
+}) {
+  const t = useT();
+  const [query, setQuery] = useState("");
+  const preset = useMemo(() => presetFor(type, draft.billingPeriod), [type, draft.billingPeriod]);
+  const coachingEnabled = catalog.modules.some((module) => module.key === "online_coaching" && module.enabled);
+  const classesEnabled = catalog.modules.some((module) => module.key === "group_classes" && module.enabled);
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+
+  const sections = ADVANCED_SECTIONS.filter(
+    (section) =>
+      (section !== "online_coaching" || coachingEnabled || draft.fields["online_coaching.included"] === true) &&
+      (section !== "group_classes" || classesEnabled || draft.fields["group_classes.included"] === true),
+  )
+    .map((section) => ({
+      section,
+      fields: catalog.fields.filter(
+        (field) =>
+          field.available &&
+          field.section === section &&
+          (normalizedQuery === "" || t(fieldLabelKey(field.key)).toLocaleLowerCase().includes(normalizedQuery)) &&
+          (field.key !== "terms.conversion_package_id" || type.key === "trial") &&
+          (field.key !== "terms.validity" || type.billing_model === "one_off" || isFieldLocked(type, field.key)),
+      ),
+    }))
+    .filter((group) => group.fields.length > 0);
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-3">
+        <input
+          type="search"
+          aria-label={t("pkgSearchSettings")}
+          placeholder={t("pkgSearchSettings")}
+          className={inputClass + " h-11 min-w-[12rem] flex-1"}
+          style={inputStyle}
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+        />
+        <button
+          type="button"
+          disabled={changedCount === 0}
+          onClick={onResetAll}
+          className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-40"
+          style={{ background: "var(--bg-soft)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+        >
+          ↺ {t("pkgResetAll")}
+        </button>
+      </div>
+      {sections.length === 0 ? <p className="text-sm" style={{ color: "var(--dim)" }}>{t("pkgNoMatchingSettings")}</p> : null}
+      {sections.map(({ section, fields }) => (
+        <details key={section} open={normalizedQuery !== "" || section === "group_classes"} className="rounded-2xl" style={{ border: "1px solid var(--border)", background: "var(--panel)" }}>
+          <summary className="cursor-pointer px-4 py-3 text-sm font-semibold" style={{ color: "var(--text)" }}>
+            {t(sectionLabelKey(section))}
+          </summary>
+          <div className="space-y-5 px-4 pb-4">
+            {fields.map((spec) => (
+              <FieldControl key={spec.key} spec={spec} type={type} draft={draft} onFieldChange={onFieldChange} context={context} preset={preset} />
+            ))}
+          </div>
+        </details>
+      ))}
+    </div>
+  );
+}
+
+export function MemberPreview({ draft, classTypes, compact }: { draft: PackageDraft; classTypes: ClassTypeRecord[]; compact?: boolean }) {
+  const t = useT();
+  const locale = useUiLocale();
+  const names = useMemo(() => new Map(classTypes.map((type) => [type.id, type.name])), [classTypes]);
+  const lines = memberSummary(draft, names);
+  const cents = priceCents(draft.price);
+  const suffix = draft.packageType === "membership" ? t(`pkgPriceSuffix_${draft.billingPeriod}`) : t("pkgPriceSuffixTotal");
+
+  return (
+    <section
+      aria-live="polite"
+      aria-label={t("pkgMemberPreview")}
+      className={"rounded-2xl " + (compact ? "p-4" : "p-5")}
+      style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}
+    >
+      <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{t("pkgMemberPreview")}</p>
+      <p className={"mt-2 font-semibold " + (compact ? "text-base" : "text-lg")} style={{ color: "var(--text)" }}>
+        {draft.name.trim() || t("pkgUntitled")}
+      </p>
+      <p className="text-sm" style={{ color: "var(--text-soft)" }}>
+        {t(typeLabelKey(draft.packageType))}
+        {cents !== null ? ` · ${money(locale, cents)} ${suffix}` : ""}
+      </p>
+      {draft.description.trim() ? <p className="mt-2 text-sm" style={{ color: "var(--text-soft)" }}>{draft.description.trim()}</p> : null}
+      <ul className="mt-3 space-y-1 text-sm" style={{ color: "var(--text)" }}>
+        {lines.map((line, index) => (
+          <li key={index} className="flex gap-2">
+            <span aria-hidden="true" style={{ color: "var(--success)" }}>✓</span>
+            <span>
+              {line.key === "pkgSummaryAmenities"
+                ? t(line.key, { list: String(line.params?.list ?? "").split("|").map((item) => t(`pkgAmenity_${item}`)).join(", ") })
+                : t(line.key, line.params)}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}

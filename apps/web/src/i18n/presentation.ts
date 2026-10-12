@@ -60,6 +60,16 @@ const SEMANTIC_KEYS: Record<string, string> = {
   unlimited: "semanticUnlimited",
   "limited-visits": "semanticLimitedVisits",
   hybrid: "semanticHybrid",
+  membership: "pkgTypeMembership",
+  class_pack: "pkgTypeClassPack",
+  drop_in: "pkgTypeDropIn",
+  pt_pack: "pkgTypePtPack",
+  add_on: "pkgTypeAddOn",
+  shared: "pkgTypeShared",
+  corporate: "pkgTypeCorporate",
+  semiannual: "pkgBilling_semiannual",
+  one_off: "pkgBilling_one_off",
+  with_base: "pkgBilling_with_base",
   credit: "semanticCredit",
   discount: "semanticDiscount",
   free_period: "semanticFreePeriod",
@@ -263,6 +273,18 @@ const API_ERROR_KEYS: Record<string, string> = {
   finance_capability_not_included: "apiErrorSelfFinanceCapabilityNotIncluded",
   finance_allowance_not_included: "apiErrorSelfFinanceAllowanceNotIncluded",
   finance_allowance_exhausted: "apiErrorSelfFinanceAllowanceExhausted",
+  finance_class_type_not_included: "apiErrorSelfFinanceClassTypeNotIncluded",
+  package_type_invariant_violated: "apiErrorPackageTypeInvariantViolated",
+  entitlement_not_available: "apiErrorEntitlementNotAvailable",
+  invalid_package_field: "apiErrorInvalidPackageField",
+  unknown_package_field: "apiErrorInvalidPackageField",
+  package_rule_violated: "apiErrorPackageRuleViolated",
+  invalid_package_type: "apiErrorInvalidPackageType",
+  package_type_not_available: "apiErrorPackageTypeNotAvailable",
+  package_type_change_requires_copy: "apiErrorPackageTypeChangeRequiresCopy",
+  package_already_used: "apiErrorPackageAlreadyUsed",
+  package_new_members_only: "apiErrorPackageNewMembersOnly",
+  package_not_renewable: "apiErrorPackageNotRenewable",
   invalid_athletes: "apiErrorInvalidAthletes",
   workout_not_published: "apiErrorWorkoutNotPublished",
   unauthorized: "apiErrorUnauthorized",
@@ -280,7 +302,35 @@ const ADMIN_ASSIGNMENT_ERROR_KEYS: Record<string, string> = {
   finance_capability_not_included: "apiErrorFinanceCapabilityNotIncluded",
   finance_allowance_not_included: "apiErrorFinanceAllowanceNotIncluded",
   finance_allowance_exhausted: "apiErrorFinanceAllowanceExhausted",
+  finance_class_type_not_included: "apiErrorFinanceClassTypeNotIncluded",
 };
+
+const PACKAGE_RULES = new Set([
+  "validity_required",
+  "limited_quota_required",
+  "positive_quota_required",
+  "at_least_one_service",
+  "coaching_channel_required",
+  "class_type_limit_outside_scope",
+  "conversion_only_for_trials",
+]);
+
+const CLASS_TYPE_ALLOWANCE_PREFIX = "class_visits:";
+
+/** Label for an allowance key, including per-class-type allowances (ADR-096). */
+export function allowanceLabel(
+  key: string,
+  translate: UiTranslator,
+  classTypeNames?: Record<string, string> | null,
+): string {
+  if (key.startsWith(CLASS_TYPE_ALLOWANCE_PREFIX)) {
+    const id = key.slice(CLASS_TYPE_ALLOWANCE_PREFIX.length);
+    return translate("pkgAllowanceClassTypeVisits", {
+      name: classTypeNames?.[id] ?? translate("pkgUnknownClassType"),
+    });
+  }
+  return semanticLabel(key, translate);
+}
 
 export function semanticLabel(value: unknown, translate: UiTranslator): string {
   if (value == null || value === "") return "";
@@ -292,9 +342,14 @@ export function semanticLabel(value: unknown, translate: UiTranslator): string {
 export function localizeError(error: unknown, translate: UiTranslator): string {
   if (!(error instanceof ApiError)) return translate("apiErrorRequestFailed");
 
+  const rule = error.payload.params?.rule;
+  if (error.payload.code === "package_rule_violated" && typeof rule === "string" && PACKAGE_RULES.has(rule)) {
+    return translate(`apiErrorPackageRule_${rule}`);
+  }
+
   const key = error.payload.code ? API_ERROR_KEYS[error.payload.code] : undefined;
   if (key) {
-    return translate(key, normalizeParams(error.payload.params));
+    return translate(key, normalizeParams(error.payload.params, translate));
   }
 
   if (error.status === 401) return translate("apiErrorUnauthorized");
@@ -313,7 +368,7 @@ export function localizeAdminAssignmentError(
 ): string {
   if (error instanceof ApiError && error.payload.code) {
     const key = ADMIN_ASSIGNMENT_ERROR_KEYS[error.payload.code];
-    if (key) return translate(key, normalizeParams(error.payload.params));
+    if (key) return translate(key, normalizeParams(error.payload.params, translate));
   }
 
   return localizeError(error, translate);
@@ -341,8 +396,12 @@ export function formatScore(
   return localizedUnit ? `${text} ${localizedUnit}` : text;
 }
 
-function normalizeParams(params: Record<string, unknown> | undefined) {
+function normalizeParams(params: Record<string, unknown> | undefined, translate: UiTranslator) {
   if (!params) return undefined;
+  const allowance = params.allowance;
+  if (typeof allowance === "string" && allowance.startsWith(CLASS_TYPE_ALLOWANCE_PREFIX)) {
+    params = { ...params, allowance: translate("pkgAllowanceClassTypeVisits", { name: translate("pkgUnknownClassType") }) };
+  }
   return Object.fromEntries(
     Object.entries(params)
       .filter(

@@ -21,7 +21,9 @@ export type EffectiveEntitlement = {
     channels: string[];
     capabilities: string[];
   };
-  allowances: Partial<Record<"class_visits" | "coaching_touchpoints", AllowanceUsage>>;
+  /** Includes per-class-type keys such as `class_visits:<class type id>` (ADR-096). */
+  allowances: Partial<Record<string, AllowanceUsage>>;
+  class_type_names?: Record<string, string>;
   usage_entries: Array<{
     id: string;
     allowance_key: string;

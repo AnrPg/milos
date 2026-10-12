@@ -1,0 +1,1531 @@
+{
+  "version": 2,
+  "modules": [
+    {
+      "enabled": true,
+      "key": "group_classes",
+      "available": true
+    },
+    {
+      "enabled": true,
+      "key": "online_coaching",
+      "available": true
+    },
+    {
+      "enabled": false,
+      "key": "open_gym",
+      "available": false
+    },
+    {
+      "enabled": false,
+      "key": "events",
+      "available": false
+    },
+    {
+      "enabled": false,
+      "key": "personal_training",
+      "available": false
+    },
+    {
+      "enabled": false,
+      "key": "digital_content",
+      "available": false
+    },
+    {
+      "enabled": false,
+      "key": "corporate_clients",
+      "available": false
+    }
+  ],
+  "fields": [
+    {
+      "key": "terms.auto_renew",
+      "kind": "boolean",
+      "phase": "a",
+      "available": true,
+      "section": "terms"
+    },
+    {
+      "max": 36,
+      "key": "terms.validity",
+      "kind": "duration",
+      "phase": "a",
+      "available": true,
+      "section": "terms"
+    },
+    {
+      "key": "terms.stacking",
+      "kind": "boolean",
+      "phase": "a",
+      "available": true,
+      "section": "terms"
+    },
+    {
+      "key": "terms.once_per_person",
+      "kind": "boolean",
+      "phase": "a",
+      "available": true,
+      "section": "terms"
+    },
+    {
+      "key": "terms.new_members_only",
+      "kind": "boolean",
+      "phase": "a",
+      "available": true,
+      "section": "terms"
+    },
+    {
+      "key": "terms.conversion_package_id",
+      "kind": "uuid_or_null",
+      "phase": "a",
+      "available": true,
+      "section": "terms"
+    },
+    {
+      "max": 60,
+      "min": 0,
+      "key": "terms.minimum_commitment_months",
+      "kind": "integer",
+      "phase": "b",
+      "available": false,
+      "section": "terms"
+    },
+    {
+      "max": 10000000,
+      "min": 0,
+      "key": "terms.joining_fee_cents",
+      "kind": "integer",
+      "phase": "b",
+      "available": false,
+      "section": "terms"
+    },
+    {
+      "options": [
+        "purchase",
+        "first_use"
+      ],
+      "key": "terms.validity_starts",
+      "kind": "enum",
+      "phase": "b",
+      "available": false,
+      "section": "terms"
+    },
+    {
+      "max": 30,
+      "min": 0,
+      "key": "terms.expiry_reminder_days",
+      "kind": "integer",
+      "phase": "b",
+      "available": false,
+      "section": "terms"
+    },
+    {
+      "key": "terms.compatible_package_ids",
+      "kind": "scope_ids",
+      "phase": "c",
+      "available": false,
+      "section": "terms"
+    },
+    {
+      "max": 10,
+      "min": 1,
+      "key": "terms.beneficiaries",
+      "kind": "integer",
+      "phase": "c",
+      "available": false,
+      "section": "terms"
+    },
+    {
+      "options": [
+        "per_person",
+        "shared"
+      ],
+      "key": "terms.quota_sharing",
+      "kind": "enum",
+      "phase": "c",
+      "available": false,
+      "section": "terms"
+    },
+    {
+      "key": "terms.allow_minor_beneficiaries",
+      "kind": "boolean",
+      "phase": "c",
+      "available": false,
+      "section": "terms"
+    },
+    {
+      "max": 10000,
+      "min": 1,
+      "key": "terms.seats",
+      "kind": "integer",
+      "phase": "c",
+      "available": false,
+      "section": "terms"
+    },
+    {
+      "options": [
+        "agreed",
+        "used"
+      ],
+      "key": "terms.seat_billing",
+      "kind": "enum",
+      "phase": "c",
+      "available": false,
+      "section": "terms"
+    },
+    {
+      "options": [
+        "invite_code",
+        "email_domain"
+      ],
+      "key": "terms.enrollment",
+      "kind": "enum",
+      "phase": "c",
+      "available": false,
+      "section": "terms"
+    },
+    {
+      "max": 120,
+      "key": "terms.enrollment_domain",
+      "kind": "string_or_null",
+      "phase": "c",
+      "available": false,
+      "section": "terms"
+    },
+    {
+      "key": "group_classes.included",
+      "kind": "boolean",
+      "phase": "a",
+      "available": true,
+      "section": "group_classes"
+    },
+    {
+      "key": "group_classes.visits",
+      "kind": "quota",
+      "phase": "a",
+      "available": true,
+      "section": "group_classes"
+    },
+    {
+      "key": "group_classes.class_types",
+      "kind": "scope_ids",
+      "phase": "a",
+      "available": true,
+      "section": "group_classes"
+    },
+    {
+      "key": "group_classes.class_type_limits",
+      "kind": "quota_by_id",
+      "phase": "a",
+      "available": true,
+      "section": "group_classes"
+    },
+    {
+      "max": 100,
+      "min": 0,
+      "key": "group_classes.rollover_max",
+      "kind": "integer",
+      "phase": "b",
+      "available": false,
+      "section": "group_classes"
+    },
+    {
+      "key": "group_classes.time_windows",
+      "kind": "time_windows",
+      "phase": "b",
+      "available": false,
+      "section": "group_classes"
+    },
+    {
+      "max": 365,
+      "min": 0,
+      "key": "booking.window_days",
+      "kind": "gym_default_integer",
+      "phase": "b",
+      "available": false,
+      "section": "booking"
+    },
+    {
+      "options": [
+        "normal",
+        "high"
+      ],
+      "key": "booking.waitlist_priority",
+      "kind": "enum",
+      "phase": "b",
+      "available": false,
+      "section": "booking"
+    },
+    {
+      "max": 168,
+      "min": 0,
+      "key": "booking.cancellation_cutoff_hours",
+      "kind": "gym_default_integer",
+      "phase": "b",
+      "available": false,
+      "section": "booking"
+    },
+    {
+      "key": "booking.no_show_penalty_waived",
+      "kind": "boolean",
+      "phase": "b",
+      "available": false,
+      "section": "booking"
+    },
+    {
+      "key": "personal_training.included",
+      "kind": "boolean",
+      "phase": "c",
+      "available": false,
+      "section": "personal_training"
+    },
+    {
+      "key": "personal_training.sessions",
+      "kind": "quota",
+      "phase": "c",
+      "available": false,
+      "section": "personal_training"
+    },
+    {
+      "options": [
+        "one_to_one",
+        "semi_private"
+      ],
+      "key": "personal_training.format",
+      "kind": "enum",
+      "phase": "c",
+      "available": false,
+      "section": "personal_training"
+    },
+    {
+      "max": 4,
+      "min": 1,
+      "key": "personal_training.group_size",
+      "kind": "integer",
+      "phase": "c",
+      "available": false,
+      "section": "personal_training"
+    },
+    {
+      "options": [
+        30,
+        45,
+        60,
+        90
+      ],
+      "key": "personal_training.session_minutes",
+      "kind": "integer_option",
+      "phase": "c",
+      "available": false,
+      "section": "personal_training"
+    },
+    {
+      "key": "personal_training.coach_id",
+      "kind": "uuid_or_null",
+      "phase": "c",
+      "available": false,
+      "section": "personal_training"
+    },
+    {
+      "max": 20,
+      "min": 0,
+      "key": "personal_training.assessments",
+      "kind": "integer",
+      "phase": "c",
+      "available": false,
+      "section": "personal_training"
+    },
+    {
+      "key": "online_coaching.included",
+      "kind": "boolean",
+      "phase": "a",
+      "available": true,
+      "section": "online_coaching"
+    },
+    {
+      "key": "online_coaching.assigned_programming",
+      "kind": "boolean",
+      "phase": "a",
+      "available": true,
+      "section": "online_coaching"
+    },
+    {
+      "key": "online_coaching.messaging",
+      "kind": "boolean",
+      "phase": "a",
+      "available": true,
+      "section": "online_coaching"
+    },
+    {
+      "key": "online_coaching.touchpoints",
+      "kind": "quota",
+      "phase": "a",
+      "available": true,
+      "section": "online_coaching"
+    },
+    {
+      "key": "online_coaching.form_reviews",
+      "kind": "quota",
+      "phase": "c",
+      "available": false,
+      "section": "online_coaching"
+    },
+    {
+      "options": [
+        24,
+        48,
+        72
+      ],
+      "key": "online_coaching.response_sla_hours",
+      "kind": "integer_option_or_null",
+      "phase": "c",
+      "available": false,
+      "section": "online_coaching"
+    },
+    {
+      "key": "online_coaching.nutrition_plan",
+      "kind": "boolean",
+      "phase": "c",
+      "available": false,
+      "section": "online_coaching"
+    },
+    {
+      "key": "content.workout_library",
+      "kind": "boolean",
+      "phase": "c",
+      "available": false,
+      "section": "content"
+    },
+    {
+      "key": "content.on_demand_video",
+      "kind": "boolean",
+      "phase": "c",
+      "available": false,
+      "section": "content"
+    },
+    {
+      "key": "content.advanced_analytics",
+      "kind": "boolean",
+      "phase": "c",
+      "available": false,
+      "section": "content"
+    },
+    {
+      "key": "facility.open_gym",
+      "kind": "boolean",
+      "phase": "b",
+      "available": false,
+      "section": "facility"
+    },
+    {
+      "key": "facility.open_gym_visits",
+      "kind": "quota",
+      "phase": "b",
+      "available": false,
+      "section": "facility"
+    },
+    {
+      "key": "facility.location_ids",
+      "kind": "scope_ids",
+      "phase": "b",
+      "available": false,
+      "section": "facility"
+    },
+    {
+      "options": [
+        "sauna",
+        "locker",
+        "towel",
+        "parking",
+        "childcare"
+      ],
+      "key": "facility.amenities",
+      "kind": "enum_list",
+      "phase": "a",
+      "available": true,
+      "section": "facility"
+    },
+    {
+      "max": 120,
+      "key": "facility.amenities_note",
+      "kind": "string_or_null",
+      "phase": "a",
+      "available": true,
+      "section": "facility"
+    },
+    {
+      "key": "perks.guest_passes",
+      "kind": "quota",
+      "phase": "b",
+      "available": false,
+      "section": "perks"
+    },
+    {
+      "max": 365,
+      "min": 0,
+      "key": "perks.freeze_days_per_year",
+      "kind": "integer",
+      "phase": "b",
+      "available": false,
+      "section": "perks"
+    },
+    {
+      "max": 100,
+      "min": 0,
+      "key": "perks.member_discount_percent",
+      "kind": "integer",
+      "phase": "b",
+      "available": false,
+      "section": "perks"
+    },
+    {
+      "options": [
+        "products",
+        "personal_training",
+        "events"
+      ],
+      "key": "perks.member_discount_scope",
+      "kind": "enum_list",
+      "phase": "b",
+      "available": false,
+      "section": "perks"
+    },
+    {
+      "key": "perks.events",
+      "kind": "boolean",
+      "phase": "b",
+      "available": false,
+      "section": "perks"
+    },
+    {
+      "key": "perks.event_visits",
+      "kind": "quota",
+      "phase": "b",
+      "available": false,
+      "section": "perks"
+    }
+  ],
+  "types": [
+    {
+      "enabled": true,
+      "key": "membership",
+      "available": true,
+      "preset": {
+        "facility.amenities_note": null,
+        "perks.guest_passes": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "booking.cancellation_cutoff_hours": null,
+        "content.workout_library": false,
+        "perks.event_visits": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "terms.joining_fee_cents": 0,
+        "perks.member_discount_scope": [],
+        "personal_training.format": "one_to_one",
+        "personal_training.session_minutes": 60,
+        "facility.open_gym_visits": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "terms.validity": null,
+        "terms.validity_starts": "purchase",
+        "terms.conversion_package_id": null,
+        "group_classes.time_windows": [],
+        "personal_training.sessions": {
+          "limit": 0,
+          "period": "subscription_period"
+        },
+        "booking.window_days": null,
+        "online_coaching.response_sla_hours": null,
+        "personal_training.assessments": 0,
+        "terms.seat_billing": "agreed",
+        "facility.open_gym": false,
+        "facility.amenities": [],
+        "terms.quota_sharing": "per_person",
+        "terms.new_members_only": false,
+        "booking.no_show_penalty_waived": false,
+        "perks.member_discount_percent": 0,
+        "terms.seats": 1,
+        "group_classes.class_type_limits": [],
+        "group_classes.class_types": "all",
+        "terms.enrollment": "invite_code",
+        "group_classes.included": true,
+        "terms.enrollment_domain": null,
+        "terms.stacking": false,
+        "terms.allow_minor_beneficiaries": false,
+        "content.advanced_analytics": false,
+        "terms.compatible_package_ids": "all",
+        "online_coaching.assigned_programming": true,
+        "online_coaching.nutrition_plan": false,
+        "terms.minimum_commitment_months": 0,
+        "booking.waitlist_priority": "normal",
+        "terms.once_per_person": false,
+        "terms.auto_renew": true,
+        "personal_training.group_size": 1,
+        "perks.freeze_days_per_year": 0,
+        "content.on_demand_video": false,
+        "online_coaching.form_reviews": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "facility.location_ids": "all",
+        "personal_training.included": false,
+        "group_classes.rollover_max": 0,
+        "online_coaching.touchpoints": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "online_coaching.messaging": true,
+        "personal_training.coach_id": null,
+        "perks.events": false,
+        "online_coaching.included": false,
+        "terms.expiry_reminder_days": 0,
+        "group_classes.visits": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "terms.beneficiaries": 1
+      },
+      "billing_model": "recurring",
+      "billing_periods": [
+        "monthly",
+        "quarterly",
+        "semiannual",
+        "annual",
+        "custom"
+      ],
+      "default_billing_period": "monthly",
+      "billing_period_overrides": {
+        "annual": {
+          "perks.freeze_days_per_year": 30
+        },
+        "custom": {
+          "perks.freeze_days_per_year": 0
+        },
+        "monthly": {
+          "perks.freeze_days_per_year": 0
+        },
+        "quarterly": {
+          "perks.freeze_days_per_year": 7
+        },
+        "semiannual": {
+          "perks.freeze_days_per_year": 14
+        }
+      },
+      "locks": [
+        {
+          "reason": "recurring_type",
+          "value": null,
+          "path": "terms.validity",
+          "field": "terms.validity"
+        },
+        {
+          "reason": "recurring_type",
+          "value": false,
+          "path": "terms.stacking",
+          "field": "terms.stacking"
+        }
+      ]
+    },
+    {
+      "enabled": true,
+      "key": "class_pack",
+      "available": true,
+      "preset": {
+        "facility.amenities_note": null,
+        "perks.guest_passes": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "booking.cancellation_cutoff_hours": null,
+        "content.workout_library": false,
+        "perks.event_visits": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "terms.joining_fee_cents": 0,
+        "perks.member_discount_scope": [],
+        "personal_training.format": "one_to_one",
+        "personal_training.session_minutes": 60,
+        "facility.open_gym_visits": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "terms.validity": {
+          "amount": 3,
+          "unit": "month"
+        },
+        "terms.validity_starts": "purchase",
+        "terms.conversion_package_id": null,
+        "group_classes.time_windows": [],
+        "personal_training.sessions": {
+          "limit": 0,
+          "period": "subscription_period"
+        },
+        "booking.window_days": null,
+        "online_coaching.response_sla_hours": null,
+        "personal_training.assessments": 0,
+        "terms.seat_billing": "agreed",
+        "facility.open_gym": false,
+        "facility.amenities": [],
+        "terms.quota_sharing": "per_person",
+        "terms.new_members_only": false,
+        "booking.no_show_penalty_waived": false,
+        "perks.member_discount_percent": 0,
+        "terms.seats": 1,
+        "group_classes.class_type_limits": [],
+        "group_classes.class_types": "all",
+        "terms.enrollment": "invite_code",
+        "group_classes.included": true,
+        "terms.enrollment_domain": null,
+        "terms.stacking": true,
+        "terms.allow_minor_beneficiaries": false,
+        "content.advanced_analytics": false,
+        "terms.compatible_package_ids": "all",
+        "online_coaching.assigned_programming": true,
+        "online_coaching.nutrition_plan": false,
+        "terms.minimum_commitment_months": 0,
+        "booking.waitlist_priority": "normal",
+        "terms.once_per_person": false,
+        "terms.auto_renew": false,
+        "personal_training.group_size": 1,
+        "perks.freeze_days_per_year": 0,
+        "content.on_demand_video": false,
+        "online_coaching.form_reviews": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "facility.location_ids": "all",
+        "personal_training.included": false,
+        "group_classes.rollover_max": 0,
+        "online_coaching.touchpoints": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "online_coaching.messaging": true,
+        "personal_training.coach_id": null,
+        "perks.events": false,
+        "online_coaching.included": false,
+        "terms.expiry_reminder_days": 0,
+        "group_classes.visits": {
+          "limit": 10,
+          "period": "subscription_period"
+        },
+        "terms.beneficiaries": 1
+      },
+      "billing_model": "one_off",
+      "billing_periods": [
+        "one_off"
+      ],
+      "default_billing_period": "one_off",
+      "billing_period_overrides": {},
+      "locks": [
+        {
+          "reason": "one_off_type",
+          "value": false,
+          "path": "terms.auto_renew",
+          "field": "terms.auto_renew"
+        },
+        {
+          "reason": "one_off_type",
+          "value": 0,
+          "path": "terms.minimum_commitment_months",
+          "field": "terms.minimum_commitment_months"
+        },
+        {
+          "reason": "type_service",
+          "value": true,
+          "path": "group_classes.included",
+          "field": "group_classes.included"
+        },
+        {
+          "reason": "counts_whole_validity",
+          "value": "subscription_period",
+          "path": "group_classes.visits.period",
+          "field": "group_classes.visits"
+        }
+      ]
+    },
+    {
+      "enabled": true,
+      "key": "drop_in",
+      "available": true,
+      "preset": {
+        "facility.amenities_note": null,
+        "perks.guest_passes": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "booking.cancellation_cutoff_hours": null,
+        "content.workout_library": false,
+        "perks.event_visits": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "terms.joining_fee_cents": 0,
+        "perks.member_discount_scope": [],
+        "personal_training.format": "one_to_one",
+        "personal_training.session_minutes": 60,
+        "facility.open_gym_visits": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "terms.validity": {
+          "amount": 30,
+          "unit": "day"
+        },
+        "terms.validity_starts": "purchase",
+        "terms.conversion_package_id": null,
+        "group_classes.time_windows": [],
+        "personal_training.sessions": {
+          "limit": 0,
+          "period": "subscription_period"
+        },
+        "booking.window_days": null,
+        "online_coaching.response_sla_hours": null,
+        "personal_training.assessments": 0,
+        "terms.seat_billing": "agreed",
+        "facility.open_gym": false,
+        "facility.amenities": [],
+        "terms.quota_sharing": "per_person",
+        "terms.new_members_only": false,
+        "booking.no_show_penalty_waived": false,
+        "perks.member_discount_percent": 0,
+        "terms.seats": 1,
+        "group_classes.class_type_limits": [],
+        "group_classes.class_types": "all",
+        "terms.enrollment": "invite_code",
+        "group_classes.included": true,
+        "terms.enrollment_domain": null,
+        "terms.stacking": true,
+        "terms.allow_minor_beneficiaries": false,
+        "content.advanced_analytics": false,
+        "terms.compatible_package_ids": "all",
+        "online_coaching.assigned_programming": true,
+        "online_coaching.nutrition_plan": false,
+        "terms.minimum_commitment_months": 0,
+        "booking.waitlist_priority": "normal",
+        "terms.once_per_person": false,
+        "terms.auto_renew": false,
+        "personal_training.group_size": 1,
+        "perks.freeze_days_per_year": 0,
+        "content.on_demand_video": false,
+        "online_coaching.form_reviews": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "facility.location_ids": "all",
+        "personal_training.included": false,
+        "group_classes.rollover_max": 0,
+        "online_coaching.touchpoints": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "online_coaching.messaging": true,
+        "personal_training.coach_id": null,
+        "perks.events": false,
+        "online_coaching.included": false,
+        "terms.expiry_reminder_days": 0,
+        "group_classes.visits": {
+          "limit": 1,
+          "period": "subscription_period"
+        },
+        "terms.beneficiaries": 1
+      },
+      "billing_model": "one_off",
+      "billing_periods": [
+        "one_off"
+      ],
+      "default_billing_period": "one_off",
+      "billing_period_overrides": {},
+      "locks": [
+        {
+          "reason": "one_off_type",
+          "value": false,
+          "path": "terms.auto_renew",
+          "field": "terms.auto_renew"
+        },
+        {
+          "reason": "one_off_type",
+          "value": 0,
+          "path": "terms.minimum_commitment_months",
+          "field": "terms.minimum_commitment_months"
+        },
+        {
+          "reason": "type_service",
+          "value": true,
+          "path": "group_classes.included",
+          "field": "group_classes.included"
+        },
+        {
+          "reason": "single_visit",
+          "value": 1,
+          "path": "group_classes.visits.limit",
+          "field": "group_classes.visits"
+        },
+        {
+          "reason": "counts_whole_validity",
+          "value": "subscription_period",
+          "path": "group_classes.visits.period",
+          "field": "group_classes.visits"
+        },
+        {
+          "reason": "single_visit",
+          "value": [],
+          "path": "group_classes.class_type_limits",
+          "field": "group_classes.class_type_limits"
+        },
+        {
+          "reason": "single_visit",
+          "value": 0,
+          "path": "perks.guest_passes.limit",
+          "field": "perks.guest_passes"
+        },
+        {
+          "reason": "single_visit",
+          "value": 0,
+          "path": "perks.freeze_days_per_year",
+          "field": "perks.freeze_days_per_year"
+        }
+      ]
+    },
+    {
+      "enabled": true,
+      "key": "trial",
+      "available": true,
+      "preset": {
+        "facility.amenities_note": null,
+        "perks.guest_passes": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "booking.cancellation_cutoff_hours": null,
+        "content.workout_library": false,
+        "perks.event_visits": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "terms.joining_fee_cents": 0,
+        "perks.member_discount_scope": [],
+        "personal_training.format": "one_to_one",
+        "personal_training.session_minutes": 60,
+        "facility.open_gym_visits": {
+          "limit": "unlimited",
+          "period": "subscription_period"
+        },
+        "terms.validity": {
+          "amount": 7,
+          "unit": "day"
+        },
+        "terms.validity_starts": "purchase",
+        "terms.conversion_package_id": null,
+        "group_classes.time_windows": [],
+        "personal_training.sessions": {
+          "limit": 0,
+          "period": "subscription_period"
+        },
+        "booking.window_days": null,
+        "online_coaching.response_sla_hours": null,
+        "personal_training.assessments": 1,
+        "terms.seat_billing": "agreed",
+        "facility.open_gym": true,
+        "facility.amenities": [],
+        "terms.quota_sharing": "per_person",
+        "terms.new_members_only": true,
+        "booking.no_show_penalty_waived": true,
+        "perks.member_discount_percent": 0,
+        "terms.seats": 1,
+        "group_classes.class_type_limits": [],
+        "group_classes.class_types": "all",
+        "terms.enrollment": "invite_code",
+        "group_classes.included": true,
+        "terms.enrollment_domain": null,
+        "terms.stacking": false,
+        "terms.allow_minor_beneficiaries": false,
+        "content.advanced_analytics": false,
+        "terms.compatible_package_ids": "all",
+        "online_coaching.assigned_programming": true,
+        "online_coaching.nutrition_plan": false,
+        "terms.minimum_commitment_months": 0,
+        "booking.waitlist_priority": "normal",
+        "terms.once_per_person": true,
+        "terms.auto_renew": false,
+        "personal_training.group_size": 1,
+        "perks.freeze_days_per_year": 0,
+        "content.on_demand_video": false,
+        "online_coaching.form_reviews": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "facility.location_ids": "all",
+        "personal_training.included": false,
+        "group_classes.rollover_max": 0,
+        "online_coaching.touchpoints": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "online_coaching.messaging": true,
+        "personal_training.coach_id": null,
+        "perks.events": false,
+        "online_coaching.included": false,
+        "terms.expiry_reminder_days": 2,
+        "group_classes.visits": {
+          "limit": "unlimited",
+          "period": "subscription_period"
+        },
+        "terms.beneficiaries": 1
+      },
+      "billing_model": "one_off",
+      "billing_periods": [
+        "one_off"
+      ],
+      "default_billing_period": "one_off",
+      "billing_period_overrides": {},
+      "locks": [
+        {
+          "reason": "one_off_type",
+          "value": false,
+          "path": "terms.auto_renew",
+          "field": "terms.auto_renew"
+        },
+        {
+          "reason": "one_off_type",
+          "value": 0,
+          "path": "terms.minimum_commitment_months",
+          "field": "terms.minimum_commitment_months"
+        },
+        {
+          "reason": "trial_once",
+          "value": true,
+          "path": "terms.once_per_person",
+          "field": "terms.once_per_person"
+        },
+        {
+          "reason": "trial_once",
+          "value": 0,
+          "path": "terms.joining_fee_cents",
+          "field": "terms.joining_fee_cents"
+        },
+        {
+          "reason": "counts_whole_validity",
+          "value": "subscription_period",
+          "path": "group_classes.visits.period",
+          "field": "group_classes.visits"
+        },
+        {
+          "reason": "trial_once",
+          "value": 0,
+          "path": "perks.guest_passes.limit",
+          "field": "perks.guest_passes"
+        },
+        {
+          "reason": "trial_once",
+          "value": 0,
+          "path": "perks.freeze_days_per_year",
+          "field": "perks.freeze_days_per_year"
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "key": "pt_pack",
+      "available": false,
+      "preset": {
+        "facility.amenities_note": null,
+        "perks.guest_passes": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "booking.cancellation_cutoff_hours": null,
+        "content.workout_library": false,
+        "perks.event_visits": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "terms.joining_fee_cents": 0,
+        "perks.member_discount_scope": [],
+        "personal_training.format": "one_to_one",
+        "personal_training.session_minutes": 60,
+        "facility.open_gym_visits": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "terms.validity": {
+          "amount": 3,
+          "unit": "month"
+        },
+        "terms.validity_starts": "purchase",
+        "terms.conversion_package_id": null,
+        "group_classes.time_windows": [],
+        "personal_training.sessions": {
+          "limit": 10,
+          "period": "subscription_period"
+        },
+        "booking.window_days": null,
+        "online_coaching.response_sla_hours": null,
+        "personal_training.assessments": 1,
+        "terms.seat_billing": "agreed",
+        "facility.open_gym": false,
+        "facility.amenities": [],
+        "terms.quota_sharing": "per_person",
+        "terms.new_members_only": false,
+        "booking.no_show_penalty_waived": false,
+        "perks.member_discount_percent": 0,
+        "terms.seats": 1,
+        "group_classes.class_type_limits": [],
+        "group_classes.class_types": "all",
+        "terms.enrollment": "invite_code",
+        "group_classes.included": false,
+        "terms.enrollment_domain": null,
+        "terms.stacking": true,
+        "terms.allow_minor_beneficiaries": false,
+        "content.advanced_analytics": false,
+        "terms.compatible_package_ids": "all",
+        "online_coaching.assigned_programming": false,
+        "online_coaching.nutrition_plan": false,
+        "terms.minimum_commitment_months": 0,
+        "booking.waitlist_priority": "normal",
+        "terms.once_per_person": false,
+        "terms.auto_renew": false,
+        "personal_training.group_size": 1,
+        "perks.freeze_days_per_year": 0,
+        "content.on_demand_video": false,
+        "online_coaching.form_reviews": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "facility.location_ids": "all",
+        "personal_training.included": true,
+        "group_classes.rollover_max": 0,
+        "online_coaching.touchpoints": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "online_coaching.messaging": true,
+        "personal_training.coach_id": null,
+        "perks.events": false,
+        "online_coaching.included": true,
+        "terms.expiry_reminder_days": 0,
+        "group_classes.visits": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "terms.beneficiaries": 1
+      },
+      "billing_model": "one_off",
+      "billing_periods": [
+        "one_off"
+      ],
+      "default_billing_period": "one_off",
+      "billing_period_overrides": {},
+      "locks": [
+        {
+          "reason": "one_off_type",
+          "value": false,
+          "path": "terms.auto_renew",
+          "field": "terms.auto_renew"
+        },
+        {
+          "reason": "one_off_type",
+          "value": 0,
+          "path": "terms.minimum_commitment_months",
+          "field": "terms.minimum_commitment_months"
+        },
+        {
+          "reason": "type_service",
+          "value": true,
+          "path": "personal_training.included",
+          "field": "personal_training.included"
+        },
+        {
+          "reason": "counts_whole_validity",
+          "value": "subscription_period",
+          "path": "personal_training.sessions.period",
+          "field": "personal_training.sessions"
+        }
+      ]
+    },
+    {
+      "enabled": true,
+      "key": "add_on",
+      "available": false,
+      "preset": {
+        "facility.amenities_note": null,
+        "perks.guest_passes": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "booking.cancellation_cutoff_hours": null,
+        "content.workout_library": false,
+        "perks.event_visits": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "terms.joining_fee_cents": 0,
+        "perks.member_discount_scope": [],
+        "personal_training.format": "one_to_one",
+        "personal_training.session_minutes": 60,
+        "facility.open_gym_visits": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "terms.validity": null,
+        "terms.validity_starts": "purchase",
+        "terms.conversion_package_id": null,
+        "group_classes.time_windows": [],
+        "personal_training.sessions": {
+          "limit": 0,
+          "period": "subscription_period"
+        },
+        "booking.window_days": null,
+        "online_coaching.response_sla_hours": null,
+        "personal_training.assessments": 0,
+        "terms.seat_billing": "agreed",
+        "facility.open_gym": false,
+        "facility.amenities": [],
+        "terms.quota_sharing": "per_person",
+        "terms.new_members_only": false,
+        "booking.no_show_penalty_waived": false,
+        "perks.member_discount_percent": 0,
+        "terms.seats": 1,
+        "group_classes.class_type_limits": [],
+        "group_classes.class_types": "all",
+        "terms.enrollment": "invite_code",
+        "group_classes.included": false,
+        "terms.enrollment_domain": null,
+        "terms.stacking": false,
+        "terms.allow_minor_beneficiaries": false,
+        "content.advanced_analytics": false,
+        "terms.compatible_package_ids": "all",
+        "online_coaching.assigned_programming": true,
+        "online_coaching.nutrition_plan": false,
+        "terms.minimum_commitment_months": 0,
+        "booking.waitlist_priority": "normal",
+        "terms.once_per_person": false,
+        "terms.auto_renew": false,
+        "personal_training.group_size": 1,
+        "perks.freeze_days_per_year": 0,
+        "content.on_demand_video": false,
+        "online_coaching.form_reviews": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "facility.location_ids": "all",
+        "personal_training.included": false,
+        "group_classes.rollover_max": 0,
+        "online_coaching.touchpoints": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "online_coaching.messaging": true,
+        "personal_training.coach_id": null,
+        "perks.events": false,
+        "online_coaching.included": false,
+        "terms.expiry_reminder_days": 0,
+        "group_classes.visits": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "terms.beneficiaries": 1
+      },
+      "billing_model": "with_base",
+      "billing_periods": [
+        "with_base"
+      ],
+      "default_billing_period": "with_base",
+      "billing_period_overrides": {},
+      "locks": [
+        {
+          "reason": "follows_base",
+          "value": false,
+          "path": "terms.auto_renew",
+          "field": "terms.auto_renew"
+        },
+        {
+          "reason": "follows_base",
+          "value": null,
+          "path": "terms.validity",
+          "field": "terms.validity"
+        },
+        {
+          "reason": "follows_base",
+          "value": false,
+          "path": "terms.stacking",
+          "field": "terms.stacking"
+        },
+        {
+          "reason": "follows_base",
+          "value": 0,
+          "path": "terms.minimum_commitment_months",
+          "field": "terms.minimum_commitment_months"
+        },
+        {
+          "reason": "follows_base",
+          "value": 0,
+          "path": "terms.joining_fee_cents",
+          "field": "terms.joining_fee_cents"
+        },
+        {
+          "reason": "follows_base",
+          "value": 0,
+          "path": "perks.freeze_days_per_year",
+          "field": "perks.freeze_days_per_year"
+        },
+        {
+          "reason": "follows_base",
+          "value": "all",
+          "path": "facility.location_ids",
+          "field": "facility.location_ids"
+        }
+      ]
+    },
+    {
+      "enabled": true,
+      "key": "shared",
+      "available": false,
+      "preset": {
+        "facility.amenities_note": null,
+        "perks.guest_passes": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "booking.cancellation_cutoff_hours": null,
+        "content.workout_library": false,
+        "perks.event_visits": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "terms.joining_fee_cents": 0,
+        "perks.member_discount_scope": [],
+        "personal_training.format": "one_to_one",
+        "personal_training.session_minutes": 60,
+        "facility.open_gym_visits": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "terms.validity": null,
+        "terms.validity_starts": "purchase",
+        "terms.conversion_package_id": null,
+        "group_classes.time_windows": [],
+        "personal_training.sessions": {
+          "limit": 0,
+          "period": "subscription_period"
+        },
+        "booking.window_days": null,
+        "online_coaching.response_sla_hours": null,
+        "personal_training.assessments": 0,
+        "terms.seat_billing": "agreed",
+        "facility.open_gym": false,
+        "facility.amenities": [],
+        "terms.quota_sharing": "per_person",
+        "terms.new_members_only": false,
+        "booking.no_show_penalty_waived": false,
+        "perks.member_discount_percent": 0,
+        "terms.seats": 1,
+        "group_classes.class_type_limits": [],
+        "group_classes.class_types": "all",
+        "terms.enrollment": "invite_code",
+        "group_classes.included": true,
+        "terms.enrollment_domain": null,
+        "terms.stacking": false,
+        "terms.allow_minor_beneficiaries": false,
+        "content.advanced_analytics": false,
+        "terms.compatible_package_ids": "all",
+        "online_coaching.assigned_programming": true,
+        "online_coaching.nutrition_plan": false,
+        "terms.minimum_commitment_months": 0,
+        "booking.waitlist_priority": "normal",
+        "terms.once_per_person": false,
+        "terms.auto_renew": true,
+        "personal_training.group_size": 1,
+        "perks.freeze_days_per_year": 0,
+        "content.on_demand_video": false,
+        "online_coaching.form_reviews": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "facility.location_ids": "all",
+        "personal_training.included": false,
+        "group_classes.rollover_max": 0,
+        "online_coaching.touchpoints": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "online_coaching.messaging": true,
+        "personal_training.coach_id": null,
+        "perks.events": false,
+        "online_coaching.included": false,
+        "terms.expiry_reminder_days": 0,
+        "group_classes.visits": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "terms.beneficiaries": 2
+      },
+      "billing_model": "recurring",
+      "billing_periods": [
+        "monthly",
+        "quarterly",
+        "semiannual",
+        "annual",
+        "custom"
+      ],
+      "default_billing_period": "monthly",
+      "billing_period_overrides": {
+        "annual": {
+          "perks.freeze_days_per_year": 30
+        },
+        "custom": {
+          "perks.freeze_days_per_year": 0
+        },
+        "monthly": {
+          "perks.freeze_days_per_year": 0
+        },
+        "quarterly": {
+          "perks.freeze_days_per_year": 7
+        },
+        "semiannual": {
+          "perks.freeze_days_per_year": 14
+        }
+      },
+      "locks": [
+        {
+          "reason": "recurring_type",
+          "value": null,
+          "path": "terms.validity",
+          "field": "terms.validity"
+        },
+        {
+          "reason": "recurring_type",
+          "value": false,
+          "path": "terms.stacking",
+          "field": "terms.stacking"
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "key": "corporate",
+      "available": false,
+      "preset": {
+        "facility.amenities_note": null,
+        "perks.guest_passes": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "booking.cancellation_cutoff_hours": null,
+        "content.workout_library": false,
+        "perks.event_visits": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "terms.joining_fee_cents": 0,
+        "perks.member_discount_scope": [],
+        "personal_training.format": "one_to_one",
+        "personal_training.session_minutes": 60,
+        "facility.open_gym_visits": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "terms.validity": null,
+        "terms.validity_starts": "purchase",
+        "terms.conversion_package_id": null,
+        "group_classes.time_windows": [],
+        "personal_training.sessions": {
+          "limit": 0,
+          "period": "subscription_period"
+        },
+        "booking.window_days": null,
+        "online_coaching.response_sla_hours": null,
+        "personal_training.assessments": 0,
+        "terms.seat_billing": "agreed",
+        "facility.open_gym": false,
+        "facility.amenities": [],
+        "terms.quota_sharing": "per_person",
+        "terms.new_members_only": false,
+        "booking.no_show_penalty_waived": false,
+        "perks.member_discount_percent": 0,
+        "terms.seats": 10,
+        "group_classes.class_type_limits": [],
+        "group_classes.class_types": "all",
+        "terms.enrollment": "invite_code",
+        "group_classes.included": true,
+        "terms.enrollment_domain": null,
+        "terms.stacking": false,
+        "terms.allow_minor_beneficiaries": false,
+        "content.advanced_analytics": false,
+        "terms.compatible_package_ids": "all",
+        "online_coaching.assigned_programming": true,
+        "online_coaching.nutrition_plan": false,
+        "terms.minimum_commitment_months": 12,
+        "booking.waitlist_priority": "normal",
+        "terms.once_per_person": false,
+        "terms.auto_renew": true,
+        "personal_training.group_size": 1,
+        "perks.freeze_days_per_year": 0,
+        "content.on_demand_video": false,
+        "online_coaching.form_reviews": {
+          "limit": 0,
+          "period": "calendar_month"
+        },
+        "facility.location_ids": "all",
+        "personal_training.included": false,
+        "group_classes.rollover_max": 0,
+        "online_coaching.touchpoints": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "online_coaching.messaging": true,
+        "personal_training.coach_id": null,
+        "perks.events": false,
+        "online_coaching.included": false,
+        "terms.expiry_reminder_days": 0,
+        "group_classes.visits": {
+          "limit": "unlimited",
+          "period": "calendar_month"
+        },
+        "terms.beneficiaries": 1
+      },
+      "billing_model": "recurring",
+      "billing_periods": [
+        "monthly",
+        "quarterly",
+        "semiannual",
+        "annual",
+        "custom"
+      ],
+      "default_billing_period": "monthly",
+      "billing_period_overrides": {},
+      "locks": [
+        {
+          "reason": "recurring_type",
+          "value": null,
+          "path": "terms.validity",
+          "field": "terms.validity"
+        },
+        {
+          "reason": "recurring_type",
+          "value": false,
+          "path": "terms.stacking",
+          "field": "terms.stacking"
+        }
+      ]
+    }
+  ],
+  "implemented_phases": [
+    "a"
+  ],
+  "sections": [
+    "terms",
+    "group_classes",
+    "booking",
+    "personal_training",
+    "online_coaching",
+    "content",
+    "facility",
+    "perks"
+  ]
+}

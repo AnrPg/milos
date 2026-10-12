@@ -14,6 +14,7 @@ import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { SemanticLabel } from "@/components/semantic-label";
+import { allowanceLabel, semanticLabel } from "@/i18n/presentation";
 import {
   shouldShowAllowanceQuota,
   visibleBillingAllowances,
@@ -137,7 +138,7 @@ function PackageSidePanel({
         ) : (
           packages.map((pkg) => {
             const name = String(pkg.name ?? pkg.code ?? i18n("package7431e3d"));
-            const family = pkg.family ? String(pkg.family) : null;
+            const packageType = pkg.package_type ? semanticLabel(String(pkg.package_type), i18n) : null;
             const billing = pkg.billing_period ? String(pkg.billing_period) : null;
             const price = typeof pkg.base_price_cents === "number" ? pkg.base_price_cents : null;
             const currency = String(pkg.currency ?? i18n("eurd06e073"));
@@ -164,10 +165,10 @@ function PackageSidePanel({
                     </span>
                   )}
                 </div>
-                {family && (
+                {packageType && (
                   <span className="text-xs" style={{ color: "var(--dim)" }}>
-                    {family}
-                    {billing ? "· " + (billing) : ""}
+                    {packageType}
+                    {billing ? " · " + semanticLabel(billing, i18n) : ""}
                   </span>
                 )}
                 {price != null && (
@@ -598,7 +599,7 @@ function EntitlementCard({ entitlement }: { entitlement: EffectiveEntitlement | 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {allowanceEntries.map(([key, usage]) => usage ? (
           <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}>
-            <p className="text-sm font-semibold" style={{ color: "var(--text)" }}><SemanticLabel value={key} /></p>
+            <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{allowanceLabel(key, i18n, entitlement.class_type_names)}</p>
             <p className="mt-1 text-2xl font-semibold" style={{ color: "var(--primary)" }}>{String(usage.remaining)}</p>
             {shouldShowAllowanceQuota(usage) ? <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("remainingOf8553660")} {String(usage.limit)} {i18n("resets5de1b0d")} {formatDate(uiLocale, usage.period_end)}</p> : null}
             {usage.extensions > 0 ? <p className="mt-1 text-xs" style={{ color: "var(--success)" }}>{i18n("includes820531f")}{usage.extensions} {i18n("personalExtension95a8d48")}</p> : null}

@@ -7,23 +7,19 @@
 
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
-import { localizeError, semanticLabel } from "@/i18n/presentation";
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
-import { createFinancePackage, fetchFinancePackages, type FinanceRecord } from "@/api/finance";
+import { fetchFinancePackages, type FinanceRecord } from "@/api/finance";
 import { useSession } from "@/components/session-provider";
-import { SemanticLabel } from "@/components/semantic-label";
 import { PackagePanel } from "@/components/admin/finance/panels/PackagePanel";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
-import {
-  DEFAULT_ENTITLEMENT,
-  EntitlementEditor,
-  entitlementParams,
-  type EntitlementDraft,
-} from "@/components/admin/finance/shared/EntitlementEditor";
+import { PackageWizard } from "@/components/admin/finance/packages/PackageWizard";
+import { useT } from "@/components/admin/finance/packages/package-ui";
+import { usePackageAuthoring } from "@/components/admin/finance/packages/use-package-authoring";
+import { typeLabelKey, type PackageDraft } from "@/components/admin/finance/packages/package-catalog";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -36,13 +32,10 @@ function money(uiLocale: string, cents: unknown) {
   return new Intl.NumberFormat(uiLocale, { style: "currency", currency: "EUR" }).format(amount / 100);
 }
 
-const BLANK_FORM = { code: "", name: "", family: "unlimited", billing_period: "monthly", price: "", tags: "" };
-
 export function PackagesTab() {
   const i18n = useUiTranslations();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
-  const queryClient = useQueryClient();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -68,31 +61,9 @@ export function PackagesTab() {
   const packages = packagesQuery.data?.packages ?? [];
   const activePackages = packages.filter((pkg) => pkg.active !== false);
   const inactivePackages = packages.filter((pkg) => pkg.active === false);
-  const [form, setForm] = useState(BLANK_FORM);
-  const [entitlement, setEntitlement] = useState<EntitlementDraft>(DEFAULT_ENTITLEMENT);
+  const { catalog, classTypes, error: catalogError } = usePackageAuthoring(token);
+  const [duplicateDraft, setDuplicateDraft] = useState<PackageDraft | null>(null);
 
-  const createMutation = useMutation({
-    mutationFn: () => {
-      const code = form.code.trim();
-
-      return createFinancePackage(token, {
-        ...(code ? { code } : {}),
-        name: form.name,
-        family: form.family,
-        billing_period: form.billing_period,
-        base_price_cents: Math.round(Number(form.price || 0) * 100),
-        currency: "EUR",
-        tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
-        params: entitlementParams(entitlement),
-      });
-    },
-    onSuccess: async () => {
-      setForm(BLANK_FORM);
-      setEntitlement(DEFAULT_ENTITLEMENT);
-      setParam("new", null);
-      await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "packages"] });
-    },
-  });
   return (
     <div className="space-y-4">
       {/* Header row */}
@@ -138,109 +109,47 @@ export function PackagesTab() {
           packageId={openPackageId}
           packages={packages}
           onClose={() => setParam("package", null)}
+          onDuplicate={(draft) => {
+            setDuplicateDraft(draft);
+            const params = new URLSearchParams(searchParams.toString());
+            params.delete("package");
+            params.set("new", "true");
+            router.replace(`?${params.toString()}`, { scroll: false });
+          }}
         />
       ) : null}
 
-      {/* Side panel: new package */}
+      {/* Side panel: new package wizard (ADR-096) */}
       {showNew ? (
         <SidePanel
           title={i18n("newMembershipPackagef93a8cb")}
           subtitle={i18n("packages0a99901")}
-          onClose={() => setParam("new", null)}
-          footer={
-            <div className="flex gap-3">
-              <button
-                className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
-                style={{ background: "var(--text)", color: "var(--bg)" }}
-                disabled={createMutation.isPending || !form.name}
-                onClick={() => createMutation.mutate()}
-                type="button"
-              >
-                {createMutation.isPending ? i18n("creating94d7d8e") : i18n("createPackagebd56259")}
-              </button>
-              <button
-                className="rounded-full px-5 py-2 text-sm font-semibold"
-                style={{ background: "var(--border)", color: "var(--text-soft)" }}
-                onClick={() => setParam("new", null)}
-                type="button"
-              >
-                {i18n("cancel77dfd21")}
-              </button>
-            </div>
-          }
+          onClose={() => { setDuplicateDraft(null); setParam("new", null); }}
+          width="md:max-w-[680px]"
+          bare
         >
-          <div className="space-y-4">
-            <PanelField label={i18n("name709a232")}>
-              <input
-                className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
-                style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
+          {catalog ? (
+            <div className="flex min-h-0 flex-1 flex-col">
+              <PackageWizard
+                key={duplicateDraft ? "duplicate" : "new"}
+                catalog={catalog}
+                token={token}
+                classTypes={classTypes}
+                packages={packages}
+                initialDraft={duplicateDraft ?? undefined}
+                onClose={() => { setDuplicateDraft(null); setParam("new", null); }}
+                onCreated={(created) => {
+                  setDuplicateDraft(null);
+                  const params = new URLSearchParams(searchParams.toString());
+                  params.delete("new");
+                  params.set("package", String(created.id));
+                  router.replace(`?${params.toString()}`, { scroll: false });
+                }}
               />
-            </PanelField>
-            <details className="rounded-2xl p-3" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
-              <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                {i18n("packageCode4e5df5f")} · {i18n("optional48a7b88")}
-              </summary>
-              <div className="mt-3">
-                <PanelField label={i18n("packageCode4e5df5f")}>
-                  <input
-                    className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
-                    style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-                    value={form.code}
-                    onChange={(e) => setForm({ ...form, code: e.target.value })}
-                  />
-                </PanelField>
-              </div>
-            </details>
-            <div className="grid gap-4 md:grid-cols-2">
-              <PanelField label={i18n("family4efb6cb")}>
-                <select
-                  className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
-                  style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-                  value={form.family}
-                  onChange={(e) => setForm({ ...form, family: e.target.value })}
-                >
-                  {["unlimited", "limited-visits", "personal-programming", "hybrid"].map((v) => (
-                    <option key={v} value={v}>{semanticLabel(v, i18n)}</option>
-                  ))}
-                </select>
-              </PanelField>
-              <PanelField label={i18n("billingPeriodda59f5a")}>
-                <select
-                  className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
-                  style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-                  value={form.billing_period}
-                  onChange={(e) => setForm({ ...form, billing_period: e.target.value })}
-                >
-                  {["monthly", "quarterly", "annual", "custom"].map((v) => (
-                    <option key={v} value={v}>{semanticLabel(v, i18n)}</option>
-                  ))}
-                </select>
-              </PanelField>
             </div>
-            <PanelField label={i18n("priceEur6e2ef14")}>
-              <input
-                className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
-                style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-                type="number"
-                value={form.price}
-                onChange={(e) => setForm({ ...form, price: e.target.value })}
-              />
-            </PanelField>
-            <PanelField label={i18n("tagsCommaSeparated32bf672")}>
-              <input
-                className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
-                style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-                value={form.tags}
-                onChange={(e) => setForm({ ...form, tags: e.target.value })}
-              />
-            </PanelField>
-            <EntitlementEditor value={entitlement} onChange={setEntitlement} />
-            {createMutation.error instanceof Error && (
-              <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(createMutation.error, i18n)}</p>
-            )}
-          </div>
+          ) : (
+            <p className="px-6 py-6 text-sm" style={{ color: "var(--dim)" }}>{catalogError ? i18n("pkgCatalogUnavailable") : i18n("loading33ce417")}</p>
+          )}
         </SidePanel>
       ) : null}
     </div>
@@ -250,6 +159,7 @@ export function PackagesTab() {
 function PackageRows({ packages, onOpen }: { packages: FinanceRecord[]; onOpen: (id: string) => void }) {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
+  const t = useT();
   return packages.map((pkg, index) => (
     <button
       key={field(pkg, "id")}
@@ -263,7 +173,7 @@ function PackageRows({ packages, onOpen }: { packages: FinanceRecord[]; onOpen: 
           {field(pkg, "name", field(pkg, "code"))}
         </p>
         <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
-          {field(pkg, "code") ? `${field(pkg, "code")} · ` : ""}<SemanticLabel value={field(pkg, "family")} /> · <SemanticLabel value={field(pkg, "billing_period")} />
+          {t(typeLabelKey(field(pkg, "package_type", "membership")))} · {t(`pkgBilling_${field(pkg, "billing_period", "monthly")}`)}
         </p>
       </div>
       <div className="flex items-center gap-4">
@@ -277,13 +187,4 @@ function PackageRows({ packages, onOpen }: { packages: FinanceRecord[]; onOpen: 
       </div>
     </button>
   ));
-}
-
-function PanelField({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="block space-y-1">
-      <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{label}</span>
-      {children}
-    </label>
-  );
 }
