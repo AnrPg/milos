@@ -106,3 +106,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-098 | First-run onboarding checklist and tours | Accepted |
 | ADR-099 | Static page headers and client-side users directory | Accepted |
 | ADR-100 | Structured-first workouts and workout assistant hardening | Accepted |
+| ADR-101 | Canonical section format schemas and structure-first parsing | Accepted |
