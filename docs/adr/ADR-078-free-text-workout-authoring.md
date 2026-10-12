@@ -1,6 +1,6 @@
 # ADR-078: Free-text Workout Authoring
 Date: 2026-08-02
-Status: Accepted
+Status: Accepted (amended by ADR-096: free text is now also read into canonical sections)
 
 ## Context
 Admins need a fast WOD authoring mode for writing the board as ordinary rich text.
