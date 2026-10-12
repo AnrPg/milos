@@ -256,10 +256,12 @@ defmodule MilosTraining.Application.PhaseBBookingTest do
 
       Oban.drain_queue(queue: :notifications, with_safety: false)
 
-      assert Enum.any?(
-               Notifications.list_for_user(priority.id),
-               &(&1.type == "booking_waitlist_promoted")
-             )
+      promoted =
+        priority.id
+        |> Notifications.list_for_user()
+        |> Enum.find(&(&1.type == "booking_waitlist_promoted"))
+
+      assert promoted.payload["scheduled_class_id"] == full.id
 
       [entry] = Scheduling.list_waitlist(normal_context, full.id)
 
@@ -313,7 +315,12 @@ defmodule MilosTraining.Application.PhaseBBookingTest do
       assert :ok = PackageExpiryReminderJob.perform(%Oban.Job{args: %{}})
       Oban.drain_queue(queue: :notifications, with_safety: false)
 
-      assert Enum.any?(Notifications.list_for_user(member.id), &(&1.type == "package_expiring"))
+      expiring =
+        member.id
+        |> Notifications.list_for_user()
+        |> Enum.find(&(&1.type == "package_expiring"))
+
+      assert expiring.payload["days"] == 2
     end)
   end
 end

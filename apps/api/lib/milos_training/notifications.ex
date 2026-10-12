@@ -155,6 +155,7 @@ defmodule MilosTraining.Notifications do
         class_name: field(payload, :class_name),
         scheduled_at: field(payload, :scheduled_at),
         booking_id: field(payload, :booking_id),
+        scheduled_class_id: field(payload, :scheduled_class_id),
         status: field(payload, :status),
         url: "/schedule"
       })
@@ -164,6 +165,7 @@ defmodule MilosTraining.Notifications do
       enqueue_simple(:package_expiring, payload, %{
         package_name: field(payload, :package_name),
         ends_on: field(payload, :ends_on),
+        days: field(payload, :days),
         subscription_id: field(payload, :subscription_id),
         url: "/account/billing"
       })
