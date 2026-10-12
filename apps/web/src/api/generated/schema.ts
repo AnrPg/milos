@@ -2291,7 +2291,7 @@ export interface paths {
         put?: never;
         /**
          * Log a class, assigned, library, or freeform workout
-         * @description Idempotent per `idempotency_key`: a replay returns the original entry with 200. Logging feeds the same durable completion projection as workout executions.
+         * @description Idempotent per `idempotency_key`: a replay returns the original entry with 200, before source authorization is re-evaluated (ADR-102). Reusing a key for a different source returns 409 `idempotency_key_conflict`. Logging feeds the same durable completion projection as workout executions.
          */
         post: operations["MilosTrainingWeb.TrainingLogController.create"];
         delete?: never;
@@ -2623,7 +2623,10 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Reject a booking */
+        /**
+         * Reject a booking
+         * @description Booking resolution is never replayed blindly (ADR-102): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.
+         */
         patch: operations["MilosTrainingWeb.AdminScheduleController.reject_booking"];
         trace?: never;
     };
@@ -2640,7 +2643,10 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Approve a booking */
+        /**
+         * Approve a booking
+         * @description Booking resolution is never replayed blindly (ADR-102): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.
+         */
         patch: operations["MilosTrainingWeb.AdminScheduleController.approve_booking"];
         trace?: never;
     };
@@ -2894,7 +2900,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Book a schedule slot */
+        /**
+         * Book a schedule slot
+         * @description Optionally idempotent per `client_operation_id` (ADR-102): replaying the same id for the same slot returns the original booking with 200 and no new reservation, notification, or broadcast; reusing it for another slot returns 409 `idempotency_key_conflict`.
+         */
         post: operations["MilosTrainingWeb.ScheduleController.create_booking"];
         delete?: never;
         options?: never;
@@ -15319,6 +15328,11 @@ export interface operations {
             content: {
                 "application/json": {
                     admin_message?: string;
+                    /**
+                     * Format: uuid
+                     * @description Stable client operation id (ADR-102). Replaying the operation that already resolved the booking returns it with 200 and no new notification.
+                     */
+                    client_operation_id?: string | null;
                 };
             };
         };
@@ -15333,6 +15347,42 @@ export interface operations {
                         booking: {
                             [key: string]: unknown;
                         };
+                    };
+                };
+            };
+            /** @description Booking not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Booking no longer pending, slot full, or operation id conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Invalid request */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
                     };
                 };
             };
@@ -15351,6 +15401,11 @@ export interface operations {
             content: {
                 "application/json": {
                     admin_message?: string;
+                    /**
+                     * Format: uuid
+                     * @description Stable client operation id (ADR-102). Replaying the operation that already resolved the booking returns it with 200 and no new notification.
+                     */
+                    client_operation_id?: string | null;
                 };
             };
         };
@@ -15365,6 +15420,42 @@ export interface operations {
                         booking: {
                             [key: string]: unknown;
                         };
+                    };
+                };
+            };
+            /** @description Booking not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Booking no longer pending, slot full, or operation id conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Invalid request */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
                     };
                 };
             };
@@ -16009,12 +16100,30 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /**
+                     * Format: uuid
+                     * @description Stable client operation id for offline replay dedupe
+                     */
+                    client_operation_id?: string | null;
                     /** Format: uuid */
                     slot_id: string;
                 };
             };
         };
         responses: {
+            /** @description Replayed booking */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        booking: {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+            };
             /** @description Booking */
             201: {
                 headers: {
@@ -16035,6 +16144,30 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+            /** @description Slot full, already booked, or operation id conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Invalid request */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
+                    };
                 };
             };
         };
