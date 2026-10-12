@@ -1,5 +1,5 @@
 # OpenTelemetry Collector (contrib) for the opt-in `observability` Compose
-# profile (ADR-098).
+# profile (ADR-106).
 #
 # Traces from the API (OTLP/HTTP, see OTEL_EXPORTER_OTLP_ENDPOINT) are turned
 # into RED metrics by the spanmetrics connector and exposed to Prometheus on

@@ -1,4 +1,4 @@
-# Alertmanager for the opt-in `observability` Compose profile (ADR-098).
+# Alertmanager for the opt-in `observability` Compose profile (ADR-106).
 #
 # Destination: a generic webhook whose URL comes from ALERTMANAGER_WEBHOOK_URL
 # (rendered into /tmp/alertmanager-webhook-url by entrypoint.sh, because
