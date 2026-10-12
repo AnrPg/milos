@@ -67,6 +67,10 @@ config :milos_training, :finance_store, MilosTraining.Infrastructure.Finance.Ect
 config :milos_training, :workout_store, MilosTraining.Infrastructure.Workouts.EctoWorkoutStore
 
 config :milos_training,
+       :workout_text_analyzer,
+       MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer
+
+config :milos_training,
        :gamification_store,
        MilosTraining.Infrastructure.Gamification.EctoGamificationStore
 

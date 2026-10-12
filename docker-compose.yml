@@ -14,6 +14,8 @@ services:
       GUARDIAN_SECRET_KEY: ${GUARDIAN_SECRET_KEY:?set GUARDIAN_SECRET_KEY in your environment or .env}
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-dev-meili-master-key}
       MEILI_URL: http://meilisearch:7700
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.8-flash}
       MINIO_ENDPOINT: http://minio:9000
       MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-http://media.localhost:18080}
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-milos_minio}
