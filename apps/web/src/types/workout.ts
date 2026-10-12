@@ -287,6 +287,7 @@ export const FORMAT_FIELD_DEFS: Partial<Record<SectionFormat, FormatFieldDef[]>>
   ],
   cluster: [
     { key: "sets", defaultValue: 4, required: true },
+    { key: "cluster_reps", defaultValue: 0 },
     { key: "intra_rest_seconds", defaultValue: 15, required: true },
     { key: "rest_seconds", defaultValue: 0 },
   ],
@@ -338,6 +339,42 @@ export function normalizeFormatParams(format: SectionFormat, params: FormatParam
     if (next[field] == null && value != null && value > 0) next[field] = value;
   }
   return next;
+}
+
+/**
+ * Complex EMOM rotations are edited as `minute_count` plus per-minute
+ * `interval_seconds_N` lengths. The backend stores them as one
+ * `interval_pattern_seconds` list whose length is the rotation length. Returns
+ * null when the rotation is plain (no explicit cycle or per-minute lengths), so
+ * the backend derives it from the exercises' interval assignments.
+ */
+export function intervalPatternFromParams(params: FormatParams, maxAssignedMinute: number): number[] | null {
+  const minuteCount = Number(params.minute_count) || 0;
+  const hasPerMinuteLengths = Object.keys(params).some(
+    (key) => key.startsWith("interval_seconds_") && Number(params[key]) > 0,
+  );
+  if (minuteCount <= 0 && !hasPerMinuteLengths) return null;
+
+  const cycleLength = Math.max(minuteCount, maxAssignedMinute);
+  if (cycleLength <= 0) return null;
+
+  const base = Number(params.interval_seconds) > 0 ? Number(params.interval_seconds) : 60;
+  return Array.from({ length: cycleLength }, (_, index) => {
+    const value = Number(params[`interval_seconds_${index + 1}`]);
+    return value > 0 ? value : base;
+  });
+}
+
+/** Inverse of `intervalPatternFromParams`, used when loading a saved section. */
+export function paramsFromIntervalPattern(pattern: unknown): FormatParams {
+  if (!Array.isArray(pattern)) return {};
+  const lengths = pattern.map(Number).filter((value) => Number.isFinite(value) && value > 0);
+  if (lengths.length === 0) return {};
+
+  return Object.fromEntries([
+    ["minute_count", lengths.length],
+    ...lengths.map((value, index) => [`interval_seconds_${index + 1}`, value]),
+  ]);
 }
 
 /**

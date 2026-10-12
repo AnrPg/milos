@@ -308,6 +308,22 @@ defmodule MilosTraining.Execution.Domain.ProgressSnapshotterTest do
   end
 
   describe "EMOM to_failure mode" do
+    test "an open-ended interval cycle scores its completed windows" do
+      segment =
+        "seg:0"
+        |> emom_segment("sec-f", "to_failure", [])
+        |> Map.put(:kind, :interval_cycle)
+
+      state = %{
+        checked_exercise_ids: [],
+        section_elapsed_ms: %{},
+        segment_cycle_counts: %{"seg:0" => 7}
+      }
+
+      assert [%{value: 7, unit: "intervals", score_type: "intervals_survived"}] =
+               ProgressSnapshotter.final_snapshots([segment], state, [])
+    end
+
     test "progress and final: intervals survived = segments with cycle_count > 0" do
       segments = [
         emom_segment("seg:0", "sec-f", "to_failure", []),

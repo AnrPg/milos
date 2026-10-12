@@ -72,6 +72,7 @@ export function FormatContextualFields({ format, params, onChange }: Props) {
     ],
     cluster: [
       { key: "sets", label: i18n("sets2ab262f"), unit: "" },
+      { key: "cluster_reps", label: i18n("clustersPerSetLabel"), unit: "", optional: true },
       { key: "intra_rest_seconds", label: i18n("intraSetRest46c5759"), unit: "secs" },
       { key: "rest_seconds", label: i18n("restBetweenSets882ab69"), unit: "secs", optional: true },
     ],

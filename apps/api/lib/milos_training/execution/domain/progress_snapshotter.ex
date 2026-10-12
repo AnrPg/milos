@@ -282,7 +282,7 @@ defmodule MilosTraining.Execution.Domain.ProgressSnapshotter do
         emom_reps_snapshot(section_segments, state)
 
       "to_failure" ->
-        survived = Enum.count(section_segments, &(completed_cycles(&1, state) > 0))
+        survived = windows_survived(section_segments, state)
 
         if survived > 0,
           do: %{value: survived, unit: "intervals", score_type: "intervals_survived"},
@@ -337,7 +337,7 @@ defmodule MilosTraining.Execution.Domain.ProgressSnapshotter do
         emom_reps_snapshot(section_segments, state)
 
       "to_failure" ->
-        survived = Enum.count(section_segments, &(completed_cycles(&1, state) > 0))
+        survived = windows_survived(section_segments, state)
 
         if survived > 0,
           do: %{value: survived, unit: "intervals", score_type: "intervals_survived"},
@@ -346,6 +346,18 @@ defmodule MilosTraining.Execution.Domain.ProgressSnapshotter do
       _ ->
         emom_reps_snapshot(section_segments, state)
     end
+  end
+
+  # Fixed EMOM windows are one segment each; an open-ended interval cycle is a
+  # single segment whose completed cycles are the windows survived.
+  defp windows_survived(section_segments, state) do
+    Enum.reduce(section_segments, 0, fn segment, acc ->
+      cycles = completed_cycles(segment, state)
+
+      if to_string(segment[:kind] || segment["kind"]) == "interval_cycle",
+        do: acc + cycles,
+        else: acc + if(cycles > 0, do: 1, else: 0)
+    end)
   end
 
   defp emom_reps_snapshot(section_segments, state) do

@@ -98,11 +98,11 @@ defmodule MilosTraining.Execution.Domain.ProgressValidator do
   defp validate_monotonic(progress, previous) do
     previous_total = previous[:total_elapsed_ms] || previous["total_elapsed_ms"] || 0
     previous_sections = previous[:section_elapsed_ms] || previous["section_elapsed_ms"] || %{}
-    previous_cycles = previous[:segment_cycle_counts] || previous["segment_cycle_counts"] || %{}
 
+    # Round counts may go down: athletes undo an accidental "+1 round". Elapsed
+    # time only ever grows; concurrent writers are rejected by lock_version.
     if progress.total_elapsed_ms >= previous_total and
-         map_does_not_regress?(progress.section_elapsed_ms, previous_sections) and
-         map_does_not_regress?(progress.segment_cycle_counts, previous_cycles) do
+         map_does_not_regress?(progress.section_elapsed_ms, previous_sections) do
       :ok
     else
       :error

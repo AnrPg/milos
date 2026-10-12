@@ -17,7 +17,7 @@ import type {
   SectionFormat,
   WorkoutType,
 } from "@/types/workout";
-import { AUTO_SCORE_MAP, EMOM_SCORING_MODE_SCORE_TYPE, FORMAT_EXERCISE_CONTEXT, adaptExerciseToDestination, concreteSetPrescriptions, makeDefaultAdvancedSettings, makeDefaultExercise, makeDefaultFormatParams, makeDefaultHeader, makeDefaultSection, normalizeFormatParams, timerConfigParams } from "@/types/workout";
+import { AUTO_SCORE_MAP, EMOM_SCORING_MODE_SCORE_TYPE, FORMAT_EXERCISE_CONTEXT, adaptExerciseToDestination, concreteSetPrescriptions, makeDefaultAdvancedSettings, makeDefaultExercise, makeDefaultFormatParams, makeDefaultHeader, makeDefaultSection, intervalPatternFromParams, normalizeFormatParams, paramsFromIntervalPattern, timerConfigParams } from "@/types/workout";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 
@@ -219,6 +219,23 @@ function parseDraftExercise(src: unknown): DraftExercise {
   };
 }
 
+// Published sections store this as `rest_before_next_section_seconds`; older
+// drafts used `rest_after_seconds`, which the API never persisted.
+function parseRestAfterSeconds(section: Record<string, unknown>): number | null {
+  const value = section.rest_before_next_section_seconds ?? section.rest_after_seconds;
+  return value != null ? Number(value) : null;
+}
+
+function intervalPatternPayload(section: DraftSection) {
+  if (section.format !== "complex_emom") return {};
+  const maxAssigned = section.exercises.reduce(
+    (max, exercise) => (exercise.intervalAssignment != null ? Math.max(max, exercise.intervalAssignment) : max),
+    0,
+  );
+  const pattern = intervalPatternFromParams(section.formatParams, maxAssigned);
+  return pattern ? { interval_pattern_seconds: pattern } : {};
+}
+
 function parseDraftSections(raw: unknown): DraftSection[] {
   if (!Array.isArray(raw)) return [];
   return raw.map((s: unknown) => {
@@ -231,6 +248,7 @@ function parseDraftSections(raw: unknown): DraftSection[] {
       type: _type,
       scoring_mode: rawScoringMode,
       amrap_scoring_style: rawAmrapStyle,
+      interval_pattern_seconds: rawIntervalPattern,
       ...formatParamRaw
     } = timerConfig;
     const format = parseSectionFormat(_type);
@@ -240,6 +258,7 @@ function parseDraftSections(raw: unknown): DraftSection[] {
     for (const [k, v] of Object.entries(formatParamRaw)) {
       formatParams[k] = v != null ? Number(v) : null;
     }
+    Object.assign(formatParams, paramsFromIntervalPattern(rawIntervalPattern));
     const scoreConfig = (sec.score_config && typeof sec.score_config === "object")
       ? sec.score_config as Record<string, unknown>
       : null;
@@ -258,7 +277,7 @@ function parseDraftSections(raw: unknown): DraftSection[] {
       scoreType,
       emomScoringMode,
       emomAmrapScoringStyle,
-      restAfterSeconds: sec.rest_after_seconds != null ? Number(sec.rest_after_seconds) : null,
+      restAfterSeconds: parseRestAfterSeconds(sec),
       exercises,
       note: typeof sec.note === "string" ? sec.note : null,
     };
@@ -727,12 +746,13 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
             ...section.formatParams,
             ...deriveLadderTimerParams(section),
           }),
+          ...intervalPatternPayload(section),
           ...(section.emomScoringMode ? { scoring_mode: section.emomScoringMode } : {}),
           ...(section.emomAmrapScoringStyle ? { amrap_scoring_style: section.emomAmrapScoringStyle } : {}),
         },
         scoreable: section.scoreable,
         score_config: section.scoreType ? { type: section.scoreType } : null,
-        rest_after_seconds: section.restAfterSeconds ?? null,
+        rest_before_next_section_seconds: section.restAfterSeconds ?? null,
         note: section.note,
         exercises: section.exercises.map((exercise) => ({
           item_type: exercise.itemType,

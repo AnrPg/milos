@@ -3,7 +3,9 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import {
   TIMER_CONFIG_CONTRACT,
+  intervalPatternFromParams,
   normalizeFormatParams,
+  paramsFromIntervalPattern,
   timerConfigParams,
   type SectionFormat,
 } from "@/types/workout";
@@ -71,5 +73,42 @@ describe("timer config contract", () => {
     expect(timerConfigParams("hrr", { effort_cap_seconds: 45, hr_ceiling_bpm: 175 })).toEqual({
       effort_seconds: 45,
     });
+  });
+
+  it("turns complex EMOM per-minute lengths into a backend interval pattern and back", () => {
+    const params = { interval_seconds: 60, minute_count: 3, interval_seconds_2: 120 };
+
+    expect(intervalPatternFromParams(params, 2)).toEqual([60, 120, 60]);
+    expect(intervalPatternFromParams({ interval_seconds: 60 }, 3)).toBeNull();
+    expect(paramsFromIntervalPattern([60, 120, 60])).toEqual({
+      minute_count: 3,
+      interval_seconds_1: 60,
+      interval_seconds_2: 120,
+      interval_seconds_3: 60,
+    });
+  });
+
+  it("sends the complex EMOM pattern and the section rest with backend field names", () => {
+    const store = useWorkoutCreationStore.getState();
+    store.resetDraft();
+    store.addSection();
+    const sectionId = useWorkoutCreationStore.getState().sections.at(-1)!.localId;
+    useWorkoutCreationStore.getState().setFormat(sectionId, "complex_emom");
+    useWorkoutCreationStore.getState().setFormatParams(sectionId, {
+      duration_seconds: 600,
+      interval_seconds: 60,
+      minute_count: 2,
+      interval_seconds_2: 90,
+    });
+    useWorkoutCreationStore.getState().updateSection(sectionId, { restAfterSeconds: 120 });
+
+    const section = (useWorkoutCreationStore.getState().toApiPayload() as {
+      sections: Record<string, unknown>[];
+    }).sections.at(-1)!;
+
+    expect(section.timer_config).toMatchObject({ interval_pattern_seconds: [60, 90] });
+    expect(section.timer_config).not.toHaveProperty("minute_count");
+    expect(section.rest_before_next_section_seconds).toBe(120);
+    expect(section).not.toHaveProperty("rest_after_seconds");
   });
 });

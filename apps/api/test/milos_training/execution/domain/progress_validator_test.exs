@@ -59,4 +59,22 @@ defmodule MilosTraining.Execution.Domain.ProgressValidatorTest do
                })
     end
   end
+
+  test "accepts a lower round count so an accidental +1 round can be undone" do
+    progress = %{
+      checked_exercise_ids: [],
+      current_segment_index: 0,
+      paused_elapsed_ms: 0,
+      total_elapsed_ms: 10,
+      section_elapsed_ms: %{},
+      segment_cycle_counts: %{"segment:0" => 1}
+    }
+
+    assert :ok =
+             ProgressValidator.validate(progress, @segments, %{
+               total_elapsed_ms: 10,
+               section_elapsed_ms: %{},
+               segment_cycle_counts: %{"segment:0" => 2}
+             })
+  end
 end
