@@ -14,6 +14,10 @@ defmodule MilosTraining.Finance.Domain.PackageCatalog do
 
   @implemented_phases [:a, :b]
 
+  # Phase C fields ship feature by feature (ADR-098); each becomes authorable
+  # once its enforcement exists. Emptied when the phase completes.
+  @released_ahead ~w[content.on_demand_video content.advanced_analytics]
+
   @quota_periods ["calendar_week", "calendar_month", "subscription_period"]
   @duration_units ["day", "week", "month"]
   @amenities ["sauna", "locker", "towel", "parking", "childcare"]
@@ -270,6 +274,9 @@ defmodule MilosTraining.Finance.Domain.PackageCatalog do
   end
 
   def fetch(key), do: {:error, {:unknown_package_field, inspect(key)}}
+
+  def available?(%{key: key, phase: phase}),
+    do: phase in @implemented_phases or key in @released_ahead
 
   def available?(%{phase: phase}), do: phase in @implemented_phases
 

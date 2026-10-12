@@ -65,6 +65,8 @@ config :milos_training,
        :facility_store,
        MilosTraining.Infrastructure.Facility.EctoFacilityStore
 
+config :milos_training, :content_store, MilosTraining.Infrastructure.Content.EctoContentStore
+
 config :milos_training,
        :execution_store,
        MilosTraining.Infrastructure.Execution.EctoExecutionStore

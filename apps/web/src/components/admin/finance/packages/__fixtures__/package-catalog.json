@@ -29,7 +29,7 @@
     {
       "enabled": false,
       "key": "digital_content",
-      "available": false
+      "available": true
     },
     {
       "enabled": false,
@@ -400,14 +400,14 @@
       "key": "content.on_demand_video",
       "kind": "boolean",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "content"
     },
     {
       "key": "content.advanced_analytics",
       "kind": "boolean",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "content"
     },
     {
