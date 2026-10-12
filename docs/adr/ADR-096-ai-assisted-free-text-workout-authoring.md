@@ -1,6 +1,6 @@
 # ADR-096: AI-assisted Free-text Workout Authoring
 Date: 2026-10-12
-Status: Accepted (amends ADR-078)
+Status: Accepted (amends ADR-078; amended by ADR-100)
 
 ## Context
 Free text became the only way to create workouts. ADR-078 kept free-text

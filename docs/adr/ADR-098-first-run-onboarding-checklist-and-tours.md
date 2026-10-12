@@ -1,6 +1,6 @@
 # ADR-098: First-run Onboarding Checklist and Product Tours
 Date: 2026-10-12
-Status: Accepted
+Status: Accepted (amended by ADR-100: tour completion is stored per account)
 
 ## Context
 New tenant admins landed on an empty dashboard with no guidance about what to
