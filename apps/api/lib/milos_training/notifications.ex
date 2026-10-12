@@ -20,6 +20,11 @@ defmodule MilosTraining.Notifications do
 
   def create_notification(params), do: create_and_broadcast_notification(params)
 
+  # ADR-105: push dispatch result -> {outcome, reason_class} for analytics.
+  defdelegate classify_push_outcome(result),
+    to: MilosTraining.Notifications.Domain.PushDeliveryOutcome,
+    as: :classify
+
   def list_for_user(user_id),
     do:
       NotificationStore.with_user_context(%{user_id: user_id}, fn ->
@@ -580,10 +585,12 @@ defmodule MilosTraining.Notifications do
 
       {:ok, notification} = ok ->
         broadcast_notification_changed(notification.user_id)
+        emit_delivered(notification)
         ok
 
       {:error, {:push_enqueue_failed, notification, _reason}} = error ->
         broadcast_notification_changed(notification.user_id)
+        emit_delivered(notification)
         error
 
       {:error, _reason} = error ->
@@ -628,6 +635,19 @@ defmodule MilosTraining.Notifications do
     )
   end
 
+  # ADR-105: a new in-app notification row is the in-app delivery. Emitted as
+  # telemetry (not a call into Analytics) so this context stays independent;
+  # MilosTraining.Application.RecordNotificationDelivered records it.
+  defp emit_delivered(notification) do
+    :telemetry.execute([:milos, :notification, :delivered], %{count: 1}, %{
+      notification_id: notification.id,
+      user_id: notification.user_id,
+      organization_id: Map.get(notification, :organization_id),
+      type: Map.get(notification, :type),
+      channel: "in_app"
+    })
+  end
+
   defp create_and_broadcast_notification(params) do
     user_id = Map.get(params, :user_id) || Map.get(params, "user_id")
 
@@ -641,6 +661,7 @@ defmodule MilosTraining.Notifications do
 
           _notification ->
             broadcast_notification_changed(notification.user_id)
+            emit_delivered(notification)
             ok
         end
 
