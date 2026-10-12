@@ -109,7 +109,7 @@ defmodule MilosTraining.Analytics.Domain.EventCatalogTest do
     refute Map.has_key?(attrs, :dedupe_key)
   end
 
-  describe "ADR-106 injury warning events" do
+  describe "ADR-114 injury warning events" do
     test "are registered as workout-scoped, explicitly deduped events" do
       for name <- ~w(injury_warning_shown injury_warning_acknowledged) do
         assert name in EventCatalog.instrumented_event_names()

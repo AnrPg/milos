@@ -1,6 +1,6 @@
 defmodule MilosTrainingWeb.Schemas.InjuryWarnings do
   @moduledoc """
-  OpenAPI schemas for ADR-106 injury-aware workout safety warnings. Warnings
+  OpenAPI schemas for ADR-114 injury-aware workout safety warnings. Warnings
   are informational: no endpoint here blocks an assignment, booking or
   execution.
   """

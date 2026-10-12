@@ -80,7 +80,7 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
     end)
   end
 
-  # ADR-107: per-member class variants. A member only ever receives their own
+  # ADR-115: per-member class variants. A member only ever receives their own
   # variant (`assignee_id` = actor); staff receive every member's.
   defp class_variants(slots, context, actor) do
     slot_ids = Enum.map(slots, & &1.id)

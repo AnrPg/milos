@@ -35,7 +35,7 @@ type Props = {
   onEditWorkout?: (assignment: AssignedWorkoutRecord) => void;
   onRescheduled?: (updated: AssignedWorkoutRecord) => void;
   launching?: boolean;
-  /** ADR-107: members may reject but not reschedule their assignments. */
+  /** ADR-115: members may reject but not reschedule their assignments. */
   allowReschedule?: boolean;
 };
 
@@ -448,7 +448,7 @@ export function AssignedWorkoutPanel({
             ) : null}
           </section>
 
-          {/* ADR-106: the athlete's own injury warnings before starting; informational only. */}
+          {/* ADR-114: the athlete's own injury warnings before starting; informational only. */}
           {!isAdmin && activeSection === "details" ? (
             <div className="px-5 pb-4">
               <MyInjuryWarningsPanel

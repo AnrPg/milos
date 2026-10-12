@@ -148,7 +148,7 @@ type Props = {
   embedded?: boolean;
   /**
    * Embedded only: resume this existing draft instead of creating a new one
-   * (ADR-107: a member's version duplicated from a class workout).
+   * (ADR-115: a member's version duplicated from a class workout).
    */
   initialDraftId?: string | null;
   onCancel?: () => void;

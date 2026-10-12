@@ -105,12 +105,12 @@ defmodule MilosTraining.Analytics.Domain.EventCatalog do
     # Notifications
     "notification_in_app_delivered" => {"notification", [:type], :subject},
     "notification_push_outcome" => {"notification", [], nil},
-    # Wellbeing safety warnings (ADR-106). context_id is the workout.
+    # Wellbeing safety warnings (ADR-114). context_id is the workout.
     "injury_warning_shown" => {"workout", [], :explicit},
     "injury_warning_acknowledged" => {"workout", [], :explicit}
   }
 
-  # ADR-106: health-adjacent events keep ONLY these metadata keys - enums,
+  # ADR-114: health-adjacent events keep ONLY these metadata keys - enums,
   # counts and ids. Body areas, limitations, tags and any other free text are
   # dropped even when short enough to pass `sanitize/1`.
   @injury_warning_metadata_keys ~w(
@@ -122,7 +122,7 @@ defmodule MilosTraining.Analytics.Domain.EventCatalog do
     "injury_warning_acknowledged" => @injury_warning_metadata_keys
   }
 
-  # ADR-106 segmentation facts added to `workout_execution_completed`:
+  # ADR-114 segmentation facts added to `workout_execution_completed`:
   # booleans/enums derived from organization-provenance injuries only.
   @injury_segmentation_keys ~w(had_active_injury injury_warning_level)
 
@@ -136,10 +136,10 @@ defmodule MilosTraining.Analytics.Domain.EventCatalog do
   @doc "Event names added by ADR-113 instrumentation, sorted."
   def instrumented_event_names, do: @instrumented_events |> Map.keys() |> Enum.sort()
 
-  @doc "Metadata keys allowed for the ADR-106 injury warning events."
+  @doc "Metadata keys allowed for the ADR-114 injury warning events."
   def injury_warning_metadata_keys, do: @injury_warning_metadata_keys
 
-  @doc "ADR-106 injury segmentation keys carried by execution completion facts."
+  @doc "ADR-114 injury segmentation keys carried by execution completion facts."
   def injury_segmentation_keys, do: @injury_segmentation_keys
 
   def registered?(name) when is_binary(name),

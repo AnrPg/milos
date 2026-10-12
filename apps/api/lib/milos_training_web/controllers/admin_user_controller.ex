@@ -140,7 +140,7 @@ defmodule MilosTrainingWeb.AdminUserController do
               type: :string,
               enum: ["class_workout", "class_variant", "personal"],
               description:
-                "Member programming mode (ADR-107; ignored for athletes). " <>
+                "Member programming mode (ADR-115; ignored for athletes). " <>
                   "`class_workout` (default) replaces the booked class's workout for everyone; " <>
                   "`class_variant` assigns this member's own version of the booked class " <>
                   "(source defaults to the class's workout when `master_workout_id` is omitted); " <>
@@ -283,7 +283,7 @@ defmodule MilosTrainingWeb.AdminUserController do
     summary:
       "Copy or save a workout and associate it with this user's assignment, class variant or booked class",
     description:
-      "Athletes receive a personal assignment. Members follow `mode` (ADR-107). " <>
+      "Athletes receive a personal assignment. Members follow `mode` (ADR-115). " <>
         "Member assignment modes fail with 403 `member_programming_not_entitled` when the " <>
         "member's package lacks the personal_programming channel or execute_assigned_workouts capability.",
     parameters: [@id_parameter],
@@ -316,7 +316,7 @@ defmodule MilosTrainingWeb.AdminUserController do
   )
 
   operation(:index_athletes,
-    summary: "List assignable users (athletes; optionally members, ADR-107)",
+    summary: "List assignable users (athletes; optionally members, ADR-115)",
     parameters: [
       %Parameter{
         name: :q,

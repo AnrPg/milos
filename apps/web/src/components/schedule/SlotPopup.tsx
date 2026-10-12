@@ -90,7 +90,7 @@ export function SlotPopup({
   const [cancelError, setCancelError] = useState<string | null>(null);
   const [editWorkoutOpen, setEditWorkoutOpen] = useState(false);
   const [activeScale, setActiveScale] = useState<string | null>(null);
-  // ADR-106: informational injury warnings for booked members (staff) and
+  // ADR-114: informational injury warnings for booked members (staff) and
   // for the member's own booking. Never blocks booking or attendance.
   const hasBookedMembers = slot.bookings.some(
     (booking) => booking.status === "approved" || booking.status === "pending",
@@ -366,7 +366,7 @@ export function SlotPopup({
             </div>
           ) : null}
 
-          {/* ADR-107: the member's own version of this class (only ever theirs) */}
+          {/* ADR-115: the member's own version of this class (only ever theirs) */}
           {!isAdmin && slot.my_version ? (
             <section
               className="mt-8 rounded-[1.8rem] p-5"

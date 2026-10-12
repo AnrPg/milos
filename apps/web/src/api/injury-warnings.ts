@@ -1,7 +1,7 @@
 import { apiRequest } from "@/api/client";
 import type { components } from "@/api/generated/schema";
 
-// ADR-106 injury-aware workout safety warnings. Informational only: none of
+// ADR-114 injury-aware workout safety warnings. Informational only: none of
 // these calls gate an assignment, booking or execution.
 
 export type AthleteInjuryWarnings = components["schemas"]["AthleteInjuryWarnings"];

@@ -1,5 +1,5 @@
 defmodule MilosTraining.Finance.Domain.EntitlementPolicyExplicitTest do
-  @moduledoc "ADR-107: explicit (rollout-independent) entitlement grants."
+  @moduledoc "ADR-115: explicit (rollout-independent) entitlement grants."
   use ExUnit.Case, async: true
 
   alias MilosTraining.Finance.Domain.EntitlementPolicy

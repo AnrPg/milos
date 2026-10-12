@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.AcknowledgeAthleteInjuryWarnings do
   @moduledoc """
-  Staff use case (ADR-106): a coach acknowledged the injury warnings shown
+  Staff use case (ADR-114): a coach acknowledged the injury warnings shown
   for athletes on a workout. The warnings are re-evaluated server-side (the
   client never supplies levels or counts) and `injury_warning_acknowledged`
   is recorded per warned athlete. Acknowledging never changes the

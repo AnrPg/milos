@@ -257,7 +257,7 @@ defmodule MilosTrainingWeb.Router do
     get("/sources", TrainingLogController, :sources)
   end
 
-  # ADR-106: the acting user's own injury safety warnings for a workout they
+  # ADR-114: the acting user's own injury safety warnings for a workout they
   # are about to start (athletes and members alike).
   scope "/api/org/:organization_slug/me/workouts/:workout_id", MilosTrainingWeb do
     pipe_through([
@@ -302,7 +302,7 @@ defmodule MilosTrainingWeb.Router do
     patch("/my-workouts/assignments/:id/reschedule", MyWorkoutController, :reschedule)
   end
 
-  # ADR-107: members receive personal assignments and class variants too, so
+  # ADR-115: members receive personal assignments and class variants too, so
   # listing, opening and rejecting assignments is open to every tenant role
   # (the services only ever act on the caller's own assignment links).
   scope "/api/org/:organization_slug", MilosTrainingWeb do
@@ -492,7 +492,7 @@ defmodule MilosTrainingWeb.Router do
     get("/wellbeing/injuries", AdminWellbeingController, :index)
     post("/wellbeing/users/:id/injuries", AdminWellbeingController, :create)
     patch("/wellbeing/injuries/:id/heal", AdminWellbeingController, :heal)
-    # ADR-106 injury-aware workout safety warnings (informational only).
+    # ADR-114 injury-aware workout safety warnings (informational only).
     post("/wellbeing/injury-warnings", AdminInjuryWarningController, :evaluate)
     post("/wellbeing/injury-warnings/acknowledge", AdminInjuryWarningController, :acknowledge)
     get("/schedule/slots/:id/injury-warnings", AdminInjuryWarningController, :slot)

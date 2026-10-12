@@ -4,7 +4,7 @@ import type {
   InjuryWarningLevel,
 } from "@/api/injury-warnings";
 
-// Pure helpers for ADR-106 injury warning UI. Warnings inform; nothing here
+// Pure helpers for ADR-114 injury warning UI. Warnings inform; nothing here
 // is ever used to disable an action.
 
 const LEVEL_RANK: Record<InjuryWarningLevel, number> = { none: 0, caution: 1, avoid: 2 };

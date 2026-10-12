@@ -80,7 +80,7 @@ defmodule MilosTraining.Workouts do
   def list_assigned_workouts_for_athlete(context, athlete_id, start_date, end_date),
     do: WorkoutStore.list_assigned_workouts_for_athlete(context, athlete_id, start_date, end_date)
 
-  @doc "ADR-107: live per-member class variants for slots (one assignee or all)."
+  @doc "ADR-115: live per-member class variants for slots (one assignee or all)."
   def list_class_variants(context, slot_ids, assignee_id),
     do: ListClassVariants.call(context, slot_ids, assignee_id)
 
@@ -99,7 +99,7 @@ defmodule MilosTraining.Workouts do
   def preflight_dsl(workout, active_scale_slugs),
     do: Preflight.validate(workout, active_scale_slugs)
 
-  @doc "`%{name, exercise_ref, category}` per exercise of a normalized workout (ADR-106)."
+  @doc "`%{name, exercise_ref, category}` per exercise of a normalized workout (ADR-114)."
   def exercise_descriptors(workout), do: ExerciseDescriptors.from_workout(workout)
 
   def reject_assignment_for_athlete(assignment_id, athlete_id),

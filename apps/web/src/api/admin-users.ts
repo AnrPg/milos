@@ -141,7 +141,7 @@ export function fetchAdminUserSchedule(token: string, userId: string, startDate:
 }
 
 /**
- * ADR-107 member programming modes: replace the booked class's workout for
+ * ADR-115 member programming modes: replace the booked class's workout for
  * everyone (ADR-071 default), create this member's own version of the class,
  * or assign a personal workout without a class.
  */
@@ -158,7 +158,7 @@ export function programAdminUserWorkout(
     slot_id?: string | null;
     copy_source: boolean;
     admin_notes?: string;
-    /** ADR-107 member programming mode; ignored for athletes. */
+    /** ADR-115 member programming mode; ignored for athletes. */
     mode?: MemberProgrammingMode;
   },
 ) {

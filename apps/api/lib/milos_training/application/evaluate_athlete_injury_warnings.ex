@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.EvaluateAthleteInjuryWarnings do
   @moduledoc """
-  Staff use case (ADR-106): injury safety warnings for a set of athletes or
+  Staff use case (ADR-114): injury safety warnings for a set of athletes or
   members against one workout - the assign-workout dialog, the class roster
   and the member dossier. Only organization-provenance injuries are visible
   (see `InjuryWarningEvaluation`). Records `injury_warning_shown` once per

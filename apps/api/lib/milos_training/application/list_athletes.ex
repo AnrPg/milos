@@ -2,7 +2,7 @@ defmodule MilosTraining.Application.ListAthletes do
   @moduledoc """
   Lists the users an assignment may target in the acting organization.
 
-  By default only active athletes. With `include_members: true` (ADR-107) active
+  By default only active athletes. With `include_members: true` (ADR-115) active
   members are listed too; whether a member may actually receive personal
   programming is decided by their package when the assignment is created.
   """

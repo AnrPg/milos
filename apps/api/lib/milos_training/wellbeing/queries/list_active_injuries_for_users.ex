@@ -1,6 +1,6 @@
 defmodule MilosTraining.Wellbeing.Queries.ListActiveInjuriesForUsers do
   @moduledoc """
-  Staff read (ADR-106): the active injuries of `user_ids` that carry the
+  Staff read (ADR-114): the active injuries of `user_ids` that carry the
   current organization's provenance. Personal (self-reported,
   organization-less) injuries and other tenants' reports are never returned,
   whatever the RLS session would otherwise allow.

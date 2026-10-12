@@ -11,7 +11,7 @@ defmodule MilosTraining.Workouts.AssignedWorkout do
     field :organization_id, :binary_id
     field :scheduled_for, :date
     field :admin_notes, :string
-    # ADR-107: set when the assignment is a per-member variant of a class
+    # ADR-115: set when the assignment is a per-member variant of a class
     # occurrence (loose reference to a Scheduling-owned scheduled class).
     field :source_scheduled_class_id, :binary_id
 

@@ -184,7 +184,7 @@ export function UserProgrammingSchedule({ token, userId, role }: Props) {
     setCreating(true);
   }
 
-  // ADR-107: duplicate the class's workout into a draft and edit it in the
+  // ADR-115: duplicate the class's workout into a draft and edit it in the
   // embedded canvas; publishing assigns it as this member's version.
   async function editClassWorkoutForMember() {
     if (!validateTarget()) return;

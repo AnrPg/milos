@@ -26,7 +26,7 @@ defmodule MilosTraining.Wellbeing do
   defdelegate list_injuries(filters \\ %{}), to: ListInjuries, as: :call
   defdelegate injury_summary(filters \\ %{}), to: InjurySummary, as: :call
 
-  # ADR-106 injury-aware workout safety warnings.
+  # ADR-114 injury-aware workout safety warnings.
   defdelegate list_active_injuries_for_users(user_ids),
     to: ListActiveInjuriesForUsers,
     as: :call

@@ -34,7 +34,7 @@ defmodule MilosTraining.Application.GetAdminUserSchedule do
       Scheduling.list_member_slots(context, id, start_at, end_at)
       |> Enum.map(&Map.put(&1, :kind, "class"))
 
-    # ADR-107: members may also hold personal assignments and class variants.
+    # ADR-115: members may also hold personal assignments and class variants.
     assignments =
       Workouts.list_assigned_workouts_for_athlete(context, id, start_date, end_date)
       |> Enum.map(&Map.put(&1, :kind, "assignment"))

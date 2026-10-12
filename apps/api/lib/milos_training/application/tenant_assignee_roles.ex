@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.TenantAssigneeRoles do
   @moduledoc """
-  ADR-107: resolves each candidate assignee's **active membership role in the
+  ADR-115: resolves each candidate assignee's **active membership role in the
   acting organization** (user id => role, or nil when the user has no active
   membership there). The global account role is never consulted (F-29).
   """

@@ -1190,7 +1190,7 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
-  # ADR-107: personal member programming needs an explicit package grant.
+  # ADR-115: personal member programming needs an explicit package grant.
   def call(conn, {:error, :member_programming_not_entitled, details}) do
     conn
     |> put_status(:forbidden)

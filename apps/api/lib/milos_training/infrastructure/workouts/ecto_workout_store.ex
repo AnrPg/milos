@@ -389,7 +389,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           Map.get(params, :source_scheduled_class_id) ||
             Map.get(params, "source_scheduled_class_id")
 
-        # ADR-107: an assignment only absorbs a new one with the same workout,
+        # ADR-115: an assignment only absorbs a new one with the same workout,
         # date and notes when both share the same source slot, so a class
         # variant never silently loses (or gains) its class link.
         existing =
@@ -527,7 +527,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   def list_class_variants([], _assignee_id), do: []
 
   def list_class_variants(slot_ids, assignee_id) when is_list(slot_ids) do
-    # ADR-107: live per-member variants of the given class occurrences. With an
+    # ADR-115: live per-member variants of the given class occurrences. With an
     # assignee id only that user's variants are returned (the member's own
     # "Your version"); with nil every assignee's (the staff view).
     variants =

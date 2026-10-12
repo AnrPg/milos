@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.AssignWorkout do
   @moduledoc """
-  Assigns a published workout to athletes and - ADR-107 - members.
+  Assigns a published workout to athletes and - ADR-115 - members.
 
   Assignees are classified by their active membership role in the acting
   organization. Members additionally need an explicit `personal_programming`

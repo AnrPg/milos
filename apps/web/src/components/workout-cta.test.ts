@@ -74,7 +74,7 @@ describe("workoutCta", () => {
     });
   });
 
-  it("offers logging for a member's personal workout due today (ADR-107)", () => {
+  it("offers logging for a member's personal workout due today (ADR-115)", () => {
     expect(
       workoutCta({
         role: "member",

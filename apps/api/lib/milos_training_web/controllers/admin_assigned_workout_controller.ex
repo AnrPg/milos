@@ -16,7 +16,7 @@ defmodule MilosTrainingWeb.AdminAssignedWorkoutController do
   operation(:create,
     summary: "Assign a published workout to one or more athletes or members",
     description:
-      "ADR-107: `athlete_ids` holds assignee user ids - active athletes or members of the " <>
+      "ADR-115: `athlete_ids` holds assignee user ids - active athletes or members of the " <>
         "organization (the field name is kept for compatibility). Members require a package " <>
         "with the personal_programming channel and execute_assigned_workouts capability " <>
         "(403 `member_programming_not_entitled`). `source_slot_id` makes the assignment one " <>
@@ -42,7 +42,7 @@ defmodule MilosTrainingWeb.AdminAssignedWorkoutController do
                 format: :uuid,
                 nullable: true,
                 description:
-                  "Class occurrence this assignment is a member's version of (ADR-107)."
+                  "Class occurrence this assignment is a member's version of (ADR-115)."
               }
             },
             required: [:master_workout_id, :athlete_ids, :scheduled_for]

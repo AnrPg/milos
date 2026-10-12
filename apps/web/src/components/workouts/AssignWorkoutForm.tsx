@@ -297,7 +297,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
               />
             </label>
 
-            {/* ADR-106: informational injury warnings for the selection; never blocks assigning. */}
+            {/* ADR-114: informational injury warnings for the selection; never blocks assigning. */}
             {tokens?.access_token && workout?.status === "published" && selectedIds.length > 0 ? (
               <div className="mt-5">
                 <AthleteInjuryWarningsPanel

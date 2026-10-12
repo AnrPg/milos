@@ -100,9 +100,9 @@ export type ScheduleSlot = {
   workout: WorkoutPreview | null;
   current_user_booking?: ScheduleBooking | null;
   bookings: ScheduleBooking[];
-  /** ADR-107: the acting member's own version of this class (members only). */
+  /** ADR-115: the acting member's own version of this class (members only). */
   my_version?: MemberClassVersion | null;
-  /** ADR-107: every member's version of this class (staff only). */
+  /** ADR-115: every member's version of this class (staff only). */
   member_versions?: StaffMemberClassVersion[];
 };
 

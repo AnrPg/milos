@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.ListClassSlotInjuryWarnings do
   @moduledoc """
-  Staff use case (ADR-106): injury warnings for the members booked
+  Staff use case (ADR-114): injury warnings for the members booked
   (pending or approved) into a class slot, against the slot's workout.
   A slot without a workout has nothing to warn about.
   """

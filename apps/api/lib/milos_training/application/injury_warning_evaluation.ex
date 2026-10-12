@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.InjuryWarningEvaluation do
   @moduledoc """
-  Shared orchestration for ADR-106 injury-aware workout safety warnings.
+  Shared orchestration for ADR-114 injury-aware workout safety warnings.
 
   Not a use case itself: the `*InjuryWarnings` application services call it so
   the visibility rules live in exactly one place.
@@ -104,7 +104,7 @@ defmodule MilosTraining.Application.InjuryWarningEvaluation do
   def for_self(_context, _workout_id), do: {:error, :organization_context_required}
 
   @doc """
-  ADR-106 completion segmentation facts for a finished execution: whether the
+  ADR-114 completion segmentation facts for a finished execution: whether the
   user had an active injury on record with the execution's organization, and
   the warning level that injury set implies for the workout. Organization
   provenance only - personal injuries never reach tenant analytics. Best

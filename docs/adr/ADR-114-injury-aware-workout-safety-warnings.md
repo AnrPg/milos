@@ -1,4 +1,4 @@
-# ADR-106: Injury-Aware Workout Safety Warnings
+# ADR-114: Injury-Aware Workout Safety Warnings
 Date: 2026-10-12
 Status: Accepted
 
@@ -17,11 +17,11 @@ Constraints:
   member. It has no `organization_id` and follows the member across gyms.
   Staff may only see injuries with their organization's provenance,
   including `admin_only` notes. The member never sees `admin_only` notes.
-- ADR-091 / ADR-101: every tenant read runs inside a `RepoContext` session
+- ADR-091 / ADR-109: every tenant read runs inside a `RepoContext` session
   under forced RLS. The `injury_reports` policy is owner-OR-tenant, so a
   staff session can still see the staff member's own rows. The tenant
   predicate must therefore be explicit.
-- ADR-105: analytics events go through the `EventCatalog` allowlist. Their
+- ADR-113: analytics events go through the `EventCatalog` allowlist. Their
   metadata holds only ids, enums, counts and booleans, with no free text.
 - The timer UI (ExecutionMode, TimerDisplay, timer engine, score modal) is
   being rewritten on another branch and must not be restructured.

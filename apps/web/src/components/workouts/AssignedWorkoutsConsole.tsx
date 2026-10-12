@@ -398,7 +398,7 @@ export function AssignedWorkoutsConsole({
   const { role } = useSelectedMembershipRole();
 
   const isAdmin = role === "admin";
-  // ADR-107: members receive personal workouts and class versions here too,
+  // ADR-115: members receive personal workouts and class versions here too,
   // but reschedule and "request a workout" remain athlete services.
   const isMember = role === "member";
 

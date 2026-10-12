@@ -41,7 +41,7 @@ type OrganizationMembershipSummary = {
 const NAV_LINKS: NavLink[] = [
   { href: "/", labelKey: "home", roles: ["member", "athlete"] },
   { href: "/schedule", labelKey: "schedule", roles: ["member"] },
-  // ADR-107: members receive personal workouts and class versions too.
+  // ADR-115: members receive personal workouts and class versions too.
   { href: "/my-workouts", labelKey: "myWorkouts", roles: ["athlete", "member"] },
   { href: "/my-workouts/pantheon", labelKey: "pantheon", roles: ["athlete", "member"] },
   { href: "/account/billing", labelKey: "billing", roles: ["member", "athlete"] },
