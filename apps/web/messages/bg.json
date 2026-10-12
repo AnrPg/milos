@@ -2593,7 +2593,9 @@
     "historyDeletedWorkout": "Изтрита тренировка",
     "historyMinutes": "{minutes} мин",
     "historyNoResult": "Няма записан резултат.",
-    "workoutCount": "{count, plural, one {# тренировка} other {# тренировки}}"
+    "workoutCount": "{count, plural, one {# тренировка} other {# тренировки}}",
+    "accessEndedTitle": "Достъпът ви изтече",
+    "accessEndedCancelledBookings": "{count, plural, one {Предстоящото ви записване беше отменено.} other {# предстоящи записвания бяха отменени.}}"
   },
   "WorkoutAssistant": {
     "title": "Асистент за тренировки",

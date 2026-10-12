@@ -2593,7 +2593,9 @@
     "historyDeletedWorkout": "Διαγραμμένη προπόνηση",
     "historyMinutes": "{minutes} λεπ.",
     "historyNoResult": "Δεν καταγράφηκε αποτέλεσμα.",
-    "workoutCount": "{count, plural, one {# προπόνηση} other {# προπονήσεις}}"
+    "workoutCount": "{count, plural, one {# προπόνηση} other {# προπονήσεις}}",
+    "accessEndedTitle": "Η πρόσβασή σας έληξε",
+    "accessEndedCancelledBookings": "{count, plural, one {Η επερχόμενη κράτησή σας ακυρώθηκε.} other {Οι # επερχόμενες κρατήσεις σας ακυρώθηκαν.}}"
   },
   "WorkoutAssistant": {
     "title": "Βοηθός προπόνησης",

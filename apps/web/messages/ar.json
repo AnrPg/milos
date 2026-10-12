@@ -2593,7 +2593,9 @@
     "historyDeletedWorkout": "تمرين محذوف",
     "historyMinutes": "{minutes} د",
     "historyNoResult": "لم تُسجَّل نتيجة لهذه الحصة.",
-    "workoutCount": "{count, plural, one {تمرين واحد} two {تمرينان} few {# تمارين} many {# تمرينًا} other {# تمرين}}"
+    "workoutCount": "{count, plural, one {تمرين واحد} two {تمرينان} few {# تمارين} many {# تمرينًا} other {# تمرين}}",
+    "accessEndedTitle": "انتهى وصولك",
+    "accessEndedCancelledBookings": "{count, plural, one {أُلغي حجزك القادم.} other {أُلغيت حجوزاتك القادمة (#).}}"
   },
   "WorkoutAssistant": {
     "title": "مساعد التمارين",

@@ -40,6 +40,22 @@ two things:
 
   It also refreshes the stored entitlement snapshots, so admin lists follow
   the calendar.
+- **All entitlements end with the slack.** Every entitlement check
+  (`EntitlementPolicy` through `AuthorizeFinanceEntitlement` and
+  `reserve_entitlement`) refuses `inactive` and `blocked` in every enforcement
+  mode. That covers:
+  - booking classes;
+  - starting class, library or assigned workouts, and loading their timers;
+  - receiving assigned workouts;
+  - coaching messages (touchpoints).
+- **What the job revokes.** When a refresh moves a client from active/grace to
+  inactive/blocked, the job also:
+  - cancels their upcoming class bookings, freeing the places and releasing
+    the class-visit allowances;
+  - notifies them (`access_ended`, with the reason and the number of cancelled
+    bookings).
+- **Admin overrides.** Admins acting themselves are not subject to client
+  entitlements, so they can still book a client in on purpose.
 - **Billing page.** The client's billing page explains the state plainly:
   - access until a date during the slack;
   - paused after the slack because of an overdue payment;

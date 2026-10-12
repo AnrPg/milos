@@ -2593,7 +2593,9 @@
     "historyDeletedWorkout": "אימון שנמחק",
     "historyMinutes": "{minutes} דק׳",
     "historyNoResult": "לא נרשמה תוצאה.",
-    "workoutCount": "{count, plural, one {אימון אחד} two {שני אימונים} other {# אימונים}}"
+    "workoutCount": "{count, plural, one {אימון אחד} two {שני אימונים} other {# אימונים}}",
+    "accessEndedTitle": "הגישה שלך הסתיימה",
+    "accessEndedCancelledBookings": "{count, plural, one {ההזמנה הקרובה שלך בוטלה.} other {# ההזמנות הקרובות שלך בוטלו.}}"
   },
   "WorkoutAssistant": {
     "title": "עוזר אימונים",

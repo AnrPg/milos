@@ -2593,7 +2593,9 @@
     "historyDeletedWorkout": "Удалённая тренировка",
     "historyMinutes": "{minutes} мин",
     "historyNoResult": "Результат не записан.",
-    "workoutCount": "{count, plural, one {# тренировка} few {# тренировки} many {# тренировок} other {# тренировки}}"
+    "workoutCount": "{count, plural, one {# тренировка} few {# тренировки} many {# тренировок} other {# тренировки}}",
+    "accessEndedTitle": "Ваш доступ закончился",
+    "accessEndedCancelledBookings": "{count, plural, one {Ваша предстоящая запись отменена.} few {# предстоящие записи отменены.} many {# предстоящих записей отменено.} other {# предстоящих записей отменено.}}"
   },
   "WorkoutAssistant": {
     "title": "Помощник по тренировкам",

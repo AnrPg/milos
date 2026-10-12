@@ -2593,7 +2593,9 @@
     "historyDeletedWorkout": "Séance supprimée",
     "historyMinutes": "{minutes} min",
     "historyNoResult": "Aucun résultat enregistré.",
-    "workoutCount": "{count, plural, one {# séance} other {# séances}}"
+    "workoutCount": "{count, plural, one {# séance} other {# séances}}",
+    "accessEndedTitle": "Votre accès est terminé",
+    "accessEndedCancelledBookings": "{count, plural, one {Votre prochaine réservation a été annulée.} other {Vos # prochaines réservations ont été annulées.}}"
   },
   "WorkoutAssistant": {
     "title": "Assistant d’entraînement",

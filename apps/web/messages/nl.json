@@ -2593,7 +2593,9 @@
     "historyDeletedWorkout": "Verwijderde workout",
     "historyMinutes": "{minutes} min",
     "historyNoResult": "Geen resultaat gelogd.",
-    "workoutCount": "{count, plural, one {# workout} other {# workouts}}"
+    "workoutCount": "{count, plural, one {# workout} other {# workouts}}",
+    "accessEndedTitle": "Je toegang is afgelopen",
+    "accessEndedCancelledBookings": "{count, plural, one {Je komende boeking is geannuleerd.} other {Je # komende boekingen zijn geannuleerd.}}"
   },
   "WorkoutAssistant": {
     "title": "Trainingsassistent",
