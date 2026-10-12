@@ -1,4 +1,4 @@
-# Navigation by Role (proposal for ADR-103)
+# Navigation by Role (ADR-103)
 
 Status: Accepted (2026-10-12).
 
@@ -12,19 +12,20 @@ not fit goes into the last menu).
 
 | Role | Bar (priority order) | Home (dashboard) sections | Hidden / renamed |
 |---|---|---|---|
-| **Owner** | Home · Coaching · Finance · Users | admin dashboard | + Settings › *Organization* card (create gym, transfer ownership, delete gym, platform subscription), + Settings › *Role access* (front desk finance access, §3) |
-| **Admin** | Home · Coaching · Finance · Users | today's dashboard; its category tiles also reach Content, Challenges, Analytics & Marketing, Reviews, Wellbeing | **Coaching** is one page with three tabs: Gym classes (today\'s Classes, with Check-in and Appointments reachable from it) · Personal training (today\'s Personal Coaching) · WODs vault (today\'s Workouts); no dropdown; Settings moves to the account menu; the Dashboard row is removed; Settings › *Organization* hidden |
-| **Coach** | Home · Coaching | My classes today (roster, approvals) · My clients (today's Users page as a tab, only their clients; *Take an athlete*, *Invite*) · Form reviews · Replies due · Nutrition plans · Appointments (their slots) · Reports (coaching analytics of their clients) · Content & challenges (links) | **Coaching** has the same three tabs (Gym classes · Personal training · WODs vault) limited to their own classes and clients; Users, Finance, Analytics & Marketing, Settings hidden; Classes without *Add class* |
-| **Front desk** | Home · Check-in · Classes · Clients · Finance | Arrivals now · Today's classes and waitlists · Quick actions (new client, sell package, take payment) · Cleaning status | *Users* → **Clients** (contact and membership status; training and health tabs hidden); Finance shows only the tabs and buttons the gym unlocked (§3); Classes without *Add class* |
+| **Owner** | Home · Coaching · Finance · Users | admin dashboard (with the Inventory tile) | + Settings › *Organization* card (create gym, transfer ownership, delete gym, platform subscription), + Settings › *Role access* (front desk finance access, §3) |
+| **Admin** | Home · Coaching · Finance · Users | today's dashboard; its category tiles also reach Content, Challenges, Analytics & Marketing, Reviews, Wellbeing, Inventory | **Coaching** is one page with three tabs: Gym classes (today\'s Classes, with Check-in and Appointments reachable from it) · Personal training (today\'s Personal Coaching) · WODs vault (today\'s Workouts); no dropdown; Settings moves to the account menu; the Dashboard row is removed; Settings › *Organization* hidden |
+| **Coach** | Home · Coaching | My classes today (roster, approvals) · My clients (today's Users page as a tab, only their clients; *Take an athlete*, *Invite*) · Form reviews · Replies due · Nutrition plans · Appointments (their slots) · Reports (coaching analytics of their clients) · Content & challenges (links) · Inventory (link; report problems, no prices) | **Coaching** has the same three tabs (Gym classes · Personal training · WODs vault) limited to their own classes and clients; Users, Finance, Analytics & Marketing, Settings hidden; Classes without *Add class* |
+| **Front desk** | Home · Check-in · Classes · Finance · Clients, Inventory under More | Arrivals now · Today's classes and waitlists · Quick actions (new client, sell package, take payment) · Cleaning status | *Users* → **Clients** (contact and membership status; training and health tabs hidden); Finance shows only the tabs and buttons the gym unlocked (§3); Classes without *Add class* |
 | **Accountant** | Home · Finance · Clients · Reports | Overdue · Corporate balances · Desk payments to reconcile | *Users* → **Clients** (billing tab only); *Analytics* → **Reports** (finance tab only) |
-| **Janitor** | Cleaning log | — (the log is the home) | everything else hidden |
+| **Janitor** | Cleaning log | — (the log is the home), with an Inventory link | Inventory without prices (report problems and low stock); everything else hidden |
 | **Member** | Home · Training · Journal | gamification + Journal call to action | **Training** (tabs): Classes · Appointments* · Videos*. **Journal** (tabs): Workouts (folders / tree list, like the WOD library) · History · PRs · Progress* · Coaching* · Wellbeing. Billing in the account menu |
 | **Athlete** | Home · Training · Journal | as member | **Training** (tabs): My workouts · Classes · Appointments* · Videos*. **Journal**: as member |
 
 ## 2. Several roles in one gym
 
 Principles: owner ⊇ admin ⊇ every staff role; staff pages merge by **union**
-(deduplicated, in priority order); a client role adds **My training** (the
+(deduplicated, in one global priority order: Home · Coaching or Check-in ·
+Classes · Finance · Users or Clients · Reports · Cleaning log · Inventory); a client role adds **My training** (the
 client's own pages) instead of merging client links into a staff bar, because
 names clash (Classes vs Schedule) and the bar would overflow. Home shows the
 sections of every role, staff sections first.
@@ -35,11 +36,11 @@ sections of every role, staff sections first.
 | Owner/admin + coach | admin bar | admin dashboard + **My clients** section | — |
 | Owner/admin + front desk / accountant / janitor | admin bar (already includes them) + Cleaning log under More for janitor | admin dashboard | — |
 | Owner/admin + member/athlete | admin bar | admin dashboard | ✔ |
-| Coach + front desk | Home · Coaching · Check-in · Clients · Finance* | coach sections + arrivals + quick actions | — |
+| Coach + front desk | Home · Coaching · Finance* (Check-in and Classes are Coaching tabs), Inventory under More | coach sections + arrivals + quick actions | — |
 | Coach + accountant | coach bar + Finance · Reports | coach sections + money sections | — |
 | Coach + janitor | coach bar + Cleaning log | coach sections | — |
 | Coach + member/athlete | coach bar | coach sections | ✔ |
-| Front desk + accountant | Home · Check-in · Classes · Clients · Finance (all tabs) · Reports | desk sections + money sections | — |
+| Front desk + accountant | Home · Check-in · Classes · Finance (all tabs) · Clients · Reports | desk sections + money sections | — |
 | Front desk + janitor | desk bar + Cleaning log | desk sections + cleaning | — |
 | Front desk + member/athlete | desk bar | desk sections | ✔ |
 | Accountant + janitor | accountant bar + Cleaning log | money sections | — |
@@ -71,7 +72,22 @@ The toggles add capabilities to the front desk role in that gym only
 
 \* only when the package includes it.
 
-## 4. Notes
+## 4. Inventory (ADR-104)
+
+One page, two tabs: **Machines** (training machines and appliances) and
+**Consumables**. Owners, admins and front desk manage it (`manage_inventory`);
+coaches and janitors see it without prices and report notes, issues, outages
+and items running low (`report_inventory`). Where it is reached:
+
+| Role | Entry |
+|---|---|
+| Owner, admin | Inventory tile on the dashboard |
+| Front desk | Inventory in the bar, last in priority, so usually under More |
+| Coach, janitor | Inventory link on their home |
+
+Alerts and the daily digest link to the page.
+
+## 5. Notes
 
 - The Journal is being designed in another worktree as a diary of workouts,
   performance, injuries, reports, messages, PRs and notes. Here it holds only

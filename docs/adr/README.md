@@ -109,3 +109,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-101 | Private coach notes and their access log | Accepted |
 | ADR-102 | Front desk, accountant and janitor roles; housekeeping log | Accepted |
 | ADR-103 | Role-aware navigation on today's UI | Accepted |
+| ADR-104 | Gym inventory: machines and consumables | Accepted |

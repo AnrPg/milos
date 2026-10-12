@@ -3692,6 +3692,16 @@
     "rhTakeAthleteHelp": "You can take athletes as your own clients. Members are assigned by an admin.",
     "rhTakePayment": "Take payment",
     "rhTodaysClasses": "Today's classes",
-    "rhYou": "You"
+    "rhYou": "You",
+    "ntfCoachClientAssignedTitle": "A coach took a new athlete",
+    "ntfCoachClientAssignedBody": "{coach} is now coaching {client}.",
+    "ntfCoachNoteViewedTitle": "An admin read your note",
+    "ntfCoachNoteViewedBody": "{reader} read your note about {client} at {time}.",
+    "ntfRepairNeededTitle": "A machine needs attention",
+    "ntfStockLowTitle": "Running low",
+    "ntfStockLowBody": "{item}: {quantity} left.",
+    "ntfDigestTitle": "Inventory today",
+    "ntfDigestBody": "Needs attention: {items}",
+    "ntfDigestEmptyBody": "Open the inventory to see what needs attention."
   }
 }

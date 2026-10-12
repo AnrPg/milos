@@ -243,6 +243,27 @@ function NotificationCard({
         return i18n("stfNotifAppointmentBookedBody", { client: client(), kind: kind(), time: when("starts_at") || "—" });
       case "appointment_cancelled":
         return i18n("stfNotifAppointmentCancelledBody", { kind: kind(), time: when("starts_at") || "—" });
+      // ADR-100, ADR-101, ADR-104.
+      case "coach_client_assigned":
+        return i18n("ntfCoachClientAssignedBody", { coach: text("coach_nickname") || "—", client: client() });
+      case "coach_note_viewed":
+        return i18n("ntfCoachNoteViewedBody", {
+          reader: text("reader_nickname") || "—",
+          client: client(),
+          time: when("read_at") || "—",
+        });
+      case "inventory_repair_needed":
+        return [text("machine_name"), text("body")].filter(Boolean).join(" · ");
+      case "inventory_stock_low":
+        return text("status") === "reported"
+          ? [text("supply_name"), text("place"), text("note")].filter(Boolean).join(" · ")
+          : i18n("ntfStockLowBody", { item: text("supply_name") || "—", quantity: String(notification.payload.quantity ?? "—") });
+      case "inventory_digest": {
+        const items = Array.isArray(notification.payload.highlights)
+          ? (notification.payload.highlights as unknown[]).filter((item): item is string => typeof item === "string")
+          : [];
+        return items.length > 0 ? i18n("ntfDigestBody", { items: items.join(", ") }) : i18n("ntfDigestEmptyBody");
+      }
       default:
         return null;
     }
@@ -318,6 +339,16 @@ function NotificationCard({
         return i18n("stfNotifAppointmentBookedTitle");
       case "appointment_cancelled":
         return i18n("stfNotifAppointmentCancelledTitle");
+      case "coach_client_assigned":
+        return i18n("ntfCoachClientAssignedTitle");
+      case "coach_note_viewed":
+        return i18n("ntfCoachNoteViewedTitle");
+      case "inventory_repair_needed":
+        return i18n("ntfRepairNeededTitle");
+      case "inventory_stock_low":
+        return i18n("ntfStockLowTitle");
+      case "inventory_digest":
+        return i18n("ntfDigestTitle");
       default:
         return i18n("notificationc18f8f2");
     }

@@ -52,4 +52,17 @@ the UI explains. Existing data gets no relationships; the migration does not
 guess them.
 
 ## Implementation Notes
-To be completed with the implementation.
+Implemented in `0f8f700`, with web panels in `4a44f1e`.
+
+- Migration `20261013110000_add_coaching_relationships_and_class_coaches`
+  adds `coaching_relationships` and `coach_user_id` on class series and
+  scheduled classes. `CoachScope` filters the staff queries listed above.
+- `ManageCoachingRelationships`: owners and admins assign any coach to any
+  client; a coach takes an athlete (never a member), which sends
+  `coach_client_assigned` to the gym's owners and admins; a redeemed coach
+  invitation creates an `invited` relationship.
+- Head coach: `coach_scope` on the membership, set from the user profile by
+  owners and admins.
+- Web: a coach assignment panel on the client profile
+  (`CoachAssignmentPanel.tsx`) and a coach select on classes
+  (`ScheduleConsole.tsx`). Coaches see membership status only.

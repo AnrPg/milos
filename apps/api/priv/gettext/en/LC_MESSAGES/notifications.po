@@ -195,3 +195,27 @@ msgstr "An admin read your note"
 
 msgid "%{reader} read your note about %{client} at %{time}."
 msgstr "%{reader} read your note about %{client} at %{time}."
+
+msgid "A machine needs attention"
+msgstr "A machine needs attention"
+
+msgid "%{machine}: %{note}"
+msgstr "%{machine}: %{note}"
+
+msgid "Reported running low"
+msgstr "Reported running low"
+
+msgid "%{item}: %{note}"
+msgstr "%{item}: %{note}"
+
+msgid "Inventory today"
+msgstr "Inventory today"
+
+msgid "Needs attention: %{items}"
+msgstr "Needs attention: %{items}"
+
+msgid "Running low"
+msgstr "Running low"
+
+msgid "%{item}: %{quantity} left."
+msgstr "%{item}: %{quantity} left."

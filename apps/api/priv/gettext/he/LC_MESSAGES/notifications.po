@@ -195,3 +195,27 @@ msgstr "מנהל קרא את ההערה שלך"
 
 msgid "%{reader} read your note about %{client} at %{time}."
 msgstr "%{reader} קרא/ה את ההערה שלך על %{client} ב-%{time}."
+
+msgid "A machine needs attention"
+msgstr "מכשיר דורש תשומת לב"
+
+msgid "%{machine}: %{note}"
+msgstr "%{machine}: %{note}"
+
+msgid "Reported running low"
+msgstr "דווח על מלאי נמוך"
+
+msgid "%{item}: %{note}"
+msgstr "%{item}: %{note}"
+
+msgid "Inventory today"
+msgstr "המלאי היום"
+
+msgid "Needs attention: %{items}"
+msgstr "דורש תשומת לב: %{items}"
+
+msgid "Running low"
+msgstr "מלאי נמוך"
+
+msgid "%{item}: %{quantity} left."
+msgstr "%{item}: נותרו %{quantity}."

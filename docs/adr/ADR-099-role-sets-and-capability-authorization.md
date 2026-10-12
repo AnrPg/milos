@@ -62,4 +62,32 @@ areas. The web shell receives roles and capabilities and gates surfaces with
 them (ADR-103). Invitations carry a role set. Tests assert the matrix.
 
 ## Implementation Notes
-To be completed with the implementation.
+Implemented in `0f8f700`, `25ab625`, `6102095` and `a37ab33`.
+
+- Migration `20261013100000_membership_role_sets` adds `roles` (array) and
+  `coach_scope` to memberships; `role` stays as the primary role.
+- `Organizations.Domain.AccessPolicy` holds the matrix
+  (`capabilities/2`, `all_capabilities/0`); `TenantAuthorization`
+  answers `can?/2` from the `TenantContext`, which carries
+  roles, capabilities and coach scope. `AccessPolicyTest` asserts the
+  report.
+- Routes: the `RequireRouteCapability` plug reads the capabilities of each
+  controller action from `MilosTrainingWeb.RouteCapabilities` (any one
+  suffices). `RouteCapabilitiesTest` fails when a route under
+  `/api/org/:slug/admin` or `/staff` has no capability or names an unknown
+  one.
+- Role grants per gym: owners and admins unlock `manage_billing`,
+  `manage_promotions`, `manage_packages` and `view_finance_reports` for
+  front desk (`SetRoleGrants`, stored in the organization settings under
+  `role_grants`; web: Settings › Role access, `RoleAccessSettings.tsx`).
+  The memberships payload carries the resulting capabilities.
+- `SetMembershipRoles` enforces the grant ceiling and keeps one owner per
+  gym; an invitation adds its role to an existing membership. Web: the user
+  profile has a roles editor (`MemberRolesEditor.tsx`) limited to what the
+  signed-in person may grant, with the head-coach switch.
+- Owner actions (`OwnerOrganizationActions`; web: Settings › Organization,
+  `OrganizationOwnerSettings.tsx`): an owner creates another gym and owns
+  it; transfers ownership to an active member and stays as admin; archives
+  the gym after typing its slug. Archiving closes the gym to everyone; only
+  the vendor deletes a gym for good (ADR-087), so there is no hard delete
+  for owners. The platform subscription is not built yet.

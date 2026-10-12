@@ -35,4 +35,15 @@ New table pair with RLS (`coaching_notes`, `coaching_note_reads`); a
 notification type following the TD-023 checklist; a coach setting.
 
 ## Implementation Notes
-To be completed with the implementation.
+Implemented in `6102095`, web panel in `4a44f1e`.
+
+- Migration `20261013140000_create_coach_notes` adds `coaching_notes` and
+  `coaching_note_reads` with RLS; `notes_visible_to_admins` lives on the
+  membership.
+- `Application.CoachNotes` lists, writes and deletes notes
+  (`CoachNotePolicy` decides who reads), logs every read by someone other
+  than the author, and sends `coach_note_viewed` when the reader is an
+  admin. Owners' reads are logged without a notification.
+- Web: `CoachNotesPanel.tsx` on the client profile shows the notes, the
+  read log of the coach's own notes and the coach's *Let admins read my
+  notes* toggle.

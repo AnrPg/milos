@@ -28,8 +28,8 @@ front desk finance access each gym unlocks — is
   clients); everything else (their
   clients, form reviews, replies, nutrition plans, appointments, reports) is
   a section of their dashboard.
-- Front desk: Home · Check-in · Classes · Clients · Finance (only the tabs
-  the gym unlocks). Accountants: Home · Finance · Clients · Reports.
+- Front desk: Home · Check-in · Classes · Finance (only the tabs the gym
+  unlocks) · Clients. Accountants: Home · Finance · Clients · Reports.
   Janitors: the Cleaning log.
 - Members and athletes: Home (gamification and a Journal call to action) ·
   Training (classes, their workouts, appointments, videos) · Journal (tabs:
@@ -57,4 +57,27 @@ The web shell reads roles and capabilities (ADR-099) to choose links;
 "Milos workspaces navigation" artifact (revised version).
 
 ## Implementation Notes
-To be completed with the implementation.
+Implemented in `aa4ec6d`, `a37ab33` and `4a44f1e`.
+
+- `src/lib/role-navigation.ts` builds the bar from the membership's
+  capabilities in one global priority order: Home · Coaching (or Check-in ·
+  Classes) · Finance · Users (or Clients) · Reports · Cleaning log.
+  So the front desk bar is **Home · Check-in · Classes · Finance · Clients**
+  (Finance before Clients), and coach + front desk gives
+  **Home · Coaching · Finance**: Check-in and Classes are reached from the
+  Coaching tabs, and the coach's clients from the dashboard.
+- `src/components/nav/PriorityNav.tsx` measures the links and moves what
+  does not fit into "More"; `TopNav` uses it for staff and client bars.
+- `SectionTabs.tsx` puts a tab strip over existing pages: Coaching (Gym
+  classes · Personal training · WODs vault), Training and Journal.
+- The account menu holds Settings and a *My training* / *Staff view* switch
+  (`src/lib/view-mode.ts`) for staff who also hold a client role.
+- Journal › Workouts (`JournalWorkouts.tsx`) lists finished workouts by type
+  in folder and tree views.
+- Role-aware staff home (`src/components/admin/StaffHome.tsx`,
+  `staff-home.ts`): admins get the dashboard (plus *My clients* when they
+  coach); coaches, front desk and accountants get their sections; janitors
+  the cleaning log.
+- Inventory (ADR-104): an overflow item in the front desk bar, a tile on the
+  admin dashboard, and a link from the coach and janitor homes.
+- Only English strings were added; other locales follow.

@@ -17,8 +17,10 @@ function preferredUrl(notification: LinkableNotification) {
   return null;
 }
 
+const STAFF_ROLES = new Set(["admin", "coach", "owner", "front_desk", "accountant", "janitor"]);
+
 function isStaffRole(role: string | null | undefined) {
-  return role === "admin" || role === "coach" || role === "owner";
+  return Boolean(role && STAFF_ROLES.has(role));
 }
 
 // ADR-098: coaching and appointment notifications open the Phase C screens.
@@ -36,6 +38,13 @@ function phaseCUrl(notification: LinkableNotification, role: string | null | und
     case "appointment_booked":
     case "appointment_cancelled":
       return isStaffRole(role) ? "/admin/appointments" : "/appointments";
+    // ADR-104: inventory alerts and the daily summary open the right tab.
+    case "inventory_repair_needed":
+      return "/admin/inventory?tab=machines";
+    case "inventory_stock_low":
+      return "/admin/inventory?tab=supplies";
+    case "inventory_digest":
+      return "/admin/inventory";
     default:
       return null;
   }
@@ -68,7 +77,7 @@ export function notificationTargetUrl(
   if (phaseC) return phaseC;
 
   const rawUrl = preferredUrl(notification) ?? payloadUrl(notification) ?? fallbackUrl(notification);
-  const isAdmin = role === "admin" || role === "coach";
+  const isAdmin = isStaffRole(role);
 
   if (
     notification.type === "chat_message" &&

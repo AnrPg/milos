@@ -195,3 +195,27 @@ msgstr "Een beheerder heeft je notitie gelezen"
 
 msgid "%{reader} read your note about %{client} at %{time}."
 msgstr "%{reader} heeft je notitie over %{client} gelezen om %{time}."
+
+msgid "A machine needs attention"
+msgstr "Een toestel heeft aandacht nodig"
+
+msgid "%{machine}: %{note}"
+msgstr "%{machine}: %{note}"
+
+msgid "Reported running low"
+msgstr "Gemeld als bijna op"
+
+msgid "%{item}: %{note}"
+msgstr "%{item}: %{note}"
+
+msgid "Inventory today"
+msgstr "Inventaris vandaag"
+
+msgid "Needs attention: %{items}"
+msgstr "Heeft aandacht nodig: %{items}"
+
+msgid "Running low"
+msgstr "Bijna op"
+
+msgid "%{item}: %{quantity} left."
+msgstr "%{item}: nog %{quantity} over."

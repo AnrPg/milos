@@ -195,3 +195,27 @@ msgstr "قرأ مسؤول ملاحظتك"
 
 msgid "%{reader} read your note about %{client} at %{time}."
 msgstr "قرأ %{reader} ملاحظتك عن %{client} في %{time}."
+
+msgid "A machine needs attention"
+msgstr "جهاز يحتاج إلى انتباه"
+
+msgid "%{machine}: %{note}"
+msgstr "%{machine}: %{note}"
+
+msgid "Reported running low"
+msgstr "تم الإبلاغ عن انخفاض المخزون"
+
+msgid "%{item}: %{note}"
+msgstr "%{item}: %{note}"
+
+msgid "Inventory today"
+msgstr "المخزون اليوم"
+
+msgid "Needs attention: %{items}"
+msgstr "يحتاج إلى انتباه: %{items}"
+
+msgid "Running low"
+msgstr "المخزون منخفض"
+
+msgid "%{item}: %{quantity} left."
+msgstr "%{item}: تبقّى %{quantity}."

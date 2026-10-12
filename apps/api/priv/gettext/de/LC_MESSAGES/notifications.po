@@ -195,3 +195,27 @@ msgstr "Ein Admin hat Ihre Notiz gelesen"
 
 msgid "%{reader} read your note about %{client} at %{time}."
 msgstr "%{reader} hat Ihre Notiz zu %{client} um %{time} gelesen."
+
+msgid "A machine needs attention"
+msgstr "Ein Gerät braucht Aufmerksamkeit"
+
+msgid "%{machine}: %{note}"
+msgstr "%{machine}: %{note}"
+
+msgid "Reported running low"
+msgstr "Als knapp gemeldet"
+
+msgid "%{item}: %{note}"
+msgstr "%{item}: %{note}"
+
+msgid "Inventory today"
+msgstr "Inventar heute"
+
+msgid "Needs attention: %{items}"
+msgstr "Braucht Aufmerksamkeit: %{items}"
+
+msgid "Running low"
+msgstr "Wird knapp"
+
+msgid "%{item}: %{quantity} left."
+msgstr "%{item}: noch %{quantity} übrig."

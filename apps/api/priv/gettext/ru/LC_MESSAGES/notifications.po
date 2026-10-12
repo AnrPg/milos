@@ -195,3 +195,27 @@ msgstr "Администратор прочитал вашу заметку"
 
 msgid "%{reader} read your note about %{client} at %{time}."
 msgstr "%{reader} прочитал(а) вашу заметку о %{client} в %{time}."
+
+msgid "A machine needs attention"
+msgstr "Тренажёр требует внимания"
+
+msgid "%{machine}: %{note}"
+msgstr "%{machine}: %{note}"
+
+msgid "Reported running low"
+msgstr "Сообщили о нехватке"
+
+msgid "%{item}: %{note}"
+msgstr "%{item}: %{note}"
+
+msgid "Inventory today"
+msgstr "Инвентарь сегодня"
+
+msgid "Needs attention: %{items}"
+msgstr "Требует внимания: %{items}"
+
+msgid "Running low"
+msgstr "Заканчивается"
+
+msgid "%{item}: %{quantity} left."
+msgstr "%{item}: осталось %{quantity}."

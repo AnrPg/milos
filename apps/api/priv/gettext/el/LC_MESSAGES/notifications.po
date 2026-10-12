@@ -195,3 +195,27 @@ msgstr "Ένας admin διάβασε τη σημείωσή σας"
 
 msgid "%{reader} read your note about %{client} at %{time}."
 msgstr "Ο/Η %{reader} διάβασε τη σημείωσή σας για τον/την %{client} στις %{time}."
+
+msgid "A machine needs attention"
+msgstr "Ένα μηχάνημα χρειάζεται προσοχή"
+
+msgid "%{machine}: %{note}"
+msgstr "%{machine}: %{note}"
+
+msgid "Reported running low"
+msgstr "Αναφέρθηκε χαμηλό απόθεμα"
+
+msgid "%{item}: %{note}"
+msgstr "%{item}: %{note}"
+
+msgid "Inventory today"
+msgstr "Απόθεμα σήμερα"
+
+msgid "Needs attention: %{items}"
+msgstr "Χρειάζονται προσοχή: %{items}"
+
+msgid "Running low"
+msgstr "Χαμηλό απόθεμα"
+
+msgid "%{item}: %{quantity} left."
+msgstr "%{item}: απομένουν %{quantity}."

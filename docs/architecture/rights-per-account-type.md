@@ -1,6 +1,6 @@
 # Rights per Account Type
 
-Status: Accepted (2026-10-12) — source of truth for ADR-099 to ADR-103.
+Status: Accepted (2026-10-12) — source of truth for ADR-099 to ADR-104.
 Owner of changes: product. Code reads this through
 `Organizations.Domain.AccessPolicy` (capabilities) and
 `Organizations.Domain.CoachScope` (data scope).
@@ -15,7 +15,7 @@ Owner of changes: product. Code reads this through
 | **Coach** | membership role | One gym; own clients and classes unless *head coach* | Owner or admin |
 | **Front desk** | membership role | One gym; reception work | Owner or admin |
 | **Accountant** | membership role | One gym; money only | Owner or admin |
-| **Janitor** | membership role | One gym; cleaning log only | Owner or admin |
+| **Janitor** | membership role | One gym; cleaning log, reports inventory problems | Owner or admin |
 | **Member** | membership role | One gym; trains in classes, buys packages | Self sign-up, invitation |
 | **Athlete** | membership role | One gym; individually programmed (remote) | Owner, admin, or a coach |
 
@@ -49,7 +49,7 @@ Owner has every right of an admin.
 | Capability | Owner | Admin | Coach | Front desk | Accountant | Janitor | Member / Athlete |
 |---|---|---|---|---|---|---|---|
 | Create another gym | ✔ | — | — | — | — | — | — |
-| Delete gym, transfer ownership | ✔ | — | — | — | — | — | — |
+| Archive gym (typing its slug), transfer ownership (stays admin) | ✔ | — | — | — | — | — | — |
 | Platform subscription (pay us) | ✔ | — | — | — | — | — | — |
 | Grant or remove owner / admin | ✔ | — | — | — | — | — | — |
 | Grant or remove staff roles (coach, front desk, accountant, janitor) | ✔ | ✔ | — | — | — | — | — |
@@ -110,6 +110,13 @@ admin is logged and the coach is notified with who read which note and when
 | Coaching analytics | ✔ | ✔ | own | — | — | — | own progress |
 | Cleaning log: record cleaning | ✔ | ✔ | — | — | — | ✔ | — |
 | Cleaning log: review, set areas and tasks | ✔ | ✔ | — | 👁 | — | own entries | — |
+| Inventory: add and edit items, prices, shops; restock, use, recount; service, repair, retire; inventory report (`manage_inventory`) | ✔ | ✔ | — | ✔ | — | — | — |
+| Inventory: see machines and consumables without prices or shops; log notes, issues, outages; report running low (`report_inventory`) ³ | ✔ | ✔ | ✔ | ✔ | — | ✔ | — |
+
+³ Reporters do not see purchase or unit prices, shops, links, service
+contacts or serial numbers, and cannot log repair calls, services, repairs
+or retirements. Inventory alerts and the daily digest go to everyone with
+`manage_inventory` (ADR-104).
 
 ## 4. Rules that are easy to get wrong
 
@@ -122,7 +129,8 @@ admin is logged and the coach is notified with who read which note and when
 3. Coaches never see money beyond **status**; front desk sees status and can
    take payments, but not invoices, reports or settings.
 4. Accountants see money and billing contacts, never training or health data.
-5. Janitors see only the cleaning log.
+5. Janitors see only the cleaning log and the inventory lists they report
+   on (without prices).
 6. Data scope applies on the server: lists, details and actions of a scoped
    coach are filtered by `CoachScope`, not only hidden in the UI.
 7. Multi-role accounts get the **union** of rights; the UI groups them by
