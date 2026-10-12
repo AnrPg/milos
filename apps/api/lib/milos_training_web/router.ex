@@ -313,6 +313,8 @@ defmodule MilosTrainingWeb.Router do
     patch("/challenges/:id", AdminChallengeController, :update)
     delete("/challenges/:id", AdminChallengeController, :delete)
     get("/settings", AdminSettingsController, :show)
+    get("/onboarding", AdminOnboardingController, :show)
+    patch("/onboarding", AdminOnboardingController, :update)
     patch("/settings", AdminSettingsController, :update)
     post("/schedule/slots", AdminScheduleController, :create_slot)
     post("/schedule/slots/series", AdminScheduleController, :create_series)

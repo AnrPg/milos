@@ -175,6 +175,12 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  def call(conn, {:error, :invalid_onboarding_action}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_onboarding_action", error: "Unknown onboarding action or step"})
+  end
+
   def call(conn, {:error, :invalid_join_link}) do
     conn
     |> put_status(:unprocessable_entity)
