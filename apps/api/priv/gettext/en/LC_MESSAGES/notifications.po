@@ -183,3 +183,15 @@ msgstr "Appointment cancelled"
 
 msgid "The session on %{time} was cancelled."
 msgstr "The session on %{time} was cancelled."
+
+msgid "A coach took a new athlete"
+msgstr "A coach took a new athlete"
+
+msgid "%{coach} is now coaching %{client}."
+msgstr "%{coach} is now coaching %{client}."
+
+msgid "An admin read your note"
+msgstr "An admin read your note"
+
+msgid "%{reader} read your note about %{client} at %{time}."
+msgstr "%{reader} read your note about %{client} at %{time}."

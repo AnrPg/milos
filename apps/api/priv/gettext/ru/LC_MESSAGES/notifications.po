@@ -183,3 +183,15 @@ msgstr "Сессия отменена"
 
 msgid "The session on %{time} was cancelled."
 msgstr "Сессия %{time} отменена."
+
+msgid "A coach took a new athlete"
+msgstr "Тренер взял нового атлета"
+
+msgid "%{coach} is now coaching %{client}."
+msgstr "%{coach} теперь тренирует %{client}."
+
+msgid "An admin read your note"
+msgstr "Администратор прочитал вашу заметку"
+
+msgid "%{reader} read your note about %{client} at %{time}."
+msgstr "%{reader} прочитал(а) вашу заметку о %{client} в %{time}."

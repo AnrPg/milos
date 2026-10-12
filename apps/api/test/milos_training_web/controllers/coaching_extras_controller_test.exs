@@ -11,7 +11,15 @@ defmodule MilosTrainingWeb.CoachingExtrasControllerTest do
     Repo.query!("SELECT set_config($1, $2, false)", ["app.organization_id", organization.id])
 
     coach = user_fixture()
-    {:ok, _} = Organizations.ensure_legacy_membership_for_migration(coach, :coach)
+    {:ok, membership} = Organizations.ensure_legacy_membership_for_migration(coach, :coach)
+
+    # A head coach reaches every client; own-client scope has its own test.
+    {:ok, _} =
+      MilosTraining.Organizations.OrganizationStore.update_membership_settings(
+        organization.id,
+        membership.id,
+        %{coach_scope: :all}
+      )
 
     {:ok, _settings} =
       Finance.update_finance_settings(%{

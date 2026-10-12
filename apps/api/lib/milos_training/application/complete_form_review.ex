@@ -2,10 +2,12 @@ defmodule MilosTraining.Application.CompleteFormReview do
   @moduledoc "A coach answers a form review; the reserved unit is used (ADR-098)."
 
   alias MilosTraining.{Coaching, Finance, Notifications}
+  alias MilosTraining.Application.AuthorizeClientAccess
   alias MilosTraining.Coaching.Domain.FormReviewPolicy
 
   def call(context, %{id: reviewer_id}, id, feedback) do
     with %{} = review <- Coaching.get_form_review(context, id) || {:error, :not_found},
+         :ok <- AuthorizeClientAccess.call(context, :manage_coaching, review.user_id),
          :ok <- FormReviewPolicy.can_review?(review),
          {:ok, reviewed} <-
            Coaching.complete_form_review(context, id, %{

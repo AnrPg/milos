@@ -10,6 +10,7 @@ defmodule MilosTrainingWeb.CoachingExtrasController do
   alias Guardian.Plug, as: GuardianPlug
 
   alias MilosTraining.Application.{
+    AuthorizeClientAccess,
     CompleteFormReview,
     GetMyNutritionPlan,
     ListCoachingReplyQueue,
@@ -129,7 +130,13 @@ defmodule MilosTrainingWeb.CoachingExtrasController do
 
   def form_review_queue(conn, params) do
     status = Map.get(params, :status, "submitted")
-    reviews = Coaching.list_form_reviews(conn.assigns.tenant_context, %{status: status})
+    context = conn.assigns.tenant_context
+
+    reviews =
+      context
+      |> Coaching.list_form_reviews(%{status: status})
+      |> own_clients(context, :user_id)
+
     json(conn, %{form_reviews: reviews})
   end
 
@@ -190,7 +197,19 @@ defmodule MilosTrainingWeb.CoachingExtrasController do
   )
 
   def reply_queue(conn, _params) do
-    json(conn, %{replies: ListCoachingReplyQueue.call(conn.assigns.tenant_context)})
+    context = conn.assigns.tenant_context
+
+    json(conn, %{
+      replies: context |> ListCoachingReplyQueue.call() |> own_clients(context, :client_id)
+    })
+  end
+
+  # Coaches with scope `:own` see only their own clients' items (ADR-100).
+  defp own_clients(items, context, key) do
+    case AuthorizeClientAccess.client_ids(context, :manage_coaching) do
+      :all -> items
+      ids -> Enum.filter(items, &(Map.get(&1, key) in ids))
+    end
   end
 
   operation(:nutrition_plan,
@@ -200,7 +219,11 @@ defmodule MilosTrainingWeb.CoachingExtrasController do
   )
 
   def nutrition_plan(conn, %{user_id: user_id}) do
-    json(conn, %{nutrition_plan: Nutrition.get_plan(conn.assigns.tenant_context, user_id)})
+    context = conn.assigns.tenant_context
+
+    with :ok <- AuthorizeClientAccess.call(context, :manage_coaching, user_id) do
+      json(conn, %{nutrition_plan: Nutrition.get_plan(context, user_id)})
+    end
   end
 
   operation(:save_nutrition_plan,
@@ -229,8 +252,10 @@ defmodule MilosTrainingWeb.CoachingExtrasController do
   def save_nutrition_plan(conn, %{user_id: user_id}) do
     staff = GuardianPlug.current_resource(conn)
 
-    with {:ok, plan} <-
-           SaveNutritionPlan.call(conn.assigns.tenant_context, staff, user_id, conn.body_params) do
+    context = conn.assigns.tenant_context
+
+    with :ok <- AuthorizeClientAccess.call(context, :manage_coaching, user_id),
+         {:ok, plan} <- SaveNutritionPlan.call(context, staff, user_id, conn.body_params) do
       json(conn, %{nutrition_plan: plan})
     end
   end

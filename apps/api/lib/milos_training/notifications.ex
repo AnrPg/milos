@@ -223,6 +223,27 @@ defmodule MilosTraining.Notifications do
         url: field(payload, :url) || "/appointments"
       })
 
+  # ADR-100: owners and admins see when a coach takes an athlete.
+  def process_event("coach_client_assigned", payload),
+    do:
+      enqueue_simple(:coach_client_assigned, payload, %{
+        coach_nickname: field(payload, :coach_nickname),
+        client_nickname: field(payload, :client_nickname),
+        client_user_id: field(payload, :client_user_id),
+        url: "/admin/users/#{field(payload, :client_user_id)}"
+      })
+
+  # ADR-101: a coach learns which admin read which note, and when.
+  def process_event("coach_note_viewed", payload),
+    do:
+      enqueue_simple(:coach_note_viewed, payload, %{
+        note_id: field(payload, :note_id),
+        reader_nickname: field(payload, :reader_nickname),
+        client_nickname: field(payload, :client_nickname),
+        read_at: field(payload, :read_at),
+        url: "/admin/users/#{field(payload, :client_user_id)}"
+      })
+
   def process_event(_event, _payload), do: {:error, :bad_request}
 
   def propagate_nickname_change(old_nickname, new_nickname),

@@ -239,7 +239,8 @@ defmodule MilosTrainingWeb.AppointmentsControllerTest do
            |> send_json(:post, "#{base}/me/appointments", %{slot_id: second["id"]})
            |> json_response(403)
 
-    assert %{"code" => "appointment_coach_not_staff"} =
+    # A coach limited to their own clients cannot publish another coach's slot.
+    assert %{"code" => "forbidden"} =
              coach_conn
              |> send_json(:post, "#{base}/staff/appointment-slots", %{
                coach_id: Ecto.UUID.generate(),
@@ -248,7 +249,7 @@ defmodule MilosTrainingWeb.AppointmentsControllerTest do
                starts_at: DateTime.utc_now() |> DateTime.add(3600) |> DateTime.truncate(:second),
                duration_minutes: 60
              })
-             |> json_response(422)
+             |> json_response(403)
   end
 
   test "staff are listed by their role in this gym", %{

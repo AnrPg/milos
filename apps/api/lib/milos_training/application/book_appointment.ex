@@ -53,7 +53,8 @@ defmodule MilosTraining.Application.BookAppointment do
 
   defp client(context, _actor, user_id) do
     cond do
-      not Organizations.any_role?(context, Organizations.admin_roles()) ->
+      not (Organizations.can?(context, :book_for_clients) or
+               Organizations.can?(context, :manage_appointments)) ->
         {:error, :forbidden}
 
       user_id not in Organizations.list_active_membership_user_ids(context.organization_id) ->

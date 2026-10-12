@@ -183,3 +183,15 @@ msgstr "Afspraak geannuleerd"
 
 msgid "The session on %{time} was cancelled."
 msgstr "De sessie van %{time} is geannuleerd."
+
+msgid "A coach took a new athlete"
+msgstr "Een coach heeft een nieuwe atleet aangenomen"
+
+msgid "%{coach} is now coaching %{client}."
+msgstr "%{coach} coacht nu %{client}."
+
+msgid "An admin read your note"
+msgstr "Een beheerder heeft je notitie gelezen"
+
+msgid "%{reader} read your note about %{client} at %{time}."
+msgstr "%{reader} heeft je notitie over %{client} gelezen om %{time}."

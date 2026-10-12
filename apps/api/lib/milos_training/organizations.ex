@@ -12,6 +12,7 @@ defmodule MilosTraining.Organizations do
     RenameOrganization,
     RevokeInvitation,
     SendOwnerInvitationEmail,
+    SetCoachScope,
     SetMembershipRole,
     SetMembershipStatus,
     UpdateOrganizationLifecycle,
@@ -50,24 +51,64 @@ defmodule MilosTraining.Organizations do
   def list_membership_organization_ids(user_ids),
     do: OrganizationStore.list_membership_organization_ids(user_ids)
 
-  @doc "Whether the tenant context holds any of `roles` (role-set aware, TD-054)."
+  @doc "Whether the tenant context holds any of `roles` (ADR-099)."
   defdelegate any_role?(context, roles),
     to: MilosTraining.Organizations.Domain.TenantAuthorization
 
-  @doc "Roles with admin rights; coaches included until TD-054 narrows them."
+  defdelegate staff?(context), to: MilosTraining.Organizations.Domain.TenantAuthorization
+
+  defdelegate can?(context, capability),
+    to: MilosTraining.Organizations.Domain.TenantAuthorization
+
+  defdelegate capability_scope(context, capability),
+    to: MilosTraining.Organizations.Domain.TenantAuthorization,
+    as: :scope
+
+  defdelegate authorize_capability(context, capability),
+    to: MilosTraining.Organizations.Domain.TenantAuthorization
+
+  @doc "Roles that run a gym: owner and admin (ADR-099)."
   defdelegate admin_roles(), to: MilosTraining.Organizations.Domain.MembershipPolicy
+
+  @doc "Every membership role (ADR-099)."
+  defdelegate roles(), to: MilosTraining.Organizations.Domain.MembershipPolicy
+
+  @doc "Roles of an active member of the gym, or [] (ADR-099)."
+  def member_roles(organization_id, user_id) when is_binary(user_id) do
+    case OrganizationStore.get_membership(organization_id, user_id) do
+      %{status: :active, roles: roles} -> roles
+      _none -> []
+    end
+  end
+
+  def member_roles(_organization_id, _user_id), do: []
+
+  @doc "Active owners and admins of a gym (ADR-099)."
+  def list_manager_user_ids(organization_id) do
+    organization_id
+    |> OrganizationStore.list_organization_memberships()
+    |> Enum.filter(
+      &(&1.status == :active and Enum.any?(&1.roles, fn r -> r in [:owner, :admin] end))
+    )
+    |> Enum.map(& &1.user_id)
+  end
 
   def list_staff_user_ids(organization_id),
     do: OrganizationStore.list_staff_user_ids(organization_id)
 
-  @doc "Active staff (owner, admin, coach) of a gym with their role there."
+  @doc """
+  Active owners, admins and coaches of a gym, with their primary role and
+  role set there (coach pickers, ADR-098/099).
+  """
   def list_staff(organization_id) do
-    staff_roles = admin_roles()
+    staff_roles = [:owner, :admin, :coach]
 
     organization_id
     |> OrganizationStore.list_organization_memberships()
-    |> Enum.filter(&(&1.status == :active and &1.role in staff_roles))
-    |> Enum.map(&%{user_id: &1.user_id, role: &1.role})
+    |> Enum.filter(
+      &(&1.status == :active and Enum.any?(&1.roles, fn role -> role in staff_roles end))
+    )
+    |> Enum.map(&%{user_id: &1.user_id, role: &1.role, roles: &1.roles})
   end
 
   def issue_invitation(context, params, issued_at \\ DateTime.utc_now()),
@@ -120,6 +161,11 @@ defmodule MilosTraining.Organizations do
 
   def set_membership_role(context, user_id, role),
     do: SetMembershipRole.call(context, user_id, role)
+
+  def set_membership_roles(context, user_id, roles),
+    do: SetMembershipRole.set_roles(context, user_id, roles)
+
+  def set_coach_scope(context, user_id, scope), do: SetCoachScope.call(context, user_id, scope)
 
   def delete_organization(context, organization_id, deleted_at \\ DateTime.utc_now()),
     do: DeleteOrganization.call(context, organization_id, deleted_at)

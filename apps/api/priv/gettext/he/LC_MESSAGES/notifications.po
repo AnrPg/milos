@@ -183,3 +183,15 @@ msgstr "הפגישה בוטלה"
 
 msgid "The session on %{time} was cancelled."
 msgstr "המפגש ב-%{time} בוטל."
+
+msgid "A coach took a new athlete"
+msgstr "מאמן לקח אתלט חדש"
+
+msgid "%{coach} is now coaching %{client}."
+msgstr "%{coach} מאמן/ת כעת את %{client}."
+
+msgid "An admin read your note"
+msgstr "מנהל קרא את ההערה שלך"
+
+msgid "%{reader} read your note about %{client} at %{time}."
+msgstr "%{reader} קרא/ה את ההערה שלך על %{client} ב-%{time}."

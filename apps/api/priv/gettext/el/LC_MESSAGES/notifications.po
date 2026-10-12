@@ -183,3 +183,15 @@ msgstr "Το ραντεβού ακυρώθηκε"
 
 msgid "The session on %{time} was cancelled."
 msgstr "Η συνεδρία της %{time} ακυρώθηκε."
+
+msgid "A coach took a new athlete"
+msgstr "Ένας coach ανέλαβε νέο αθλητή"
+
+msgid "%{coach} is now coaching %{client}."
+msgstr "Ο/Η %{coach} προπονεί πλέον τον/την %{client}."
+
+msgid "An admin read your note"
+msgstr "Ένας admin διάβασε τη σημείωσή σας"
+
+msgid "%{reader} read your note about %{client} at %{time}."
+msgstr "Ο/Η %{reader} διάβασε τη σημείωσή σας για τον/την %{client} στις %{time}."

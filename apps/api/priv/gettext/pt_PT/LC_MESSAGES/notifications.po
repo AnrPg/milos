@@ -183,3 +183,15 @@ msgstr "Marcação cancelada"
 
 msgid "The session on %{time} was cancelled."
 msgstr "A sessão de %{time} foi cancelada."
+
+msgid "A coach took a new athlete"
+msgstr "Um treinador assumiu um novo atleta"
+
+msgid "%{coach} is now coaching %{client}."
+msgstr "%{coach} treina agora %{client}."
+
+msgid "An admin read your note"
+msgstr "Um administrador leu a sua nota"
+
+msgid "%{reader} read your note about %{client} at %{time}."
+msgstr "%{reader} leu a sua nota sobre %{client} às %{time}."

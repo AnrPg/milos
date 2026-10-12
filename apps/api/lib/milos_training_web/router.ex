@@ -1,6 +1,8 @@
 defmodule MilosTrainingWeb.Router do
   use MilosTrainingWeb, :router
 
+  @all_roles MilosTraining.Organizations.Domain.MembershipPolicy.roles()
+
   pipeline :api do
     plug(:accepts, ["json"])
     plug(OpenApiSpex.Plug.PutApiSpec, module: MilosTrainingWeb.ApiSpec)
@@ -89,16 +91,17 @@ defmodule MilosTrainingWeb.Router do
     )
   end
 
-  # Coaches have admin rights until a rights-per-role report says otherwise
-  # (ADR-098); see Organizations.Domain.MembershipPolicy.admin_roles/0.
+  # Staff routes need the capability RouteCapabilities lists for the action
+  # (ADR-099); data scope is enforced by the application services.
   pipeline :admin_only do
     plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
-    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin, :coach])
+    plug(MilosTrainingWeb.Plugs.RequireRouteCapability)
   end
 
+  # Members and staff; athletes have their own programming instead.
   pipeline :member_or_admin do
     plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
-    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin, :coach, :member])
+    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: @all_roles -- [:athlete])
   end
 
   pipeline :athlete_or_admin do
@@ -108,15 +111,12 @@ defmodule MilosTrainingWeb.Router do
 
   pipeline :staff_only do
     plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
-    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin, :coach])
+    plug(MilosTrainingWeb.Plugs.RequireRouteCapability)
   end
 
   pipeline :tenant_member do
     plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
-
-    plug(MilosTrainingWeb.Plugs.RequireTenantRole,
-      roles: [:owner, :admin, :coach, :athlete, :member]
-    )
+    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: @all_roles)
   end
 
   pipeline :user_only do
@@ -128,7 +128,7 @@ defmodule MilosTrainingWeb.Router do
   end
 
   pipeline :organization_admin do
-    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin, :coach])
+    plug(MilosTrainingWeb.Plugs.RequireRouteCapability)
   end
 
   pipeline :vendor do
@@ -275,6 +275,9 @@ defmodule MilosTrainingWeb.Router do
     ])
 
     get("/members", StaffController, :index)
+    get("/coaching-relationships", CoachingRelationshipsController, :index)
+    post("/coaching-relationships", CoachingRelationshipsController, :create)
+    post("/coaching-relationships/:id/end", CoachingRelationshipsController, :finish)
     get("/form-reviews", CoachingExtrasController, :form_review_queue)
     post("/form-reviews/:id/review", CoachingExtrasController, :complete_form_review)
     get("/reply-queue", CoachingExtrasController, :reply_queue)
@@ -322,6 +325,9 @@ defmodule MilosTrainingWeb.Router do
     )
 
     patch("/users/:id/role", AdminUserController, :update_role)
+    put("/users/:id/roles", AdminUserController, :update_roles)
+    patch("/users/:id/coach-scope", AdminUserController, :update_coach_scope)
+    get("/users/:id/membership-status", AdminUserController, :membership_status)
     get("/search", AdminSearchController, :index)
     get("/analytics/summary", AdminAnalyticsController, :summary)
     get("/athletes", AdminUserController, :index_athletes)

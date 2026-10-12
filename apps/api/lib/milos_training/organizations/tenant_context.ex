@@ -16,6 +16,9 @@ defmodule MilosTraining.Organizations.TenantContext do
     :membership_id,
     :user_id,
     :role,
+    roles: [],
+    capabilities: %{},
+    coach_scope: :own,
     request_metadata: %{}
   ]
 
@@ -27,6 +30,9 @@ defmodule MilosTraining.Organizations.TenantContext do
           membership_id: Ecto.UUID.t(),
           user_id: Ecto.UUID.t(),
           role: atom(),
+          roles: [atom()],
+          capabilities: %{atom() => :all | :own | :status},
+          coach_scope: :own | :all,
           request_metadata: map()
         }
 end

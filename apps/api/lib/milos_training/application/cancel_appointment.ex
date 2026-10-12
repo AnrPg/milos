@@ -10,7 +10,9 @@ defmodule MilosTraining.Application.CancelAppointment do
   alias MilosTraining.Appointments.Domain.AppointmentPolicy
 
   def call(context, %{id: actor_id}, booking_id) do
-    staff? = Organizations.any_role?(context, Organizations.admin_roles())
+    staff? =
+      Organizations.can?(context, :manage_appointments) or
+        Organizations.can?(context, :book_for_clients)
 
     with %{} = booking <- Appointments.get_booking(context, booking_id) || {:error, :not_found},
          :ok <- owner_or_staff(booking, actor_id, staff?),

@@ -68,6 +68,7 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
         approved_booking_count: slot.approved_booking_count,
         spots_remaining: slot.spots_remaining,
         location_id: Map.get(slot, :location_id),
+        coach_user_id: Map.get(slot, :coach_user_id),
         waitlist_count: length(waitlist),
         workout: preview_workout(workout),
         current_user_booking:

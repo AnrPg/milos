@@ -183,3 +183,15 @@ msgstr "تم إلغاء الموعد"
 
 msgid "The session on %{time} was cancelled."
 msgstr "تم إلغاء الجلسة في %{time}."
+
+msgid "A coach took a new athlete"
+msgstr "تولّى مدرب رياضيًا جديدًا"
+
+msgid "%{coach} is now coaching %{client}."
+msgstr "يدرّب %{coach} الآن %{client}."
+
+msgid "An admin read your note"
+msgstr "قرأ مسؤول ملاحظتك"
+
+msgid "%{reader} read your note about %{client} at %{time}."
+msgstr "قرأ %{reader} ملاحظتك عن %{client} في %{time}."

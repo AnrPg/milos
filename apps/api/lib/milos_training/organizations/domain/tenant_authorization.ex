@@ -1,7 +1,7 @@
 defmodule MilosTraining.Organizations.Domain.TenantAuthorization do
   @moduledoc false
 
-  alias MilosTraining.Organizations.Domain.MembershipPolicy
+  alias MilosTraining.Organizations.Domain.{AccessPolicy, MembershipPolicy}
   alias MilosTraining.Organizations.TenantContext
 
   def build(account, organization, membership, request_metadata)
@@ -17,6 +17,9 @@ defmodule MilosTraining.Organizations.Domain.TenantAuthorization do
         {:error, :inactive_membership}
 
       true ->
+        roles = membership_roles(membership)
+        coach_scope = Map.get(membership, :coach_scope) || :own
+
         {:ok,
          %TenantContext{
            organization: organization,
@@ -25,7 +28,10 @@ defmodule MilosTraining.Organizations.Domain.TenantAuthorization do
            organization_id: organization.id,
            membership_id: membership.id,
            user_id: account.id,
-           role: membership.role,
+           role: MembershipPolicy.primary_role(roles) || membership.role,
+           roles: roles,
+           capabilities: AccessPolicy.capabilities(roles, coach_scope: coach_scope),
+           coach_scope: coach_scope,
            request_metadata: request_metadata || %{}
          }}
     end
@@ -38,14 +44,39 @@ defmodule MilosTraining.Organizations.Domain.TenantAuthorization do
     if any_role?(context, roles), do: :ok, else: {:error, :forbidden}
   end
 
-  @doc """
-  Roles the account holds in the context's gym. A membership holds one role
-  today; checks go through this so memberships can later hold several (TD-054).
-  """
-  def roles(%{roles: roles}) when is_list(roles), do: roles
+  defp membership_roles(%{roles: [_ | _] = roles}), do: roles
+  defp membership_roles(%{role: role}) when not is_nil(role), do: [role]
+  defp membership_roles(_membership), do: []
+
+  @doc "Roles the account holds in the context's gym (ADR-099)."
+  def roles(%{roles: [_ | _] = roles}), do: roles
   def roles(%{role: role}) when not is_nil(role), do: [role]
   def roles(_context), do: []
 
+  @doc "Whether the account works at the gym (any role besides member/athlete)."
+  def staff?(context),
+    do: context |> roles() |> Enum.any?(&(&1 not in MembershipPolicy.client_roles()))
+
   def any_role?(context, roles) when is_list(roles),
     do: context |> roles() |> Enum.any?(&(&1 in roles))
+
+  @doc """
+  The account's capabilities in the context's gym (ADR-099). A context built
+  without them (tests, jobs) derives them from its roles.
+  """
+  def capabilities(%{capabilities: capabilities})
+      when is_map(capabilities) and map_size(capabilities) > 0,
+      do: capabilities
+
+  def capabilities(context),
+    do: AccessPolicy.capabilities(roles(context), coach_scope: Map.get(context, :coach_scope))
+
+  def can?(context, capability), do: AccessPolicy.can?(capabilities(context), capability)
+
+  @doc "`:all`, `:own`, `:status` or nil when the capability is missing."
+  def scope(context, capability), do: AccessPolicy.scope(capabilities(context), capability)
+
+  def authorize_capability(context, capability) do
+    if can?(context, capability), do: :ok, else: {:error, :forbidden}
+  end
 end

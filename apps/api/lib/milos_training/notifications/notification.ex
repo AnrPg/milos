@@ -31,7 +31,9 @@ defmodule MilosTraining.Notifications.Notification do
     :coaching_reply_overdue,
     :nutrition_plan_updated,
     :appointment_booked,
-    :appointment_cancelled
+    :appointment_cancelled,
+    :coach_client_assigned,
+    :coach_note_viewed
   ]
 
   schema "notifications" do

@@ -81,6 +81,10 @@ config :milos_training,
        MilosTraining.Infrastructure.Coaching.EctoFormReviewStore
 
 config :milos_training,
+       :coaching_relationship_store,
+       MilosTraining.Infrastructure.Coaching.EctoRelationshipStore
+
+config :milos_training,
        :nutrition_store,
        MilosTraining.Infrastructure.Nutrition.EctoNutritionStore
 

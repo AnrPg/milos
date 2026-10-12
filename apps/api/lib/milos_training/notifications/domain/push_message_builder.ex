@@ -284,6 +284,31 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  def build("coach_client_assigned", payload, localize) do
+    %{
+      title: localize.("A coach took a new athlete", %{}),
+      body:
+        localize.("%{coach} is now coaching %{client}.", %{
+          coach: payload["coach_nickname"] || "",
+          client: payload["client_nickname"] || ""
+        }),
+      url: payload["url"] || "/admin/users"
+    }
+  end
+
+  def build("coach_note_viewed", payload, localize) do
+    %{
+      title: localize.("An admin read your note", %{}),
+      body:
+        localize.("%{reader} read your note about %{client} at %{time}.", %{
+          reader: payload["reader_nickname"] || "",
+          client: payload["client_nickname"] || "",
+          time: payload["read_at"] || ""
+        }),
+      url: payload["url"] || "/admin/users"
+    }
+  end
+
   def build("chat_message", payload, localize) do
     title =
       if payload["context_type"] in ["assignment", "class_slot"],

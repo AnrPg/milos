@@ -46,7 +46,8 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     %OrganizationMembership{}
     |> OrganizationMembership.changeset(params)
     |> Repo.insert(
-      on_conflict: {:replace, [:role, :status, :joined_at, :invited_by_user_id, :updated_at]},
+      on_conflict:
+        {:replace, [:role, :roles, :status, :joined_at, :invited_by_user_id, :updated_at]},
       conflict_target: [:organization_id, :user_id],
       returning: true
     )
@@ -196,7 +197,7 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     |> where(
       [membership],
       membership.organization_id == ^organization_id and membership.status == :active and
-        membership.role in [:owner, :admin, :coach]
+        fragment("? && ?::varchar[]", membership.roles, ^["owner", "admin", "coach"])
     )
     |> select([membership], membership.user_id)
     |> Repo.all()
@@ -539,6 +540,34 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   end
 
   @impl true
+  def update_membership_roles(organization_id, membership_id, roles) do
+    update_membership(organization_id, membership_id, %{roles: roles})
+  end
+
+  # Coach scope (ADR-100) and notes visibility (ADR-101).
+  @impl true
+  def update_membership_settings(organization_id, membership_id, settings) do
+    update_membership(
+      organization_id,
+      membership_id,
+      Map.take(settings, [:coach_scope, :notes_visible_to_admins])
+    )
+  end
+
+  defp update_membership(organization_id, membership_id, params) do
+    Repo.transaction(fn ->
+      membership = get_membership_by_id(organization_id, membership_id)
+      if is_nil(membership), do: Repo.rollback(:not_found)
+
+      membership
+      |> OrganizationMembership.changeset(params)
+      |> Repo.update()
+      |> unwrap_or_rollback()
+    end)
+    |> flatten_transaction()
+  end
+
+  @impl true
   def update_membership_status(organization_id, membership_id, status) do
     Repo.transaction(fn ->
       membership = get_membership_by_id(organization_id, membership_id)
@@ -569,9 +598,16 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
         |> Repo.insert()
         |> unwrap_or_rollback()
 
+      # An existing member gains the invited role (ADR-099); an inactive
+      # membership restarts with it.
       membership ->
+        roles =
+          if membership.status == :active,
+            do: Enum.uniq([invitation.role | membership.roles]),
+            else: [invitation.role]
+
         membership
-        |> OrganizationMembership.changeset(params)
+        |> OrganizationMembership.changeset(params |> Map.delete(:role) |> Map.put(:roles, roles))
         |> Repo.update()
         |> unwrap_or_rollback()
     end

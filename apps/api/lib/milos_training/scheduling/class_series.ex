@@ -24,6 +24,8 @@ defmodule MilosTraining.Scheduling.ClassSeries do
     field :booking_timeout_minutes, :integer, default: 60
     # ADR-097: optional Facility location.
     field :location_id, :binary_id
+    # The coach who runs it (ADR-100).
+    field :coach_user_id, :binary_id
     field :status, :string, default: "active"
 
     belongs_to :class_type, ClassType
@@ -39,6 +41,7 @@ defmodule MilosTraining.Scheduling.ClassSeries do
       :master_workout_id,
       :class_type_id,
       :location_id,
+      :coach_user_id,
       :name,
       :duration_minutes,
       :timezone,

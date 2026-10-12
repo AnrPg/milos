@@ -183,3 +183,15 @@ msgstr "Appuntamento annullato"
 
 msgid "The session on %{time} was cancelled."
 msgstr "La sessione del %{time} è stata annullata."
+
+msgid "A coach took a new athlete"
+msgstr "Un coach ha preso in carico un nuovo atleta"
+
+msgid "%{coach} is now coaching %{client}."
+msgstr "%{coach} ora allena %{client}."
+
+msgid "An admin read your note"
+msgstr "Un amministratore ha letto la tua nota"
+
+msgid "%{reader} read your note about %{client} at %{time}."
+msgstr "%{reader} ha letto la tua nota su %{client} alle %{time}."

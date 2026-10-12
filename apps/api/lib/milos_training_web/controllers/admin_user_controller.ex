@@ -199,6 +199,71 @@ defmodule MilosTrainingWeb.AdminUserController do
     }
   }
 
+  @membership_roles_response %Schema{
+    type: :object,
+    properties: %{
+      membership: %Schema{
+        type: :object,
+        properties: %{
+          user_id: %Schema{type: :string, format: :uuid},
+          role: %Schema{type: :string},
+          roles: %Schema{type: :array, items: %Schema{type: :string}},
+          coach_scope: %Schema{type: :string, enum: ["own", "all"]},
+          status: %Schema{type: :string}
+        },
+        required: [:user_id, :role, :roles, :coach_scope]
+      }
+    },
+    required: [:membership]
+  }
+
+  # A coach with scope `:own` reaches only their own clients (ADR-100).
+  @client_actions %{
+    show: [:view_directory, :view_billing_contacts],
+    training_history: [:view_client_training],
+    schedule: [:view_client_training, :run_classes],
+    program_workout: [:manage_coaching],
+    prs: [:view_client_training],
+    incidents: [:view_health],
+    messages: [:message_clients],
+    coaching_context: [:view_client_training]
+  }
+
+  plug :authorize_client
+       when action in [
+              :show,
+              :training_history,
+              :schedule,
+              :program_workout,
+              :prs,
+              :incidents,
+              :messages,
+              :coaching_context
+            ]
+
+  defp authorize_client(conn, _opts) do
+    capabilities = Map.fetch!(@client_actions, action_name(conn))
+    client_id = conn.path_params["id"]
+
+    allowed? =
+      Enum.any?(capabilities, fn capability ->
+        MilosTraining.Application.AuthorizeClientAccess.call(
+          conn.assigns.tenant_context,
+          capability,
+          client_id
+        ) == :ok
+      end)
+
+    if allowed? do
+      conn
+    else
+      conn
+      |> put_status(:forbidden)
+      |> json(%{code: "not_your_client", error: "Not one of your clients"})
+      |> halt()
+    end
+  end
+
   operation(:index,
     summary: "List all users for the admin directory",
     parameters: [
@@ -477,6 +542,148 @@ defmodule MilosTrainingWeb.AdminUserController do
       error ->
         error
     end
+  end
+
+  operation(:update_roles,
+    summary: "Set every role a person holds in this gym (ADR-099)",
+    parameters: [
+      %Parameter{
+        name: :id,
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, format: :uuid}
+      }
+    ],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{
+              roles: %Schema{
+                type: :array,
+                minItems: 1,
+                items: %Schema{
+                  type: :string,
+                  enum:
+                    Enum.map(
+                      MilosTraining.Organizations.roles(),
+                      &to_string/1
+                    )
+                }
+              }
+            },
+            required: [:roles]
+          }
+        }
+      }
+    },
+    responses: [ok: {"Membership", "application/json", @membership_roles_response}]
+  )
+
+  def update_roles(conn, params) do
+    id = params["id"] || params[:id]
+    roles = Map.get(conn.body_params, :roles) || Map.get(conn.body_params, "roles")
+
+    with {:ok, membership} <-
+           MilosTraining.Organizations.set_membership_roles(
+             conn.assigns.tenant_context,
+             id,
+             roles
+           ) do
+      json(conn, %{membership: membership_json(membership)})
+    end
+  end
+
+  operation(:update_coach_scope,
+    summary: "Make a coach a head coach (all clients) or limit them to their own (ADR-100)",
+    parameters: [
+      %Parameter{
+        name: :id,
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, format: :uuid}
+      }
+    ],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{coach_scope: %Schema{type: :string, enum: ["own", "all"]}},
+            required: [:coach_scope]
+          }
+        }
+      }
+    },
+    responses: [ok: {"Membership", "application/json", @membership_roles_response}]
+  )
+
+  def update_coach_scope(conn, params) do
+    id = params["id"] || params[:id]
+    scope = Map.get(conn.body_params, :coach_scope) || Map.get(conn.body_params, "coach_scope")
+
+    with {:ok, membership} <-
+           MilosTraining.Organizations.set_coach_scope(conn.assigns.tenant_context, id, scope) do
+      json(conn, %{membership: membership_json(membership)})
+    end
+  end
+
+  operation(:membership_status,
+    summary: "A client's membership status without amounts (coaches, front desk)",
+    parameters: [
+      %Parameter{
+        name: :id,
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, format: :uuid}
+      }
+    ],
+    responses: [
+      ok:
+        {"Status", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             membership_status: %Schema{
+               type: :object,
+               properties: %{
+                 status: %Schema{type: :string},
+                 expires_on: %Schema{type: :string, format: :date, nullable: true},
+                 frozen_until: %Schema{type: :string, format: :date, nullable: true},
+                 packages: %Schema{type: :array, items: %Schema{type: :string}},
+                 allowances: %Schema{type: :object, additionalProperties: true}
+               },
+               required: [:status, :packages, :allowances]
+             }
+           },
+           required: [:membership_status]
+         }}
+    ]
+  )
+
+  def membership_status(conn, params) do
+    id = params["id"] || params[:id]
+
+    with {:ok, status} <-
+           MilosTraining.Application.GetClientMembershipStatus.call(
+             conn.assigns.tenant_context,
+             id
+           ) do
+      json(conn, %{membership_status: status})
+    end
+  end
+
+  defp membership_json(membership) do
+    %{
+      user_id: membership.user_id,
+      role: to_string(membership.role),
+      roles: Enum.map(membership.roles, &to_string/1),
+      coach_scope: to_string(membership.coach_scope),
+      status: to_string(membership.status)
+    }
   end
 
   def delete(conn, params) do

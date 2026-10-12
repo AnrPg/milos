@@ -115,7 +115,7 @@ defmodule MilosTraining.OrganizationsTest do
              Organizations.issue_invitation(%{member_context | role: :coach}, %{role: :member})
   end
 
-  test "an admin cannot invite someone to owner, but can invite up to admin", context do
+  test "an admin invites staff and clients, but never an owner or another admin", context do
     {:ok, admin_membership} =
       Organizations.add_membership(%{
         organization_id: context.organization.id,
@@ -139,10 +139,13 @@ defmodule MilosTraining.OrganizationsTest do
     assert {:error, :role_ceiling_exceeded} =
              Organizations.issue_invitation(admin_context, %{role: :owner})
 
-    assert {:ok, %{invitation: invitation}} =
+    assert {:error, :role_ceiling_exceeded} =
              Organizations.issue_invitation(admin_context, %{role: :admin})
 
-    assert invitation.role == :admin
+    assert {:ok, %{invitation: invitation}} =
+             Organizations.issue_invitation(admin_context, %{role: :front_desk})
+
+    assert invitation.role == :front_desk
   end
 
   test "an owner can invite a peer owner" do

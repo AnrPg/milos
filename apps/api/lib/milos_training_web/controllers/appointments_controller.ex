@@ -15,7 +15,7 @@ defmodule MilosTrainingWeb.AppointmentsController do
     RecordAppointmentAttendance
   }
 
-  alias MilosTraining.Appointments
+  alias MilosTraining.{Appointments, Organizations}
   alias MilosTrainingWeb.Schemas.Appointments, as: S
   alias OpenApiSpex.{Parameter, Schema}
 
@@ -132,13 +132,16 @@ defmodule MilosTrainingWeb.AppointmentsController do
   )
 
   def slots(conn, params) do
+    context = conn.assigns.tenant_context
+
     filters = %{
       from: Map.get(params, :from, DateTime.add(DateTime.utc_now(), -86_400)),
       to: Map.get(params, :to),
-      coach_id: Map.get(params, :coach_id)
+      coach_id:
+        if(own_slots_only?(context), do: context.user_id, else: Map.get(params, :coach_id))
     }
 
-    json(conn, %{slots: Appointments.list_slots(conn.assigns.tenant_context, filters)})
+    json(conn, %{slots: Appointments.list_slots(context, filters)})
   end
 
   operation(:create_slot,
@@ -152,8 +155,10 @@ defmodule MilosTrainingWeb.AppointmentsController do
 
   def create_slot(conn, _params) do
     staff = GuardianPlug.current_resource(conn)
+    coach_id = Map.get(conn.body_params, :coach_id)
 
-    with {:ok, slot} <-
+    with :ok <- own_coach(conn.assigns.tenant_context, coach_id || staff.id),
+         {:ok, slot} <-
            CreateAppointmentSlot.call(conn.assigns.tenant_context, staff, conn.body_params) do
       conn |> put_status(:created) |> json(%{slot: slot})
     end
@@ -168,7 +173,8 @@ defmodule MilosTrainingWeb.AppointmentsController do
   def cancel_slot(conn, %{id: id}) do
     staff = GuardianPlug.current_resource(conn)
 
-    with {:ok, slot} <- CancelAppointmentSlot.call(conn.assigns.tenant_context, staff, id) do
+    with :ok <- own_slot(conn.assigns.tenant_context, id),
+         {:ok, slot} <- CancelAppointmentSlot.call(conn.assigns.tenant_context, staff, id) do
       json(conn, %{slot: slot})
     end
   end
@@ -192,7 +198,8 @@ defmodule MilosTrainingWeb.AppointmentsController do
     staff = GuardianPlug.current_resource(conn)
     user_id = Map.get(conn.body_params, :user_id)
 
-    with {:ok, booking} <-
+    with :ok <- own_slot(conn.assigns.tenant_context, slot_id),
+         {:ok, booking} <-
            BookAppointment.call(conn.assigns.tenant_context, staff, slot_id, user_id) do
       conn |> put_status(:created) |> json(%{appointment: booking})
     end
@@ -217,9 +224,45 @@ defmodule MilosTrainingWeb.AppointmentsController do
     staff = GuardianPlug.current_resource(conn)
     status = Map.get(conn.body_params, :status)
 
-    with {:ok, booking} <-
+    with :ok <- own_booking(conn.assigns.tenant_context, id),
+         {:ok, booking} <-
            RecordAppointmentAttendance.call(conn.assigns.tenant_context, staff, id, status) do
       json(conn, %{appointment: booking})
+    end
+  end
+
+  # A coach with scope `:own` manages only their own slots (ADR-100); front
+  # desk and managers reach every slot.
+  defp own_slots_only?(context) do
+    Organizations.capability_scope(context, :manage_appointments) == :own and
+      not Organizations.can?(context, :book_for_clients)
+  end
+
+  defp own_coach(context, coach_id) do
+    if own_slots_only?(context) and coach_id != context.user_id,
+      do: {:error, :forbidden},
+      else: :ok
+  end
+
+  defp own_slot(context, slot_id) do
+    if own_slots_only?(context) do
+      case Appointments.get_slot(context, slot_id) do
+        nil -> {:error, :not_found}
+        slot -> own_coach(context, slot.coach_id)
+      end
+    else
+      :ok
+    end
+  end
+
+  defp own_booking(context, booking_id) do
+    if own_slots_only?(context) do
+      case Appointments.get_booking(context, booking_id) do
+        nil -> {:error, :not_found}
+        booking -> own_coach(context, booking.slot.coach_id)
+      end
+    else
+      :ok
     end
   end
 end

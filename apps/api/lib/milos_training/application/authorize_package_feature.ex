@@ -8,7 +8,7 @@ defmodule MilosTraining.Application.AuthorizePackageFeature do
   alias MilosTraining.Organizations
 
   def call(context, actor, capability) do
-    if Organizations.any_role?(context, Organizations.admin_roles()),
+    if Organizations.staff?(context),
       do: :ok,
       else: authorize(context, actor, capability)
   end
