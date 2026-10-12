@@ -43,13 +43,8 @@ defmodule MilosTraining.Finance.Domain.PackageType do
 
   def fetch(_), do: {:error, :invalid_package_type}
 
-  # Types and modules released ahead of their phase (ADR-098 rollout).
-  @released_ahead ~w[digital_content pt_pack personal_training]
-
-  def available?(%{key: key, phase: phase}),
-    do:
-      phase in MilosTraining.Finance.Domain.PackageCatalog.implemented_phases() or
-        key in @released_ahead
+  def available?(%{phase: phase}),
+    do: phase in MilosTraining.Finance.Domain.PackageCatalog.implemented_phases()
 
   def module_available?(key) do
     case Enum.find(@modules, &(&1.key == key)) do

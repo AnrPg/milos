@@ -167,10 +167,18 @@ defmodule MilosTraining.Finance.Domain.PackageContractTest do
                })
     end
 
-    test "unimplemented types cannot be created" do
-      for type <- ["add_on", "shared", "corporate"] do
-        assert {:error, :package_type_not_available} =
-                 PackageContract.normalize(%{"package_type" => type})
+    test "every package type can be created once Phase C ships" do
+      for type <- [
+            "membership",
+            "class_pack",
+            "drop_in",
+            "trial",
+            "pt_pack",
+            "add_on",
+            "shared",
+            "corporate"
+          ] do
+        assert {:ok, _} = PackageContract.normalize(%{"package_type" => type})
       end
     end
 

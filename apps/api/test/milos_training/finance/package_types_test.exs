@@ -110,9 +110,6 @@ defmodule MilosTraining.Finance.PackageTypesTest do
                  billing_period: "annual",
                  fields: %{"content.workout_library" => true}
                })
-
-      assert {:error, :package_type_not_available} =
-               Finance.create_package(%{name: "Corporate", package_type: "corporate"})
     end
 
     test "records changed fields and blocks type changes once the package is sold" do

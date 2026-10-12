@@ -6,6 +6,12 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   alias MilosTraining.Finance.FinanceSubscriptionFreeze
 
   alias MilosTraining.Finance.{
+    FinanceCorporateClient,
+    FinanceCorporateInvoice,
+    FinanceSubscriptionBeneficiary
+  }
+
+  alias MilosTraining.Finance.{
     FinanceCreditLedgerEntry,
     FinanceEntitlementUsageEntry,
     FinanceInvoice,
@@ -35,6 +41,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     MembershipLinks,
     PackageCode,
     PackageContract,
+    PaymentModelPolicy,
     PromotionRedemptionPolicy,
     ReferralLifecycle,
     ReferralPolicy,
@@ -311,30 +318,9 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
                package.id,
                package.params || %{},
                list_subscriptions(membership.id)
-             ) do
-        params =
-          params
-          |> string_key_map()
-          |> put_subscription_window(package)
-          |> Map.merge(%{
-            "membership_id" => membership.id,
-            "membership_package_id" => package.id,
-            "package_code_snapshot" => package_identity_snapshot(package),
-            "package_family_snapshot" => package.family,
-            "billing_period_snapshot" => package.billing_period,
-            "price_cents_snapshot" => package.base_price_cents,
-            "params_snapshot" => package.params || %{}
-          })
-
-        subscription =
-          %MembershipPackageSubscription{}
-          |> MembershipPackageSubscription.changeset(params)
-          |> Repo.insert()
-          |> case do
-            {:ok, subscription} -> subscription
-            {:error, reason} -> Repo.rollback(reason)
-          end
-
+             ),
+           {:ok, params} <- payment_model_params(membership, package, string_key_map(params)) do
+        subscription = insert_subscription!(membership, package, params)
         refresh_entitlement_snapshot(membership.id)
         normalize_subscription(subscription)
       else
@@ -342,6 +328,56 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         {:error, reason} -> Repo.rollback(reason)
       end
     end)
+  end
+
+  defp insert_subscription!(membership, package, params) do
+    params =
+      params
+      |> put_subscription_window(package)
+      |> Map.merge(%{
+        "membership_id" => membership.id,
+        "membership_package_id" => package.id,
+        "package_code_snapshot" => package_identity_snapshot(package),
+        "package_family_snapshot" => package.family,
+        "billing_period_snapshot" => package.billing_period,
+        "price_cents_snapshot" => package.base_price_cents,
+        "params_snapshot" => package.params || %{}
+      })
+
+    %MembershipPackageSubscription{}
+    |> MembershipPackageSubscription.changeset(params)
+    |> Repo.insert()
+    |> case do
+      {:ok, subscription} -> subscription
+      {:error, reason} -> Repo.rollback(reason)
+    end
+  end
+
+  # ADR-098: add-ons attach to a compatible base and follow it; corporate
+  # seats are created only by enrollment, never assigned directly.
+  defp payment_model_params(membership, package, params) do
+    case PackageContract.type_from_params(package.params) do
+      "add_on" ->
+        compatible = package_terms(package.params)[:compatible_package_ids] || "all"
+
+        with {:ok, base} <-
+               membership.id
+               |> effective_subscriptions(Date.utc_today())
+               |> PaymentModelPolicy.add_on_base(compatible, params["base_subscription_id"]) do
+          {:ok,
+           params
+           |> Map.put("base_subscription_id", base.id)
+           |> Map.put("starts_on", params["starts_on"] || Date.utc_today())}
+        end
+
+      "corporate" ->
+        if params["corporate_client_id"],
+          do: {:ok, params},
+          else: {:error, :corporate_package_requires_enrollment}
+
+      _other ->
+        {:ok, Map.drop(params, ["base_subscription_id", "corporate_client_id"])}
+    end
   end
 
   @impl true
@@ -840,6 +876,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     with %Membership{} = membership <- Membership |> tenant_scope() |> Repo.get(membership_id),
          %MembershipPackageSubscription{} = subscription <-
            renewal_subscription(membership.id, params["membership_package_subscription_id"]),
+         :ok <- not_corporate_seat(subscription),
          :ok <- SubscriptionSelection.renewable?(subscription.params_snapshot || %{}) do
       period_start = parse_date(params["service_period_start"], Date.utc_today())
 
@@ -1279,6 +1316,446 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     end
   end
 
+  # ── Shared memberships (ADR-098) ─────────────────────────────────────────
+
+  @impl true
+  def list_beneficiaries(subscription_id) do
+    FinanceSubscriptionBeneficiary
+    |> tenant_scope()
+    |> where([beneficiary], beneficiary.membership_package_subscription_id == ^subscription_id)
+    |> where([beneficiary], is_nil(beneficiary.removed_at))
+    |> join(:inner, [beneficiary], membership in Membership,
+      on: membership.id == beneficiary.membership_id
+    )
+    |> order_by([beneficiary], asc: beneficiary.inserted_at)
+    |> select([beneficiary, membership], {beneficiary, membership.user_id})
+    |> Repo.all()
+    |> Enum.map(fn {beneficiary, user_id} -> normalize_beneficiary(beneficiary, user_id) end)
+  end
+
+  @impl true
+  def add_beneficiary(subscription_id, beneficiary_user_id, admin_id, params) do
+    params = string_key_map(params)
+
+    Repo.transaction(fn ->
+      subscription = locked_subscription!(subscription_id)
+      payer = Repo.get!(Membership, subscription.membership_id)
+
+      if payer.user_id == beneficiary_user_id, do: Repo.rollback(:beneficiary_is_payer)
+
+      if PaymentModelPolicy.package_type(subscription) != "shared",
+        do: Repo.rollback(:not_a_shared_membership)
+
+      is_minor = params["is_minor"] in [true, "true"]
+      active = list_beneficiaries(subscription.id)
+
+      case PaymentModelPolicy.can_add_beneficiary?(
+             package_terms(subscription.params_snapshot),
+             length(active),
+             is_minor
+           ) do
+        :ok -> :ok
+        {:error, reason} -> Repo.rollback(reason)
+      end
+
+      membership = ensure_member_membership!(beneficiary_user_id)
+
+      beneficiary =
+        %{
+          membership_package_subscription_id: subscription.id,
+          membership_id: membership.id,
+          is_minor: is_minor,
+          added_by_id: admin_id
+        }
+        |> FinanceSubscriptionBeneficiary.changeset()
+        |> Repo.insert()
+        |> case do
+          {:ok, beneficiary} -> beneficiary
+          {:error, changeset} -> Repo.rollback(changeset)
+        end
+
+      refresh_entitlement_snapshot(membership.id)
+      normalize_beneficiary(beneficiary, beneficiary_user_id)
+    end)
+  end
+
+  @impl true
+  def remove_beneficiary(subscription_id, beneficiary_id) do
+    Repo.transaction(fn ->
+      beneficiary =
+        FinanceSubscriptionBeneficiary
+        |> tenant_scope()
+        |> where(
+          [beneficiary],
+          beneficiary.id == ^beneficiary_id and
+            beneficiary.membership_package_subscription_id == ^subscription_id and
+            is_nil(beneficiary.removed_at)
+        )
+        |> Repo.one() || Repo.rollback(:not_found)
+
+      {:ok, removed} =
+        beneficiary
+        |> FinanceSubscriptionBeneficiary.remove_changeset(DateTime.utc_now())
+        |> Repo.update()
+
+      refresh_entitlement_snapshot(removed.membership_id)
+      user_id = Repo.get!(Membership, removed.membership_id).user_id
+      normalize_beneficiary(removed, user_id)
+    end)
+  end
+
+  defp locked_subscription!(subscription_id) do
+    MembershipPackageSubscription
+    |> tenant_scope()
+    |> where([subscription], subscription.id == ^subscription_id)
+    |> lock("FOR UPDATE")
+    |> Repo.one() || Repo.rollback(:not_found)
+  end
+
+  # Beneficiaries and corporate employees need a finance profile; one is
+  # created as an active member profile when missing.
+  defp ensure_member_membership!(user_id) do
+    case tenant_scope(Membership) |> where([m], m.user_id == ^user_id) |> Repo.one() do
+      %Membership{} = membership ->
+        membership
+
+      nil ->
+        %Membership{}
+        |> Membership.changeset(%{
+          "user_id" => user_id,
+          "status" => "active",
+          "user_type_snapshot" => "member",
+          "signup_source" => "admin_created"
+        })
+        |> Repo.insert()
+        |> case do
+          {:ok, membership} -> membership
+          {:error, reason} -> Repo.rollback(reason)
+        end
+    end
+  end
+
+  defp normalize_beneficiary(beneficiary, user_id) do
+    %{
+      id: beneficiary.id,
+      subscription_id: beneficiary.membership_package_subscription_id,
+      membership_id: beneficiary.membership_id,
+      user_id: user_id,
+      is_minor: beneficiary.is_minor,
+      added_by_id: beneficiary.added_by_id,
+      removed_at: beneficiary.removed_at,
+      inserted_at: beneficiary.inserted_at
+    }
+  end
+
+  # ── Corporate clients (ADR-098) ──────────────────────────────────────────
+
+  @impl true
+  def list_corporate_clients do
+    FinanceCorporateClient
+    |> tenant_scope()
+    |> order_by([client], asc: client.company_name)
+    |> Repo.all()
+    |> Enum.map(&normalize_corporate_client/1)
+  end
+
+  @impl true
+  def get_corporate_client(id) do
+    case fetch_corporate_client(id) do
+      nil -> nil
+      client -> normalize_corporate_client(client)
+    end
+  end
+
+  @impl true
+  def find_corporate_client(%{enrollment_code: code}) when is_binary(code) do
+    FinanceCorporateClient
+    |> tenant_scope()
+    |> where([client], client.enrollment_code == ^String.upcase(String.trim(code)))
+    |> where([client], client.status == "active")
+    |> Repo.one()
+    |> then(&(&1 && normalize_corporate_client(&1)))
+  end
+
+  def find_corporate_client(%{email: email}) when is_binary(email) do
+    FinanceCorporateClient
+    |> tenant_scope()
+    |> where([client], client.status == "active")
+    |> Repo.all()
+    |> Enum.map(&normalize_corporate_client/1)
+    |> Enum.find(fn client ->
+      client.enrollment == "email_domain" and
+        PaymentModelPolicy.email_in_domain?(email, client.enrollment_domain)
+    end)
+  end
+
+  def find_corporate_client(_criteria), do: nil
+
+  @impl true
+  def create_corporate_client(params) do
+    params = string_key_map(params)
+
+    Repo.transaction(fn ->
+      package =
+        tenant_scope(MembershipPackage)
+        |> where([package], package.id == ^params["membership_package_id"])
+        |> Repo.one() || Repo.rollback(:not_found)
+
+      if PackageContract.type_from_params(package.params) != "corporate",
+        do: Repo.rollback(:not_a_corporate_package)
+
+      params
+      |> Map.put("enrollment_code", params["enrollment_code"] || enrollment_code())
+      |> FinanceCorporateClient.create_changeset()
+      |> Repo.insert()
+      |> case do
+        {:ok, client} -> normalize_corporate_client(client)
+        {:error, changeset} -> Repo.rollback(changeset)
+      end
+    end)
+  end
+
+  @impl true
+  def update_corporate_client(id, params) do
+    params = string_key_map(params)
+
+    params =
+      if params["regenerate_code"] in [true, "true"],
+        do: Map.put(params, "enrollment_code", enrollment_code()),
+        else: Map.delete(params, "enrollment_code")
+
+    case fetch_corporate_client(id) do
+      nil ->
+        {:error, :not_found}
+
+      client ->
+        client
+        |> FinanceCorporateClient.update_changeset(params)
+        |> Repo.update()
+        |> case do
+          {:ok, client} -> {:ok, normalize_corporate_client(client)}
+          error -> error
+        end
+    end
+  end
+
+  @impl true
+  def enroll_corporate_seat(client_id, user_id, params) do
+    Repo.transaction(fn ->
+      client =
+        FinanceCorporateClient
+        |> tenant_scope()
+        |> where([client], client.id == ^client_id and client.status == "active")
+        |> lock("FOR UPDATE")
+        |> Repo.one() || Repo.rollback(:not_found)
+
+      package = Repo.get!(MembershipPackage, client.membership_package_id)
+      terms = package_terms(package.params)
+      membership = ensure_member_membership!(user_id)
+      seats = active_corporate_seats(client.id, Date.utc_today())
+
+      if Enum.any?(seats, &(&1.membership_id == membership.id)),
+        do: Repo.rollback(:already_enrolled)
+
+      unless PaymentModelPolicy.seat_available?(terms[:seats], length(seats)),
+        do: Repo.rollback(:corporate_seats_full)
+
+      params =
+        params
+        |> string_key_map()
+        |> Map.take(["starts_on"])
+        |> Map.put("corporate_client_id", client.id)
+
+      subscription = insert_subscription!(membership, package, params)
+      refresh_entitlement_snapshot(membership.id)
+      normalize_subscription(subscription)
+    end)
+  end
+
+  @impl true
+  def end_corporate_seat(client_id, subscription_id) do
+    Repo.transaction(fn ->
+      subscription =
+        MembershipPackageSubscription
+        |> tenant_scope()
+        |> where(
+          [subscription],
+          subscription.id == ^subscription_id and subscription.corporate_client_id == ^client_id
+        )
+        |> lock("FOR UPDATE")
+        |> Repo.one() || Repo.rollback(:not_found)
+
+      {:ok, ended} =
+        subscription
+        |> MembershipPackageSubscription.changeset(%{
+          "status" => "cancelled",
+          "ends_on" => Date.utc_today()
+        })
+        |> Repo.update()
+
+      refresh_entitlement_snapshot(ended.membership_id)
+      normalize_subscription(ended)
+    end)
+  end
+
+  @impl true
+  def list_corporate_seats(client_id) do
+    MembershipPackageSubscription
+    |> tenant_scope()
+    |> where([subscription], subscription.corporate_client_id == ^client_id)
+    |> join(:inner, [subscription], membership in Membership,
+      on: membership.id == subscription.membership_id
+    )
+    |> order_by([subscription], desc: subscription.inserted_at)
+    |> select([subscription, membership], {subscription, membership.user_id})
+    |> Repo.all()
+    |> Enum.map(fn {subscription, user_id} ->
+      subscription |> normalize_subscription() |> Map.put(:user_id, user_id)
+    end)
+  end
+
+  defp active_corporate_seats(client_id, on) do
+    MembershipPackageSubscription
+    |> tenant_scope()
+    |> where([subscription], subscription.corporate_client_id == ^client_id)
+    |> where([subscription], subscription.status == "active")
+    |> where([subscription], is_nil(subscription.ends_on) or subscription.ends_on >= ^on)
+    |> Repo.all()
+  end
+
+  # Seats held at any time in the period count as used.
+  defp used_corporate_seats(client_id, period_start, period_end) do
+    MembershipPackageSubscription
+    |> tenant_scope()
+    |> where([subscription], subscription.corporate_client_id == ^client_id)
+    |> where([subscription], subscription.starts_on <= ^period_end)
+    |> where(
+      [subscription],
+      is_nil(subscription.ends_on) or subscription.ends_on >= ^period_start
+    )
+    |> select([subscription], count(subscription.membership_id, :distinct))
+    |> Repo.one()
+  end
+
+  @impl true
+  def generate_corporate_invoice(client_id, %Date{} = on) do
+    Repo.transaction(fn ->
+      client = fetch_corporate_client(client_id) || Repo.rollback(:not_found)
+      package = Repo.get!(MembershipPackage, client.membership_package_id)
+      terms = package_terms(package.params)
+
+      {period_start, period_end} =
+        PaymentModelPolicy.corporate_period(package.billing_period, on)
+
+      seat_billing = terms[:seat_billing] || "agreed"
+      used = used_corporate_seats(client.id, period_start, period_end)
+      seats = PaymentModelPolicy.seats_billed(seat_billing, terms[:seats], used)
+
+      %{
+        corporate_client_id: client.id,
+        period_start: period_start,
+        period_end: period_end,
+        seat_billing: seat_billing,
+        seats_billed: seats,
+        unit_price_cents: package.base_price_cents,
+        total_cents: seats * package.base_price_cents,
+        issued_on: Date.utc_today()
+      }
+      |> FinanceCorporateInvoice.changeset()
+      |> Repo.insert()
+      |> case do
+        {:ok, invoice} -> normalize_corporate_invoice(invoice)
+        {:error, changeset} -> Repo.rollback(changeset)
+      end
+    end)
+  end
+
+  @impl true
+  def list_corporate_invoices(client_id) do
+    FinanceCorporateInvoice
+    |> tenant_scope()
+    |> where([invoice], invoice.corporate_client_id == ^client_id)
+    |> order_by([invoice], desc: invoice.period_start)
+    |> Repo.all()
+    |> Enum.map(&normalize_corporate_invoice/1)
+  end
+
+  @impl true
+  def set_corporate_invoice_status(invoice_id, status) when status in ["paid", "void"] do
+    case tenant_scope(FinanceCorporateInvoice)
+         |> where([invoice], invoice.id == ^invoice_id)
+         |> Repo.one() do
+      nil ->
+        {:error, :not_found}
+
+      %{status: "issued"} = invoice ->
+        paid_on = if status == "paid", do: Date.utc_today()
+
+        invoice
+        |> FinanceCorporateInvoice.status_changeset(status, paid_on)
+        |> Repo.update()
+        |> case do
+          {:ok, invoice} -> {:ok, normalize_corporate_invoice(invoice)}
+          error -> error
+        end
+
+      _closed ->
+        {:error, :corporate_invoice_closed}
+    end
+  end
+
+  def set_corporate_invoice_status(_invoice_id, _status), do: {:error, :invalid_invoice_status}
+
+  defp fetch_corporate_client(id) do
+    case Ecto.UUID.cast(id) do
+      {:ok, id} -> tenant_scope(FinanceCorporateClient) |> where([c], c.id == ^id) |> Repo.one()
+      :error -> nil
+    end
+  end
+
+  @code_alphabet ~c"ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+
+  defp enrollment_code do
+    for _ <- 1..8, into: "", do: <<Enum.random(@code_alphabet)>>
+  end
+
+  defp normalize_corporate_client(client) do
+    package = Repo.get(MembershipPackage, client.membership_package_id)
+    terms = package_terms(package && package.params)
+
+    %{
+      id: client.id,
+      membership_package_id: client.membership_package_id,
+      package_name: package && package.name,
+      company_name: client.company_name,
+      billing_email: client.billing_email,
+      contact_name: client.contact_name,
+      enrollment_code: client.enrollment_code,
+      enrollment: terms[:enrollment] || "invite_code",
+      enrollment_domain: terms[:enrollment_domain],
+      seats: terms[:seats],
+      seat_billing: terms[:seat_billing] || "agreed",
+      active_seats: length(active_corporate_seats(client.id, Date.utc_today())),
+      status: client.status
+    }
+  end
+
+  defp normalize_corporate_invoice(invoice) do
+    Map.take(invoice, [
+      :id,
+      :corporate_client_id,
+      :period_start,
+      :period_end,
+      :seat_billing,
+      :seats_billed,
+      :unit_price_cents,
+      :total_cents,
+      :status,
+      :issued_on,
+      :paid_on
+    ])
+  end
+
   @impl true
   def allowance_terms(user_id, allowance, occurred_on) do
     with %Membership{} = membership <-
@@ -1531,7 +2008,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     allowance = Map.get(request, :allowance)
 
     {period_start, period_end, committed, extensions, limit} =
-      allowance_state(subscription, allowance, occurred_on)
+      allowance_state(subscription, allowance, occurred_on, membership.id)
 
     policy_request =
       request
@@ -1690,7 +2167,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
           |> Enum.uniq_by(&elem(&1, 0))
           |> Map.new(fn {allowance, config, sub} ->
             {period_start, period_end, committed, extensions, limit} =
-              allowance_state(sub, allowance, occurred_on)
+              allowance_state(sub, allowance, occurred_on, membership.id)
 
             {allowance,
              %{
@@ -1731,19 +2208,23 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     end
   end
 
-  defp allowance_state(nil, _allowance, occurred_on),
+  defp allowance_state(nil, _allowance, occurred_on, _membership_id),
     do: {occurred_on, occurred_on, 0, 0, nil}
 
-  defp allowance_state(subscription, allowance, occurred_on) do
+  # `membership_id` is the person using the allowance; per-person quotas of a
+  # shared subscription only count that person's usage (ADR-098).
+  defp allowance_state(subscription, allowance, occurred_on, membership_id) do
     with {:ok, plan} <- EntitlementPlan.parse(subscription.params_snapshot || %{}),
          %{limit: limit, period: period} <- Map.get(plan.allowances, allowance) do
       {period_start, period_end} = AllowancePeriod.bounds(period, occurred_on, subscription)
+      usage_by = if PaymentModelPolicy.per_person_usage?(plan), do: membership_id
 
       entries =
         FinanceEntitlementUsageEntry
         |> where([entry], entry.membership_package_subscription_id == ^subscription.id)
         |> where([entry], entry.allowance_key == ^to_string(allowance))
         |> where([entry], entry.period_start == ^period_start and entry.period_end == ^period_end)
+        |> usage_by_member(usage_by)
         |> Repo.all()
 
       committed =
@@ -1758,7 +2239,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         |> Enum.reduce(0, &(&1.quantity_delta + &2))
         |> then(&max(-&1, 0))
 
-      carried = rollover_units(subscription, allowance, period, limit, occurred_on, plan)
+      carried =
+        rollover_units(subscription, allowance, period, limit, occurred_on, plan, usage_by)
 
       {period_start, period_end, committed, extensions + carried, limit}
     else
@@ -1767,7 +2249,12 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   end
 
   # ADR-097: unused units of the previous calendar period, capped by rollover_max.
-  defp rollover_units(subscription, allowance, period, limit, occurred_on, plan) do
+  defp usage_by_member(query, nil), do: query
+
+  defp usage_by_member(query, membership_id),
+    do: where(query, [entry], entry.membership_id == ^membership_id)
+
+  defp rollover_units(subscription, allowance, period, limit, occurred_on, plan, usage_by) do
     rollover_max = plan.terms[:rollover_max] || 0
 
     with true <- rollover_max > 0 and is_integer(limit),
@@ -1783,6 +2270,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
           [entry],
           entry.period_start == ^previous_start and entry.period_end == ^previous_end
         )
+        |> usage_by_member(usage_by)
         |> Repo.all()
 
       committed =
@@ -1810,24 +2298,55 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   end
 
   # ADR-096: stacked subscriptions in the order they should be consumed.
+  # ADR-098: shared subscriptions the member benefits from are included, and
+  # add-ons only while their base is usable.
   defp effective_subscriptions(membership_id, occurred_on) do
-    MembershipPackageSubscription
-    |> where([subscription], subscription.membership_id == ^membership_id)
-    |> where([subscription], subscription.status == "active")
-    |> where(
-      [subscription],
-      is_nil(subscription.starts_on) or subscription.starts_on <= ^occurred_on
-    )
-    |> where([subscription], is_nil(subscription.ends_on) or subscription.ends_on >= ^occurred_on)
-    |> Repo.all()
-    |> Enum.reject(&(&1.id in frozen_subscription_ids(membership_id, occurred_on)))
+    shared_ids = beneficiary_subscription_ids(membership_id)
+
+    subscriptions =
+      MembershipPackageSubscription
+      |> where(
+        [subscription],
+        subscription.membership_id == ^membership_id or subscription.id in ^shared_ids
+      )
+      |> where([subscription], subscription.status == "active")
+      |> where(
+        [subscription],
+        is_nil(subscription.starts_on) or subscription.starts_on <= ^occurred_on
+      )
+      |> where(
+        [subscription],
+        is_nil(subscription.ends_on) or subscription.ends_on >= ^occurred_on
+      )
+      |> Repo.all()
+
+    frozen = frozen_subscription_ids(Enum.map(subscriptions, & &1.id), occurred_on)
+
+    subscriptions
+    |> Enum.reject(&(&1.id in frozen))
+    |> PaymentModelPolicy.drop_orphan_add_ons()
     |> SubscriptionSelection.order()
   end
 
-  defp frozen_subscription_ids(membership_id, occurred_on) do
-    membership_id
-    |> frozen_subscriptions(occurred_on)
-    |> Enum.map(& &1.membership_package_subscription_id)
+  defp beneficiary_subscription_ids(membership_id) do
+    FinanceSubscriptionBeneficiary
+    |> tenant_scope()
+    |> where([beneficiary], beneficiary.membership_id == ^membership_id)
+    |> where([beneficiary], is_nil(beneficiary.removed_at))
+    |> select([beneficiary], beneficiary.membership_package_subscription_id)
+    |> Repo.all()
+  end
+
+  defp frozen_subscription_ids([], _occurred_on), do: []
+
+  defp frozen_subscription_ids(subscription_ids, occurred_on) do
+    FinanceSubscriptionFreeze
+    |> tenant_scope()
+    |> where([freeze], freeze.membership_package_subscription_id in ^subscription_ids)
+    |> where([freeze], is_nil(freeze.cancelled_at))
+    |> where([freeze], freeze.starts_on <= ^occurred_on and freeze.ends_on >= ^occurred_on)
+    |> select([freeze], freeze.membership_package_subscription_id)
+    |> Repo.all()
   end
 
   # ADR-097: a subscription is unusable while one of its freezes covers the day.
@@ -1892,7 +2411,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       allowance = Map.get(candidate_request, :allowance)
 
       {_start, _end, committed, extensions, limit} =
-        allowance_state(subscription, allowance, occurred_on)
+        allowance_state(subscription, allowance, occurred_on, membership_id)
 
       policy_request =
         candidate_request
@@ -2905,6 +3424,12 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   # ADR-097: the joining fee is charged once, on the first invoice of a
   # member's first subscription to the package.
+  # ADR-098: the company pays for corporate seats, never the member.
+  defp not_corporate_seat(%{corporate_client_id: nil}), do: :ok
+  defp not_corporate_seat(_subscription), do: {:error, :corporate_seat_billed_to_company}
+
+  defp joining_fee_lines(%{corporate_client_id: client_id}) when not is_nil(client_id), do: []
+
   defp joining_fee_lines(subscription) do
     fee = package_terms(subscription.params_snapshot)[:joining_fee_cents] || 0
 
@@ -3244,9 +3769,15 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
           Date.compare(today, invoice.due_date) == :gt
       end)
 
+    # ADR-098: a beneficiary of a shared membership holds it as well.
+    shared_ids = beneficiary_subscription_ids(membership.id)
+
     active_subscription? =
       MembershipPackageSubscription
-      |> where([subscription], subscription.membership_id == ^membership.id)
+      |> where(
+        [subscription],
+        subscription.membership_id == ^membership.id or subscription.id in ^shared_ids
+      )
       |> where(
         [subscription],
         subscription.status in ^InvoiceLifecycle.active_subscription_statuses()
@@ -4181,6 +4712,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       fields: PackageContract.fields_from_params(subscription.params_snapshot || %{}),
       commitment_ends_on: subscription.commitment_ends_on,
       activated_on: subscription.activated_on,
+      base_subscription_id: subscription.base_subscription_id,
+      corporate_client_id: subscription.corporate_client_id,
       referral_reward_applied: subscription.referral_reward_applied,
       inserted_at: subscription.inserted_at,
       updated_at: subscription.updated_at

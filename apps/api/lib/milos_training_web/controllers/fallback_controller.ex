@@ -1362,7 +1362,23 @@ defmodule MilosTrainingWeb.FallbackController do
     appointment_coach_not_included: {:forbidden, "This coach is not included in the package"},
     appointment_not_active: {:conflict, "The appointment is no longer active"},
     appointment_coach_not_staff: {:unprocessable_entity, "Choose a coach of this gym"},
-    invalid_attendance_status: {:unprocessable_entity, "Attendance must be attended or no_show"}
+    invalid_attendance_status: {:unprocessable_entity, "Attendance must be attended or no_show"},
+    add_on_base_required:
+      {:unprocessable_entity, "The member needs a compatible membership first"},
+    corporate_package_requires_enrollment:
+      {:unprocessable_entity, "Corporate seats are added through the corporate client"},
+    beneficiary_is_payer: {:unprocessable_entity, "The payer is already on the membership"},
+    not_a_shared_membership: {:unprocessable_entity, "This membership is not shared"},
+    beneficiary_limit_reached: {:conflict, "The membership has no room for more people"},
+    minor_beneficiaries_not_allowed:
+      {:unprocessable_entity, "This package does not allow minors"},
+    not_a_corporate_package: {:unprocessable_entity, "Choose a corporate package"},
+    already_enrolled: {:conflict, "The member already has a seat"},
+    corporate_seats_full: {:conflict, "All seats are taken"},
+    corporate_invoice_closed: {:conflict, "The invoice is already paid or void"},
+    invalid_invoice_status: {:unprocessable_entity, "Status must be paid or void"},
+    corporate_enrollment_not_found: {:not_found, "No corporate plan matches"},
+    corporate_seat_billed_to_company: {:unprocessable_entity, "The company pays for this seat"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@phase_b_errors, reason) do

@@ -12,17 +12,7 @@ defmodule MilosTraining.Finance.Domain.PackageCatalog do
   owning phase ships enforcement and product surfaces.
   """
 
-  @implemented_phases [:a, :b]
-
-  # Phase C fields ship feature by feature (ADR-098); each becomes authorable
-  # once its enforcement exists. Emptied when the phase completes.
-  @released_ahead ~w[
-    content.on_demand_video content.advanced_analytics
-    online_coaching.form_reviews online_coaching.response_sla_hours online_coaching.nutrition_plan
-    personal_training.included personal_training.sessions personal_training.format
-    personal_training.group_size personal_training.session_minutes personal_training.coach_id
-    personal_training.assessments
-  ]
+  @implemented_phases [:a, :b, :c]
 
   @quota_periods ["calendar_week", "calendar_month", "subscription_period"]
   @duration_units ["day", "week", "month"]
@@ -280,9 +270,6 @@ defmodule MilosTraining.Finance.Domain.PackageCatalog do
   end
 
   def fetch(key), do: {:error, {:unknown_package_field, inspect(key)}}
-
-  def available?(%{key: key, phase: phase}),
-    do: phase in @implemented_phases or key in @released_ahead
 
   def available?(%{phase: phase}), do: phase in @implemented_phases
 

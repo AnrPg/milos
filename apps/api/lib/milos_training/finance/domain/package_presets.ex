@@ -108,9 +108,11 @@ defmodule MilosTraining.Finance.Domain.PackagePresets do
       "online_coaching.included" => true,
       "online_coaching.assigned_programming" => false
     },
+    # A typical add-on is a nutrition plan on top of a membership (ADR-098).
     "add_on" => %{
       "terms.auto_renew" => false,
-      "group_classes.included" => false
+      "group_classes.included" => false,
+      "online_coaching.nutrition_plan" => true
     },
     "shared" => %{
       "terms.beneficiaries" => 2

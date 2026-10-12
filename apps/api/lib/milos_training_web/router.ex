@@ -207,6 +207,7 @@ defmodule MilosTrainingWeb.Router do
     post("/form-reviews", CoachingExtrasController, :submit_form_review)
     post("/form-reviews/:id/withdraw", CoachingExtrasController, :withdraw_form_review)
     get("/nutrition-plan", CoachingExtrasController, :my_nutrition_plan)
+    post("/corporate-enrollment", PaymentModelsController, :enroll)
     get("/appointments/slots", AppointmentsController, :offered_slots)
     get("/appointments", AppointmentsController, :my_appointments)
     post("/appointments", AppointmentsController, :book)
@@ -386,6 +387,30 @@ defmodule MilosTrainingWeb.Router do
     post("/finance/cleanup-records/:id/purge", AdminFinanceController, :purge_record)
     get("/finance/packages", AdminFinanceController, :packages)
     get("/finance/package-catalog", AdminFinanceController, :package_catalog)
+    get("/finance/subscriptions/:id/beneficiaries", PaymentModelsController, :beneficiaries)
+    post("/finance/subscriptions/:id/beneficiaries", PaymentModelsController, :add_beneficiary)
+
+    post(
+      "/finance/subscriptions/:id/beneficiaries/:beneficiary_id/remove",
+      PaymentModelsController,
+      :remove_beneficiary
+    )
+
+    get("/finance/corporate-clients", PaymentModelsController, :clients)
+    post("/finance/corporate-clients", PaymentModelsController, :create_client)
+    patch("/finance/corporate-clients/:id", PaymentModelsController, :update_client)
+    get("/finance/corporate-clients/:id/seats", PaymentModelsController, :seats)
+    post("/finance/corporate-clients/:id/seats", PaymentModelsController, :add_seat)
+
+    post(
+      "/finance/corporate-clients/:id/seats/:subscription_id/end",
+      PaymentModelsController,
+      :end_seat
+    )
+
+    get("/finance/corporate-clients/:id/invoices", PaymentModelsController, :invoices)
+    post("/finance/corporate-clients/:id/invoices", PaymentModelsController, :create_invoice)
+    post("/finance/corporate-invoices/:id/status", PaymentModelsController, :invoice_status)
     post("/finance/packages", AdminFinanceController, :create_package)
     get("/finance/packages/:id", AdminFinanceController, :package)
     patch("/finance/packages/:id", AdminFinanceController, :update_package)

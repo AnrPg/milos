@@ -421,6 +421,53 @@ defmodule MilosTraining.Finance do
   def allowance_terms(context, user_id, allowance, occurred_on),
     do: scoped(context, fn -> FinanceStore.allowance_terms(user_id, allowance, occurred_on) end)
 
+  # ADR-098 payment models: shared beneficiaries and corporate clients.
+  def list_beneficiaries(context, subscription_id),
+    do: scoped(context, fn -> FinanceStore.list_beneficiaries(subscription_id) end)
+
+  def add_beneficiary(context, subscription_id, user_id, admin_id, params),
+    do:
+      scoped(context, fn ->
+        FinanceStore.add_beneficiary(subscription_id, user_id, admin_id, params)
+      end)
+
+  def remove_beneficiary(context, subscription_id, beneficiary_id),
+    do:
+      scoped(context, fn -> FinanceStore.remove_beneficiary(subscription_id, beneficiary_id) end)
+
+  def list_corporate_clients(context),
+    do: scoped(context, fn -> FinanceStore.list_corporate_clients() end)
+
+  def get_corporate_client(context, id),
+    do: scoped(context, fn -> FinanceStore.get_corporate_client(id) end)
+
+  def find_corporate_client(context, criteria),
+    do: scoped(context, fn -> FinanceStore.find_corporate_client(criteria) end)
+
+  def create_corporate_client(context, params),
+    do: scoped(context, fn -> FinanceStore.create_corporate_client(params) end)
+
+  def update_corporate_client(context, id, params),
+    do: scoped(context, fn -> FinanceStore.update_corporate_client(id, params) end)
+
+  def enroll_corporate_seat(context, client_id, user_id, params),
+    do: scoped(context, fn -> FinanceStore.enroll_corporate_seat(client_id, user_id, params) end)
+
+  def end_corporate_seat(context, client_id, subscription_id),
+    do: scoped(context, fn -> FinanceStore.end_corporate_seat(client_id, subscription_id) end)
+
+  def list_corporate_seats(context, client_id),
+    do: scoped(context, fn -> FinanceStore.list_corporate_seats(client_id) end)
+
+  def generate_corporate_invoice(context, client_id, on),
+    do: scoped(context, fn -> FinanceStore.generate_corporate_invoice(client_id, on) end)
+
+  def list_corporate_invoices(context, client_id),
+    do: scoped(context, fn -> FinanceStore.list_corporate_invoices(client_id) end)
+
+  def set_corporate_invoice_status(context, invoice_id, status),
+    do: scoped(context, fn -> FinanceStore.set_corporate_invoice_status(invoice_id, status) end)
+
   def subscriptions_due_for_expiry_reminder(context, today),
     do: scoped(context, fn -> FinanceStore.subscriptions_due_for_expiry_reminder(today) end)
 end

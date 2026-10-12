@@ -85,5 +85,21 @@ defmodule MilosTraining.Finance.Ports.FinanceStore do
   @callback list_freezes(binary()) :: [map()]
   @callback booking_terms(binary(), Date.t()) :: map()
   @callback allowance_terms(binary(), atom(), Date.t()) :: map() | nil
+  # ADR-098 payment models
+  @callback list_beneficiaries(binary()) :: [map()]
+  @callback add_beneficiary(binary(), binary(), binary(), map()) ::
+              {:ok, map()} | {:error, term()}
+  @callback remove_beneficiary(binary(), binary()) :: {:ok, map()} | {:error, term()}
+  @callback list_corporate_clients() :: [map()]
+  @callback get_corporate_client(binary()) :: map() | nil
+  @callback find_corporate_client(map()) :: map() | nil
+  @callback create_corporate_client(map()) :: {:ok, map()} | {:error, term()}
+  @callback update_corporate_client(binary(), map()) :: {:ok, map()} | {:error, term()}
+  @callback enroll_corporate_seat(binary(), binary(), map()) :: {:ok, map()} | {:error, term()}
+  @callback end_corporate_seat(binary(), binary()) :: {:ok, map()} | {:error, term()}
+  @callback list_corporate_seats(binary()) :: [map()]
+  @callback generate_corporate_invoice(binary(), Date.t()) :: {:ok, map()} | {:error, term()}
+  @callback list_corporate_invoices(binary()) :: [map()]
+  @callback set_corporate_invoice_status(binary(), String.t()) :: {:ok, map()} | {:error, term()}
   @callback subscriptions_due_for_expiry_reminder(Date.t()) :: [map()]
 end

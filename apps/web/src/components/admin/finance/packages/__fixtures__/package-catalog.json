@@ -34,7 +34,7 @@
     {
       "enabled": false,
       "key": "corporate_clients",
-      "available": false
+      "available": true
     }
   ],
   "fields": [
@@ -123,7 +123,7 @@
       "key": "terms.compatible_package_ids",
       "kind": "scope_ids",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "terms"
     },
     {
@@ -132,7 +132,7 @@
       "key": "terms.beneficiaries",
       "kind": "integer",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "terms"
     },
     {
@@ -143,14 +143,14 @@
       "key": "terms.quota_sharing",
       "kind": "enum",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "terms"
     },
     {
       "key": "terms.allow_minor_beneficiaries",
       "kind": "boolean",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "terms"
     },
     {
@@ -159,7 +159,7 @@
       "key": "terms.seats",
       "kind": "integer",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "terms"
     },
     {
@@ -170,7 +170,7 @@
       "key": "terms.seat_billing",
       "kind": "enum",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "terms"
     },
     {
@@ -181,7 +181,7 @@
       "key": "terms.enrollment",
       "kind": "enum",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "terms"
     },
     {
@@ -189,7 +189,7 @@
       "key": "terms.enrollment_domain",
       "kind": "string_or_null",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "terms"
     },
     {
@@ -1151,7 +1151,7 @@
     {
       "enabled": true,
       "key": "add_on",
-      "available": false,
+      "available": true,
       "preset": {
         "facility.amenities_note": null,
         "perks.guest_passes": {
@@ -1201,7 +1201,7 @@
         "content.advanced_analytics": false,
         "terms.compatible_package_ids": "all",
         "online_coaching.assigned_programming": true,
-        "online_coaching.nutrition_plan": false,
+        "online_coaching.nutrition_plan": true,
         "terms.minimum_commitment_months": 0,
         "booking.waitlist_priority": "normal",
         "terms.once_per_person": false,
@@ -1285,7 +1285,7 @@
     {
       "enabled": true,
       "key": "shared",
-      "available": false,
+      "available": true,
       "preset": {
         "facility.amenities_note": null,
         "perks.guest_passes": {
@@ -1409,7 +1409,7 @@
     {
       "enabled": false,
       "key": "corporate",
-      "available": false,
+      "available": true,
       "preset": {
         "facility.amenities_note": null,
         "perks.guest_passes": {
@@ -1517,7 +1517,8 @@
   ],
   "implemented_phases": [
     "a",
-    "b"
+    "b",
+    "c"
   ],
   "sections": [
     "terms",

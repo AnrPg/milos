@@ -160,7 +160,9 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
     assert catalog["version"] == 2
     types = Map.new(catalog["types"], &{&1["key"], &1})
     assert types["drop_in"]["available"]
-    refute types["corporate"]["available"]
+    assert types["corporate"]["available"]
+    # Corporate needs its module switched on before admins see it.
+    refute types["corporate"]["enabled"]
     assert types["drop_in"]["billing_periods"] == ["one_off"]
     assert Enum.any?(types["drop_in"]["locks"], &(&1["path"] == "group_classes.visits.limit"))
     assert types["class_pack"]["preset"]["group_classes.visits"]["limit"] == 10
@@ -216,10 +218,14 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
       conn
       |> recycle()
       |> put_bearer_token(admin)
-      |> post("#{base}/packages", %{name: "Couple", package_type: "shared"})
+      |> post("#{base}/packages", %{
+        name: "Library",
+        package_type: "membership",
+        fields: %{"content.workout_library" => true}
+      })
       |> json_response(422)
 
-    assert unavailable["code"] == "package_type_not_available"
+    assert unavailable["code"] == "entitlement_not_available"
 
     conn
     |> recycle()
