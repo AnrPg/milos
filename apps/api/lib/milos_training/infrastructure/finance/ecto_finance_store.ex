@@ -31,10 +31,13 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     InvoiceNumber,
     MembershipLifecycle,
     MembershipLinks,
+    PackageCode,
+    PackageContract,
     PromotionRedemptionPolicy,
     ReferralLifecycle,
     ReferralPolicy,
-    ReferralRewardFulfillment
+    ReferralRewardFulfillment,
+    SubscriptionSelection
   }
 
   alias MilosTraining.Repo
@@ -42,10 +45,21 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def create_package(params) do
-    %MembershipPackage{}
-    |> MembershipPackage.changeset(params)
-    |> Repo.insert()
-    |> normalize_result(&normalize_package/1)
+    params = string_key_map(params)
+
+    with {:ok, attrs} <- package_contract_attrs(params, nil) do
+      Repo.transaction(fn ->
+        attrs = Map.put(attrs, "code", available_package_code(params["code"] || params["name"]))
+
+        %MembershipPackage{}
+        |> MembershipPackage.changeset(attrs)
+        |> Repo.insert()
+        |> case do
+          {:ok, package} -> normalize_package(package)
+          {:error, reason} -> Repo.rollback(reason)
+        end
+      end)
+    end
   end
 
   @impl true
@@ -65,8 +79,27 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       if retiring? && effective_subscriptions_for_package(package.id) != [],
         do: Repo.rollback(:package_retirement_reconciliation_required)
 
+      params = string_key_map(params)
+
+      attrs =
+        case package_contract_attrs(params, package) do
+          {:ok, attrs} -> attrs
+          {:error, reason} -> Repo.rollback(reason)
+        end
+
+      if Map.has_key?(attrs, "package_type") && package.package_type != attrs["package_type"] &&
+           effective_subscriptions_for_package(package.id) != [],
+         do: Repo.rollback(:package_type_change_requires_copy)
+
+      # ADR-096: codes are immutable once assigned; legacy packages without a
+      # code receive one derived from their name on the next save.
+      attrs =
+        if is_nil(package.code),
+          do: Map.put(attrs, "code", available_package_code(params["name"] || package.name)),
+          else: Map.delete(attrs, "code")
+
       package
-      |> MembershipPackage.changeset(params)
+      |> MembershipPackage.changeset(attrs)
       |> Repo.update()
       |> case do
         {:ok, updated} -> normalize_package(updated)
@@ -264,10 +297,17 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
              tenant_scope(MembershipPackage)
              |> where([package], package.id == ^package_id)
              |> Repo.one(),
-           :ok <- validate_package_active(package) do
+           :ok <- validate_package_active(package),
+           :ok <-
+             SubscriptionSelection.eligible?(
+               package.id,
+               package.params || %{},
+               list_subscriptions(membership.id)
+             ) do
         params =
           params
           |> string_key_map()
+          |> put_subscription_window(package)
           |> Map.merge(%{
             "membership_id" => membership.id,
             "membership_package_id" => package.id,
@@ -790,7 +830,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
     with %Membership{} = membership <- Membership |> tenant_scope() |> Repo.get(membership_id),
          %MembershipPackageSubscription{} = subscription <-
-           renewal_subscription(membership.id, params["membership_package_subscription_id"]) do
+           renewal_subscription(membership.id, params["membership_package_subscription_id"]),
+         :ok <- SubscriptionSelection.renewable?(subscription.params_snapshot || %{}) do
       period_start = parse_date(params["service_period_start"], Date.utc_today())
 
       with {:ok, {period_start, period_end}} <-
@@ -1172,7 +1213,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       |> where([entry, membership], membership.user_id == ^user_id)
       |> where([entry], entry.source_context == ^to_string(source_context))
       |> where([entry], entry.source_id == ^source_id)
-      |> where([entry], entry.allowance_key == ^to_string(allowance))
+      |> where_allowance_key(allowance)
       |> where([entry], entry.event_type == "reserve")
       |> where(
         [entry],
@@ -1196,15 +1237,17 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   defp reserve_for_membership!(membership, request) do
     occurred_on = Map.get(request, :occurred_on, Date.utc_today())
-    subscription = effective_subscription(membership.id, occurred_on)
-    entitlement = entitlement_for_membership(membership)
+    base_entitlement = entitlement_for_membership(membership)
     mode = entitlement_enforcement_mode()
+
+    {subscription, request} =
+      select_subscription(membership.id, base_entitlement, request, occurred_on)
 
     entitlement =
       if subscription do
-        Map.put(entitlement, :plan, subscription.params_snapshot || %{})
+        Map.put(base_entitlement, :plan, subscription.params_snapshot || %{})
       else
-        entitlement
+        base_entitlement
       end
 
     allowance = Map.get(request, :allowance)
@@ -1262,6 +1305,9 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   defp entitlement_denial_details(:finance_capability_not_included, request),
     do: %{capability: Map.get(request, :capability)}
+
+  defp entitlement_denial_details(:finance_class_type_not_included, request),
+    do: %{class_type_id: Map.get(request, :class_type_id)}
 
   defp entitlement_denial_details(:finance_allowance_not_included, request),
     do: %{allowance: Map.get(request, :allowance)}
@@ -1408,6 +1454,13 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   end
 
   defp effective_subscription(membership_id, occurred_on) do
+    membership_id
+    |> effective_subscriptions(occurred_on)
+    |> List.first()
+  end
+
+  # ADR-096: stacked subscriptions in the order they should be consumed.
+  defp effective_subscriptions(membership_id, occurred_on) do
     MembershipPackageSubscription
     |> where([subscription], subscription.membership_id == ^membership_id)
     |> where([subscription], subscription.status == "active")
@@ -1416,9 +1469,63 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       is_nil(subscription.starts_on) or subscription.starts_on <= ^occurred_on
     )
     |> where([subscription], is_nil(subscription.ends_on) or subscription.ends_on >= ^occurred_on)
-    |> order_by([subscription], desc: subscription.starts_on, desc: subscription.inserted_at)
-    |> limit(1)
-    |> Repo.one()
+    |> Repo.all()
+    |> SubscriptionSelection.order()
+  end
+
+  # Picks the first stacked subscription that authorizes the request under
+  # enforcement and resolves class-type allowances against its plan. When none
+  # authorizes, the primary subscription is used so the denial is reported
+  # (or observed) against the membership's main contract.
+  defp select_subscription(membership_id, entitlement, request, occurred_on) do
+    candidates =
+      Enum.map(effective_subscriptions(membership_id, occurred_on), fn subscription ->
+        {subscription, resolve_request_allowance(subscription, request)}
+      end)
+
+    Enum.find(candidates, fn {subscription, candidate_request} ->
+      allowance = Map.get(candidate_request, :allowance)
+
+      {_start, _end, committed, extensions, limit} =
+        allowance_state(subscription, allowance, occurred_on)
+
+      policy_request =
+        candidate_request
+        |> Map.put(:committed, committed)
+        |> Map.put(:limit, effective_limit(limit, extensions))
+
+      match?(
+        {:ok, _},
+        EntitlementPolicy.authorize(
+          Map.put(entitlement, :plan, subscription.params_snapshot || %{}),
+          policy_request,
+          mode: :enforce_all,
+          actor_role: Map.get(request, :actor_role)
+        )
+      )
+    end)
+    |> case do
+      nil -> List.first(candidates) || {nil, request}
+      selected -> selected
+    end
+  end
+
+  defp resolve_request_allowance(subscription, request) do
+    case EntitlementPlan.parse(subscription.params_snapshot || %{}) do
+      {:ok, plan} ->
+        Map.put(
+          request,
+          :allowance,
+          EntitlementPlan.resolve_allowance(
+            plan,
+            Map.get(request, :allowance),
+            Map.get(request, :class_type_id)
+          )
+        )
+
+      _ ->
+        request
+    end
   end
 
   defp insert_usage_entry!(params) do
@@ -3533,11 +3640,19 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       name: package.name,
       description: package.description,
       family: package.family,
+      package_type: package.package_type,
       billing_period: package.billing_period,
       base_price_cents: package.base_price_cents,
       currency: package.currency,
       tags: package.tags || [],
       params: package.params || %{},
+      fields: PackageContract.fields_from_params(package.params || %{}),
+      changed_fields:
+        PackageContract.changed_fields(
+          package.package_type,
+          package.billing_period,
+          PackageContract.fields_from_params(package.params || %{})
+        ),
       active: package.active,
       inserted_at: package.inserted_at,
       updated_at: package.updated_at
@@ -3583,9 +3698,11 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       package_name: package && package.name,
       package_code_snapshot: subscription.package_code_snapshot,
       package_family_snapshot: subscription.package_family_snapshot,
+      package_type: PackageContract.type_from_params(subscription.params_snapshot || %{}),
       billing_period_snapshot: subscription.billing_period_snapshot,
       price_cents_snapshot: subscription.price_cents_snapshot,
       params_snapshot: subscription.params_snapshot || %{},
+      fields: PackageContract.fields_from_params(subscription.params_snapshot || %{}),
       referral_reward_applied: subscription.referral_reward_applied,
       inserted_at: subscription.inserted_at,
       updated_at: subscription.updated_at
@@ -4010,6 +4127,95 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     end)
   end
 
+  @contract_keys ["package_type", "billing_period", "fields"]
+  @legacy_contract_keys ["params", "family"]
+
+  # ADR-096: v2 writes are normalised by the pure PackageContract. Internal
+  # callers that still submit a legacy v1 `params` document keep working as
+  # recurring memberships; the public API only accepts the v2 contract.
+  defp package_contract_attrs(params, package) do
+    base = Map.drop(params, @contract_keys ++ @legacy_contract_keys ++ ["code"])
+
+    cond do
+      Enum.any?(["package_type", "fields"], &Map.has_key?(params, &1)) or
+          (package && package_v2?(package) && Map.has_key?(params, "billing_period")) ->
+        existing =
+          package &&
+            %{
+              package_type: package.package_type,
+              billing_period: package.billing_period,
+              fields: PackageContract.fields_from_params(package.params || %{})
+            }
+
+        with {:ok, contract} <- PackageContract.normalize(params, existing: existing) do
+          {:ok,
+           Map.merge(base, %{
+             "package_type" => contract.package_type,
+             "billing_period" => contract.billing_period,
+             "params" => PackageContract.to_params(contract)
+           })}
+        end
+
+      is_nil(package) ->
+        {:ok,
+         base
+         |> Map.put("package_type", "membership")
+         |> Map.put("billing_period", params["billing_period"])
+         |> Map.put("params", params["params"] || %{})}
+
+      true ->
+        {:ok, Map.merge(base, Map.take(params, ["params", "billing_period"]))}
+    end
+  end
+
+  defp package_v2?(package),
+    do: Map.get(package.params || %{}, "entitlement_version") == PackageContract.version()
+
+  defp available_package_code(source) do
+    case PackageCode.normalize(source) do
+      nil ->
+        nil
+
+      base ->
+        taken =
+          MembershipPackage
+          |> tenant_scope()
+          |> where([package], package.code == ^base or like(package.code, ^"#{base}_%"))
+          |> select([package], package.code)
+          |> Repo.all()
+
+        PackageCode.unique(base, taken)
+    end
+  end
+
+  defp put_subscription_window(params, package) do
+    starts_on = parse_date(params["starts_on"], Date.utc_today())
+
+    ends_on =
+      case params["ends_on"] do
+        value when value in [nil, ""] ->
+          SubscriptionSelection.ends_on(starts_on, package.params || %{})
+
+        value ->
+          value
+      end
+
+    params
+    |> Map.put("starts_on", starts_on)
+    |> Map.put("ends_on", ends_on)
+  end
+
+  defp where_allowance_key(query, allowance) when allowance in [:class_visits, "class_visits"] do
+    where(
+      query,
+      [entry],
+      entry.allowance_key == "class_visits" or like(entry.allowance_key, "class_visits:%")
+    )
+  end
+
+  defp where_allowance_key(query, allowance),
+    do: where(query, [entry], entry.allowance_key == ^to_string(allowance))
+
   defp string_key_map(params) when is_map(params) do
     Map.new(params, fn {key, value} -> {to_string(key), value} end)
   end
@@ -4029,7 +4235,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
           payment_reminder_interval_days: 7,
           entitlement_enforcement_mode: "observe",
           entitlement_timezone: "Europe/Athens",
-          document_mode: "invoice"
+          document_mode: "invoice",
+          package_modules: MilosTraining.Finance.Domain.PackageType.default_modules()
         }
 
       settings ->
@@ -4064,6 +4271,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       entitlement_enforcement_mode: s.entitlement_enforcement_mode,
       entitlement_timezone: s.entitlement_timezone,
       document_mode: s.document_mode,
+      package_modules: s.package_modules,
       inserted_at: s.inserted_at,
       updated_at: s.updated_at
     }

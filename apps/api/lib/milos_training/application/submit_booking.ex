@@ -40,6 +40,7 @@ defmodule MilosTraining.Application.SubmitBooking do
       channel: :in_person,
       capability: :book_classes,
       allowance: :class_visits,
+      class_type_id: Map.get(slot, :class_type_id),
       quantity: 1,
       occurred_on: DateTime.to_date(slot.scheduled_at),
       source_context: "scheduling",

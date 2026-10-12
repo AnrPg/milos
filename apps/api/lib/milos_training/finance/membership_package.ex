@@ -1,7 +1,7 @@
 defmodule MilosTraining.Finance.MembershipPackage do
   use Ecto.Schema
   import Ecto.Changeset
-  alias MilosTraining.Finance.Domain.EntitlementPlan
+  alias MilosTraining.Finance.Domain.{EntitlementPlan, PackageCode, PackageType}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -12,6 +12,7 @@ defmodule MilosTraining.Finance.MembershipPackage do
     field :name, :string
     field :description, :string
     field :family, :string
+    field :package_type, :string, default: "membership"
     field :billing_period, :string
     field :base_price_cents, :integer, default: 0
     field :currency, :string, default: "EUR"
@@ -28,7 +29,7 @@ defmodule MilosTraining.Finance.MembershipPackage do
       :code,
       :name,
       :description,
-      :family,
+      :package_type,
       :billing_period,
       :base_price_cents,
       :currency,
@@ -36,9 +37,11 @@ defmodule MilosTraining.Finance.MembershipPackage do
       :params,
       :active
     ])
-    |> update_change(:code, &normalize_code/1)
-    |> validate_required([:name, :family, :billing_period])
-    |> validate_inclusion(:billing_period, ["monthly", "quarterly", "annual", "custom"])
+    |> update_change(:code, &PackageCode.normalize/1)
+    |> validate_required([:name, :package_type, :billing_period])
+    |> validate_inclusion(:package_type, PackageType.keys())
+    |> validate_inclusion(:billing_period, PackageType.all_billing_periods())
+    |> put_family_from_type()
     |> validate_number(:base_price_cents, greater_than_or_equal_to: 0)
     |> validate_entitlement_plan()
     |> unique_constraint([:organization_id, :code],
@@ -46,19 +49,11 @@ defmodule MilosTraining.Finance.MembershipPackage do
     )
   end
 
-  defp normalize_code(nil), do: nil
-
-  defp normalize_code(""), do: nil
-
-  defp normalize_code(code) do
-    code
-    |> String.trim()
-    |> String.downcase()
-    |> String.replace(~r/[^a-z0-9_]+/, "_")
-    |> String.trim("_")
-    |> case do
-      "" -> nil
-      normalized -> normalized
+  # ADR-096: family is the reporting label of the package type and is never authored.
+  defp put_family_from_type(changeset) do
+    case get_field(changeset, :package_type) do
+      nil -> changeset
+      type -> put_change(changeset, :family, type)
     end
   end
 
