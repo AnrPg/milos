@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.CreateScheduledSlot do
-  alias MilosTraining.Application.ScheduleRealtime
+  alias MilosTraining.Application.{ScheduleRealtime, TrackAnalyticsEvent}
   alias MilosTraining.Scheduling
   alias MilosTraining.Workouts
 
@@ -13,6 +13,7 @@ defmodule MilosTraining.Application.CreateScheduledSlot do
          {:ok, _class_type} <- fetch_class_type(context, class_type_id),
          {:ok, slot} <- create_slot(context, params) do
       broadcast_slot_created(slot)
+      TrackAnalyticsEvent.call("class_slot_created", context, slot)
       {:ok, slot}
     else
       {:error, reason} -> {:error, reason}

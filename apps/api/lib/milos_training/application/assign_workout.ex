@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.AssignWorkout do
-  alias MilosTraining.Application.BroadcastUserSync
+  alias MilosTraining.Application.{BroadcastUserSync, TrackAnalyticsEvent}
   alias MilosTraining.{Finance, Identity, Notifications, Organizations, Workouts}
 
   def call(context, params) do
@@ -23,6 +23,11 @@ defmodule MilosTraining.Application.AssignWorkout do
            :ok <- finalize_touchpoints(context, reservations, assignment, delivery_id) do
         broadcast_assignment_refresh(context, assignment)
         dispatch_assignment_notification(context, assignment)
+
+        TrackAnalyticsEvent.call("workout_assignment_created", context, assignment, %{
+          metadata: %{athlete_count: length(athlete_ids)}
+        })
+
         {:ok, assignment}
       end
     else

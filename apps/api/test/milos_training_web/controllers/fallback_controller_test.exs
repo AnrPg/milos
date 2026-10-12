@@ -1,6 +1,7 @@
 defmodule MilosTrainingWeb.FallbackControllerTest do
   use MilosTrainingWeb.ConnCase, async: true
 
+  alias MilosTraining.TestSupport.TelemetryCapture
   alias MilosTrainingWeb.FallbackController
 
   test "returns a stable semantic code while retaining compatibility prose", %{conn: conn} do
@@ -54,5 +55,28 @@ defmodule MilosTrainingWeb.FallbackControllerTest do
 
     assert response["code"] == "finance_capability_not_included"
     assert response["params"] == %{"capability" => "execute_assigned_workouts"}
+  end
+
+  describe "auth anomaly telemetry" do
+    setup do
+      TelemetryCapture.capture([[:milos, :auth, :anomaly]])
+    end
+
+    for reason <- [:invalid_credentials, :invalid_refresh_token, :invalid_token] do
+      test "emits an auth anomaly for #{reason}", %{conn: conn} do
+        conn |> FallbackController.call({:error, unquote(reason)}) |> json_response(401)
+
+        expected_reason = Atom.to_string(unquote(reason))
+
+        assert_received {:telemetry_event, [:milos, :auth, :anomaly], %{count: 1},
+                         %{reason: ^expected_reason}}
+      end
+    end
+
+    test "does not emit auth anomalies for unrelated failures", %{conn: conn} do
+      conn |> FallbackController.call({:error, :not_found}) |> json_response(404)
+
+      refute_received {:telemetry_event, [:milos, :auth, :anomaly], _measurements, _metadata}
+    end
   end
 end

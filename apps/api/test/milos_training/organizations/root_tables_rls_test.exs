@@ -68,6 +68,19 @@ defmodule MilosTraining.Organizations.RootTablesRLSTest do
       )
     end
 
+    # ADR-104 retired slugs, one per organization.
+    for {org_id, slug} <- [{org_a, "rls-old-a-#{unique}"}, {org_b, "rls-old-b-#{unique}"}] do
+      Postgrex.query!(
+        conn,
+        """
+        INSERT INTO organization_slug_aliases
+          (id, organization_id, slug, retired_at, inserted_at, updated_at)
+        VALUES ($1, $2, $3, now(), now(), now())
+        """,
+        [Ecto.UUID.dump!(Ecto.UUID.generate()), org_id, slug]
+      )
+    end
+
     Postgrex.query!(conn, "SELECT set_config('app.invitation_redemption', '', false)", [])
 
     on_exit(fn ->
@@ -103,7 +116,9 @@ defmodule MilosTraining.Organizations.RootTablesRLSTest do
      member_a_s: member_a_s,
      member_b_s: member_b_s,
      org_a_s: org_a_s,
-     org_b_s: org_b_s}
+     org_b_s: org_b_s,
+     old_a: "rls-old-a-#{unique}",
+     old_b: "rls-old-b-#{unique}"}
   end
 
   test "tenant resolution still works: a member reads their own organization by slug", %{
@@ -242,5 +257,78 @@ defmodule MilosTraining.Organizations.RootTablesRLSTest do
       end)
 
     assert rows == []
+  end
+
+  describe "organization_slug_aliases (ADR-104)" do
+    test "a member reads their own organization's retired slugs, not another's", ctx do
+      as_session(ctx.conn, ctx.member_a_s, nil, false, fn ->
+        %{rows: own} =
+          Postgrex.query!(
+            ctx.conn,
+            "SELECT slug FROM organization_slug_aliases WHERE slug = $1",
+            [
+              ctx.old_a
+            ]
+          )
+
+        %{rows: other} =
+          Postgrex.query!(
+            ctx.conn,
+            "SELECT slug FROM organization_slug_aliases WHERE slug = $1",
+            [
+              ctx.old_b
+            ]
+          )
+
+        assert own == [[ctx.old_a]]
+        assert other == []
+      end)
+    end
+
+    test "with no acting user, retired slugs are invisible", ctx do
+      rows =
+        as_session(ctx.conn, "", nil, false, fn ->
+          %{rows: rows} =
+            Postgrex.query!(ctx.conn, "SELECT slug FROM organization_slug_aliases", [])
+
+          rows
+        end)
+
+      assert rows == []
+    end
+
+    test "the lookup carve-out answers alias -> canonical slug and nothing is writable", ctx do
+      as_session(ctx.conn, "", nil, false, fn ->
+        Postgrex.query!(ctx.conn, "SELECT set_config('app.slug_alias_lookup', 'true', false)", [])
+
+        %{rows: rows} =
+          Postgrex.query!(
+            ctx.conn,
+            """
+            SELECT o.id FROM organizations o
+            JOIN organization_slug_aliases a ON a.organization_id = o.id
+            WHERE a.slug = $1
+            """,
+            [ctx.old_b]
+          )
+
+        assert rows == [[Ecto.UUID.dump!(ctx.org_b_s)]]
+
+        # SELECT-only: the carve-out never widens writes for an acting user.
+        Postgrex.query!(ctx.conn, "SELECT set_config('app.user_id', $1, false)", [ctx.member_a_s])
+
+        %{num_rows: updated} =
+          Postgrex.query!(
+            ctx.conn,
+            "UPDATE organization_slug_aliases SET slug = slug WHERE slug = $1",
+            [
+              ctx.old_b
+            ]
+          )
+
+        Postgrex.query!(ctx.conn, "SELECT set_config('app.slug_alias_lookup', '', false)", [])
+        assert updated == 0
+      end)
+    end
   end
 end

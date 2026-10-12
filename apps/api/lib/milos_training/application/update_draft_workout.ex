@@ -1,24 +1,23 @@
 defmodule MilosTraining.Application.UpdateDraftWorkout do
-  alias MilosTraining.Application.BroadcastUserSync
-  alias MilosTraining.Identity
+  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients}
   alias MilosTraining.Workouts
 
   def call(id, params) do
     with {:ok, draft} <- Workouts.update_draft(id, params) do
-      broadcast_draft_refresh(draft.id, params)
+      broadcast_draft_refresh([draft], draft.id, params)
       {:ok, draft}
     end
   end
 
   def call(context, id, params) do
     with {:ok, draft} <- MilosTraining.Workouts.WorkoutStore.update_draft(context, id, params) do
-      broadcast_draft_refresh(draft.id, params)
+      broadcast_draft_refresh([context, draft], draft.id, params)
       {:ok, draft}
     end
   end
 
-  defp broadcast_draft_refresh(draft_id, params) do
-    admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
+  defp broadcast_draft_refresh(sources, draft_id, params) do
+    admin_ids = TenantStaffRecipients.user_ids(sources)
 
     BroadcastUserSync.for_users(
       admin_ids,

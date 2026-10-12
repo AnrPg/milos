@@ -6,11 +6,13 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
     ChangeOrganizationLifecycle,
     ChangeOrganizationSettings,
     DeleteOrganization,
+    GetOrganizationSlugRenameImpact,
     IssuePlatformOrganizationInvitation,
     ListPlatformOrganizationAccess,
     ListProvisionedOrganizations,
     ProvisionOrganization,
     RenameOrganization,
+    RenameOrganizationSlug,
     SendOwnerInvitationEmail,
     UpdatePlatformOrganizationMembershipRole
   }
@@ -102,6 +104,103 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
       }
     },
     responses: [ok: {"Organization", "application/json", @organization_schema}]
+  )
+
+  @organization_summary_schema %Schema{
+    type: :object,
+    properties: %{
+      id: %Schema{type: :string, format: :uuid},
+      slug: %Schema{type: :string},
+      name: %Schema{type: :string},
+      status: %Schema{type: :string, enum: ["active", "suspended", "archived"]},
+      inserted_at: %Schema{type: :string, format: :"date-time"},
+      updated_at: %Schema{type: :string, format: :"date-time"}
+    },
+    required: [:id, :slug, :name, :status]
+  }
+
+  @slug_alias_schema %Schema{
+    type: :object,
+    properties: %{
+      slug: %Schema{type: :string},
+      retired_at: %Schema{type: :string, format: :"date-time"}
+    },
+    required: [:slug, :retired_at]
+  }
+
+  operation(:slug_impact,
+    summary: "Summarize what renaming an organization's path slug affects (ADR-104)",
+    parameters: [@organization_id],
+    responses: [
+      ok:
+        {"Slug rename impact", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             organization: @organization_summary_schema,
+             canonical_path: %Schema{type: :string},
+             active_member_count: %Schema{type: :integer, minimum: 0},
+             pending_invitation_count: %Schema{type: :integer, minimum: 0},
+             purge_open: %Schema{type: :boolean},
+             previous_slugs: %Schema{type: :array, items: @slug_alias_schema}
+           },
+           required: [
+             :organization,
+             :canonical_path,
+             :active_member_count,
+             :pending_invitation_count,
+             :purge_open,
+             :previous_slugs
+           ]
+         }}
+    ]
+  )
+
+  operation(:rename_slug,
+    summary: "Rename an organization's path slug, keeping the old slug as a redirecting alias",
+    description:
+      "Requires the current slug retyped as `confirmation`. The previous slug keeps resolving " <>
+        "for API requests (with an `x-organization-canonical-slug` response header) and the web " <>
+        "redirects `/org/<old>/...` to the new slug. Retired slugs stay reserved for the " <>
+        "organization and can be reclaimed by it.",
+    parameters: [@organization_id],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{
+              slug: %Schema{
+                type: :string,
+                minLength: 3,
+                maxLength: 63,
+                pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              confirmation: %Schema{type: :string}
+            },
+            required: [:slug, :confirmation]
+          }
+        }
+      }
+    },
+    responses: [
+      ok:
+        {"Renamed organization", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             organization: @organization_summary_schema,
+             canonical_path: %Schema{type: :string},
+             previous_slug: %Schema{type: :string},
+             previous_slugs: %Schema{type: :array, items: @slug_alias_schema}
+           },
+           required: [:organization, :canonical_path, :previous_slug, :previous_slugs]
+         }},
+      unprocessable_entity:
+        {"Invalid slug or confirmation", "application/json", @organization_schema},
+      conflict: {"Slug taken or rename blocked", "application/json", @organization_schema}
+    ]
   )
 
   operation(:settings,
@@ -217,7 +316,7 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
           expires_at: result.invitation.expires_at,
           role: result.invitation.role
         },
-        canonical_path: "/org/#{result.organization.slug}"
+        canonical_path: canonical_path(result.organization.slug)
       })
     end
   end
@@ -241,6 +340,36 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
              conn.body_params["name"]
            ) do
       json(conn, %{organization: serialize_organization(organization)})
+    end
+  end
+
+  def slug_impact(conn, %{"id" => organization_id}) do
+    with {:ok, impact} <-
+           GetOrganizationSlugRenameImpact.call(conn.assigns.platform_context, organization_id) do
+      json(conn, %{
+        organization: serialize_organization(impact.organization),
+        canonical_path: canonical_path(impact.organization.slug),
+        active_member_count: impact.active_member_count,
+        pending_invitation_count: impact.pending_invitation_count,
+        purge_open: impact.purge_open,
+        previous_slugs: Enum.map(impact.aliases, &serialize_slug_alias/1)
+      })
+    end
+  end
+
+  def rename_slug(conn, %{"id" => organization_id}) do
+    with {:ok, result} <-
+           RenameOrganizationSlug.call(
+             conn.assigns.platform_context,
+             organization_id,
+             conn.body_params
+           ) do
+      json(conn, %{
+        organization: serialize_organization(result.organization),
+        canonical_path: canonical_path(result.organization.slug),
+        previous_slug: result.previous_slug,
+        previous_slugs: Enum.map(result.aliases, &serialize_slug_alias/1)
+      })
     end
   end
 
@@ -318,7 +447,7 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
     %{
       organization: serialize_organization(organization),
       settings: serialize_settings(settings),
-      canonical_path: "/org/#{organization.slug}",
+      canonical_path: canonical_path(organization.slug),
       pending_registration: Map.get(entry, :pending_registration, false)
     }
   end
@@ -334,6 +463,11 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
     }
   end
 
+  defp canonical_path(slug), do: "/org/#{slug}"
+
+  defp serialize_slug_alias(slug_alias),
+    do: %{slug: slug_alias.slug, retired_at: slug_alias.retired_at}
+
   defp serialize_settings(nil), do: nil
 
   defp serialize_settings(settings) do
@@ -344,6 +478,7 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
       invitation_lifetime_seconds: settings.invitation_lifetime_seconds,
       brand_name: settings.brand_name,
       brand_logo_url: settings.brand_logo_url,
+      brand_logo_uploaded: not is_nil(settings.brand_logo_object_key),
       brand_primary_color: settings.brand_primary_color,
       settings: settings.settings
     }

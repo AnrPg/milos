@@ -133,6 +133,22 @@ export async function deleteAssignedWorkout(token: string, assignmentId: string)
   });
 }
 
+/**
+ * Analytics (ADR-105): the athlete opened an assignment's detail. Recorded at
+ * most once per athlete, assignment and day server-side; best effort, never
+ * throws.
+ */
+export async function reportAssignmentOpened(token: string, assignmentId: string) {
+  try {
+    await apiRequest(`/my-workouts/assignments/${assignmentId}/open`, {
+      method: "POST",
+      token,
+    });
+  } catch {
+    // Analytics must never affect the assignment view.
+  }
+}
+
 export async function rejectAssignment(token: string, assignmentId: string) {
   await apiRequest(`/my-workouts/assignments/${assignmentId}/reject`, {
     method: "PATCH",

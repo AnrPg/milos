@@ -11,10 +11,11 @@ defmodule MilosTraining.Gamification.Domain.ChallengeProgress do
       events: events,
       progress: next_progress,
       target: target,
-      completed?: target > 0 and next_progress >= target
+      completed?: next_progress >= target
     }
   end
 
+  # Always a positive integer: criteria without a valid count target 1.
   def target(challenge), do: ChallengeCriteria.target(challenge)
 
   defp evaluate(%{criteria_type: type, criteria_value: cv} = challenge, facts)
@@ -36,8 +37,8 @@ defmodule MilosTraining.Gamification.Domain.ChallengeProgress do
     else
       pts = ChallengeCriteria.increment_per_completion(%{criteria_value: cv})
       lbl = ChallengeCriteria.increment_label(%{criteria_value: cv}) || "for this workout"
-      events = if pts > 0, do: [%{points: pts, label: lbl}], else: []
-      {pts, events}
+      # increment_per_completion/1 is always >= 1, so every completion scores.
+      {pts, [%{points: pts, label: lbl}]}
     end
   end
 

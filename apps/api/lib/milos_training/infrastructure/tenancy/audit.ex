@@ -19,6 +19,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     communication_messages analytics_events notification_click_events
     push_dispatch_attempts
     user_pr_history
+    training_log_entries
   )
 
   @transitional_tenant_tables []
@@ -30,8 +31,8 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
   # explicitly so the exemption is a claim on the record, not an absence.
   @platform_administered_tables ~w(
     organizations organization_memberships organization_settings
-    organization_domains registration_invitations vendors users
-    organization_provisioning_events
+    organization_domains organization_slug_aliases registration_invitations vendors users
+    organization_provisioning_events organization_purges
   )
 
   # Materialized views carry denormalized tenant data but cannot have RLS

@@ -22,6 +22,33 @@ defmodule MilosTraining.Organizations.OrganizationStore do
   @impl true
   def get_organization_by_domain(host), do: impl().get_organization_by_domain(host)
   @impl true
+  def get_organization_by_slug_alias(slug), do: impl().get_organization_by_slug_alias(slug)
+  @impl true
+  def get_canonical_slug_for_alias(slug), do: impl().get_canonical_slug_for_alias(slug)
+  @impl true
+  def list_slug_aliases(organization_id), do: impl().list_slug_aliases(organization_id)
+  @impl true
+  def count_pending_invitations(organization_id, now),
+    do: impl().count_pending_invitations(organization_id, now)
+
+  @impl true
+  def rename_organization_slug(
+        organization_id,
+        requested_slug,
+        confirmation,
+        platform_user_id,
+        changed_at
+      ),
+      do:
+        impl().rename_organization_slug(
+          organization_id,
+          requested_slug,
+          confirmation,
+          platform_user_id,
+          changed_at
+        )
+
+  @impl true
   def get_membership(organization_id, user_id),
     do: impl().get_membership(organization_id, user_id)
 
@@ -119,12 +146,53 @@ defmodule MilosTraining.Organizations.OrganizationStore do
       )
 
   @impl true
+  def replace_organization_logo(organization_id, logo, actor, changed_at),
+    do: impl().replace_organization_logo(organization_id, logo, actor, changed_at)
+
+  @impl true
   def update_membership_role(organization_id, membership_id, role),
     do: impl().update_membership_role(organization_id, membership_id, role)
 
   @impl true
   def update_membership_status(organization_id, membership_id, status),
     do: impl().update_membership_status(organization_id, membership_id, status)
+
+  @impl true
+  def request_organization_purge(
+        organization_id,
+        platform_user_id,
+        lifecycle_status,
+        requested_at
+      ),
+      do:
+        impl().request_organization_purge(
+          organization_id,
+          platform_user_id,
+          lifecycle_status,
+          requested_at
+        )
+
+  @impl true
+  def get_purge(purge_id), do: impl().get_purge(purge_id)
+
+  @impl true
+  def lock_purge(purge_id), do: impl().lock_purge(purge_id)
+
+  @impl true
+  def get_open_purge(organization_id), do: impl().get_open_purge(organization_id)
+
+  @impl true
+  def get_latest_purge(organization_id), do: impl().get_latest_purge(organization_id)
+
+  @impl true
+  def list_purges(limit), do: impl().list_purges(limit)
+
+  @impl true
+  def update_purge(purge, params), do: impl().update_purge(purge, params)
+
+  @impl true
+  def finalize_purge(purge, params, platform_user_id, completed_at),
+    do: impl().finalize_purge(purge, params, platform_user_id, completed_at)
 
   defp impl, do: Application.fetch_env!(:milos_training, :organization_store)
 end

@@ -126,5 +126,5 @@ defmodule MilosTrainingWeb.AdminWellbeingController do
 
   defp param_id(params), do: params["id"] || params[:id]
 
-  defp body_params(conn, params), do: Map.drop(conn.body_params || params, ["id", :id])
+  defp body_params(conn, _params), do: Map.drop(conn.body_params, ["id", :id])
 end

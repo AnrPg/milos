@@ -120,7 +120,7 @@ defmodule MilosTraining.Application.RealtimeSyncTest do
       ends_at: Date.add(Date.utc_today(), 7)
     }
 
-    assert {:ok, challenge} = CreateSeasonalChallenge.call(admin.id, params)
+    assert {:ok, challenge} = CreateSeasonalChallenge.call(context, admin.id, params)
 
     assert_user_syncs([
       %{user_id: admin.id, scopes: ["landing"], reason: "landing_invalidated"},
@@ -141,10 +141,10 @@ defmodule MilosTraining.Application.RealtimeSyncTest do
     context = legacy_tenant_context!(admin, :owner)
     set_legacy_session!(context, admin)
 
-    assert {:ok, draft} = CreateDraftWorkout.call(admin)
+    assert {:ok, draft} = CreateDraftWorkout.call(context, admin)
 
     assert {:ok, updated_draft} =
-             UpdateDraftWorkout.call(draft.id, %{
+             UpdateDraftWorkout.call(context, draft.id, %{
                title: "Updated title",
                editor_session_id: editor_session_id,
                expected_source_revision: draft.dsl_source_revision

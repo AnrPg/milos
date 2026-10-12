@@ -1,7 +1,8 @@
 defmodule MilosTraining.Application.StartWorkoutExecution do
   alias MilosTraining.Application.{
     AuthorizeFinanceEntitlement,
-    AuthorizeWorkoutExecutionSource
+    AuthorizeWorkoutExecutionSource,
+    TrackAnalyticsEvent
   }
 
   alias MilosTraining.Execution
@@ -37,11 +38,20 @@ defmodule MilosTraining.Application.StartWorkoutExecution do
       # Re-open the tenant scope here so the workout lookup inside
       # StartExecution (and the execution insert itself) can see rows owned by
       # that organization; the outer `call/3` context never carried it.
-      Workouts.with_tenant_context(execution_context, fn ->
+      execution_context
+      |> Workouts.with_tenant_context(fn ->
         Execution.start_execution(actor.id, Map.merge(params, authorized_source))
       end)
+      |> track_started(actor)
     end
   end
+
+  defp track_started({:ok, execution} = result, actor) do
+    TrackAnalyticsEvent.call("workout_execution_started", actor, execution, %{user_id: actor.id})
+    result
+  end
+
+  defp track_started(result, _actor), do: result
 
   defp authorize_entitlement(execution_context, actor, authorized_source) do
     request = AuthorizeFinanceEntitlement.execution_request(authorized_source)

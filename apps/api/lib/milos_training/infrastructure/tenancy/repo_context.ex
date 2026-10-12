@@ -23,6 +23,13 @@ defmodule MilosTraining.Infrastructure.Tenancy.RepoContext do
     with_settings(contextual_settings(context), fun)
   end
 
+  # ADR-104: the unauthenticated retired-slug lookup behind the web proxy's
+  # 308 redirect. Its policies are SELECT-only and only ever answer which
+  # canonical slug replaced a retired one. Set only by ResolveSlugAlias.
+  def run(%{slug_alias_lookup: true} = context, fun) when is_function(fun, 0) do
+    with_settings(contextual_settings(context), fun)
+  end
+
   def run(_context, _fun), do: {:error, :missing_ownership_scope}
 
   def current_setting(name)
@@ -31,7 +38,8 @@ defmodule MilosTraining.Infrastructure.Tenancy.RepoContext do
              "app.user_id",
              "app.admin_mode",
              "app.execution_authorization_check",
-             "app.invitation_redemption"
+             "app.invitation_redemption",
+             "app.slug_alias_lookup"
            ] do
     case Ecto.Adapters.SQL.query(Repo, "SELECT current_setting($1, true)", [name]) do
       {:ok, %{rows: [[value]]}} when value in [nil, ""] -> nil
@@ -66,6 +74,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.RepoContext do
     |> maybe_put_admin_mode(context)
     |> maybe_put_execution_authorization_check(context)
     |> maybe_put_invitation_redemption(context)
+    |> maybe_put_slug_alias_lookup(context)
   end
 
   defp maybe_put_user(settings, %{user_id: user_id}) when is_binary(user_id),
@@ -108,6 +117,11 @@ defmodule MilosTraining.Infrastructure.Tenancy.RepoContext do
     do: [{"app.invitation_redemption", "true"} | settings]
 
   defp maybe_put_invitation_redemption(settings, _context), do: settings
+
+  defp maybe_put_slug_alias_lookup(settings, %{slug_alias_lookup: true}),
+    do: [{"app.slug_alias_lookup", "true"} | settings]
+
+  defp maybe_put_slug_alias_lookup(settings, _context), do: settings
 
   defp set_session(name, value) do
     Ecto.Adapters.SQL.query!(Repo, "SELECT set_config($1, $2, false)", [name, value])

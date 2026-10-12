@@ -67,6 +67,15 @@ defmodule MilosTrainingWeb.Router do
     )
   end
 
+  pipeline :execution_interaction_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit,
+      max: 60,
+      interval: 60_000,
+      bucket: "execution-interactions",
+      methods: ["POST"]
+    )
+  end
+
   pipeline :notification_write_rate_limited do
     plug(MilosTrainingWeb.Plugs.RateLimit,
       max: 120,
@@ -78,6 +87,16 @@ defmodule MilosTrainingWeb.Router do
 
   pipeline :search_rate_limited do
     plug(MilosTrainingWeb.Plugs.RateLimit, max: 120, interval: 60_000, bucket: "search")
+  end
+
+  pipeline :slug_alias_rate_limited do
+    # Called by the web proxy (one client address for every browser) and
+    # cached there, so the budget is generous; it only bounds enumeration.
+    plug(MilosTrainingWeb.Plugs.RateLimit,
+      max: 600,
+      interval: 60_000,
+      bucket: "organization-slug-aliases"
+    )
   end
 
   pipeline :platform_write_rate_limited do
@@ -135,6 +154,17 @@ defmodule MilosTrainingWeb.Router do
     get("/openapi", OpenApiSpex.Plug.RenderSpec, [])
     get("/calendar/feed.ics", MilosTrainingWeb.CalendarFeedController, :feed)
     get("/theme", MilosTrainingWeb.ThemeController, :show)
+  end
+
+  # ADR-104: unauthenticated retired-slug lookup behind the web proxy's 308.
+  scope "/api" do
+    pipe_through([:api, :slug_alias_rate_limited])
+
+    get(
+      "/organization-slug-aliases/:slug",
+      MilosTrainingWeb.OrganizationSlugAliasController,
+      :show
+    )
   end
 
   scope "/api/auth", MilosTrainingWeb do
@@ -209,6 +239,24 @@ defmodule MilosTrainingWeb.Router do
     post("/threads/:id/read", MessagingController, :mark_read)
   end
 
+  # ADR-100: standalone training log (class / offline workouts).
+  scope "/api/org/:organization_slug/me/training-log", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :tenant_member,
+      :tenant_write_rate_limited
+    ])
+
+    get("/entries", TrainingLogController, :index)
+    post("/entries", TrainingLogController, :create)
+    get("/entries/:id", TrainingLogController, :show)
+    patch("/entries/:id", TrainingLogController, :update)
+    post("/entries/:id/void", TrainingLogController, :void)
+    get("/sources", TrainingLogController, :sources)
+  end
+
   scope "/api/org/:organization_slug", MilosTrainingWeb do
     pipe_through([
       :api,
@@ -250,6 +298,7 @@ defmodule MilosTrainingWeb.Router do
 
     get("/my-workouts", MyWorkoutController, :index)
     post("/my-workouts/requests", MyWorkoutController, :request_assignment)
+    post("/my-workouts/assignments/:id/open", MyWorkoutController, :open)
     patch("/my-workouts/assignments/:id/reject", MyWorkoutController, :reject)
     patch("/my-workouts/assignments/:id/reschedule", MyWorkoutController, :reschedule)
   end
@@ -322,6 +371,10 @@ defmodule MilosTrainingWeb.Router do
     delete("/challenges/:id", AdminChallengeController, :delete)
     get("/settings", AdminSettingsController, :show)
     patch("/settings", AdminSettingsController, :update)
+    get("/branding", AdminBrandingController, :show)
+    post("/branding/logo/upload-url", AdminBrandingController, :logo_upload_url)
+    put("/branding/logo", AdminBrandingController, :finalize_logo)
+    delete("/branding/logo", AdminBrandingController, :remove_logo)
     post("/schedule/slots", AdminScheduleController, :create_slot)
     post("/schedule/slots/series", AdminScheduleController, :create_series)
     patch("/schedule/slots/:id", AdminScheduleController, :update_slot)
@@ -455,7 +508,36 @@ defmodule MilosTrainingWeb.Router do
 
     patch("/organizations/:id/lifecycle", PlatformOrganizationController, :lifecycle)
     patch("/organizations/:id/name", PlatformOrganizationController, :rename)
+    # ADR-104 slug rename with typed confirmation and retired-slug aliases.
+    get("/organizations/:id/slug-impact", PlatformOrganizationController, :slug_impact)
+    patch("/organizations/:id/slug", PlatformOrganizationController, :rename_slug)
     patch("/organizations/:id/settings", PlatformOrganizationController, :settings)
+
+    post(
+      "/organizations/:id/branding/logo/upload-url",
+      PlatformOrganizationBrandingController,
+      :logo_upload_url
+    )
+
+    put(
+      "/organizations/:id/branding/logo",
+      PlatformOrganizationBrandingController,
+      :finalize_logo
+    )
+
+    delete(
+      "/organizations/:id/branding/logo",
+      PlatformOrganizationBrandingController,
+      :remove_logo
+    )
+
+    # ADR-099 reviewed tenant export/purge workflow.
+    get("/organization-purges", PlatformOrganizationPurgeController, :index)
+    post("/organizations/:id/purge", PlatformOrganizationPurgeController, :create)
+    get("/organizations/:id/purge", PlatformOrganizationPurgeController, :show)
+    post("/organizations/:id/purge/approve", PlatformOrganizationPurgeController, :approve)
+    post("/organizations/:id/purge/cancel", PlatformOrganizationPurgeController, :cancel)
+    post("/organizations/:id/purge/resume", PlatformOrganizationPurgeController, :resume)
   end
 
   scope "/api/me", MilosTrainingWeb do
@@ -530,6 +612,20 @@ defmodule MilosTrainingWeb.Router do
     post("/:id/notes", ExecutionController, :submit_note)
     patch("/:id/complete", ExecutionController, :complete)
     post("/:id/modifications", ExecutionController, :add_modifications)
+  end
+
+  # ADR-105: batched client interaction analytics get their own bucket so a
+  # chatty client can never eat into the progress/complete budget above.
+  scope "/api/executions", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :execution_interaction_rate_limited
+    ])
+
+    post("/:id/interactions", ExecutionController, :record_interactions)
   end
 
   scope "/api/gamification", MilosTrainingWeb do

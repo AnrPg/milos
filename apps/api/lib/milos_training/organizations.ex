@@ -1,8 +1,11 @@
 defmodule MilosTraining.Organizations do
+  alias MilosTraining.Organizations.Domain.BrandLogoPolicy
   alias MilosTraining.Organizations.OrganizationStore
 
   alias MilosTraining.Organizations.Commands.{
     AddMembership,
+    AdvanceOrganizationPurge,
+    CompleteOrganizationPurge,
     CreateOrganization,
     DeleteOrganization,
     IssueInvitation,
@@ -10,6 +13,9 @@ defmodule MilosTraining.Organizations do
     ProvisionOrganization,
     RedeemInvitation,
     RenameOrganization,
+    RenameOrganizationSlug,
+    ReplaceOrganizationLogo,
+    RequestOrganizationPurge,
     RevokeInvitation,
     SendOwnerInvitationEmail,
     SetMembershipRole,
@@ -20,14 +26,20 @@ defmodule MilosTraining.Organizations do
   }
 
   alias MilosTraining.Organizations.Queries.{
+    BuildTenantPurgeContext,
     FindOrganization,
+    GetOrganizationBranding,
+    GetOrganizationPurge,
+    GetSlugRenameImpact,
     InspectInvitation,
     ListActiveMembershipUserIds,
     ListDeletableOrganizationUserIds,
     ListMemberships,
     ListOrganizationMemberships,
     ListProvisionedOrganizations,
+    ListStaffUserIds,
     ResolvePlatformContext,
+    ResolveSlugAlias,
     ResolveTenantContext
   }
 
@@ -42,16 +54,14 @@ defmodule MilosTraining.Organizations do
   defdelegate get_by_domain(host), to: FindOrganization, as: :by_domain
   defdelegate list_memberships(user_id), to: ListMemberships, as: :call
 
-  def list_active_membership_user_ids(organization_id) when is_binary(organization_id),
-    do: OrganizationStore.list_active_membership_user_ids(organization_id)
-
-  def list_active_membership_user_ids(context), do: ListActiveMembershipUserIds.call(context)
+  defdelegate list_active_membership_user_ids(context_or_organization_id),
+    to: ListActiveMembershipUserIds,
+    as: :call
 
   def list_membership_organization_ids(user_ids),
     do: OrganizationStore.list_membership_organization_ids(user_ids)
 
-  def list_staff_user_ids(organization_id),
-    do: OrganizationStore.list_staff_user_ids(organization_id)
+  defdelegate list_staff_user_ids(organization_id), to: ListStaffUserIds, as: :call
 
   def issue_invitation(context, params, issued_at \\ DateTime.utc_now()),
     do: IssueInvitation.call(context, params, issued_at)
@@ -118,6 +128,20 @@ defmodule MilosTraining.Organizations do
   def rename_organization(context, organization_id, name),
     do: RenameOrganization.call(context, organization_id, name)
 
+  # ADR-104 slug rename with retired-slug aliases.
+  def rename_organization_slug(
+        context,
+        organization_id,
+        params,
+        changed_at \\ DateTime.utc_now()
+      ),
+      do: RenameOrganizationSlug.call(context, organization_id, params, changed_at)
+
+  def slug_rename_impact(context, organization_id, now \\ DateTime.utc_now()),
+    do: GetSlugRenameImpact.call(context, organization_id, now)
+
+  def resolve_slug_alias(slug), do: ResolveSlugAlias.call(slug)
+
   def send_owner_invitation_email(context, organization_id, params),
     do: SendOwnerInvitationEmail.call(context, organization_id, params)
 
@@ -128,6 +152,97 @@ defmodule MilosTraining.Organizations do
         changed_at \\ DateTime.utc_now()
       ),
       do: UpdateOrganizationSettings.call(context, organization_id, params, changed_at)
+
+  # ADR-103 first-class tenant logo upload. `context` is a tenant owner/admin
+  # `TenantContext` (organization_id may be nil: their own organization) or a
+  # vendor `PlatformContext` (organization_id required).
+  def get_organization_branding(context, organization_id \\ nil),
+    do: GetOrganizationBranding.call(context, organization_id)
+
+  def authorize_logo_change(context, organization_id \\ nil),
+    do: BrandLogoPolicy.authorize(context, organization_id)
+
+  @doc "Validates an upload request and allocates the object key it may write."
+  def allocate_logo_key(organization_id, content_type, byte_size) do
+    with {:ok, content_type} <- BrandLogoPolicy.validate_request(content_type, byte_size) do
+      {:ok,
+       %{
+         key: BrandLogoPolicy.object_key(organization_id, Ecto.UUID.generate(), content_type),
+         content_type: content_type,
+         max_bytes: BrandLogoPolicy.max_bytes()
+       }}
+    end
+  end
+
+  def logo_key_owned?(organization_id, key), do: BrandLogoPolicy.owned_key?(organization_id, key)
+  def logo_probe_bytes, do: BrandLogoPolicy.probe_bytes()
+  def validate_logo_object(key, object), do: BrandLogoPolicy.validate_object(key, object)
+
+  def superseded_logo_key(organization_id, previous_key, next_key),
+    do: BrandLogoPolicy.superseded_key(organization_id, previous_key, next_key)
+
+  def set_organization_logo(context, organization_id, logo, changed_at \\ DateTime.utc_now()),
+    do: ReplaceOrganizationLogo.call(context, organization_id, logo, changed_at)
+
+  def remove_organization_logo(context, organization_id, changed_at \\ DateTime.utc_now()),
+    do: ReplaceOrganizationLogo.call(context, organization_id, nil, changed_at)
+
+  # ADR-099 reviewed tenant export/purge workflow. Purge records are
+  # platform-level and survive the organization they describe.
+  def request_organization_purge(context, organization_id, requested_at \\ DateTime.utc_now()),
+    do: RequestOrganizationPurge.call(context, organization_id, requested_at)
+
+  def advance_organization_purge(
+        context,
+        purge_id,
+        event,
+        attrs \\ %{},
+        at \\ DateTime.utc_now()
+      ),
+      do: AdvanceOrganizationPurge.call(context, purge_id, event, attrs, at)
+
+  def record_organization_purge_step(context, purge_id, step, result, at \\ DateTime.utc_now()),
+    do: AdvanceOrganizationPurge.call(context, purge_id, {:record_step, step, result}, %{}, at)
+
+  def approve_organization_purge(
+        context,
+        organization_id,
+        confirmation,
+        at \\ DateTime.utc_now()
+      ),
+      do: AdvanceOrganizationPurge.approve(context, organization_id, confirmation, at)
+
+  def cancel_organization_purge(context, organization_id, at \\ DateTime.utc_now()),
+    do: AdvanceOrganizationPurge.cancel(context, organization_id, at)
+
+  def complete_organization_purge(context, purge_id, completed_at \\ DateTime.utc_now()),
+    do: CompleteOrganizationPurge.call(context, purge_id, completed_at)
+
+  def get_organization_purge(context, organization_id),
+    do: GetOrganizationPurge.latest(context, organization_id)
+
+  def get_organization_purge_by_id(context, purge_id),
+    do: GetOrganizationPurge.by_id(context, purge_id)
+
+  def list_organization_purges(context), do: GetOrganizationPurge.list(context)
+
+  def tenant_purge_context(context, purge), do: BuildTenantPurgeContext.call(context, purge)
+
+  def purge_step_completed?(purge, step),
+    do: MilosTraining.Organizations.Domain.PurgePolicy.step_completed?(purge.steps, step)
+
+  def purge_resume_stage(purge),
+    do: MilosTraining.Organizations.Domain.PurgePolicy.resume_stage(purge)
+
+  # Organizations' own tenant rows are exported like every other context's;
+  # they are purged by `complete_organization_purge/3` (organization delete).
+  def tenant_data_policy, do: MilosTraining.Organizations.Domain.TenantDataPolicy.policy()
+
+  def tenant_data_inventory(context),
+    do: MilosTraining.TenantData.TableStore.inventory(tenant_data_policy(), context)
+
+  def export_tenant_data(context, mode \\ :full),
+    do: MilosTraining.TenantData.TableStore.export(tenant_data_policy(), context, mode)
 
   def resolve_system_tenant_context(organization_id, source, request_metadata \\ %{})
       when is_binary(organization_id) and is_atom(source) do

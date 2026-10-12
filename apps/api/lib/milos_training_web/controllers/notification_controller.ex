@@ -304,10 +304,10 @@ defmodule MilosTrainingWeb.NotificationController do
   end
 
   def mark_clicked(conn, %{id: notification_id} = params) do
-    actor = GuardianPlug.current_resource(conn)
     body = normalize_body_params(conn, params)
 
-    with {:ok, _click_event} <- MarkNotificationClicked.call(actor.id, notification_id, body) do
+    with {:ok, _click_event} <-
+           MarkNotificationClicked.call(conn.assigns.user_context, notification_id, body) do
       json(conn, %{clicked: true, read: true})
     end
   end

@@ -26,6 +26,14 @@ services:
       REDIS_URL: redis://redis:6379
       SECRET_KEY_BASE: ${SECRET_KEY_BASE:?set SECRET_KEY_BASE in your environment or .env}
       MIX_ENV: prod
+      # Observability (ADR-098). All empty by default = no trace export and no
+      # metrics listener. See ops/observability/README.md to enable.
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: ${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT:-}
+      OTEL_SERVICE_NAME: ${OTEL_SERVICE_NAME:-milos-training-api}
+      OTEL_SERVICE_NAMESPACE: ${OTEL_SERVICE_NAMESPACE:-milos-training}
+      METRICS_PORT: ${METRICS_PORT:-}
+      METRICS_TOKEN: ${METRICS_TOKEN:-}
     command: sh -lc "./bin/milos_training eval \"MilosTraining.Release.migrate()\" && exec ./bin/milos_training start"
     depends_on:
       postgres:
@@ -221,9 +229,111 @@ services:
       timeout: 5s
       retries: 10
 
+  # --- Opt-in observability stack (ADR-098): docker compose --profile observability up -d
+  # Nothing below starts without the profile. Prometheus/Alertmanager/Grafana
+  # bind to 127.0.0.1 only and are never routed through Caddy.
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.161.0@sha256:fd328de2552466ad78385e1b1289c3f2402b1c45f265b252aab1955b42845ac1
+    profiles: ["observability"]
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./ops/observability/otel-collector/config.yaml:/etc/otelcol-contrib/config.yaml:ro
+    networks: [app]
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v3.15.0@sha256:efd719c99d83b060d9daefdcf00360461adf279f45ef5391f8d111892118753e
+    profiles: ["observability"]
+    entrypoint: ["/bin/sh", "/etc/prometheus/entrypoint.sh"]
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=${PROMETHEUS_RETENTION:-15d}
+      - --web.external-url=${PROMETHEUS_EXTERNAL_URL:-http://127.0.0.1:19090}
+    environment:
+      METRICS_TOKEN: ${METRICS_TOKEN:-}
+    ports:
+      - "127.0.0.1:${PROMETHEUS_HOST_PORT:-19090}:9090"
+    volumes:
+      - ./ops/observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./ops/observability/prometheus/rules:/etc/prometheus/rules:ro
+      - ./ops/observability/prometheus/entrypoint.sh:/etc/prometheus/entrypoint.sh:ro
+      - prometheus_data:/prometheus
+    depends_on:
+      - otel-collector
+      - alertmanager
+    networks: [app]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:9090/-/ready >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  alertmanager:
+    image: prom/alertmanager:v0.34.1@sha256:e9733bafb1bdef9b00e25a21f8f99dc26a22224bf16641ad754d1649f4c3357a
+    profiles: ["observability"]
+    entrypoint: ["/bin/sh", "/etc/alertmanager/entrypoint.sh"]
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yml
+      - --storage.path=/alertmanager
+      - --web.external-url=${ALERTMANAGER_EXTERNAL_URL:-http://127.0.0.1:19093}
+    environment:
+      ALERTMANAGER_WEBHOOK_URL: ${ALERTMANAGER_WEBHOOK_URL:-}
+      ALERTMANAGER_SMTP_PASSWORD: ${ALERTMANAGER_SMTP_PASSWORD:-}
+    ports:
+      - "127.0.0.1:${ALERTMANAGER_HOST_PORT:-19093}:9093"
+    volumes:
+      - ./ops/observability/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ./ops/observability/alertmanager/entrypoint.sh:/etc/alertmanager/entrypoint.sh:ro
+      - alertmanager_data:/alertmanager
+    networks: [app]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:9093/-/ready >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:13.2.3@sha256:b28bae15e219c998fb0e0424ed724930cc61b1f61fb404d47c862f9a23f9e572
+    profiles: ["observability"]
+    # Compose cannot require a variable only for one profile (":?" fails the
+    # default `up` too), so the container refuses to start without a password.
+    entrypoint:
+      - /bin/sh
+      - -c
+      - 'if [ -z "$${GF_SECURITY_ADMIN_PASSWORD}" ]; then echo "observability: set GRAFANA_ADMIN_PASSWORD in .env" >&2; exit 1; fi; exec /run.sh'
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://127.0.0.1:13000}
+    ports:
+      - "127.0.0.1:${GRAFANA_HOST_PORT:-13000}:3000"
+    volumes:
+      - ./ops/observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./ops/observability/grafana/dashboards:/etc/grafana/dashboards/milos:ro
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks: [app]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/api/health >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
 volumes:
   caddy_data:
   caddy_config:
+  prometheus_data:
+  alertmanager_data:
+  grafana_data:
 
 networks:
   app:

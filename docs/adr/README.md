@@ -101,3 +101,13 @@ must have an ADR. See `template.md` for the format.
 | ADR-093 | Tenant delete purges eligible client accounts | Accepted |
 | ADR-094 | Temporary clean slate production purge | Accepted |
 | ADR-095 | Align account role with membership | Accepted |
+| ADR-096 | Tenant-scoped admin fanout replaces global admin lookups | Accepted |
+| ADR-097 | Dialyzer baseline paid down to zero | Accepted |
+| ADR-098 | Observability dashboards and alerting | Accepted |
+| ADR-099 | Reviewed tenant export and purge | Accepted |
+| ADR-100 | Standalone training-log entries | Accepted |
+| ADR-101 | Controller tests run under the RLS-enforcing runtime role | Accepted |
+| ADR-102 | Offline outbox failure controls and command adapters | Accepted |
+| ADR-103 | Tenant logo upload | Accepted |
+| ADR-104 | Organization name and slug editing | Accepted |
+| ADR-105 | Comprehensive analytics instrumentation | Accepted |

@@ -4,6 +4,7 @@ defmodule MilosTraining.Application.GetOrCreateMessagingThread do
   asking Messaging to atomically create or return the thread.
   """
 
+  alias MilosTraining.Application.TrackMessagingAnalytics
   alias MilosTraining.{Identity, Messaging, Organizations, Scheduling, Workouts}
 
   def call(%{id: actor_id}, %{context_type: :direct, participant_id: actor_id}),
@@ -16,6 +17,7 @@ defmodule MilosTraining.Application.GetOrCreateMessagingThread do
         actor_id: actor.id,
         participant_id: participant_id
       })
+      |> TrackMessagingAnalytics.call()
     end
   end
 
@@ -33,6 +35,7 @@ defmodule MilosTraining.Application.GetOrCreateMessagingThread do
         actor_id: actor.id,
         participants: participant_ids
       })
+      |> TrackMessagingAnalytics.call()
     end
   end
 
@@ -59,6 +62,7 @@ defmodule MilosTraining.Application.GetOrCreateMessagingThread do
         actor_id: actor.id,
         participants: participant_ids
       })
+      |> TrackMessagingAnalytics.call()
     end
   end
 

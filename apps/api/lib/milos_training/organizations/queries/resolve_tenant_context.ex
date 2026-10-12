@@ -9,7 +9,14 @@ defmodule MilosTraining.Organizations.Queries.ResolveTenantContext do
     # policies would be circular: reading `organizations` to build a context
     # would require a context.
     RepoContext.run(%{user_id: account.id}, fn ->
-      organization = OrganizationStore.get_organization_by_slug(slug)
+      # ADR-104: a retired slug resolves transparently to its organization, so
+      # bookmarks, stored selections, stale token claims and socket params
+      # keep working after a rename. The context always carries the canonical
+      # organization; transports compare it with the requested slug to signal
+      # the new one.
+      organization =
+        OrganizationStore.get_organization_by_slug(slug) ||
+          OrganizationStore.get_organization_by_slug_alias(slug)
 
       membership =
         if organization do

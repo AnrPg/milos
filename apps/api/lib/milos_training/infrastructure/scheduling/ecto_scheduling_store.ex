@@ -15,7 +15,12 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
     SchedulingSetting
   }
 
-  alias MilosTraining.Scheduling.Domain.{ClassTypeArchivePolicy, RecurrenceRule}
+  alias MilosTraining.Scheduling.Domain.{
+    BookingOperationPolicy,
+    ClassTypeArchivePolicy,
+    RecurrenceRule
+  }
+
   alias MilosTraining.Workers.BookingTimeoutJob
   alias MilosTraining.Workers.ClassSeriesExtensionJob
   alias MilosTraining.Workers.ReconcileBookingReleaseJob
@@ -579,7 +584,34 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def create_booking(%{organization_id: organization_id}, user_id, slot_id, timeout_minutes) do
+  def create_booking(context, user_id, slot_id, timeout_minutes),
+    do: create_booking(context, user_id, slot_id, timeout_minutes, [])
+
+  @impl true
+  def get_booking_by_client_operation(
+        %{organization_id: organization_id},
+        user_id,
+        client_operation_id
+      ) do
+    Booking
+    |> where(
+      [booking],
+      booking.organization_id == ^organization_id and booking.user_id == ^user_id and
+        booking.client_operation_id == ^client_operation_id
+    )
+    |> Repo.one()
+    |> preload_booking()
+    |> normalize_booking()
+  end
+
+  @impl true
+  def create_booking(
+        %{organization_id: organization_id},
+        user_id,
+        slot_id,
+        timeout_minutes,
+        opts
+      ) do
     Multi.new()
     |> Multi.run(:slot, fn repo, _changes ->
       case repo.get_by(ScheduledClass, id: slot_id, organization_id: organization_id) do
@@ -593,7 +625,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
         organization_id: organization_id,
         scheduled_class_id: slot_id,
         user_id: user_id,
-        status: :pending
+        status: :pending,
+        client_operation_id: Keyword.get(opts, :client_operation_id)
       })
     )
     |> Multi.run(:timeout_job, fn repo, %{booking: booking} ->
@@ -618,7 +651,11 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def create_approved_booking(%{organization_id: organization_id}, user_id, slot_id) do
+  def create_approved_booking(context, user_id, slot_id),
+    do: create_approved_booking(context, user_id, slot_id, [])
+
+  @impl true
+  def create_approved_booking(%{organization_id: organization_id}, user_id, slot_id, opts) do
     tenant_transaction(fn ->
       slot =
         ScheduledClass
@@ -643,7 +680,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
             organization_id: organization_id,
             scheduled_class_id: slot_id,
             user_id: user_id,
-            status: :approved
+            status: :approved,
+            client_operation_id: Keyword.get(opts, :client_operation_id)
           })
           |> Repo.insert()
           |> case do
@@ -683,6 +721,33 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       %{status: :rejected, admin_message: admin_message},
       reconciliation
     )
+  end
+
+  @impl true
+  def resolve_booking_operation(
+        %{organization_id: organization_id},
+        id,
+        %{status: status} = params,
+        reconciliation
+      )
+      when status in [:approved, :rejected] do
+    case tenant_transaction(fn ->
+           with {:ok, booking, outcome} <-
+                  resolve_booking_operation_transaction(organization_id, id, params),
+                {:ok, _job} <- maybe_reconciliation_job(outcome, reconciliation) do
+             {booking, outcome}
+           else
+             {:error, reason} -> Repo.rollback(reason)
+           end
+         end) do
+      {:ok, {%Booking{} = booking, outcome}} ->
+        normalized = booking |> preload_booking() |> normalize_booking()
+        if outcome == :resolved, do: maybe_cancel_timeout_job(normalized.timeout_job_id)
+        {:ok, normalized, outcome}
+
+      {:error, reason} ->
+        {:error, reason}
+    end
   end
 
   @impl true
@@ -899,6 +964,48 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
     end
   end
 
+  defp resolve_booking_operation_transaction(organization_id, id, params) do
+    booking =
+      Booking
+      |> where(
+        [booking],
+        booking.id == ^id and booking.organization_id == ^organization_id
+      )
+      |> lock("FOR UPDATE")
+      |> Repo.one()
+
+    with %Booking{} <- booking || {:error, :not_found},
+         :proceed <-
+           BookingOperationPolicy.resolution_decision(
+             booking,
+             params.status,
+             params.resolution_operation_id
+           ),
+         :ok <- ensure_capacity_for(params, organization_id, booking) do
+      booking
+      |> Booking.resolution_changeset(params)
+      |> Repo.update()
+      |> case do
+        {:ok, updated_booking} -> {:ok, updated_booking, :resolved}
+        {:error, changeset} -> {:error, changeset}
+      end
+    else
+      :replay -> {:ok, booking, :replayed}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp ensure_capacity_for(params, organization_id, booking) do
+    if approving?(params) and slot_at_capacity?(organization_id, booking.scheduled_class_id),
+      do: {:error, :slot_full},
+      else: :ok
+  end
+
+  defp maybe_reconciliation_job(:resolved, reconciliation),
+    do: insert_reconciliation_job(reconciliation)
+
+  defp maybe_reconciliation_job(:replayed, _reconciliation), do: {:ok, :not_required}
+
   defp booking_resolution_changeset(booking, %{status: :cancelled} = params),
     do: Booking.timeout_changeset(booking, params)
 
@@ -1045,6 +1152,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       status: booking.status,
       admin_message: booking.admin_message,
       timeout_job_id: booking.timeout_job_id,
+      client_operation_id: booking.client_operation_id,
+      resolution_operation_id: booking.resolution_operation_id,
       inserted_at: booking.inserted_at,
       updated_at: booking.updated_at
     }

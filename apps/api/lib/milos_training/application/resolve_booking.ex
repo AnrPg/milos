@@ -1,23 +1,40 @@
 defmodule MilosTraining.Application.ResolveBooking do
-  alias MilosTraining.Application.ScheduleRealtime
+  alias MilosTraining.Application.{ScheduleRealtime, TrackAnalyticsEvent}
   alias MilosTraining.{Finance, Scheduling}
+  alias MilosTraining.Scheduling.Domain.BookingOperationPolicy
 
+  @doc """
+  Approves or rejects a pending booking.
+
+  Accepts an optional `client_operation_id` (ADR-102). Returns
+  `{:ok, booking, :resolved | :replayed}`; a replay of the operation that
+  already resolved the booking returns it without notifying the member,
+  releasing entitlements, or broadcasting again. Bookings resolved by anything
+  else stay a deterministic `:booking_not_pending` conflict.
+  """
   def call(context, booking_id, params) do
     action = Map.get(params, :action) || Map.get(params, "action")
     admin_message = Map.get(params, :admin_message) || Map.get(params, "admin_message")
 
-    with booking when not is_nil(booking) <- Scheduling.get_booking(context, booking_id),
-         {:ok, updated_booking} <- run_resolution(context, action, booking_id, admin_message) do
-      maybe_reconcile_now(action, updated_booking)
+    operation_id =
+      Map.get(params, :client_operation_id) || Map.get(params, "client_operation_id")
 
-      notification_payload =
-        updated_booking
-        |> plain_map()
-        |> Map.put(:notification_batch_at, DateTime.utc_now() |> DateTime.truncate(:second))
-
-      MilosTraining.Notifications.dispatch_event(:booking_resolved, notification_payload)
-      broadcast_resolution(updated_booking)
-      {:ok, updated_booking}
+    with {:ok, status} <- requested_status(action),
+         {:ok, operation_id} <- BookingOperationPolicy.normalize_operation_id(operation_id),
+         booking when is_map(booking) <- Scheduling.get_booking(context, booking_id),
+         {:ok, updated_booking, outcome} <-
+           Scheduling.resolve_booking_operation(
+             context,
+             booking_id,
+             %{
+               status: status,
+               admin_message: admin_message,
+               resolution_operation_id: operation_id
+             },
+             reconciliation_for(status, booking)
+           ) do
+      if outcome == :resolved, do: announce(context, status, updated_booking, admin_message)
+      {:ok, updated_booking, outcome}
     else
       nil -> {:error, :not_found}
       :error -> {:error, :bad_request}
@@ -27,31 +44,36 @@ defmodule MilosTraining.Application.ResolveBooking do
 
   def call(_booking_id, _params), do: {:error, :organization_context_required}
 
-  defp run_resolution(context, :approve, booking_id, admin_message),
-    do: Scheduling.approve_booking(context, booking_id, admin_message)
+  defp requested_status(action) when action in [:approve, "approve"], do: {:ok, :approved}
+  defp requested_status(action) when action in [:reject, "reject"], do: {:ok, :rejected}
+  defp requested_status(_action), do: :error
 
-  defp run_resolution(context, "approve", booking_id, admin_message),
-    do: run_resolution(context, :approve, booking_id, admin_message)
+  defp resolution_event(:approved), do: "class_booking_approved"
+  defp resolution_event(:rejected), do: "class_booking_rejected"
 
-  defp run_resolution(context, :reject, booking_id, admin_message),
-    do:
-      Scheduling.reject_booking(
-        context,
-        booking_id,
-        admin_message,
-        reconciliation(context, "Booking rejected", "booking-rejected", booking_id)
-      )
+  defp announce(context, status, booking, admin_message) do
+    maybe_reconcile_now(status, booking)
 
-  defp run_resolution(context, "reject", booking_id, admin_message),
-    do: run_resolution(context, :reject, booking_id, admin_message)
+    notification_payload =
+      booking
+      |> plain_map()
+      |> Map.put(:notification_batch_at, DateTime.utc_now() |> DateTime.truncate(:second))
 
-  defp run_resolution(_context, _, _booking_id, _admin_message), do: :error
+    MilosTraining.Notifications.dispatch_event(:booking_resolved, notification_payload)
+    broadcast_resolution(booking)
 
-  defp reconciliation(context, reason, idempotency_prefix, booking_id) do
-    booking = Scheduling.get_booking(context, booking_id)
-
-    reconciliation_payload(booking, reason, idempotency_prefix)
+    TrackAnalyticsEvent.call(resolution_event(status), context, booking, %{
+      metadata: %{
+        member_id: booking.user_id,
+        has_admin_message: admin_message not in [nil, ""]
+      }
+    })
   end
+
+  defp reconciliation_for(:rejected, booking),
+    do: reconciliation_payload(booking, "Booking rejected", "booking-rejected")
+
+  defp reconciliation_for(_status, _booking), do: nil
 
   defp reconciliation_payload(booking, reason, idempotency_prefix) do
     %{
@@ -64,7 +86,7 @@ defmodule MilosTraining.Application.ResolveBooking do
     }
   end
 
-  defp maybe_reconcile_now(action, booking) when action in [:reject, "reject"] do
+  defp maybe_reconcile_now(:rejected, booking) do
     _result =
       Finance.release_entitlement_source(
         booking.user_id,
@@ -80,7 +102,7 @@ defmodule MilosTraining.Application.ResolveBooking do
     :ok
   end
 
-  defp maybe_reconcile_now(_action, _booking), do: :ok
+  defp maybe_reconcile_now(_status, _booking), do: :ok
 
   defp plain_map(%_{} = struct), do: Map.from_struct(struct)
   defp plain_map(map) when is_map(map), do: map

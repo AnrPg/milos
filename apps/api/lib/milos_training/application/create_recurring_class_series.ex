@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.CreateRecurringClassSeries do
-  alias MilosTraining.Application.ScheduleRealtime
+  alias MilosTraining.Application.{ScheduleRealtime, TrackAnalyticsEvent}
   alias MilosTraining.Scheduling
   alias MilosTraining.Workouts
 
@@ -11,6 +11,7 @@ defmodule MilosTraining.Application.CreateRecurringClassSeries do
          {:ok, _class_type} <- fetch_class_type(context, class_type_id),
          {:ok, series} <- create_series(context, params) do
       ScheduleRealtime.broadcast("series_created", series)
+      TrackAnalyticsEvent.call("class_series_created", context, series)
 
       {:ok, series}
     end

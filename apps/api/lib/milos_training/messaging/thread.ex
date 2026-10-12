@@ -20,6 +20,8 @@ defmodule MilosTraining.Messaging.Thread do
     timestamps(updated_at: false)
   end
 
+  @type t :: %__MODULE__{}
+
   def changeset(thread, attrs) do
     thread
     |> cast(attrs, [:organization_id, :context_type, :context_id, :direct_key, :created_by_id])

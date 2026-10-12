@@ -12,6 +12,7 @@ defmodule MilosTraining.Scheduling do
     DeleteSlot,
     RecordAttendance,
     RejectBooking,
+    ResolveBookingOperation,
     SubmitBooking,
     SubmitAutoApprovedBooking,
     TimeoutBooking,
@@ -23,6 +24,7 @@ defmodule MilosTraining.Scheduling do
 
   alias MilosTraining.Scheduling.Queries.{
     GetBooking,
+    GetBookingByClientOperation,
     GetCalendarWeek,
     GetAttendance,
     GetApprovedBookingForClass,
@@ -133,8 +135,30 @@ defmodule MilosTraining.Scheduling do
 
   defdelegate submit_booking(user_id, slot_id, timeout_minutes), to: SubmitBooking, as: :call
 
+  @doc "ADR-102: `opts` may carry `client_operation_id:` for replay dedupe."
+  defdelegate submit_booking(context, user_id, slot_id, timeout_minutes, opts),
+    to: SubmitBooking,
+    as: :call
+
   defdelegate submit_auto_approved_booking(context, user_id, slot_id),
     to: SubmitAutoApprovedBooking,
+    as: :call
+
+  defdelegate submit_auto_approved_booking(context, user_id, slot_id, opts),
+    to: SubmitAutoApprovedBooking,
+    as: :call
+
+  defdelegate get_booking_by_client_operation(context, user_id, client_operation_id),
+    to: GetBookingByClientOperation,
+    as: :call
+
+  @doc """
+  ADR-102 idempotent admin resolution. `params` holds `:status`
+  (`:approved | :rejected`), `:admin_message`, and `:resolution_operation_id`.
+  Returns `{:ok, booking, :resolved | :replayed}`.
+  """
+  defdelegate resolve_booking_operation(context, id, params, reconciliation),
+    to: ResolveBookingOperation,
     as: :call
 
   defdelegate submit_auto_approved_booking(user_id, slot_id),
@@ -209,4 +233,18 @@ defmodule MilosTraining.Scheduling do
 
   def update_settings(params),
     do: MilosTraining.Scheduling.SchedulingStore.update_settings(params)
+
+  # ADR-099 reviewed tenant export/purge. This context owns its table list and
+  # retention policy; the shared executor only runs what this policy declares,
+  # always inside a RepoContext session for the purge's tenant.
+  def tenant_data_policy, do: MilosTraining.Scheduling.Domain.TenantDataPolicy.policy()
+
+  def tenant_data_inventory(context),
+    do: MilosTraining.TenantData.TableStore.inventory(tenant_data_policy(), context)
+
+  def export_tenant_data(context, mode \\ :full),
+    do: MilosTraining.TenantData.TableStore.export(tenant_data_policy(), context, mode)
+
+  def purge_tenant_data(context),
+    do: MilosTraining.TenantData.TableStore.purge(tenant_data_policy(), context)
 end

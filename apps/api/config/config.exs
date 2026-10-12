@@ -32,7 +32,8 @@ config :milos_training, Oban,
        {"*/15 * * * *", MilosTraining.Workers.RefreshCoachingAggregatesJob},
        {"0 2 * * *", MilosTraining.Workers.MarkOverdueInvoicesJob},
        {"17 * * * *", MilosTraining.Workers.ReconcileEntitlementReservationsJob},
-       {"0 9 * * *", MilosTraining.Workers.PaymentReminderJob}
+       {"0 9 * * *", MilosTraining.Workers.PaymentReminderJob},
+       {"41 * * * *", MilosTraining.Workers.ExecutionAbandonmentSweepJob}
      ]}
   ],
   queues: [
@@ -49,6 +50,9 @@ config :milos_training, MilosTraining.Infrastructure.Auth.Guardian,
 
 config :milos_training, :start_redix, true
 config :milos_training, :start_oban, true
+# ADR-105: a started execution not completed within this many hours is recorded
+# as workout_execution_abandoned by ExecutionAbandonmentSweepJob.
+config :milos_training, :execution_abandonment_hours, 6
 config :milos_training, :redis_url, System.get_env("REDIS_URL", "redis://localhost:6379")
 config :milos_training, :readiness_checker, MilosTraining.Infrastructure.Readiness.Live
 config :milos_training, :identity_user_store, MilosTraining.Infrastructure.Identity.EctoUserStore
@@ -66,6 +70,10 @@ config :milos_training,
 config :milos_training,
        :class_timer_store,
        MilosTraining.Infrastructure.Execution.EctoClassTimerStore
+
+config :milos_training,
+       :training_log_store,
+       MilosTraining.Infrastructure.Execution.EctoTrainingLogStore
 
 config :milos_training, :finance_store, MilosTraining.Infrastructure.Finance.EctoFinanceStore
 config :milos_training, :workout_store, MilosTraining.Infrastructure.Workouts.EctoWorkoutStore
@@ -104,6 +112,7 @@ config :milos_training,
 
 config :milos_training, :avatar_storage, MilosTraining.Infrastructure.Storage.MinioStorage
 config :milos_training, :document_storage, MilosTraining.Infrastructure.Storage.MinioStorage
+config :milos_training, :tenant_object_store, MilosTraining.Infrastructure.Storage.MinioStorage
 config :milos_training, :landing_cache, MilosTraining.Infrastructure.Cache.LandingCache
 
 config :milos_training,
@@ -172,6 +181,10 @@ config :logger, :default_formatter,
 config :phoenix, :json_library, Jason
 
 config :open_api_spex, :json_render_error_v2, true
+
+# Cache the API spec once; see MilosTrainingWeb.OpenApiSpecCache for why the
+# default adapter exhausts the VM's literal area.
+config :open_api_spex, :cache_adapter, MilosTrainingWeb.OpenApiSpecCache
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

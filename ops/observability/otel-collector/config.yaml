@@ -1,0 +1,77 @@
+# OpenTelemetry Collector (contrib) for the opt-in `observability` Compose
+# profile (ADR-098).
+#
+# Traces from the API (OTLP/HTTP, see OTEL_EXPORTER_OTLP_ENDPOINT) are turned
+# into RED metrics by the spanmetrics connector and exposed to Prometheus on
+# :8889. No trace storage backend ships in this profile; add an exporter
+# (e.g. otlphttp to Tempo/Jaeger) to the traces pipeline if you need one.
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 256
+    spike_limit_mib: 64
+
+  # Probe traffic would dominate request rates and hide real latency:
+  # Prometheus scrapes the internal metrics listener every 15s and Compose
+  # checks /api/health every 10s.
+  filter/probes:
+    error_mode: ignore
+    traces:
+      span:
+        - 'attributes["url.path"] == "/metrics"'
+        - 'attributes["url.path"] == "/api/health"'
+
+  batch:
+    send_batch_size: 1024
+    timeout: 5s
+
+connectors:
+  spanmetrics:
+    histogram:
+      unit: ms
+      explicit:
+        buckets: [10ms, 25ms, 50ms, 100ms, 250ms, 500ms, 1s, 2.5s, 5s, 10s]
+    # service.name, span.name, span.kind and status.code are always included.
+    dimensions:
+      - name: http.request.method
+      - name: http.route
+      - name: http.response.status_code
+    aggregation_temporality: AGGREGATION_TEMPORALITY_CUMULATIVE
+    metrics_flush_interval: 15s
+
+exporters:
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    # Series that stop receiving data (e.g. a route nobody calls any more)
+    # disappear after this window instead of being exported forever.
+    metric_expiration: 30m
+
+service:
+  telemetry:
+    logs:
+      level: info
+    metrics:
+      level: normal
+      readers:
+        - pull:
+            exporter:
+              prometheus:
+                host: 0.0.0.0
+                port: 8888
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, filter/probes, batch]
+      exporters: [spanmetrics]
+    metrics:
+      receivers: [otlp, spanmetrics]
+      processors: [memory_limiter, batch]
+      exporters: [prometheus]

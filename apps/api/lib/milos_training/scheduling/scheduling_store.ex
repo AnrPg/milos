@@ -156,10 +156,26 @@ defmodule MilosTraining.Scheduling.SchedulingStore do
   def create_booking(_user_id, _slot_id, _timeout_minutes), do: missing_tenant()
 
   @impl true
+  def create_booking(context, user_id, slot_id, timeout_minutes, opts),
+    do: tenant_call(context, :create_booking, [user_id, slot_id, timeout_minutes, opts])
+
+  @impl true
+  def get_booking_by_client_operation(context, user_id, client_operation_id),
+    do: tenant_call(context, :get_booking_by_client_operation, [user_id, client_operation_id])
+
+  @impl true
+  def resolve_booking_operation(context, id, params, reconciliation),
+    do: tenant_call(context, :resolve_booking_operation, [id, params, reconciliation])
+
+  @impl true
   def create_approved_booking(context, user_id, slot_id),
     do: tenant_call(context, :create_approved_booking, [user_id, slot_id])
 
   def create_approved_booking(_user_id, _slot_id), do: missing_tenant()
+
+  @impl true
+  def create_approved_booking(context, user_id, slot_id, opts),
+    do: tenant_call(context, :create_approved_booking, [user_id, slot_id, opts])
 
   @impl true
   def approve_booking(context, id, admin_message),

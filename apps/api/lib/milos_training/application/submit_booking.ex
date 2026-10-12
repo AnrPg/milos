@@ -1,27 +1,82 @@
 defmodule MilosTraining.Application.SubmitBooking do
   require Logger
 
+  alias MilosTraining.Application.TrackAnalyticsEvent
   alias MilosTraining.{Finance, Identity, Scheduling}
-  alias MilosTraining.Scheduling.Domain.BookingPolicy
+  alias MilosTraining.Scheduling.Domain.{BookingOperationPolicy, BookingPolicy}
 
-  def call(context, %{id: user_id} = actor, slot_id) do
+  @doc """
+  Submits a booking request.
+
+  `call/3` keeps the historical `{:ok, booking}` shape. `call/4` accepts
+  `client_operation_id:` (ADR-102) and returns `{:ok, booking, :created |
+  :replayed}`: a replay of an operation that already created a booking returns
+  that booking without reserving another class visit, notifying staff, or
+  broadcasting again; reusing the id for another class is
+  `{:error, :idempotency_key_conflict}`.
+  """
+  def call(context, %{id: _} = actor, slot_id) do
+    case call(context, actor, slot_id, []) do
+      {:ok, booking, _outcome} -> {:ok, booking}
+      error -> error
+    end
+  end
+
+  def call(context, %{id: user_id} = actor, slot_id, opts) when is_list(opts) do
+    with {:ok, operation_id} <-
+           BookingOperationPolicy.normalize_operation_id(Keyword.get(opts, :client_operation_id)),
+         :none <- find_replay(context, user_id, operation_id, slot_id) do
+      submit(context, actor, slot_id, operation_id)
+    end
+  end
+
+  defp submit(context, %{id: user_id} = actor, slot_id, operation_id) do
     with {:ok, slot} <- fetch_slot(context, slot_id),
          :ok <- BookingPolicy.can_book?(slot, user_id: user_id, now: DateTime.utc_now()),
          {:ok, reservation} <- reserve_visit(context, actor, slot) do
-      case create_booking(context, slot, user_id) do
+      case create_booking(context, slot, user_id, operation_id) do
         {:ok, booking} ->
           dispatch_booking_notification(slot, booking)
           broadcast_booking_event(slot, booking)
           broadcast_entitlement_change(user_id)
-          {:ok, booking}
+
+          TrackAnalyticsEvent.call("class_booking_requested", context, booking, %{
+            user_id: user_id,
+            metadata: %{auto_approved: slot.auto_approve == true}
+          })
+
+          {:ok, booking, :created}
 
         {:error, reason} ->
           release_failed_reservation(context, reservation)
-          {:error, reason}
+          # A concurrent delivery of the same operation may have won the race.
+          case find_replay(context, user_id, operation_id, slot_id) do
+            :none -> {:error, reason}
+            replay_or_conflict -> replay_or_conflict
+          end
       end
     else
       {:error, reason} -> {:error, reason}
       {:error, reason, details} -> {:error, reason, details}
+    end
+  end
+
+  defp find_replay(_context, _user_id, nil, _slot_id), do: :none
+  defp find_replay(nil, _user_id, _operation_id, _slot_id), do: :none
+
+  defp find_replay(context, user_id, operation_id, slot_id) do
+    case Scheduling.get_booking_by_client_operation(context, user_id, operation_id) do
+      nil ->
+        :none
+
+      {:error, reason} ->
+        {:error, reason}
+
+      booking ->
+        case BookingOperationPolicy.submission_replay(booking, slot_id) do
+          :replay -> {:ok, booking, :replayed}
+          {:error, reason} -> {:error, reason}
+        end
     end
   end
 
@@ -92,17 +147,23 @@ defmodule MilosTraining.Application.SubmitBooking do
     end
   end
 
-  defp create_booking(nil, %{auto_approve: true, id: slot_id}, user_id),
+  defp create_booking(nil, %{auto_approve: true, id: slot_id}, user_id, _operation_id),
     do: Scheduling.submit_auto_approved_booking(user_id, slot_id)
 
-  defp create_booking(context, %{auto_approve: true, id: slot_id}, user_id),
-    do: Scheduling.submit_auto_approved_booking(context, user_id, slot_id)
+  defp create_booking(context, %{auto_approve: true, id: slot_id}, user_id, operation_id),
+    do:
+      Scheduling.submit_auto_approved_booking(context, user_id, slot_id,
+        client_operation_id: operation_id
+      )
 
-  defp create_booking(nil, slot, user_id),
+  defp create_booking(nil, slot, user_id, _operation_id),
     do: Scheduling.submit_booking(user_id, slot.id, slot.booking_timeout_minutes)
 
-  defp create_booking(context, slot, user_id),
-    do: Scheduling.submit_booking(context, user_id, slot.id, slot.booking_timeout_minutes)
+  defp create_booking(context, slot, user_id, operation_id),
+    do:
+      Scheduling.submit_booking(context, user_id, slot.id, slot.booking_timeout_minutes,
+        client_operation_id: operation_id
+      )
 
   defp dispatch_booking_notification(%{auto_approve: true}, booking),
     do: dispatch_non_critical(:booking_resolved, booking)

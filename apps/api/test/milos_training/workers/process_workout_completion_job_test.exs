@@ -2,7 +2,8 @@ defmodule MilosTraining.Workers.ProcessWorkoutCompletionJobTest do
   use MilosTraining.DataCase, async: false
   use Oban.Testing, repo: MilosTraining.Repo
 
-  alias MilosTraining.Application.CompleteWorkout
+  alias MilosTraining.Application.{CompleteWorkout, LogTrainingEntry, VoidTrainingLogEntry}
+  alias MilosTraining.Gamification
   alias MilosTraining.Execution
   alias MilosTraining.Organizations
   alias MilosTraining.Repo
@@ -83,5 +84,74 @@ defmodule MilosTraining.Workers.ProcessWorkoutCompletionJobTest do
 
     assert :ok =
              perform_job(ProcessWorkoutCompletionJob, %{"execution_id" => execution.id})
+  end
+
+  describe "standalone training-log completions (ADR-100)" do
+    defp training_log_member_context do
+      owner = admin_fixture()
+      member = user_fixture(%{role: :member})
+
+      {:ok, organization} =
+        Organizations.create_organization(%{
+          name: "Job Gym #{System.unique_integer([:positive])}"
+        })
+
+      for {user, role} <- [{owner, :owner}, {member, :member}] do
+        {:ok, _membership} =
+          Organizations.add_membership(%{
+            organization_id: organization.id,
+            user_id: user.id,
+            role: role,
+            status: :active,
+            joined_at: DateTime.utc_now()
+          })
+      end
+
+      {:ok, context} = Organizations.resolve_tenant_context(member, organization.slug)
+      {member, context}
+    end
+
+    defp freeform_log_params do
+      %{
+        "source_type" => "freeform",
+        "title" => "Park run",
+        "performed_at" => DateTime.utc_now() |> DateTime.add(-3600) |> DateTime.to_iso8601(),
+        "idempotency_key" => "job-" <> Ecto.UUID.generate()
+      }
+    end
+
+    test "logging enqueues the shared completion job with a training_log source flag" do
+      {member, context} = training_log_member_context()
+
+      assert {:ok, entry, :created} =
+               LogTrainingEntry.call(context, member, freeform_log_params())
+
+      args = %{
+        "source" => "training_log",
+        "training_log_entry_id" => entry.id,
+        "organization_id" => entry.organization_id,
+        "user_id" => member.id
+      }
+
+      assert_enqueued(worker: ProcessWorkoutCompletionJob, args: args)
+      assert :ok = perform_job(ProcessWorkoutCompletionJob, args)
+      assert %{total_workouts: 1} = Gamification.get_user_stats(member.id)
+    end
+
+    test "a job for a voided entry cancels instead of crashing or counting" do
+      {member, context} = training_log_member_context()
+      {:ok, entry, :created} = LogTrainingEntry.call(context, member, freeform_log_params())
+      {:ok, _voided} = VoidTrainingLogEntry.call(context, member, entry.id, %{})
+
+      assert {:cancel, :training_log_entry_voided} =
+               perform_job(ProcessWorkoutCompletionJob, %{
+                 "source" => "training_log",
+                 "training_log_entry_id" => entry.id,
+                 "organization_id" => entry.organization_id,
+                 "user_id" => member.id
+               })
+
+      assert Gamification.get_user_stats(member.id) == nil
+    end
   end
 end

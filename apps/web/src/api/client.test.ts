@@ -26,6 +26,24 @@ describe("apiRequest tenant headers", () => {
     );
   });
 
+  it("replaces a remembered retired slug with the canonical slug the API names (ADR-104)", async () => {
+    window.history.replaceState(null, "", "/admin/users");
+    window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, "old-gym");
+    const fetchMock = vi.spyOn(window, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), {
+        status: 200,
+        headers: { "x-organization-canonical-slug": "new-gym" },
+      }),
+    );
+
+    await apiRequest<{ ok: boolean }>("/admin/users", { token: "token" });
+    expect(fetchMock).toHaveBeenLastCalledWith("/api/org/old-gym/admin/users", expect.anything());
+    expect(window.localStorage.getItem(SELECTED_ORGANIZATION_SLUG_KEY)).toBe("new-gym");
+
+    await apiRequest<{ ok: boolean }>("/admin/users", { token: "token" });
+    expect(fetchMock).toHaveBeenLastCalledWith("/api/org/new-gym/admin/users", expect.anything());
+  });
+
   it("falls back to the selected organization for global admin pages", async () => {
     window.history.replaceState(null, "", "/admin/users");
     window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, "selected-gym");

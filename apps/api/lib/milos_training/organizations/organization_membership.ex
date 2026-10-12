@@ -18,6 +18,8 @@ defmodule MilosTraining.Organizations.OrganizationMembership do
     timestamps(type: :utc_datetime_usec)
   end
 
+  @type t :: %__MODULE__{}
+
   def changeset(membership \\ %__MODULE__{}, params) do
     membership
     |> cast(params, [

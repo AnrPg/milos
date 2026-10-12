@@ -213,7 +213,7 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
   defp parse_date(value) when is_binary(value) do
     case Date.from_iso8601(value) do
       {:ok, date} -> {:ok, date}
-      :error -> {:error, :bad_request}
+      {:error, _reason} -> {:error, :bad_request}
     end
   end
 

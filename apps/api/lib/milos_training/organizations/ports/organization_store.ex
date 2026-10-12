@@ -2,7 +2,9 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   alias MilosTraining.Organizations.{
     Organization,
     OrganizationMembership,
+    OrganizationPurge,
     OrganizationSetting,
+    OrganizationSlugAlias,
     RegistrationInvitation,
     Vendor
   }
@@ -20,6 +22,25 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   @callback get_organization_by_id(Ecto.UUID.t()) :: Organization.t() | nil
   @callback get_organization_by_slug(String.t()) :: Organization.t() | nil
   @callback get_organization_by_domain(String.t()) :: Organization.t() | nil
+  # ADR-104 retired slug aliases.
+  @callback get_organization_by_slug_alias(String.t()) :: Organization.t() | nil
+  @callback get_canonical_slug_for_alias(String.t()) :: String.t() | nil
+  @callback list_slug_aliases(Ecto.UUID.t()) :: [OrganizationSlugAlias.t()]
+  @callback count_pending_invitations(Ecto.UUID.t(), DateTime.t()) :: non_neg_integer()
+  @callback rename_organization_slug(
+              Ecto.UUID.t(),
+              String.t(),
+              String.t() | nil,
+              Ecto.UUID.t(),
+              DateTime.t()
+            ) ::
+              {:ok,
+               %{
+                 organization: Organization.t(),
+                 previous_slug: String.t(),
+                 aliases: [OrganizationSlugAlias.t()]
+               }}
+              | {:error, term()}
   @callback get_membership(Ecto.UUID.t(), Ecto.UUID.t()) :: OrganizationMembership.t() | nil
   @callback get_membership_by_id(Ecto.UUID.t(), Ecto.UUID.t()) :: OrganizationMembership.t() | nil
   @callback list_memberships(Ecto.UUID.t()) :: [map()]
@@ -52,9 +73,38 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   @callback get_organization_settings(Ecto.UUID.t()) :: OrganizationSetting.t() | nil
   @callback update_organization_settings(Ecto.UUID.t(), map(), Ecto.UUID.t(), DateTime.t()) ::
               {:ok, OrganizationSetting.t()} | {:error, term()}
+  # ADR-103: sets (`%{object_key, url}`) or clears (nil) the uploaded logo and
+  # records the audit event in one transaction.
+  @callback replace_organization_logo(
+              Ecto.UUID.t(),
+              %{object_key: String.t(), url: String.t()} | nil,
+              %{user_id: Ecto.UUID.t(), scope: :tenant | :vendor},
+              DateTime.t()
+            ) ::
+              {:ok,
+               %{
+                 settings: OrganizationSetting.t(),
+                 previous_object_key: String.t() | nil,
+                 event: String.t() | nil
+               }}
+              | {:error, term()}
   @callback update_membership_status(Ecto.UUID.t(), Ecto.UUID.t(), atom()) ::
               {:ok, OrganizationMembership.t()} | {:error, term()}
   @callback update_membership_role(Ecto.UUID.t(), Ecto.UUID.t(), atom()) ::
               {:ok, OrganizationMembership.t()} | {:error, term()}
   @callback transaction((-> {:ok, term()} | {:error, term()})) :: {:ok, term()} | {:error, term()}
+
+  # ADR-099 reviewed tenant purge records (platform-level, survive the purge).
+  @callback request_organization_purge(Ecto.UUID.t(), Ecto.UUID.t(), atom(), DateTime.t()) ::
+              {:ok, %{purge: OrganizationPurge.t(), organization: Organization.t()}}
+              | {:error, term()}
+  @callback get_purge(Ecto.UUID.t()) :: OrganizationPurge.t() | nil
+  @callback lock_purge(Ecto.UUID.t()) :: OrganizationPurge.t() | nil
+  @callback get_open_purge(Ecto.UUID.t()) :: OrganizationPurge.t() | nil
+  @callback get_latest_purge(Ecto.UUID.t()) :: OrganizationPurge.t() | nil
+  @callback list_purges(pos_integer()) :: [OrganizationPurge.t()]
+  @callback update_purge(OrganizationPurge.t(), map()) ::
+              {:ok, OrganizationPurge.t()} | {:error, term()}
+  @callback finalize_purge(OrganizationPurge.t(), map(), Ecto.UUID.t(), DateTime.t()) ::
+              {:ok, OrganizationPurge.t()} | {:error, term()}
 end

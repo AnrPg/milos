@@ -1,8 +1,8 @@
 defmodule MilosTraining.Application.DeleteWorkout do
   require Logger
 
-  alias MilosTraining.Application.BroadcastUserSync
-  alias MilosTraining.{Identity, Scheduling, Workouts}
+  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients, TrackAnalyticsEvent}
+  alias MilosTraining.{Scheduling, Workouts}
   alias MilosTraining.Notifications
 
   def call(%{organization_id: _} = context, id) do
@@ -17,8 +17,17 @@ defmodule MilosTraining.Application.DeleteWorkout do
       broadcast_deleted_slots(deleted_slot_ids, organization_id)
       notify_assignment_targets(assignment_targets)
       notify_booking_targets(booking_targets)
-      broadcast_assignment_refresh(assignment_targets, id)
-      broadcast_admin_workout_refresh(id)
+      broadcast_assignment_refresh(context, assignment_targets, id)
+      broadcast_admin_workout_refresh(context, id)
+
+      TrackAnalyticsEvent.call("workout_deleted", context, workout, %{
+        metadata: %{
+          affected_assignment_count: length(assignment_targets),
+          affected_booking_count: length(booking_targets),
+          deleted_slot_count: length(deleted_slot_ids)
+        }
+      })
+
       :ok
     else
       nil -> {:error, :not_found}
@@ -88,8 +97,8 @@ defmodule MilosTraining.Application.DeleteWorkout do
     end)
   end
 
-  defp broadcast_assignment_refresh(targets, workout_id) do
-    admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
+  defp broadcast_assignment_refresh(context, targets, workout_id) do
+    admin_ids = TenantStaffRecipients.user_ids(context)
 
     targets
     |> Enum.map(&Map.get(&1, :user_id))
@@ -101,8 +110,8 @@ defmodule MilosTraining.Application.DeleteWorkout do
     )
   end
 
-  defp broadcast_admin_workout_refresh(workout_id) do
-    admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
+  defp broadcast_admin_workout_refresh(context, workout_id) do
+    admin_ids = TenantStaffRecipients.user_ids(context)
 
     BroadcastUserSync.for_users(admin_ids, ["admin_workouts"],
       reason: "workout_deleted",

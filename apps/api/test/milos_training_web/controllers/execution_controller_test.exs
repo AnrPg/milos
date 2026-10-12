@@ -1,4 +1,6 @@
 defmodule MilosTrainingWeb.ExecutionControllerTest do
+  # TD-046: /api/executions is user-scoped, so tenant derivation must work
+  # under the RLS-enforcing runtime role, not only as a superuser.
   use MilosTrainingWeb.ConnCase, async: false
 
   import MilosTraining.TestFixtures, only: [slot_fixture: 2]

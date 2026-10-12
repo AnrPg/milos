@@ -35,18 +35,24 @@ defmodule MilosTrainingWeb.FallbackController do
   end
 
   def call(conn, {:error, :invalid_credentials}) do
+    emit_auth_anomaly(:invalid_credentials)
+
     conn
     |> put_status(:unauthorized)
     |> json(%{code: "invalid_credentials", error: "Invalid credentials"})
   end
 
   def call(conn, {:error, :invalid_refresh_token}) do
+    emit_auth_anomaly(:invalid_refresh_token)
+
     conn
     |> put_status(:unauthorized)
     |> json(%{code: "invalid_refresh_token", error: "Invalid refresh token"})
   end
 
   def call(conn, {:error, :invalid_token}) do
+    emit_auth_anomaly(:invalid_token)
+
     conn
     |> put_status(:unauthorized)
     |> json(%{code: "invalid_token", error: "Invalid token"})
@@ -343,6 +349,62 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-103 tenant logo upload.
+  def call(conn, {:error, :invalid_brand_logo_upload}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_brand_logo_upload",
+      error: "Use a PNG, JPEG, or WebP logo up to 2 MiB."
+    })
+  end
+
+  def call(conn, {:error, :brand_logo_upload_missing}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "brand_logo_upload_missing",
+      error: "The logo upload was not found in storage. Upload the image again."
+    })
+  end
+
+  def call(conn, {:error, :unsupported_brand_logo_type}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "unsupported_brand_logo_type",
+      error: "The uploaded file is not a PNG, JPEG, or WebP image."
+    })
+  end
+
+  def call(conn, {:error, {:brand_logo_too_large, byte_size}}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "brand_logo_too_large",
+      params: %{byte_size: byte_size, max_bytes: 2_097_152},
+      error: "The uploaded logo is larger than 2 MiB."
+    })
+  end
+
+  def call(conn, {:error, :brand_logo_key_forbidden}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "brand_logo_key_forbidden",
+      error: "The logo upload does not belong to this organization."
+    })
+  end
+
+  def call(conn, {:error, :brand_logo_storage_unavailable}) do
+    conn
+    |> put_status(:service_unavailable)
+    |> json(%{
+      code: "brand_logo_storage_unavailable",
+      error: "Logo storage could not be reached for verification. Try again shortly."
+    })
+  end
+
   def call(conn, {:error, :invalid_invoice_upload}) do
     emit_upload_rejection(:invalid_invoice_upload)
 
@@ -457,6 +519,69 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{
       code: "completion_processing_unavailable",
       error: "Workout completion processing is temporarily unavailable"
+    })
+  end
+
+  def call(conn, {:error, :invalid_training_log_source}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_training_log_source",
+      error: "Training log source type or reference is invalid"
+    })
+  end
+
+  def call(conn, {:error, :training_log_source_forbidden}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "training_log_source_forbidden",
+      error: "You cannot log a workout for this source"
+    })
+  end
+
+  def call(conn, {:error, :training_log_source_not_started}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "training_log_source_not_started",
+      error: "This class has not started yet"
+    })
+  end
+
+  def call(conn, {:error, :training_log_already_counted}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "training_log_already_counted",
+      error: "A completed workout execution already counts this workout"
+    })
+  end
+
+  def call(conn, {:error, :training_log_source_already_logged}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "training_log_source_already_logged",
+      error: "This workout has already been logged"
+    })
+  end
+
+  def call(conn, {:error, :training_log_entry_voided}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "training_log_entry_voided",
+      error: "Voided training log entries cannot be changed"
+    })
+  end
+
+  def call(conn, {:error, :stale_training_log_entry}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "stale_training_log_entry",
+      error: "This entry changed elsewhere. Reload before saving."
     })
   end
 
@@ -1168,6 +1293,15 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  def call(conn, {:error, :idempotency_key_conflict}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "idempotency_key_conflict",
+      error: "This operation id was already used for a different request"
+    })
+  end
+
   def call(conn, {:error, :booking_not_pending}) do
     conn
     |> put_status(:conflict)
@@ -1192,6 +1326,95 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-099 reviewed tenant purge workflow.
+  def call(conn, {:error, :organization_purge_exists}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "organization_purge_exists",
+      error: "This organization already has an open purge request"
+    })
+  end
+
+  def call(conn, {:error, :organization_purge_in_progress}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "organization_purge_in_progress",
+      error: "Cancel the open purge request before changing this organization's status"
+    })
+  end
+
+  def call(conn, {:error, :invalid_purge_transition}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "invalid_purge_transition",
+      error: "The purge request is not in a state that allows this action"
+    })
+  end
+
+  def call(conn, {:error, :purge_confirmation_mismatch}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "purge_confirmation_mismatch",
+      error: "Type the organization slug exactly to approve the purge"
+    })
+  end
+
+  # ADR-104 organization slug rename.
+  def call(conn, {:error, :invalid_slug}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_slug",
+      error: "Use 3-63 lowercase letters, digits and single hyphens"
+    })
+  end
+
+  def call(conn, {:error, :slug_unchanged}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "slug_unchanged", error: "The new slug matches the current slug"})
+  end
+
+  def call(conn, {:error, :slug_confirmation_mismatch}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "slug_confirmation_mismatch",
+      error: "Type the current organization slug exactly to confirm the rename"
+    })
+  end
+
+  def call(conn, {:error, :slug_taken}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "slug_taken",
+      error: "This slug belongs to another organization or is reserved as its previous slug"
+    })
+  end
+
+  def call(conn, {:error, :slug_rename_blocked_by_purge}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "slug_rename_blocked_by_purge",
+      error: "Cancel the open purge request before renaming this organization's slug"
+    })
+  end
+
+  def call(conn, {:error, :purge_job_unavailable}) do
+    conn
+    |> put_status(:service_unavailable)
+    |> json(%{
+      code: "purge_job_unavailable",
+      error: "Background processing is unavailable; resume the purge later"
+    })
+  end
+
   def call(conn, {:error, _reason}) do
     conn
     |> put_status(:internal_server_error)
@@ -1212,6 +1435,12 @@ defmodule MilosTrainingWeb.FallbackController do
     Enum.reduce(opts, msg, fn {key, value}, acc ->
       String.replace(acc, "%{#{key}}", to_string(value))
     end)
+  end
+
+  # Credential failures use a bounded reason set; ops/observability alert rules
+  # watch their rate for brute force and refresh-token reuse.
+  defp emit_auth_anomaly(reason) do
+    :telemetry.execute([:milos, :auth, :anomaly], %{count: 1}, %{reason: Atom.to_string(reason)})
   end
 
   defp emit_upload_rejection(reason) do

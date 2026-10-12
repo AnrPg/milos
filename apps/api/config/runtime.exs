@@ -60,10 +60,20 @@ config :milos_training, :meilisearch,
   api_key: meili_api_key,
   admin_member_index: System.get_env("MEILI_ADMIN_MEMBER_INDEX", "admin_members")
 
-otel_traces_endpoint = System.get_env("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT")
-otel_endpoint = otel_traces_endpoint || System.get_env("OTEL_EXPORTER_OTLP_ENDPOINT")
+# Compose passes optional observability variables through as empty strings
+# when they are unset in .env, so blank values must mean "not configured".
+present_env = fn name ->
+  case System.get_env(name) do
+    value when is_binary(value) -> if String.trim(value) == "", do: nil, else: String.trim(value)
+    nil -> nil
+  end
+end
 
-otel_service_name = System.get_env("OTEL_SERVICE_NAME", "milos-training-api")
+otel_traces_endpoint = present_env.("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT")
+otel_base_endpoint = present_env.("OTEL_EXPORTER_OTLP_ENDPOINT")
+otel_endpoint = otel_traces_endpoint || otel_base_endpoint
+
+otel_service_name = present_env.("OTEL_SERVICE_NAME") || "milos-training-api"
 
 if otel_endpoint do
   config :opentelemetry,
@@ -72,7 +82,7 @@ if otel_endpoint do
     resource: [
       service: [
         name: otel_service_name,
-        namespace: System.get_env("OTEL_SERVICE_NAMESPACE", "milos-training")
+        namespace: present_env.("OTEL_SERVICE_NAMESPACE") || "milos-training"
       ],
       deployment: [environment: Atom.to_string(config_env())]
     ]
@@ -81,7 +91,7 @@ if otel_endpoint do
     [
       otlp_protocol: :http_protobuf,
       otlp_compression: :gzip,
-      otlp_endpoint: System.get_env("OTEL_EXPORTER_OTLP_ENDPOINT", otel_endpoint)
+      otlp_endpoint: otel_base_endpoint || otel_endpoint
     ]
 
   exporter_config =
@@ -94,6 +104,35 @@ if otel_endpoint do
   config :opentelemetry_exporter, exporter_config
 else
   config :opentelemetry, traces_exporter: :none
+end
+
+# Internal Prometheus scrape listener (ADR-098). Disabled unless METRICS_PORT
+# is set. It binds its own port, separate from the Phoenix endpoint, which
+# Compose never publishes and Caddy never proxies. Production requires a
+# bearer token so a misrouted network cannot read operational telemetry.
+metrics_port = present_env.("METRICS_PORT")
+
+if metrics_port do
+  metrics_token = present_env.("METRICS_TOKEN")
+
+  if config_env() == :prod and (is_nil(metrics_token) or byte_size(metrics_token) < 32) do
+    raise "METRICS_TOKEN (at least 32 characters) is required when METRICS_PORT is set"
+  end
+
+  {:ok, metrics_ip} =
+    "METRICS_BIND_IP"
+    |> present_env.()
+    |> Kernel.||("0.0.0.0")
+    |> String.to_charlist()
+    |> :inet.parse_address()
+
+  config :milos_training, :prometheus_metrics,
+    enabled: true,
+    port: String.to_integer(metrics_port),
+    ip: metrics_ip,
+    token: metrics_token
+else
+  config :milos_training, :prometheus_metrics, enabled: false
 end
 
 if config_env() == :prod do

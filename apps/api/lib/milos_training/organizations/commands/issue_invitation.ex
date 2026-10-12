@@ -5,6 +5,7 @@ defmodule MilosTraining.Organizations.Commands.IssueInvitation do
     TenantAuthorization
   }
 
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Organizations.Domain.InvitationEmail
   alias MilosTraining.Organizations.OrganizationStore
 
@@ -26,7 +27,10 @@ defmodule MilosTraining.Organizations.Commands.IssueInvitation do
         intended_email_digest: InvitationEmail.digest(value(params, :intended_email))
       }
 
-      case OrganizationStore.issue_invitation(invitation_params, issued_at) do
+      # registration_invitations is a root tenant table (TD-046).
+      case RepoContext.run(context, fn ->
+             OrganizationStore.issue_invitation(invitation_params, issued_at)
+           end) do
         {:ok, invitation} -> {:ok, %{invitation: invitation, token: token}}
         error -> error
       end

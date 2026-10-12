@@ -4,6 +4,7 @@ defmodule MilosTrainingWeb.MyWorkoutController do
 
   alias Guardian.Plug, as: GuardianPlug
   alias MilosTraining.Application.GetAssignedWorkoutWeek
+  alias MilosTraining.Application.OpenAssignedWorkout
   alias MilosTraining.Application.RejectAssignedWorkout
   alias MilosTraining.Application.RequestWorkoutAssignment
   alias MilosTraining.Application.RescheduleAssignedWorkout
@@ -52,6 +53,32 @@ defmodule MilosTrainingWeb.MyWorkoutController do
     end
   end
 
+  operation(:open,
+    summary: "Athlete reports opening an assigned workout's detail (analytics, ADR-105)",
+    description:
+      "Records workout_assignment_opened once per athlete, assignment and UTC day. " <>
+        "Repeated calls the same day are accepted and ignored.",
+    parameters: [
+      %Parameter{
+        name: :id,
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, format: :uuid}
+      }
+    ],
+    responses: [
+      no_content: "Recorded (or already recorded today)",
+      not_found: {"Not found", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def open(conn, %{"id" => assignment_id}) do
+    case OpenAssignedWorkout.call(conn.assigns.tenant_context, assignment_id) do
+      :ok -> send_resp(conn, :no_content, "")
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
   operation(:reject,
     summary: "Athlete rejects an assigned workout",
     parameters: [
@@ -74,7 +101,7 @@ defmodule MilosTrainingWeb.MyWorkoutController do
   def reject(conn, %{"id" => assignment_id}) do
     user = GuardianPlug.current_resource(conn)
 
-    case RejectAssignedWorkout.call(assignment_id, user.id) do
+    case RejectAssignedWorkout.call(conn.assigns.tenant_context, assignment_id, user.id) do
       {:ok, assignment} -> json(conn, %{assignment: assignment})
       {:error, :not_found} -> {:error, :not_found}
       {:error, :already_rejected} -> {:error, :unprocessable_entity}

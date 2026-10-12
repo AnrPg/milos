@@ -1,5 +1,9 @@
 defmodule MilosTraining.Analytics.Ports.AnalyticsStore do
-  @callback record_event(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
+  @callback record_event(map()) :: {:ok, map() | :duplicate} | {:error, Ecto.Changeset.t()}
+  @callback record_events([map()]) ::
+              {:ok, %{inserted: non_neg_integer(), duplicates: non_neg_integer()}}
+              | {:error, Ecto.Changeset.t()}
+  @callback list_recorded_dedupe_keys(String.t(), [String.t()]) :: [String.t()]
   @callback record_notification_click(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback record_push_attempt(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback record_attendance(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}

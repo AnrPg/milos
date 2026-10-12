@@ -19,20 +19,24 @@ defmodule MilosTrainingWeb.ConnCase do
 
   using do
     quote do
-      # The default endpoint for testing
-      @endpoint MilosTrainingWeb.Endpoint
-
       use MilosTrainingWeb, :verified_routes
+
+      # TD-046: every request is dispatched as the RLS-enforcing runtime role
+      # (see MilosTrainingWeb.RLSEnforcedEndpoint). Set after the verified
+      # routes `use`, which assigns its own @endpoint.
+      @endpoint MilosTrainingWeb.RLSEnforcedEndpoint
 
       # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
       import MilosTrainingWeb.ConnCase
+      import MilosTraining.DataCase, only: [bypass_rls: 1]
     end
   end
 
   setup tags do
     MilosTraining.DataCase.setup_sandbox(tags)
+    MilosTrainingWeb.RLSEnforcedEndpoint.put_enforced(Map.get(tags, :rls_enforced, true))
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 

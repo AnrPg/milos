@@ -1,7 +1,13 @@
 defmodule MilosTraining.Application.TimeoutBooking do
   require Logger
 
-  alias MilosTraining.Application.{BroadcastUserSync, ResolveJobTenantContext, ScheduleRealtime}
+  alias MilosTraining.Application.{
+    BroadcastUserSync,
+    ResolveJobTenantContext,
+    ScheduleRealtime,
+    TrackAnalyticsEvent
+  }
+
   alias MilosTraining.{Finance, Notifications, Scheduling}
 
   def call(organization_id, booking_id) do
@@ -11,6 +17,12 @@ defmodule MilosTraining.Application.TimeoutBooking do
       reconcile_entitlement(context, timed_out_booking)
       dispatch_timeout_notification(timed_out_booking)
       broadcast_timeout(timed_out_booking)
+
+      TrackAnalyticsEvent.call("class_booking_timed_out", nil, timed_out_booking, %{
+        organization_id: organization_id,
+        user_id: timed_out_booking.user_id
+      })
+
       {:ok, timed_out_booking}
     else
       {:error, :not_found} -> :ok

@@ -85,6 +85,11 @@ function organizationSlugForRequest(token?: string | null) {
   return organizationSlugFromPath() ?? selectedOrganizationSlug() ?? organizationSlugFromToken(token);
 }
 
+/** The organization a tenant-scoped request would target right now. */
+export function currentOrganizationSlug(token?: string | null) {
+  return organizationSlugForRequest(token);
+}
+
 const TENANT_SCOPED_PREFIXES = [
   "/admin",
   "/bookings",
@@ -96,6 +101,7 @@ const TENANT_SCOPED_PREFIXES = [
   "/me/reviews",
   "/me/search/users",
   "/me/threads",
+  "/me/training-log",
   "/my-workouts",
   "/schedule",
 ];
@@ -131,6 +137,17 @@ function rememberOrganizationSlug(slug: string) {
   try {
     window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, slug);
   } catch {}
+}
+
+// ADR-104: the API resolves a retired organization slug transparently and
+// names the current one in this header. A remembered selection that still
+// holds the retired slug is updated so later requests use the new one.
+export const CANONICAL_ORGANIZATION_SLUG_HEADER = "x-organization-canonical-slug";
+
+function rememberCanonicalOrganizationSlug(response: Response, requestedSlug: string | null) {
+  const canonicalSlug = response.headers?.get?.(CANONICAL_ORGANIZATION_SLUG_HEADER);
+  if (!canonicalSlug || !requestedSlug || canonicalSlug === requestedSlug) return;
+  if (selectedOrganizationSlug() === requestedSlug) rememberOrganizationSlug(canonicalSlug);
 }
 
 let refreshPromise: Promise<string | null> | null = null;
@@ -318,6 +335,8 @@ export async function apiRequest<T>(
     body: options.body ? JSON.stringify(options.body) : undefined,
     credentials: "same-origin",
   });
+
+  rememberCanonicalOrganizationSlug(response, organizationSlug);
 
   if (response.status === 401 && allowRefresh && token) {
     const refreshedToken = await refreshAccessToken();

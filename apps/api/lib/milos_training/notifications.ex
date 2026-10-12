@@ -20,6 +20,11 @@ defmodule MilosTraining.Notifications do
 
   def create_notification(params), do: create_and_broadcast_notification(params)
 
+  # ADR-105: push dispatch result -> {outcome, reason_class} for analytics.
+  defdelegate classify_push_outcome(result),
+    to: MilosTraining.Notifications.Domain.PushDeliveryOutcome,
+    as: :classify
+
   def list_for_user(user_id),
     do:
       NotificationStore.with_user_context(%{user_id: user_id}, fn ->
@@ -281,8 +286,10 @@ defmodule MilosTraining.Notifications do
         nil ->
           "/admin/coaching-assignments?open_assignment=#{assigned_workout_id}"
 
+        # Assignments are normalized with ISO-8601 string dates (and job args
+        # are JSON), so accept both a Date and its string form.
         date ->
-          "/admin/coaching-assignments?open_assignment=#{assigned_workout_id}&date=#{Date.to_iso8601(date)}"
+          "/admin/coaching-assignments?open_assignment=#{assigned_workout_id}&date=#{iso_date(date)}"
       end
 
     payload
@@ -290,6 +297,7 @@ defmodule MilosTraining.Notifications do
     |> Enum.each(fn admin ->
       result =
         deliver_notification(admin.id, :workout_rejected, %{
+          organization_id: field(payload, :organization_id),
           assigned_workout_id: assigned_workout_id,
           workout_title: workout_title,
           athlete_nickname: athlete_nickname,
@@ -305,6 +313,9 @@ defmodule MilosTraining.Notifications do
 
     :ok
   end
+
+  defp iso_date(%Date{} = date), do: Date.to_iso8601(date)
+  defp iso_date(date) when is_binary(date), do: date
 
   def enqueue_athlete_message(payload) do
     sender_nickname = field(payload, :sender_nickname)
@@ -575,10 +586,12 @@ defmodule MilosTraining.Notifications do
 
       {:ok, notification} = ok ->
         broadcast_notification_changed(notification.user_id)
+        emit_delivered(notification)
         ok
 
       {:error, {:push_enqueue_failed, notification, _reason}} = error ->
         broadcast_notification_changed(notification.user_id)
+        emit_delivered(notification)
         error
 
       {:error, _reason} = error ->
@@ -623,6 +636,19 @@ defmodule MilosTraining.Notifications do
     )
   end
 
+  # ADR-105: a new in-app notification row is the in-app delivery. Emitted as
+  # telemetry (not a call into Analytics) so this context stays independent;
+  # MilosTraining.Application.RecordNotificationDelivered records it.
+  defp emit_delivered(notification) do
+    :telemetry.execute([:milos, :notification, :delivered], %{count: 1}, %{
+      notification_id: notification.id,
+      user_id: notification.user_id,
+      organization_id: Map.get(notification, :organization_id),
+      type: Map.get(notification, :type),
+      channel: "in_app"
+    })
+  end
+
   defp create_and_broadcast_notification(params) do
     user_id = Map.get(params, :user_id) || Map.get(params, "user_id")
 
@@ -636,6 +662,7 @@ defmodule MilosTraining.Notifications do
 
           _notification ->
             broadcast_notification_changed(notification.user_id)
+            emit_delivered(notification)
             ok
         end
 
@@ -702,4 +729,18 @@ defmodule MilosTraining.Notifications do
   defp challenge_completed_dedupe_key(user_id, payload) do
     NotificationDedupe.challenge_completed_key(user_id, field(payload, :challenge_id))
   end
+
+  # ADR-099 reviewed tenant export/purge. This context owns its table list and
+  # retention policy; the shared executor only runs what this policy declares,
+  # always inside a RepoContext session for the purge's tenant.
+  def tenant_data_policy, do: MilosTraining.Notifications.Domain.TenantDataPolicy.policy()
+
+  def tenant_data_inventory(context),
+    do: MilosTraining.TenantData.TableStore.inventory(tenant_data_policy(), context)
+
+  def export_tenant_data(context, mode \\ :full),
+    do: MilosTraining.TenantData.TableStore.export(tenant_data_policy(), context, mode)
+
+  def purge_tenant_data(context),
+    do: MilosTraining.TenantData.TableStore.purge(tenant_data_policy(), context)
 end

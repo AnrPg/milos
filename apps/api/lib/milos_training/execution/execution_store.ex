@@ -39,6 +39,13 @@ defmodule MilosTraining.Execution.ExecutionStore do
   def list_executions_for_kpis(since), do: adapter().list_executions_for_kpis(since)
 
   @impl true
+  def list_stale_executions(started_before, started_after, limit),
+    do: adapter().list_stale_executions(started_before, started_after, limit)
+
+  @impl true
+  def last_progress_at(execution_id), do: adapter().last_progress_at(execution_id)
+
+  @impl true
   def progress_operation_applied?(execution_id, user_id, operation_id),
     do: adapter().progress_operation_applied?(execution_id, user_id, operation_id)
 end

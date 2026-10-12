@@ -12,9 +12,11 @@ defmodule MilosTraining.Infrastructure.Observability.TelemetryLogReporter do
     [:milos_training, :repo, :query],
     [:milos, :communication, :message_recorded],
     [:milos, :readiness, :failure],
+    [:milos, :readiness, :check],
     [:milos, :upload, :rejected],
     [:milos, :outbox, :age],
     [:milos, :auth, :anomaly],
+    [:milos, :rate_limit, :rejected],
     [:milos, :cache, :state],
     [:oban, :job, :exception],
     [:oban, :job, :discard],
@@ -51,6 +53,8 @@ defmodule MilosTraining.Infrastructure.Observability.TelemetryLogReporter do
         :context,
         :dependency,
         :cache,
+        :operation,
+        :bucket,
         :failed
       ])
       |> Enum.reduce(%{}, fn {key, value}, tags ->

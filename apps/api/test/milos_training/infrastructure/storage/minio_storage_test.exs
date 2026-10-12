@@ -11,6 +11,26 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorageTest do
     assert operation.resource == "location"
   end
 
+  test "the public media bucket exposes only avatars and tenant logos (ADR-103)" do
+    %{Statement: [%{Action: action, Resource: resource}]} =
+      MinioStorage.public_read_policy("milos-avatars")
+
+    assert action == ["s3:GetObject"]
+
+    assert resource == [
+             "arn:aws:s3:::milos-avatars/users/*/avatars/*",
+             "arn:aws:s3:::milos-avatars/organizations/*/branding/logo/*"
+           ]
+  end
+
+  test "only branding objects have a public URL" do
+    assert {:ok, url} =
+             MinioStorage.public_object_url(:branding, "organizations/o/branding/logo/x.png")
+
+    assert String.ends_with?(url, "/organizations/o/branding/logo/x.png")
+    assert {:error, :not_public} = MinioStorage.public_object_url(:documents, "x")
+  end
+
   test "avatar uploads only require headers browsers may set" do
     assert MinioStorage.avatar_upload_headers("image/jpeg") == [
              {"content-type", "image/jpeg"}
@@ -92,5 +112,27 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorageTest do
 
     assert MinioStorage.avatar_metadata(headers, <<0xFF, 0xD8, 0xFF, 0xE0, "jpeg-rest">>) ==
              {:error, :avatar_upload_metadata_missing}
+  end
+
+  test "list-objects responses are parsed without SweetXml, including pagination tokens" do
+    body = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+      <Name>milos-invoices</Name><IsTruncated>true</IsTruncated>
+      <NextContinuationToken>tok&amp;en</NextContinuationToken>
+      <Contents><Key>organizations/o/invoices/1/a&amp;b.pdf</Key><Size>42</Size></Contents>
+      <Contents><Key>organizations/o/branding/logo.png</Key><Size>7</Size></Contents>
+    </ListBucketResult>
+    """
+
+    assert {[
+              %{key: "organizations/o/invoices/1/a&b.pdf", size: 42},
+              %{key: "organizations/o/branding/logo.png", size: 7}
+            ], "tok&en"} = MinioStorage.parse_list_objects_xml(body)
+
+    assert {[], nil} =
+             MinioStorage.parse_list_objects_xml(
+               "<ListBucketResult><IsTruncated>false</IsTruncated></ListBucketResult>"
+             )
   end
 end

@@ -18,7 +18,8 @@ defmodule MilosTrainingWeb.GamificationPreferencesController do
   def show(conn, _params) do
     current_user = Guardian.Plug.current_resource(conn)
 
-    with {:ok, prefs} <- GetGamificationPreferences.call(current_user.id) do
+    with {:ok, prefs} <-
+           GetGamificationPreferences.call(conn.assigns.user_context, current_user.id) do
       json(conn, %{preferences: prefs || %{off_days: []}})
     end
   end
@@ -47,7 +48,8 @@ defmodule MilosTrainingWeb.GamificationPreferencesController do
   def update(conn, params) do
     current_user = Guardian.Plug.current_resource(conn)
 
-    with {:ok, prefs} <- UpdateGamificationPreferences.call(current_user.id, params) do
+    with {:ok, prefs} <-
+           UpdateGamificationPreferences.call(conn.assigns.user_context, current_user.id, params) do
       json(conn, %{preferences: prefs})
     end
   end

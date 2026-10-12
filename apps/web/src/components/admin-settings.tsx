@@ -6,7 +6,7 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
@@ -23,6 +23,8 @@ import {
   type FinanceCleanupRecord,
 } from "@/api/finance";
 import { listScaleLevels, replaceScaleLevels, type ScaleLevel } from "@/api/workouts";
+import { adminLogoApi, fetchAdminBranding } from "@/api/organization-branding";
+import { TenantLogoUploader } from "@/components/branding/TenantLogoUploader";
 import { useSession } from "@/components/session-provider";
 import { THEME_UPDATED_EVENT } from "@/components/theme-provider";
 import { APP_THEMES, THEME_SLUGS, normalizeThemeSlug, type ThemeSlug } from "@/lib/theme";
@@ -251,6 +253,43 @@ function AppearanceSection({ token }: { token: string }) {
         onReset={() => setThemeSlug(serverSlug)}
       />
     </div>
+  );
+}
+
+// ── Branding section (ADR-103) ───────────────────────────────────────────────
+
+function BrandingSection({ token }: { token: string }) {
+  const i18n = useUiTranslations();
+  const queryClient = useQueryClient();
+  const brandingQuery = useQuery({
+    queryKey: ["admin", "branding"],
+    queryFn: () => fetchAdminBranding(token),
+  });
+  const api = useMemo(() => adminLogoApi(token), [token]);
+
+  if (brandingQuery.isError) {
+    return (
+      <p className="text-sm" style={{ color: "var(--danger)" }}>
+        {localizeError(brandingQuery.error, i18n)}
+      </p>
+    );
+  }
+
+  if (!brandingQuery.data) {
+    return <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>;
+  }
+
+  return (
+    <TenantLogoUploader
+      api={api}
+      currentUrl={brandingQuery.data.brand_logo_url ?? null}
+      uploaded={brandingQuery.data.brand_logo_uploaded}
+      onChange={(branding) => {
+        queryClient.setQueryData(["admin", "branding"], branding);
+        // The shell header and organization selector read the logo from memberships.
+        void queryClient.invalidateQueries({ queryKey: ["organization-memberships"] });
+      }}
+    />
   );
 }
 
@@ -1135,6 +1174,14 @@ export function AdminSettingsHub() {
               description={i18n("appColourPalette9dc5de5")}
             >
               <AppearanceSection token={token} />
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              id="branding"
+              title={i18n("brandingSectionTitle")}
+              description={i18n("brandingSectionDescription")}
+            >
+              <BrandingSection token={token} />
             </CollapsibleSection>
 
             <CollapsibleSection

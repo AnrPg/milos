@@ -1,4 +1,5 @@
 defmodule MilosTraining.Application.WithdrawBooking do
+  alias MilosTraining.Application.TrackAnalyticsEvent
   alias MilosTraining.{Finance, Notifications, Scheduling}
 
   def call(context, user_id, booking_id) do
@@ -7,6 +8,11 @@ defmodule MilosTraining.Application.WithdrawBooking do
          {:ok, withdrawn_booking} <-
            Scheduling.withdraw_booking(context, booking_id, reconciliation(booking)) do
       reconcile_now(booking)
+
+      TrackAnalyticsEvent.call("class_booking_cancelled", context, withdrawn_booking, %{
+        metadata: %{cancelled_by: "member", previous_status: booking.status}
+      })
+
       {:ok, withdrawn_booking}
     else
       nil -> {:error, :not_found}

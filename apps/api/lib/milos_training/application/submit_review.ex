@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.SubmitReview do
-  alias MilosTraining.Application.{BroadcastUserSync, RecordAnalyticsEvent}
+  alias MilosTraining.Application.{BroadcastUserSync, RecordAnalyticsEvent, TenantStaffRecipients}
   alias MilosTraining.Feedback.Domain.ReviewEligibility
 
   alias MilosTraining.{
@@ -7,7 +7,6 @@ defmodule MilosTraining.Application.SubmitReview do
     Execution,
     Feedback,
     Finance,
-    Identity,
     Notifications,
     Scheduling,
     Workouts
@@ -33,7 +32,7 @@ defmodule MilosTraining.Application.SubmitReview do
         }
       })
 
-      broadcast_review_submitted(user_id, review.id)
+      broadcast_review_submitted(user_id, review)
       dispatch_review_notification(user_id, review)
 
       {:ok, review}
@@ -151,7 +150,6 @@ defmodule MilosTraining.Application.SubmitReview do
 
   defp target_label("private_coaching"), do: "Private coaching"
   defp target_label(type) when is_binary(type), do: String.replace(type, "_", " ")
-  defp target_label(_type), do: "Review target"
 
   defp normalize_target_type("private_coaching"), do: "coaching_parameter"
   defp normalize_target_type(type), do: type
@@ -240,8 +238,9 @@ defmodule MilosTraining.Application.SubmitReview do
 
   defp get_attendance(_context, _user_id, _slot_id), do: nil
 
-  defp broadcast_review_submitted(user_id, review_id) do
-    admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
+  defp broadcast_review_submitted(user_id, review) do
+    review_id = review.id
+    admin_ids = TenantStaffRecipients.user_ids(review)
 
     BroadcastUserSync.for_user(user_id, ["my_reviews"],
       reason: "review_submitted",

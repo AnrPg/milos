@@ -85,29 +85,52 @@ defmodule MilosTrainingWeb.ScheduleController do
     ]
   )
 
+  @booking_response %Schema{
+    type: :object,
+    properties: %{booking: %Schema{type: :object, additionalProperties: true}},
+    required: [:booking]
+  }
+
+  @error_response %Schema{
+    type: :object,
+    properties: %{code: %Schema{type: :string}, error: %Schema{type: :string}}
+  }
+
   operation(:create_booking,
     summary: "Book a schedule slot",
+    description:
+      "Optionally idempotent per `client_operation_id` (ADR-102): replaying the same id for " <>
+        "the same slot returns the original booking with 200 and no new reservation, " <>
+        "notification, or broadcast; reusing it for another slot returns 409 " <>
+        "`idempotency_key_conflict`.",
     request_body: %RequestBody{
       required: true,
       content: %{
         "application/json" => %MediaType{
           schema: %Schema{
             type: :object,
-            properties: %{slot_id: %Schema{type: :string, format: :uuid}},
+            properties: %{
+              slot_id: %Schema{type: :string, format: :uuid},
+              client_operation_id: %Schema{
+                type: :string,
+                format: :uuid,
+                nullable: true,
+                description: "Stable client operation id for offline replay dedupe"
+              }
+            },
             required: [:slot_id]
           }
         }
       }
     },
     responses: [
-      created:
-        {"Booking", "application/json",
-         %Schema{
-           type: :object,
-           properties: %{booking: %Schema{type: :object, additionalProperties: true}},
-           required: [:booking]
-         }},
-      forbidden: {"Finance entitlement denied", "application/json", %Schema{type: :object}}
+      created: {"Booking", "application/json", @booking_response},
+      ok: {"Replayed booking", "application/json", @booking_response},
+      forbidden: {"Finance entitlement denied", "application/json", %Schema{type: :object}},
+      conflict:
+        {"Slot full, already booked, or operation id conflict", "application/json",
+         @error_response},
+      unprocessable_entity: {"Invalid request", "application/json", @error_response}
     ]
   )
 
@@ -119,19 +142,20 @@ defmodule MilosTrainingWeb.ScheduleController do
     end
   end
 
-  def create_booking(conn, %{"slot_id" => slot_id}) do
+  def create_booking(conn, params) do
     actor = GuardianPlug.current_resource(conn)
+    body = conn.body_params |> normalize_body_params(params)
+    slot_id = ParamExtractor.get(body, "slot_id")
+    operation_id = ParamExtractor.get(body, "client_operation_id")
 
-    with {:ok, booking} <- SubmitBooking.call(conn.assigns.tenant_context, actor, slot_id) do
+    with {:ok, booking, outcome} <-
+           SubmitBooking.call(conn.assigns.tenant_context, actor, slot_id,
+             client_operation_id: operation_id
+           ) do
       conn
-      |> put_status(:created)
+      |> put_status(if(outcome == :created, do: :created, else: :ok))
       |> json(%{booking: booking})
     end
-  end
-
-  def create_booking(conn, params) do
-    body = conn.body_params |> normalize_body_params(params)
-    create_booking(conn, %{"slot_id" => body["slot_id"] || body[:slot_id]})
   end
 
   operation(:delete_booking,
