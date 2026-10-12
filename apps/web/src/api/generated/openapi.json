@@ -2,6 +2,69 @@
   "components": {
     "responses": {},
     "schemas": {
+      "AdminOnboardingChecklist": {
+        "properties": {
+          "completed_count": {
+            "type": "integer"
+          },
+          "dismissed": {
+            "type": "boolean"
+          },
+          "finished": {
+            "type": "boolean"
+          },
+          "steps": {
+            "items": {
+              "properties": {
+                "auto": {
+                  "type": "boolean"
+                },
+                "done": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "enum": [
+                    "settings",
+                    "classes",
+                    "packages",
+                    "workout",
+                    "invite",
+                    "tour"
+                  ],
+                  "type": "string"
+                },
+                "skipped": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "done",
+                "auto",
+                "skipped"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "tour_completed": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "steps",
+          "completed_count",
+          "total",
+          "finished",
+          "dismissed",
+          "tour_completed"
+        ],
+        "title": "AdminOnboardingChecklist",
+        "type": "object"
+      },
       "FreeTextWorkoutAnalysis": {
         "properties": {
           "issues": {
@@ -11178,6 +11241,217 @@
         "summary": "Return the authenticated user",
         "tags": [
           "Authentication"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/onboarding": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminOnboardingController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "completed_count": {
+                      "type": "integer"
+                    },
+                    "dismissed": {
+                      "type": "boolean"
+                    },
+                    "finished": {
+                      "type": "boolean"
+                    },
+                    "steps": {
+                      "items": {
+                        "properties": {
+                          "auto": {
+                            "type": "boolean"
+                          },
+                          "done": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "enum": [
+                              "settings",
+                              "classes",
+                              "packages",
+                              "workout",
+                              "invite",
+                              "tour"
+                            ],
+                            "type": "string"
+                          },
+                          "skipped": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "done",
+                          "auto",
+                          "skipped"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "tour_completed": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "steps",
+                    "completed_count",
+                    "total",
+                    "finished",
+                    "dismissed",
+                    "tour_completed"
+                  ],
+                  "title": "AdminOnboardingChecklist",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Checklist"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get the admin onboarding checklist",
+        "tags": [
+          "Admin Onboarding"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminOnboardingController.update",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "action": {
+                    "enum": [
+                      "complete",
+                      "skip",
+                      "reopen",
+                      "dismiss",
+                      "restore",
+                      "tour_completed"
+                    ],
+                    "type": "string"
+                  },
+                  "step": {
+                    "enum": [
+                      "settings",
+                      "classes",
+                      "packages",
+                      "workout",
+                      "invite",
+                      "tour"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "action"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "completed_count": {
+                      "type": "integer"
+                    },
+                    "dismissed": {
+                      "type": "boolean"
+                    },
+                    "finished": {
+                      "type": "boolean"
+                    },
+                    "steps": {
+                      "items": {
+                        "properties": {
+                          "auto": {
+                            "type": "boolean"
+                          },
+                          "done": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "enum": [
+                              "settings",
+                              "classes",
+                              "packages",
+                              "workout",
+                              "invite",
+                              "tour"
+                            ],
+                            "type": "string"
+                          },
+                          "skipped": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "done",
+                          "auto",
+                          "skipped"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "tour_completed": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "steps",
+                    "completed_count",
+                    "total",
+                    "finished",
+                    "dismissed",
+                    "tour_completed"
+                  ],
+                  "title": "AdminOnboardingChecklist",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Checklist"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Complete, skip or reopen a step, dismiss the popup or record the finished tour",
+        "tags": [
+          "Admin Onboarding"
         ]
       }
     },

@@ -1042,6 +1042,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/onboarding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the admin onboarding checklist */
+        get: operations["MilosTrainingWeb.AdminOnboardingController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Complete, skip or reopen a step, dismiss the popup or record the finished tour */
+        patch: operations["MilosTrainingWeb.AdminOnboardingController.update"];
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/users/{id}/messages": {
         parameters: {
             query?: never;
@@ -2832,6 +2850,21 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AdminOnboardingChecklist */
+        AdminOnboardingChecklist: {
+            completed_count: number;
+            dismissed: boolean;
+            finished: boolean;
+            steps: {
+                auto: boolean;
+                done: boolean;
+                /** @enum {string} */
+                id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour";
+                skipped: boolean;
+            }[];
+            total: number;
+            tour_completed: boolean;
+        };
         /** FreeTextWorkoutAnalysis */
         FreeTextWorkoutAnalysis: {
             issues: {
@@ -7229,6 +7262,81 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminOnboardingController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Checklist */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        completed_count: number;
+                        dismissed: boolean;
+                        finished: boolean;
+                        steps: {
+                            auto: boolean;
+                            done: boolean;
+                            /** @enum {string} */
+                            id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour";
+                            skipped: boolean;
+                        }[];
+                        total: number;
+                        tour_completed: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminOnboardingController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    action: "complete" | "skip" | "reopen" | "dismiss" | "restore" | "tour_completed";
+                    /** @enum {string} */
+                    step?: "settings" | "classes" | "packages" | "workout" | "invite" | "tour";
+                };
+            };
+        };
+        responses: {
+            /** @description Checklist */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        completed_count: number;
+                        dismissed: boolean;
+                        finished: boolean;
+                        steps: {
+                            auto: boolean;
+                            done: boolean;
+                            /** @enum {string} */
+                            id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour";
+                            skipped: boolean;
+                        }[];
+                        total: number;
+                        tour_completed: boolean;
                     };
                 };
             };
