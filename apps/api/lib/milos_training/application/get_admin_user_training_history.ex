@@ -48,7 +48,8 @@ defmodule MilosTraining.Application.GetAdminUserTrainingHistory do
       started_at_utc: execution.started_at_utc,
       completed_at_utc: execution.completed_at_utc,
       total_elapsed_ms: execution.total_elapsed_ms,
-      section_scores: execution.section_scores || []
+      section_scores: execution.section_scores || [],
+      duration_adjustments: Map.get(execution, :duration_adjustments) || %{}
     }
   end
 

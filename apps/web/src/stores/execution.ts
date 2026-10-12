@@ -31,7 +31,10 @@ type ExecutionState = {
   lockVersion: number;
   workoutId: string | null;
   scaleSlug: string | null;
+  /** The sequence with this execution's clock adjustments applied (what runs). */
   segments: TimerSegment[];
+  /** The sequence as authored, before clock adjustments. */
+  baseSegments: TimerSegment[];
   currentSegmentIndex: number;
   status: ExecutionStatus;
   segmentStartedAt: number | null;
@@ -131,6 +134,7 @@ const initialState = {
   workoutId: null,
   scaleSlug: null,
   segments: [],
+  baseSegments: [] as TimerSegment[],
   currentSegmentIndex: 0,
   status: "idle" as ExecutionStatus,
   segmentStartedAt: null,
@@ -152,6 +156,8 @@ const initialState = {
 const isCountdown = (segment: TimerSegment | undefined) => segment?.kind === "countdown";
 
 const MIN_ADJUSTED_SECONDS = 5;
+/** Matches the API's bound on a single segment's adjustment. */
+const MAX_ADJUSTMENT_SECONDS = 3_600;
 
 function isAdjustable(segment: TimerSegment | undefined): segment is TimerSegment & { duration_seconds: number } {
   return Boolean(
@@ -170,12 +176,25 @@ export function applyDurationAdjustments(segments: TimerSegment[], adjustments: 
   });
 }
 
-function marksOf(state: Pick<ExecutionState, "checkedExerciseIds" | "segmentCycleCounts" | "sectionScores">): ProgressMarks {
+function marksOf(
+  state: Pick<ExecutionState, "checkedExerciseIds" | "segmentCycleCounts" | "sectionScores" | "durationAdjustments">,
+): ProgressMarks {
   return {
     checkedExerciseIds: state.checkedExerciseIds,
     segmentCycleCounts: state.segmentCycleCounts,
     sectionScores: state.sectionScores,
+    durationAdjustments: state.durationAdjustments,
   };
+}
+
+/** The API stores adjustments enriched for coaches; the client works with plain deltas. */
+export function adjustmentDeltas(stored: WorkoutExecution["duration_adjustments"]): Record<string, number> {
+  const deltas: Record<string, number> = {};
+  for (const [key, value] of Object.entries(stored ?? {})) {
+    const delta = typeof value === "number" ? value : value?.delta_seconds;
+    if (typeof delta === "number" && Number.isFinite(delta) && delta !== 0) deltas[key] = Math.round(delta);
+  }
+  return deltas;
 }
 
 function serverMarks(execution: WorkoutExecution): ProgressMarks {
@@ -183,6 +202,7 @@ function serverMarks(execution: WorkoutExecution): ProgressMarks {
     checkedExerciseIds: normalizeCheckedExerciseIds(execution.checked_exercise_ids),
     segmentCycleCounts: execution.segment_cycle_counts ?? {},
     sectionScores: execution.section_scores,
+    durationAdjustments: adjustmentDeltas(execution.duration_adjustments),
   };
 }
 
@@ -255,6 +275,7 @@ export const useExecutionStore = create<ExecutionState>()(
           workoutId,
           scaleSlug,
           segments,
+          baseSegments: segments,
           checkedExerciseIds: normalizeCheckedExerciseIds(checkedExerciseIds),
           sectionScores,
           exerciseNotes,
@@ -270,16 +291,22 @@ export const useExecutionStore = create<ExecutionState>()(
             checkedExerciseIds: normalizeCheckedExerciseIds(checkedExerciseIds),
             segmentCycleCounts,
             sectionScores,
+            durationAdjustments: {},
           },
         }),
 
       hydrateFromExecution: (execution, segments) =>
         set((state) => {
           const sameExecution = state.executionId === execution.id;
-          const durationAdjustments = sameExecution ? state.durationAdjustments : {};
-          const nextSegments = segments
-            ? applyDurationAdjustments(segments, durationAdjustments)
-            : state.segments;
+          // The server copy is authoritative; older APIs without the field keep local changes.
+          const durationAdjustments =
+            execution.duration_adjustments !== undefined
+              ? adjustmentDeltas(execution.duration_adjustments)
+              : sameExecution
+                ? state.durationAdjustments
+                : {};
+          const baseSegments = segments ?? (state.baseSegments.length > 0 ? state.baseSegments : state.segments);
+          const nextSegments = applyDurationAdjustments(baseSegments, durationAdjustments);
           const banked = Math.max(0, execution.paused_elapsed_ms ?? 0);
           const currentKey = sectionTimeKey(nextSegments[execution.current_segment_index]);
           const sectionElapsedMs = { ...(execution.section_elapsed_ms ?? {}) };
@@ -293,6 +320,7 @@ export const useExecutionStore = create<ExecutionState>()(
             workoutId: execution.master_workout_id,
             scaleSlug: execution.scale_level_slug,
             segments: nextSegments,
+            baseSegments,
             currentSegmentIndex: execution.current_segment_index,
             status: executionStatusFromApi(execution.status),
             segmentStartedAt:
@@ -330,7 +358,14 @@ export const useExecutionStore = create<ExecutionState>()(
         const rebased = rebaseProgressMarks(base, local, server);
         if (!hasMarkChanges(server, rebased)) return false;
 
-        set({ ...rebased, syncedMarks: server, pendingSync: true });
+        const adjustments = rebased.durationAdjustments ?? {};
+        set((state) => ({
+          ...rebased,
+          durationAdjustments: adjustments,
+          segments: applyDurationAdjustments(state.baseSegments, adjustments),
+          syncedMarks: server,
+          pendingSync: true,
+        }));
         return true;
       },
 
@@ -434,27 +469,41 @@ export const useExecutionStore = create<ExecutionState>()(
       adjustSegmentDuration: (index, deltaSeconds) =>
         set((state) => {
           const segment = state.segments[index];
-          if (!isAdjustable(segment) || deltaSeconds === 0) return state;
+          const authored = state.baseSegments[index] ?? segment;
+          if (!isAdjustable(segment) || !isAdjustable(authored) || deltaSeconds === 0) return state;
 
           const ranSeconds =
             index === state.currentSegmentIndex ? Math.ceil(state.currentElapsedMs() / 1000) + 1 : 0;
-          const nextDuration = Math.max(MIN_ADJUSTED_SECONDS, ranSeconds, segment.duration_seconds + deltaSeconds);
-          const applied = nextDuration - segment.duration_seconds;
-          if (applied === 0) return state;
+          const nextDuration = Math.min(
+            authored.duration_seconds + MAX_ADJUSTMENT_SECONDS,
+            Math.max(
+              MIN_ADJUSTED_SECONDS,
+              ranSeconds,
+              authored.duration_seconds - MAX_ADJUSTMENT_SECONDS,
+              segment.duration_seconds + deltaSeconds,
+            ),
+          );
+          if (nextDuration === segment.duration_seconds) return state;
+
+          const durationAdjustments = { ...state.durationAdjustments };
+          const delta = nextDuration - authored.duration_seconds;
+          if (delta === 0) delete durationAdjustments[segment.segment_key];
+          else durationAdjustments[segment.segment_key] = delta;
 
           return {
-            segments: state.segments.map((candidate, candidateIndex) =>
-              candidateIndex === index ? { ...candidate, duration_seconds: nextDuration } : candidate,
+            durationAdjustments,
+            segments: applyDurationAdjustments(
+              state.baseSegments.length > 0 ? state.baseSegments : state.segments,
+              durationAdjustments,
             ),
-            durationAdjustments: {
-              ...state.durationAdjustments,
-              [segment.segment_key]: (state.durationAdjustments[segment.segment_key] ?? 0) + applied,
-            },
           };
         }),
 
       setSegments: (segments) =>
-        set((state) => ({ segments: applyDurationAdjustments(segments, state.durationAdjustments) })),
+        set((state) => ({
+          baseSegments: segments,
+          segments: applyDurationAdjustments(segments, state.durationAdjustments),
+        })),
 
       countKpi: (key, amount = 1) =>
         set((state) => ({
@@ -587,6 +636,7 @@ export const useExecutionStore = create<ExecutionState>()(
             ? new Date(state.resumeCountdownEndsAt).toISOString()
             : null,
           kpi_counters: state.kpiCounters,
+          duration_adjustments: state.durationAdjustments,
         };
       },
 
@@ -601,6 +651,7 @@ export const useExecutionStore = create<ExecutionState>()(
         workoutId: state.workoutId,
         scaleSlug: state.scaleSlug,
         segments: state.segments,
+        baseSegments: state.baseSegments,
         currentSegmentIndex: state.currentSegmentIndex,
         status: state.status,
         segmentStartedAt: state.segmentStartedAt,

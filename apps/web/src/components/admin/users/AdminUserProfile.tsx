@@ -22,6 +22,8 @@ import {
   type AdminUserFinance,
   type AdminUserPR,
 } from "@/api/admin-users";
+import type { DurationAdjustment } from "@/api/executions";
+import { formatClock } from "@/components/workouts/execution/TimerDisplay";
 import type { PRSupportingMetrics } from "@/api/gamification";
 import type { EffectiveEntitlement } from "@/api/my-finance";
 import { updateFinanceMember } from "@/api/finance";
@@ -201,6 +203,7 @@ function ExecutionCard({ item, href }: { item: AdminUserExecution; href?: string
       value={item.total_elapsed_ms ? `${Math.round(item.total_elapsed_ms / 60000)}m` : undefined}
       href={href}
     >
+      <ClockAdjustments adjustments={item.duration_adjustments} />
       {item.section_scores?.length ? (
         <div className="grid gap-2 sm:grid-cols-2">
           {item.section_scores.slice(0, 6).map((score, index) => (
@@ -214,6 +217,28 @@ function ExecutionCard({ item, href }: { item: AdminUserExecution; href?: string
         <Empty>{i18n("noScoredWorkoutSectionsRecordedcfa7742")}</Empty>
       )}
     </DetailCard>
+  );
+}
+
+/** "AMRAP 12: 12:00 → 14:00 (+2:00)" for each clock the athlete changed. */
+function ClockAdjustments({ adjustments }: { adjustments?: Record<string, DurationAdjustment> }) {
+  const i18n = useUiTranslations();
+  const entries = Object.values(adjustments ?? {}).filter((entry) => entry && entry.delta_seconds);
+  if (entries.length === 0) return null;
+
+  return (
+    <ul className="mb-2 grid gap-1 text-xs" aria-label={i18n("clockAdjustmentsLabel")} style={{ color: "var(--warning, var(--muted))" }}>
+      {entries.map((entry, index) => (
+        <li key={index}>
+          {i18n("clockAdjustedLabel", {
+            name: entry.section_name || entry.label || "—",
+            from: formatClock(entry.authored_seconds),
+            to: formatClock(entry.authored_seconds + entry.delta_seconds),
+            delta: `${entry.delta_seconds > 0 ? "+" : "−"}${formatClock(Math.abs(entry.delta_seconds))}`,
+          })}
+        </li>
+      ))}
+    </ul>
   );
 }
 

@@ -676,6 +676,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/class-timers/{slot_id}/commands": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Run a class timer command (coaches and admins) */
+        post: operations["MilosTrainingWeb.ClassTimerController.command"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/members/{id}/credits": {
         parameters: {
             query?: never;
@@ -2064,6 +2081,23 @@ export interface paths {
         put?: never;
         /** Issue a tenant invitation from the platform console */
         post: operations["MilosTrainingWeb.PlatformOrganizationController.invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/class-timers/{slot_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read the coach-run timer of a scheduled class */
+        get: operations["MilosTrainingWeb.ClassTimerController.show"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3573,6 +3607,10 @@ export interface operations {
                 "application/json": {
                     checked_exercise_ids: string[];
                     current_segment_index: number;
+                    /** @description Mid-workout clock changes in seconds, by segment key (countdowns and capped count-ups only). */
+                    duration_adjustments?: {
+                        [key: string]: number;
+                    };
                     expected_version: number;
                     /** @description Device-observed execution KPIs (skips, countdown_skips, countdown_segments, pauses, paused_ms, finish_wizard_opens, first_started_at_ms). Counters never decrease. */
                     kpi_counters?: {
@@ -5604,6 +5642,125 @@ export interface operations {
                 };
             };
             /** @description Invalid timer configuration */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ClassTimerController.command": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Scheduled class ID */
+                slot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    command: "start" | "pause" | "resume" | "next" | "previous" | "jump" | "adjust" | "reset" | "finish" | "configure";
+                    countdown_seconds?: number;
+                    delta_seconds?: number;
+                    expected_version?: number | null;
+                    index?: number;
+                    timer_preset?: {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Class timer */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class: {
+                            duration_minutes?: number;
+                            /** Format: uuid */
+                            id?: string;
+                            name?: string;
+                            /** Format: date-time */
+                            scheduled_at?: string;
+                        };
+                        segments: {
+                            [key: string]: unknown;
+                        }[];
+                        /** Format: date-time */
+                        server_now: string;
+                        timer: {
+                            current_segment_index: number;
+                            duration_adjustments?: {
+                                [key: string]: unknown;
+                            };
+                            lock_version: number;
+                            paused_elapsed_ms: number;
+                            /** Format: date-time */
+                            segment_started_at_utc?: string | null;
+                            /** @enum {string} */
+                            status: "ready" | "running" | "paused" | "finished";
+                            timer_preset?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                        };
+                        workout?: {
+                            [key: string]: unknown;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Stale class timer version */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Invalid command */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -10398,6 +10555,10 @@ export interface operations {
             content: {
                 "application/json": {
                     checked_exercise_ids?: string[];
+                    /** @description Mid-workout clock changes in seconds, by segment key (countdowns and capped count-ups only). */
+                    duration_adjustments?: {
+                        [key: string]: number;
+                    };
                     /** @description Device-observed execution KPIs (skips, countdown_skips, countdown_segments, pauses, paused_ms, finish_wizard_opens, first_started_at_ms). Counters never decrease. */
                     kpi_counters?: {
                         [key: string]: number;
@@ -12326,6 +12487,75 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ClassTimerController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Scheduled class ID */
+                slot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Class timer */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class: {
+                            duration_minutes?: number;
+                            /** Format: uuid */
+                            id?: string;
+                            name?: string;
+                            /** Format: date-time */
+                            scheduled_at?: string;
+                        };
+                        segments: {
+                            [key: string]: unknown;
+                        }[];
+                        /** Format: date-time */
+                        server_now: string;
+                        timer: {
+                            current_segment_index: number;
+                            duration_adjustments?: {
+                                [key: string]: unknown;
+                            };
+                            lock_version: number;
+                            paused_elapsed_ms: number;
+                            /** Format: date-time */
+                            segment_started_at_utc?: string | null;
+                            /** @enum {string} */
+                            status: "ready" | "running" | "paused" | "finished";
+                            timer_preset?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                        };
+                        workout?: {
+                            [key: string]: unknown;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
                     };
                 };
             };

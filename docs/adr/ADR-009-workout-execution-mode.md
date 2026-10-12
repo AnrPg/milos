@@ -218,9 +218,8 @@ progress, and the IndexedDB check-off queue.
   mark. Check-offs still waiting in that old queue are adopted once on load
   (`legacy-offline-queue.ts`, to be removed after one release).
 - **Clock adjustments**: +/-30 s from the pause sheet changes the segment's
-  length on the device and is remembered per execution (re-applied when the
-  sequence is re-fetched). It never shortens below what already ran, and it is
-  not sent to the server, so another device keeps the authored length.
+  length. It never shortens below what already ran (superseded below: the
+  change is now synced).
 - **Localized labels**: segments carry `label_key` and `label_params` next to
   the English `label`; clients render the key in the viewer's language and
   fall back to `label` for unknown keys.
@@ -234,3 +233,39 @@ progress, and the IndexedDB check-off queue.
   stale snapshots never lower them. `ExecutionKpis.summarize/1` turns those
   counters plus the execution records into the `execution` block of the admin
   analytics summary.
+
+## Synced Adjustments, Free-Text Progress, KPI Dashboard and Class Wall Display — 2026-10-12
+
+- **Clock adjustments are synced.** Progress and completion payloads carry
+  `duration_adjustments` (`segment_key → delta seconds`). The API keeps them
+  only for countdowns and capped count-ups in the validated sequence (±1 h,
+  never below 5 s; unknown keys are dropped so a device can't get stuck) and
+  stores each with the authored length and section name. Every device applies
+  the server's copy to the authored sequence on load, conflict rebases treat
+  them like round deltas, the finish review shows them, and coaches see
+  "AMRAP 12: 12:00 → 14:00 (+2:00)" in the athlete's training history.
+- **Free-text progress.** Free-text workouts save their clock every 30 s
+  while running and on pause/resume/reset/hide, with device KPIs (pauses,
+  paused time, resets, first start, review opens). With no timer segments
+  the server lets that single clock go back (a reset); structured workouts
+  keep monotonic elapsed totals.
+- **Where workouts stop.** The server records `kpi_counters.position`
+  (format, section, segment, elapsed) and the workout's `formats` on every
+  progress write. The KPI report adds stopping points by format and section,
+  completion by format and by source, structured vs free text, a daily trend,
+  median workout time and the share of workouts whose clock was changed. The
+  admin training analytics page shows them (7/30/90 days, table view for the
+  trend).
+- **Class wall display.** `class_timers` holds one coach-run timer per
+  scheduled class (RLS by organization): status, segment, start time (in the
+  future during the get-ready countdown), banked pause time, adjustments and
+  an optional preset that replaces the class workout (e.g. an EMOM clock for a
+  strength class; free-text workouts use their attached preset). The timer is
+  a schedule, so timed segments ending need no writes: `ClassTimerMachine`
+  (server) and `classTimerPosition` (client) catch up identically, and the
+  preset builders are checked against one shared fixture. Coaches/admins send
+  commands (`start`, `pause`, `resume`, `next`, `previous`, `jump`, `adjust`,
+  `reset`, `finish`, `configure`) with the version they saw; a conflict
+  refetches instead of re-sending. Updates are pushed on `class_timer:<class>`;
+  any active member of the gym can follow (wall display or phone). Responses
+  carry `server_now` so screens correct their own clock skew.

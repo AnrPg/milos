@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import fixtures from "./timer-preset-fixtures.json";
 import { buildFreeTextSegments, freeTextPosition, parseFreeTextTimerPreset, runElapsedMs } from "./free-text-timer";
 
 describe("free-text timer", () => {
@@ -45,5 +46,14 @@ describe("free-text timer", () => {
       format: "amrap",
       duration_seconds: null,
     });
+  });
+});
+
+describe("timer preset parity with the API", () => {
+  it.each(fixtures.cases.map((entry) => [entry.preset.format, entry] as const))("builds %s like the server", (_format, entry) => {
+    const segments = buildFreeTextSegments(parseFreeTextTimerPreset(entry.preset)!);
+    expect(segments.map((segment) => [segment.kind, segment.phase, segment.duration_seconds, segment.total_rounds])).toEqual(
+      entry.segments,
+    );
   });
 });

@@ -231,6 +231,19 @@ defmodule MilosTrainingWeb.Router do
       :api,
       :authenticated,
       :authenticated_rate_limited,
+      :tenant_member,
+      :tenant_write_rate_limited
+    ])
+
+    get("/class-timers/:slot_id", ClassTimerController, :show)
+    post("/class-timers/:slot_id/commands", ClassTimerController, :command)
+  end
+
+  scope "/api/org/:organization_slug", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
       :athlete_or_admin,
       :tenant_write_rate_limited
     ])

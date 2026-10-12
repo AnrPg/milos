@@ -40,8 +40,12 @@ U14 +/-30 s and +/- rounds from the pause sheet, U15 Media Session, and §1.3 KP
 admin analytics summary. Offline progress also merges on conflict again: a 409 replays this
 device's check-offs, rounds and scores on top of the newer server version, and check-offs left in
 the old IndexedDB queue are adopted once.
-- **Not covered**: the class wall display that U13 suggests, which needs a coach-side screen fed
-  by the PubSub channel. Free-text executions do not report KPI counters yet.
+
+**P2 follow-ups shipped (2026-10-12)**: the coach-run class wall display (U13: remote control,
+TV display and members following on their phones, live over the `class_timer` channel), clock
+adjustments synced across devices and shown to coaches, free-text progress saves and KPIs, and
+the execution KPI dashboard in admin training analytics (stopping points by format, completion by
+format and source, daily trend).
 
 ---
 

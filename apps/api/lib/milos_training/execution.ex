@@ -8,7 +8,7 @@ defmodule MilosTraining.Execution do
 
   alias MilosTraining.Execution.Domain.{ExecutionKpis, TimerSequenceBuilder}
   alias MilosTraining.Execution.Queries.GetExecution
-  alias MilosTraining.Execution.ExecutionStore
+  alias MilosTraining.Execution.{ClassTimerStore, ExecutionStore}
 
   defdelegate start_execution(user_id, params), to: StartExecution, as: :call
   defdelegate complete_execution(id, user_id, params), to: CompleteExecution, as: :call
@@ -33,6 +33,12 @@ defmodule MilosTraining.Execution do
     |> ExecutionKpis.summarize()
     |> Map.put(:since, since)
   end
+
+  def get_class_timer(context, scheduled_class_id),
+    do: ClassTimerStore.get_class_timer(context, scheduled_class_id)
+
+  def save_class_timer(context, scheduled_class_id, attrs, expected_version),
+    do: ClassTimerStore.save_class_timer(context, scheduled_class_id, attrs, expected_version)
 
   defdelegate build_timer_sequence(workout), to: TimerSequenceBuilder, as: :build
   defdelegate preview_timer_sequence(workout), to: TimerSequenceBuilder, as: :preview

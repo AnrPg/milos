@@ -1,0 +1,19 @@
+{
+  "_comment": "Shared expectations for timer presets. Checked by free-text-timer.test.ts (web) and timer_presets_test.exs (API) so both builders stay identical. Each segment: [kind, phase, duration_seconds, total_rounds].",
+  "cases": [
+    { "preset": { "format": "tabata", "work_seconds": 20, "rest_seconds": 10, "rounds": 3 },
+      "segments": [["countdown", "work", 20, 3], ["countdown", "rest", 10, 3], ["countdown", "work", 20, 3], ["countdown", "rest", 10, 3], ["countdown", "work", 20, 3]] },
+    { "preset": { "format": "custom_hiit", "work_seconds": 40, "rounds": 2 },
+      "segments": [["countdown", "work", 40, 2], ["countdown", "work", 40, 2]] },
+    { "preset": { "format": "emom", "interval_seconds": 120, "rounds": 10 },
+      "segments": [["interval_cycle", "work", 120, 10]] },
+    { "preset": { "format": "death_by" },
+      "segments": [["interval_cycle", "work", 60, null]] },
+    { "preset": { "format": "amrap" },
+      "segments": [["countdown", "work", 720, null]] },
+    { "preset": { "format": "for_time", "duration_seconds": 600 },
+      "segments": [["countup", "work", 600, null]] },
+    { "preset": { "format": "untimed" },
+      "segments": [["countup", "work", null, null]] }
+  ]
+}

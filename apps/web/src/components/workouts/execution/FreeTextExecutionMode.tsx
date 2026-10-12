@@ -20,6 +20,7 @@ import {
   storeFreeTextExecutionWorkout,
   type FreeTextExecutionWorkout,
 } from "@/lib/free-text-execution";
+import { type FreeTextSnapshot, useFreeTextProgressSync } from "@/hooks/useFreeTextProgressSync";
 import { useScreenWakeLock } from "@/hooks/useScreenWakeLock";
 import {
   buildFreeTextSegments,
@@ -28,7 +29,12 @@ import {
   freeTextLimitMs,
   freeTextPosition,
   QUICK_PRESETS,
+  emptyFreeTextKpi,
+  type FreeTextKpi,
+  kpiPayload,
+  readFreeTextKpi,
   readFreeTextRun,
+  storeFreeTextKpi,
   readLastPreset,
   runElapsedMs,
   storeFreeTextRun,
@@ -87,10 +93,49 @@ export function FreeTextExecutionMode() {
     if (coachPreset) setDraftPreset(coachPreset);
   }
 
+  // Latest run and counters for progress saves made right after a change.
+  const runRef = useRef<FreeTextRun | null>(null);
+  const kpiRef = useRef<{ executionId: string | null; kpi: FreeTextKpi }>({ executionId: null, kpi: emptyFreeTextKpi() });
+
+  /** This execution's counters, loaded from storage the first time they are needed. */
+  function currentKpi(): FreeTextKpi {
+    if (runExecutionId && kpiRef.current.executionId !== runExecutionId) {
+      kpiRef.current = { executionId: runExecutionId, kpi: readFreeTextKpi(runExecutionId) };
+    }
+    return kpiRef.current.kpi;
+  }
+
   function updateRun(next: FreeTextRun | null) {
+    runRef.current = next;
     setRun(next);
     if (runExecutionId) storeFreeTextRun(runExecutionId, next);
   }
+
+  function updateKpi(change: (kpi: FreeTextKpi) => FreeTextKpi) {
+    const next = change(currentKpi());
+    kpiRef.current = { executionId: runExecutionId, kpi: next };
+    if (runExecutionId) storeFreeTextKpi(runExecutionId, next);
+  }
+
+  const currentKpiRef = useRef(currentKpi);
+  useEffect(() => {
+    currentKpiRef.current = currentKpi;
+  });
+
+  const progressSnapshot = useCallback((): FreeTextSnapshot => {
+    const current = runRef.current;
+    const now = Date.now();
+    return {
+      running: current?.startedAt != null,
+      startedAt: current?.startedAt ?? null,
+      carriedMs: current?.carriedMs ?? 0,
+      elapsedMs: current
+        ? freeTextPosition(buildFreeTextSegments(current.preset), runElapsedMs(current, now)).totalElapsedMs
+        : 0,
+      kpi: kpiPayload(currentKpiRef.current()),
+    };
+  }, []);
+  const { save: saveProgress } = useFreeTextProgressSync(tokens?.access_token, runExecutionId, progressSnapshot);
 
   const running = run?.startedAt != null;
   const [now, setNow] = useState(() => Date.now());
@@ -144,23 +189,42 @@ export function FreeTextExecutionMode() {
   function start() {
     primeCueAudio();
     storeLastPreset(draftPreset);
-    updateRun({ preset: draftPreset, startedAt: Date.now(), carriedMs: 0 });
+    const now = Date.now();
+    updateRun({ preset: draftPreset, startedAt: now, carriedMs: 0 });
+    updateKpi((kpi) => (kpi.first_started_at_ms ? kpi : { ...kpi, first_started_at_ms: now }));
+    void saveProgress();
   }
 
   function pause() {
     if (!run || run.startedAt === null) return;
     const elapsed = runElapsedMs(run, Date.now());
     updateRun({ ...run, startedAt: null, carriedMs: runLimitMs === null ? elapsed : Math.min(elapsed, runLimitMs) });
+    void saveProgress();
+  }
+
+  /** The athlete paused (as opposed to the pause before the review). */
+  function userPause() {
+    if (!run || run.startedAt === null) return;
+    // Count first: pause() saves progress right away.
+    updateKpi((kpi) => ({ ...kpi, pauses: kpi.pauses + 1, paused_at: Date.now() }));
+    pause();
   }
 
   function resume() {
     if (!run) return;
     primeCueAudio();
-    updateRun({ ...run, startedAt: Date.now() });
+    const now = Date.now();
+    updateRun({ ...run, startedAt: now });
+    updateKpi((kpi) =>
+      kpi.paused_at ? { ...kpi, paused_ms: kpi.paused_ms + Math.max(0, now - kpi.paused_at), paused_at: null } : kpi,
+    );
+    void saveProgress();
   }
 
   function reset() {
+    if (run && runElapsedMs(run, Date.now()) > 0) updateKpi((kpi) => ({ ...kpi, skips: kpi.skips + 1, paused_at: null }));
     updateRun(null);
+    void saveProgress();
   }
 
   useEffect(() => {
@@ -224,7 +288,9 @@ export function FreeTextExecutionMode() {
   }, [tokens?.access_token, workout?.execution_id]);
 
   function beginFinish() {
+    updateKpi((kpi) => ({ ...kpi, finish_wizard_opens: kpi.finish_wizard_opens + 1 }));
     pause();
+    void saveProgress();
     setCompletionFeedback(null);
     setShowFinishWizard(true);
   }
@@ -249,11 +315,13 @@ export function FreeTextExecutionMode() {
         checked_exercise_ids: [],
         section_scores: editedScores,
         total_elapsed_ms: Math.round(position.totalElapsedMs),
+        kpi_counters: kpiPayload(currentKpi()),
         section_elapsed_ms: {},
         segment_cycle_counts: {},
       });
       clearFreeTextExecutionWorkout(workout.id);
       storeFreeTextRun(workout.execution_id, null);
+      storeFreeTextKpi(workout.execution_id, null);
       router.push("/");
     } catch (error) {
       setCompletionFeedback(
@@ -359,7 +427,7 @@ export function FreeTextExecutionMode() {
               {i18n("resetTimerLabel")}
             </button>
             {status === "running" ? (
-              <button type="button" onClick={pause} className="col-span-2 min-h-14 rounded-full text-base font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
+              <button type="button" onClick={userPause} className="col-span-2 min-h-14 rounded-full text-base font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
                 {i18n("pausecd21a1b")}
               </button>
             ) : status === "finished" ? (

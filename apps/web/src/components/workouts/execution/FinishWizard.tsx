@@ -4,6 +4,7 @@
 
 
 
+import { formatClock } from "./TimerDisplay";
 import {useUiTranslations} from "@/i18n/ui";
 import React, { useState } from "react";
 import type { TimerSegment } from "@/api/executions";
@@ -708,10 +709,12 @@ function ConfirmStep({
   feedback,
   onBack,
   onSave,
+  clockAdjustments = [],
 }: {
   scores: SectionScore[];
   modifications: ExerciseModification[];
   segments: TimerSegment[];
+  clockAdjustments?: ClockAdjustmentSummary[];
   isSaving: boolean;
   feedback: string | null;
   onBack: () => void;
@@ -744,6 +747,20 @@ function ConfirmStep({
         <div className="text-2xl font-bold text-center" style={{ color: "var(--text)" }}>
           {i18n("readyToSave3fab096")}
         </div>
+        {clockAdjustments.length > 0 ? (
+          <ul className="mt-2 grid gap-1 text-center text-sm" aria-label={i18n("clockAdjustmentsLabel")} style={{ color: "var(--text-soft)" }}>
+            {clockAdjustments.map((entry, index) => (
+              <li key={index}>
+                {i18n("clockAdjustedLabel", {
+                  name: entry.name,
+                  from: formatClock(entry.authoredSeconds),
+                  to: formatClock(entry.authoredSeconds + entry.deltaSeconds),
+                  delta: `${entry.deltaSeconds > 0 ? "+" : "−"}${formatClock(Math.abs(entry.deltaSeconds))}`,
+                })}
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-4">
@@ -849,10 +866,14 @@ function ConfirmStep({
 
 // ── Public component ──────────────────────────────────────────────────────────
 
+/** A clock the athlete changed mid-workout, shown before saving. */
+export type ClockAdjustmentSummary = { name: string; authoredSeconds: number; deltaSeconds: number };
+
 export function FinishWizard({
   scores,
   segments,
   initialModifications,
+  clockAdjustments,
   freeText = false,
   isSaving,
   feedback,
@@ -862,6 +883,7 @@ export function FinishWizard({
   scores: SectionScore[];
   segments: TimerSegment[];
   initialModifications: ExerciseModification[];
+  clockAdjustments?: ClockAdjustmentSummary[];
   freeText?: boolean;
   isSaving: boolean;
   feedback: string | null;
@@ -929,6 +951,7 @@ export function FinishWizard({
       scores={confirmedScores}
       modifications={confirmedMods}
       segments={segments}
+      clockAdjustments={clockAdjustments}
       isSaving={isSaving}
       feedback={feedback}
       onBack={() => setStep(2)}

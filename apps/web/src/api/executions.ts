@@ -99,6 +99,9 @@ export type WorkoutExecution = {
   }>;
   exercise_modifications: ExerciseModification[];
   lock_version: number;
+  kpi_counters?: Record<string, number>;
+  /** Mid-workout clock changes; older APIs omit the field. */
+  duration_adjustments?: Record<string, DurationAdjustment | number>;
   inserted_at: string;
 };
 
@@ -170,6 +173,16 @@ export type ExecutionProgressPayload = {
   segment_cycle_counts: Record<string, number>;
   section_scores: SectionScore[];
   kpi_counters?: KpiCounters;
+  duration_adjustments?: Record<string, number>;
+};
+
+/** A stored mid-workout clock change, with the authored length for coaches. */
+export type DurationAdjustment = {
+  delta_seconds: number;
+  authored_seconds: number;
+  section_id?: string;
+  section_name?: string | null;
+  label?: string | null;
 };
 
 /** Device-observed execution KPIs; the API only ever lets them grow. */
@@ -213,6 +226,7 @@ export async function completeExecution(
     section_elapsed_ms?: Record<string, number>;
     segment_cycle_counts?: Record<string, number>;
     kpi_counters?: KpiCounters;
+    duration_adjustments?: Record<string, number>;
   },
 ): Promise<WorkoutExecution> {
   const data = await apiRequest<{ execution: WorkoutExecution }>(

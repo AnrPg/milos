@@ -171,6 +171,9 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
           current_segment_index: execution.current_segment_index,
           section_scores: execution.section_scores,
           kpi_counters: execution.kpi_counters,
+          duration_adjustments: execution.duration_adjustments,
+          total_elapsed_ms: execution.total_elapsed_ms,
+          source: execution.source,
           started_at_utc: execution.started_at_utc
         })
         |> Repo.all()
@@ -224,6 +227,7 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
       exercise_modifications: execution.exercise_modifications || [],
       lock_version: execution.lock_version,
       kpi_counters: execution.kpi_counters || %{},
+      duration_adjustments: execution.duration_adjustments || %{},
       inserted_at: execution.inserted_at
     }
   end

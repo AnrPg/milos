@@ -16,6 +16,8 @@ import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { workoutTypeColor } from "@/lib/workout-colors";
 import { SemanticLabel } from "@/components/semantic-label";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import Link from "next/link";
 
 function formatDateTime(locale: string, isoString: string) {
   return new Intl.DateTimeFormat(locale, {
@@ -71,6 +73,7 @@ export function SlotPopup({
 }: SlotPopupProps) {
   const i18n = useUiTranslations();
   const locale = useLocale();
+  const organizationSlug = useOrganizationSlug();
   const isPast = new Date(slot.scheduled_at) <= new Date();
   const canBook = !isAdmin && !slot.current_user_booking && slot.spots_remaining > 0 && !isPast;
   const [messageText, setMessageText] = useState("");
@@ -314,6 +317,29 @@ export function SlotPopup({
                   {slot.current_user_booking.admin_message}
                 </p>
               ) : null}
+            </div>
+          ) : null}
+
+          {/* Class timer: coach remote + wall display for staff, live clock for booked members */}
+          {isAdmin || slot.current_user_booking?.status === "approved" ? (
+            <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label={i18n("classTimerLinksLabel")}>
+              {isAdmin ? (
+                <Link
+                  href={adminHref(`/class-timer/${slot.id}/control`, organizationSlug)}
+                  className="rounded-full px-4 py-2 text-sm font-semibold"
+                  style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+                >
+                  {i18n("classTimerRemoteLink")}
+                </Link>
+              ) : null}
+              <Link
+                href={adminHref(`/class-timer/${slot.id}/display`, organizationSlug)}
+                target={isAdmin ? "_blank" : undefined}
+                className="rounded-full px-4 py-2 text-sm font-semibold"
+                style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}
+              >
+                {isAdmin ? i18n("classTimerDisplayLink") : i18n("classTimerFollowLink")}
+              </Link>
             </div>
           ) : null}
 

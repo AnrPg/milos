@@ -199,3 +199,46 @@ describe("clock adjustments", () => {
     expect(useExecutionStore.getState().segments[0]!.duration_seconds).toBe(90);
   });
 });
+
+describe("clock adjustments across devices", () => {
+  const timed = [segment("segment:0", "a", { kind: "countdown", duration_seconds: 60 }), segment("segment:1", "b")];
+
+  beforeEach(() => {
+    useExecutionStore.getState().reset();
+    useExecutionStore.getState().initExecution({
+      executionId: "execution-1",
+      lockVersion: 2,
+      workoutId: "workout-1",
+      scaleSlug: null,
+      segments: timed,
+      status: "paused",
+    });
+  });
+
+  it("sends adjustments as deltas and applies the server's on load", () => {
+    useExecutionStore.getState().adjustSegmentDuration(0, 30);
+    expect(useExecutionStore.getState().buildProgressPayload()!.duration_adjustments).toEqual({ "segment:0": 30 });
+
+    const fromOtherDevice = {
+      ...echo(useExecutionStore.getState().buildProgressPayload()!, 3),
+      duration_adjustments: { "segment:0": { delta_seconds: 120, authored_seconds: 60 } },
+    } as WorkoutExecution;
+    useExecutionStore.getState().hydrateFromExecution(fromOtherDevice);
+
+    // Applied to the authored 60 s, not on top of the local +30.
+    expect(useExecutionStore.getState().segments[0]!.duration_seconds).toBe(180);
+  });
+
+  it("keeps a local adjustment when another device saved first", () => {
+    useExecutionStore.getState().adjustSegmentDuration(0, 30);
+    const server = {
+      ...echo(useExecutionStore.getState().buildProgressPayload()!, 5),
+      duration_adjustments: { "segment:0": { delta_seconds: -15, authored_seconds: 60 } },
+    } as WorkoutExecution;
+
+    expect(useExecutionStore.getState().rebaseOnto(server)).toBe(true);
+    const state = useExecutionStore.getState();
+    expect(state.durationAdjustments).toEqual({ "segment:0": 15 });
+    expect(state.segments[0]!.duration_seconds).toBe(75);
+  });
+});

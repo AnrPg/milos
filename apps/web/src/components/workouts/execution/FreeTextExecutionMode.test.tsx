@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { storeFreeTextExecutionWorkout } from "@/lib/free-text-execution";
@@ -18,13 +18,18 @@ vi.mock("@/components/session-provider", () => ({
   useSession: () => ({ tokens: { access_token: "token" } }),
 }));
 
+const updateExecutionProgress = vi.fn();
+
 vi.mock("@/api/executions", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/api/executions")>()),
-  fetchExecution: () => new Promise(() => undefined),
+  fetchExecution: () => Promise.resolve({ id: "execution-1", lock_version: 1, exercise_modifications: [] }),
+  updateExecutionProgress: (...args: unknown[]) => updateExecutionProgress(...args),
 }));
 
 describe("FreeTextExecutionMode", () => {
   beforeEach(() => {
+    updateExecutionProgress.mockReset();
+    updateExecutionProgress.mockImplementation(() => Promise.resolve({ id: "execution-1", lock_version: 2 }));
     window.localStorage.clear();
     window.sessionStorage.clear();
     storeFreeTextExecutionWorkout(
@@ -58,5 +63,23 @@ describe("FreeTextExecutionMode", () => {
     render(<FreeTextExecutionMode />);
     fireEvent.click(screen.getByRole("button", { name: "timerPreset_tabata" }));
     expect(screen.getByRole("timer")).toHaveTextContent("0:20");
+  });
+
+  it("saves progress with pause and start counters while training", async () => {
+    render(<FreeTextExecutionMode />);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "startTimerLabel" }));
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "pausecd21a1b" }));
+    });
+
+    await waitFor(() => {
+      const payload = updateExecutionProgress.mock.calls.at(-1)![2];
+      expect(payload.status).toBe("paused");
+      expect(payload.kpi_counters).toMatchObject({ pauses: 1 });
+      expect(typeof payload.kpi_counters.first_started_at_ms).toBe("number");
+    });
   });
 });

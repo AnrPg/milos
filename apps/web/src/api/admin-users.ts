@@ -1,3 +1,4 @@
+import type { DurationAdjustment } from "@/api/executions";
 import { apiRequest } from "@/api/client";
 import type { paths } from "@/api/generated/schema";
 import type { EffectiveEntitlement } from "@/api/my-finance";
@@ -56,6 +57,8 @@ export type AdminUserExecution = {
   completed_at_utc: string | null;
   total_elapsed_ms: number;
   section_scores: Array<Record<string, unknown>>;
+  /** Clock changes the athlete made mid-workout, by segment key. */
+  duration_adjustments?: Record<string, DurationAdjustment>;
 };
 
 export type AdminUserTraining = {

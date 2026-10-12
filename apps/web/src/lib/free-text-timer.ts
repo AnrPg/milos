@@ -251,3 +251,55 @@ export function storeLastPreset(preset: FreeTextTimerPreset) {
     // ignore
   }
 }
+
+export type FreeTextKpi = {
+  pauses: number;
+  paused_ms: number;
+  finish_wizard_opens: number;
+  /** Timer restarts from zero (the free-text counterpart of skipping). */
+  skips: number;
+  first_started_at_ms?: number;
+  /** While paused: when the pause began, for `paused_ms`. */
+  paused_at?: number | null;
+};
+
+const KPI_KEY = "milos:free-text-kpi:";
+
+export function emptyFreeTextKpi(): FreeTextKpi {
+  return { pauses: 0, paused_ms: 0, finish_wizard_opens: 0, skips: 0, paused_at: null };
+}
+
+/** Counters survive resets and reloads, so they live apart from the run. */
+export function readFreeTextKpi(executionId: string): FreeTextKpi {
+  try {
+    const raw = JSON.parse(window.localStorage.getItem(KPI_KEY + executionId) ?? "null") as Partial<FreeTextKpi> | null;
+    if (!raw || typeof raw !== "object") return emptyFreeTextKpi();
+    const count = (value: unknown) => (typeof value === "number" && value >= 0 ? Math.round(value) : 0);
+    return {
+      pauses: count(raw.pauses),
+      paused_ms: count(raw.paused_ms),
+      finish_wizard_opens: count(raw.finish_wizard_opens),
+      skips: count(raw.skips),
+      first_started_at_ms: typeof raw.first_started_at_ms === "number" ? raw.first_started_at_ms : undefined,
+      paused_at: typeof raw.paused_at === "number" ? raw.paused_at : null,
+    };
+  } catch {
+    return emptyFreeTextKpi();
+  }
+}
+
+export function storeFreeTextKpi(executionId: string, kpi: FreeTextKpi | null) {
+  try {
+    if (kpi) window.localStorage.setItem(KPI_KEY + executionId, JSON.stringify(kpi));
+    else window.localStorage.removeItem(KPI_KEY + executionId);
+  } catch {
+    // ignore
+  }
+}
+
+/** The counters the API accepts (drops local bookkeeping). */
+export function kpiPayload(kpi: FreeTextKpi) {
+  const { paused_at: _pausedAt, ...counters } = kpi;
+  void _pausedAt;
+  return counters;
+}

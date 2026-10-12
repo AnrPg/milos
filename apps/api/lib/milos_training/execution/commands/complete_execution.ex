@@ -1,5 +1,11 @@
 defmodule MilosTraining.Execution.Commands.CompleteExecution do
-  alias MilosTraining.Execution.Domain.{ExecutionKpis, ProgressSnapshotter, ProgressValidator}
+  alias MilosTraining.Execution.Domain.{
+    DurationAdjustments,
+    ExecutionKpis,
+    ProgressSnapshotter,
+    ProgressValidator
+  }
+
   alias MilosTraining.Execution.ExecutionStore
 
   def call(execution_id, user_id, params, opts \\ []) do
@@ -59,10 +65,21 @@ defmodule MilosTraining.Execution.Commands.CompleteExecution do
             section_scores: section_scores,
             exercise_notes: execution.exercise_notes || [],
             kpi_counters:
-              ExecutionKpis.merge_counters(
-                execution[:kpi_counters],
+              execution[:kpi_counters]
+              |> ExecutionKpis.merge_counters(
                 params[:kpi_counters] || params["kpi_counters"],
                 execution[:started_at_utc]
+              )
+              |> ExecutionKpis.put_position(
+                Map.get(params, :segments, Map.get(params, "segments", [])),
+                current_segment_index,
+                total_elapsed_ms
+              ),
+            duration_adjustments:
+              DurationAdjustments.normalize(
+                params[:duration_adjustments] || params["duration_adjustments"],
+                Map.get(params, :segments, Map.get(params, "segments", [])),
+                execution[:duration_adjustments]
               )
           }
 

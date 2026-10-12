@@ -15,6 +15,14 @@ defmodule MilosTraining.Execution.Domain.ExecutionKpis do
       `first_start_delay_ms` relative to the execution's start
 
   Counters only grow: a stale or replayed snapshot can never lower them.
+
+  The server also records, from the timer sequence it validates against:
+
+    - `position` — where the athlete is (format, section, segment index and
+      elapsed time), so unfinished executions show where people stop
+    - `formats` — every timer format in the workout, for per-format rates
+
+  Free-text workouts have no sequence; they report the format `free_text`.
   """
 
   @counter_keys ~w(skips countdown_skips countdown_segments pauses paused_ms finish_wizard_opens)
@@ -28,12 +36,16 @@ defmodule MilosTraining.Execution.Domain.ExecutionKpis do
     incoming = stringify(incoming)
 
     counters =
-      Enum.reduce(@counter_keys, Map.take(existing, @counter_keys), fn key, acc ->
-        case counter(incoming[key]) do
-          nil -> acc
-          value -> Map.put(acc, key, max(value, counter(acc[key]) || 0))
+      Enum.reduce(
+        @counter_keys,
+        Map.take(existing, @counter_keys ++ ["position", "formats"]),
+        fn key, acc ->
+          case counter(incoming[key]) do
+            nil -> acc
+            value -> Map.put(acc, key, max(value, counter(acc[key]) || 0))
+          end
         end
-      end)
+      )
 
     case {existing["first_start_delay_ms"],
           first_start_delay(incoming["first_started_at_ms"], started_at_utc)} do
@@ -44,6 +56,33 @@ defmodule MilosTraining.Execution.Domain.ExecutionKpis do
   end
 
   def merge_counters(existing, _incoming, _started_at_utc), do: stringify(existing || %{})
+
+  @doc "Records where the athlete is in the sequence (and which formats it has)."
+  def put_position(counters, segments, index, total_elapsed_ms) when is_list(segments) do
+    segment = Enum.at(segments, index || 0)
+
+    position = %{
+      "format" => if(segment, do: to_string(value(segment, :format)), else: "free_text"),
+      "section_name" => segment && value(segment, :section_name),
+      "segment_index" => index || 0,
+      "segment_count" => length(segments),
+      "elapsed_ms" => if(is_integer(total_elapsed_ms), do: total_elapsed_ms, else: 0)
+    }
+
+    formats =
+      case segments do
+        [] -> ["free_text"]
+        _ -> segments |> Enum.map(&to_string(value(&1, :format))) |> Enum.uniq()
+      end
+
+    counters
+    |> Map.put("position", position)
+    |> Map.put_new("formats", formats)
+  end
+
+  def put_position(counters, _segments, _index, _total), do: counters
+
+  defp value(map, key), do: Map.get(map, key, Map.get(map, Atom.to_string(key)))
 
   defp counter(value) when is_integer(value) and value >= 0, do: min(value, @max_counter)
   defp counter(_value), do: nil
@@ -57,52 +96,145 @@ defmodule MilosTraining.Execution.Domain.ExecutionKpis do
   defp first_start_delay(_epoch_ms, _started_at), do: nil
 
   @doc """
-  Summarizes executions (maps with `:status`, `:current_segment_index`,
-  `:section_scores`, `:kpi_counters` and `:started_at_utc`) into the KPI report.
+  Summarizes executions into the KPI report. Each row is a map with
+  `:status`, `:source`, `:current_segment_index`, `:section_scores`,
+  `:kpi_counters`, `:duration_adjustments`, `:total_elapsed_ms` and
+  `:started_at_utc`.
   """
   def summarize(executions) do
-    started = length(executions)
-    {completed, open} = Enum.split_with(executions, &(to_string(&1.status) == "completed"))
-    counters = Enum.map(executions, &stringify(&1.kpi_counters || %{}))
-    sum = fn key -> Enum.reduce(counters, 0, &(&2 + (&1[key] || 0))) end
-    scored = Enum.filter(completed, &(&1.section_scores not in [nil, []]))
+    rows = Enum.map(executions, &row/1)
+    started = length(rows)
+    {completed, open} = Enum.split_with(rows, & &1.completed?)
+    sum = fn key -> Enum.reduce(rows, 0, &(&2 + (&1.counters[key] || 0))) end
+    scored = Enum.filter(completed, &(&1.scores != []))
     wizard_opens = sum.("finish_wizard_opens")
+    {free_text, structured} = Enum.split_with(rows, &("free_text" in &1.formats))
 
     %{
       started: started,
       completed: length(completed),
       completion_rate: ratio(length(completed), started),
       abandon_points: abandon_points(open),
+      abandon_by_format: abandon_by_format(open),
+      by_format: rates_by(rows, & &1.formats),
+      by_source: rates_by(rows, &[&1.source]),
+      structured: %{
+        started: length(structured),
+        completed: Enum.count(structured, & &1.completed?)
+      },
+      free_text: free_text_summary(free_text),
+      daily: daily(rows),
       score_capture_rate: ratio(Enum.count(scored, &manual_score?/1), length(scored)),
       skip_rate_on_countdowns: ratio(sum.("countdown_skips"), sum.("countdown_segments")),
       skips: sum.("skips"),
       pauses_per_execution: ratio(sum.("pauses"), started),
       average_paused_ms: if(started > 0, do: div(sum.("paused_ms"), started), else: nil),
       median_time_to_first_start_ms:
-        counters
-        |> Enum.map(& &1["first_start_delay_ms"])
+        rows
+        |> Enum.map(& &1.counters["first_start_delay_ms"])
         |> Enum.filter(&is_integer/1)
         |> median(),
+      median_completed_duration_ms:
+        completed |> Enum.map(& &1.elapsed_ms) |> Enum.filter(&(&1 > 0)) |> median(),
+      clock_adjustment_rate: ratio(Enum.count(rows, & &1.adjusted?), started),
       finish_wizard_drop_off_rate:
         if(wizard_opens > 0, do: ratio(max(wizard_opens - length(completed), 0), wizard_opens))
+    }
+  end
+
+  defp row(execution) do
+    counters = stringify(field(execution, :kpi_counters) || %{})
+    position = counters["position"] || %{}
+
+    %{
+      completed?: to_string(field(execution, :status)) == "completed",
+      source: to_string(field(execution, :source) || "unknown"),
+      index: field(execution, :current_segment_index) || 0,
+      scores: field(execution, :section_scores) || [],
+      counters: counters,
+      position: position,
+      formats: List.wrap(counters["formats"] || position["format"] || "unknown"),
+      adjusted?: (field(execution, :duration_adjustments) || %{}) != %{},
+      elapsed_ms: field(execution, :total_elapsed_ms) || 0,
+      date: date(field(execution, :started_at_utc))
     }
   end
 
   # Where unfinished executions stopped, most common first.
   defp abandon_points(open) do
     open
-    |> Enum.frequencies_by(& &1.current_segment_index)
-    |> Enum.sort_by(fn {index, count} -> {-count, index} end)
+    |> Enum.frequencies_by(fn row ->
+      {row.position["format"] || "unknown", row.position["section_name"], row.index}
+    end)
+    |> Enum.sort_by(fn {{format, _name, index}, count} -> {-count, format, index} end)
     |> Enum.take(10)
-    |> Enum.map(fn {index, count} -> %{segment_index: index, count: count} end)
+    |> Enum.map(fn {{format, name, index}, count} ->
+      %{format: format, section_name: name, segment_index: index, count: count}
+    end)
   end
 
-  defp manual_score?(execution) do
-    Enum.any?(execution.section_scores, fn score ->
+  defp abandon_by_format(open) do
+    total = length(open)
+
+    open
+    |> Enum.frequencies_by(&(&1.position["format"] || "unknown"))
+    |> Enum.sort_by(fn {format, count} -> {-count, format} end)
+    |> Enum.map(fn {format, count} ->
+      %{format: format, count: count, share: ratio(count, total)}
+    end)
+  end
+
+  defp rates_by(rows, keys_fun) do
+    rows
+    |> Enum.flat_map(fn row -> Enum.map(keys_fun.(row), &{&1, row.completed?}) end)
+    |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
+    |> Enum.map(fn {key, outcomes} ->
+      done = Enum.count(outcomes, & &1)
+
+      %{
+        key: key,
+        started: length(outcomes),
+        completed: done,
+        completion_rate: ratio(done, length(outcomes))
+      }
+    end)
+    |> Enum.sort_by(&{-&1.started, &1.key})
+  end
+
+  defp free_text_summary(rows) do
+    abandoned = Enum.reject(rows, & &1.completed?)
+
+    %{
+      started: length(rows),
+      completed: length(rows) - length(abandoned),
+      completion_rate: ratio(length(rows) - length(abandoned), length(rows)),
+      median_abandon_elapsed_ms:
+        abandoned |> Enum.map(&(&1.position["elapsed_ms"] || &1.elapsed_ms)) |> median()
+    }
+  end
+
+  defp daily(rows) do
+    rows
+    |> Enum.reject(&is_nil(&1.date))
+    |> Enum.group_by(& &1.date)
+    |> Enum.map(fn {date, day} ->
+      %{date: date, started: length(day), completed: Enum.count(day, & &1.completed?)}
+    end)
+    |> Enum.sort_by(& &1.date)
+  end
+
+  defp date(%DateTime{} = value), do: value |> DateTime.to_date() |> Date.to_iso8601()
+  defp date(%NaiveDateTime{} = value), do: value |> NaiveDateTime.to_date() |> Date.to_iso8601()
+  defp date(_value), do: nil
+
+  defp manual_score?(row) do
+    Enum.any?(row.scores, fn score ->
       score = stringify(score)
       score["source"] == "manual" or score["kind"] == "final"
     end)
   end
+
+  defp field(map, key), do: Map.get(map, key, Map.get(map, Atom.to_string(key)))
 
   defp ratio(_part, 0), do: nil
   defp ratio(part, whole), do: Float.round(part / whole, 4)

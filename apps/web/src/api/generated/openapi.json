@@ -2019,6 +2019,15 @@
                     "minimum": 0,
                     "type": "integer"
                   },
+                  "duration_adjustments": {
+                    "additionalProperties": {
+                      "maximum": 3600,
+                      "minimum": -3600,
+                      "type": "integer"
+                    },
+                    "description": "Mid-workout clock changes in seconds, by segment key (countdowns and capped count-ups only).",
+                    "type": "object"
+                  },
                   "expected_version": {
                     "minimum": 1,
                     "type": "integer"
@@ -7316,6 +7325,279 @@
         "summary": "Preview the timer sequence a draft section will run",
         "tags": [
           "Admin Workouts"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/class-timers/{slot_id}/commands": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ClassTimerController.command",
+        "parameters": [
+          {
+            "description": "Scheduled class ID",
+            "in": "path",
+            "name": "slot_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "command": {
+                    "enum": [
+                      "start",
+                      "pause",
+                      "resume",
+                      "next",
+                      "previous",
+                      "jump",
+                      "adjust",
+                      "reset",
+                      "finish",
+                      "configure"
+                    ],
+                    "type": "string"
+                  },
+                  "countdown_seconds": {
+                    "maximum": 60,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "delta_seconds": {
+                    "maximum": 3600,
+                    "minimum": -3600,
+                    "type": "integer"
+                  },
+                  "expected_version": {
+                    "minimum": 1,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "index": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "timer_preset": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "command"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "class": {
+                      "properties": {
+                        "duration_minutes": {
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "scheduled_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "segments": {
+                      "items": {
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "server_now": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "timer": {
+                      "properties": {
+                        "current_segment_index": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "duration_adjustments": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "lock_version": {
+                          "type": "integer"
+                        },
+                        "paused_elapsed_ms": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "segment_started_at_utc": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "ready",
+                            "running",
+                            "paused",
+                            "finished"
+                          ],
+                          "type": "string"
+                        },
+                        "timer_preset": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "current_segment_index",
+                        "paused_elapsed_ms",
+                        "lock_version"
+                      ],
+                      "type": "object"
+                    },
+                    "workout": {
+                      "additionalProperties": true,
+                      "nullable": true,
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "class",
+                    "segments",
+                    "timer",
+                    "server_now"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Class timer"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Stale class timer version"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid command"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Run a class timer command (coaches and admins)",
+        "tags": [
+          "Class Timers"
         ]
       }
     },
@@ -21151,6 +21433,15 @@
                     },
                     "type": "array"
                   },
+                  "duration_adjustments": {
+                    "additionalProperties": {
+                      "maximum": 3600,
+                      "minimum": -3600,
+                      "type": "integer"
+                    },
+                    "description": "Mid-workout clock changes in seconds, by segment key (countdowns and capped count-ups only).",
+                    "type": "object"
+                  },
                   "kpi_counters": {
                     "additionalProperties": {
                       "minimum": 0,
@@ -26018,6 +26309,160 @@
         "summary": "Issue a tenant invitation from the platform console",
         "tags": [
           "Platform Organizations"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/class-timers/{slot_id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ClassTimerController.show",
+        "parameters": [
+          {
+            "description": "Scheduled class ID",
+            "in": "path",
+            "name": "slot_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "class": {
+                      "properties": {
+                        "duration_minutes": {
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "scheduled_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "segments": {
+                      "items": {
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "server_now": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "timer": {
+                      "properties": {
+                        "current_segment_index": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "duration_adjustments": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "lock_version": {
+                          "type": "integer"
+                        },
+                        "paused_elapsed_ms": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "segment_started_at_utc": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "ready",
+                            "running",
+                            "paused",
+                            "finished"
+                          ],
+                          "type": "string"
+                        },
+                        "timer_preset": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "current_segment_index",
+                        "paused_elapsed_ms",
+                        "lock_version"
+                      ],
+                      "type": "object"
+                    },
+                    "workout": {
+                      "additionalProperties": true,
+                      "nullable": true,
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "class",
+                    "segments",
+                    "timer",
+                    "server_now"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Class timer"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Read the coach-run timer of a scheduled class",
+        "tags": [
+          "Class Timers"
         ]
       }
     },

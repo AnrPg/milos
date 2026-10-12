@@ -17,6 +17,7 @@ import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { SemanticLabel } from "@/components/semantic-label";
 import { HelpTooltip } from "@/components/HelpTooltip";
+import { ExecutionKpiDashboard } from "@/components/admin/ExecutionKpiDashboard";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -234,6 +235,8 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
             href={adminHref("/admin/metrics/engagement", organizationSlug)}
           />
         </section> : null}
+
+        {section === "training" ? <ExecutionKpiDashboard /> : null}
 
         {section === "training" ? <section id="training-analytics" className="scroll-mt-20 rounded-[1.6rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
           <h2 className="text-xl font-black">{i18n("teamWorkoutBreakdownLast30Days86ec3d2")}</h2>

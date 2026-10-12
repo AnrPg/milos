@@ -611,7 +611,7 @@ export function ExecutionMode() {
 
   /** Coach changed the plan: lengthen or shorten the running clock. */
   function handleAdjustTime(deltaSeconds: number) {
-    adjustSegmentDuration(currentSegmentIndex, deltaSeconds);
+    commit(() => adjustSegmentDuration(currentSegmentIndex, deltaSeconds));
   }
 
   // ── Lock screen / system media controls ────────────────────────────────────
@@ -627,6 +627,20 @@ export function ExecutionMode() {
     },
     onPause: userPause,
   });
+
+  function clockAdjustmentSummaries() {
+    const store = useExecutionStore.getState();
+    const authored = store.baseSegments.length > 0 ? store.baseSegments : store.segments;
+    return Object.entries(store.durationAdjustments).flatMap(([key, deltaSeconds]) => {
+      const segment = authored.find((candidate) => candidate.segment_key === key);
+      if (!segment || typeof segment.duration_seconds !== "number" || deltaSeconds === 0) return [];
+      return [{
+        name: segment.section_name || segmentLabel(segment, i18n),
+        authoredSeconds: segment.duration_seconds,
+        deltaSeconds,
+      }];
+    });
+  }
 
   // ── Render ──────────────────────────────────────────────────────────────────
 
@@ -699,6 +713,7 @@ export function ExecutionMode() {
         scores={pendingFinish.scores}
         segments={segments}
         initialModifications={inExecutionModifications}
+        clockAdjustments={clockAdjustmentSummaries()}
         isSaving={isSaving}
         feedback={feedback}
         onConfirm={(editedScores, modifications) => void confirmPendingFinish(editedScores, modifications)}

@@ -51,6 +51,10 @@ defmodule MilosTrainingWeb.Realtime do
     })
   end
 
+  def broadcast_class_timer(scheduled_class_id, payload) do
+    Endpoint.broadcast("class_timer:#{scheduled_class_id}", "class_timer:updated", payload)
+  end
+
   def broadcast_execution_completed(execution_id, payload) do
     Endpoint.broadcast("execution:#{execution_id}", "execution:completed", payload)
   end

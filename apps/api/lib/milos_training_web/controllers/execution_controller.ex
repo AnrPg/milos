@@ -28,6 +28,13 @@ defmodule MilosTrainingWeb.ExecutionController do
     additionalProperties: %Schema{type: :integer, minimum: 0}
   }
 
+  @duration_adjustments_schema %Schema{
+    type: :object,
+    description:
+      "Mid-workout clock changes in seconds, by segment key (countdowns and capped count-ups only).",
+    additionalProperties: %Schema{type: :integer, minimum: -3600, maximum: 3600}
+  }
+
   @id_param %Parameter{
     name: :id,
     in: :path,
@@ -138,7 +145,8 @@ defmodule MilosTrainingWeb.ExecutionController do
              type: :object,
              additionalProperties: %Schema{type: :integer, minimum: 0}
            },
-           kpi_counters: @kpi_counters_schema
+           kpi_counters: @kpi_counters_schema,
+           duration_adjustments: @duration_adjustments_schema
          }
        }},
     responses: [
@@ -219,7 +227,8 @@ defmodule MilosTrainingWeb.ExecutionController do
              format: :"date-time",
              nullable: true
            },
-           kpi_counters: @kpi_counters_schema
+           kpi_counters: @kpi_counters_schema,
+           duration_adjustments: @duration_adjustments_schema
          }
        }},
     responses: [
