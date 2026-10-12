@@ -1,0 +1,68 @@
+msgid ""
+msgstr ""
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Refund receipt"
+msgstr "Refund receipt"
+
+msgid "Receipt number"
+msgstr "Receipt number"
+
+msgid "Issued on"
+msgstr "Issued on"
+
+msgid "Issued by"
+msgstr "Issued by"
+
+msgid "Issued to"
+msgstr "Issued to"
+
+msgid "Refund details"
+msgstr "Refund details"
+
+msgid "Refund type"
+msgstr "Refund type"
+
+msgid "Refunded amount"
+msgstr "Refunded amount"
+
+msgid "Reason"
+msgstr "Reason"
+
+msgid "Original payment"
+msgstr "Original payment"
+
+msgid "Payment date"
+msgstr "Payment date"
+
+msgid "Payment method"
+msgstr "Payment method"
+
+msgid "Original amount"
+msgstr "Original amount"
+
+msgid "Invoice"
+msgstr "Invoice"
+
+msgid "Previously refunded"
+msgstr "Previously refunded"
+
+msgid "Remaining paid amount"
+msgstr "Remaining paid amount"
+
+msgid "Refund"
+msgstr "Refund"
+
+msgid "Payment reversal"
+msgstr "Payment reversal"
+
+msgid "This receipt is an immutable record of an audited payment reversal. Keep it with your payment records."
+msgstr "This receipt is an immutable record of an audited payment reversal. Keep it with your payment records."
+
+msgid "Document fingerprint (SHA-256)"
+msgstr "Document fingerprint (SHA-256)"
+
+msgid "Not provided"
+msgstr "Not provided"

@@ -1,0 +1,68 @@
+msgid ""
+msgstr ""
+"Language: it\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Refund receipt"
+msgstr "Ricevuta di rimborso"
+
+msgid "Receipt number"
+msgstr "Numero ricevuta"
+
+msgid "Issued on"
+msgstr "Data di emissione"
+
+msgid "Issued by"
+msgstr "Emessa da"
+
+msgid "Issued to"
+msgstr "Emessa a"
+
+msgid "Refund details"
+msgstr "Dettagli del rimborso"
+
+msgid "Refund type"
+msgstr "Tipo di rimborso"
+
+msgid "Refunded amount"
+msgstr "Importo rimborsato"
+
+msgid "Reason"
+msgstr "Motivo"
+
+msgid "Original payment"
+msgstr "Pagamento originale"
+
+msgid "Payment date"
+msgstr "Data del pagamento"
+
+msgid "Payment method"
+msgstr "Metodo di pagamento"
+
+msgid "Original amount"
+msgstr "Importo originale"
+
+msgid "Invoice"
+msgstr "Fattura"
+
+msgid "Previously refunded"
+msgstr "Già rimborsato"
+
+msgid "Remaining paid amount"
+msgstr "Importo pagato residuo"
+
+msgid "Refund"
+msgstr "Rimborso"
+
+msgid "Payment reversal"
+msgstr "Storno del pagamento"
+
+msgid "This receipt is an immutable record of an audited payment reversal. Keep it with your payment records."
+msgstr "Questa ricevuta è una registrazione immutabile di uno storno di pagamento verificato. Conservala insieme ai tuoi documenti di pagamento."
+
+msgid "Document fingerprint (SHA-256)"
+msgstr "Impronta digitale del documento (SHA-256)"
+
+msgid "Not provided"
+msgstr "Non indicato"

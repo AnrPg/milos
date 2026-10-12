@@ -1,0 +1,68 @@
+msgid ""
+msgstr ""
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Refund receipt"
+msgstr ""
+
+msgid "Receipt number"
+msgstr ""
+
+msgid "Issued on"
+msgstr ""
+
+msgid "Issued by"
+msgstr ""
+
+msgid "Issued to"
+msgstr ""
+
+msgid "Refund details"
+msgstr ""
+
+msgid "Refund type"
+msgstr ""
+
+msgid "Refunded amount"
+msgstr ""
+
+msgid "Reason"
+msgstr ""
+
+msgid "Original payment"
+msgstr ""
+
+msgid "Payment date"
+msgstr ""
+
+msgid "Payment method"
+msgstr ""
+
+msgid "Original amount"
+msgstr ""
+
+msgid "Invoice"
+msgstr ""
+
+msgid "Previously refunded"
+msgstr ""
+
+msgid "Remaining paid amount"
+msgstr ""
+
+msgid "Refund"
+msgstr ""
+
+msgid "Payment reversal"
+msgstr ""
+
+msgid "This receipt is an immutable record of an audited payment reversal. Keep it with your payment records."
+msgstr ""
+
+msgid "Document fingerprint (SHA-256)"
+msgstr ""
+
+msgid "Not provided"
+msgstr ""

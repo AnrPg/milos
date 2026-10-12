@@ -1,0 +1,68 @@
+msgid ""
+msgstr ""
+"Language: es\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Refund receipt"
+msgstr "Recibo de reembolso"
+
+msgid "Receipt number"
+msgstr "Número de recibo"
+
+msgid "Issued on"
+msgstr "Fecha de emisión"
+
+msgid "Issued by"
+msgstr "Emitido por"
+
+msgid "Issued to"
+msgstr "Emitido a"
+
+msgid "Refund details"
+msgstr "Detalles del reembolso"
+
+msgid "Refund type"
+msgstr "Tipo de reembolso"
+
+msgid "Refunded amount"
+msgstr "Importe reembolsado"
+
+msgid "Reason"
+msgstr "Motivo"
+
+msgid "Original payment"
+msgstr "Pago original"
+
+msgid "Payment date"
+msgstr "Fecha de pago"
+
+msgid "Payment method"
+msgstr "Método de pago"
+
+msgid "Original amount"
+msgstr "Importe original"
+
+msgid "Invoice"
+msgstr "Factura"
+
+msgid "Previously refunded"
+msgstr "Reembolsado anteriormente"
+
+msgid "Remaining paid amount"
+msgstr "Importe pagado restante"
+
+msgid "Refund"
+msgstr "Reembolso"
+
+msgid "Payment reversal"
+msgstr "Reversión de pago"
+
+msgid "This receipt is an immutable record of an audited payment reversal. Keep it with your payment records."
+msgstr "Este recibo es un registro inmutable de una reversión de pago auditada. Guárdalo con tus comprobantes de pago."
+
+msgid "Document fingerprint (SHA-256)"
+msgstr "Huella digital del documento (SHA-256)"
+
+msgid "Not provided"
+msgstr "No indicado"

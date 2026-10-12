@@ -1,0 +1,68 @@
+msgid ""
+msgstr ""
+"Language: he\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Refund receipt"
+msgstr "קבלת החזר"
+
+msgid "Receipt number"
+msgstr "מספר קבלה"
+
+msgid "Issued on"
+msgstr "תאריך הנפקה"
+
+msgid "Issued by"
+msgstr "הונפק על ידי"
+
+msgid "Issued to"
+msgstr "הונפק עבור"
+
+msgid "Refund details"
+msgstr "פרטי ההחזר"
+
+msgid "Refund type"
+msgstr "סוג ההחזר"
+
+msgid "Refunded amount"
+msgstr "סכום ההחזר"
+
+msgid "Reason"
+msgstr "סיבה"
+
+msgid "Original payment"
+msgstr "התשלום המקורי"
+
+msgid "Payment date"
+msgstr "תאריך התשלום"
+
+msgid "Payment method"
+msgstr "אמצעי תשלום"
+
+msgid "Original amount"
+msgstr "הסכום המקורי"
+
+msgid "Invoice"
+msgstr "חשבונית"
+
+msgid "Previously refunded"
+msgstr "הוחזר בעבר"
+
+msgid "Remaining paid amount"
+msgstr "יתרת הסכום ששולם"
+
+msgid "Refund"
+msgstr "החזר"
+
+msgid "Payment reversal"
+msgstr "ביטול תשלום"
+
+msgid "This receipt is an immutable record of an audited payment reversal. Keep it with your payment records."
+msgstr "קבלה זו היא רשומה בלתי ניתנת לשינוי של ביטול תשלום מבוקר. שמרו אותה יחד עם רשומות התשלום שלכם."
+
+msgid "Document fingerprint (SHA-256)"
+msgstr "טביעת אצבע של המסמך (SHA-256)"
+
+msgid "Not provided"
+msgstr "לא צוין"

@@ -1,0 +1,68 @@
+msgid ""
+msgstr ""
+"Language: bg\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Refund receipt"
+msgstr "Разписка за възстановяване"
+
+msgid "Receipt number"
+msgstr "Номер на разписката"
+
+msgid "Issued on"
+msgstr "Дата на издаване"
+
+msgid "Issued by"
+msgstr "Издадена от"
+
+msgid "Issued to"
+msgstr "Издадена на"
+
+msgid "Refund details"
+msgstr "Подробности за възстановяването"
+
+msgid "Refund type"
+msgstr "Вид възстановяване"
+
+msgid "Refunded amount"
+msgstr "Възстановена сума"
+
+msgid "Reason"
+msgstr "Причина"
+
+msgid "Original payment"
+msgstr "Първоначално плащане"
+
+msgid "Payment date"
+msgstr "Дата на плащане"
+
+msgid "Payment method"
+msgstr "Начин на плащане"
+
+msgid "Original amount"
+msgstr "Първоначална сума"
+
+msgid "Invoice"
+msgstr "Фактура"
+
+msgid "Previously refunded"
+msgstr "Възстановено преди"
+
+msgid "Remaining paid amount"
+msgstr "Оставаща платена сума"
+
+msgid "Refund"
+msgstr "Възстановяване"
+
+msgid "Payment reversal"
+msgstr "Сторниране на плащане"
+
+msgid "This receipt is an immutable record of an audited payment reversal. Keep it with your payment records."
+msgstr "Тази разписка е непроменим запис на проверено сторниране на плащане. Пазете я заедно с документите си за плащания."
+
+msgid "Document fingerprint (SHA-256)"
+msgstr "Цифров отпечатък на документа (SHA-256)"
+
+msgid "Not provided"
+msgstr "Не е посочено"
