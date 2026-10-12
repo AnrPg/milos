@@ -2,21 +2,39 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 import type {
+  KpiCounters,
   ExerciseNote,
   ExecutionProgressPayload,
   SectionScore,
   TimerSegment,
   WorkoutExecution,
 } from "@/api/executions";
+import { hasMarkChanges, type ProgressMarks, rebaseProgressMarks } from "@/lib/execution-rebase";
+import { liveElapsedMs } from "@/lib/timer-engine";
 
 export type ExecutionStatus = "idle" | "active" | "paused" | "completed";
 
+/**
+ * Elapsed-time model
+ * ------------------
+ * - `totalElapsedMs` / `sectionElapsedMs` hold *committed* time only: segments
+ *   the athlete has left. The current segment is never included.
+ * - `pausedElapsed` is time banked in the current segment by earlier pauses;
+ *   while active, the running stretch is `now - segmentStartedAt`.
+ * - Progress snapshots sent to the API carry committed + banked time
+ *   (`buildProgressPayload`), and `hydrateFromExecution` subtracts the banked
+ *   part again, so both sides derive each other exactly and a pause can never
+ *   be counted twice.
+ */
 type ExecutionState = {
   executionId: string | null;
   lockVersion: number;
   workoutId: string | null;
   scaleSlug: string | null;
+  /** The sequence with this execution's clock adjustments applied (what runs). */
   segments: TimerSegment[];
+  /** The sequence as authored, before clock adjustments. */
+  baseSegments: TimerSegment[];
   currentSegmentIndex: number;
   status: ExecutionStatus;
   segmentStartedAt: number | null;
@@ -28,6 +46,16 @@ type ExecutionState = {
   checkedExerciseIds: string[];
   sectionScores: SectionScore[];
   exerciseNotes: ExerciseNote[];
+  /** Local progress the server has not acknowledged yet. */
+  pendingSync: boolean;
+  /** Hand-made marks as the server last acknowledged them; the base for conflict rebases. */
+  syncedMarks: ProgressMarks | null;
+  /** Seconds added to (or removed from) segment clocks mid-workout, by segment key. */
+  durationAdjustments: Record<string, number>;
+  /** Execution KPIs only this device can observe (see `KpiCounters`). */
+  kpiCounters: KpiCounters;
+  /** When the athlete paused, for `paused_ms`. */
+  kpiPausedAt: number | null;
   initExecution: (params: {
     executionId: string;
     lockVersion?: number;
@@ -47,23 +75,56 @@ type ExecutionState = {
     segmentCycleCounts?: Record<string, number>;
   }) => void;
   hydrateFromExecution: (execution: WorkoutExecution, segments?: TimerSegment[]) => void;
-  startTimer: (startedAt?: number) => void;
-  pauseTimer: (pausedAt?: number) => void;
+  setLockVersion: (lockVersion: number) => void;
+  /** The server accepted `execution` while a newer local change waits: keep local state. */
+  acknowledge: (execution: WorkoutExecution) => void;
+  /**
+   * Adopts a newer server version that conflicts with local progress, then
+   * replays local check-offs, round counts and scores on top of it. Returns
+   * true when local marks remain to be sent.
+   */
+  rebaseOnto: (execution: WorkoutExecution, segments?: TimerSegment[]) => boolean;
+  setPendingSync: (pendingSync: boolean) => void;
+  /** Elapsed time of the current segment at `now`. */
+  currentElapsedMs: (now?: number) => number;
+  /** Banks the running stretch; `maxElapsedMs` clamps it (a countdown cannot overrun). */
+  pauseTimer: (pausedAt?: number, maxElapsedMs?: number | null) => void;
   startResumeCountdown: (endsAt: number) => void;
   resumeTimer: (startedAt?: number) => void;
-  advanceSegment: (startedAt?: number) => void;
-  jumpToSegment: (index: number, startedAt?: number) => void;
-  commitSegmentElapsed: (sectionId: string, elapsedMs: number) => void;
+  /**
+   * Commits `elapsedMs` for the current segment and moves to `index`
+   * (completing the execution when `index` is past the end).
+   */
+  moveToSegment: (index: number, params: { elapsedMs: number; startedAt: number }) => void;
+  /** Commits several segments that ended on their own and lands on `index`. */
+  applyCatchUp: (plan: {
+    completed: { index: number; elapsedMs: number }[];
+    index: number;
+    segmentStartedAt: number;
+  }) => void;
+  /**
+   * Lengthens or shortens a timed segment while the athlete trains (a coach
+   * changing the plan mid-class). Never shortens below what already ran.
+   */
+  adjustSegmentDuration: (index: number, deltaSeconds: number) => void;
+  /** Replaces the segment list, re-applying this execution's clock adjustments. */
+  setSegments: (segments: TimerSegment[]) => void;
+  /** Adds to a KPI counter. */
+  countKpi: (key: Exclude<keyof KpiCounters, "first_started_at_ms">, amount?: number) => void;
+  /** Records the athlete's pause (for pause count and paused time). */
+  recordPauseKpi: (at?: number) => void;
+  recordResumeKpi: (at?: number) => void;
+  recordFirstStartKpi: (at?: number) => void;
   incrementSegmentCycle: (segmentKey: string) => void;
+  decrementSegmentCycle: (segmentKey: string) => void;
   setCheckedExerciseIds: (exerciseIds: string[]) => void;
   upsertScore: (score: SectionScore) => void;
   upsertNote: (note: ExerciseNote) => void;
   replaceNotes: (notes: ExerciseNote[]) => void;
   completeExecution: () => void;
-  buildProgressPayload: (snapshot?: {
-    currentSegment: TimerSegment | null;
-    currentElapsedMs: number;
-  }) => ExecutionProgressPayload | null;
+  /** Committed totals plus the current segment's elapsed time at `now`. */
+  completionTotals: (now?: number) => { totalElapsedMs: number; sectionElapsedMs: Record<string, number> };
+  buildProgressPayload: () => ExecutionProgressPayload | null;
   reset: () => void;
 };
 
@@ -73,6 +134,7 @@ const initialState = {
   workoutId: null,
   scaleSlug: null,
   segments: [],
+  baseSegments: [] as TimerSegment[],
   currentSegmentIndex: 0,
   status: "idle" as ExecutionStatus,
   segmentStartedAt: null,
@@ -84,7 +146,65 @@ const initialState = {
   checkedExerciseIds: [],
   sectionScores: [],
   exerciseNotes: [],
+  pendingSync: false,
+  syncedMarks: null as ProgressMarks | null,
+  durationAdjustments: {} as Record<string, number>,
+  kpiCounters: {} as KpiCounters,
+  kpiPausedAt: null as number | null,
 };
+
+const isCountdown = (segment: TimerSegment | undefined) => segment?.kind === "countdown";
+
+const MIN_ADJUSTED_SECONDS = 5;
+/** Matches the API's bound on a single segment's adjustment. */
+const MAX_ADJUSTMENT_SECONDS = 3_600;
+
+function isAdjustable(segment: TimerSegment | undefined): segment is TimerSegment & { duration_seconds: number } {
+  return Boolean(
+    segment &&
+      typeof segment.duration_seconds === "number" &&
+      (segment.kind === "countdown" || segment.kind === "countup"),
+  );
+}
+
+export function applyDurationAdjustments(segments: TimerSegment[], adjustments: Record<string, number>) {
+  if (Object.keys(adjustments).length === 0) return segments;
+  return segments.map((segment) => {
+    const delta = adjustments[segment.segment_key];
+    if (!delta || !isAdjustable(segment)) return segment;
+    return { ...segment, duration_seconds: Math.max(MIN_ADJUSTED_SECONDS, segment.duration_seconds + delta) };
+  });
+}
+
+function marksOf(
+  state: Pick<ExecutionState, "checkedExerciseIds" | "segmentCycleCounts" | "sectionScores" | "durationAdjustments">,
+): ProgressMarks {
+  return {
+    checkedExerciseIds: state.checkedExerciseIds,
+    segmentCycleCounts: state.segmentCycleCounts,
+    sectionScores: state.sectionScores,
+    durationAdjustments: state.durationAdjustments,
+  };
+}
+
+/** The API stores adjustments enriched for coaches; the client works with plain deltas. */
+export function adjustmentDeltas(stored: WorkoutExecution["duration_adjustments"]): Record<string, number> {
+  const deltas: Record<string, number> = {};
+  for (const [key, value] of Object.entries(stored ?? {})) {
+    const delta = typeof value === "number" ? value : value?.delta_seconds;
+    if (typeof delta === "number" && Number.isFinite(delta) && delta !== 0) deltas[key] = Math.round(delta);
+  }
+  return deltas;
+}
+
+function serverMarks(execution: WorkoutExecution): ProgressMarks {
+  return {
+    checkedExerciseIds: normalizeCheckedExerciseIds(execution.checked_exercise_ids),
+    segmentCycleCounts: execution.segment_cycle_counts ?? {},
+    sectionScores: execution.section_scores,
+    durationAdjustments: adjustmentDeltas(execution.duration_adjustments),
+  };
+}
 
 function executionStatusFromApi(status: WorkoutExecution["status"]): ExecutionStatus {
   if (status === "active" || status === "paused" || status === "completed") {
@@ -102,6 +222,27 @@ function toTimestamp(value: string | null | undefined): number | null {
 
 function normalizeCheckedExerciseIds(exerciseIds: string[]) {
   return Array.from(new Set(exerciseIds));
+}
+
+/** Time in between-section transitions/rests counts toward the workout, not a section. */
+function sectionTimeKey(segment: TimerSegment | undefined) {
+  return segment && !segment.between_sections ? segment.section_id : null;
+}
+
+function addElapsed(
+  totals: { totalElapsedMs: number; sectionElapsedMs: Record<string, number> },
+  segment: TimerSegment | undefined,
+  elapsedMs: number,
+) {
+  const amount = Math.max(0, Math.round(elapsedMs));
+  const key = sectionTimeKey(segment);
+  return {
+    totalElapsedMs: totals.totalElapsedMs + amount,
+    sectionElapsedMs:
+      key === null
+        ? totals.sectionElapsedMs
+        : { ...totals.sectionElapsedMs, [key]: (totals.sectionElapsedMs[key] ?? 0) + amount },
+  };
 }
 
 export const useExecutionStore = create<ExecutionState>()(
@@ -134,6 +275,7 @@ export const useExecutionStore = create<ExecutionState>()(
           workoutId,
           scaleSlug,
           segments,
+          baseSegments: segments,
           checkedExerciseIds: normalizeCheckedExerciseIds(checkedExerciseIds),
           sectionScores,
           exerciseNotes,
@@ -145,48 +287,114 @@ export const useExecutionStore = create<ExecutionState>()(
           totalElapsedMs,
           sectionElapsedMs,
           segmentCycleCounts,
+          syncedMarks: {
+            checkedExerciseIds: normalizeCheckedExerciseIds(checkedExerciseIds),
+            segmentCycleCounts,
+            sectionScores,
+            durationAdjustments: {},
+          },
         }),
 
       hydrateFromExecution: (execution, segments) =>
-        set((state) => ({
-          executionId: execution.id,
-          lockVersion: execution.lock_version,
-          workoutId: execution.master_workout_id,
-          scaleSlug: execution.scale_level_slug,
-          segments: segments ?? state.segments,
-          currentSegmentIndex: execution.current_segment_index,
-          status: executionStatusFromApi(execution.status),
-          segmentStartedAt:
-            execution.status === "active"
-              ? toTimestamp(execution.segment_started_at_utc)
-              : null,
-          pausedElapsed: execution.paused_elapsed_ms,
-          resumeCountdownEndsAt: toTimestamp(execution.resume_countdown_ends_at_utc),
-          totalElapsedMs: execution.total_elapsed_ms,
-          sectionElapsedMs: execution.section_elapsed_ms,
-          segmentCycleCounts: execution.segment_cycle_counts,
-          checkedExerciseIds: normalizeCheckedExerciseIds(execution.checked_exercise_ids),
-          sectionScores: execution.section_scores,
-          exerciseNotes: execution.exercise_notes,
-        })),
+        set((state) => {
+          const sameExecution = state.executionId === execution.id;
+          // The server copy is authoritative; older APIs without the field keep local changes.
+          const durationAdjustments =
+            execution.duration_adjustments !== undefined
+              ? adjustmentDeltas(execution.duration_adjustments)
+              : sameExecution
+                ? state.durationAdjustments
+                : {};
+          const baseSegments = segments ?? (state.baseSegments.length > 0 ? state.baseSegments : state.segments);
+          const nextSegments = applyDurationAdjustments(baseSegments, durationAdjustments);
+          const banked = Math.max(0, execution.paused_elapsed_ms ?? 0);
+          const currentKey = sectionTimeKey(nextSegments[execution.current_segment_index]);
+          const sectionElapsedMs = { ...(execution.section_elapsed_ms ?? {}) };
+          if (currentKey !== null && sectionElapsedMs[currentKey] !== undefined) {
+            sectionElapsedMs[currentKey] = Math.max(0, sectionElapsedMs[currentKey]! - banked);
+          }
 
-      startTimer: (startedAt = Date.now()) =>
-        set({
-          status: "active",
-          segmentStartedAt: startedAt,
-          pausedElapsed: 0,
-          resumeCountdownEndsAt: null,
+          return {
+            executionId: execution.id,
+            lockVersion: execution.lock_version,
+            workoutId: execution.master_workout_id,
+            scaleSlug: execution.scale_level_slug,
+            segments: nextSegments,
+            baseSegments,
+            currentSegmentIndex: execution.current_segment_index,
+            status: executionStatusFromApi(execution.status),
+            segmentStartedAt:
+              execution.status === "active"
+                ? toTimestamp(execution.segment_started_at_utc)
+                : null,
+            pausedElapsed: banked,
+            resumeCountdownEndsAt: toTimestamp(execution.resume_countdown_ends_at_utc),
+            totalElapsedMs: Math.max(0, (execution.total_elapsed_ms ?? 0) - banked),
+            sectionElapsedMs,
+            segmentCycleCounts: execution.segment_cycle_counts ?? {},
+            checkedExerciseIds: normalizeCheckedExerciseIds(execution.checked_exercise_ids),
+            sectionScores: execution.section_scores,
+            exerciseNotes: execution.exercise_notes,
+            syncedMarks: serverMarks(execution),
+            durationAdjustments,
+            kpiCounters: sameExecution ? state.kpiCounters : {},
+            kpiPausedAt: sameExecution ? state.kpiPausedAt : null,
+          };
         }),
 
-      pauseTimer: (pausedAt = Date.now()) =>
+      setLockVersion: (lockVersion) => set({ lockVersion }),
+
+      acknowledge: (execution) =>
+        set({ lockVersion: execution.lock_version, syncedMarks: serverMarks(execution) }),
+
+      rebaseOnto: (execution, segments) => {
+        const before = get();
+        const base = before.syncedMarks ?? serverMarks(execution);
+        const local = marksOf(before);
+        get().hydrateFromExecution(execution, segments);
+        if (execution.status === "completed" || !hasMarkChanges(base, local)) return false;
+
+        const server = serverMarks(execution);
+        const rebased = rebaseProgressMarks(base, local, server);
+        if (!hasMarkChanges(server, rebased)) return false;
+
+        const adjustments = rebased.durationAdjustments ?? {};
+        set((state) => ({
+          ...rebased,
+          durationAdjustments: adjustments,
+          segments: applyDurationAdjustments(state.baseSegments, adjustments),
+          syncedMarks: server,
+          pendingSync: true,
+        }));
+        return true;
+      },
+
+      setPendingSync: (pendingSync) => set({ pendingSync }),
+
+      currentElapsedMs: (now = Date.now()) => {
+        const state = get();
+        return liveElapsedMs({
+          pausedElapsed: state.pausedElapsed,
+          segmentStartedAt: state.segmentStartedAt,
+          running: state.status === "active",
+          now,
+        });
+      },
+
+      pauseTimer: (pausedAt = Date.now(), maxElapsedMs = null) =>
         set((state) => {
-          const elapsed = state.segmentStartedAt
-            ? state.pausedElapsed + (pausedAt - state.segmentStartedAt)
+          const elapsed = state.status === "active"
+            ? liveElapsedMs({
+                pausedElapsed: state.pausedElapsed,
+                segmentStartedAt: state.segmentStartedAt,
+                running: true,
+                now: pausedAt,
+              })
             : state.pausedElapsed;
 
           return {
             status: "paused",
-            pausedElapsed: elapsed,
+            pausedElapsed: Math.round(maxElapsedMs === null ? elapsed : Math.min(elapsed, maxElapsedMs)),
             segmentStartedAt: null,
             resumeCountdownEndsAt: null,
           };
@@ -206,34 +414,30 @@ export const useExecutionStore = create<ExecutionState>()(
           resumeCountdownEndsAt: null,
         }),
 
-      advanceSegment: (startedAt = Date.now()) =>
+      moveToSegment: (index, { elapsedMs, startedAt }) =>
         set((state) => {
-          const next = state.currentSegmentIndex + 1;
+          const committed = addElapsed(state, state.segments[state.currentSegmentIndex], elapsedMs);
+          const kpiCounters =
+            index > state.currentSegmentIndex && isCountdown(state.segments[state.currentSegmentIndex])
+              ? { ...state.kpiCounters, countdown_segments: (state.kpiCounters.countdown_segments ?? 0) + 1 }
+              : state.kpiCounters;
 
-          if (next >= state.segments.length) {
+          if (index >= state.segments.length) {
             return {
+              ...committed,
+              kpiCounters,
               status: "completed" as ExecutionStatus,
-              currentSegmentIndex: state.currentSegmentIndex,
               segmentStartedAt: null,
               pausedElapsed: 0,
               resumeCountdownEndsAt: null,
             };
           }
 
-          return {
-            currentSegmentIndex: next,
-            status: "active" as ExecutionStatus,
-            segmentStartedAt: startedAt,
-            pausedElapsed: 0,
-            resumeCountdownEndsAt: null,
-          };
-        }),
-
-      jumpToSegment: (index, startedAt = Date.now()) =>
-        set((state) => {
-          if (index < 0 || index >= state.segments.length) return state;
+          if (index < 0) return state;
 
           return {
+            ...committed,
+            kpiCounters,
             currentSegmentIndex: index,
             segmentStartedAt: state.status === "active" ? startedAt : null,
             pausedElapsed: 0,
@@ -241,20 +445,110 @@ export const useExecutionStore = create<ExecutionState>()(
           };
         }),
 
-      commitSegmentElapsed: (sectionId, elapsedMs) =>
+      applyCatchUp: ({ completed, index, segmentStartedAt }) =>
+        set((state) => {
+          let totals = { totalElapsedMs: state.totalElapsedMs, sectionElapsedMs: state.sectionElapsedMs };
+          for (const step of completed) {
+            totals = addElapsed(totals, state.segments[step.index], step.elapsedMs);
+          }
+          const countdowns = completed.filter((step) => isCountdown(state.segments[step.index])).length;
+
+          return {
+            ...totals,
+            kpiCounters: countdowns
+              ? { ...state.kpiCounters, countdown_segments: (state.kpiCounters.countdown_segments ?? 0) + countdowns }
+              : state.kpiCounters,
+            currentSegmentIndex: index,
+            status: "active" as ExecutionStatus,
+            segmentStartedAt,
+            pausedElapsed: 0,
+            resumeCountdownEndsAt: null,
+          };
+        }),
+
+      adjustSegmentDuration: (index, deltaSeconds) =>
+        set((state) => {
+          const segment = state.segments[index];
+          const authored = state.baseSegments[index] ?? segment;
+          if (!isAdjustable(segment) || !isAdjustable(authored) || deltaSeconds === 0) return state;
+
+          const ranSeconds =
+            index === state.currentSegmentIndex ? Math.ceil(state.currentElapsedMs() / 1000) + 1 : 0;
+          const nextDuration = Math.min(
+            authored.duration_seconds + MAX_ADJUSTMENT_SECONDS,
+            Math.max(
+              MIN_ADJUSTED_SECONDS,
+              ranSeconds,
+              authored.duration_seconds - MAX_ADJUSTMENT_SECONDS,
+              segment.duration_seconds + deltaSeconds,
+            ),
+          );
+          if (nextDuration === segment.duration_seconds) return state;
+
+          const durationAdjustments = { ...state.durationAdjustments };
+          const delta = nextDuration - authored.duration_seconds;
+          if (delta === 0) delete durationAdjustments[segment.segment_key];
+          else durationAdjustments[segment.segment_key] = delta;
+
+          return {
+            durationAdjustments,
+            segments: applyDurationAdjustments(
+              state.baseSegments.length > 0 ? state.baseSegments : state.segments,
+              durationAdjustments,
+            ),
+          };
+        }),
+
+      setSegments: (segments) =>
         set((state) => ({
-          totalElapsedMs: state.totalElapsedMs + Math.max(0, elapsedMs),
-          sectionElapsedMs: {
-            ...state.sectionElapsedMs,
-            [sectionId]: (state.sectionElapsedMs[sectionId] ?? 0) + Math.max(0, elapsedMs),
-          },
+          baseSegments: segments,
+          segments: applyDurationAdjustments(segments, state.durationAdjustments),
         })),
+
+      countKpi: (key, amount = 1) =>
+        set((state) => ({
+          kpiCounters: { ...state.kpiCounters, [key]: Math.max(0, Math.round((state.kpiCounters[key] ?? 0) + amount)) },
+        })),
+
+      recordPauseKpi: (at = Date.now()) =>
+        set((state) => ({
+          kpiCounters: { ...state.kpiCounters, pauses: (state.kpiCounters.pauses ?? 0) + 1 },
+          kpiPausedAt: at,
+        })),
+
+      recordResumeKpi: (at = Date.now()) =>
+        set((state) =>
+          state.kpiPausedAt === null
+            ? state
+            : {
+                kpiCounters: {
+                  ...state.kpiCounters,
+                  paused_ms: (state.kpiCounters.paused_ms ?? 0) + Math.max(0, at - state.kpiPausedAt),
+                },
+                kpiPausedAt: null,
+              },
+        ),
+
+      recordFirstStartKpi: (at = Date.now()) =>
+        set((state) =>
+          state.kpiCounters.first_started_at_ms
+            ? state
+            : { kpiCounters: { ...state.kpiCounters, first_started_at_ms: Math.round(at) } },
+        ),
 
       incrementSegmentCycle: (segmentKey) =>
         set((state) => ({
           segmentCycleCounts: {
             ...state.segmentCycleCounts,
             [segmentKey]: (state.segmentCycleCounts[segmentKey] ?? 0) + 1,
+          },
+        })),
+
+      decrementSegmentCycle: (segmentKey) =>
+        set((state) => ({
+          segmentCycleCounts: {
+            ...state.segmentCycleCounts,
+            [segmentKey]: Math.max(0, (state.segmentCycleCounts[segmentKey] ?? 0) - 1),
           },
         })),
 
@@ -309,22 +603,19 @@ export const useExecutionStore = create<ExecutionState>()(
           segmentStartedAt: null,
           pausedElapsed: 0,
           resumeCountdownEndsAt: null,
+          pendingSync: false,
         }),
 
-      buildProgressPayload: (snapshot) => {
+      completionTotals: (now = Date.now()) => {
         const state = get();
-        const currentSegment = snapshot?.currentSegment ?? null;
-        const currentElapsedMs = Math.max(0, snapshot?.currentElapsedMs ?? 0);
-        const effectiveSectionElapsedMs = { ...state.sectionElapsedMs };
+        return addElapsed(state, state.segments[state.currentSegmentIndex], state.currentElapsedMs(now));
+      },
 
-        if (currentSegment) {
-          effectiveSectionElapsedMs[currentSegment.section_id] =
-            (effectiveSectionElapsedMs[currentSegment.section_id] ?? 0) + currentElapsedMs;
-        }
+      buildProgressPayload: () => {
+        const state = get();
+        if (!state.executionId) return null;
 
-        if (!state.executionId) {
-          return null;
-        }
+        const snapshot = addElapsed(state, state.segments[state.currentSegmentIndex], state.pausedElapsed);
 
         return {
           expected_version: state.lockVersion,
@@ -336,14 +627,16 @@ export const useExecutionStore = create<ExecutionState>()(
             state.status === "active" && state.segmentStartedAt
               ? new Date(state.segmentStartedAt).toISOString()
               : null,
-          paused_elapsed_ms: state.pausedElapsed,
-          total_elapsed_ms: state.totalElapsedMs + currentElapsedMs,
-          section_elapsed_ms: effectiveSectionElapsedMs,
+          paused_elapsed_ms: Math.round(state.pausedElapsed),
+          total_elapsed_ms: snapshot.totalElapsedMs,
+          section_elapsed_ms: snapshot.sectionElapsedMs,
           segment_cycle_counts: state.segmentCycleCounts,
           section_scores: state.sectionScores,
           resume_countdown_ends_at_utc: state.resumeCountdownEndsAt
             ? new Date(state.resumeCountdownEndsAt).toISOString()
             : null,
+          kpi_counters: state.kpiCounters,
+          duration_adjustments: state.durationAdjustments,
         };
       },
 
@@ -358,6 +651,7 @@ export const useExecutionStore = create<ExecutionState>()(
         workoutId: state.workoutId,
         scaleSlug: state.scaleSlug,
         segments: state.segments,
+        baseSegments: state.baseSegments,
         currentSegmentIndex: state.currentSegmentIndex,
         status: state.status,
         segmentStartedAt: state.segmentStartedAt,
@@ -369,6 +663,11 @@ export const useExecutionStore = create<ExecutionState>()(
         checkedExerciseIds: state.checkedExerciseIds,
         sectionScores: state.sectionScores,
         exerciseNotes: state.exerciseNotes,
+        pendingSync: state.pendingSync,
+        syncedMarks: state.syncedMarks,
+        durationAdjustments: state.durationAdjustments,
+        kpiCounters: state.kpiCounters,
+        kpiPausedAt: state.kpiPausedAt,
       }),
     },
   ),

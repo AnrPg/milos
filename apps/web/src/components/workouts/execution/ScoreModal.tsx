@@ -161,7 +161,7 @@ export function ScoreModal({
             onClick={handleSave}
             disabled={!value.trim() || isSaving}
             className="flex-1 rounded-xl py-2.5 text-sm font-semibold disabled:opacity-30"
-            style={{ background: "var(--accent, var(--primary))", color: "var(--text)" }}
+            style={{ background: "var(--accent, var(--primary))", color: "var(--primary-contrast)" }}
           >
             {isSaving ? i18n("saving56a2285") : i18n("saveefc007a")}
           </button>

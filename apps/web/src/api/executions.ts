@@ -7,10 +7,17 @@ export type TimerSegment = {
   section_name: string;
   format: string;
   kind: "countdown" | "countup" | "manual" | "no_timer" | "interval_cycle";
+  /** Work, rest inside a format, or a transition; older sequences omit it. */
+  phase?: "work" | "rest" | "transition";
+  /** Transition/rest inserted between sections; its time is not section time. */
+  between_sections?: boolean;
   duration_seconds: number | null;
   round: number | null;
   total_rounds: number | null;
   label: string;
+  /** Stable key for localizing `label`; absent when the label is the section name. */
+  label_key?: string | null;
+  label_params?: Record<string, string | number> | null;
   section_note?: string | null;
   scoreable: boolean;
   score_config: {
@@ -41,6 +48,8 @@ export type TimerSegment = {
     alternating_group_id?: string | null;
     note?: string | null;
     interval_assignment?: number | null;
+    /** Prescribed rest between this exercise's sets. */
+    rest_seconds?: number | null;
     excluded?: boolean;
   }>;
 };
@@ -90,6 +99,9 @@ export type WorkoutExecution = {
   }>;
   exercise_modifications: ExerciseModification[];
   lock_version: number;
+  kpi_counters?: Record<string, number>;
+  /** Mid-workout clock changes; older APIs omit the field. */
+  duration_adjustments?: Record<string, DurationAdjustment | number>;
   inserted_at: string;
 };
 
@@ -160,6 +172,28 @@ export type ExecutionProgressPayload = {
   section_elapsed_ms: Record<string, number>;
   segment_cycle_counts: Record<string, number>;
   section_scores: SectionScore[];
+  kpi_counters?: KpiCounters;
+  duration_adjustments?: Record<string, number>;
+};
+
+/** A stored mid-workout clock change, with the authored length for coaches. */
+export type DurationAdjustment = {
+  delta_seconds: number;
+  authored_seconds: number;
+  section_id?: string;
+  section_name?: string | null;
+  label?: string | null;
+};
+
+/** Device-observed execution KPIs; the API only ever lets them grow. */
+export type KpiCounters = {
+  skips?: number;
+  countdown_skips?: number;
+  countdown_segments?: number;
+  pauses?: number;
+  paused_ms?: number;
+  finish_wizard_opens?: number;
+  first_started_at_ms?: number;
 };
 
 export async function startExecution(
@@ -191,6 +225,8 @@ export async function completeExecution(
     total_elapsed_ms?: number;
     section_elapsed_ms?: Record<string, number>;
     segment_cycle_counts?: Record<string, number>;
+    kpi_counters?: KpiCounters;
+    duration_adjustments?: Record<string, number>;
   },
 ): Promise<WorkoutExecution> {
   const data = await apiRequest<{ execution: WorkoutExecution }>(

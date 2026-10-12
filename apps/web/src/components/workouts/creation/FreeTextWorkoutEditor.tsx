@@ -13,7 +13,7 @@ import { Plugin } from "@tiptap/pm/state";
 import { EditorContent, useEditor, type Editor, type JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import {
   createDraftWorkout,
@@ -25,7 +25,14 @@ import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { FREE_TEXT_EDITOR_CLASS, sanitizeWorkoutDslPaste } from "@/lib/workout-dsl-editor-data";
-import type { WorkoutType } from "@/types/workout";
+import {
+  FREE_TEXT_TIMER_METADATA_KEY,
+  type FreeTextTimerPreset,
+  parseFreeTextTimerPreset,
+} from "@/lib/free-text-timer";
+import { getFormatLabels, type WorkoutType } from "@/types/workout";
+
+import { FreeTextTimerFields } from "./FreeTextTimerFields";
 
 type Props = {
   draftId: string | null;
@@ -33,7 +40,7 @@ type Props = {
 };
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
-type RibbonKey = "overview" | "details" | "tools";
+type RibbonKey = "overview" | "details" | "timer" | "tools";
 
 const WORKOUT_TYPES: WorkoutType[] = [
   "crossfit",
@@ -60,8 +67,13 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
   const [collapsedRibbons, setCollapsedRibbons] = useState<Record<RibbonKey, boolean>>({
     overview: false,
     details: false,
+    timer: true,
     tools: false,
   });
+  /** Optional timer the athlete gets pre-selected; kept in `workout_metadata`. */
+  const [timerPreset, setTimerPreset] = useState<FreeTextTimerPreset | null>(null);
+  const metadataRef = useRef<Record<string, unknown>>({});
+  const formatLabels = useMemo(() => getFormatLabels(i18n), [i18n]);
   const loadedDraftRef = useRef<string | null>(null);
   const revisionRef = useRef<number | null>(null);
 
@@ -130,6 +142,8 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
           setType(workout.type as WorkoutType);
         }
         const nextBody = workout.free_text_body ?? "";
+        metadataRef.current = workout.workout_metadata ?? {};
+        setTimerPreset(parseFreeTextTimerPreset(metadataRef.current[FREE_TEXT_TIMER_METADATA_KEY]));
         revisionRef.current = workout.dsl_source_revision ?? 0;
         setBody(nextBody);
         editor.commands.setContent(workout.free_text_document ?? textToDocument(nextBody));
@@ -152,13 +166,14 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
         body,
         document: editor.getJSON(),
         expectedSourceRevision: revisionRef.current,
+        metadata: withTimerPreset(metadataRef.current, timerPreset),
       }));
       revisionRef.current = draft.dsl_source_revision ?? revisionRef.current;
       setSaveStatus("saved");
     } catch {
       setSaveStatus("error");
     }
-  }, [accessToken, body, draftId, editor, title, type]);
+  }, [accessToken, body, draftId, editor, timerPreset, title, type]);
 
   useEffect(() => {
     if (!draftId || loadedDraftRef.current !== draftId) return;
@@ -166,7 +181,7 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
       void saveDraft();
     }, 1_000);
     return () => window.clearTimeout(timer);
-  }, [body, draftId, saveDraft, title, type]);
+  }, [body, draftId, saveDraft, timerPreset, title, type]);
 
   const canPublish = Boolean(accessToken && draftId && editor && title.trim() && body.trim() && !publishing);
 
@@ -175,7 +190,14 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
     setPublishing(true);
 
     try {
-      const payload = buildPayload({ title, type, body, document: editor.getJSON(), expectedSourceRevision: revisionRef.current });
+      const payload = buildPayload({
+        title,
+        type,
+        body,
+        document: editor.getJSON(),
+        expectedSourceRevision: revisionRef.current,
+        metadata: withTimerPreset(metadataRef.current, timerPreset),
+      });
       const draft = await updateDraftWorkout(accessToken, draftId, payload);
       revisionRef.current = draft.dsl_source_revision ?? revisionRef.current;
       await publishWorkoutDraft(accessToken, draftId, {
@@ -250,6 +272,31 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
                 ))}
               </select>
             </label>
+          </div>
+        </CollapsibleRibbon>
+
+        <CollapsibleRibbon
+          label={i18n("freeTextTimerRibbonLabel")}
+          collapsed={collapsedRibbons.timer}
+          onToggle={() => toggleRibbon("timer")}
+        >
+          <div className="p-4">
+            <label className="flex items-center gap-2 text-sm font-semibold" style={{ color: "var(--text)" }}>
+              <input
+                type="checkbox"
+                checked={timerPreset !== null}
+                onChange={(event) =>
+                  setTimerPreset(event.target.checked ? { format: "for_time", duration_seconds: 720 } : null)
+                }
+              />
+              {i18n("attachTimerLabel")}
+            </label>
+            <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
+              {i18n("attachTimerHint")}
+            </p>
+            {timerPreset ? (
+              <FreeTextTimerFields preset={timerPreset} formatLabels={formatLabels} onChange={setTimerPreset} />
+            ) : null}
           </div>
         </CollapsibleRibbon>
 
@@ -601,12 +648,14 @@ function buildPayload({
   body,
   document,
   expectedSourceRevision,
+  metadata,
 }: {
   title: string;
   type: WorkoutType;
   body: string;
   document: JSONContent;
   expectedSourceRevision?: number | null;
+  metadata: Record<string, unknown>;
 }) {
   return {
     title,
@@ -614,6 +663,7 @@ function buildPayload({
     authoring_mode: "free_text",
     free_text_body: body,
     free_text_document: document,
+    workout_metadata: metadata,
     expected_source_revision: expectedSourceRevision,
     draft_data: {
       title,
@@ -621,10 +671,17 @@ function buildPayload({
       authoring_mode: "free_text",
       free_text_body: body,
       free_text_document: document,
+      workout_metadata: metadata,
       sections: [],
     },
     sections: [],
   };
+}
+
+function withTimerPreset(metadata: Record<string, unknown>, preset: FreeTextTimerPreset | null) {
+  const rest = { ...metadata };
+  delete rest[FREE_TEXT_TIMER_METADATA_KEY];
+  return preset ? { ...rest, [FREE_TEXT_TIMER_METADATA_KEY]: preset } : rest;
 }
 
 function toolbarButton(label: string, text: string, active: boolean, run: () => unknown) {

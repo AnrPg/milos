@@ -165,7 +165,7 @@ export function NoteModal({
             onClick={handleSave}
             disabled={isSaving}
             className="flex-1 rounded-xl py-2.5 text-sm font-semibold"
-            style={{ background: "var(--accent, var(--primary))", color: "var(--text)" }}
+            style={{ background: "var(--accent, var(--primary))", color: "var(--primary-contrast)" }}
             type="button"
           >
             {isSaving ? i18n("saving56a2285") : existingNote ? i18n("updatefb91e24") : i18n("saveefc007a")}

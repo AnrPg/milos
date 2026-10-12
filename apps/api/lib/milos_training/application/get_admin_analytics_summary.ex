@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.GetAdminAnalyticsSummary do
-  alias MilosTraining.{Analytics, Coaching, Feedback, Finance, Wellbeing}
+  alias MilosTraining.{Analytics, Coaching, Execution, Feedback, Finance, Wellbeing}
 
   def call(params \\ %{}) do
     analytics = Analytics.analytics_summary(params)
@@ -7,6 +7,7 @@ defmodule MilosTraining.Application.GetAdminAnalyticsSummary do
     coaching = Coaching.get_aggregates()
     feedback = Feedback.review_summary(params)
     wellbeing = Wellbeing.injury_summary(params)
+    execution = Execution.execution_kpis(since(params))
 
     {:ok,
      %{
@@ -15,8 +16,30 @@ defmodule MilosTraining.Application.GetAdminAnalyticsSummary do
        finance: finance,
        coaching: coaching,
        feedback: feedback,
-       wellbeing: wellbeing
+       wellbeing: wellbeing,
+       execution: execution
      }}
+  end
+
+  @default_days 30
+
+  # Same window the other summaries use (`days`, default 30).
+  defp since(params) do
+    days =
+      case params[:days] || params["days"] do
+        days when is_integer(days) and days > 0 -> days
+        days when is_binary(days) -> parse_days(days)
+        _ -> @default_days
+      end
+
+    DateTime.add(DateTime.utc_now(), -days * 86_400, :second)
+  end
+
+  defp parse_days(value) do
+    case Integer.parse(value) do
+      {days, ""} when days > 0 -> days
+      _ -> @default_days
+    end
   end
 
   defp dashboard_view(analytics, finance, coaching, feedback, wellbeing) do

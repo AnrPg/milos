@@ -192,6 +192,36 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
     end
   end
 
+  @impl true
+  def list_executions_for_kpis(%DateTime{} = since) do
+    case RepoContext.current_setting("app.organization_id") do
+      organization_id when is_binary(organization_id) ->
+        WorkoutExecution
+        |> where(
+          [execution],
+          execution.organization_id == ^organization_id and execution.started_at_utc >= ^since
+        )
+        |> select([execution], %{
+          status: execution.status,
+          completed_at_utc: execution.completed_at_utc,
+          current_segment_index: execution.current_segment_index,
+          section_scores: execution.section_scores,
+          kpi_counters: execution.kpi_counters,
+          duration_adjustments: execution.duration_adjustments,
+          total_elapsed_ms: execution.total_elapsed_ms,
+          source: execution.source,
+          started_at_utc: execution.started_at_utc
+        })
+        |> Repo.all()
+        |> Enum.map(fn row ->
+          if row.completed_at_utc, do: %{row | status: :completed}, else: row
+        end)
+
+      _missing_scope ->
+        []
+    end
+  end
+
   defp normalize(%WorkoutExecution{} = execution) do
     normalized_status =
       cond do
@@ -232,6 +262,8 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
       exercise_notes: execution.exercise_notes || [],
       exercise_modifications: execution.exercise_modifications || [],
       lock_version: execution.lock_version,
+      kpi_counters: execution.kpi_counters || %{},
+      duration_adjustments: execution.duration_adjustments || %{},
       inserted_at: execution.inserted_at
     }
   end

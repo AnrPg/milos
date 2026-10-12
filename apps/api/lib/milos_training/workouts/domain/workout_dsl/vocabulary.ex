@@ -47,7 +47,13 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Vocabulary do
     },
     "complex_emom" => %{
       required: [:duration_seconds, :interval_seconds],
-      optional: [:scoring_mode, :amrap_scoring_style, :max_windows, :transition_seconds],
+      optional: [
+        :scoring_mode,
+        :amrap_scoring_style,
+        :max_windows,
+        :transition_seconds,
+        :interval_pattern_seconds
+      ],
       dsl_required: [:duration_seconds, :interval_seconds],
       body: "interval-slots",
       scores: ~w(reps rounds rounds+reps)
@@ -178,6 +184,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Vocabulary do
   @timer_dsl_keys %{
     "duration" => :duration_seconds,
     "interval" => :interval_seconds,
+    "interval-pattern" => :interval_pattern_seconds,
     "time-cap" => :time_cap_seconds,
     "work" => :work_seconds,
     "rest" => :rest_seconds,
@@ -303,6 +310,8 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Vocabulary do
       if candidate == field, do: key
     end)
   end
+
+  def timer_value_kind(:interval_pattern_seconds), do: :duration_list
 
   def timer_value_kind(field)
       when field in [

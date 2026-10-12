@@ -45,5 +45,7 @@ defmodule MilosTrainingWeb.AdminAnalyticsControllerTest do
     assert is_map(response["coaching"])
     assert is_integer(response["coaching"]["active_athlete_count"])
     assert is_map(response["dashboard"]["cross_context"])
+    assert response["execution"]["started"] == 0
+    assert Map.has_key?(response["execution"], "completion_rate")
   end
 end

@@ -39,6 +39,25 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Values do
 
   def duration(_value), do: :error
 
+  @doc "Parses a comma-separated list of durations, e.g. `1 min, 2 min, 90 sec`."
+  def duration_list(raw) when is_binary(raw) do
+    raw
+    |> String.split(",")
+    |> Enum.reduce_while({:ok, []}, fn part, {:ok, acc} ->
+      case duration(part) do
+        {:ok, seconds} -> {:cont, {:ok, [seconds | acc]}}
+        :error -> {:halt, :error}
+      end
+    end)
+    |> case do
+      {:ok, []} -> :error
+      {:ok, values} -> {:ok, Enum.reverse(values)}
+      :error -> :error
+    end
+  end
+
+  def duration_list(_value), do: :error
+
   def duration_range(raw) when is_binary(raw) do
     case String.split(raw, ~r/\s*(?:\.\.|to)\s*/i, parts: 2) do
       [left, right] ->

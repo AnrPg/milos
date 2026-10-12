@@ -11,12 +11,13 @@ defmodule MilosTraining.Execution do
 
   alias MilosTraining.Execution.Domain.{
     ExecutionAnalytics,
+    ExecutionKpis,
     TimerSequenceBuilder,
     TrainingLogPolicy
   }
 
   alias MilosTraining.Execution.Queries.{GetExecution, GetTrainingLogEntries}
-  alias MilosTraining.Execution.{ExecutionStore, TrainingLogStore}
+  alias MilosTraining.Execution.{ClassTimerStore, ExecutionStore, TrainingLogStore}
 
   defdelegate start_execution(user_id, params), to: StartExecution, as: :call
   defdelegate complete_execution(id, user_id, params), to: CompleteExecution, as: :call
@@ -34,7 +35,22 @@ defmodule MilosTraining.Execution do
   def list_executions_for_coaching(user_id),
     do: ExecutionStore.list_executions_for_coaching(user_id)
 
+  @doc "Execution KPI report for the current organization since `since`."
+  def execution_kpis(%DateTime{} = since) do
+    since
+    |> ExecutionStore.list_executions_for_kpis()
+    |> ExecutionKpis.summarize()
+    |> Map.put(:since, since)
+  end
+
+  def get_class_timer(context, scheduled_class_id),
+    do: ClassTimerStore.get_class_timer(context, scheduled_class_id)
+
+  def save_class_timer(context, scheduled_class_id, attrs, expected_version),
+    do: ClassTimerStore.save_class_timer(context, scheduled_class_id, attrs, expected_version)
+
   defdelegate build_timer_sequence(workout), to: TimerSequenceBuilder, as: :build
+  defdelegate preview_timer_sequence(workout), to: TimerSequenceBuilder, as: :preview
 
   # -- Analytics facts (ADR-113) ----------------------------------------------
 

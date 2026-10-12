@@ -68,6 +68,10 @@ config :milos_training,
        MilosTraining.Infrastructure.Execution.EctoExecutionStore
 
 config :milos_training,
+       :class_timer_store,
+       MilosTraining.Infrastructure.Execution.EctoClassTimerStore
+
+config :milos_training,
        :training_log_store,
        MilosTraining.Infrastructure.Execution.EctoTrainingLogStore
 
@@ -182,6 +186,10 @@ config :logger, :default_formatter,
 config :phoenix, :json_library, Jason
 
 config :open_api_spex, :json_render_error_v2, true
+
+# Cache the API spec once; see MilosTrainingWeb.OpenApiSpecCache for why the
+# default adapter exhausts the VM's literal area.
+config :open_api_spex, :cache_adapter, MilosTrainingWeb.OpenApiSpecCache
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

@@ -23,7 +23,9 @@ defmodule MilosTraining.Execution.Domain.TenantDataPolicy do
               %{table: "workout_executions"},
               # ADR-108 standalone training-log entries; their RLS USING clause
               # admits organization sessions, so purge runs per tenant.
-              %{table: "training_log_entries"}
+              %{table: "training_log_entries"},
+              # Coach-run class timers (one per scheduled class), RLS by organization.
+              %{table: "class_timers"}
             ]
           })
 

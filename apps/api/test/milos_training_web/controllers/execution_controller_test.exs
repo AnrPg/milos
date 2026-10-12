@@ -448,6 +448,45 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
 
       assert updated["lock_version"] == execution["lock_version"] + 1
 
+      counted =
+        athlete_conn
+        |> recycle()
+        |> patch(
+          "/api/executions/#{execution["id"]}/progress",
+          valid
+          |> Map.merge(%{
+            expected_version: updated["lock_version"],
+            operation_id: Ecto.UUID.generate(),
+            kpi_counters: %{pauses: 2, skips: 1, bogus: 7}
+          })
+        )
+        |> json_response(200)
+        |> Map.fetch!("execution")
+
+      assert %{"pauses" => 2, "skips" => 1, "position" => %{"format" => "for_time"}} =
+               counted["kpi_counters"]
+
+      refute Map.has_key?(counted["kpi_counters"], "bogus")
+
+      stale_counters =
+        athlete_conn
+        |> recycle()
+        |> patch(
+          "/api/executions/#{execution["id"]}/progress",
+          valid
+          |> Map.merge(%{
+            expected_version: counted["lock_version"],
+            operation_id: Ecto.UUID.generate(),
+            kpi_counters: %{pauses: 1}
+          })
+        )
+        |> json_response(200)
+        |> Map.fetch!("execution")
+
+      assert stale_counters["kpi_counters"]["pauses"] == 2
+      assert stale_counters["duration_adjustments"] == %{}
+      updated = stale_counters
+
       replayed =
         athlete_conn
         |> recycle()
@@ -479,6 +518,63 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
           segment_cycle_counts: %{forged: 42}
       })
       |> json_response(400)
+    end
+
+    test "progress stores clock adjustments for timed segments with authored context", %{
+      conn: conn
+    } do
+      admin = create_admin!("execution_adjust_admin")
+      athlete_conn = authenticate_as_member(conn, "execution_adjust_athlete")
+      :ok = ensure_scale_level!("scaled", "Scaled")
+
+      {:ok, workout} =
+        Workouts.create_workout(legacy_context!(admin), admin, %{
+          title: "Adjustable AMRAP",
+          type: "crossfit",
+          sections: [
+            %{
+              name: "AMRAP 10",
+              order: 1,
+              scoreable: false,
+              timer_config: %{type: "amrap", duration_seconds: 600},
+              exercises: [%{name: "Burpee", order: 1, prescription_value: 10}]
+            }
+          ]
+        })
+
+      execution =
+        athlete_conn
+        |> post("/api/executions", %{master_workout_id: workout.id, source: "self_selected"})
+        |> json_response(201)
+        |> Map.fetch!("execution")
+
+      updated =
+        athlete_conn
+        |> recycle()
+        |> patch("/api/executions/#{execution["id"]}/progress", %{
+          expected_version: execution["lock_version"],
+          operation_id: Ecto.UUID.generate(),
+          checked_exercise_ids: [],
+          current_segment_index: 0,
+          status: "paused",
+          paused_elapsed_ms: 1_000,
+          total_elapsed_ms: 1_000,
+          section_elapsed_ms: %{},
+          segment_cycle_counts: %{},
+          duration_adjustments: %{"segment:0" => 120, "segment:7" => 30}
+        })
+        |> json_response(200)
+        |> Map.fetch!("execution")
+
+      assert %{
+               "segment:0" => %{
+                 "delta_seconds" => 120,
+                 "authored_seconds" => 600,
+                 "section_name" => "AMRAP 10"
+               }
+             } = updated["duration_adjustments"]
+
+      refute Map.has_key?(updated["duration_adjustments"], "segment:7")
     end
 
     test "completion persists measured fallback scores when none are submitted manually", %{

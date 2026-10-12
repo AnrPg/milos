@@ -879,6 +879,9 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
         :duration ->
           {&Values.duration/1, :invalid_duration}
 
+        :duration_list ->
+          {&Values.duration_list/1, :invalid_duration}
+
         :distance ->
           {&Values.distance/1, :invalid_distance}
 
