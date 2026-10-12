@@ -1,4 +1,5 @@
 defmodule MilosTraining.Organizations do
+  alias MilosTraining.Organizations.Domain.BrandLogoPolicy
   alias MilosTraining.Organizations.OrganizationStore
 
   alias MilosTraining.Organizations.Commands.{
@@ -12,6 +13,7 @@ defmodule MilosTraining.Organizations do
     ProvisionOrganization,
     RedeemInvitation,
     RenameOrganization,
+    ReplaceOrganizationLogo,
     RequestOrganizationPurge,
     RevokeInvitation,
     SendOwnerInvitationEmail,
@@ -25,6 +27,7 @@ defmodule MilosTraining.Organizations do
   alias MilosTraining.Organizations.Queries.{
     BuildTenantPurgeContext,
     FindOrganization,
+    GetOrganizationBranding,
     GetOrganizationPurge,
     InspectInvitation,
     ListActiveMembershipUserIds,
@@ -132,6 +135,40 @@ defmodule MilosTraining.Organizations do
         changed_at \\ DateTime.utc_now()
       ),
       do: UpdateOrganizationSettings.call(context, organization_id, params, changed_at)
+
+  # ADR-103 first-class tenant logo upload. `context` is a tenant owner/admin
+  # `TenantContext` (organization_id may be nil: their own organization) or a
+  # vendor `PlatformContext` (organization_id required).
+  def get_organization_branding(context, organization_id \\ nil),
+    do: GetOrganizationBranding.call(context, organization_id)
+
+  def authorize_logo_change(context, organization_id \\ nil),
+    do: BrandLogoPolicy.authorize(context, organization_id)
+
+  @doc "Validates an upload request and allocates the object key it may write."
+  def allocate_logo_key(organization_id, content_type, byte_size) do
+    with {:ok, content_type} <- BrandLogoPolicy.validate_request(content_type, byte_size) do
+      {:ok,
+       %{
+         key: BrandLogoPolicy.object_key(organization_id, Ecto.UUID.generate(), content_type),
+         content_type: content_type,
+         max_bytes: BrandLogoPolicy.max_bytes()
+       }}
+    end
+  end
+
+  def logo_key_owned?(organization_id, key), do: BrandLogoPolicy.owned_key?(organization_id, key)
+  def logo_probe_bytes, do: BrandLogoPolicy.probe_bytes()
+  def validate_logo_object(key, object), do: BrandLogoPolicy.validate_object(key, object)
+
+  def superseded_logo_key(organization_id, previous_key, next_key),
+    do: BrandLogoPolicy.superseded_key(organization_id, previous_key, next_key)
+
+  def set_organization_logo(context, organization_id, logo, changed_at \\ DateTime.utc_now()),
+    do: ReplaceOrganizationLogo.call(context, organization_id, logo, changed_at)
+
+  def remove_organization_logo(context, organization_id, changed_at \\ DateTime.utc_now()),
+    do: ReplaceOrganizationLogo.call(context, organization_id, nil, changed_at)
 
   # ADR-099 reviewed tenant export/purge workflow. Purge records are
   # platform-level and survive the organization they describe.

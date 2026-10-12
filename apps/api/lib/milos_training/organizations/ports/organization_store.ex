@@ -53,6 +53,21 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   @callback get_organization_settings(Ecto.UUID.t()) :: OrganizationSetting.t() | nil
   @callback update_organization_settings(Ecto.UUID.t(), map(), Ecto.UUID.t(), DateTime.t()) ::
               {:ok, OrganizationSetting.t()} | {:error, term()}
+  # ADR-103: sets (`%{object_key, url}`) or clears (nil) the uploaded logo and
+  # records the audit event in one transaction.
+  @callback replace_organization_logo(
+              Ecto.UUID.t(),
+              %{object_key: String.t(), url: String.t()} | nil,
+              %{user_id: Ecto.UUID.t(), scope: :tenant | :vendor},
+              DateTime.t()
+            ) ::
+              {:ok,
+               %{
+                 settings: OrganizationSetting.t(),
+                 previous_object_key: String.t() | nil,
+                 event: String.t() | nil
+               }}
+              | {:error, term()}
   @callback update_membership_status(Ecto.UUID.t(), Ecto.UUID.t(), atom()) ::
               {:ok, OrganizationMembership.t()} | {:error, term()}
   @callback update_membership_role(Ecto.UUID.t(), Ecto.UUID.t(), atom()) ::

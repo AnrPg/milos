@@ -4,7 +4,7 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   import Ecto.Query
 
   alias Ecto.Multi
-  alias MilosTraining.Organizations.Domain.InvitationPolicy
+  alias MilosTraining.Organizations.Domain.{BrandLogoPolicy, InvitationPolicy}
 
   alias MilosTraining.Organizations.{
     Organization,
@@ -508,6 +508,51 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
       |> unwrap_or_rollback()
 
       updated
+    end)
+    |> flatten_transaction()
+  end
+
+  @impl true
+  def replace_organization_logo(organization_id, logo, actor, changed_at) do
+    next_key = logo && logo.object_key
+
+    Repo.transaction(fn ->
+      settings =
+        OrganizationSetting
+        |> where([settings], settings.organization_id == ^organization_id)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      if is_nil(settings), do: Repo.rollback(:not_found)
+
+      case BrandLogoPolicy.change_event(settings, next_key) do
+        nil ->
+          %{settings: settings, previous_object_key: nil, event: nil}
+
+        event ->
+          updated =
+            settings
+            |> OrganizationSetting.logo_changeset(%{
+              brand_logo_object_key: next_key,
+              brand_logo_url: logo && logo.url
+            })
+            |> Repo.update()
+            |> unwrap_or_rollback()
+
+          %OrganizationProvisioningEvent{}
+          |> OrganizationProvisioningEvent.changeset(%{
+            organization_id: organization_id,
+            # The audit column predates tenant-initiated events; it records
+            # the acting account, and metadata.actor_scope says which kind.
+            vendor_user_id: actor.user_id,
+            event: event,
+            metadata: BrandLogoPolicy.event_metadata(actor, settings, next_key, changed_at)
+          })
+          |> Repo.insert()
+          |> unwrap_or_rollback()
+
+          %{settings: updated, previous_object_key: settings.brand_logo_object_key, event: event}
+      end
     end)
     |> flatten_transaction()
   end

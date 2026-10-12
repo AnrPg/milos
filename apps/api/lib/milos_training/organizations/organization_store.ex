@@ -119,6 +119,10 @@ defmodule MilosTraining.Organizations.OrganizationStore do
       )
 
   @impl true
+  def replace_organization_logo(organization_id, logo, actor, changed_at),
+    do: impl().replace_organization_logo(organization_id, logo, actor, changed_at)
+
+  @impl true
   def update_membership_role(organization_id, membership_id, role),
     do: impl().update_membership_role(organization_id, membership_id, role)
 
