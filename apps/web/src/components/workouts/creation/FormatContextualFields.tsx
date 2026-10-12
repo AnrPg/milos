@@ -6,7 +6,9 @@
 import {useUiTranslations} from "@/i18n/ui";
 import { FORMAT_FIELD_DEFS, type FormatParams, type SectionFormat } from "@/types/workout";
 
-import { TimeInput } from "./TimeInput";
+import { LONG_DURATION_PRESETS, SHORT_DURATION_PRESETS, TimeInput } from "./TimeInput";
+
+const LONG_DURATION_FIELDS = new Set(["duration_seconds", "time_cap_seconds", "recovery_cap_seconds"]);
 import { SemanticLabel } from "@/components/semantic-label";
 
 type FieldLabel = {
@@ -113,7 +115,7 @@ export function FormatContextualFields({ format, params, onChange }: Props) {
         const field = { ...label, defaultValue };
 
         return (
-          <div key={field.key} className="flex items-center justify-between gap-2">
+          <div key={field.key} className="flex items-start justify-between gap-2">
             <label className="shrink-0 text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
               {field.label}
               {field.optional ? (
@@ -128,6 +130,8 @@ export function FormatContextualFields({ format, params, onChange }: Props) {
                 <TimeInput
                   value={typeof value === "number" ? value : null}
                   onChange={(secs) => onChange({ ...params, [field.key]: secs })}
+                  presets={LONG_DURATION_FIELDS.has(field.key) ? LONG_DURATION_PRESETS : SHORT_DURATION_PRESETS}
+                  ariaLabel={field.label}
                 />
               ) : (
                 <>

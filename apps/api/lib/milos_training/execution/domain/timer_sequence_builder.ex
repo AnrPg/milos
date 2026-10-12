@@ -52,6 +52,38 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
     end)
   end
 
+  @doc """
+  Summarizes the sequence an athlete will run for authoring previews: one slim
+  entry per segment plus the total length of the timed part. `open_ended` is
+  true when any segment only ends when the athlete says so (stopwatches,
+  manual steps, uncapped interval cycles).
+  """
+  def preview(workout) do
+    segments = build(workout)
+
+    %{
+      segments:
+        Enum.map(
+          segments,
+          &Map.take(&1, [:label, :kind, :phase, :duration_seconds, :round, :total_rounds])
+        ),
+      total_seconds: Enum.reduce(segments, 0, &(&2 + timed_seconds(&1))),
+      open_ended: Enum.any?(segments, &open_ended?/1)
+    }
+  end
+
+  defp timed_seconds(%{kind: :countdown, duration_seconds: seconds}), do: seconds
+
+  defp timed_seconds(%{kind: :interval_cycle, duration_seconds: seconds, total_rounds: rounds})
+       when is_integer(rounds),
+       do: seconds * rounds
+
+  defp timed_seconds(_segment), do: 0
+
+  defp open_ended?(%{kind: :countdown}), do: false
+  defp open_ended?(%{kind: :interval_cycle, total_rounds: rounds}), do: not is_integer(rounds)
+  defp open_ended?(_segment), do: true
+
   defp build_section(section, all_sections) do
     child_sections = children_of(section, all_sections)
 

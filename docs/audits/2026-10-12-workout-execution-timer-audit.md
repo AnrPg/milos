@@ -28,6 +28,12 @@ the exact lines. None were reproduced in a running app; §8 lists how to confirm
   it a second time. This also fixes the score-on-the-last-segment path, which used to count that
   segment twice.
 
+**P1 shipped (2026-10-12)**: T2, T5–T9, U3–U7, V2–V5, §6 duration input and timeline preview,
+plus follow-ups: Complex EMOM rotation and per-minute interval patterns, the pause double count,
+and light-theme button contrast. ADR-009 has an amendment describing the new timer engine and
+progress sync. Still open (P2): localized backend labels (T11), template presets (§6.5), free-text
+timer unification (T10), landscape/cast mode, Media Session, and KPI instrumentation.
+
 ---
 
 ## 0. Executive summary

@@ -175,3 +175,32 @@ bounded TTL to offline reads.
 - Execution progress snapshots are now semantic as well as transport-level: the backend stores `total_elapsed_ms`, per-section elapsed maps, per-segment cycle counters, and auto-derived section score snapshots so interrupted sessions retain meaningful progress even before final completion.
 - Timer segments now carry stable `segment_key` identifiers and execution checklist steps are keyed by segment + exercise + set, which prevents repeated rounds or interval segments from colliding on the same exercise ID.
 - Completing a scoreable workout no longer depends on manual score entry. The score modal is prefilled with a measured value, the athlete may override it, and if they do not, the backend persists the derived fallback score automatically. For scoreable time-based formats this fixes blank history entries like completed for-time workouts with no submitted score.
+
+## Schedule-Based Timer and Optimistic Progress Amendment — 2026-10-12
+
+Supersedes the "commit after acknowledgement" rule above for execution
+progress, and the IndexedDB check-off queue.
+
+- **Timer engine** (`apps/web/src/lib/timer-engine.ts`): pure functions derive
+  every clock from the segment's scheduled start, banked pause time and "now".
+  When a timed segment ends, the next one starts at the moment it ended
+  (`planCatchUp`), not when the client noticed or the server answered, and
+  every segment that ran out while the page was hidden is skipped through in
+  one step. Ticks use `setInterval` plus `visibilitychange`, because
+  `requestAnimationFrame` stops in background tabs.
+- **Optimistic progress**: all progress changes apply locally first and are
+  sent by `useExecutionSync`, one request at a time, coalescing changes made
+  during a request. Failures leave `pendingSync` set and retry; on reload the
+  unsynced local state wins while the server `lock_version` is unchanged. A
+  409 means another device moved on: the server state wins.
+- **Elapsed accounting**: the client store holds committed time only (segments
+  already left). Progress snapshots send committed time plus the current
+  segment's banked pause time, and hydration subtracts it again. A pause is no
+  longer counted twice, and leaving a segment backwards commits its time.
+- **Sequence shape**: segments carry `phase` (`work`/`rest`/`transition`).
+  Between-section transitions and rests use synthetic `<id>:transition` and
+  `<id>:rest-after` section ids and never count toward section time or scoring.
+  Open-ended formats (Death By, EMOM to failure) are one `interval_cycle`
+  segment. Round counts may decrease (undo); elapsed totals stay monotonic.
+- **Authoring preview**: `POST /admin/workouts/timer-preview` runs the same
+  builder on a draft section, so the editor's timeline always matches execution.

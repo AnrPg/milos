@@ -1,5 +1,5 @@
 defmodule MilosTraining.Workouts do
-  alias MilosTraining.Workouts.Domain.{WorkoutDsl, WorkoutType}
+  alias MilosTraining.Workouts.Domain.{TimerConfig, WorkoutDsl, WorkoutType}
   alias MilosTraining.Workouts.Domain.WorkoutDsl.Preflight
   alias MilosTraining.Workouts.Domain.WorkoutDsl.{Manual, Templates, Vocabulary}
 
@@ -86,6 +86,7 @@ defmodule MilosTraining.Workouts do
   defdelegate materialize_workout(id), to: MaterializeWorkout, as: :by_id
   def supported_workout_types, do: WorkoutType.values()
   def parse_dsl(source), do: WorkoutDsl.parse(source)
+  def normalize_timer_config(config), do: TimerConfig.normalize(config)
   def format_dsl(workout, opts \\ []), do: WorkoutDsl.format(workout, opts)
   def dsl_vocabulary, do: Vocabulary.export()
   def dsl_manual, do: Manual.export()

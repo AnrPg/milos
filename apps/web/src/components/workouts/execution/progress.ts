@@ -109,15 +109,33 @@ function exerciseSetCount(exercise: TimerSegment["exercises"][number]) {
   return exercise.sets && exercise.sets > 1 ? exercise.sets : 1;
 }
 
+const ROUND_COUNTING_FORMATS = [
+  "amrap",
+  "edt",
+  "death_by",
+  "ladder_ascending",
+  "ladder_descending",
+  "pyramid",
+];
+
+/**
+ * Segments where the athlete repeats the same list and counts rounds: AMRAP
+ * style formats, ladders, open-ended interval cycles (Death By, EMOM to
+ * failure) and "N rounds for time".
+ */
 export function isRepeatableSegment(segment: TimerSegment) {
-  return [
-    "amrap",
-    "edt",
-    "death_by",
-    "ladder_ascending",
-    "ladder_descending",
-    "pyramid",
-  ].includes(segment.format);
+  return (
+    ROUND_COUNTING_FORMATS.includes(segment.format) ||
+    segment.kind === "interval_cycle" ||
+    roundTarget(segment) !== null
+  );
+}
+
+/** Rounds to complete before the segment is done ("5 rounds for time"). */
+export function roundTarget(segment: TimerSegment) {
+  return segment.format === "for_time" && segment.total_rounds && segment.total_rounds > 1
+    ? segment.total_rounds
+    : null;
 }
 
 export function shouldAutoAdvanceOnChecklistComplete(segment: TimerSegment) {
@@ -126,6 +144,33 @@ export function shouldAutoAdvanceOnChecklistComplete(segment: TimerSegment) {
   }
 
   return segment.kind === "countup" || segment.kind === "manual" || segment.kind === "no_timer";
+}
+
+/**
+ * Exercises of an interval cycle shown in a given window. Exercises assigned to
+ * minute N of a rotation repeat every rotation (the authored interval pattern
+ * length, else the highest assignment); unassigned ones appear every window.
+ */
+export function stepsForWindow(segment: TimerSegment, windowIndex: number | null) {
+  const steps = buildSegmentStepDefinitions(segment);
+  if (windowIndex === null || segment.kind !== "interval_cycle") return steps;
+
+  const pattern = segment.timer_config?.interval_pattern_seconds;
+  const assignments = segment.exercises
+    .map((exercise) => exercise.interval_assignment ?? 0)
+    .filter((assignment) => assignment > 0);
+  const rotation = Array.isArray(pattern) && pattern.length > 0 ? pattern.length : Math.max(0, ...assignments);
+  if (rotation === 0) return steps;
+
+  const slot = ((windowIndex - 1) % rotation) + 1;
+  return steps.filter(
+    (step) => step.exercise.interval_assignment == null || step.exercise.interval_assignment === slot,
+  );
+}
+
+/** Reps each exercise targets in a round of a growing/shrinking format. */
+export function targetRepsForRound(segment: TimerSegment, round: number) {
+  return repsForRound(segment, round);
 }
 
 /**

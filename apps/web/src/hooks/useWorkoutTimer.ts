@@ -3,23 +3,29 @@
 import { useEffect, useState } from "react";
 
 import type { TimerSegment } from "@/api/executions";
+import { liveElapsedMs, readSegmentClock, type SegmentClock } from "@/lib/timer-engine";
 
 export type TimerState = {
+  /** Whole seconds elapsed in the segment. */
   elapsed: number;
+  elapsedMs: number;
+  /** Whole seconds left (countdown, cap or current window); null when untimed. */
   remaining: number | null;
   isExpired: boolean;
+  clock: SegmentClock | null;
 };
 
-type Tick = { key: string; elapsedMs: number };
+const TICK_MS = 250;
 
 /**
- * Drives a single timer segment using requestAnimationFrame for accuracy (±100ms).
- * Wall-clock diff against startTime ensures no drift across frames.
+ * Reads the current segment's clock. Time is always derived from the
+ * segment's scheduled start and banked pause time (see `timer-engine`), so a
+ * slow or skipped tick only delays the display — it can never make the timer
+ * drift or report a stale segment as expired.
  *
- * Each tick is tagged with the inputs it was measured for. A tick taken for a
- * previous segment (or before a pause/resume) is ignored, so the first render
- * after a segment change never reports the old segment's elapsed time — which
- * would otherwise make a shorter next segment look expired and skip it.
+ * Ticks use an interval rather than requestAnimationFrame, which browsers stop
+ * entirely in background tabs; returning to the page re-reads the clock at
+ * once so expired segments are caught up immediately.
  */
 export function useWorkoutTimer(
   segment: TimerSegment | null,
@@ -28,46 +34,41 @@ export function useWorkoutTimer(
   segmentStartedAt: number | null,
 ): TimerState {
   const running = Boolean(segment) && isActive;
-  const tickKey = `${segment?.segment_key ?? ""}|${running}|${pausedElapsed}|${segmentStartedAt ?? ""}`;
-  const [tick, setTick] = useState<Tick | null>(null);
+  const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
     if (!running) return;
 
-    const startedAt = segmentStartedAt ?? Date.now();
-    let frame: number | null = null;
-
-    const loop = () => {
-      setTick({ key: tickKey, elapsedMs: pausedElapsed + Math.max(0, Date.now() - startedAt) });
-      frame = requestAnimationFrame(loop);
+    const tick = () => setNow(Date.now());
+    const interval = window.setInterval(tick, TICK_MS);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") tick();
     };
 
-    frame = requestAnimationFrame(loop);
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", tick);
 
     return () => {
-      if (frame !== null) cancelAnimationFrame(frame);
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", tick);
     };
-  }, [running, pausedElapsed, segmentStartedAt, tickKey]);
+  }, [running]);
 
-  const elapsedMs = running && tick?.key === tickKey ? tick.elapsedMs : pausedElapsed;
-  const elapsedSeconds = Math.floor(elapsedMs / 1000);
+  // `now` only ever lags real time, so a fresh segment starts at 0 instead of
+  // inheriting the previous segment's elapsed time.
+  const elapsedMs = liveElapsedMs({ pausedElapsed, segmentStartedAt, running, now });
 
-  if (!segment || segment.kind === "no_timer" || segment.kind === "manual") {
-    return { elapsed: elapsedSeconds, remaining: null, isExpired: false };
+  if (!segment) {
+    return { elapsed: Math.floor(elapsedMs / 1000), elapsedMs, remaining: null, isExpired: false, clock: null };
   }
 
-  if (segment.kind === "countdown" && segment.duration_seconds !== null) {
-    const remaining = Math.max(0, segment.duration_seconds - elapsedSeconds);
-    return { elapsed: elapsedSeconds, remaining, isExpired: remaining === 0 };
-  }
-
-  // countup: optional time cap
-  if (segment.kind === "countup") {
-    const cap = segment.duration_seconds;
-    const isExpired = cap !== null && elapsedSeconds >= cap;
-    const remaining = cap !== null ? Math.max(0, cap - elapsedSeconds) : null;
-    return { elapsed: elapsedSeconds, remaining, isExpired };
-  }
-
-  return { elapsed: elapsedSeconds, remaining: null, isExpired: false };
+  const clock = readSegmentClock(segment, elapsedMs);
+  return {
+    elapsed: Math.floor(elapsedMs / 1000),
+    elapsedMs,
+    remaining: clock.remainingMs === null ? null : Math.ceil(clock.remainingMs / 1000),
+    isExpired: clock.isExpired,
+    clock,
+  };
 }

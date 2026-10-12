@@ -659,6 +659,23 @@ export interface paths {
         patch: operations["MilosTrainingWeb.AdminFinanceController.update_package"];
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/workouts/timer-preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview the timer sequence a draft section will run */
+        post: operations["MilosTrainingWeb.AdminWorkoutTimerPreviewController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/members/{id}/credits": {
         parameters: {
             query?: never;
@@ -5509,6 +5526,84 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminWorkoutTimerPreviewController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Draft section: name, timer_config, exercises, section_metadata and rest_before_next_section_seconds. */
+                    section: {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Timer sequence preview */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        open_ended: boolean;
+                        segments: {
+                            duration_seconds: number | null;
+                            /** @enum {string} */
+                            kind: "countdown" | "countup" | "manual" | "no_timer" | "interval_cycle";
+                            label: string;
+                            /** @enum {string} */
+                            phase: "work" | "rest" | "transition";
+                            round: number | null;
+                            total_rounds: number | null;
+                        }[];
+                        total_seconds: number;
+                    };
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Invalid timer configuration */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
                     };
                 };
             };

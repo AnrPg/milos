@@ -7,6 +7,10 @@ export type TimerSegment = {
   section_name: string;
   format: string;
   kind: "countdown" | "countup" | "manual" | "no_timer" | "interval_cycle";
+  /** Work, rest inside a format, or a transition; older sequences omit it. */
+  phase?: "work" | "rest" | "transition";
+  /** Transition/rest inserted between sections; its time is not section time. */
+  between_sections?: boolean;
   duration_seconds: number | null;
   round: number | null;
   total_rounds: number | null;

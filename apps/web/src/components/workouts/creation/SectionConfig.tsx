@@ -17,7 +17,8 @@ import {
 
 import { FormatContextualFields } from "./FormatContextualFields";
 import { FormatDropdown } from "./FormatDropdown";
-import { TimeInput } from "./TimeInput";
+import { SHORT_DURATION_PRESETS, TimeInput } from "./TimeInput";
+import { TimerTimeline } from "./TimerTimeline";
 import { IntegerInput } from "@/components/integer-input";
 
 const SCORE_TYPES: ScoreType[] = ["time", "reps", "weight", "rounds", "rounds+reps", "kcal", "hr_drop", "load"];
@@ -159,6 +160,7 @@ export function SectionConfig({ section }: Props) {
                       <div key={min} className="flex items-center justify-between gap-2">
                         <span className="text-xs" style={{ color: "var(--muted)" }}>{i18n("min7eb0cee")} {min}</span>
                         <TimeInput
+                          ariaLabel={`${i18n("min7eb0cee")} ${min}`}
                           value={((section.formatParams["interval_seconds_" + (min)] as number)
                             ?? (section.formatParams.interval_seconds as number)
                             ?? 60)}
@@ -208,6 +210,7 @@ export function SectionConfig({ section }: Props) {
             </div>
           );
         })()}
+        <TimerTimeline section={section} />
       </div>
 
       <div>
@@ -218,6 +221,8 @@ export function SectionConfig({ section }: Props) {
         <TimeInput
           value={section.restAfterSeconds}
           onChange={(secs) => updateSection(section.localId, { restAfterSeconds: secs })}
+          presets={SHORT_DURATION_PRESETS}
+          ariaLabel={i18n("restAfterSectione73a6eb")}
         />
       </div>
 

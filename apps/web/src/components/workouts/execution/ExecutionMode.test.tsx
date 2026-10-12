@@ -32,18 +32,12 @@ vi.mock("@/lib/realtime", () => ({
   subscribeToTopic: () => () => undefined,
 }));
 
-vi.mock("@/lib/offline-execution-queue", () => ({
-  isOfflineFailure: () => false,
-  queueOfflineCheckoff: vi.fn(),
-  reconcileOfflineCheckoffs: () => Promise.resolve(),
-}));
-
 vi.mock("@/api/executions", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/api/executions")>()),
   updateExecutionProgress: (...args: unknown[]) => updateExecutionProgress(...args),
 }));
 
-let lockVersion = 1;
+let lockVersion = 3;
 
 function executionFromPayload(payload: ExecutionProgressPayload): WorkoutExecution {
   lockVersion += 1;
@@ -100,21 +94,23 @@ const segments = [
   } as TimerSegment,
 ];
 
-function startAt(index: number) {
+function startAt(index: number, extra: { segments?: TimerSegment[]; segmentStartedAt?: number } = {}) {
   useExecutionStore.getState().initExecution({
     executionId: "execution-1",
+    // Past the ready screen: the workout has already been started.
+    lockVersion: 3,
     workoutId: "workout-1",
     scaleSlug: null,
-    segments,
+    segments: extra.segments ?? segments,
     currentSegmentIndex: index,
     status: "active",
-    segmentStartedAt: Date.now(),
+    segmentStartedAt: extra.segmentStartedAt ?? Date.now(),
   });
 }
 
 describe("ExecutionMode", () => {
   beforeEach(() => {
-    lockVersion = 1;
+    lockVersion = 3;
     updateExecutionProgress.mockReset();
     updateExecutionProgress.mockImplementation((_token: string, _id: string, payload: ExecutionProgressPayload) =>
       Promise.resolve(executionFromPayload(payload)),
@@ -127,7 +123,7 @@ describe("ExecutionMode", () => {
     render(<ExecutionMode />);
 
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "next2f04eb1" }));
+      fireEvent.click(screen.getByRole("button", { name: "nextbc98198" }));
     });
 
     await waitFor(() => expect(useExecutionStore.getState().currentSegmentIndex).toBe(1));
@@ -139,7 +135,7 @@ describe("ExecutionMode", () => {
     render(<ExecutionMode />);
 
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "next2f04eb1" }));
+      fireEvent.click(screen.getByRole("button", { name: "nextbc98198" }));
     });
 
     await waitFor(() =>
@@ -165,5 +161,84 @@ describe("ExecutionMode", () => {
 
     expect(await screen.findByRole("button", { name: "resumeb3bd0b5" })).toBeInTheDocument();
     expect(useExecutionStore.getState().status).toBe("paused");
+  });
+
+  it("shows the ready screen for a fresh execution and starts with a get-ready countdown", async () => {
+    useExecutionStore.getState().initExecution({
+      executionId: "execution-1",
+      workoutId: "workout-1",
+      scaleSlug: null,
+      segments,
+      status: "active",
+      segmentStartedAt: Date.now() - 60_000,
+    });
+    render(<ExecutionMode />);
+
+    expect(screen.getByText("readyTitle")).toBeInTheDocument();
+
+    const before = Date.now();
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "start952f375" }));
+    });
+
+    const state = useExecutionStore.getState();
+    expect(state.status).toBe("paused");
+    expect(state.pausedElapsed).toBe(0);
+    expect(state.resumeCountdownEndsAt! - before).toBeGreaterThanOrEqual(10_000);
+    expect(screen.getByText("getReadyLabel")).toBeInTheDocument();
+  });
+
+  it("catches up on intervals that ran out while the screen was off, on schedule", async () => {
+    const startedAt = Date.now() - 35_000; // 20 s work + 10 s rest + 5 s into work 2
+    startAt(0, { segmentStartedAt: startedAt });
+    render(<ExecutionMode />);
+
+    await waitFor(() => expect(useExecutionStore.getState().currentSegmentIndex).toBe(2));
+    const state = useExecutionStore.getState();
+    expect(state.segmentStartedAt).toBe(startedAt + 30_000);
+    expect(state.totalElapsedMs).toBe(30_000);
+    expect(state.sectionElapsedMs).toEqual({ tabata: 30_000 });
+  });
+
+  it("counts AMRAP rounds with +1 and lets a round be removed", async () => {
+    const amrap = [
+      {
+        ...tabataSegment(0, "AMRAP 12", "work"),
+        section_id: "amrap",
+        format: "amrap",
+        duration_seconds: 720,
+        total_rounds: null,
+        round: null,
+      } as TimerSegment,
+    ];
+    startAt(0, { segments: amrap });
+    render(<ExecutionMode />);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "addRoundLabel" }));
+      fireEvent.click(screen.getByRole("button", { name: "addRoundLabel" }));
+    });
+    expect(useExecutionStore.getState().segmentCycleCounts["segment:0"]).toBe(2);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "removeRoundLabel" }));
+    });
+    expect(useExecutionStore.getState().segmentCycleCounts["segment:0"]).toBe(1);
+    await waitFor(() => expect(updateExecutionProgress).toHaveBeenCalled());
+  });
+
+  it("undoes an accidental check-off", async () => {
+    startAt(0);
+    render(<ExecutionMode />);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /markStepDoneLabel/ }));
+    });
+    expect(useExecutionStore.getState().checkedExerciseIds).toEqual(["segment:0::burpee"]);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "editorUndo" }));
+    });
+    expect(useExecutionStore.getState().checkedExerciseIds).toEqual([]);
   });
 });

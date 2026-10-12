@@ -27,4 +27,5 @@ defmodule MilosTraining.Execution do
     do: ExecutionStore.list_executions_for_coaching(user_id)
 
   defdelegate build_timer_sequence(workout), to: TimerSequenceBuilder, as: :build
+  defdelegate preview_timer_sequence(workout), to: TimerSequenceBuilder, as: :preview
 end

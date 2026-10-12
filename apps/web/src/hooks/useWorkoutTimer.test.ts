@@ -32,7 +32,7 @@ type Props = {
 
 describe("useWorkoutTimer", () => {
   beforeEach(() => {
-    vi.useFakeTimers({ toFake: ["Date", "requestAnimationFrame", "cancelAnimationFrame", "setTimeout"] });
+    vi.useFakeTimers({ toFake: ["Date", "setInterval", "clearInterval", "setTimeout", "clearTimeout"] });
     vi.setSystemTime(new Date("2026-10-12T10:00:00Z"));
   });
 

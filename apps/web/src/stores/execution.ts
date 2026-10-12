@@ -8,9 +8,22 @@ import type {
   TimerSegment,
   WorkoutExecution,
 } from "@/api/executions";
+import { liveElapsedMs } from "@/lib/timer-engine";
 
 export type ExecutionStatus = "idle" | "active" | "paused" | "completed";
 
+/**
+ * Elapsed-time model
+ * ------------------
+ * - `totalElapsedMs` / `sectionElapsedMs` hold *committed* time only: segments
+ *   the athlete has left. The current segment is never included.
+ * - `pausedElapsed` is time banked in the current segment by earlier pauses;
+ *   while active, the running stretch is `now - segmentStartedAt`.
+ * - Progress snapshots sent to the API carry committed + banked time
+ *   (`buildProgressPayload`), and `hydrateFromExecution` subtracts the banked
+ *   part again, so both sides derive each other exactly and a pause can never
+ *   be counted twice.
+ */
 type ExecutionState = {
   executionId: string | null;
   lockVersion: number;
@@ -28,6 +41,8 @@ type ExecutionState = {
   checkedExerciseIds: string[];
   sectionScores: SectionScore[];
   exerciseNotes: ExerciseNote[];
+  /** Local progress the server has not acknowledged yet. */
+  pendingSync: boolean;
   initExecution: (params: {
     executionId: string;
     lockVersion?: number;
@@ -47,23 +62,35 @@ type ExecutionState = {
     segmentCycleCounts?: Record<string, number>;
   }) => void;
   hydrateFromExecution: (execution: WorkoutExecution, segments?: TimerSegment[]) => void;
-  startTimer: (startedAt?: number) => void;
-  pauseTimer: (pausedAt?: number) => void;
+  setLockVersion: (lockVersion: number) => void;
+  setPendingSync: (pendingSync: boolean) => void;
+  /** Elapsed time of the current segment at `now`. */
+  currentElapsedMs: (now?: number) => number;
+  /** Banks the running stretch; `maxElapsedMs` clamps it (a countdown cannot overrun). */
+  pauseTimer: (pausedAt?: number, maxElapsedMs?: number | null) => void;
   startResumeCountdown: (endsAt: number) => void;
   resumeTimer: (startedAt?: number) => void;
-  advanceSegment: (startedAt?: number) => void;
-  jumpToSegment: (index: number, startedAt?: number) => void;
-  commitSegmentElapsed: (sectionId: string, elapsedMs: number) => void;
+  /**
+   * Commits `elapsedMs` for the current segment and moves to `index`
+   * (completing the execution when `index` is past the end).
+   */
+  moveToSegment: (index: number, params: { elapsedMs: number; startedAt: number }) => void;
+  /** Commits several segments that ended on their own and lands on `index`. */
+  applyCatchUp: (plan: {
+    completed: { index: number; elapsedMs: number }[];
+    index: number;
+    segmentStartedAt: number;
+  }) => void;
   incrementSegmentCycle: (segmentKey: string) => void;
+  decrementSegmentCycle: (segmentKey: string) => void;
   setCheckedExerciseIds: (exerciseIds: string[]) => void;
   upsertScore: (score: SectionScore) => void;
   upsertNote: (note: ExerciseNote) => void;
   replaceNotes: (notes: ExerciseNote[]) => void;
   completeExecution: () => void;
-  buildProgressPayload: (snapshot?: {
-    currentSegment: TimerSegment | null;
-    currentElapsedMs: number;
-  }) => ExecutionProgressPayload | null;
+  /** Committed totals plus the current segment's elapsed time at `now`. */
+  completionTotals: (now?: number) => { totalElapsedMs: number; sectionElapsedMs: Record<string, number> };
+  buildProgressPayload: () => ExecutionProgressPayload | null;
   reset: () => void;
 };
 
@@ -84,6 +111,7 @@ const initialState = {
   checkedExerciseIds: [],
   sectionScores: [],
   exerciseNotes: [],
+  pendingSync: false,
 };
 
 function executionStatusFromApi(status: WorkoutExecution["status"]): ExecutionStatus {
@@ -102,6 +130,27 @@ function toTimestamp(value: string | null | undefined): number | null {
 
 function normalizeCheckedExerciseIds(exerciseIds: string[]) {
   return Array.from(new Set(exerciseIds));
+}
+
+/** Time in between-section transitions/rests counts toward the workout, not a section. */
+function sectionTimeKey(segment: TimerSegment | undefined) {
+  return segment && !segment.between_sections ? segment.section_id : null;
+}
+
+function addElapsed(
+  totals: { totalElapsedMs: number; sectionElapsedMs: Record<string, number> },
+  segment: TimerSegment | undefined,
+  elapsedMs: number,
+) {
+  const amount = Math.max(0, Math.round(elapsedMs));
+  const key = sectionTimeKey(segment);
+  return {
+    totalElapsedMs: totals.totalElapsedMs + amount,
+    sectionElapsedMs:
+      key === null
+        ? totals.sectionElapsedMs
+        : { ...totals.sectionElapsedMs, [key]: (totals.sectionElapsedMs[key] ?? 0) + amount },
+  };
 }
 
 export const useExecutionStore = create<ExecutionState>()(
@@ -148,45 +197,66 @@ export const useExecutionStore = create<ExecutionState>()(
         }),
 
       hydrateFromExecution: (execution, segments) =>
-        set((state) => ({
-          executionId: execution.id,
-          lockVersion: execution.lock_version,
-          workoutId: execution.master_workout_id,
-          scaleSlug: execution.scale_level_slug,
-          segments: segments ?? state.segments,
-          currentSegmentIndex: execution.current_segment_index,
-          status: executionStatusFromApi(execution.status),
-          segmentStartedAt:
-            execution.status === "active"
-              ? toTimestamp(execution.segment_started_at_utc)
-              : null,
-          pausedElapsed: execution.paused_elapsed_ms,
-          resumeCountdownEndsAt: toTimestamp(execution.resume_countdown_ends_at_utc),
-          totalElapsedMs: execution.total_elapsed_ms,
-          sectionElapsedMs: execution.section_elapsed_ms,
-          segmentCycleCounts: execution.segment_cycle_counts,
-          checkedExerciseIds: normalizeCheckedExerciseIds(execution.checked_exercise_ids),
-          sectionScores: execution.section_scores,
-          exerciseNotes: execution.exercise_notes,
-        })),
+        set((state) => {
+          const nextSegments = segments ?? state.segments;
+          const banked = Math.max(0, execution.paused_elapsed_ms ?? 0);
+          const currentKey = sectionTimeKey(nextSegments[execution.current_segment_index]);
+          const sectionElapsedMs = { ...(execution.section_elapsed_ms ?? {}) };
+          if (currentKey !== null && sectionElapsedMs[currentKey] !== undefined) {
+            sectionElapsedMs[currentKey] = Math.max(0, sectionElapsedMs[currentKey]! - banked);
+          }
 
-      startTimer: (startedAt = Date.now()) =>
-        set({
-          status: "active",
-          segmentStartedAt: startedAt,
-          pausedElapsed: 0,
-          resumeCountdownEndsAt: null,
+          return {
+            executionId: execution.id,
+            lockVersion: execution.lock_version,
+            workoutId: execution.master_workout_id,
+            scaleSlug: execution.scale_level_slug,
+            segments: nextSegments,
+            currentSegmentIndex: execution.current_segment_index,
+            status: executionStatusFromApi(execution.status),
+            segmentStartedAt:
+              execution.status === "active"
+                ? toTimestamp(execution.segment_started_at_utc)
+                : null,
+            pausedElapsed: banked,
+            resumeCountdownEndsAt: toTimestamp(execution.resume_countdown_ends_at_utc),
+            totalElapsedMs: Math.max(0, (execution.total_elapsed_ms ?? 0) - banked),
+            sectionElapsedMs,
+            segmentCycleCounts: execution.segment_cycle_counts ?? {},
+            checkedExerciseIds: normalizeCheckedExerciseIds(execution.checked_exercise_ids),
+            sectionScores: execution.section_scores,
+            exerciseNotes: execution.exercise_notes,
+          };
         }),
 
-      pauseTimer: (pausedAt = Date.now()) =>
+      setLockVersion: (lockVersion) => set({ lockVersion }),
+
+      setPendingSync: (pendingSync) => set({ pendingSync }),
+
+      currentElapsedMs: (now = Date.now()) => {
+        const state = get();
+        return liveElapsedMs({
+          pausedElapsed: state.pausedElapsed,
+          segmentStartedAt: state.segmentStartedAt,
+          running: state.status === "active",
+          now,
+        });
+      },
+
+      pauseTimer: (pausedAt = Date.now(), maxElapsedMs = null) =>
         set((state) => {
-          const elapsed = state.segmentStartedAt
-            ? state.pausedElapsed + (pausedAt - state.segmentStartedAt)
+          const elapsed = state.status === "active"
+            ? liveElapsedMs({
+                pausedElapsed: state.pausedElapsed,
+                segmentStartedAt: state.segmentStartedAt,
+                running: true,
+                now: pausedAt,
+              })
             : state.pausedElapsed;
 
           return {
             status: "paused",
-            pausedElapsed: elapsed,
+            pausedElapsed: Math.round(maxElapsedMs === null ? elapsed : Math.min(elapsed, maxElapsedMs)),
             segmentStartedAt: null,
             resumeCountdownEndsAt: null,
           };
@@ -206,34 +276,24 @@ export const useExecutionStore = create<ExecutionState>()(
           resumeCountdownEndsAt: null,
         }),
 
-      advanceSegment: (startedAt = Date.now()) =>
+      moveToSegment: (index, { elapsedMs, startedAt }) =>
         set((state) => {
-          const next = state.currentSegmentIndex + 1;
+          const committed = addElapsed(state, state.segments[state.currentSegmentIndex], elapsedMs);
 
-          if (next >= state.segments.length) {
+          if (index >= state.segments.length) {
             return {
+              ...committed,
               status: "completed" as ExecutionStatus,
-              currentSegmentIndex: state.currentSegmentIndex,
               segmentStartedAt: null,
               pausedElapsed: 0,
               resumeCountdownEndsAt: null,
             };
           }
 
-          return {
-            currentSegmentIndex: next,
-            status: "active" as ExecutionStatus,
-            segmentStartedAt: startedAt,
-            pausedElapsed: 0,
-            resumeCountdownEndsAt: null,
-          };
-        }),
-
-      jumpToSegment: (index, startedAt = Date.now()) =>
-        set((state) => {
-          if (index < 0 || index >= state.segments.length) return state;
+          if (index < 0) return state;
 
           return {
+            ...committed,
             currentSegmentIndex: index,
             segmentStartedAt: state.status === "active" ? startedAt : null,
             pausedElapsed: 0,
@@ -241,20 +301,36 @@ export const useExecutionStore = create<ExecutionState>()(
           };
         }),
 
-      commitSegmentElapsed: (sectionId, elapsedMs) =>
-        set((state) => ({
-          totalElapsedMs: state.totalElapsedMs + Math.max(0, elapsedMs),
-          sectionElapsedMs: {
-            ...state.sectionElapsedMs,
-            [sectionId]: (state.sectionElapsedMs[sectionId] ?? 0) + Math.max(0, elapsedMs),
-          },
-        })),
+      applyCatchUp: ({ completed, index, segmentStartedAt }) =>
+        set((state) => {
+          let totals = { totalElapsedMs: state.totalElapsedMs, sectionElapsedMs: state.sectionElapsedMs };
+          for (const step of completed) {
+            totals = addElapsed(totals, state.segments[step.index], step.elapsedMs);
+          }
+
+          return {
+            ...totals,
+            currentSegmentIndex: index,
+            status: "active" as ExecutionStatus,
+            segmentStartedAt,
+            pausedElapsed: 0,
+            resumeCountdownEndsAt: null,
+          };
+        }),
 
       incrementSegmentCycle: (segmentKey) =>
         set((state) => ({
           segmentCycleCounts: {
             ...state.segmentCycleCounts,
             [segmentKey]: (state.segmentCycleCounts[segmentKey] ?? 0) + 1,
+          },
+        })),
+
+      decrementSegmentCycle: (segmentKey) =>
+        set((state) => ({
+          segmentCycleCounts: {
+            ...state.segmentCycleCounts,
+            [segmentKey]: Math.max(0, (state.segmentCycleCounts[segmentKey] ?? 0) - 1),
           },
         })),
 
@@ -309,22 +385,19 @@ export const useExecutionStore = create<ExecutionState>()(
           segmentStartedAt: null,
           pausedElapsed: 0,
           resumeCountdownEndsAt: null,
+          pendingSync: false,
         }),
 
-      buildProgressPayload: (snapshot) => {
+      completionTotals: (now = Date.now()) => {
         const state = get();
-        const currentSegment = snapshot?.currentSegment ?? null;
-        const currentElapsedMs = Math.max(0, snapshot?.currentElapsedMs ?? 0);
-        const effectiveSectionElapsedMs = { ...state.sectionElapsedMs };
+        return addElapsed(state, state.segments[state.currentSegmentIndex], state.currentElapsedMs(now));
+      },
 
-        if (currentSegment) {
-          effectiveSectionElapsedMs[currentSegment.section_id] =
-            (effectiveSectionElapsedMs[currentSegment.section_id] ?? 0) + currentElapsedMs;
-        }
+      buildProgressPayload: () => {
+        const state = get();
+        if (!state.executionId) return null;
 
-        if (!state.executionId) {
-          return null;
-        }
+        const snapshot = addElapsed(state, state.segments[state.currentSegmentIndex], state.pausedElapsed);
 
         return {
           expected_version: state.lockVersion,
@@ -336,9 +409,9 @@ export const useExecutionStore = create<ExecutionState>()(
             state.status === "active" && state.segmentStartedAt
               ? new Date(state.segmentStartedAt).toISOString()
               : null,
-          paused_elapsed_ms: state.pausedElapsed,
-          total_elapsed_ms: state.totalElapsedMs + currentElapsedMs,
-          section_elapsed_ms: effectiveSectionElapsedMs,
+          paused_elapsed_ms: Math.round(state.pausedElapsed),
+          total_elapsed_ms: snapshot.totalElapsedMs,
+          section_elapsed_ms: snapshot.sectionElapsedMs,
           segment_cycle_counts: state.segmentCycleCounts,
           section_scores: state.sectionScores,
           resume_countdown_ends_at_utc: state.resumeCountdownEndsAt
@@ -369,6 +442,7 @@ export const useExecutionStore = create<ExecutionState>()(
         checkedExerciseIds: state.checkedExerciseIds,
         sectionScores: state.sectionScores,
         exerciseNotes: state.exerciseNotes,
+        pendingSync: state.pendingSync,
       }),
     },
   ),

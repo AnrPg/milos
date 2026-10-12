@@ -7118,6 +7118,182 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/workouts/timer-preview": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminWorkoutTimerPreviewController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "section": {
+                    "additionalProperties": true,
+                    "description": "Draft section: name, timer_config, exercises, section_metadata and rest_before_next_section_seconds.",
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "section"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "open_ended": {
+                      "type": "boolean"
+                    },
+                    "segments": {
+                      "items": {
+                        "properties": {
+                          "duration_seconds": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "kind": {
+                            "enum": [
+                              "countdown",
+                              "countup",
+                              "manual",
+                              "no_timer",
+                              "interval_cycle"
+                            ],
+                            "type": "string"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "phase": {
+                            "enum": [
+                              "work",
+                              "rest",
+                              "transition"
+                            ],
+                            "type": "string"
+                          },
+                          "round": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "total_rounds": {
+                            "nullable": true,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "label",
+                          "kind",
+                          "phase",
+                          "duration_seconds",
+                          "round",
+                          "total_rounds"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "total_seconds": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "segments",
+                    "total_seconds",
+                    "open_ended"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Timer sequence preview"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid timer configuration"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Preview the timer sequence a draft section will run",
+        "tags": [
+          "Admin Workouts"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/finance/members/{id}/credits": {
       "post": {
         "callbacks": {},

@@ -482,3 +482,27 @@ export async function fetchWorkout(token: string, id: string) {
 export async function fetchMaterializedWorkout(token: string, id: string) {
   return apiRequest<MaterializedWorkoutResponse>(`/workouts/${id}/scales`, { token });
 }
+
+export type TimerPreviewSegment = {
+  label: string;
+  kind: "countdown" | "countup" | "manual" | "no_timer" | "interval_cycle";
+  phase: "work" | "rest" | "transition";
+  duration_seconds: number | null;
+  round: number | null;
+  total_rounds: number | null;
+};
+
+export type TimerPreview = {
+  segments: TimerPreviewSegment[];
+  total_seconds: number;
+  open_ended: boolean;
+};
+
+/** The exact timer sequence a draft section will run (same builder as execution). */
+export async function previewSectionTimer(token: string, section: Record<string, unknown>) {
+  return apiRequest<TimerPreview>("/admin/workouts/timer-preview", {
+    method: "POST",
+    token,
+    body: { section },
+  });
+}

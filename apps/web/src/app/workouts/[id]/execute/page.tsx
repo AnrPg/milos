@@ -73,7 +73,20 @@ function ExecutePageContent() {
 
         if (cancelled) return;
 
-        hydrateFromExecution(execution, recoveredSegments);
+        // Progress made offline (or not yet acknowledged when the tab closed)
+        // is newer than the server copy unless another device moved on since.
+        const local = useExecutionStore.getState();
+        const keepLocal =
+          local.executionId === execution.id &&
+          local.pendingSync &&
+          local.lockVersion === execution.lock_version &&
+          execution.status !== "completed";
+
+        if (keepLocal) {
+          useExecutionStore.setState({ segments: recoveredSegments });
+        } else {
+          hydrateFromExecution(execution, recoveredSegments);
+        }
 
         setRecoveryState("done");
       } catch {
