@@ -7,7 +7,8 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
 
       config :milos_training, :gemini,
         api_key: System.get_env("GEMINI_API_KEY"),
-        model: System.get_env("GEMINI_MODEL", "gemini-3.8-flash")
+        model: System.get_env("GEMINI_MODEL", "gemini-3.8-flash"),
+        thinking_level: System.get_env("GEMINI_THINKING_LEVEL", "low")
 
   The key never leaves the server: browsers call the Phoenix endpoint, which
   calls Gemini. Output is untrusted and is validated by
@@ -23,6 +24,8 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
 
   @endpoint "https://generativelanguage.googleapis.com/v1beta/models"
   @default_model "gemini-3.8-flash"
+  # "low" keeps answers around 5–10 s; Gemini's default reasoning took 45 s+.
+  @default_thinking_level "low"
 
   @language_names %{
     "en" => "English",
@@ -56,13 +59,8 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
     body = %{
       systemInstruction: %{parts: [%{text: system_prompt(locale)}]},
       contents: [%{role: "user", parts: [%{text: text}]}],
-      generationConfig: %{
-        temperature: 0.1,
-        # JSON mode with the schema in the instructions: Gemini's constrained
-        # `responseSchema` decoding returned truncated, degenerate objects for
-        # this deeply optional schema, while plain JSON mode follows it well.
-        responseMimeType: "application/json"
-      }
+      generationConfig:
+        generation_config(Keyword.get(config, :thinking_level, @default_thinking_level))
     }
 
     request_options =
@@ -88,6 +86,17 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
         Logger.warning("Gemini workout analysis failed: #{Exception.message(exception)}")
         {:error, :analyzer_unavailable}
     end
+  end
+
+  # JSON mode with the schema in the instructions: Gemini's constrained
+  # `responseSchema` decoding returned truncated, degenerate objects for this
+  # deeply optional schema, while plain JSON mode follows it well.
+  defp generation_config(thinking_level) do
+    base = %{temperature: 0.1, responseMimeType: "application/json"}
+
+    if blank?(thinking_level),
+      do: base,
+      else: Map.put(base, :thinkingConfig, %{thinkingLevel: thinking_level})
   end
 
   defp decode(%{"candidates" => [%{"content" => %{"parts" => parts}} | _rest]}) do
