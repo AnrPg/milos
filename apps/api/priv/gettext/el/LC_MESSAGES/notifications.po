@@ -147,3 +147,27 @@ msgstr "Το πακέτο σου λήγει σύντομα"
 
 msgid "%{package} ends on %{date}."
 msgstr "Το %{package} λήγει στις %{date}."
+
+msgid "New form review request"
+msgstr "Νέο αίτημα αξιολόγησης τεχνικής"
+
+msgid "%{client} sent a video for feedback."
+msgstr "Ο/Η %{client} έστειλε βίντεο για σχόλια."
+
+msgid "Your form review is ready"
+msgstr "Η αξιολόγηση τεχνικής σου είναι έτοιμη"
+
+msgid "Your coach left feedback on your video."
+msgstr "Ο προπονητής σου άφησε σχόλια στο βίντεό σου."
+
+msgid "A client is waiting for a reply"
+msgstr "Ένας πελάτης περιμένει απάντηση"
+
+msgid "%{client} has been waiting longer than the promised reply time."
+msgstr "Ο/Η %{client} περιμένει περισσότερο από τον χρόνο απάντησης που υποσχεθήκαμε."
+
+msgid "Your nutrition plan was updated"
+msgstr "Το διατροφικό σου πλάνο ενημερώθηκε"
+
+msgid "Open it to see what changed."
+msgstr "Άνοιξέ το για να δεις τι άλλαξε."

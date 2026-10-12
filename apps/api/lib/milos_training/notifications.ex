@@ -170,6 +170,40 @@ defmodule MilosTraining.Notifications do
         url: "/account/billing"
       })
 
+  # ADR-098 coaching notifications.
+  def process_event("form_review_submitted", payload),
+    do:
+      enqueue_simple(:form_review_submitted, payload, %{
+        form_review_id: field(payload, :form_review_id),
+        client_nickname: field(payload, :client_nickname),
+        exercise_name: field(payload, :exercise_name),
+        url: "/admin/coaching/form-reviews"
+      })
+
+  def process_event("form_review_completed", payload),
+    do:
+      enqueue_simple(:form_review_completed, payload, %{
+        form_review_id: field(payload, :form_review_id),
+        exercise_name: field(payload, :exercise_name),
+        url: "/account/coaching"
+      })
+
+  def process_event("coaching_reply_overdue", payload),
+    do:
+      enqueue_simple(:coaching_reply_overdue, payload, %{
+        thread_id: field(payload, :thread_id),
+        client_nickname: field(payload, :client_nickname),
+        due_at: field(payload, :due_at),
+        url: "/account/activity/chats?thread=#{field(payload, :thread_id)}"
+      })
+
+  def process_event("nutrition_plan_updated", payload),
+    do:
+      enqueue_simple(:nutrition_plan_updated, payload, %{
+        title: field(payload, :title),
+        url: "/account/coaching"
+      })
+
   def process_event(_event, _payload), do: {:error, :bad_request}
 
   def propagate_nickname_change(old_nickname, new_nickname),

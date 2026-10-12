@@ -147,3 +147,27 @@ msgstr "Je pakket loopt binnenkort af"
 
 msgid "%{package} ends on %{date}."
 msgstr "%{package} loopt af op %{date}."
+
+msgid "New form review request"
+msgstr "Nieuw verzoek om techniekfeedback"
+
+msgid "%{client} sent a video for feedback."
+msgstr "%{client} heeft een video gestuurd voor feedback."
+
+msgid "Your form review is ready"
+msgstr "Je techniekfeedback staat klaar"
+
+msgid "Your coach left feedback on your video."
+msgstr "Je coach heeft feedback gegeven op je video."
+
+msgid "A client is waiting for a reply"
+msgstr "Een klant wacht op een antwoord"
+
+msgid "%{client} has been waiting longer than the promised reply time."
+msgstr "%{client} wacht langer dan de beloofde reactietijd."
+
+msgid "Your nutrition plan was updated"
+msgstr "Je voedingsplan is bijgewerkt"
+
+msgid "Open it to see what changed."
+msgstr "Open het om te zien wat er is veranderd."

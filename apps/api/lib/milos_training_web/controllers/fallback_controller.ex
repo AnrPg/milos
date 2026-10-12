@@ -1351,7 +1351,9 @@ defmodule MilosTrainingWeb.FallbackController do
     guest_already_booked: {:conflict, "A guest is already booked for this class"},
     booking_not_waitlisted: {:conflict, "The booking is not on the waitlist"},
     location_not_found: {:not_found, "Location not found"},
-    location_archived: {:unprocessable_entity, "The location is archived"}
+    location_archived: {:unprocessable_entity, "The location is archived"},
+    # ADR-098
+    form_review_closed: {:conflict, "The form review is already closed"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@phase_b_errors, reason) do

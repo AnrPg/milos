@@ -100,7 +100,7 @@ defmodule MilosTraining.Organizations.SetMembershipStatusTest do
              Organizations.set_membership_status(admin_context, member_membership.id, :suspended)
   end
 
-  test "a coach cannot change membership status at all", %{
+  test "a coach manages membership status like an admin", %{
     organization: organization,
     member_membership: member_membership
   } do
@@ -108,7 +108,7 @@ defmodule MilosTraining.Organizations.SetMembershipStatusTest do
     {:ok, _} = add_membership(organization, coach, :coach)
     {:ok, coach_context} = Organizations.resolve_tenant_context(coach, organization.slug)
 
-    assert {:error, :forbidden} =
+    assert {:ok, %{status: :revoked}} =
              Organizations.set_membership_status(coach_context, member_membership.id, :revoked)
   end
 

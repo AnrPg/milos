@@ -18,7 +18,7 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipRole do
   alias MilosTraining.{Finance, Scheduling, Workouts}
 
   def call(context, user_id, role) when is_binary(user_id) do
-    with :ok <- TenantAuthorization.authorize(context, [:owner, :admin]),
+    with :ok <- TenantAuthorization.authorize(context, MembershipPolicy.admin_roles()),
          {:ok, role} <- normalize_role(role),
          {:ok, membership} <- fetch_membership(context, user_id),
          :ok <- refuse_self_change(context, membership),
@@ -50,7 +50,7 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipRole do
     admin_ids =
       context.organization_id
       |> OrganizationStore.list_organization_memberships()
-      |> Enum.filter(&(&1.role in [:owner, :admin] and &1.status == :active))
+      |> Enum.filter(&(&1.role in MembershipPolicy.admin_roles() and &1.status == :active))
       |> Enum.map(& &1.user_id)
 
     BroadcastUserSync.for_users(admin_ids, ["admin_athletes", "admin_finance"],

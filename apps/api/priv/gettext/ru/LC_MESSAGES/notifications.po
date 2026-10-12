@@ -147,3 +147,27 @@ msgstr "Ваш пакет скоро закончится"
 
 msgid "%{package} ends on %{date}."
 msgstr "%{package} заканчивается %{date}."
+
+msgid "New form review request"
+msgstr "Новый запрос на разбор техники"
+
+msgid "%{client} sent a video for feedback."
+msgstr "%{client} отправил(а) видео на разбор."
+
+msgid "Your form review is ready"
+msgstr "Разбор вашей техники готов"
+
+msgid "Your coach left feedback on your video."
+msgstr "Тренер оставил отзыв о вашем видео."
+
+msgid "A client is waiting for a reply"
+msgstr "Клиент ждёт ответа"
+
+msgid "%{client} has been waiting longer than the promised reply time."
+msgstr "%{client} ждёт дольше обещанного времени ответа."
+
+msgid "Your nutrition plan was updated"
+msgstr "Ваш план питания обновлён"
+
+msgid "Open it to see what changed."
+msgstr "Откройте, чтобы увидеть изменения."

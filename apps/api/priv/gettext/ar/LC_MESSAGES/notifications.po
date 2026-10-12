@@ -147,3 +147,27 @@ msgstr "باقتك تنتهي قريبًا"
 
 msgid "%{package} ends on %{date}."
 msgstr "تنتهي %{package} في %{date}."
+
+msgid "New form review request"
+msgstr "طلب جديد لمراجعة الأداء"
+
+msgid "%{client} sent a video for feedback."
+msgstr "أرسل %{client} فيديو للحصول على ملاحظات."
+
+msgid "Your form review is ready"
+msgstr "مراجعة أدائك جاهزة"
+
+msgid "Your coach left feedback on your video."
+msgstr "ترك مدربك ملاحظات على الفيديو الخاص بك."
+
+msgid "A client is waiting for a reply"
+msgstr "عميل ينتظر الرد"
+
+msgid "%{client} has been waiting longer than the promised reply time."
+msgstr "ينتظر %{client} أكثر من وقت الرد الموعود."
+
+msgid "Your nutrition plan was updated"
+msgstr "تم تحديث خطتك الغذائية"
+
+msgid "Open it to see what changed."
+msgstr "افتحها لمعرفة ما تغيّر."

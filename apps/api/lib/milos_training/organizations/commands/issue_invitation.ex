@@ -11,7 +11,7 @@ defmodule MilosTraining.Organizations.Commands.IssueInvitation do
   @default_lifetime_seconds 604_800
 
   def call(context, params, issued_at) do
-    with :ok <- TenantAuthorization.authorize(context, [:owner, :admin]),
+    with :ok <- TenantAuthorization.authorize(context, MembershipPolicy.admin_roles()),
          role <- normalize_role(value(params, :role)),
          :ok <- authorize_role_ceiling(context.role, role) do
       token = InvitationToken.generate()

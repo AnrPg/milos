@@ -367,7 +367,7 @@
       "key": "online_coaching.form_reviews",
       "kind": "quota",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "online_coaching"
     },
     {
@@ -379,14 +379,14 @@
       "key": "online_coaching.response_sla_hours",
       "kind": "integer_option_or_null",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "online_coaching"
     },
     {
       "key": "online_coaching.nutrition_plan",
       "kind": "boolean",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "online_coaching"
     },
     {

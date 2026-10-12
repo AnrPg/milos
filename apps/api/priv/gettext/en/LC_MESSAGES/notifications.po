@@ -147,3 +147,27 @@ msgstr "Your package ends soon"
 
 msgid "%{package} ends on %{date}."
 msgstr "%{package} ends on %{date}."
+
+msgid "New form review request"
+msgstr "New form review request"
+
+msgid "%{client} sent a video for feedback."
+msgstr "%{client} sent a video for feedback."
+
+msgid "Your form review is ready"
+msgstr "Your form review is ready"
+
+msgid "Your coach left feedback on your video."
+msgstr "Your coach left feedback on your video."
+
+msgid "A client is waiting for a reply"
+msgstr "A client is waiting for a reply"
+
+msgid "%{client} has been waiting longer than the promised reply time."
+msgstr "%{client} has been waiting longer than the promised reply time."
+
+msgid "Your nutrition plan was updated"
+msgstr "Your nutrition plan was updated"
+
+msgid "Open it to see what changed."
+msgstr "Open it to see what changed."

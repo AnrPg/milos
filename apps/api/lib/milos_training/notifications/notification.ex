@@ -25,7 +25,11 @@ defmodule MilosTraining.Notifications.Notification do
     :invoice_issued,
     :payment_reminder,
     :booking_waitlist_promoted,
-    :package_expiring
+    :package_expiring,
+    :form_review_submitted,
+    :form_review_completed,
+    :coaching_reply_overdue,
+    :nutrition_plan_updated
   ]
 
   schema "notifications" do

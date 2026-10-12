@@ -16,7 +16,10 @@ defmodule MilosTraining.Finance.Domain.PackageCatalog do
 
   # Phase C fields ship feature by feature (ADR-098); each becomes authorable
   # once its enforcement exists. Emptied when the phase completes.
-  @released_ahead ~w[content.on_demand_video content.advanced_analytics]
+  @released_ahead ~w[
+    content.on_demand_video content.advanced_analytics
+    online_coaching.form_reviews online_coaching.response_sla_hours online_coaching.nutrition_plan
+  ]
 
   @quota_periods ["calendar_week", "calendar_month", "subscription_period"]
   @duration_units ["day", "week", "month"]

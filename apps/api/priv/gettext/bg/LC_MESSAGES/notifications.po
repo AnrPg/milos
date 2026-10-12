@@ -147,3 +147,27 @@ msgstr "Пакетът ти изтича скоро"
 
 msgid "%{package} ends on %{date}."
 msgstr "%{package} изтича на %{date}."
+
+msgid "New form review request"
+msgstr "Нова заявка за преглед на техника"
+
+msgid "%{client} sent a video for feedback."
+msgstr "%{client} изпрати видео за обратна връзка."
+
+msgid "Your form review is ready"
+msgstr "Прегледът на техниката ви е готов"
+
+msgid "Your coach left feedback on your video."
+msgstr "Треньорът ви остави обратна връзка за видеото."
+
+msgid "A client is waiting for a reply"
+msgstr "Клиент чака отговор"
+
+msgid "%{client} has been waiting longer than the promised reply time."
+msgstr "%{client} чака повече от обещаното време за отговор."
+
+msgid "Your nutrition plan was updated"
+msgstr "Хранителният ви план е обновен"
+
+msgid "Open it to see what changed."
+msgstr "Отворете го, за да видите промените."

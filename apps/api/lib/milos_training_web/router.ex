@@ -89,19 +89,26 @@ defmodule MilosTrainingWeb.Router do
     )
   end
 
+  # Coaches have admin rights until a rights-per-role report says otherwise
+  # (ADR-098); see Organizations.Domain.MembershipPolicy.admin_roles/0.
   pipeline :admin_only do
     plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
-    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin])
+    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin, :coach])
   end
 
   pipeline :member_or_admin do
     plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
-    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin, :member])
+    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin, :coach, :member])
   end
 
   pipeline :athlete_or_admin do
     plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
     plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin, :coach, :athlete])
+  end
+
+  pipeline :staff_only do
+    plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
+    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin, :coach])
   end
 
   pipeline :tenant_member do
@@ -121,7 +128,7 @@ defmodule MilosTrainingWeb.Router do
   end
 
   pipeline :organization_admin do
-    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin])
+    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin, :coach])
   end
 
   pipeline :vendor do
@@ -196,6 +203,10 @@ defmodule MilosTrainingWeb.Router do
     get("/finance", MyFinanceController, :index)
     get("/entitlement", MyFinanceController, :entitlement)
     get("/videos", MyContentController, :videos)
+    get("/form-reviews", CoachingExtrasController, :my_form_reviews)
+    post("/form-reviews", CoachingExtrasController, :submit_form_review)
+    post("/form-reviews/:id/withdraw", CoachingExtrasController, :withdraw_form_review)
+    get("/nutrition-plan", CoachingExtrasController, :my_nutrition_plan)
     get("/progress", MyContentController, :progress)
     get("/invoices/:id/download-url", MyFinanceController, :invoice_download_url)
     get("/reviews", ReviewController, :index)
@@ -245,6 +256,23 @@ defmodule MilosTrainingWeb.Router do
     post("/my-workouts/requests", MyWorkoutController, :request_assignment)
     patch("/my-workouts/assignments/:id/reject", MyWorkoutController, :reject)
     patch("/my-workouts/assignments/:id/reschedule", MyWorkoutController, :reschedule)
+  end
+
+  # Staff work that coaches share with owners and admins (ADR-098).
+  scope "/api/org/:organization_slug/staff", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :staff_only,
+      :tenant_write_rate_limited
+    ])
+
+    get("/form-reviews", CoachingExtrasController, :form_review_queue)
+    post("/form-reviews/:id/review", CoachingExtrasController, :complete_form_review)
+    get("/reply-queue", CoachingExtrasController, :reply_queue)
+    get("/clients/:user_id/nutrition-plan", CoachingExtrasController, :nutrition_plan)
+    put("/clients/:user_id/nutrition-plan", CoachingExtrasController, :save_nutrition_plan)
   end
 
   scope "/api/org/:organization_slug/admin", MilosTrainingWeb do

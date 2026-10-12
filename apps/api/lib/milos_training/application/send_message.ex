@@ -20,7 +20,10 @@ defmodule MilosTraining.Application.SendMessage do
     end
   end
 
-  def call(_sender, params), do: Messaging.send_message(params, %{reservations: []})
+  # Only staff write coaching notes: a client-sent note would skip the
+  # touchpoint ledger (ADR-098).
+  def call(_sender, params),
+    do: Messaging.send_message(Map.put(params, :message_type, :chat), %{reservations: []})
 
   defp coaching_recipients(thread, sender_id) do
     ids =

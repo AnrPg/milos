@@ -27,6 +27,14 @@ Phase C makes every remaining catalog field and package type authorable and
 enforced. Finance stays the owner of the package contract, the ledger and all
 billing; each new service lives in the context that owns its data.
 
+### Staff roles
+No document yet separates what coaches may do from what admins may do, so
+coaches hold admin rights: every owner/admin route and membership command
+accepts coaches, and a coach ranks as an admin for role grants. Coach-facing
+Phase C work (form reviews, the reply queue, nutrition plans, appointments)
+lives under `/staff`, which owners, admins and coaches share. A rights-per-role
+report will narrow this later (TD-054).
+
 ### Entitlement plan
 - New channels `personal_training`, `digital_content`, `nutrition`; new
   capabilities `book_pt_sessions`, `book_assessments`, `request_form_reviews`,

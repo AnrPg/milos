@@ -147,3 +147,27 @@ msgstr "החבילה מסתיימת בקרוב"
 
 msgid "%{package} ends on %{date}."
 msgstr "%{package} מסתיימת ב-%{date}."
+
+msgid "New form review request"
+msgstr "בקשה חדשה לבדיקת טכניקה"
+
+msgid "%{client} sent a video for feedback."
+msgstr "%{client} שלח/ה סרטון לקבלת משוב."
+
+msgid "Your form review is ready"
+msgstr "בדיקת הטכניקה שלך מוכנה"
+
+msgid "Your coach left feedback on your video."
+msgstr "המאמן השאיר משוב על הסרטון שלך."
+
+msgid "A client is waiting for a reply"
+msgstr "לקוח מחכה לתשובה"
+
+msgid "%{client} has been waiting longer than the promised reply time."
+msgstr "%{client} מחכה יותר מזמן התגובה שהובטח."
+
+msgid "Your nutrition plan was updated"
+msgstr "תוכנית התזונה שלך עודכנה"
+
+msgid "Open it to see what changed."
+msgstr "פתח/י כדי לראות מה השתנה."

@@ -225,6 +225,44 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  def build("form_review_submitted", payload, localize) do
+    %{
+      title: localize.("New form review request", %{}),
+      body:
+        localize.("%{client} sent a video for feedback.", %{
+          client: payload["client_nickname"] || ""
+        }),
+      url: payload["url"] || "/admin/coaching/form-reviews"
+    }
+  end
+
+  def build("form_review_completed", payload, localize) do
+    %{
+      title: localize.("Your form review is ready", %{}),
+      body: localize.("Your coach left feedback on your video.", %{}),
+      url: payload["url"] || "/account/coaching"
+    }
+  end
+
+  def build("coaching_reply_overdue", payload, localize) do
+    %{
+      title: localize.("A client is waiting for a reply", %{}),
+      body:
+        localize.("%{client} has been waiting longer than the promised reply time.", %{
+          client: payload["client_nickname"] || ""
+        }),
+      url: payload["url"] || "/account/activity/chats"
+    }
+  end
+
+  def build("nutrition_plan_updated", payload, localize) do
+    %{
+      title: localize.("Your nutrition plan was updated", %{}),
+      body: localize.("Open it to see what changed.", %{}),
+      url: payload["url"] || "/account/coaching"
+    }
+  end
+
   def build("chat_message", payload, localize) do
     title =
       if payload["context_type"] in ["assignment", "class_slot"],

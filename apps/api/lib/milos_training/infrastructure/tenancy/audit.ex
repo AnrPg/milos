@@ -12,6 +12,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     finance_invoice_lines finance_payment_reversals finance_credit_ledger_entries
     finance_entitlement_usage_entries finance_settings finance_subscription_freezes
     facility_locations facility_check_ins content_videos
+    coaching_form_reviews coaching_reply_alerts nutrition_plans
     review_questionnaires reviews review_answers
     messaging_threads
     messaging_participants messaging_messages seasonal_challenges

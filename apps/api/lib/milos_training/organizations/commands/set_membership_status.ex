@@ -19,7 +19,7 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipStatus do
   @settable_statuses [:active, :suspended, :revoked]
 
   def call(context, membership_id, status) when is_binary(membership_id) do
-    with :ok <- TenantAuthorization.authorize(context, [:owner, :admin]),
+    with :ok <- TenantAuthorization.authorize(context, MembershipPolicy.admin_roles()),
          {:ok, status} <- normalize_status(status),
          {:ok, membership} <- fetch_membership(context, membership_id),
          :ok <- refuse_self_change(context, membership),

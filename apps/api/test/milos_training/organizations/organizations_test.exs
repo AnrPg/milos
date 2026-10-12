@@ -86,7 +86,7 @@ defmodule MilosTraining.OrganizationsTest do
     assert {:error, :invalid_invitation} = Organizations.inspect_invitation(second_token, now)
   end
 
-  test "only owner and admin memberships may manage invitations", context do
+  test "only staff memberships may manage invitations", context do
     {:ok, membership} =
       Organizations.add_membership(%{
         organization_id: context.organization.id,
@@ -110,7 +110,8 @@ defmodule MilosTraining.OrganizationsTest do
     assert {:error, :forbidden} =
              Organizations.issue_invitation(member_context, %{role: :member})
 
-    assert {:error, :forbidden} =
+    # Coaches hold admin rights until a rights-per-role report separates them (ADR-098).
+    assert {:ok, _invitation} =
              Organizations.issue_invitation(%{member_context | role: :coach}, %{role: :member})
   end
 

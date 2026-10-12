@@ -4,7 +4,12 @@ defmodule MilosTraining.Organizations.Domain.MembershipPolicy do
   @roles [:owner, :admin, :coach, :member, :athlete]
   @statuses [:invited, :active, :suspended, :revoked]
 
+  # No rights-per-role report separates coaches from admins yet, so coaches
+  # hold admin rights (ADR-098). Change this list when that report exists.
+  @admin_roles [:owner, :admin, :coach]
+
   def roles, do: @roles
+  def admin_roles, do: @admin_roles
   def statuses, do: @statuses
   def authorized_status?(status), do: status == :active
 
@@ -26,5 +31,7 @@ defmodule MilosTraining.Organizations.Domain.MembershipPolicy do
     role_rank(issuer_role) <= role_rank(target_role)
   end
 
+  # A coach ranks as an admin while coaches hold admin rights (ADR-098).
+  defp role_rank(:coach), do: role_rank(:admin)
   defp role_rank(role), do: Enum.find_index(@roles, &(&1 == role)) || length(@roles)
 end

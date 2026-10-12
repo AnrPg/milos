@@ -147,3 +147,27 @@ msgstr "O teu pacote termina em breve"
 
 msgid "%{package} ends on %{date}."
 msgstr "%{package} termina a %{date}."
+
+msgid "New form review request"
+msgstr "Novo pedido de revisão de técnica"
+
+msgid "%{client} sent a video for feedback."
+msgstr "%{client} enviou um vídeo para receber feedback."
+
+msgid "Your form review is ready"
+msgstr "A sua revisão de técnica está pronta"
+
+msgid "Your coach left feedback on your video."
+msgstr "O seu treinador deixou feedback no seu vídeo."
+
+msgid "A client is waiting for a reply"
+msgstr "Um cliente aguarda resposta"
+
+msgid "%{client} has been waiting longer than the promised reply time."
+msgstr "%{client} aguarda há mais tempo do que o tempo de resposta prometido."
+
+msgid "Your nutrition plan was updated"
+msgstr "O seu plano alimentar foi atualizado"
+
+msgid "Open it to see what changed."
+msgstr "Abra-o para ver o que mudou."
