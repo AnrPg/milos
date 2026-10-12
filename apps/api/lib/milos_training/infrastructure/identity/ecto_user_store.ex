@@ -5,6 +5,7 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
 
   alias MilosTraining.{
     Identity.Account,
+    Identity.Domain.ProductTours,
     Identity.PasswordHasher,
     Identity.RegistrationPolicy,
     Identity.User,
@@ -232,6 +233,22 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
   end
 
   @impl true
+  def mark_tour_completed(user_id, audience) do
+    case Repo.get(User, user_id) do
+      nil ->
+        {:error, :not_found}
+
+      %User{} = user ->
+        with {:ok, completed} <- ProductTours.complete(user.completed_tours, audience) do
+          user
+          |> User.tours_changeset(completed)
+          |> Repo.update()
+          |> wrap_result()
+        end
+    end
+  end
+
+  @impl true
   def update_avatar(user_id, avatar_url) do
     case Repo.get(User, user_id) do
       nil ->
@@ -342,7 +359,8 @@ defmodule MilosTraining.Infrastructure.Identity.EctoUserStore do
       avatar_url: user.avatar_url,
       preferred_locale: user.preferred_locale || "en",
       email: user.email,
-      inserted_at: user.inserted_at
+      inserted_at: user.inserted_at,
+      completed_tours: user.completed_tours || []
     }
   end
 
