@@ -22,6 +22,8 @@ defmodule MilosTraining.Analytics do
   defdelegate build_event(event_name, actor, subject, extra), to: EventCatalog, as: :build
   defdelegate event_names(), to: EventCatalog
   defdelegate execution_interaction_kinds(), to: ExecutionInteraction, as: :kinds
+  defdelegate execution_interaction_fields(), to: ExecutionInteraction, as: :fields
+  defdelegate execution_interaction_max_batch(), to: ExecutionInteraction, as: :max_batch
 
   defdelegate validate_execution_interactions(events, now),
     to: ExecutionInteraction,
