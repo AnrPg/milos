@@ -344,6 +344,7 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
       invitation_lifetime_seconds: settings.invitation_lifetime_seconds,
       brand_name: settings.brand_name,
       brand_logo_url: settings.brand_logo_url,
+      brand_logo_uploaded: not is_nil(settings.brand_logo_object_key),
       brand_primary_color: settings.brand_primary_color,
       settings: settings.settings
     }

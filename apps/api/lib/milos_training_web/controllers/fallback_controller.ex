@@ -349,6 +349,62 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-103 tenant logo upload.
+  def call(conn, {:error, :invalid_brand_logo_upload}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_brand_logo_upload",
+      error: "Use a PNG, JPEG, or WebP logo up to 2 MiB."
+    })
+  end
+
+  def call(conn, {:error, :brand_logo_upload_missing}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "brand_logo_upload_missing",
+      error: "The logo upload was not found in storage. Upload the image again."
+    })
+  end
+
+  def call(conn, {:error, :unsupported_brand_logo_type}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "unsupported_brand_logo_type",
+      error: "The uploaded file is not a PNG, JPEG, or WebP image."
+    })
+  end
+
+  def call(conn, {:error, {:brand_logo_too_large, byte_size}}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "brand_logo_too_large",
+      params: %{byte_size: byte_size, max_bytes: 2_097_152},
+      error: "The uploaded logo is larger than 2 MiB."
+    })
+  end
+
+  def call(conn, {:error, :brand_logo_key_forbidden}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "brand_logo_key_forbidden",
+      error: "The logo upload does not belong to this organization."
+    })
+  end
+
+  def call(conn, {:error, :brand_logo_storage_unavailable}) do
+    conn
+    |> put_status(:service_unavailable)
+    |> json(%{
+      code: "brand_logo_storage_unavailable",
+      error: "Logo storage could not be reached for verification. Try again shortly."
+    })
+  end
+
   def call(conn, {:error, :invalid_invoice_upload}) do
     emit_upload_rejection(:invalid_invoice_upload)
 

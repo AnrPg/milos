@@ -326,6 +326,10 @@ defmodule MilosTrainingWeb.Router do
     delete("/challenges/:id", AdminChallengeController, :delete)
     get("/settings", AdminSettingsController, :show)
     patch("/settings", AdminSettingsController, :update)
+    get("/branding", AdminBrandingController, :show)
+    post("/branding/logo/upload-url", AdminBrandingController, :logo_upload_url)
+    put("/branding/logo", AdminBrandingController, :finalize_logo)
+    delete("/branding/logo", AdminBrandingController, :remove_logo)
     post("/schedule/slots", AdminScheduleController, :create_slot)
     post("/schedule/slots/series", AdminScheduleController, :create_series)
     patch("/schedule/slots/:id", AdminScheduleController, :update_slot)
@@ -460,6 +464,24 @@ defmodule MilosTrainingWeb.Router do
     patch("/organizations/:id/lifecycle", PlatformOrganizationController, :lifecycle)
     patch("/organizations/:id/name", PlatformOrganizationController, :rename)
     patch("/organizations/:id/settings", PlatformOrganizationController, :settings)
+
+    post(
+      "/organizations/:id/branding/logo/upload-url",
+      PlatformOrganizationBrandingController,
+      :logo_upload_url
+    )
+
+    put(
+      "/organizations/:id/branding/logo",
+      PlatformOrganizationBrandingController,
+      :finalize_logo
+    )
+
+    delete(
+      "/organizations/:id/branding/logo",
+      PlatformOrganizationBrandingController,
+      :remove_logo
+    )
 
     # ADR-099 reviewed tenant export/purge workflow.
     get("/organization-purges", PlatformOrganizationPurgeController, :index)
