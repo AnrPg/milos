@@ -104,6 +104,7 @@ config :milos_training,
 
 config :milos_training, :avatar_storage, MilosTraining.Infrastructure.Storage.MinioStorage
 config :milos_training, :document_storage, MilosTraining.Infrastructure.Storage.MinioStorage
+config :milos_training, :tenant_object_store, MilosTraining.Infrastructure.Storage.MinioStorage
 config :milos_training, :landing_cache, MilosTraining.Infrastructure.Cache.LandingCache
 
 config :milos_training,

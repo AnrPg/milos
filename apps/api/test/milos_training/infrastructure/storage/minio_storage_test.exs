@@ -93,4 +93,26 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorageTest do
     assert MinioStorage.avatar_metadata(headers, <<0xFF, 0xD8, 0xFF, 0xE0, "jpeg-rest">>) ==
              {:error, :avatar_upload_metadata_missing}
   end
+
+  test "list-objects responses are parsed without SweetXml, including pagination tokens" do
+    body = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+      <Name>milos-invoices</Name><IsTruncated>true</IsTruncated>
+      <NextContinuationToken>tok&amp;en</NextContinuationToken>
+      <Contents><Key>organizations/o/invoices/1/a&amp;b.pdf</Key><Size>42</Size></Contents>
+      <Contents><Key>organizations/o/branding/logo.png</Key><Size>7</Size></Contents>
+    </ListBucketResult>
+    """
+
+    assert {[
+              %{key: "organizations/o/invoices/1/a&b.pdf", size: 42},
+              %{key: "organizations/o/branding/logo.png", size: 7}
+            ], "tok&en"} = MinioStorage.parse_list_objects_xml(body)
+
+    assert {[], nil} =
+             MinioStorage.parse_list_objects_xml(
+               "<ListBucketResult><IsTruncated>false</IsTruncated></ListBucketResult>"
+             )
+  end
 end

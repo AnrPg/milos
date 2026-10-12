@@ -2,11 +2,142 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
   @moduledoc false
   @behaviour MilosTraining.Application.Ports.DocumentStorage
   @behaviour MilosTraining.Application.Ports.AvatarStorage
+  @behaviour MilosTraining.Application.Ports.TenantObjectStore
   require Logger
 
   @expires_seconds 900
   @max_avatar_bytes 5 * 1_024 * 1_024
   @allowed_avatar_types ~w(image/jpeg image/png image/webp image/gif image/bmp image/avif)
+  @delete_batch_size 1_000
+
+  # --- ADR-099 tenant object inventory/cleanup -------------------------------
+
+  @impl MilosTraining.Application.Ports.TenantObjectStore
+  def put_object(bucket, key, body, content_type) when is_binary(key) and is_binary(body) do
+    {config, _url_config, bucket_name} = bucket_config(bucket)
+
+    with :ok <- ensure_bucket(config, bucket_name) do
+      case ExAws.S3.put_object(bucket_name, key, body, content_type: content_type)
+           |> ExAws.request(config) do
+        {:ok, _response} -> :ok
+        {:error, reason} -> {:error, {:object_store_failed, reason}}
+      end
+    end
+  end
+
+  @impl MilosTraining.Application.Ports.TenantObjectStore
+  def list_objects(bucket, prefix) when is_binary(prefix) and prefix != "" do
+    {config, _url_config, bucket_name} = bucket_config(bucket)
+    list_objects_page(config, bucket_name, prefix, nil, [])
+  end
+
+  @impl MilosTraining.Application.Ports.TenantObjectStore
+  def delete_objects(_bucket, []), do: {:ok, 0}
+
+  def delete_objects(bucket, keys) when is_list(keys) do
+    {config, _url_config, bucket_name} = bucket_config(bucket)
+
+    keys
+    |> Enum.chunk_every(@delete_batch_size)
+    |> Enum.reduce_while({:ok, 0}, fn batch, {:ok, deleted} ->
+      case ExAws.S3.delete_multiple_objects(bucket_name, batch, quiet: true)
+           |> Map.put(:parser, & &1)
+           |> ExAws.request(config) do
+        {:ok, %{body: body}} when is_binary(body) ->
+          if String.contains?(body, "<Error>"),
+            do: {:halt, {:error, {:object_store_failed, :partial_delete}}},
+            else: {:cont, {:ok, deleted + length(batch)}}
+
+        {:ok, _response} ->
+          {:cont, {:ok, deleted + length(batch)}}
+
+        {:error, reason} ->
+          {:halt, {:error, {:object_store_failed, reason}}}
+      end
+    end)
+  end
+
+  @impl MilosTraining.Application.Ports.TenantObjectStore
+  def presigned_object_url(bucket, key) when is_binary(key) do
+    {_config, url_config, bucket_name} = bucket_config(bucket)
+
+    ExAws.S3.presigned_url(url_config, :get, bucket_name, key,
+      expires_in: @expires_seconds,
+      virtual_host: false
+    )
+  end
+
+  defp bucket_config(:documents), do: ex_aws_config()
+  defp bucket_config(:avatars), do: avatar_ex_aws_config()
+
+  defp list_objects_page(config, bucket_name, prefix, token, acc) do
+    options =
+      [prefix: prefix, max_keys: 1_000] ++
+        if(token, do: [continuation_token: token], else: [])
+
+    # The ExAws list parser needs SweetXml, which this app does not depend on;
+    # the response is parsed by parse_list_objects_xml/1 instead.
+    case ExAws.S3.list_objects_v2(bucket_name, options)
+         |> Map.put(:parser, & &1)
+         |> ExAws.request(config) do
+      {:ok, %{body: body}} when is_binary(body) ->
+        {objects, next_token} = parse_list_objects_xml(body)
+        acc = acc ++ objects
+
+        if next_token,
+          do: list_objects_page(config, bucket_name, prefix, next_token, acc),
+          else: {:ok, acc}
+
+      {:error, {:http_error, 404, _response}} ->
+        {:ok, acc}
+
+      {:error, reason} ->
+        {:error, {:object_store_failed, reason}}
+    end
+  end
+
+  @doc false
+  def parse_list_objects_xml(body) when is_binary(body) do
+    objects =
+      ~r{<Contents>(.*?)</Contents>}s
+      |> Regex.scan(body, capture: :all_but_first)
+      |> Enum.flat_map(fn [contents] ->
+        with [key] <- Regex.run(~r{<Key>(.*?)</Key>}s, contents, capture: :all_but_first) do
+          size =
+            case Regex.run(~r{<Size>(\d+)</Size>}, contents, capture: :all_but_first) do
+              [size] -> String.to_integer(size)
+              _missing -> 0
+            end
+
+          [%{key: unescape_xml(key), size: size}]
+        else
+          _missing -> []
+        end
+      end)
+
+    truncated? = Regex.match?(~r{<IsTruncated>true</IsTruncated>}, body)
+
+    next_token =
+      case Regex.run(~r{<NextContinuationToken>(.*?)</NextContinuationToken>}s, body,
+             capture: :all_but_first
+           ) do
+        [token] when truncated? -> unescape_xml(token)
+        _other -> nil
+      end
+
+    {objects, next_token}
+  end
+
+  defp unescape_xml(value) do
+    value
+    |> String.replace("&lt;", "<")
+    |> String.replace("&gt;", ">")
+    |> String.replace("&quot;", "\"")
+    |> String.replace("&apos;", "'")
+    |> String.replace("&amp;", "&")
+  end
+
+  # ---------------------------------------------------------------------------
 
   def ensure_buckets do
     {document_config, _document_url, document_bucket} = ex_aws_config()
