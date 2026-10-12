@@ -12,9 +12,9 @@ not fit goes into the last menu).
 
 | Role | Bar (priority order) | Home (dashboard) sections | Hidden / renamed |
 |---|---|---|---|
-| **Owner** | Home · Training ▾ · Finance · WODs · Users | admin dashboard | + Settings › *Organization* card (create gym, transfer ownership, delete gym, platform subscription), + Settings › *Role access* (front desk finance access, §3) |
-| **Admin** | Home · Training ▾ · Finance · WODs · Users | today's dashboard; its category tiles also reach Content, Challenges, Analytics & Marketing, Reviews, Wellbeing | **Training ▾** opens Gym classes · Personal training (then Appointments · Check-in desk); *Workouts* → **WODs**; Settings moves to the account menu; the Dashboard row is removed; Settings › *Organization* hidden |
-| **Coach** | Home · Classes · Personals · WOD vault | My classes today (roster, approvals) · My clients (today's Users page as a tab, only their clients; *Take an athlete*, *Invite*) · Form reviews · Replies due · Nutrition plans · Appointments (their slots) · Reports (coaching analytics of their clients) · Content & challenges (links) | *Personal Coaching* → **Personals**, *Workouts* → **WOD vault**; Users, Finance, Analytics & Marketing, Settings hidden; Classes without *Add class* |
+| **Owner** | Home · Coaching · Finance · Users | admin dashboard | + Settings › *Organization* card (create gym, transfer ownership, delete gym, platform subscription), + Settings › *Role access* (front desk finance access, §3) |
+| **Admin** | Home · Coaching · Finance · Users | today's dashboard; its category tiles also reach Content, Challenges, Analytics & Marketing, Reviews, Wellbeing | **Coaching** is one page with three tabs: Gym classes (today\'s Classes, with Check-in and Appointments reachable from it) · Personal training (today\'s Personal Coaching) · WODs vault (today\'s Workouts); no dropdown; Settings moves to the account menu; the Dashboard row is removed; Settings › *Organization* hidden |
+| **Coach** | Home · Coaching | My classes today (roster, approvals) · My clients (today's Users page as a tab, only their clients; *Take an athlete*, *Invite*) · Form reviews · Replies due · Nutrition plans · Appointments (their slots) · Reports (coaching analytics of their clients) · Content & challenges (links) | **Coaching** has the same three tabs (Gym classes · Personal training · WODs vault) limited to their own classes and clients; Users, Finance, Analytics & Marketing, Settings hidden; Classes without *Add class* |
 | **Front desk** | Home · Check-in · Classes · Clients · Finance | Arrivals now · Today's classes and waitlists · Quick actions (new client, sell package, take payment) · Cleaning status | *Users* → **Clients** (contact and membership status; training and health tabs hidden); Finance shows only the tabs and buttons the gym unlocked (§3); Classes without *Add class* |
 | **Accountant** | Home · Finance · Clients · Reports | Overdue · Corporate balances · Desk payments to reconcile | *Users* → **Clients** (billing tab only); *Analytics* → **Reports** (finance tab only) |
 | **Janitor** | Cleaning log | — (the log is the home) | everything else hidden |
@@ -32,10 +32,10 @@ sections of every role, staff sections first.
 | Combination | Bar | Home | My training (account menu) |
 |---|---|---|---|
 | Owner + admin | owner | owner | — |
-| Owner/admin + coach | admin bar; *Personal Coaching* keeps its name | admin dashboard + **My clients** section | — |
+| Owner/admin + coach | admin bar | admin dashboard + **My clients** section | — |
 | Owner/admin + front desk / accountant / janitor | admin bar (already includes them) + Cleaning log under More for janitor | admin dashboard | — |
 | Owner/admin + member/athlete | admin bar | admin dashboard | ✔ |
-| Coach + front desk | Home · Classes · Personals · Check-in · Clients · WOD vault · Finance* | coach sections + arrivals + quick actions | — |
+| Coach + front desk | Home · Coaching · Check-in · Clients · Finance* | coach sections + arrivals + quick actions | — |
 | Coach + accountant | coach bar + Finance · Reports | coach sections + money sections | — |
 | Coach + janitor | coach bar + Cleaning log | coach sections | — |
 | Coach + member/athlete | coach bar | coach sections | ✔ |
@@ -77,5 +77,6 @@ The toggles add capabilities to the front desk role in that gym only
   performance, injuries, reports, messages, PRs and notes. Here it holds only
   the tabs implemented in this worktree, plus **Workouts**: every finished
   workout in two views, folders and a tree list, as in the admin WOD library.
-- "Training" is one label for every role: for staff it is classes and
-  personal training, for clients what they book and train.
+- Staff reach classes, personal training and the WODs vault through one
+  **Coaching** link (three tabs); clients reach what they book and train
+  through **Training**.

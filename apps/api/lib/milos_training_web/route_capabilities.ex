@@ -27,7 +27,8 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     W.AppointmentsController => [:manage_appointments],
     W.StaffController => [:manage_coaching, :manage_appointments, :manage_schedule],
     W.PaymentModelsController => [:manage_billing],
-    W.CoachingRelationshipsController => [:assign_coaches, :manage_coaching]
+    W.CoachingRelationshipsController => [:assign_coaches, :manage_coaching],
+    W.RoleAccessController => [:manage_settings]
   }
 
   @actions %{
@@ -134,6 +135,15 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     {W.AppointmentsController, :slots} => [:manage_appointments, :book_for_clients],
     {W.AppointmentsController, :book_for_client} => [:manage_appointments, :book_for_clients],
     {W.AppointmentsController, :cancel} => [:manage_appointments, :book_for_clients],
+
+    # Cleaning log (ADR-102)
+    {W.CleaningController, :areas} => [:record_cleaning, :review_cleaning, :manage_cleaning_areas],
+    {W.CleaningController, :create_area} => [:manage_cleaning_areas],
+    {W.CleaningController, :update_area} => [:manage_cleaning_areas],
+    {W.CleaningController, :archive_area} => [:manage_cleaning_areas],
+    {W.CleaningController, :entries} => [:record_cleaning, :review_cleaning],
+    {W.CleaningController, :start} => [:record_cleaning],
+    {W.CleaningController, :finish} => [:record_cleaning],
 
     # Invitations
     {W.OrganizationAccessController, :issue} => [:invite_clients],

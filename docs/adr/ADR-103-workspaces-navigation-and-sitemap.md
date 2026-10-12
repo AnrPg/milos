@@ -19,11 +19,13 @@ full proposal — what each role sees, every multi-role combination, and the
 front desk finance access each gym unlocks — is
 `docs/architecture/navigation-by-role.md`. In short:
 
-- Owners and admins: Home · Training ▾ (Gym classes · Personal training,
-  then Appointments · Check-in desk) · Finance · WODs · Users; the other
-  staff pages are dashboard tiles; Settings is in the account menu; owners
+- Owners and admins: Home · Coaching · Finance · Users. Coaching is one
+  page with three tabs: Gym classes · Personal training · WODs vault (no
+  dropdown, no separate vault link); the other staff pages are dashboard
+  tiles; Settings is in the account menu; owners
   also get Settings › Organization and Settings › Role access.
-- Coaches: Home · Classes · Personals · WOD vault; everything else (their
+- Coaches: Home · Coaching (the same three tabs, their own classes and
+  clients); everything else (their
   clients, form reviews, replies, nutrition plans, appointments, reports) is
   a section of their dashboard.
 - Front desk: Home · Check-in · Classes · Clients · Finance (only the tabs

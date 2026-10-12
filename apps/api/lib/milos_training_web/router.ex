@@ -275,6 +275,13 @@ defmodule MilosTrainingWeb.Router do
     ])
 
     get("/members", StaffController, :index)
+    get("/cleaning/areas", CleaningController, :areas)
+    post("/cleaning/areas", CleaningController, :create_area)
+    patch("/cleaning/areas/:id", CleaningController, :update_area)
+    post("/cleaning/areas/:id/archive", CleaningController, :archive_area)
+    get("/cleaning/entries", CleaningController, :entries)
+    post("/cleaning/entries", CleaningController, :start)
+    post("/cleaning/entries/:id/finish", CleaningController, :finish)
     get("/coaching-relationships", CoachingRelationshipsController, :index)
     post("/coaching-relationships", CoachingRelationshipsController, :create)
     post("/coaching-relationships/:id/end", CoachingRelationshipsController, :finish)
@@ -326,6 +333,8 @@ defmodule MilosTrainingWeb.Router do
 
     patch("/users/:id/role", AdminUserController, :update_role)
     put("/users/:id/roles", AdminUserController, :update_roles)
+    get("/role-access", RoleAccessController, :show)
+    put("/role-access/:role", RoleAccessController, :update)
     patch("/users/:id/coach-scope", AdminUserController, :update_coach_scope)
     get("/users/:id/membership-status", AdminUserController, :membership_status)
     get("/search", AdminSearchController, :index)

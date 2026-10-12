@@ -73,6 +73,7 @@ defmodule Mix.Tasks.Milos.Architecture do
     coaching/coaching_store
     coaching/form_review_store
     coaching/relationship_store
+    housekeeping/housekeeping_store
     facility/facility_store
     content/content_store
     appointments/appointment_store

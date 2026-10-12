@@ -167,6 +167,23 @@ defmodule MilosTraining.Organizations do
 
   def set_coach_scope(context, user_id, scope), do: SetCoachScope.call(context, user_id, scope)
 
+  @doc "Capabilities of a role set in a gym (ADR-099), for session payloads."
+  def capabilities_for(roles, coach_scope, role_grants),
+    do:
+      MilosTraining.Organizations.Domain.AccessPolicy.capabilities(roles,
+        coach_scope: coach_scope,
+        role_grants: role_grants
+      )
+
+  def get_role_grants(context),
+    do: MilosTraining.Organizations.Commands.SetRoleGrants.get(context)
+
+  def set_role_grants(context, role, capabilities),
+    do: MilosTraining.Organizations.Commands.SetRoleGrants.call(context, role, capabilities)
+
+  def grantable_capabilities,
+    do: MilosTraining.Organizations.Commands.SetRoleGrants.grantable()
+
   def delete_organization(context, organization_id, deleted_at \\ DateTime.utc_now()),
     do: DeleteOrganization.call(context, organization_id, deleted_at)
 

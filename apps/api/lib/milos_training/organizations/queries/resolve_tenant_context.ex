@@ -16,9 +16,25 @@ defmodule MilosTraining.Organizations.Queries.ResolveTenantContext do
           OrganizationStore.get_membership(organization.id, account.id)
         end
 
-      TenantAuthorization.build(account, organization, membership, request_metadata)
+      TenantAuthorization.build(
+        account,
+        organization,
+        membership,
+        request_metadata,
+        role_grants(organization)
+      )
     end)
   end
 
   def call(_account, _slug, _request_metadata), do: {:error, :membership_required}
+
+  # What the gym unlocked for roles such as front desk (ADR-099).
+  defp role_grants(nil), do: %{}
+
+  defp role_grants(organization) do
+    case OrganizationStore.get_organization_settings(organization.id) do
+      %{settings: %{"role_grants" => grants}} when is_map(grants) -> grants
+      _none -> %{}
+    end
+  end
 end

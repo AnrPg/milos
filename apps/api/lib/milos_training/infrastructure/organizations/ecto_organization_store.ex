@@ -539,6 +539,20 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     |> flatten_transaction()
   end
 
+  # One key of the gym's free-form settings map, e.g. role grants (ADR-099).
+  @impl true
+  def put_organization_setting(organization_id, key, value) do
+    case Repo.get_by(OrganizationSetting, organization_id: organization_id) do
+      nil ->
+        {:error, :not_found}
+
+      settings ->
+        settings
+        |> Ecto.Changeset.change(settings: Map.put(settings.settings || %{}, key, value))
+        |> Repo.update()
+    end
+  end
+
   @impl true
   def update_membership_roles(organization_id, membership_id, roles) do
     update_membership(organization_id, membership_id, %{roles: roles})

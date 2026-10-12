@@ -133,4 +133,30 @@ defmodule MilosTrainingWeb.RolesAndCoachScopeTest do
     {:ok, %{membership: membership}} = Organizations.redeem_invitation(token, desk.id)
     assert membership.roles == [:front_desk, :member]
   end
+
+  test "a gym unlocks invoices for its front desk; memberships carry capabilities", %{
+    conn: conn,
+    owner_conn: owner_conn,
+    base: base
+  } do
+    desk = client(:front_desk)
+    desk_conn = put_bearer_token(conn, desk)
+
+    assert desk_conn |> recycle() |> get("#{base}/admin/finance/members") |> json_response(200)
+    assert desk_conn |> recycle() |> get("#{base}/admin/finance/promotions") |> json_response(403)
+
+    assert %{"grants" => %{"front_desk" => ["manage_promotions"]}} =
+             owner_conn
+             |> send_json(:put, "#{base}/admin/role-access/front_desk", %{
+               capabilities: ["manage_promotions", "grant_admin_roles"]
+             })
+             |> json_response(200)
+
+    assert desk_conn |> recycle() |> get("#{base}/admin/finance/promotions") |> json_response(200)
+
+    [membership] = desk_conn |> recycle() |> get("/api/memberships") |> json_response(200)
+    assert membership["roles"] == ["front_desk"]
+    assert membership["capabilities"]["manage_promotions"] == "all"
+    refute Map.has_key?(membership["capabilities"], "grant_admin_roles")
+  end
 end

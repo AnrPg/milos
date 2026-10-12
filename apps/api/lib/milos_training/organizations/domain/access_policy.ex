@@ -121,16 +121,26 @@ defmodule MilosTraining.Organizations.Domain.AccessPolicy do
     athlete: %{}
   }
 
+  # What a gym may unlock for a role on top of its defaults (ADR-099,
+  # docs/architecture/navigation-by-role.md §3).
+  @grantable %{
+    front_desk: [:manage_billing, :manage_promotions, :manage_packages, :view_finance_reports]
+  }
+
+  def grantable, do: @grantable
+
   @doc """
-  The capabilities of a role set as `%{capability => scope}`. Option
-  `coach_scope: :all` makes a coach a head coach.
+  The capabilities of a role set as `%{capability => scope}`. Options:
+  `coach_scope: :all` makes a coach a head coach; `role_grants` (a gym's
+  `%{"front_desk" => ["manage_billing", ...]}`) adds unlocked capabilities.
   """
   def capabilities(roles, opts \\ []) do
     head_coach? = Keyword.get(opts, :coach_scope) in [:all, "all"]
+    role_grants = Keyword.get(opts, :role_grants) || %{}
 
     roles
     |> List.wrap()
-    |> Enum.map(&grants_for(&1, head_coach?))
+    |> Enum.map(&Map.merge(grants_for(&1, head_coach?), unlocked(&1, role_grants)))
     |> Enum.reduce(%{}, &Map.merge(&2, &1, fn _capability, a, b -> wider(a, b) end))
   end
 
@@ -139,6 +149,26 @@ defmodule MilosTraining.Organizations.Domain.AccessPolicy do
 
   @doc "Every capability any role can hold."
   def all_capabilities, do: (Map.keys(@owner) ++ Map.keys(@coach)) |> Enum.uniq()
+
+  @doc "Parses a gym's grants for a role, keeping only grantable capabilities."
+  def unlocked(role, role_grants) do
+    allowed = Map.get(@grantable, role, [])
+
+    role_grants
+    |> Map.get(to_string(role), Map.get(role_grants, role, []))
+    |> List.wrap()
+    |> Enum.map(&to_capability(&1, allowed))
+    |> Enum.reject(&is_nil/1)
+    |> Map.new(&{&1, :all})
+  end
+
+  defp to_capability(capability, allowed) when is_atom(capability),
+    do: if(capability in allowed, do: capability)
+
+  defp to_capability(capability, allowed) when is_binary(capability),
+    do: Enum.find(allowed, &(Atom.to_string(&1) == capability))
+
+  defp to_capability(_capability, _allowed), do: nil
 
   defp grants_for(:coach, true), do: Map.merge(@coach, Map.new(@coaching_scoped, &{&1, :all}))
   defp grants_for(role, _head_coach?), do: Map.get(@grants, role, %{})

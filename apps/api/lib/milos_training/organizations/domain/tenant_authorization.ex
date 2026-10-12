@@ -4,7 +4,9 @@ defmodule MilosTraining.Organizations.Domain.TenantAuthorization do
   alias MilosTraining.Organizations.Domain.{AccessPolicy, MembershipPolicy}
   alias MilosTraining.Organizations.TenantContext
 
-  def build(account, organization, membership, request_metadata)
+  def build(account, organization, membership, request_metadata, role_grants \\ %{})
+
+  def build(account, organization, membership, request_metadata, role_grants)
       when is_map(account) and is_map(organization) and is_map(membership) do
     cond do
       organization.status != :active ->
@@ -30,14 +32,18 @@ defmodule MilosTraining.Organizations.Domain.TenantAuthorization do
            user_id: account.id,
            role: MembershipPolicy.primary_role(roles) || membership.role,
            roles: roles,
-           capabilities: AccessPolicy.capabilities(roles, coach_scope: coach_scope),
+           capabilities:
+             AccessPolicy.capabilities(roles,
+               coach_scope: coach_scope,
+               role_grants: role_grants || %{}
+             ),
            coach_scope: coach_scope,
            request_metadata: request_metadata || %{}
          }}
     end
   end
 
-  def build(_account, _organization, _membership, _request_metadata),
+  def build(_account, _organization, _membership, _request_metadata, _role_grants),
     do: {:error, :membership_required}
 
   def authorize(%TenantContext{} = context, roles) when is_list(roles) do
