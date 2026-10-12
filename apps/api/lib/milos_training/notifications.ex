@@ -148,6 +148,26 @@ defmodule MilosTraining.Notifications do
   def process_event("review_submitted", payload), do: enqueue_review_submitted(payload)
   def process_event("invoice_issued", payload), do: enqueue_invoice_issued(payload)
   def process_event("payment_reminder", payload), do: enqueue_payment_reminder(payload)
+
+  def process_event("booking_waitlist_promoted", payload),
+    do:
+      enqueue_simple(:booking_waitlist_promoted, payload, %{
+        class_name: field(payload, :class_name),
+        scheduled_at: field(payload, :scheduled_at),
+        booking_id: field(payload, :booking_id),
+        status: field(payload, :status),
+        url: "/schedule"
+      })
+
+  def process_event("package_expiring", payload),
+    do:
+      enqueue_simple(:package_expiring, payload, %{
+        package_name: field(payload, :package_name),
+        ends_on: field(payload, :ends_on),
+        subscription_id: field(payload, :subscription_id),
+        url: "/account/billing"
+      })
+
   def process_event(_event, _payload), do: {:error, :bad_request}
 
   def propagate_nickname_change(old_nickname, new_nickname),
@@ -503,6 +523,39 @@ defmodule MilosTraining.Notifications do
 
         error
     end
+  end
+
+  # ADR-097 notifications with a fixed payload shape.
+  defp enqueue_simple(type, payload, notification_payload) do
+    user_id = field(payload, :user_id)
+
+    case deliver_notification(user_id, type, stringify_values(notification_payload)) do
+      {:ok, _notification} ->
+        :ok
+
+      :ok ->
+        :ok
+
+      {:error, reason} = error ->
+        Logger.error("#{type} delivery failed user_id=#{user_id} reason=#{inspect(reason)}")
+        error
+    end
+  end
+
+  defp stringify_values(payload) do
+    Map.new(payload, fn
+      {key, %DateTime{} = value} ->
+        {key, DateTime.to_iso8601(value)}
+
+      {key, %Date{} = value} ->
+        {key, Date.to_iso8601(value)}
+
+      {key, value} when is_atom(value) and not is_nil(value) and not is_boolean(value) ->
+        {key, Atom.to_string(value)}
+
+      pair ->
+        pair
+    end)
   end
 
   def delete_booking_pending_notifications(booking_id) do

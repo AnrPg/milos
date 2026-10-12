@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.ResolveBooking do
-  alias MilosTraining.Application.ScheduleRealtime
+  alias MilosTraining.Application.{BookingEntitlement, PromoteClassWaitlist, ScheduleRealtime}
   alias MilosTraining.{Finance, Scheduling}
 
   def call(context, booking_id, params) do
@@ -9,6 +9,9 @@ defmodule MilosTraining.Application.ResolveBooking do
     with booking when not is_nil(booking) <- Scheduling.get_booking(context, booking_id),
          {:ok, updated_booking} <- run_resolution(context, action, booking_id, admin_message) do
       maybe_reconcile_now(action, updated_booking)
+
+      if action in [:reject, "reject"],
+        do: PromoteClassWaitlist.call(context, booking.scheduled_class_id)
 
       notification_payload =
         updated_booking
@@ -59,6 +62,7 @@ defmodule MilosTraining.Application.ResolveBooking do
       booking_id: booking.id,
       user_id: booking.user_id,
       scheduled_class_id: booking.scheduled_class_id,
+      allowance: Atom.to_string(BookingEntitlement.allowance(booking)),
       reason: reason,
       idempotency_key: "#{idempotency_prefix}:#{booking.id}"
     }
@@ -70,7 +74,7 @@ defmodule MilosTraining.Application.ResolveBooking do
         booking.user_id,
         "scheduling",
         booking.scheduled_class_id,
-        :class_visits,
+        BookingEntitlement.allowance(booking),
         %{
           reason: "Booking rejected",
           idempotency_key: "booking-rejected:#{booking.id}"

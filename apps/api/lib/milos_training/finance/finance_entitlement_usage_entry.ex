@@ -72,10 +72,13 @@ defmodule MilosTraining.Finance.FinanceEntitlementUsageEntry do
     end
   end
 
+  # ADR-097 adds event visits, guest passes and open-gym visits.
+  @allowance_keys ~w(class_visits coaching_touchpoints event_visits guest_passes open_gym_visits)
+
   defp validate_allowance_key(changeset) do
     validate_change(changeset, :allowance_key, fn :allowance_key, key ->
       cond do
-        key in ["class_visits", "coaching_touchpoints"] -> []
+        key in @allowance_keys -> []
         class_type_key?(key) -> []
         true -> [allowance_key: "is invalid"]
       end

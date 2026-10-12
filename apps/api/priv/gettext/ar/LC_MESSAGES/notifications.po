@@ -135,3 +135,15 @@ msgstr "تم تعيين تمارين جديدة"
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr "عيّن لك مدربك تمرينًا واحدًا أو أكثر."
+
+msgid "You got a spot"
+msgstr "حصلت على مكان"
+
+msgid "A place opened up in %{class}. Your booking is confirmed or awaiting approval."
+msgstr "توفر مكان في %{class}. حجزك مؤكد أو بانتظار الموافقة."
+
+msgid "Your package ends soon"
+msgstr "باقتك تنتهي قريبًا"
+
+msgid "%{package} ends on %{date}."
+msgstr "تنتهي %{package} في %{date}."

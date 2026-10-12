@@ -1,7 +1,10 @@
 defmodule MilosTraining.Repo.Migrations.AddPhaseBFinanceTerms do
   use Ecto.Migration
 
-  # ADR-097: commitment, activation on first use, freezes and member discounts.
+  # ADR-097: commitment, activation on first use, freezes, member discounts and
+  # the ledger keys for events, guest passes and open gym.
+
+  @class_type_key "allowance_key ~ '^class_visits:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'"
 
   def up do
     alter table(:membership_package_subscriptions) do
@@ -51,9 +54,18 @@ defmodule MilosTraining.Repo.Migrations.AddPhaseBFinanceTerms do
              check:
                "charge_category IS NULL OR charge_category IN ('product', 'personal_training', 'event', 'other')"
            )
+
+    replace_allowance_keys(
+      "'class_visits', 'coaching_touchpoints', 'event_visits', 'guest_passes', 'open_gym_visits'",
+      true
+    )
   end
 
   def down do
+    # The ledger is append-only: Phase B entries are kept and the previous
+    # constraint applies to new rows only.
+    replace_allowance_keys("'class_visits', 'coaching_touchpoints'", false)
+
     drop constraint(:finance_invoice_lines, :finance_invoice_lines_charge_category)
 
     alter table(:finance_invoice_lines) do
@@ -67,6 +79,15 @@ defmodule MilosTraining.Repo.Migrations.AddPhaseBFinanceTerms do
       remove :activated_on
       remove :commitment_ends_on
     end
+  end
+
+  defp replace_allowance_keys(keys, validate?) do
+    drop constraint(:finance_entitlement_usage_entries, :entitlement_usage_allowance_key)
+
+    create constraint(:finance_entitlement_usage_entries, :entitlement_usage_allowance_key,
+             check: "allowance_key IN (#{keys}) OR #{@class_type_key}",
+             validate: validate?
+           )
   end
 
   defp enable_tenant_rls(table) do

@@ -199,6 +199,32 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  def build("booking_waitlist_promoted", payload, localize) do
+    %{
+      title: localize.("You got a spot", %{}),
+      body:
+        localize.(
+          "A place opened up in %{class}. Your booking is confirmed or awaiting approval.",
+          %{
+            class: payload["class_name"] || ""
+          }
+        ),
+      url: payload["url"] || "/schedule"
+    }
+  end
+
+  def build("package_expiring", payload, localize) do
+    %{
+      title: localize.("Your package ends soon", %{}),
+      body:
+        localize.("%{package} ends on %{date}.", %{
+          package: payload["package_name"] || "",
+          date: payload["ends_on"] || ""
+        }),
+      url: payload["url"] || "/account/billing"
+    }
+  end
+
   def build("chat_message", payload, localize) do
     title =
       if payload["context_type"] in ["assignment", "class_slot"],

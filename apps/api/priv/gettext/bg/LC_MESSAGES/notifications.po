@@ -135,3 +135,15 @@ msgstr "Зададени са нови тренировки"
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr "Вашият треньор ви зададе една или повече тренировки."
+
+msgid "You got a spot"
+msgstr "Получи място"
+
+msgid "A place opened up in %{class}. Your booking is confirmed or awaiting approval."
+msgstr "Освободи се място в %{class}. Резервацията ти е потвърдена или чака одобрение."
+
+msgid "Your package ends soon"
+msgstr "Пакетът ти изтича скоро"
+
+msgid "%{package} ends on %{date}."
+msgstr "%{package} изтича на %{date}."

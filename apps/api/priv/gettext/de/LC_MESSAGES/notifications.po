@@ -135,3 +135,15 @@ msgstr "Neue Workouts zugewiesen"
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr "Ihr Coach hat Ihnen ein oder mehrere Workouts zugewiesen."
+
+msgid "You got a spot"
+msgstr "Du hast einen Platz"
+
+msgid "A place opened up in %{class}. Your booking is confirmed or awaiting approval."
+msgstr "Im Kurs %{class} ist ein Platz frei geworden. Deine Buchung ist bestätigt oder wartet auf Freigabe."
+
+msgid "Your package ends soon"
+msgstr "Dein Paket endet bald"
+
+msgid "%{package} ends on %{date}."
+msgstr "%{package} endet am %{date}."

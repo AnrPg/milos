@@ -32,8 +32,10 @@ defmodule MilosTraining.Application.AuthorizeFinanceEntitlement do
     |> add_denial_details(request)
   end
 
+  # The class or event booking was already authorized for its channel, so the
+  # execution only needs the capability (ADR-097: events use their own channel).
   def execution_request(%{source: "class_booking"}),
-    do: %{channel: :in_person, capability: :execute_class_workouts}
+    do: %{capability: :execute_class_workouts}
 
   def execution_request(%{source: "assigned"}),
     do: %{channel: :personal_programming, capability: :execute_assigned_workouts}

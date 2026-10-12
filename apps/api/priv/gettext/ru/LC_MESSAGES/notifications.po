@@ -135,3 +135,15 @@ msgstr "Назначены новые тренировки"
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr "Ваш тренер назначил вам одну или несколько тренировок."
+
+msgid "You got a spot"
+msgstr "Для вас освободилось место"
+
+msgid "A place opened up in %{class}. Your booking is confirmed or awaiting approval."
+msgstr "Освободилось место на занятии %{class}. Ваша запись подтверждена или ожидает одобрения."
+
+msgid "Your package ends soon"
+msgstr "Ваш пакет скоро закончится"
+
+msgid "%{package} ends on %{date}."
+msgstr "%{package} заканчивается %{date}."

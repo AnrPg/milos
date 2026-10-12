@@ -135,3 +135,15 @@ msgstr "Ανατέθηκαν νέες προπονήσεις"
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr "Ο προπονητής σας ανέθεσε μία ή περισσότερες προπονήσεις."
+
+msgid "You got a spot"
+msgstr "Βρέθηκε θέση για σένα"
+
+msgid "A place opened up in %{class}. Your booking is confirmed or awaiting approval."
+msgstr "Άνοιξε θέση στο %{class}. Η κράτησή σου επιβεβαιώθηκε ή περιμένει έγκριση."
+
+msgid "Your package ends soon"
+msgstr "Το πακέτο σου λήγει σύντομα"
+
+msgid "%{package} ends on %{date}."
+msgstr "Το %{package} λήγει στις %{date}."

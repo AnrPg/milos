@@ -1,14 +1,23 @@
 defmodule MilosTraining.Application.SubmitBooking do
   require Logger
 
+  alias MilosTraining.Application.BookingTerms
   alias MilosTraining.{Finance, Identity, Scheduling}
   alias MilosTraining.Scheduling.Domain.BookingPolicy
 
   def call(context, %{id: user_id} = actor, slot_id) do
+    now = DateTime.utc_now()
+
     with {:ok, slot} <- fetch_slot(context, slot_id),
-         :ok <- BookingPolicy.can_book?(slot, user_id: user_id, now: DateTime.utc_now()),
-         {:ok, reservation} <- reserve_visit(context, actor, slot) do
-      case create_booking(context, slot, user_id) do
+         :ok <- BookingPolicy.can_book?(slot, user_id: user_id, now: now),
+         terms = BookingTerms.for_slot(context, user_id, slot),
+         :ok <-
+           BookingPolicy.booking_window_open?(slot.scheduled_at, now, terms.booking_window_days),
+         request = BookingPolicy.entitlement_request(slot),
+         {:ok, reservation} <- reserve_visit(context, actor, slot, request) do
+      attrs = %{entitlement_allowance: BookingPolicy.booking_allowance(request)}
+
+      case create_booking(context, slot, user_id, attrs) do
         {:ok, booking} ->
           dispatch_booking_notification(slot, booking)
           broadcast_booking_event(slot, booking)
@@ -34,19 +43,18 @@ defmodule MilosTraining.Application.SubmitBooking do
     end
   end
 
-  defp reserve_visit(context, actor, slot) do
-    request = %{
-      actor_role: actor.role,
-      channel: :in_person,
-      capability: :book_classes,
-      allowance: :class_visits,
-      class_type_id: Map.get(slot, :class_type_id),
-      quantity: 1,
-      occurred_on: DateTime.to_date(slot.scheduled_at),
-      source_context: "scheduling",
-      source_id: slot.id,
-      idempotency_key: "booking-reservation:#{Ecto.UUID.generate()}"
-    }
+  @doc false
+  def reserve_visit(context, actor, slot, entitlement_request) do
+    request =
+      Map.merge(entitlement_request, %{
+        actor_role: actor.role,
+        occurred_on: DateTime.to_date(slot.scheduled_at),
+        starts_at: slot.scheduled_at,
+        location_id: Map.get(slot, :location_id),
+        source_context: "scheduling",
+        source_id: slot.id,
+        idempotency_key: "booking-reservation:#{Ecto.UUID.generate()}"
+      })
 
     case context do
       nil -> Finance.reserve_entitlement(actor.id, request)
@@ -54,9 +62,10 @@ defmodule MilosTraining.Application.SubmitBooking do
     end
   end
 
-  defp release_failed_reservation(_context, %{id: nil}), do: :ok
+  @doc false
+  def release_failed_reservation(_context, %{id: nil}), do: :ok
 
-  defp release_failed_reservation(context, %{id: reservation_id}) do
+  def release_failed_reservation(context, %{id: reservation_id}) do
     params = %{
       reason: "Scheduling rejected booking creation",
       idempotency_key: "booking-compensation:#{reservation_id}"
@@ -93,22 +102,31 @@ defmodule MilosTraining.Application.SubmitBooking do
     end
   end
 
-  defp create_booking(nil, %{auto_approve: true, id: slot_id}, user_id),
+  @doc false
+  def create_booking(nil, %{auto_approve: true, id: slot_id}, user_id, _attrs),
     do: Scheduling.submit_auto_approved_booking(user_id, slot_id)
 
-  defp create_booking(context, %{auto_approve: true, id: slot_id}, user_id),
-    do: Scheduling.submit_auto_approved_booking(context, user_id, slot_id)
+  def create_booking(context, %{auto_approve: true, id: slot_id}, user_id, attrs),
+    do: Scheduling.submit_auto_approved_booking_with(context, user_id, slot_id, attrs)
 
-  defp create_booking(nil, slot, user_id),
+  def create_booking(nil, slot, user_id, _attrs),
     do: Scheduling.submit_booking(user_id, slot.id, slot.booking_timeout_minutes)
 
-  defp create_booking(context, slot, user_id),
-    do: Scheduling.submit_booking(context, user_id, slot.id, slot.booking_timeout_minutes)
+  def create_booking(context, slot, user_id, attrs),
+    do:
+      Scheduling.submit_booking_with(
+        context,
+        user_id,
+        slot.id,
+        slot.booking_timeout_minutes,
+        attrs
+      )
 
-  defp dispatch_booking_notification(%{auto_approve: true}, booking),
+  @doc false
+  def dispatch_booking_notification(%{auto_approve: true}, booking),
     do: dispatch_non_critical(:booking_resolved, booking)
 
-  defp dispatch_booking_notification(_slot, booking),
+  def dispatch_booking_notification(_slot, booking),
     do: dispatch_non_critical(:booking_submitted, booking)
 
   defp dispatch_non_critical(event, booking) do
@@ -128,7 +146,8 @@ defmodule MilosTraining.Application.SubmitBooking do
       )
   end
 
-  defp broadcast_booking_event(%{auto_approve: true}, booking) do
+  @doc false
+  def broadcast_booking_event(%{auto_approve: true}, booking) do
     Phoenix.PubSub.broadcast(
       MilosTraining.PubSub,
       "booking:resolved",
@@ -136,13 +155,14 @@ defmodule MilosTraining.Application.SubmitBooking do
     )
   end
 
-  defp broadcast_booking_event(_slot, booking), do: broadcast_submission(booking)
+  def broadcast_booking_event(_slot, booking), do: broadcast_submission(booking)
 
   defp notification_dispatcher do
     Application.get_env(:milos_training, :notification_dispatcher, MilosTraining.Notifications)
   end
 
-  defp broadcast_entitlement_change(user_id) do
+  @doc false
+  def broadcast_entitlement_change(user_id) do
     MilosTraining.Application.BroadcastUserSync.for_user(user_id, ["finance_entitlement"],
       reason: "class_visit_reserved"
     )

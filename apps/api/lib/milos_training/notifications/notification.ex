@@ -23,7 +23,9 @@ defmodule MilosTraining.Notifications.Notification do
     :challenge_completed,
     :chat_message,
     :invoice_issued,
-    :payment_reminder
+    :payment_reminder,
+    :booking_waitlist_promoted,
+    :package_expiring
   ]
 
   schema "notifications" do

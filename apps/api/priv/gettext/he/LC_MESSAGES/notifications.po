@@ -135,3 +135,15 @@ msgstr "הוקצו אימונים חדשים"
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr "המאמן שלך הקצה לך אימון אחד או יותר."
+
+msgid "You got a spot"
+msgstr "התפנה לך מקום"
+
+msgid "A place opened up in %{class}. Your booking is confirmed or awaiting approval."
+msgstr "התפנה מקום ב-%{class}. ההזמנה אושרה או ממתינה לאישור."
+
+msgid "Your package ends soon"
+msgstr "החבילה מסתיימת בקרוב"
+
+msgid "%{package} ends on %{date}."
+msgstr "%{package} מסתיימת ב-%{date}."
