@@ -167,6 +167,30 @@ defmodule MilosTraining.Workouts.WorkoutStore do
   def replace_scale_levels(levels), do: adapter().replace_scale_levels(levels)
 
   @impl true
+  def ensure_default_scale_levels(levels), do: adapter().ensure_default_scale_levels(levels)
+
+  # ADR-110: scale levels are tenant-owned, so they are only reachable through
+  # an organization-scoped session; anything else fails closed.
+  def list_scale_levels(%{organization_id: organization_id} = context)
+      when is_binary(organization_id),
+      do: within_tenant(context, &list_scale_levels/0)
+
+  def list_scale_levels(_context), do: {:error, :organization_context_required}
+
+  def replace_scale_levels(%{organization_id: organization_id} = context, levels)
+      when is_binary(organization_id),
+      do: within_tenant(context, fn -> replace_scale_levels(levels) end)
+
+  def replace_scale_levels(_context, _levels), do: {:error, :organization_context_required}
+
+  def ensure_default_scale_levels(%{organization_id: organization_id} = context, levels)
+      when is_binary(organization_id),
+      do: within_tenant(context, fn -> ensure_default_scale_levels(levels) end)
+
+  def ensure_default_scale_levels(_context, _levels),
+    do: {:error, :organization_context_required}
+
+  @impl true
   def reject_assignment_for_athlete(assignment_id, athlete_id),
     do: adapter().reject_assignment_for_athlete(assignment_id, athlete_id)
 

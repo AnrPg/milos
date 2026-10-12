@@ -14,6 +14,7 @@ defmodule MilosTraining.Workouts do
     PublishWorkout,
     ReplaceScaleLevels,
     ReopenWorkout,
+    SeedDefaultScaleLevels,
     SubstituteAssignmentWorkout,
     UpdateAssignedWorkout,
     UpdateDraftWorkout
@@ -86,8 +87,9 @@ defmodule MilosTraining.Workouts do
 
   defdelegate list_workouts, to: ListAdminWorkouts, as: :all
   def list_workouts(context), do: WorkoutStore.list_workouts(context)
-  defdelegate list_scale_levels, to: ListScaleLevels, as: :all
-  defdelegate replace_scale_levels(levels), to: ReplaceScaleLevels, as: :call
+  defdelegate list_scale_levels(context), to: ListScaleLevels, as: :all
+  defdelegate replace_scale_levels(context, levels), to: ReplaceScaleLevels, as: :call
+  defdelegate seed_default_scale_levels(context), to: SeedDefaultScaleLevels, as: :call
   defdelegate materialize_workout(id), to: MaterializeWorkout, as: :by_id
   def supported_workout_types, do: WorkoutType.values()
   def parse_dsl(source), do: WorkoutDsl.parse(source)
@@ -170,13 +172,16 @@ defmodule MilosTraining.Workouts do
 
   def materialize_workout_for_scale(id, scale_slug) do
     case get_workout(id) do
-      nil ->
-        nil
-
-      workout ->
-        MilosTraining.Workouts.Domain.WorkoutMaterializer.materialize(workout, scale_slug)
+      nil -> nil
+      workout -> materialize_for_scale(workout, scale_slug)
     end
   end
+
+  # Materializes an already tenant-fetched workout. Scale levels come from the
+  # workout's own variations, so they are always the workout's organization's
+  # set (ADR-110).
+  def materialize_for_scale(workout, scale_slug),
+    do: MilosTraining.Workouts.Domain.WorkoutMaterializer.materialize(workout, scale_slug)
 
   def get_assignment(assignment_id) do
     MilosTraining.Workouts.WorkoutStore.get_assignment(assignment_id)

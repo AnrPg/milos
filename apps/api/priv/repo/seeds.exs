@@ -68,15 +68,12 @@ if existing_count == 0 do
   IO.puts("Seeded #{length(quotes)} training quotes.")
 end
 
-if Workouts.list_scale_levels() == [] do
-  {:ok, scale_levels} =
-    Workouts.replace_scale_levels([
-      %{slug: "scaled", label: "Scaled", sort_order: 1},
-      %{slug: "rx", label: "Rx", sort_order: 2},
-      %{slug: "rx-plus", label: "Rx+", sort_order: 3}
-    ])
-
-  IO.puts("Seeded #{length(scale_levels)} workout scale levels.")
+# Scale levels are tenant-owned (ADR-110): each organization gets the default
+# set when it is provisioned, and existing organizations were backfilled by
+# the 20261012160000 migration. Re-assert the defaults for any organization
+# that has none (idempotent).
+for organization <- Repo.all(MilosTraining.Organizations.Organization) do
+  {:ok, _levels} = Workouts.seed_default_scale_levels(%{organization_id: organization.id})
 end
 
 ensure_admin = fn admin_nickname, admin_password ->

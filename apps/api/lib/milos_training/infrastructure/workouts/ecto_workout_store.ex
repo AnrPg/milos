@@ -346,9 +346,12 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     end)
   end
 
+  # Scale levels are tenant-owned (ADR-110). Every query is filtered to the
+  # session's organization on top of RLS, and writes fail closed without one.
   @impl true
   def list_scale_levels do
     ScaleLevel
+    |> scoped_to_tenant()
     |> where([scale_level], scale_level.is_active == true)
     |> order_by([scale_level], asc: scale_level.sort_order)
     |> Repo.all()
@@ -357,19 +360,53 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   @impl true
   def replace_scale_levels(levels) when is_list(levels) do
-    cleaned_levels =
-      levels
-      |> Enum.map(&normalize_scale_level_params/1)
-      |> Enum.reject(&blank_scale_level?/1)
+    with {:ok, organization_id} <- current_organization_id() do
+      cleaned_levels =
+        levels
+        |> Enum.map(&normalize_scale_level_params/1)
+        |> Enum.reject(&blank_scale_level?/1)
 
-    changeset =
-      Ecto.Changeset.change(%ScaleLevel{})
-      |> validate_scale_level_list(cleaned_levels)
+      changeset =
+        Ecto.Changeset.change(%ScaleLevel{})
+        |> validate_scale_level_list(cleaned_levels)
 
-    if changeset.valid? do
-      do_replace_scale_levels(cleaned_levels)
-    else
-      {:error, changeset}
+      if changeset.valid? do
+        do_replace_scale_levels(organization_id, cleaned_levels)
+      else
+        {:error, changeset}
+      end
+    end
+  end
+
+  @impl true
+  def ensure_default_scale_levels(levels) when is_list(levels) do
+    with {:ok, organization_id} <- current_organization_id() do
+      Repo.transaction(fn ->
+        existing? = ScaleLevel |> scoped_to_tenant() |> Repo.exists?()
+
+        unless existing? do
+          Enum.each(levels, fn level ->
+            %ScaleLevel{}
+            |> ScaleLevel.changeset(
+              Map.merge(level, %{organization_id: organization_id, is_active: true})
+            )
+            |> Repo.insert()
+            |> case do
+              {:ok, _level} -> :ok
+              {:error, changeset} -> Repo.rollback(changeset)
+            end
+          end)
+        end
+
+        list_scale_levels()
+      end)
+    end
+  end
+
+  defp current_organization_id do
+    case RepoContext.current_setting("app.organization_id") do
+      organization_id when is_binary(organization_id) -> {:ok, organization_id}
+      _no_tenant_context -> {:error, :organization_context_required}
     end
   end
 
@@ -643,12 +680,15 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     end)
   end
 
-  defp do_replace_scale_levels(levels) do
+  defp do_replace_scale_levels(organization_id, levels) do
     now = DateTime.utc_now() |> DateTime.truncate(:second)
+
+    tenant_levels =
+      from(scale_level in ScaleLevel, where: scale_level.organization_id == ^organization_id)
 
     Multi.new()
     |> Multi.run(:existing, fn repo, _changes ->
-      {:ok, repo.all(from(scale_level in ScaleLevel))}
+      {:ok, repo.all(tenant_levels)}
     end)
     |> Multi.run(:guard_removals, fn repo, %{existing: existing} ->
       requested_slugs = MapSet.new(Enum.map(levels, & &1.slug))
@@ -662,7 +702,9 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         else
           repo.aggregate(
             from(variation in ExerciseVariation,
-              where: variation.scale_level_id in ^removable_ids
+              where:
+                variation.organization_id == ^organization_id and
+                  variation.scale_level_id in ^removable_ids
             ),
             :count
           )
@@ -709,7 +751,9 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
               case Map.get(existing_by_slug, level_params.slug) do
                 nil ->
                   %ScaleLevel{}
-                  |> ScaleLevel.changeset(Map.put(level_params, :is_active, true))
+                  |> ScaleLevel.changeset(
+                    Map.merge(level_params, %{organization_id: organization_id, is_active: true})
+                  )
                   |> repo.insert()
 
                 %ScaleLevel{} = scale_level ->
@@ -734,7 +778,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     end)
     |> Multi.run(:normalize, fn repo, _changes ->
       levels =
-        repo.all(from scale_level in ScaleLevel, order_by: [asc: scale_level.sort_order])
+        repo.all(from scale_level in tenant_levels, order_by: [asc: scale_level.sort_order])
         |> Enum.map(&normalize_scale_level/1)
         |> Enum.map(fn level -> Map.put(level, :updated_at, now) end)
 

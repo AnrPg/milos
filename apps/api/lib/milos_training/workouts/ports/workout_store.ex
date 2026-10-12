@@ -26,7 +26,10 @@ defmodule MilosTraining.Workouts.Ports.WorkoutStore do
   @callback delete_folder(binary()) :: :ok | {:error, term()}
   @callback update_library_metadata(binary(), map()) :: {:ok, map()} | {:error, term()}
   @callback list_scale_levels() :: [map()]
-  @callback replace_scale_levels([map()]) :: {:ok, [map()]} | {:error, Ecto.Changeset.t()}
+  @callback replace_scale_levels([map()]) ::
+              {:ok, [map()]} | {:error, Ecto.Changeset.t() | :organization_context_required}
+  @callback ensure_default_scale_levels([map()]) ::
+              {:ok, [map()]} | {:error, Ecto.Changeset.t() | :organization_context_required}
   @callback reject_assignment_for_athlete(binary(), binary()) ::
               {:ok, map()} | {:error, :not_found | :forbidden | :already_rejected}
   @callback workout_organization_id(binary()) :: binary() | nil

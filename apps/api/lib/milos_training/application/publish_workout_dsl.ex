@@ -6,28 +6,18 @@ defmodule MilosTraining.Application.PublishWorkoutDsl do
   alias MilosTraining.Application.PublishWorkout
   alias MilosTraining.{Execution, Workouts}
 
+  # Scale slugs are preflighted against the acting tenant's scale levels
+  # (ADR-110), so there is no context-free arity.
   def call(context, id, params) do
-    with_parsed_publish(params, fn publish_params ->
-      PublishWorkout.call(context, id, publish_params)
-    end)
-  end
-
-  def call(id, params) do
-    with_parsed_publish(params, fn publish_params ->
-      PublishWorkout.call(id, publish_params)
-    end)
-  end
-
-  defp with_parsed_publish(params, publish_fun) do
     source = value(params, :source)
     acknowledge_warnings? = value(params, :acknowledge_warnings, false) == true
 
     with {:ok, parsed} <- Workouts.parse_dsl(source),
          :ok <- require_warning_acknowledgement(parsed.diagnostics, acknowledge_warnings?),
-         :ok <- preflight(parsed.workout),
+         :ok <- preflight(context, parsed.workout),
          {:ok, execution_preview} <- build_execution_preview(parsed.workout),
          publish_params <- publish_params(parsed, params),
-         {:ok, workout} <- publish_fun.(publish_params) do
+         {:ok, workout} <- PublishWorkout.call(context, id, publish_params) do
       {:ok,
        %{
          workout: workout,
@@ -45,9 +35,14 @@ defmodule MilosTraining.Application.PublishWorkoutDsl do
 
   defp require_warning_acknowledgement(_diagnostics, _acknowledged), do: :ok
 
-  defp preflight(workout) do
-    active_slugs = Workouts.list_scale_levels() |> Enum.map(& &1.slug)
-    Workouts.preflight_dsl(workout, active_slugs)
+  defp preflight(context, workout) do
+    case Workouts.list_scale_levels(context) do
+      levels when is_list(levels) ->
+        Workouts.preflight_dsl(workout, Enum.map(levels, & &1.slug))
+
+      {:error, _reason} = error ->
+        error
+    end
   end
 
   defp build_execution_preview(workout) do

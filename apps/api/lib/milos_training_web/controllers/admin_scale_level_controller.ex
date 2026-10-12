@@ -104,7 +104,10 @@ defmodule MilosTrainingWeb.AdminScaleLevelController do
   )
 
   def index(conn, _params) do
-    json(conn, %{scale_levels: ListScaleLevels.call()})
+    case ListScaleLevels.call(conn.assigns.tenant_context) do
+      levels when is_list(levels) -> json(conn, %{scale_levels: levels})
+      error -> error
+    end
   end
 
   def update(conn, params) do

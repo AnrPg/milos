@@ -5,7 +5,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     class_types scheduling_settings class_series scheduled_classes bookings
     class_attendance_records
     master_workouts workout_folders workout_sections workout_exercises
-    exercise_variations assigned_workouts assigned_workout_athletes
+    exercise_variations assigned_workouts assigned_workout_athletes scale_levels
     membership_packages memberships membership_package_subscriptions
     membership_payments promotion_campaigns promotion_codes promotion_redemptions
     referral_programs referral_events referral_rewards finance_invoices
