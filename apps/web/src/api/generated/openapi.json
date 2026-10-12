@@ -2,6 +2,145 @@
   "components": {
     "responses": {},
     "schemas": {
+      "OrganizationBranding": {
+        "properties": {
+          "brand_logo_uploaded": {
+            "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-103).",
+            "type": "boolean"
+          },
+          "brand_logo_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "brand_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "brand_primary_color": {
+            "nullable": true,
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organization_id",
+          "brand_logo_url",
+          "brand_logo_uploaded"
+        ],
+        "title": "OrganizationBranding",
+        "type": "object"
+      },
+      "OrganizationBrandingResponse": {
+        "properties": {
+          "branding": {
+            "properties": {
+              "brand_logo_uploaded": {
+                "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-103).",
+                "type": "boolean"
+              },
+              "brand_logo_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "brand_name": {
+                "nullable": true,
+                "type": "string"
+              },
+              "brand_primary_color": {
+                "nullable": true,
+                "type": "string"
+              },
+              "organization_id": {
+                "format": "uuid",
+                "type": "string"
+              }
+            },
+            "required": [
+              "organization_id",
+              "brand_logo_url",
+              "brand_logo_uploaded"
+            ],
+            "title": "OrganizationBranding",
+            "type": "object"
+          }
+        },
+        "required": [
+          "branding"
+        ],
+        "title": "OrganizationBrandingResponse",
+        "type": "object"
+      },
+      "OrganizationLogoFinalizeRequest": {
+        "properties": {
+          "logo_key": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "logo_key"
+        ],
+        "title": "OrganizationLogoFinalizeRequest",
+        "type": "object"
+      },
+      "OrganizationLogoUpload": {
+        "properties": {
+          "expires_in": {
+            "type": "integer"
+          },
+          "key": {
+            "type": "string"
+          },
+          "max_bytes": {
+            "type": "integer"
+          },
+          "required_headers": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "upload_url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "upload_url",
+          "key",
+          "required_headers",
+          "expires_in",
+          "max_bytes"
+        ],
+        "title": "OrganizationLogoUpload",
+        "type": "object"
+      },
+      "OrganizationLogoUploadRequest": {
+        "properties": {
+          "byte_size": {
+            "maximum": 2097152,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "content_type": {
+            "enum": [
+              "image/png",
+              "image/jpeg",
+              "image/webp"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "content_type",
+          "byte_size"
+        ],
+        "title": "OrganizationLogoUploadRequest",
+        "type": "object"
+      },
       "SemanticError": {
         "description": "Stable machine-readable API failure with English compatibility copy.",
         "properties": {
@@ -5019,6 +5158,92 @@
         "summary": "Create a promotion campaign",
         "tags": [
           "Admin Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/branding/logo/upload-url": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminBrandingController.logo_upload_url",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "byte_size": {
+                    "maximum": 2097152,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "content_type": {
+                    "enum": [
+                      "image/png",
+                      "image/jpeg",
+                      "image/webp"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "content_type",
+                  "byte_size"
+                ],
+                "title": "OrganizationLogoUploadRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expires_in": {
+                      "type": "integer"
+                    },
+                    "key": {
+                      "type": "string"
+                    },
+                    "max_bytes": {
+                      "type": "integer"
+                    },
+                    "required_headers": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "upload_url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "upload_url",
+                    "key",
+                    "required_headers",
+                    "expires_in",
+                    "max_bytes"
+                  ],
+                  "title": "OrganizationLogoUpload",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Upload URL"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create a constrained presigned upload for a new organization logo",
+        "tags": [
+          "Admin Settings"
         ]
       }
     },
@@ -17919,6 +18144,175 @@
         ]
       }
     },
+    "/api/platform/organizations/{id}/branding/logo": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationBrandingController.remove_logo",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "branding": {
+                      "properties": {
+                        "brand_logo_uploaded": {
+                          "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-103).",
+                          "type": "boolean"
+                        },
+                        "brand_logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "organization_id",
+                        "brand_logo_url",
+                        "brand_logo_uploaded"
+                      ],
+                      "title": "OrganizationBranding",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "branding"
+                  ],
+                  "title": "OrganizationBrandingResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Branding"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remove an organization's logo",
+        "tags": [
+          "Platform Organizations"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationBrandingController.finalize_logo",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "logo_key": {
+                    "maxLength": 255,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "logo_key"
+                ],
+                "title": "OrganizationLogoFinalizeRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "branding": {
+                      "properties": {
+                        "brand_logo_uploaded": {
+                          "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-103).",
+                          "type": "boolean"
+                        },
+                        "brand_logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "organization_id",
+                        "brand_logo_url",
+                        "brand_logo_uploaded"
+                      ],
+                      "title": "OrganizationBranding",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "branding"
+                  ],
+                  "title": "OrganizationBrandingResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Branding"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Verify an uploaded logo and make it the organization's logo",
+        "tags": [
+          "Platform Organizations"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/invitations": {
       "post": {
         "callbacks": {},
@@ -26281,6 +26675,71 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/branding": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminBrandingController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "branding": {
+                      "properties": {
+                        "brand_logo_uploaded": {
+                          "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-103).",
+                          "type": "boolean"
+                        },
+                        "brand_logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "organization_id",
+                        "brand_logo_url",
+                        "brand_logo_uploaded"
+                      ],
+                      "title": "OrganizationBranding",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "branding"
+                  ],
+                  "title": "OrganizationBrandingResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Branding"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Fetch the organization's branding",
+        "tags": [
+          "Admin Settings"
+        ]
+      }
+    },
     "/api/platform/organizations/{id}/invitations/email": {
       "post": {
         "callbacks": {},
@@ -32647,6 +33106,155 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/branding/logo": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminBrandingController.remove_logo",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "branding": {
+                      "properties": {
+                        "brand_logo_uploaded": {
+                          "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-103).",
+                          "type": "boolean"
+                        },
+                        "brand_logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "organization_id",
+                        "brand_logo_url",
+                        "brand_logo_uploaded"
+                      ],
+                      "title": "OrganizationBranding",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "branding"
+                  ],
+                  "title": "OrganizationBrandingResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Branding"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remove the organization's logo",
+        "tags": [
+          "Admin Settings"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminBrandingController.finalize_logo",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "logo_key": {
+                    "maxLength": 255,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "logo_key"
+                ],
+                "title": "OrganizationLogoFinalizeRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "branding": {
+                      "properties": {
+                        "brand_logo_uploaded": {
+                          "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-103).",
+                          "type": "boolean"
+                        },
+                        "brand_logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "organization_id",
+                        "brand_logo_url",
+                        "brand_logo_uploaded"
+                      ],
+                      "title": "OrganizationBranding",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "branding"
+                  ],
+                  "title": "OrganizationBrandingResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Branding"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Verify an uploaded logo and make it the organization's logo",
+        "tags": [
+          "Admin Settings"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/workouts/{id}/reopen": {
       "post": {
         "callbacks": {},
@@ -33316,6 +33924,102 @@
         "summary": "Update an assigned workout",
         "tags": [
           "Admin Assigned Workouts"
+        ]
+      }
+    },
+    "/api/platform/organizations/{id}/branding/logo/upload-url": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationBrandingController.logo_upload_url",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "byte_size": {
+                    "maximum": 2097152,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "content_type": {
+                    "enum": [
+                      "image/png",
+                      "image/jpeg",
+                      "image/webp"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "content_type",
+                  "byte_size"
+                ],
+                "title": "OrganizationLogoUploadRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expires_in": {
+                      "type": "integer"
+                    },
+                    "key": {
+                      "type": "string"
+                    },
+                    "max_bytes": {
+                      "type": "integer"
+                    },
+                    "required_headers": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "upload_url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "upload_url",
+                    "key",
+                    "required_headers",
+                    "expires_in",
+                    "max_bytes"
+                  ],
+                  "title": "OrganizationLogoUpload",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Upload URL"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create a constrained presigned upload for an organization logo",
+        "tags": [
+          "Platform Organizations"
         ]
       }
     },

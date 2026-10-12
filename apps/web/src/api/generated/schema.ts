@@ -333,6 +333,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/branding/logo/upload-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a constrained presigned upload for a new organization logo */
+        post: operations["MilosTrainingWeb.AdminBrandingController.logo_upload_url"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/logout": {
         parameters: {
             query?: never;
@@ -1229,6 +1246,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/platform/organizations/{id}/branding/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Verify an uploaded logo and make it the organization's logo */
+        put: operations["MilosTrainingWeb.PlatformOrganizationBrandingController.finalize_logo"];
+        post?: never;
+        /** Remove an organization's logo */
+        delete: operations["MilosTrainingWeb.PlatformOrganizationBrandingController.remove_logo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/invitations": {
         parameters: {
             query?: never;
@@ -1617,6 +1652,23 @@ export interface paths {
         };
         /** Search users with finance membership metadata */
         get: operations["MilosTrainingWeb.AdminSearchController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/branding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fetch the organization's branding */
+        get: operations["MilosTrainingWeb.AdminBrandingController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2435,6 +2487,24 @@ export interface paths {
         patch: operations["MilosTrainingWeb.TrainingLogController.update"];
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/branding/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Verify an uploaded logo and make it the organization's logo */
+        put: operations["MilosTrainingWeb.AdminBrandingController.finalize_logo"];
+        post?: never;
+        /** Remove the organization's logo */
+        delete: operations["MilosTrainingWeb.AdminBrandingController.remove_logo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/workouts/{id}/reopen": {
         parameters: {
             query?: never;
@@ -2536,6 +2606,23 @@ export interface paths {
         head?: never;
         /** Update an assigned workout */
         patch: operations["MilosTrainingWeb.AdminAssignedWorkoutController.update"];
+        trace?: never;
+    };
+    "/api/platform/organizations/{id}/branding/logo/upload-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a constrained presigned upload for an organization logo */
+        post: operations["MilosTrainingWeb.PlatformOrganizationBrandingController.logo_upload_url"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/users/{id}/coaching-context": {
@@ -2921,6 +3008,49 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** OrganizationBranding */
+        OrganizationBranding: {
+            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
+            brand_logo_uploaded: boolean;
+            brand_logo_url: string | null;
+            brand_name?: string | null;
+            brand_primary_color?: string | null;
+            /** Format: uuid */
+            organization_id: string;
+        };
+        /** OrganizationBrandingResponse */
+        OrganizationBrandingResponse: {
+            /** OrganizationBranding */
+            branding: {
+                /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
+                brand_logo_uploaded: boolean;
+                brand_logo_url: string | null;
+                brand_name?: string | null;
+                brand_primary_color?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+            };
+        };
+        /** OrganizationLogoFinalizeRequest */
+        OrganizationLogoFinalizeRequest: {
+            logo_key: string;
+        };
+        /** OrganizationLogoUpload */
+        OrganizationLogoUpload: {
+            expires_in: number;
+            key: string;
+            max_bytes: number;
+            required_headers: {
+                [key: string]: string;
+            };
+            upload_url: string;
+        };
+        /** OrganizationLogoUploadRequest */
+        OrganizationLogoUploadRequest: {
+            byte_size: number;
+            /** @enum {string} */
+            content_type: "image/png" | "image/jpeg" | "image/webp";
+        };
         /** @description Stable machine-readable API failure with English compatibility copy. */
         SemanticError: {
             code: string;
@@ -4641,6 +4771,42 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminBrandingController.logo_upload_url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    byte_size: number;
+                    /** @enum {string} */
+                    content_type: "image/png" | "image/jpeg" | "image/webp";
+                };
+            };
+        };
+        responses: {
+            /** @description Upload URL */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        expires_in: number;
+                        key: string;
+                        max_bytes: number;
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        upload_url: string;
                     };
                 };
             };
@@ -9303,6 +9469,78 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PlatformOrganizationBrandingController.finalize_logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    logo_key: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Branding */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** OrganizationBranding */
+                        branding: {
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
+                            brand_logo_uploaded: boolean;
+                            brand_logo_url: string | null;
+                            brand_name?: string | null;
+                            brand_primary_color?: string | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformOrganizationBrandingController.remove_logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Branding */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** OrganizationBranding */
+                        branding: {
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
+                            brand_logo_uploaded: boolean;
+                            brand_logo_url: string | null;
+                            brand_name?: string | null;
+                            brand_primary_color?: string | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.OrganizationAccessController.issue": {
         parameters: {
             query?: never;
@@ -12012,6 +12250,37 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminBrandingController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Branding */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** OrganizationBranding */
+                        branding: {
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
+                            brand_logo_uploaded: boolean;
+                            brand_logo_url: string | null;
+                            brand_name?: string | null;
+                            brand_primary_color?: string | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.PlatformOrganizationController.invitation_email": {
         parameters: {
             query?: never;
@@ -14580,6 +14849,74 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminBrandingController.finalize_logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    logo_key: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Branding */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** OrganizationBranding */
+                        branding: {
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
+                            brand_logo_uploaded: boolean;
+                            brand_logo_url: string | null;
+                            brand_name?: string | null;
+                            brand_primary_color?: string | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminBrandingController.remove_logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Branding */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** OrganizationBranding */
+                        branding: {
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
+                            brand_logo_uploaded: boolean;
+                            brand_logo_url: string | null;
+                            brand_name?: string | null;
+                            brand_primary_color?: string | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminWorkoutController.reopen": {
         parameters: {
             query?: never;
@@ -14878,6 +15215,44 @@ export interface operations {
                         assignment: {
                             [key: string]: unknown;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformOrganizationBrandingController.logo_upload_url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    byte_size: number;
+                    /** @enum {string} */
+                    content_type: "image/png" | "image/jpeg" | "image/webp";
+                };
+            };
+        };
+        responses: {
+            /** @description Upload URL */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        expires_in: number;
+                        key: string;
+                        max_bytes: number;
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        upload_url: string;
                     };
                 };
             };
