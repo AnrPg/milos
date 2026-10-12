@@ -38,7 +38,7 @@ defmodule MilosTrainingWeb.AdminWorkoutFreeTextController do
       code: %Schema{
         type: :string,
         description:
-          "assistant | text_correction | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format"
+          "assistant | text_correction | assumption (severity info: a value the assistant inferred; Keep or Reject) | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format"
       },
       severity: %Schema{type: :string, enum: ["error", "warning", "info"]},
       kind: %Schema{

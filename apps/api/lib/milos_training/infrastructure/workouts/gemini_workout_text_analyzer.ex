@@ -20,7 +20,8 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
       config :milos_training, :gemini,
         api_key: System.get_env("GEMINI_API_KEY"),
         model: System.get_env("GEMINI_MODEL", "gemini-3.8-flash"),
-        thinking_level: System.get_env("GEMINI_THINKING_LEVEL", "low")
+        thinking_level: System.get_env("GEMINI_THINKING_LEVEL", "low"),
+        parser_thinking_level: System.get_env("GEMINI_PARSER_THINKING_LEVEL", "medium")
 
   The key never leaves the server. Output is untrusted and is validated by
   the Workouts domain (`Contract`, `Proofreading`, `FreeTextAnalysis`).
@@ -37,6 +38,10 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
   @default_model "gemini-3.8-flash"
   # "low" keeps answers around 5–10 s; Gemini's default reasoning took 45 s+.
   @default_thinking_level "low"
+  # The parser interprets free-form coach text (implied formats, scattered
+  # parameters, shorthand): it gets more reasoning than the quick structure and
+  # proofreading agents.
+  @default_parser_thinking_level "medium"
   # Tool round budgets per agent: each round trip costs seconds, and the
   # prompts already carry the vocabulary, so tools are for edge cases only.
   @parser_tool_rounds 2
@@ -121,8 +126,7 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
       %{
         systemInstruction: %{parts: [%{text: system_prompt}]},
         contents: turns,
-        generationConfig:
-          generation_config(Keyword.get(config, :thinking_level, @default_thinking_level))
+        generationConfig: generation_config(thinking_level(config, context))
       }
       |> put_tools(tool_names, final_round)
 
@@ -139,7 +143,7 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
 
           responses =
             Enum.map(calls, fn %{"name" => name} = call ->
-              result = Tools.call(name, Map.get(call, "args", %{}), context)
+              result = call_tool(name, Map.get(call, "args", %{}), context)
               %{functionResponse: %{name: name, response: result}}
             end)
 
@@ -151,6 +155,16 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
           {:error, :analyzer_invalid_response}
       end
     end
+  end
+
+  # A tool failure is reported back to the model, never raised: the agent can
+  # still answer without it.
+  defp call_tool(name, args, context) do
+    Tools.call(name, args, context)
+  rescue
+    exception ->
+      Logger.warning("Workout assistant tool #{name} failed: #{Exception.message(exception)}")
+      %{"error" => "tool_failed", "tool" => name}
   end
 
   defp post(body, config, context) do
@@ -207,6 +221,12 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
       do: base,
       else: Map.put(base, :thinkingConfig, %{thinkingLevel: thinking_level})
   end
+
+  defp thinking_level(config, %{agent: "parser"}),
+    do: Keyword.get(config, :parser_thinking_level) || @default_parser_thinking_level
+
+  defp thinking_level(config, _context),
+    do: Keyword.get(config, :thinking_level, @default_thinking_level)
 
   defp function_calls(parts) do
     parts
