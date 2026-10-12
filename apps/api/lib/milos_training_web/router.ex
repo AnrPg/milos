@@ -462,6 +462,7 @@ defmodule MilosTrainingWeb.Router do
     ])
 
     patch("/profile", MeController, :update_profile)
+    post("/tours/:audience/complete", MeController, :complete_tour)
     post("/avatar/upload-url", MeController, :avatar_upload_url)
     patch("/avatar", MeController, :update_avatar)
     get("/search/users", MeController, :search_users)

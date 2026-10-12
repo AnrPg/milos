@@ -175,6 +175,12 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  def call(conn, {:error, :invalid_tour}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_tour", error: "Unknown product tour"})
+  end
+
   def call(conn, {:error, :invalid_onboarding_action}) do
     conn
     |> put_status(:unprocessable_entity)
