@@ -16,6 +16,17 @@ export function packageSubscriptionLabel(subscription: Record<string, unknown>) 
   return "";
 }
 
+/**
+ * ADR-111: the dossier PR panel's content count. Staff who are not coaches of
+ * the gym still get the panel, explaining that PRs are visible to coaches only.
+ */
+export function prSectionContentCount(
+  data: { visibility: "coach" | "coach_role_required"; prs: unknown[] } | undefined,
+) {
+  if (!data) return 0;
+  return data.visibility === "coach_role_required" ? 1 : data.prs.length;
+}
+
 export function visibleAdminProfileSections(
   availableSections: string[],
   contentCounts: Record<string, number>,

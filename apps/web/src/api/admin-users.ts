@@ -75,6 +75,8 @@ export type AdminUserSchedule = {
   items: Array<Record<string, unknown>>;
 };
 
+export type AdminUserPRVisibility = "coach" | "coach_role_required";
+
 export type AdminUserPR = {
   id: string;
   name: string;
@@ -169,7 +171,12 @@ export function programAdminUserWorkout(
 }
 
 export function fetchAdminUserPRs(token: string, userId: string) {
-  return apiRequest<{ user_id: string; prs: AdminUserPR[] }>(`/admin/users/${userId}/prs`, { token });
+  // ADR-111: only the gym's coaches read members' PRs; other staff receive
+  // `coach_role_required` and no records.
+  return apiRequest<{ user_id: string; visibility: AdminUserPRVisibility; prs: AdminUserPR[] }>(
+    `/admin/users/${userId}/prs`,
+    { token },
+  );
 }
 
 export function fetchAdminUserIncidents(token: string, userId: string) {

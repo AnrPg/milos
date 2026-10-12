@@ -15,7 +15,8 @@ import { useShareExport } from "@/components/share-export/useShareExport";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { buildPRListDocument } from "@/lib/document-export";
 import { PantheonCard } from "./PantheonCard";
-import { PRFormModal } from "./PRFormModal";
+import { NewPRFormModal, PRFormModal } from "./PRFormModal";
+import { SharedPRsSection } from "./SharedPRsSection";
 import { PRShareModal } from "./PRShareModal";
 
 export function PantheonPage() {
@@ -132,6 +133,8 @@ export function PantheonPage() {
             ))}
           </div>
         )}
+
+        <SharedPRsSection />
       </div>
 
       {/* Delete confirmation */}
@@ -169,9 +172,11 @@ export function PantheonPage() {
         </div>
       )}
 
-      {formPR !== null && (
-        <PRFormModal pr={formPR === "new" ? null : formPR} onClose={() => setFormPR(null)} />
-      )}
+      {formPR === "new" ? (
+        <NewPRFormModal onClose={() => setFormPR(null)} />
+      ) : formPR !== null ? (
+        <PRFormModal pr={formPR} onClose={() => setFormPR(null)} />
+      ) : null}
 
       {sharePR && (
         <PRShareModal pr={sharePR} onClose={() => setSharePR(null)} />

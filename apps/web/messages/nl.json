@@ -2723,5 +2723,32 @@
     "apiErrorClassVariantRequiresSingleMember": "Een lesversie voor een lid moet aan precies één lid worden toegewezen.",
     "apiErrorSlotNotBookedByMember": "Dit lid heeft die les niet geboekt.",
     "apiErrorSlotNotFound": "De les is niet gevonden."
+  },
+  "PrSharing": {
+    "gymLabel": "Waar heb je dit PR neergezet?",
+    "gymPersonal": "Persoonlijk (niet aan een gym gekoppeld)",
+    "gymHint": "Coaches van de gekozen gym kunnen dit PR zien, tenzij je de zichtbaarheid voor coaches in je profiel uitzet.",
+    "settingsTitle": "PR's delen",
+    "settingsDescription": "Kies wie je persoonlijke records nog meer mag zien.",
+    "coachVisibilityLabel": "Coaches van mijn gyms mogen mijn PR's zien",
+    "coachVisibilityHint": "Geldt voor PR's die je in een gym hebt vastgelegd, zolang je daar actief lid bent. Eigenaren en beheerders zien ze alleen als ze ook coachen.",
+    "grantsTitle": "Gedeeld met specifieke personen",
+    "grantsHint": "Zij zien al je PR's alleen-lezen, in elke gym, totdat je stopt met delen.",
+    "grantsEmpty": "Je hebt je PR's met niemand gedeeld.",
+    "searchLabel": "Zoek iemand om mee te delen",
+    "searchPlaceholder": "Zoeken op bijnaam",
+    "searchEmpty": "Geen overeenkomende personen.",
+    "share": "Delen",
+    "revoke": "Stoppen met delen",
+    "sharedSince": "Gedeeld sinds {date}",
+    "loadError": "Je deelinstellingen konden niet worden geladen.",
+    "saveError": "De wijziging kon niet worden opgeslagen.",
+    "sharedWithMeTitle": "Met mij gedeeld",
+    "sharedWithMeDescription": "Persoonlijke records die anderen met je hebben gedeeld.",
+    "sharedWithMeEmpty": "Nog niemand heeft zijn PR's met je gedeeld.",
+    "sharedBy": "Gedeeld door {name}",
+    "ownerHasNoPrs": "Nog geen PR's vastgelegd.",
+    "earlierResults": "Eerdere resultaten: {count}",
+    "dossierCoachOnly": "Persoonlijke records zijn alleen zichtbaar voor de coaches van deze gym."
   }
 }

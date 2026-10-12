@@ -2723,5 +2723,32 @@
     "apiErrorClassVariantRequiresSingleMember": "La version d'un cours pour un membre doit être attribuée à un seul membre.",
     "apiErrorSlotNotBookedByMember": "Ce membre n'a pas réservé ce cours.",
     "apiErrorSlotNotFound": "Cours introuvable."
+  },
+  "PrSharing": {
+    "gymLabel": "Où as-tu réalisé ce PR ?",
+    "gymPersonal": "Personnel (non lié à une salle)",
+    "gymHint": "Les coachs de la salle choisie peuvent voir ce PR, sauf si vous désactivez la visibilité pour les coachs dans votre profil.",
+    "settingsTitle": "Partage des PR",
+    "settingsDescription": "Choisissez qui d'autre peut voir vos records personnels.",
+    "coachVisibilityLabel": "Les coachs de mes salles peuvent voir mes PR",
+    "coachVisibilityHint": "S'applique aux PR enregistrés dans une salle tant que vous en êtes membre actif. Les propriétaires et administrateurs ne les voient que s'ils sont aussi coachs.",
+    "grantsTitle": "Partagé avec des personnes précises",
+    "grantsHint": "Elles voient tous vos PR en lecture seule, dans toutes les salles, jusqu'à ce que vous arrêtiez le partage.",
+    "grantsEmpty": "Vous n'avez partagé vos PR avec personne.",
+    "searchLabel": "Trouver une personne avec qui partager",
+    "searchPlaceholder": "Rechercher par pseudo",
+    "searchEmpty": "Aucune personne correspondante.",
+    "share": "Partager",
+    "revoke": "Arrêter le partage",
+    "sharedSince": "Partagé depuis le {date}",
+    "loadError": "Impossible de charger vos paramètres de partage.",
+    "saveError": "Impossible d'enregistrer la modification.",
+    "sharedWithMeTitle": "Partagés avec moi",
+    "sharedWithMeDescription": "Records personnels que d'autres personnes ont choisi de partager avec vous.",
+    "sharedWithMeEmpty": "Personne n'a encore partagé ses PR avec vous.",
+    "sharedBy": "Partagé par {name}",
+    "ownerHasNoPrs": "Aucun PR enregistré pour l'instant.",
+    "earlierResults": "Résultats précédents : {count}",
+    "dossierCoachOnly": "Les records personnels ne sont visibles que par les coachs de cette salle."
   }
 }

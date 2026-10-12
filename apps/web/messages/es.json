@@ -2723,5 +2723,32 @@
     "apiErrorClassVariantRequiresSingleMember": "La versión de una clase para un miembro debe asignarse exactamente a un miembro.",
     "apiErrorSlotNotBookedByMember": "Este miembro no ha reservado esa clase.",
     "apiErrorSlotNotFound": "No se encontró la clase."
+  },
+  "PrSharing": {
+    "gymLabel": "¿Dónde conseguiste este PR?",
+    "gymPersonal": "Personal (sin vincular a un gimnasio)",
+    "gymHint": "Los entrenadores del gimnasio elegido pueden ver este PR salvo que desactives la visibilidad para entrenadores en tu perfil.",
+    "settingsTitle": "Compartir PR",
+    "settingsDescription": "Elige quién más puede ver tus récords personales.",
+    "coachVisibilityLabel": "Los entrenadores de mis gimnasios pueden ver mis PR",
+    "coachVisibilityHint": "Se aplica a los PR que registraste en un gimnasio mientras seas miembro activo. Propietarios y administradores solo los ven si también entrenan.",
+    "grantsTitle": "Compartido con personas concretas",
+    "grantsHint": "Ven todos tus PR en modo de solo lectura, en cualquier gimnasio, hasta que dejes de compartir.",
+    "grantsEmpty": "No has compartido tus PR con nadie.",
+    "searchLabel": "Busca con quién compartir",
+    "searchPlaceholder": "Buscar por apodo",
+    "searchEmpty": "No hay personas que coincidan.",
+    "share": "Compartir",
+    "revoke": "Dejar de compartir",
+    "sharedSince": "Compartido desde {date}",
+    "loadError": "No se pudieron cargar tus ajustes de uso compartido.",
+    "saveError": "No se pudo guardar el cambio.",
+    "sharedWithMeTitle": "Compartido conmigo",
+    "sharedWithMeDescription": "Récords personales que otras personas decidieron compartir contigo.",
+    "sharedWithMeEmpty": "Todavía nadie ha compartido sus PR contigo.",
+    "sharedBy": "Compartido por {name}",
+    "ownerHasNoPrs": "Aún no hay PR registrados.",
+    "earlierResults": "Resultados anteriores: {count}",
+    "dossierCoachOnly": "Los récords personales solo son visibles para los entrenadores de este gimnasio."
   }
 }

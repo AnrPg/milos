@@ -4,15 +4,20 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { PRRecord } from "@/api/gamification";
 
-const { editPR, updatePR } = vi.hoisted(() => ({
+const { createPR, editPR, updatePR } = vi.hoisted(() => ({
+  createPR: vi.fn(),
   editPR: vi.fn(),
   updatePR: vi.fn(),
 }));
 
 vi.mock("@/api/gamification", async (importOriginal) => {
   const original = await importOriginal<typeof import("@/api/gamification")>();
-  return { ...original, editPR, updatePR };
+  return { ...original, createPR, editPR, updatePR };
 });
+
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => key,
+}));
 
 vi.mock("@/components/session-provider", () => ({
   useSession: () => ({ tokens: { access_token: "access-token" } }),
@@ -50,8 +55,26 @@ function renderModal() {
   );
 }
 
+function renderNewModal(defaultGymSlug: string) {
+  const queryClient = new QueryClient({
+    defaultOptions: { mutations: { retry: false }, queries: { retry: false } },
+  });
+
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <PRFormModal
+        pr={null}
+        gyms={[{ slug: "atlas-gym", name: "Atlas Gym" }]}
+        defaultGymSlug={defaultGymSlug}
+        onClose={vi.fn()}
+      />
+    </QueryClientProvider>,
+  );
+}
+
 describe("PRFormModal", () => {
   beforeEach(() => {
+    createPR.mockReset().mockResolvedValue(pr);
     editPR.mockReset().mockResolvedValue(pr);
     updatePR.mockReset().mockResolvedValue(pr);
   });
@@ -72,6 +95,29 @@ describe("PRFormModal", () => {
 
     await waitFor(() => expect(updatePR).toHaveBeenCalledOnce());
     expect(editPR).not.toHaveBeenCalled();
+  });
+
+  it("records a new PR in the default gym so that gym's coaches can see it", async () => {
+    renderNewModal("atlas-gym");
+
+    fireEvent.change(screen.getByPlaceholderText("eGBackSquat1rm675304b"), { target: { value: "Clean" } });
+    fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "90" } });
+    fireEvent.click(screen.getByRole("button", { name: "addPr24c8c6f" }));
+
+    await waitFor(() => expect(createPR).toHaveBeenCalledOnce());
+    expect(createPR.mock.calls[0][1]).toMatchObject({ name: "Clean", organization_slug: "atlas-gym" });
+  });
+
+  it("records a personal PR when no gym is chosen", async () => {
+    renderNewModal("atlas-gym");
+
+    fireEvent.change(screen.getByRole("combobox", { name: "gymLabel" }), { target: { value: "" } });
+    fireEvent.change(screen.getByPlaceholderText("eGBackSquat1rm675304b"), { target: { value: "Marathon" } });
+    fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "42" } });
+    fireEvent.click(screen.getByRole("button", { name: "addPr24c8c6f" }));
+
+    await waitFor(() => expect(createPR).toHaveBeenCalledOnce());
+    expect(createPR.mock.calls[0][1]).toMatchObject({ name: "Marathon", organization_slug: null });
   });
 
   it("bounds the popup to the viewport and lets its contents scroll", () => {

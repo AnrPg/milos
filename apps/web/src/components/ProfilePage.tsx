@@ -16,6 +16,7 @@ import { fetchMyReviews } from "@/api/reviews";
 import { getAvatarUploadUrl, updateAvatar, updateProfile } from "@/api/profile";
 import { fetchGamificationPreferences, updateGamificationPreferences } from "@/api/gamification";
 import { ReviewList } from "@/components/my-reviews";
+import { PRSharingSettings } from "@/components/pantheon/PRSharingSettings";
 import { AvatarEditorModal } from "@/components/profile/AvatarEditorModal";
 import { isSupportedAvatarSource } from "@/components/profile/avatar-crop";
 import { useSession } from "@/components/session-provider";
@@ -125,6 +126,7 @@ export function ProfilePage() {
     ),
   );
   const tProfile = useTranslations("Profile");
+  const tPrSharing = useTranslations("PrSharing");
   const { tokens, currentUser, signOut } = useSession();
   const user = currentUser as CurrentUserWithAvatar | null;
   const showSelfServiceSurfaces = showsTenantSelfServiceSurfaces(user);
@@ -527,6 +529,14 @@ export function ProfilePage() {
             </div>
           </CollapsibleSection>
         ) : null}
+
+        <CollapsibleSection
+          id="pr-sharing"
+          title={tPrSharing("settingsTitle")}
+          description={tPrSharing("settingsDescription")}
+        >
+          <PRSharingSettings />
+        </CollapsibleSection>
 
         <CollapsibleSection id="avatar" title={i18n("avatar7631b26")} description={i18n("profilePictureaeb8371")}>
           <div className="space-y-5">

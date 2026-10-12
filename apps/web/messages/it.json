@@ -2723,5 +2723,32 @@
     "apiErrorClassVariantRequiresSingleMember": "La versione di una lezione per un membro deve essere assegnata a esattamente un membro.",
     "apiErrorSlotNotBookedByMember": "Questo membro non ha prenotato quella lezione.",
     "apiErrorSlotNotFound": "Lezione non trovata."
+  },
+  "PrSharing": {
+    "gymLabel": "Dove hai stabilito questo PR?",
+    "gymPersonal": "Personale (non collegato a una palestra)",
+    "gymHint": "I coach della palestra selezionata possono vedere questo PR, a meno che tu non disattivi la visibilità ai coach nel tuo profilo.",
+    "settingsTitle": "Condivisione dei PR",
+    "settingsDescription": "Scegli chi altro può vedere i tuoi record personali.",
+    "coachVisibilityLabel": "I coach delle mie palestre possono vedere i miei PR",
+    "coachVisibilityHint": "Vale per i PR registrati in una palestra finché ne sei membro attivo. Titolari e amministratori li vedono solo se sono anche coach.",
+    "grantsTitle": "Condivisi con persone specifiche",
+    "grantsHint": "Vedono tutti i tuoi PR in sola lettura, in ogni palestra, finché non smetti di condividere.",
+    "grantsEmpty": "Non hai condiviso i tuoi PR con nessuno.",
+    "searchLabel": "Trova qualcuno con cui condividere",
+    "searchPlaceholder": "Cerca per nickname",
+    "searchEmpty": "Nessuna persona corrispondente.",
+    "share": "Condividi",
+    "revoke": "Interrompi condivisione",
+    "sharedSince": "Condiviso dal {date}",
+    "loadError": "Impossibile caricare le impostazioni di condivisione.",
+    "saveError": "Impossibile salvare la modifica.",
+    "sharedWithMeTitle": "Condivisi con me",
+    "sharedWithMeDescription": "Record personali che altre persone hanno scelto di condividere con te.",
+    "sharedWithMeEmpty": "Nessuno ha ancora condiviso i propri PR con te.",
+    "sharedBy": "Condiviso da {name}",
+    "ownerHasNoPrs": "Nessun PR registrato finora.",
+    "earlierResults": "Risultati precedenti: {count}",
+    "dossierCoachOnly": "I record personali sono visibili solo ai coach di questa palestra."
   }
 }

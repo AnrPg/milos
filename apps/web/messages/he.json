@@ -2723,5 +2723,32 @@
     "apiErrorClassVariantRequiresSingleMember": "יש להקצות גרסת שיעור של חבר לחבר אחד בדיוק.",
     "apiErrorSlotNotBookedByMember": "החבר הזה לא הזמין את השיעור הזה.",
     "apiErrorSlotNotFound": "השיעור לא נמצא."
+  },
+  "PrSharing": {
+    "gymLabel": "איפה קבעת את השיא הזה?",
+    "gymPersonal": "אישי (לא משויך לחדר כושר)",
+    "gymHint": "המאמנים של חדר הכושר שנבחר יכולים לראות את השיא, אלא אם תכבה את הנראות למאמנים בפרופיל.",
+    "settingsTitle": "שיתוף שיאים",
+    "settingsDescription": "בחר מי עוד יכול לראות את השיאים האישיים שלך.",
+    "coachVisibilityLabel": "המאמנים בחדרי הכושר שלי יכולים לראות את השיאים שלי",
+    "coachVisibilityHint": "חל על שיאים שתיעדת בחדר כושר, כל עוד אתה חבר פעיל בו. בעלים ומנהלים רואים אותם רק אם הם גם מאמנים.",
+    "grantsTitle": "משותף עם אנשים מסוימים",
+    "grantsHint": "הם רואים את כל השיאים שלך לקריאה בלבד, בכל חדר כושר, עד שתפסיק לשתף.",
+    "grantsEmpty": "עדיין לא שיתפת את השיאים שלך עם אף אחד.",
+    "searchLabel": "מצא מישהו לשתף איתו",
+    "searchPlaceholder": "חיפוש לפי כינוי",
+    "searchEmpty": "לא נמצאו אנשים מתאימים.",
+    "share": "שיתוף",
+    "revoke": "הפסקת שיתוף",
+    "sharedSince": "משותף מאז {date}",
+    "loadError": "לא ניתן היה לטעון את הגדרות השיתוף.",
+    "saveError": "לא ניתן היה לשמור את השינוי.",
+    "sharedWithMeTitle": "שותפו איתי",
+    "sharedWithMeDescription": "שיאים אישיים שאחרים בחרו לשתף איתך.",
+    "sharedWithMeEmpty": "עדיין אף אחד לא שיתף איתך את השיאים שלו.",
+    "sharedBy": "שותף על ידי {name}",
+    "ownerHasNoPrs": "עדיין אין שיאים מתועדים.",
+    "earlierResults": "תוצאות קודמות: {count}",
+    "dossierCoachOnly": "שיאים אישיים גלויים רק למאמנים של חדר הכושר הזה."
   }
 }

@@ -2723,5 +2723,32 @@
     "apiErrorClassVariantRequiresSingleMember": "Eine Kursversion für Mitglieder muss genau einem Mitglied zugewiesen werden.",
     "apiErrorSlotNotBookedByMember": "Dieses Mitglied hat diesen Kurs nicht gebucht.",
     "apiErrorSlotNotFound": "Der Kurs wurde nicht gefunden."
+  },
+  "PrSharing": {
+    "gymLabel": "Wo hast du diesen PR aufgestellt?",
+    "gymPersonal": "Persönlich (keinem Studio zugeordnet)",
+    "gymHint": "Die Coaches des gewählten Studios sehen diesen PR, sofern du die Sichtbarkeit für Coaches in deinem Profil nicht ausschaltest.",
+    "settingsTitle": "PRs teilen",
+    "settingsDescription": "Lege fest, wer deine persönlichen Rekorde noch sehen darf.",
+    "coachVisibilityLabel": "Coaches meiner Studios dürfen meine PRs sehen",
+    "coachVisibilityHint": "Gilt für PRs, die du in einem Studio erfasst hast, solange du dort aktives Mitglied bist. Inhaber und Admins sehen sie nur, wenn sie auch coachen.",
+    "grantsTitle": "Mit bestimmten Personen geteilt",
+    "grantsHint": "Sie sehen alle deine PRs schreibgeschützt und studioübergreifend, bis du das Teilen beendest.",
+    "grantsEmpty": "Du hast deine PRs mit niemandem geteilt.",
+    "searchLabel": "Person zum Teilen finden",
+    "searchPlaceholder": "Nach Nickname suchen",
+    "searchEmpty": "Keine passenden Personen.",
+    "share": "Teilen",
+    "revoke": "Teilen beenden",
+    "sharedSince": "Geteilt seit {date}",
+    "loadError": "Deine Freigabeeinstellungen konnten nicht geladen werden.",
+    "saveError": "Die Änderung konnte nicht gespeichert werden.",
+    "sharedWithMeTitle": "Mit mir geteilt",
+    "sharedWithMeDescription": "Persönliche Rekorde, die andere mit dir teilen.",
+    "sharedWithMeEmpty": "Noch hat niemand seine PRs mit dir geteilt.",
+    "sharedBy": "Geteilt von {name}",
+    "ownerHasNoPrs": "Noch keine PRs erfasst.",
+    "earlierResults": "Frühere Ergebnisse: {count}",
+    "dossierCoachOnly": "Persönliche Rekorde sind nur für die Coaches dieses Studios sichtbar."
   }
 }

@@ -2723,5 +2723,32 @@
     "apiErrorClassVariantRequiresSingleMember": "A member's class version must be assigned to exactly one member.",
     "apiErrorSlotNotBookedByMember": "This member has not booked that class.",
     "apiErrorSlotNotFound": "That class could not be found."
+  },
+  "PrSharing": {
+    "gymLabel": "Where did you set this PR?",
+    "gymPersonal": "Personal (not linked to a gym)",
+    "gymHint": "Coaches of the selected gym can see this PR unless you turn coach visibility off in your profile.",
+    "settingsTitle": "PR sharing",
+    "settingsDescription": "Choose who else can see your personal records.",
+    "coachVisibilityLabel": "Coaches of my gyms can see my PRs",
+    "coachVisibilityHint": "Applies to PRs you recorded in a gym, while you are an active member there. Owners and admins only see them if they also coach.",
+    "grantsTitle": "Shared with specific people",
+    "grantsHint": "They see all your PRs, read-only, in every gym, until you stop sharing.",
+    "grantsEmpty": "You have not shared your PRs with anyone.",
+    "searchLabel": "Find someone to share with",
+    "searchPlaceholder": "Search by nickname",
+    "searchEmpty": "No matching people.",
+    "share": "Share",
+    "revoke": "Stop sharing",
+    "sharedSince": "Shared since {date}",
+    "loadError": "Your sharing settings could not be loaded.",
+    "saveError": "The change could not be saved.",
+    "sharedWithMeTitle": "Shared with me",
+    "sharedWithMeDescription": "Personal records other people chose to share with you.",
+    "sharedWithMeEmpty": "Nobody has shared their PRs with you yet.",
+    "sharedBy": "Shared by {name}",
+    "ownerHasNoPrs": "No PRs recorded yet.",
+    "earlierResults": "Earlier results: {count}",
+    "dossierCoachOnly": "Personal records are visible to this gym's coaches only."
   }
 }

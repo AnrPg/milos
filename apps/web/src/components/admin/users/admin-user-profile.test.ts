@@ -2,8 +2,18 @@ import { describe, expect, it } from "vitest";
 
 import {
   packageSubscriptionLabel,
+  prSectionContentCount,
   visibleAdminProfileSections,
 } from "@/components/admin/users/admin-user-profile";
+
+describe("prSectionContentCount", () => {
+  it("keeps the PR panel for staff who are not coaches so it can explain why it is empty", () => {
+    expect(prSectionContentCount(undefined)).toBe(0);
+    expect(prSectionContentCount({ visibility: "coach_role_required", prs: [] })).toBe(1);
+    expect(prSectionContentCount({ visibility: "coach", prs: [] })).toBe(0);
+    expect(prSectionContentCount({ visibility: "coach", prs: [{}, {}] })).toBe(2);
+  });
+});
 
 describe("visibleAdminProfileSections", () => {
   it("keeps operational sections but removes empty person-history sections", () => {

@@ -2723,5 +2723,32 @@
     "apiErrorClassVariantRequiresSingleMember": "A versão de uma aula para um membro tem de ser atribuída a exatamente um membro.",
     "apiErrorSlotNotBookedByMember": "Este membro não reservou essa aula.",
     "apiErrorSlotNotFound": "Não foi possível encontrar a aula."
+  },
+  "PrSharing": {
+    "gymLabel": "Onde fizeste este PR?",
+    "gymPersonal": "Pessoal (sem ginásio associado)",
+    "gymHint": "Os treinadores do ginásio escolhido podem ver este PR, a menos que desative a visibilidade para treinadores no seu perfil.",
+    "settingsTitle": "Partilha de PR",
+    "settingsDescription": "Escolha quem mais pode ver os seus recordes pessoais.",
+    "coachVisibilityLabel": "Os treinadores dos meus ginásios podem ver os meus PR",
+    "coachVisibilityHint": "Aplica-se aos PR registados num ginásio enquanto for membro ativo. Proprietários e administradores só os veem se também treinarem.",
+    "grantsTitle": "Partilhado com pessoas específicas",
+    "grantsHint": "Veem todos os seus PR, apenas em leitura, em qualquer ginásio, até deixar de partilhar.",
+    "grantsEmpty": "Ainda não partilhou os seus PR com ninguém.",
+    "searchLabel": "Procure alguém para partilhar",
+    "searchPlaceholder": "Pesquisar por alcunha",
+    "searchEmpty": "Nenhuma pessoa corresponde.",
+    "share": "Partilhar",
+    "revoke": "Deixar de partilhar",
+    "sharedSince": "Partilhado desde {date}",
+    "loadError": "Não foi possível carregar as definições de partilha.",
+    "saveError": "Não foi possível guardar a alteração.",
+    "sharedWithMeTitle": "Partilhado comigo",
+    "sharedWithMeDescription": "Recordes pessoais que outras pessoas escolheram partilhar consigo.",
+    "sharedWithMeEmpty": "Ainda ninguém partilhou os seus PR consigo.",
+    "sharedBy": "Partilhado por {name}",
+    "ownerHasNoPrs": "Ainda não há PR registados.",
+    "earlierResults": "Resultados anteriores: {count}",
+    "dossierCoachOnly": "Os recordes pessoais só são visíveis para os treinadores deste ginásio."
   }
 }
