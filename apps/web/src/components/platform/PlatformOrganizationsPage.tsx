@@ -25,8 +25,10 @@ import {
 } from "@/api/platform-organizations";
 import { ApiError } from "@/api/client";
 import { fetchOrganizationMemberships } from "@/api/organizations";
+import { OrganizationPurgeDialog } from "@/components/platform/OrganizationPurgeDialog";
 import { useSession } from "@/components/session-provider";
 import { useUiLocale } from "@/i18n/use-ui-locale";
+import { platformOrganizationPurgeCopy } from "@/i18n/platform-organization-purge";
 import { platformOrganizationsCopy } from "@/i18n/platform-organizations";
 import { membershipWorkspaceHref, rememberSelectedOrganization } from "@/lib/organization-slug";
 
@@ -53,6 +55,7 @@ type GeneratedInvitation = PlatformInvitationResult["invitation"] & {
 export function PlatformOrganizationsPage() {
   const locale = useUiLocale();
   const copy = platformOrganizationsCopy(locale);
+  const purgeCopy = platformOrganizationPurgeCopy(locale);
   const { tokens } = useSession();
   const [form, setForm] = useState(defaultForm);
   const [submitting, setSubmitting] = useState(false);
@@ -68,6 +71,7 @@ export function PlatformOrganizationsPage() {
   const [provisioningOpen, setProvisioningOpen] = useState(false);
   const [confirmingArchive, setConfirmingArchive] = useState<PlatformOrganization | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState<PlatformOrganization | null>(null);
+  const [reviewingPurge, setReviewingPurge] = useState<PlatformOrganization | null>(null);
   const [lifecycleSubmitting, setLifecycleSubmitting] = useState<string | null>(null);
   const [deleteSubmitting, setDeleteSubmitting] = useState<string | null>(null);
   const [generatedInvitationsByOrg, setGeneratedInvitationsByOrg] = useState<
@@ -417,6 +421,13 @@ export function PlatformOrganizationsPage() {
                     ) : null}
                     <button
                       type="button"
+                      onClick={() => setReviewingPurge(entry)}
+                      className="border border-red-900 px-3 py-2 text-sm font-semibold text-red-900"
+                    >
+                      {purgeCopy.open}
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => setConfirmingDelete(entry)}
                       className="border border-red-900 bg-red-50 px-3 py-2 text-sm font-semibold text-red-900"
                     >
@@ -479,6 +490,15 @@ export function PlatformOrganizationsPage() {
           submitting={lifecycleSubmitting === `${confirmingArchive.organization.id}:archived`}
           onCancel={() => setConfirmingArchive(null)}
           onConfirm={() => void updateLifecycle(confirmingArchive.organization.id, "archived")}
+        />
+      ) : null}
+      {reviewingPurge ? (
+        <OrganizationPurgeDialog
+          accessToken={accessToken}
+          locale={locale}
+          organization={reviewingPurge}
+          onClose={() => setReviewingPurge(null)}
+          onChanged={() => void organizationsQuery.refetch()}
         />
       ) : null}
       {confirmingDelete ? (
