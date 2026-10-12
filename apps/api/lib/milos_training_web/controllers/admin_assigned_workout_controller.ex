@@ -14,7 +14,14 @@ defmodule MilosTrainingWeb.AdminAssignedWorkoutController do
        [json_render_error_v2: true] when action in [:create, :update]
 
   operation(:create,
-    summary: "Assign a published workout to one or more athletes",
+    summary: "Assign a published workout to one or more athletes or members",
+    description:
+      "ADR-107: `athlete_ids` holds assignee user ids - active athletes or members of the " <>
+        "organization (the field name is kept for compatibility). Members require a package " <>
+        "with the personal_programming channel and execute_assigned_workouts capability " <>
+        "(403 `member_programming_not_entitled`). `source_slot_id` makes the assignment one " <>
+        "member's version of a class they booked (exactly one member; " <>
+        "422 `class_variant_requires_single_member` / `slot_not_booked_by_member`).",
     request_body: %RequestBody{
       required: true,
       content: %{
@@ -25,10 +32,18 @@ defmodule MilosTrainingWeb.AdminAssignedWorkoutController do
               master_workout_id: %Schema{type: :string, format: :uuid},
               athlete_ids: %Schema{
                 type: :array,
+                description: "Assignee user ids (athletes or members).",
                 items: %Schema{type: :string, format: :uuid}
               },
               scheduled_for: %Schema{type: :string, format: :date},
-              admin_notes: %Schema{type: :string}
+              admin_notes: %Schema{type: :string},
+              source_slot_id: %Schema{
+                type: :string,
+                format: :uuid,
+                nullable: true,
+                description:
+                  "Class occurrence this assignment is a member's version of (ADR-107)."
+              }
             },
             required: [:master_workout_id, :athlete_ids, :scheduled_for]
           }

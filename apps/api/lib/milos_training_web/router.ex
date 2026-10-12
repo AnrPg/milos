@@ -298,11 +298,25 @@ defmodule MilosTrainingWeb.Router do
       :tenant_write_rate_limited
     ])
 
-    get("/my-workouts", MyWorkoutController, :index)
     post("/my-workouts/requests", MyWorkoutController, :request_assignment)
+    patch("/my-workouts/assignments/:id/reschedule", MyWorkoutController, :reschedule)
+  end
+
+  # ADR-107: members receive personal assignments and class variants too, so
+  # listing, opening and rejecting assignments is open to every tenant role
+  # (the services only ever act on the caller's own assignment links).
+  scope "/api/org/:organization_slug", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :tenant_member,
+      :tenant_write_rate_limited
+    ])
+
+    get("/my-workouts", MyWorkoutController, :index)
     post("/my-workouts/assignments/:id/open", MyWorkoutController, :open)
     patch("/my-workouts/assignments/:id/reject", MyWorkoutController, :reject)
-    patch("/my-workouts/assignments/:id/reschedule", MyWorkoutController, :reschedule)
   end
 
   scope "/api/org/:organization_slug/admin", MilosTrainingWeb do
