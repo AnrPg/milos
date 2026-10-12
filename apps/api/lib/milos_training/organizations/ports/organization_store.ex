@@ -56,5 +56,8 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
               {:ok, OrganizationMembership.t()} | {:error, term()}
   @callback update_membership_role(Ecto.UUID.t(), Ecto.UUID.t(), atom()) ::
               {:ok, OrganizationMembership.t()} | {:error, term()}
+  @callback put_organization_settings_entry(Ecto.UUID.t(), String.t(), term()) ::
+              {:ok, OrganizationSetting.t()} | {:error, term()}
+  @callback list_active_invitations(Ecto.UUID.t(), DateTime.t()) :: [RegistrationInvitation.t()]
   @callback transaction((-> {:ok, term()} | {:error, term()})) :: {:ok, term()} | {:error, term()}
 end
