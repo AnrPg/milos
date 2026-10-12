@@ -175,7 +175,7 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     assert training["class_participation"] == []
 
     prs = get_as_admin(build_conn(), admin, slug, member.id, "prs")
-    assert prs == %{"prs" => [], "user_id" => member.id}
+    assert prs == %{"prs" => [], "user_id" => member.id, "visibility" => "coach_role_required"}
 
     incidents = get_as_admin(build_conn(), admin, slug, member.id, "incidents")
 
@@ -190,24 +190,37 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     assert messages["summary"] == %{"thread_count" => 0, "unread_thread_count" => 0}
   end
 
-  # TD-070: user_pr_records is owner-only under RLS and ADR-055's explicit PR
-  # sharing grants are not implemented, so the dossier PR tab is empty for
-  # staff in production. Superuser dispatch keeps the composition covered.
-  @tag rls_enforced: false
+  # ADR-111 (TD-062): the dossier PR tab follows PR visibility - the gym's
+  # coaches read PRs recorded in this gym; owners/admins who are not coaches
+  # get a role-safe empty state.
   test "focused dossier endpoints compose PR, injury, and message records", %{conn: conn} do
     admin = admin_fixture()
+    coach = user_fixture(%{nickname: "dossier_coach"})
     athlete = user_fixture(%{role: :athlete, nickname: "dossier_athlete"})
     {_organization, context} = tenant_fixture(admin, "Dossier Composed Records")
     member_of(context.organization_id, athlete, :athlete)
+    member_of(context.organization_id, coach, :coach)
 
     slug = context.organization.slug
 
     {:ok, _pr} =
-      MilosTraining.Application.CreatePR.call(athlete.id, %{
+      MilosTraining.Application.CreatePR.call(MilosTraining.Identity.UserContext.new(athlete), %{
         "name" => "Back squat",
         "current_score" => 120,
         "unit" => "kg",
-        "beaten_on" => Date.to_iso8601(Date.utc_today())
+        "beaten_on" => Date.to_iso8601(Date.utc_today()),
+        "supporting_metrics" => %{"reps" => 1},
+        "organization_slug" => slug
+      })
+
+    {:ok, _personal_pr} =
+      MilosTraining.Application.CreatePR.call(MilosTraining.Identity.UserContext.new(athlete), %{
+        "name" => "Half marathon",
+        "current_score" => 5400,
+        "unit" => "mins_secs",
+        "higher_is_better" => false,
+        "beaten_on" => Date.to_iso8601(Date.utc_today()),
+        "supporting_metrics" => %{"distance_m" => 21_097}
       })
 
     {:ok, _injury} =
@@ -235,8 +248,18 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
         })
       end)
 
-    assert [%{"name" => "Back squat", "unit" => "kg"}] =
-             get_as_admin(conn, admin, slug, athlete.id, "prs")["prs"]
+    assert %{"visibility" => "coach", "prs" => [%{"name" => "Back squat", "unit" => "kg"}]} =
+             get_as_admin(conn, coach, slug, athlete.id, "prs")
+
+    assert %{"visibility" => "coach_role_required", "prs" => []} =
+             get_as_admin(build_conn(), admin, slug, athlete.id, "prs")
+
+    # The coach role reaches the PR tab only; the rest of the dossier stays
+    # owner/admin-only.
+    assert build_conn()
+           |> put_bearer_token(coach)
+           |> get("/api/org/#{slug}/admin/users/#{athlete.id}/incidents")
+           |> json_response(403)
 
     assert [%{"body_area" => "shoulder", "status" => "active"}] =
              get_as_admin(build_conn(), admin, slug, athlete.id, "incidents")["incidents"]

@@ -58,9 +58,8 @@ defmodule MilosTrainingWeb.PRController do
   )
 
   def index(conn, params) do
-    current_user = Guardian.Plug.current_resource(conn)
     opts = if params["q"], do: [query: params["q"]], else: []
-    {:ok, prs} = ListUserPRs.call(current_user.id, opts)
+    {:ok, prs} = ListUserPRs.call(conn.assigns.user_context, opts)
     json(conn, %{prs: prs})
   end
 
@@ -71,7 +70,13 @@ defmodule MilosTrainingWeb.PRController do
        %Schema{
          type: :object,
          required: [:name, :current_score, :unit, :beaten_on],
-         properties: @pr_fields
+         properties:
+           Map.put(@pr_fields, :organization_slug, %Schema{
+             type: :string,
+             nullable: true,
+             description:
+               "Gym the PR was achieved in (ADR-111). Must be one of the caller's active memberships; the gym's coaches can then read it. Omit for a personal PR."
+           })
        }},
     responses: [
       created: {"PR", "application/json", %Schema{type: :object}},
@@ -80,9 +85,7 @@ defmodule MilosTrainingWeb.PRController do
   )
 
   def create(conn, params) do
-    current_user = Guardian.Plug.current_resource(conn)
-
-    with {:ok, pr} <- CreatePR.call(current_user.id, params) do
+    with {:ok, pr} <- CreatePR.call(conn.assigns.user_context, params) do
       conn
       |> put_status(:created)
       |> json(%{pr: pr})
@@ -102,9 +105,7 @@ defmodule MilosTrainingWeb.PRController do
   )
 
   def update(conn, %{"id" => id} = params) do
-    current_user = Guardian.Plug.current_resource(conn)
-
-    with {:ok, pr} <- UpdatePR.call(id, current_user.id, params) do
+    with {:ok, pr} <- UpdatePR.call(conn.assigns.user_context, id, params) do
       json(conn, %{pr: pr})
     end
   end
@@ -122,9 +123,7 @@ defmodule MilosTrainingWeb.PRController do
   )
 
   def edit(conn, %{"id" => id} = params) do
-    current_user = Guardian.Plug.current_resource(conn)
-
-    with {:ok, pr} <- EditPR.call(id, current_user.id, params) do
+    with {:ok, pr} <- EditPR.call(conn.assigns.user_context, id, params) do
       json(conn, %{pr: pr})
     end
   end
@@ -139,9 +138,7 @@ defmodule MilosTrainingWeb.PRController do
   )
 
   def delete(conn, %{"id" => id}) do
-    current_user = Guardian.Plug.current_resource(conn)
-
-    with :ok <- DeletePR.call(id, current_user.id) do
+    with :ok <- DeletePR.call(conn.assigns.user_context, id) do
       send_resp(conn, :no_content, "")
     end
   end
@@ -156,9 +153,7 @@ defmodule MilosTrainingWeb.PRController do
   )
 
   def history(conn, %{"id" => id}) do
-    current_user = Guardian.Plug.current_resource(conn)
-
-    with {:ok, entries} <- GetPRHistory.call(id, current_user.id) do
+    with {:ok, entries} <- GetPRHistory.call(conn.assigns.user_context, id) do
       json(conn, %{history: entries})
     end
   end
@@ -173,9 +168,7 @@ defmodule MilosTrainingWeb.PRController do
   )
 
   def share(conn, %{"id" => id}) do
-    current_user = Guardian.Plug.current_resource(conn)
-
-    with {:ok, result} <- SharePR.call(id, current_user.id) do
+    with {:ok, result} <- SharePR.call(conn.assigns.user_context, id) do
       json(conn, result)
     end
   end

@@ -113,6 +113,11 @@ defmodule MilosTrainingWeb.Router do
     plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin])
   end
 
+  pipeline :tenant_staff do
+    plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
+    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin, :coach])
+  end
+
   pipeline :member_or_admin do
     plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
     plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin, :member])
@@ -319,6 +324,20 @@ defmodule MilosTrainingWeb.Router do
     patch("/my-workouts/assignments/:id/reject", MyWorkoutController, :reject)
   end
 
+  # ADR-111: members' PRs are readable by the gym's coaches, so the dossier PR
+  # tab admits coaches as well as owners/admins. Owners/admins who are not
+  # coaches get a role-safe empty state; the database enforces the rest.
+  scope "/api/org/:organization_slug/admin", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :tenant_staff
+    ])
+
+    get("/users/:id/prs", AdminUserController, :prs)
+  end
+
   scope "/api/org/:organization_slug/admin", MilosTrainingWeb do
     pipe_through([
       :api,
@@ -336,7 +355,6 @@ defmodule MilosTrainingWeb.Router do
     get("/users/:id/training-history", AdminUserController, :training_history)
     get("/users/:id/schedule", AdminUserController, :schedule)
     post("/users/:id/programming", AdminUserController, :program_workout)
-    get("/users/:id/prs", AdminUserController, :prs)
     get("/users/:id/incidents", AdminUserController, :incidents)
     get("/users/:id/messages", AdminUserController, :messages)
     get("/users/:id/coaching-context", AdminUserController, :coaching_context)
@@ -676,6 +694,23 @@ defmodule MilosTrainingWeb.Router do
     delete("/:id", PRController, :delete)
     get("/:id/history", PRController, :history)
     post("/:id/share", PRController, :share)
+  end
+
+  # ADR-111: personal PR sharing (global, not tenant-scoped).
+  scope "/api/pr-sharing", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :tenant_write_rate_limited
+    ])
+
+    get("/", PRSharingController, :show)
+    put("/coach-visibility", PRSharingController, :update_coach_visibility)
+    post("/grants", PRSharingController, :create_grant)
+    delete("/grants/:id", PRSharingController, :revoke_grant)
+    get("/shared-with-me", PRSharingController, :shared_with_me)
   end
 
   if Application.compile_env(:milos_training, :dev_routes) do

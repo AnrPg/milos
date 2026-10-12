@@ -89,9 +89,15 @@ defmodule MilosTrainingWeb.AdminUserController do
   }
   @pr_response %Schema{
     type: :object,
-    required: [:user_id, :prs],
+    required: [:user_id, :visibility, :prs],
     properties: %{
       user_id: @user_id,
+      visibility: %Schema{
+        type: :string,
+        enum: ["coach", "coach_role_required"],
+        description:
+          "ADR-111: `coach` - PRs recorded in this gym that the member shares with its coaches; `coach_role_required` - the caller is staff but not a coach of this gym, so no PRs are returned."
+      },
       prs: %Schema{
         type: :array,
         items: %Schema{

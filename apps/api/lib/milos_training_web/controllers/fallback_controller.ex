@@ -1452,6 +1452,21 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  def call(conn, {:error, :cannot_share_prs_with_self}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "cannot_share_prs_with_self", error: "You already own these records"})
+  end
+
+  def call(conn, {:error, :pr_organization_unavailable}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "pr_organization_unavailable",
+      error: "PRs can only be recorded in a gym you are an active member of"
+    })
+  end
+
   def call(conn, {:error, _reason}) do
     conn
     |> put_status(:internal_server_error)
