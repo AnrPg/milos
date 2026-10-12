@@ -37,6 +37,60 @@ defmodule MilosTraining.RLSCase do
     # issued through it never durably take effect. The separate `conn` this
     # test gets below is a genuinely different physical connection/role and
     # needs privileges that actually persisted.
+    ensure_runtime_role!()
+
+    {:ok, pid} =
+      Postgrex.start_link(
+        hostname: System.get_env("DB_HOST", "localhost"),
+        port: String.to_integer(System.get_env("DB_PORT", "5432")),
+        username: @runtime_role,
+        password: @runtime_password,
+        database:
+          System.get_env("DB_NAME", "milos_training_test#{System.get_env("MIX_TEST_PARTITION")}")
+      )
+
+    # These tests write outside the Ecto sandbox (the raw connection is the whole
+    # point), so nothing rolls back. Without this every run left its
+    # organizations and users behind, which then skewed suite-wide count
+    # assertions elsewhere. Cleanup lives here rather than in each test so it
+    # also runs when a test fails partway through.
+    on_exit(fn ->
+      {:ok, cleanup} =
+        Postgrex.start_link(
+          hostname: System.get_env("DB_HOST", "localhost"),
+          port: String.to_integer(System.get_env("DB_PORT", "5432")),
+          username: System.get_env("DB_USER", "postgres"),
+          password: System.get_env("DB_PASSWORD", "postgres"),
+          database:
+            System.get_env(
+              "DB_NAME",
+              "milos_training_test#{System.get_env("MIX_TEST_PARTITION")}"
+            )
+        )
+
+      Postgrex.query!(
+        cleanup,
+        "DELETE FROM organization_memberships WHERE user_id IN (SELECT id FROM users WHERE nickname LIKE 'rls\_%')",
+        []
+      )
+
+      Postgrex.query!(cleanup, "DELETE FROM users WHERE nickname LIKE 'rls\_%'", [])
+      Postgrex.query!(cleanup, "DELETE FROM organizations WHERE slug LIKE 'rls-%'", [])
+
+      GenServer.stop(cleanup)
+    end)
+
+    {:ok, conn: pid}
+  end
+
+  @doc """
+  Durably creates the non-superuser `#{@runtime_role}` role (NOBYPASSRLS) and
+  grants it DML on every table. Also used by DataCase tests that run real
+  application code under RLS via `SET LOCAL ROLE` (ADR-099 purge test).
+  """
+  def runtime_role, do: @runtime_role
+
+  def ensure_runtime_role! do
     {:ok, admin_conn} =
       Postgrex.start_link(
         hostname: System.get_env("DB_HOST", "localhost"),
@@ -84,49 +138,7 @@ defmodule MilosTraining.RLSCase do
     )
 
     GenServer.stop(admin_conn)
-
-    {:ok, pid} =
-      Postgrex.start_link(
-        hostname: System.get_env("DB_HOST", "localhost"),
-        port: String.to_integer(System.get_env("DB_PORT", "5432")),
-        username: @runtime_role,
-        password: @runtime_password,
-        database:
-          System.get_env("DB_NAME", "milos_training_test#{System.get_env("MIX_TEST_PARTITION")}")
-      )
-
-    # These tests write outside the Ecto sandbox (the raw connection is the whole
-    # point), so nothing rolls back. Without this every run left its
-    # organizations and users behind, which then skewed suite-wide count
-    # assertions elsewhere. Cleanup lives here rather than in each test so it
-    # also runs when a test fails partway through.
-    on_exit(fn ->
-      {:ok, cleanup} =
-        Postgrex.start_link(
-          hostname: System.get_env("DB_HOST", "localhost"),
-          port: String.to_integer(System.get_env("DB_PORT", "5432")),
-          username: System.get_env("DB_USER", "postgres"),
-          password: System.get_env("DB_PASSWORD", "postgres"),
-          database:
-            System.get_env(
-              "DB_NAME",
-              "milos_training_test#{System.get_env("MIX_TEST_PARTITION")}"
-            )
-        )
-
-      Postgrex.query!(
-        cleanup,
-        "DELETE FROM organization_memberships WHERE user_id IN (SELECT id FROM users WHERE nickname LIKE 'rls\_%')",
-        []
-      )
-
-      Postgrex.query!(cleanup, "DELETE FROM users WHERE nickname LIKE 'rls\_%'", [])
-      Postgrex.query!(cleanup, "DELETE FROM organizations WHERE slug LIKE 'rls-%'", [])
-
-      GenServer.stop(cleanup)
-    end)
-
-    {:ok, conn: pid}
+    :ok
   end
 
   @doc "Generates a UUID as both its string form (for set_config/text params) and its 16-byte binary form (for uuid columns)."
