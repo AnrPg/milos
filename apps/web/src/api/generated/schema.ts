@@ -149,7 +149,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Summarize what renaming an organization's path slug affects (ADR-104) */
+        /** Summarize what renaming an organization's path slug affects (ADR-112) */
         get: operations["MilosTrainingWeb.PlatformOrganizationController.slug_impact"];
         put?: never;
         post?: never;
@@ -1156,7 +1156,7 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Athlete reports opening an assigned workout's detail (analytics, ADR-105)
+         * Assignee reports opening an assigned workout's detail (analytics, ADR-121)
          * @description Records workout_assignment_opened once per athlete, assignment and UTC day. Repeated calls the same day are accepted and ignored.
          */
         post: operations["MilosTrainingWeb.MyWorkoutController.open"];
@@ -1277,6 +1277,23 @@ export interface paths {
         };
         /** Get Web Push configuration for the current user */
         get: operations["MilosTrainingWeb.NotificationController.push_config"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/schedule/slots/{id}/injury-warnings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Injury safety warnings for the members booked into a class slot */
+        get: operations["MilosTrainingWeb.AdminInjuryWarningController.slot"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1828,7 +1845,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Assign a published workout to one or more athletes */
+        /**
+         * Assign a published workout to one or more athletes or members
+         * @description ADR-115: `athlete_ids` holds assignee user ids - active athletes or members of the organization (the field name is kept for compatibility). Members require a package with the personal_programming channel and execute_assigned_workouts capability (403 `member_programming_not_entitled`). `source_slot_id` makes the assignment one member's version of a class they booked (exactly one member; 422 `class_variant_requires_single_member` / `slot_not_booked_by_member`).
+         */
         post: operations["MilosTrainingWeb.AdminAssignedWorkoutController.create"];
         delete?: never;
         options?: never;
@@ -1983,7 +2003,7 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Report client-only execution interaction events (analytics, ADR-105)
+         * Report client-only execution interaction events (analytics, ADR-113)
          * @description Batched, idempotent ingestion of execution interaction signals the server cannot observe (pause sheet, manual skip, round taps, adjusts, ready screen, finish wizard, cast mode). Each event dedupes on its client_event_id; retries are accepted and counted as duplicates. Any invalid event rejects the batch.
          */
         post: operations["MilosTrainingWeb.ExecutionController.record_interactions"];
@@ -2041,7 +2061,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Athlete rejects an assigned workout */
+        /** Assignee (athlete or member, ADR-115) rejects an assigned workout */
         patch: operations["MilosTrainingWeb.MyWorkoutController.reject"];
         trace?: never;
     };
@@ -2274,7 +2294,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List assigned workouts for the current athlete or all athlete assignments for admins */
+        /**
+         * List assigned workouts for the current athlete or member, or all assignments for staff
+         * @description ADR-115: members receive personal assignments and class variants. Each assignment carries `assignment_kind` (`personal` | `class_variant`) and `source_slot_id` (the class a variant belongs to, or null).
+         */
         get: operations["MilosTrainingWeb.MyWorkoutController.index"];
         put?: never;
         post?: never;
@@ -2336,6 +2359,23 @@ export interface paths {
         patch: operations["MilosTrainingWeb.AdminClassTypeController.update"];
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/workouts/{workout_id}/injury-warnings/acknowledge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Acknowledge the current user's injury safety warnings for a workout */
+        post: operations["MilosTrainingWeb.MyInjuryWarningController.acknowledge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/platform/organizations/{id}/invitations": {
         parameters: {
             query?: never;
@@ -2382,7 +2422,7 @@ export interface paths {
         put?: never;
         /**
          * Log a class, assigned, library, or freeform workout
-         * @description Idempotent per `idempotency_key`: a replay returns the original entry with 200, before source authorization is re-evaluated (ADR-102). Reusing a key for a different source returns 409 `idempotency_key_conflict`. Logging feeds the same durable completion projection as workout executions.
+         * @description Idempotent per `idempotency_key`: a replay returns the original entry with 200, before source authorization is re-evaluated (ADR-110). Reusing a key for a different source returns 409 `idempotency_key_conflict`. Logging feeds the same durable completion projection as workout executions.
          */
         post: operations["MilosTrainingWeb.TrainingLogController.create"];
         delete?: never;
@@ -2597,6 +2637,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/workouts/{workout_id}/injury-warnings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The current user's injury safety warnings for a workout
+         * @description Informational only (ADR-114): includes the user's own personal injuries; never blocks starting the workout.
+         */
+        get: operations["MilosTrainingWeb.MyInjuryWarningController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/profile": {
         parameters: {
             query?: never;
@@ -2716,7 +2776,7 @@ export interface paths {
         head?: never;
         /**
          * Reject a booking
-         * @description Booking resolution is never replayed blindly (ADR-102): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.
+         * @description Booking resolution is never replayed blindly (ADR-110): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.
          */
         patch: operations["MilosTrainingWeb.AdminScheduleController.reject_booking"];
         trace?: never;
@@ -2736,7 +2796,7 @@ export interface paths {
         head?: never;
         /**
          * Approve a booking
-         * @description Booking resolution is never replayed blindly (ADR-102): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.
+         * @description Booking resolution is never replayed blindly (ADR-110): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.
          */
         patch: operations["MilosTrainingWeb.AdminScheduleController.approve_booking"];
         trace?: never;
@@ -2879,6 +2939,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/wellbeing/injury-warnings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Injury safety warnings for athletes against a workout
+         * @description Informational only (ADR-114). Only injuries with this organization's provenance are considered; members' personal self-reports are never visible to staff.
+         */
+        post: operations["MilosTrainingWeb.AdminInjuryWarningController.evaluate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/wellbeing/injury-warnings/acknowledge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acknowledge injury safety warnings shown for athletes
+         * @description Records an analytics acknowledgement for each warned athlete. Warnings are re-evaluated server-side and never block.
+         */
+        post: operations["MilosTrainingWeb.AdminInjuryWarningController.acknowledge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/workout-folders": {
         parameters: {
             query?: never;
@@ -2906,7 +3006,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Copy or save a workout and associate it with this user's athlete assignment or booked class */
+        /**
+         * Copy or save a workout and associate it with this user's assignment, class variant or booked class
+         * @description Athletes receive a personal assignment. Members follow `mode` (ADR-115). Member assignment modes fail with 403 `member_programming_not_entitled` when the member's package lacks the personal_programming channel or execute_assigned_workouts capability.
+         */
         post: operations["MilosTrainingWeb.AdminUserController.program_workout"];
         delete?: never;
         options?: never;
@@ -2993,7 +3096,7 @@ export interface paths {
         put?: never;
         /**
          * Book a schedule slot
-         * @description Optionally idempotent per `client_operation_id` (ADR-102): replaying the same id for the same slot returns the original booking with 200 and no new reservation, notification, or broadcast; reusing it for another slot returns 409 `idempotency_key_conflict`.
+         * @description Optionally idempotent per `client_operation_id` (ADR-110): replaying the same id for the same slot returns the original booking with 200 and no new reservation, notification, or broadcast; reusing it for another slot returns 409 `idempotency_key_conflict`.
          */
         post: operations["MilosTrainingWeb.ScheduleController.create_booking"];
         delete?: never;
@@ -3077,7 +3180,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List athlete users */
+        /** List assignable users (athletes; optionally members, ADR-115) */
         get: operations["MilosTrainingWeb.AdminUserController.index_athletes"];
         put?: never;
         post?: never;
@@ -3162,125 +3265,57 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** ExecutionInteractionBatch */
-        ExecutionInteractionBatch: {
-            events: {
-                /** Format: uuid */
-                client_event_id: string;
-                /** @enum {string} */
-                kind: "cast_mode_toggled" | "check_off_undone" | "cues_toggled" | "finish_wizard_abandoned" | "finish_wizard_opened" | "finish_wizard_saved" | "first_segment_started" | "pause" | "ready_screen_shown" | "resume" | "round_decremented" | "round_incremented" | "rounds_adjusted" | "segment_restarted" | "segment_skipped" | "time_adjusted" | "workout_launched";
-                /** @description Typed facts allowed for the interaction kind (see ADR-105). No free text; keys not allowed for the kind reject the batch. */
-                metadata?: {
-                    countdown_seconds?: number;
-                    /** @enum {string} */
-                    cue_channel?: "sound" | "voice" | "vibration";
-                    delta_rounds?: number;
-                    delta_seconds?: number;
-                    duration_ms?: number;
-                    elapsed_ms?: number;
-                    enabled?: boolean;
-                    format?: string;
-                    /** @enum {string} */
-                    orientation?: "portrait" | "landscape";
-                    remaining_ms?: number;
-                    round_count?: number;
-                    scored_section_count?: number;
-                    section_id?: string;
-                    segment_index?: number;
-                    step?: number;
-                    /** @enum {string} */
-                    surface?: "pause_sheet" | "primary_action" | "header" | "gesture" | "keyboard" | "snackbar" | "ready_screen" | "finish_wizard" | "cast_display" | "lock_screen";
+        /** WorkoutDslPublishResponse */
+        WorkoutDslPublishResponse: {
+            diagnostics: {
+                code: string;
+                column: number;
+                line: number;
+                params: {
+                    [key: string]: unknown;
                 };
-                /** Format: date-time */
-                occurred_at: string;
+                /** @enum {string} */
+                severity: "error" | "warning";
             }[];
-        };
-        /** ExecutionInteractionBatchResult */
-        ExecutionInteractionBatchResult: {
-            accepted: number;
-            duplicates: number;
-        };
-        /** ExecutionInteractionEvent */
-        ExecutionInteractionEvent: {
-            /** Format: uuid */
-            client_event_id: string;
-            /** @enum {string} */
-            kind: "cast_mode_toggled" | "check_off_undone" | "cues_toggled" | "finish_wizard_abandoned" | "finish_wizard_opened" | "finish_wizard_saved" | "first_segment_started" | "pause" | "ready_screen_shown" | "resume" | "round_decremented" | "round_incremented" | "rounds_adjusted" | "segment_restarted" | "segment_skipped" | "time_adjusted" | "workout_launched";
-            /** @description Typed facts allowed for the interaction kind (see ADR-105). No free text; keys not allowed for the kind reject the batch. */
-            metadata?: {
-                countdown_seconds?: number;
-                /** @enum {string} */
-                cue_channel?: "sound" | "voice" | "vibration";
-                delta_rounds?: number;
-                delta_seconds?: number;
-                duration_ms?: number;
-                elapsed_ms?: number;
-                enabled?: boolean;
-                format?: string;
-                /** @enum {string} */
-                orientation?: "portrait" | "landscape";
-                remaining_ms?: number;
-                round_count?: number;
-                scored_section_count?: number;
-                section_id?: string;
-                segment_index?: number;
-                step?: number;
-                /** @enum {string} */
-                surface?: "pause_sheet" | "primary_action" | "header" | "gesture" | "keyboard" | "snackbar" | "ready_screen" | "finish_wizard" | "cast_display" | "lock_screen";
-            };
-            /** Format: date-time */
-            occurred_at: string;
-        };
-        /** OrganizationBranding */
-        OrganizationBranding: {
-            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
-            brand_logo_uploaded: boolean;
-            brand_logo_url: string | null;
-            brand_name?: string | null;
-            brand_primary_color?: string | null;
-            /** Format: uuid */
-            organization_id: string;
-        };
-        /** OrganizationBrandingResponse */
-        OrganizationBrandingResponse: {
-            /** OrganizationBranding */
-            branding: {
-                /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
-                brand_logo_uploaded: boolean;
-                brand_logo_url: string | null;
-                brand_name?: string | null;
-                brand_primary_color?: string | null;
-                /** Format: uuid */
-                organization_id: string;
-            };
-        };
-        /** OrganizationLogoFinalizeRequest */
-        OrganizationLogoFinalizeRequest: {
-            logo_key: string;
-        };
-        /** OrganizationLogoUpload */
-        OrganizationLogoUpload: {
-            expires_in: number;
-            key: string;
-            max_bytes: number;
-            required_headers: {
-                [key: string]: string;
-            };
-            upload_url: string;
-        };
-        /** OrganizationLogoUploadRequest */
-        OrganizationLogoUploadRequest: {
-            byte_size: number;
-            /** @enum {string} */
-            content_type: "image/png" | "image/jpeg" | "image/webp";
-        };
-        /** @description Stable machine-readable API failure with English compatibility copy. */
-        SemanticError: {
-            code: string;
-            error: string;
-            params?: {
+            execution_preview: {
                 [key: string]: unknown;
             };
+            formatted_source: string;
+            workout: {
+                [key: string]: unknown;
+            };
+        };
+        /** MyWorkoutInjuryWarnings */
+        MyWorkoutInjuryWarnings: {
+            /** @enum {string} */
+            level: "none" | "caution" | "avoid";
+            warnings: {
+                body_area: string;
+                exercises: {
+                    exercise_ref?: string | null;
+                    /** @enum {string} */
+                    level: "caution" | "avoid";
+                    /** @enum {string} */
+                    match: "catalog" | "name";
+                    name: string;
+                    patterns: string[];
+                }[];
+                /** Format: uuid */
+                injury_id: string;
+                /** @enum {string} */
+                level: "caution" | "avoid";
+                /** @enum {string} */
+                provenance: "organization" | "personal";
+                regions: ("shoulder" | "elbow" | "wrist" | "neck" | "back" | "hip" | "knee" | "hamstring" | "ankle" | "chest" | "core")[];
+                /** @enum {string} */
+                severity: "mild" | "moderate" | "severe";
+                tags: string[];
+                training_limitations?: string | null;
+                /** Format: uuid */
+                user_id: string;
+            }[];
+            /** Format: uuid */
+            workout_id: string;
         };
         /** TrainingLogCreateRequest */
         TrainingLogCreateRequest: {
@@ -3336,160 +3371,6 @@ export interface components {
             source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
             timezone?: string | null;
             title?: string | null;
-        };
-        /** TrainingLogEntry */
-        TrainingLogEntry: {
-            /** Format: uuid */
-            booking_id?: string | null;
-            duration_seconds?: number | null;
-            exercise_modifications: {
-                actual_value: string | number | boolean;
-                canonical_value: string | number | boolean;
-                exercise_id?: string | null;
-                exercise_name?: string | null;
-                field: string;
-                interval_index?: number | null;
-                note?: string | null;
-                patch_id: string;
-                round_index?: number | null;
-                row_index?: number | null;
-                section_id: string;
-                section_name?: string | null;
-                segment_key?: string | null;
-                set_index?: number | null;
-                type?: string;
-                unit?: string | null;
-            }[];
-            /** Format: uuid */
-            id: string;
-            idempotency_key?: string;
-            /** Format: date-time */
-            inserted_at?: string;
-            lock_version: number;
-            /** Format: uuid */
-            master_workout_id?: string | null;
-            notes?: string | null;
-            /** Format: uuid */
-            organization_id?: string;
-            perceived_effort?: number | null;
-            performed_at_tz?: string;
-            /** Format: date-time */
-            performed_at_utc: string;
-            performed_exercises: {
-                calories?: number | null;
-                distance?: number | null;
-                /** @enum {string|null} */
-                distance_unit?: "m" | "km" | "mi" | null;
-                duration_seconds?: number | null;
-                exercise_ref?: string | null;
-                load?: number | null;
-                /** @enum {string|null} */
-                load_unit?: "kg" | "lb" | null;
-                name: string;
-                note?: string | null;
-                reps?: number | null;
-                row_index?: number;
-                sets?: number | null;
-            }[];
-            scale_level_slug?: string | null;
-            section_scores: {
-                section_id: string;
-                unit?: string | null;
-                value: number | string;
-            }[];
-            /** Format: uuid */
-            source_reference_id?: string | null;
-            /** @enum {string} */
-            source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
-            /** @enum {string} */
-            status: "logged" | "voided";
-            title: string;
-            /** Format: date-time */
-            updated_at?: string;
-            /** Format: uuid */
-            user_id?: string;
-            void_reason?: string | null;
-            /** Format: date-time */
-            voided_at?: string | null;
-            workout_type?: string | null;
-        };
-        /** TrainingLogEntryCollection */
-        TrainingLogEntryCollection: {
-            entries: {
-                /** Format: uuid */
-                booking_id?: string | null;
-                duration_seconds?: number | null;
-                exercise_modifications: {
-                    actual_value: string | number | boolean;
-                    canonical_value: string | number | boolean;
-                    exercise_id?: string | null;
-                    exercise_name?: string | null;
-                    field: string;
-                    interval_index?: number | null;
-                    note?: string | null;
-                    patch_id: string;
-                    round_index?: number | null;
-                    row_index?: number | null;
-                    section_id: string;
-                    section_name?: string | null;
-                    segment_key?: string | null;
-                    set_index?: number | null;
-                    type?: string;
-                    unit?: string | null;
-                }[];
-                /** Format: uuid */
-                id: string;
-                idempotency_key?: string;
-                /** Format: date-time */
-                inserted_at?: string;
-                lock_version: number;
-                /** Format: uuid */
-                master_workout_id?: string | null;
-                notes?: string | null;
-                /** Format: uuid */
-                organization_id?: string;
-                perceived_effort?: number | null;
-                performed_at_tz?: string;
-                /** Format: date-time */
-                performed_at_utc: string;
-                performed_exercises: {
-                    calories?: number | null;
-                    distance?: number | null;
-                    /** @enum {string|null} */
-                    distance_unit?: "m" | "km" | "mi" | null;
-                    duration_seconds?: number | null;
-                    exercise_ref?: string | null;
-                    load?: number | null;
-                    /** @enum {string|null} */
-                    load_unit?: "kg" | "lb" | null;
-                    name: string;
-                    note?: string | null;
-                    reps?: number | null;
-                    row_index?: number;
-                    sets?: number | null;
-                }[];
-                scale_level_slug?: string | null;
-                section_scores: {
-                    section_id: string;
-                    unit?: string | null;
-                    value: number | string;
-                }[];
-                /** Format: uuid */
-                source_reference_id?: string | null;
-                /** @enum {string} */
-                source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
-                /** @enum {string} */
-                status: "logged" | "voided";
-                title: string;
-                /** Format: date-time */
-                updated_at?: string;
-                /** Format: uuid */
-                user_id?: string;
-                void_reason?: string | null;
-                /** Format: date-time */
-                voided_at?: string | null;
-                workout_type?: string | null;
-            }[];
         };
         /** TrainingLogEntryResponse */
         TrainingLogEntryResponse: {
@@ -3570,48 +3451,197 @@ export interface components {
                 workout_type?: string | null;
             };
         };
-        /** TrainingLogSources */
-        TrainingLogSources: {
-            assignments: {
-                /** Format: uuid */
-                id: string;
-                /** Format: date */
-                scheduled_for: string;
-                scoreable_sections: {
-                    id: string;
-                    name?: string | null;
-                    score_type?: string | null;
-                    unit?: string | null;
-                }[];
-                title: string;
-                /** Format: uuid */
-                workout_id?: string | null;
-                workout_title?: string | null;
-            }[];
-            classes: {
+        /** OrganizationLogoUploadRequest */
+        OrganizationLogoUploadRequest: {
+            byte_size: number;
+            /** @enum {string} */
+            content_type: "image/png" | "image/jpeg" | "image/webp";
+        };
+        /** TrainingLogEntryCollection */
+        TrainingLogEntryCollection: {
+            entries: {
                 /** Format: uuid */
                 booking_id?: string | null;
-                /** Format: uuid */
-                id: string;
-                /** Format: date-time */
-                scheduled_at: string;
-                scoreable_sections: {
-                    id: string;
-                    name?: string | null;
-                    score_type?: string | null;
+                duration_seconds?: number | null;
+                exercise_modifications: {
+                    actual_value: string | number | boolean;
+                    canonical_value: string | number | boolean;
+                    exercise_id?: string | null;
+                    exercise_name?: string | null;
+                    field: string;
+                    interval_index?: number | null;
+                    note?: string | null;
+                    patch_id: string;
+                    round_index?: number | null;
+                    row_index?: number | null;
+                    section_id: string;
+                    section_name?: string | null;
+                    segment_key?: string | null;
+                    set_index?: number | null;
+                    type?: string;
                     unit?: string | null;
                 }[];
-                title: string;
-                /** Format: uuid */
-                workout_id?: string | null;
-                workout_title?: string | null;
-            }[];
-            library_workouts: {
                 /** Format: uuid */
                 id: string;
+                idempotency_key?: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                lock_version: number;
+                /** Format: uuid */
+                master_workout_id?: string | null;
+                notes?: string | null;
+                /** Format: uuid */
+                organization_id?: string;
+                perceived_effort?: number | null;
+                performed_at_tz?: string;
+                /** Format: date-time */
+                performed_at_utc: string;
+                performed_exercises: {
+                    calories?: number | null;
+                    distance?: number | null;
+                    /** @enum {string|null} */
+                    distance_unit?: "m" | "km" | "mi" | null;
+                    duration_seconds?: number | null;
+                    exercise_ref?: string | null;
+                    load?: number | null;
+                    /** @enum {string|null} */
+                    load_unit?: "kg" | "lb" | null;
+                    name: string;
+                    note?: string | null;
+                    reps?: number | null;
+                    row_index?: number;
+                    sets?: number | null;
+                }[];
+                scale_level_slug?: string | null;
+                section_scores: {
+                    section_id: string;
+                    unit?: string | null;
+                    value: number | string;
+                }[];
+                /** Format: uuid */
+                source_reference_id?: string | null;
+                /** @enum {string} */
+                source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
+                /** @enum {string} */
+                status: "logged" | "voided";
                 title: string;
+                /** Format: date-time */
+                updated_at?: string;
+                /** Format: uuid */
+                user_id?: string;
+                void_reason?: string | null;
+                /** Format: date-time */
+                voided_at?: string | null;
                 workout_type?: string | null;
             }[];
+        };
+        /** OrganizationBrandingResponse */
+        OrganizationBrandingResponse: {
+            /** OrganizationBranding */
+            branding: {
+                /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
+                brand_logo_uploaded: boolean;
+                brand_logo_url: string | null;
+                brand_name?: string | null;
+                brand_primary_color?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+            };
+        };
+        /** OrganizationLogoFinalizeRequest */
+        OrganizationLogoFinalizeRequest: {
+            logo_key: string;
+        };
+        /** TrainingLogVoidRequest */
+        TrainingLogVoidRequest: {
+            expected_version?: number;
+            reason?: string | null;
+        };
+        /** MyInjuryWarningsAcknowledgement */
+        MyInjuryWarningsAcknowledgement: {
+            /** Format: uuid */
+            source_context_id?: string | null;
+            /** @enum {string|null} */
+            surface?: "assignment_detail" | "class_detail" | "pre_start" | null;
+        };
+        /** ExecutionInteractionEvent */
+        ExecutionInteractionEvent: {
+            /** Format: uuid */
+            client_event_id: string;
+            /** @enum {string} */
+            kind: "cast_mode_toggled" | "check_off_undone" | "cues_toggled" | "finish_wizard_abandoned" | "finish_wizard_opened" | "finish_wizard_saved" | "first_segment_started" | "pause" | "ready_screen_shown" | "resume" | "round_decremented" | "round_incremented" | "rounds_adjusted" | "segment_restarted" | "segment_skipped" | "time_adjusted" | "workout_launched";
+            /** @description Typed facts allowed for the interaction kind (see ADR-113). No free text; keys not allowed for the kind reject the batch. */
+            metadata?: {
+                countdown_seconds?: number;
+                /** @enum {string} */
+                cue_channel?: "sound" | "voice" | "vibration";
+                delta_rounds?: number;
+                delta_seconds?: number;
+                duration_ms?: number;
+                elapsed_ms?: number;
+                enabled?: boolean;
+                format?: string;
+                /** @enum {string} */
+                orientation?: "portrait" | "landscape";
+                remaining_ms?: number;
+                round_count?: number;
+                scored_section_count?: number;
+                section_id?: string;
+                segment_index?: number;
+                step?: number;
+                /** @enum {string} */
+                surface?: "pause_sheet" | "primary_action" | "header" | "gesture" | "keyboard" | "snackbar" | "ready_screen" | "finish_wizard" | "cast_display" | "lock_screen";
+            };
+            /** Format: date-time */
+            occurred_at: string;
+        };
+        /** WorkoutDslParseRequest */
+        WorkoutDslParseRequest: {
+            source: string;
+        };
+        /** AthleteInjuryWarningsRequest */
+        AthleteInjuryWarningsRequest: {
+            /** Format: uuid */
+            source_context_id?: string | null;
+            /** @enum {string|null} */
+            surface?: "assign_dialog" | "class_roster" | "member_dossier" | null;
+            user_ids: string[];
+            /** Format: uuid */
+            workout_id: string;
+        };
+        /** WorkoutDslDiagnosticResponse */
+        WorkoutDslDiagnosticResponse: {
+            diagnostics: {
+                code: string;
+                column: number;
+                line: number;
+                params: {
+                    [key: string]: unknown;
+                };
+                /** @enum {string} */
+                severity: "error" | "warning";
+            }[];
+        };
+        /** WorkoutDslDiagnostic */
+        WorkoutDslDiagnostic: {
+            code: string;
+            column: number;
+            line: number;
+            params: {
+                [key: string]: unknown;
+            };
+            /** @enum {string} */
+            severity: "error" | "warning";
+        };
+        /** OrganizationBranding */
+        OrganizationBranding: {
+            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
+            brand_logo_uploaded: boolean;
+            brand_logo_url: string | null;
+            brand_name?: string | null;
+            brand_primary_color?: string | null;
+            /** Format: uuid */
+            organization_id: string;
         };
         /** TrainingLogUpdateRequest */
         TrainingLogUpdateRequest: {
@@ -3664,105 +3694,6 @@ export interface components {
             timezone?: string | null;
             title?: string | null;
         };
-        /** TrainingLogVoidRequest */
-        TrainingLogVoidRequest: {
-            expected_version?: number;
-            reason?: string | null;
-        };
-        ValidationError: {
-            /** @enum {string} */
-            code: "validation_failed";
-            errors: {
-                [key: string]: unknown;
-            };
-        };
-        /** WorkoutDslAuthoringResponse */
-        WorkoutDslAuthoringResponse: {
-            /** @enum {string} */
-            authoring_mode: "structured" | "quick_text";
-            diagnostics: {
-                code: string;
-                column: number;
-                line: number;
-                params: {
-                    [key: string]: unknown;
-                };
-                /** @enum {string} */
-                severity: "error" | "warning";
-            }[];
-            document?: {
-                [key: string]: unknown;
-            } | null;
-            source: string;
-            source_revision: number;
-            /** @enum {integer} */
-            version: 1;
-        };
-        /** WorkoutDslDiagnostic */
-        WorkoutDslDiagnostic: {
-            code: string;
-            column: number;
-            line: number;
-            params: {
-                [key: string]: unknown;
-            };
-            /** @enum {string} */
-            severity: "error" | "warning";
-        };
-        /** WorkoutDslDiagnosticResponse */
-        WorkoutDslDiagnosticResponse: {
-            diagnostics: {
-                code: string;
-                column: number;
-                line: number;
-                params: {
-                    [key: string]: unknown;
-                };
-                /** @enum {string} */
-                severity: "error" | "warning";
-            }[];
-        };
-        /** WorkoutDslManualResponse */
-        WorkoutDslManualResponse: {
-            markdown: string;
-            templates: {
-                [key: string]: unknown;
-            };
-            /** @enum {integer} */
-            version: 1;
-            /** WorkoutDslVocabulary */
-            vocabulary: {
-                exercise_catalog: {
-                    aliases: string[];
-                    capabilities: string[];
-                    category: string;
-                    id: string;
-                    label: string;
-                }[];
-                exercise_parameters: string[];
-                format_aliases: {
-                    [key: string]: unknown;
-                };
-                format_specs: {
-                    [key: string]: unknown;
-                };
-                group_parameters: string[];
-                header_parameters: string[];
-                note_markers: string[];
-                scale_parameters: string[];
-                section_formats: string[];
-                section_parameters: {
-                    [key: string]: string[];
-                };
-                /** @enum {integer} */
-                version: 1;
-                workout_parameters: string[];
-            };
-        };
-        /** WorkoutDslParseRequest */
-        WorkoutDslParseRequest: {
-            source: string;
-        };
         /** WorkoutDslParseResponse */
         WorkoutDslParseResponse: {
             diagnostics: {
@@ -3810,35 +3741,99 @@ export interface components {
                 [key: string]: unknown;
             };
         };
-        /** WorkoutDslPublishRequest */
-        WorkoutDslPublishRequest: {
-            /** @default false */
-            acknowledge_warnings: boolean;
-            document?: {
-                [key: string]: unknown;
-            } | null;
-            expected_source_revision: number;
-            source: string;
-        };
-        /** WorkoutDslPublishResponse */
-        WorkoutDslPublishResponse: {
-            diagnostics: {
-                code: string;
-                column: number;
-                line: number;
-                params: {
-                    [key: string]: unknown;
-                };
-                /** @enum {string} */
-                severity: "error" | "warning";
+        /** TrainingLogEntry */
+        TrainingLogEntry: {
+            /** Format: uuid */
+            booking_id?: string | null;
+            duration_seconds?: number | null;
+            exercise_modifications: {
+                actual_value: string | number | boolean;
+                canonical_value: string | number | boolean;
+                exercise_id?: string | null;
+                exercise_name?: string | null;
+                field: string;
+                interval_index?: number | null;
+                note?: string | null;
+                patch_id: string;
+                round_index?: number | null;
+                row_index?: number | null;
+                section_id: string;
+                section_name?: string | null;
+                segment_key?: string | null;
+                set_index?: number | null;
+                type?: string;
+                unit?: string | null;
             }[];
-            execution_preview: {
+            /** Format: uuid */
+            id: string;
+            idempotency_key?: string;
+            /** Format: date-time */
+            inserted_at?: string;
+            lock_version: number;
+            /** Format: uuid */
+            master_workout_id?: string | null;
+            notes?: string | null;
+            /** Format: uuid */
+            organization_id?: string;
+            perceived_effort?: number | null;
+            performed_at_tz?: string;
+            /** Format: date-time */
+            performed_at_utc: string;
+            performed_exercises: {
+                calories?: number | null;
+                distance?: number | null;
+                /** @enum {string|null} */
+                distance_unit?: "m" | "km" | "mi" | null;
+                duration_seconds?: number | null;
+                exercise_ref?: string | null;
+                load?: number | null;
+                /** @enum {string|null} */
+                load_unit?: "kg" | "lb" | null;
+                name: string;
+                note?: string | null;
+                reps?: number | null;
+                row_index?: number;
+                sets?: number | null;
+            }[];
+            scale_level_slug?: string | null;
+            section_scores: {
+                section_id: string;
+                unit?: string | null;
+                value: number | string;
+            }[];
+            /** Format: uuid */
+            source_reference_id?: string | null;
+            /** @enum {string} */
+            source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
+            /** @enum {string} */
+            status: "logged" | "voided";
+            title: string;
+            /** Format: date-time */
+            updated_at?: string;
+            /** Format: uuid */
+            user_id?: string;
+            void_reason?: string | null;
+            /** Format: date-time */
+            voided_at?: string | null;
+            workout_type?: string | null;
+        };
+        /** @description Stable machine-readable API failure with English compatibility copy. */
+        SemanticError: {
+            code: string;
+            error: string;
+            params?: {
                 [key: string]: unknown;
             };
-            formatted_source: string;
-            workout: {
-                [key: string]: unknown;
+        };
+        /** OrganizationLogoUpload */
+        OrganizationLogoUpload: {
+            expires_in: number;
+            key: string;
+            max_bytes: number;
+            required_headers: {
+                [key: string]: string;
             };
+            upload_url: string;
         };
         /** WorkoutDslVocabulary */
         WorkoutDslVocabulary: {
@@ -3867,6 +3862,251 @@ export interface components {
             /** @enum {integer} */
             version: 1;
             workout_parameters: string[];
+        };
+        ValidationError: {
+            /** @enum {string} */
+            code: "validation_failed";
+            errors: {
+                [key: string]: unknown;
+            };
+        };
+        /** ExecutionInteractionBatch */
+        ExecutionInteractionBatch: {
+            events: {
+                /** Format: uuid */
+                client_event_id: string;
+                /** @enum {string} */
+                kind: "cast_mode_toggled" | "check_off_undone" | "cues_toggled" | "finish_wizard_abandoned" | "finish_wizard_opened" | "finish_wizard_saved" | "first_segment_started" | "pause" | "ready_screen_shown" | "resume" | "round_decremented" | "round_incremented" | "rounds_adjusted" | "segment_restarted" | "segment_skipped" | "time_adjusted" | "workout_launched";
+                /** @description Typed facts allowed for the interaction kind (see ADR-113). No free text; keys not allowed for the kind reject the batch. */
+                metadata?: {
+                    countdown_seconds?: number;
+                    /** @enum {string} */
+                    cue_channel?: "sound" | "voice" | "vibration";
+                    delta_rounds?: number;
+                    delta_seconds?: number;
+                    duration_ms?: number;
+                    elapsed_ms?: number;
+                    enabled?: boolean;
+                    format?: string;
+                    /** @enum {string} */
+                    orientation?: "portrait" | "landscape";
+                    remaining_ms?: number;
+                    round_count?: number;
+                    scored_section_count?: number;
+                    section_id?: string;
+                    segment_index?: number;
+                    step?: number;
+                    /** @enum {string} */
+                    surface?: "pause_sheet" | "primary_action" | "header" | "gesture" | "keyboard" | "snackbar" | "ready_screen" | "finish_wizard" | "cast_display" | "lock_screen";
+                };
+                /** Format: date-time */
+                occurred_at: string;
+            }[];
+        };
+        /** ExecutionInteractionBatchResult */
+        ExecutionInteractionBatchResult: {
+            accepted: number;
+            duplicates: number;
+        };
+        /** WorkoutDslAuthoringResponse */
+        WorkoutDslAuthoringResponse: {
+            /** @enum {string} */
+            authoring_mode: "structured" | "quick_text";
+            diagnostics: {
+                code: string;
+                column: number;
+                line: number;
+                params: {
+                    [key: string]: unknown;
+                };
+                /** @enum {string} */
+                severity: "error" | "warning";
+            }[];
+            document?: {
+                [key: string]: unknown;
+            } | null;
+            source: string;
+            source_revision: number;
+            /** @enum {integer} */
+            version: 1;
+        };
+        /** WorkoutDslPublishRequest */
+        WorkoutDslPublishRequest: {
+            /** @default false */
+            acknowledge_warnings: boolean;
+            document?: {
+                [key: string]: unknown;
+            } | null;
+            expected_source_revision: number;
+            source: string;
+        };
+        /** WorkoutDslManualResponse */
+        WorkoutDslManualResponse: {
+            markdown: string;
+            templates: {
+                [key: string]: unknown;
+            };
+            /** @enum {integer} */
+            version: 1;
+            /** WorkoutDslVocabulary */
+            vocabulary: {
+                exercise_catalog: {
+                    aliases: string[];
+                    capabilities: string[];
+                    category: string;
+                    id: string;
+                    label: string;
+                }[];
+                exercise_parameters: string[];
+                format_aliases: {
+                    [key: string]: unknown;
+                };
+                format_specs: {
+                    [key: string]: unknown;
+                };
+                group_parameters: string[];
+                header_parameters: string[];
+                note_markers: string[];
+                scale_parameters: string[];
+                section_formats: string[];
+                section_parameters: {
+                    [key: string]: string[];
+                };
+                /** @enum {integer} */
+                version: 1;
+                workout_parameters: string[];
+            };
+        };
+        /** ClassSlotInjuryWarnings */
+        ClassSlotInjuryWarnings: {
+            athletes: {
+                /** @enum {string} */
+                level: "none" | "caution" | "avoid";
+                /** Format: uuid */
+                user_id: string;
+                warnings: {
+                    body_area: string;
+                    exercises: {
+                        exercise_ref?: string | null;
+                        /** @enum {string} */
+                        level: "caution" | "avoid";
+                        /** @enum {string} */
+                        match: "catalog" | "name";
+                        name: string;
+                        patterns: string[];
+                    }[];
+                    /** Format: uuid */
+                    injury_id: string;
+                    /** @enum {string} */
+                    level: "caution" | "avoid";
+                    /** @enum {string} */
+                    provenance: "organization" | "personal";
+                    regions: ("shoulder" | "elbow" | "wrist" | "neck" | "back" | "hip" | "knee" | "hamstring" | "ankle" | "chest" | "core")[];
+                    /** @enum {string} */
+                    severity: "mild" | "moderate" | "severe";
+                    tags: string[];
+                    training_limitations?: string | null;
+                    /** Format: uuid */
+                    user_id: string;
+                }[];
+            }[];
+            /** @enum {string} */
+            level: "none" | "caution" | "avoid";
+            /** Format: uuid */
+            slot_id: string;
+            /** Format: uuid */
+            workout_id?: string | null;
+        };
+        /** AthleteInjuryWarnings */
+        AthleteInjuryWarnings: {
+            athletes: {
+                /** @enum {string} */
+                level: "none" | "caution" | "avoid";
+                /** Format: uuid */
+                user_id: string;
+                warnings: {
+                    body_area: string;
+                    exercises: {
+                        exercise_ref?: string | null;
+                        /** @enum {string} */
+                        level: "caution" | "avoid";
+                        /** @enum {string} */
+                        match: "catalog" | "name";
+                        name: string;
+                        patterns: string[];
+                    }[];
+                    /** Format: uuid */
+                    injury_id: string;
+                    /** @enum {string} */
+                    level: "caution" | "avoid";
+                    /** @enum {string} */
+                    provenance: "organization" | "personal";
+                    regions: ("shoulder" | "elbow" | "wrist" | "neck" | "back" | "hip" | "knee" | "hamstring" | "ankle" | "chest" | "core")[];
+                    /** @enum {string} */
+                    severity: "mild" | "moderate" | "severe";
+                    tags: string[];
+                    training_limitations?: string | null;
+                    /** Format: uuid */
+                    user_id: string;
+                }[];
+            }[];
+            /** @enum {string} */
+            level: "none" | "caution" | "avoid";
+            /** Format: uuid */
+            workout_id: string;
+        };
+        /** TrainingLogSources */
+        TrainingLogSources: {
+            assignments: {
+                /** Format: uuid */
+                id: string;
+                /** Format: date */
+                scheduled_for: string;
+                scoreable_sections: {
+                    id: string;
+                    name?: string | null;
+                    score_type?: string | null;
+                    unit?: string | null;
+                }[];
+                title: string;
+                /** Format: uuid */
+                workout_id?: string | null;
+                workout_title?: string | null;
+            }[];
+            classes: {
+                /** Format: uuid */
+                booking_id?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                scheduled_at: string;
+                scoreable_sections: {
+                    id: string;
+                    name?: string | null;
+                    score_type?: string | null;
+                    unit?: string | null;
+                }[];
+                title: string;
+                /** Format: uuid */
+                workout_id?: string | null;
+                workout_title?: string | null;
+            }[];
+            library_workouts: {
+                /** Format: uuid */
+                id: string;
+                title: string;
+                workout_type?: string | null;
+            }[];
+        };
+        /** AthleteInjuryWarningsAcknowledged */
+        AthleteInjuryWarningsAcknowledged: {
+            acknowledged_count: number;
+        };
+        /** MyInjuryWarningsAcknowledged */
+        MyInjuryWarningsAcknowledged: {
+            /** @enum {string} */
+            level: "none" | "caution" | "avoid";
+            warning_count: number;
         };
     };
     responses: never;
@@ -9832,6 +10072,66 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminInjuryWarningController.slot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Injury warnings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        athletes: {
+                            /** @enum {string} */
+                            level: "none" | "caution" | "avoid";
+                            /** Format: uuid */
+                            user_id: string;
+                            warnings: {
+                                body_area: string;
+                                exercises: {
+                                    exercise_ref?: string | null;
+                                    /** @enum {string} */
+                                    level: "caution" | "avoid";
+                                    /** @enum {string} */
+                                    match: "catalog" | "name";
+                                    name: string;
+                                    patterns: string[];
+                                }[];
+                                /** Format: uuid */
+                                injury_id: string;
+                                /** @enum {string} */
+                                level: "caution" | "avoid";
+                                /** @enum {string} */
+                                provenance: "organization" | "personal";
+                                regions: ("shoulder" | "elbow" | "wrist" | "neck" | "back" | "hip" | "knee" | "hamstring" | "ankle" | "chest" | "core")[];
+                                /** @enum {string} */
+                                severity: "mild" | "moderate" | "severe";
+                                tags: string[];
+                                training_limitations?: string | null;
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
+                        }[];
+                        /** @enum {string} */
+                        level: "none" | "caution" | "avoid";
+                        /** Format: uuid */
+                        slot_id: string;
+                        /** Format: uuid */
+                        workout_id?: string | null;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.PlatformOrganizationController.membership_role": {
         parameters: {
             query?: never;
@@ -10109,7 +10409,7 @@ export interface operations {
                     "application/json": {
                         /** OrganizationBranding */
                         branding: {
-                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
                             brand_logo_uploaded: boolean;
                             brand_logo_url: string | null;
                             brand_name?: string | null;
@@ -10142,7 +10442,7 @@ export interface operations {
                     "application/json": {
                         /** OrganizationBranding */
                         branding: {
-                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
                             brand_logo_uploaded: boolean;
                             brand_logo_url: string | null;
                             brand_name?: string | null;
@@ -12890,7 +13190,7 @@ export interface operations {
                     "application/json": {
                         /** OrganizationBranding */
                         branding: {
-                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
                             brand_logo_uploaded: boolean;
                             brand_logo_url: string | null;
                             brand_name?: string | null;
@@ -12971,11 +13271,17 @@ export interface operations {
             content: {
                 "application/json": {
                     admin_notes?: string;
+                    /** @description Assignee user ids (athletes or members). */
                     athlete_ids: string[];
                     /** Format: uuid */
                     master_workout_id: string;
                     /** Format: date */
                     scheduled_for: string;
+                    /**
+                     * Format: uuid
+                     * @description Class occurrence this assignment is a member's version of (ADR-115).
+                     */
+                    source_slot_id?: string | null;
                 };
             };
         };
@@ -13354,7 +13660,7 @@ export interface operations {
                         client_event_id: string;
                         /** @enum {string} */
                         kind: "cast_mode_toggled" | "check_off_undone" | "cues_toggled" | "finish_wizard_abandoned" | "finish_wizard_opened" | "finish_wizard_saved" | "first_segment_started" | "pause" | "ready_screen_shown" | "resume" | "round_decremented" | "round_incremented" | "rounds_adjusted" | "segment_restarted" | "segment_skipped" | "time_adjusted" | "workout_launched";
-                        /** @description Typed facts allowed for the interaction kind (see ADR-105). No free text; keys not allowed for the kind reject the batch. */
+                        /** @description Typed facts allowed for the interaction kind (see ADR-113). No free text; keys not allowed for the kind reject the batch. */
                         metadata?: {
                             countdown_seconds?: number;
                             /** @enum {string} */
@@ -14384,6 +14690,41 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.MyInjuryWarningController.acknowledge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workout_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    source_context_id?: string | null;
+                    /** @enum {string|null} */
+                    surface?: "assignment_detail" | "class_detail" | "pre_start" | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Acknowledged */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        level: "none" | "caution" | "avoid";
+                        warning_count: number;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.PlatformOrganizationController.invite": {
         parameters: {
             query?: never;
@@ -15288,6 +15629,61 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.MyInjuryWarningController.show": {
+        parameters: {
+            query?: {
+                surface?: "assignment_detail" | "class_detail" | "pre_start";
+                source_context_id?: string;
+            };
+            header?: never;
+            path: {
+                workout_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Injury warnings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        level: "none" | "caution" | "avoid";
+                        warnings: {
+                            body_area: string;
+                            exercises: {
+                                exercise_ref?: string | null;
+                                /** @enum {string} */
+                                level: "caution" | "avoid";
+                                /** @enum {string} */
+                                match: "catalog" | "name";
+                                name: string;
+                                patterns: string[];
+                            }[];
+                            /** Format: uuid */
+                            injury_id: string;
+                            /** @enum {string} */
+                            level: "caution" | "avoid";
+                            /** @enum {string} */
+                            provenance: "organization" | "personal";
+                            regions: ("shoulder" | "elbow" | "wrist" | "neck" | "back" | "hip" | "knee" | "hamstring" | "ankle" | "chest" | "core")[];
+                            /** @enum {string} */
+                            severity: "mild" | "moderate" | "severe";
+                            tags: string[];
+                            training_limitations?: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                        /** Format: uuid */
+                        workout_id: string;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.MeController.update_profile": {
         parameters: {
             query?: never;
@@ -15651,7 +16047,7 @@ export interface operations {
                     "application/json": {
                         /** OrganizationBranding */
                         branding: {
-                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
                             brand_logo_uploaded: boolean;
                             brand_logo_url: string | null;
                             brand_name?: string | null;
@@ -15682,7 +16078,7 @@ export interface operations {
                     "application/json": {
                         /** OrganizationBranding */
                         branding: {
-                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
                             brand_logo_uploaded: boolean;
                             brand_logo_url: string | null;
                             brand_name?: string | null;
@@ -15892,7 +16288,7 @@ export interface operations {
                     admin_message?: string;
                     /**
                      * Format: uuid
-                     * @description Stable client operation id (ADR-102). Replaying the operation that already resolved the booking returns it with 200 and no new notification.
+                     * @description Stable client operation id (ADR-110). Replaying the operation that already resolved the booking returns it with 200 and no new notification.
                      */
                     client_operation_id?: string | null;
                 };
@@ -15965,7 +16361,7 @@ export interface operations {
                     admin_message?: string;
                     /**
                      * Format: uuid
-                     * @description Stable client operation id (ADR-102). Replaying the operation that already resolved the booking returns it with 200 and no new notification.
+                     * @description Stable client operation id (ADR-110). Replaying the operation that already resolved the booking returns it with 200 and no new notification.
                      */
                     client_operation_id?: string | null;
                 };
@@ -16360,6 +16756,108 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminInjuryWarningController.evaluate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    source_context_id?: string | null;
+                    /** @enum {string|null} */
+                    surface?: "assign_dialog" | "class_roster" | "member_dossier" | null;
+                    user_ids: string[];
+                    /** Format: uuid */
+                    workout_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Injury warnings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        athletes: {
+                            /** @enum {string} */
+                            level: "none" | "caution" | "avoid";
+                            /** Format: uuid */
+                            user_id: string;
+                            warnings: {
+                                body_area: string;
+                                exercises: {
+                                    exercise_ref?: string | null;
+                                    /** @enum {string} */
+                                    level: "caution" | "avoid";
+                                    /** @enum {string} */
+                                    match: "catalog" | "name";
+                                    name: string;
+                                    patterns: string[];
+                                }[];
+                                /** Format: uuid */
+                                injury_id: string;
+                                /** @enum {string} */
+                                level: "caution" | "avoid";
+                                /** @enum {string} */
+                                provenance: "organization" | "personal";
+                                regions: ("shoulder" | "elbow" | "wrist" | "neck" | "back" | "hip" | "knee" | "hamstring" | "ankle" | "chest" | "core")[];
+                                /** @enum {string} */
+                                severity: "mild" | "moderate" | "severe";
+                                tags: string[];
+                                training_limitations?: string | null;
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
+                        }[];
+                        /** @enum {string} */
+                        level: "none" | "caution" | "avoid";
+                        /** Format: uuid */
+                        workout_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminInjuryWarningController.acknowledge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    source_context_id?: string | null;
+                    /** @enum {string|null} */
+                    surface?: "assign_dialog" | "class_roster" | "member_dossier" | null;
+                    user_ids: string[];
+                    /** Format: uuid */
+                    workout_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Acknowledged */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        acknowledged_count: number;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminWorkoutFolderController.index": {
         parameters: {
             query?: never;
@@ -16444,7 +16942,12 @@ export interface operations {
                     /** Format: uuid */
                     folder_id: string;
                     /** Format: uuid */
-                    master_workout_id: string;
+                    master_workout_id?: string;
+                    /**
+                     * @description Member programming mode (ADR-115; ignored for athletes). `class_workout` (default) replaces the booked class's workout for everyone; `class_variant` assigns this member's own version of the booked class (source defaults to the class's workout when `master_workout_id` is omitted); `personal` assigns a personal workout without a class. Both assignment modes require the member's package to include personal programming.
+                     * @enum {string}
+                     */
+                    mode?: "class_workout" | "class_variant" | "personal";
                     /** Format: date */
                     scheduled_for: string;
                     slot_id?: string | null;
@@ -17401,6 +17904,8 @@ export interface operations {
         parameters: {
             query?: {
                 q?: string;
+                /** @description Also list active members (who may receive personal programming when their package allows it). */
+                include_members?: boolean;
             };
             header?: never;
             path?: never;

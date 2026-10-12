@@ -1,6 +1,6 @@
 defmodule MilosTraining.Organizations.Commands.RenameOrganizationSlug do
   @moduledoc """
-  ADR-104: vendor-only rename of an organization's path slug.
+  ADR-112: vendor-only rename of an organization's path slug.
 
   The previous slug is kept as an `organization_slug_aliases` row so existing
   links keep working, and the rename, alias bookkeeping and audit event commit

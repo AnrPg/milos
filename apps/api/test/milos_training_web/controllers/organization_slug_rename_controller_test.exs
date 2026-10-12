@@ -1,5 +1,5 @@
 defmodule MilosTrainingWeb.OrganizationSlugRenameControllerTest do
-  @moduledoc "ADR-104: platform slug rename endpoints and API tenant resolution by a retired slug."
+  @moduledoc "ADR-112: platform slug rename endpoints and API tenant resolution by a retired slug."
   use MilosTrainingWeb.ConnCase, async: false
 
   import Ecto.Query

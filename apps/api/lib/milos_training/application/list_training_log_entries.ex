@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.ListTrainingLogEntries do
-  @moduledoc "Lists the acting user's training-log entries in the tenant (ADR-100)."
+  @moduledoc "Lists the acting user's training-log entries in the tenant (ADR-108)."
 
   alias MilosTraining.Execution
 

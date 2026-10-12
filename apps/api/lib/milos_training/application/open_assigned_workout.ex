@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.OpenAssignedWorkout do
   @moduledoc """
-  Records that an athlete opened an assignment's detail (ADR-105).
+  Records that an athlete opened an assignment's detail (ADR-113).
 
   There is no server read path for a single assignment - the week view lists
   them and the detail sheet opens client-side - so the client reports the

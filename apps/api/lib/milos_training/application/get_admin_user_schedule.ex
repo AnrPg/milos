@@ -30,8 +30,16 @@ defmodule MilosTraining.Application.GetAdminUserSchedule do
     start_at = DateTime.new!(start_date, ~T[00:00:00], "Etc/UTC")
     end_at = end_date |> Date.add(1) |> DateTime.new!(~T[00:00:00], "Etc/UTC")
 
-    Scheduling.list_member_slots(context, id, start_at, end_at)
-    |> Enum.map(&Map.put(&1, :kind, "class"))
+    classes =
+      Scheduling.list_member_slots(context, id, start_at, end_at)
+      |> Enum.map(&Map.put(&1, :kind, "class"))
+
+    # ADR-115: members may also hold personal assignments and class variants.
+    assignments =
+      Workouts.list_assigned_workouts_for_athlete(context, id, start_date, end_date)
+      |> Enum.map(&Map.put(&1, :kind, "assignment"))
+
+    classes ++ assignments
   end
 
   defp items(_context, _user, _start_date, _end_date), do: []

@@ -1,4 +1,4 @@
-# ADR-098: Observability dashboards and alerting profile
+# ADR-106: Observability dashboards and alerting profile
 Date: 2026-10-12
 Status: Accepted
 

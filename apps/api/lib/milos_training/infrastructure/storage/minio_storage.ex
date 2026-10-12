@@ -10,7 +10,7 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
   @allowed_avatar_types ~w(image/jpeg image/png image/webp image/gif image/bmp image/avif)
   @delete_batch_size 1_000
 
-  # --- ADR-099 tenant object inventory/cleanup -------------------------------
+  # --- ADR-107 tenant object inventory/cleanup -------------------------------
 
   @impl MilosTraining.Application.Ports.TenantObjectStore
   def put_object(bucket, key, body, content_type) when is_binary(key) and is_binary(body) do
@@ -67,7 +67,7 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
     )
   end
 
-  # ADR-103: tenant logos share the public media (avatar) bucket; the bucket
+  # ADR-111: tenant logos share the public media (avatar) bucket; the bucket
   # policy makes only `organizations/*/branding/logo/*` publicly readable.
   @impl MilosTraining.Application.Ports.TenantObjectStore
   def presigned_upload(bucket, key, content_type) when is_binary(key) do
@@ -465,7 +465,7 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
   end
 
   @doc false
-  # Anonymous reads are limited to avatars and (ADR-103) tenant logos; every
+  # Anonymous reads are limited to avatars and (ADR-111) tenant logos; every
   # other key in the public media bucket stays private.
   def public_read_policy(bucket) do
     %{

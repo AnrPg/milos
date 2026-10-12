@@ -1,6 +1,7 @@
 defmodule MilosTraining.Application.CompleteWorkout do
   alias MilosTraining.Application.{
     BroadcastUserSync,
+    InjuryWarningEvaluation,
     InvalidateLandingPages,
     TenantStaffRecipients,
     TrackAnalyticsEvent
@@ -19,7 +20,7 @@ defmodule MilosTraining.Application.CompleteWorkout do
 
   def call(execution_id, user_id, params) do
     with {:ok, current_execution} <- fetch_execution(execution_id, user_id),
-         {:ok, segments} <- timer_sequence_for_execution(current_execution),
+         {:ok, segments, workout} <- timer_sequence_for_execution(current_execution),
          {:ok, execution} <-
            Execution.complete_execution(
              execution_id,
@@ -32,7 +33,10 @@ defmodule MilosTraining.Application.CompleteWorkout do
 
       TrackAnalyticsEvent.call("workout_execution_completed", nil, execution, %{
         user_id: user_id,
-        metadata: Execution.completion_analytics_facts(execution, segments)
+        metadata:
+          execution
+          |> Execution.completion_analytics_facts(segments)
+          |> Map.merge(InjuryWarningEvaluation.completion_facts(execution, workout))
       })
 
       {:ok, execution}
@@ -43,7 +47,7 @@ defmodule MilosTraining.Application.CompleteWorkout do
     account = Identity.find_by_id(user_id)
     settings = Gamification.get_settings()
 
-    # ADR-100: live standalone training-log entries count as completions next
+    # ADR-108: live standalone training-log entries count as completions next
     # to finished executions, so streaks, totals, badges and challenges see
     # class/offline workouts too. Voided entries are excluded here, which is
     # how a void stops counting on the next projection run.
@@ -93,7 +97,7 @@ defmodule MilosTraining.Application.CompleteWorkout do
 
   @doc """
   Runs the completion projection for a standalone training-log entry
-  (ADR-100). Voided entries are a no-op so a late job never crashes or
+  (ADR-108). Voided entries are a no-op so a late job never crashes or
   counts them.
   """
   def process_training_log_completion(entry) do
@@ -163,7 +167,7 @@ defmodule MilosTraining.Application.CompleteWorkout do
     end
   end
 
-  defp timer_sequence_for_execution(%{master_workout_id: nil}), do: {:ok, []}
+  defp timer_sequence_for_execution(%{master_workout_id: nil}), do: {:ok, [], nil}
 
   defp timer_sequence_for_execution(%{
          master_workout_id: workout_id,
@@ -178,8 +182,8 @@ defmodule MilosTraining.Application.CompleteWorkout do
     # instead of silently completing against zero timer segments.
     Workouts.with_tenant_context(%{organization_id: organization_id, user_id: user_id}, fn ->
       case resolve_workout(workout_id, scale_slug) do
-        nil -> {:ok, []}
-        workout -> {:ok, Execution.build_timer_sequence(workout)}
+        nil -> {:ok, [], nil}
+        workout -> {:ok, Execution.build_timer_sequence(workout), workout}
       end
     end)
   end

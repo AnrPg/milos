@@ -143,19 +143,29 @@ export function fetchAdminUserSchedule(token: string, userId: string, startDate:
   return apiRequest<AdminUserSchedule>(`/admin/users/${userId}/schedule?${query}`, { token });
 }
 
+/**
+ * ADR-115 member programming modes: replace the booked class's workout for
+ * everyone (ADR-071 default), create this member's own version of the class,
+ * or assign a personal workout without a class.
+ */
+export type MemberProgrammingMode = "class_workout" | "class_variant" | "personal";
+
 export function programAdminUserWorkout(
   token: string,
   userId: string,
   body: {
-    master_workout_id: string;
+    /** Optional only for a member `class_variant` (defaults to the class's workout). */
+    master_workout_id?: string;
     folder_id: string | null;
     scheduled_for: string;
     slot_id?: string | null;
     copy_source: boolean;
     admin_notes?: string;
+    /** ADR-115 member programming mode; ignored for athletes. */
+    mode?: MemberProgrammingMode;
   },
 ) {
-  return apiRequest<{ workout: Record<string, unknown>; association: Record<string, unknown> }>(
+  return apiRequest<{ workout: Record<string, unknown>; association: Record<string, unknown>; mode?: string }>(
     `/admin/users/${userId}/programming`,
     { token, method: "POST", body },
   );

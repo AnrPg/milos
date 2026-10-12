@@ -1,6 +1,6 @@
 defmodule MilosTraining.Infrastructure.TenantData.EctoTableStore do
   @moduledoc """
-  Ecto adapter executing context-declared tenant table specs (ADR-099).
+  Ecto adapter executing context-declared tenant table specs (ADR-107).
 
   Deletes use Ecto `delete_all` (no raw SQL mutation). Exports reuse the same
   Ecto predicate for the id set and wrap it in `row_to_json` so every column is

@@ -1,5 +1,5 @@
 defmodule MilosTrainingWeb.Schemas.OrganizationBranding do
-  @moduledoc "OpenAPI schemas and serialization for tenant logo upload (ADR-103)."
+  @moduledoc "OpenAPI schemas and serialization for tenant logo upload (ADR-111)."
 
   alias OpenApiSpex.Schema
 
@@ -56,7 +56,7 @@ defmodule MilosTrainingWeb.Schemas.OrganizationBranding do
         brand_logo_uploaded: %Schema{
           type: :boolean,
           description:
-            "True when brand_logo_url is derived from an uploaded logo object (ADR-103)."
+            "True when brand_logo_url is derived from an uploaded logo object (ADR-111)."
         },
         brand_primary_color: %Schema{type: :string, nullable: true}
       }

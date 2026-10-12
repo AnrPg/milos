@@ -1,4 +1,4 @@
-# Observability profile (TD-031 / ADR-098)
+# Observability profile (TD-031 / ADR-106)
 
 An opt-in Docker Compose profile that turns the API's telemetry into
 dashboards and alerts using only free/open-source components:

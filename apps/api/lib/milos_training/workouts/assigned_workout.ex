@@ -11,6 +11,9 @@ defmodule MilosTraining.Workouts.AssignedWorkout do
     field :organization_id, :binary_id
     field :scheduled_for, :date
     field :admin_notes, :string
+    # ADR-115: set when the assignment is a per-member variant of a class
+    # occurrence (loose reference to a Scheduling-owned scheduled class).
+    field :source_scheduled_class_id, :binary_id
 
     belongs_to :master_workout, MasterWorkout
     has_many :athlete_links, AssignedWorkoutAthlete
@@ -20,7 +23,13 @@ defmodule MilosTraining.Workouts.AssignedWorkout do
 
   def changeset(assignment \\ %__MODULE__{}, params) do
     assignment
-    |> cast(params, [:organization_id, :master_workout_id, :scheduled_for, :admin_notes])
+    |> cast(params, [
+      :organization_id,
+      :master_workout_id,
+      :scheduled_for,
+      :admin_notes,
+      :source_scheduled_class_id
+    ])
     |> update_change(:admin_notes, &normalize_admin_notes/1)
     |> validate_required([:organization_id, :master_workout_id, :scheduled_for])
     |> foreign_key_constraint(:master_workout_id)

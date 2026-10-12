@@ -1,6 +1,6 @@
 defmodule MilosTraining.Organizations.Commands.AdvanceOrganizationPurge do
   @moduledoc """
-  Moves a purge record through the ADR-099 state machine. Every transition
+  Moves a purge record through the ADR-107 state machine. Every transition
   locks the purge row inside a vendor-scoped RepoContext and validates the
   event against `Domain.PurgePolicy` before persisting.
   """

@@ -1,9 +1,11 @@
 defmodule MilosTraining.Wellbeing do
   alias MilosTraining.Wellbeing.Commands.{MarkHealed, ReportInjury}
+  alias MilosTraining.Wellbeing.Domain.InjuryRiskPolicy
 
   alias MilosTraining.Wellbeing.Queries.{
     GetInjuryForUser,
     InjurySummary,
+    ListActiveInjuriesForUsers,
     ListInjuries,
     ListInjuriesForUser
   }
@@ -24,7 +26,20 @@ defmodule MilosTraining.Wellbeing do
   defdelegate list_injuries(filters \\ %{}), to: ListInjuries, as: :call
   defdelegate injury_summary(filters \\ %{}), to: InjurySummary, as: :call
 
-  # ADR-099 reviewed tenant export/purge. This context owns its table list and
+  # ADR-114 injury-aware workout safety warnings.
+  defdelegate list_active_injuries_for_users(user_ids),
+    to: ListActiveInjuriesForUsers,
+    as: :call
+
+  @doc "Own active injuries the user may see (incl. personal self-reports)."
+  def list_active_injuries_for_user(user_id),
+    do: user_id |> list_injuries_for_user() |> Enum.filter(&(&1.status == "active"))
+
+  defdelegate evaluate_injury_risk(injuries, exercises), to: InjuryRiskPolicy, as: :evaluate
+  defdelegate injury_risk_analytics_facts(evaluation), to: InjuryRiskPolicy, as: :analytics_facts
+  defdelegate max_injury_warning_level(levels), to: InjuryRiskPolicy, as: :max_level
+
+  # ADR-107 reviewed tenant export/purge. This context owns its table list and
   # retention policy; the shared executor only runs what this policy declares,
   # always inside a RepoContext session for the purge's tenant.
   def tenant_data_policy, do: MilosTraining.Wellbeing.Domain.TenantDataPolicy.policy()

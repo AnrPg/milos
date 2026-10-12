@@ -1,4 +1,4 @@
-// ADR-104: retired organization slugs. The web proxy issues a 308 from
+// ADR-112: retired organization slugs. The web proxy issues a 308 from
 // `/org/<retired>/...` to `/org/<canonical>/...` after asking the API which
 // canonical slug replaced a retired one. Lookups are best-effort: on any
 // failure the request proceeds unchanged, and the API still resolves the

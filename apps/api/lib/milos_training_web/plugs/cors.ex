@@ -72,7 +72,7 @@ defmodule MilosTrainingWeb.Plugs.Cors do
       |> put_resp_header("access-control-allow-origin", origin)
       |> put_resp_header("access-control-allow-methods", @allowed_methods)
       |> put_resp_header("access-control-allow-headers", @default_allowed_headers)
-      # ADR-104: lets cross-origin dev clients read the retired-slug signal.
+      # ADR-112: lets cross-origin dev clients read the retired-slug signal.
       |> put_resp_header("access-control-expose-headers", "x-organization-canonical-slug")
       |> put_resp_header("vary", "Origin")
     end)

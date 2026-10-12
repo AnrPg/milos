@@ -1,7 +1,7 @@
 defmodule MilosTraining.Repo.Migrations.CreateOrganizationPurges do
   use Ecto.Migration
 
-  # ADR-099: the reviewed tenant export/purge workflow keeps one platform-level
+  # ADR-107: the reviewed tenant export/purge workflow keeps one platform-level
   # record per purge request. The record must outlive the organization it
   # describes, so `organization_id` deliberately carries no foreign key (a
   # cascade would erase the audit trail together with the tenant) and the

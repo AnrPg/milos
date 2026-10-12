@@ -52,7 +52,7 @@ defmodule MilosTraining.Execution do
   defdelegate build_timer_sequence(workout), to: TimerSequenceBuilder, as: :build
   defdelegate preview_timer_sequence(workout), to: TimerSequenceBuilder, as: :preview
 
-  # -- Analytics facts (ADR-105) ----------------------------------------------
+  # -- Analytics facts (ADR-113) ----------------------------------------------
 
   def with_execution_context(context, fun), do: ExecutionStore.with_user_context(context, fun)
 
@@ -73,7 +73,7 @@ defmodule MilosTraining.Execution do
     to: ExecutionAnalytics,
     as: :abandoned?
 
-  # -- Standalone training log (ADR-100) -------------------------------------
+  # -- Standalone training log (ADR-108) -------------------------------------
 
   def with_training_log_context(context, fun),
     do: TrainingLogStore.with_tenant_context(context, fun)
@@ -131,7 +131,7 @@ defmodule MilosTraining.Execution do
     to: TrainingLogPolicy,
     as: :scoreable_sections
 
-  # ADR-099 reviewed tenant export/purge. This context owns its table list and
+  # ADR-107 reviewed tenant export/purge. This context owns its table list and
   # retention policy; the shared executor only runs what this policy declares,
   # always inside a RepoContext session for the purge's tenant.
   def tenant_data_policy, do: MilosTraining.Execution.Domain.TenantDataPolicy.policy()

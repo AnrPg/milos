@@ -146,17 +146,22 @@ type ActiveDrag = {
 
 type Props = {
   embedded?: boolean;
+  /**
+   * Embedded only: resume this existing draft instead of creating a new one
+   * (ADR-115: a member's version duplicated from a class workout).
+   */
+  initialDraftId?: string | null;
   onCancel?: () => void;
   onPublished?: (workout: WorkoutRecord) => void;
 };
 
-export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished }: Props) {
+export function WorkoutCreationCanvas({ embedded = false, initialDraftId = null, onCancel, onPublished }: Props) {
   const i18n = useUiTranslations();
   const { tokens } = useSession();
   const router = useRouter();
   const organizationSlug = useOrganizationSlug();
   const searchParams = useSearchParams();
-  const urlDraftId = embedded ? null : searchParams.get("draft");
+  const urlDraftId = embedded ? initialDraftId : searchParams.get("draft");
   const draftId = useWorkoutCreationStore((state) => state.draftId);
   const initDraft = useWorkoutCreationStore((state) => state.initDraft);
   const resetDraft = useWorkoutCreationStore((state) => state.resetDraft);

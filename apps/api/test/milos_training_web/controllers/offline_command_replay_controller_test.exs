@@ -1,6 +1,6 @@
 defmodule MilosTrainingWeb.OfflineCommandReplayControllerTest do
   @moduledoc """
-  ADR-102 HTTP contract for the explicitly opted-in offline outbox commands:
+  ADR-110 HTTP contract for the explicitly opted-in offline outbox commands:
   member booking request, admin booking approval/rejection, and training-log
   entry creation. Replays converge on the original result; conflicts are
   deterministic 409s the client surfaces instead of replaying.

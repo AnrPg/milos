@@ -1,7 +1,7 @@
 {
   "uid": "milos-operations",
   "title": "Milos Training - Operations",
-  "description": "TD-031 / ADR-098: traces, readiness, outbox, Oban, auth anomalies, cache, uploads.",
+  "description": "TD-031 / ADR-106: traces, readiness, outbox, Oban, auth anomalies, cache, uploads.",
   "tags": [
     "milos",
     "td-031"

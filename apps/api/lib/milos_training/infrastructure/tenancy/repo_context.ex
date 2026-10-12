@@ -23,7 +23,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.RepoContext do
     with_settings(contextual_settings(context), fun)
   end
 
-  # ADR-104: the unauthenticated retired-slug lookup behind the web proxy's
+  # ADR-112: the unauthenticated retired-slug lookup behind the web proxy's
   # 308 redirect. Its policies are SELECT-only and only ever answer which
   # canonical slug replaced a retired one. Set only by ResolveSlugAlias.
   def run(%{slug_alias_lookup: true} = context, fun) when is_function(fun, 0) do

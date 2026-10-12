@@ -8,7 +8,7 @@ defmodule MilosTraining.Analytics.Domain.EventCatalogTest do
   @subject "33333333-3333-3333-3333-333333333333"
   @at ~U[2026-10-12 08:30:00.000000Z]
 
-  test "registry keeps the Phase 8 events and adds the ADR-105 families" do
+  test "registry keeps the Phase 8 events and adds the ADR-113 families" do
     names = EventCatalog.event_names()
 
     for name <- ~w(payment_recorded review_submitted notification_clicked finance_invoice_created) do
@@ -107,5 +107,68 @@ defmodule MilosTraining.Analytics.Domain.EventCatalogTest do
              })
 
     refute Map.has_key?(attrs, :dedupe_key)
+  end
+
+  describe "ADR-114 injury warning events" do
+    test "are registered as workout-scoped, explicitly deduped events" do
+      for name <- ~w(injury_warning_shown injury_warning_acknowledged) do
+        assert name in EventCatalog.instrumented_event_names()
+      end
+
+      assert {:ok, attrs} =
+               EventCatalog.build(
+                 "injury_warning_shown",
+                 %{organization_id: @org, user_id: @user, role: :admin},
+                 %{id: @subject},
+                 %{dedupe_key: "k", occurred_at: @at, metadata: %{audience: "staff"}}
+               )
+
+      assert attrs.context_type == "workout"
+      assert attrs.context_id == @subject
+      assert attrs.dedupe_key == "k"
+    end
+
+    test "metadata is restricted to the injury allowlist (enums, counts, ids only)" do
+      assert {:ok, attrs} =
+               EventCatalog.build("injury_warning_acknowledged", %{organization_id: @org}, nil, %{
+                 context_id: @subject,
+                 metadata: %{
+                   audience: "self",
+                   surface: "assignment_detail",
+                   warning_level: "avoid",
+                   injury_warning_count: 2,
+                   avoid_exercise_count: 1,
+                   caution_exercise_count: 3,
+                   athlete_id: @user,
+                   body_area: "left knee",
+                   training_limitations: "no squats",
+                   note: "x"
+                 }
+               })
+
+      assert attrs.metadata == %{
+               "audience" => "self",
+               "surface" => "assignment_detail",
+               "warning_level" => "avoid",
+               "injury_warning_count" => 2,
+               "avoid_exercise_count" => 1,
+               "caution_exercise_count" => 3,
+               "athlete_id" => @user
+             }
+    end
+
+    test "execution completion accepts the injury segmentation facts" do
+      assert "had_active_injury" in EventCatalog.injury_segmentation_keys()
+      assert "injury_warning_level" in EventCatalog.injury_segmentation_keys()
+
+      assert {:ok, attrs} =
+               EventCatalog.build("workout_execution_completed", nil, %{id: @subject}, %{
+                 organization_id: @org,
+                 metadata: %{had_active_injury: true, injury_warning_level: "caution"}
+               })
+
+      assert attrs.metadata["had_active_injury"] == true
+      assert attrs.metadata["injury_warning_level"] == "caution"
+    end
   end
 end

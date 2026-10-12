@@ -1,6 +1,6 @@
 defmodule MilosTraining.Organizations.Commands.RequestOrganizationPurge do
   @moduledoc """
-  Opens a reviewed purge (ADR-099): records the platform purge request and
+  Opens a reviewed purge (ADR-107): records the platform purge request and
   suspends an active organization so no tenant session can write while the
   export is taken. Root-table reads/writes run in a vendor-scoped RepoContext.
   """

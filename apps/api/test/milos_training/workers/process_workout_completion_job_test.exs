@@ -86,7 +86,7 @@ defmodule MilosTraining.Workers.ProcessWorkoutCompletionJobTest do
              perform_job(ProcessWorkoutCompletionJob, %{"execution_id" => execution.id})
   end
 
-  describe "standalone training-log completions (ADR-100)" do
+  describe "standalone training-log completions (ADR-108)" do
     defp training_log_member_context do
       owner = admin_fixture()
       member = user_fixture(%{role: :member})

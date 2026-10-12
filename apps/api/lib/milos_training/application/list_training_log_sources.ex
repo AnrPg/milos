@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.ListTrainingLogSources do
   @moduledoc """
-  Source picker for the "Log a workout" flow (ADR-100).
+  Source picker for the "Log a workout" flow (ADR-108).
 
   Offers, for the acting user inside the tenant:
 

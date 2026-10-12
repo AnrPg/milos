@@ -18,7 +18,7 @@ defmodule MilosTraining.Analytics do
   defdelegate record_event(params), to: RecordEvent, as: :call
   defdelegate record_events(params_list), to: RecordEvent, as: :call_many
 
-  # ADR-105 event registry and client interaction allowlist.
+  # ADR-113 event registry and client interaction allowlist.
   defdelegate build_event(event_name, actor, subject, extra), to: EventCatalog, as: :build
   defdelegate event_names(), to: EventCatalog
   defdelegate execution_interaction_kinds(), to: ExecutionInteraction, as: :kinds
@@ -49,7 +49,7 @@ defmodule MilosTraining.Analytics do
   defdelegate upsert_exercise_catalog_entry(params), to: UpsertExerciseCatalogEntry, as: :call
   defdelegate analytics_summary(params \\ %{}), to: AnalyticsSummary, as: :call
 
-  # ADR-099 reviewed tenant export/purge. This context owns its table list and
+  # ADR-107 reviewed tenant export/purge. This context owns its table list and
   # retention policy; the shared executor only runs what this policy declares,
   # always inside a RepoContext session for the purge's tenant.
   def tenant_data_policy, do: MilosTraining.Analytics.Domain.TenantDataPolicy.policy()

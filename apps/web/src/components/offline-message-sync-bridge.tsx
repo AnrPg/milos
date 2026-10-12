@@ -17,7 +17,7 @@ const DELIVERED_QUERY_KEYS: Record<string, readonly (readonly string[])[]> = {
 };
 
 /**
- * Root-level reconciliation of the durable device outbox (ADR-067, ADR-102):
+ * Root-level reconciliation of the durable device outbox (ADR-067, ADR-110):
  * queued messages and explicitly registered commands of the signed-in user
  * are replayed on bootstrap, `online`, tab focus, and explicit retry.
  */

@@ -1,4 +1,4 @@
-# Alert thresholds for TD-031 / ADR-098. Rationale for each number lives in
+# Alert thresholds for TD-031 / ADR-106. Rationale for each number lives in
 # ops/observability/README.md ("Alert thresholds"). Metric names come from
 # MilosTrainingWeb.Telemetry.prometheus_metrics/0 (milos_*) and from the
 # collector's spanmetrics connector (traces_span_metrics_*).

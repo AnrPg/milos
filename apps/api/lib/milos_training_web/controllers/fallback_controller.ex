@@ -349,7 +349,7 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
-  # ADR-103 tenant logo upload.
+  # ADR-111 tenant logo upload.
   def call(conn, {:error, :invalid_brand_logo_upload}) do
     conn
     |> put_status(:unprocessable_entity)
@@ -1184,7 +1184,44 @@ defmodule MilosTrainingWeb.FallbackController do
   def call(conn, {:error, :invalid_athletes}) do
     conn
     |> put_status(:unprocessable_entity)
-    |> json(%{code: "invalid_athletes", error: "Assigned workouts may target athlete users only"})
+    |> json(%{
+      code: "invalid_athletes",
+      error: "Assigned workouts may target active athletes or members of this organization only"
+    })
+  end
+
+  # ADR-115: personal member programming needs an explicit package grant.
+  def call(conn, {:error, :member_programming_not_entitled, details}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "member_programming_not_entitled",
+      error:
+        "The member's package does not include personal programming " <>
+          "(personal_programming channel and execute_assigned_workouts capability)",
+      params: details
+    })
+  end
+
+  def call(conn, {:error, :class_variant_requires_single_member}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "class_variant_requires_single_member",
+      error: "A member's class version must target exactly one member"
+    })
+  end
+
+  def call(conn, {:error, :slot_not_found}) do
+    conn
+    |> put_status(:not_found)
+    |> json(%{code: "slot_not_found", error: "Class not found"})
+  end
+
+  def call(conn, {:error, :invalid_programming_mode}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_programming_mode", error: "Unknown programming mode"})
   end
 
   def call(conn, {:error, :workout_reassignment_not_supported}) do
@@ -1326,7 +1363,7 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
-  # ADR-099 reviewed tenant purge workflow.
+  # ADR-107 reviewed tenant purge workflow.
   def call(conn, {:error, :organization_purge_exists}) do
     conn
     |> put_status(:conflict)
@@ -1363,7 +1400,7 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
-  # ADR-104 organization slug rename.
+  # ADR-112 organization slug rename.
   def call(conn, {:error, :invalid_slug}) do
     conn
     |> put_status(:unprocessable_entity)

@@ -20,7 +20,7 @@ defmodule MilosTraining.Notifications do
 
   def create_notification(params), do: create_and_broadcast_notification(params)
 
-  # ADR-105: push dispatch result -> {outcome, reason_class} for analytics.
+  # ADR-113: push dispatch result -> {outcome, reason_class} for analytics.
   defdelegate classify_push_outcome(result),
     to: MilosTraining.Notifications.Domain.PushDeliveryOutcome,
     as: :classify
@@ -636,7 +636,7 @@ defmodule MilosTraining.Notifications do
     )
   end
 
-  # ADR-105: a new in-app notification row is the in-app delivery. Emitted as
+  # ADR-113: a new in-app notification row is the in-app delivery. Emitted as
   # telemetry (not a call into Analytics) so this context stays independent;
   # MilosTraining.Application.RecordNotificationDelivered records it.
   defp emit_delivered(notification) do
@@ -730,7 +730,7 @@ defmodule MilosTraining.Notifications do
     NotificationDedupe.challenge_completed_key(user_id, field(payload, :challenge_id))
   end
 
-  # ADR-099 reviewed tenant export/purge. This context owns its table list and
+  # ADR-107 reviewed tenant export/purge. This context owns its table list and
   # retention policy; the shared executor only runs what this policy declares,
   # always inside a RepoContext session for the purge's tenant.
   def tenant_data_policy, do: MilosTraining.Notifications.Domain.TenantDataPolicy.policy()

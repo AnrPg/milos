@@ -135,9 +135,20 @@ defmodule MilosTrainingWeb.AdminUserController do
             scheduled_for: %Schema{type: :string, format: :date},
             slot_id: %Schema{allOf: [@user_id], nullable: true},
             copy_source: %Schema{type: :boolean, default: true},
-            admin_notes: %Schema{type: :string, nullable: true}
+            admin_notes: %Schema{type: :string, nullable: true},
+            mode: %Schema{
+              type: :string,
+              enum: ["class_workout", "class_variant", "personal"],
+              description:
+                "Member programming mode (ADR-115; ignored for athletes). " <>
+                  "`class_workout` (default) replaces the booked class's workout for everyone; " <>
+                  "`class_variant` assigns this member's own version of the booked class " <>
+                  "(source defaults to the class's workout when `master_workout_id` is omitted); " <>
+                  "`personal` assigns a personal workout without a class. Both assignment " <>
+                  "modes require the member's package to include personal programming."
+            }
           },
-          required: [:master_workout_id, :folder_id, :scheduled_for, :copy_source]
+          required: [:folder_id, :scheduled_for, :copy_source]
         }
       }
     }
@@ -270,7 +281,11 @@ defmodule MilosTrainingWeb.AdminUserController do
 
   operation(:program_workout,
     summary:
-      "Copy or save a workout and associate it with this user's athlete assignment or booked class",
+      "Copy or save a workout and associate it with this user's assignment, class variant or booked class",
+    description:
+      "Athletes receive a personal assignment. Members follow `mode` (ADR-115). " <>
+        "Member assignment modes fail with 403 `member_programming_not_entitled` when the " <>
+        "member's package lacks the personal_programming channel or execute_assigned_workouts capability.",
     parameters: [@id_parameter],
     request_body: @program_body,
     responses: [created: {"Programming result", "application/json", @summary_object}]
@@ -301,13 +316,21 @@ defmodule MilosTrainingWeb.AdminUserController do
   )
 
   operation(:index_athletes,
-    summary: "List athlete users",
+    summary: "List assignable users (athletes; optionally members, ADR-115)",
     parameters: [
       %Parameter{
         name: :q,
         in: :query,
         required: false,
         schema: %Schema{type: :string}
+      },
+      %Parameter{
+        name: :include_members,
+        in: :query,
+        required: false,
+        description:
+          "Also list active members (who may receive personal programming when their package allows it).",
+        schema: %Schema{type: :boolean, default: false}
       }
     ],
     responses: [
@@ -609,11 +632,15 @@ defmodule MilosTrainingWeb.AdminUserController do
   end
 
   def index_athletes(conn, params) do
-    case ListAthletes.call(conn.assigns.tenant_context, params["q"] || params[:q]) do
+    opts = [include_members: truthy?(params["include_members"] || params[:include_members])]
+
+    case ListAthletes.call(conn.assigns.tenant_context, params["q"] || params[:q], opts) do
       {:error, reason} -> {:error, reason}
       athletes -> json(conn, %{athletes: athletes})
     end
   end
+
+  defp truthy?(value), do: value in [true, "true", "1"]
 
   defp render_service(conn, service, params) do
     with {:ok, payload} <- service.call(conn.assigns.tenant_context, params["id"] || params[:id]) do

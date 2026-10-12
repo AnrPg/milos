@@ -1,4 +1,4 @@
-# ADR-105: Comprehensive Analytics Instrumentation
+# ADR-113: Comprehensive Analytics Instrumentation
 Date: 2026-10-12
 Status: Accepted
 
@@ -40,7 +40,7 @@ Constraints:
 
 ## Decision
 1. **Event registry as allowlist.** `Analytics.Domain.EventCatalog` lists
-   every event name (the Phase 8 names plus the ADR-105 families). For each
+   every event name (the Phase 8 names plus the ADR-113 families). For each
    event it sets the context type, the subject keys copied into metadata, and
    a dedupe strategy. `Analytics.record_event/1` refuses names that are not
    registered. Metadata is sanitized to scalar values only: strings of 64
@@ -130,7 +130,7 @@ Constraints:
 - Every analytics write is best effort. A failing analytics store never fails
   a user operation. `track_analytics_event_test.exs` asserts this.
 - `analytics_events.dedupe_key` is dropped from anonymized retained exports,
-  because keys can embed user ids (ADR-099).
+  because keys can embed user ids (ADR-107).
 - The abandonment sweep scans only executions started in the 48 hours before
   the threshold. Abandoned executions older than that at first deploy are not
   backfilled. An execution completed after it was flagged abandoned keeps

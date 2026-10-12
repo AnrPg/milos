@@ -27,7 +27,7 @@ vi.mock("@/i18n/use-ui-locale", () => ({
   useUiLocale: () => "en",
 }));
 
-// The settings dialog embeds the shared logo uploader (ADR-103).
+// The settings dialog embeds the shared logo uploader (ADR-111).
 vi.mock("@/i18n/ui", () => ({
   useUiTranslations: () => (key: string) => key,
 }));

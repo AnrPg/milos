@@ -11,7 +11,7 @@ export default async function MyWorkoutsPage({
   const params = await searchParams;
   const initialOpenAssignmentId = params.open_assignment ?? null;
   return (
-    <AuthGuard roles={["athlete", "admin"]}>
+    <AuthGuard roles={["athlete", "member", "admin"]}>
       <AssignedWorkoutsConsole initialOpenAssignmentId={initialOpenAssignmentId} />
     </AuthGuard>
   );

@@ -1,5 +1,5 @@
 defmodule MilosTraining.Workouts do
-  alias MilosTraining.Workouts.Domain.{TimerConfig, WorkoutDsl, WorkoutType}
+  alias MilosTraining.Workouts.Domain.{ExerciseDescriptors, TimerConfig, WorkoutDsl, WorkoutType}
   alias MilosTraining.Workouts.Domain.WorkoutDsl.Preflight
   alias MilosTraining.Workouts.Domain.WorkoutDsl.{Manual, Templates, Vocabulary}
 
@@ -25,6 +25,7 @@ defmodule MilosTraining.Workouts do
     GetWorkout,
     GetAthleteWeekView,
     ListAdminWorkouts,
+    ListClassVariants,
     ListScaleLevels,
     MaterializeWorkout
   }
@@ -79,6 +80,10 @@ defmodule MilosTraining.Workouts do
   def list_assigned_workouts_for_athlete(context, athlete_id, start_date, end_date),
     do: WorkoutStore.list_assigned_workouts_for_athlete(context, athlete_id, start_date, end_date)
 
+  @doc "ADR-115: live per-member class variants for slots (one assignee or all)."
+  def list_class_variants(context, slot_ids, assignee_id),
+    do: ListClassVariants.call(context, slot_ids, assignee_id)
+
   defdelegate list_workouts, to: ListAdminWorkouts, as: :all
   def list_workouts(context), do: WorkoutStore.list_workouts(context)
   defdelegate list_scale_levels, to: ListScaleLevels, as: :all
@@ -94,6 +99,9 @@ defmodule MilosTraining.Workouts do
 
   def preflight_dsl(workout, active_scale_slugs),
     do: Preflight.validate(workout, active_scale_slugs)
+
+  @doc "`%{name, exercise_ref, category}` per exercise of a normalized workout (ADR-114)."
+  def exercise_descriptors(workout), do: ExerciseDescriptors.from_workout(workout)
 
   def reject_assignment_for_athlete(assignment_id, athlete_id),
     do:
@@ -188,7 +196,7 @@ defmodule MilosTraining.Workouts do
     )
   end
 
-  # ADR-099 reviewed tenant export/purge. This context owns its table list and
+  # ADR-107 reviewed tenant export/purge. This context owns its table list and
   # retention policy; the shared executor only runs what this policy declares,
   # always inside a RepoContext session for the purge's tenant.
   def tenant_data_policy, do: MilosTraining.Workouts.Domain.TenantDataPolicy.policy()

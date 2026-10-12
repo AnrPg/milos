@@ -18,6 +18,24 @@ defmodule MilosTraining.Finance.Domain.EntitlementPolicy do
     end
   end
 
+  @doc """
+  ADR-115: authorizes only an *explicit* package grant.
+
+  Evaluates the customer's contract in the strictest mode regardless of the
+  tenant's rollout mode: no `observe` leniency, no missing-profile or
+  missing-plan pass and no admin-actor bypass (the subject is the customer, not
+  the caller). Used where a role does not imply the benefit — e.g. personal
+  programming for gym members.
+  """
+  def authorize_explicit(entitlement, request) do
+    case authorize_customer(entitlement, Map.delete(request, :actor_role), mode: :enforce_all) do
+      {:ok, _decision} -> :ok
+      :ok -> :ok
+      {:error, reason, _details} -> {:error, reason}
+      {:error, _reason} = error -> error
+    end
+  end
+
   defp authorize_customer(nil, _request, opts) do
     case Keyword.get(opts, :mode, :observe) do
       :observe -> {:ok, %{observed?: true, reason: :finance_profile_missing}}

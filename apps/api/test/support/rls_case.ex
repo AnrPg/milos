@@ -86,7 +86,7 @@ defmodule MilosTraining.RLSCase do
   @doc """
   Durably creates the non-superuser `#{@runtime_role}` role (NOBYPASSRLS) and
   grants it DML on every table. Also used by DataCase tests that run real
-  application code under RLS via `SET LOCAL ROLE` (ADR-099 purge test).
+  application code under RLS via `SET LOCAL ROLE` (ADR-107 purge test).
   """
   def runtime_role, do: @runtime_role
 

@@ -1,4 +1,4 @@
-# ADR-102: Offline Outbox Failure Controls and Command Adapters
+# ADR-110: Offline Outbox Failure Controls and Command Adapters
 Date: 2026-10-12
 Status: Accepted
 
@@ -68,7 +68,7 @@ replay. Two gaps remained (TD-035):
      release job, or broadcast); same operation, other outcome →
      `409 idempotency_key_conflict`; resolved by anything else →
      `409 booking_not_pending` (never replayed).
-   - *Execution / training log*: ADR-100's `idempotency_key` is reused (the
+   - *Execution / training log*: ADR-108's `idempotency_key` is reused (the
      outbox operation id equals the form's key). A replay is now resolved
      *before* source authorization, so an acknowledged-but-unconfirmed write
      converges on its entry even if the class or assignment stopped

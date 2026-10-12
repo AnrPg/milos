@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.OrganizationLogo do
   @moduledoc """
-  Shared steps of the ADR-103 tenant logo flow: resolving the acting
+  Shared steps of the ADR-111 tenant logo flow: resolving the acting
   organization, the post-change cleanup of superseded objects, and the staff
   refresh broadcast. The use cases are `RequestOrganizationLogoUpload`,
   `FinalizeOrganizationLogo` and `RemoveOrganizationLogo`.
@@ -26,7 +26,7 @@ defmodule MilosTraining.Application.OrganizationLogo do
   @doc """
   After a committed change: delete the superseded object (prefix-pinned, best
   effort - an orphan stays inside the tenant prefix and is removed by the
-  ADR-099 purge) and tell tenant staff to refresh branding.
+  ADR-107 purge) and tell tenant staff to refresh branding.
   """
   def after_change(_organization_id, %{event: nil, settings: settings}), do: {:ok, settings}
 

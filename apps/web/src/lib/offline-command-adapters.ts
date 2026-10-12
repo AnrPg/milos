@@ -11,7 +11,7 @@ import {
 } from "@/lib/offline-command-outbox";
 
 /**
- * The explicit ADR-102 registry of non-message commands that may be queued
+ * The explicit ADR-110 registry of non-message commands that may be queued
  * offline. Each entry is backed by a server-side idempotency and conflict
  * policy in its owning context; adding a command here without that policy is
  * forbidden. There is deliberately no fallback for unregistered kinds.
@@ -67,7 +67,7 @@ export const trainingLogCreateAdapter: OutboxCommandAdapter<
 > = {
   kind: "training_log.create",
   labelKey: "outboxKindTrainingLog",
-  // ADR-100 already carries a client idempotency key; reuse it so a double
+  // ADR-108 already carries a client idempotency key; reuse it so a double
   // submit from the form and an outbox replay converge on one entry.
   idempotencyKey: (payload) => payload.idempotency_key,
   send: (token, payload, { idempotencyKey, organizationSlug }) =>

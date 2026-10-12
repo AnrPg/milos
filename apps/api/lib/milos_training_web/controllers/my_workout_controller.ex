@@ -17,7 +17,11 @@ defmodule MilosTrainingWeb.MyWorkoutController do
 
   operation(:index,
     summary:
-      "List assigned workouts for the current athlete or all athlete assignments for admins",
+      "List assigned workouts for the current athlete or member, or all assignments for staff",
+    description:
+      "ADR-115: members receive personal assignments and class variants. Each assignment carries " <>
+        "`assignment_kind` (`personal` | `class_variant`) and `source_slot_id` (the class a " <>
+        "variant belongs to, or null).",
     parameters: [
       %Parameter{
         name: :start_date,
@@ -54,7 +58,7 @@ defmodule MilosTrainingWeb.MyWorkoutController do
   end
 
   operation(:open,
-    summary: "Athlete reports opening an assigned workout's detail (analytics, ADR-105)",
+    summary: "Assignee reports opening an assigned workout's detail (analytics, ADR-121)",
     description:
       "Records workout_assignment_opened once per athlete, assignment and UTC day. " <>
         "Repeated calls the same day are accepted and ignored.",
@@ -80,7 +84,7 @@ defmodule MilosTrainingWeb.MyWorkoutController do
   end
 
   operation(:reject,
-    summary: "Athlete rejects an assigned workout",
+    summary: "Assignee (athlete or member, ADR-115) rejects an assigned workout",
     parameters: [
       %Parameter{
         name: :id,

@@ -1,6 +1,6 @@
 defmodule MilosTraining.Organizations.Domain.BrandLogoPolicy do
   @moduledoc """
-  Pure rules for first-class tenant logo uploads (ADR-103).
+  Pure rules for first-class tenant logo uploads (ADR-111).
 
   Logos live under `organizations/<organization_id>/branding/logo/<uuid>.<ext>`
   in the public media bucket. Only raster formats that browsers cannot execute

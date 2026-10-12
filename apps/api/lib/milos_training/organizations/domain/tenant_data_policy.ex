@@ -1,6 +1,6 @@
 defmodule MilosTraining.Organizations.Domain.TenantDataPolicy do
   @moduledoc """
-  Organizations tenant data retention and purge policy (ADR-099).
+  Organizations tenant data retention and purge policy (ADR-107).
 
   Declares the tables this context owns, in delete (dependency) order, and
   how they are treated when a tenant is purged.

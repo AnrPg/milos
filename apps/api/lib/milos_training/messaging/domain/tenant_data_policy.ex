@@ -1,6 +1,6 @@
 defmodule MilosTraining.Messaging.Domain.TenantDataPolicy do
   @moduledoc """
-  Messaging tenant data retention and purge policy (ADR-099).
+  Messaging tenant data retention and purge policy (ADR-107).
 
   Declares the tables this context owns, in delete (dependency) order, and
   how they are treated when a tenant is purged.

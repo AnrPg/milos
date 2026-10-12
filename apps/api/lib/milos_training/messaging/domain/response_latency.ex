@@ -1,6 +1,6 @@
 defmodule MilosTraining.Messaging.Domain.ResponseLatency do
   @moduledoc """
-  Pure staff-response facts for messaging analytics (ADR-105).
+  Pure staff-response facts for messaging analytics (ADR-113).
 
   A staff message is a *first staff response* when the closest preceding
   non-system message in the thread came from a non-staff participant. Its

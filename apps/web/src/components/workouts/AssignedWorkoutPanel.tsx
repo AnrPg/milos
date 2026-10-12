@@ -22,6 +22,7 @@ import { workoutTypeColor } from "@/lib/workout-colors";
 import { downloadIcsEvent } from "@/lib/ics";
 import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
+import { MyInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
 
 type Props = {
   assignment: AssignedWorkoutRecord;
@@ -34,6 +35,8 @@ type Props = {
   onEditWorkout?: (assignment: AssignedWorkoutRecord) => void;
   onRescheduled?: (updated: AssignedWorkoutRecord) => void;
   launching?: boolean;
+  /** ADR-115: members may reject but not reschedule their assignments. */
+  allowReschedule?: boolean;
 };
 
 export function AssignedWorkoutPanel({
@@ -47,6 +50,7 @@ export function AssignedWorkoutPanel({
   onEditWorkout,
   onRescheduled,
   launching,
+  allowReschedule = true,
 }: Props) {
   const i18n = useUiTranslations();
   const [activeSection, setActiveSection] = useState<"details" | "conversation">("details");
@@ -362,17 +366,19 @@ export function AssignedWorkoutPanel({
                         >
                           {rejecting ? i18n("rejecting812b8d2") : i18n("rejectWorkouta584840")}
                         </button>
-                        <button
-                          className="flex-1 rounded-full px-4 py-2 text-sm font-semibold"
-                          style={{ background: "var(--border)", color: "var(--text-soft)" }}
-                          onClick={() => {
-                            setRescheduleDate(assignment.scheduled_for);
-                            setRescheduling(true);
-                          }}
-                          type="button"
-                        >
-                          {i18n("reschedule34b2dc9")}
-                        </button>
+                        {allowReschedule ? (
+                          <button
+                            className="flex-1 rounded-full px-4 py-2 text-sm font-semibold"
+                            style={{ background: "var(--border)", color: "var(--text-soft)" }}
+                            onClick={() => {
+                              setRescheduleDate(assignment.scheduled_for);
+                              setRescheduling(true);
+                            }}
+                            type="button"
+                          >
+                            {i18n("reschedule34b2dc9")}
+                          </button>
+                        ) : null}
                       </div>
                     ) : (
                       <div className="space-y-2">
@@ -441,6 +447,18 @@ export function AssignedWorkoutPanel({
               </div>
             ) : null}
           </section>
+
+          {/* ADR-114: the athlete's own injury warnings before starting; informational only. */}
+          {!isAdmin && activeSection === "details" ? (
+            <div className="px-5 pb-4">
+              <MyInjuryWarningsPanel
+                accessToken={accessToken}
+                workoutId={assignment.master_workout_id}
+                surface="assignment_detail"
+                sourceContextId={assignment.id}
+              />
+            </div>
+          ) : null}
 
           <ChatSection
             contextType="assignment"

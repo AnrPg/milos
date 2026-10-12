@@ -2,473 +2,215 @@
   "components": {
     "responses": {},
     "schemas": {
-      "ExecutionInteractionBatch": {
+      "WorkoutDslPublishResponse": {
+        "additionalProperties": false,
         "properties": {
-          "events": {
+          "diagnostics": {
             "items": {
+              "additionalProperties": false,
               "properties": {
-                "client_event_id": {
-                  "format": "uuid",
+                "code": {
                   "type": "string"
                 },
-                "kind": {
-                  "enum": [
-                    "cast_mode_toggled",
-                    "check_off_undone",
-                    "cues_toggled",
-                    "finish_wizard_abandoned",
-                    "finish_wizard_opened",
-                    "finish_wizard_saved",
-                    "first_segment_started",
-                    "pause",
-                    "ready_screen_shown",
-                    "resume",
-                    "round_decremented",
-                    "round_incremented",
-                    "rounds_adjusted",
-                    "segment_restarted",
-                    "segment_skipped",
-                    "time_adjusted",
-                    "workout_launched"
-                  ],
-                  "type": "string"
+                "column": {
+                  "minimum": 1,
+                  "type": "integer"
                 },
-                "metadata": {
-                  "additionalProperties": false,
-                  "description": "Typed facts allowed for the interaction kind (see ADR-105). No free text; keys not allowed for the kind reject the batch.",
-                  "properties": {
-                    "countdown_seconds": {
-                      "maximum": 600,
-                      "minimum": 0,
-                      "type": "integer"
-                    },
-                    "cue_channel": {
-                      "enum": [
-                        "sound",
-                        "voice",
-                        "vibration"
-                      ],
-                      "type": "string"
-                    },
-                    "delta_rounds": {
-                      "maximum": 100,
-                      "minimum": -100,
-                      "type": "integer"
-                    },
-                    "delta_seconds": {
-                      "maximum": 3600,
-                      "minimum": -3600,
-                      "type": "integer"
-                    },
-                    "duration_ms": {
-                      "maximum": 86400000,
-                      "minimum": 0,
-                      "type": "integer"
-                    },
-                    "elapsed_ms": {
-                      "maximum": 86400000,
-                      "minimum": 0,
-                      "type": "integer"
-                    },
-                    "enabled": {
-                      "type": "boolean"
-                    },
-                    "format": {
-                      "pattern": "^[A-Za-z0-9_-]{1,64}$",
-                      "type": "string"
-                    },
-                    "orientation": {
-                      "enum": [
-                        "portrait",
-                        "landscape"
-                      ],
-                      "type": "string"
-                    },
-                    "remaining_ms": {
-                      "maximum": 86400000,
-                      "minimum": 0,
-                      "type": "integer"
-                    },
-                    "round_count": {
-                      "maximum": 10000,
-                      "minimum": 0,
-                      "type": "integer"
-                    },
-                    "scored_section_count": {
-                      "maximum": 1000,
-                      "minimum": 0,
-                      "type": "integer"
-                    },
-                    "section_id": {
-                      "pattern": "^[A-Za-z0-9_-]{1,64}$",
-                      "type": "string"
-                    },
-                    "segment_index": {
-                      "maximum": 10000,
-                      "minimum": 0,
-                      "type": "integer"
-                    },
-                    "step": {
-                      "maximum": 20,
-                      "minimum": 0,
-                      "type": "integer"
-                    },
-                    "surface": {
-                      "enum": [
-                        "pause_sheet",
-                        "primary_action",
-                        "header",
-                        "gesture",
-                        "keyboard",
-                        "snackbar",
-                        "ready_screen",
-                        "finish_wizard",
-                        "cast_display",
-                        "lock_screen"
-                      ],
-                      "type": "string"
-                    }
-                  },
+                "line": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "params": {
+                  "additionalProperties": true,
                   "type": "object"
                 },
-                "occurred_at": {
-                  "format": "date-time",
+                "severity": {
+                  "enum": [
+                    "error",
+                    "warning"
+                  ],
                   "type": "string"
                 }
               },
               "required": [
-                "client_event_id",
-                "kind",
-                "occurred_at"
+                "code",
+                "severity",
+                "line",
+                "column",
+                "params"
               ],
-              "title": "ExecutionInteractionEvent",
+              "title": "WorkoutDslDiagnostic",
               "type": "object"
             },
-            "maxItems": 50,
-            "minItems": 1,
             "type": "array"
-          }
-        },
-        "required": [
-          "events"
-        ],
-        "title": "ExecutionInteractionBatch",
-        "type": "object"
-      },
-      "ExecutionInteractionBatchResult": {
-        "properties": {
-          "accepted": {
-            "minimum": 0,
-            "type": "integer"
           },
-          "duplicates": {
-            "minimum": 0,
-            "type": "integer"
-          }
-        },
-        "required": [
-          "accepted",
-          "duplicates"
-        ],
-        "title": "ExecutionInteractionBatchResult",
-        "type": "object"
-      },
-      "ExecutionInteractionEvent": {
-        "properties": {
-          "client_event_id": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "kind": {
-            "enum": [
-              "cast_mode_toggled",
-              "check_off_undone",
-              "cues_toggled",
-              "finish_wizard_abandoned",
-              "finish_wizard_opened",
-              "finish_wizard_saved",
-              "first_segment_started",
-              "pause",
-              "ready_screen_shown",
-              "resume",
-              "round_decremented",
-              "round_incremented",
-              "rounds_adjusted",
-              "segment_restarted",
-              "segment_skipped",
-              "time_adjusted",
-              "workout_launched"
-            ],
-            "type": "string"
-          },
-          "metadata": {
-            "additionalProperties": false,
-            "description": "Typed facts allowed for the interaction kind (see ADR-105). No free text; keys not allowed for the kind reject the batch.",
-            "properties": {
-              "countdown_seconds": {
-                "maximum": 600,
-                "minimum": 0,
-                "type": "integer"
-              },
-              "cue_channel": {
-                "enum": [
-                  "sound",
-                  "voice",
-                  "vibration"
-                ],
-                "type": "string"
-              },
-              "delta_rounds": {
-                "maximum": 100,
-                "minimum": -100,
-                "type": "integer"
-              },
-              "delta_seconds": {
-                "maximum": 3600,
-                "minimum": -3600,
-                "type": "integer"
-              },
-              "duration_ms": {
-                "maximum": 86400000,
-                "minimum": 0,
-                "type": "integer"
-              },
-              "elapsed_ms": {
-                "maximum": 86400000,
-                "minimum": 0,
-                "type": "integer"
-              },
-              "enabled": {
-                "type": "boolean"
-              },
-              "format": {
-                "pattern": "^[A-Za-z0-9_-]{1,64}$",
-                "type": "string"
-              },
-              "orientation": {
-                "enum": [
-                  "portrait",
-                  "landscape"
-                ],
-                "type": "string"
-              },
-              "remaining_ms": {
-                "maximum": 86400000,
-                "minimum": 0,
-                "type": "integer"
-              },
-              "round_count": {
-                "maximum": 10000,
-                "minimum": 0,
-                "type": "integer"
-              },
-              "scored_section_count": {
-                "maximum": 1000,
-                "minimum": 0,
-                "type": "integer"
-              },
-              "section_id": {
-                "pattern": "^[A-Za-z0-9_-]{1,64}$",
-                "type": "string"
-              },
-              "segment_index": {
-                "maximum": 10000,
-                "minimum": 0,
-                "type": "integer"
-              },
-              "step": {
-                "maximum": 20,
-                "minimum": 0,
-                "type": "integer"
-              },
-              "surface": {
-                "enum": [
-                  "pause_sheet",
-                  "primary_action",
-                  "header",
-                  "gesture",
-                  "keyboard",
-                  "snackbar",
-                  "ready_screen",
-                  "finish_wizard",
-                  "cast_display",
-                  "lock_screen"
-                ],
-                "type": "string"
-              }
-            },
+          "execution_preview": {
+            "additionalProperties": true,
             "type": "object"
           },
-          "occurred_at": {
-            "format": "date-time",
-            "type": "string"
-          }
-        },
-        "required": [
-          "client_event_id",
-          "kind",
-          "occurred_at"
-        ],
-        "title": "ExecutionInteractionEvent",
-        "type": "object"
-      },
-      "OrganizationBranding": {
-        "properties": {
-          "brand_logo_uploaded": {
-            "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-103).",
-            "type": "boolean"
-          },
-          "brand_logo_url": {
-            "nullable": true,
+          "formatted_source": {
             "type": "string"
           },
-          "brand_name": {
-            "nullable": true,
-            "type": "string"
-          },
-          "brand_primary_color": {
-            "nullable": true,
-            "type": "string"
-          },
-          "organization_id": {
-            "format": "uuid",
-            "type": "string"
-          }
-        },
-        "required": [
-          "organization_id",
-          "brand_logo_url",
-          "brand_logo_uploaded"
-        ],
-        "title": "OrganizationBranding",
-        "type": "object"
-      },
-      "OrganizationBrandingResponse": {
-        "properties": {
-          "branding": {
-            "properties": {
-              "brand_logo_uploaded": {
-                "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-103).",
-                "type": "boolean"
-              },
-              "brand_logo_url": {
-                "nullable": true,
-                "type": "string"
-              },
-              "brand_name": {
-                "nullable": true,
-                "type": "string"
-              },
-              "brand_primary_color": {
-                "nullable": true,
-                "type": "string"
-              },
-              "organization_id": {
-                "format": "uuid",
-                "type": "string"
-              }
-            },
-            "required": [
-              "organization_id",
-              "brand_logo_url",
-              "brand_logo_uploaded"
-            ],
-            "title": "OrganizationBranding",
-            "type": "object"
-          }
-        },
-        "required": [
-          "branding"
-        ],
-        "title": "OrganizationBrandingResponse",
-        "type": "object"
-      },
-      "OrganizationLogoFinalizeRequest": {
-        "properties": {
-          "logo_key": {
-            "maxLength": 255,
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "required": [
-          "logo_key"
-        ],
-        "title": "OrganizationLogoFinalizeRequest",
-        "type": "object"
-      },
-      "OrganizationLogoUpload": {
-        "properties": {
-          "expires_in": {
-            "type": "integer"
-          },
-          "key": {
-            "type": "string"
-          },
-          "max_bytes": {
-            "type": "integer"
-          },
-          "required_headers": {
-            "additionalProperties": {
-              "type": "string"
-            },
-            "type": "object"
-          },
-          "upload_url": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "upload_url",
-          "key",
-          "required_headers",
-          "expires_in",
-          "max_bytes"
-        ],
-        "title": "OrganizationLogoUpload",
-        "type": "object"
-      },
-      "OrganizationLogoUploadRequest": {
-        "properties": {
-          "byte_size": {
-            "maximum": 2097152,
-            "minimum": 1,
-            "type": "integer"
-          },
-          "content_type": {
-            "enum": [
-              "image/png",
-              "image/jpeg",
-              "image/webp"
-            ],
-            "type": "string"
-          }
-        },
-        "required": [
-          "content_type",
-          "byte_size"
-        ],
-        "title": "OrganizationLogoUploadRequest",
-        "type": "object"
-      },
-      "SemanticError": {
-        "description": "Stable machine-readable API failure with English compatibility copy.",
-        "properties": {
-          "code": {
-            "type": "string"
-          },
-          "error": {
-            "type": "string"
-          },
-          "params": {
+          "workout": {
             "additionalProperties": true,
             "type": "object"
           }
         },
         "required": [
-          "code",
-          "error"
+          "workout",
+          "formatted_source",
+          "diagnostics",
+          "execution_preview"
         ],
+        "title": "WorkoutDslPublishResponse",
+        "type": "object"
+      },
+      "MyWorkoutInjuryWarnings": {
+        "additionalProperties": false,
+        "properties": {
+          "level": {
+            "enum": [
+              "none",
+              "caution",
+              "avoid"
+            ],
+            "type": "string"
+          },
+          "warnings": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "body_area": {
+                  "type": "string"
+                },
+                "exercises": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "exercise_ref": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "level": {
+                        "enum": [
+                          "caution",
+                          "avoid"
+                        ],
+                        "type": "string"
+                      },
+                      "match": {
+                        "enum": [
+                          "catalog",
+                          "name"
+                        ],
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "patterns": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "level",
+                      "patterns",
+                      "match"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "injury_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "level": {
+                  "enum": [
+                    "caution",
+                    "avoid"
+                  ],
+                  "type": "string"
+                },
+                "provenance": {
+                  "enum": [
+                    "organization",
+                    "personal"
+                  ],
+                  "type": "string"
+                },
+                "regions": {
+                  "items": {
+                    "enum": [
+                      "shoulder",
+                      "elbow",
+                      "wrist",
+                      "neck",
+                      "back",
+                      "hip",
+                      "knee",
+                      "hamstring",
+                      "ankle",
+                      "chest",
+                      "core"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "severity": {
+                  "enum": [
+                    "mild",
+                    "moderate",
+                    "severe"
+                  ],
+                  "type": "string"
+                },
+                "tags": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "training_limitations": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "user_id": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "injury_id",
+                "user_id",
+                "body_area",
+                "regions",
+                "severity",
+                "level",
+                "provenance",
+                "tags",
+                "exercises"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "workout_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workout_id",
+          "level",
+          "warnings"
+        ],
+        "title": "MyWorkoutInjuryWarnings",
         "type": "object"
       },
       "TrainingLogCreateRequest": {
@@ -737,316 +479,348 @@
         "title": "TrainingLogCreateRequest",
         "type": "object"
       },
-      "TrainingLogEntry": {
+      "TrainingLogEntryResponse": {
         "properties": {
-          "booking_id": {
-            "format": "uuid",
-            "nullable": true,
-            "type": "string"
-          },
-          "duration_seconds": {
-            "nullable": true,
-            "type": "integer"
-          },
-          "exercise_modifications": {
-            "items": {
-              "properties": {
-                "actual_value": {
-                  "oneOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "boolean"
-                    }
-                  ]
-                },
-                "canonical_value": {
-                  "oneOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "boolean"
-                    }
-                  ]
-                },
-                "exercise_id": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "exercise_name": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "field": {
-                  "type": "string"
-                },
-                "interval_index": {
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "note": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "patch_id": {
-                  "type": "string"
-                },
-                "round_index": {
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "row_index": {
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "section_id": {
-                  "type": "string"
-                },
-                "section_name": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "segment_key": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "set_index": {
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "type": {
-                  "type": "string"
-                },
-                "unit": {
-                  "nullable": true,
-                  "type": "string"
-                }
+          "entry": {
+            "properties": {
+              "booking_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
               },
-              "required": [
-                "patch_id",
-                "section_id",
-                "field",
-                "canonical_value",
-                "actual_value"
-              ],
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "id": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "idempotency_key": {
-            "type": "string"
-          },
-          "inserted_at": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "lock_version": {
-            "type": "integer"
-          },
-          "master_workout_id": {
-            "format": "uuid",
-            "nullable": true,
-            "type": "string"
-          },
-          "notes": {
-            "nullable": true,
-            "type": "string"
-          },
-          "organization_id": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "perceived_effort": {
-            "nullable": true,
-            "type": "integer"
-          },
-          "performed_at_tz": {
-            "type": "string"
-          },
-          "performed_at_utc": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "performed_exercises": {
-            "items": {
-              "properties": {
-                "calories": {
-                  "minimum": 0,
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "distance": {
-                  "minimum": 0,
-                  "nullable": true,
-                  "type": "number"
-                },
-                "distance_unit": {
-                  "enum": [
-                    "m",
-                    "km",
-                    "mi"
+              "duration_seconds": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "exercise_modifications": {
+                "items": {
+                  "properties": {
+                    "actual_value": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    },
+                    "canonical_value": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    },
+                    "exercise_id": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "exercise_name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "field": {
+                      "type": "string"
+                    },
+                    "interval_index": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "note": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "patch_id": {
+                      "type": "string"
+                    },
+                    "round_index": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "row_index": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "section_id": {
+                      "type": "string"
+                    },
+                    "section_name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "segment_key": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "set_index": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "unit": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "patch_id",
+                    "section_id",
+                    "field",
+                    "canonical_value",
+                    "actual_value"
                   ],
-                  "nullable": true,
-                  "type": "string"
+                  "type": "object"
                 },
-                "duration_seconds": {
-                  "minimum": 0,
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "exercise_ref": {
-                  "maxLength": 120,
-                  "nullable": true,
-                  "type": "string"
-                },
-                "load": {
-                  "minimum": 0,
-                  "nullable": true,
-                  "type": "number"
-                },
-                "load_unit": {
-                  "enum": [
-                    "kg",
-                    "lb"
-                  ],
-                  "nullable": true,
-                  "type": "string"
-                },
-                "name": {
-                  "maxLength": 120,
-                  "minLength": 1,
-                  "type": "string"
-                },
-                "note": {
-                  "maxLength": 500,
-                  "nullable": true,
-                  "type": "string"
-                },
-                "reps": {
-                  "minimum": 0,
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "row_index": {
-                  "type": "integer"
-                },
-                "sets": {
-                  "maximum": 100,
-                  "minimum": 1,
-                  "nullable": true,
-                  "type": "integer"
-                }
+                "type": "array"
               },
-              "required": [
-                "name"
-              ],
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "scale_level_slug": {
-            "nullable": true,
-            "type": "string"
-          },
-          "section_scores": {
-            "items": {
-              "properties": {
-                "section_id": {
-                  "type": "string"
-                },
-                "unit": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "value": {
-                  "oneOf": [
-                    {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "idempotency_key": {
+                "type": "string"
+              },
+              "inserted_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "lock_version": {
+                "type": "integer"
+              },
+              "master_workout_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "notes": {
+                "nullable": true,
+                "type": "string"
+              },
+              "organization_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "perceived_effort": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "performed_at_tz": {
+                "type": "string"
+              },
+              "performed_at_utc": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "performed_exercises": {
+                "items": {
+                  "properties": {
+                    "calories": {
+                      "minimum": 0,
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "distance": {
+                      "minimum": 0,
+                      "nullable": true,
                       "type": "number"
                     },
-                    {
+                    "distance_unit": {
+                      "enum": [
+                        "m",
+                        "km",
+                        "mi"
+                      ],
+                      "nullable": true,
                       "type": "string"
+                    },
+                    "duration_seconds": {
+                      "minimum": 0,
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "exercise_ref": {
+                      "maxLength": 120,
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "load": {
+                      "minimum": 0,
+                      "nullable": true,
+                      "type": "number"
+                    },
+                    "load_unit": {
+                      "enum": [
+                        "kg",
+                        "lb"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "name": {
+                      "maxLength": 120,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "note": {
+                      "maxLength": 500,
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "reps": {
+                      "minimum": 0,
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "row_index": {
+                      "type": "integer"
+                    },
+                    "sets": {
+                      "maximum": 100,
+                      "minimum": 1,
+                      "nullable": true,
+                      "type": "integer"
                     }
-                  ]
-                }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
               },
-              "required": [
-                "section_id",
-                "value"
-              ],
-              "type": "object"
+              "scale_level_slug": {
+                "nullable": true,
+                "type": "string"
+              },
+              "section_scores": {
+                "items": {
+                  "properties": {
+                    "section_id": {
+                      "type": "string"
+                    },
+                    "unit": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "value": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "section_id",
+                    "value"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "source_reference_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "source_type": {
+                "enum": [
+                  "class",
+                  "assigned_workout",
+                  "library_workout",
+                  "freeform"
+                ],
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "logged",
+                  "voided"
+                ],
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "updated_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "user_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "void_reason": {
+                "nullable": true,
+                "type": "string"
+              },
+              "voided_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "workout_type": {
+                "nullable": true,
+                "type": "string"
+              }
             },
-            "type": "array"
-          },
-          "source_reference_id": {
-            "format": "uuid",
-            "nullable": true,
-            "type": "string"
-          },
-          "source_type": {
-            "enum": [
-              "class",
-              "assigned_workout",
-              "library_workout",
-              "freeform"
+            "required": [
+              "id",
+              "source_type",
+              "title",
+              "performed_at_utc",
+              "status",
+              "lock_version",
+              "section_scores",
+              "exercise_modifications",
+              "performed_exercises"
             ],
-            "type": "string"
+            "title": "TrainingLogEntry",
+            "type": "object"
+          }
+        },
+        "required": [
+          "entry"
+        ],
+        "title": "TrainingLogEntryResponse",
+        "type": "object"
+      },
+      "OrganizationLogoUploadRequest": {
+        "properties": {
+          "byte_size": {
+            "maximum": 2097152,
+            "minimum": 1,
+            "type": "integer"
           },
-          "status": {
+          "content_type": {
             "enum": [
-              "logged",
-              "voided"
+              "image/png",
+              "image/jpeg",
+              "image/webp"
             ],
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "updated_at": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "user_id": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "void_reason": {
-            "nullable": true,
-            "type": "string"
-          },
-          "voided_at": {
-            "format": "date-time",
-            "nullable": true,
-            "type": "string"
-          },
-          "workout_type": {
-            "nullable": true,
             "type": "string"
           }
         },
         "required": [
-          "id",
-          "source_type",
-          "title",
-          "performed_at_utc",
-          "status",
-          "lock_version",
-          "section_scores",
-          "exercise_modifications",
-          "performed_exercises"
+          "content_type",
+          "byte_size"
         ],
-        "title": "TrainingLogEntry",
+        "title": "OrganizationLogoUploadRequest",
         "type": "object"
       },
       "TrainingLogEntryCollection": {
@@ -1373,484 +1147,402 @@
         "title": "TrainingLogEntryCollection",
         "type": "object"
       },
-      "TrainingLogEntryResponse": {
+      "OrganizationBrandingResponse": {
         "properties": {
-          "entry": {
+          "branding": {
             "properties": {
-              "booking_id": {
-                "format": "uuid",
+              "brand_logo_uploaded": {
+                "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-111).",
+                "type": "boolean"
+              },
+              "brand_logo_url": {
                 "nullable": true,
                 "type": "string"
               },
-              "duration_seconds": {
-                "nullable": true,
-                "type": "integer"
-              },
-              "exercise_modifications": {
-                "items": {
-                  "properties": {
-                    "actual_value": {
-                      "oneOf": [
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        },
-                        {
-                          "type": "boolean"
-                        }
-                      ]
-                    },
-                    "canonical_value": {
-                      "oneOf": [
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        },
-                        {
-                          "type": "boolean"
-                        }
-                      ]
-                    },
-                    "exercise_id": {
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "exercise_name": {
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "field": {
-                      "type": "string"
-                    },
-                    "interval_index": {
-                      "nullable": true,
-                      "type": "integer"
-                    },
-                    "note": {
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "patch_id": {
-                      "type": "string"
-                    },
-                    "round_index": {
-                      "nullable": true,
-                      "type": "integer"
-                    },
-                    "row_index": {
-                      "nullable": true,
-                      "type": "integer"
-                    },
-                    "section_id": {
-                      "type": "string"
-                    },
-                    "section_name": {
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "segment_key": {
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "set_index": {
-                      "nullable": true,
-                      "type": "integer"
-                    },
-                    "type": {
-                      "type": "string"
-                    },
-                    "unit": {
-                      "nullable": true,
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "patch_id",
-                    "section_id",
-                    "field",
-                    "canonical_value",
-                    "actual_value"
-                  ],
-                  "type": "object"
-                },
-                "type": "array"
-              },
-              "id": {
-                "format": "uuid",
-                "type": "string"
-              },
-              "idempotency_key": {
-                "type": "string"
-              },
-              "inserted_at": {
-                "format": "date-time",
-                "type": "string"
-              },
-              "lock_version": {
-                "type": "integer"
-              },
-              "master_workout_id": {
-                "format": "uuid",
+              "brand_name": {
                 "nullable": true,
                 "type": "string"
               },
-              "notes": {
+              "brand_primary_color": {
                 "nullable": true,
                 "type": "string"
               },
               "organization_id": {
                 "format": "uuid",
                 "type": "string"
-              },
-              "perceived_effort": {
-                "nullable": true,
-                "type": "integer"
-              },
-              "performed_at_tz": {
-                "type": "string"
-              },
-              "performed_at_utc": {
-                "format": "date-time",
-                "type": "string"
-              },
-              "performed_exercises": {
-                "items": {
-                  "properties": {
-                    "calories": {
-                      "minimum": 0,
-                      "nullable": true,
-                      "type": "integer"
-                    },
-                    "distance": {
-                      "minimum": 0,
-                      "nullable": true,
-                      "type": "number"
-                    },
-                    "distance_unit": {
-                      "enum": [
-                        "m",
-                        "km",
-                        "mi"
-                      ],
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "duration_seconds": {
-                      "minimum": 0,
-                      "nullable": true,
-                      "type": "integer"
-                    },
-                    "exercise_ref": {
-                      "maxLength": 120,
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "load": {
-                      "minimum": 0,
-                      "nullable": true,
-                      "type": "number"
-                    },
-                    "load_unit": {
-                      "enum": [
-                        "kg",
-                        "lb"
-                      ],
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "name": {
-                      "maxLength": 120,
-                      "minLength": 1,
-                      "type": "string"
-                    },
-                    "note": {
-                      "maxLength": 500,
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "reps": {
-                      "minimum": 0,
-                      "nullable": true,
-                      "type": "integer"
-                    },
-                    "row_index": {
-                      "type": "integer"
-                    },
-                    "sets": {
-                      "maximum": 100,
-                      "minimum": 1,
-                      "nullable": true,
-                      "type": "integer"
-                    }
-                  },
-                  "required": [
-                    "name"
-                  ],
-                  "type": "object"
-                },
-                "type": "array"
-              },
-              "scale_level_slug": {
-                "nullable": true,
-                "type": "string"
-              },
-              "section_scores": {
-                "items": {
-                  "properties": {
-                    "section_id": {
-                      "type": "string"
-                    },
-                    "unit": {
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "value": {
-                      "oneOf": [
-                        {
-                          "type": "number"
-                        },
-                        {
-                          "type": "string"
-                        }
-                      ]
-                    }
-                  },
-                  "required": [
-                    "section_id",
-                    "value"
-                  ],
-                  "type": "object"
-                },
-                "type": "array"
-              },
-              "source_reference_id": {
-                "format": "uuid",
-                "nullable": true,
-                "type": "string"
-              },
-              "source_type": {
-                "enum": [
-                  "class",
-                  "assigned_workout",
-                  "library_workout",
-                  "freeform"
-                ],
-                "type": "string"
-              },
-              "status": {
-                "enum": [
-                  "logged",
-                  "voided"
-                ],
-                "type": "string"
-              },
-              "title": {
-                "type": "string"
-              },
-              "updated_at": {
-                "format": "date-time",
-                "type": "string"
-              },
-              "user_id": {
-                "format": "uuid",
-                "type": "string"
-              },
-              "void_reason": {
-                "nullable": true,
-                "type": "string"
-              },
-              "voided_at": {
-                "format": "date-time",
-                "nullable": true,
-                "type": "string"
-              },
-              "workout_type": {
-                "nullable": true,
-                "type": "string"
               }
             },
             "required": [
-              "id",
-              "source_type",
-              "title",
-              "performed_at_utc",
-              "status",
-              "lock_version",
-              "section_scores",
-              "exercise_modifications",
-              "performed_exercises"
+              "organization_id",
+              "brand_logo_url",
+              "brand_logo_uploaded"
             ],
-            "title": "TrainingLogEntry",
+            "title": "OrganizationBranding",
             "type": "object"
           }
         },
         "required": [
-          "entry"
+          "branding"
         ],
-        "title": "TrainingLogEntryResponse",
+        "title": "OrganizationBrandingResponse",
         "type": "object"
       },
-      "TrainingLogSources": {
+      "OrganizationLogoFinalizeRequest": {
         "properties": {
-          "assignments": {
-            "items": {
-              "properties": {
-                "id": {
-                  "format": "uuid",
-                  "type": "string"
-                },
-                "scheduled_for": {
-                  "format": "date",
-                  "type": "string"
-                },
-                "scoreable_sections": {
-                  "items": {
-                    "properties": {
-                      "id": {
-                        "type": "string"
-                      },
-                      "name": {
-                        "nullable": true,
-                        "type": "string"
-                      },
-                      "score_type": {
-                        "nullable": true,
-                        "type": "string"
-                      },
-                      "unit": {
-                        "nullable": true,
-                        "type": "string"
-                      }
-                    },
-                    "required": [
-                      "id"
-                    ],
-                    "type": "object"
-                  },
-                  "type": "array"
-                },
-                "title": {
-                  "type": "string"
-                },
-                "workout_id": {
-                  "format": "uuid",
-                  "nullable": true,
-                  "type": "string"
-                },
-                "workout_title": {
-                  "nullable": true,
-                  "type": "string"
-                }
+          "logo_key": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "logo_key"
+        ],
+        "title": "OrganizationLogoFinalizeRequest",
+        "type": "object"
+      },
+      "TrainingLogVoidRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "reason": {
+            "maxLength": 500,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "title": "TrainingLogVoidRequest",
+        "type": "object"
+      },
+      "MyInjuryWarningsAcknowledgement": {
+        "additionalProperties": false,
+        "properties": {
+          "source_context_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "surface": {
+            "enum": [
+              "assignment_detail",
+              "class_detail",
+              "pre_start"
+            ],
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "title": "MyInjuryWarningsAcknowledgement",
+        "type": "object"
+      },
+      "ExecutionInteractionEvent": {
+        "properties": {
+          "client_event_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "cast_mode_toggled",
+              "check_off_undone",
+              "cues_toggled",
+              "finish_wizard_abandoned",
+              "finish_wizard_opened",
+              "finish_wizard_saved",
+              "first_segment_started",
+              "pause",
+              "ready_screen_shown",
+              "resume",
+              "round_decremented",
+              "round_incremented",
+              "rounds_adjusted",
+              "segment_restarted",
+              "segment_skipped",
+              "time_adjusted",
+              "workout_launched"
+            ],
+            "type": "string"
+          },
+          "metadata": {
+            "additionalProperties": false,
+            "description": "Typed facts allowed for the interaction kind (see ADR-113). No free text; keys not allowed for the kind reject the batch.",
+            "properties": {
+              "countdown_seconds": {
+                "maximum": 600,
+                "minimum": 0,
+                "type": "integer"
               },
-              "required": [
-                "id",
-                "title",
-                "scheduled_for",
-                "scoreable_sections"
-              ],
-              "type": "object"
+              "cue_channel": {
+                "enum": [
+                  "sound",
+                  "voice",
+                  "vibration"
+                ],
+                "type": "string"
+              },
+              "delta_rounds": {
+                "maximum": 100,
+                "minimum": -100,
+                "type": "integer"
+              },
+              "delta_seconds": {
+                "maximum": 3600,
+                "minimum": -3600,
+                "type": "integer"
+              },
+              "duration_ms": {
+                "maximum": 86400000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "elapsed_ms": {
+                "maximum": 86400000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "format": {
+                "pattern": "^[A-Za-z0-9_-]{1,64}$",
+                "type": "string"
+              },
+              "orientation": {
+                "enum": [
+                  "portrait",
+                  "landscape"
+                ],
+                "type": "string"
+              },
+              "remaining_ms": {
+                "maximum": 86400000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "round_count": {
+                "maximum": 10000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "scored_section_count": {
+                "maximum": 1000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "section_id": {
+                "pattern": "^[A-Za-z0-9_-]{1,64}$",
+                "type": "string"
+              },
+              "segment_index": {
+                "maximum": 10000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "step": {
+                "maximum": 20,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "surface": {
+                "enum": [
+                  "pause_sheet",
+                  "primary_action",
+                  "header",
+                  "gesture",
+                  "keyboard",
+                  "snackbar",
+                  "ready_screen",
+                  "finish_wizard",
+                  "cast_display",
+                  "lock_screen"
+                ],
+                "type": "string"
+              }
             },
+            "type": "object"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "client_event_id",
+          "kind",
+          "occurred_at"
+        ],
+        "title": "ExecutionInteractionEvent",
+        "type": "object"
+      },
+      "WorkoutDslParseRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "source": {
+            "maxLength": 200000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "source"
+        ],
+        "title": "WorkoutDslParseRequest",
+        "type": "object"
+      },
+      "AthleteInjuryWarningsRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "source_context_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "surface": {
+            "enum": [
+              "assign_dialog",
+              "class_roster",
+              "member_dossier"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "user_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 250,
             "type": "array"
           },
-          "classes": {
+          "workout_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workout_id",
+          "user_ids"
+        ],
+        "title": "AthleteInjuryWarningsRequest",
+        "type": "object"
+      },
+      "WorkoutDslDiagnosticResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "diagnostics": {
             "items": {
+              "additionalProperties": false,
               "properties": {
-                "booking_id": {
-                  "format": "uuid",
-                  "nullable": true,
+                "code": {
                   "type": "string"
                 },
-                "id": {
-                  "format": "uuid",
-                  "type": "string"
+                "column": {
+                  "minimum": 1,
+                  "type": "integer"
                 },
-                "scheduled_at": {
-                  "format": "date-time",
-                  "type": "string"
+                "line": {
+                  "minimum": 1,
+                  "type": "integer"
                 },
-                "scoreable_sections": {
-                  "items": {
-                    "properties": {
-                      "id": {
-                        "type": "string"
-                      },
-                      "name": {
-                        "nullable": true,
-                        "type": "string"
-                      },
-                      "score_type": {
-                        "nullable": true,
-                        "type": "string"
-                      },
-                      "unit": {
-                        "nullable": true,
-                        "type": "string"
-                      }
-                    },
-                    "required": [
-                      "id"
-                    ],
-                    "type": "object"
-                  },
-                  "type": "array"
+                "params": {
+                  "additionalProperties": true,
+                  "type": "object"
                 },
-                "title": {
-                  "type": "string"
-                },
-                "workout_id": {
-                  "format": "uuid",
-                  "nullable": true,
-                  "type": "string"
-                },
-                "workout_title": {
-                  "nullable": true,
+                "severity": {
+                  "enum": [
+                    "error",
+                    "warning"
+                  ],
                   "type": "string"
                 }
               },
               "required": [
-                "id",
-                "title",
-                "scheduled_at",
-                "scoreable_sections"
+                "code",
+                "severity",
+                "line",
+                "column",
+                "params"
               ],
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "library_workouts": {
-            "items": {
-              "properties": {
-                "id": {
-                  "format": "uuid",
-                  "type": "string"
-                },
-                "title": {
-                  "type": "string"
-                },
-                "workout_type": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "required": [
-                "id",
-                "title"
-              ],
+              "title": "WorkoutDslDiagnostic",
               "type": "object"
             },
             "type": "array"
           }
         },
         "required": [
-          "classes",
-          "assignments",
-          "library_workouts"
+          "diagnostics"
         ],
-        "title": "TrainingLogSources",
+        "title": "WorkoutDslDiagnosticResponse",
+        "type": "object"
+      },
+      "WorkoutDslDiagnostic": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "column": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "line": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "params": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "severity": {
+            "enum": [
+              "error",
+              "warning"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "severity",
+          "line",
+          "column",
+          "params"
+        ],
+        "title": "WorkoutDslDiagnostic",
+        "type": "object"
+      },
+      "OrganizationBranding": {
+        "properties": {
+          "brand_logo_uploaded": {
+            "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-111).",
+            "type": "boolean"
+          },
+          "brand_logo_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "brand_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "brand_primary_color": {
+            "nullable": true,
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organization_id",
+          "brand_logo_url",
+          "brand_logo_uploaded"
+        ],
+        "title": "OrganizationBranding",
         "type": "object"
       },
       "TrainingLogUpdateRequest": {
@@ -2099,368 +1791,6 @@
         "title": "TrainingLogUpdateRequest",
         "type": "object"
       },
-      "TrainingLogVoidRequest": {
-        "additionalProperties": false,
-        "properties": {
-          "expected_version": {
-            "minimum": 1,
-            "type": "integer"
-          },
-          "reason": {
-            "maxLength": 500,
-            "nullable": true,
-            "type": "string"
-          }
-        },
-        "title": "TrainingLogVoidRequest",
-        "type": "object"
-      },
-      "ValidationError": {
-        "properties": {
-          "code": {
-            "enum": [
-              "validation_failed"
-            ],
-            "type": "string"
-          },
-          "errors": {
-            "additionalProperties": true,
-            "type": "object"
-          }
-        },
-        "required": [
-          "code",
-          "errors"
-        ],
-        "type": "object"
-      },
-      "WorkoutDslAuthoringResponse": {
-        "additionalProperties": false,
-        "properties": {
-          "authoring_mode": {
-            "enum": [
-              "structured",
-              "quick_text"
-            ],
-            "type": "string"
-          },
-          "diagnostics": {
-            "items": {
-              "additionalProperties": false,
-              "properties": {
-                "code": {
-                  "type": "string"
-                },
-                "column": {
-                  "minimum": 1,
-                  "type": "integer"
-                },
-                "line": {
-                  "minimum": 1,
-                  "type": "integer"
-                },
-                "params": {
-                  "additionalProperties": true,
-                  "type": "object"
-                },
-                "severity": {
-                  "enum": [
-                    "error",
-                    "warning"
-                  ],
-                  "type": "string"
-                }
-              },
-              "required": [
-                "code",
-                "severity",
-                "line",
-                "column",
-                "params"
-              ],
-              "title": "WorkoutDslDiagnostic",
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "document": {
-            "additionalProperties": true,
-            "nullable": true,
-            "type": "object"
-          },
-          "source": {
-            "type": "string"
-          },
-          "source_revision": {
-            "minimum": 0,
-            "type": "integer"
-          },
-          "version": {
-            "enum": [
-              1
-            ],
-            "type": "integer"
-          }
-        },
-        "required": [
-          "version",
-          "source",
-          "source_revision",
-          "authoring_mode",
-          "diagnostics"
-        ],
-        "title": "WorkoutDslAuthoringResponse",
-        "type": "object"
-      },
-      "WorkoutDslDiagnostic": {
-        "additionalProperties": false,
-        "properties": {
-          "code": {
-            "type": "string"
-          },
-          "column": {
-            "minimum": 1,
-            "type": "integer"
-          },
-          "line": {
-            "minimum": 1,
-            "type": "integer"
-          },
-          "params": {
-            "additionalProperties": true,
-            "type": "object"
-          },
-          "severity": {
-            "enum": [
-              "error",
-              "warning"
-            ],
-            "type": "string"
-          }
-        },
-        "required": [
-          "code",
-          "severity",
-          "line",
-          "column",
-          "params"
-        ],
-        "title": "WorkoutDslDiagnostic",
-        "type": "object"
-      },
-      "WorkoutDslDiagnosticResponse": {
-        "additionalProperties": false,
-        "properties": {
-          "diagnostics": {
-            "items": {
-              "additionalProperties": false,
-              "properties": {
-                "code": {
-                  "type": "string"
-                },
-                "column": {
-                  "minimum": 1,
-                  "type": "integer"
-                },
-                "line": {
-                  "minimum": 1,
-                  "type": "integer"
-                },
-                "params": {
-                  "additionalProperties": true,
-                  "type": "object"
-                },
-                "severity": {
-                  "enum": [
-                    "error",
-                    "warning"
-                  ],
-                  "type": "string"
-                }
-              },
-              "required": [
-                "code",
-                "severity",
-                "line",
-                "column",
-                "params"
-              ],
-              "title": "WorkoutDslDiagnostic",
-              "type": "object"
-            },
-            "type": "array"
-          }
-        },
-        "required": [
-          "diagnostics"
-        ],
-        "title": "WorkoutDslDiagnosticResponse",
-        "type": "object"
-      },
-      "WorkoutDslManualResponse": {
-        "additionalProperties": false,
-        "properties": {
-          "markdown": {
-            "type": "string"
-          },
-          "templates": {
-            "additionalProperties": true,
-            "type": "object"
-          },
-          "version": {
-            "enum": [
-              1
-            ],
-            "type": "integer"
-          },
-          "vocabulary": {
-            "additionalProperties": false,
-            "properties": {
-              "exercise_catalog": {
-                "items": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "aliases": {
-                      "items": {
-                        "type": "string"
-                      },
-                      "type": "array"
-                    },
-                    "capabilities": {
-                      "items": {
-                        "type": "string"
-                      },
-                      "type": "array"
-                    },
-                    "category": {
-                      "type": "string"
-                    },
-                    "id": {
-                      "type": "string"
-                    },
-                    "label": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "label",
-                    "category",
-                    "aliases",
-                    "capabilities"
-                  ],
-                  "type": "object"
-                },
-                "type": "array"
-              },
-              "exercise_parameters": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "format_aliases": {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              "format_specs": {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              "group_parameters": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "header_parameters": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "note_markers": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "scale_parameters": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "section_formats": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "section_parameters": {
-                "additionalProperties": {
-                  "items": {
-                    "type": "string"
-                  },
-                  "type": "array"
-                },
-                "type": "object"
-              },
-              "version": {
-                "enum": [
-                  1
-                ],
-                "type": "integer"
-              },
-              "workout_parameters": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              }
-            },
-            "required": [
-              "version",
-              "section_formats",
-              "format_aliases",
-              "format_specs",
-              "workout_parameters",
-              "exercise_parameters",
-              "group_parameters",
-              "scale_parameters",
-              "header_parameters",
-              "note_markers",
-              "section_parameters",
-              "exercise_catalog"
-            ],
-            "title": "WorkoutDslVocabulary",
-            "type": "object"
-          }
-        },
-        "required": [
-          "version",
-          "markdown",
-          "templates",
-          "vocabulary"
-        ],
-        "title": "WorkoutDslManualResponse",
-        "type": "object"
-      },
-      "WorkoutDslParseRequest": {
-        "additionalProperties": false,
-        "properties": {
-          "source": {
-            "maxLength": 200000,
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "required": [
-          "source"
-        ],
-        "title": "WorkoutDslParseRequest",
-        "type": "object"
-      },
       "WorkoutDslParseResponse": {
         "additionalProperties": false,
         "properties": {
@@ -2650,96 +1980,367 @@
         "title": "WorkoutDslParseResponse",
         "type": "object"
       },
-      "WorkoutDslPublishRequest": {
-        "additionalProperties": false,
+      "TrainingLogEntry": {
         "properties": {
-          "acknowledge_warnings": {
-            "default": false,
-            "type": "boolean"
-          },
-          "document": {
-            "additionalProperties": true,
+          "booking_id": {
+            "format": "uuid",
             "nullable": true,
-            "type": "object"
+            "type": "string"
           },
-          "expected_source_revision": {
-            "minimum": 0,
+          "duration_seconds": {
+            "nullable": true,
             "type": "integer"
           },
-          "source": {
-            "maxLength": 200000,
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "required": [
-          "source",
-          "expected_source_revision"
-        ],
-        "title": "WorkoutDslPublishRequest",
-        "type": "object"
-      },
-      "WorkoutDslPublishResponse": {
-        "additionalProperties": false,
-        "properties": {
-          "diagnostics": {
+          "exercise_modifications": {
             "items": {
-              "additionalProperties": false,
               "properties": {
-                "code": {
+                "actual_value": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "canonical_value": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "exercise_id": {
+                  "nullable": true,
                   "type": "string"
                 },
-                "column": {
-                  "minimum": 1,
+                "exercise_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "field": {
+                  "type": "string"
+                },
+                "interval_index": {
+                  "nullable": true,
                   "type": "integer"
                 },
-                "line": {
-                  "minimum": 1,
+                "note": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "patch_id": {
+                  "type": "string"
+                },
+                "round_index": {
+                  "nullable": true,
                   "type": "integer"
                 },
-                "params": {
-                  "additionalProperties": true,
-                  "type": "object"
+                "row_index": {
+                  "nullable": true,
+                  "type": "integer"
                 },
-                "severity": {
-                  "enum": [
-                    "error",
-                    "warning"
-                  ],
+                "section_id": {
+                  "type": "string"
+                },
+                "section_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "segment_key": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "set_index": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "unit": {
+                  "nullable": true,
                   "type": "string"
                 }
               },
               "required": [
-                "code",
-                "severity",
-                "line",
-                "column",
-                "params"
+                "patch_id",
+                "section_id",
+                "field",
+                "canonical_value",
+                "actual_value"
               ],
-              "title": "WorkoutDslDiagnostic",
               "type": "object"
             },
             "type": "array"
           },
-          "execution_preview": {
-            "additionalProperties": true,
-            "type": "object"
-          },
-          "formatted_source": {
+          "id": {
+            "format": "uuid",
             "type": "string"
           },
-          "workout": {
+          "idempotency_key": {
+            "type": "string"
+          },
+          "inserted_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "lock_version": {
+            "type": "integer"
+          },
+          "master_workout_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "notes": {
+            "nullable": true,
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "perceived_effort": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "performed_at_tz": {
+            "type": "string"
+          },
+          "performed_at_utc": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "performed_exercises": {
+            "items": {
+              "properties": {
+                "calories": {
+                  "minimum": 0,
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "distance": {
+                  "minimum": 0,
+                  "nullable": true,
+                  "type": "number"
+                },
+                "distance_unit": {
+                  "enum": [
+                    "m",
+                    "km",
+                    "mi"
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
+                "duration_seconds": {
+                  "minimum": 0,
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "exercise_ref": {
+                  "maxLength": 120,
+                  "nullable": true,
+                  "type": "string"
+                },
+                "load": {
+                  "minimum": 0,
+                  "nullable": true,
+                  "type": "number"
+                },
+                "load_unit": {
+                  "enum": [
+                    "kg",
+                    "lb"
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
+                "name": {
+                  "maxLength": 120,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "note": {
+                  "maxLength": 500,
+                  "nullable": true,
+                  "type": "string"
+                },
+                "reps": {
+                  "minimum": 0,
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "row_index": {
+                  "type": "integer"
+                },
+                "sets": {
+                  "maximum": 100,
+                  "minimum": 1,
+                  "nullable": true,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "scale_level_slug": {
+            "nullable": true,
+            "type": "string"
+          },
+          "section_scores": {
+            "items": {
+              "properties": {
+                "section_id": {
+                  "type": "string"
+                },
+                "unit": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "value": {
+                  "oneOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "section_id",
+                "value"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "source_reference_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "source_type": {
+            "enum": [
+              "class",
+              "assigned_workout",
+              "library_workout",
+              "freeform"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "logged",
+              "voided"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "void_reason": {
+            "nullable": true,
+            "type": "string"
+          },
+          "voided_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "workout_type": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "source_type",
+          "title",
+          "performed_at_utc",
+          "status",
+          "lock_version",
+          "section_scores",
+          "exercise_modifications",
+          "performed_exercises"
+        ],
+        "title": "TrainingLogEntry",
+        "type": "object"
+      },
+      "SemanticError": {
+        "description": "Stable machine-readable API failure with English compatibility copy.",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          },
+          "params": {
             "additionalProperties": true,
             "type": "object"
           }
         },
         "required": [
-          "workout",
-          "formatted_source",
-          "diagnostics",
-          "execution_preview"
+          "code",
+          "error"
         ],
-        "title": "WorkoutDslPublishResponse",
+        "type": "object"
+      },
+      "OrganizationLogoUpload": {
+        "properties": {
+          "expires_in": {
+            "type": "integer"
+          },
+          "key": {
+            "type": "string"
+          },
+          "max_bytes": {
+            "type": "integer"
+          },
+          "required_headers": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "upload_url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "upload_url",
+          "key",
+          "required_headers",
+          "expires_in",
+          "max_bytes"
+        ],
+        "title": "OrganizationLogoUpload",
         "type": "object"
       },
       "WorkoutDslVocabulary": {
@@ -2863,6 +2464,1001 @@
           "exercise_catalog"
         ],
         "title": "WorkoutDslVocabulary",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "code": {
+            "enum": [
+              "validation_failed"
+            ],
+            "type": "string"
+          },
+          "errors": {
+            "additionalProperties": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "code",
+          "errors"
+        ],
+        "type": "object"
+      },
+      "ExecutionInteractionBatch": {
+        "properties": {
+          "events": {
+            "items": {
+              "properties": {
+                "client_event_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "cast_mode_toggled",
+                    "check_off_undone",
+                    "cues_toggled",
+                    "finish_wizard_abandoned",
+                    "finish_wizard_opened",
+                    "finish_wizard_saved",
+                    "first_segment_started",
+                    "pause",
+                    "ready_screen_shown",
+                    "resume",
+                    "round_decremented",
+                    "round_incremented",
+                    "rounds_adjusted",
+                    "segment_restarted",
+                    "segment_skipped",
+                    "time_adjusted",
+                    "workout_launched"
+                  ],
+                  "type": "string"
+                },
+                "metadata": {
+                  "additionalProperties": false,
+                  "description": "Typed facts allowed for the interaction kind (see ADR-113). No free text; keys not allowed for the kind reject the batch.",
+                  "properties": {
+                    "countdown_seconds": {
+                      "maximum": 600,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "cue_channel": {
+                      "enum": [
+                        "sound",
+                        "voice",
+                        "vibration"
+                      ],
+                      "type": "string"
+                    },
+                    "delta_rounds": {
+                      "maximum": 100,
+                      "minimum": -100,
+                      "type": "integer"
+                    },
+                    "delta_seconds": {
+                      "maximum": 3600,
+                      "minimum": -3600,
+                      "type": "integer"
+                    },
+                    "duration_ms": {
+                      "maximum": 86400000,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "elapsed_ms": {
+                      "maximum": 86400000,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "format": {
+                      "pattern": "^[A-Za-z0-9_-]{1,64}$",
+                      "type": "string"
+                    },
+                    "orientation": {
+                      "enum": [
+                        "portrait",
+                        "landscape"
+                      ],
+                      "type": "string"
+                    },
+                    "remaining_ms": {
+                      "maximum": 86400000,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "round_count": {
+                      "maximum": 10000,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "scored_section_count": {
+                      "maximum": 1000,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "section_id": {
+                      "pattern": "^[A-Za-z0-9_-]{1,64}$",
+                      "type": "string"
+                    },
+                    "segment_index": {
+                      "maximum": 10000,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "step": {
+                      "maximum": 20,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "surface": {
+                      "enum": [
+                        "pause_sheet",
+                        "primary_action",
+                        "header",
+                        "gesture",
+                        "keyboard",
+                        "snackbar",
+                        "ready_screen",
+                        "finish_wizard",
+                        "cast_display",
+                        "lock_screen"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "occurred_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "client_event_id",
+                "kind",
+                "occurred_at"
+              ],
+              "title": "ExecutionInteractionEvent",
+              "type": "object"
+            },
+            "maxItems": 50,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "events"
+        ],
+        "title": "ExecutionInteractionBatch",
+        "type": "object"
+      },
+      "ExecutionInteractionBatchResult": {
+        "properties": {
+          "accepted": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "duplicates": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "accepted",
+          "duplicates"
+        ],
+        "title": "ExecutionInteractionBatchResult",
+        "type": "object"
+      },
+      "WorkoutDslAuthoringResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "authoring_mode": {
+            "enum": [
+              "structured",
+              "quick_text"
+            ],
+            "type": "string"
+          },
+          "diagnostics": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "column": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "line": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "params": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "severity": {
+                  "enum": [
+                    "error",
+                    "warning"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "code",
+                "severity",
+                "line",
+                "column",
+                "params"
+              ],
+              "title": "WorkoutDslDiagnostic",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "document": {
+            "additionalProperties": true,
+            "nullable": true,
+            "type": "object"
+          },
+          "source": {
+            "type": "string"
+          },
+          "source_revision": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "version": {
+            "enum": [
+              1
+            ],
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "source",
+          "source_revision",
+          "authoring_mode",
+          "diagnostics"
+        ],
+        "title": "WorkoutDslAuthoringResponse",
+        "type": "object"
+      },
+      "WorkoutDslPublishRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "acknowledge_warnings": {
+            "default": false,
+            "type": "boolean"
+          },
+          "document": {
+            "additionalProperties": true,
+            "nullable": true,
+            "type": "object"
+          },
+          "expected_source_revision": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "source": {
+            "maxLength": 200000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "expected_source_revision"
+        ],
+        "title": "WorkoutDslPublishRequest",
+        "type": "object"
+      },
+      "WorkoutDslManualResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "markdown": {
+            "type": "string"
+          },
+          "templates": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "version": {
+            "enum": [
+              1
+            ],
+            "type": "integer"
+          },
+          "vocabulary": {
+            "additionalProperties": false,
+            "properties": {
+              "exercise_catalog": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "aliases": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "capabilities": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "category": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "label",
+                    "category",
+                    "aliases",
+                    "capabilities"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "exercise_parameters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "format_aliases": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "format_specs": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "group_parameters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "header_parameters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "note_markers": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "scale_parameters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "section_formats": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "section_parameters": {
+                "additionalProperties": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "type": "object"
+              },
+              "version": {
+                "enum": [
+                  1
+                ],
+                "type": "integer"
+              },
+              "workout_parameters": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "version",
+              "section_formats",
+              "format_aliases",
+              "format_specs",
+              "workout_parameters",
+              "exercise_parameters",
+              "group_parameters",
+              "scale_parameters",
+              "header_parameters",
+              "note_markers",
+              "section_parameters",
+              "exercise_catalog"
+            ],
+            "title": "WorkoutDslVocabulary",
+            "type": "object"
+          }
+        },
+        "required": [
+          "version",
+          "markdown",
+          "templates",
+          "vocabulary"
+        ],
+        "title": "WorkoutDslManualResponse",
+        "type": "object"
+      },
+      "ClassSlotInjuryWarnings": {
+        "additionalProperties": false,
+        "properties": {
+          "athletes": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "level": {
+                  "enum": [
+                    "none",
+                    "caution",
+                    "avoid"
+                  ],
+                  "type": "string"
+                },
+                "user_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "warnings": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "body_area": {
+                        "type": "string"
+                      },
+                      "exercises": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "exercise_ref": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "level": {
+                              "enum": [
+                                "caution",
+                                "avoid"
+                              ],
+                              "type": "string"
+                            },
+                            "match": {
+                              "enum": [
+                                "catalog",
+                                "name"
+                              ],
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "patterns": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "name",
+                            "level",
+                            "patterns",
+                            "match"
+                          ],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "injury_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "level": {
+                        "enum": [
+                          "caution",
+                          "avoid"
+                        ],
+                        "type": "string"
+                      },
+                      "provenance": {
+                        "enum": [
+                          "organization",
+                          "personal"
+                        ],
+                        "type": "string"
+                      },
+                      "regions": {
+                        "items": {
+                          "enum": [
+                            "shoulder",
+                            "elbow",
+                            "wrist",
+                            "neck",
+                            "back",
+                            "hip",
+                            "knee",
+                            "hamstring",
+                            "ankle",
+                            "chest",
+                            "core"
+                          ],
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "severity": {
+                        "enum": [
+                          "mild",
+                          "moderate",
+                          "severe"
+                        ],
+                        "type": "string"
+                      },
+                      "tags": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "training_limitations": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "user_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "injury_id",
+                      "user_id",
+                      "body_area",
+                      "regions",
+                      "severity",
+                      "level",
+                      "provenance",
+                      "tags",
+                      "exercises"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "user_id",
+                "level",
+                "warnings"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "level": {
+            "enum": [
+              "none",
+              "caution",
+              "avoid"
+            ],
+            "type": "string"
+          },
+          "slot_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "workout_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "slot_id",
+          "level",
+          "athletes"
+        ],
+        "title": "ClassSlotInjuryWarnings",
+        "type": "object"
+      },
+      "AthleteInjuryWarnings": {
+        "additionalProperties": false,
+        "properties": {
+          "athletes": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "level": {
+                  "enum": [
+                    "none",
+                    "caution",
+                    "avoid"
+                  ],
+                  "type": "string"
+                },
+                "user_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "warnings": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "body_area": {
+                        "type": "string"
+                      },
+                      "exercises": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "exercise_ref": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "level": {
+                              "enum": [
+                                "caution",
+                                "avoid"
+                              ],
+                              "type": "string"
+                            },
+                            "match": {
+                              "enum": [
+                                "catalog",
+                                "name"
+                              ],
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "patterns": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "name",
+                            "level",
+                            "patterns",
+                            "match"
+                          ],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "injury_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "level": {
+                        "enum": [
+                          "caution",
+                          "avoid"
+                        ],
+                        "type": "string"
+                      },
+                      "provenance": {
+                        "enum": [
+                          "organization",
+                          "personal"
+                        ],
+                        "type": "string"
+                      },
+                      "regions": {
+                        "items": {
+                          "enum": [
+                            "shoulder",
+                            "elbow",
+                            "wrist",
+                            "neck",
+                            "back",
+                            "hip",
+                            "knee",
+                            "hamstring",
+                            "ankle",
+                            "chest",
+                            "core"
+                          ],
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "severity": {
+                        "enum": [
+                          "mild",
+                          "moderate",
+                          "severe"
+                        ],
+                        "type": "string"
+                      },
+                      "tags": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "training_limitations": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "user_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "injury_id",
+                      "user_id",
+                      "body_area",
+                      "regions",
+                      "severity",
+                      "level",
+                      "provenance",
+                      "tags",
+                      "exercises"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "user_id",
+                "level",
+                "warnings"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "level": {
+            "enum": [
+              "none",
+              "caution",
+              "avoid"
+            ],
+            "type": "string"
+          },
+          "workout_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workout_id",
+          "level",
+          "athletes"
+        ],
+        "title": "AthleteInjuryWarnings",
+        "type": "object"
+      },
+      "TrainingLogSources": {
+        "properties": {
+          "assignments": {
+            "items": {
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "scheduled_for": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "scoreable_sections": {
+                  "items": {
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "score_type": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "unit": {
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "workout_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "workout_title": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "scheduled_for",
+                "scoreable_sections"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "classes": {
+            "items": {
+              "properties": {
+                "booking_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "scheduled_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "scoreable_sections": {
+                  "items": {
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "score_type": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "unit": {
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "workout_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "workout_title": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "scheduled_at",
+                "scoreable_sections"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "library_workouts": {
+            "items": {
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "workout_type": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "title"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "classes",
+          "assignments",
+          "library_workouts"
+        ],
+        "title": "TrainingLogSources",
+        "type": "object"
+      },
+      "AthleteInjuryWarningsAcknowledged": {
+        "additionalProperties": false,
+        "properties": {
+          "acknowledged_count": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "acknowledged_count"
+        ],
+        "title": "AthleteInjuryWarningsAcknowledged",
+        "type": "object"
+      },
+      "MyInjuryWarningsAcknowledged": {
+        "additionalProperties": false,
+        "properties": {
+          "level": {
+            "enum": [
+              "none",
+              "caution",
+              "avoid"
+            ],
+            "type": "string"
+          },
+          "warning_count": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "level",
+          "warning_count"
+        ],
+        "title": "MyInjuryWarningsAcknowledged",
         "type": "object"
       }
     },
@@ -3969,7 +4565,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Summarize what renaming an organization's path slug affects (ADR-104)",
+        "summary": "Summarize what renaming an organization's path slug affects (ADR-112)",
         "tags": [
           "Platform Organizations"
         ]
@@ -14398,7 +14994,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Athlete reports opening an assigned workout's detail (analytics, ADR-105)",
+        "summary": "Assignee reports opening an assigned workout's detail (analytics, ADR-121)",
         "tags": [
           "Assigned Workouts"
         ]
@@ -18698,6 +19294,220 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/schedule/slots/{id}/injury-warnings": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminInjuryWarningController.slot",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "athletes": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "level": {
+                            "enum": [
+                              "none",
+                              "caution",
+                              "avoid"
+                            ],
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "warnings": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "body_area": {
+                                  "type": "string"
+                                },
+                                "exercises": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "exercise_ref": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "level": {
+                                        "enum": [
+                                          "caution",
+                                          "avoid"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "match": {
+                                        "enum": [
+                                          "catalog",
+                                          "name"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "patterns": {
+                                        "items": {
+                                          "type": "string"
+                                        },
+                                        "type": "array"
+                                      }
+                                    },
+                                    "required": [
+                                      "name",
+                                      "level",
+                                      "patterns",
+                                      "match"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "injury_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "level": {
+                                  "enum": [
+                                    "caution",
+                                    "avoid"
+                                  ],
+                                  "type": "string"
+                                },
+                                "provenance": {
+                                  "enum": [
+                                    "organization",
+                                    "personal"
+                                  ],
+                                  "type": "string"
+                                },
+                                "regions": {
+                                  "items": {
+                                    "enum": [
+                                      "shoulder",
+                                      "elbow",
+                                      "wrist",
+                                      "neck",
+                                      "back",
+                                      "hip",
+                                      "knee",
+                                      "hamstring",
+                                      "ankle",
+                                      "chest",
+                                      "core"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "type": "array"
+                                },
+                                "severity": {
+                                  "enum": [
+                                    "mild",
+                                    "moderate",
+                                    "severe"
+                                  ],
+                                  "type": "string"
+                                },
+                                "tags": {
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "type": "array"
+                                },
+                                "training_limitations": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "user_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "injury_id",
+                                "user_id",
+                                "body_area",
+                                "regions",
+                                "severity",
+                                "level",
+                                "provenance",
+                                "tags",
+                                "exercises"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "user_id",
+                          "level",
+                          "warnings"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "level": {
+                      "enum": [
+                        "none",
+                        "caution",
+                        "avoid"
+                      ],
+                      "type": "string"
+                    },
+                    "slot_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "workout_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "slot_id",
+                    "level",
+                    "athletes"
+                  ],
+                  "title": "ClassSlotInjuryWarnings",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Injury warnings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Injury safety warnings for the members booked into a class slot",
+        "tags": [
+          "Admin Wellbeing"
+        ]
+      }
+    },
     "/api/platform/organizations/{id}/memberships/{membership_id}/role": {
       "patch": {
         "callbacks": {},
@@ -19346,7 +20156,7 @@
                     "branding": {
                       "properties": {
                         "brand_logo_uploaded": {
-                          "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-103).",
+                          "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-111).",
                           "type": "boolean"
                         },
                         "brand_logo_url": {
@@ -19440,7 +20250,7 @@
                     "branding": {
                       "properties": {
                         "brand_logo_uploaded": {
-                          "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-103).",
+                          "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-111).",
                           "type": "boolean"
                         },
                         "brand_logo_url": {
@@ -27884,7 +28694,7 @@
                     "branding": {
                       "properties": {
                         "brand_logo_uploaded": {
-                          "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-103).",
+                          "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-111).",
                           "type": "boolean"
                         },
                         "brand_logo_url": {
@@ -28041,6 +28851,7 @@
     "/api/org/{organization_slug}/admin/assigned-workouts": {
       "post": {
         "callbacks": {},
+        "description": "ADR-115: `athlete_ids` holds assignee user ids - active athletes or members of the organization (the field name is kept for compatibility). Members require a package with the personal_programming channel and execute_assigned_workouts capability (403 `member_programming_not_entitled`). `source_slot_id` makes the assignment one member's version of a class they booked (exactly one member; 422 `class_variant_requires_single_member` / `slot_not_booked_by_member`).",
         "operationId": "MilosTrainingWeb.AdminAssignedWorkoutController.create",
         "parameters": [],
         "requestBody": {
@@ -28052,6 +28863,7 @@
                     "type": "string"
                   },
                   "athlete_ids": {
+                    "description": "Assignee user ids (athletes or members).",
                     "items": {
                       "format": "uuid",
                       "type": "string"
@@ -28064,6 +28876,12 @@
                   },
                   "scheduled_for": {
                     "format": "date",
+                    "type": "string"
+                  },
+                  "source_slot_id": {
+                    "description": "Class occurrence this assignment is a member's version of (ADR-115).",
+                    "format": "uuid",
+                    "nullable": true,
                     "type": "string"
                   }
                 },
@@ -28104,7 +28922,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Assign a published workout to one or more athletes",
+        "summary": "Assign a published workout to one or more athletes or members",
         "tags": [
           "Admin Assigned Workouts"
         ]
@@ -28902,7 +29720,7 @@
                         },
                         "metadata": {
                           "additionalProperties": false,
-                          "description": "Typed facts allowed for the interaction kind (see ADR-105). No free text; keys not allowed for the kind reject the batch.",
+                          "description": "Typed facts allowed for the interaction kind (see ADR-113). No free text; keys not allowed for the kind reject the batch.",
                           "properties": {
                             "countdown_seconds": {
                               "maximum": 600,
@@ -29109,7 +29927,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Report client-only execution interaction events (analytics, ADR-105)",
+        "summary": "Report client-only execution interaction events (analytics, ADR-113)",
         "tags": [
           "Execution"
         ]
@@ -29315,7 +30133,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Athlete rejects an assigned workout",
+        "summary": "Assignee (athlete or member, ADR-115) rejects an assigned workout",
         "tags": [
           "Assigned Workouts"
         ]
@@ -30647,6 +31465,7 @@
     "/api/org/{organization_slug}/my-workouts": {
       "get": {
         "callbacks": {},
+        "description": "ADR-115: members receive personal assignments and class variants. Each assignment carries `assignment_kind` (`personal` | `class_variant`) and `source_slot_id` (the class a variant belongs to, or null).",
         "operationId": "MilosTrainingWeb.MyWorkoutController.index",
         "parameters": [
           {
@@ -30698,7 +31517,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "List assigned workouts for the current athlete or all athlete assignments for admins",
+        "summary": "List assigned workouts for the current athlete or member, or all assignments for staff",
         "tags": [
           "Assigned Workouts"
         ]
@@ -31206,6 +32025,92 @@
         "summary": "Rename or reorder an active class type",
         "tags": [
           "Admin Class Types"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/workouts/{workout_id}/injury-warnings/acknowledge": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyInjuryWarningController.acknowledge",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "workout_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "source_context_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "surface": {
+                    "enum": [
+                      "assignment_detail",
+                      "class_detail",
+                      "pre_start"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "title": "MyInjuryWarningsAcknowledgement",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "level": {
+                      "enum": [
+                        "none",
+                        "caution",
+                        "avoid"
+                      ],
+                      "type": "string"
+                    },
+                    "warning_count": {
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "level",
+                    "warning_count"
+                  ],
+                  "title": "MyInjuryWarningsAcknowledged",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Acknowledged"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Acknowledge the current user's injury safety warnings for a workout",
+        "tags": [
+          "Wellbeing"
         ]
       }
     },
@@ -31785,7 +32690,7 @@
       },
       "post": {
         "callbacks": {},
-        "description": "Idempotent per `idempotency_key`: a replay returns the original entry with 200, before source authorization is re-evaluated (ADR-102). Reusing a key for a different source returns 409 `idempotency_key_conflict`. Logging feeds the same durable completion projection as workout executions.",
+        "description": "Idempotent per `idempotency_key`: a replay returns the original entry with 200, before source authorization is re-evaluated (ADR-110). Reusing a key for a different source returns 409 `idempotency_key_conflict`. Logging feeds the same durable completion projection as workout executions.",
         "operationId": "MilosTrainingWeb.TrainingLogController.create",
         "parameters": [],
         "requestBody": {
@@ -33608,6 +34513,212 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/me/workouts/{workout_id}/injury-warnings": {
+      "get": {
+        "callbacks": {},
+        "description": "Informational only (ADR-114): includes the user's own personal injuries; never blocks starting the workout.",
+        "operationId": "MilosTrainingWeb.MyInjuryWarningController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "workout_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "surface",
+            "required": false,
+            "schema": {
+              "enum": [
+                "assignment_detail",
+                "class_detail",
+                "pre_start"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "source_context_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "level": {
+                      "enum": [
+                        "none",
+                        "caution",
+                        "avoid"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "body_area": {
+                            "type": "string"
+                          },
+                          "exercises": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "exercise_ref": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "level": {
+                                  "enum": [
+                                    "caution",
+                                    "avoid"
+                                  ],
+                                  "type": "string"
+                                },
+                                "match": {
+                                  "enum": [
+                                    "catalog",
+                                    "name"
+                                  ],
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "patterns": {
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "name",
+                                "level",
+                                "patterns",
+                                "match"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "injury_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "level": {
+                            "enum": [
+                              "caution",
+                              "avoid"
+                            ],
+                            "type": "string"
+                          },
+                          "provenance": {
+                            "enum": [
+                              "organization",
+                              "personal"
+                            ],
+                            "type": "string"
+                          },
+                          "regions": {
+                            "items": {
+                              "enum": [
+                                "shoulder",
+                                "elbow",
+                                "wrist",
+                                "neck",
+                                "back",
+                                "hip",
+                                "knee",
+                                "hamstring",
+                                "ankle",
+                                "chest",
+                                "core"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "severity": {
+                            "enum": [
+                              "mild",
+                              "moderate",
+                              "severe"
+                            ],
+                            "type": "string"
+                          },
+                          "tags": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "training_limitations": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "injury_id",
+                          "user_id",
+                          "body_area",
+                          "regions",
+                          "severity",
+                          "level",
+                          "provenance",
+                          "tags",
+                          "exercises"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "workout_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "workout_id",
+                    "level",
+                    "warnings"
+                  ],
+                  "title": "MyWorkoutInjuryWarnings",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Injury warnings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The current user's injury safety warnings for a workout",
+        "tags": [
+          "Wellbeing"
+        ]
+      }
+    },
     "/api/me/profile": {
       "patch": {
         "callbacks": {},
@@ -34735,7 +35846,7 @@
                     "branding": {
                       "properties": {
                         "brand_logo_uploaded": {
-                          "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-103).",
+                          "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-111).",
                           "type": "boolean"
                         },
                         "brand_logo_url": {
@@ -34819,7 +35930,7 @@
                     "branding": {
                       "properties": {
                         "brand_logo_uploaded": {
-                          "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-103).",
+                          "description": "True when brand_logo_url is derived from an uploaded logo object (ADR-111).",
                           "type": "boolean"
                         },
                         "brand_logo_url": {
@@ -35308,7 +36419,7 @@
     "/api/org/{organization_slug}/admin/bookings/{id}/reject": {
       "patch": {
         "callbacks": {},
-        "description": "Booking resolution is never replayed blindly (ADR-102): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.",
+        "description": "Booking resolution is never replayed blindly (ADR-110): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.",
         "operationId": "MilosTrainingWeb.AdminScheduleController.reject_booking",
         "parameters": [
           {
@@ -35330,7 +36441,7 @@
                     "type": "string"
                   },
                   "client_operation_id": {
-                    "description": "Stable client operation id (ADR-102). Replaying the operation that already resolved the booking returns it with 200 and no new notification.",
+                    "description": "Stable client operation id (ADR-110). Replaying the operation that already resolved the booking returns it with 200 and no new notification.",
                     "format": "uuid",
                     "nullable": true,
                     "type": "string"
@@ -35431,7 +36542,7 @@
     "/api/org/{organization_slug}/admin/bookings/{id}/approve": {
       "patch": {
         "callbacks": {},
-        "description": "Booking resolution is never replayed blindly (ADR-102): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.",
+        "description": "Booking resolution is never replayed blindly (ADR-110): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.",
         "operationId": "MilosTrainingWeb.AdminScheduleController.approve_booking",
         "parameters": [
           {
@@ -35453,7 +36564,7 @@
                     "type": "string"
                   },
                   "client_operation_id": {
-                    "description": "Stable client operation id (ADR-102). Replaying the operation that already resolved the booking returns it with 200 and no new notification.",
+                    "description": "Stable client operation id (ADR-110). Replaying the operation that already resolved the booking returns it with 200 and no new notification.",
                     "format": "uuid",
                     "nullable": true,
                     "type": "string"
@@ -36175,6 +37286,334 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/wellbeing/injury-warnings": {
+      "post": {
+        "callbacks": {},
+        "description": "Informational only (ADR-114). Only injuries with this organization's provenance are considered; members' personal self-reports are never visible to staff.",
+        "operationId": "MilosTrainingWeb.AdminInjuryWarningController.evaluate",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "source_context_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "surface": {
+                    "enum": [
+                      "assign_dialog",
+                      "class_roster",
+                      "member_dossier"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "user_ids": {
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 250,
+                    "type": "array"
+                  },
+                  "workout_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "workout_id",
+                  "user_ids"
+                ],
+                "title": "AthleteInjuryWarningsRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "athletes": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "level": {
+                            "enum": [
+                              "none",
+                              "caution",
+                              "avoid"
+                            ],
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "warnings": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "body_area": {
+                                  "type": "string"
+                                },
+                                "exercises": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "exercise_ref": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "level": {
+                                        "enum": [
+                                          "caution",
+                                          "avoid"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "match": {
+                                        "enum": [
+                                          "catalog",
+                                          "name"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "patterns": {
+                                        "items": {
+                                          "type": "string"
+                                        },
+                                        "type": "array"
+                                      }
+                                    },
+                                    "required": [
+                                      "name",
+                                      "level",
+                                      "patterns",
+                                      "match"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "injury_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "level": {
+                                  "enum": [
+                                    "caution",
+                                    "avoid"
+                                  ],
+                                  "type": "string"
+                                },
+                                "provenance": {
+                                  "enum": [
+                                    "organization",
+                                    "personal"
+                                  ],
+                                  "type": "string"
+                                },
+                                "regions": {
+                                  "items": {
+                                    "enum": [
+                                      "shoulder",
+                                      "elbow",
+                                      "wrist",
+                                      "neck",
+                                      "back",
+                                      "hip",
+                                      "knee",
+                                      "hamstring",
+                                      "ankle",
+                                      "chest",
+                                      "core"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "type": "array"
+                                },
+                                "severity": {
+                                  "enum": [
+                                    "mild",
+                                    "moderate",
+                                    "severe"
+                                  ],
+                                  "type": "string"
+                                },
+                                "tags": {
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "type": "array"
+                                },
+                                "training_limitations": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "user_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "injury_id",
+                                "user_id",
+                                "body_area",
+                                "regions",
+                                "severity",
+                                "level",
+                                "provenance",
+                                "tags",
+                                "exercises"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "user_id",
+                          "level",
+                          "warnings"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "level": {
+                      "enum": [
+                        "none",
+                        "caution",
+                        "avoid"
+                      ],
+                      "type": "string"
+                    },
+                    "workout_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "workout_id",
+                    "level",
+                    "athletes"
+                  ],
+                  "title": "AthleteInjuryWarnings",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Injury warnings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Injury safety warnings for athletes against a workout",
+        "tags": [
+          "Admin Wellbeing"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/wellbeing/injury-warnings/acknowledge": {
+      "post": {
+        "callbacks": {},
+        "description": "Records an analytics acknowledgement for each warned athlete. Warnings are re-evaluated server-side and never block.",
+        "operationId": "MilosTrainingWeb.AdminInjuryWarningController.acknowledge",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "source_context_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "surface": {
+                    "enum": [
+                      "assign_dialog",
+                      "class_roster",
+                      "member_dossier"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "user_ids": {
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 250,
+                    "type": "array"
+                  },
+                  "workout_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "workout_id",
+                  "user_ids"
+                ],
+                "title": "AthleteInjuryWarningsRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "acknowledged_count": {
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "acknowledged_count"
+                  ],
+                  "title": "AthleteInjuryWarningsAcknowledged",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Acknowledged"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Acknowledge injury safety warnings shown for athletes",
+        "tags": [
+          "Admin Wellbeing"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/workout-folders": {
       "get": {
         "callbacks": {},
@@ -36317,6 +37756,7 @@
     "/api/org/{organization_slug}/admin/users/{id}/programming": {
       "post": {
         "callbacks": {},
+        "description": "Athletes receive a personal assignment. Members follow `mode` (ADR-115). Member assignment modes fail with 403 `member_programming_not_entitled` when the member's package lacks the personal_programming channel or execute_assigned_workouts capability.",
         "operationId": "MilosTrainingWeb.AdminUserController.program_workout",
         "parameters": [
           {
@@ -36351,6 +37791,15 @@
                     "format": "uuid",
                     "type": "string"
                   },
+                  "mode": {
+                    "description": "Member programming mode (ADR-115; ignored for athletes). `class_workout` (default) replaces the booked class's workout for everyone; `class_variant` assigns this member's own version of the booked class (source defaults to the class's workout when `master_workout_id` is omitted); `personal` assigns a personal workout without a class. Both assignment modes require the member's package to include personal programming.",
+                    "enum": [
+                      "class_workout",
+                      "class_variant",
+                      "personal"
+                    ],
+                    "type": "string"
+                  },
                   "scheduled_for": {
                     "format": "date",
                     "type": "string"
@@ -36366,7 +37815,6 @@
                   }
                 },
                 "required": [
-                  "master_workout_id",
                   "folder_id",
                   "scheduled_for",
                   "copy_source"
@@ -36395,7 +37843,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Copy or save a workout and associate it with this user's athlete assignment or booked class",
+        "summary": "Copy or save a workout and associate it with this user's assignment, class variant or booked class",
         "tags": [
           "Admin Users"
         ]
@@ -36889,7 +38337,7 @@
     "/api/org/{organization_slug}/bookings": {
       "post": {
         "callbacks": {},
-        "description": "Optionally idempotent per `client_operation_id` (ADR-102): replaying the same id for the same slot returns the original booking with 200 and no new reservation, notification, or broadcast; reusing it for another slot returns 409 `idempotency_key_conflict`.",
+        "description": "Optionally idempotent per `client_operation_id` (ADR-110): replaying the same id for the same slot returns the original booking with 200 and no new reservation, notification, or broadcast; reusing it for another slot returns 409 `idempotency_key_conflict`.",
         "operationId": "MilosTrainingWeb.ScheduleController.create_booking",
         "parameters": [],
         "requestBody": {
@@ -39212,6 +40660,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "Also list active members (who may receive personal programming when their package allows it).",
+            "in": "query",
+            "name": "include_members",
+            "required": false,
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -39259,7 +40717,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "List athlete users",
+        "summary": "List assignable users (athletes; optionally members, ADR-115)",
         "tags": [
           "Admin Users"
         ]

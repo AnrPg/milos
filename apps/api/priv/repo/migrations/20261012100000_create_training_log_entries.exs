@@ -1,7 +1,7 @@
 defmodule MilosTraining.Repo.Migrations.CreateTrainingLogEntries do
   use Ecto.Migration
 
-  # ADR-100 / TD-033: standalone training-log entries for class or offline
+  # ADR-108 / TD-033: standalone training-log entries for class or offline
   # workouts that never ran as a timer-backed `workout_executions` row.
   #
   # Tenant-owned (organization_id + user_id) with forced RLS. The policy
