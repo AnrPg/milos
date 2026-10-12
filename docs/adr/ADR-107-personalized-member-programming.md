@@ -52,7 +52,7 @@ class occurrence.
 - One additive, nullable column `assigned_workouts.source_scheduled_class_id`
   (exposed as `source_slot_id`) marks a class variant. It is a loose reference to
   a Scheduling-owned row (no cross-context foreign key, like ADR-100's
-  `source_reference_id`). The assignment `kind` is derived: `class_variant` when
+  `source_reference_id`). The derived `assignment_kind` is `class_variant` when
   the source slot is set, otherwise `personal`.
 - The workout of a variant is an ordinary library copy (ADR-071): staff either
   copy the class workout as-is, or duplicate it into a draft, edit it in the
@@ -185,5 +185,68 @@ authorized, metered source.
   variant directly from the admin schedule popup, and coaching aggregates that
   separate member from athlete programming.
 
+## Convergence With the Multi-Role / Coaching Branch
+A parallel branch (`claude/loving-franklin-vuxz19`, its ADR-098 "package
+phase C" and ADR-100 "coach client scope and head coach") was not merged into
+this work. This ADR deliberately does not touch the membership role model.
+Overlap and how to converge after both land:
+
+| That branch | This ADR | Convergence |
+|---|---|---|
+| `organization_memberships.roles` role sets | Assignee eligibility reads the single active membership role (`TenantAssigneeRoles`) | Replace the single-role lookup with "role set contains `athlete` or `member`"; `AssignmentAudiencePolicy.classify/2` stays unchanged if it receives the customer role. A person who is both should be classified as athlete (no explicit grant needed). |
+| `coaching_relationships` + `CoachScope` filter staff programming queries | Staff routes stay owner/admin (unchanged pipelines); no coach scoping | `AssignWorkout`, `ProgramUserWorkout`, `ListAthletes` (`include_members`) and `member_versions` in the schedule should filter by `CoachScope` for coaches with `coach_scope = own`. Member programming is owner/admin-assigned; ADR-100's rule that coaches may self-assign athletes only is compatible. |
+| Workout vault + `repeat` execution source | Member assignments execute through the `assigned` source | No conflict: completed member assignments appear in the vault as ordinary completed executions; a repeat of one uses `repeat`, not `assigned`, so it never re-checks the assignment. |
+| Effective entitlement merges stacked/add-on subscriptions | `AuthorizeMemberProgramming` reads `Finance.get_effective_entitlement/2` | Picks up the merge automatically; a "personal programming" add-on on top of a class package will then enable member programming. |
+| New channels (`personal_training`, …) and retired `workout_library` | Gate on `personal_programming` + `execute_assigned_workouts` | Unchanged vocabulary; no collision. |
+| PT appointments / form reviews | Not touched | Independent. |
+
+Migration ranges do not collide (this ADR: `20261012140000`).
+
 ## Implementation Notes
-_Filled in after implementation._
+Implemented on 2026-10-12 (TD-037).
+
+- **Migration** `20261012140000_add_source_scheduled_class_to_assigned_workouts`:
+  one nullable column plus a partial index; no RLS change (the table is already
+  forced-RLS and tenant-registered).
+- **Domain**: `Workouts.Domain.AssignmentAudiencePolicy` (classification,
+  class-variant rule, kind, live status, member programming modes,
+  executable roles) and `Finance.Domain.EntitlementPolicy.authorize_explicit/2`;
+  both unit tested.
+- **Application**: new `TenantAssigneeRoles` and `AuthorizeMemberProgramming`;
+  `AssignWorkout`, `UpdateAssignedWorkout`, `ProgramUserWorkout`,
+  `AuthorizeWorkoutExecutionSource`, `GetAssignedWorkoutWeek`,
+  `GetScheduleCalendar`, `GetAdminUserSchedule`, `ListAthletes` and
+  `Organizations.Commands.SetMembershipRole` changed as described above. The
+  workouts store exposes `list_class_variants/2` (query
+  `Workouts.Queries.ListClassVariants`).
+- **API**: the field is named `assignment_kind` (not `kind`) because the admin
+  user schedule already uses `kind` = `class` | `assignment`. Profile
+  programming accepts `mode`; `master_workout_id` became optional there (only a
+  `class_variant` may omit it — it then copies the class's workout; other modes
+  return `workout_not_found`). Assign accepts `source_slot_id`; `scheduled_for`
+  stays required by the contract.
+- **Emergent fixes**: `GET /admin/athletes` serialized `Identity.Account`
+  structs, which have no JSON encoder, so the endpoint raised whenever an
+  athlete existed. It now returns `{id, nickname, role}` with the membership
+  role. `AssignWorkout` previously ignored membership status; assignees must
+  now be *active* members of the tenant. Staff realtime refresh after an
+  assignment uses `TenantStaffRecipients`.
+- **Updates**: members newly added to an existing assignment must pass the
+  explicit grant; like athlete additions on update, they are not metered
+  (only creation reserves a touchpoint).
+- **Frontend**: members get "My workouts" in the navigation and route guard;
+  the console hides reschedule and "request a workout" for members and badges
+  class versions. The schedule card shows "Your version" and the slot popup
+  previews it with an "Open and start" link into `/my-workouts` (the existing
+  start flow — no timer UI files were changed); staff see "Member versions" in
+  the popup. The admin profile programming dialog offers the three member
+  modes; "Edit class WOD for this member" duplicates the class workout into a
+  draft and opens it in the embedded canvas (new `initialDraftId` prop), and
+  publishing assigns it as the member's version. Assignee pickers include
+  members with a "Member" badge. The home CTA also surfaces a member's
+  assignment due today.
+- **Deferred** (follow-up debt): member reschedule and "request a workout";
+  a staff shortcut to create a variant straight from the admin schedule popup
+  (today it is done from the member's profile); coaching aggregates that
+  separate member from athlete programming; coach scoping after the coaching
+  branch merges (see the convergence table).
