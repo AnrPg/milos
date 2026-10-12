@@ -3069,6 +3069,9 @@
     "admRosterWaitlistHint": "Οι θέσεις προσφέρονται με αυτή τη σειρά όταν κάποιος ακυρώνει.",
     "admRosterPriority": "Προτεραιότητα",
     "admSlotLocation": "Χώρος",
-    "admSlotLocationAny": "Χωρίς συγκεκριμένο χώρο"
+    "admSlotLocationAny": "Χωρίς συγκεκριμένο χώρο",
+    "semanticEvents": "Εκδηλώσεις",
+    "semanticFacility": "Ελεύθερη προπόνηση",
+    "semanticWaitlisted": "Σε λίστα αναμονής"
   }
 }

@@ -3069,6 +3069,9 @@
     "admRosterWaitlistHint": "Als iemand annuleert, worden plekken in deze volgorde aangeboden.",
     "admRosterPriority": "Voorrang",
     "admSlotLocation": "Locatie",
-    "admSlotLocationAny": "Geen specifieke locatie"
+    "admSlotLocationAny": "Geen specifieke locatie",
+    "semanticEvents": "Evenementen",
+    "semanticFacility": "Vrij trainen",
+    "semanticWaitlisted": "Op de wachtlijst"
   }
 }

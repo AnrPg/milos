@@ -174,6 +174,8 @@ describe("apiRequest tenant headers", () => {
   it.each([
     ["/schedule?days=7", "/api/org/atlas-gym/schedule?days=7"],
     ["/bookings", "/api/org/atlas-gym/bookings"],
+    ["/locations", "/api/org/atlas-gym/locations"],
+    ["/check-ins", "/api/org/atlas-gym/check-ins"],
     ["/my-workouts?start_date=2026-08-08", "/api/org/atlas-gym/my-workouts?start_date=2026-08-08"],
     ["/workouts/workout-1", "/api/org/atlas-gym/workouts/workout-1"],
     ["/workouts/workout-1/scales", "/api/org/atlas-gym/workouts/workout-1/scales"],

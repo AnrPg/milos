@@ -3069,6 +3069,9 @@
     "admRosterWaitlistHint": "Quand quelqu'un annule, les places sont proposées dans cet ordre.",
     "admRosterPriority": "Prioritaire",
     "admSlotLocation": "Site",
-    "admSlotLocationAny": "Aucun site précis"
+    "admSlotLocationAny": "Aucun site précis",
+    "semanticEvents": "Événements",
+    "semanticFacility": "Accès libre",
+    "semanticWaitlisted": "Sur liste d'attente"
   }
 }

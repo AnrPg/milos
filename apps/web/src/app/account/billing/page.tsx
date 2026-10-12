@@ -408,9 +408,9 @@ export default function BillingPage() {
                   </span>
                   <span className="text-xs" style={{ color: "var(--dim)" }}>
                     {activeSub.billing_period_snapshot
-                      ? i18n("billed763fe55") + (String(activeSub.billing_period_snapshot))
+                      ? `${i18n("billed763fe55")} ${semanticLabel(String(activeSub.billing_period_snapshot), i18n)}`
                       : ""}
-                    {activeSub.ends_on ? i18n("renews241920c") + (formatDate(uiLocale, activeSub.ends_on as string)) : ""}
+                    {activeSub.ends_on ? ` ${i18n("renews241920c")} ${formatDate(uiLocale, activeSub.ends_on as string)}` : ""}
                   </span>
                   {typeof activeSub.price_cents_snapshot === "number" && (
                     <span className="text-sm" style={{ color: "var(--text-soft)" }}>

@@ -3069,6 +3069,9 @@
     "admRosterWaitlistHint": "Когда кто-то отменяет запись, места предлагаются в этом порядке.",
     "admRosterPriority": "Приоритет",
     "admSlotLocation": "Место",
-    "admSlotLocationAny": "Без конкретного места"
+    "admSlotLocationAny": "Без конкретного места",
+    "semanticEvents": "Мероприятия",
+    "semanticFacility": "Свободный зал",
+    "semanticWaitlisted": "В листе ожидания"
   }
 }

@@ -3069,6 +3069,9 @@
     "admRosterWaitlistHint": "Cuando alguien cancela, las plazas se ofrecen en este orden.",
     "admRosterPriority": "Prioridad",
     "admSlotLocation": "Sede",
-    "admSlotLocationAny": "Sin sede concreta"
+    "admSlotLocationAny": "Sin sede concreta",
+    "semanticEvents": "Eventos",
+    "semanticFacility": "Sala libre",
+    "semanticWaitlisted": "En lista de espera"
   }
 }

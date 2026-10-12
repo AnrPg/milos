@@ -3069,6 +3069,9 @@
     "admRosterWaitlistHint": "Quando qualcuno disdice, i posti vengono offerti in quest'ordine.",
     "admRosterPriority": "Priorità",
     "admSlotLocation": "Sede",
-    "admSlotLocationAny": "Nessuna sede specifica"
+    "admSlotLocationAny": "Nessuna sede specifica",
+    "semanticEvents": "Eventi",
+    "semanticFacility": "Open gym",
+    "semanticWaitlisted": "In lista d'attesa"
   }
 }

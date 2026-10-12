@@ -3069,6 +3069,9 @@
     "admRosterWaitlistHint": "Wenn jemand storniert, werden Plätze in dieser Reihenfolge angeboten.",
     "admRosterPriority": "Priorität",
     "admSlotLocation": "Standort",
-    "admSlotLocationAny": "Kein bestimmter Standort"
+    "admSlotLocationAny": "Kein bestimmter Standort",
+    "semanticEvents": "Events",
+    "semanticFacility": "Freies Training",
+    "semanticWaitlisted": "Auf der Warteliste"
   }
 }

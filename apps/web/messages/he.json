@@ -3069,6 +3069,9 @@
     "admRosterWaitlistHint": "כשמישהו מבטל, המקומות מוצעים לפי הסדר הזה.",
     "admRosterPriority": "עדיפות",
     "admSlotLocation": "מיקום",
-    "admSlotLocationAny": "ללא מיקום מסוים"
+    "admSlotLocationAny": "ללא מיקום מסוים",
+    "semanticEvents": "אירועים",
+    "semanticFacility": "חדר כושר פתוח",
+    "semanticWaitlisted": "ברשימת המתנה"
   }
 }

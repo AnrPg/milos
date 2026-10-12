@@ -3069,6 +3069,9 @@
     "admRosterWaitlistHint": "Когато някой се откаже, местата се предлагат в този ред.",
     "admRosterPriority": "Приоритет",
     "admSlotLocation": "Локация",
-    "admSlotLocationAny": "Без конкретно място"
+    "admSlotLocationAny": "Без конкретно място",
+    "semanticEvents": "Събития",
+    "semanticFacility": "Свободна зала",
+    "semanticWaitlisted": "В списъка с чакащи"
   }
 }

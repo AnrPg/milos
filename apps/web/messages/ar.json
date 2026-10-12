@@ -3069,6 +3069,9 @@
     "admRosterWaitlistHint": "تُعرض الأماكن بهذا الترتيب عندما يلغي أحدهم.",
     "admRosterPriority": "أولوية",
     "admSlotLocation": "الموقع",
-    "admSlotLocationAny": "بدون موقع محدد"
+    "admSlotLocationAny": "بدون موقع محدد",
+    "semanticEvents": "الفعاليات",
+    "semanticFacility": "التمرين الحر",
+    "semanticWaitlisted": "في قائمة الانتظار"
   }
 }

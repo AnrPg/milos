@@ -3069,6 +3069,9 @@
     "admRosterWaitlistHint": "Quando alguém cancela, as vagas são oferecidas por esta ordem.",
     "admRosterPriority": "Prioridade",
     "admSlotLocation": "Local",
-    "admSlotLocationAny": "Sem local específico"
+    "admSlotLocationAny": "Sem local específico",
+    "semanticEvents": "Eventos",
+    "semanticFacility": "Treino livre",
+    "semanticWaitlisted": "Em lista de espera"
   }
 }

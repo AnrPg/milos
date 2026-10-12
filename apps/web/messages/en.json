@@ -3069,6 +3069,9 @@
     "admRosterWaitlistHint": "Spots are offered in this order when someone cancels.",
     "admRosterPriority": "Priority",
     "admSlotLocation": "Location",
-    "admSlotLocationAny": "No specific location"
+    "admSlotLocationAny": "No specific location",
+    "semanticEvents": "Events",
+    "semanticFacility": "Open gym",
+    "semanticWaitlisted": "Waitlisted"
   }
 }
