@@ -11,6 +11,25 @@ the exact lines. None were reproduced in a running app; §8 lists how to confirm
 
 ---
 
+## Implementation status
+
+**P0 shipped (2026-10-12)**: T1, T3, T4, U1, U2/U9, V1, V6, V7, as listed in the §8 roadmap.
+
+- **T1** turned out wider than §3 describes. With the editor's defaults, **7 of 19** formats were
+  rejected: HRR, Death By, Cluster, both ladders and Pyramid (a default `time_cap_seconds: 0`
+  fails the `> 0` check), plus Complex EMOM whenever per-minute intervals were set. The editor now
+  builds `timer_config` from `apps/web/src/types/timer-config-contract.json`, and
+  `timer_config_contract_test.exs` keeps that file identical to the backend vocabulary. All 19
+  default payloads now normalize.
+- **Known limitation**: Complex EMOM per-minute interval lengths (`interval_seconds_N`) have no
+  backend field. They are no longer sent, so the section saves with its base interval.
+- **Finish path**: opening the review now persists a pause first. A persisted pause already
+  includes the current segment's elapsed time in the stored totals, so completion no longer adds
+  it a second time. This also fixes the score-on-the-last-segment path, which used to count that
+  segment twice.
+
+---
+
 ## 0. Executive summary
 
 The execution experience has a solid technical foundation: a versioned, server-backed progress

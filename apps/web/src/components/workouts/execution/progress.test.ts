@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { TimerSegment } from "@/api/executions";
 
-import { buildSegmentStepDefinitions } from "./progress";
+import { buildSegmentStepDefinitions, isLastSegmentOfSection } from "./progress";
 
 function segment(exercises: TimerSegment["exercises"]): TimerSegment {
   return {
@@ -80,5 +80,28 @@ describe("buildSegmentStepDefinitions", () => {
       "c:4",
     ]);
     expect(steps.every((step) => step.groupKind === "alternating")).toBe(true);
+  });
+});
+
+describe("isLastSegmentOfSection", () => {
+  const tabata = (key: string, sectionId = "tabata") => ({
+    ...segment([]),
+    segment_key: key,
+    section_id: sectionId,
+  });
+  const segments = [tabata("work-1"), tabata("rest-1"), tabata("work-2"), tabata("cooldown", "cooldown")];
+
+  it("is false for intervals inside a multi-segment section", () => {
+    expect(isLastSegmentOfSection(segments, 0)).toBe(false);
+    expect(isLastSegmentOfSection(segments, 1)).toBe(false);
+  });
+
+  it("is true for the final segment of a section and of the workout", () => {
+    expect(isLastSegmentOfSection(segments, 2)).toBe(true);
+    expect(isLastSegmentOfSection(segments, 3)).toBe(true);
+  });
+
+  it("is false for an out-of-range index", () => {
+    expect(isLastSegmentOfSection(segments, 9)).toBe(false);
   });
 });

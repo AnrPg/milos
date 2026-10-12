@@ -45,7 +45,7 @@ export function TimeInput({ value, onChange }: Props) {
     onChange((normalizedMinutes * 60) + normalizedSeconds);
   }
 
-  const inputClass = i18n("w10RoundedLgBgTransparentPx1ac1970b");
+  const inputClass = "w-10 rounded-lg bg-transparent px-1 py-1 text-center text-sm outline-none";
   const inputStyle = {
     background: "var(--bg)",
     border: "1px solid var(--dim)",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { TimerSegment } from "@/api/executions";
 
@@ -10,9 +10,16 @@ export type TimerState = {
   isExpired: boolean;
 };
 
+type Tick = { key: string; elapsedMs: number };
+
 /**
  * Drives a single timer segment using requestAnimationFrame for accuracy (±100ms).
  * Wall-clock diff against startTime ensures no drift across frames.
+ *
+ * Each tick is tagged with the inputs it was measured for. A tick taken for a
+ * previous segment (or before a pause/resume) is ignored, so the first render
+ * after a segment change never reports the old segment's elapsed time — which
+ * would otherwise make a shorter next segment look expired and skip it.
  */
 export function useWorkoutTimer(
   segment: TimerSegment | null,
@@ -20,42 +27,30 @@ export function useWorkoutTimer(
   pausedElapsed: number,
   segmentStartedAt: number | null,
 ): TimerState {
-  const [elapsed, setElapsed] = useState(pausedElapsed);
-  const rafRef = useRef<number | null>(null);
-  const startTimeRef = useRef<number | null>(null);
+  const running = Boolean(segment) && isActive;
+  const tickKey = `${segment?.segment_key ?? ""}|${running}|${pausedElapsed}|${segmentStartedAt ?? ""}`;
+  const [tick, setTick] = useState<Tick | null>(null);
 
   useEffect(() => {
-    if (!segment || !isActive) {
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
-      }
-      startTimeRef.current = null;
-      return;
-    }
+    if (!running) return;
 
-    startTimeRef.current = segmentStartedAt ?? Date.now();
+    const startedAt = segmentStartedAt ?? Date.now();
+    let frame: number | null = null;
 
-    const tick = () => {
-      if (startTimeRef.current === null) return;
-      const now = Date.now();
-      const totalElapsed = pausedElapsed + (now - startTimeRef.current);
-      setElapsed(totalElapsed);
-      rafRef.current = requestAnimationFrame(tick);
+    const loop = () => {
+      setTick({ key: tickKey, elapsedMs: pausedElapsed + Math.max(0, Date.now() - startedAt) });
+      frame = requestAnimationFrame(loop);
     };
 
-    rafRef.current = requestAnimationFrame(tick);
+    frame = requestAnimationFrame(loop);
 
     return () => {
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
-      }
-      startTimeRef.current = null;
+      if (frame !== null) cancelAnimationFrame(frame);
     };
-  }, [isActive, pausedElapsed, segment, segmentStartedAt]);
+  }, [running, pausedElapsed, segmentStartedAt, tickKey]);
 
-  const elapsedSeconds = Math.floor((isActive ? elapsed : pausedElapsed) / 1000);
+  const elapsedMs = running && tick?.key === tickKey ? tick.elapsedMs : pausedElapsed;
+  const elapsedSeconds = Math.floor(elapsedMs / 1000);
 
   if (!segment || segment.kind === "no_timer" || segment.kind === "manual") {
     return { elapsed: elapsedSeconds, remaining: null, isExpired: false };

@@ -128,6 +128,17 @@ export function shouldAutoAdvanceOnChecklistComplete(segment: TimerSegment) {
   return segment.kind === "countup" || segment.kind === "manual" || segment.kind === "no_timer";
 }
 
+/**
+ * Whether the segment at `index` is the last one emitted for its section.
+ * Interval formats (Tabata, EMOM, Billat, Cluster…) split one section into many
+ * segments; score capture belongs at the end of the section, not every interval.
+ */
+export function isLastSegmentOfSection(segments: TimerSegment[], index: number) {
+  const segment = segments[index];
+  if (!segment) return false;
+  return segments[index + 1]?.section_id !== segment.section_id;
+}
+
 export function formatDurationMs(totalMs: number) {
   const totalSeconds = Math.max(0, Math.floor(totalMs / 1000));
   const minutes = Math.floor(totalSeconds / 60);

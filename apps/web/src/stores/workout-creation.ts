@@ -17,7 +17,7 @@ import type {
   SectionFormat,
   WorkoutType,
 } from "@/types/workout";
-import { AUTO_SCORE_MAP, EMOM_SCORING_MODE_SCORE_TYPE, FORMAT_EXERCISE_CONTEXT, adaptExerciseToDestination, concreteSetPrescriptions, makeDefaultAdvancedSettings, makeDefaultExercise, makeDefaultFormatParams, makeDefaultHeader, makeDefaultSection } from "@/types/workout";
+import { AUTO_SCORE_MAP, EMOM_SCORING_MODE_SCORE_TYPE, FORMAT_EXERCISE_CONTEXT, adaptExerciseToDestination, concreteSetPrescriptions, makeDefaultAdvancedSettings, makeDefaultExercise, makeDefaultFormatParams, makeDefaultHeader, makeDefaultSection, normalizeFormatParams, timerConfigParams } from "@/types/workout";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 
@@ -251,7 +251,9 @@ function parseDraftSections(raw: unknown): DraftSection[] {
       localId: crypto.randomUUID(),
       name: typeof sec.name === "string" ? sec.name : "",
       format,
-      formatParams: Object.keys(formatParams).length > 0 ? formatParams : makeDefaultFormatParams(format),
+      formatParams: Object.keys(formatParams).length > 0
+        ? normalizeFormatParams(format, formatParams)
+        : makeDefaultFormatParams(format),
       scoreable: Boolean(sec.scoreable),
       scoreType,
       emomScoringMode,
@@ -721,8 +723,10 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
         name: section.name,
         timer_config: {
           type: section.format,
-          ...section.formatParams,
-          ...deriveLadderTimerParams(section),
+          ...timerConfigParams(section.format, {
+            ...section.formatParams,
+            ...deriveLadderTimerParams(section),
+          }),
           ...(section.emomScoringMode ? { scoring_mode: section.emomScoringMode } : {}),
           ...(section.emomAmrapScoringStyle ? { amrap_scoring_style: section.emomAmrapScoringStyle } : {}),
         },

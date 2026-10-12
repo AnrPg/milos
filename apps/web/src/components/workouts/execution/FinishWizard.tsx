@@ -29,12 +29,14 @@ function ScoreEntryStep({
   scores,
   segments,
   onBack,
+  backLabel,
   onNext,
   onSkip,
 }: {
   scores: SectionScore[];
   segments: TimerSegment[];
   onBack: (() => void) | null;
+  backLabel?: string;
   onNext: (edited: SectionScore[]) => void;
   onSkip: () => void;
 }) {
@@ -94,7 +96,7 @@ function ScoreEntryStep({
   if (scoreableSections.length === 0) {
     return (
       <div
-        className="flex h-screen flex-col items-center justify-center gap-6 p-8"
+        className="flex h-dvh flex-col items-center justify-center gap-6 p-8"
         style={{ background: "var(--bg)" }}
       >
         <div className="text-5xl">🏁</div>
@@ -112,17 +114,27 @@ function ScoreEntryStep({
         >
           {i18n("next2f04eb1")}
         </button>
+        {onBack ? (
+          <button
+            type="button"
+            onClick={onBack}
+            className="w-full max-w-xs rounded-2xl py-3 text-sm font-semibold"
+            style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}
+          >
+            {backLabel ?? i18n("backc32ae9f")}
+          </button>
+        ) : null}
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
+    <div className="flex h-dvh flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
       <div className="flex items-center justify-between px-5 pt-8 pb-2">
         <div>
           {onBack && (
             <button type="button" onClick={onBack} className="text-sm" style={{ color: "var(--dim)" }}>
-              {i18n("backc32ae9f")}
+              {backLabel ?? i18n("backc32ae9f")}
             </button>
           )}
         </div>
@@ -437,7 +449,7 @@ function ModificationsEditorStep({
   }
 
   return (
-    <div className="flex h-screen flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
+    <div className="flex h-dvh flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
       <div className="flex items-center justify-between px-5 pt-8 pb-2">
         <button type="button" onClick={onBack} className="text-sm" style={{ color: "var(--dim)" }}>
           {i18n("backc32ae9f")}
@@ -639,7 +651,7 @@ function FreeTextModificationsStep({
   }
 
   return (
-    <div className="flex h-screen flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
+    <div className="flex h-dvh flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
       <div className="flex items-center justify-between px-5 pt-8 pb-2">
         <button type="button" onClick={onBack} className="text-sm" style={{ color: "var(--dim)" }}>
           {i18n("backc32ae9f")}
@@ -718,7 +730,7 @@ function ConfirmStep({
 
   return (
     <div
-      className="flex h-screen flex-col"
+      className="flex h-dvh flex-col"
       style={{ background: "var(--bg)", color: "var(--text)" }}
     >
       <div className="flex items-center px-5 pt-8 pb-2">
@@ -845,6 +857,7 @@ export function FinishWizard({
   isSaving,
   feedback,
   onConfirm,
+  onCancel,
 }: {
   scores: SectionScore[];
   segments: TimerSegment[];
@@ -853,7 +866,10 @@ export function FinishWizard({
   isSaving: boolean;
   feedback: string | null;
   onConfirm: (editedScores: SectionScore[], modifications: ExerciseModification[]) => void;
+  /** Leaves the wizard and returns to the (paused) workout. */
+  onCancel?: () => void;
 }) {
+  const i18n = useUiTranslations();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [confirmedScores, setConfirmedScores] = useState<SectionScore[]>(scores);
   const [confirmedMods, setConfirmedMods] = useState<ExerciseModification[]>(initialModifications);
@@ -877,7 +893,8 @@ export function FinishWizard({
       <ScoreEntryStep
         scores={scores}
         segments={segments}
-        onBack={null}
+        onBack={onCancel ?? null}
+        backLabel={i18n("backToWorkoutLabel")}
         onNext={handleScoresNext}
         onSkip={() => setStep(2)}
       />

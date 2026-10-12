@@ -251,12 +251,13 @@ export function FreeTextExecutionMode() {
         isSaving={isSavingCompletion}
         feedback={completionFeedback}
         onConfirm={confirmFinish}
+        onCancel={() => setShowFinishWizard(false)}
       />
     );
   }
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden" style={{ background: "var(--bg)", color: "var(--text)" }}>
+    <div className="flex h-dvh flex-col overflow-hidden" style={{ background: "var(--bg)", color: "var(--text)" }}>
       <header className="flex items-center justify-between gap-3 border-b px-4 py-3" style={{ borderColor: "var(--border)" }}>
         <button type="button" onClick={() => router.back()} className="rounded-xl px-3 py-2 text-sm" style={{ color: "var(--muted)" }}>
           {i18n("backdc381ae")}

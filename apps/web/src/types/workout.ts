@@ -1,3 +1,5 @@
+import timerConfigContract from "./timer-config-contract.json";
+
 export type PrescriptionUnit = "reps" | "secs" | "kcal";
 export type LoadMode = "absolute" | "pct_1rm" | "bw";
 export type LoadProgressionMode = "linear" | "per_set";
@@ -245,7 +247,7 @@ type FormatFieldDef = {
 };
 
 export const FORMAT_FIELD_DEFS: Partial<Record<SectionFormat, FormatFieldDef[]>> = {
-  for_time: [{ key: "time_cap_seconds", defaultValue: 900 }],
+  for_time: [{ key: "time_cap_seconds", defaultValue: 900 }, { key: "rounds", defaultValue: 0 }],
   train_to_exhaustion: [{ key: "rest_seconds", defaultValue: 90 }],
   kcal_target: [{ key: "kcal_target", defaultValue: 100, required: true }, { key: "time_cap_seconds", defaultValue: 900 }],
   emom: [
@@ -258,7 +260,10 @@ export const FORMAT_FIELD_DEFS: Partial<Record<SectionFormat, FormatFieldDef[]>>
     { key: "interval_seconds", defaultValue: 60, required: true },
     { key: "max_windows", defaultValue: 100 },
   ],
-  even_odd: [{ key: "duration_seconds", defaultValue: 600, required: true }],
+  even_odd: [
+    { key: "duration_seconds", defaultValue: 600, required: true },
+    { key: "interval_seconds", defaultValue: 60 },
+  ],
   billat: [
     { key: "work_seconds", defaultValue: 30, required: true },
     { key: "rest_seconds", defaultValue: 30, required: true },
@@ -267,7 +272,8 @@ export const FORMAT_FIELD_DEFS: Partial<Record<SectionFormat, FormatFieldDef[]>>
   amrap: [{ key: "duration_seconds", defaultValue: 720, required: true }],
   edt: [{ key: "duration_seconds", defaultValue: 900, required: true }, { key: "pr_zone_rounds", defaultValue: 5 }],
   death_by: [
-    { key: "max_rounds", defaultValue: 0 },
+    { key: "interval_seconds", defaultValue: 60 },
+    { key: "ladder_cap", defaultValue: 0 },
   ],
   tabata: [
     { key: "work_seconds", defaultValue: 20, required: true },
@@ -280,19 +286,20 @@ export const FORMAT_FIELD_DEFS: Partial<Record<SectionFormat, FormatFieldDef[]>>
     { key: "rounds", defaultValue: 10, required: true },
   ],
   cluster: [
+    { key: "sets", defaultValue: 4, required: true },
     { key: "intra_rest_seconds", defaultValue: 15, required: true },
+    { key: "rest_seconds", defaultValue: 0 },
   ],
   hrr: [
-    { key: "hr_ceiling_bpm", defaultValue: 175, required: true },
-    { key: "hr_floor_bpm", defaultValue: 130, required: true },
-    { key: "cycles", defaultValue: 0 },
-    { key: "effort_cap_seconds", defaultValue: 0 },
+    { key: "effort_seconds", defaultValue: 60, required: true },
+    { key: "hr_drop_target", defaultValue: 0 },
+    { key: "recovery_cap_seconds", defaultValue: 0 },
   ],
   ladder_ascending: [
     { key: "time_cap_seconds", defaultValue: 0 },
   ],
   ladder_descending: [
-    { key: "min_reps", defaultValue: 1 },
+    { key: "min_reps", defaultValue: 1, required: true },
     { key: "time_cap_seconds", defaultValue: 0 },
   ],
   pyramid: [
@@ -300,6 +307,59 @@ export const FORMAT_FIELD_DEFS: Partial<Record<SectionFormat, FormatFieldDef[]>>
   ],
   rest: [{ key: "duration_seconds", defaultValue: 60, required: true }],
 };
+
+type TimerConfigContract = Record<SectionFormat, { required: string[]; optional: string[] }>;
+
+/**
+ * Backend timer vocabulary (required + optional fields per format). Kept in
+ * lockstep with the API by `timer_config_contract_test.exs`.
+ */
+export const TIMER_CONFIG_CONTRACT = timerConfigContract as TimerConfigContract;
+
+// Keys written by older editor versions, mapped to their backend field.
+const LEGACY_TIMER_PARAM_KEYS: Partial<Record<SectionFormat, Record<string, string>>> = {
+  death_by: { max_rounds: "ladder_cap" },
+  hrr: { effort_cap_seconds: "effort_seconds" },
+};
+
+/**
+ * Renames legacy editor keys to their backend field names so drafts saved by
+ * older editor versions keep their values.
+ */
+export function normalizeFormatParams(format: SectionFormat, params: FormatParams): FormatParams {
+  const legacy = LEGACY_TIMER_PARAM_KEYS[format];
+  if (!legacy) return params;
+
+  const next: FormatParams = { ...params };
+  for (const [legacyKey, field] of Object.entries(legacy)) {
+    if (!(legacyKey in next)) continue;
+    const value = next[legacyKey];
+    delete next[legacyKey];
+    if (next[field] == null && value != null && value > 0) next[field] = value;
+  }
+  return next;
+}
+
+/**
+ * Builds the numeric part of a section `timer_config` payload. Only fields the
+ * backend accepts for the format are sent, and unset optional values (null or
+ * <= 0, which the editor uses for "off") are dropped because the backend
+ * rejects non-positive values.
+ */
+export function timerConfigParams(format: SectionFormat, params: FormatParams): Record<string, number> {
+  const contract = TIMER_CONFIG_CONTRACT[format];
+  const allowed = new Set([...contract.required, ...contract.optional]);
+  const normalized = normalizeFormatParams(format, params);
+  const result: Record<string, number> = {};
+
+  for (const [key, value] of Object.entries(normalized)) {
+    if (!allowed.has(key)) continue;
+    if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) continue;
+    result[key] = value;
+  }
+
+  return result;
+}
 
 export function makeDefaultFormatParams(format: SectionFormat): FormatParams {
   const fields = FORMAT_FIELD_DEFS[format] ?? [];
@@ -465,7 +525,7 @@ export function getFormatInstruction(i18n: UiTranslate, format: SectionFormat, p
     case "edt":
       return i18n("instructionEdt", {duration: fmins(i18n, params.duration_seconds)});
     case "death_by":
-      return i18n(params.max_rounds ? "instructionDeathByWithMax" : "instructionDeathBy", {rounds: params.max_rounds ?? 0});
+      return i18n(params.ladder_cap ? "instructionDeathByWithMax" : "instructionDeathBy", {rounds: params.ladder_cap ?? 0});
     case "tabata":
       return i18n("instructionTabata", {work: fsecs(i18n, params.work_seconds), rest: fsecs(i18n, params.rest_seconds), rounds: params.rounds ?? 8});
     case "custom_hiit":
@@ -475,7 +535,7 @@ export function getFormatInstruction(i18n: UiTranslate, format: SectionFormat, p
         ? i18n("instructionClusterWithRest", {rest: fsecs(i18n, params.intra_rest_seconds)})
         : i18n("instructionCluster");
     case "hrr":
-      return i18n(params.cycles ? "instructionHrrWithCycles" : "instructionHrr", {floor: params.hr_floor_bpm ?? 130, ceiling: params.hr_ceiling_bpm ?? 175, cycles: params.cycles ?? 0});
+      return i18n(params.hr_drop_target ? "instructionHrrEffortWithDrop" : "instructionHrrEffort", {effort: fsecs(i18n, params.effort_seconds), drop: params.hr_drop_target ?? 0});
     case "ladder_ascending":
       return i18n(params.time_cap_seconds ? "instructionLadderAscendingWithCap" : "instructionLadderAscending", {cap: fmins(i18n, params.time_cap_seconds)});
     case "ladder_descending":

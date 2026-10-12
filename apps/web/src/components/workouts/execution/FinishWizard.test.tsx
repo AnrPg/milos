@@ -42,4 +42,23 @@ describe("FinishWizard free-text modifications", () => {
       }),
     ]);
   });
+
+  it("offers a way back to the workout from the first step", () => {
+    const onCancel = vi.fn();
+
+    render(
+      <FinishWizard
+        scores={[]}
+        segments={[]}
+        initialModifications={[]}
+        isSaving={false}
+        feedback={null}
+        onConfirm={vi.fn()}
+        onCancel={onCancel}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "backToWorkoutLabel" }));
+    expect(onCancel).toHaveBeenCalledTimes(1);
+  });
 });

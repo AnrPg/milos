@@ -5,7 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
-import React, { useEffect, useEffectEvent, useMemo, useState } from "react";
+import React, { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import {
@@ -19,8 +19,19 @@ import {
   type WorkoutExecution,
 } from "@/api/executions";
 import { useSession } from "@/components/session-provider";
+import { useScreenWakeLock } from "@/hooks/useScreenWakeLock";
 import { useWorkoutTimer } from "@/hooks/useWorkoutTimer";
 import { subscribeToTopic } from "@/lib/realtime";
+import {
+  CUE_MODES,
+  type CueMode,
+  type CueSnapshot,
+  nextCue,
+  playCue,
+  primeCueAudio,
+  readCueMode,
+  storeCueMode,
+} from "@/lib/timer-cues";
 import {
   isOfflineFailure,
   queueOfflineCheckoff,
@@ -34,6 +45,7 @@ import { ScoreModal } from "./ScoreModal";
 import {
   buildSegmentStepIds,
   computeMeasuredScore,
+  isLastSegmentOfSection,
   isRepeatableSegment,
   shouldAutoAdvanceOnChecklistComplete,
 } from "./progress";
@@ -93,6 +105,10 @@ function normalizeCheckedExerciseIds(
   return Array.from(new Set(next));
 }
 
+function isRestSegment(segment: TimerSegment) {
+  return segment.format === "rest" || (segment.kind === "countdown" && segment.exercises.length === 0);
+}
+
 function isExecutionPayload(value: unknown): value is { execution: WorkoutExecution } {
   return (
     typeof value === "object" &&
@@ -100,6 +116,39 @@ function isExecutionPayload(value: unknown): value is { execution: WorkoutExecut
     "execution" in value &&
     typeof value.execution === "object" &&
     value.execution !== null
+  );
+}
+
+const CUE_MODE_LABELS: Record<CueMode, string> = {
+  sound: "cueModeSoundLabel",
+  vibrate: "cueModeVibrateLabel",
+  off: "cueModeOffLabel",
+};
+
+function PauseIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <rect x="6" y="4" width="4" height="16" rx="1" />
+      <rect x="14" y="4" width="4" height="16" rx="1" />
+    </svg>
+  );
+}
+
+function CueModeIcon({ mode }: { mode: CueMode }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {mode === "vibrate" ? (
+        <>
+          <rect x="8" y="3" width="8" height="18" rx="2" />
+          <path d="M4 8v8M20 8v8" />
+        </>
+      ) : (
+        <>
+          <path d="M11 5 6 9H3v6h3l5 4z" />
+          {mode === "sound" ? <path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" /> : <path d="m16 9 6 6M22 9l-6 6" />}
+        </>
+      )}
+    </svg>
   );
 }
 
@@ -149,10 +198,16 @@ export function ExecutionMode() {
     elapsedSnapshot: number;
   } | null>(null);
 
+  const [cueMode, setCueMode] = useState<CueMode>(() => readCueMode());
+
   const currentSegment = segments[currentSegmentIndex] ?? null;
   const isActive = status === "active";
   const isLastSegment = currentSegmentIndex === segments.length - 1;
   const isTimerRunning = isActive && !showScoreModal && !scoreTransitionLocked;
+  // Interval formats split one section into many segments; only the section's
+  // final segment asks for a score so Tabata/EMOM never interrupt every interval.
+  const promptsForScore =
+    Boolean(currentSegment?.scoreable) && isLastSegmentOfSection(segments, currentSegmentIndex);
 
   const { elapsed, remaining, isExpired } = useWorkoutTimer(
     currentSegment,
@@ -237,12 +292,30 @@ export function ExecutionMode() {
   ) {
     if (!tokens?.access_token || !executionId) return false;
 
+    // Freeze the clock while the athlete reviews, so backing out of the review
+    // returns to a paused workout instead of one that kept running underneath.
+    // A persisted pause folds the current segment's elapsed time into the
+    // stored totals, so completion must not add it a second time.
+    let elapsedAlreadyCounted = useExecutionStore.getState().status === "paused";
+
+    if (useExecutionStore.getState().status === "active") {
+      try {
+        await persistProposedMutation(
+          () => pauseTimer(Date.now()),
+          { currentSegment, currentElapsedMs: elapsed * 1000 },
+        );
+        elapsedAlreadyCounted = true;
+      } catch {
+        setFeedback(i18n("pauseCouldNotBeSyncedTryAgain5a0fece"));
+      }
+    }
+
     // Always show the review screen before submitting so the user can confirm.
     setShowScoreModal(false);
     setPendingFinish({
       scores: finalSectionScores,
       checkedExerciseIds: finalCheckedExerciseIds,
-      includeCurrentElapsed,
+      includeCurrentElapsed: elapsedAlreadyCounted ? false : includeCurrentElapsed,
       elapsedSnapshot: elapsed,
     });
     return true;
@@ -309,7 +382,7 @@ export function ExecutionMode() {
   }
 
   const handleExpiredSegment = useEffectEvent(() => {
-    if (currentSegment?.scoreable) {
+    if (promptsForScore) {
       void openScoreModal();
     } else if (isLastSegment) {
       void handleFinish();
@@ -358,6 +431,43 @@ export function ExecutionMode() {
 
     resumeAfterCountdown();
   }, [countdownNow, resumeCountdownEndsAt]);
+
+  useScreenWakeLock(status !== "completed");
+
+  // Audio/haptic cues: phase start (work vs rest) and the last 3 seconds.
+  const previousCueRef = useRef<CueSnapshot | null>(null);
+  const cueSegmentKey = currentSegment?.segment_key ?? null;
+  const cuePhase = currentSegment && isRestSegment(currentSegment) ? "rest" : "work";
+
+  useEffect(() => {
+    const snapshot: CueSnapshot = {
+      segmentKey: cueSegmentKey,
+      running: isTimerRunning,
+      remaining,
+      phase: cuePhase,
+    };
+    const cue = nextCue(previousCueRef.current, snapshot);
+    previousCueRef.current = snapshot;
+    if (cue) playCue(cue, cueMode);
+  }, [cueMode, cuePhase, cueSegmentKey, isTimerRunning, remaining]);
+
+  useEffect(() => {
+    if (resumeCountdown !== null && resumeCountdown > 0) playCue("tick", cueMode);
+  }, [cueMode, resumeCountdown]);
+
+  const previousStatusRef = useRef(status);
+  useEffect(() => {
+    if (status === "completed" && previousStatusRef.current !== "completed") playCue("finish", cueMode);
+    previousStatusRef.current = status;
+  }, [cueMode, status]);
+
+  function cycleCueMode() {
+    primeCueAudio();
+    const next = CUE_MODES[(CUE_MODES.indexOf(cueMode) + 1) % CUE_MODES.length]!;
+    storeCueMode(next);
+    setCueMode(next);
+    if (next !== "off") playCue("tick", next);
+  }
 
   useEffect(() => {
     if (!tokens?.access_token || !executionId) return;
@@ -425,7 +535,7 @@ export function ExecutionMode() {
   }
 
   function handleNext() {
-    if (currentSegment?.scoreable) {
+    if (promptsForScore) {
       void openScoreModal();
     } else {
       void movePastCurrentSegment();
@@ -497,7 +607,7 @@ export function ExecutionMode() {
           return;
         }
 
-        if (currentSegment?.scoreable && shouldAutoAdvanceOnChecklistComplete(currentSegment)) {
+        if (promptsForScore && currentSegment && shouldAutoAdvanceOnChecklistComplete(currentSegment)) {
           await openScoreModal();
         } else if (currentSegment && shouldAutoAdvanceOnChecklistComplete(currentSegment)) {
           await movePastCurrentSegment(sectionScores, execution.checked_exercise_ids);
@@ -523,7 +633,7 @@ export function ExecutionMode() {
   if (status === "completed") {
     return (
       <div
-        className="flex h-screen flex-col items-center justify-center gap-6 p-8"
+        className="flex h-dvh flex-col items-center justify-center gap-6 p-8"
         style={{ background: "var(--bg)", color: "var(--text)" }}
       >
         <div className="text-5xl">🏁</div>
@@ -557,7 +667,7 @@ export function ExecutionMode() {
             router.push("/");
           }}
           className="rounded-2xl px-8 py-3 text-base font-semibold"
-          style={{ background: "var(--accent, var(--primary))", color: "var(--text)" }}
+          style={{ background: "var(--accent, var(--primary))", color: "var(--primary-contrast)" }}
         >
           {i18n("donee9b450d")}
         </button>
@@ -576,36 +686,39 @@ export function ExecutionMode() {
         isSaving={isSaving}
         feedback={feedback}
         onConfirm={(editedScores, modifications) => void confirmPendingFinish(editedScores, modifications)}
+        onCancel={() => {
+          setFeedback(null);
+          setPendingFinish(null);
+        }}
       />
     );
   }
 
   return (
     <div
-      className="flex h-screen flex-col overflow-hidden"
+      className="flex h-dvh flex-col overflow-hidden"
       style={{ background: "var(--bg)", color: "var(--text)" }}
+      onPointerDownCapture={primeCueAudio}
     >
       <div
         className="flex items-center justify-between px-4 py-3"
         style={{ borderBottom: "1px solid var(--border)" }}
       >
-        <button
-          onClick={handlePause}
-          className="rounded-xl p-2 text-sm"
-          style={{ color: "var(--muted)" }}
-        >
-          {i18n("pausecd21a1b")}
-        </button>
         <div className="text-sm font-semibold" style={{ color: "var(--muted)" }}>
           {currentSegmentIndex + 1} / {segments.length}
         </div>
         <button
-          onClick={() => void handleFinish()}
-          disabled={isSaving}
-          className="rounded-xl px-3 py-1.5 text-sm font-semibold disabled:opacity-30"
-          style={{ color: "var(--accent, var(--primary))" }}
+          type="button"
+          onClick={cycleCueMode}
+          aria-label={i18n("timerAlertsLabel", { mode: i18n(CUE_MODE_LABELS[cueMode]) })}
+          className="flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-semibold"
+          style={{
+            border: "1px solid var(--border)",
+            color: cueMode === "off" ? "var(--dim)" : "var(--text-soft)",
+          }}
         >
-          {i18n("finishb74bdee")}
+          <CueModeIcon mode={cueMode} />
+          <span>{i18n(CUE_MODE_LABELS[cueMode])}</span>
         </button>
       </div>
 
@@ -645,9 +758,26 @@ export function ExecutionMode() {
       </div>
 
       <div
-        className="flex gap-3 px-4 py-4"
-        style={{ borderTop: "1px solid var(--border)" }}
+        className="flex gap-3 px-4 pt-4"
+        style={{
+          borderTop: "1px solid var(--border)",
+          paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
+        }}
       >
+        <button
+          type="button"
+          onClick={handlePause}
+          disabled={status !== "active"}
+          aria-label={i18n("pausecd21a1b")}
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full disabled:opacity-30"
+          style={{
+            background: "var(--card, var(--panel-muted))",
+            border: "1px solid var(--border)",
+            color: "var(--text)",
+          }}
+        >
+          <PauseIcon />
+        </button>
         {currentSegmentIndex > 0 && (
           <button
             onClick={() => {
@@ -678,33 +808,52 @@ export function ExecutionMode() {
           }}
           disabled={isSaving}
           className="flex h-12 flex-1 items-center justify-center rounded-full text-base font-bold disabled:opacity-30"
-          style={{ background: "var(--accent, var(--primary))", color: "var(--text)" }}
+          style={{ background: "var(--accent, var(--primary))", color: "var(--primary-contrast)" }}
         >
           {isSaving ? i18n("saving56a2285") : isLastSegment ? i18n("finishb74bdee") : i18n("next2f04eb1")}
         </button>
       </div>
 
-      {status === "paused" && !resumeCountdownEndsAt && (
+      {status === "paused" && !resumeCountdownEndsAt && !showScoreModal && !scoreTransitionLocked && (
         <div
-          className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="execution-paused-title"
+          className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-4 px-6"
           style={{ background: "color-mix(in srgb, var(--bg) 92%, transparent)" }}
         >
-          <div className="text-4xl font-bold" style={{ color: "var(--text)" }}>
+          <div id="execution-paused-title" className="mb-2 text-4xl font-bold" style={{ color: "var(--text)" }}>
             {i18n("pausedc7dfb6f")}
           </div>
+          {feedback ? (
+            <p className="max-w-xs text-center text-sm" style={{ color: "var(--primary-strong)" }}>
+              {feedback}
+            </p>
+          ) : null}
           <button
+            type="button"
             onClick={handleResume}
-            className="rounded-2xl px-10 py-4 text-xl font-bold"
-            style={{ background: "var(--accent, var(--primary))", color: "var(--text)" }}
+            autoFocus
+            className="w-full max-w-xs rounded-2xl py-4 text-xl font-bold"
+            style={{ background: "var(--accent, var(--primary))", color: "var(--primary-contrast)" }}
           >
             {i18n("resumeb3bd0b5")}
+          </button>
+          <button
+            type="button"
+            onClick={() => void handleFinish()}
+            disabled={isSaving}
+            className="w-full max-w-xs rounded-2xl py-3 text-base font-semibold disabled:opacity-30"
+            style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}
+          >
+            {i18n("endWorkoutLabel")}
           </button>
         </div>
       )}
 
       {resumeCountdown !== null && (
         <div
-          className="absolute inset-0 z-50 flex items-center justify-center"
+          className="fixed inset-0 z-50 flex items-center justify-center"
           style={{ background: "color-mix(in srgb, var(--bg) 92%, transparent)" }}
         >
           <div

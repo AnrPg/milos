@@ -1,0 +1,21 @@
+{
+  "untimed": { "required": [], "optional": [] },
+  "for_time": { "required": [], "optional": ["rounds", "time_cap_seconds", "transition_seconds"] },
+  "train_to_exhaustion": { "required": [], "optional": ["rest_seconds", "rounds", "time_cap_seconds"] },
+  "kcal_target": { "required": [], "optional": ["kcal_target", "time_cap_seconds"] },
+  "emom": { "required": ["duration_seconds", "interval_seconds"], "optional": ["scoring_mode", "max_windows", "transition_seconds"] },
+  "complex_emom": { "required": ["duration_seconds", "interval_seconds"], "optional": ["scoring_mode", "amrap_scoring_style", "max_windows", "transition_seconds"] },
+  "even_odd": { "required": ["duration_seconds"], "optional": ["interval_seconds", "transition_seconds"] },
+  "billat": { "required": ["work_seconds", "rest_seconds", "cycles"], "optional": ["target_distance_meters", "target_pace", "transition_seconds"] },
+  "amrap": { "required": ["duration_seconds"], "optional": ["target_rounds", "transition_seconds"] },
+  "edt": { "required": ["duration_seconds"], "optional": ["pr_zone_rounds", "transition_seconds"] },
+  "death_by": { "required": ["start_reps", "step_reps"], "optional": ["ladder_cap", "interval_seconds"] },
+  "tabata": { "required": ["work_seconds", "rest_seconds", "rounds"], "optional": ["transition_seconds"] },
+  "custom_hiit": { "required": ["work_seconds", "rest_seconds", "rounds"], "optional": ["transition_seconds"] },
+  "cluster": { "required": ["intra_rest_seconds", "sets"], "optional": ["cluster_reps", "rest_seconds"] },
+  "hrr": { "required": ["effort_seconds"], "optional": ["hr_zone", "rest_seconds", "recovery_cap_seconds", "hr_drop_target"] },
+  "ladder_ascending": { "required": ["start_reps", "step_reps"], "optional": ["ladder_cap", "time_cap_seconds", "end_reps"] },
+  "ladder_descending": { "required": ["start_reps", "step_reps", "min_reps"], "optional": ["time_cap_seconds"] },
+  "pyramid": { "required": ["peak_reps", "step_reps"], "optional": ["start_reps", "time_cap_seconds"] },
+  "rest": { "required": [], "optional": ["duration_seconds", "recovery_condition"] }
+}
