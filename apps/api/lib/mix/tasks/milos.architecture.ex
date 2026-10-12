@@ -68,6 +68,7 @@ defmodule Mix.Tasks.Milos.Architecture do
     gamification/gamification_store
     finance/finance_store
     execution/execution_store
+    execution/training_log_store
     wellbeing/wellbeing_store
     notifications/notification_store
     coaching/coaching_store

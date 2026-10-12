@@ -63,6 +63,10 @@ config :milos_training,
        :execution_store,
        MilosTraining.Infrastructure.Execution.EctoExecutionStore
 
+config :milos_training,
+       :training_log_store,
+       MilosTraining.Infrastructure.Execution.EctoTrainingLogStore
+
 config :milos_training, :finance_store, MilosTraining.Infrastructure.Finance.EctoFinanceStore
 config :milos_training, :workout_store, MilosTraining.Infrastructure.Workouts.EctoWorkoutStore
 

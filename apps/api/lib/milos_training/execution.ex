@@ -1,14 +1,17 @@
 defmodule MilosTraining.Execution do
   alias MilosTraining.Execution.Commands.{
     CompleteExecution,
+    LogTrainingEntry,
     StartExecution,
     SubmitExecutionNote,
-    UpdateExecutionProgress
+    UpdateExecutionProgress,
+    UpdateTrainingLogEntry,
+    VoidTrainingLogEntry
   }
 
-  alias MilosTraining.Execution.Domain.TimerSequenceBuilder
-  alias MilosTraining.Execution.Queries.GetExecution
-  alias MilosTraining.Execution.ExecutionStore
+  alias MilosTraining.Execution.Domain.{TimerSequenceBuilder, TrainingLogPolicy}
+  alias MilosTraining.Execution.Queries.{GetExecution, GetTrainingLogEntries}
+  alias MilosTraining.Execution.{ExecutionStore, TrainingLogStore}
 
   defdelegate start_execution(user_id, params), to: StartExecution, as: :call
   defdelegate complete_execution(id, user_id, params), to: CompleteExecution, as: :call
@@ -27,4 +30,58 @@ defmodule MilosTraining.Execution do
     do: ExecutionStore.list_executions_for_coaching(user_id)
 
   defdelegate build_timer_sequence(workout), to: TimerSequenceBuilder, as: :build
+
+  # -- Standalone training log (ADR-100) -------------------------------------
+
+  def with_training_log_context(context, fun),
+    do: TrainingLogStore.with_tenant_context(context, fun)
+
+  def with_training_log_owner_context(context, fun),
+    do: TrainingLogStore.with_owner_context(context, fun)
+
+  defdelegate log_training_entry(user_id, source, params, opts),
+    to: LogTrainingEntry,
+    as: :call
+
+  defdelegate update_training_log_entry(entry_id, user_id, params, opts),
+    to: UpdateTrainingLogEntry,
+    as: :call
+
+  defdelegate void_training_log_entry(entry_id, user_id, params, now),
+    to: VoidTrainingLogEntry,
+    as: :call
+
+  defdelegate get_training_log_entry_for_user(id, user_id),
+    to: GetTrainingLogEntries,
+    as: :by_id_for_user
+
+  defdelegate list_training_log_entries_for_user(user_id, opts),
+    to: GetTrainingLogEntries,
+    as: :for_user
+
+  defdelegate list_logged_training_source_ids(user_id, source_type),
+    to: GetTrainingLogEntries,
+    as: :live_source_reference_ids
+
+  defdelegate list_training_log_completions_for_user(user_id),
+    to: GetTrainingLogEntries,
+    as: :completion_records_for_user
+
+  defdelegate training_log_completion_record(entry), to: TrainingLogPolicy, as: :completion_record
+
+  defdelegate training_log_double_counted?(source, executions, performed_at),
+    to: TrainingLogPolicy,
+    as: :double_counted?
+
+  defdelegate authorize_training_log_class(access, now),
+    to: TrainingLogPolicy,
+    as: :authorize_class
+
+  defdelegate loggable_training_sources(candidates, logged_reference_ids, executions),
+    to: TrainingLogPolicy,
+    as: :loggable_candidates
+
+  defdelegate training_log_scoreable_sections(workout),
+    to: TrainingLogPolicy,
+    as: :scoreable_sections
 end
