@@ -215,6 +215,8 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           draft_data: workout.draft_data,
           folder_id: workout.folder_id,
           source_workout_id: workout.source_workout_id,
+          icon: workout.icon,
+          icon_source: workout.icon_source,
           sections: draft_sections
         }
 
@@ -268,6 +270,26 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     with :ok <- validate_folder_parent(nil, params),
          {:ok, folder} <- %WorkoutFolder{} |> WorkoutFolder.changeset(params) |> Repo.insert() do
       {:ok, normalize_folder(folder)}
+    end
+  end
+
+  @impl true
+  def set_workout_icon(id, icon, icon_source) do
+    case MasterWorkout |> scoped_to_tenant() |> Repo.get(id) do
+      nil ->
+        {:error, :not_found}
+
+      workout ->
+        workout
+        |> Ecto.Changeset.change(icon: icon, icon_source: icon_source)
+        |> Repo.update()
+        |> case do
+          {:ok, updated} ->
+            {:ok, %{id: updated.id, icon: updated.icon, icon_source: updated.icon_source}}
+
+          error ->
+            error
+        end
     end
   end
 
@@ -908,6 +930,8 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       created_by_id: workout.created_by_id,
       folder_id: workout.folder_id,
       source_workout_id: workout.source_workout_id,
+      icon: workout.icon,
+      icon_source: workout.icon_source,
       inserted_at: workout.inserted_at,
       updated_at: workout.updated_at,
       sections: sections
@@ -1922,7 +1946,11 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           draft_data: draft_data
         }
 
-        case %MasterWorkout{} |> MasterWorkout.draft_changeset(params) |> Repo.insert() do
+        # Copies keep the original's icon, whoever chose it.
+        %MasterWorkout{icon: source.icon, icon_source: source.icon_source}
+        |> MasterWorkout.draft_changeset(params)
+        |> Repo.insert()
+        |> case do
           {:ok, new_workout} -> {:ok, %{id: new_workout.id, status: "draft", title: title}}
           {:error, changeset} -> {:error, changeset}
         end

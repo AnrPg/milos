@@ -60,6 +60,12 @@ config :milos_training, :meilisearch,
   api_key: meili_api_key,
   admin_member_index: System.get_env("MEILI_ADMIN_MEMBER_INDEX", "admin_members")
 
+# Optional AI icon suggestions for published workouts (ADR-096). Without a key
+# the workout library uses its keyword rules only.
+config :milos_training, :gemini,
+  api_key: System.get_env("GEMINI_API_KEY"),
+  model: System.get_env("GEMINI_MODEL", "gemini-2.5-flash-lite")
+
 otel_traces_endpoint = System.get_env("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT")
 otel_endpoint = otel_traces_endpoint || System.get_env("OTEL_EXPORTER_OTLP_ENDPOINT")
 

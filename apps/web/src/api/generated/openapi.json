@@ -2364,6 +2364,90 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/workouts/{id}/icon": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminWorkoutController.update_icon",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "icon": {
+                    "description": "A single emoji; null resets the icon to automatic",
+                    "maxLength": 32,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "icon"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "icon": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "icon_source": {
+                      "enum": [
+                        "ai",
+                        "coach",
+                        null
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "icon",
+                    "icon_source"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Icon"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set a workout's library icon, or reset it to automatic (rules + AI suggestion)",
+        "tags": [
+          "Admin Workouts"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/finance/queues": {
       "get": {
         "callbacks": {},

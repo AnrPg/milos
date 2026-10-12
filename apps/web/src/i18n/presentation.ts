@@ -269,6 +269,7 @@ const API_ERROR_KEYS: Record<string, string> = {
   class_placement_requires_member: "apiErrorClassPlacementRequiresMember",
   folder_not_found: "apiErrorFolderNotFound",
   folder_cycle: "apiErrorFolderCycle",
+  invalid_workout_icon: "apiErrorInvalidWorkoutIcon",
   invalid_athletes: "apiErrorInvalidAthletes",
   workout_not_published: "apiErrorWorkoutNotPublished",
   unauthorized: "apiErrorUnauthorized",

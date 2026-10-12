@@ -1174,6 +1174,12 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "folder_not_found", error: "The chosen library folder does not exist"})
   end
 
+  def call(conn, {:error, :invalid_workout_icon}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_workout_icon", error: "Choose a single emoji as the icon"})
+  end
+
   def call(conn, {:error, :folder_cycle}) do
     conn
     |> put_status(:unprocessable_entity)

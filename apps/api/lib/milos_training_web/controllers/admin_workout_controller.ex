@@ -10,6 +10,7 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
     DuplicateWorkout,
     FileWorkoutCopy,
     GetAdminWorkout,
+    SetWorkoutIcon,
     ListAdminWorkouts,
     PublishWorkout,
     ReopenWorkout,
@@ -25,7 +26,29 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
   security([%{"bearerAuth" => []}])
 
   plug OpenApiSpex.Plug.CastAndValidate,
-       [json_render_error_v2: true] when action in [:create, :update_draft, :publish, :copy]
+       [json_render_error_v2: true]
+       when action in [:create, :update_draft, :publish, :copy, :update_icon]
+
+  @icon_body %RequestBody{
+    required: true,
+    content: %{
+      "application/json" => %MediaType{
+        schema: %Schema{
+          type: :object,
+          additionalProperties: false,
+          properties: %{
+            icon: %Schema{
+              type: :string,
+              nullable: true,
+              maxLength: 32,
+              description: "A single emoji; null resets the icon to automatic"
+            }
+          },
+          required: [:icon]
+        }
+      }
+    }
+  }
 
   @folder_target_body %RequestBody{
     required: false,
@@ -315,6 +338,34 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
       conn
       |> put_status(:created)
       |> json(%{workout: workout})
+    end
+  end
+
+  operation(:update_icon,
+    summary: "Set a workout's library icon, or reset it to automatic (rules + AI suggestion)",
+    parameters: [@id_param],
+    request_body: @icon_body,
+    responses: [
+      ok:
+        {"Icon", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             id: %Schema{type: :string, format: :uuid},
+             icon: %Schema{type: :string, nullable: true},
+             icon_source: %Schema{type: :string, nullable: true, enum: ["ai", "coach", nil]}
+           },
+           required: [:id, :icon, :icon_source]
+         }}
+    ]
+  )
+
+  def update_icon(conn, params) do
+    id = Map.get(params, "id") || Map.get(params, :id)
+    icon = Map.get(conn.body_params, :icon) || Map.get(conn.body_params, "icon")
+
+    with {:ok, result} <- SetWorkoutIcon.call(conn.assigns.tenant_context, id, icon) do
+      json(conn, result)
     end
   end
 

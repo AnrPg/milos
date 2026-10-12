@@ -149,6 +149,9 @@ export type WorkoutRecord = {
   created_by_id?: string;
   folder_id?: string | null;
   source_workout_id?: string | null;
+  /** Emoji chosen by a coach or suggested by AI; null = keyword rules apply. */
+  icon?: string | null;
+  icon_source?: "ai" | "coach" | null;
   inserted_at?: string;
   updated_at?: string;
   scale_level?: ScaleLevel;
@@ -464,6 +467,14 @@ export async function reopenWorkout(token: string, id: string): Promise<{ id: st
     { method: "POST", token, body: {} },
   );
   return response.draft;
+}
+
+export function setWorkoutIcon(token: string, id: string, icon: string | null) {
+  return apiRequest<{ id: string; icon: string | null; icon_source: "ai" | "coach" | null }>(`/admin/workouts/${id}/icon`, {
+    method: "PATCH",
+    token,
+    body: { icon },
+  });
 }
 
 export async function copyWorkoutToFolder(token: string, id: string, folderId: string | null) {

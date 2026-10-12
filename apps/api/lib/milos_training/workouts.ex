@@ -126,6 +126,9 @@ defmodule MilosTraining.Workouts do
   def update_folder(id, params), do: MilosTraining.Workouts.WorkoutStore.update_folder(id, params)
   def update_folder(context, id, params), do: WorkoutStore.update_folder(context, id, params)
 
+  def set_workout_icon(context, id, icon, icon_source),
+    do: WorkoutStore.set_workout_icon(context, id, icon, icon_source)
+
   def find_filed_copy(context, source_id, folder_id),
     do: WorkoutStore.find_filed_copy(context, source_id, folder_id)
 

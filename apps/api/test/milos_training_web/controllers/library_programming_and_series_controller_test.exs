@@ -4,6 +4,7 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
   import MilosTraining.TestFixtures
 
   alias MilosTraining.{Finance, Organizations, Repo}
+  alias MilosTraining.Application.SuggestWorkoutIcon
 
   test "admin organizes workouts in nested folders and moves a workout", %{conn: conn} do
     admin = admin_fixture(%{nickname: "folder_admin"})
@@ -194,12 +195,9 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
 
     assert rejected["code"] == "slot_not_booked_by_member"
 
-    # The class got its own copy of the template, filed under Classes/<year>/<month>/<date>.
-    class_copy_id = slot["master_workout_id"]
-    refute class_copy_id == source.id
-
-    assert MilosTraining.Scheduling.get_slot(context, slot["id"]).master_workout_id ==
-             class_copy_id
+    # Creating a class files nothing; it keeps pointing at the library template.
+    assert slot["master_workout_id"] == source.id
+    assert MilosTraining.Scheduling.get_slot(context, slot["id"]).master_workout_id == source.id
 
     programmed =
       admin_conn
@@ -404,25 +402,33 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
       assert length(renamed) == length(folders)
     end
 
-    test "class workouts are filed by date and same-day classes share one copy",
+    test "class folders are created only when a workout is assigned; same-day classes share a copy",
          %{conn: conn} do
       admin = admin_fixture(%{nickname: "class_filing_admin"})
       %{organization: organization, context: context} = tenant_fixture(admin, "Class Filing Gym")
+      placeholder = tenant_workout_fixture(admin, context, %{title: "Placeholder"})
       template = tenant_workout_fixture(admin, context, %{title: "Daily Template"})
       class_type = class_type_fixture(%{name: "Filing Class", tenant_context: context})
       scheduled_at = ~U[2031-03-04 09:00:00Z]
+      evening_at = DateTime.add(scheduled_at, 8 * 3_600)
 
-      morning = create_slot(conn, admin, organization, template.id, class_type.id, scheduled_at)
+      morning =
+        create_slot(conn, admin, organization, placeholder.id, class_type.id, scheduled_at)
+
+      evening = create_slot(conn, admin, organization, placeholder.id, class_type.id, evening_at)
+
+      # Scheduling classes alone leaves the Classes tree empty.
+      assert morning["master_workout_id"] == placeholder.id
+
+      refute conn
+             |> list_folders(admin, organization)
+             |> Enum.any?(&String.starts_with?(&1["system_key"] || "", "classes:"))
+
+      morning =
+        assign_slot_workout(conn, admin, organization, morning, template.id, class_type.id)
 
       evening =
-        create_slot(
-          conn,
-          admin,
-          organization,
-          template.id,
-          class_type.id,
-          DateTime.add(scheduled_at, 8 * 3_600)
-        )
+        assign_slot_workout(conn, admin, organization, evening, template.id, class_type.id)
 
       refute morning["master_workout_id"] == template.id
       assert evening["master_workout_id"] == morning["master_workout_id"]
@@ -535,6 +541,66 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
     end
   end
 
+  describe "workout icons" do
+    test "published workouts get an AI icon unless a coach picked one", %{conn: conn} do
+      admin = admin_fixture(%{nickname: "icon_admin"})
+      %{organization: organization, context: context} = tenant_fixture(admin, "Icon Gym")
+      deload = tenant_workout_fixture(admin, context, %{title: "Deload day"})
+      chatty = tenant_workout_fixture(admin, context, %{title: "Chatty WOD"})
+
+      assert {:ok, "💆"} = SuggestWorkoutIcon.call(context, deload.id)
+
+      assert %{"icon" => "💆", "icon_source" => "ai"} =
+               workout_by_id(conn, admin, organization, deload.id)
+
+      # Model output that is not a single emoji is never stored.
+      assert {:ok, :skipped} = SuggestWorkoutIcon.call(context, chatty.id)
+      assert workout_by_id(conn, admin, organization, chatty.id)["icon"] == nil
+
+      # A coach's choice wins and survives later suggestions.
+      assert %{"icon" => "🔥", "icon_source" => "coach"} =
+               set_icon(conn, admin, organization, deload.id, "🔥") |> json_response(200)
+
+      assert {:ok, :kept_coach_icon} = SuggestWorkoutIcon.call(context, deload.id)
+      assert workout_by_id(conn, admin, organization, deload.id)["icon"] == "🔥"
+
+      assert %{"code" => "invalid_workout_icon"} =
+               set_icon(conn, admin, organization, deload.id, "fire") |> json_response(422)
+
+      # Resetting to automatic asks for a fresh suggestion.
+      set_icon(conn, admin, organization, deload.id, nil) |> json_response(200)
+
+      assert %{"icon" => "💆", "icon_source" => "ai"} =
+               workout_by_id(conn, admin, organization, deload.id)
+
+      # Copies keep their original's icon.
+      copied =
+        conn
+        |> recycle()
+        |> put_bearer_token(admin)
+        |> put_req_header("content-type", "application/json")
+        |> post(
+          "/api/org/#{organization.slug}/admin/workouts/#{deload.id}/copy",
+          Jason.encode!(%{folder_id: nil})
+        )
+        |> json_response(201)
+        |> Map.fetch!("workout")
+
+      assert copied["icon"] == "💆"
+    end
+  end
+
+  defp set_icon(conn, admin, organization, workout_id, icon) do
+    conn
+    |> recycle()
+    |> put_bearer_token(admin)
+    |> put_req_header("content-type", "application/json")
+    |> patch(
+      "/api/org/#{organization.slug}/admin/workouts/#{workout_id}/icon",
+      Jason.encode!(%{icon: icon})
+    )
+  end
+
   defp list_folders(conn, admin, organization) do
     conn
     |> recycle()
@@ -552,6 +618,28 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
     |> json_response(200)
     |> Map.fetch!("workouts")
     |> Enum.find(&(&1["id"] == id))
+  end
+
+  defp assign_slot_workout(conn, admin, organization, slot, workout_id, class_type_id) do
+    conn
+    |> recycle()
+    |> put_bearer_token(admin)
+    |> put_req_header("content-type", "application/json")
+    |> patch(
+      "/api/org/#{organization.slug}/admin/schedule/slots/#{slot["id"]}",
+      Jason.encode!(%{
+        master_workout_id: workout_id,
+        class_type_id: class_type_id,
+        name: slot["name"],
+        duration_minutes: slot["duration_minutes"],
+        scheduled_at: slot["scheduled_at"],
+        capacity: slot["capacity"],
+        auto_approve: slot["auto_approve"],
+        booking_timeout_minutes: slot["booking_timeout_minutes"]
+      })
+    )
+    |> json_response(200)
+    |> Map.fetch!("slot")
   end
 
   defp create_slot(conn, admin, organization, workout_id, class_type_id, scheduled_at) do

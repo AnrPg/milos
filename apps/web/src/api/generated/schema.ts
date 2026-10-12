@@ -229,6 +229,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/workouts/{id}/icon": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Set a workout's library icon, or reset it to automatic (rules + AI suggestion) */
+        patch: operations["MilosTrainingWeb.AdminWorkoutController.update_icon"];
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/queues": {
         parameters: {
             query?: never;
@@ -3742,6 +3759,41 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminWorkoutController.update_icon": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description A single emoji; null resets the icon to automatic */
+                    icon: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Icon */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        icon: string | null;
+                        /** @enum {string|null} */
+                        icon_source: "ai" | "coach" | null;
+                        /** Format: uuid */
+                        id: string;
                     };
                 };
             };

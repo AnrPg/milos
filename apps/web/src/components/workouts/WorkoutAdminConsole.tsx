@@ -16,6 +16,7 @@ import {
   listWorkoutFolders,
   listAdminWorkouts,
   moveWorkoutToFolder,
+  setWorkoutIcon,
   updateWorkoutFolder,
   type WorkoutFolder,
   type WorkoutRecord,
@@ -27,15 +28,18 @@ import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { AssignWorkoutPanel } from "@/components/workouts/AssignWorkoutPanel";
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
+import { LibraryIconDialog } from "@/components/workouts/library/LibraryIconDialog";
 import { LibraryItemMenu, type LibraryMenuAction } from "@/components/workouts/library/LibraryItemMenu";
 import { LibraryTransferDialog, type FolderOption } from "@/components/workouts/library/LibraryTransferDialog";
 import {
-  FOLDER_KIND_ICONS,
   compareFolders,
   dayFolderBadge,
   folderDisplayName,
+  folderIcon,
   folderKind,
   folderSubtreeIds,
+  resolveWorkoutIcon,
+  ruleIcon,
   workoutIcon,
 } from "@/components/workouts/library/library-folders";
 import { SemanticLabel } from "@/components/semantic-label";
@@ -77,6 +81,7 @@ export function WorkoutAdminConsole() {
   const [expandedTreeIds, setExpandedTreeIds] = useState<Set<string>>(() => new Set());
   const [openMenuKey, setOpenMenuKey] = useState<string | null>(null);
   const [transfer, setTransfer] = useState<Transfer | null>(null);
+  const [iconTarget, setIconTarget] = useState<WorkoutRecord | null>(null);
   const [draggedWorkoutId, setDraggedWorkoutId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -297,6 +302,15 @@ export function WorkoutAdminConsole() {
     });
   }
 
+  async function saveIcon(workout: WorkoutRecord, icon: string | null) {
+    if (!tokens?.access_token) return;
+    await runAction(`icon-${workout.id}`, async () => {
+      const updated = await setWorkoutIcon(tokens.access_token!, workout.id, icon);
+      setWorkouts((current) => current.map((item) => item.id === updated.id ? { ...item, icon: updated.icon, icon_source: updated.icon_source } : item));
+      setIconTarget(null);
+    });
+  }
+
   async function saveFolder(folder: WorkoutFolder, changes: { name?: string; parent_id?: string | null }) {
     if (!tokens?.access_token) return;
     await runAction(`folder-${folder.id}`, async () => {
@@ -349,6 +363,7 @@ export function WorkoutAdminConsole() {
       });
     }
     actions.push(
+      { key: "icon", icon: resolveWorkoutIcon(workout), label: i18n("featureChangeIcon"), onSelect: () => setIconTarget(workout) },
       { key: "move", icon: "↪", label: i18n("featureMoveToFolder"), onSelect: () => setTransfer({ kind: "move-workout", workout }) },
       { key: "copy", icon: "⧉", label: i18n("featureCopyToFolder"), onSelect: () => setTransfer({ kind: "copy-workout", workout }) },
       { key: "share", icon: "⇪", label: shareExport.copy.title, onSelect: () => setShareTarget(workout) },
@@ -418,7 +433,7 @@ export function WorkoutAdminConsole() {
               <span className="text-[9px] font-bold uppercase leading-[0.9rem]" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>{badge.month}</span>
               <span className="flex-1 text-lg font-bold leading-[1.6rem]" style={{ color: "var(--bg)" }}>{badge.day}</span>
             </span>
-          ) : FOLDER_KIND_ICONS[folderKind(folder)]}
+          ) : folderIcon(folder)}
           {count > 0 ? (
             <span className="absolute -bottom-1 -end-2 min-w-5 rounded-full px-1 text-[10px] font-bold leading-4" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
               {count}
@@ -459,7 +474,7 @@ export function WorkoutAdminConsole() {
           }}
         >
           <span aria-hidden className="relative grid h-[2.6rem] w-[2.2rem] place-items-center rounded-md text-2xl leading-none shadow-sm" style={{ background: "color-mix(in srgb, var(--primary) 14%, var(--panel-muted))", border: "1px solid color-mix(in srgb, var(--primary) 30%, var(--border))" }}>
-            {workoutIcon(workout.type)}
+            {resolveWorkoutIcon(workout)}
             {workout.status === "draft" ? (
               <span className="absolute -end-1 -top-1 h-2.5 w-2.5 rounded-full" style={{ background: "var(--warning)", boxShadow: "0 0 0 2px var(--panel)" }} />
             ) : null}
@@ -508,7 +523,7 @@ export function WorkoutAdminConsole() {
             }}
           >
             <span aria-hidden className="inline-block w-3 text-[10px] transition-transform" style={{ color: "var(--dim)", transform: expanded ? "rotate(90deg)" : undefined }}>▶</span>
-            <span aria-hidden>{FOLDER_KIND_ICONS[folderKind(folder)]}</span>
+            <span aria-hidden>{folderIcon(folder)}</span>
             <span className="truncate font-medium">{displayName(folder)}</span>
             <span className="text-xs tabular-nums" style={{ color: "var(--dim)" }}>{subtreeWorkoutCount(folder.id)}</span>
           </button>
@@ -541,7 +556,7 @@ export function WorkoutAdminConsole() {
             setMenuOpen(menuKey, true);
           }}
         >
-          <span aria-hidden>{workoutIcon(workout.type)}</span>
+          <span aria-hidden>{resolveWorkoutIcon(workout)}</span>
           <span className="truncate">{title}</span>
           <span className="shrink-0 text-xs" style={{ color: "var(--dim)" }}><SemanticLabel value={workout.type} /></span>
           {workout.status === "draft" ? <span className="shrink-0 text-xs" style={{ color: "var(--warning)" }}>· {i18n("draft23d33e2")}</span> : null}
@@ -662,7 +677,7 @@ export function WorkoutAdminConsole() {
           onClick={() => toggleFolderGroup(folder.id)}
         >
           <span aria-hidden className="inline-block w-3 text-xs transition-transform" style={{ color: "var(--dim)", transform: collapsed ? "rotate(-90deg)" : undefined }}>▾</span>
-          <span aria-hidden>{FOLDER_KIND_ICONS[folderKind(folder)]}</span>
+          <span aria-hidden>{folderIcon(folder)}</span>
           <span className="min-w-0 flex-1 truncate text-sm font-semibold" style={{ color: "var(--text)" }}>{displayName(folder)}</span>
           <span className="text-xs tabular-nums" style={{ color: "var(--muted)" }}>{subtreeWorkoutCount(folder.id)}</span>
         </button>
@@ -763,9 +778,11 @@ export function WorkoutAdminConsole() {
                     style={{ background: "var(--primary)", color: "var(--primary-contrast)", boxShadow: "0 12px 30px color-mix(in srgb, var(--primary) 35%, transparent)" }}
                     href={newWorkoutHref}
                   >
-                    <span aria-hidden className="text-xl leading-none">🏋️</span>
                     <span aria-hidden className="text-xl leading-none">+</span>
-                    <span>{i18n("featureNewWorkoutButton")}</span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <span aria-hidden className="hidden text-xl leading-none sm:inline">🏋️</span>
+                      {i18n("featureNewWorkoutButton")}
+                    </span>
                   </Link>
                 </HoverHint>
 
@@ -818,14 +835,15 @@ export function WorkoutAdminConsole() {
                     <button
                       type="button"
                       aria-label={i18n("featureNewFolder")}
-                      className="grid h-9 w-9 place-items-center rounded-full text-sm opacity-55 transition-opacity hover:opacity-100"
+                      className="relative grid h-9 w-9 place-items-center rounded-full text-base opacity-60 transition-opacity hover:opacity-100"
                       style={{ color: "var(--text-soft)" }}
                       onClick={() => {
                         setFolderParentId(currentFolder?.id ?? "");
                         setFolderModalOpen(true);
                       }}
                     >
-                      📁+
+                      <span aria-hidden>📂</span>
+                      <span aria-hidden className="absolute bottom-1 end-0.5 grid h-3.5 w-3.5 place-items-center rounded-full text-[10px] font-black leading-none" style={{ background: "var(--success)", color: "var(--bg)" }}>+</span>
                     </button>
                   </HoverHint>
                 </div>
@@ -932,6 +950,19 @@ export function WorkoutAdminConsole() {
       ) : null}
 
       {renderTransferDialog()}
+
+      {iconTarget ? (
+        <LibraryIconDialog
+          key={iconTarget.id}
+          workoutTitle={iconTarget.title || i18n("untitledWorkouta1885a5")}
+          currentIcon={resolveWorkoutIcon(iconTarget)}
+          automaticIcon={ruleIcon(iconTarget.title) ?? workoutIcon(iconTarget.type)}
+          isCustom={iconTarget.icon_source === "coach"}
+          busy={busyAction === `icon-${iconTarget.id}`}
+          onCancel={() => setIconTarget(null)}
+          onSave={(icon) => void saveIcon(iconTarget, icon)}
+        />
+      ) : null}
 
       {editTarget && tokens?.access_token ? (
         <WorkoutEditModal

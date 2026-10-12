@@ -40,6 +40,9 @@ defmodule MilosTraining.Workouts.WorkoutStore do
   def update_folder(context, id, params),
     do: within_tenant(context, fn -> update_folder(id, params) end)
 
+  def set_workout_icon(context, id, icon, icon_source),
+    do: within_tenant(context, fn -> set_workout_icon(id, icon, icon_source) end)
+
   def find_filed_copy(context, source_id, folder_id),
     do: within_tenant(context, fn -> find_filed_copy(source_id, folder_id) end)
 
@@ -152,6 +155,10 @@ defmodule MilosTraining.Workouts.WorkoutStore do
 
   @impl true
   def update_folder(id, params), do: adapter().update_folder(id, params)
+
+  @impl true
+  def set_workout_icon(id, icon, icon_source),
+    do: adapter().set_workout_icon(id, icon, icon_source)
 
   @impl true
   def find_filed_copy(source_id, folder_id), do: adapter().find_filed_copy(source_id, folder_id)

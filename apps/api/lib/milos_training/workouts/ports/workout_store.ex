@@ -23,6 +23,8 @@ defmodule MilosTraining.Workouts.Ports.WorkoutStore do
   @callback create_folder(binary(), map()) :: {:ok, map()} | {:error, term()}
   @callback update_folder(binary(), map()) :: {:ok, map()} | {:error, term()}
   @callback find_filed_copy(binary(), binary()) :: binary() | nil
+  @callback set_workout_icon(binary(), String.t() | nil, String.t() | nil) ::
+              {:ok, map()} | {:error, term()}
   @callback ensure_system_folder(String.t(), String.t(), binary() | nil) ::
               {:ok, map()} | {:error, term()}
   @callback delete_folder(binary()) :: :ok | {:error, term()}

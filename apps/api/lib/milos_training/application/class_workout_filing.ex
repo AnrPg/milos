@@ -2,11 +2,15 @@ defmodule MilosTraining.Application.ClassWorkoutFiling do
   @moduledoc """
   Files the workout of a dated class in `Classes/<year>/<month>/<date>`.
 
-  When a class is given a workout from elsewhere in the library, the class gets
-  its own copy in that day's folder, leaving the template untouched. A workout
-  already filed in the day's folder (e.g. created specifically for the class) is
-  used as-is. Recurring series keep referencing their template; each occurrence
-  is filed once a coach sets that day's workout.
+  Filing happens only when a workout is *assigned* to an existing class (or a
+  class's workout is changed). Creating classes never files anything, so the
+  Classes tree only holds days that actually had a workout programmed, instead
+  of filling up with placeholder copies for every scheduled class.
+
+  The class gets its own copy in that day's folder, leaving the template
+  untouched. A workout already filed in the day's folder (e.g. created
+  specifically for the class) is used as-is, and classes on the same day share
+  one copy.
   """
 
   alias MilosTraining.Application.{FileWorkoutCopy, WorkoutLibraryFolders}
