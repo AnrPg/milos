@@ -14,6 +14,11 @@ defmodule MilosTrainingWeb.AdminWorkoutTimerPreviewController do
     type: :object,
     properties: %{
       label: %Schema{type: :string},
+      label_key: %Schema{type: :string, nullable: true},
+      label_params: %Schema{
+        type: :object,
+        additionalProperties: %Schema{oneOf: [%Schema{type: :integer}, %Schema{type: :string}]}
+      },
       kind: %Schema{type: :string, enum: ~w(countdown countup manual no_timer interval_cycle)},
       phase: %Schema{type: :string, enum: ~w(work rest transition)},
       duration_seconds: %Schema{type: :integer, nullable: true},

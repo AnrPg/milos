@@ -16,4 +16,5 @@ defmodule MilosTraining.Execution.Ports.ExecutionStore do
   @callback list_executions_for_user(binary()) :: [map()]
   @callback list_executions_for_coaching(binary()) :: [map()]
   @callback progress_operation_applied?(binary(), binary(), binary()) :: boolean()
+  @callback list_executions_for_kpis(DateTime.t()) :: [map()]
 end

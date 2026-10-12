@@ -20,7 +20,9 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
                            an :interval_cycle; nil when untimed
     - :round             — round index within the section (1-based), nil for non-cycling formats
     - :total_rounds      — total rounds (or the window cap of an :interval_cycle), nil otherwise
-    - :label             — human-readable display string for the timer phase
+    - :label             — English display string for the timer phase
+    - :label_key         — stable key for localizing the label (nil: use the section name)
+    - :label_params      — values interpolated into the localized label
     - :exercises         — list of exercise maps relevant to this segment
     - :score_config      — score config map from the section (nil if not scoreable)
     - :scoreable         — boolean
@@ -65,7 +67,16 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
       segments:
         Enum.map(
           segments,
-          &Map.take(&1, [:label, :kind, :phase, :duration_seconds, :round, :total_rounds])
+          &Map.take(&1, [
+            :label,
+            :label_key,
+            :label_params,
+            :kind,
+            :phase,
+            :duration_seconds,
+            :round,
+            :total_rounds
+          ])
         ),
       total_seconds: Enum.reduce(segments, 0, &(&2 + timed_seconds(&1))),
       open_ended: Enum.any?(segments, &open_ended?/1)
@@ -126,7 +137,7 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
         []
 
       seconds ->
-        [between_segment(section, "transition", seconds, "transition", "Transition")]
+        [between_segment(section, "transition", seconds, "transition", text("transition"))]
     end
   end
 
@@ -136,7 +147,7 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
              section["rest_before_next_section_seconds"]
          ) do
       nil -> []
-      seconds -> [between_segment(section, "rest-after", seconds, "rest", "Rest")]
+      seconds -> [between_segment(section, "rest-after", seconds, "rest", text("rest"))]
     end
   end
 
@@ -144,7 +155,7 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
     id = section[:id] || section["id"]
 
     section
-    |> segment(:countdown, seconds, nil, nil, [], label: label, phase: phase)
+    |> segment(:countdown, seconds, nil, nil, [], [phase: phase] ++ label)
     |> Map.merge(%{
       section_id: "#{id}:#{suffix}",
       scoreable: false,
@@ -178,8 +189,11 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
       "kcal_target" ->
         target = get_timer_field(section, :kcal_target)
         cap = get_timer_field(section, :time_cap_seconds)
-        label = if target, do: "#{target} kcal", else: "Kcal target"
-        [segment(section, :countup, cap, nil, nil, exercises, label: label)]
+
+        label =
+          if target, do: text("kcal_target", %{kcal: target}), else: text("kcal_target_open")
+
+        [segment(section, :countup, cap, nil, nil, exercises, label)]
 
       "amrap" ->
         duration = get_timer_field(section, :duration_seconds)
@@ -194,7 +208,7 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
         # and it ends when the athlete fails (or at the optional round cap).
         interval = positive(get_timer_field(section, :interval_seconds)) || 60
         cap = positive(get_timer_field(section, :ladder_cap))
-        [segment(section, :interval_cycle, interval, nil, cap, exercises, label: "Death By")]
+        [segment(section, :interval_cycle, interval, nil, cap, exercises, text("death_by"))]
 
       "emom" ->
         build_emom_segments(section, exercises)
@@ -228,7 +242,7 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
         duration = get_timer_field(section, :duration_seconds)
 
         kind = if is_integer(duration) and duration > 0, do: :countdown, else: :manual
-        [segment(section, kind, duration, nil, nil, [], label: "Rest", phase: "rest")]
+        [segment(section, kind, duration, nil, nil, [], [phase: "rest"] ++ text("rest"))]
 
       _ ->
         [segment(section, :no_timer, nil, nil, nil, exercises)]
@@ -243,8 +257,14 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
 
     if rounds > 1 do
       with_rests(1..rounds, rest, fn round ->
-        segment(section, :no_timer, nil, round, rounds, exercises,
-          label: "Round #{round}/#{rounds}"
+        segment(
+          section,
+          :no_timer,
+          nil,
+          round,
+          rounds,
+          exercises,
+          text("round", %{round: round, total: rounds})
         )
       end)
     else
@@ -261,7 +281,15 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
 
     if sets > 1 do
       with_rests(1..sets, rest, fn set_num ->
-        segment(section, :countup, cap, set_num, sets, exercises, label: "Set #{set_num}/#{sets}")
+        segment(
+          section,
+          :countup,
+          cap,
+          set_num,
+          sets,
+          exercises,
+          text("set", %{set: set_num, total: sets})
+        )
       end)
     else
       [segment(section, :countup, cap, nil, nil, exercises)]
@@ -280,7 +308,7 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
       cap = positive(get_timer_field(section, :max_windows))
       window = if pattern, do: hd(pattern), else: interval
 
-      [segment(section, :interval_cycle, window, nil, cap, exercises, label: "EMOM")]
+      [segment(section, :interval_cycle, window, nil, cap, exercises, text("emom"))]
     else
       windows = emom_windows(duration, pattern || [interval])
       total_rounds = length(windows)
@@ -296,7 +324,7 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
           round,
           total_rounds,
           round_exercises_for_emom(exercises, round, cycle_length),
-          label: "Min #{round}"
+          text("minute", %{round: round})
         )
       end)
     end
@@ -376,7 +404,10 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
           is_nil(assignment) or assignment == parity
         end)
 
-      label = if rem(round, 2) == 1, do: "Odd – Min #{round}", else: "Even – Min #{round}"
+      label =
+        if rem(round, 2) == 1,
+          do: text("odd_minute", %{round: round}),
+          else: text("even_minute", %{round: round})
 
       segment(
         section,
@@ -385,7 +416,7 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
         round,
         total_rounds,
         round_exercises,
-        label: label
+        label
       )
     end)
   end
@@ -414,16 +445,27 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
   defp work_rest_segments(section, exercises, work, rest, rounds) do
     Enum.flat_map(1..rounds, fn round ->
       work_segment =
-        segment(section, :countdown, work, round, rounds, exercises,
-          label: "Work #{round}/#{rounds}"
+        segment(
+          section,
+          :countdown,
+          work,
+          round,
+          rounds,
+          exercises,
+          text("work", %{round: round, total: rounds})
         )
 
       if round < rounds do
         [
           work_segment,
-          segment(section, :countdown, rest, round, rounds, [],
-            label: "Rest #{round}/#{rounds}",
-            phase: "rest"
+          segment(
+            section,
+            :countdown,
+            rest,
+            round,
+            rounds,
+            [],
+            [phase: "rest"] ++ text("rest_round", %{round: round, total: rounds})
           )
         ]
       else
@@ -444,8 +486,14 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
       Enum.flat_map(1..sets, fn set_num ->
         set_segments =
           with_rests(1..clusters, intra_rest, fn cluster ->
-            segment(section, :manual, nil, set_num, sets, exercises,
-              label: "Set #{set_num}/#{sets} · Cluster #{cluster}/#{clusters}"
+            segment(
+              section,
+              :manual,
+              nil,
+              set_num,
+              sets,
+              exercises,
+              text("cluster", %{set: set_num, total: sets, cluster: cluster, clusters: clusters})
             )
           end)
 
@@ -454,7 +502,15 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
     else
       # Without clusters per set, each set is one cluster separated by intra rest.
       with_rests(1..sets, set_rest || intra_rest, fn set_num ->
-        segment(section, :manual, nil, set_num, sets, exercises, label: "Set #{set_num}/#{sets}")
+        segment(
+          section,
+          :manual,
+          nil,
+          set_num,
+          sets,
+          exercises,
+          text("set", %{set: set_num, total: sets})
+        )
       end)
     end
   end
@@ -465,29 +521,29 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
   defp rest_between_sets(_section, set_segments, _set_num, _sets, nil), do: set_segments
 
   defp rest_between_sets(section, set_segments, set_num, sets, rest),
-    do: set_segments ++ [rest_segment(section, rest, set_num, sets, "Rest")]
+    do: set_segments ++ [rest_segment(section, rest, set_num, sets, text("rest"))]
 
   # ── HRR: effort then HR recovery period ──────────────────────────────────────
 
   defp build_hrr_segments(section, exercises) do
     effort = get_timer_field(section, :effort_seconds) || 0
     hr_zone = get_timer_field(section, :hr_zone)
-    zone_label = if hr_zone, do: " (Zone #{hr_zone})", else: ""
+    effort_label = if hr_zone, do: text("effort_zone", %{zone: hr_zone}), else: text("effort")
     drop = positive(get_timer_field(section, :hr_drop_target))
-    recovery_label = if drop, do: "Recover −#{drop} bpm", else: "Recover to HR"
+    recovery_label = if drop, do: text("recover_drop", %{bpm: drop}), else: text("recover")
 
     recovery =
       case {positive(get_timer_field(section, :rest_seconds)),
             positive(get_timer_field(section, :recovery_cap_seconds))} do
         {rest, _cap} when is_integer(rest) ->
-          segment(section, :countdown, rest, nil, nil, [], label: recovery_label, phase: "rest")
+          segment(section, :countdown, rest, nil, nil, [], [phase: "rest"] ++ recovery_label)
 
         {nil, cap} ->
-          segment(section, :countup, cap, nil, nil, [], label: recovery_label, phase: "rest")
+          segment(section, :countup, cap, nil, nil, [], [phase: "rest"] ++ recovery_label)
       end
 
     [
-      segment(section, :countdown, effort, nil, nil, exercises, label: "Effort#{zone_label}"),
+      segment(section, :countdown, effort, nil, nil, exercises, effort_label),
       recovery
     ]
   end
@@ -512,15 +568,52 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
       duration_seconds: rest,
       exercises: [],
       label: "Rest",
+      label_key: "rest",
+      label_params: %{},
       phase: "rest"
     })
   end
 
   defp rest_segment(section, rest, round, total_rounds, label) do
-    segment(section, :countdown, rest, round, total_rounds, [], label: label, phase: "rest")
+    segment(section, :countdown, rest, round, total_rounds, [], [phase: "rest"] ++ label)
   end
 
   # ── Helpers ───────────────────────────────────────────────────────────────────
+
+  # Labels travel as a stable key plus parameters so clients can localize
+  # them; `label` keeps an English rendering for older clients and logs.
+  @label_texts %{
+    "transition" => "Transition",
+    "rest" => "Rest",
+    "kcal_target" => "{kcal} kcal",
+    "kcal_target_open" => "Kcal target",
+    "death_by" => "Death By",
+    "emom" => "EMOM",
+    "round" => "Round {round}/{total}",
+    "set" => "Set {set}/{total}",
+    "minute" => "Min {round}",
+    "odd_minute" => "Odd – Min {round}",
+    "even_minute" => "Even – Min {round}",
+    "work" => "Work {round}/{total}",
+    "rest_round" => "Rest {round}/{total}",
+    "cluster" => "Set {set}/{total} · Cluster {cluster}/{clusters}",
+    "effort" => "Effort",
+    "effort_zone" => "Effort (Zone {zone})",
+    "recover" => "Recover to HR",
+    "recover_drop" => "Recover −{bpm} bpm"
+  }
+
+  @doc "The label keys segments can carry, for contract tests and clients."
+  def label_keys, do: Map.keys(@label_texts)
+
+  defp text(key, params \\ %{}) do
+    english =
+      Enum.reduce(params, Map.fetch!(@label_texts, key), fn {name, value}, acc ->
+        String.replace(acc, "{#{name}}", to_string(value))
+      end)
+
+    [label: english, label_key: key, label_params: params]
+  end
 
   defp segment(section, kind, duration, round, total_rounds, exercises, opts \\ []) do
     id = section[:id] || section["id"]
@@ -529,6 +622,8 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
     scoreable = section[:scoreable] || section["scoreable"] || false
     score_config = section[:score_config] || section["score_config"]
     label = Keyword.get(opts, :label, name)
+    label_key = Keyword.get(opts, :label_key)
+    label_params = Keyword.get(opts, :label_params, %{})
     phase = Keyword.get(opts, :phase, "work")
 
     %{
@@ -542,6 +637,8 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
       round: round,
       total_rounds: total_rounds,
       label: label,
+      label_key: label_key,
+      label_params: label_params,
       exercises: exercises,
       section_note: section[:note] || section["note"],
       scoreable: scoreable,

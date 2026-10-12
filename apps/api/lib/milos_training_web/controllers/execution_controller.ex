@@ -20,6 +20,14 @@ defmodule MilosTrainingWeb.ExecutionController do
   tags(["Execution"])
   security([%{"bearerAuth" => []}])
 
+  @kpi_counters_schema %Schema{
+    type: :object,
+    description:
+      "Device-observed execution KPIs (skips, countdown_skips, countdown_segments, pauses, " <>
+        "paused_ms, finish_wizard_opens, first_started_at_ms). Counters never decrease.",
+    additionalProperties: %Schema{type: :integer, minimum: 0}
+  }
+
   @id_param %Parameter{
     name: :id,
     in: :path,
@@ -129,7 +137,8 @@ defmodule MilosTrainingWeb.ExecutionController do
            segment_cycle_counts: %Schema{
              type: :object,
              additionalProperties: %Schema{type: :integer, minimum: 0}
-           }
+           },
+           kpi_counters: @kpi_counters_schema
          }
        }},
     responses: [
@@ -209,7 +218,8 @@ defmodule MilosTrainingWeb.ExecutionController do
              type: :string,
              format: :"date-time",
              nullable: true
-           }
+           },
+           kpi_counters: @kpi_counters_schema
          }
        }},
     responses: [

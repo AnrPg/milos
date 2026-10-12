@@ -378,3 +378,34 @@ function formatRoundsReps(rounds: number, reps: number) {
   if (reps <= 0) return `${rounds} rounds`;
   return `${rounds} rounds + ${reps} reps`;
 }
+
+/**
+ * Seconds of rest to count down after checking off `stepId` in a straight-set
+ * workout: the exercise's prescribed rest between sets, after every set but
+ * the last. In a superset or alternating group the rest follows the group's
+ * last member of that set, using the longest rest any member prescribes.
+ * Timed and interval formats already schedule their own rests.
+ */
+export function setRestSeconds(segment: TimerSegment, stepId: string): number | null {
+  if (segment.format !== "untimed" || segment.kind !== "no_timer") return null;
+
+  const steps = buildSegmentStepDefinitions(segment);
+  const index = steps.findIndex((step) => step.stepId === stepId);
+  const step = steps[index];
+  if (!step) return null;
+
+  const sameBlock = (candidate: SegmentStepDefinition) =>
+    step.groupId ? candidate.groupId === step.groupId : candidate.exercise.id === step.exercise.id;
+  const block = steps.filter(sameBlock);
+  const lastSetNumber = Math.max(...block.map((candidate) => candidate.setNumber));
+  if (step.setNumber >= lastSetNumber) return null;
+
+  // Rest only once the whole set of a group is done.
+  const laterInSet = steps
+    .slice(index + 1)
+    .some((candidate) => sameBlock(candidate) && candidate.setNumber === step.setNumber);
+  if (laterInSet) return null;
+
+  const rest = Math.max(0, ...block.map((candidate) => candidate.exercise.rest_seconds ?? 0));
+  return rest > 0 ? rest : null;
+}

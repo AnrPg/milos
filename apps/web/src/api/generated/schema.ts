@@ -3574,6 +3574,10 @@ export interface operations {
                     checked_exercise_ids: string[];
                     current_segment_index: number;
                     expected_version: number;
+                    /** @description Device-observed execution KPIs (skips, countdown_skips, countdown_segments, pauses, paused_ms, finish_wizard_opens, first_started_at_ms). Counters never decrease. */
+                    kpi_counters?: {
+                        [key: string]: number;
+                    };
                     /** Format: uuid */
                     operation_id: string;
                     paused_elapsed_ms: number;
@@ -5562,6 +5566,10 @@ export interface operations {
                             /** @enum {string} */
                             kind: "countdown" | "countup" | "manual" | "no_timer" | "interval_cycle";
                             label: string;
+                            label_key?: string | null;
+                            label_params?: {
+                                [key: string]: number | string;
+                            };
                             /** @enum {string} */
                             phase: "work" | "rest" | "transition";
                             round: number | null;
@@ -10390,6 +10398,10 @@ export interface operations {
             content: {
                 "application/json": {
                     checked_exercise_ids?: string[];
+                    /** @description Device-observed execution KPIs (skips, countdown_skips, countdown_segments, pauses, paused_ms, finish_wizard_opens, first_started_at_ms). Counters never decrease. */
+                    kpi_counters?: {
+                        [key: string]: number;
+                    };
                     section_elapsed_ms?: {
                         [key: string]: number;
                     };

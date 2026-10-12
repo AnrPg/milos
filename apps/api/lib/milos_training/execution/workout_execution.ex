@@ -31,6 +31,7 @@ defmodule MilosTraining.Execution.WorkoutExecution do
     field(:exercise_notes, {:array, :map}, default: [])
     field(:exercise_modifications, {:array, :map}, default: [])
     field(:lock_version, :integer, default: 1)
+    field(:kpi_counters, :map, default: %{})
 
     timestamps(updated_at: false)
   end
@@ -80,7 +81,8 @@ defmodule MilosTraining.Execution.WorkoutExecution do
       :segment_cycle_counts,
       :checked_exercise_ids,
       :section_scores,
-      :exercise_notes
+      :exercise_notes,
+      :kpi_counters
     ])
     |> validate_required([:completed_at_utc])
     |> validate_inclusion(:status, @statuses)
@@ -103,7 +105,8 @@ defmodule MilosTraining.Execution.WorkoutExecution do
       :checked_exercise_ids,
       :section_scores,
       :exercise_notes,
-      :exercise_modifications
+      :exercise_modifications,
+      :kpi_counters
     ])
     |> validate_required([:status, :current_segment_index, :paused_elapsed_ms])
     |> validate_inclusion(:status, @statuses)

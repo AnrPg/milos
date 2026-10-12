@@ -2,12 +2,14 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 import type {
+  KpiCounters,
   ExerciseNote,
   ExecutionProgressPayload,
   SectionScore,
   TimerSegment,
   WorkoutExecution,
 } from "@/api/executions";
+import { hasMarkChanges, type ProgressMarks, rebaseProgressMarks } from "@/lib/execution-rebase";
 import { liveElapsedMs } from "@/lib/timer-engine";
 
 export type ExecutionStatus = "idle" | "active" | "paused" | "completed";
@@ -43,6 +45,14 @@ type ExecutionState = {
   exerciseNotes: ExerciseNote[];
   /** Local progress the server has not acknowledged yet. */
   pendingSync: boolean;
+  /** Hand-made marks as the server last acknowledged them; the base for conflict rebases. */
+  syncedMarks: ProgressMarks | null;
+  /** Seconds added to (or removed from) segment clocks mid-workout, by segment key. */
+  durationAdjustments: Record<string, number>;
+  /** Execution KPIs only this device can observe (see `KpiCounters`). */
+  kpiCounters: KpiCounters;
+  /** When the athlete paused, for `paused_ms`. */
+  kpiPausedAt: number | null;
   initExecution: (params: {
     executionId: string;
     lockVersion?: number;
@@ -63,6 +73,14 @@ type ExecutionState = {
   }) => void;
   hydrateFromExecution: (execution: WorkoutExecution, segments?: TimerSegment[]) => void;
   setLockVersion: (lockVersion: number) => void;
+  /** The server accepted `execution` while a newer local change waits: keep local state. */
+  acknowledge: (execution: WorkoutExecution) => void;
+  /**
+   * Adopts a newer server version that conflicts with local progress, then
+   * replays local check-offs, round counts and scores on top of it. Returns
+   * true when local marks remain to be sent.
+   */
+  rebaseOnto: (execution: WorkoutExecution, segments?: TimerSegment[]) => boolean;
   setPendingSync: (pendingSync: boolean) => void;
   /** Elapsed time of the current segment at `now`. */
   currentElapsedMs: (now?: number) => number;
@@ -81,6 +99,19 @@ type ExecutionState = {
     index: number;
     segmentStartedAt: number;
   }) => void;
+  /**
+   * Lengthens or shortens a timed segment while the athlete trains (a coach
+   * changing the plan mid-class). Never shortens below what already ran.
+   */
+  adjustSegmentDuration: (index: number, deltaSeconds: number) => void;
+  /** Replaces the segment list, re-applying this execution's clock adjustments. */
+  setSegments: (segments: TimerSegment[]) => void;
+  /** Adds to a KPI counter. */
+  countKpi: (key: Exclude<keyof KpiCounters, "first_started_at_ms">, amount?: number) => void;
+  /** Records the athlete's pause (for pause count and paused time). */
+  recordPauseKpi: (at?: number) => void;
+  recordResumeKpi: (at?: number) => void;
+  recordFirstStartKpi: (at?: number) => void;
   incrementSegmentCycle: (segmentKey: string) => void;
   decrementSegmentCycle: (segmentKey: string) => void;
   setCheckedExerciseIds: (exerciseIds: string[]) => void;
@@ -112,7 +143,48 @@ const initialState = {
   sectionScores: [],
   exerciseNotes: [],
   pendingSync: false,
+  syncedMarks: null as ProgressMarks | null,
+  durationAdjustments: {} as Record<string, number>,
+  kpiCounters: {} as KpiCounters,
+  kpiPausedAt: null as number | null,
 };
+
+const isCountdown = (segment: TimerSegment | undefined) => segment?.kind === "countdown";
+
+const MIN_ADJUSTED_SECONDS = 5;
+
+function isAdjustable(segment: TimerSegment | undefined): segment is TimerSegment & { duration_seconds: number } {
+  return Boolean(
+    segment &&
+      typeof segment.duration_seconds === "number" &&
+      (segment.kind === "countdown" || segment.kind === "countup"),
+  );
+}
+
+export function applyDurationAdjustments(segments: TimerSegment[], adjustments: Record<string, number>) {
+  if (Object.keys(adjustments).length === 0) return segments;
+  return segments.map((segment) => {
+    const delta = adjustments[segment.segment_key];
+    if (!delta || !isAdjustable(segment)) return segment;
+    return { ...segment, duration_seconds: Math.max(MIN_ADJUSTED_SECONDS, segment.duration_seconds + delta) };
+  });
+}
+
+function marksOf(state: Pick<ExecutionState, "checkedExerciseIds" | "segmentCycleCounts" | "sectionScores">): ProgressMarks {
+  return {
+    checkedExerciseIds: state.checkedExerciseIds,
+    segmentCycleCounts: state.segmentCycleCounts,
+    sectionScores: state.sectionScores,
+  };
+}
+
+function serverMarks(execution: WorkoutExecution): ProgressMarks {
+  return {
+    checkedExerciseIds: normalizeCheckedExerciseIds(execution.checked_exercise_ids),
+    segmentCycleCounts: execution.segment_cycle_counts ?? {},
+    sectionScores: execution.section_scores,
+  };
+}
 
 function executionStatusFromApi(status: WorkoutExecution["status"]): ExecutionStatus {
   if (status === "active" || status === "paused" || status === "completed") {
@@ -194,11 +266,20 @@ export const useExecutionStore = create<ExecutionState>()(
           totalElapsedMs,
           sectionElapsedMs,
           segmentCycleCounts,
+          syncedMarks: {
+            checkedExerciseIds: normalizeCheckedExerciseIds(checkedExerciseIds),
+            segmentCycleCounts,
+            sectionScores,
+          },
         }),
 
       hydrateFromExecution: (execution, segments) =>
         set((state) => {
-          const nextSegments = segments ?? state.segments;
+          const sameExecution = state.executionId === execution.id;
+          const durationAdjustments = sameExecution ? state.durationAdjustments : {};
+          const nextSegments = segments
+            ? applyDurationAdjustments(segments, durationAdjustments)
+            : state.segments;
           const banked = Math.max(0, execution.paused_elapsed_ms ?? 0);
           const currentKey = sectionTimeKey(nextSegments[execution.current_segment_index]);
           const sectionElapsedMs = { ...(execution.section_elapsed_ms ?? {}) };
@@ -226,10 +307,32 @@ export const useExecutionStore = create<ExecutionState>()(
             checkedExerciseIds: normalizeCheckedExerciseIds(execution.checked_exercise_ids),
             sectionScores: execution.section_scores,
             exerciseNotes: execution.exercise_notes,
+            syncedMarks: serverMarks(execution),
+            durationAdjustments,
+            kpiCounters: sameExecution ? state.kpiCounters : {},
+            kpiPausedAt: sameExecution ? state.kpiPausedAt : null,
           };
         }),
 
       setLockVersion: (lockVersion) => set({ lockVersion }),
+
+      acknowledge: (execution) =>
+        set({ lockVersion: execution.lock_version, syncedMarks: serverMarks(execution) }),
+
+      rebaseOnto: (execution, segments) => {
+        const before = get();
+        const base = before.syncedMarks ?? serverMarks(execution);
+        const local = marksOf(before);
+        get().hydrateFromExecution(execution, segments);
+        if (execution.status === "completed" || !hasMarkChanges(base, local)) return false;
+
+        const server = serverMarks(execution);
+        const rebased = rebaseProgressMarks(base, local, server);
+        if (!hasMarkChanges(server, rebased)) return false;
+
+        set({ ...rebased, syncedMarks: server, pendingSync: true });
+        return true;
+      },
 
       setPendingSync: (pendingSync) => set({ pendingSync }),
 
@@ -279,10 +382,15 @@ export const useExecutionStore = create<ExecutionState>()(
       moveToSegment: (index, { elapsedMs, startedAt }) =>
         set((state) => {
           const committed = addElapsed(state, state.segments[state.currentSegmentIndex], elapsedMs);
+          const kpiCounters =
+            index > state.currentSegmentIndex && isCountdown(state.segments[state.currentSegmentIndex])
+              ? { ...state.kpiCounters, countdown_segments: (state.kpiCounters.countdown_segments ?? 0) + 1 }
+              : state.kpiCounters;
 
           if (index >= state.segments.length) {
             return {
               ...committed,
+              kpiCounters,
               status: "completed" as ExecutionStatus,
               segmentStartedAt: null,
               pausedElapsed: 0,
@@ -294,6 +402,7 @@ export const useExecutionStore = create<ExecutionState>()(
 
           return {
             ...committed,
+            kpiCounters,
             currentSegmentIndex: index,
             segmentStartedAt: state.status === "active" ? startedAt : null,
             pausedElapsed: 0,
@@ -307,9 +416,13 @@ export const useExecutionStore = create<ExecutionState>()(
           for (const step of completed) {
             totals = addElapsed(totals, state.segments[step.index], step.elapsedMs);
           }
+          const countdowns = completed.filter((step) => isCountdown(state.segments[step.index])).length;
 
           return {
             ...totals,
+            kpiCounters: countdowns
+              ? { ...state.kpiCounters, countdown_segments: (state.kpiCounters.countdown_segments ?? 0) + countdowns }
+              : state.kpiCounters,
             currentSegmentIndex: index,
             status: "active" as ExecutionStatus,
             segmentStartedAt,
@@ -317,6 +430,62 @@ export const useExecutionStore = create<ExecutionState>()(
             resumeCountdownEndsAt: null,
           };
         }),
+
+      adjustSegmentDuration: (index, deltaSeconds) =>
+        set((state) => {
+          const segment = state.segments[index];
+          if (!isAdjustable(segment) || deltaSeconds === 0) return state;
+
+          const ranSeconds =
+            index === state.currentSegmentIndex ? Math.ceil(state.currentElapsedMs() / 1000) + 1 : 0;
+          const nextDuration = Math.max(MIN_ADJUSTED_SECONDS, ranSeconds, segment.duration_seconds + deltaSeconds);
+          const applied = nextDuration - segment.duration_seconds;
+          if (applied === 0) return state;
+
+          return {
+            segments: state.segments.map((candidate, candidateIndex) =>
+              candidateIndex === index ? { ...candidate, duration_seconds: nextDuration } : candidate,
+            ),
+            durationAdjustments: {
+              ...state.durationAdjustments,
+              [segment.segment_key]: (state.durationAdjustments[segment.segment_key] ?? 0) + applied,
+            },
+          };
+        }),
+
+      setSegments: (segments) =>
+        set((state) => ({ segments: applyDurationAdjustments(segments, state.durationAdjustments) })),
+
+      countKpi: (key, amount = 1) =>
+        set((state) => ({
+          kpiCounters: { ...state.kpiCounters, [key]: Math.max(0, Math.round((state.kpiCounters[key] ?? 0) + amount)) },
+        })),
+
+      recordPauseKpi: (at = Date.now()) =>
+        set((state) => ({
+          kpiCounters: { ...state.kpiCounters, pauses: (state.kpiCounters.pauses ?? 0) + 1 },
+          kpiPausedAt: at,
+        })),
+
+      recordResumeKpi: (at = Date.now()) =>
+        set((state) =>
+          state.kpiPausedAt === null
+            ? state
+            : {
+                kpiCounters: {
+                  ...state.kpiCounters,
+                  paused_ms: (state.kpiCounters.paused_ms ?? 0) + Math.max(0, at - state.kpiPausedAt),
+                },
+                kpiPausedAt: null,
+              },
+        ),
+
+      recordFirstStartKpi: (at = Date.now()) =>
+        set((state) =>
+          state.kpiCounters.first_started_at_ms
+            ? state
+            : { kpiCounters: { ...state.kpiCounters, first_started_at_ms: Math.round(at) } },
+        ),
 
       incrementSegmentCycle: (segmentKey) =>
         set((state) => ({
@@ -417,6 +586,7 @@ export const useExecutionStore = create<ExecutionState>()(
           resume_countdown_ends_at_utc: state.resumeCountdownEndsAt
             ? new Date(state.resumeCountdownEndsAt).toISOString()
             : null,
+          kpi_counters: state.kpiCounters,
         };
       },
 
@@ -443,6 +613,10 @@ export const useExecutionStore = create<ExecutionState>()(
         sectionScores: state.sectionScores,
         exerciseNotes: state.exerciseNotes,
         pendingSync: state.pendingSync,
+        syncedMarks: state.syncedMarks,
+        durationAdjustments: state.durationAdjustments,
+        kpiCounters: state.kpiCounters,
+        kpiPausedAt: state.kpiPausedAt,
       }),
     },
   ),

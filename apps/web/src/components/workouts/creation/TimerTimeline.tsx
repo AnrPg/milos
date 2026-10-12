@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { previewSectionTimer, type TimerPreview } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
+import { segmentLabel } from "@/lib/segment-label";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import type { DraftSection } from "@/types/workout";
 
@@ -112,7 +113,7 @@ export function TimerTimeline({ section }: { section: DraftSection }) {
         <ol className="mt-2 flex flex-col gap-1">
           {preview.segments.slice(0, MAX_LISTED_SEGMENTS).map((segment, index) => (
             <li key={index} className="flex justify-between gap-2">
-              <span className="truncate">{segment.label}</span>
+              <span className="truncate">{segmentLabel(segment, i18n)}</span>
               <span className="shrink-0 tabular-nums" style={{ color: "var(--muted)" }}>
                 {segmentDurationLabel(segment, i18n)}
               </span>

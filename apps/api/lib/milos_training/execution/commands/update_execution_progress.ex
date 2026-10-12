@@ -1,6 +1,6 @@
 defmodule MilosTraining.Execution.Commands.UpdateExecutionProgress do
   alias MilosTraining.Execution.Commands.Params
-  alias MilosTraining.Execution.Domain.{ProgressSnapshotter, ProgressValidator}
+  alias MilosTraining.Execution.Domain.{ExecutionKpis, ProgressSnapshotter, ProgressValidator}
   alias MilosTraining.Execution.ExecutionStore
 
   @allowed_statuses ["active", "paused"]
@@ -105,7 +105,13 @@ defmodule MilosTraining.Execution.Commands.UpdateExecutionProgress do
          segment_cycle_counts: segment_cycle_counts,
          segment_started_at_utc: segment_started_at_utc,
          resume_countdown_ends_at_utc: resume_countdown_ends_at_utc,
-         section_scores: section_scores
+         section_scores: section_scores,
+         kpi_counters:
+           ExecutionKpis.merge_counters(
+             execution[:kpi_counters],
+             params[:kpi_counters] || params["kpi_counters"],
+             execution[:started_at_utc]
+           )
        }}
     end
   end

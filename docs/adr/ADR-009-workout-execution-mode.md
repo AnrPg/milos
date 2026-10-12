@@ -192,7 +192,8 @@ progress, and the IndexedDB check-off queue.
   sent by `useExecutionSync`, one request at a time, coalescing changes made
   during a request. Failures leave `pendingSync` set and retry; on reload the
   unsynced local state wins while the server `lock_version` is unchanged. A
-  409 means another device moved on: the server state wins.
+  409 means another device moved on: its timeline wins (see the conflict
+  rebase below).
 - **Elapsed accounting**: the client store holds committed time only (segments
   already left). Progress snapshots send committed time plus the current
   segment's banked pause time, and hydration subtracts it again. A pause is no
@@ -204,3 +205,32 @@ progress, and the IndexedDB check-off queue.
   segment. Round counts may decrease (undo); elapsed totals stay monotonic.
 - **Authoring preview**: `POST /admin/workouts/timer-preview` runs the same
   builder on a draft section, so the editor's timeline always matches execution.
+
+## Conflict Rebase, Labels and KPIs Amendment — 2026-10-12 (P2)
+
+- **Conflict rebase** (`apps/web/src/lib/execution-rebase.ts`): the store keeps
+  the hand-made marks (check-offs, round counts, scores) as the server last
+  acknowledged them. On a 409, or on reload after another device moved on, the
+  client adopts the server's clock and position and replays its own unsent
+  marks on top: check-offs added or removed, round-count deltas, and scores
+  changed locally. The result is resent with the new `lock_version`. This
+  restores what the retired IndexedDB queue did for check-offs, now for every
+  mark. Check-offs still waiting in that old queue are adopted once on load
+  (`legacy-offline-queue.ts`, to be removed after one release).
+- **Clock adjustments**: +/-30 s from the pause sheet changes the segment's
+  length on the device and is remembered per execution (re-applied when the
+  sequence is re-fetched). It never shortens below what already ran, and it is
+  not sent to the server, so another device keeps the authored length.
+- **Localized labels**: segments carry `label_key` and `label_params` next to
+  the English `label`; clients render the key in the viewer's language and
+  fall back to `label` for unknown keys.
+- **Free-text timer**: free-text workouts run on the same timer engine, built
+  from a preset (format plus durations) that the coach can attach under
+  `workout_metadata.free_text_timer`. The clock is persisted per execution in
+  `localStorage` as a start timestamp plus banked time, so reloads keep it.
+- **KPIs**: progress and completion payloads carry `kpi_counters` (skips,
+  countdown skips and segments, pauses and paused time, finish-review opens,
+  first start). The API keeps the maximum of each counter, so replays and
+  stale snapshots never lower them. `ExecutionKpis.summarize/1` turns those
+  counters plus the execution records into the `execution` block of the admin
+  analytics summary.

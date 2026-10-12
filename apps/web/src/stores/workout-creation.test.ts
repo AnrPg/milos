@@ -66,3 +66,19 @@ describe("workout creation draft hydration", () => {
     });
   });
 });
+
+describe("section templates", () => {
+  beforeEach(() => useWorkoutCreationStore.getState().resetDraft());
+
+  it("sets the format and fills every field in one step", () => {
+    const store = useWorkoutCreationStore.getState();
+    store.addSection();
+    const sectionId = useWorkoutCreationStore.getState().sections.at(-1)!.localId;
+
+    store.applySectionTemplate(sectionId, "emom", { duration_seconds: 1200, interval_seconds: 120 });
+
+    const section = useWorkoutCreationStore.getState().sections.find((candidate) => candidate.localId === sectionId)!;
+    expect(section.format).toBe("emom");
+    expect(section.formatParams).toMatchObject({ duration_seconds: 1200, interval_seconds: 120 });
+  });
+});

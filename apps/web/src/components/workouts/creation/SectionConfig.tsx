@@ -13,6 +13,7 @@ import {
   type DraftSection,
   type EmomScoringMode,
   type ScoreType,
+  SECTION_TEMPLATES,
 } from "@/types/workout";
 
 import { FormatContextualFields } from "./FormatContextualFields";
@@ -31,7 +32,7 @@ export function SectionConfig({ section }: Props) {
   const i18n = useUiTranslations();
   const emomScoringModeLabels = getEmomScoringModeLabels(i18n);
   const emomScoringModeDescriptions = getEmomScoringModeDescriptions(i18n);
-  const { updateSection, setFormat, setFormatParams, deleteSection, setEmomScoringMode, setEmomAmrapScoringStyle } = useWorkoutCreationStore();
+  const { updateSection, setFormat, setFormatParams, applySectionTemplate, deleteSection, setEmomScoringMode, setEmomAmrapScoringStyle } = useWorkoutCreationStore();
 
   const autoScore = AUTO_SCORE_MAP[section.format];
   const isEmomFormat = section.format === "emom" || section.format === "complex_emom";
@@ -73,6 +74,19 @@ export function SectionConfig({ section }: Props) {
         <label className="mb-1 block text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
           {i18n("format041a5de")}
         </label>
+        <div className="mb-2 flex flex-wrap gap-1.5" role="group" aria-label={i18n("sectionTemplatesLabel")}>
+          {SECTION_TEMPLATES.map((template) => (
+            <button
+              key={template.id}
+              type="button"
+              onClick={() => applySectionTemplate(section.localId, template.format, template.params)}
+              className="min-h-8 rounded-full px-2.5 text-xs font-semibold"
+              style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}
+            >
+              {i18n(`timerPreset_${template.id}`)}
+            </button>
+          ))}
+        </div>
         <FormatDropdown value={section.format} onChange={(format) => setFormat(section.localId, format)} />
         <FormatContextualFields
           format={section.format}

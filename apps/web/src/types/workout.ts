@@ -240,6 +240,16 @@ export function getFormatTooltips(i18n: UiTranslate) {
   }])) as Record<SectionFormat, {bestFor: string; trains: string; how: string; score?: string}>;
 }
 
+/** One-tap section setups for the most common WODs; each fills format and fields. */
+export const SECTION_TEMPLATES: { id: string; format: SectionFormat; params: FormatParams }[] = [
+  { id: "tabata", format: "tabata", params: { work_seconds: 20, rest_seconds: 10, rounds: 8 } },
+  { id: "emom10", format: "emom", params: { duration_seconds: 600, interval_seconds: 60 } },
+  { id: "e2mom20", format: "emom", params: { duration_seconds: 1200, interval_seconds: 120 } },
+  { id: "amrap12", format: "amrap", params: { duration_seconds: 720 } },
+  { id: "ft21159", format: "for_time", params: { time_cap_seconds: 720, rounds: 0 } },
+  { id: "deathBy", format: "death_by", params: { interval_seconds: 60, ladder_cap: 0 } },
+];
+
 type FormatFieldDef = {
   key: string;
   defaultValue: number;

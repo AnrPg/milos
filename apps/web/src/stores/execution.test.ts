@@ -127,3 +127,75 @@ describe("execution elapsed-time model", () => {
     expect(state.currentElapsedMs(85_000)).toBe(5_000);
   });
 });
+
+describe("conflict rebase", () => {
+  beforeEach(() => {
+    useExecutionStore.getState().reset();
+    useExecutionStore.getState().initExecution({
+      executionId: "execution-1",
+      lockVersion: 4,
+      workoutId: "workout-1",
+      scaleSlug: null,
+      segments,
+      status: "active",
+      segmentStartedAt: 0,
+      checkedExerciseIds: ["x"],
+    });
+  });
+
+  it("follows the server timeline and replays local marks on top", () => {
+    const store = useExecutionStore.getState();
+    store.setCheckedExerciseIds(["x", "y"]);
+    store.incrementSegmentCycle("segment:0");
+    store.setPendingSync(true);
+
+    const serverPayload = { ...store.buildProgressPayload()!, checked_exercise_ids: ["x", "z"], current_segment_index: 2, segment_cycle_counts: { "segment:0": 3 } };
+    const kept = useExecutionStore.getState().rebaseOnto(echo(serverPayload, 6));
+
+    const state = useExecutionStore.getState();
+    expect(kept).toBe(true);
+    expect(state.lockVersion).toBe(6);
+    expect(state.currentSegmentIndex).toBe(2);
+    expect([...state.checkedExerciseIds].sort()).toEqual(["x", "y", "z"]);
+    expect(state.segmentCycleCounts["segment:0"]).toBe(4);
+    expect(state.pendingSync).toBe(true);
+  });
+
+  it("has nothing to resend when there were no local marks", () => {
+    const store = useExecutionStore.getState();
+    const serverPayload = { ...store.buildProgressPayload()!, checked_exercise_ids: ["z"] };
+    expect(useExecutionStore.getState().rebaseOnto(echo(serverPayload, 6))).toBe(false);
+    expect(useExecutionStore.getState().checkedExerciseIds).toEqual(["z"]);
+  });
+});
+
+describe("clock adjustments", () => {
+  const timed = [segment("segment:0", "a", { kind: "countdown", duration_seconds: 60 }), segment("segment:1", "b")];
+
+  beforeEach(() => {
+    useExecutionStore.getState().reset();
+    useExecutionStore.getState().initExecution({
+      executionId: "execution-1",
+      workoutId: "workout-1",
+      scaleSlug: null,
+      segments: timed,
+      status: "paused",
+      pausedElapsed: 40_000,
+    });
+  });
+
+  it("never shortens a clock below what already ran", () => {
+    useExecutionStore.getState().adjustSegmentDuration(0, -30);
+    expect(useExecutionStore.getState().segments[0]!.duration_seconds).toBe(41);
+  });
+
+  it("re-applies adjustments when the sequence is reloaded", () => {
+    const store = useExecutionStore.getState();
+    store.adjustSegmentDuration(0, 30);
+    store.hydrateFromExecution(echo(store.buildProgressPayload()!, 2), timed);
+    expect(useExecutionStore.getState().segments[0]!.duration_seconds).toBe(90);
+
+    useExecutionStore.getState().setSegments(timed);
+    expect(useExecutionStore.getState().segments[0]!.duration_seconds).toBe(90);
+  });
+});

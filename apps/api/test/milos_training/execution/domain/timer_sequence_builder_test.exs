@@ -362,4 +362,44 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilderTest do
       assert Enum.all?(between, &(&1.scoreable == false and &1.exercises == []))
     end
   end
+
+  describe "localizable labels" do
+    test "segments carry a label key and parameters next to the English label" do
+      workout = %{
+        sections: [
+          %{
+            id: "tabata",
+            name: "Tabata",
+            order: 1,
+            timer_config: %{type: "tabata", work_seconds: 20, rest_seconds: 10, rounds: 2},
+            exercises: []
+          }
+        ]
+      }
+
+      segments = TimerSequenceBuilder.build(workout)
+
+      assert Enum.map(segments, &{&1.label, &1.label_key, &1.label_params}) == [
+               {"Work 1/2", "work", %{round: 1, total: 2}},
+               {"Rest 1/2", "rest_round", %{round: 1, total: 2}},
+               {"Work 2/2", "work", %{round: 2, total: 2}}
+             ]
+    end
+
+    test "segments named after their section have no label key" do
+      workout = %{
+        sections: [
+          %{
+            id: "a",
+            name: "AMRAP 12",
+            order: 1,
+            timer_config: %{type: "amrap", duration_seconds: 720}
+          }
+        ]
+      }
+
+      assert [%{label: "AMRAP 12", label_key: nil, label_params: %{}}] =
+               TimerSequenceBuilder.build(workout)
+    end
+  end
 end

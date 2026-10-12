@@ -6,7 +6,7 @@ defmodule MilosTraining.Execution do
     UpdateExecutionProgress
   }
 
-  alias MilosTraining.Execution.Domain.TimerSequenceBuilder
+  alias MilosTraining.Execution.Domain.{ExecutionKpis, TimerSequenceBuilder}
   alias MilosTraining.Execution.Queries.GetExecution
   alias MilosTraining.Execution.ExecutionStore
 
@@ -25,6 +25,14 @@ defmodule MilosTraining.Execution do
 
   def list_executions_for_coaching(user_id),
     do: ExecutionStore.list_executions_for_coaching(user_id)
+
+  @doc "Execution KPI report for the current organization since `since`."
+  def execution_kpis(%DateTime{} = since) do
+    since
+    |> ExecutionStore.list_executions_for_kpis()
+    |> ExecutionKpis.summarize()
+    |> Map.put(:since, since)
+  end
 
   defdelegate build_timer_sequence(workout), to: TimerSequenceBuilder, as: :build
   defdelegate preview_timer_sequence(workout), to: TimerSequenceBuilder, as: :preview

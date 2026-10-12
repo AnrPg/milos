@@ -241,4 +241,85 @@ describe("ExecutionMode", () => {
     });
     expect(useExecutionStore.getState().checkedExerciseIds).toEqual([]);
   });
+
+  it("counts down the prescribed rest after a set of a straight-set exercise", async () => {
+    const strength = [
+      {
+        ...tabataSegment(0, "Strength", "work"),
+        section_id: "strength",
+        format: "untimed",
+        kind: "no_timer",
+        duration_seconds: null,
+        round: null,
+        total_rounds: null,
+        scoreable: false,
+        score_config: null,
+        exercises: [{ id: "squat", item_type: "exercise", name: "Squat", sets: 3, rest_seconds: 90 }],
+      } as unknown as TimerSegment,
+    ];
+    startAt(0, { segments: strength });
+    render(<ExecutionMode />);
+
+    await act(async () => {
+      fireEvent.click(screen.getAllByRole("button", { name: /markStepDoneLabel/ })[0]!);
+    });
+
+    const rest = screen.getByRole("timer", { name: "setRestLabel" });
+    expect(rest).toHaveTextContent("1:30");
+
+    fireEvent.click(screen.getByRole("button", { name: "skipRestLabel" }));
+    expect(screen.queryByRole("timer", { name: "setRestLabel" })).not.toBeInTheDocument();
+  });
+
+  it("lets the clock be lengthened from the pause sheet", async () => {
+    startAt(0);
+    render(<ExecutionMode />);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "pausecd21a1b" }));
+    });
+    fireEvent.click(await screen.findByRole("button", { name: "plusThirtySecondsLabel" }));
+
+    const state = useExecutionStore.getState();
+    expect(state.segments[0]!.duration_seconds).toBe(50);
+    expect(state.durationAdjustments).toEqual({ "segment:0": 30 });
+  });
+
+  it("opens and closes the big-clock display", async () => {
+    startAt(0);
+    render(<ExecutionMode />);
+
+    fireEvent.click(screen.getByRole("button", { name: "castModeLabel" }));
+    const cast = screen.getByRole("dialog", { name: "castModeLabel" });
+    expect(cast).toHaveTextContent("Work 1/2");
+
+    fireEvent.click(cast);
+    expect(screen.queryByRole("dialog", { name: "castModeLabel" })).not.toBeInTheDocument();
+  });
+
+  it("records skips, pauses and the finish review for execution KPIs", async () => {
+    startAt(0);
+    render(<ExecutionMode />);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "nextbc98198" }));
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "pausecd21a1b" }));
+    });
+    await act(async () => {
+      fireEvent.click(await screen.findByRole("button", { name: "endWorkoutLabel" }));
+    });
+
+    expect(useExecutionStore.getState().kpiCounters).toMatchObject({
+      skips: 1,
+      countdown_skips: 1,
+      countdown_segments: 1,
+      pauses: 1,
+      finish_wizard_opens: 1,
+    });
+    await waitFor(() =>
+      expect(updateExecutionProgress.mock.calls.at(-1)![2].kpi_counters).toMatchObject({ pauses: 1 }),
+    );
+  });
 });

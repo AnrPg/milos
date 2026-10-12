@@ -163,6 +163,7 @@ export type WorkoutRecord = {
   last_dsl_diagnostics?: WorkoutDslDiagnostic[];
   free_text_body?: string | null;
   free_text_document?: Record<string, unknown> | null;
+  workout_metadata?: Record<string, unknown> | null;
 };
 
 export type WorkoutFolder = {
@@ -485,6 +486,8 @@ export async function fetchMaterializedWorkout(token: string, id: string) {
 
 export type TimerPreviewSegment = {
   label: string;
+  label_key?: string | null;
+  label_params?: Record<string, string | number> | null;
   kind: "countdown" | "countup" | "manual" | "no_timer" | "interval_cycle";
   phase: "work" | "rest" | "transition";
   duration_seconds: number | null;

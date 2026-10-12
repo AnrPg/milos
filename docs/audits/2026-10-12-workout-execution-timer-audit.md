@@ -31,8 +31,17 @@ the exact lines. None were reproduced in a running app; §8 lists how to confirm
 **P1 shipped (2026-10-12)**: T2, T5–T9, U3–U7, V2–V5, §6 duration input and timeline preview,
 plus follow-ups: Complex EMOM rotation and per-minute interval patterns, the pause double count,
 and light-theme button contrast. ADR-009 has an amendment describing the new timer engine and
-progress sync. Still open (P2): localized backend labels (T11), template presets (§6.5), free-text
-timer unification (T10), landscape/cast mode, Media Session, and KPI instrumentation.
+progress sync.
+
+**P2 shipped (2026-10-12)**: T11/V9 localized labels (`label_key` + `label_params`), §6.5 section
+templates, T10/§6.6 free-text timer on the shared engine with presets, "last used" and a
+coach-attached preset, T2 rest-between-sets countdown for straight sets, U13 big-clock display,
+U14 +/-30 s and +/- rounds from the pause sheet, U15 Media Session, and §1.3 KPI counters in the
+admin analytics summary. Offline progress also merges on conflict again: a 409 replays this
+device's check-offs, rounds and scores on top of the newer server version, and check-offs left in
+the old IndexedDB queue are adopted once.
+- **Not covered**: the class wall display that U13 suggests, which needs a coach-side screen fed
+  by the PubSub channel. Free-text executions do not report KPI counters yet.
 
 ---
 

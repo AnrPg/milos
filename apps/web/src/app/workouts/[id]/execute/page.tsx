@@ -74,16 +74,16 @@ function ExecutePageContent() {
         if (cancelled) return;
 
         // Progress made offline (or not yet acknowledged when the tab closed)
-        // is newer than the server copy unless another device moved on since.
+        // is newer than the server copy unless another device moved on since;
+        // then the server timeline wins and local marks are replayed on top.
         const local = useExecutionStore.getState();
-        const keepLocal =
-          local.executionId === execution.id &&
-          local.pendingSync &&
-          local.lockVersion === execution.lock_version &&
-          execution.status !== "completed";
+        const unsent =
+          local.executionId === execution.id && local.pendingSync && execution.status !== "completed";
 
-        if (keepLocal) {
-          useExecutionStore.setState({ segments: recoveredSegments });
+        if (unsent && local.lockVersion === execution.lock_version) {
+          local.setSegments(recoveredSegments);
+        } else if (unsent) {
+          local.rebaseOnto(execution, recoveredSegments);
         } else {
           hydrateFromExecution(execution, recoveredSegments);
         }

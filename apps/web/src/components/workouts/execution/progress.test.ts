@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { TimerSegment } from "@/api/executions";
 
-import { buildSegmentStepDefinitions, isLastSegmentOfSection } from "./progress";
+import { buildSegmentStepDefinitions, isLastSegmentOfSection, setRestSeconds } from "./progress";
 
 function segment(exercises: TimerSegment["exercises"]): TimerSegment {
   return {
@@ -103,5 +103,45 @@ describe("isLastSegmentOfSection", () => {
 
   it("is false for an out-of-range index", () => {
     expect(isLastSegmentOfSection(segments, 9)).toBe(false);
+  });
+});
+
+describe("setRestSeconds", () => {
+  const straight = (exercises: TimerSegment["exercises"]) =>
+    ({
+      segment_key: "segment:0",
+      section_id: "strength",
+      section_name: "Strength",
+      format: "untimed",
+      kind: "no_timer",
+      duration_seconds: null,
+      round: null,
+      total_rounds: null,
+      label: "Strength",
+      scoreable: false,
+      score_config: null,
+      exercises,
+    }) as TimerSegment;
+
+  it("rests between sets but not after the last one", () => {
+    const segment = straight([{ id: "squat", name: "Squat", sets: 3, rest_seconds: 90 }]);
+    expect(setRestSeconds(segment, "segment:0::squat::set:1")).toBe(90);
+    expect(setRestSeconds(segment, "segment:0::squat::set:2")).toBe(90);
+    expect(setRestSeconds(segment, "segment:0::squat::set:3")).toBeNull();
+  });
+
+  it("rests after the whole superset round", () => {
+    const segment = straight([
+      { id: "a", name: "A", sets: 2, rest_seconds: 60, superset_group_id: "g" },
+      { id: "b", name: "B", sets: 2, rest_seconds: 120, superset_group_id: "g" },
+    ]);
+    expect(setRestSeconds(segment, "segment:0::a::set:1")).toBeNull();
+    expect(setRestSeconds(segment, "segment:0::b::set:1")).toBe(120);
+  });
+
+  it("does nothing without prescribed rest or for timed formats", () => {
+    expect(setRestSeconds(straight([{ id: "a", name: "A", sets: 3 }]), "segment:0::a::set:1")).toBeNull();
+    const amrap = { ...straight([{ id: "a", name: "A", sets: 3, rest_seconds: 60 }]), format: "amrap", kind: "countdown" } as TimerSegment;
+    expect(setRestSeconds(amrap, "segment:0::a::set:1")).toBeNull();
   });
 });

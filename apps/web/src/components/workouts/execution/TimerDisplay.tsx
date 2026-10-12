@@ -4,6 +4,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import React from "react";
 
 import type { TimerSegment } from "@/api/executions";
+import { segmentLabel } from "@/lib/segment-label";
 import type { SegmentClock } from "@/lib/timer-engine";
 
 export type TimerPhase = "work" | "rest" | "transition";
@@ -40,6 +41,15 @@ export function formatClock(totalSeconds: number): string {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
+/** The number the clock shows: remaining time on countdowns, elapsed otherwise. */
+export function displaySeconds(segment: TimerSegment, clock: SegmentClock | null): { seconds: number; countsDown: boolean } {
+  const countsDown = clock?.remainingMs !== null && clock?.remainingMs !== undefined && segment.kind !== "countup";
+  const seconds = countsDown
+    ? Math.ceil((clock?.remainingMs ?? 0) / 1000)
+    : Math.floor((clock?.elapsedMs ?? 0) / 1000);
+  return { seconds, countsDown };
+}
+
 const RING_RADIUS = 46;
 const RING_LENGTH = 2 * Math.PI * RING_RADIUS;
 const MAX_PIPS = 12;
@@ -57,10 +67,7 @@ export function TimerDisplay({
 }: Props) {
   const i18n = useUiTranslations();
   const color = PHASE_COLORS[phase];
-  const countsDown = clock?.remainingMs !== null && clock?.remainingMs !== undefined && segment.kind !== "countup";
-  const seconds = countsDown
-    ? Math.ceil((clock?.remainingMs ?? 0) / 1000)
-    : Math.floor((clock?.elapsedMs ?? 0) / 1000);
+  const { seconds, countsDown } = displaySeconds(segment, clock);
   const finalSeconds = running && countsDown && seconds > 0 && seconds <= 3;
   const isCapped = segment.kind === "countup" && clock?.limitMs != null;
   const phaseLabel =
@@ -78,7 +85,7 @@ export function TimerDisplay({
           {phaseLabel}
         </span>
         <span className="text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
-          {segment.label}
+          {segmentLabel(segment, i18n)}
         </span>
       </div>
 

@@ -44,6 +44,8 @@ type WorkoutCreationStore = DraftWorkoutState & {
   reorderSections: (fromId: string, toId: string) => void;
   setFormat: (sectionId: string, format: SectionFormat) => void;
   setFormatParams: (sectionId: string, params: FormatParams) => void;
+  /** Sets the format and fills its fields from a template in one step. */
+  applySectionTemplate: (sectionId: string, format: SectionFormat, params: FormatParams) => void;
   setEmomScoringMode: (sectionId: string, mode: EmomScoringMode | null) => void;
   setEmomAmrapScoringStyle: (sectionId: string, style: "grand_total" | "lowest_window" | null) => void;
   addExercise: (sectionId: string) => void;
@@ -403,6 +405,17 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
         };
       }),
     })),
+
+  applySectionTemplate: (sectionId, format, params) => {
+    get().setFormat(sectionId, format);
+    set((state) => ({
+      sections: state.sections.map((section) =>
+        section.localId === sectionId
+          ? { ...section, formatParams: { ...section.formatParams, ...params } }
+          : section,
+      ),
+    }));
+  },
 
   setFormatParams: (sectionId, params) =>
     set((state) => ({

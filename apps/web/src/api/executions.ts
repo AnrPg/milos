@@ -15,6 +15,9 @@ export type TimerSegment = {
   round: number | null;
   total_rounds: number | null;
   label: string;
+  /** Stable key for localizing `label`; absent when the label is the section name. */
+  label_key?: string | null;
+  label_params?: Record<string, string | number> | null;
   section_note?: string | null;
   scoreable: boolean;
   score_config: {
@@ -45,6 +48,8 @@ export type TimerSegment = {
     alternating_group_id?: string | null;
     note?: string | null;
     interval_assignment?: number | null;
+    /** Prescribed rest between this exercise's sets. */
+    rest_seconds?: number | null;
     excluded?: boolean;
   }>;
 };
@@ -164,6 +169,18 @@ export type ExecutionProgressPayload = {
   section_elapsed_ms: Record<string, number>;
   segment_cycle_counts: Record<string, number>;
   section_scores: SectionScore[];
+  kpi_counters?: KpiCounters;
+};
+
+/** Device-observed execution KPIs; the API only ever lets them grow. */
+export type KpiCounters = {
+  skips?: number;
+  countdown_skips?: number;
+  countdown_segments?: number;
+  pauses?: number;
+  paused_ms?: number;
+  finish_wizard_opens?: number;
+  first_started_at_ms?: number;
 };
 
 export async function startExecution(
@@ -195,6 +212,7 @@ export async function completeExecution(
     total_elapsed_ms?: number;
     section_elapsed_ms?: Record<string, number>;
     segment_cycle_counts?: Record<string, number>;
+    kpi_counters?: KpiCounters;
   },
 ): Promise<WorkoutExecution> {
   const data = await apiRequest<{ execution: WorkoutExecution }>(

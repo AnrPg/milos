@@ -36,6 +36,9 @@ defmodule MilosTraining.Execution.ExecutionStore do
   def list_executions_for_coaching(user_id), do: adapter().list_executions_for_coaching(user_id)
 
   @impl true
+  def list_executions_for_kpis(since), do: adapter().list_executions_for_kpis(since)
+
+  @impl true
   def progress_operation_applied?(execution_id, user_id, operation_id),
     do: adapter().progress_operation_applied?(execution_id, user_id, operation_id)
 end

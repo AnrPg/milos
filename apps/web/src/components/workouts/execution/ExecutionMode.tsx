@@ -16,9 +16,11 @@ import {
 import { useSession } from "@/components/session-provider";
 import { LocalizedScore } from "@/components/localized-score";
 import { useExecutionSync, type SyncProblem } from "@/hooks/useExecutionSync";
+import { useMediaSession } from "@/hooks/useMediaSession";
 import { useScreenWakeLock } from "@/hooks/useScreenWakeLock";
 import { useWorkoutTimer } from "@/hooks/useWorkoutTimer";
 import { subscribeToTopic } from "@/lib/realtime";
+import { segmentLabel } from "@/lib/segment-label";
 import { planCatchUp, segmentLimitMs } from "@/lib/timer-engine";
 import {
   CUE_MODES,
@@ -42,12 +44,14 @@ import {
   isRepeatableSegment,
   roundTarget as segmentRoundTarget,
   shouldAutoAdvanceOnChecklistComplete,
+  setRestSeconds,
   stepsForWindow,
   targetRepsForRound,
 } from "./progress";
 import { ReadyScreen } from "./ReadyScreen";
 import { ScoreModal } from "./ScoreModal";
-import { formatClock, PHASE_COLORS, type TimerPhase, TimerDisplay } from "./TimerDisplay";
+import { CastView } from "./CastView";
+import { displaySeconds, formatClock, PHASE_COLORS, type TimerPhase, TimerDisplay } from "./TimerDisplay";
 import { type ChecklistStep, toChecklistSteps, WorkoutChecklist } from "./WorkoutChecklist";
 
 const GET_READY_MS = 10_000;
@@ -115,6 +119,17 @@ function PauseIcon() {
   );
 }
 
+function CastIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 7V5h16v14h-6" />
+      <path d="M4 11a8 8 0 0 1 8 8" />
+      <path d="M4 15a4 4 0 0 1 4 4" />
+      <path d="M4 19h.01" />
+    </svg>
+  );
+}
+
 function CueModeIcon({ mode }: { mode: CueMode }) {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -168,6 +183,7 @@ export function ExecutionMode() {
     applyCatchUp,
     incrementSegmentCycle,
     decrementSegmentCycle,
+    adjustSegmentDuration,
     setCheckedExerciseIds,
     upsertScore,
     upsertNote,
@@ -185,10 +201,20 @@ export function ExecutionMode() {
   const [pendingFinish, setPendingFinish] = useState<{ scores: SectionScore[] } | null>(null);
   const [undo, setUndo] = useState<UndoState | null>(null);
   const [cueMode, setCueMode] = useState<CueMode>(() => readCueMode());
+  /** Rest between straight sets, counted down on the device after a set check-off. */
+  const [setRest, setSetRest] = useState<{ endsAt: number; total: number; segmentIndex: number } | null>(null);
+  const [castMode, setCastMode] = useState(false);
+  const exitCastMode = useCallback(() => setCastMode(false), []);
 
   const onSyncProblem = useCallback(
     (problem: SyncProblem) =>
-      setFeedback(problem === "conflict" ? i18n("progressConflictLabel") : i18n("progressSavedOfflineLabel")),
+      setFeedback(
+        problem === "conflict"
+          ? i18n("progressConflictLabel")
+          : problem === "merged"
+            ? i18n("progressMergedLabel")
+            : i18n("progressSavedOfflineLabel"),
+      ),
     [i18n],
   );
   const { sync, isSyncing } = useExecutionSync(tokens?.access_token, executionId, onSyncProblem);
@@ -261,6 +287,24 @@ export function ExecutionMode() {
     commit(() => pauseTimer(Date.now(), limitOf(currentSegment)));
   }
 
+  /** The athlete paused (as opposed to a pause the app takes, e.g. for the review). */
+  function userPause() {
+    if (useExecutionStore.getState().status !== "active") return;
+    useExecutionStore.getState().recordPauseKpi();
+    pauseNow();
+  }
+
+  /** The athlete ended the segment before its clock ran out. */
+  function skipSegment() {
+    const limit = limitOf(currentSegment);
+    if (currentSegment && limit !== null && !timer.isExpired) {
+      const store = useExecutionStore.getState();
+      store.countKpi("skips");
+      if (currentSegment.kind === "countdown") store.countKpi("countdown_skips");
+    }
+    endCurrentSegment();
+  }
+
   function openScoreModal() {
     pauseNow();
     setShowScoreModal(true);
@@ -271,6 +315,7 @@ export function ExecutionMode() {
 
     // Freeze the clock while the athlete reviews, so backing out of the review
     // returns to a paused workout instead of one that kept running underneath.
+    useExecutionStore.getState().countKpi("finish_wizard_opens");
     pauseNow();
     setShowScoreModal(false);
     setPendingFinish({ scores: finalSectionScores });
@@ -306,6 +351,7 @@ export function ExecutionMode() {
         total_elapsed_ms: totals.totalElapsedMs,
         section_elapsed_ms: totals.sectionElapsedMs,
         segment_cycle_counts: store.segmentCycleCounts,
+        kpi_counters: store.kpiCounters,
       });
       hydrateFromExecution(execution);
       completeExecution();
@@ -353,11 +399,25 @@ export function ExecutionMode() {
     void sync();
   }, [windowIndex, currentSegment, sync]);
 
+  // A set rest belongs to the segment it started in, and ends on its own.
+  const activeSetRest = setRest && setRest.segmentIndex === currentSegmentIndex ? setRest : null;
+  const setRestRemaining = activeSetRest
+    ? Math.max(0, Math.ceil((activeSetRest.endsAt - countdownNow) / 1000))
+    : null;
+  const showSetRest = setRestRemaining !== null && setRestRemaining > 0;
+
+  const countdownRunning = resumeCountdownEndsAt !== null || showSetRest;
   useEffect(() => {
-    if (resumeCountdownEndsAt === null) return;
+    if (!countdownRunning) return;
     const intervalId = setInterval(() => setCountdownNow(Date.now()), 250);
     return () => clearInterval(intervalId);
-  }, [resumeCountdownEndsAt]);
+  }, [countdownRunning]);
+
+  useEffect(() => {
+    if (setRestRemaining === null) return;
+    if (setRestRemaining === 0) playCue("work", cueMode);
+    else if (setRestRemaining <= 3) playCue("tick", cueMode);
+  }, [cueMode, setRestRemaining]);
 
   const resumeAfterCountdown = useEffectEvent(() => {
     // Resume at the scheduled moment, even if the countdown finished in the background.
@@ -447,6 +507,7 @@ export function ExecutionMode() {
 
   function handleStart() {
     primeCueAudio();
+    useExecutionStore.getState().recordFirstStartKpi();
     commit(() => {
       useExecutionStore.setState({ pausedElapsed: 0 });
       startResumeCountdown(Date.now() + GET_READY_MS);
@@ -455,6 +516,7 @@ export function ExecutionMode() {
 
   function handleResume() {
     primeCueAudio();
+    useExecutionStore.getState().recordResumeKpi();
     commit(() => startResumeCountdown(Date.now() + RESUME_COUNTDOWN_MS));
   }
 
@@ -475,6 +537,7 @@ export function ExecutionMode() {
     }
     const { checkedExerciseIds: checked, segmentCycleCounts: cycles } = undo;
     setUndo(null);
+    setSetRest(null);
     commit(() => useExecutionStore.setState({ checkedExerciseIds: checked, segmentCycleCounts: cycles }));
   }
 
@@ -513,6 +576,14 @@ export function ExecutionMode() {
 
     setCheckedExerciseIds(next);
 
+    const rest = wasChecked || finishesSegment ? null : setRestSeconds(currentSegment, stepId);
+    if (rest !== null) {
+      setCountdownNow(Date.now());
+      setSetRest({ endsAt: Date.now() + rest * 1000, total: rest, segmentIndex: currentSegmentIndex });
+    } else if (wasChecked) {
+      setSetRest(null);
+    }
+
     if (finishesSegment && repeatable) {
       completeRound(i18n("roundDoneToast", { round: (roundsCompleted ?? 0) + 1 }));
       return;
@@ -531,6 +602,31 @@ export function ExecutionMode() {
     setUndo(null);
     commit(() => decrementSegmentCycle(currentSegment.segment_key));
   }
+
+  function handleAddRoundWhilePaused() {
+    if (!currentSegment) return;
+    setUndo(null);
+    commit(() => incrementSegmentCycle(currentSegment.segment_key));
+  }
+
+  /** Coach changed the plan: lengthen or shorten the running clock. */
+  function handleAdjustTime(deltaSeconds: number) {
+    adjustSegmentDuration(currentSegmentIndex, deltaSeconds);
+  }
+
+  // ── Lock screen / system media controls ────────────────────────────────────
+
+  const clockSeconds = currentSegment ? displaySeconds(currentSegment, timer.clock) : null;
+  const localizedLabel = currentSegment ? segmentLabel(currentSegment, i18n) : "";
+  useMediaSession({
+    title: clockSeconds ? `${localizedLabel} · ${formatClock(clockSeconds.seconds)}` : localizedLabel,
+    subtitle: currentSegment?.section_name ?? "",
+    running: isTimerRunning,
+    onPlay: () => {
+      if (useExecutionStore.getState().status === "paused") handleResume();
+    },
+    onPause: userPause,
+  });
 
   // ── Render ──────────────────────────────────────────────────────────────────
 
@@ -637,9 +733,32 @@ export function ExecutionMode() {
       : repeatable
         ? { label: i18n("addRoundLabel"), onClick: () => completeRound(i18n("roundDoneToast", { round: (roundsCompleted ?? 0) + 1 })) }
         : phase !== "work"
-          ? { label: i18n("skipRestLabel"), onClick: endCurrentSegment }
-          : { label: i18n("nextbc98198"), onClick: endCurrentSegment };
+          ? { label: i18n("skipRestLabel"), onClick: skipSegment }
+          : { label: i18n("nextbc98198"), onClick: skipSegment };
   const showEndSegmentButton = repeatable && currentSegment.kind !== "interval_cycle";
+  const adjustableClock =
+    typeof currentSegment.duration_seconds === "number" &&
+    (currentSegment.kind === "countdown" || currentSegment.kind === "countup");
+  const nextUpText = nextSegment
+    ? i18n("nextUpLabel", {
+        label:
+          nextSegment.section_id !== currentSegment.section_id && !nextSegment.between_sections
+            ? `${nextSegment.section_name} · ${segmentLabel(nextSegment, i18n)}`
+            : segmentLabel(nextSegment, i18n),
+      })
+    : null;
+  const castRoundText =
+    roundsCompleted !== null
+      ? roundTarget
+        ? i18n("timerRoundLabel", { round: Math.min(roundsCompleted + 1, roundTarget), rounds: roundTarget })
+        : i18n("roundNumberLabel", { round: roundsCompleted + 1 })
+      : intervalWindow
+        ? intervalWindow.count
+          ? i18n("timerRoundLabel", { round: intervalWindow.index, rounds: intervalWindow.count })
+          : i18n("intervalWindowLabel", { window: intervalWindow.index })
+        : currentSegment.round && currentSegment.total_rounds
+          ? i18n("timerRoundLabel", { round: currentSegment.round, rounds: currentSegment.total_rounds })
+          : null;
   const phaseColor = PHASE_COLORS[phase];
   const nextLimit = nextSegment ? segmentLimitMs(nextSegment) : null;
 
@@ -662,7 +781,19 @@ export function ExecutionMode() {
               {i18n("segmentPositionLabel", { current: currentSegmentIndex + 1, total: segments.length })}
             </div>
           </div>
-          {soundControl}
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setCastMode(true)}
+              aria-label={i18n("castModeLabel")}
+              title={i18n("castModeLabel")}
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-xl"
+              style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}
+            >
+              <CastIcon />
+            </button>
+            {soundControl}
+          </div>
         </div>
         <div
           role="progressbar"
@@ -698,17 +829,51 @@ export function ExecutionMode() {
             className="mb-3 flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm"
             style={{ background: "var(--panel-muted)", color: "var(--text-soft)" }}
           >
-            <span className="min-w-0 truncate">
-              {i18n("nextUpLabel", {
-                label:
-                  nextSegment.section_id !== currentSegment.section_id && !nextSegment.between_sections
-                    ? `${nextSegment.section_name} · ${nextSegment.label}`
-                    : nextSegment.label,
-              })}
-            </span>
+            <span className="min-w-0 truncate">{nextUpText}</span>
             {nextLimit !== null && nextSegment.kind === "countdown" ? (
               <span className="shrink-0 font-mono tabular-nums">{formatClock(Math.round(nextLimit / 1000))}</span>
             ) : null}
+          </div>
+        ) : null}
+
+        {showSetRest ? (
+          <div
+            role="timer"
+            aria-label={i18n("setRestLabel")}
+            className="mb-3 flex items-center justify-between gap-3 rounded-2xl px-4 py-3"
+            style={{
+              background: `color-mix(in srgb, ${PHASE_COLORS.rest} 16%, var(--bg))`,
+              border: `1px solid color-mix(in srgb, ${PHASE_COLORS.rest} 45%, transparent)`,
+            }}
+          >
+            <div className="min-w-0">
+              <div className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--text-soft)" }}>
+                {i18n("setRestLabel")}
+              </div>
+              <div
+                className={`font-mono text-4xl font-bold tabular-nums ${setRestRemaining <= 3 ? "motion-safe:animate-pulse" : ""}`}
+              >
+                {formatClock(setRestRemaining)}
+              </div>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setSetRest((rest) => (rest ? { ...rest, endsAt: rest.endsAt + 15_000, total: rest.total + 15 } : rest))}
+                className="min-h-11 rounded-xl px-3 text-sm font-semibold"
+                style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}
+              >
+                {i18n("addFifteenSecondsLabel")}
+              </button>
+              <button
+                type="button"
+                onClick={() => setSetRest(null)}
+                className="min-h-11 rounded-xl px-3 text-sm font-bold"
+                style={{ background: "var(--accent, var(--primary))", color: "var(--primary-contrast)" }}
+              >
+                {i18n("skipRestLabel")}
+              </button>
+            </div>
           </div>
         ) : null}
 
@@ -764,7 +929,7 @@ export function ExecutionMode() {
       >
         <button
           type="button"
-          onClick={pauseNow}
+          onClick={userPause}
           disabled={status !== "active"}
           aria-label={i18n("pausecd21a1b")}
           className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full disabled:opacity-30"
@@ -795,7 +960,7 @@ export function ExecutionMode() {
         {showEndSegmentButton ? (
           <button
             type="button"
-            onClick={endCurrentSegment}
+            onClick={skipSegment}
             aria-label={isLastSegment ? i18n("finishb74bdee") : i18n("nextbc98198")}
             className="h-14 w-14 shrink-0 rounded-full text-2xl"
             style={{ background: "var(--card, var(--panel-muted))", border: "1px solid var(--border)", color: "var(--text-soft)" }}
@@ -830,6 +995,55 @@ export function ExecutionMode() {
           >
             {i18n("resumeb3bd0b5")}
           </button>
+          {adjustableClock ? (
+            <div className="flex w-full max-w-xs items-center justify-between gap-2" role="group" aria-label={i18n("adjustTimeLabel")}>
+              <button
+                type="button"
+                onClick={() => handleAdjustTime(-30)}
+                className="min-h-12 flex-1 rounded-2xl text-base font-semibold"
+                style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}
+              >
+                {i18n("minusThirtySecondsLabel")}
+              </button>
+              <span className="min-w-16 text-center font-mono text-lg font-bold tabular-nums">
+                {formatClock(currentSegment.duration_seconds ?? 0)}
+              </span>
+              <button
+                type="button"
+                onClick={() => handleAdjustTime(30)}
+                className="min-h-12 flex-1 rounded-2xl text-base font-semibold"
+                style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}
+              >
+                {i18n("plusThirtySecondsLabel")}
+              </button>
+            </div>
+          ) : null}
+          {repeatable ? (
+            <div className="flex w-full max-w-xs items-center justify-between gap-2" role="group" aria-label={i18n("adjustRoundsLabel")}>
+              <button
+                type="button"
+                onClick={handleRemoveRound}
+                disabled={(roundsCompleted ?? 0) === 0}
+                aria-label={i18n("removeRoundLabel")}
+                className="min-h-12 flex-1 rounded-2xl text-xl font-semibold disabled:opacity-30"
+                style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}
+              >
+                −
+              </button>
+              <span className="min-w-16 text-center text-sm font-semibold">
+                {i18n("roundsDoneLabel", { count: roundsCompleted ?? 0 })}
+              </span>
+              <button
+                type="button"
+                onClick={handleAddRoundWhilePaused}
+                aria-label={i18n("addRoundLabel")}
+                className="min-h-12 flex-1 rounded-2xl text-xl font-semibold"
+                style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}
+              >
+                +
+              </button>
+            </div>
+          ) : null}
           <button
             type="button"
             onClick={() => handleFinish()}
@@ -859,10 +1073,24 @@ export function ExecutionMode() {
           </div>
           <div className="text-center text-base" style={{ color: "var(--text-soft)" }}>
             {currentSegment.section_name ? `${currentSegment.section_name} · ` : ""}
-            {currentSegment.label}
+            {segmentLabel(currentSegment, i18n)}
           </div>
         </div>
       )}
+
+      {castMode && clockSeconds ? (
+        <CastView
+          seconds={clockSeconds.seconds}
+          phase={phase}
+          label={localizedLabel}
+          sectionName={currentSegment.section_name}
+          roundText={castRoundText}
+          nextText={nextUpText}
+          finalSeconds={isTimerRunning && clockSeconds.countsDown && clockSeconds.seconds > 0 && clockSeconds.seconds <= 3}
+          paused={status === "paused"}
+          onExit={exitCastMode}
+        />
+      ) : null}
 
       {modifyTarget && (
         <ModificationModal

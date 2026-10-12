@@ -2023,6 +2023,14 @@
                     "minimum": 1,
                     "type": "integer"
                   },
+                  "kpi_counters": {
+                    "additionalProperties": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "description": "Device-observed execution KPIs (skips, countdown_skips, countdown_segments, pauses, paused_ms, finish_wizard_opens, first_started_at_ms). Counters never decrease.",
+                    "type": "object"
+                  },
                   "operation_id": {
                     "format": "uuid",
                     "type": "string"
@@ -7171,6 +7179,23 @@
                           },
                           "label": {
                             "type": "string"
+                          },
+                          "label_key": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "label_params": {
+                            "additionalProperties": {
+                              "oneOf": [
+                                {
+                                  "type": "integer"
+                                },
+                                {
+                                  "type": "string"
+                                }
+                              ]
+                            },
+                            "type": "object"
                           },
                           "phase": {
                             "enum": [
@@ -21125,6 +21150,14 @@
                       "type": "string"
                     },
                     "type": "array"
+                  },
+                  "kpi_counters": {
+                    "additionalProperties": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "description": "Device-observed execution KPIs (skips, countdown_skips, countdown_segments, pauses, paused_ms, finish_wizard_opens, first_started_at_ms). Counters never decrease.",
+                    "type": "object"
                   },
                   "section_elapsed_ms": {
                     "additionalProperties": {

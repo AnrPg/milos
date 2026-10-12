@@ -446,6 +446,41 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
 
       assert updated["lock_version"] == execution["lock_version"] + 1
 
+      counted =
+        athlete_conn
+        |> recycle()
+        |> patch(
+          "/api/executions/#{execution["id"]}/progress",
+          valid
+          |> Map.merge(%{
+            expected_version: updated["lock_version"],
+            operation_id: Ecto.UUID.generate(),
+            kpi_counters: %{pauses: 2, skips: 1, bogus: 7}
+          })
+        )
+        |> json_response(200)
+        |> Map.fetch!("execution")
+
+      assert counted["kpi_counters"] == %{"pauses" => 2, "skips" => 1}
+
+      stale_counters =
+        athlete_conn
+        |> recycle()
+        |> patch(
+          "/api/executions/#{execution["id"]}/progress",
+          valid
+          |> Map.merge(%{
+            expected_version: counted["lock_version"],
+            operation_id: Ecto.UUID.generate(),
+            kpi_counters: %{pauses: 1}
+          })
+        )
+        |> json_response(200)
+        |> Map.fetch!("execution")
+
+      assert stale_counters["kpi_counters"]["pauses"] == 2
+      updated = stale_counters
+
       replayed =
         athlete_conn
         |> recycle()
