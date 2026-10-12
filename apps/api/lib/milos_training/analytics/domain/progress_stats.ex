@@ -100,11 +100,26 @@ defmodule MilosTraining.Analytics.Domain.ProgressStats do
   @timeline_limit 50
 
   @doc """
-  The client's PR improvements over time, newest first: each history entry
-  with the score it replaced (`nil` for a first record).
+  The client's PR improvements over time, newest first, each with the score
+  it replaced (`nil` for a first record). History rows hold the scores a PR
+  had before it was beaten; the current score lives on the record itself.
   """
-  def pr_timeline(history_entries) do
-    history_entries
+  def pr_timeline(history_entries, records \\ []) do
+    current =
+      Enum.map(records, fn record ->
+        %{
+          id: value(record, :id),
+          pr_record_id: value(record, :id),
+          name: value(record, :name),
+          unit: value(record, :unit),
+          higher_is_better: value(record, :higher_is_better),
+          beaten_on: value(record, :beaten_on),
+          score: value(record, :current_score),
+          inserted_at: value(record, :updated_at)
+        }
+      end)
+
+    (history_entries ++ current)
     |> Enum.group_by(&value(&1, :pr_record_id))
     |> Enum.flat_map(fn {_record_id, entries} ->
       entries

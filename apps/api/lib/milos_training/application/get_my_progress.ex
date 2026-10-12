@@ -11,7 +11,13 @@ defmodule MilosTraining.Application.GetMyProgress do
       executions
       |> Enum.filter(&(&1.organization_id == organization_id))
       |> ProgressStats.build(Date.utc_today())
-      |> Map.put(:pr_timeline, ProgressStats.pr_timeline(Pantheon.list_record_history(actor.id)))
+      |> Map.put(
+        :pr_timeline,
+        ProgressStats.pr_timeline(
+          Pantheon.list_record_history(actor.id),
+          Pantheon.list_records(actor.id)
+        )
+      )
       |> then(&{:ok, &1})
     end
   end

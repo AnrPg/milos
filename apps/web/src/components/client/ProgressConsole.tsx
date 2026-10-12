@@ -331,7 +331,10 @@ function PRTimeline({ entries }: { entries: PRTimelineEntry[] }) {
               <ol className="flex flex-col border-s-2 ps-4" style={{ borderColor: "var(--border)" }}>
                 {month.entries.map((entry) => {
                   const pr = prById.get(entry.pr_record_id) ?? null;
-                  const unit = entry.unit === "mins_secs" ? "" : ` ${semanticLabel(entry.unit, i18n)}`;
+                  const unit =
+                    entry.unit === "mins_secs"
+                      ? ""
+                      : ` ${entry.unit === "kg" ? i18n("kilogramsUnit") : semanticLabel(entry.unit, i18n)}`;
                   const improvement = prImprovement(entry);
                   const improvementText =
                     improvement.kind === "first"

@@ -174,9 +174,11 @@ export async function renderCorporateInvoicePdf(layout: CorporateInvoiceLayout):
     y = 56;
   };
 
-  text(layout.issuer, margin, 16, { bold: true });
-  text(layout.title, right, 18, { bold: true, align: "right", color: [124, 58, 237] });
-  y += 18;
+  // The issuer and the (long) invoice number get their own lines so they
+  // never overlap.
+  text(layout.issuer, margin, 15, { bold: true });
+  y += 26;
+  text(layout.title, margin, 17, { bold: true, color: [124, 58, 237] });
   text(layout.status, right, 9.5, { align: "right", color: [100, 116, 139] });
   y += 34;
 

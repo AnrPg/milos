@@ -16,12 +16,30 @@ defmodule MilosTraining.Analytics.Domain.ProgressStatsTest do
     }
 
   test "the PR timeline lists improvements newest first with the score they beat" do
+    # History keeps superseded scores; the current one is on the record.
+    records = [
+      %{
+        id: "squat",
+        name: "Back squat",
+        unit: "kg",
+        higher_is_better: true,
+        current_score: 115.0,
+        beaten_on: "2026-10-01",
+        updated_at: "2026-10-01T10:00:00Z"
+      },
+      %{
+        id: "dead",
+        name: "Deadlift",
+        unit: "kg",
+        higher_is_better: true,
+        current_score: 150.0,
+        beaten_on: "2026-09-10",
+        updated_at: "2026-09-10T10:00:00Z"
+      }
+    ]
+
     timeline =
-      ProgressStats.pr_timeline([
-        entry("squat", "Back squat", 115.0, "2026-10-01"),
-        entry("squat", "Back squat", 100.0, "2026-08-01"),
-        entry("dead", "Deadlift", 150.0, "2026-09-10")
-      ])
+      ProgressStats.pr_timeline([entry("squat", "Back squat", 100.0, "2026-08-01")], records)
 
     assert [
              %{name: "Back squat", score: 115.0, previous_score: 100.0, change: 15.0},
