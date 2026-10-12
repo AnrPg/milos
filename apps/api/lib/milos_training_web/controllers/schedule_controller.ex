@@ -211,7 +211,7 @@ defmodule MilosTrainingWeb.ScheduleController do
 
   def join_waitlist(conn, _params) do
     actor = GuardianPlug.current_resource(conn)
-    %{slot_id: slot_id} = conn.body_params
+    slot_id = Map.get(conn.body_params, :slot_id)
 
     with {:ok, entry} <- JoinClassWaitlist.call(conn.assigns.tenant_context, actor, slot_id) do
       conn
@@ -247,7 +247,8 @@ defmodule MilosTrainingWeb.ScheduleController do
 
   def create_guest_booking(conn, _params) do
     actor = GuardianPlug.current_resource(conn)
-    %{slot_id: slot_id, guest_name: guest_name} = conn.body_params
+    slot_id = Map.get(conn.body_params, :slot_id)
+    guest_name = Map.get(conn.body_params, :guest_name)
 
     with {:ok, booking} <-
            SubmitGuestBooking.call(conn.assigns.tenant_context, actor, slot_id, guest_name) do
@@ -303,7 +304,7 @@ defmodule MilosTrainingWeb.ScheduleController do
 
   def check_in(conn, _params) do
     actor = GuardianPlug.current_resource(conn)
-    params = %{"location_id" => Map.get(conn.body_params || %{}, :location_id)}
+    params = %{"location_id" => Map.get(conn.body_params, :location_id)}
 
     with {:ok, check_in} <-
            CheckInOpenGym.call(conn.assigns.tenant_context, actor, actor.id, params) do

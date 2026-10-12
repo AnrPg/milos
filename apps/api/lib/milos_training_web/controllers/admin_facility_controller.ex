@@ -171,7 +171,7 @@ defmodule MilosTrainingWeb.AdminFacilityController do
 
   def create_check_in(conn, _params) do
     staff = GuardianPlug.current_resource(conn)
-    %{user_id: user_id} = conn.body_params
+    user_id = Map.get(conn.body_params, :user_id)
     params = %{"location_id" => Map.get(conn.body_params, :location_id)}
 
     with {:ok, check_in} <-
