@@ -12,6 +12,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     ScaleLevel,
     Workouts.AssignedWorkout,
     Workouts.AssignedWorkoutAthlete,
+    Workouts.Domain.AssignmentAudiencePolicy,
     Workouts.Domain.WorkoutAuthoring,
     Workouts.Domain.WorkoutMaterializer,
     Workouts.ExerciseVariation,
@@ -384,7 +385,23 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         scheduled_for = Map.get(params, :scheduled_for) || Map.get(params, "scheduled_for")
         admin_notes = normalize_admin_notes_input(params)
 
-        case find_assignment_by_workout_date_and_notes(workout_id, scheduled_for, admin_notes) do
+        source_slot_id =
+          Map.get(params, :source_scheduled_class_id) ||
+            Map.get(params, "source_scheduled_class_id")
+
+        # ADR-107: an assignment only absorbs a new one with the same workout,
+        # date and notes when both share the same source slot, so a class
+        # variant never silently loses (or gains) its class link.
+        existing =
+          case find_assignment_by_workout_date_and_notes(workout_id, scheduled_for, admin_notes) do
+            %AssignedWorkout{source_scheduled_class_id: ^source_slot_id} = assignment ->
+              assignment
+
+            _other ->
+              nil
+          end
+
+        case existing do
           nil ->
             %AssignedWorkout{}
             |> AssignedWorkout.changeset(params)
@@ -504,6 +521,63 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     |> Repo.all()
     |> Repo.preload(@assigned_workout_preloads)
     |> Enum.map(&normalize_assignment/1)
+  end
+
+  @impl true
+  def list_class_variants([], _assignee_id), do: []
+
+  def list_class_variants(slot_ids, assignee_id) when is_list(slot_ids) do
+    # ADR-107: live per-member variants of the given class occurrences. With an
+    # assignee id only that user's variants are returned (the member's own
+    # "Your version"); with nil every assignee's (the staff view).
+    variants =
+      AssignedWorkout
+      |> scoped_to_tenant()
+      |> join(:inner, [assignment], link in AssignedWorkoutAthlete,
+        on: link.assigned_workout_id == assignment.id
+      )
+      |> where(
+        [assignment, link],
+        assignment.source_scheduled_class_id in ^slot_ids and
+          (is_nil(link.athlete_status) or link.athlete_status == :accepted)
+      )
+      |> maybe_scope_variant_assignee(assignee_id)
+      |> order_by([assignment, _link], asc: assignment.inserted_at)
+      |> select([assignment, link], {assignment, link})
+      |> Repo.all()
+      |> Enum.map(fn {assignment, link} ->
+        assignment = Repo.preload(assignment, master_workout: @workout_preloads)
+
+        %{
+          assignment_id: assignment.id,
+          source_slot_id: assignment.source_scheduled_class_id,
+          assignee_id: link.athlete_id,
+          assignee_status: link.athlete_status && to_string(link.athlete_status),
+          scheduled_for: Date.to_iso8601(link.scheduled_for),
+          master_workout_id: assignment.master_workout_id,
+          workout: normalize_assigned_workout(assignment.master_workout)
+        }
+      end)
+
+    attach_variant_completion(variants, assignee_id)
+  end
+
+  defp maybe_scope_variant_assignee(query, nil), do: query
+
+  defp maybe_scope_variant_assignee(query, assignee_id),
+    do: where(query, [_assignment, link], link.athlete_id == ^assignee_id)
+
+  defp attach_variant_completion(variants, nil), do: variants
+
+  defp attach_variant_completion(variants, assignee_id) do
+    completion_map =
+      fetch_completed_assignment_executions(assignee_id, Enum.map(variants, & &1.assignment_id))
+
+    Enum.map(variants, fn variant ->
+      if Map.has_key?(completion_map, variant.assignment_id),
+        do: Map.put(variant, :execution_status, "completed"),
+        else: variant
+    end)
   end
 
   @impl true
@@ -838,6 +912,8 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       admin_notes: assignment.admin_notes,
       inserted_at: assignment.inserted_at,
       athlete_ids: Enum.map(assignment.athlete_links, & &1.athlete_id),
+      source_slot_id: assignment.source_scheduled_class_id,
+      assignment_kind: AssignmentAudiencePolicy.kind(assignment.source_scheduled_class_id),
       workout: normalize_assigned_workout(assignment.master_workout)
     }
   end
@@ -1784,7 +1860,8 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           athlete_ids: Enum.map(assignment.athlete_links, & &1.athlete_id),
           athlete_scheduled_for:
             Map.new(assignment.athlete_links, &{&1.athlete_id, &1.scheduled_for}),
-          scheduled_for: assignment.scheduled_for
+          scheduled_for: assignment.scheduled_for,
+          source_slot_id: assignment.source_scheduled_class_id
         }
     end
   end

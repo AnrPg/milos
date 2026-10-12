@@ -25,6 +25,7 @@ defmodule MilosTraining.Workouts do
     GetWorkout,
     GetAthleteWeekView,
     ListAdminWorkouts,
+    ListClassVariants,
     ListScaleLevels,
     MaterializeWorkout
   }
@@ -78,6 +79,10 @@ defmodule MilosTraining.Workouts do
 
   def list_assigned_workouts_for_athlete(context, athlete_id, start_date, end_date),
     do: WorkoutStore.list_assigned_workouts_for_athlete(context, athlete_id, start_date, end_date)
+
+  @doc "ADR-107: live per-member class variants for slots (one assignee or all)."
+  def list_class_variants(context, slot_ids, assignee_id),
+    do: ListClassVariants.call(context, slot_ids, assignee_id)
 
   defdelegate list_workouts, to: ListAdminWorkouts, as: :all
   def list_workouts(context), do: WorkoutStore.list_workouts(context)

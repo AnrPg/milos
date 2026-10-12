@@ -69,6 +69,9 @@ defmodule MilosTraining.Workouts.WorkoutStore do
         list_assigned_workouts_for_athlete(athlete_id, start_date, end_date)
       end)
 
+  def list_class_variants(context, slot_ids, assignee_id),
+    do: within_tenant(context, fn -> list_class_variants(slot_ids, assignee_id) end)
+
   def reject_assignment_for_athlete(context, assignment_id, athlete_id),
     do: within_tenant(context, fn -> reject_assignment_for_athlete(assignment_id, athlete_id) end)
 
@@ -122,6 +125,10 @@ defmodule MilosTraining.Workouts.WorkoutStore do
 
   @impl true
   def delete_assigned_workout(id), do: adapter().delete_assigned_workout(id)
+
+  @impl true
+  def list_class_variants(slot_ids, assignee_id),
+    do: adapter().list_class_variants(slot_ids, assignee_id)
 
   @impl true
   def list_assigned_workouts_for_athlete(athlete_id, start_date, end_date),

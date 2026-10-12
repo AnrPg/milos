@@ -18,6 +18,7 @@ defmodule MilosTraining.Workouts.Ports.WorkoutStore do
   @callback list_assigned_workouts_for_athlete(binary(), Date.t(), Date.t()) :: [map()]
   @callback list_assigned_workouts_for_admin(Date.t(), Date.t()) :: [map()]
   @callback list_workout_change_targets(binary()) :: [map()]
+  @callback list_class_variants([Ecto.UUID.t()], Ecto.UUID.t() | nil) :: [map()]
   @callback list_workouts() :: [map()]
   @callback list_folders() :: [map()]
   @callback create_folder(binary(), map()) :: {:ok, map()} | {:error, term()}
