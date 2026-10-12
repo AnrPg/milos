@@ -61,8 +61,11 @@ defmodule MilosTraining.Application.SchedulingAnalyticsInstrumentationTest do
     assert first.metadata["scheduled_class_id"] == slot.id
     assert first.metadata["auto_approved"] == false
 
-    assert {:ok, _} = ResolveBooking.call(context, approved.id, %{"action" => "approve"})
-    assert {:ok, _} = ResolveBooking.call(context, rejected.id, %{"action" => "reject"})
+    assert {:ok, _, :resolved} =
+             ResolveBooking.call(context, approved.id, %{"action" => "approve"})
+
+    assert {:ok, _, :resolved} =
+             ResolveBooking.call(context, rejected.id, %{"action" => "reject"})
 
     approved_event = analytics_event!(organization.id, "class_booking_approved")
     assert approved_event.context_id == approved.id
