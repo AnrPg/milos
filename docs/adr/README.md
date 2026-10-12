@@ -108,3 +108,5 @@ must have an ADR. See `template.md` for the format.
 | ADR-100 | Structured-first workouts and workout assistant hardening | Accepted |
 | ADR-101 | Canonical section format schemas and structure-first parsing | Accepted |
 | ADR-102 | Reasoning-first workout assistant | Accepted |
+| ADR-103 | Subscription expiry reminders and grace slack | Accepted |
+| ADR-104 | Training log on profiles | Accepted |
