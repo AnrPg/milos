@@ -104,8 +104,27 @@ defmodule MilosTraining.Analytics.Domain.EventCatalog do
       {"messaging_message", [:thread_id, :message_type], :subject},
     # Notifications
     "notification_in_app_delivered" => {"notification", [:type], :subject},
-    "notification_push_outcome" => {"notification", [], nil}
+    "notification_push_outcome" => {"notification", [], nil},
+    # Wellbeing safety warnings (ADR-106). context_id is the workout.
+    "injury_warning_shown" => {"workout", [], :explicit},
+    "injury_warning_acknowledged" => {"workout", [], :explicit}
   }
+
+  # ADR-106: health-adjacent events keep ONLY these metadata keys - enums,
+  # counts and ids. Body areas, limitations, tags and any other free text are
+  # dropped even when short enough to pass `sanitize/1`.
+  @injury_warning_metadata_keys ~w(
+    audience surface warning_level injury_warning_count avoid_exercise_count
+    caution_exercise_count athlete_id source_context_id
+  )
+  @metadata_allowlists %{
+    "injury_warning_shown" => @injury_warning_metadata_keys,
+    "injury_warning_acknowledged" => @injury_warning_metadata_keys
+  }
+
+  # ADR-106 segmentation facts added to `workout_execution_completed`:
+  # booleans/enums derived from organization-provenance injuries only.
+  @injury_segmentation_keys ~w(had_active_injury injury_warning_level)
 
   @max_string_length 64
 
@@ -116,6 +135,12 @@ defmodule MilosTraining.Analytics.Domain.EventCatalog do
 
   @doc "Event names added by ADR-113 instrumentation, sorted."
   def instrumented_event_names, do: @instrumented_events |> Map.keys() |> Enum.sort()
+
+  @doc "Metadata keys allowed for the ADR-106 injury warning events."
+  def injury_warning_metadata_keys, do: @injury_warning_metadata_keys
+
+  @doc "ADR-106 injury segmentation keys carried by execution completion facts."
+  def injury_segmentation_keys, do: @injury_segmentation_keys
 
   def registered?(name) when is_binary(name),
     do: Map.has_key?(@legacy_events, name) or Map.has_key?(@instrumented_events, name)
@@ -159,7 +184,8 @@ defmodule MilosTraining.Analytics.Domain.EventCatalog do
             metadata:
               subject
               |> take(subject_keys)
-              |> Map.merge(sanitize(field(extra, :metadata) || %{})),
+              |> Map.merge(sanitize(field(extra, :metadata) || %{}))
+              |> allowlist(event_name),
             dedupe_key: dedupe_key(dedupe, event_name, user_id, context_id, occurred_at, extra)
           }
           |> Enum.reject(fn {_key, value} -> is_nil(value) end)
@@ -193,6 +219,13 @@ defmodule MilosTraining.Analytics.Domain.EventCatalog do
           {:ok, context_type} -> {context_type, [], nil}
           :error -> nil
         end
+    end
+  end
+
+  defp allowlist(metadata, event_name) do
+    case Map.fetch(@metadata_allowlists, event_name) do
+      {:ok, keys} -> Map.take(metadata, keys)
+      :error -> metadata
     end
   end
 
