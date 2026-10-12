@@ -10,13 +10,10 @@ import { useLocale, useTranslations } from "next-intl";
 
 import { ApiError } from "@/api/client";
 import {
-  approveBooking,
-  createBooking,
   createScheduleSlot,
   createScheduleSeries,
   deleteScheduleSlot,
   fetchSchedule,
-  rejectBooking,
   updateScheduleSlot,
   type ScheduleBooking,
   type ClassTypeRecord,
@@ -33,7 +30,9 @@ import { CalendarView } from "@/components/schedule/CalendarView";
 import { buildScheduleWindow } from "@/components/schedule/calendar-window";
 import { SlotPopup } from "@/components/schedule/SlotPopup";
 import { TypeFilterChips } from "@/components/schedule/TypeFilterChips";
+import { useOutboxCommand } from "@/hooks/useOutboxCommand";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { OFFLINE_COMMAND_OUTBOX_EVENT } from "@/lib/offline-command-outbox";
 import { organizationTopic, subscribeToTopic } from "@/lib/realtime";
 import { useScheduleStore } from "@/stores/schedule";
 import { IntegerInput } from "@/components/integer-input";
@@ -103,6 +102,8 @@ export function ScheduleConsole({
   const [classTypes, setClassTypes] = useState<ClassTypeRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const submitCommand = useOutboxCommand();
   const [selectedSlot, setSelectedSlot] = useState<ScheduleSlot | null>(null);
   const [bookingTarget, setBookingTarget] = useState<ScheduleSlot | null>(null);
   const [resolveTarget, setResolveTarget] = useState<{ booking: ScheduleBooking; action: "approve" | "reject" } | null>(
@@ -156,6 +157,19 @@ export function ScheduleConsole({
     });
 
     return () => window.cancelAnimationFrame(frame);
+  }, [loadSchedule]);
+
+  useEffect(() => {
+    const handleOutbox = (event: Event) => {
+      const detail = (event as CustomEvent<{ kind?: string; delivered?: boolean }>).detail;
+      if (detail?.delivered && detail.kind?.startsWith("booking.")) {
+        setNotice(null);
+        void loadSchedule();
+      }
+    };
+
+    window.addEventListener(OFFLINE_COMMAND_OUTBOX_EVENT, handleOutbox);
+    return () => window.removeEventListener(OFFLINE_COMMAND_OUTBOX_EVENT, handleOutbox);
   }, [loadSchedule]);
 
   useEffect(() => {
@@ -229,10 +243,16 @@ export function ScheduleConsole({
     setBusy(true);
 
     try {
-      await createBooking(tokens.access_token, bookingTarget.id);
+      // ADR-102: booking requests go through the durable outbox so an offline
+      // request is replayed once, with the same idempotency key, on reconnect.
+      const outcome = await submitCommand("booking.request", {
+        slotId: bookingTarget.id,
+        label: bookingTarget.name,
+      });
+      setNotice(outcome.status === "queued" ? i18n("outboxQueuedNotice") : null);
       setBookingTarget(null);
       setSelectedSlot(null);
-      await loadSchedule();
+      if (outcome.status === "delivered") await loadSchedule();
     } catch (requestError) {
       setError(requestError instanceof Error ? localizeError(requestError, i18n) : t("failedToCreateBooking"));
     } finally {
@@ -246,13 +266,17 @@ export function ScheduleConsole({
     setBusy(true);
 
     try {
-      if (resolveTarget.action === "approve") {
-        await approveBooking(tokens.access_token, resolveTarget.booking.id, resolveMessage.trim() || undefined);
-      } else {
-        await rejectBooking(tokens.access_token, resolveTarget.booking.id, resolveMessage.trim() || undefined);
-      }
+      const outcome = await submitCommand(
+        resolveTarget.action === "approve" ? "booking.approve" : "booking.reject",
+        {
+          bookingId: resolveTarget.booking.id,
+          adminMessage: resolveMessage.trim() || null,
+          label: resolveTarget.booking.user_nickname ?? null,
+        },
+      );
+      setNotice(outcome.status === "queued" ? i18n("outboxQueuedNotice") : null);
 
-      const refreshedSlots = await loadSchedule();
+      const refreshedSlots = outcome.status === "delivered" ? await loadSchedule() : null;
       setResolveTarget(null);
       setResolveMessage("");
 
@@ -468,6 +492,16 @@ export function ScheduleConsole({
         {error ? (
           <div className="rounded-[1.6rem] px-5 py-4 text-sm" style={{ background: "var(--primary)]/10", border: "1px solid var(--primary)30", color: "var(--primary-strong)" }}>
             {error}
+          </div>
+        ) : null}
+
+        {notice ? (
+          <div
+            role="status"
+            className="rounded-[1.6rem] px-5 py-4 text-sm"
+            style={{ background: "var(--panel)", border: "1px solid var(--border-strong)", color: "var(--text-soft)" }}
+          >
+            {notice}
           </div>
         ) : null}
 

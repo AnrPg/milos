@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
-  createTrainingLogEntry,
   fetchTrainingLogSources,
   listTrainingLogEntries,
   updateTrainingLogEntry,
@@ -15,6 +14,7 @@ import {
 import { HomeDisclosure } from "@/components/home/HomeDisclosure";
 import { useSession } from "@/components/session-provider";
 import { localizeError } from "@/i18n/presentation";
+import { useOutboxCommand } from "@/hooks/useOutboxCommand";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import {
@@ -431,13 +431,30 @@ function EntryForm({
   );
   const [idempotencyKey] = useState(newIdempotencyKey);
   const [errors, setErrors] = useState<TrainingLogFormError[]>([]);
+  const [queued, setQueued] = useState(false);
+  const submitCommand = useOutboxCommand();
 
   const mutation = useMutation({
-    mutationFn: () =>
-      state.mode === "create"
-        ? createTrainingLogEntry(token, buildCreatePayload(form, state.source, { idempotencyKey, timezone: browserTimezone() }))
-        : updateTrainingLogEntry(token, state.entry.id, buildUpdatePayload(form, state.entry, sections, browserTimezone())),
-    onSuccess: async () => {
+    // ADR-102: new entries go through the durable outbox (the form's
+    // idempotency key is the operation id); edits stay online-only because
+    // they carry an optimistic-lock version.
+    mutationFn: async (): Promise<{ queued: boolean }> => {
+      if (state.mode === "create") {
+        const outcome = await submitCommand(
+          "training_log.create",
+          buildCreatePayload(form, state.source, { idempotencyKey, timezone: browserTimezone() }),
+        );
+        return { queued: outcome.status === "queued" };
+      }
+
+      await updateTrainingLogEntry(token, state.entry.id, buildUpdatePayload(form, state.entry, sections, browserTimezone()));
+      return { queued: false };
+    },
+    onSuccess: async (result) => {
+      if (result.queued) {
+        setQueued(true);
+        return;
+      }
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["training-log"] }),
         queryClient.invalidateQueries({ queryKey: ["landing"] }),
@@ -624,6 +641,9 @@ function EntryForm({
         <ul className="grid gap-1 text-sm" role="alert" style={{ color: "var(--danger, #dc2626)" }}>
           {errors.map((error) => <li key={error}>{i18n(FORM_ERROR_KEYS[error])}</li>)}
         </ul>
+      ) : null}
+      {queued && !mutation.isError ? (
+        <p className="text-sm" role="status" style={{ color: "var(--text-soft)" }}>{i18n("outboxQueuedNotice")}</p>
       ) : null}
       {mutation.isError ? (
         <p className="text-sm" role="alert" style={{ color: "var(--danger, #dc2626)" }}>{localizeError(mutation.error, i18n)}</p>
