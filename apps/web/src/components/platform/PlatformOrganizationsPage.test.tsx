@@ -27,6 +27,11 @@ vi.mock("@/i18n/use-ui-locale", () => ({
   useUiLocale: () => "en",
 }));
 
+// The settings dialog embeds the shared logo uploader (ADR-103).
+vi.mock("@/i18n/ui", () => ({
+  useUiTranslations: () => (key: string) => key,
+}));
+
 vi.mock("@/api/organizations", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/api/organizations")>();
   return {
@@ -363,6 +368,24 @@ describe("PlatformOrganizationsPage", () => {
       expect(changePlatformOrganizationSettings).toHaveBeenCalled();
     });
     expect(renamePlatformOrganization).not.toHaveBeenCalled();
+  });
+
+  it("manages the logo through the uploader and never echoes brand_logo_url in settings", async () => {
+    renderPage();
+
+    const article = await screen.findByText("North Harbor Strength");
+    fireEvent.click(within(article.closest("article")!).getByRole("button", { name: "Edit settings" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Settings" });
+    expect(within(dialog).queryByLabelText("Brand logo URL (optional)")).toBeNull();
+    expect(within(dialog).getByRole("button", { name: "brandLogoChoose" })).toBeInTheDocument();
+
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save settings" }));
+
+    await waitFor(() => expect(changePlatformOrganizationSettings).toHaveBeenCalled());
+    const sent = vi.mocked(changePlatformOrganizationSettings).mock.calls.at(-1)![2];
+    expect(sent).not.toHaveProperty("brand_logo_url");
+    expect(sent).not.toHaveProperty("brand_logo_uploaded");
   });
 
   it("manages tenant access with role-specific invitations and membership roles", async () => {

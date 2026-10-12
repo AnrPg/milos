@@ -24,6 +24,8 @@ export type OrganizationSettings = {
   invitation_lifetime_seconds: number;
   brand_name: string | null;
   brand_logo_url: string | null;
+  /** ADR-103: true when brand_logo_url is derived from an uploaded logo. */
+  brand_logo_uploaded?: boolean;
   brand_primary_color: string | null;
   settings: Record<string, unknown>;
 };

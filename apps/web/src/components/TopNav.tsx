@@ -6,6 +6,7 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -34,7 +35,7 @@ type NavLink = { href: string; labelKey: string; roles: UserRole[] };
 type AdminNavLink = { href: string; labelKey: string; mobileVisible: boolean };
 type OrganizationMembershipSummary = {
   organization: { name: string; slug: string };
-  settings?: { brand_name?: string | null } | null;
+  settings?: { brand_name?: string | null; brand_logo_url?: string | null } | null;
 };
 
 const NAV_LINKS: NavLink[] = [
@@ -105,6 +106,18 @@ export function tenantBrandName(
   const membership = selectedMembership ?? memberships[0];
 
   return membership?.settings?.brand_name?.trim() || membership?.organization.name.trim() || null;
+}
+
+/** ADR-103: the selected tenant's logo for the shell header, if any. */
+export function tenantBrandLogoUrl(
+  memberships: OrganizationMembershipSummary[],
+  selectedSlug?: string | null,
+) {
+  const selectedMembership =
+    selectedSlug ? memberships.find((entry) => entry.organization.slug === selectedSlug) : null;
+  const membership = selectedMembership ?? memberships[0];
+
+  return membership?.settings?.brand_logo_url?.trim() || null;
 }
 
 function DashboardDropdown({
@@ -376,6 +389,7 @@ export function TopNav() {
   const outstandingCents = financeQuery.data?.total_outstanding_balance_cents ?? 0;
 
   const brandName = tenantBrandName(memberships, selectedOrganizationSlug) ?? i18n("milosTraining5b1a1c1");
+  const brandLogoUrl = tenantBrandLogoUrl(memberships, selectedOrganizationSlug);
   const hasTenantMembership = memberships.length > 0;
   const showTenantShell = hasTenantMembership;
   const unreadQuery = useQuery({
@@ -425,11 +439,22 @@ export function TopNav() {
       <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 px-2 py-1 sm:flex sm:flex-wrap sm:gap-x-4 sm:px-5">
         <Link
           href="/"
-          className="col-span-2 block min-w-0 whitespace-normal break-words text-xs font-bold uppercase leading-tight sm:col-span-1 sm:max-w-[32rem] sm:shrink-0"
+          className="col-span-2 flex min-w-0 items-center gap-2 whitespace-normal break-words text-xs font-bold uppercase leading-tight sm:col-span-1 sm:max-w-[32rem] sm:shrink-0"
           style={{ color: "var(--text)" }}
           title={brandName}
         >
-          {brandName}
+          {brandLogoUrl ? (
+            <Image
+              alt=""
+              aria-hidden="true"
+              className="h-7 w-7 shrink-0 rounded-md object-contain"
+              height={28}
+              src={brandLogoUrl}
+              unoptimized
+              width={28}
+            />
+          ) : null}
+          <span className="min-w-0">{brandName}</span>
         </Link>
 
         <nav className="order-3 col-start-1 row-start-2 flex min-w-0 flex-1 flex-wrap items-center gap-0.5 overflow-visible sm:order-none sm:col-span-1 sm:row-start-auto sm:gap-1">

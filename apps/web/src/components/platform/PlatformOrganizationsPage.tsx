@@ -25,6 +25,8 @@ import {
 } from "@/api/platform-organizations";
 import { ApiError } from "@/api/client";
 import { fetchOrganizationMemberships } from "@/api/organizations";
+import { platformLogoApi } from "@/api/organization-branding";
+import { TenantLogoUploader } from "@/components/branding/TenantLogoUploader";
 import { OrganizationPurgeDialog } from "@/components/platform/OrganizationPurgeDialog";
 import { useSession } from "@/components/session-provider";
 import { useUiLocale } from "@/i18n/use-ui-locale";
@@ -182,10 +184,15 @@ export function PlatformOrganizationsPage() {
       if (name !== editing.organization.name) {
         await renamePlatformOrganization(accessToken, editing.organization.id, name);
       }
+      // The logo is managed by its own upload/remove endpoints (ADR-103);
+      // never echo a possibly stale brand_logo_url back through settings.
+      const editableSettings: Partial<OrganizationSettings> = { ...settings };
+      delete editableSettings.brand_logo_url;
+      delete editableSettings.brand_logo_uploaded;
       await changePlatformOrganizationSettings(
         accessToken,
         editing.organization.id,
-        settings,
+        editableSettings,
       );
       await organizationsQuery.refetch();
       setEditing(null);
@@ -455,9 +462,11 @@ export function PlatformOrganizationsPage() {
 
       {editing?.settings ? (
         <SettingsDialog
+          accessToken={accessToken}
           copy={copy}
           organization={editing}
           onCancel={() => setEditing(null)}
+          onLogoChanged={() => void organizationsQuery.refetch()}
           onSave={saveSettings}
         />
       ) : null}
@@ -865,15 +874,21 @@ function DeleteDialog({ copy, organization, submitting, onCancel, onConfirm }: {
   );
 }
 
-function SettingsDialog({ copy, organization, onCancel, onSave }: {
+function SettingsDialog({ accessToken, copy, organization, onCancel, onSave, onLogoChanged }: {
+  accessToken: string | undefined;
   copy: ReturnType<typeof platformOrganizationsCopy>;
   organization: PlatformOrganization;
   onCancel: () => void;
   onSave: (name: string, settings: OrganizationSettings) => Promise<void>;
+  onLogoChanged: () => void;
 }) {
   const [name, setName] = useState(organization.organization.name);
   const [settings, setSettings] = useState(organization.settings!);
   const [saving, setSaving] = useState(false);
+  const logoApi = useMemo(
+    () => (accessToken ? platformLogoApi(accessToken, organization.organization.id) : null),
+    [accessToken, organization.organization.id],
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label={copy.settings}>
@@ -893,7 +908,26 @@ function SettingsDialog({ copy, organization, onCancel, onSave }: {
           <TextField label={copy.locale} value={settings.default_locale} required onChange={(default_locale) => setSettings({ ...settings, default_locale })} />
           <TextField label={copy.invitationLifetime} type="number" min={1} value={String(settings.invitation_lifetime_seconds / 3600)} required onChange={(hours) => setSettings({ ...settings, invitation_lifetime_seconds: Number(hours) * 3600 })} />
           <TextField label={copy.brandName} value={settings.brand_name ?? ""} onChange={(brand_name) => setSettings({ ...settings, brand_name })} />
-          <TextField label={copy.brandLogo} type="url" value={settings.brand_logo_url ?? ""} onChange={(brand_logo_url) => setSettings({ ...settings, brand_logo_url })} />
+          {logoApi ? (
+            <div>
+              <span className="text-sm font-semibold text-[var(--text)]">{copy.brandLogoUpload}</span>
+              <div className="mt-2">
+                <TenantLogoUploader
+                  api={logoApi}
+                  currentUrl={settings.brand_logo_url}
+                  uploaded={Boolean(settings.brand_logo_uploaded)}
+                  onChange={(branding) => {
+                    setSettings((current) => ({
+                      ...current,
+                      brand_logo_url: branding.brand_logo_url ?? null,
+                      brand_logo_uploaded: branding.brand_logo_uploaded,
+                    }));
+                    onLogoChanged();
+                  }}
+                />
+              </div>
+            </div>
+          ) : null}
           <TextField label={copy.brandColor} value={settings.brand_primary_color ?? ""} onChange={(brand_primary_color) => setSettings({ ...settings, brand_primary_color })} />
         </div>
         <div className="mt-6 flex justify-end gap-3">
