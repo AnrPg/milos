@@ -30,6 +30,9 @@ import {
 } from "@/i18n/locales";
 import { PageHeader } from "@/components/PageHeader";
 import { ReplayTourButton } from "@/components/onboarding/Onboarding";
+import { TrainingLog } from "@/components/history/TrainingLog";
+import { defaultHistoryKind } from "@/lib/training-log";
+import { fetchMyTrainingLog } from "@/api/training-log";
 
 function CollapsibleSection({
   id,
@@ -324,6 +327,15 @@ export function ProfilePage() {
             {personalPending ? i18n("saving56a2285") : i18n("saveChanges179359b")}
           </button>
         </div>
+
+        {tokens?.access_token && showSelfServiceSurfaces && (user?.role === "member" || user?.role === "athlete") ? (
+          <TrainingLog
+            id="history"
+            queryKey={["me", user.id]}
+            fetchPage={(kind, offset) => fetchMyTrainingLog(tokens.access_token, kind, offset)}
+            defaultKind={defaultHistoryKind(user.role)}
+          />
+        ) : null}
 
         <CollapsibleSection
           id="language-region"

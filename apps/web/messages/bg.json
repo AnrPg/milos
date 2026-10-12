@@ -2580,7 +2580,20 @@
     "subscriptionEndedTitle": "Абонаментът ви изтече",
     "yourSubscription": "Абонаментът ви",
     "subscriptionEndsSoonBody": "{package} изтича на {date} (след {days} дни). Подновете, за да продължите да записвате часове.",
-    "subscriptionEndedBody": "{package} изтече. Запазвате достъп до {date}; подновете дотогава, за да продължите да записвате часове."
+    "subscriptionEndedBody": "{package} изтече. Запазвате достъп до {date}; подновете дотогава, за да продължите да записвате часове.",
+    "historyTitle": "История на тренировките",
+    "historyWorkouts": "Тренировки",
+    "historyClasses": "Часове",
+    "historyLoading": "Зареждане…",
+    "historyError": "Историята не можа да се зареди. Опитайте по-късно.",
+    "historyNoWorkouts": "Все още няма записани тренировки.",
+    "historyNoClasses": "Все още няма минали записани часове.",
+    "historyShowing": "Показани {shown} от {total}",
+    "historyShowMore": "Покажи още",
+    "historyDeletedWorkout": "Изтрита тренировка",
+    "historyMinutes": "{minutes} мин",
+    "historyNoResult": "Няма записан резултат.",
+    "workoutCount": "{count, plural, one {# тренировка} other {# тренировки}}"
   },
   "WorkoutAssistant": {
     "title": "Асистент за тренировки",

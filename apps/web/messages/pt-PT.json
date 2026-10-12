@@ -2580,7 +2580,20 @@
     "subscriptionEndedTitle": "A sua subscrição terminou",
     "yourSubscription": "A sua subscrição",
     "subscriptionEndsSoonBody": "{package} termina a {date} (daqui a {days} dias). Renove para continuar a reservar aulas.",
-    "subscriptionEndedBody": "{package} terminou. Mantém o acesso até {date}; renove antes disso para continuar a reservar aulas."
+    "subscriptionEndedBody": "{package} terminou. Mantém o acesso até {date}; renove antes disso para continuar a reservar aulas.",
+    "historyTitle": "Histórico de treino",
+    "historyWorkouts": "Treinos",
+    "historyClasses": "Aulas",
+    "historyLoading": "A carregar…",
+    "historyError": "Não foi possível carregar o histórico. Tente mais tarde.",
+    "historyNoWorkouts": "Ainda não há treinos registados.",
+    "historyNoClasses": "Ainda não há aulas passadas reservadas.",
+    "historyShowing": "A mostrar {shown} de {total}",
+    "historyShowMore": "Ver mais",
+    "historyDeletedWorkout": "Treino eliminado",
+    "historyMinutes": "{minutes} min",
+    "historyNoResult": "Nenhum resultado registado.",
+    "workoutCount": "{count, plural, one {# treino} other {# treinos}}"
   },
   "WorkoutAssistant": {
     "title": "Assistente de treino",

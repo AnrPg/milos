@@ -2580,7 +2580,20 @@
     "subscriptionEndedTitle": "Ваша подписка закончилась",
     "yourSubscription": "Ваша подписка",
     "subscriptionEndsSoonBody": "{package} заканчивается {date} (через {days} дн.). Продлите, чтобы и дальше записываться на занятия.",
-    "subscriptionEndedBody": "{package} закончилась. Доступ сохраняется до {date}; продлите до этой даты, чтобы и дальше записываться на занятия."
+    "subscriptionEndedBody": "{package} закончилась. Доступ сохраняется до {date}; продлите до этой даты, чтобы и дальше записываться на занятия.",
+    "historyTitle": "История тренировок",
+    "historyWorkouts": "Тренировки",
+    "historyClasses": "Занятия",
+    "historyLoading": "Загрузка…",
+    "historyError": "Не удалось загрузить историю. Попробуйте позже.",
+    "historyNoWorkouts": "Тренировок пока нет.",
+    "historyNoClasses": "Прошедших занятий пока нет.",
+    "historyShowing": "Показано {shown} из {total}",
+    "historyShowMore": "Показать ещё",
+    "historyDeletedWorkout": "Удалённая тренировка",
+    "historyMinutes": "{minutes} мин",
+    "historyNoResult": "Результат не записан.",
+    "workoutCount": "{count, plural, one {# тренировка} few {# тренировки} many {# тренировок} other {# тренировки}}"
   },
   "WorkoutAssistant": {
     "title": "Помощник по тренировкам",

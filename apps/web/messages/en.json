@@ -2580,7 +2580,20 @@
     "subscriptionEndedTitle": "Your subscription has ended",
     "yourSubscription": "Your subscription",
     "subscriptionEndsSoonBody": "{package} ends on {date} (in {days} days). Renew to keep booking classes.",
-    "subscriptionEndedBody": "{package} has ended. You keep access until {date}; renew before then to keep booking classes."
+    "subscriptionEndedBody": "{package} has ended. You keep access until {date}; renew before then to keep booking classes.",
+    "historyTitle": "Training history",
+    "historyWorkouts": "Workouts",
+    "historyClasses": "Classes",
+    "historyLoading": "Loading…",
+    "historyError": "The history could not be loaded. Try again later.",
+    "historyNoWorkouts": "No workouts logged yet.",
+    "historyNoClasses": "No past classes booked yet.",
+    "historyShowing": "Showing {shown} of {total}",
+    "historyShowMore": "Show more",
+    "historyDeletedWorkout": "Deleted workout",
+    "historyMinutes": "{minutes} min",
+    "historyNoResult": "No result logged for this one.",
+    "workoutCount": "{count, plural, one {# workout} other {# workouts}}"
   },
   "WorkoutAssistant": {
     "title": "Workout assistant",

@@ -2580,7 +2580,20 @@
     "subscriptionEndedTitle": "انتهى اشتراكك",
     "yourSubscription": "اشتراكك",
     "subscriptionEndsSoonBody": "ينتهي {package} في {date} (بعد {days} أيام). جدّد لتواصل حجز الحصص.",
-    "subscriptionEndedBody": "انتهى {package}. يبقى وصولك متاحًا حتى {date}؛ جدّد قبل ذلك لتواصل حجز الحصص."
+    "subscriptionEndedBody": "انتهى {package}. يبقى وصولك متاحًا حتى {date}؛ جدّد قبل ذلك لتواصل حجز الحصص.",
+    "historyTitle": "سجل التدريب",
+    "historyWorkouts": "التمارين",
+    "historyClasses": "الحصص",
+    "historyLoading": "جارٍ التحميل…",
+    "historyError": "تعذّر تحميل السجل. حاول لاحقًا.",
+    "historyNoWorkouts": "لا توجد تمارين مسجّلة بعد.",
+    "historyNoClasses": "لا توجد حصص سابقة محجوزة بعد.",
+    "historyShowing": "عرض {shown} من {total}",
+    "historyShowMore": "عرض المزيد",
+    "historyDeletedWorkout": "تمرين محذوف",
+    "historyMinutes": "{minutes} د",
+    "historyNoResult": "لم تُسجَّل نتيجة لهذه الحصة.",
+    "workoutCount": "{count, plural, one {تمرين واحد} two {تمرينان} few {# تمارين} many {# تمرينًا} other {# تمرين}}"
   },
   "WorkoutAssistant": {
     "title": "مساعد التمارين",

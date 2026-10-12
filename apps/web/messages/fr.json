@@ -2580,7 +2580,20 @@
     "subscriptionEndedTitle": "Votre abonnement est terminé",
     "yourSubscription": "Votre abonnement",
     "subscriptionEndsSoonBody": "{package} se termine le {date} (dans {days} jours). Renouvelez pour continuer à réserver des cours.",
-    "subscriptionEndedBody": "{package} est terminé. Vous gardez l'accès jusqu'au {date} ; renouvelez d'ici là pour continuer à réserver des cours."
+    "subscriptionEndedBody": "{package} est terminé. Vous gardez l'accès jusqu'au {date} ; renouvelez d'ici là pour continuer à réserver des cours.",
+    "historyTitle": "Historique d'entraînement",
+    "historyWorkouts": "Séances",
+    "historyClasses": "Cours",
+    "historyLoading": "Chargement…",
+    "historyError": "L'historique n'a pas pu être chargé. Réessayez plus tard.",
+    "historyNoWorkouts": "Aucune séance enregistrée pour l'instant.",
+    "historyNoClasses": "Aucun cours passé réservé pour l'instant.",
+    "historyShowing": "{shown} sur {total} affichés",
+    "historyShowMore": "Voir plus",
+    "historyDeletedWorkout": "Séance supprimée",
+    "historyMinutes": "{minutes} min",
+    "historyNoResult": "Aucun résultat enregistré.",
+    "workoutCount": "{count, plural, one {# séance} other {# séances}}"
   },
   "WorkoutAssistant": {
     "title": "Assistant d’entraînement",

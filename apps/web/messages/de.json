@@ -2580,7 +2580,20 @@
     "subscriptionEndedTitle": "Ihr Abo ist abgelaufen",
     "yourSubscription": "Ihr Abo",
     "subscriptionEndsSoonBody": "{package} endet am {date} (in {days} Tagen). Verlängern Sie, um weiter Kurse buchen zu können.",
-    "subscriptionEndedBody": "{package} ist abgelaufen. Sie haben noch bis {date} Zugang; verlängern Sie bis dahin, um weiter Kurse buchen zu können."
+    "subscriptionEndedBody": "{package} ist abgelaufen. Sie haben noch bis {date} Zugang; verlängern Sie bis dahin, um weiter Kurse buchen zu können.",
+    "historyTitle": "Trainingsverlauf",
+    "historyWorkouts": "Workouts",
+    "historyClasses": "Kurse",
+    "historyLoading": "Wird geladen…",
+    "historyError": "Der Verlauf konnte nicht geladen werden. Versuchen Sie es später erneut.",
+    "historyNoWorkouts": "Noch keine Workouts erfasst.",
+    "historyNoClasses": "Noch keine vergangenen Kurse gebucht.",
+    "historyShowing": "{shown} von {total} angezeigt",
+    "historyShowMore": "Mehr anzeigen",
+    "historyDeletedWorkout": "Gelöschtes Workout",
+    "historyMinutes": "{minutes} Min.",
+    "historyNoResult": "Kein Ergebnis erfasst.",
+    "workoutCount": "{count, plural, one {# Workout} other {# Workouts}}"
   },
   "WorkoutAssistant": {
     "title": "Trainingsassistent",

@@ -2580,7 +2580,20 @@
     "subscriptionEndedTitle": "Η συνδρομή σας έληξε",
     "yourSubscription": "Η συνδρομή σας",
     "subscriptionEndsSoonBody": "Η συνδρομή {package} λήγει στις {date} (σε {days} ημέρες). Ανανεώστε για να συνεχίσετε να κλείνετε μαθήματα.",
-    "subscriptionEndedBody": "Η συνδρομή {package} έληξε. Διατηρείτε πρόσβαση έως τις {date}· ανανεώστε μέχρι τότε για να συνεχίσετε να κλείνετε μαθήματα."
+    "subscriptionEndedBody": "Η συνδρομή {package} έληξε. Διατηρείτε πρόσβαση έως τις {date}· ανανεώστε μέχρι τότε για να συνεχίσετε να κλείνετε μαθήματα.",
+    "historyTitle": "Ιστορικό προπόνησης",
+    "historyWorkouts": "Προπονήσεις",
+    "historyClasses": "Μαθήματα",
+    "historyLoading": "Φόρτωση…",
+    "historyError": "Δεν ήταν δυνατή η φόρτωση του ιστορικού. Δοκιμάστε ξανά αργότερα.",
+    "historyNoWorkouts": "Δεν έχουν καταγραφεί προπονήσεις ακόμη.",
+    "historyNoClasses": "Δεν υπάρχουν ακόμη προηγούμενα μαθήματα.",
+    "historyShowing": "Εμφάνιση {shown} από {total}",
+    "historyShowMore": "Περισσότερα",
+    "historyDeletedWorkout": "Διαγραμμένη προπόνηση",
+    "historyMinutes": "{minutes} λεπ.",
+    "historyNoResult": "Δεν καταγράφηκε αποτέλεσμα.",
+    "workoutCount": "{count, plural, one {# προπόνηση} other {# προπονήσεις}}"
   },
   "WorkoutAssistant": {
     "title": "Βοηθός προπόνησης",

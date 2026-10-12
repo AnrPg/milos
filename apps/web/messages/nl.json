@@ -2580,7 +2580,20 @@
     "subscriptionEndedTitle": "Je abonnement is afgelopen",
     "yourSubscription": "Je abonnement",
     "subscriptionEndsSoonBody": "{package} loopt af op {date} (over {days} dagen). Verleng om lessen te blijven boeken.",
-    "subscriptionEndedBody": "{package} is afgelopen. Je houdt toegang tot {date}; verleng vóór die datum om lessen te blijven boeken."
+    "subscriptionEndedBody": "{package} is afgelopen. Je houdt toegang tot {date}; verleng vóór die datum om lessen te blijven boeken.",
+    "historyTitle": "Trainingsgeschiedenis",
+    "historyWorkouts": "Workouts",
+    "historyClasses": "Lessen",
+    "historyLoading": "Laden…",
+    "historyError": "De geschiedenis kon niet worden geladen. Probeer het later opnieuw.",
+    "historyNoWorkouts": "Nog geen workouts gelogd.",
+    "historyNoClasses": "Nog geen eerdere lessen geboekt.",
+    "historyShowing": "{shown} van {total} getoond",
+    "historyShowMore": "Meer tonen",
+    "historyDeletedWorkout": "Verwijderde workout",
+    "historyMinutes": "{minutes} min",
+    "historyNoResult": "Geen resultaat gelogd.",
+    "workoutCount": "{count, plural, one {# workout} other {# workouts}}"
   },
   "WorkoutAssistant": {
     "title": "Trainingsassistent",

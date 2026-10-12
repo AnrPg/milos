@@ -2580,7 +2580,20 @@
     "subscriptionEndedTitle": "Il tuo abbonamento è scaduto",
     "yourSubscription": "Il tuo abbonamento",
     "subscriptionEndsSoonBody": "{package} scade il {date} (tra {days} giorni). Rinnova per continuare a prenotare le lezioni.",
-    "subscriptionEndedBody": "{package} è scaduto. Mantieni l'accesso fino al {date}; rinnova entro quella data per continuare a prenotare le lezioni."
+    "subscriptionEndedBody": "{package} è scaduto. Mantieni l'accesso fino al {date}; rinnova entro quella data per continuare a prenotare le lezioni.",
+    "historyTitle": "Storico allenamenti",
+    "historyWorkouts": "Allenamenti",
+    "historyClasses": "Lezioni",
+    "historyLoading": "Caricamento…",
+    "historyError": "Impossibile caricare lo storico. Riprova più tardi.",
+    "historyNoWorkouts": "Nessun allenamento registrato.",
+    "historyNoClasses": "Nessuna lezione passata prenotata.",
+    "historyShowing": "{shown} di {total} mostrati",
+    "historyShowMore": "Mostra altro",
+    "historyDeletedWorkout": "Allenamento eliminato",
+    "historyMinutes": "{minutes} min",
+    "historyNoResult": "Nessun risultato registrato.",
+    "workoutCount": "{count, plural, one {# allenamento} other {# allenamenti}}"
   },
   "WorkoutAssistant": {
     "title": "Assistente allenamento",

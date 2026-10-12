@@ -904,6 +904,23 @@ export interface paths {
         patch: operations["MilosTrainingWeb.AdminScheduleController.update_slot"];
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The signed-in user's training log (workouts or booked classes) with performance */
+        get: operations["MilosTrainingWeb.TrainingLogController.mine"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/athletes/{id}/drill-down": {
         parameters: {
             query?: never;
@@ -1952,6 +1969,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/users/{id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A user's training log (workouts or booked classes) with performance */
+        get: operations["MilosTrainingWeb.TrainingLogController.for_user"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/search/users": {
         parameters: {
             query?: never;
@@ -2945,6 +2979,58 @@ export interface components {
             params?: {
                 [key: string]: unknown;
             };
+        };
+        /** TrainingLogPage */
+        TrainingLogPage: {
+            entries: {
+                class?: {
+                    attendance?: string | null;
+                    duration_minutes?: number | null;
+                    name?: string | null;
+                    type_name?: string | null;
+                } | null;
+                id: string;
+                occurred_at?: string | null;
+                performance: {
+                    completed_at?: string | null;
+                    elapsed_ms?: number | null;
+                    execution_id: string;
+                    scale_level_slug?: string | null;
+                    scores: {
+                        score_type?: string | null;
+                        section_id?: string | null;
+                        section_name?: string | null;
+                        unit?: string | null;
+                        value?: unknown;
+                    }[];
+                    started_at?: string | null;
+                    status: string;
+                } | null;
+                source?: string | null;
+                workout: {
+                    id?: string;
+                    sections?: {
+                        exercises?: {
+                            [key: string]: unknown;
+                        }[];
+                        format?: string;
+                        id?: string;
+                        name?: string | null;
+                        nested?: boolean;
+                        score_type?: string | null;
+                        timer_config?: {
+                            [key: string]: unknown;
+                        } | null;
+                    }[];
+                    title?: string | null;
+                    type?: string | null;
+                } | null;
+            }[];
+            /** @enum {string} */
+            kind: "workouts" | "classes";
+            next_offset: number | null;
+            offset: number;
+            total: number;
         };
         ValidationError: {
             /** @enum {string} */
@@ -6754,6 +6840,80 @@ export interface operations {
                         slot: {
                             [key: string]: unknown;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.TrainingLogController.mine": {
+        parameters: {
+            query?: {
+                kind?: "workouts" | "classes";
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Training log page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: {
+                            class?: {
+                                attendance?: string | null;
+                                duration_minutes?: number | null;
+                                name?: string | null;
+                                type_name?: string | null;
+                            } | null;
+                            id: string;
+                            occurred_at?: string | null;
+                            performance: {
+                                completed_at?: string | null;
+                                elapsed_ms?: number | null;
+                                execution_id: string;
+                                scale_level_slug?: string | null;
+                                scores: {
+                                    score_type?: string | null;
+                                    section_id?: string | null;
+                                    section_name?: string | null;
+                                    unit?: string | null;
+                                    value?: unknown;
+                                }[];
+                                started_at?: string | null;
+                                status: string;
+                            } | null;
+                            source?: string | null;
+                            workout: {
+                                id?: string;
+                                sections?: {
+                                    exercises?: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    format?: string;
+                                    id?: string;
+                                    name?: string | null;
+                                    nested?: boolean;
+                                    score_type?: string | null;
+                                    timer_config?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                                title?: string | null;
+                                type?: string | null;
+                            } | null;
+                        }[];
+                        /** @enum {string} */
+                        kind: "workouts" | "classes";
+                        next_offset: number | null;
+                        offset: number;
+                        total: number;
                     };
                 };
             };
@@ -12212,6 +12372,82 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.TrainingLogController.for_user": {
+        parameters: {
+            query?: {
+                kind?: "workouts" | "classes";
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Training log page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: {
+                            class?: {
+                                attendance?: string | null;
+                                duration_minutes?: number | null;
+                                name?: string | null;
+                                type_name?: string | null;
+                            } | null;
+                            id: string;
+                            occurred_at?: string | null;
+                            performance: {
+                                completed_at?: string | null;
+                                elapsed_ms?: number | null;
+                                execution_id: string;
+                                scale_level_slug?: string | null;
+                                scores: {
+                                    score_type?: string | null;
+                                    section_id?: string | null;
+                                    section_name?: string | null;
+                                    unit?: string | null;
+                                    value?: unknown;
+                                }[];
+                                started_at?: string | null;
+                                status: string;
+                            } | null;
+                            source?: string | null;
+                            workout: {
+                                id?: string;
+                                sections?: {
+                                    exercises?: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    format?: string;
+                                    id?: string;
+                                    name?: string | null;
+                                    nested?: boolean;
+                                    score_type?: string | null;
+                                    timer_config?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                                title?: string | null;
+                                type?: string | null;
+                            } | null;
+                        }[];
+                        /** @enum {string} */
+                        kind: "workouts" | "classes";
+                        next_offset: number | null;
+                        offset: number;
+                        total: number;
                     };
                 };
             };

@@ -265,6 +265,196 @@
         ],
         "type": "object"
       },
+      "TrainingLogPage": {
+        "properties": {
+          "entries": {
+            "items": {
+              "properties": {
+                "class": {
+                  "nullable": true,
+                  "properties": {
+                    "attendance": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "duration_minutes": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "type_name": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "occurred_at": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "performance": {
+                  "nullable": true,
+                  "properties": {
+                    "completed_at": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "elapsed_ms": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "execution_id": {
+                      "type": "string"
+                    },
+                    "scale_level_slug": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "scores": {
+                      "items": {
+                        "properties": {
+                          "score_type": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "section_id": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "section_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "unit": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "value": {
+                            "nullable": true
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "started_at": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "execution_id",
+                    "status",
+                    "scores"
+                  ],
+                  "type": "object"
+                },
+                "source": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "workout": {
+                  "nullable": true,
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "sections": {
+                      "items": {
+                        "properties": {
+                          "exercises": {
+                            "items": {
+                              "additionalProperties": true,
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "format": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "nested": {
+                            "type": "boolean"
+                          },
+                          "score_type": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "timer_config": {
+                            "additionalProperties": true,
+                            "nullable": true,
+                            "type": "object"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "title": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "type": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "required": [
+                "id",
+                "workout",
+                "performance"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "kind": {
+            "enum": [
+              "workouts",
+              "classes"
+            ],
+            "type": "string"
+          },
+          "next_offset": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kind",
+          "total",
+          "offset",
+          "next_offset",
+          "entries"
+        ],
+        "title": "TrainingLogPage",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "code": {
@@ -9834,6 +10024,251 @@
         "summary": "Update a scheduled class slot",
         "tags": [
           "Admin Schedule"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/history": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.TrainingLogController.mine",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "kind",
+            "schema": {
+              "default": "workouts",
+              "enum": [
+                "workouts",
+                "classes"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "entries": {
+                      "items": {
+                        "properties": {
+                          "class": {
+                            "nullable": true,
+                            "properties": {
+                              "attendance": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "duration_minutes": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "type_name": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "occurred_at": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "performance": {
+                            "nullable": true,
+                            "properties": {
+                              "completed_at": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "elapsed_ms": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "execution_id": {
+                                "type": "string"
+                              },
+                              "scale_level_slug": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "scores": {
+                                "items": {
+                                  "properties": {
+                                    "score_type": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "section_id": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "section_name": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "unit": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "value": {
+                                      "nullable": true
+                                    }
+                                  },
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "started_at": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "execution_id",
+                              "status",
+                              "scores"
+                            ],
+                            "type": "object"
+                          },
+                          "source": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "workout": {
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "sections": {
+                                "items": {
+                                  "properties": {
+                                    "exercises": {
+                                      "items": {
+                                        "additionalProperties": true,
+                                        "type": "object"
+                                      },
+                                      "type": "array"
+                                    },
+                                    "format": {
+                                      "type": "string"
+                                    },
+                                    "id": {
+                                      "type": "string"
+                                    },
+                                    "name": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "nested": {
+                                      "type": "boolean"
+                                    },
+                                    "score_type": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "timer_config": {
+                                      "additionalProperties": true,
+                                      "nullable": true,
+                                      "type": "object"
+                                    }
+                                  },
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "title": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "type": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "workout",
+                          "performance"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "kind": {
+                      "enum": [
+                        "workouts",
+                        "classes"
+                      ],
+                      "type": "string"
+                    },
+                    "next_offset": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "total",
+                    "offset",
+                    "next_offset",
+                    "entries"
+                  ],
+                  "title": "TrainingLogPage",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Training log page"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The signed-in user's training log (workouts or booked classes) with performance",
+        "tags": [
+          "Training Log"
         ]
       }
     },
@@ -25732,6 +26167,260 @@
         "summary": "List all members with finance summary",
         "tags": [
           "Admin Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/users/{id}/history": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.TrainingLogController.for_user",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "schema": {
+              "default": "workouts",
+              "enum": [
+                "workouts",
+                "classes"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "entries": {
+                      "items": {
+                        "properties": {
+                          "class": {
+                            "nullable": true,
+                            "properties": {
+                              "attendance": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "duration_minutes": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "type_name": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "occurred_at": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "performance": {
+                            "nullable": true,
+                            "properties": {
+                              "completed_at": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "elapsed_ms": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "execution_id": {
+                                "type": "string"
+                              },
+                              "scale_level_slug": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "scores": {
+                                "items": {
+                                  "properties": {
+                                    "score_type": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "section_id": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "section_name": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "unit": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "value": {
+                                      "nullable": true
+                                    }
+                                  },
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "started_at": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "execution_id",
+                              "status",
+                              "scores"
+                            ],
+                            "type": "object"
+                          },
+                          "source": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "workout": {
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "sections": {
+                                "items": {
+                                  "properties": {
+                                    "exercises": {
+                                      "items": {
+                                        "additionalProperties": true,
+                                        "type": "object"
+                                      },
+                                      "type": "array"
+                                    },
+                                    "format": {
+                                      "type": "string"
+                                    },
+                                    "id": {
+                                      "type": "string"
+                                    },
+                                    "name": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "nested": {
+                                      "type": "boolean"
+                                    },
+                                    "score_type": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "timer_config": {
+                                      "additionalProperties": true,
+                                      "nullable": true,
+                                      "type": "object"
+                                    }
+                                  },
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "title": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "type": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "workout",
+                          "performance"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "kind": {
+                      "enum": [
+                        "workouts",
+                        "classes"
+                      ],
+                      "type": "string"
+                    },
+                    "next_offset": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "total",
+                    "offset",
+                    "next_offset",
+                    "entries"
+                  ],
+                  "title": "TrainingLogPage",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Training log page"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A user's training log (workouts or booked classes) with performance",
+        "tags": [
+          "Training Log"
         ]
       }
     },

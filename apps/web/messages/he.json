@@ -2580,7 +2580,20 @@
     "subscriptionEndedTitle": "המנוי שלך הסתיים",
     "yourSubscription": "המנוי שלך",
     "subscriptionEndsSoonBody": "{package} מסתיים ב־{date} (בעוד {days} ימים). חדשו כדי להמשיך להזמין שיעורים.",
-    "subscriptionEndedBody": "{package} הסתיים. הגישה נשמרת עד {date}; חדשו עד אז כדי להמשיך להזמין שיעורים."
+    "subscriptionEndedBody": "{package} הסתיים. הגישה נשמרת עד {date}; חדשו עד אז כדי להמשיך להזמין שיעורים.",
+    "historyTitle": "היסטוריית אימונים",
+    "historyWorkouts": "אימונים",
+    "historyClasses": "שיעורים",
+    "historyLoading": "טוען…",
+    "historyError": "לא ניתן היה לטעון את ההיסטוריה. נסו שוב מאוחר יותר.",
+    "historyNoWorkouts": "עדיין לא נרשמו אימונים.",
+    "historyNoClasses": "עדיין אין שיעורים קודמים.",
+    "historyShowing": "מוצגים {shown} מתוך {total}",
+    "historyShowMore": "הצג עוד",
+    "historyDeletedWorkout": "אימון שנמחק",
+    "historyMinutes": "{minutes} דק׳",
+    "historyNoResult": "לא נרשמה תוצאה.",
+    "workoutCount": "{count, plural, one {אימון אחד} two {שני אימונים} other {# אימונים}}"
   },
   "WorkoutAssistant": {
     "title": "עוזר אימונים",
