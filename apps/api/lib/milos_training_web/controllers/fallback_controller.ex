@@ -1261,6 +1261,52 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-099 reviewed tenant purge workflow.
+  def call(conn, {:error, :organization_purge_exists}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "organization_purge_exists",
+      error: "This organization already has an open purge request"
+    })
+  end
+
+  def call(conn, {:error, :organization_purge_in_progress}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "organization_purge_in_progress",
+      error: "Cancel the open purge request before changing this organization's status"
+    })
+  end
+
+  def call(conn, {:error, :invalid_purge_transition}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "invalid_purge_transition",
+      error: "The purge request is not in a state that allows this action"
+    })
+  end
+
+  def call(conn, {:error, :purge_confirmation_mismatch}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "purge_confirmation_mismatch",
+      error: "Type the organization slug exactly to approve the purge"
+    })
+  end
+
+  def call(conn, {:error, :purge_job_unavailable}) do
+    conn
+    |> put_status(:service_unavailable)
+    |> json(%{
+      code: "purge_job_unavailable",
+      error: "Background processing is unavailable; resume the purge later"
+    })
+  end
+
   def call(conn, {:error, _reason}) do
     conn
     |> put_status(:internal_server_error)

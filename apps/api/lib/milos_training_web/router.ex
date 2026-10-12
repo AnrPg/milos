@@ -460,6 +460,14 @@ defmodule MilosTrainingWeb.Router do
     patch("/organizations/:id/lifecycle", PlatformOrganizationController, :lifecycle)
     patch("/organizations/:id/name", PlatformOrganizationController, :rename)
     patch("/organizations/:id/settings", PlatformOrganizationController, :settings)
+
+    # ADR-099 reviewed tenant export/purge workflow.
+    get("/organization-purges", PlatformOrganizationPurgeController, :index)
+    post("/organizations/:id/purge", PlatformOrganizationPurgeController, :create)
+    get("/organizations/:id/purge", PlatformOrganizationPurgeController, :show)
+    post("/organizations/:id/purge/approve", PlatformOrganizationPurgeController, :approve)
+    post("/organizations/:id/purge/cancel", PlatformOrganizationPurgeController, :cancel)
+    post("/organizations/:id/purge/resume", PlatformOrganizationPurgeController, :resume)
   end
 
   scope "/api/me", MilosTrainingWeb do
