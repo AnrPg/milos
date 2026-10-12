@@ -257,6 +257,21 @@ defmodule MilosTrainingWeb.Router do
     get("/sources", TrainingLogController, :sources)
   end
 
+  # ADR-106: the acting user's own injury safety warnings for a workout they
+  # are about to start (athletes and members alike).
+  scope "/api/org/:organization_slug/me/workouts/:workout_id", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :tenant_member,
+      :tenant_write_rate_limited
+    ])
+
+    get("/injury-warnings", MyInjuryWarningController, :show)
+    post("/injury-warnings/acknowledge", MyInjuryWarningController, :acknowledge)
+  end
+
   scope "/api/org/:organization_slug", MilosTrainingWeb do
     pipe_through([
       :api,
@@ -463,6 +478,10 @@ defmodule MilosTrainingWeb.Router do
     get("/wellbeing/injuries", AdminWellbeingController, :index)
     post("/wellbeing/users/:id/injuries", AdminWellbeingController, :create)
     patch("/wellbeing/injuries/:id/heal", AdminWellbeingController, :heal)
+    # ADR-106 injury-aware workout safety warnings (informational only).
+    post("/wellbeing/injury-warnings", AdminInjuryWarningController, :evaluate)
+    post("/wellbeing/injury-warnings/acknowledge", AdminInjuryWarningController, :acknowledge)
+    get("/schedule/slots/:id/injury-warnings", AdminInjuryWarningController, :slot)
   end
 
   scope "/api/platform", MilosTrainingWeb do
