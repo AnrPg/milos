@@ -48,7 +48,10 @@
     "settings": "Settings",
     "myTraining": "My training",
     "staffView": "Staff view",
-    "inventory": "Inventory"
+    "inventory": "Inventory",
+    "menu": "Menu",
+    "notifications": "Notifications",
+    "unreadNotifications": "{count, plural, one {# unread notification} other {# unread notifications}}"
   },
   "Profile": {
     "eyebrow": "Profile",

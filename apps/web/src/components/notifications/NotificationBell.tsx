@@ -465,7 +465,20 @@ const FILTER_TYPES: Record<FilterTab, string[] | null> = {
   ],
 };
 
-export function NotificationBell() {
+const OPEN_EVENT = "milos:open-notifications";
+
+/** Opens the inbox from elsewhere, e.g. the avatar menu on phones (ADR-103). */
+export function openNotifications() {
+  window.dispatchEvent(new Event(OPEN_EVENT));
+}
+
+export function NotificationBell({
+  onUnreadChange,
+  triggerClassName = "flex",
+}: {
+  onUnreadChange?: (count: number) => void;
+  triggerClassName?: string;
+} = {}) {
   const i18n = useUiTranslations();
   const FILTER_TABS: { key: FilterTab; label: string }[] = [
     { key: "all", label: i18n("all6a72085") },
@@ -653,6 +666,19 @@ export function NotificationBell() {
     return i18n("noNotificationsYet5537c60");
   }, [i18n, markAllRead.isPending, notificationQuery.data, notificationQuery.isError, notificationQuery.isPending]);
 
+  useEffect(() => {
+    onUnreadChange?.(typeof unreadCount === "number" ? unreadCount : 0);
+  }, [onUnreadChange, unreadCount]);
+
+  useEffect(() => {
+    const handler = () => {
+      setOpen(true);
+      void notificationQuery.refetch();
+    };
+    window.addEventListener(OPEN_EVENT, handler);
+    return () => window.removeEventListener(OPEN_EVENT, handler);
+  }, [notificationQuery]);
+
   if (status !== "authenticated" || !tokens?.access_token) return null;
 
   function openPanel() {
@@ -687,7 +713,7 @@ export function NotificationBell() {
       <button
         aria-expanded={open}
         aria-label={i18n("openNotificationsac4735e")}
-        className="flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition-colors"
+        className={`${triggerClassName} shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition-colors`}
         style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
         onClick={openPanel}
         type="button"

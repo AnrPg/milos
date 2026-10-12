@@ -80,11 +80,14 @@ export function PriorityNav({
 
   return (
     <div ref={containerRef} className="relative flex min-w-0 flex-1 items-center">
-      <div ref={measureRef} aria-hidden="true" className="invisible absolute start-0 top-0 flex gap-1" style={{ pointerEvents: "none" }}>
-        {links.map((link) => (
-          <span key={link.id} className={pill}>{link.label}</span>
-        ))}
-        <span className={pill}>{moreLabel} ▾</span>
+      {/* Measures each label's natural width without taking space or scrolling the page. */}
+      <div aria-hidden="true" className="invisible absolute start-0 top-0 h-0 w-0 overflow-hidden" style={{ pointerEvents: "none" }}>
+        <div ref={measureRef} className="flex w-max gap-1">
+          {links.map((link) => (
+            <span key={link.id} className={pill}>{link.label}</span>
+          ))}
+          <span className={pill}>{moreLabel} ▾</span>
+        </div>
       </div>
 
       <div className="flex min-w-0 items-center gap-1">

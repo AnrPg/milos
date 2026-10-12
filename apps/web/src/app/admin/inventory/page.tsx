@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export default function AdminInventoryPage() {
   return (
-    <AuthGuard roles={["admin"]}>
+    <AuthGuard roles={["admin", "member", "athlete"]}>
       <Suspense>
         <InventoryPage />
       </Suspense>

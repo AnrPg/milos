@@ -33,6 +33,8 @@ import {
 import { setView, useView } from "@/lib/view-mode";
 import { PriorityNav } from "@/components/nav/PriorityNav";
 import { SectionTabs } from "@/components/nav/SectionTabs";
+import { MobileNavMenu } from "@/components/nav/MobileNavMenu";
+import { openNotifications } from "@/components/notifications/NotificationBell";
 import { SemanticLabel } from "@/components/semantic-label";
 import { entitledFeatures } from "@/components/client/entitlement";
 import { useClientEntitlement } from "@/components/client/use-client-entitlement";
@@ -92,6 +94,7 @@ export function TopNav() {
   const queryClient = useQueryClient();
   const [menuOpen, setMenuOpen] = useState(false);
   const [msgOpen, setMsgOpen] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
   const authenticated = status === "authenticated" && Boolean(tokens?.access_token) && Boolean(currentUser);
 
@@ -111,7 +114,10 @@ export function TopNav() {
   const selectedOrganizationSlug = useOrganizationSlug();
   const currentMembership = selectedMembership(memberships, selectedOrganizationSlug);
   const role = surfaceRoleForMembership(currentMembership, view);
-  const canSwitchView = hasStaffRole(currentMembership) && clientRole(currentMembership) !== null;
+  const canSwitchView =
+    hasStaffRole(currentMembership) &&
+    clientRole(currentMembership) !== null &&
+    surfaceRoleForMembership(currentMembership, "staff") === "admin";
   const showSelfServiceSurfaces =
     role !== "admin" && Boolean(currentUser) && showsTenantSelfServiceSurfaces(currentUser);
   const financeQuery = useQuery({
@@ -133,6 +139,9 @@ export function TopNav() {
   const brandName = tenantBrandName(memberships, selectedOrganizationSlug) ?? i18n("milosTraining5b1a1c1");
   const hasTenantMembership = memberships.length > 0;
   const showTenantShell = hasTenantMembership;
+  const mobileLinks = isVendor
+    ? [{ id: "platform", href: "/platform/organizations", label: t("platform") }, ...(showTenantShell ? navLinks : [])]
+    : navLinks;
   const unreadQuery = useQuery({
     queryKey: ["messages", "unread", selectedOrganizationSlug],
     enabled: authenticated && showTenantShell && Boolean(selectedOrganizationSlug),
@@ -177,21 +186,24 @@ export function TopNav() {
         minHeight: "3.25rem",
       }}
     >
-      <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 px-2 py-1 sm:flex sm:flex-wrap sm:gap-x-4 sm:px-5">
+      <div className="flex w-full items-center gap-2 px-2 py-1 sm:flex-wrap sm:gap-x-4 sm:px-5">
+        {showTenantShell || isVendor ? (
+          <MobileNavMenu links={mobileLinks} activeId={activeNavId} label={t("menu")} />
+        ) : null}
         <Link
           href="/"
-          className="col-span-2 block min-w-0 whitespace-normal break-words text-xs font-bold uppercase leading-tight sm:col-span-1 sm:max-w-[32rem] sm:shrink-0"
+          className="block min-w-0 flex-1 truncate text-xs font-bold uppercase leading-tight sm:max-w-[32rem] sm:flex-none sm:shrink-0 sm:whitespace-normal sm:break-words"
           style={{ color: "var(--text)" }}
           title={brandName}
         >
           {brandName}
         </Link>
 
-        <nav className="order-3 col-start-1 row-start-2 flex min-w-0 flex-1 items-center gap-0.5 overflow-visible sm:order-none sm:col-span-1 sm:row-start-auto sm:gap-1">
+        <nav className="hidden min-w-0 flex-1 items-center gap-1 overflow-visible sm:flex">
           {isVendor ? (
             <Link
               href="/platform/organizations"
-              className="whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold transition-colors sm:px-3 sm:text-sm"
+              className="whitespace-nowrap rounded-full px-3 py-1 text-sm font-semibold transition-colors"
               style={{
                 background: pathActive(pathname, "/platform") ? "var(--border)" : "transparent",
                 color: pathActive(pathname, "/platform") ? "var(--text)" : "var(--dim)",
@@ -205,8 +217,9 @@ export function TopNav() {
           ) : null}
         </nav>
 
-        <div className="col-start-2 row-start-2 ms-auto flex shrink-0 items-center gap-1 justify-self-end sm:row-start-auto sm:gap-2">
-          {showTenantShell ? <NotificationBell /> : null}
+        <div className="ms-auto flex shrink-0 items-center gap-1 sm:gap-2">
+          {/* Phones open notifications from the avatar menu (ADR-103). */}
+          {showTenantShell ? <NotificationBell onUnreadChange={setUnreadNotifications} triggerClassName="hidden sm:flex" /> : null}
 
           {showTenantShell ? (
             <div className="relative shrink-0">
@@ -238,7 +251,7 @@ export function TopNav() {
 
           <div ref={menuRef} className="relative shrink-0">
             <button
-              className="flex items-center gap-2 rounded-full py-1 ps-1 pe-3 text-sm font-semibold transition-colors"
+              className="relative flex items-center gap-2 rounded-full py-1 ps-1 pe-3 text-sm font-semibold transition-colors"
               style={{ background: "var(--panel)", color: "var(--text)" }}
               onClick={() => setMenuOpen((value) => !value)}
               type="button"
@@ -267,6 +280,13 @@ export function TopNav() {
                   <span aria-hidden="true" className="absolute -end-1.5 -top-1.5 h-2 w-2 rounded-full" style={{ background: "var(--danger)" }} />
                 ) : null}
               </span>
+              {unreadNotifications > 0 ? (
+                <span
+                  aria-label={t("unreadNotifications", { count: unreadNotifications })}
+                  className="absolute -end-0.5 -top-0.5 h-3 w-3 rounded-full sm:hidden"
+                  style={{ background: "var(--danger)", border: "2px solid var(--bg)" }}
+                />
+              ) : null}
             </button>
 
             {menuOpen ? (
@@ -285,6 +305,24 @@ export function TopNav() {
                     {isVendor ? t("platform") : <SemanticLabel value={currentMembership?.role ?? currentUser.role} />}
                   </p>
                 </div>
+                {showTenantShell ? (
+                  <button
+                    type="button"
+                    className="flex w-full items-center justify-between gap-2 px-4 py-2.5 text-start text-sm font-semibold transition-colors hover:bg-[var(--border)] sm:hidden"
+                    style={{ color: "var(--text-soft)" }}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      openNotifications();
+                    }}
+                  >
+                    {t("notifications")}
+                    {unreadNotifications > 0 ? (
+                      <span className="rounded-full px-1.5 text-[10px] font-bold" style={{ background: "var(--danger)", color: "#fff" }}>
+                        {unreadNotifications > 99 ? "99+" : unreadNotifications}
+                      </span>
+                    ) : null}
+                  </button>
+                ) : null}
                 <Link
                   href="/profile"
                   className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[var(--border)]"

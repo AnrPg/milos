@@ -37,8 +37,11 @@ front desk finance access each gym unlocks — is
   Wellbeing).
 - Several roles: staff pages merge by union; a client role adds *My
   training* in the account menu.
-- The bar uses priority+ overflow so it fits a narrow phone in every
-  language.
+- Small screens (below the `sm` breakpoint): the header holds only a ☰
+  button (opens every link of the bar as a vertical list), the gym name,
+  Messages and the avatar. Notifications move into the avatar menu, and
+  the avatar shows a red dot while any are unread. Larger screens keep the
+  bar with priority+ overflow ("More").
 
 ## Rationale
 Keeping the screens people already know limits relearning; hiding what a

@@ -57,6 +57,7 @@ describe("surfaceRole", () => {
     expect(surfaceRole(coachAthlete, "client")).toBe("athlete");
     expect(surfaceRole({ role: "coach", roles: ["coach"] }, "client")).toBe("admin");
     expect(surfaceRole({ role: "member" })).toBe("member");
+    expect(surfaceRole({ role: "janitor", roles: ["janitor", "member"] })).toBe("member");
   });
 });
 

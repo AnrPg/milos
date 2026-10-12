@@ -52,6 +52,10 @@ export function surfaceRole(
   view: View = "staff",
 ): "admin" | "member" | "athlete" {
   const client = clientRole(membership);
+  // A janitor who also trains keeps the client pages; the cleaning log is a
+  // link in that bar (navigation-by-role.md §2).
+  const staff = membershipRoles(membership).filter((role) => (STAFF_ROLES as readonly string[]).includes(role));
+  if (client && staff.length > 0 && staff.every((role) => role === "janitor")) return client;
   if (hasStaffRole(membership) && !(view === "client" && client)) return "admin";
   return client ?? "member";
 }
@@ -127,6 +131,9 @@ export function clientNavItems(role: "member" | "athlete", membership?: Membersh
   ];
   if (can(membership, "record_cleaning") && !can(membership, "manage_cleaning_areas") && !can(membership, "take_payments")) {
     items.push({ id: "cleaning", href: "/admin/cleaning", labelKey: "cleaningLog", match: ["/admin/cleaning"], scoped: true });
+  }
+  if (can(membership, "report_inventory") && !can(membership, "manage_inventory")) {
+    items.push({ id: "inventory", href: "/admin/inventory", labelKey: "inventory", match: ["/admin/inventory"], scoped: true });
   }
   return items;
 }

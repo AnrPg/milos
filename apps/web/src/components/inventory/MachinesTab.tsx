@@ -130,7 +130,8 @@ function MachineRow({
   return (
     <li className="rounded-2xl" style={rowStyle}>
       <button type="button" aria-expanded={open} onClick={onToggle} className="flex w-full flex-wrap items-center gap-2 px-4 py-3 text-start">
-        <span className="min-w-0 flex-1">
+        {/* At least ~10rem for the name; the badges wrap below on narrow phones. */}
+        <span className="min-w-[10rem] flex-1">
           <span className="block truncate font-semibold" style={{ color: "var(--text)" }}>
             {machine.name}
             {machine.quantity > 1 ? <span style={subtleText}> ×{machine.quantity}</span> : null}

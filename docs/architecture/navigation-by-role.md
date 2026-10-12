@@ -2,6 +2,10 @@
 
 Status: Accepted (2026-10-12).
 
+Small screens show only ☰ (all links of the bar, vertically), the gym name,
+Messages and the avatar; notifications live in the avatar menu and a red dot
+on the avatar marks unread ones. The bars below are what ☰ lists on a phone.
+
 Rule of this proposal: **today's UI stays as it is.** Changes are only
 showing/hiding pages, tabs and buttons, renaming a few labels, and adding
 sections or pages where something new is needed. The bar fits a narrow phone
