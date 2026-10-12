@@ -939,6 +939,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/tours/{audience}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record that the current account finished a product tour */
+        post: operations["MilosTrainingWeb.MeController.complete_tour"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/reviews": {
         parameters: {
             query?: never;
@@ -6912,6 +6929,30 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.MeController.complete_tour": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                audience: "admin" | "member" | "athlete";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Completed tours */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        completed_tours: string[];
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.ReviewController.index": {
         parameters: {
             query?: never;
@@ -7244,6 +7285,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         avatar_url?: string | null;
+                        completed_tours: ("admin" | "member" | "athlete")[];
                         /** Format: uuid */
                         id: string;
                         nickname: string;

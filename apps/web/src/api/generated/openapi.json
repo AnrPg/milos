@@ -10298,6 +10298,59 @@
         ]
       }
     },
+    "/api/me/tours/{audience}/complete": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MeController.complete_tour",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "audience",
+            "required": true,
+            "schema": {
+              "enum": [
+                "admin",
+                "member",
+                "athlete"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "completed_tours": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "completed_tours"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Completed tours"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Record that the current account finished a product tour",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/me/reviews": {
       "get": {
         "callbacks": {},
@@ -11170,6 +11223,17 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "completed_tours": {
+                      "items": {
+                        "enum": [
+                          "admin",
+                          "member",
+                          "athlete"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
                     "id": {
                       "format": "uuid",
                       "type": "string"
@@ -11206,7 +11270,8 @@
                     "nickname",
                     "role",
                     "vendor",
-                    "preferred_locale"
+                    "preferred_locale",
+                    "completed_tours"
                   ],
                   "type": "object"
                 }
