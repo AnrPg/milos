@@ -2,6 +2,161 @@
   "components": {
     "responses": {},
     "schemas": {
+      "FreeTextWorkoutAnalysis": {
+        "properties": {
+          "issues": {
+            "items": {
+              "properties": {
+                "code": {
+                  "description": "assistant | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format",
+                  "type": "string"
+                },
+                "current_value": {
+                  "nullable": true
+                },
+                "id": {
+                  "type": "string"
+                },
+                "message": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "params": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "path": {
+                  "type": "string"
+                },
+                "required": {
+                  "type": "boolean"
+                },
+                "severity": {
+                  "enum": [
+                    "error",
+                    "warning",
+                    "info"
+                  ],
+                  "type": "string"
+                },
+                "suggestion": {
+                  "nullable": true,
+                  "properties": {
+                    "label": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "text_edit": {
+                      "nullable": true,
+                      "properties": {
+                        "find": {
+                          "type": "string"
+                        },
+                        "replace": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "find",
+                        "replace"
+                      ],
+                      "type": "object"
+                    },
+                    "value": {
+                      "description": "Canonical value for the issue path",
+                      "nullable": true
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "required": [
+                "id",
+                "path",
+                "code",
+                "severity",
+                "required",
+                "params"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "suggestions": {
+            "items": {
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                },
+                "reason": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "text_insert": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "value": {
+                  "nullable": true
+                }
+              },
+              "required": [
+                "id",
+                "path",
+                "field"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "summary": {
+            "properties": {
+              "blocking": {
+                "type": "integer"
+              },
+              "errors": {
+                "type": "integer"
+              },
+              "exercises": {
+                "type": "integer"
+              },
+              "sections": {
+                "type": "integer"
+              },
+              "warnings": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "sections",
+              "exercises",
+              "errors",
+              "warnings",
+              "blocking"
+            ],
+            "type": "object"
+          },
+          "workout": {
+            "additionalProperties": true,
+            "description": "Canonical workout: title, type, subtitle, description, difficulty, estimated_duration_seconds, equipment, tags and sections[] with name, note, timer_config and exercises[]",
+            "type": "object"
+          }
+        },
+        "required": [
+          "workout",
+          "issues",
+          "suggestions",
+          "summary"
+        ],
+        "title": "FreeTextWorkoutAnalysis",
+        "type": "object"
+      },
       "SemanticError": {
         "description": "Stable machine-readable API failure with English compatibility copy.",
         "properties": {
@@ -20851,6 +21006,275 @@
         "summary": "Revoke a personal allowance extension with a compensating ledger entry",
         "tags": [
           "Admin Users"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/workouts/free-text/analyze": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminWorkoutFreeTextController.analyze",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "locale": {
+                    "maxLength": 10,
+                    "type": "string"
+                  },
+                  "text": {
+                    "maxLength": 20000,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "text"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "issues": {
+                      "items": {
+                        "properties": {
+                          "code": {
+                            "description": "assistant | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format",
+                            "type": "string"
+                          },
+                          "current_value": {
+                            "nullable": true
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "message": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "params": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "path": {
+                            "type": "string"
+                          },
+                          "required": {
+                            "type": "boolean"
+                          },
+                          "severity": {
+                            "enum": [
+                              "error",
+                              "warning",
+                              "info"
+                            ],
+                            "type": "string"
+                          },
+                          "suggestion": {
+                            "nullable": true,
+                            "properties": {
+                              "label": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "text_edit": {
+                                "nullable": true,
+                                "properties": {
+                                  "find": {
+                                    "type": "string"
+                                  },
+                                  "replace": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "find",
+                                  "replace"
+                                ],
+                                "type": "object"
+                              },
+                              "value": {
+                                "description": "Canonical value for the issue path",
+                                "nullable": true
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "path",
+                          "code",
+                          "severity",
+                          "required",
+                          "params"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "suggestions": {
+                      "items": {
+                        "properties": {
+                          "field": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "path": {
+                            "type": "string"
+                          },
+                          "reason": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "text_insert": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "value": {
+                            "nullable": true
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "path",
+                          "field"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "summary": {
+                      "properties": {
+                        "blocking": {
+                          "type": "integer"
+                        },
+                        "errors": {
+                          "type": "integer"
+                        },
+                        "exercises": {
+                          "type": "integer"
+                        },
+                        "sections": {
+                          "type": "integer"
+                        },
+                        "warnings": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "sections",
+                        "exercises",
+                        "errors",
+                        "warnings",
+                        "blocking"
+                      ],
+                      "type": "object"
+                    },
+                    "workout": {
+                      "additionalProperties": true,
+                      "description": "Canonical workout: title, type, subtitle, description, difficulty, estimated_duration_seconds, equipment, tags and sections[] with name, note, timer_config and exercises[]",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "workout",
+                    "issues",
+                    "suggestions",
+                    "summary"
+                  ],
+                  "title": "FreeTextWorkoutAnalysis",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Analysis"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid text"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Assistant unavailable"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Assistant not configured"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Read a free-text workout into the canonical schema with actionable issues",
+        "tags": [
+          "Admin Workouts"
         ]
       }
     },

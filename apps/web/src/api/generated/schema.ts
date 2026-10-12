@@ -1454,6 +1454,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/workouts/free-text/analyze": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read a free-text workout into the canonical schema with actionable issues */
+        post: operations["MilosTrainingWeb.AdminWorkoutFreeTextController.analyze"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/packages/{id}/retire": {
         parameters: {
             query?: never;
@@ -2762,6 +2779,51 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** FreeTextWorkoutAnalysis */
+        FreeTextWorkoutAnalysis: {
+            issues: {
+                /** @description assistant | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format */
+                code: string;
+                current_value?: unknown;
+                id: string;
+                message?: string | null;
+                params: {
+                    [key: string]: unknown;
+                };
+                path: string;
+                required: boolean;
+                /** @enum {string} */
+                severity: "error" | "warning" | "info";
+                suggestion?: {
+                    label?: string | null;
+                    text_edit?: {
+                        find: string;
+                        replace: string;
+                    } | null;
+                    /** @description Canonical value for the issue path */
+                    value?: unknown;
+                } | null;
+            }[];
+            suggestions: {
+                field: string;
+                id: string;
+                path: string;
+                reason?: string | null;
+                text_insert?: string | null;
+                value?: unknown;
+            }[];
+            summary: {
+                blocking: number;
+                errors: number;
+                exercises: number;
+                sections: number;
+                warnings: number;
+            };
+            /** @description Canonical workout: title, type, subtitle, description, difficulty, estimated_duration_seconds, equipment, tags and sections[] with name, note, timer_config and exercises[] */
+            workout: {
+                [key: string]: unknown;
+            };
+        };
         /** @description Stable machine-readable API failure with English compatibility copy. */
         SemanticError: {
             code: string;
@@ -10240,6 +10302,112 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminWorkoutFreeTextController.analyze": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    locale?: string;
+                    text: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Analysis */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        issues: {
+                            /** @description assistant | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format */
+                            code: string;
+                            current_value?: unknown;
+                            id: string;
+                            message?: string | null;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            path: string;
+                            required: boolean;
+                            /** @enum {string} */
+                            severity: "error" | "warning" | "info";
+                            suggestion?: {
+                                label?: string | null;
+                                text_edit?: {
+                                    find: string;
+                                    replace: string;
+                                } | null;
+                                /** @description Canonical value for the issue path */
+                                value?: unknown;
+                            } | null;
+                        }[];
+                        suggestions: {
+                            field: string;
+                            id: string;
+                            path: string;
+                            reason?: string | null;
+                            text_insert?: string | null;
+                            value?: unknown;
+                        }[];
+                        summary: {
+                            blocking: number;
+                            errors: number;
+                            exercises: number;
+                            sections: number;
+                            warnings: number;
+                        };
+                        /** @description Canonical workout: title, type, subtitle, description, difficulty, estimated_duration_seconds, equipment, tags and sections[] with name, note, timer_config and exercises[] */
+                        workout: {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description Invalid text */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Assistant unavailable */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Assistant not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
                     };
                 };
             };
