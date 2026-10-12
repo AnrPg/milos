@@ -71,13 +71,18 @@
             "items": {
               "properties": {
                 "code": {
-                  "description": "assistant | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format",
+                  "description": "assistant | text_correction | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format",
                   "type": "string"
                 },
                 "current_value": {
                   "nullable": true
                 },
                 "id": {
+                  "type": "string"
+                },
+                "kind": {
+                  "description": "For text_correction: spelling | unit | number | abbreviation | format | ambiguity",
+                  "nullable": true,
                   "type": "string"
                 },
                 "message": {
@@ -89,6 +94,7 @@
                   "type": "object"
                 },
                 "path": {
+                  "description": "Canonical field path, or \"text\" for a text-only correction",
                   "type": "string"
                 },
                 "required": {
@@ -144,6 +150,21 @@
               "type": "object"
             },
             "type": "array"
+          },
+          "quality": {
+            "description": "How much the parser answer had to be repaired against the contract",
+            "properties": {
+              "corrections": {
+                "type": "integer"
+              },
+              "remaining_violations": {
+                "type": "integer"
+              },
+              "repair_attempts": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
           },
           "suggestions": {
             "items": {
@@ -21660,13 +21681,18 @@
                       "items": {
                         "properties": {
                           "code": {
-                            "description": "assistant | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format",
+                            "description": "assistant | text_correction | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format",
                             "type": "string"
                           },
                           "current_value": {
                             "nullable": true
                           },
                           "id": {
+                            "type": "string"
+                          },
+                          "kind": {
+                            "description": "For text_correction: spelling | unit | number | abbreviation | format | ambiguity",
+                            "nullable": true,
                             "type": "string"
                           },
                           "message": {
@@ -21678,6 +21704,7 @@
                             "type": "object"
                           },
                           "path": {
+                            "description": "Canonical field path, or \"text\" for a text-only correction",
                             "type": "string"
                           },
                           "required": {
@@ -21733,6 +21760,21 @@
                         "type": "object"
                       },
                       "type": "array"
+                    },
+                    "quality": {
+                      "description": "How much the parser answer had to be repaired against the contract",
+                      "properties": {
+                        "corrections": {
+                          "type": "integer"
+                        },
+                        "remaining_violations": {
+                          "type": "integer"
+                        },
+                        "repair_attempts": {
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
                     },
                     "suggestions": {
                       "items": {

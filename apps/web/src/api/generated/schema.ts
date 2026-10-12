@@ -2885,14 +2885,17 @@ export interface components {
         /** FreeTextWorkoutAnalysis */
         FreeTextWorkoutAnalysis: {
             issues: {
-                /** @description assistant | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format */
+                /** @description assistant | text_correction | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format */
                 code: string;
                 current_value?: unknown;
                 id: string;
+                /** @description For text_correction: spelling | unit | number | abbreviation | format | ambiguity */
+                kind?: string | null;
                 message?: string | null;
                 params: {
                     [key: string]: unknown;
                 };
+                /** @description Canonical field path, or "text" for a text-only correction */
                 path: string;
                 required: boolean;
                 /** @enum {string} */
@@ -2907,6 +2910,12 @@ export interface components {
                     value?: unknown;
                 } | null;
             }[];
+            /** @description How much the parser answer had to be repaired against the contract */
+            quality?: {
+                corrections?: number;
+                remaining_violations?: number;
+                repair_attempts?: number;
+            };
             suggestions: {
                 field: string;
                 id: string;
@@ -10661,14 +10670,17 @@ export interface operations {
                 content: {
                     "application/json": {
                         issues: {
-                            /** @description assistant | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format */
+                            /** @description assistant | text_correction | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format */
                             code: string;
                             current_value?: unknown;
                             id: string;
+                            /** @description For text_correction: spelling | unit | number | abbreviation | format | ambiguity */
+                            kind?: string | null;
                             message?: string | null;
                             params: {
                                 [key: string]: unknown;
                             };
+                            /** @description Canonical field path, or "text" for a text-only correction */
                             path: string;
                             required: boolean;
                             /** @enum {string} */
@@ -10683,6 +10695,12 @@ export interface operations {
                                 value?: unknown;
                             } | null;
                         }[];
+                        /** @description How much the parser answer had to be repaired against the contract */
+                        quality?: {
+                            corrections?: number;
+                            remaining_violations?: number;
+                            repair_attempts?: number;
+                        };
                         suggestions: {
                             field: string;
                             id: string;
