@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.TenantDataContexts do
   @moduledoc """
-  Bounded contexts that own tenant data, ordered for purge (ADR-107).
+  Bounded contexts that own tenant data, ordered for purge (ADR-117).
 
   Each module exposes `tenant_data_policy/0`, `tenant_data_inventory/1`,
   `export_tenant_data/2` and `purge_tenant_data/1` through its public API.

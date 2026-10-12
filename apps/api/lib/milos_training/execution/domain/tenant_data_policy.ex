@@ -1,6 +1,6 @@
 defmodule MilosTraining.Execution.Domain.TenantDataPolicy do
   @moduledoc """
-  Execution tenant data retention and purge policy (ADR-107).
+  Execution tenant data retention and purge policy (ADR-117).
 
   Declares the tables this context owns, in delete (dependency) order, and
   how they are treated when a tenant is purged.
@@ -21,7 +21,7 @@ defmodule MilosTraining.Execution.Domain.TenantDataPolicy do
                 rls: :user
               },
               %{table: "workout_executions"},
-              # ADR-108 standalone training-log entries; their RLS USING clause
+              # ADR-118 standalone training-log entries; their RLS USING clause
               # admits organization sessions, so purge runs per tenant.
               %{table: "training_log_entries"},
               # Coach-run class timers (one per scheduled class), RLS by organization.

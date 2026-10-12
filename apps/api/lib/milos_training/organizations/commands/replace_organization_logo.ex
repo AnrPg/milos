@@ -1,6 +1,6 @@
 defmodule MilosTraining.Organizations.Commands.ReplaceOrganizationLogo do
   @moduledoc """
-  ADR-111: records a validated uploaded logo (`%{object_key, url}`) or removes
+  ADR-121: records a validated uploaded logo (`%{object_key, url}`) or removes
   the current one (nil) for an organization, with its audit event.
 
   Callers are tenant owners/admins (their own organization) and vendors

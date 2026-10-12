@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.RenderFinanceRefundReceipt do
   @moduledoc """
-  Renders a refund receipt as a printable HTML document (ADR-116) in the
+  Renders a refund receipt as a printable HTML document (ADR-126) in the
   viewer's locale. The page is produced from the immutable snapshot only, so
   the same receipt and locale always render the same bytes.
   """

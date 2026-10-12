@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.FinanceAccountingExportJobs do
   @moduledoc """
-  Enqueues the ADR-116 background accounting export. The job carries only
+  Enqueues the ADR-126 background accounting export. The job carries only
   the organization and run ids; the worker re-resolves the tenant (an
   inactive organization stops the export).
   """

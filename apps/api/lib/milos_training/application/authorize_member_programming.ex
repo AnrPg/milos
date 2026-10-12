@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.AuthorizeMemberProgramming do
   @moduledoc """
-  ADR-115: personal programming for gym members requires an explicit package
+  ADR-125: personal programming for gym members requires an explicit package
   grant.
 
   A member's role does not imply personal programming, so each member's

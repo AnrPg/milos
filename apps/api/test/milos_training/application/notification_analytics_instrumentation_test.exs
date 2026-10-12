@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.NotificationAnalyticsInstrumentationTest do
-  @moduledoc "ADR-113: in-app delivery and push delivery outcome analytics."
+  @moduledoc "ADR-123: in-app delivery and push delivery outcome analytics."
   use MilosTraining.DataCase, async: false
 
   import Ecto.Query

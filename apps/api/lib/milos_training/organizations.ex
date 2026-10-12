@@ -87,7 +87,7 @@ defmodule MilosTraining.Organizations do
     do: ResolveTenantContext.call(account, slug, request_metadata)
 
   @doc """
-  ADR-119: whether the tenant context's acting member is a coach of the
+  ADR-129: whether the tenant context's acting member is a coach of the
   tenant. The application-level mirror of `milos_acting_user_coaches/1`.
   """
   def acting_user_coaches?(context), do: TenantAuthorization.coaches?(context)
@@ -134,7 +134,7 @@ defmodule MilosTraining.Organizations do
   def rename_organization(context, organization_id, name),
     do: RenameOrganization.call(context, organization_id, name)
 
-  # ADR-112 slug rename with retired-slug aliases.
+  # ADR-122 slug rename with retired-slug aliases.
   def rename_organization_slug(
         context,
         organization_id,
@@ -159,7 +159,7 @@ defmodule MilosTraining.Organizations do
       ),
       do: UpdateOrganizationSettings.call(context, organization_id, params, changed_at)
 
-  # ADR-111 first-class tenant logo upload. `context` is a tenant owner/admin
+  # ADR-121 first-class tenant logo upload. `context` is a tenant owner/admin
   # `TenantContext` (organization_id may be nil: their own organization) or a
   # vendor `PlatformContext` (organization_id required).
   def get_organization_branding(context, organization_id \\ nil),
@@ -193,7 +193,7 @@ defmodule MilosTraining.Organizations do
   def remove_organization_logo(context, organization_id, changed_at \\ DateTime.utc_now()),
     do: ReplaceOrganizationLogo.call(context, organization_id, nil, changed_at)
 
-  # ADR-107 reviewed tenant export/purge workflow. Purge records are
+  # ADR-117 reviewed tenant export/purge workflow. Purge records are
   # platform-level and survive the organization they describe.
   def request_organization_purge(context, organization_id, requested_at \\ DateTime.utc_now()),
     do: RequestOrganizationPurge.call(context, organization_id, requested_at)

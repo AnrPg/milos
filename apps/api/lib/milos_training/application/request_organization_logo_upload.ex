@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.RequestOrganizationLogoUpload do
   @moduledoc """
-  ADR-111: issues a presigned PUT for a new tenant logo under
+  ADR-121: issues a presigned PUT for a new tenant logo under
   `organizations/<organization_id>/branding/logo/<uuid>.<ext>`. Mirrors
   `RequestAvatarUpload`: the browser uploads straight to object storage and
   then calls `FinalizeOrganizationLogo` with the returned key.

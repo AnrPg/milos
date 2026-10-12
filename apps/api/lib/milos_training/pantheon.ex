@@ -37,7 +37,7 @@ defmodule MilosTraining.Pantheon do
     to: MilosTraining.Pantheon.PRStore,
     as: :list_pr_history
 
-  # Every Pantheon read/write is RLS-protected (ADR-119): personal operations
+  # Every Pantheon read/write is RLS-protected (ADR-129): personal operations
   # run in the acting user's scope, coach reads in the coach's tenant scope.
   def with_user_context(context, fun) when is_function(fun, 0),
     do: MilosTraining.Pantheon.PRStore.with_scope(context, fun)
@@ -45,7 +45,7 @@ defmodule MilosTraining.Pantheon do
   def with_tenant_context(context, fun) when is_function(fun, 0),
     do: MilosTraining.Pantheon.PRStore.with_scope(context, fun)
 
-  # ADR-119 sharing: coach-visibility opt-out and explicit grants.
+  # ADR-129 sharing: coach-visibility opt-out and explicit grants.
   defdelegate get_sharing_preference(user_id),
     to: MilosTraining.Pantheon.PRStore
 
@@ -78,7 +78,7 @@ defmodule MilosTraining.Pantheon do
   defdelegate edit_record(id, params), to: MilosTraining.Pantheon.PRStore, as: :edit_pr
   defdelegate delete_record(id, user_id), to: MilosTraining.Pantheon.PRStore, as: :delete_pr
 
-  # ADR-107 reviewed tenant export/purge. This context owns its table list and
+  # ADR-117 reviewed tenant export/purge. This context owns its table list and
   # retention policy; the shared executor only runs what this policy declares,
   # always inside a RepoContext session for the purge's tenant.
   def tenant_data_policy, do: MilosTraining.Pantheon.Domain.TenantDataPolicy.policy()

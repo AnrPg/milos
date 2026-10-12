@@ -1,6 +1,6 @@
 defmodule MilosTraining.Scheduling.Domain.TenantDataPolicy do
   @moduledoc """
-  Scheduling tenant data retention and purge policy (ADR-107).
+  Scheduling tenant data retention and purge policy (ADR-117).
 
   Declares the tables this context owns, in delete (dependency) order, and
   how they are treated when a tenant is purged.

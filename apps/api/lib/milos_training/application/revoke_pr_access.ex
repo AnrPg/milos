@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.RevokePRAccess do
-  @moduledoc "Revokes one of the owner's PR sharing grants (ADR-119)."
+  @moduledoc "Revokes one of the owner's PR sharing grants (ADR-129)."
 
   alias MilosTraining.Pantheon
 

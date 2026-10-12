@@ -2,7 +2,7 @@ defmodule MilosTraining.Finance.Queries.ReconciliationCandidates do
   @moduledoc """
   Internal facts that could match a statement line, ranked by the domain
   rules (exact amount first, then nearest date) with each candidate's
-  evaluation (ADR-116).
+  evaluation (ADR-126).
   """
 
   alias MilosTraining.Finance.Domain.ReconciliationMatching

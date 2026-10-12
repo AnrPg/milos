@@ -1,5 +1,5 @@
 defmodule MilosTraining.Workouts.Domain.AssignmentAudiencePolicyTest do
-  @moduledoc "ADR-115: who an assignment may target and what a class variant is."
+  @moduledoc "ADR-125: who an assignment may target and what a class variant is."
   use ExUnit.Case, async: true
 
   alias MilosTraining.Workouts.Domain.AssignmentAudiencePolicy, as: Policy

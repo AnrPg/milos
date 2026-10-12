@@ -357,7 +357,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
                   ) : null}
                 </div>
 
-                {/* ADR-114: informational only; assigning stays available. */}
+                {/* ADR-124: informational only; assigning stays available. */}
                 {selectedWorkout && selectedAthleteIds.length > 0 ? (
                   <AthleteInjuryWarningsPanel
                     accessToken={accessToken}

@@ -104,7 +104,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
     |> Enum.map(&normalize_injury/1)
   end
 
-  # ADR-114 staff safety warnings: organization-provenance only. The tenant
+  # ADR-124 staff safety warnings: organization-provenance only. The tenant
   # predicate (not the owner-or-tenant disjunction) keeps the acting staff
   # member's own injuries and every personal self-report out of the result.
   @impl true

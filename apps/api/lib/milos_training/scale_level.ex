@@ -5,7 +5,7 @@ defmodule MilosTraining.ScaleLevel do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
-  # Tenant-owned since ADR-118: each organization has its own set, unique per
+  # Tenant-owned since ADR-128: each organization has its own set, unique per
   # organization by slug and (active) sort order, under forced RLS.
   schema "scale_levels" do
     field :organization_id, :binary_id

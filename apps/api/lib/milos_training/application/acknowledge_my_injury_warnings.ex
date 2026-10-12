@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.AcknowledgeMyInjuryWarnings do
   @moduledoc """
-  Athlete/member use case (ADR-114): the user acknowledged their own injury
+  Athlete/member use case (ADR-124): the user acknowledged their own injury
   warnings for a workout. Re-evaluated server-side; the analytics event only
   reflects this organization's injuries (see `GetMyWorkoutInjuryWarnings`).
   Acknowledging never blocks or alters the workout.

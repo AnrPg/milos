@@ -1,6 +1,6 @@
 defmodule MilosTraining.Finance.Ports.FinanceAccountingStore do
   @moduledoc """
-  Persistence port for the ADR-116 accounting artifacts that attach to the
+  Persistence port for the ADR-126 accounting artifacts that attach to the
   append-only payment/reversal facts: refund receipts, payment-provider
   reconciliation records and accounting-export runs. Every callback runs in
   the caller's tenant session (`RepoContext.run/2`).

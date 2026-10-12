@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.ListPRsSharedWithMe do
   @moduledoc """
-  The grantee's "Shared with me" view (ADR-119): every PR, with history, of
+  The grantee's "Shared with me" view (ADR-129): every PR, with history, of
   each account that has an active grant naming the acting user. Reads run in
   the grantee's own scope; `user_pr_records_grantee_read_policy` is what
   admits them, so a revoked grant returns nothing.

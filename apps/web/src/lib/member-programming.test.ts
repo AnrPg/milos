@@ -7,7 +7,7 @@ import {
   programmingSuccessKey,
 } from "@/lib/member-programming";
 
-describe("member programming rules (ADR-115)", () => {
+describe("member programming rules (ADR-125)", () => {
   it("offers the member's own class version first and the class-wide swap last", () => {
     expect(MEMBER_PROGRAMMING_MODES).toEqual(["class_variant", "personal", "class_workout"]);
   });

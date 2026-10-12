@@ -1,6 +1,6 @@
 defmodule MilosTrainingWeb.PersonalizedMemberProgrammingControllerTest do
   @moduledoc """
-  ADR-115 (TD-037): personalized member programming end to end, through the
+  ADR-125 (TD-037): personalized member programming end to end, through the
   RLS-enforcing endpoint - entitlement gating, member vs athlete, class-variant
   visibility and tenant isolation.
   """

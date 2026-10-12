@@ -1,7 +1,7 @@
 defmodule MilosTraining.Scheduling.Domain.BookingOperationPolicy do
   @moduledoc """
   Idempotency and conflict rules for offline-replayable booking commands
-  (ADR-110). Pure functions: callers load the booking state and apply the
+  (ADR-120). Pure functions: callers load the booking state and apply the
   decision inside their own transaction.
 
   * A booking request carries a client operation id. Replaying it returns the

@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.GetFinanceAccountingExportDownload do
   @moduledoc """
   Short-lived (15 minute) signed download link for a completed accounting
-  export (ADR-116). The object key must sit under the tenant's own prefix;
+  export (ADR-126). The object key must sit under the tenant's own prefix;
   `TenantObjectStorage` refuses anything else.
   """
 

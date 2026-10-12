@@ -17,7 +17,7 @@ export function packageSubscriptionLabel(subscription: Record<string, unknown>) 
 }
 
 /**
- * ADR-119: the dossier PR panel's content count. Staff who are not coaches of
+ * ADR-129: the dossier PR panel's content count. Staff who are not coaches of
  * the gym still get the panel, explaining that PRs are visible to coaches only.
  */
 export function prSectionContentCount(

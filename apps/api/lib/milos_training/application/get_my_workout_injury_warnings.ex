@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.GetMyWorkoutInjuryWarnings do
   @moduledoc """
-  Athlete/member use case (ADR-114): the acting user's own injury warnings
+  Athlete/member use case (ADR-124): the acting user's own injury warnings
   for a workout they are about to start - including personal self-reported
   injuries, which they own. `injury_warning_shown` is recorded only from
   this organization's injuries, so a personal injury never becomes a

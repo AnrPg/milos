@@ -26,7 +26,7 @@ defmodule MilosTrainingWeb.AdminInjuryWarningController do
   operation(:evaluate,
     summary: "Injury safety warnings for athletes against a workout",
     description:
-      "Informational only (ADR-114). Only injuries with this organization's provenance are considered; members' personal self-reports are never visible to staff.",
+      "Informational only (ADR-124). Only injuries with this organization's provenance are considered; members' personal self-reports are never visible to staff.",
     request_body: @staff_request_body,
     responses: [
       ok: {"Injury warnings", "application/json", InjuryWarnings.staff_result()}

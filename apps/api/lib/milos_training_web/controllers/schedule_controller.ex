@@ -99,7 +99,7 @@ defmodule MilosTrainingWeb.ScheduleController do
   operation(:create_booking,
     summary: "Book a schedule slot",
     description:
-      "Optionally idempotent per `client_operation_id` (ADR-110): replaying the same id for " <>
+      "Optionally idempotent per `client_operation_id` (ADR-120): replaying the same id for " <>
         "the same slot returns the original booking with 200 and no new reservation, " <>
         "notification, or broadcast; reusing it for another slot returns 409 " <>
         "`idempotency_key_conflict`.",

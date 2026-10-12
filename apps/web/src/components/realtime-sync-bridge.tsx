@@ -33,7 +33,7 @@ export function RealtimeSyncBridge() {
       void queryClient.invalidateQueries({ queryKey: ["admin", "settings"] });
     }
 
-    // ADR-111: a logo upload/removal refreshes the shell header and settings.
+    // ADR-121: a logo upload/removal refreshes the shell header and settings.
     if (detail.scopes.includes("organization_branding")) {
       void queryClient.invalidateQueries({ queryKey: ["organization-memberships"] });
       void queryClient.invalidateQueries({ queryKey: ["admin", "branding"] });

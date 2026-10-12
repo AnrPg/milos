@@ -9,7 +9,7 @@ defmodule MilosTraining.Organizations.Queries.ResolveTenantContext do
     # policies would be circular: reading `organizations` to build a context
     # would require a context.
     RepoContext.run(%{user_id: account.id}, fn ->
-      # ADR-112: a retired slug resolves transparently to its organization, so
+      # ADR-122: a retired slug resolves transparently to its organization, so
       # bookmarks, stored selections, stale token claims and socket params
       # keep working after a rename. The context always carries the canonical
       # organization; transports compare it with the requested slug to signal

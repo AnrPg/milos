@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.OrganizationLogoTest do
-  @moduledoc "ADR-111 tenant logo upload flow against the in-memory object store."
+  @moduledoc "ADR-121 tenant logo upload flow against the in-memory object store."
 
   use MilosTraining.DataCase, async: false
 

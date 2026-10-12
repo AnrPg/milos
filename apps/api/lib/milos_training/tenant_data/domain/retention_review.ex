@@ -1,6 +1,6 @@
 defmodule MilosTraining.TenantData.Domain.RetentionReview do
   @moduledoc """
-  Pure helpers shared by every bounded context's tenant data policy (ADR-107).
+  Pure helpers shared by every bounded context's tenant data policy (ADR-117).
 
   A context policy is a plain map:
 

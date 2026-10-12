@@ -1,5 +1,5 @@
 defmodule MilosTraining.Analytics.EventRegistryAndDedupeTest do
-  @moduledoc "ADR-113: registry enforcement and per-tenant dedupe in the Analytics context."
+  @moduledoc "ADR-123: registry enforcement and per-tenant dedupe in the Analytics context."
   use MilosTraining.DataCase, async: false
 
   import MilosTraining.AnalyticsHelpers

@@ -1,4 +1,4 @@
-# Prometheus for the opt-in `observability` Compose profile (ADR-106).
+# Prometheus for the opt-in `observability` Compose profile (ADR-116).
 # Scrape targets resolve on the internal `app` network only; nothing here is
 # reachable through Caddy.
 global:

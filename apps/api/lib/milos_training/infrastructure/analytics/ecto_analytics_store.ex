@@ -30,7 +30,7 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
     end
   end
 
-  # ADR-113: rows carrying a dedupe_key are inserted with ON CONFLICT DO
+  # ADR-123: rows carrying a dedupe_key are inserted with ON CONFLICT DO
   # NOTHING against the partial (organization_id, event_name, dedupe_key)
   # unique index, so replays/retries are no-ops rather than errors. insert_all
   # is used because a client-generated binary_id makes Repo.insert/2 report a

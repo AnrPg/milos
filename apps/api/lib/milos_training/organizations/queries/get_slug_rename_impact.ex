@@ -1,6 +1,6 @@
 defmodule MilosTraining.Organizations.Queries.GetSlugRenameImpact do
   @moduledoc """
-  ADR-112: what a slug rename touches, shown to the vendor before the typed
+  ADR-122: what a slug rename touches, shown to the vendor before the typed
   confirmation - active members whose bookmarks move, pending invitations
   (their links are token-based and keep working), retired aliases that keep
   redirecting, and whether an open purge currently blocks the rename.

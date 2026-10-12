@@ -1,5 +1,5 @@
 defmodule MilosTraining.Workers.ExportOrganizationTenantDataJob do
-  @moduledoc "ADR-107 stage 2: builds the tenant export and retention archive."
+  @moduledoc "ADR-117 stage 2: builds the tenant export and retention archive."
 
   use Oban.Worker,
     queue: :default,

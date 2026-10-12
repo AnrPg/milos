@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.BookingOperationIdempotencyTest do
   @moduledoc """
-  ADR-110 integration tests: booking request and admin resolution replays
+  ADR-120 integration tests: booking request and admin resolution replays
   dedupe on a client operation id, scoped per tenant and requesting user.
   """
   use MilosTraining.DataCase, async: false

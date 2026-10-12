@@ -19,7 +19,7 @@ defmodule MilosTrainingWeb.MyWorkoutController do
     summary:
       "List assigned workouts for the current athlete or member, or all assignments for staff",
     description:
-      "ADR-115: members receive personal assignments and class variants. Each assignment carries " <>
+      "ADR-125: members receive personal assignments and class variants. Each assignment carries " <>
         "`assignment_kind` (`personal` | `class_variant`) and `source_slot_id` (the class a " <>
         "variant belongs to, or null).",
     parameters: [
@@ -84,7 +84,7 @@ defmodule MilosTrainingWeb.MyWorkoutController do
   end
 
   operation(:reject,
-    summary: "Assignee (athlete or member, ADR-115) rejects an assigned workout",
+    summary: "Assignee (athlete or member, ADR-125) rejects an assigned workout",
     parameters: [
       %Parameter{
         name: :id,

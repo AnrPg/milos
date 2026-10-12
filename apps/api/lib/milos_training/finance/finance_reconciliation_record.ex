@@ -1,7 +1,7 @@
 defmodule MilosTraining.Finance.FinanceReconciliationRecord do
   @moduledoc """
   One external payment-provider statement line and its (optional) match to an
-  internal payment or reversal fact (ADR-116). Idempotent on
+  internal payment or reversal fact (ADR-126). Idempotent on
   `(organization_id, provider, external_reference)`.
   """
 

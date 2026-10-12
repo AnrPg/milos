@@ -23,7 +23,7 @@ defmodule MilosTrainingWeb.MyInjuryWarningController do
   operation(:show,
     summary: "The current user's injury safety warnings for a workout",
     description:
-      "Informational only (ADR-114): includes the user's own personal injuries; never blocks starting the workout.",
+      "Informational only (ADR-124): includes the user's own personal injuries; never blocks starting the workout.",
     parameters: [
       @workout_id,
       %Parameter{

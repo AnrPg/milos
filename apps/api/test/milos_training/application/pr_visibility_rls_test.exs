@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.PRVisibilityRLSTest do
   @moduledoc """
-  ADR-119 / TD-070 under real Row Level Security: who may read a member's
+  ADR-129 / TD-077 under real Row Level Security: who may read a member's
   Pantheon PRs. Fixtures are seeded as the superuser; every assertion runs as
   the RLS-enforcing runtime role through the real application services.
   """

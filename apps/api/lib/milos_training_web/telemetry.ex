@@ -31,7 +31,7 @@ defmodule MilosTrainingWeb.Telemetry do
   Supervision children. The outbox probe runs whenever Oban runs so the
   structured log summary always carries outbox age. The Prometheus exporter,
   the readiness probe and the internal metrics listener only start when
-  `METRICS_PORT` enables them (ADR-106); nothing is exposed otherwise.
+  `METRICS_PORT` enables them (ADR-116); nothing is exposed otherwise.
   """
   def children(prometheus, options) do
     [
@@ -140,7 +140,7 @@ defmodule MilosTrainingWeb.Telemetry do
   @db_buckets [0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5]
 
   @doc """
-  Metrics exported in Prometheus format by `PrometheusExporter` (ADR-106).
+  Metrics exported in Prometheus format by `PrometheusExporter` (ADR-116).
   Every label is bounded: routes are router patterns, reasons/buckets are
   fixed atoms, workers are module names. Alert rules and Grafana dashboards in
   `ops/observability/` depend on these names; rename them together.

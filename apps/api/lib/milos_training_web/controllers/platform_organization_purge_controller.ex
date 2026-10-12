@@ -1,6 +1,6 @@
 defmodule MilosTrainingWeb.PlatformOrganizationPurgeController do
   @moduledoc """
-  ADR-107 reviewed tenant export/purge workflow for vendors:
+  ADR-117 reviewed tenant export/purge workflow for vendors:
   request -> export (job) -> retention review -> typed approval -> purge (job).
   """
 

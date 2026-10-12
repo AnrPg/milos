@@ -109,7 +109,7 @@ defmodule MilosTrainingWeb.MyFinanceController do
     end
   end
 
-  # ADR-116: a member's own refund receipts. Receipts of other members are
+  # ADR-126: a member's own refund receipts. Receipts of other members are
   # reported as not found.
   @receipt_id %OpenApiSpex.Parameter{
     name: :id,

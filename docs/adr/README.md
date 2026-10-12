@@ -101,19 +101,19 @@ must have an ADR. See `template.md` for the format.
 | ADR-093 | Tenant delete purges eligible client accounts | Accepted |
 | ADR-094 | Temporary clean slate production purge | Accepted |
 | ADR-095 | Align account role with membership | Accepted |
-| ADR-104 | Tenant-scoped admin fanout replaces global admin lookups | Accepted |
-| ADR-105 | Dialyzer baseline paid down to zero | Accepted |
-| ADR-106 | Observability dashboards and alerting | Accepted |
-| ADR-107 | Reviewed tenant export and purge | Accepted |
-| ADR-108 | Standalone training-log entries | Accepted |
-| ADR-109 | Controller tests run under the RLS-enforcing runtime role | Accepted |
-| ADR-110 | Offline outbox failure controls and command adapters | Accepted |
-| ADR-111 | Tenant logo upload | Accepted |
-| ADR-112 | Organization name and slug editing | Accepted |
-| ADR-113 | Comprehensive analytics instrumentation | Accepted |
-| ADR-117 | Web dependency security refresh and patched OpenAPI generator chain | Accepted |
-| ADR-114 | Injury-aware workout safety warnings | Accepted |
-| ADR-115 | Personalized member programming | Accepted |
-| ADR-116 | Refund receipts, provider reconciliation and accounting exports | Accepted |
-| ADR-118 | Tenant-owned scale levels | Accepted |
-| ADR-119 | PR visibility for gym coaches and explicit sharing grants | Accepted |
+| ADR-114 | Tenant-scoped admin fanout replaces global admin lookups | Accepted |
+| ADR-115 | Dialyzer baseline paid down to zero | Accepted |
+| ADR-116 | Observability dashboards and alerting | Accepted |
+| ADR-117 | Reviewed tenant export and purge | Accepted |
+| ADR-118 | Standalone training-log entries | Accepted |
+| ADR-119 | Controller tests run under the RLS-enforcing runtime role | Accepted |
+| ADR-120 | Offline outbox failure controls and command adapters | Accepted |
+| ADR-121 | Tenant logo upload | Accepted |
+| ADR-122 | Organization name and slug editing | Accepted |
+| ADR-123 | Comprehensive analytics instrumentation | Accepted |
+| ADR-127 | Web dependency security refresh and patched OpenAPI generator chain | Accepted |
+| ADR-124 | Injury-aware workout safety warnings | Accepted |
+| ADR-125 | Personalized member programming | Accepted |
+| ADR-126 | Refund receipts, provider reconciliation and accounting exports | Accepted |
+| ADR-128 | Tenant-owned scale levels | Accepted |
+| ADR-129 | PR visibility for gym coaches and explicit sharing grants | Accepted |

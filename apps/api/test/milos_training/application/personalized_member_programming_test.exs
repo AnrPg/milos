@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.PersonalizedMemberProgrammingTest do
   @moduledoc """
-  ADR-115 (TD-037) application-service integration tests against PostgreSQL.
+  ADR-125 (TD-037) application-service integration tests against PostgreSQL.
   Service calls run as the RLS-enforcing runtime role; fixtures model
   pre-existing data and run as the test superuser.
   """

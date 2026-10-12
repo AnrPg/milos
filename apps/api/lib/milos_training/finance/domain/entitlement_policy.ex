@@ -19,7 +19,7 @@ defmodule MilosTraining.Finance.Domain.EntitlementPolicy do
   end
 
   @doc """
-  ADR-115: authorizes only an *explicit* package grant.
+  ADR-125: authorizes only an *explicit* package grant.
 
   Evaluates the customer's contract in the strictest mode regardless of the
   tenant's rollout mode: no `observe` leniency, no missing-profile or

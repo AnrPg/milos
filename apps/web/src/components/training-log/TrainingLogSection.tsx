@@ -435,7 +435,7 @@ function EntryForm({
   const submitCommand = useOutboxCommand();
 
   const mutation = useMutation({
-    // ADR-110: new entries go through the durable outbox (the form's
+    // ADR-120: new entries go through the durable outbox (the form's
     // idempotency key is the operation id); edits stay online-only because
     // they carry an optimistic-lock version.
     mutationFn: async (): Promise<{ queued: boolean }> => {

@@ -1,11 +1,11 @@
 defmodule MilosTraining.Repo.Migrations.CreateFinanceAccountingExports do
   use Ecto.Migration
 
-  # ADR-116 / TD-022: audit record of every accounting export run - who asked,
+  # ADR-126 / TD-022: audit record of every accounting export run - who asked,
   # when, for which date range, how it ran, and the stored artifact's object
   # key, size and SHA-256. The artifact itself lives in the tenant object
   # store under `organizations/<id>/finance/accounting-exports/...` so the
-  # ADR-107 inventory and purge see it.
+  # ADR-117 inventory and purge see it.
   def up do
     create table(:finance_accounting_exports, primary_key: false) do
       add :id, :binary_id, primary_key: true

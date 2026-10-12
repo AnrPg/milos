@@ -67,9 +67,9 @@ export type AssignedWorkoutRecord = {
   my_athlete_status?: "accepted" | "rejected" | null;
   execution_status?: "completed" | null;
   execution_scores?: SectionScore[];
-  /** ADR-115: a personal workout, or one member's version of a class. */
+  /** ADR-125: a personal workout, or one member's version of a class. */
   assignment_kind?: "personal" | "class_variant";
-  /** ADR-115: the class occurrence a class variant belongs to. */
+  /** ADR-125: the class occurrence a class variant belongs to. */
   source_slot_id?: string | null;
 };
 
@@ -81,11 +81,11 @@ export type AssignedWorkoutWeek = {
 
 export type AssignWorkoutPayload = {
   master_workout_id: string;
-  /** Assignee user ids: athletes or (ADR-115) entitled members. */
+  /** Assignee user ids: athletes or (ADR-125) entitled members. */
   athlete_ids: string[];
   scheduled_for: string;
   admin_notes?: string;
-  /** ADR-115: makes the assignment one member's version of this class. */
+  /** ADR-125: makes the assignment one member's version of this class. */
   source_slot_id?: string;
 };
 
@@ -141,7 +141,7 @@ export async function deleteAssignedWorkout(token: string, assignmentId: string)
 }
 
 /**
- * Analytics (ADR-113): the athlete opened an assignment's detail. Recorded at
+ * Analytics (ADR-123): the athlete opened an assignment's detail. Recorded at
  * most once per athlete, assignment and day server-side; best effort, never
  * throws.
  */
@@ -244,7 +244,7 @@ export async function listAthletes(
     search.set("q", query.trim());
   }
 
-  // ADR-115: members can receive personal programming when their package allows it.
+  // ADR-125: members can receive personal programming when their package allows it.
   if (options.includeMembers) {
     search.set("include_members", "true");
   }

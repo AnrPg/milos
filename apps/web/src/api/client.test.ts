@@ -26,7 +26,7 @@ describe("apiRequest tenant headers", () => {
     );
   });
 
-  it("replaces a remembered retired slug with the canonical slug the API names (ADR-112)", async () => {
+  it("replaces a remembered retired slug with the canonical slug the API names (ADR-122)", async () => {
     window.history.replaceState(null, "", "/admin/users");
     window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, "old-gym");
     const fetchMock = vi.spyOn(window, "fetch").mockResolvedValue(

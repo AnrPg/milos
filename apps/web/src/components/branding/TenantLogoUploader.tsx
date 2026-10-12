@@ -17,7 +17,7 @@ import {
 type TenantLogoUploaderProps = {
   /** Current logo URL (uploaded or legacy external), or null. */
   currentUrl: string | null;
-  /** True when currentUrl comes from an uploaded object (ADR-111). */
+  /** True when currentUrl comes from an uploaded object (ADR-121). */
   uploaded: boolean;
   api: OrganizationLogoApi;
   onChange: (branding: OrganizationBranding) => void;

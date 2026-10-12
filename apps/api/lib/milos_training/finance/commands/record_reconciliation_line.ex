@@ -1,5 +1,5 @@
 defmodule MilosTraining.Finance.Commands.RecordReconciliationLine do
-  @moduledoc "Records (idempotently) one external provider statement line (ADR-116)."
+  @moduledoc "Records (idempotently) one external provider statement line (ADR-126)."
 
   alias MilosTraining.Finance.Domain.ReconciliationMatching
   alias MilosTraining.Finance.FinanceAccountingStore

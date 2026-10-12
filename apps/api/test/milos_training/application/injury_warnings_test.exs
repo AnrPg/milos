@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.InjuryWarningsTest do
   @moduledoc """
-  ADR-114 injury-aware workout safety warnings: staff vs self visibility
+  ADR-124 injury-aware workout safety warnings: staff vs self visibility
   across two tenants and personal (self-reported) injuries, the class roster
   path, analytics segmentation and completion facts. Runs as the
   RLS-enforcing runtime role; fixtures model pre-existing data.

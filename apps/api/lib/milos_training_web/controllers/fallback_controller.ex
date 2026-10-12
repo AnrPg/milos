@@ -349,7 +349,7 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
-  # ADR-111 tenant logo upload.
+  # ADR-121 tenant logo upload.
   def call(conn, {:error, :invalid_brand_logo_upload}) do
     conn
     |> put_status(:unprocessable_entity)
@@ -1190,7 +1190,7 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
-  # ADR-115: personal member programming needs an explicit package grant.
+  # ADR-125: personal member programming needs an explicit package grant.
   def call(conn, {:error, :member_programming_not_entitled, details}) do
     conn
     |> put_status(:forbidden)
@@ -1363,7 +1363,7 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
-  # ADR-107 reviewed tenant purge workflow.
+  # ADR-117 reviewed tenant purge workflow.
   def call(conn, {:error, :organization_purge_exists}) do
     conn
     |> put_status(:conflict)
@@ -1400,7 +1400,7 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
-  # ADR-112 organization slug rename.
+  # ADR-122 organization slug rename.
   def call(conn, {:error, :invalid_slug}) do
     conn
     |> put_status(:unprocessable_entity)
@@ -1467,7 +1467,7 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
-  # ADR-116 refund receipts, reconciliation and accounting exports.
+  # ADR-126 refund receipts, reconciliation and accounting exports.
   def call(conn, {:error, :reconciliation_reference_conflict}) do
     conn
     |> put_status(:conflict)

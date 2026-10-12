@@ -161,7 +161,7 @@ defmodule MilosTrainingWeb.Router do
     get("/theme", MilosTrainingWeb.ThemeController, :show)
   end
 
-  # ADR-112: unauthenticated retired-slug lookup behind the web proxy's 308.
+  # ADR-122: unauthenticated retired-slug lookup behind the web proxy's 308.
   scope "/api" do
     pipe_through([:api, :slug_alias_rate_limited])
 
@@ -247,7 +247,7 @@ defmodule MilosTrainingWeb.Router do
     post("/threads/:id/read", MessagingController, :mark_read)
   end
 
-  # ADR-108: standalone training log (class / offline workouts).
+  # ADR-118: standalone training log (class / offline workouts).
   scope "/api/org/:organization_slug/me/training-log", MilosTrainingWeb do
     pipe_through([
       :api,
@@ -265,7 +265,7 @@ defmodule MilosTrainingWeb.Router do
     get("/sources", TrainingLogController, :sources)
   end
 
-  # ADR-114: the acting user's own injury safety warnings for a workout they
+  # ADR-124: the acting user's own injury safety warnings for a workout they
   # are about to start (athletes and members alike).
   scope "/api/org/:organization_slug/me/workouts/:workout_id", MilosTrainingWeb do
     pipe_through([
@@ -323,7 +323,7 @@ defmodule MilosTrainingWeb.Router do
     patch("/my-workouts/assignments/:id/reschedule", MyWorkoutController, :reschedule)
   end
 
-  # ADR-115: members receive personal assignments and class variants too, so
+  # ADR-125: members receive personal assignments and class variants too, so
   # listing, opening and rejecting assignments is open to every tenant role
   # (the services only ever act on the caller's own assignment links).
   scope "/api/org/:organization_slug", MilosTrainingWeb do
@@ -340,7 +340,7 @@ defmodule MilosTrainingWeb.Router do
     patch("/my-workouts/assignments/:id/reject", MyWorkoutController, :reject)
   end
 
-  # ADR-119: members' PRs are readable by the gym's coaches, so the dossier PR
+  # ADR-129: members' PRs are readable by the gym's coaches, so the dossier PR
   # tab admits coaches as well as owners/admins. Owners/admins who are not
   # coaches get a role-safe empty state; the database enforces the rest.
   scope "/api/org/:organization_slug/admin", MilosTrainingWeb do
@@ -502,7 +502,7 @@ defmodule MilosTrainingWeb.Router do
 
     get("/finance/invoices/:id/download-url", AdminFinanceController, :invoice_download_url)
 
-    # ADR-116 refund receipts, provider reconciliation and accounting exports.
+    # ADR-126 refund receipts, provider reconciliation and accounting exports.
     get("/finance/refund-receipts", AdminFinanceAccountingController, :refund_receipts)
     get("/finance/refund-receipts/:id", AdminFinanceAccountingController, :refund_receipt)
 
@@ -576,7 +576,7 @@ defmodule MilosTrainingWeb.Router do
     get("/wellbeing/injuries", AdminWellbeingController, :index)
     post("/wellbeing/users/:id/injuries", AdminWellbeingController, :create)
     patch("/wellbeing/injuries/:id/heal", AdminWellbeingController, :heal)
-    # ADR-114 injury-aware workout safety warnings (informational only).
+    # ADR-124 injury-aware workout safety warnings (informational only).
     post("/wellbeing/injury-warnings", AdminInjuryWarningController, :evaluate)
     post("/wellbeing/injury-warnings/acknowledge", AdminInjuryWarningController, :acknowledge)
     get("/schedule/slots/:id/injury-warnings", AdminInjuryWarningController, :slot)
@@ -611,7 +611,7 @@ defmodule MilosTrainingWeb.Router do
 
     patch("/organizations/:id/lifecycle", PlatformOrganizationController, :lifecycle)
     patch("/organizations/:id/name", PlatformOrganizationController, :rename)
-    # ADR-112 slug rename with typed confirmation and retired-slug aliases.
+    # ADR-122 slug rename with typed confirmation and retired-slug aliases.
     get("/organizations/:id/slug-impact", PlatformOrganizationController, :slug_impact)
     patch("/organizations/:id/slug", PlatformOrganizationController, :rename_slug)
     patch("/organizations/:id/settings", PlatformOrganizationController, :settings)
@@ -634,7 +634,7 @@ defmodule MilosTrainingWeb.Router do
       :remove_logo
     )
 
-    # ADR-107 reviewed tenant export/purge workflow.
+    # ADR-117 reviewed tenant export/purge workflow.
     get("/organization-purges", PlatformOrganizationPurgeController, :index)
     post("/organizations/:id/purge", PlatformOrganizationPurgeController, :create)
     get("/organizations/:id/purge", PlatformOrganizationPurgeController, :show)
@@ -717,7 +717,7 @@ defmodule MilosTrainingWeb.Router do
     post("/:id/modifications", ExecutionController, :add_modifications)
   end
 
-  # ADR-113: batched client interaction analytics get their own bucket so a
+  # ADR-123: batched client interaction analytics get their own bucket so a
   # chatty client can never eat into the progress/complete budget above.
   scope "/api/executions", MilosTrainingWeb do
     pipe_through([
@@ -762,7 +762,7 @@ defmodule MilosTrainingWeb.Router do
     post("/:id/share", PRController, :share)
   end
 
-  # ADR-119: personal PR sharing (global, not tenant-scoped).
+  # ADR-129: personal PR sharing (global, not tenant-scoped).
   scope "/api/pr-sharing", MilosTrainingWeb do
     pipe_through([
       :api,

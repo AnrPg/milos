@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.GetPRSharing do
   @moduledoc """
-  The owner's PR sharing settings (ADR-119): whether gym coaches may read
+  The owner's PR sharing settings (ADR-129): whether gym coaches may read
   their PRs, and the accounts they have explicitly granted read access to.
   """
 

@@ -1,6 +1,6 @@
 defmodule MilosTraining.Organizations.OrganizationSlugAlias do
   @moduledoc """
-  A path slug an organization has retired (ADR-112).
+  A path slug an organization has retired (ADR-122).
 
   Retired slugs keep resolving to their organization and stay reserved for it
   for as long as the organization exists, so bookmarked and shared

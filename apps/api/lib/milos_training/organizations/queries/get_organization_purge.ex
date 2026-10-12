@@ -1,5 +1,5 @@
 defmodule MilosTraining.Organizations.Queries.GetOrganizationPurge do
-  @moduledoc "Vendor-scoped reads of ADR-107 platform purge records."
+  @moduledoc "Vendor-scoped reads of ADR-117 platform purge records."
 
   alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Organizations.{OrganizationStore, PlatformContext}

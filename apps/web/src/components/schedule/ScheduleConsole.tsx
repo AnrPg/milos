@@ -243,7 +243,7 @@ export function ScheduleConsole({
     setBusy(true);
 
     try {
-      // ADR-110: booking requests go through the durable outbox so an offline
+      // ADR-120: booking requests go through the durable outbox so an offline
       // request is replayed once, with the same idempotency key, on reconnect.
       const outcome = await submitCommand("booking.request", {
         slotId: bookingTarget.id,

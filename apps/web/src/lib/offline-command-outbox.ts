@@ -9,7 +9,7 @@ import { classifyDeliveryError, type OutboxFailure } from "@/lib/outbox-failure"
 
 /**
  * Durable outbox for explicitly opted-in, notification-triggering commands
- * other than chat messages (ADR-110). Unlike a generic request queue, only
+ * other than chat messages (ADR-120). Unlike a generic request queue, only
  * kinds with a registered adapter can be queued or replayed; each adapter
  * declares its idempotency key, retry classification, and conflict policy,
  * and its owning API context dedupes replays server-side.

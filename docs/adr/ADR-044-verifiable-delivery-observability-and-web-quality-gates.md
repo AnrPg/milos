@@ -113,6 +113,6 @@ Implemented 2026-07-16.
   enum state. Finance remains explicitly in progress because its broader read
   models first need equivalent source-schema precision.
 
-Follow-up (2026-10-12): ADR-106 found that outbox age, auth anomaly, and cache
+Follow-up (2026-10-12): ADR-116 found that outbox age, auth anomaly, and cache
 telemetry were reported on but never emitted; it adds the emitters and the
 production dashboards and alerts (TD-031).

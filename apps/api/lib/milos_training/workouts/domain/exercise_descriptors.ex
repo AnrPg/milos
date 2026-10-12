@@ -1,7 +1,7 @@
 defmodule MilosTraining.Workouts.Domain.ExerciseDescriptors do
   @moduledoc """
   Reduces a normalized workout to the minimal exercise descriptors other
-  contexts may reason about (ADR-114 injury warnings) without depending on
+  contexts may reason about (ADR-124 injury warnings) without depending on
   Workouts internals: `%{name, exercise_ref, category}`.
 
   `exercise_ref` is the stable Quick Text catalog id. Structured workouts

@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.ExecuteOrganizationPurge do
   @moduledoc """
-  ADR-107 stage 5. Purges an approved tenant in dependency order:
+  ADR-117 stage 5. Purges an approved tenant in dependency order:
 
   1. each bounded context through its own `purge_tenant_data/1`, dependents
      first (Analytics ... Finance, Scheduling, Workouts);

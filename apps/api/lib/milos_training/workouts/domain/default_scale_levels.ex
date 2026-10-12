@@ -1,6 +1,6 @@
 defmodule MilosTraining.Workouts.Domain.DefaultScaleLevels do
   @moduledoc """
-  The scale levels every new organization starts with (ADR-118).
+  The scale levels every new organization starts with (ADR-128).
 
   Scale levels are tenant-owned; a gym can rename, reorder or replace them
   through `PUT /api/org/:slug/admin/scale-levels`. This is only the starting

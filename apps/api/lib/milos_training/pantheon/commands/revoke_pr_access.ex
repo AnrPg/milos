@@ -1,6 +1,6 @@
 defmodule MilosTraining.Pantheon.Commands.RevokePRAccess do
   @moduledoc """
-  Revokes one of the owner's active PR sharing grants (ADR-119). The row is
+  Revokes one of the owner's active PR sharing grants (ADR-129). The row is
   kept with `revoked_at` as a record of past sharing. Must run in the owner's
   scope.
   """

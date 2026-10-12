@@ -146,7 +146,7 @@ export function fetchAdminUserSchedule(token: string, userId: string, startDate:
 }
 
 /**
- * ADR-115 member programming modes: replace the booked class's workout for
+ * ADR-125 member programming modes: replace the booked class's workout for
  * everyone (ADR-071 default), create this member's own version of the class,
  * or assign a personal workout without a class.
  */
@@ -163,7 +163,7 @@ export function programAdminUserWorkout(
     slot_id?: string | null;
     copy_source: boolean;
     admin_notes?: string;
-    /** ADR-115 member programming mode; ignored for athletes. */
+    /** ADR-125 member programming mode; ignored for athletes. */
     mode?: MemberProgrammingMode;
   },
 ) {
@@ -174,7 +174,7 @@ export function programAdminUserWorkout(
 }
 
 export function fetchAdminUserPRs(token: string, userId: string) {
-  // ADR-119: only the gym's coaches read members' PRs; other staff receive
+  // ADR-129: only the gym's coaches read members' PRs; other staff receive
   // `coach_role_required` and no records.
   return apiRequest<{ user_id: string; visibility: AdminUserPRVisibility; prs: AdminUserPR[] }>(
     `/admin/users/${userId}/prs`,

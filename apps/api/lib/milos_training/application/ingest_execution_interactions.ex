@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.IngestExecutionInteractions do
   @moduledoc """
-  Ingests a batch of client-only execution interaction signals (ADR-113) -
+  Ingests a batch of client-only execution interaction signals (ADR-123) -
   pause/resume, manual skips and restarts, round taps, on-the-fly adjusts,
   ready screen and get-ready countdown, finish-wizard steps, cast mode - as
   `execution_interaction` analytics events.

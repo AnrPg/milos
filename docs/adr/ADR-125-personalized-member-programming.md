@@ -1,4 +1,4 @@
-# ADR-115: Personalized Member Programming
+# ADR-125: Personalized Member Programming
 Date: 2026-10-12
 Status: Accepted
 
@@ -51,7 +51,7 @@ class occurrence.
   compatibility and documents it as "assignee user ids (athletes or members)".
 - One additive, nullable column `assigned_workouts.source_scheduled_class_id`
   (exposed as `source_slot_id`) marks a class variant. It is a loose reference to
-  a Scheduling-owned row (no cross-context foreign key, like ADR-108's
+  a Scheduling-owned row (no cross-context foreign key, like ADR-118's
   `source_reference_id`). The derived `assignment_kind` is `class_variant` when
   the source slot is set, otherwise `personal`.
 - The workout of a variant is an ordinary library copy (ADR-071): staff either
@@ -127,7 +127,7 @@ booking instead; both remain possible and each counts once as its own execution.
 ### Notifications and realtime
 The existing `workout_assigned` notification is delivered to every assignee
 (members included) and links to `/my-workouts`. Staff realtime refresh uses
-`TenantStaffRecipients` (ADR-104). No new notification type is introduced.
+`TenantStaffRecipients` (ADR-114). No new notification type is introduced.
 
 ### Role transitions
 Leaving the `member` role now also archives that user's live assignments in the

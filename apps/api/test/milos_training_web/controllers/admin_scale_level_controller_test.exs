@@ -1,8 +1,8 @@
 defmodule MilosTrainingWeb.AdminScaleLevelControllerTest do
   @moduledoc """
-  ADR-118 / TD-056: `/api/org/:slug/admin/scale-levels` reads and replaces
+  ADR-128 / TD-063: `/api/org/:slug/admin/scale-levels` reads and replaces
   only the addressed tenant's scale levels. Requests run as the RLS-enforcing
-  runtime role (ADR-109).
+  runtime role (ADR-119).
   """
 
   use MilosTrainingWeb.ConnCase, async: false

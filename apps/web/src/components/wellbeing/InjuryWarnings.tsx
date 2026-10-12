@@ -1,6 +1,6 @@
 "use client";
 
-// ADR-114 injury-aware workout safety warnings. Self-contained and
+// ADR-124 injury-aware workout safety warnings. Self-contained and
 // non-blocking: these components only inform. They never disable an
 // assignment, booking or "Start workout" action, and a failed load simply
 // renders a quiet notice.

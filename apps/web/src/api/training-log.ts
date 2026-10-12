@@ -37,7 +37,7 @@ export async function createTrainingLogEntry(
   body: CreateTrainingLogRequest,
   options?: { organizationSlug?: string | null },
 ): Promise<TrainingLogEntry> {
-  // ADR-110: an outbox replay pins the tenant the entry was logged in.
+  // ADR-120: an outbox replay pins the tenant the entry was logged in.
   const path = options?.organizationSlug
     ? `/org/${options.organizationSlug}${BASE}/entries`
     : `${BASE}/entries`;

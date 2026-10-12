@@ -1,6 +1,6 @@
 defmodule MilosTraining.Workouts.Domain.TenantDataPolicy do
   @moduledoc """
-  Workouts tenant data retention and purge policy (ADR-107).
+  Workouts tenant data retention and purge policy (ADR-117).
 
   Declares the tables this context owns, in delete (dependency) order, and
   how they are treated when a tenant is purged.
@@ -22,7 +22,7 @@ defmodule MilosTraining.Workouts.Domain.TenantDataPolicy do
               %{table: "workout_sections"},
               %{table: "master_workouts"},
               %{table: "workout_folders"},
-              # ADR-118: after exercise_variations, which reference it.
+              # ADR-128: after exercise_variations, which reference it.
               %{table: "scale_levels"}
             ]
           })

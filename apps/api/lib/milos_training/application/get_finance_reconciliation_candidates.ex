@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.GetFinanceReconciliationCandidates do
   @moduledoc """
   Ranked internal payment/reversal facts that could match a statement line
-  (ADR-116), each with its evaluation and the member's display name for the
+  (ADR-126), each with its evaluation and the member's display name for the
   admin matching screen.
   """
 

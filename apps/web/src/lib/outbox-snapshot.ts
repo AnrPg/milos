@@ -4,7 +4,7 @@ import type { OutboxFailure } from "@/lib/outbox-failure";
 
 /**
  * A device-outbox entry as presented in the global outbox panel, independent
- * of whether it is a chat message (ADR-067) or a registered command (ADR-110).
+ * of whether it is a chat message (ADR-067) or a registered command (ADR-120).
  */
 export type OutboxEntry = {
   source: "message" | "command";

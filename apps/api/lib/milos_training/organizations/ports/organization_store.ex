@@ -22,7 +22,7 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   @callback get_organization_by_id(Ecto.UUID.t()) :: Organization.t() | nil
   @callback get_organization_by_slug(String.t()) :: Organization.t() | nil
   @callback get_organization_by_domain(String.t()) :: Organization.t() | nil
-  # ADR-112 retired slug aliases.
+  # ADR-122 retired slug aliases.
   @callback get_organization_by_slug_alias(String.t()) :: Organization.t() | nil
   @callback get_canonical_slug_for_alias(String.t()) :: String.t() | nil
   @callback list_slug_aliases(Ecto.UUID.t()) :: [OrganizationSlugAlias.t()]
@@ -73,7 +73,7 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   @callback get_organization_settings(Ecto.UUID.t()) :: OrganizationSetting.t() | nil
   @callback update_organization_settings(Ecto.UUID.t(), map(), Ecto.UUID.t(), DateTime.t()) ::
               {:ok, OrganizationSetting.t()} | {:error, term()}
-  # ADR-111: sets (`%{object_key, url}`) or clears (nil) the uploaded logo and
+  # ADR-121: sets (`%{object_key, url}`) or clears (nil) the uploaded logo and
   # records the audit event in one transaction.
   @callback replace_organization_logo(
               Ecto.UUID.t(),
@@ -94,7 +94,7 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
               {:ok, OrganizationMembership.t()} | {:error, term()}
   @callback transaction((-> {:ok, term()} | {:error, term()})) :: {:ok, term()} | {:error, term()}
 
-  # ADR-107 reviewed tenant purge records (platform-level, survive the purge).
+  # ADR-117 reviewed tenant purge records (platform-level, survive the purge).
   @callback request_organization_purge(Ecto.UUID.t(), Ecto.UUID.t(), atom(), DateTime.t()) ::
               {:ok, %{purge: OrganizationPurge.t(), organization: Organization.t()}}
               | {:error, term()}

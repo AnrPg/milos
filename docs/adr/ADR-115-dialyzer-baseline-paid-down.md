@@ -1,4 +1,4 @@
-# ADR-105: Dialyzer Baseline Paid Down to Zero
+# ADR-115: Dialyzer Baseline Paid Down to Zero
 Date: 2026-10-12
 Status: Accepted
 

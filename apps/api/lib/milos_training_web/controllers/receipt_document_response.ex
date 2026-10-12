@@ -1,6 +1,6 @@
 defmodule MilosTrainingWeb.Controllers.ReceiptDocumentResponse do
   @moduledoc """
-  Shared HTTP handling for the ADR-116 printable refund receipt: locale
+  Shared HTTP handling for the ADR-126 printable refund receipt: locale
   resolution and a locked-down HTML response (no scripts, no external
   resources, not frameable, never cached by shared caches).
   """

@@ -9,7 +9,7 @@ interface MessageBubbleProps {
   message: ChatMessage | DisplayChatMessage;
   isOwnMessage: boolean;
   senderNickname?: string;
-  /** Re-enqueue a failed message with its original operation id (ADR-110). */
+  /** Re-enqueue a failed message with its original operation id (ADR-120). */
   onRetry?: (operationId: string) => void | Promise<void>;
   /** Drop a failed message from the device outbox after confirmation. */
   onDiscard?: (operationId: string) => void | Promise<void>;

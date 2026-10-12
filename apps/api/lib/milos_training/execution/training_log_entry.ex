@@ -1,6 +1,6 @@
 defmodule MilosTraining.Execution.TrainingLogEntry do
   @moduledoc """
-  Standalone training-log entry (ADR-108).
+  Standalone training-log entry (ADR-118).
 
   Records a workout the user performed without a timer-backed
   `workout_executions` row: a class they attended, an assigned or library

@@ -3,7 +3,7 @@ defmodule MilosTraining.Application.EditPR do
   alias MilosTraining.Pantheon
   alias MilosTraining.Pantheon.Domain.PRResultMetrics
 
-  # Owner-only under RLS: runs in the acting user's scope (ADR-119).
+  # Owner-only under RLS: runs in the acting user's scope (ADR-129).
   def call(%{user_id: user_id} = context, id, params),
     do: Pantheon.with_user_context(context, fn -> call(id, user_id, params) end)
 

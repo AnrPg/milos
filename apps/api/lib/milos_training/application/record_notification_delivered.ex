@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.RecordNotificationDelivered do
   @moduledoc """
-  Records `notification_in_app_delivered` (ADR-113) for every newly created
+  Records `notification_in_app_delivered` (ADR-123) for every newly created
   in-app notification.
 
   The Notifications context emits `[:milos, :notification, :delivered]`

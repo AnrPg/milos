@@ -1,7 +1,7 @@
 defmodule MilosTraining.Wellbeing.Domain.InjuryRiskPolicy do
   @moduledoc """
   Pure mapping from a person's active injuries to non-blocking safety
-  warnings for one workout (ADR-114).
+  warnings for one workout (ADR-124).
 
   Inputs are plain maps, so this module has no dependency on the Workouts
   context:

@@ -35,7 +35,7 @@ defmodule MilosTraining.Organizations.Domain.TenantAuthorization do
     do: {:error, :membership_required}
 
   @doc """
-  ADR-119 seam: is the acting member a coach of this tenant?
+  ADR-129 seam: is the acting member a coach of this tenant?
 
   Mirrors the SQL helper `milos_acting_user_coaches(org_id)` used by the PR
   visibility RLS policies; the two must change together. Under single-role

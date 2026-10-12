@@ -54,7 +54,7 @@ export function workoutCta(input: WorkoutCtaInput): WorkoutCta | null {
     if (bookedClass) return { href: `/schedule?open_slot=${bookedClass.id}`, label: "log" };
   }
 
-  // ADR-115: members may also have a personal workout or class version due today.
+  // ADR-125: members may also have a personal workout or class version due today.
   if (input.role === "athlete" || input.role === "member") {
     const today = localDate(input.now);
     const dueAssignment = input.assignments.find(

@@ -22,7 +22,7 @@ defmodule MilosTraining.Identity do
   defdelegate bump_security_version(user_id), to: UserStore
   defdelegate supported_locales(), to: Locale, as: :supported
 
-  @doc "Secret-free account records for a tenant export (ADR-107)."
+  @doc "Secret-free account records for a tenant export (ADR-117)."
   def export_accounts(user_ids) when is_list(user_ids) do
     user_ids
     |> list_by_ids()

@@ -1,6 +1,6 @@
 defmodule MilosTraining.Workouts.Commands.SeedDefaultScaleLevels do
   @moduledoc """
-  Gives an organization the default scale levels (ADR-118). Idempotent: an
+  Gives an organization the default scale levels (ADR-128). Idempotent: an
   organization that already has any scale level is left untouched.
   """
 

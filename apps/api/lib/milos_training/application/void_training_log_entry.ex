@@ -1,11 +1,11 @@
 defmodule MilosTraining.Application.VoidTrainingLogEntry do
   @moduledoc """
-  Voids a training-log entry (ADR-108). Entries are never deleted.
+  Voids a training-log entry (ADR-118). Entries are never deleted.
 
   Voiding removes the entry from every *future* completion projection (the
   gamification projection rebuilds its completed list from live entries), but
   does not retroactively reverse streaks, badges, PR events, or challenge
-  progress already awarded - see ADR-108 Consequences.
+  progress already awarded - see ADR-118 Consequences.
   """
 
   alias MilosTraining.Application.{InvalidateLandingPages, TrackAnalyticsEvent}

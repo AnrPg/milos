@@ -1,7 +1,7 @@
 defmodule MilosTraining.Repo.Migrations.AddOrganizationBrandLogoObjectKey do
   use Ecto.Migration
 
-  # ADR-111: first-class tenant logo upload.
+  # ADR-121: first-class tenant logo upload.
   #
   # `brand_logo_object_key` records the storage key of an uploaded logo
   # (`organizations/<organization_id>/branding/logo/<uuid>.<ext>`). The

@@ -26,7 +26,7 @@ services:
       REDIS_URL: redis://redis:6379
       SECRET_KEY_BASE: ${SECRET_KEY_BASE:?set SECRET_KEY_BASE in your environment or .env}
       MIX_ENV: prod
-      # Observability (ADR-106). All empty by default = no trace export and no
+      # Observability (ADR-116). All empty by default = no trace export and no
       # metrics listener. See ops/observability/README.md to enable.
       OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
       OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: ${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT:-}
@@ -229,7 +229,7 @@ services:
       timeout: 5s
       retries: 10
 
-  # --- Opt-in observability stack (ADR-106): docker compose --profile observability up -d
+  # --- Opt-in observability stack (ADR-116): docker compose --profile observability up -d
   # Nothing below starts without the profile. Prometheus/Alertmanager/Grafana
   # bind to 127.0.0.1 only and are never routed through Caddy.
   otel-collector:

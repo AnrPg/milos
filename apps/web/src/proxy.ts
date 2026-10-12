@@ -13,7 +13,7 @@ export function configuredMediaOrigins(env: MediaOriginEnv = process.env) {
 }
 
 export async function proxy(request: NextRequest) {
-  // ADR-112: a retired organization slug permanently redirects to the
+  // ADR-122: a retired organization slug permanently redirects to the
   // canonical one, preserving the rest of the path and the query.
   const retiredSlugTarget = await retiredOrganizationSlugRedirect(request.method, request.nextUrl);
   if (retiredSlugTarget) {

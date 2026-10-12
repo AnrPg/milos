@@ -84,7 +84,7 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
            )
   end
 
-  test "provisioning seeds the new organization's default scale levels (ADR-118)", context do
+  test "provisioning seeds the new organization's default scale levels (ADR-128)", context do
     response =
       context.conn
       |> put_bearer_token(context.platform_user)

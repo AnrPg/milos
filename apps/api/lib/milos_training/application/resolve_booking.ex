@@ -6,7 +6,7 @@ defmodule MilosTraining.Application.ResolveBooking do
   @doc """
   Approves or rejects a pending booking.
 
-  Accepts an optional `client_operation_id` (ADR-110). Returns
+  Accepts an optional `client_operation_id` (ADR-120). Returns
   `{:ok, booking, :resolved | :replayed}`; a replay of the operation that
   already resolved the booking returns it without notifying the member,
   releasing entitlements, or broadcasting again. Bookings resolved by anything

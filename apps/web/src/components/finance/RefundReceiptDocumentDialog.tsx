@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 
 /**
- * ADR-116: previews a server-rendered refund receipt in a fully sandboxed
+ * ADR-126: previews a server-rendered refund receipt in a fully sandboxed
  * iframe (no scripts, no same-origin access) and opens it in its own tab for
  * printing or saving as PDF.
  */

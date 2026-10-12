@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.FinalizeOrganizationLogo do
   @moduledoc """
-  ADR-111: verifies an uploaded tenant logo and makes it the organization's
+  ADR-121: verifies an uploaded tenant logo and makes it the organization's
   logo.
 
   Order matters: the key must be one this organization's policy issued

@@ -1,6 +1,6 @@
 defmodule MilosTraining.Pantheon.PRSharingPreference do
   @moduledoc """
-  Per-user PR sharing preference (ADR-119). Absence of a row means the
+  Per-user PR sharing preference (ADR-129). Absence of a row means the
   defaults: coaches of the gyms a PR was recorded in may read it.
   """
 

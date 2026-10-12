@@ -26,7 +26,7 @@ describe("configuredMediaOrigins", () => {
   });
 });
 
-describe("retired organization slugs (ADR-112)", () => {
+describe("retired organization slugs (ADR-122)", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
   });

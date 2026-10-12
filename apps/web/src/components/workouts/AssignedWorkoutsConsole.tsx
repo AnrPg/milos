@@ -398,7 +398,7 @@ export function AssignedWorkoutsConsole({
   const { role } = useSelectedMembershipRole();
 
   const isAdmin = role === "admin";
-  // ADR-115: members receive personal workouts and class versions here too,
+  // ADR-125: members receive personal workouts and class versions here too,
   // but reschedule and "request a workout" remain athlete services.
   const isMember = role === "member";
 
@@ -430,7 +430,7 @@ export function AssignedWorkoutsConsole({
 
   const accessToken = tokens?.access_token;
 
-  // ADR-113: an athlete opening an assignment's detail is an analytics fact.
+  // ADR-123: an athlete opening an assignment's detail is an analytics fact.
   const panelAssignmentId = panelAssignment?.id ?? null;
   useEffect(() => {
     if (!panelAssignmentId || isAdmin || !accessToken) return;

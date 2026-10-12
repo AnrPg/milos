@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.TrackMessagingAnalytics do
   @moduledoc """
-  Messaging analytics (ADR-113), applied to the result of a messaging write
+  Messaging analytics (ADR-123), applied to the result of a messaging write
   and returning that result unchanged so call sites stay one pipe long.
 
   * `{:ok, %Thread{}}` - `messaging_thread_created`, once per thread (the

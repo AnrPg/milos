@@ -240,7 +240,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   def list_workouts do
     MasterWorkout
     |> scoped_to_tenant()
-    # ADR-115: member-programming copies are personal, not library entries.
+    # ADR-125: member-programming copies are personal, not library entries.
     |> where([workout], workout.library_visibility == "shared")
     |> order_by([workout], desc: workout.inserted_at)
     |> Repo.all()
@@ -346,7 +346,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     end)
   end
 
-  # Scale levels are tenant-owned (ADR-118). Every query is filtered to the
+  # Scale levels are tenant-owned (ADR-128). Every query is filtered to the
   # session's organization on top of RLS, and writes fail closed without one.
   @impl true
   def list_scale_levels do
@@ -429,7 +429,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           Map.get(params, :source_scheduled_class_id) ||
             Map.get(params, "source_scheduled_class_id")
 
-        # ADR-115: an assignment only absorbs a new one with the same workout,
+        # ADR-125: an assignment only absorbs a new one with the same workout,
         # date and notes when both share the same source slot, so a class
         # variant never silently loses (or gains) its class link.
         existing =
@@ -567,7 +567,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   def list_class_variants([], _assignee_id), do: []
 
   def list_class_variants(slot_ids, assignee_id) when is_list(slot_ids) do
-    # ADR-115: live per-member variants of the given class occurrences. With an
+    # ADR-125: live per-member variants of the given class occurrences. With an
     # assignee id only that user's variants are returned (the member's own
     # "Your version"); with nil every assignee's (the staff view).
     variants =

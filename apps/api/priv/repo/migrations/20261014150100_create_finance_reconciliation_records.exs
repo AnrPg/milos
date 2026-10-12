@@ -1,7 +1,7 @@
 defmodule MilosTraining.Repo.Migrations.CreateFinanceReconciliationRecords do
   use Ecto.Migration
 
-  # ADR-116 / TD-022: provider-agnostic reconciliation records. Each row is
+  # ADR-126 / TD-022: provider-agnostic reconciliation records. Each row is
   # one external statement line (a provider payment or refund) recorded
   # manually by staff and optionally matched to exactly one internal fact - a
   # `membership_payments` row or a `finance_payment_reversals` row. Recording

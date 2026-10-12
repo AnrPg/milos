@@ -1,7 +1,7 @@
 import { apiRequest } from "@/api/client";
 import type { components } from "@/api/generated/schema";
 
-// ADR-116: refund receipts, payment-provider reconciliation and accounting exports.
+// ADR-126: refund receipts, payment-provider reconciliation and accounting exports.
 type Schemas = components["schemas"];
 
 export type RefundReceipt = Schemas["FinanceRefundReceipt"];

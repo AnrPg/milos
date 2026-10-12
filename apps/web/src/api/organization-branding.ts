@@ -1,7 +1,7 @@
 import type { components } from "@/api/generated/schema";
 import { apiRequest } from "@/api/client";
 
-// ADR-111 tenant logo upload. Tenant owners/admins use the `/admin/branding`
+// ADR-121 tenant logo upload. Tenant owners/admins use the `/admin/branding`
 // routes (scoped to the selected organization by the API client); vendors use
 // the platform routes for any organization.
 

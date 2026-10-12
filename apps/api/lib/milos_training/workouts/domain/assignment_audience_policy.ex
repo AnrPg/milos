@@ -1,6 +1,6 @@
 defmodule MilosTraining.Workouts.Domain.AssignmentAudiencePolicy do
   @moduledoc """
-  ADR-115: who a workout assignment may target, and what a class variant is.
+  ADR-125: who a workout assignment may target, and what a class variant is.
 
   Pure rules over already-resolved facts (tenant membership roles, the optional
   source slot). Assignee roles always come from the membership in the acting

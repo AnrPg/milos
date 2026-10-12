@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.OrganizationPurgeRLSTest do
   @moduledoc """
-  ADR-107 under real Row Level Security.
+  ADR-117 under real Row Level Security.
 
   The suite normally runs as a superuser, which bypasses RLS, so a root-tenant
   table query that is not wrapped in `RepoContext.run/2` passes every ordinary

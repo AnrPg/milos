@@ -166,7 +166,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Summarize what renaming an organization's path slug affects (ADR-112) */
+        /** Summarize what renaming an organization's path slug affects (ADR-122) */
         get: operations["MilosTrainingWeb.PlatformOrganizationController.slug_impact"];
         put?: never;
         post?: never;
@@ -2048,7 +2048,7 @@ export interface paths {
         put?: never;
         /**
          * Assign a published workout to one or more athletes or members
-         * @description ADR-115: `athlete_ids` holds assignee user ids - active athletes or members of the organization (the field name is kept for compatibility). Members require a package with the personal_programming channel and execute_assigned_workouts capability (403 `member_programming_not_entitled`). `source_slot_id` makes the assignment one member's version of a class they booked (exactly one member; 422 `class_variant_requires_single_member` / `slot_not_booked_by_member`).
+         * @description ADR-125: `athlete_ids` holds assignee user ids - active athletes or members of the organization (the field name is kept for compatibility). Members require a package with the personal_programming channel and execute_assigned_workouts capability (403 `member_programming_not_entitled`). `source_slot_id` makes the assignment one member's version of a class they booked (exactly one member; 422 `class_variant_requires_single_member` / `slot_not_booked_by_member`).
          */
         post: operations["MilosTrainingWeb.AdminAssignedWorkoutController.create"];
         delete?: never;
@@ -2221,7 +2221,7 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Report client-only execution interaction events (analytics, ADR-113)
+         * Report client-only execution interaction events (analytics, ADR-123)
          * @description Batched, idempotent ingestion of execution interaction signals the server cannot observe (pause sheet, manual skip, round taps, adjusts, ready screen, finish wizard, cast mode). Each event dedupes on its client_event_id; retries are accepted and counted as duplicates. Any invalid event rejects the batch.
          */
         post: operations["MilosTrainingWeb.ExecutionController.record_interactions"];
@@ -2279,7 +2279,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Assignee (athlete or member, ADR-115) rejects an assigned workout */
+        /** Assignee (athlete or member, ADR-125) rejects an assigned workout */
         patch: operations["MilosTrainingWeb.MyWorkoutController.reject"];
         trace?: never;
     };
@@ -2548,7 +2548,7 @@ export interface paths {
         };
         /**
          * List assigned workouts for the current athlete or member, or all assignments for staff
-         * @description ADR-115: members receive personal assignments and class variants. Each assignment carries `assignment_kind` (`personal` | `class_variant`) and `source_slot_id` (the class a variant belongs to, or null).
+         * @description ADR-125: members receive personal assignments and class variants. Each assignment carries `assignment_kind` (`personal` | `class_variant`) and `source_slot_id` (the class a variant belongs to, or null).
          */
         get: operations["MilosTrainingWeb.MyWorkoutController.index"];
         put?: never;
@@ -2674,7 +2674,7 @@ export interface paths {
         put?: never;
         /**
          * Log a class, assigned, library, or freeform workout
-         * @description Idempotent per `idempotency_key`: a replay returns the original entry with 200, before source authorization is re-evaluated (ADR-110). Reusing a key for a different source returns 409 `idempotency_key_conflict`. Logging feeds the same durable completion projection as workout executions.
+         * @description Idempotent per `idempotency_key`: a replay returns the original entry with 200, before source authorization is re-evaluated (ADR-120). Reusing a key for a different source returns 409 `idempotency_key_conflict`. Logging feeds the same durable completion projection as workout executions.
          */
         post: operations["MilosTrainingWeb.TrainingLogController.create"];
         delete?: never;
@@ -2932,7 +2932,7 @@ export interface paths {
         };
         /**
          * The current user's injury safety warnings for a workout
-         * @description Informational only (ADR-114): includes the user's own personal injuries; never blocks starting the workout.
+         * @description Informational only (ADR-124): includes the user's own personal injuries; never blocks starting the workout.
          */
         get: operations["MilosTrainingWeb.MyInjuryWarningController.show"];
         put?: never;
@@ -3062,7 +3062,7 @@ export interface paths {
         head?: never;
         /**
          * Reject a booking
-         * @description Booking resolution is never replayed blindly (ADR-110): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.
+         * @description Booking resolution is never replayed blindly (ADR-120): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.
          */
         patch: operations["MilosTrainingWeb.AdminScheduleController.reject_booking"];
         trace?: never;
@@ -3082,7 +3082,7 @@ export interface paths {
         head?: never;
         /**
          * Approve a booking
-         * @description Booking resolution is never replayed blindly (ADR-110): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.
+         * @description Booking resolution is never replayed blindly (ADR-120): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.
          */
         patch: operations["MilosTrainingWeb.AdminScheduleController.approve_booking"];
         trace?: never;
@@ -3253,7 +3253,7 @@ export interface paths {
         put?: never;
         /**
          * Injury safety warnings for athletes against a workout
-         * @description Informational only (ADR-114). Only injuries with this organization's provenance are considered; members' personal self-reports are never visible to staff.
+         * @description Informational only (ADR-124). Only injuries with this organization's provenance are considered; members' personal self-reports are never visible to staff.
          */
         post: operations["MilosTrainingWeb.AdminInjuryWarningController.evaluate"];
         delete?: never;
@@ -3311,7 +3311,7 @@ export interface paths {
         put?: never;
         /**
          * Copy or save a workout and associate it with this user's assignment, class variant or booked class
-         * @description Athletes receive a personal assignment. Members follow `mode` (ADR-115). Member assignment modes fail with 403 `member_programming_not_entitled` when the member's package lacks the personal_programming channel or execute_assigned_workouts capability.
+         * @description Athletes receive a personal assignment. Members follow `mode` (ADR-125). Member assignment modes fail with 403 `member_programming_not_entitled` when the member's package lacks the personal_programming channel or execute_assigned_workouts capability.
          */
         post: operations["MilosTrainingWeb.AdminUserController.program_workout"];
         delete?: never;
@@ -3399,7 +3399,7 @@ export interface paths {
         put?: never;
         /**
          * Book a schedule slot
-         * @description Optionally idempotent per `client_operation_id` (ADR-110): replaying the same id for the same slot returns the original booking with 200 and no new reservation, notification, or broadcast; reusing it for another slot returns 409 `idempotency_key_conflict`.
+         * @description Optionally idempotent per `client_operation_id` (ADR-120): replaying the same id for the same slot returns the original booking with 200 and no new reservation, notification, or broadcast; reusing it for another slot returns 409 `idempotency_key_conflict`.
          */
         post: operations["MilosTrainingWeb.ScheduleController.create_booking"];
         delete?: never;
@@ -3483,7 +3483,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List assignable users (athletes; optionally members, ADR-115) */
+        /** List assignable users (athletes; optionally members, ADR-125) */
         get: operations["MilosTrainingWeb.AdminUserController.index_athletes"];
         put?: never;
         post?: never;
@@ -3904,7 +3904,7 @@ export interface components {
         OrganizationBrandingResponse: {
             /** OrganizationBranding */
             branding: {
-                /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
+                /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-121). */
                 brand_logo_uploaded: boolean;
                 brand_logo_url: string | null;
                 brand_name?: string | null;
@@ -3981,7 +3981,7 @@ export interface components {
             client_event_id: string;
             /** @enum {string} */
             kind: "cast_mode_toggled" | "check_off_undone" | "cues_toggled" | "finish_wizard_abandoned" | "finish_wizard_opened" | "finish_wizard_saved" | "first_segment_started" | "pause" | "ready_screen_shown" | "resume" | "round_decremented" | "round_incremented" | "rounds_adjusted" | "segment_restarted" | "segment_skipped" | "time_adjusted" | "workout_launched";
-            /** @description Typed facts allowed for the interaction kind (see ADR-113). No free text; keys not allowed for the kind reject the batch. */
+            /** @description Typed facts allowed for the interaction kind (see ADR-123). No free text; keys not allowed for the kind reject the batch. */
             metadata?: {
                 countdown_seconds?: number;
                 /** @enum {string} */
@@ -4129,7 +4129,7 @@ export interface components {
         };
         /** OrganizationBranding */
         OrganizationBranding: {
-            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
+            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-121). */
             brand_logo_uploaded: boolean;
             brand_logo_url: string | null;
             brand_name?: string | null;
@@ -4485,7 +4485,7 @@ export interface components {
                 client_event_id: string;
                 /** @enum {string} */
                 kind: "cast_mode_toggled" | "check_off_undone" | "cues_toggled" | "finish_wizard_abandoned" | "finish_wizard_opened" | "finish_wizard_saved" | "first_segment_started" | "pause" | "ready_screen_shown" | "resume" | "round_decremented" | "round_incremented" | "rounds_adjusted" | "segment_restarted" | "segment_skipped" | "time_adjusted" | "workout_launched";
-                /** @description Typed facts allowed for the interaction kind (see ADR-113). No free text; keys not allowed for the kind reject the batch. */
+                /** @description Typed facts allowed for the interaction kind (see ADR-123). No free text; keys not allowed for the kind reject the batch. */
                 metadata?: {
                     countdown_seconds?: number;
                     /** @enum {string} */
@@ -9351,7 +9351,7 @@ export interface operations {
                         /** Format: uuid */
                         user_id: string;
                         /**
-                         * @description ADR-119: `coach` - PRs recorded in this gym that the member shares with its coaches; `coach_role_required` - the caller is staff but not a coach of this gym, so no PRs are returned.
+                         * @description ADR-129: `coach` - PRs recorded in this gym that the member shares with its coaches; `coach_role_required` - the caller is staff but not a coach of this gym, so no PRs are returned.
                          * @enum {string}
                          */
                         visibility: "coach" | "coach_role_required";
@@ -11956,7 +11956,7 @@ export interface operations {
                     "application/json": {
                         /** OrganizationBranding */
                         branding: {
-                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-121). */
                             brand_logo_uploaded: boolean;
                             brand_logo_url: string | null;
                             brand_name?: string | null;
@@ -11989,7 +11989,7 @@ export interface operations {
                     "application/json": {
                         /** OrganizationBranding */
                         branding: {
-                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-121). */
                             brand_logo_uploaded: boolean;
                             brand_logo_url: string | null;
                             brand_name?: string | null;
@@ -15042,7 +15042,7 @@ export interface operations {
                     "application/json": {
                         /** OrganizationBranding */
                         branding: {
-                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-121). */
                             brand_logo_uploaded: boolean;
                             brand_logo_url: string | null;
                             brand_name?: string | null;
@@ -15131,7 +15131,7 @@ export interface operations {
                     scheduled_for: string;
                     /**
                      * Format: uuid
-                     * @description Class occurrence this assignment is a member's version of (ADR-115).
+                     * @description Class occurrence this assignment is a member's version of (ADR-125).
                      */
                     source_slot_id?: string | null;
                 };
@@ -15248,7 +15248,7 @@ export interface operations {
                     higher_is_better?: boolean;
                     name: string;
                     notes?: string;
-                    /** @description Gym the PR was achieved in (ADR-119). Must be one of the caller's active memberships; the gym's coaches can then read it. Omit for a personal PR. */
+                    /** @description Gym the PR was achieved in (ADR-129). Must be one of the caller's active memberships; the gym's coaches can then read it. Omit for a personal PR. */
                     organization_slug?: string | null;
                     /** @description Optional typed result context. Accepted keys: reps, sets, load_kg, duration_seconds, distance_m, calories, rounds, variation. */
                     supporting_metrics?: Record<string, never>;
@@ -15550,7 +15550,7 @@ export interface operations {
                         client_event_id: string;
                         /** @enum {string} */
                         kind: "cast_mode_toggled" | "check_off_undone" | "cues_toggled" | "finish_wizard_abandoned" | "finish_wizard_opened" | "finish_wizard_saved" | "first_segment_started" | "pause" | "ready_screen_shown" | "resume" | "round_decremented" | "round_incremented" | "rounds_adjusted" | "segment_restarted" | "segment_skipped" | "time_adjusted" | "workout_launched";
-                        /** @description Typed facts allowed for the interaction kind (see ADR-113). No free text; keys not allowed for the kind reject the batch. */
+                        /** @description Typed facts allowed for the interaction kind (see ADR-123). No free text; keys not allowed for the kind reject the batch. */
                         metadata?: {
                             countdown_seconds?: number;
                             /** @enum {string} */
@@ -18166,7 +18166,7 @@ export interface operations {
                     "application/json": {
                         /** OrganizationBranding */
                         branding: {
-                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-121). */
                             brand_logo_uploaded: boolean;
                             brand_logo_url: string | null;
                             brand_name?: string | null;
@@ -18197,7 +18197,7 @@ export interface operations {
                     "application/json": {
                         /** OrganizationBranding */
                         branding: {
-                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-121). */
                             brand_logo_uploaded: boolean;
                             brand_logo_url: string | null;
                             brand_name?: string | null;
@@ -18407,7 +18407,7 @@ export interface operations {
                     admin_message?: string;
                     /**
                      * Format: uuid
-                     * @description Stable client operation id (ADR-110). Replaying the operation that already resolved the booking returns it with 200 and no new notification.
+                     * @description Stable client operation id (ADR-120). Replaying the operation that already resolved the booking returns it with 200 and no new notification.
                      */
                     client_operation_id?: string | null;
                 };
@@ -18480,7 +18480,7 @@ export interface operations {
                     admin_message?: string;
                     /**
                      * Format: uuid
-                     * @description Stable client operation id (ADR-110). Replaying the operation that already resolved the booking returns it with 200 and no new notification.
+                     * @description Stable client operation id (ADR-120). Replaying the operation that already resolved the booking returns it with 200 and no new notification.
                      */
                     client_operation_id?: string | null;
                 };
@@ -19109,7 +19109,7 @@ export interface operations {
                     /** Format: uuid */
                     master_workout_id?: string;
                     /**
-                     * @description Member programming mode (ADR-115; ignored for athletes). `class_workout` (default) replaces the booked class's workout for everyone; `class_variant` assigns this member's own version of the booked class (source defaults to the class's workout when `master_workout_id` is omitted); `personal` assigns a personal workout without a class. Both assignment modes require the member's package to include personal programming.
+                     * @description Member programming mode (ADR-125; ignored for athletes). `class_workout` (default) replaces the booked class's workout for everyone; `class_variant` assigns this member's own version of the booked class (source defaults to the class's workout when `master_workout_id` is omitted); `personal` assigns a personal workout without a class. Both assignment modes require the member's package to include personal programming.
                      * @enum {string}
                      */
                     mode?: "class_workout" | "class_variant" | "personal";

@@ -9,7 +9,7 @@ defmodule MilosTraining.Pantheon.PRStore do
 
   # PRs, history, sharing preferences and grants are RLS-protected: every
   # access runs in an explicit ownership scope - the acting user (personal
-  # reads/writes, grantee reads) or the acting coach's tenant (ADR-119).
+  # reads/writes, grantee reads) or the acting coach's tenant (ADR-129).
   def with_scope(context, fun) when is_function(fun, 0), do: RepoContext.run(context, fun)
 
   @impl true

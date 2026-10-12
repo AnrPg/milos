@@ -106,7 +106,7 @@ else
   config :opentelemetry, traces_exporter: :none
 end
 
-# Internal Prometheus scrape listener (ADR-106). Disabled unless METRICS_PORT
+# Internal Prometheus scrape listener (ADR-116). Disabled unless METRICS_PORT
 # is set. It binds its own port, separate from the Phoenix endpoint, which
 # Compose never publishes and Caddy never proxies. Production requires a
 # bearer token so a misrouted network cannot read operational telemetry.

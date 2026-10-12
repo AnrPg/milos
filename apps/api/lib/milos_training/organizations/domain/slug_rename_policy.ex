@@ -1,6 +1,6 @@
 defmodule MilosTraining.Organizations.Domain.SlugRenamePolicy do
   @moduledoc """
-  Pure rules for renaming an organization's path slug (ADR-112).
+  Pure rules for renaming an organization's path slug (ADR-122).
 
   A slug rename moves `canonical_path`, every `/org/:slug` route and every
   bookmarked or shared tenant link, so it is guarded three ways:

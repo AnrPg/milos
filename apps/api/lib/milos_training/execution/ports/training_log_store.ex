@@ -1,5 +1,5 @@
 defmodule MilosTraining.Execution.Ports.TrainingLogStore do
-  @moduledoc "Persistence port for standalone training-log entries (ADR-108)."
+  @moduledoc "Persistence port for standalone training-log entries (ADR-118)."
 
   @type entry :: map()
   @type write_error ::

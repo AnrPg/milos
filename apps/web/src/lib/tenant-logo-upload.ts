@@ -1,6 +1,6 @@
 import type { OrganizationBranding, OrganizationLogoApi } from "@/api/organization-branding";
 
-// ADR-111: client-side mirror of the server's logo policy. The server
+// ADR-121: client-side mirror of the server's logo policy. The server
 // re-validates the stored bytes (magic bytes + size), so these checks only
 // spare the user a pointless upload. SVG is deliberately not accepted.
 export const TENANT_LOGO_CONTENT_TYPES = ["image/png", "image/jpeg", "image/webp"] as const;

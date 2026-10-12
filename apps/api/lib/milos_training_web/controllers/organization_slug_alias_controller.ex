@@ -1,6 +1,6 @@
 defmodule MilosTrainingWeb.OrganizationSlugAliasController do
   @moduledoc """
-  ADR-112: unauthenticated retired-slug lookup used by the web proxy to issue
+  ADR-122: unauthenticated retired-slug lookup used by the web proxy to issue
   a 308 from `/org/<old>/...` to `/org/<new>/...`.
 
   It answers only for retired aliases and reveals nothing beyond the current

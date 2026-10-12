@@ -1,5 +1,5 @@
 /**
- * ADR-115 personalized member programming: pure UI rules shared by the staff
+ * ADR-125 personalized member programming: pure UI rules shared by the staff
  * programming dialog, the class card and the member's workout list.
  */
 

@@ -5,7 +5,7 @@ defmodule MilosTraining.Workers.ProcessWorkoutCompletionJob do
   Two completion sources share this job and its gamification pathway:
 
     * executions - `%{"execution_id" => id}`
-    * standalone training-log entries (ADR-108) -
+    * standalone training-log entries (ADR-118) -
       `%{"source" => "training_log", "training_log_entry_id" => id,
       "organization_id" => org, "user_id" => user}`
 

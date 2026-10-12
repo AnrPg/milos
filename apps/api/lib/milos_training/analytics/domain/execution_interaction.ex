@@ -1,7 +1,7 @@
 defmodule MilosTraining.Analytics.Domain.ExecutionInteraction do
   @moduledoc """
   Allowlist and validation for client-only workout-execution interaction
-  signals (ADR-113). These are facts only the client can observe - a pause
+  signals (ADR-123). These are facts only the client can observe - a pause
   sheet opening, a manual skip versus an automatic segment advance, a
   "+1 round" tap, a get-ready countdown - and they arrive in batches through
   `POST /api/executions/:id/interactions`.

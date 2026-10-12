@@ -1,6 +1,6 @@
 defmodule MilosTraining.Finance.RefundReceiptsTest do
   @moduledoc """
-  ADR-116 refund receipts: issued atomically with payment reversals, gapless
+  ADR-126 refund receipts: issued atomically with payment reversals, gapless
   per-tenant numbering (sequential and under transaction rollback),
   idempotent replays, immutability, member/staff visibility and two-tenant
   isolation - all under the RLS-enforcing runtime role.

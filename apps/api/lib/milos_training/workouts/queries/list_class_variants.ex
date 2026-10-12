@@ -1,6 +1,6 @@
 defmodule MilosTraining.Workouts.Queries.ListClassVariants do
   @moduledoc """
-  ADR-115: live per-member variants of class occurrences.
+  ADR-125: live per-member variants of class occurrences.
 
   `assignee_id` narrows the result to one user's own variants (the member's
   "Your version"); `nil` returns every assignee's variants (staff view).

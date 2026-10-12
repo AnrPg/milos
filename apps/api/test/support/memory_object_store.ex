@@ -1,6 +1,6 @@
 defmodule MilosTraining.TestSupport.MemoryObjectStore do
   @moduledoc """
-  In-memory `TenantObjectStore` for tests (ADR-107). Objects are keyed by
+  In-memory `TenantObjectStore` for tests (ADR-117). Objects are keyed by
   `{bucket, key}` in a globally named Agent; tests only touch keys under their
   own freshly generated organization/user ids, so async tests do not collide.
   """

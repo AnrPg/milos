@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.ProvisionOrganization do
   @moduledoc """
   Provisions an organization (Organizations) and gives it the default scale
-  levels (Workouts, ADR-118), running the seed inside the new tenant's scope.
+  levels (Workouts, ADR-128), running the seed inside the new tenant's scope.
 
   The two writes are separate transactions in separate contexts. Seeding is
   idempotent and a fresh organization's table is empty, so the only failure

@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.SweepAbandonedExecutions do
   @moduledoc """
   Records `workout_execution_abandoned` for one tenant's executions that were
-  started but not completed within the abandonment threshold (ADR-113).
+  started but not completed within the abandonment threshold (ADR-123).
 
   * Threshold: `config :milos_training, :execution_abandonment_hours`
     (default #{6}h). An execution started at least that long ago and still not

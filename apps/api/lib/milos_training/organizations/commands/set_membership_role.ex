@@ -89,7 +89,7 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipRole do
   # another.
   defp reconcile_role_owned_state(_context, %{role: role}, role), do: :ok
 
-  # ADR-115: members may also hold personal assignments and class variants;
+  # ADR-125: members may also hold personal assignments and class variants;
   # leaving the role archives them like leaving :athlete does.
   defp reconcile_role_owned_state(context, %{role: :member, user_id: user_id}, _new_role) do
     with {:ok, release_facts} <-

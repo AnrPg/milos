@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.TenantPurgeJobs do
   @moduledoc """
-  Enqueues the ADR-107 background stages. Jobs carry only the purge id and the
+  Enqueues the ADR-117 background stages. Jobs carry only the purge id and the
   acting vendor id; the worker re-resolves the vendor's platform context so a
   revoked vendor cannot keep a purge running.
   """

@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.OrganizationPurgeTest do
   @moduledoc """
-  ADR-107 reviewed tenant export/purge: staged workflow, context-by-context
+  ADR-117 reviewed tenant export/purge: staged workflow, context-by-context
   purge in dependency order, two-tenant isolation, idempotent re-runs, and an
   audit record that survives the purge.
   """

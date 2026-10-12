@@ -1175,7 +1175,7 @@ export function LandingPage() {
             );
           })()}
 
-          {/* ── Training log (class / offline workouts, ADR-108) ─────── */}
+          {/* ── Training log (class / offline workouts, ADR-118) ─────── */}
           <TrainingLogSection />
         </div>
 

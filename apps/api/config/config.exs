@@ -50,7 +50,7 @@ config :milos_training, MilosTraining.Infrastructure.Auth.Guardian,
 
 config :milos_training, :start_redix, true
 config :milos_training, :start_oban, true
-# ADR-113: a started execution not completed within this many hours is recorded
+# ADR-123: a started execution not completed within this many hours is recorded
 # as workout_execution_abandoned by ExecutionAbandonmentSweepJob.
 config :milos_training, :execution_abandonment_hours, 6
 config :milos_training, :redis_url, System.get_env("REDIS_URL", "redis://localhost:6379")

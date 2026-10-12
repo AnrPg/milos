@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.RemoveOrganizationLogo do
   @moduledoc """
-  ADR-111: clears an organization's logo (uploaded or legacy external URL),
+  ADR-121: clears an organization's logo (uploaded or legacy external URL),
   records the audit event and deletes the uploaded object, prefix-pinned.
   """
 

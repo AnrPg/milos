@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.UpdateTrainingLogEntry do
   @moduledoc """
-  Owner edit of a training-log entry within the tenant (ADR-108).
+  Owner edit of a training-log entry within the tenant (ADR-118).
 
   Edits change the performed details only; they do not re-run the completion
   projection (gamification is computed once, when the entry is logged).

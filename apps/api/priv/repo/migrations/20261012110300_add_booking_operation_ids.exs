@@ -1,6 +1,6 @@
 defmodule MilosTraining.Repo.Migrations.AddBookingOperationIds do
   @moduledoc """
-  ADR-110: client operation identities for offline-replayable booking commands.
+  ADR-120: client operation identities for offline-replayable booking commands.
 
   `client_operation_id` dedupes a member's booking request replay; it is unique
   per tenant and requesting user (rows without a key are unconstrained).

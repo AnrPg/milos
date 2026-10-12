@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.SetPRCoachVisibility do
   @moduledoc """
-  The owner's coach-visibility opt-out (ADR-119). Applies to every gym the
+  The owner's coach-visibility opt-out (ADR-129). Applies to every gym the
   user belongs to; explicit sharing grants are unaffected.
   """
 

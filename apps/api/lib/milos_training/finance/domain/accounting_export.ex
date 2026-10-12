@@ -1,6 +1,6 @@
 defmodule MilosTraining.Finance.Domain.AccountingExport do
   @moduledoc """
-  Stable accounting-export schemas and artifact building (ADR-116).
+  Stable accounting-export schemas and artifact building (ADR-126).
 
   An export covers an inclusive date range and produces, per dataset, one
   CSV (RFC 4180, UTF-8, CRLF, header row) and one JSON document with the

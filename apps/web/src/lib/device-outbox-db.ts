@@ -1,6 +1,6 @@
 /**
  * Shared IndexedDB database for the per-device durable outbox (ADR-067,
- * ADR-110). Version 1 held only message operations; version 2 adds the
+ * ADR-120). Version 1 held only message operations; version 2 adds the
  * explicitly registered non-message command operations. Upgrades are
  * additive: existing stores are never dropped, so queued messages survive.
  */

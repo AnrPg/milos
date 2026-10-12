@@ -100,9 +100,9 @@ export type ScheduleSlot = {
   workout: WorkoutPreview | null;
   current_user_booking?: ScheduleBooking | null;
   bookings: ScheduleBooking[];
-  /** ADR-115: the acting member's own version of this class (members only). */
+  /** ADR-125: the acting member's own version of this class (members only). */
   my_version?: MemberClassVersion | null;
-  /** ADR-115: every member's version of this class (staff only). */
+  /** ADR-125: every member's version of this class (staff only). */
   member_versions?: StaffMemberClassVersion[];
 };
 
@@ -201,7 +201,7 @@ export async function archiveClassType(token: string, id: string, replacementCla
 }
 
 /**
- * Offline-replay options (ADR-110). `clientOperationId` makes the command
+ * Offline-replay options (ADR-120). `clientOperationId` makes the command
  * idempotent on the server; `organizationSlug` pins a replay to the tenant
  * the user acted in, even if they switched organizations meanwhile.
  */

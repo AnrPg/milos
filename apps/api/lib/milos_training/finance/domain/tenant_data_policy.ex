@@ -1,6 +1,6 @@
 defmodule MilosTraining.Finance.Domain.TenantDataPolicy do
   @moduledoc """
-  Finance tenant data retention and purge policy (ADR-107).
+  Finance tenant data retention and purge policy (ADR-117).
 
   Declares the tables this context owns, in delete (dependency) order, and
   how they are treated when a tenant is purged.
@@ -17,7 +17,7 @@ defmodule MilosTraining.Finance.Domain.TenantDataPolicy do
               "Invoices, payments, reversals, refund receipts, reconciliation records, accounting-export runs and the ledgers behind them are accounting records with a statutory retention period; they are archived with their uploaded documents and purged from the live database.",
             retained_object_prefixes: ["invoices/"],
             tables: [
-              # ADR-116: refund receipts and reconciliation records reference
+              # ADR-126: refund receipts and reconciliation records reference
               # reversals and payments, so they are deleted first.
               %{table: "finance_reconciliation_records"},
               %{table: "finance_refund_receipts"},

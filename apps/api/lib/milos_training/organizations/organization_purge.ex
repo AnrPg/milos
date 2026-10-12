@@ -1,6 +1,6 @@
 defmodule MilosTraining.Organizations.OrganizationPurge do
   @moduledoc """
-  Platform-level audit record of one reviewed tenant export/purge (ADR-107).
+  Platform-level audit record of one reviewed tenant export/purge (ADR-117).
 
   The row intentionally has no foreign key to `organizations` or `users`: it
   must survive the purge it describes. It holds identifiers, counts, policies

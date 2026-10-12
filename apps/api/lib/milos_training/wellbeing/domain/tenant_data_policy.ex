@@ -1,6 +1,6 @@
 defmodule MilosTraining.Wellbeing.Domain.TenantDataPolicy do
   @moduledoc """
-  Wellbeing tenant data retention and purge policy (ADR-107).
+  Wellbeing tenant data retention and purge policy (ADR-117).
 
   Declares the tables this context owns, in delete (dependency) order, and
   how they are treated when a tenant is purged.

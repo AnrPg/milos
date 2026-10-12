@@ -63,7 +63,7 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
 
   defp may_self_select?(_actor, _organization_id), do: false
 
-  # ADR-115: an assignment may be addressed to an athlete or a member. The link
+  # ADR-125: an assignment may be addressed to an athlete or a member. The link
   # alone is not enough - the assignee must still hold an active athlete or
   # member membership in the assignment's organization.
   defp authorize_assignment(context, %{id: assignee_id} = actor, workout_id, assignment_id)

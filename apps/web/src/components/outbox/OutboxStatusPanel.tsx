@@ -57,7 +57,7 @@ async function loadOperations(userId: string): Promise<RawOperations> {
 }
 
 /**
- * Global, per-user view of the device outbox (ADR-110): a compact status pill
+ * Global, per-user view of the device outbox (ADR-120): a compact status pill
  * while anything is waiting or failed, and a panel listing each operation with
  * its failure reason, Retry, and Discard.
  */

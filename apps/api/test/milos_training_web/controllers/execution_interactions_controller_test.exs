@@ -1,5 +1,5 @@
 defmodule MilosTrainingWeb.ExecutionInteractionsControllerTest do
-  @moduledoc "ADR-113: execution interaction ingestion and assignment-open command endpoints."
+  @moduledoc "ADR-123: execution interaction ingestion and assignment-open command endpoints."
   use MilosTrainingWeb.ConnCase, async: false
 
   import MilosTraining.AnalyticsHelpers

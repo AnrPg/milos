@@ -1,6 +1,6 @@
 defmodule MilosTraining.Finance.Domain.ReconciliationMatching do
   @moduledoc """
-  Pure rules for manual payment-provider reconciliation (ADR-116).
+  Pure rules for manual payment-provider reconciliation (ADR-126).
 
   A statement line is one external movement: a provider `payment` (money in)
   or `refund` (money out), identified by a provider key and the provider's

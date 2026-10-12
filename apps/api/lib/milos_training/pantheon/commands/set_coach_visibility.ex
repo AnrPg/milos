@@ -1,6 +1,6 @@
 defmodule MilosTraining.Pantheon.Commands.SetCoachVisibility do
   @moduledoc """
-  Owner-only opt-out (ADR-119): when disabled, no coach of any gym can read
+  Owner-only opt-out (ADR-129): when disabled, no coach of any gym can read
   the user's PRs. Explicit grants are unaffected. Must run in the owner's scope.
   """
 

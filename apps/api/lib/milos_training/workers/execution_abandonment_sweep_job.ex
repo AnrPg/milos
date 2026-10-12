@@ -1,6 +1,6 @@
 defmodule MilosTraining.Workers.ExecutionAbandonmentSweepJob do
   @moduledoc """
-  Hourly Oban cron (ADR-113): records `workout_execution_abandoned` for every
+  Hourly Oban cron (ADR-123): records `workout_execution_abandoned` for every
   active tenant via `SweepAbandonedExecutions`, one tenant session at a time.
   Safe to re-run; the sweep is idempotent per execution.
   """

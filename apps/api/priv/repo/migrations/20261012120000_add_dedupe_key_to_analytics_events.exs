@@ -1,7 +1,7 @@
 defmodule MilosTraining.Repo.Migrations.AddDedupeKeyToAnalyticsEvents do
   use Ecto.Migration
 
-  # ADR-113 / TD-011: analytics events that must be recorded at most once
+  # ADR-123 / TD-011: analytics events that must be recorded at most once
   # (assignment opened per user/assignment/day, execution abandoned once per
   # execution, client-batched execution interactions keyed by a client event
   # id, thread created once per thread) carry a `dedupe_key`. Uniqueness is

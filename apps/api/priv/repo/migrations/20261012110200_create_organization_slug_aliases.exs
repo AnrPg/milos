@@ -1,7 +1,7 @@
 defmodule MilosTraining.Repo.Migrations.CreateOrganizationSlugAliases do
   use Ecto.Migration
 
-  # ADR-112: a vendor can rename an organization's path slug. Every slug the
+  # ADR-122: a vendor can rename an organization's path slug. Every slug the
   # organization has given up is kept here so bookmarked, shared and stored
   # `/org/<old>/...` links keep resolving (API) and redirecting (web), and so
   # no other organization can claim a retired slug while the organization

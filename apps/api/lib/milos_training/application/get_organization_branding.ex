@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.GetOrganizationBranding do
-  @moduledoc "ADR-111: branding settings for the tenant admin settings screen."
+  @moduledoc "ADR-121: branding settings for the tenant admin settings screen."
 
   alias MilosTraining.Organizations
 

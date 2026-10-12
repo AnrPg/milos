@@ -1,4 +1,4 @@
-# ADR-119: PR visibility for gym coaches and explicit sharing grants
+# ADR-129: PR visibility for gym coaches and explicit sharing grants
 Date: 2026-10-12
 Status: Accepted
 
@@ -7,11 +7,11 @@ ADR-055 keeps Pantheon personal records (PRs: `user_pr_records`,
 `user_pr_history`) owned by the global user, "with optional organization
 provenance and explicit sharing grants". The grants were never built, and the
 only RLS policy on both tables is owner-only (`user_id = app.user_id`). The
-TD-046 harness showed the consequence (TD-070): in production no staff member
+TD-046 harness showed the consequence (TD-077): in production no staff member
 can read a member's PRs, so the admin dossier PR tab is always empty; its
 controller test had to opt out of RLS enforcement.
 
-Investigating TD-070 also showed that the member's own Pantheon endpoints
+Investigating TD-077 also showed that the member's own Pantheon endpoints
 (`/api/prs`) ran without any ownership scope: under the production runtime
 role every create was rejected by `user_pr_records_owner_policy` and every read
 was empty. Nothing ever wrote a PR's `organization_id` either, so "provenance"
@@ -95,7 +95,7 @@ coach of org X" decision through one seam.
 
 ## Rationale
 Database enforcement keeps the rule true for every code path, including
-future ones, which is the lesson of TD-046/TD-070. Permissive SELECT-only
+future ones, which is the lesson of TD-046/TD-077. Permissive SELECT-only
 policies widen reads without touching the owner-only write path, so grantees
 and coaches are read-only by construction (an update attempt by a grantee hits
 the owner policy and finds nothing). Requiring the provenance to equal the
@@ -105,11 +105,11 @@ one-line change in one place instead of an edit to every policy.
 
 ## Alternatives Considered
 - **Additive `coaches` flag on `organization_memberships`** (the original
-  TD-070 brief for "owner/admin who also coaches"): dropped by the owner
+  TD-077 brief for "owner/admin who also coaches"): dropped by the owner
   because multi-role memberships are implemented separately; it would have
   been a second, conflicting role model.
 - **Application-only filtering** (staff reads as superuser or with a widened
-  session): rejected - it is exactly what failed silently before (TD-070) and
+  session): rejected - it is exactly what failed silently before (TD-077) and
   leaves any new query unprotected.
 - **Opt-out as a `users` column**: rejected - `users` is Identity's table and
   exempt from RLS; a Pantheon-owned personal table keeps the preference inside
@@ -148,7 +148,7 @@ one-line change in one place instead of an edit to every policy.
 - Account deletion removes grants in both directions (FK cascade) and the
   preference row. Grants and preferences carry no `organization_id`, so they are
   personal tables in the tenancy audit, not part of any `TenantDataPolicy`;
-  tenant export/purge (ADR-107) neither exports nor deletes them, exactly as
+  tenant export/purge (ADR-117) neither exports nor deletes them, exactly as
   for other user-keyed personal tables.
 - Coaches currently reach only the dossier PR endpoint; the rest of the dossier
   shell and the user directory remain owner/admin-only, so a coach-facing

@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.MatchFinanceReconciliationRecord do
   @moduledoc """
   Matches a statement line to an internal payment (`target_type: payment`)
-  or reversal (`target_type: reversal`) fact (ADR-116). The record becomes
+  or reversal (`target_type: reversal`) fact (ADR-126). The record becomes
   `matched` or, when the domain rules find discrepancies, `mismatched` and
   flagged for review. Internal facts are never modified.
   """

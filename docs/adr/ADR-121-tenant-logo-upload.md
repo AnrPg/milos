@@ -1,4 +1,4 @@
-# ADR-111: Tenant Logo Upload
+# ADR-121: Tenant Logo Upload
 Date: 2026-10-12
 Status: Accepted
 
@@ -12,7 +12,7 @@ tenant-scoped storage, validation, preview, audit events and consumption across
 branded surfaces.
 
 The avatar flow (presigned PUT straight to MinIO, then a finalize call that probes
-the stored bytes) and the ADR-107 tenant object inventory
+the stored bytes) and the ADR-117 tenant object inventory
 (`organizations/<organization_id>/...`, prefix-pinned list/delete) already provide
 the building blocks.
 
@@ -93,7 +93,7 @@ dependency.
   `vendor_user_id` column, with `metadata.actor_scope` set to `tenant` or `vendor`.
   The metadata holds only ids, object keys, a boolean for "previous logo was an
   external URL", and the change timestamp.
-- Uploaded logos are tenant objects for ADR-107. `TenantObjectStorage.inventory/2`
+- Uploaded logos are tenant objects for ADR-117. `TenantObjectStorage.inventory/2`
   lists them with the tenant's documents, and `purge_tenant_objects/2` deletes them.
 - The stored URL is derived at finalize time from `MINIO_PUBLIC_ENDPOINT`. If the
   public endpoint changes, existing logo URLs must be re-derived (re-upload, or a
@@ -148,7 +148,7 @@ dependency.
   reads `brand_logo_url`, so neither renders a logo. Both are follow-ups if
   per-tenant login pages or branded emails are introduced.
 - **Deferred**: orphaned objects from uploads that are never finalized stay inside
-  the tenant prefix until the ADR-107 purge. A periodic sweep of
+  the tenant prefix until the ADR-117 purge. A periodic sweep of
   `organizations/*/branding/logo/` keys that no settings row references would
   reclaim them sooner. Server-side image re-encoding (to strip metadata or
   normalize dimensions) is not done.

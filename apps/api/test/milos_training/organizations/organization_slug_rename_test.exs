@@ -1,5 +1,5 @@
 defmodule MilosTraining.Organizations.OrganizationSlugRenameTest do
-  @moduledoc "ADR-112: slug rename, retired-slug aliases and alias reservation."
+  @moduledoc "ADR-122: slug rename, retired-slug aliases and alias reservation."
   use MilosTraining.DataCase, async: false
 
   import Ecto.Query

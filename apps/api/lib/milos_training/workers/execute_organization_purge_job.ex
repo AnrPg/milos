@@ -1,6 +1,6 @@
 defmodule MilosTraining.Workers.ExecuteOrganizationPurgeJob do
   @moduledoc """
-  ADR-107 stage 5: purges an approved tenant context-by-context. The service is
+  ADR-117 stage 5: purges an approved tenant context-by-context. The service is
   idempotent, so Oban retries resume from the first unfinished step.
   """
 

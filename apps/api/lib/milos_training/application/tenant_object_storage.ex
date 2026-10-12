@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.TenantObjectStorage do
   @moduledoc """
-  Storage-owned tenant object inventory and cleanup (ADR-107).
+  Storage-owned tenant object inventory and cleanup (ADR-117).
 
   Every operation is pinned to an ownership prefix built by `OwnershipKeys`:
   tenant documents live under `organizations/<organization_id>/` in the
@@ -8,7 +8,7 @@ defmodule MilosTraining.Application.TenantObjectStorage do
   bucket. Nothing here can list or delete outside those prefixes, which is what
   makes a tenant purge safe without a blind bucket-wide delete.
 
-  ADR-111 tenant logos use the logical `:branding` bucket (the public media
+  ADR-121 tenant logos use the logical `:branding` bucket (the public media
   bucket) under the same `organizations/<organization_id>/` prefix; they are
   inventoried with, and purged like, the tenant's documents.
   """
@@ -20,13 +20,13 @@ defmodule MilosTraining.Application.TenantObjectStorage do
     with {:ok, documents} <- list_tenant_objects(organization_id),
          {:ok, branding} <- list_branding_objects(organization_id),
          {:ok, avatars} <- list_user_objects(user_ids) do
-      # Uploaded logos (ADR-111) are tenant objects too; they live in the
+      # Uploaded logos (ADR-121) are tenant objects too; they live in the
       # public media bucket but are purged like any other tenant document.
       {:ok, %{documents: documents ++ branding, avatars: avatars}}
     end
   end
 
-  # --- ADR-111 tenant branding (public media bucket, tenant prefix) ----------
+  # --- ADR-121 tenant branding (public media bucket, tenant prefix) ----------
 
   def list_branding_objects(organization_id) when is_binary(organization_id),
     do: impl().list_objects(:branding, tenant_prefix(organization_id))

@@ -1,4 +1,4 @@
-# ADR-107: Reviewed Tenant Export and Purge
+# ADR-117: Reviewed Tenant Export and Purge
 Date: 2026-10-12
 Status: Accepted
 

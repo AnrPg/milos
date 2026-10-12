@@ -1,8 +1,8 @@
 defmodule MilosTraining.Finance.ReconciliationAndExportsTest do
   @moduledoc """
-  ADR-116 payment-provider reconciliation (idempotent recording, matching
+  ADR-126 payment-provider reconciliation (idempotent recording, matching
   rules, one fact per line, two-tenant isolation) and accounting exports
-  (contents, checksums, tenant object prefix, ADR-107 inventory/purge,
+  (contents, checksums, tenant object prefix, ADR-117 inventory/purge,
   background mode) under the RLS-enforcing runtime role.
   """
 
@@ -337,7 +337,7 @@ defmodule MilosTraining.Finance.ReconciliationAndExportsTest do
       assert files["reversals.csv"] =~ reversal.refund_receipt.receipt_number
       assert files["refund_receipts.csv"] =~ reversal.refund_receipt.snapshot_sha256
 
-      # ADR-107: the artifact is part of the tenant inventory and purge.
+      # ADR-117: the artifact is part of the tenant inventory and purge.
       {:ok, %{documents: documents}} = TenantObjectStorage.inventory(tenant.organization.id, [])
       assert Enum.any?(documents, &(&1.key == export.object_key))
 

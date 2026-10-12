@@ -1,6 +1,6 @@
 defmodule MilosTraining.Finance.FinanceDocumentCounter do
   @moduledoc """
-  Per-tenant, per-document-type sequence (ADR-116). The row is locked
+  Per-tenant, per-document-type sequence (ADR-126). The row is locked
   `FOR UPDATE` in the transaction that issues the numbered document, so a
   rollback also rolls the counter back and numbers have no gaps.
   """

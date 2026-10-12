@@ -1,5 +1,5 @@
 defmodule MilosTrainingWeb.AdminBrandingController do
-  @moduledoc "Tenant owner/admin logo upload (ADR-111)."
+  @moduledoc "Tenant owner/admin logo upload (ADR-121)."
 
   use MilosTrainingWeb, :controller
   use OpenApiSpex.ControllerSpecs

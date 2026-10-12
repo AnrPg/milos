@@ -1,5 +1,5 @@
 defmodule MilosTrainingWeb.InjuryWarningControllerTest do
-  @moduledoc "ADR-114 injury warning endpoints (requests run RLS-enforced)."
+  @moduledoc "ADR-124 injury warning endpoints (requests run RLS-enforced)."
   use MilosTrainingWeb.ConnCase, async: false
 
   import MilosTraining.AnalyticsHelpers

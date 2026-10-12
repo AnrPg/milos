@@ -41,7 +41,7 @@ type OrganizationMembershipSummary = {
 const NAV_LINKS: NavLink[] = [
   { href: "/", labelKey: "home", roles: ["member", "athlete"] },
   { href: "/schedule", labelKey: "schedule", roles: ["member"] },
-  // ADR-115: members receive personal workouts and class versions too.
+  // ADR-125: members receive personal workouts and class versions too.
   { href: "/my-workouts", labelKey: "myWorkouts", roles: ["athlete", "member"] },
   { href: "/my-workouts/pantheon", labelKey: "pantheon", roles: ["athlete", "member"] },
   { href: "/account/billing", labelKey: "billing", roles: ["member", "athlete"] },
@@ -109,7 +109,7 @@ export function tenantBrandName(
   return membership?.settings?.brand_name?.trim() || membership?.organization.name.trim() || null;
 }
 
-/** ADR-111: the selected tenant's logo for the shell header, if any. */
+/** ADR-121: the selected tenant's logo for the shell header, if any. */
 export function tenantBrandLogoUrl(
   memberships: OrganizationMembershipSummary[],
   selectedSlug?: string | null,

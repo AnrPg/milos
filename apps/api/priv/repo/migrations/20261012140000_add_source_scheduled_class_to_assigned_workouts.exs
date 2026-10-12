@@ -1,11 +1,11 @@
 defmodule MilosTraining.Repo.Migrations.AddSourceScheduledClassToAssignedWorkouts do
   @moduledoc """
-  ADR-115: personalized member programming.
+  ADR-125: personalized member programming.
 
   A nullable `source_scheduled_class_id` marks an assignment as a per-member
   variant of a class occurrence. It is a loose reference to the
   Scheduling-owned `scheduled_classes` row (no cross-context foreign key, like
-  ADR-108's `source_reference_id`), so a variant survives slot deletion as a
+  ADR-118's `source_reference_id`), so a variant survives slot deletion as a
   personal assignment. The column is additive on the already tenant-scoped,
   RLS-forced `assigned_workouts` table; the index serves the per-slot variant
   lookups made by the schedule calendar.

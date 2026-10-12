@@ -1,4 +1,4 @@
-# ADR-108: Standalone Training-Log Entries
+# ADR-118: Standalone Training-Log Entries
 Date: 2026-10-12
 Status: Accepted
 

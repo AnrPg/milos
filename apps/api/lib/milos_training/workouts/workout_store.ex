@@ -169,7 +169,7 @@ defmodule MilosTraining.Workouts.WorkoutStore do
   @impl true
   def ensure_default_scale_levels(levels), do: adapter().ensure_default_scale_levels(levels)
 
-  # ADR-118: scale levels are tenant-owned, so they are only reachable through
+  # ADR-128: scale levels are tenant-owned, so they are only reachable through
   # an organization-scoped session; anything else fails closed.
   def list_scale_levels(%{organization_id: organization_id} = context)
       when is_binary(organization_id),

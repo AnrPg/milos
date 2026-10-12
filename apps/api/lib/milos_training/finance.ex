@@ -385,7 +385,7 @@ defmodule MilosTraining.Finance do
   def count_pending_referral_approvals(context),
     do: scoped(context, fn -> count_pending_referral_approvals() end)
 
-  # ADR-116 refund receipts, payment-provider reconciliation and accounting
+  # ADR-126 refund receipts, payment-provider reconciliation and accounting
   # exports. All of them attach to the append-only payment/reversal facts.
   defdelegate list_refund_receipts(filters), to: Queries.ListRefundReceipts, as: :call
 
@@ -465,7 +465,7 @@ defmodule MilosTraining.Finance do
   def accounting_export_rows(context, range_start, range_end),
     do: scoped(context, fn -> accounting_export_rows(range_start, range_end) end)
 
-  # ADR-107 reviewed tenant export/purge. This context owns its table list and
+  # ADR-117 reviewed tenant export/purge. This context owns its table list and
   # retention policy; the shared executor only runs what this policy declares,
   # always inside a RepoContext session for the purge's tenant.
   def tenant_data_policy, do: MilosTraining.Finance.Domain.TenantDataPolicy.policy()

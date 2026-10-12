@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.UpdateAssignedWorkout do
   @moduledoc """
-  Edits an assignment's assignees, date and notes. ADR-115: assignees may be
+  Edits an assignment's assignees, date and notes. ADR-125: assignees may be
   athletes or members (tenant membership roles); members newly added to the
   assignment need the explicit personal-programming grant, and a class variant
   keeps exactly one member who must still hold the class booking when the

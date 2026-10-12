@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.RecordFinanceReconciliationLine do
   @moduledoc """
-  Records one external payment-provider statement line (ADR-116). Idempotent
+  Records one external payment-provider statement line (ADR-126). Idempotent
   on (organization, provider, external_reference): an identical replay
   returns the existing record with outcome `:replayed`; a replay with
   different economic content fails with `:reconciliation_reference_conflict`.

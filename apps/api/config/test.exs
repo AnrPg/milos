@@ -51,5 +51,5 @@ config :milos_training, :meilisearch,
   admin_member_index: System.get_env("MEILI_ADMIN_MEMBER_INDEX", "admin_members"),
   log_failures: false
 
-# ADR-107: tenant export/purge object operations run against an in-memory store.
+# ADR-117: tenant export/purge object operations run against an in-memory store.
 config :milos_training, :tenant_object_store, MilosTraining.TestSupport.MemoryObjectStore

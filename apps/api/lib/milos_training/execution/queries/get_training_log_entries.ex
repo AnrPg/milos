@@ -1,5 +1,5 @@
 defmodule MilosTraining.Execution.Queries.GetTrainingLogEntries do
-  @moduledoc "Read side of standalone training-log entries (ADR-108)."
+  @moduledoc "Read side of standalone training-log entries (ADR-118)."
 
   alias MilosTraining.Execution.Domain.TrainingLogPolicy
   alias MilosTraining.Execution.TrainingLogStore
@@ -12,7 +12,7 @@ defmodule MilosTraining.Execution.Queries.GetTrainingLogEntries do
   end
 
   @doc """
-  ADR-110: looks up a prior submission of the request's `idempotency_key`.
+  ADR-120: looks up a prior submission of the request's `idempotency_key`.
   Returns `:none` when there is none (or the key is unusable; the command
   validates it), `{:ok, entry}` for a matching replay, or
   `{:error, :idempotency_key_conflict}` when the key names another source.

@@ -7,7 +7,7 @@ defmodule MilosTraining.Application.PublishWorkoutDsl do
   alias MilosTraining.{Execution, Workouts}
 
   # Scale slugs are preflighted against the acting tenant's scale levels
-  # (ADR-118), so there is no context-free arity.
+  # (ADR-128), so there is no context-free arity.
   def call(context, id, params) do
     source = value(params, :source)
     acknowledge_warnings? = value(params, :acknowledge_warnings, false) == true

@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.Ports.TenantObjectStore do
   @moduledoc """
   Object-storage operations needed for the reviewed tenant export/purge
-  (ADR-107). `bucket` is a logical name, never a raw bucket string, so callers
+  (ADR-117). `bucket` is a logical name, never a raw bucket string, so callers
   cannot address arbitrary buckets.
   """
 
@@ -15,7 +15,7 @@ defmodule MilosTraining.Application.Ports.TenantObjectStore do
               {:ok, non_neg_integer()} | {:error, term()}
   @callback presigned_object_url(bucket(), String.t()) :: {:ok, String.t()} | {:error, term()}
 
-  # ADR-111 tenant logo uploads (`:branding` lives in the public media bucket).
+  # ADR-121 tenant logo uploads (`:branding` lives in the public media bucket).
   @doc "Presigned PUT constrained to `content_type`; returns url and required headers."
   @callback presigned_upload(bucket(), String.t(), String.t()) ::
               {:ok, %{url: String.t(), headers: %{String.t() => String.t()}}}

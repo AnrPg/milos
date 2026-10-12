@@ -1,6 +1,6 @@
 defmodule MilosTraining.Finance.Domain.RefundReceipt do
   @moduledoc """
-  Pure rules for refund receipts (ADR-116).
+  Pure rules for refund receipts (ADR-126).
 
   A receipt is issued for every payment reversal that returns money
   (`refund`, `payment_reversal`). A `waiver_reversal` cancels a waived

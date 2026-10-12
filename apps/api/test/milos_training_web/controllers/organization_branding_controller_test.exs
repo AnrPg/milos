@@ -1,5 +1,5 @@
 defmodule MilosTrainingWeb.OrganizationBrandingControllerTest do
-  @moduledoc "ADR-111 tenant admin and platform logo upload endpoints."
+  @moduledoc "ADR-121 tenant admin and platform logo upload endpoints."
 
   use MilosTrainingWeb.ConnCase, async: false
 

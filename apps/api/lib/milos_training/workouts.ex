@@ -81,7 +81,7 @@ defmodule MilosTraining.Workouts do
   def list_assigned_workouts_for_athlete(context, athlete_id, start_date, end_date),
     do: WorkoutStore.list_assigned_workouts_for_athlete(context, athlete_id, start_date, end_date)
 
-  @doc "ADR-115: live per-member class variants for slots (one assignee or all)."
+  @doc "ADR-125: live per-member class variants for slots (one assignee or all)."
   def list_class_variants(context, slot_ids, assignee_id),
     do: ListClassVariants.call(context, slot_ids, assignee_id)
 
@@ -102,7 +102,7 @@ defmodule MilosTraining.Workouts do
   def preflight_dsl(workout, active_scale_slugs),
     do: Preflight.validate(workout, active_scale_slugs)
 
-  @doc "`%{name, exercise_ref, category}` per exercise of a normalized workout (ADR-114)."
+  @doc "`%{name, exercise_ref, category}` per exercise of a normalized workout (ADR-124)."
   def exercise_descriptors(workout), do: ExerciseDescriptors.from_workout(workout)
 
   def reject_assignment_for_athlete(assignment_id, athlete_id),
@@ -180,7 +180,7 @@ defmodule MilosTraining.Workouts do
 
   # Materializes an already tenant-fetched workout. Scale levels come from the
   # workout's own variations, so they are always the workout's organization's
-  # set (ADR-118).
+  # set (ADR-128).
   def materialize_for_scale(workout, scale_slug),
     do: MilosTraining.Workouts.Domain.WorkoutMaterializer.materialize(workout, scale_slug)
 
@@ -201,7 +201,7 @@ defmodule MilosTraining.Workouts do
     )
   end
 
-  # ADR-107 reviewed tenant export/purge. This context owns its table list and
+  # ADR-117 reviewed tenant export/purge. This context owns its table list and
   # retention policy; the shared executor only runs what this policy declares,
   # always inside a RepoContext session for the purge's tenant.
   def tenant_data_policy, do: MilosTraining.Workouts.Domain.TenantDataPolicy.policy()

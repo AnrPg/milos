@@ -68,7 +68,7 @@ defmodule MilosTraining.Organizations.RootTablesRLSTest do
       )
     end
 
-    # ADR-112 retired slugs, one per organization.
+    # ADR-122 retired slugs, one per organization.
     for {org_id, slug} <- [{org_a, "rls-old-a-#{unique}"}, {org_b, "rls-old-b-#{unique}"}] do
       Postgrex.query!(
         conn,
@@ -259,7 +259,7 @@ defmodule MilosTraining.Organizations.RootTablesRLSTest do
     assert rows == []
   end
 
-  describe "organization_slug_aliases (ADR-112)" do
+  describe "organization_slug_aliases (ADR-122)" do
     test "a member reads their own organization's retired slugs, not another's", ctx do
       as_session(ctx.conn, ctx.member_a_s, nil, false, fn ->
         %{rows: own} =

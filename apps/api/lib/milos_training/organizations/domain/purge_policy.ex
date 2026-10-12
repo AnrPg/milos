@@ -1,7 +1,7 @@
 defmodule MilosTraining.Organizations.Domain.PurgePolicy do
   @moduledoc """
   Pure state machine and guards for the reviewed tenant purge workflow
-  (ADR-107).
+  (ADR-117).
 
       requested -> exporting -> exported -> approved -> purging -> completed
                        |                                  |

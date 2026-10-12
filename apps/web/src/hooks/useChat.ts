@@ -38,7 +38,7 @@ interface UseChatReturn {
   typingUsers: TypingUser[];
   isLoading: boolean;
   sendMessage: (body: string, messageType?: string) => Promise<DisplayChatMessage>;
-  /** Re-enqueues a failed message with its original operation id (ADR-110). */
+  /** Re-enqueues a failed message with its original operation id (ADR-120). */
   retryMessage: (operationId: string) => Promise<void>;
   /** Removes a failed message from the device outbox; it is never sent. */
   discardMessage: (operationId: string) => Promise<void>;

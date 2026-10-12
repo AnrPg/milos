@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.RequestOrganizationPurge do
   @moduledoc """
-  ADR-107 stage 1: records the purge request (suspending an active tenant) and
+  ADR-117 stage 1: records the purge request (suspending an active tenant) and
   enqueues the export job.
   """
 

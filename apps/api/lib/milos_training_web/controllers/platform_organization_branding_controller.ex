@@ -1,5 +1,5 @@
 defmodule MilosTrainingWeb.PlatformOrganizationBrandingController do
-  @moduledoc "Vendor logo upload for any organization from the platform console (ADR-111)."
+  @moduledoc "Vendor logo upload for any organization from the platform console (ADR-121)."
 
   use MilosTrainingWeb, :controller
   use OpenApiSpex.ControllerSpecs

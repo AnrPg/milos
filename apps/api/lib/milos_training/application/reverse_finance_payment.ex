@@ -4,7 +4,7 @@ defmodule MilosTraining.Application.ReverseFinancePayment do
 
   @doc """
   Records an audited payment reversal. Finance issues the refund receipt
-  (ADR-116) in the same transaction; this service supplies the receipt's
+  (ADR-126) in the same transaction; this service supplies the receipt's
   party names (organization and member) from their owning contexts so the
   immutable receipt snapshot is self-contained. Client-supplied
   `receipt_party` values are always overwritten.

@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.BuildFinanceAccountingExport do
   @moduledoc """
-  Builds and stores one accounting export run (ADR-116): reads every dataset
+  Builds and stores one accounting export run (ADR-126): reads every dataset
   for the run's range through Finance, adds member display names from
   Identity, bundles CSV + JSON + manifest into a ZIP, stores it under the
   tenant prefix (`organizations/<id>/finance/accounting-exports/<run>/`) and

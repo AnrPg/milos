@@ -18,7 +18,7 @@ export function isValidOrganizationSlug(value: string) {
   return value.length >= 3 && value.length <= 63 && SLUG_PATTERN.test(value);
 }
 
-// ADR-112: a slug rename moves canonical_path and every /org/:slug link, so
+// ADR-122: a slug rename moves canonical_path and every /org/:slug link, so
 // the vendor reviews the impact and retypes the current slug before it runs.
 export function OrganizationSlugRenameDialog({
   accessToken,

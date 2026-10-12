@@ -135,7 +135,7 @@ defmodule MilosTraining.Scheduling do
 
   defdelegate submit_booking(user_id, slot_id, timeout_minutes), to: SubmitBooking, as: :call
 
-  @doc "ADR-110: `opts` may carry `client_operation_id:` for replay dedupe."
+  @doc "ADR-120: `opts` may carry `client_operation_id:` for replay dedupe."
   defdelegate submit_booking(context, user_id, slot_id, timeout_minutes, opts),
     to: SubmitBooking,
     as: :call
@@ -153,7 +153,7 @@ defmodule MilosTraining.Scheduling do
     as: :call
 
   @doc """
-  ADR-110 idempotent admin resolution. `params` holds `:status`
+  ADR-120 idempotent admin resolution. `params` holds `:status`
   (`:approved | :rejected`), `:admin_message`, and `:resolution_operation_id`.
   Returns `{:ok, booking, :resolved | :replayed}`.
   """
@@ -234,7 +234,7 @@ defmodule MilosTraining.Scheduling do
   def update_settings(params),
     do: MilosTraining.Scheduling.SchedulingStore.update_settings(params)
 
-  # ADR-107 reviewed tenant export/purge. This context owns its table list and
+  # ADR-117 reviewed tenant export/purge. This context owns its table list and
   # retention policy; the shared executor only runs what this policy declares,
   # always inside a RepoContext session for the purge's tenant.
   def tenant_data_policy, do: MilosTraining.Scheduling.Domain.TenantDataPolicy.policy()

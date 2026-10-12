@@ -190,7 +190,7 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     assert messages["summary"] == %{"thread_count" => 0, "unread_thread_count" => 0}
   end
 
-  # ADR-119 (TD-070): the dossier PR tab follows PR visibility - the gym's
+  # ADR-129 (TD-077): the dossier PR tab follows PR visibility - the gym's
   # coaches read PRs recorded in this gym; owners/admins who are not coaches
   # get a role-safe empty state.
   test "focused dossier endpoints compose PR, injury, and message records", %{conn: conn} do

@@ -1,6 +1,6 @@
 defmodule MilosTraining.TenantData.TenantTableCoverageTest do
   @moduledoc """
-  ADR-107 guard: every table carrying `organization_id` must be declared by
+  ADR-117 guard: every table carrying `organization_id` must be declared by
   exactly one bounded context's tenant data policy, so a new tenant table can
   never be silently left out of the export or the purge.
   """

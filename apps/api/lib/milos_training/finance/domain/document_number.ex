@@ -1,6 +1,6 @@
 defmodule MilosTraining.Finance.Domain.DocumentNumber do
   @moduledoc """
-  Gapless per-tenant document numbering (ADR-116).
+  Gapless per-tenant document numbering (ADR-126).
 
   The infrastructure locks the tenant's counter row (`FOR UPDATE`) inside the
   issuing transaction, asks this module for the next value and writes it back

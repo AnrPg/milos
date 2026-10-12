@@ -117,7 +117,7 @@ export async function recordMessageDeliveryFailure(
 /**
  * Pure failure transition: transient failures stay pending for automatic
  * replay; permanent and conflict failures become `failed` and wait for an
- * explicit retry or discard (ADR-110).
+ * explicit retry or discard (ADR-120).
  */
 export function applyMessageDeliveryFailure(
   operation: QueuedMessageOperation,

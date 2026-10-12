@@ -138,7 +138,7 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
     |> Enum.map(&normalize/1)
   end
 
-  # ADR-113 abandonment sweep: started, never-completed executions of the
+  # ADR-123 abandonment sweep: started, never-completed executions of the
   # session's tenant whose start falls in [started_after, started_before).
   # Fails closed (no rows) without a tenant in the session.
   @impl true

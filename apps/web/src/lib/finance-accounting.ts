@@ -1,7 +1,7 @@
 import { ApiError } from "@/api/client";
 import type { ReconciliationLineRequest } from "@/api/finance-accounting";
 
-// ADR-116 UI rules. The backend remains authoritative; these mirror its
+// ADR-126 UI rules. The backend remains authoritative; these mirror its
 // validation so admins get immediate feedback before a request is sent.
 
 export const EXPORT_INLINE_MAX_DAYS = 31;
@@ -113,7 +113,7 @@ const ERROR_KEYS: Record<string, string> = {
   accounting_export_not_ready: "errorExportNotReady",
 };
 
-/** Message key for an ADR-116 API error, falling back to the generic one. */
+/** Message key for an ADR-126 API error, falling back to the generic one. */
 export function accountingErrorKey(error: unknown): string {
   if (error instanceof ApiError && error.payload.code && ERROR_KEYS[error.payload.code]) {
     return ERROR_KEYS[error.payload.code];

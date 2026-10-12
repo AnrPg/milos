@@ -9,7 +9,7 @@ defmodule MilosTraining.Application.SubmitBooking do
   Submits a booking request.
 
   `call/3` keeps the historical `{:ok, booking}` shape. `call/4` accepts
-  `client_operation_id:` (ADR-110) and returns `{:ok, booking, :created |
+  `client_operation_id:` (ADR-120) and returns `{:ok, booking, :created |
   :replayed}`: a replay of an operation that already created a booking returns
   that booking without reserving another class visit, notifying staff, or
   broadcasting again; reusing the id for another class is

@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.TrackAnalyticsEvent do
   @moduledoc """
   One-line, best-effort analytics instrumentation for application services
-  (ADR-113).
+  (ADR-123).
 
       TrackAnalyticsEvent.call("workout_published", context, workout, %{metadata: %{...}})
 

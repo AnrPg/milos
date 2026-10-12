@@ -2,7 +2,7 @@ defmodule MilosTraining.Application.ProgramUserWorkout do
   @moduledoc """
   Programs a workout for one user from the admin profile calendar (ADR-071).
 
-  Athletes receive a personal assignment. Members (ADR-115) are programmed in
+  Athletes receive a personal assignment. Members (ADR-125) are programmed in
   one of three modes:
 
   - `class_workout` (default, ADR-071): the copy replaces the workout of a class
@@ -121,7 +121,7 @@ defmodule MilosTraining.Application.ProgramUserWorkout do
     end
   end
 
-  # Owner decision (ADR-115): a copy made for one member's personalized
+  # Owner decision (ADR-125): a copy made for one member's personalized
   # programming never appears in the shared workout library. Athlete copies and
   # the class-workout mode keep the ADR-071 behaviour.
   defp keep_member_copy_personal(context, mode, workout, params)

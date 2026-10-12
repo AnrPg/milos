@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.WorkoutAnalyticsInstrumentationTest do
-  @moduledoc "ADR-113: workout authoring and assignment lifecycle events."
+  @moduledoc "ADR-123: workout authoring and assignment lifecycle events."
   use MilosTraining.DataCase, async: false
 
   import MilosTraining.AnalyticsHelpers

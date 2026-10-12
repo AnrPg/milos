@@ -298,7 +298,7 @@ defmodule MilosTraining.Execution.Domain.TrainingLogPolicyTest do
     end
   end
 
-  describe "replay_decision/2 (ADR-110)" do
+  describe "replay_decision/2 (ADR-120)" do
     test "replays when raw params or a server source name the same source" do
       entry = %{source_type: "class", source_reference_id: "slot-1"}
 

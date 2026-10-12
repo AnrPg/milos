@@ -1,6 +1,6 @@
 defmodule MilosTraining.Organizations.Commands.CompleteOrganizationPurge do
   @moduledoc """
-  Final ADR-107 step: deletes the organization row (cascading the remaining
+  Final ADR-117 step: deletes the organization row (cascading the remaining
   Organizations-owned rows) and marks the platform purge record completed in
   one transaction. Idempotent: an already completed purge is returned as is.
   """

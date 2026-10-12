@@ -1,6 +1,6 @@
 defmodule MilosTraining.TenantData.TableStore do
   @moduledoc """
-  Tenant-scoped facade over the configured `TableStore` adapter (ADR-107).
+  Tenant-scoped facade over the configured `TableStore` adapter (ADR-117).
 
   Bounded contexts call this only with their *own* policy (declared in their
   `Domain.TenantDataPolicy`), so no context names another context's tables.

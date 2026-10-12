@@ -1,6 +1,6 @@
 defmodule MilosTraining.Pantheon.Queries.ListPRAccessGrants do
   @moduledoc """
-  Active PR sharing grants (ADR-119): `owned/1` for the owner's management
+  Active PR sharing grants (ADR-129): `owned/1` for the owner's management
   view, `received/1` for the grantee's "Shared with me" view. RLS admits the
   owner to their own grants and the grantee to grants naming them.
   """
