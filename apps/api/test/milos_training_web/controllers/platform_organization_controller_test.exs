@@ -84,6 +84,65 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
            )
   end
 
+  test "provisioning seeds the new organization's default scale levels (ADR-110)", context do
+    response =
+      context.conn
+      |> put_bearer_token(context.platform_user)
+      |> post("/api/platform/organizations", %{
+        name: "Scale Seed Strength",
+        slug: "scale-seed-strength",
+        initial_owner_email: "scale-owner@example.test"
+      })
+      |> json_response(201)
+
+    organization_id = response["organization"]["id"]
+
+    levels = MilosTraining.Workouts.list_scale_levels(%{organization_id: organization_id})
+
+    assert Enum.map(levels, &{&1.slug, &1.label, &1.sort_order}) == [
+             {"scaled", "Scaled", 1},
+             {"rx", "Rx", 2},
+             {"rx-plus", "Rx+", 3}
+           ]
+  end
+
+  test "permanently deletes an organization whose workouts use its scale levels", context do
+    {:ok, organization} = Organizations.create_organization(%{name: "Scaled Gym"})
+    tenant = %{organization_id: organization.id, user_id: context.platform_user.id}
+    {:ok, _levels} = MilosTraining.Workouts.seed_default_scale_levels(tenant)
+
+    workout_fixture(context.platform_user, %{
+      tenant_context: tenant,
+      sections: [
+        %{
+          name: "Main",
+          order: 1,
+          exercises: [
+            %{
+              name: "Thrusters",
+              order: 1,
+              prescription_value: 10,
+              prescription_unit: "reps",
+              variations: [%{scale_level_slug: "rx", prescription_value: 8}]
+            }
+          ]
+        }
+      ]
+    })
+
+    conn =
+      context.conn
+      |> put_bearer_token(context.platform_user)
+      |> delete("/api/platform/organizations/#{organization.id}")
+
+    assert response(conn, 204) == ""
+
+    refute Repo.exists?(
+             from level in MilosTraining.ScaleLevel,
+               where: level.organization_id == ^organization.id
+           )
+  end
+
   test "lists a newly-provisioned organization as pending until its admin invitation is redeemed",
        context do
     conn =

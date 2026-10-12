@@ -8,7 +8,7 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
       {admin_conn, organization} = authenticate_as_admin(conn, "admin_draft_author")
 
       {:ok, _levels} =
-        MilosTraining.Workouts.replace_scale_levels([
+        MilosTraining.Workouts.replace_scale_levels(%{organization_id: organization.id}, [
           %{slug: "scaled", label: "Scaled", sort_order: 1},
           %{slug: "rx", label: "Rx", sort_order: 2},
           %{slug: "competition", label: "Competition", sort_order: 3}

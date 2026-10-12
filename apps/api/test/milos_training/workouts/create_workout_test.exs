@@ -18,7 +18,7 @@ defmodule MilosTraining.Workouts.CreateWorkoutTest do
       set_legacy_session!(admin.id)
 
       {:ok, _levels} =
-        Workouts.replace_scale_levels([
+        Workouts.replace_scale_levels(legacy_scope!(), [
           %{slug: "scaled", label: "Scaled", sort_order: 1},
           %{slug: "rx", label: "Rx", sort_order: 2},
           %{slug: "competition", label: "Competition", sort_order: 3}
@@ -68,7 +68,7 @@ defmodule MilosTraining.Workouts.CreateWorkoutTest do
       admin = create_admin!("admin_order_normalization")
 
       {:ok, _levels} =
-        Workouts.replace_scale_levels([
+        Workouts.replace_scale_levels(legacy_scope!(), [
           %{slug: "scaled", label: "Scaled", sort_order: 1}
         ])
 
@@ -111,7 +111,7 @@ defmodule MilosTraining.Workouts.CreateWorkoutTest do
       admin = create_admin!("admin_blank_variation")
 
       {:ok, _levels} =
-        Workouts.replace_scale_levels([
+        Workouts.replace_scale_levels(legacy_scope!(), [
           %{slug: "scaled", label: "Scaled", sort_order: 1}
         ])
 
@@ -143,7 +143,7 @@ defmodule MilosTraining.Workouts.CreateWorkoutTest do
       admin = create_admin!("admin_timer_validation")
 
       {:ok, _levels} =
-        Workouts.replace_scale_levels([
+        Workouts.replace_scale_levels(legacy_scope!(), [
           %{slug: "scaled", label: "Scaled", sort_order: 1}
         ])
 
@@ -167,16 +167,16 @@ defmodule MilosTraining.Workouts.CreateWorkoutTest do
     end
   end
 
-  describe "replace_scale_levels/1" do
+  describe "replace_scale_levels/2" do
     test "allows swapping existing sort orders without unique collisions" do
       {:ok, _levels} =
-        Workouts.replace_scale_levels([
+        Workouts.replace_scale_levels(legacy_scope!(), [
           %{slug: "scaled", label: "Scaled", sort_order: 1},
           %{slug: "rx", label: "Rx", sort_order: 2}
         ])
 
       assert {:ok, updated_levels} =
-               Workouts.replace_scale_levels([
+               Workouts.replace_scale_levels(legacy_scope!(), [
                  %{slug: "scaled", label: "Scaled", sort_order: 2},
                  %{slug: "rx", label: "Rx", sort_order: 1}
                ])
@@ -197,6 +197,13 @@ defmodule MilosTraining.Workouts.CreateWorkoutTest do
     {:ok, admin} = Identity.update_role(user, :admin)
     set_legacy_session!(admin.id)
     admin
+  end
+
+  # ADR-110: scale levels are tenant-owned; these tests author in the legacy
+  # organization, so its set is the one they configure.
+  defp legacy_scope! do
+    {:ok, organization} = Organizations.ensure_legacy_organization_for_migration()
+    %{organization_id: organization.id}
   end
 
   defp set_legacy_session!(user_id) do

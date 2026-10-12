@@ -669,7 +669,7 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
   defp wait_for_notifications(user_id, 0), do: Notifications.list_for_user(user_id)
 
   defp workout_with_scale!(admin) do
-    :ok = ensure_scale_level!("scaled", "Scaled")
+    :ok = ensure_scale_level!(legacy_context!(admin), "scaled", "Scaled")
 
     {:ok, workout} =
       Workouts.create_workout(legacy_context!(admin), admin, %{
@@ -702,7 +702,7 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
   end
 
   defp scoreable_for_time_workout!(admin) do
-    :ok = ensure_scale_level!("scaled", "Scaled")
+    :ok = ensure_scale_level!(legacy_context!(admin), "scaled", "Scaled")
 
     {:ok, workout} =
       Workouts.create_workout(legacy_context!(admin), admin, %{
@@ -737,8 +737,8 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
     workout
   end
 
-  defp ensure_scale_level!(slug, label) do
-    levels = Workouts.list_scale_levels()
+  defp ensure_scale_level!(context, slug, label) do
+    levels = Workouts.list_scale_levels(context)
 
     if Enum.any?(levels, &(&1.slug == slug)) do
       :ok
@@ -747,6 +747,7 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
 
       {:ok, _levels} =
         Workouts.replace_scale_levels(
+          context,
           levels
           |> Enum.map(fn level ->
             %{slug: level.slug, label: level.label, sort_order: level.sort_order}

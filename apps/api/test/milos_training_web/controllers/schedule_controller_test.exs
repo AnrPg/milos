@@ -222,7 +222,7 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
     {:ok, _} = Organizations.ensure_legacy_membership_for_migration(admin, :owner)
 
     {:ok, _levels} =
-      MilosTraining.Workouts.replace_scale_levels([
+      MilosTraining.Workouts.replace_scale_levels(legacy_scope!(), [
         %{slug: "scaled", label: "Scaled", sort_order: 1},
         %{slug: "rx", label: "Rx", sort_order: 2}
       ])
@@ -345,4 +345,11 @@ defmodule MilosTrainingWeb.ScheduleControllerTest do
   end
 
   defp wait_for_notifications(user_id, 0), do: Notifications.list_for_user(user_id)
+
+  # ADR-110: scale levels are tenant-owned; these workouts live in the legacy
+  # organization, so its set is the one configured.
+  defp legacy_scope! do
+    {:ok, organization} = MilosTraining.Organizations.ensure_legacy_organization_for_migration()
+    %{organization_id: organization.id}
+  end
 end
