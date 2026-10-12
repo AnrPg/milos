@@ -8,13 +8,11 @@ import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { useState } from "react";
 import { useLocale } from "next-intl";
-import Link from "next/link";
 
 import { ApiError } from "@/api/client";
 import { cancelBooking, sendSlotMessage, type ScheduleBooking, type ScheduleSlot } from "@/api/schedule";
 import { downloadIcsEvent } from "@/lib/ics";
 import { WorkoutPreviewDetail, type PreviewSection } from "@/components/workouts/WorkoutPreviewDetail";
-import { yourVersionHref } from "@/lib/member-programming";
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { workoutTypeColor } from "@/lib/workout-colors";
 import { SemanticLabel } from "@/components/semantic-label";
@@ -391,7 +389,9 @@ export function SlotPopup({
             </div>
           ) : null}
 
-          {/* ADR-115: the member's own version of this class (only ever theirs) */}
+          {/* ADR-115: the member's own version of this class (only ever theirs).
+              Informational only: members start it from My workouts, and staff
+              program it from the user's profile - no class-view action. */}
           {!isAdmin && slot.my_version ? (
             <section
               className="mt-8 rounded-[1.8rem] p-5"
@@ -416,15 +416,7 @@ export function SlotPopup({
                   <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "color-mix(in srgb, var(--success) 15%, transparent)", color: "var(--success)" }}>
                     {i18n("donea821d15")}
                   </span>
-                ) : (
-                  <Link
-                    className="rounded-full px-4 py-2 text-sm font-semibold"
-                    style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-                    href={yourVersionHref(slot.my_version.assignment_id, slot.my_version.scheduled_for)}
-                  >
-                    {i18n("memberProgrammingOpenYourVersion")}
-                  </Link>
-                )}
+                ) : null}
               </div>
               <WorkoutPreviewDetail
                 sections={slot.my_version.workout.sections as PreviewSection[]}

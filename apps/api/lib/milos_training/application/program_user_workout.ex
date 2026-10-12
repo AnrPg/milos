@@ -27,6 +27,7 @@ defmodule MilosTraining.Application.ProgramUserWorkout do
          :ok <- validate_target(context, mode, user, params),
          {:ok, params} <- resolve_source_workout(context, mode, params),
          {:ok, workout} <- prepare_workout(context, admin, user, params),
+         :ok <- keep_member_copy_personal(context, mode, workout, params),
          {:ok, association} <- associate(context, mode, user, workout.id, params) do
       {:ok, %{workout: workout, association: association, mode: to_string(mode)}}
     end
@@ -119,6 +120,23 @@ defmodule MilosTraining.Application.ProgramUserWorkout do
       end
     end
   end
+
+  # Owner decision (ADR-115): a copy made for one member's personalized
+  # programming never appears in the shared workout library. Athlete copies and
+  # the class-workout mode keep the ADR-071 behaviour.
+  defp keep_member_copy_personal(context, mode, workout, params)
+       when mode in [:personal, :class_variant] do
+    if value(params, :copy_source) != false do
+      case Workouts.update_library_metadata(context, workout.id, %{library_visibility: "personal"}) do
+        {:ok, _metadata} -> :ok
+        error -> error
+      end
+    else
+      :ok
+    end
+  end
+
+  defp keep_member_copy_personal(_context, _mode, _workout, _params), do: :ok
 
   defp associate(context, mode, %{id: assignee_id}, workout_id, params)
        when mode in [:athlete, :personal] do

@@ -5,7 +5,6 @@ import {
   modeRequiresBookedClass,
   modeRequiresProgrammingEntitlement,
   programmingSuccessKey,
-  yourVersionHref,
 } from "@/lib/member-programming";
 
 describe("member programming rules (ADR-115)", () => {
@@ -23,12 +22,6 @@ describe("member programming rules (ADR-115)", () => {
     expect(modeRequiresProgrammingEntitlement("class_variant")).toBe(true);
     expect(modeRequiresProgrammingEntitlement("personal")).toBe(true);
     expect(modeRequiresProgrammingEntitlement("class_workout")).toBe(false);
-  });
-
-  it("links a class card's version to the auto-opening workout list", () => {
-    expect(yourVersionHref("a-1", "2026-10-12")).toBe(
-      "/my-workouts?open_assignment=a-1&date=2026-10-12",
-    );
   });
 
   it("chooses role- and mode-aware success copy", () => {

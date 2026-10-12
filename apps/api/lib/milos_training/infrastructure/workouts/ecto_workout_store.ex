@@ -240,6 +240,8 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   def list_workouts do
     MasterWorkout
     |> scoped_to_tenant()
+    # ADR-115: member-programming copies are personal, not library entries.
+    |> where([workout], workout.library_visibility == "shared")
     |> order_by([workout], desc: workout.inserted_at)
     |> Repo.all()
     |> Repo.preload(@workout_preloads)
@@ -314,7 +316,8 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
       workout ->
         workout
-        |> Ecto.Changeset.cast(params, [:folder_id, :source_workout_id])
+        |> Ecto.Changeset.cast(params, [:folder_id, :source_workout_id, :library_visibility])
+        |> Ecto.Changeset.validate_inclusion(:library_visibility, ["shared", "personal"])
         |> Ecto.Changeset.foreign_key_constraint(:folder_id)
         |> Ecto.Changeset.foreign_key_constraint(:source_workout_id)
         |> Repo.update()

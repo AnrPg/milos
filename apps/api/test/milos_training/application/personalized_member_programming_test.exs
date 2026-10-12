@@ -14,10 +14,11 @@ defmodule MilosTraining.Application.PersonalizedMemberProgrammingTest do
     AuthorizeMemberProgramming,
     AuthorizeWorkoutExecutionSource,
     GetAssignedWorkoutWeek,
+    ProgramUserWorkout,
     UpdateAssignedWorkout
   }
 
-  alias MilosTraining.{Finance, Organizations, Repo, TestFixtures}
+  alias MilosTraining.{Finance, Organizations, Repo, TestFixtures, Workouts}
   alias MilosTraining.Organizations.OrganizationMembership
 
   @programming_plan %{
@@ -104,6 +105,44 @@ defmodule MilosTraining.Application.PersonalizedMemberProgrammingTest do
   defp member_context(%{organization: organization}, user) do
     {:ok, context} = Organizations.resolve_tenant_context(user, organization.slug)
     context
+  end
+
+  test "member programming copies stay out of the library; athlete copies remain listed" do
+    ctx = tenant()
+    member = ctx |> customer(:member) |> then(&entitle(ctx, &1))
+    athlete = customer(ctx, :athlete)
+    source = workout(ctx)
+    today = Date.to_iso8601(Date.utc_today())
+
+    {:ok, %{workout: member_copy}} =
+      with_runtime_role(fn ->
+        ProgramUserWorkout.call(ctx.context, ctx.owner, member.id, %{
+          "mode" => "personal",
+          "master_workout_id" => source.id,
+          "scheduled_for" => today
+        })
+      end)
+
+    {:ok, %{workout: athlete_copy}} =
+      with_runtime_role(fn ->
+        ProgramUserWorkout.call(ctx.context, ctx.owner, athlete.id, %{
+          "master_workout_id" => source.id,
+          "scheduled_for" => today
+        })
+      end)
+
+    library_ids =
+      with_runtime_role(fn -> ctx.context |> Workouts.list_workouts() |> Enum.map(& &1.id) end)
+
+    assert source.id in library_ids
+    assert athlete_copy.id in library_ids
+    refute member_copy.id in library_ids
+
+    # The personal copy still resolves by id for the member's assignment.
+    assert %{id: id} =
+             with_runtime_role(fn -> Workouts.get_workout(ctx.context, member_copy.id) end)
+
+    assert id == member_copy.id
   end
 
   test "AuthorizeMemberProgramming accepts only explicit grants and names the member" do
