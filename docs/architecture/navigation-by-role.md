@@ -1,6 +1,6 @@
 # Navigation by Role (proposal for ADR-103)
 
-Status: Proposed — awaiting product approval.
+Status: Accepted (2026-10-12).
 
 Rule of this proposal: **today's UI stays as it is.** Changes are only
 showing/hiding pages, tabs and buttons, renaming a few labels, and adding
@@ -12,14 +12,14 @@ not fit goes into the last menu).
 
 | Role | Bar (priority order) | Home (dashboard) sections | Hidden / renamed |
 |---|---|---|---|
-| **Owner** | as today's admin bar | as today's admin dashboard | + Settings › *Organization* card (create gym, transfer ownership, delete gym, platform subscription), + Settings › *Role access* (front desk finance access, §3) |
-| **Admin** | as today | as today | Settings › *Organization* hidden |
+| **Owner** | Home · Training ▾ · Finance · WODs · Users | admin dashboard | + Settings › *Organization* card (create gym, transfer ownership, delete gym, platform subscription), + Settings › *Role access* (front desk finance access, §3) |
+| **Admin** | Home · Training ▾ · Finance · WODs · Users | today's dashboard; its category tiles also reach Content, Challenges, Analytics & Marketing, Reviews, Wellbeing | **Training ▾** opens Gym classes · Personal training (then Appointments · Check-in desk); *Workouts* → **WODs**; Settings moves to the account menu; the Dashboard row is removed; Settings › *Organization* hidden |
 | **Coach** | Home · Classes · Personals · WOD vault | My classes today (roster, approvals) · My clients (today's Users page as a tab, only their clients; *Take an athlete*, *Invite*) · Form reviews · Replies due · Nutrition plans · Appointments (their slots) · Reports (coaching analytics of their clients) · Content & challenges (links) | *Personal Coaching* → **Personals**, *Workouts* → **WOD vault**; Users, Finance, Analytics & Marketing, Settings hidden; Classes without *Add class* |
 | **Front desk** | Home · Check-in · Classes · Clients · Finance | Arrivals now · Today's classes and waitlists · Quick actions (new client, sell package, take payment) · Cleaning status | *Users* → **Clients** (contact and membership status; training and health tabs hidden); Finance shows only the tabs and buttons the gym unlocked (§3); Classes without *Add class* |
 | **Accountant** | Home · Finance · Clients · Reports | Overdue · Corporate balances · Desk payments to reconcile | *Users* → **Clients** (billing tab only); *Analytics* → **Reports** (finance tab only) |
 | **Janitor** | Cleaning log | — (the log is the home) | everything else hidden |
-| **Member** | as today | as today | — |
-| **Athlete** | as today | as today | — |
+| **Member** | Home · Training · Journal | gamification + Journal call to action | **Training** (tabs): Classes · Appointments* · Videos*. **Journal** (tabs): Workouts (folders / tree list, like the WOD library) · History · PRs · Progress* · Coaching* · Wellbeing. Billing in the account menu |
+| **Athlete** | Home · Training · Journal | as member | **Training** (tabs): My workouts · Classes · Appointments* · Videos*. **Journal**: as member |
 
 ## 2. Several roles in one gym
 
@@ -45,7 +45,7 @@ sections of every role, staff sections first.
 | Accountant + janitor | accountant bar + Cleaning log | money sections | — |
 | Accountant + member/athlete | accountant bar | money sections | ✔ |
 | Janitor + member/athlete | client bar + Cleaning log | client home | — (client bar already) |
-| Member + athlete | Home · Schedule · My Workouts · History · Pantheon | client home with both | — |
+| Member + athlete | Home · Training · Journal (Training shows both My workouts and Classes) | client home | — |
 | Three or more roles | union of the staff bars (priority+ overflow into More) | all staff sections | ✔ if a client role is held |
 
 \* only the unlocked tabs (§3).
@@ -68,3 +68,14 @@ Optional (off by default):
 
 The toggles add capabilities to the front desk role in that gym only
 (ADR-099 extension).
+
+\* only when the package includes it.
+
+## 4. Notes
+
+- The Journal is being designed in another worktree as a diary of workouts,
+  performance, injuries, reports, messages, PRs and notes. Here it holds only
+  the tabs implemented in this worktree, plus **Workouts**: every finished
+  workout in two views, folders and a tree list, as in the admin WOD library.
+- "Training" is one label for every role: for staff it is classes and
+  personal training, for clients what they book and train.

@@ -1,6 +1,6 @@
 # ADR-103: Role-Aware Navigation on Today's UI
 Date: 2026-10-12
-Status: Proposed — awaiting product approval
+Status: Accepted
 
 ## Context
 ADR-099 adds role sets and three new staff roles (front desk, accountant,
@@ -19,15 +19,20 @@ full proposal — what each role sees, every multi-role combination, and the
 front desk finance access each gym unlocks — is
 `docs/architecture/navigation-by-role.md`. In short:
 
-- Owners and admins keep today's staff bar; owners also get Settings ›
-  Organization and Settings › Role access.
+- Owners and admins: Home · Training ▾ (Gym classes · Personal training,
+  then Appointments · Check-in desk) · Finance · WODs · Users; the other
+  staff pages are dashboard tiles; Settings is in the account menu; owners
+  also get Settings › Organization and Settings › Role access.
 - Coaches: Home · Classes · Personals · WOD vault; everything else (their
   clients, form reviews, replies, nutrition plans, appointments, reports) is
   a section of their dashboard.
 - Front desk: Home · Check-in · Classes · Clients · Finance (only the tabs
   the gym unlocks). Accountants: Home · Finance · Clients · Reports.
   Janitors: the Cleaning log.
-- Members and athletes: unchanged.
+- Members and athletes: Home (gamification and a Journal call to action) ·
+  Training (classes, their workouts, appointments, videos) · Journal (tabs:
+  Workouts in folder and tree views, History, PRs, Progress, Coaching,
+  Wellbeing).
 - Several roles: staff pages merge by union; a client role adds *My
   training* in the account menu.
 - The bar uses priority+ overflow so it fits a narrow phone in every
@@ -50,4 +55,4 @@ The web shell reads roles and capabilities (ADR-099) to choose links;
 "Milos workspaces navigation" artifact (revised version).
 
 ## Implementation Notes
-To be completed after approval.
+To be completed with the implementation.
