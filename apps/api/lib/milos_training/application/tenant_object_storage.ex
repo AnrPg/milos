@@ -7,6 +7,10 @@ defmodule MilosTraining.Application.TenantObjectStorage do
   documents bucket and account avatars under `users/<user_id>/` in the avatar
   bucket. Nothing here can list or delete outside those prefixes, which is what
   makes a tenant purge safe without a blind bucket-wide delete.
+
+  ADR-103 tenant logos use the logical `:branding` bucket (the public media
+  bucket) under the same `organizations/<organization_id>/` prefix; they are
+  inventoried with, and purged like, the tenant's documents.
   """
 
   alias MilosTraining.Application.OwnershipKeys
@@ -14,9 +18,45 @@ defmodule MilosTraining.Application.TenantObjectStorage do
   @doc "Objects currently stored for a tenant and for the given accounts."
   def inventory(organization_id, user_ids) when is_binary(organization_id) do
     with {:ok, documents} <- list_tenant_objects(organization_id),
+         {:ok, branding} <- list_branding_objects(organization_id),
          {:ok, avatars} <- list_user_objects(user_ids) do
-      {:ok, %{documents: documents, avatars: avatars}}
+      # Uploaded logos (ADR-103) are tenant objects too; they live in the
+      # public media bucket but are purged like any other tenant document.
+      {:ok, %{documents: documents ++ branding, avatars: avatars}}
     end
+  end
+
+  # --- ADR-103 tenant branding (public media bucket, tenant prefix) ----------
+
+  def list_branding_objects(organization_id) when is_binary(organization_id),
+    do: impl().list_objects(:branding, tenant_prefix(organization_id))
+
+  @doc "Presigned PUT for a tenant-owned branding key."
+  def branding_upload(organization_id, key, content_type)
+      when is_binary(organization_id) and is_binary(key) do
+    if String.starts_with?(key, tenant_prefix(organization_id)),
+      do: impl().presigned_upload(:branding, key, content_type),
+      else: {:error, :brand_logo_key_forbidden}
+  end
+
+  @doc "Leading bytes and size of a tenant-owned branding object."
+  def probe_branding_object(organization_id, key, bytes)
+      when is_binary(organization_id) and is_binary(key) do
+    if String.starts_with?(key, tenant_prefix(organization_id)),
+      do: impl().probe_object(:branding, key, bytes),
+      else: {:error, :brand_logo_key_forbidden}
+  end
+
+  def branding_public_url(key) when is_binary(key), do: impl().public_object_url(:branding, key)
+
+  @doc "Deletes tenant-owned branding objects; keys outside the tenant prefix are refused."
+  def delete_branding_objects(organization_id, keys)
+      when is_binary(organization_id) and is_list(keys) do
+    prefix = tenant_prefix(organization_id)
+
+    if Enum.all?(keys, &(is_binary(&1) and String.starts_with?(&1, prefix))),
+      do: delete(:branding, Enum.map(keys, &%{key: &1})),
+      else: {:error, :brand_logo_key_forbidden}
   end
 
   def list_tenant_objects(organization_id) when is_binary(organization_id),
@@ -61,14 +101,16 @@ defmodule MilosTraining.Application.TenantObjectStorage do
     prefix = tenant_prefix(organization_id)
     retained = Enum.map(retained_relative_prefixes, &(prefix <> &1))
 
-    with {:ok, objects} <- list_tenant_objects(organization_id) do
+    with {:ok, objects} <- list_tenant_objects(organization_id),
+         {:ok, branding} <- list_branding_objects(organization_id) do
       {kept, doomed} =
         Enum.split_with(objects, fn %{key: key} ->
           Enum.any?(retained, &String.starts_with?(key, &1))
         end)
 
-      with {:ok, deleted} <- delete(:documents, doomed) do
-        {:ok, %{deleted_objects: deleted, retained_objects: length(kept)}}
+      with {:ok, deleted} <- delete(:documents, doomed),
+           {:ok, deleted_branding} <- delete(:branding, branding) do
+        {:ok, %{deleted_objects: deleted + deleted_branding, retained_objects: length(kept)}}
       end
     end
   end

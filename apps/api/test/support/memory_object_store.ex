@@ -45,6 +45,30 @@ defmodule MilosTraining.TestSupport.MemoryObjectStore do
   def presigned_object_url(bucket, key),
     do: {:ok, "https://objects.test/#{bucket}/#{key}?signature=test"}
 
+  @impl true
+  def presigned_upload(bucket, key, content_type),
+    do:
+      {:ok,
+       %{
+         url: "https://objects.test/upload/#{bucket}/#{key}?signature=test",
+         headers: %{"content-type" => content_type}
+       }}
+
+  @impl true
+  def probe_object(bucket, key, bytes) do
+    case get(bucket, key) do
+      {:ok, body} ->
+        {:ok,
+         %{head: binary_part(body, 0, min(bytes, byte_size(body))), byte_size: byte_size(body)}}
+
+      :error ->
+        {:error, :not_found}
+    end
+  end
+
+  @impl true
+  def public_object_url(bucket, key), do: {:ok, "https://media.test/#{bucket}/#{key}"}
+
   @doc "Raw body of a stored object, for assertions."
   def get(bucket, key) do
     Agent.get(__MODULE__, fn objects ->

@@ -67,8 +67,65 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
     )
   end
 
+  # ADR-103: tenant logos share the public media (avatar) bucket; the bucket
+  # policy makes only `organizations/*/branding/logo/*` publicly readable.
+  @impl MilosTraining.Application.Ports.TenantObjectStore
+  def presigned_upload(bucket, key, content_type) when is_binary(key) do
+    {storage_config, url_config, bucket_name} = bucket_config(bucket)
+    headers = [{"content-type", content_type}]
+
+    with :ok <- ensure_bucket(storage_config, bucket_name),
+         :ok <- ensure_public_read_policy(bucket, storage_config, bucket_name),
+         {:ok, url} <-
+           ExAws.S3.presigned_url(url_config, :put, bucket_name, key,
+             expires_in: @expires_seconds,
+             virtual_host: false,
+             headers: headers
+           ) do
+      {:ok, %{url: url, headers: Map.new(headers)}}
+    else
+      {:error, reason} -> {:error, {:object_store_failed, reason}}
+    end
+  end
+
+  @impl MilosTraining.Application.Ports.TenantObjectStore
+  def probe_object(bucket, key, bytes) when is_binary(key) and is_integer(bytes) and bytes > 0 do
+    {storage_config, _url_config, bucket_name} = bucket_config(bucket)
+
+    case ExAws.S3.get_object(bucket_name, key, range: "bytes=0-#{bytes - 1}")
+         |> ExAws.request(storage_config) do
+      {:ok, %{headers: headers, body: body}} ->
+        normalized = Map.new(headers, fn {name, value} -> {String.downcase(name), value} end)
+        {:ok, %{head: to_string(body), byte_size: total_object_size(normalized)}}
+
+      {:error, {:http_error, 404, _response}} ->
+        {:error, :not_found}
+
+      # An empty object cannot satisfy any byte range.
+      {:error, {:http_error, 416, _response}} ->
+        {:ok, %{head: "", byte_size: 0}}
+
+      {:error, reason} ->
+        {:error, {:object_store_failed, reason}}
+    end
+  end
+
+  @impl MilosTraining.Application.Ports.TenantObjectStore
+  def public_object_url(:branding, key) when is_binary(key) do
+    {_storage_config, _url_config, bucket_name} = bucket_config(:branding)
+    {:ok, avatar_public_url(bucket_name, key)}
+  end
+
+  def public_object_url(_bucket, _key), do: {:error, :not_public}
+
+  defp ensure_public_read_policy(:branding, config, bucket_name),
+    do: ensure_avatar_read_policy(config, bucket_name)
+
+  defp ensure_public_read_policy(_bucket, _config, _bucket_name), do: :ok
+
   defp bucket_config(:documents), do: ex_aws_config()
   defp bucket_config(:avatars), do: avatar_ex_aws_config()
+  defp bucket_config(:branding), do: avatar_ex_aws_config()
 
   defp list_objects_page(config, bucket_name, prefix, token, acc) do
     options =
@@ -407,19 +464,28 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
     end
   end
 
+  @doc false
+  # Anonymous reads are limited to avatars and (ADR-103) tenant logos; every
+  # other key in the public media bucket stays private.
+  def public_read_policy(bucket) do
+    %{
+      Version: "2012-10-17",
+      Statement: [
+        %{
+          Effect: "Allow",
+          Principal: "*",
+          Action: ["s3:GetObject"],
+          Resource: [
+            "arn:aws:s3:::#{bucket}/users/*/avatars/*",
+            "arn:aws:s3:::#{bucket}/organizations/*/branding/logo/*"
+          ]
+        }
+      ]
+    }
+  end
+
   defp ensure_avatar_read_policy(config, bucket) do
-    policy =
-      Jason.encode!(%{
-        Version: "2012-10-17",
-        Statement: [
-          %{
-            Effect: "Allow",
-            Principal: "*",
-            Action: ["s3:GetObject"],
-            Resource: ["arn:aws:s3:::#{bucket}/users/*/avatars/*"]
-          }
-        ]
-      })
+    policy = Jason.encode!(public_read_policy(bucket))
 
     case ExAws.S3.put_bucket_policy(bucket, policy) |> ExAws.request(config) do
       {:ok, _response} -> :ok

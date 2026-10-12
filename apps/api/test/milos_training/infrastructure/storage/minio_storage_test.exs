@@ -11,6 +11,26 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorageTest do
     assert operation.resource == "location"
   end
 
+  test "the public media bucket exposes only avatars and tenant logos (ADR-103)" do
+    %{Statement: [%{Action: action, Resource: resource}]} =
+      MinioStorage.public_read_policy("milos-avatars")
+
+    assert action == ["s3:GetObject"]
+
+    assert resource == [
+             "arn:aws:s3:::milos-avatars/users/*/avatars/*",
+             "arn:aws:s3:::milos-avatars/organizations/*/branding/logo/*"
+           ]
+  end
+
+  test "only branding objects have a public URL" do
+    assert {:ok, url} =
+             MinioStorage.public_object_url(:branding, "organizations/o/branding/logo/x.png")
+
+    assert String.ends_with?(url, "/organizations/o/branding/logo/x.png")
+    assert {:error, :not_public} = MinioStorage.public_object_url(:documents, "x")
+  end
+
   test "avatar uploads only require headers browsers may set" do
     assert MinioStorage.avatar_upload_headers("image/jpeg") == [
              {"content-type", "image/jpeg"}
