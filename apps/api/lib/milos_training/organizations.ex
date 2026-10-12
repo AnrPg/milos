@@ -75,6 +75,16 @@ defmodule MilosTraining.Organizations do
   def update_join_link(context, params),
     do: MilosTraining.Organizations.Commands.UpdateJoinLink.call(context, params)
 
+  def get_onboarding_state(context),
+    do: MilosTraining.Organizations.Queries.GetOnboardingState.call(context)
+
+  def update_onboarding(context, params, now \\ DateTime.utc_now()),
+    do: MilosTraining.Organizations.Commands.UpdateOnboarding.call(context, params, now)
+
+  @doc "Builds the onboarding checklist view from stored state and setup signals."
+  def onboarding_checklist(state, signals),
+    do: MilosTraining.Organizations.Domain.OnboardingChecklist.build(state, signals)
+
   def inspect_join_link(slug), do: MilosTraining.Organizations.Queries.InspectJoinLink.call(slug)
 
   def join_by_link(slug, user_id, joined_at \\ DateTime.utc_now()),
