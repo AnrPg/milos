@@ -1,12 +1,24 @@
 defmodule MilosTraining.Notifications.Commands.DispatchNotification do
   alias MilosTraining.Notifications.Commands.CreateNotification
   alias MilosTraining.Notifications.Commands.EnqueuePushDispatch
+  alias MilosTraining.Notifications.NotificationStore
   alias MilosTraining.Notifications.Domain.{PayloadNormalizer, PushMessageBuilder}
   alias MilosTraining.Notifications.PushConfig
   alias MilosTraining.Localization
   alias MilosTraining.Organizations.OrganizationStore
 
+  # Notifications are owner-only under RLS (`user_id = app.user_id`, including
+  # on insert), so a notification addressed to someone other than the session
+  # user - staff notified of a member's action, or any Oban event job - is
+  # written inside the recipient's scope (TD-046). The outer organization
+  # scope is preserved.
   def call(user_id, type, payload, locale \\ "en") do
+    NotificationStore.with_user_context(%{user_id: user_id}, fn ->
+      dispatch(user_id, type, payload, locale)
+    end)
+  end
+
+  defp dispatch(user_id, type, payload, locale) do
     normalized_payload =
       payload
       |> PayloadNormalizer.normalize()
