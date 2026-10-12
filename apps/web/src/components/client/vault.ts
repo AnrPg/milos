@@ -95,3 +95,43 @@ export function filterVault(workouts: VaultWorkout[], query: string): VaultWorko
     (workout.workout_title ?? "").toLocaleLowerCase().includes(needle),
   );
 }
+
+export type FinishedWorkout = {
+  master_workout_id: string;
+  title: string | null;
+  type: string | null;
+  /** Newest first. */
+  entries: HistoryEntry[];
+};
+export type FinishedWorkoutFolder = { type: string | null; workouts: FinishedWorkout[] };
+
+/**
+ * The Journal's Workouts tab (ADR-103): every finished workout once, filed by
+ * workout type, with each time it was done. Folders and workouts are ordered
+ * by their latest completion.
+ */
+export function groupFinishedWorkouts(entries: HistoryEntry[]): FinishedWorkoutFolder[] {
+  const byWorkout = new Map<string, FinishedWorkout>();
+  for (const entry of entries) {
+    const workout = byWorkout.get(entry.master_workout_id) ?? {
+      master_workout_id: entry.master_workout_id,
+      title: entry.workout_title,
+      type: entry.workout_type,
+      entries: [],
+    };
+    workout.entries.push(entry);
+    byWorkout.set(entry.master_workout_id, workout);
+  }
+  const latest = (workout: FinishedWorkout) => workout.entries[0]?.completed_at_utc ?? "";
+  const folders = new Map<string, FinishedWorkoutFolder>();
+  for (const workout of byWorkout.values()) {
+    workout.entries.sort((a, b) => (b.completed_at_utc ?? "").localeCompare(a.completed_at_utc ?? ""));
+    const key = workout.type ?? "";
+    const folder = folders.get(key) ?? { type: workout.type, workouts: [] };
+    folder.workouts.push(workout);
+    folders.set(key, folder);
+  }
+  const result = Array.from(folders.values());
+  for (const folder of result) folder.workouts.sort((a, b) => latest(b).localeCompare(latest(a)));
+  return result.sort((a, b) => latest(b.workouts[0]).localeCompare(latest(a.workouts[0])));
+}

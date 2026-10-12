@@ -33,7 +33,21 @@
     "coaching": "Coaching",
     "appointments": "Appointments",
     "more": "More",
-    "onDemandContent": "On-demand content"
+    "onDemandContent": "On-demand content",
+    "checkIn": "Check-in",
+    "clients": "Clients",
+    "reports": "Reports",
+    "cleaningLog": "Cleaning log",
+    "training": "Training",
+    "journal": "Journal",
+    "gymClasses": "Gym classes",
+    "personalTraining": "Personal training",
+    "wodsVault": "WODs vault",
+    "finishedWorkouts": "Workouts",
+    "wellbeing": "Wellbeing",
+    "settings": "Settings",
+    "myTraining": "My training",
+    "staffView": "Staff view"
   },
   "Profile": {
     "eyebrow": "Profile",
@@ -3545,6 +3559,15 @@
     "clCorporateJoinCompany": "Join company plan",
     "stfCopyEnrollmentLink": "Copy enrollment link",
     "stfEnrollmentLinkCopied": "Link copied",
-    "stfEnrollmentLinkHelp": "Send this link to the company's employees. Members only see the company plan when they open it, or when their work email matches the plan's domain."
+    "stfEnrollmentLinkHelp": "Send this link to the company's employees. Members only see the company plan when they open it, or when their work email matches the plan's domain.",
+    "jrnWorkoutsTitle": "Finished workouts",
+    "jrnWorkoutsIntro": "Every workout you have finished, filed by type, with each time you did it.",
+    "jrnViewLabel": "View",
+    "jrnViewFolders": "Folders",
+    "jrnViewTree": "Tree list",
+    "jrnAllFolders": "All folders",
+    "jrnTimesDone": "{count, plural, one {Done once} other {Done # times}}",
+    "jrnWorkoutCount": "{count, plural, one {# workout} other {# workouts}}",
+    "jrnOtherWorkouts": "Other"
   }
 }

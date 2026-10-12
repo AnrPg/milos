@@ -7,7 +7,7 @@
 import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
@@ -21,8 +21,20 @@ import { subscribeToTopic } from "@/lib/realtime";
 import { showsTenantSelfServiceSurfaces } from "@/lib/account-surfaces";
 import { adminHref, membershipWorkspaceHref, rememberSelectedOrganization, useOrganizationSlug } from "@/lib/organization-slug";
 import { selectedMembership, surfaceRoleForMembership } from "@/lib/membership-role";
+import {
+  activeItemId,
+  can,
+  clientNavItems,
+  clientRole,
+  hasStaffRole,
+  sectionGroupFor,
+  staffNavItems,
+} from "@/lib/role-navigation";
+import { setView, useView } from "@/lib/view-mode";
+import { PriorityNav } from "@/components/nav/PriorityNav";
+import { SectionTabs } from "@/components/nav/SectionTabs";
 import { SemanticLabel } from "@/components/semantic-label";
-import { entitledFeatures, type ClientFeature } from "@/components/client/entitlement";
+import { entitledFeatures } from "@/components/client/entitlement";
 import { useClientEntitlement } from "@/components/client/use-client-entitlement";
 import { OrganizationSelector } from "@/components/organization-selector";
 
@@ -30,75 +42,9 @@ export { adminHref } from "@/lib/organization-slug";
 
 const CANVAS_PATHS = ["/login"];
 
-type UserRole = "member" | "athlete" | "admin";
-
-type NavLink = { href: string; labelKey: string; roles: UserRole[]; feature?: ClientFeature };
-type AdminNavLink = { href: string; labelKey: string; mobileVisible: boolean };
 type OrganizationMembershipSummary = {
   organization: { name: string; slug: string };
   settings?: { brand_name?: string | null } | null;
-};
-
-const NAV_LINKS: NavLink[] = [
-  { href: "/", labelKey: "home", roles: ["member", "athlete"] },
-  { href: "/schedule", labelKey: "schedule", roles: ["member"] },
-  { href: "/my-workouts", labelKey: "myWorkouts", roles: ["athlete"] },
-  { href: "/my-workouts/history", labelKey: "history", roles: ["member", "athlete"] },
-  { href: "/my-workouts/pantheon", labelKey: "pantheon", roles: ["athlete", "member"] },
-  { href: "/account/billing", labelKey: "billing", roles: ["member", "athlete"] },
-];
-
-// Package services (ADR-098), shown only when the client's package includes them.
-const FEATURE_NAV_LINKS: NavLink[] = [
-  { href: "/videos", labelKey: "videos", roles: ["member", "athlete"], feature: "videos" },
-  { href: "/progress", labelKey: "progress", roles: ["member", "athlete"], feature: "progress" },
-  { href: "/coaching", labelKey: "coaching", roles: ["member", "athlete"], feature: "coaching" },
-  { href: "/appointments", labelKey: "appointments", roles: ["member", "athlete"], feature: "appointments" },
-];
-
-/** Member/athlete links: the bar's own links, and package services for the "More" menu. */
-export function memberNavLinks(role: string, features: ClientFeature[]) {
-  const forRole = (link: NavLink) => link.roles.includes(role as UserRole);
-  return {
-    primary: NAV_LINKS.filter(forRole),
-    more: FEATURE_NAV_LINKS.filter(
-      (link) => forRole(link) && link.feature !== undefined && features.includes(link.feature),
-    ),
-  };
-}
-
-const ADMIN_NAV_LINKS: AdminNavLink[] = [
-  { href: "/", labelKey: "home", mobileVisible: true },
-  { href: "/admin/users", labelKey: "users", mobileVisible: false },
-  { href: "/admin/finance", labelKey: "finance", mobileVisible: false },
-  { href: "/admin/class-schedule", labelKey: "classes", mobileVisible: true },
-  { href: "/admin/coaching-assignments", labelKey: "personalCoaching", mobileVisible: true },
-  { href: "/admin/workouts", labelKey: "workouts", mobileVisible: false },
-  { href: "/admin/metrics", labelKey: "analyticsMarketing", mobileVisible: false },
-];
-
-type DashboardCategory = {
-  labelKey: string;
-  items: { href: string; labelKey?: string; label?: string; description: string }[];
-};
-
-const ADMIN_NAV_ICONS: Record<string, string> = {
-  "/": "⌂",
-  "/admin/users": "◎",
-  "/admin/finance": "$",
-  "/admin/class-schedule": "▦",
-  "/admin/coaching-assignments": "◇",
-  "/admin/workouts": "▣",
-  "/admin/metrics": "⌁",
-};
-
-const MEMBER_NAV_ICONS: Record<string, string> = {
-  "/": "⌂",
-  "/schedule": "▦",
-  "/my-workouts": "▣",
-  "/my-workouts/history": "↺",
-  "/my-workouts/pantheon": "★",
-  "/account/billing": "$",
 };
 
 function stripOrganizationPrefix(pathname: string) {
@@ -136,306 +82,12 @@ export function tenantBrandName(
   return membership?.settings?.brand_name?.trim() || membership?.organization.name.trim() || null;
 }
 
-function DashboardDropdown({
-  pathname,
-  organizationSlug,
-}: {
-  pathname: string;
-  organizationSlug: string | null;
-}) {
-  const i18n = useUiTranslations();
-  const DASHBOARD_CATEGORIES: DashboardCategory[] = [
-    {
-      labelKey: "operations",
-      items: [
-        { href: "/admin/users", labelKey: "users", description: i18n("directoryAndPersonProfiles103196f") },
-        { href: "/admin/finance", labelKey: "finance", description: i18n("invoicesPaymentsAndCredits3671159") },
-        { href: "/admin/class-schedule", labelKey: "classes", description: i18n("slotsBookingsAndAttendanced9c2596") },
-        { href: "/admin/check-in", label: i18n("admCheckInTitle"), description: i18n("admCheckInNavDescription") },
-        { href: "/admin/coaching-assignments", labelKey: "personalCoaching", description: i18n("athleteProgrammingBoard954ac27") },
-        { href: "/admin/appointments", labelKey: "appointments", description: i18n("clNavAdminAppointmentsDescription") },
-      ],
-    },
-    {
-      labelKey: "contentGrowth",
-      items: [
-        { href: "/admin/workouts", labelKey: "workouts", description: i18n("masterWorkoutDefinitions09554e6") },
-        { href: "/admin/content", labelKey: "onDemandContent", description: i18n("clNavAdminContentDescription") },
-        { href: "/admin/metrics", labelKey: "analyticsMarketing", description: i18n("reportingEngagementAndGrowth37e1707") },
-        { href: "/admin/challenges", label: i18n("challengesff38765"), description: i18n("seasonalEngagementCampaignsd11b07e") },
-      ],
-    },
-    {
-      labelKey: "utility",
-      items: [
-        { href: "/admin/settings", labelKey: "appConfigurations", description: i18n("appearanceRulesAndLevelTaxonomyc970499") },
-      ],
-    },
-  ];
-
-  const t = useTranslations("Navigation");
-  const [open, setOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const ref = useRef<HTMLDivElement>(null);
-
-  const isAdminActive = stripOrganizationPrefix(pathname) === "/admin";
-  const openMenu = () => {
-    setOpen(true);
-    setActiveCategory((current) => current ?? DASHBOARD_CATEGORIES[0]?.labelKey ?? null);
-  };
-
-  useEffect(() => {
-    if (!open) return;
-    function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-        setActiveCategory(null);
-      }
-    }
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
-
-  return (
-    <div ref={ref} className="relative shrink-0" onFocus={openMenu} onMouseEnter={openMenu}>
-      <div
-        className="flex items-center rounded-full"
-        style={{ background: isAdminActive ? "var(--border)" : "transparent" }}
-      >
-        <Link
-          href={adminHref("/admin", organizationSlug)}
-          className="grid h-8 min-w-8 place-items-center rounded-full px-2 text-xs font-semibold transition-colors sm:h-auto sm:min-w-0 sm:px-3 sm:py-1 sm:text-sm"
-          style={{ color: isAdminActive ? "var(--text)" : "var(--dim)" }}
-          aria-label={t("dashboard")}
-          title={t("dashboard")}
-        >
-          <span aria-hidden="true" className="sm:hidden">⌂</span>
-          <span className="hidden sm:inline">{t("dashboard")}</span>
-        </Link>
-        <button
-          aria-expanded={open}
-          aria-label={t("openDashboard")}
-          className="h-8 px-1.5 text-xs sm:h-auto sm:py-1 sm:pe-2"
-          style={{ color: isAdminActive ? "var(--text)" : "var(--dim)" }}
-          onClick={() => setOpen((value) => !value)}
-          type="button"
-        >
-          ▾
-        </button>
-      </div>
-
-      {open ? (
-        <div
-          className="absolute start-0 top-full mt-1 flex max-w-[calc(100vw-1rem)] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7)]"
-          style={{ background: "var(--panel)", border: "1px solid var(--border)", zIndex: 100 }}
-          onMouseLeave={() => { setOpen(false); setActiveCategory(null); }}
-        >
-          {/* Category list */}
-          <div className="w-32 border-e py-1.5 sm:w-40" style={{ borderColor: "var(--border)" }}>
-            {DASHBOARD_CATEGORIES.map((cat) => (
-              <button
-                key={cat.labelKey}
-                className="flex w-full items-center justify-between gap-2 px-4 py-2 text-start text-xs font-semibold transition-colors"
-                style={{
-                  color: activeCategory === cat.labelKey ? "var(--text)" : "var(--muted)",
-                  background: activeCategory === cat.labelKey ? "color-mix(in srgb, var(--text) 5%, transparent)" : "transparent",
-                }}
-                onMouseEnter={() => setActiveCategory(cat.labelKey)}
-                onClick={() => setActiveCategory(cat.labelKey)}
-                type="button"
-              >
-                {t(cat.labelKey)}
-                <span className="rtl:rotate-180" style={{ color: "var(--dim)" }}>›</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Sub-items */}
-          {activeCategory ? (
-            <div className="w-48 py-1.5 sm:w-56">
-              {DASHBOARD_CATEGORIES.find((c) => c.labelKey === activeCategory)?.items.map((item) => (
-                <Link
-                  key={item.href}
-                  href={adminHref(item.href, organizationSlug)}
-                  className="block px-4 py-2.5 transition-colors hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)]"
-                  onClick={() => { setOpen(false); setActiveCategory(null); }}
-                >
-                  <p className="text-sm font-semibold" style={{ color: pathActive(pathname, item.href) ? "var(--primary)" : "var(--text)" }}>
-                    {item.labelKey ? t(item.labelKey) : item.label}
-                  </p>
-                  <p className="mt-0.5 text-xs" style={{ color: "var(--dim)" }}>{item.description}</p>
-                </Link>
-              ))}
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function MobileMemberNavDropdown({
-  links,
-  moreLinks,
-  outstandingCents,
-}: {
-  links: NavLink[];
-  moreLinks: NavLink[];
-  outstandingCents: number;
-}) {
-  const t = useTranslations("Navigation");
-  const pathname = usePathname();
-  const [open, setOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<"training" | "more" | "account">("training");
-  const ref = useRef<HTMLDivElement>(null);
-  const trainingLinks = links.filter((link) => link.href !== "/account/billing");
-  const accountLinks = links.filter((link) => link.href === "/account/billing");
-  const categories = [
-    { id: "training" as const, label: t("myWorkouts"), items: trainingLinks },
-    { id: "more" as const, label: t("more"), items: moreLinks },
-    { id: "account" as const, label: t("profile"), items: accountLinks },
-  ].filter((category) => category.items.length > 0);
-  const activeItems = categories.find((category) => category.id === activeCategory)?.items ?? categories[0]?.items ?? [];
-
-  useEffect(() => {
-    if (!open) return;
-    function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
-
-  if (categories.length === 0) return null;
-
-  return (
-    <div ref={ref} className="relative shrink-0 sm:hidden">
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-label={t("openDashboard")}
-        title={t("openDashboard")}
-        className="grid h-8 min-w-8 place-items-center rounded-full px-2 text-xs font-semibold"
-        style={{ background: open ? "var(--border)" : "transparent", color: open ? "var(--text)" : "var(--dim)" }}
-        onClick={() => setOpen((value) => !value)}
-      >
-        ☰
-      </button>
-      {open ? (
-        <div
-          className="absolute start-0 top-full mt-1 flex max-w-[calc(100vw-1rem)] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7)]"
-          style={{ background: "var(--panel)", border: "1px solid var(--border)", zIndex: 100 }}
-        >
-          <div className="w-32 border-e py-1.5" style={{ borderColor: "var(--border)" }}>
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                type="button"
-                className="flex w-full items-center justify-between gap-2 px-4 py-2 text-start text-xs font-semibold transition-colors"
-                style={{
-                  color: activeCategory === category.id ? "var(--text)" : "var(--muted)",
-                  background: activeCategory === category.id ? "color-mix(in srgb, var(--text) 5%, transparent)" : "transparent",
-                }}
-                onMouseEnter={() => setActiveCategory(category.id)}
-                onClick={() => setActiveCategory(category.id)}
-              >
-                {category.label}
-                <span className="rtl:rotate-180" style={{ color: "var(--dim)" }}>›</span>
-              </button>
-            ))}
-          </div>
-          <div className="w-48 py-1.5">
-            {activeItems.map((link) => {
-              const showBalanceBadge = link.href === "/account/billing" && outstandingCents > 0;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)]"
-                  style={{ color: pathActive(pathname, link.href) ? "var(--primary)" : "var(--text)" }}
-                  onClick={() => setOpen(false)}
-                >
-                  <span>{t(link.labelKey)}</span>
-                  {showBalanceBadge ? (
-                    <span className="rounded-full px-1.5 text-[10px] font-bold" style={{ background: "var(--danger)", color: "#fff" }}>
-                      !
-                    </span>
-                  ) : null}
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function MemberMoreDropdown({ links, pathname }: { links: NavLink[]; pathname: string }) {
-  const t = useTranslations("Navigation");
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const active = links.some((link) => pathActive(pathname, link.href));
-
-  useEffect(() => {
-    if (!open) return;
-    function handleClick(event: MouseEvent) {
-      if (ref.current && !ref.current.contains(event.target as Node)) setOpen(false);
-    }
-    function handleKey(event: KeyboardEvent) {
-      if (event.key === "Escape") setOpen(false);
-    }
-    document.addEventListener("mousedown", handleClick);
-    document.addEventListener("keydown", handleKey);
-    return () => {
-      document.removeEventListener("mousedown", handleClick);
-      document.removeEventListener("keydown", handleKey);
-    };
-  }, [open]);
-
-  return (
-    <div ref={ref} className="relative shrink-0">
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-haspopup="true"
-        onClick={() => setOpen((value) => !value)}
-        className="rounded-full px-3 py-1 text-sm font-semibold transition-colors"
-        style={{
-          background: active || open ? "var(--border)" : "transparent",
-          color: active || open ? "var(--text)" : "var(--dim)",
-        }}
-      >
-        {t("more")} <span aria-hidden="true" className="text-xs">▾</span>
-      </button>
-      {open ? (
-        <div
-          className="absolute start-0 top-full mt-1 w-52 rounded-2xl py-1.5 shadow-[0_20px_60px_rgba(0,0,0,0.7)]"
-          style={{ background: "var(--panel)", border: "1px solid var(--border)", zIndex: 100 }}
-        >
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)]"
-              style={{ color: pathActive(pathname, link.href) ? "var(--primary)" : "var(--text)" }}
-              onClick={() => setOpen(false)}
-            >
-              {t(link.labelKey)}
-            </Link>
-          ))}
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
 export function TopNav() {
   const i18n = useUiTranslations();
   const t = useTranslations("Navigation");
   const pathname = usePathname();
+  const router = useRouter();
+  const view = useView();
   const { status, tokens, currentUser, signOut } = useSession();
   const queryClient = useQueryClient();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -458,7 +110,8 @@ export function TopNav() {
   const memberships = Array.isArray(membershipsQuery.data) ? membershipsQuery.data : [];
   const selectedOrganizationSlug = useOrganizationSlug();
   const currentMembership = selectedMembership(memberships, selectedOrganizationSlug);
-  const role = surfaceRoleForMembership(currentMembership) as UserRole;
+  const role = surfaceRoleForMembership(currentMembership, view);
+  const canSwitchView = hasStaffRole(currentMembership) && clientRole(currentMembership) !== null;
   const showSelfServiceSurfaces =
     role !== "admin" && Boolean(currentUser) && showsTenantSelfServiceSurfaces(currentUser);
   const financeQuery = useQuery({
@@ -469,7 +122,13 @@ export function TopNav() {
   });
   const outstandingCents = financeQuery.data?.total_outstanding_balance_cents ?? 0;
   const { entitlement } = useClientEntitlement(authenticated && showSelfServiceSurfaces);
-  const memberLinks = memberNavLinks(role, entitledFeatures(entitlement));
+  const features = entitledFeatures(entitlement);
+  const staffItems = role === "admin" ? staffNavItems(currentMembership) : [];
+  const navItems = role === "admin" ? staffItems : clientNavItems(role, currentMembership);
+  const hrefFor = (href: string, scoped?: boolean) => (scoped ? adminHref(href, selectedOrganizationSlug) : href);
+  const navLinks = navItems.map((item) => ({ id: item.id, href: hrefFor(item.href, item.scoped), label: t(item.labelKey) }));
+  const activeNavId = activeItemId(pathname, navItems);
+  const sectionGroup = sectionGroupFor(pathname, { surface: role, staffItems, features });
 
   const brandName = tenantBrandName(memberships, selectedOrganizationSlug) ?? i18n("milosTraining5b1a1c1");
   const hasTenantMembership = memberships.length > 0;
@@ -511,7 +170,7 @@ export function TopNav() {
 
   return (
     <header
-      className="sticky top-0 z-50 flex items-center overflow-x-clip"
+      className="sticky top-0 z-50 flex flex-col overflow-x-clip"
       style={{
         background: "var(--bg)",
         borderBottom: "1px solid var(--border)",
@@ -528,7 +187,7 @@ export function TopNav() {
           {brandName}
         </Link>
 
-        <nav className="order-3 col-start-1 row-start-2 flex min-w-0 flex-1 flex-wrap items-center gap-0.5 overflow-visible sm:order-none sm:col-span-1 sm:row-start-auto sm:gap-1">
+        <nav className="order-3 col-start-1 row-start-2 flex min-w-0 flex-1 items-center gap-0.5 overflow-visible sm:order-none sm:col-span-1 sm:row-start-auto sm:gap-1">
           {isVendor ? (
             <Link
               href="/platform/organizations"
@@ -541,71 +200,9 @@ export function TopNav() {
               {t("platform")}
             </Link>
           ) : null}
-          {showTenantShell && role === "admin" ? (
-            <DashboardDropdown pathname={pathname} organizationSlug={selectedOrganizationSlug} />
+          {showTenantShell ? (
+            <PriorityNav links={navLinks} activeId={activeNavId} moreLabel={t("more")} />
           ) : null}
-          {showTenantShell && showSelfServiceSurfaces ? (
-            <MobileMemberNavDropdown
-              links={memberLinks.primary}
-              moreLinks={memberLinks.more}
-              outstandingCents={outstandingCents}
-            />
-          ) : null}
-          <div className="hidden min-w-0 flex-wrap items-center gap-0.5 overflow-visible sm:flex sm:gap-1">
-            {showTenantShell && role === "admin"
-              ? ADMIN_NAV_LINKS.map((link) => {
-                  const active = pathActive(pathname, link.href);
-                  const icon = ADMIN_NAV_ICONS[link.href] ?? "•";
-                  return (
-                    <Link
-                      key={link.href}
-                      href={adminHref(link.href, selectedOrganizationSlug)}
-                      className={(link.mobileVisible ? "" : "hidden md:block") + " grid h-8 min-w-8 place-items-center rounded-full px-2 text-xs font-semibold transition-colors sm:h-auto sm:min-w-0 sm:px-3 sm:py-1 sm:text-sm"}
-                      style={{
-                        background: active ? "var(--border)" : "transparent",
-                        color: active ? "var(--text)" : "var(--dim)",
-                      }}
-                      aria-label={t(link.labelKey)}
-                      title={t(link.labelKey)}
-                    >
-                      <span aria-hidden="true" className="sm:hidden">{icon}</span>
-                      <span className="hidden sm:inline">{t(link.labelKey)}</span>
-                    </Link>
-                  );
-                })
-              : null}
-            {showTenantShell && showSelfServiceSurfaces && memberLinks.primary.map((link) => {
-              const active = pathActive(pathname, link.href);
-              const showBalanceBadge = link.href === "/account/billing" && outstandingCents > 0;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="relative grid h-8 min-w-8 place-items-center rounded-full px-2 text-xs font-semibold transition-colors sm:h-auto sm:min-w-0 sm:px-3 sm:py-1 sm:text-sm"
-                  style={{
-                    background: active ? "var(--border)" : "transparent",
-                    color: active ? "var(--text)" : "var(--dim)",
-                  }}
-                  aria-label={t(link.labelKey)}
-                  title={t(link.labelKey)}
-                >
-                  <span aria-hidden="true" className="sm:hidden">{MEMBER_NAV_ICONS[link.href] ?? "•"}</span>
-                  <span className="hidden sm:inline">{t(link.labelKey)}</span>
-                  {showBalanceBadge ? (
-                    <span
-                      className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold"
-                      style={{ background: "var(--danger)", color: "#fff" }}
-                    >
-                      !
-                    </span>
-                  ) : null}
-                </Link>
-              );
-            })}
-            {showTenantShell && showSelfServiceSurfaces && memberLinks.more.length > 0 ? (
-              <MemberMoreDropdown links={memberLinks.more} pathname={pathname} />
-            ) : null}
-          </div>
         </nav>
 
         <div className="col-start-2 row-start-2 ms-auto flex shrink-0 items-center gap-1 justify-self-end sm:row-start-auto sm:gap-2">
@@ -664,8 +261,11 @@ export function TopNav() {
               <span className="hidden max-w-[7rem] truncate sm:block" style={{ color: "var(--text-soft)" }}>
                 {currentUser.nickname}
               </span>
-              <span className="text-[10px]" style={{ color: "var(--dim)" }}>
+              <span className="relative text-[10px]" style={{ color: "var(--dim)" }}>
                 ▾
+                {role !== "admin" && outstandingCents > 0 ? (
+                  <span aria-hidden="true" className="absolute -end-1.5 -top-1.5 h-2 w-2 rounded-full" style={{ background: "var(--danger)" }} />
+                ) : null}
               </span>
             </button>
 
@@ -730,6 +330,31 @@ export function TopNav() {
                 ) : (
                   <>
                     <OrganizationSelector variant="menu" onSelect={() => setMenuOpen(false)} />
+                    {role === "admin" && can(currentMembership, "manage_settings") ? (
+                      <Link
+                        href={adminHref("/admin/settings", selectedOrganizationSlug)}
+                        className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[var(--border)]"
+                        style={{ color: "var(--text-soft)" }}
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        {t("settings")}
+                      </Link>
+                    ) : null}
+                    {canSwitchView ? (
+                      <button
+                        type="button"
+                        className="block w-full px-4 py-2.5 text-start text-sm font-semibold transition-colors hover:bg-[var(--border)]"
+                        style={{ color: "var(--text-soft)" }}
+                        onClick={() => {
+                          const next = role === "admin" ? "client" : "staff";
+                          setView(next);
+                          setMenuOpen(false);
+                          router.push(next === "client" ? "/" : adminHref("/admin", selectedOrganizationSlug));
+                        }}
+                      >
+                        {role === "admin" ? t("myTraining") : t("staffView")}
+                      </button>
+                    ) : null}
                     {role !== "admin" && showSelfServiceSurfaces ? (
                       <Link
                         href="/account/billing"
@@ -737,7 +362,14 @@ export function TopNav() {
                         style={{ color: "var(--text-soft)" }}
                         onClick={() => setMenuOpen(false)}
                       >
-                        {t("billing")}
+                        <span className="flex items-center justify-between gap-2">
+                          {t("billing")}
+                          {outstandingCents > 0 ? (
+                            <span className="rounded-full px-1.5 text-[10px] font-bold" style={{ background: "var(--danger)", color: "#fff" }}>
+                              !
+                            </span>
+                          ) : null}
+                        </span>
                       </Link>
                     ) : null}
                   </>
@@ -758,6 +390,9 @@ export function TopNav() {
           </div>
         </div>
       </div>
+      {showTenantShell && sectionGroup ? (
+        <SectionTabs group={sectionGroup} pathname={pathname} hrefFor={hrefFor} labelFor={(key) => t(key)} />
+      ) : null}
     </header>
   );
 }
