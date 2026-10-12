@@ -14,6 +14,7 @@ import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { SemanticLabel } from "@/components/semantic-label";
+import { MyRefundReceipts } from "@/components/finance/MyRefundReceipts";
 import {
   shouldShowAllowanceQuota,
   visibleBillingAllowances,
@@ -568,6 +569,8 @@ export default function BillingPage() {
             )}
           </>
         )}
+
+        {accessToken && !loading && !error ? <MyRefundReceipts /> : null}
       </div>
 
       {showPackages && finance && (

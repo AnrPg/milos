@@ -8,11 +8,13 @@
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { fetchFinanceQueues, fetchFinanceSummary, type FinanceRecord } from "@/api/finance";
+import { AccountingTab } from "@/components/admin/finance/tabs/AccountingTab";
 import { MembersTab } from "@/components/admin/finance/tabs/MembersTab";
 import { PackagesTab } from "@/components/admin/finance/tabs/PackagesTab";
 import { PromotionsTab } from "@/components/admin/finance/tabs/PromotionsTab";
@@ -22,17 +24,19 @@ import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
-type Tab = "members" | "packages" | "promotions" | "referrals" | "queues";
+type Tab = "members" | "packages" | "promotions" | "referrals" | "queues" | "accounting";
 
 export function FinanceOperations() {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
+  const accountingT = useTranslations("FinanceAccounting");
   const TABS: Array<{ id: Tab; label: string }> = [
     { id: "members", label: i18n("members1cb449c") },
     { id: "packages", label: i18n("packages0a99901") },
     { id: "promotions", label: i18n("promotions086e09b") },
     { id: "referrals", label: i18n("referrals2b0e3a3") },
     { id: "queues", label: i18n("queues83dbc32") },
+    { id: "accounting", label: accountingT("tab") },
   ];
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -166,6 +170,7 @@ export function FinanceOperations() {
         {activeTab === "promotions" && <PromotionsTab />}
         {activeTab === "referrals" && <ReferralsTab />}
         {activeTab === "queues" && <QueuesTab />}
+        {activeTab === "accounting" && <AccountingTab />}
 
       </div>
     </main>
