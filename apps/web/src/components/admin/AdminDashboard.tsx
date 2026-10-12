@@ -20,6 +20,7 @@ import { fetchSchedule } from "@/api/schedule";
 import { useSession } from "@/components/session-provider";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
+import { InviteClientsButton } from "@/components/invites/InviteClients";
 
 type AlertCategory = "finance" | "coaching" | "training";
 
@@ -331,6 +332,7 @@ export function AdminDashboard() {
           title={i18n("dashboardd87f47b")}
           actions={
             <>
+              <InviteClientsButton />
               <Link href={adminHref("/admin/finance", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--text)", color: "var(--bg)" }}>
                 {i18n("finance1b48d3f")}
               </Link>

@@ -57,7 +57,13 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
   const [mode, setMode] = useState<Mode>(() =>
     searchParams.get("token") ? "register" : initialMode,
   );
-  const [registerForm, setRegisterForm] = useState<RegisterRequest>(initialRegister);
+  const [registerForm, setRegisterForm] = useState<RegisterRequest>(() => {
+    // A public join link (/join/<slug>) passes the role the organization grants.
+    const requestedRole = searchParams.get("role");
+    return requestedRole === "athlete" || requestedRole === "member"
+      ? { ...initialRegister, role: requestedRole }
+      : initialRegister;
+  });
   const [loginForm, setLoginForm] = useState<LoginRequest>(initialLogin);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
