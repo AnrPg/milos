@@ -150,3 +150,15 @@ msgstr "%{package} מסתיים ב־%{date} (בעוד %{days} ימים). חדש�
 
 msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
 msgstr "%{package} הסתיים. הגישה נשמרת עד %{date}; חדשו עד אז כדי להמשיך להזמין שיעורים."
+
+msgid "Your access has ended"
+msgstr "הגישה שלך הסתיימה"
+
+msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+msgstr "הגישה שלך מושהית בגלל תשלום באיחור. שלמו את היתרה כדי להזמין שיעורים שוב."
+
+msgid "Your access has ended. Renew your subscription to book classes again."
+msgstr "הגישה שלך הסתיימה. חדשו את המנוי כדי להזמין שיעורים שוב."
+
+msgid "Your upcoming bookings were cancelled: %{count}."
+msgstr "ההזמנות הקרובות שלך בוטלו: %{count}."

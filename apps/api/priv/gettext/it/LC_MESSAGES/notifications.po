@@ -150,3 +150,15 @@ msgstr "%{package} scade il %{date} (tra %{days} giorni). Rinnova per continuare
 
 msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
 msgstr "%{package} è scaduto. Mantieni l'accesso fino al %{date}; rinnova entro quella data per continuare a prenotare le lezioni."
+
+msgid "Your access has ended"
+msgstr "Il tuo accesso è terminato"
+
+msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+msgstr "Il tuo accesso è sospeso perché un pagamento è scaduto. Salda il dovuto per prenotare di nuovo le lezioni."
+
+msgid "Your access has ended. Renew your subscription to book classes again."
+msgstr "Il tuo accesso è terminato. Rinnova l'abbonamento per prenotare di nuovo le lezioni."
+
+msgid "Your upcoming bookings were cancelled: %{count}."
+msgstr "Le tue prossime prenotazioni sono state annullate: %{count}."

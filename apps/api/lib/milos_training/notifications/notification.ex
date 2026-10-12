@@ -25,7 +25,8 @@ defmodule MilosTraining.Notifications.Notification do
     :invoice_issued,
     :payment_reminder,
     :subscription_expiring,
-    :subscription_grace
+    :subscription_grace,
+    :access_ended
   ]
 
   schema "notifications" do

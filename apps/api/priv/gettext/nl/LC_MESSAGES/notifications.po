@@ -150,3 +150,15 @@ msgstr "%{package} loopt af op %{date} (over %{days} dagen). Verleng om lessen t
 
 msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
 msgstr "%{package} is afgelopen. Je houdt toegang tot %{date}; verleng vóór die datum om lessen te blijven boeken."
+
+msgid "Your access has ended"
+msgstr "Je toegang is afgelopen"
+
+msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+msgstr "Je toegang is gepauzeerd omdat een betaling openstaat. Betaal het openstaande bedrag om weer lessen te boeken."
+
+msgid "Your access has ended. Renew your subscription to book classes again."
+msgstr "Je toegang is afgelopen. Verleng je abonnement om weer lessen te boeken."
+
+msgid "Your upcoming bookings were cancelled: %{count}."
+msgstr "Je komende boekingen zijn geannuleerd: %{count}."

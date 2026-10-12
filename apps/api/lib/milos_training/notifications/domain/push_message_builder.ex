@@ -236,6 +236,34 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  def build("access_ended", payload, localize) do
+    body =
+      if payload["reason"] == "overdue_payment",
+        do:
+          localize.(
+            "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again.",
+            %{}
+          ),
+        else:
+          localize.("Your access has ended. Renew your subscription to book classes again.", %{})
+
+    cancelled = payload["cancelled_bookings"] || 0
+
+    body =
+      if cancelled > 0,
+        do:
+          body <>
+            " " <>
+            localize.("Your upcoming bookings were cancelled: %{count}.", %{count: cancelled}),
+        else: body
+
+    %{
+      title: localize.("Your access has ended", %{}),
+      body: payload["body"] || body,
+      url: payload["url"] || "/account/billing"
+    }
+  end
+
   def build("chat_message", payload, localize) do
     title =
       if payload["context_type"] in ["assignment", "class_slot"],

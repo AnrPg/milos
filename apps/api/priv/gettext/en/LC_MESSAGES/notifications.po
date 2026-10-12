@@ -150,3 +150,15 @@ msgstr "%{package} ends on %{date} (in %{days} days). Renew to keep booking clas
 
 msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
 msgstr "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+
+msgid "Your access has ended"
+msgstr "Your access has ended"
+
+msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+msgstr "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+
+msgid "Your access has ended. Renew your subscription to book classes again."
+msgstr "Your access has ended. Renew your subscription to book classes again."
+
+msgid "Your upcoming bookings were cancelled: %{count}."
+msgstr "Your upcoming bookings were cancelled: %{count}."

@@ -4349,9 +4349,26 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   def refresh_entitlement_snapshots do
     Membership
     |> tenant_scope()
-    |> select([membership], membership.id)
     |> Repo.all()
-    |> Enum.each(&refresh_entitlement_snapshot/1)
+    |> Enum.flat_map(fn membership ->
+      refresh_entitlement_snapshot(membership.id)
+      updated = Repo.get(Membership, membership.id)
+
+      # Lost access with this refresh (e.g. the grace slack is over).
+      if (membership.entitlement_status in ["active", "grace"] and updated) &&
+           updated.entitlement_status in ["inactive", "blocked"] do
+        [
+          %{
+            membership_id: updated.id,
+            user_id: updated.user_id,
+            status: updated.entitlement_status,
+            source: updated.entitlement_source
+          }
+        ]
+      else
+        []
+      end
+    end)
   end
 
   @impl true
