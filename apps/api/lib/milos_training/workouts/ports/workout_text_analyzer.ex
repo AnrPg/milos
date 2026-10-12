@@ -1,14 +1,21 @@
 defmodule MilosTraining.Workouts.Ports.WorkoutTextAnalyzer do
   @moduledoc """
-  Port for an assistant that reads a coach's free-text workout and returns an
-  untrusted interpretation (see `MilosTraining.Workouts.Domain.FreeTextAnalysis`
-  for the expected raw shape and how it is validated).
+  Port for the workout assistant agents.
+
+    * `parse/2` returns the parser agent's untrusted reading of a free-text
+      workout (validated by `WorkoutAssistant.Contract` and normalized by
+      `FreeTextAnalysis`). With `options.repair = %{previous, violations}` the
+      agent is asked to fix its previous answer.
+    * `proofread/2` returns `%{"corrections" => [...]}` with verbatim in-line
+      text corrections (verified by `WorkoutAssistant.Proofreading`).
   """
 
-  @type options :: %{required(:locale) => String.t()}
+  @type options :: %{
+          required(:locale) => String.t(),
+          optional(:repair) => %{previous: map(), violations: [map()]}
+        }
+  @type error :: :analyzer_not_configured | :analyzer_unavailable | :analyzer_invalid_response
 
-  @callback analyze(text :: String.t(), options()) ::
-              {:ok, map()}
-              | {:error,
-                 :analyzer_not_configured | :analyzer_unavailable | :analyzer_invalid_response}
+  @callback parse(text :: String.t(), options()) :: {:ok, map()} | {:error, error()}
+  @callback proofread(text :: String.t(), options()) :: {:ok, map()} | {:error, error()}
 end

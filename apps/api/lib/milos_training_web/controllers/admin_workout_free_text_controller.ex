@@ -31,13 +31,22 @@ defmodule MilosTrainingWeb.AdminWorkoutFreeTextController do
     type: :object,
     properties: %{
       id: %Schema{type: :string},
-      path: %Schema{type: :string},
+      path: %Schema{
+        type: :string,
+        description: "Canonical field path, or \"text\" for a text-only correction"
+      },
       code: %Schema{
         type: :string,
         description:
-          "assistant | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format"
+          "assistant | text_correction | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format"
       },
       severity: %Schema{type: :string, enum: ["error", "warning", "info"]},
+      kind: %Schema{
+        type: :string,
+        nullable: true,
+        description:
+          "For text_correction: spelling | unit | number | abbreviation | format | ambiguity"
+      },
       required: %Schema{type: :boolean},
       message: @nullable_string,
       params: %Schema{type: :object, additionalProperties: true},
@@ -72,6 +81,15 @@ defmodule MilosTrainingWeb.AdminWorkoutFreeTextController do
       },
       issues: %Schema{type: :array, items: @issue_schema},
       suggestions: %Schema{type: :array, items: @missing_field_schema},
+      quality: %Schema{
+        type: :object,
+        description: "How much the parser answer had to be repaired against the contract",
+        properties: %{
+          repair_attempts: %Schema{type: :integer},
+          remaining_violations: %Schema{type: :integer},
+          corrections: %Schema{type: :integer}
+        }
+      },
       summary: %Schema{
         type: :object,
         properties: %{

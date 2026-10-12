@@ -2,12 +2,31 @@ defmodule MilosTraining.Test.FakeWorkoutTextAnalyzer do
   @moduledoc false
   @behaviour MilosTraining.Workouts.Ports.WorkoutTextAnalyzer
 
+  # Tests steer the fake per process; Task.async callers inherit `$callers`.
   @impl true
-  def analyze(text, options) do
-    case Process.get(:fake_workout_text_analyzer) do
+  def parse(text, options) do
+    case lookup(:fake_workout_text_analyzer) do
       nil -> {:ok, default_response(text, options)}
       fun when is_function(fun, 2) -> fun.(text, options)
     end
+  end
+
+  @impl true
+  def proofread(text, options) do
+    case lookup(:fake_workout_text_proofreader) do
+      nil -> {:ok, %{"corrections" => []}}
+      fun when is_function(fun, 2) -> fun.(text, options)
+    end
+  end
+
+  defp lookup(key) do
+    [self() | Process.get(:"$callers", [])]
+    |> Enum.find_value(fn pid ->
+      case Process.info(pid, :dictionary) do
+        {:dictionary, dictionary} -> Keyword.get(dictionary, key)
+        nil -> nil
+      end
+    end)
   end
 
   defp default_response(_text, options) do

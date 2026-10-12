@@ -1,7 +1,16 @@
 defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
   @moduledoc """
   `WorkoutTextAnalyzer` adapter backed by the Google Gemini `generateContent`
-  API with a JSON response schema.
+  API. Runs two agents:
+
+    * `parse/2` – reads free text into the canonical schema; may be called
+      again with `:repair` feedback (contract violations) by the caller;
+    * `proofread/2` – proposes verbatim in-line text corrections.
+
+  Both agents may call server-side tools (Gemini function calling), executed
+  by `MilosTraining.Workouts.Domain.WorkoutAssistant.Tools`: exercise catalog
+  lookup, timer format specs, unit conversion and, for the parser, a
+  `validate_draft` self-check against the strict contract.
 
   Configuration (runtime):
 
@@ -10,63 +19,132 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
         model: System.get_env("GEMINI_MODEL", "gemini-3.8-flash"),
         thinking_level: System.get_env("GEMINI_THINKING_LEVEL", "low")
 
-  The key never leaves the server: browsers call the Phoenix endpoint, which
-  calls Gemini. Output is untrusted and is validated by
-  `MilosTraining.Workouts.Domain.FreeTextAnalysis`.
+  The key never leaves the server. Output is untrusted and is validated by
+  the Workouts domain (`Contract`, `Proofreading`, `FreeTextAnalysis`).
   """
 
   @behaviour MilosTraining.Workouts.Ports.WorkoutTextAnalyzer
 
   require Logger
 
-  alias MilosTraining.Workouts.Domain.FreeTextAnalysis
-  alias MilosTraining.Workouts.Domain.WorkoutDsl.Vocabulary
+  alias MilosTraining.Infrastructure.Workouts.GeminiPrompts
+  alias MilosTraining.Workouts.Domain.WorkoutAssistant.Tools
 
   @endpoint "https://generativelanguage.googleapis.com/v1beta/models"
   @default_model "gemini-3.8-flash"
   # "low" keeps answers around 5–10 s; Gemini's default reasoning took 45 s+.
   @default_thinking_level "low"
-
-  @language_names %{
-    "en" => "English",
-    "el" => "Greek",
-    "ar" => "Arabic",
-    "ru" => "Russian",
-    "de" => "German",
-    "es" => "Spanish",
-    "pt-PT" => "European Portuguese",
-    "he" => "Hebrew",
-    "it" => "Italian",
-    "bg" => "Bulgarian",
-    "nl" => "Dutch",
-    "fr" => "French"
-  }
+  # Tool round budgets per agent: each round trip costs seconds, and the
+  # prompts already carry the vocabulary, so tools are for edge cases only.
+  @parser_tool_rounds 2
+  @proofreader_tool_rounds 1
+  # validate_draft stays available in Tools but is not offered by default: the
+  # server runs the same contract on every answer and requests a repair, which
+  # costs a round trip only when something is actually wrong.
+  @parser_tools ~w(lookup_exercises get_timer_format convert_units)
+  @proofreader_tools ~w(lookup_exercises convert_units)
 
   @impl true
-  def analyze(text, options) do
-    config = Application.get_env(:milos_training, :gemini, [])
-    api_key = Keyword.get(config, :api_key)
+  def parse(text, options) do
+    locale = Map.get(options, :locale, "en")
 
-    if blank?(api_key) do
+    turns =
+      case Map.get(options, :repair) do
+        %{previous: previous, violations: violations} ->
+          [
+            user_turn(text),
+            %{role: "model", parts: [%{text: Jason.encode!(previous)}]},
+            user_turn(GeminiPrompts.repair(previous, violations))
+          ]
+
+        _first_attempt ->
+          [user_turn(text)]
+      end
+
+    run(GeminiPrompts.parser(locale), turns, @parser_tools, %{
+      source: text,
+      agent: "parser",
+      max_rounds: @parser_tool_rounds
+    })
+  end
+
+  @impl true
+  def proofread(text, options) do
+    locale = Map.get(options, :locale, "en")
+
+    run(GeminiPrompts.proofreader(locale), [user_turn(text)], @proofreader_tools, %{
+      source: text,
+      agent: "proofreader",
+      max_rounds: @proofreader_tool_rounds
+    })
+  end
+
+  ## Agent loop
+
+  defp run(system_prompt, turns, tool_names, context) do
+    config = Application.get_env(:milos_training, :gemini, [])
+
+    if blank?(Keyword.get(config, :api_key)) do
       {:error, :analyzer_not_configured}
     else
-      model = Keyword.get(config, :model) || @default_model
-      request(text, Map.get(options, :locale, "en"), api_key, model, config)
+      loop(system_prompt, turns, tool_names, context, config, 0)
     end
   end
 
-  defp request(text, locale, api_key, model, config) do
-    body = %{
-      systemInstruction: %{parts: [%{text: system_prompt(locale)}]},
-      contents: [%{role: "user", parts: [%{text: text}]}],
-      generationConfig:
-        generation_config(Keyword.get(config, :thinking_level, @default_thinking_level))
-    }
+  defp loop(system_prompt, turns, tool_names, context, config, round) do
+    # Once the tool budget is spent the model must answer: tools stay declared
+    # (the history references them) but calling is switched off.
+    final_round = round >= context.max_rounds
+
+    turns =
+      if final_round and tool_names != [],
+        do:
+          turns ++ [user_turn("Stop calling tools. Answer now with the final JSON object only.")],
+        else: turns
+
+    body =
+      %{
+        systemInstruction: %{parts: [%{text: system_prompt}]},
+        contents: turns,
+        generationConfig:
+          generation_config(Keyword.get(config, :thinking_level, @default_thinking_level))
+      }
+      |> put_tools(tool_names, final_round)
+
+    with {:ok, content} <- post(body, config, context),
+         parts = Map.get(content, "parts", []) do
+      case function_calls(parts) do
+        [] ->
+          decode_answer(parts)
+
+        calls when not final_round ->
+          Logger.debug(
+            "Workout assistant #{context.agent} tools: #{Enum.map_join(calls, ", ", & &1["name"])}"
+          )
+
+          responses =
+            Enum.map(calls, fn %{"name" => name} = call ->
+              result = Tools.call(name, Map.get(call, "args", %{}), context)
+              %{functionResponse: %{name: name, response: result}}
+            end)
+
+          # The model turn is sent back verbatim (it carries thought signatures).
+          turns = turns ++ [content, %{role: "user", parts: responses}]
+          loop(system_prompt, turns, tool_names, context, config, round + 1)
+
+        _calls_after_budget ->
+          {:error, :analyzer_invalid_response}
+      end
+    end
+  end
+
+  defp post(body, config, context) do
+    model = Keyword.get(config, :model) || @default_model
 
     request_options =
       [
         url: "#{@endpoint}/#{model}:generateContent",
-        headers: [{"x-goog-api-key", api_key}],
+        headers: [{"x-goog-api-key", Keyword.get(config, :api_key)}],
         json: body,
         receive_timeout: Keyword.get(config, :receive_timeout, 60_000),
         retry: :transient,
@@ -75,17 +153,33 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
       |> Keyword.merge(Keyword.get(config, :req_options, []))
 
     case Req.post(request_options) do
-      {:ok, %Req.Response{status: 200, body: response}} ->
-        decode(response)
+      {:ok, %Req.Response{status: 200, body: %{"candidates" => [%{"content" => content} | _]}}} ->
+        {:ok, content}
 
-      {:ok, %Req.Response{status: status}} ->
-        Logger.warning("Gemini workout analysis failed with HTTP #{status}")
+      {:ok, %Req.Response{status: 200}} ->
+        {:error, :analyzer_invalid_response}
+
+      {:ok, %Req.Response{status: status, body: body}} ->
+        Logger.warning(
+          "Gemini #{context.agent} failed with HTTP #{status}: #{inspect(body, limit: 5)}"
+        )
+
         {:error, :analyzer_unavailable}
 
       {:error, exception} ->
-        Logger.warning("Gemini workout analysis failed: #{Exception.message(exception)}")
+        Logger.warning("Gemini #{context.agent} failed: #{Exception.message(exception)}")
         {:error, :analyzer_unavailable}
     end
+  end
+
+  defp put_tools(body, [], _final_round), do: body
+
+  defp put_tools(body, names, final_round) do
+    mode = if final_round, do: "NONE", else: "AUTO"
+
+    body
+    |> Map.put(:tools, [%{functionDeclarations: Tools.declarations(names)}])
+    |> Map.put(:toolConfig, %{functionCallingConfig: %{mode: mode}})
   end
 
   # JSON mode with the schema in the instructions: Gemini's constrained
@@ -99,180 +193,47 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
       else: Map.put(base, :thinkingConfig, %{thinkingLevel: thinking_level})
   end
 
-  defp decode(%{"candidates" => [%{"content" => %{"parts" => parts}} | _rest]}) do
+  defp function_calls(parts) do
     parts
-    |> Enum.map_join("", &Map.get(&1, "text", ""))
-    |> Jason.decode()
-    |> case do
-      {:ok, %{} = decoded} -> {:ok, decoded}
-      _other -> {:error, :analyzer_invalid_response}
+    |> Enum.map(&Map.get(&1, "functionCall"))
+    |> Enum.filter(&is_map/1)
+  end
+
+  defp decode_answer(parts) do
+    text =
+      parts
+      |> Enum.reject(&Map.get(&1, "thought"))
+      |> Enum.map_join("", &Map.get(&1, "text", ""))
+
+    case decode_json(text) do
+      {:ok, %{} = decoded} ->
+        {:ok, decoded}
+
+      _other ->
+        Logger.warning(
+          "Gemini answer was not a JSON object: #{inspect(Enum.map(parts, &Map.keys/1))} #{String.slice(text, 0, 300)}"
+        )
+
+        {:error, :analyzer_invalid_response}
     end
   end
 
-  defp decode(_response), do: {:error, :analyzer_invalid_response}
+  # Tolerates code fences or prose around the object.
+  defp decode_json(text) do
+    trimmed = text |> String.trim() |> String.replace(~r/^```(?:json)?\s*|\s*```$/u, "")
 
-  defp system_prompt(locale) do
-    language = Map.get(@language_names, locale, "English")
+    case Jason.decode(trimmed) do
+      {:ok, decoded} ->
+        {:ok, decoded}
 
-    formats =
-      Enum.map_join(Vocabulary.section_formats(), "\n", fn format ->
-        required = format |> Vocabulary.required_timer_fields() |> Enum.join(", ")
-        optional = format |> Vocabulary.optional_timer_fields() |> Enum.join(", ")
-        "- #{format}: required [#{required}] optional [#{optional}]"
-      end)
-
-    """
-    You are an expert strength & conditioning coach and a meticulous data editor.
-    A coach typed a workout as free text. Read it and return JSON that follows the
-    response schema exactly. Never invent exercises, numbers or sections that the
-    text does not state or clearly imply.
-
-    ## Canonical schema
-    workout: title (3-160 chars), type (one of: #{Enum.join(FreeTextAnalysis.workout_types(), ", ")}),
-    subtitle, description, difficulty (one of: #{Enum.join(FreeTextAnalysis.difficulties(), ", ")}),
-    estimated_duration_minutes (number), equipment (list), tags (list).
-    sections: name, format, timer (list of {key, value}), note, exercises.
-    exercise: name, sets, ONE of reps | duration_seconds | calories | distance_meters,
-    ONE of load_kg | load_percent_1rm | bodyweight=true, rest_seconds, tempo, note.
-    Convert pounds to kilograms and minutes to seconds. Use integers.
-    Leave a field out when the text does not state it. Never fill tempo, rest,
-    load or difficulty from general knowledge: propose those in missing_fields.
-    Copy exercise and section names exactly as written, typos included; report
-    each misspelling as an issue whose fix corrects both the field and the text.
-
-    Section formats and their timer keys. Timer keys must be spelled exactly as
-    listed; values are plain numbers (durations in seconds):
-    #{formats}
-    Use "untimed" for plain strength work. Use "for_time" for "for time"/RFT.
-
-    ## Paths
-    Refer to fields with dot paths and zero-based indexes, for example
-    "title", "sections.0.timer", "sections.1.exercises.2.load_kg".
-
-    ## issues
-    Report every problem a coach should fix: typos in exercise names, ambiguous or
-    impossible numbers, units that do not match, missing values that make the
-    workout impossible to perform, a type or format that contradicts the text.
-    For each issue give: path, severity ("error" when the workout cannot be
-    performed or a required field is missing, otherwise "warning"), message (one
-    short, friendly, actionable sentence that says what is wrong and how to fix
-    it), suggestion_label (a 2-5 word button label such as "Use 100 kg"),
-    suggested_value (the corrected value for the field at path, as text), and
-    when the fix should also change the coach's text: find_text (an exact,
-    verbatim substring of the coach's text) and replace_text (its replacement).
-    Every warning MUST include suggested_value, and find_text/replace_text when
-    the text itself is wrong (always for misspellings). Do not report an issue
-    you cannot offer a fix for, unless it is an error.
-
-    ## missing_fields
-    Compare the workout with the full canonical schema and propose useful
-    missing values (difficulty, estimated duration, equipment, description,
-    tags, rest, tempo, timer settings...). For each give: path, reason (one short
-    sentence on why it helps), suggested_value (as text) and insert_text (a short
-    line the coach could add to the text, in the coach's own style).
-
-    Write every message, label, reason and insert_text in #{language}.
-
-    ## Output
-    Answer with one JSON object that matches this JSON schema (Gemini schema
-    notation, types in capitals) and nothing else:
-    #{Jason.encode!(response_schema())}
-    """
+      {:error, _reason} ->
+        with [object] <- Regex.run(~r/\{.*\}/su, trimmed),
+             do: Jason.decode(object),
+             else: (_ -> :error)
+    end
   end
 
-  defp response_schema do
-    string = %{type: "STRING"}
-    number = %{type: "NUMBER"}
-    strings = %{type: "ARRAY", items: string}
-
-    exercise = %{
-      type: "OBJECT",
-      properties: %{
-        name: string,
-        sets: number,
-        reps: number,
-        duration_seconds: number,
-        calories: number,
-        distance_meters: number,
-        load_kg: number,
-        load_percent_1rm: number,
-        bodyweight: %{type: "BOOLEAN"},
-        rest_seconds: number,
-        tempo: string,
-        note: string
-      },
-      required: ["name"]
-    }
-
-    section = %{
-      type: "OBJECT",
-      properties: %{
-        name: string,
-        format: %{type: "STRING", enum: Vocabulary.section_formats()},
-        timer: %{
-          type: "ARRAY",
-          items: %{
-            type: "OBJECT",
-            properties: %{key: string, value: string},
-            required: ["key", "value"]
-          }
-        },
-        note: string,
-        exercises: %{type: "ARRAY", items: exercise}
-      },
-      required: ["name", "exercises"]
-    }
-
-    %{
-      type: "OBJECT",
-      properties: %{
-        workout: %{
-          type: "OBJECT",
-          properties: %{
-            title: string,
-            type: %{type: "STRING", enum: FreeTextAnalysis.workout_types()},
-            subtitle: string,
-            description: string,
-            difficulty: %{type: "STRING", enum: FreeTextAnalysis.difficulties()},
-            estimated_duration_minutes: number,
-            equipment: strings,
-            tags: strings
-          }
-        },
-        sections: %{type: "ARRAY", items: section},
-        issues: %{
-          type: "ARRAY",
-          items: %{
-            type: "OBJECT",
-            properties: %{
-              path: string,
-              severity: %{type: "STRING", enum: ["error", "warning"]},
-              message: string,
-              suggestion_label: string,
-              suggested_value: string,
-              find_text: string,
-              replace_text: string
-            },
-            required: ["path", "severity", "message"]
-          }
-        },
-        missing_fields: %{
-          type: "ARRAY",
-          items: %{
-            type: "OBJECT",
-            properties: %{
-              path: string,
-              reason: string,
-              suggested_value: string,
-              insert_text: string
-            },
-            required: ["path", "reason", "suggested_value"]
-          }
-        }
-      },
-      required: ["workout", "sections", "issues", "missing_fields"]
-    }
-  end
+  defp user_turn(text), do: %{role: "user", parts: [%{text: text}]}
 
   defp blank?(nil), do: true
   defp blank?(value) when is_binary(value), do: String.trim(value) == ""
