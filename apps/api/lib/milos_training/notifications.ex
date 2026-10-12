@@ -297,6 +297,7 @@ defmodule MilosTraining.Notifications do
     |> Enum.each(fn admin ->
       result =
         deliver_notification(admin.id, :workout_rejected, %{
+          organization_id: field(payload, :organization_id),
           assigned_workout_id: assigned_workout_id,
           workout_title: workout_title,
           athlete_nickname: athlete_nickname,

@@ -119,6 +119,13 @@ defmodule MilosTraining.Application.WorkoutAnalyticsInstrumentationTest do
 
     assert analytics_event!(organization.id, "workout_assignment_rejected").user_id == athlete.id
 
+    # The rejection reaches the owning tenant's staff (the payload used to
+    # carry no organization, so staff recipients resolved to nobody).
+    assert Enum.any?(
+             MilosTraining.Notifications.list_for_user(owner.id),
+             &(&1.type in [:workout_rejected, "workout_rejected"])
+           )
+
     assert :ok = DeleteAssignedWorkout.call(context, assignment.id)
     assert analytics_event!(organization.id, "workout_assignment_deleted").user_id == owner.id
   end

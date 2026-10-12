@@ -13,7 +13,7 @@ defmodule MilosTraining.Application.RejectAssignedWorkout do
   defp do_call(context, assignment_id, athlete_id) do
     with {:ok, assignment} <- Workouts.reject_assignment_for_athlete(assignment_id, athlete_id) do
       athlete = Identity.find_by_id(athlete_id)
-      dispatch_rejected_notification(assignment, athlete)
+      dispatch_rejected_notification(context, assignment, athlete)
       broadcast_assignment_refresh(context, assignment)
 
       TrackAnalyticsEvent.call("workout_assignment_rejected", context, assignment, %{
@@ -24,7 +24,7 @@ defmodule MilosTraining.Application.RejectAssignedWorkout do
     end
   end
 
-  defp dispatch_rejected_notification(assignment, athlete) do
+  defp dispatch_rejected_notification(context, assignment, athlete) do
     workout_title =
       assignment
       |> Map.get(:workout, %{})
@@ -32,7 +32,11 @@ defmodule MilosTraining.Application.RejectAssignedWorkout do
 
     athlete_nickname = (athlete && athlete.nickname) || "An athlete"
 
+    # Staff recipients are resolved from the owning organization; without it
+    # the rejection reached nobody.
     Notifications.dispatch_event(:workout_rejected, %{
+      organization_id:
+        (context && Map.get(context, :organization_id)) || Map.get(assignment, :organization_id),
       assigned_workout_id: assignment.id,
       workout_title: workout_title,
       athlete_nickname: athlete_nickname,
