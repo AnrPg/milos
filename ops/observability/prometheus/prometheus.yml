@@ -1,0 +1,46 @@
+# Prometheus for the opt-in `observability` Compose profile (ADR-098).
+# Scrape targets resolve on the internal `app` network only; nothing here is
+# reachable through Caddy.
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+  external_labels:
+    deployment: milos-training
+
+rule_files:
+  - /etc/prometheus/rules/*.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
+
+scrape_configs:
+  # In-app Telemetry.Metrics exporter on the API's internal listener
+  # (METRICS_PORT=9568). The entrypoint writes METRICS_TOKEN to this file.
+  - job_name: milos-api
+    metrics_path: /metrics
+    authorization:
+      type: Bearer
+      credentials_file: /tmp/milos-metrics-token
+    static_configs:
+      - targets: ["api:9568"]
+
+  # RED metrics derived from OTLP traces by the spanmetrics connector.
+  - job_name: otel-collector-spanmetrics
+    static_configs:
+      - targets: ["otel-collector:8889"]
+
+  # Collector self-telemetry (dropped/refused spans, exporter failures).
+  - job_name: otel-collector
+    static_configs:
+      - targets: ["otel-collector:8888"]
+
+  - job_name: alertmanager
+    static_configs:
+      - targets: ["alertmanager:9093"]
+
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
