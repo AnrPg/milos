@@ -33,6 +33,9 @@ defmodule MilosTraining.Notifications.Notification do
     :appointment_booked,
     :appointment_cancelled,
     :coach_client_assigned,
+    :inventory_repair_needed,
+    :inventory_stock_low,
+    :inventory_digest,
     :coach_note_viewed
   ]
 

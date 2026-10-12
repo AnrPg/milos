@@ -244,6 +244,48 @@ defmodule MilosTraining.Notifications do
         url: "/admin/users/#{field(payload, :client_user_id)}"
       })
 
+  # ADR-104: a machine needs a repair, or a consumable is running out.
+  def process_event("inventory_repair_needed", payload),
+    do:
+      enqueue_simple(:inventory_repair_needed, payload, %{
+        machine_id: field(payload, :machine_id),
+        machine_name: field(payload, :machine_name),
+        kind: field(payload, :kind),
+        severity: field(payload, :severity),
+        symptom: field(payload, :symptom),
+        body: field(payload, :body),
+        url: "/admin/inventory?tab=machines"
+      })
+
+  def process_event("inventory_stock_low", payload),
+    do:
+      enqueue_simple(:inventory_stock_low, payload, %{
+        supply_id: field(payload, :supply_id),
+        supply_name: field(payload, :supply_name),
+        status: field(payload, :status),
+        quantity: field(payload, :quantity),
+        days_left: field(payload, :days_left),
+        note: field(payload, :note),
+        level: field(payload, :level),
+        place: field(payload, :place),
+        url: "/admin/inventory?tab=supplies"
+      })
+
+  def process_event("inventory_digest", payload),
+    do:
+      enqueue_simple(:inventory_digest, payload, %{
+        date: field(payload, :date),
+        reported_low: field(payload, :reported_low),
+        low_stock: field(payload, :low_stock),
+        critical_stock: field(payload, :critical_stock),
+        service_due: field(payload, :service_due),
+        service_soon: field(payload, :service_soon),
+        machines_down: field(payload, :machines_down),
+        machine_notes: field(payload, :machine_notes),
+        highlights: field(payload, :highlights),
+        url: "/admin/inventory"
+      })
+
   def process_event(_event, _payload), do: {:error, :bad_request}
 
   def propagate_nickname_change(old_nickname, new_nickname),

@@ -36,7 +36,8 @@ config :milos_training, Oban,
        {"*/30 * * * *", MilosTraining.Workers.RebuildMemberSearchIndexJob},
        {"0 8 * * *", MilosTraining.Workers.PackageExpiryReminderJob},
        {"23 * * * *", MilosTraining.Workers.CoachingReplyOverdueJob},
-       {"41 6 * * *", MilosTraining.Workers.CorporateInvoicingJob}
+       {"41 6 * * *", MilosTraining.Workers.CorporateInvoicingJob},
+       {"7 7 * * *", MilosTraining.Workers.InventoryDigestJob}
      ]}
   ],
   queues: [
@@ -83,6 +84,10 @@ config :milos_training,
 config :milos_training,
        :housekeeping_store,
        MilosTraining.Infrastructure.Housekeeping.EctoHousekeepingStore
+
+config :milos_training,
+       :inventory_store,
+       MilosTraining.Infrastructure.Inventory.EctoInventoryStore
 
 config :milos_training,
        :coaching_note_store,

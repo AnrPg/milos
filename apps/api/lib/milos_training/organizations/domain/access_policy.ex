@@ -47,7 +47,8 @@ defmodule MilosTraining.Organizations.Domain.AccessPolicy do
     view_coaching_analytics: :all,
     record_cleaning: :all,
     review_cleaning: :all,
-    manage_cleaning_areas: :all
+    manage_cleaning_areas: :all,
+    manage_inventory: :all
   }
 
   @owner Map.merge(@admin, %{
@@ -80,7 +81,8 @@ defmodule MilosTraining.Organizations.Domain.AccessPolicy do
            self_assign_athletes: :all,
            write_coach_notes: :own,
            manage_content: :all,
-           manage_challenges: :all
+           manage_challenges: :all,
+           report_inventory: :all
          })
 
   @front_desk %{
@@ -93,7 +95,8 @@ defmodule MilosTraining.Organizations.Domain.AccessPolicy do
     check_in: :all,
     book_for_clients: :all,
     message_clients: :all,
-    review_cleaning: :all
+    review_cleaning: :all,
+    manage_inventory: :all
   }
 
   @accountant %{
@@ -108,7 +111,7 @@ defmodule MilosTraining.Organizations.Domain.AccessPolicy do
     manage_finance_settings: :all
   }
 
-  @janitor %{record_cleaning: :own}
+  @janitor %{record_cleaning: :own, report_inventory: :all}
 
   @grants %{
     owner: @owner,

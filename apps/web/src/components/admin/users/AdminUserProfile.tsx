@@ -41,6 +41,10 @@ import { useSession } from "@/components/session-provider";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { allowanceLabel, localizeError, semanticLabel } from "@/i18n/presentation";
 import { MemberRolesEditor } from "@/components/admin/users/MemberRolesEditor";
+import { CoachAssignmentPanel } from "@/components/admin/users/CoachAssignmentPanel";
+import { CoachNotesPanel } from "@/components/admin/users/CoachNotesPanel";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { can } from "@/lib/role-navigation";
 import { useUiTranslations } from "@/i18n/ui";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { UserProgrammingSchedule } from "@/components/admin/users/UserProgrammingSchedule";
@@ -487,6 +491,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   const organizationSlug = useOrganizationSlug();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { membership: actor } = useSelectedMembershipRole();
   const profileQuery = useDossierQuery(token, userId, "profile", fetchAdminUserProfile);
   const profile = profileQuery.data?.user;
   const finance = useDossierQuery(token, userId, "finance", fetchAdminUserFinance, Boolean(profile?.available_sections.includes("finance")));
@@ -546,6 +551,12 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   });
   const sections = new Set(visibleSections);
   if (profile.identity.role === "member" || profile.identity.role === "athlete") sections.add("schedule");
+  // ADR-100/101: coaches and private coach notes belong to client profiles.
+  const isClient = profile.membership?.roles?.length
+    ? profile.membership.roles.some((role) => role === "member" || role === "athlete")
+    : profile.identity.role === "member" || profile.identity.role === "athlete";
+  const showCoachNotes = isClient && (can(actor, "write_coach_notes") || can(actor, "read_coach_notes"));
+  const showCoaches = isClient && (can(actor, "assign_coaches") || can(actor, "manage_coaching"));
   const overviewItems: Array<[string, React.ReactNode]> = [
     [i18n("rolec3f104d"), <SemanticLabel key="role" value={profile.identity.role} />],
     [i18n("account85dfa32"), <SemanticLabel key="account" value={profile.account_status} />],
@@ -592,6 +603,10 @@ export function AdminUserProfile({ userId }: { userId: string }) {
           {sections.has("health_incidents") ? <Panel id="health_incidents" title={i18n("healthIncidentse3ca869")} href={adminHref("/admin/metrics#health-incidents", organizationSlug)}><p>{incidents.data?.summary.active ?? 0} {i18n("active4c71073")} {incidents.data?.summary.total ?? 0} {i18n("total5a537e2")}</p><div className="mt-3 grid gap-3">{incidents.data?.incidents.length ? incidents.data.incidents.map((incident) => <GenericRecordCard key={incident.id} title={incident.body_area} meta={<><SemanticLabel value={incident.severity} /> · <SemanticLabel value={incident.status} /> · {date(incident.started_on)}</>} detail={incident.training_limitations ? <p style={{ color: "var(--muted)" }}>{incident.training_limitations}</p> : null} href={adminHref("/admin/metrics#health-incidents", organizationSlug)} />) : <Empty>{i18n("noHealthIncidentsRecorded91c9d4e")}</Empty>}</div></Panel> : null}
 
           {sections.has("coaching_context") ? <Panel id="coaching_context" title={i18n("coachingContexteb3075d")} href={adminHref("/admin/coaching-assignments", organizationSlug)}><CoachingContextSummary drillDown={coaching.data?.drill_down} /></Panel> : null}
+
+          {token && showCoaches ? <Panel id="coaching_relationships" title={i18n("rhCoaches")}><CoachAssignmentPanel userId={userId} /></Panel> : null}
+
+          {token && showCoachNotes ? <Panel id="coach_notes" title={i18n("rhCoachNotes")}><CoachNotesPanel userId={userId} /></Panel> : null}
 
           {sections.has("class_participation") ? <Panel id="class_participation" title={i18n("classParticipation9ef4001")} href={adminHref("/admin/class-schedule", organizationSlug)}><div className="grid gap-3">{training.data?.class_participation.length ? training.data.class_participation.map((item) => <ExecutionCard key={item.id} item={item} href={adminHref("/admin/class-schedule", organizationSlug)} />) : <Empty>{i18n("noClassLinkedWorkoutExecutionsRecordedf8ca7a6")}</Empty>}</div></Panel> : null}
 

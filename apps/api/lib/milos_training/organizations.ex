@@ -132,6 +132,21 @@ defmodule MilosTraining.Organizations do
     |> Enum.map(& &1.user_id)
   end
 
+  @doc "Active members whose roles carry `capability` (role defaults, ADR-099)."
+  def list_user_ids_with_capability(organization_id, capability) do
+    organization_id
+    |> OrganizationStore.list_organization_memberships()
+    |> Enum.filter(fn membership ->
+      membership.status == :active and
+        membership.roles
+        |> MilosTraining.Organizations.Domain.AccessPolicy.capabilities(
+          coach_scope: membership.coach_scope
+        )
+        |> Map.has_key?(capability)
+    end)
+    |> Enum.map(& &1.user_id)
+  end
+
   def list_staff_user_ids(organization_id),
     do: OrganizationStore.list_staff_user_ids(organization_id)
 

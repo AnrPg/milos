@@ -2075,6 +2075,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/staff/inventory/supplies/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Stop tracking a consumable (its history is kept) */
+        post: operations["MilosTrainingWeb.InventoryController.archive_supply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/invoices/{id}/issue": {
         parameters: {
             query?: never;
@@ -2211,6 +2228,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/staff/inventory/supplies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consumables with stock and how long it lasts */
+        get: operations["MilosTrainingWeb.InventoryController.supplies"];
+        put?: never;
+        /** Add a consumable */
+        post: operations["MilosTrainingWeb.InventoryController.create_supply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/platform/organizations/{id}/invitations/email": {
         parameters: {
             query?: never;
@@ -2308,6 +2343,23 @@ export interface paths {
         post?: never;
         /** Permanently delete an organization */
         delete: operations["MilosTrainingWeb.PlatformOrganizationController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/inventory/machines/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Remove a machine from the list (its log is kept) */
+        post: operations["MilosTrainingWeb.InventoryController.archive_machine"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -2522,6 +2574,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/staff/inventory/supplies/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit a consumable (use movements to change the count) */
+        patch: operations["MilosTrainingWeb.InventoryController.update_supply"];
+        trace?: never;
+    };
     "/api/wellbeing/injuries/{id}/heal": {
         parameters: {
             query?: never;
@@ -2657,6 +2726,23 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/inventory/machines/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit a machine's details */
+        patch: operations["MilosTrainingWeb.InventoryController.update_machine"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/finance/members": {
@@ -2986,6 +3072,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/staff/inventory/machines/{id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A machine's log */
+        get: operations["MilosTrainingWeb.InventoryController.machine_events"];
+        put?: never;
+        /** Log a note, issue, outage, repair call, service or repair */
+        post: operations["MilosTrainingWeb.InventoryController.log_machine_event"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/organization/transfer": {
         parameters: {
             query?: never;
@@ -3052,6 +3156,24 @@ export interface paths {
         head?: never;
         /** Change organization lifecycle state */
         patch: operations["MilosTrainingWeb.PlatformOrganizationController.lifecycle"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/inventory/supplies/{id}/low-reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every "running low" report on a consumable: who, when, note, resolved */
+        get: operations["MilosTrainingWeb.InventoryController.supply_reports"];
+        put?: never;
+        /** Report a consumable running low or empty, with a note (anyone on the team) */
+        post: operations["MilosTrainingWeb.InventoryController.report_low"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/memberships": {
@@ -3415,6 +3537,24 @@ export interface paths {
         patch: operations["MilosTrainingWeb.AdminFacilityController.update_location"];
         trace?: never;
     };
+    "/api/org/{organization_slug}/staff/inventory/supplies/{id}/movements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A consumable's restocks, uses and recounts */
+        get: operations["MilosTrainingWeb.InventoryController.movements"];
+        put?: never;
+        /** Restock, use or recount a consumable */
+        post: operations["MilosTrainingWeb.InventoryController.record_movement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/register-admin": {
         parameters: {
             query?: never;
@@ -3548,6 +3688,23 @@ export interface paths {
         put?: never;
         /** Create a workout-library folder */
         post: operations["MilosTrainingWeb.AdminWorkoutFolderController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/inventory/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** How fast consumables go, what they cost, and monthly inventory expenses */
+        get: operations["MilosTrainingWeb.InventoryController.report"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3844,6 +4001,24 @@ export interface paths {
         patch: operations["MilosTrainingWeb.AdminFinanceController.update_referral_status"];
         trace?: never;
     };
+    "/api/org/{organization_slug}/staff/inventory/machines": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Machines and appliances, with state and service due */
+        get: operations["MilosTrainingWeb.InventoryController.machines"];
+        put?: never;
+        /** Add a machine or appliance */
+        post: operations["MilosTrainingWeb.InventoryController.create_machine"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/threads/{id}/read": {
         parameters: {
             query?: never;
@@ -3942,6 +4117,24 @@ export interface components {
             role: "owner" | "admin" | "coach";
             /** Format: uuid */
             user_id: string;
+        };
+        /** InventorySupplyMovement */
+        InventorySupplyMovement: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "restock" | "consume" | "adjust";
+            nickname?: string | null;
+            note?: string | null;
+            /** Format: date-time */
+            occurred_at: string;
+            quantity: number;
+            /** Format: uuid */
+            supply_id: string;
+            total_cents?: number | null;
+            unit_price_cents?: number | null;
+            /** Format: uuid */
+            user_id?: string | null;
         };
         /** PRTimelineEntry */
         PRTimelineEntry: {
@@ -4060,6 +4253,27 @@ export interface components {
         /** WorkoutDslParseRequest */
         WorkoutDslParseRequest: {
             source: string;
+        };
+        /** InventoryMachineEvent */
+        InventoryMachineEvent: {
+            body?: string | null;
+            cost_cents?: number | null;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "note" | "issue" | "out_of_order" | "repair_requested" | "maintenance" | "repaired" | "retired";
+            /** Format: uuid */
+            machine_id: string;
+            nickname?: string | null;
+            /** Format: date-time */
+            occurred_at: string;
+            /** @enum {string|null} */
+            severity?: "low" | "medium" | "high" | "safety" | null;
+            /** @enum {string|null} */
+            symptom?: "noise" | "not_starting" | "broken_part" | "leak" | "electrical" | "display" | "cleanliness" | "other" | null;
+            usable?: boolean | null;
+            /** Format: uuid */
+            user_id?: string | null;
         };
         /** WorkoutDslDiagnosticResponse */
         WorkoutDslDiagnosticResponse: {
@@ -4419,6 +4633,69 @@ export interface components {
             expected_source_revision: number;
             source: string;
         };
+        /** InventoryReport */
+        InventoryReport: {
+            expenses: {
+                machines_cents: number;
+                month: string;
+                supplies_cents: number;
+                total_cents: number;
+            }[];
+            /** Format: date */
+            from: string;
+            supplies: {
+                consumed: number;
+                consumed_per_month: number;
+                monthly: {
+                    cents: number;
+                    month: string;
+                }[];
+                name: string;
+                purchased?: number;
+                spent_cents: number;
+                spent_per_month_cents?: number;
+                /** Format: uuid */
+                supply_id: string;
+                unit?: string | null;
+            }[];
+            /** Format: date */
+            to: string;
+            totals: {
+                machines_cents: number;
+                supplies_cents: number;
+            };
+        };
+        /** InventoryMachine */
+        InventoryMachine: {
+            /** Format: date-time */
+            archived_at?: string | null;
+            brand?: string | null;
+            /** @enum {string} */
+            category: "training" | "appliance";
+            /** Format: uuid */
+            id: string;
+            /** Format: date */
+            last_serviced_on?: string | null;
+            /** Format: uuid */
+            location_id?: string | null;
+            model?: string | null;
+            name: string;
+            /** Format: date */
+            next_service_on?: string | null;
+            notes?: string | null;
+            purchase_price_cents?: number | null;
+            /** Format: date */
+            purchased_on?: string | null;
+            quantity: number;
+            serial_number?: string | null;
+            service_contact?: string | null;
+            service_due?: boolean;
+            service_interval_days?: number | null;
+            /** @enum {string} */
+            status: "working" | "needs_attention" | "out_of_order" | "retired";
+            /** Format: date */
+            warranty_until?: string | null;
+        };
         /** WorkoutDslManualResponse */
         WorkoutDslManualResponse: {
             markdown: string;
@@ -4487,6 +4764,28 @@ export interface components {
             /** Format: uuid */
             user_id: string;
         };
+        /** InventoryLowReport */
+        InventoryLowReport: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            level: "running_low" | "empty";
+            nickname?: string | null;
+            note?: string | null;
+            place?: string | null;
+            /** Format: date-time */
+            reported_at: string;
+            /** Format: date-time */
+            resolved_at?: string | null;
+            resolved_by?: string | null;
+            /** Format: uuid */
+            resolved_by_id?: string | null;
+            seen_quantity?: number | null;
+            /** Format: uuid */
+            supply_id: string;
+            /** Format: uuid */
+            user_id?: string | null;
+        };
         /** CoachNote */
         CoachNote: {
             body: string;
@@ -4540,6 +4839,55 @@ export interface components {
             tasks_done: string[];
             /** Format: uuid */
             user_id?: string | null;
+        };
+        /** InventorySupply */
+        InventorySupply: {
+            /** Format: date-time */
+            archived_at?: string | null;
+            brand?: string | null;
+            /** @enum {string} */
+            consumption_speed: "fast" | "regular" | "slow";
+            description?: string | null;
+            /** Format: uuid */
+            id: string;
+            name: string;
+            open_reports?: {
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                level: "running_low" | "empty";
+                nickname?: string | null;
+                note?: string | null;
+                place?: string | null;
+                /** Format: date-time */
+                reported_at: string;
+                /** Format: date-time */
+                resolved_at?: string | null;
+                resolved_by?: string | null;
+                /** Format: uuid */
+                resolved_by_id?: string | null;
+                seen_quantity?: number | null;
+                /** Format: uuid */
+                supply_id: string;
+                /** Format: uuid */
+                user_id?: string | null;
+            }[];
+            quantity: number;
+            reorder_level?: number | null;
+            shop?: string | null;
+            stock?: {
+                /** @enum {string} */
+                basis: "observed" | "estimated";
+                daily_use: number;
+                days_left?: number | null;
+                /** @enum {string} */
+                status: "ok" | "low" | "critical" | "out";
+            };
+            /** @enum {string} */
+            stock_status: "ok" | "low" | "critical" | "out";
+            unit?: string | null;
+            unit_price_cents?: number | null;
+            url?: string | null;
         };
         /** NutritionPlan */
         NutritionPlan: {
@@ -14502,6 +14850,32 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.InventoryController.archive_supply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Supply */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        supply: {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminFinanceController.issue_invoice": {
         parameters: {
             query?: never;
@@ -15361,6 +15735,162 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.InventoryController.supplies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Supplies */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        supplies: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            brand?: string | null;
+                            /** @enum {string} */
+                            consumption_speed: "fast" | "regular" | "slow";
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            open_reports?: {
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                level: "running_low" | "empty";
+                                nickname?: string | null;
+                                note?: string | null;
+                                place?: string | null;
+                                /** Format: date-time */
+                                reported_at: string;
+                                /** Format: date-time */
+                                resolved_at?: string | null;
+                                resolved_by?: string | null;
+                                /** Format: uuid */
+                                resolved_by_id?: string | null;
+                                seen_quantity?: number | null;
+                                /** Format: uuid */
+                                supply_id: string;
+                                /** Format: uuid */
+                                user_id?: string | null;
+                            }[];
+                            quantity: number;
+                            reorder_level?: number | null;
+                            shop?: string | null;
+                            stock?: {
+                                /** @enum {string} */
+                                basis: "observed" | "estimated";
+                                daily_use: number;
+                                days_left?: number | null;
+                                /** @enum {string} */
+                                status: "ok" | "low" | "critical" | "out";
+                            };
+                            /** @enum {string} */
+                            stock_status: "ok" | "low" | "critical" | "out";
+                            unit?: string | null;
+                            unit_price_cents?: number | null;
+                            url?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.InventoryController.create_supply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    brand?: string | null;
+                    /** @enum {string} */
+                    consumption_speed?: "fast" | "regular" | "slow";
+                    description?: string | null;
+                    name?: string;
+                    /** @description Starting count (create only) */
+                    quantity?: number;
+                    reorder_level?: number | null;
+                    shop?: string | null;
+                    unit?: string | null;
+                    unit_price_cents?: number | null;
+                    url?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Supply */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** InventorySupply */
+                        supply: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            brand?: string | null;
+                            /** @enum {string} */
+                            consumption_speed: "fast" | "regular" | "slow";
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            open_reports?: {
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                level: "running_low" | "empty";
+                                nickname?: string | null;
+                                note?: string | null;
+                                place?: string | null;
+                                /** Format: date-time */
+                                reported_at: string;
+                                /** Format: date-time */
+                                resolved_at?: string | null;
+                                resolved_by?: string | null;
+                                /** Format: uuid */
+                                resolved_by_id?: string | null;
+                                seen_quantity?: number | null;
+                                /** Format: uuid */
+                                supply_id: string;
+                                /** Format: uuid */
+                                user_id?: string | null;
+                            }[];
+                            quantity: number;
+                            reorder_level?: number | null;
+                            shop?: string | null;
+                            stock?: {
+                                /** @enum {string} */
+                                basis: "observed" | "estimated";
+                                daily_use: number;
+                                days_left?: number | null;
+                                /** @enum {string} */
+                                status: "ok" | "low" | "critical" | "out";
+                            };
+                            /** @enum {string} */
+                            stock_status: "ok" | "low" | "critical" | "out";
+                            unit?: string | null;
+                            unit_price_cents?: number | null;
+                            url?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.PlatformOrganizationController.invitation_email": {
         parameters: {
             query?: never;
@@ -15532,6 +16062,60 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    "MilosTrainingWeb.InventoryController.archive_machine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Machine */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** InventoryMachine */
+                        machine: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            brand?: string | null;
+                            /** @enum {string} */
+                            category: "training" | "appliance";
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            last_serviced_on?: string | null;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            model?: string | null;
+                            name: string;
+                            /** Format: date */
+                            next_service_on?: string | null;
+                            notes?: string | null;
+                            purchase_price_cents?: number | null;
+                            /** Format: date */
+                            purchased_on?: string | null;
+                            quantity: number;
+                            serial_number?: string | null;
+                            service_contact?: string | null;
+                            service_due?: boolean;
+                            service_interval_days?: number | null;
+                            /** @enum {string} */
+                            status: "working" | "needs_attention" | "out_of_order" | "retired";
+                            /** Format: date */
+                            warranty_until?: string | null;
+                        };
+                    };
+                };
             };
         };
     };
@@ -16313,6 +16897,95 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.InventoryController.update_supply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    brand?: string | null;
+                    /** @enum {string} */
+                    consumption_speed?: "fast" | "regular" | "slow";
+                    description?: string | null;
+                    name?: string;
+                    /** @description Starting count (create only) */
+                    quantity?: number;
+                    reorder_level?: number | null;
+                    shop?: string | null;
+                    unit?: string | null;
+                    unit_price_cents?: number | null;
+                    url?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Supply */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** InventorySupply */
+                        supply: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            brand?: string | null;
+                            /** @enum {string} */
+                            consumption_speed: "fast" | "regular" | "slow";
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            open_reports?: {
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                level: "running_low" | "empty";
+                                nickname?: string | null;
+                                note?: string | null;
+                                place?: string | null;
+                                /** Format: date-time */
+                                reported_at: string;
+                                /** Format: date-time */
+                                resolved_at?: string | null;
+                                resolved_by?: string | null;
+                                /** Format: uuid */
+                                resolved_by_id?: string | null;
+                                seen_quantity?: number | null;
+                                /** Format: uuid */
+                                supply_id: string;
+                                /** Format: uuid */
+                                user_id?: string | null;
+                            }[];
+                            quantity: number;
+                            reorder_level?: number | null;
+                            shop?: string | null;
+                            stock?: {
+                                /** @enum {string} */
+                                basis: "observed" | "estimated";
+                                daily_use: number;
+                                days_left?: number | null;
+                                /** @enum {string} */
+                                status: "ok" | "low" | "critical" | "out";
+                            };
+                            /** @enum {string} */
+                            stock_status: "ok" | "low" | "critical" | "out";
+                            unit?: string | null;
+                            unit_price_cents?: number | null;
+                            url?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.WellbeingController.heal": {
         parameters: {
             query?: never;
@@ -16613,6 +17286,84 @@ export interface operations {
                         };
                         role: string;
                         token?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.InventoryController.update_machine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    brand?: string | null;
+                    /** @enum {string} */
+                    category?: "training" | "appliance";
+                    /** Format: date */
+                    last_serviced_on?: string | null;
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    model?: string | null;
+                    name?: string;
+                    notes?: string | null;
+                    purchase_price_cents?: number | null;
+                    /** Format: date */
+                    purchased_on?: string | null;
+                    quantity?: number;
+                    serial_number?: string | null;
+                    service_contact?: string | null;
+                    service_interval_days?: number | null;
+                    /** Format: date */
+                    warranty_until?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Machine */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** InventoryMachine */
+                        machine: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            brand?: string | null;
+                            /** @enum {string} */
+                            category: "training" | "appliance";
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            last_serviced_on?: string | null;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            model?: string | null;
+                            name: string;
+                            /** Format: date */
+                            next_service_on?: string | null;
+                            notes?: string | null;
+                            purchase_price_cents?: number | null;
+                            /** Format: date */
+                            purchased_on?: string | null;
+                            quantity: number;
+                            serial_number?: string | null;
+                            service_contact?: string | null;
+                            service_due?: boolean;
+                            service_interval_days?: number | null;
+                            /** @enum {string} */
+                            status: "working" | "needs_attention" | "out_of_order" | "retired";
+                            /** Format: date */
+                            warranty_until?: string | null;
+                        };
                     };
                 };
             };
@@ -17616,6 +18367,140 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.InventoryController.machine_events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Events */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        events: {
+                            body?: string | null;
+                            cost_cents?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "note" | "issue" | "out_of_order" | "repair_requested" | "maintenance" | "repaired" | "retired";
+                            /** Format: uuid */
+                            machine_id: string;
+                            nickname?: string | null;
+                            /** Format: date-time */
+                            occurred_at: string;
+                            /** @enum {string|null} */
+                            severity?: "low" | "medium" | "high" | "safety" | null;
+                            /** @enum {string|null} */
+                            symptom?: "noise" | "not_starting" | "broken_part" | "leak" | "electrical" | "display" | "cleanliness" | "other" | null;
+                            usable?: boolean | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.InventoryController.log_machine_event": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body?: string | null;
+                    cost_cents?: number | null;
+                    /** @enum {string} */
+                    kind: "note" | "issue" | "out_of_order" | "repair_requested" | "maintenance" | "repaired" | "retired";
+                    /** Format: date-time */
+                    occurred_at?: string | null;
+                    /** @enum {string|null} */
+                    severity?: "low" | "medium" | "high" | "safety" | null;
+                    /** @enum {string|null} */
+                    symptom?: "noise" | "not_starting" | "broken_part" | "leak" | "electrical" | "display" | "cleanliness" | "other" | null;
+                    usable?: boolean | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Logged */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** InventoryMachineEvent */
+                        event: {
+                            body?: string | null;
+                            cost_cents?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "note" | "issue" | "out_of_order" | "repair_requested" | "maintenance" | "repaired" | "retired";
+                            /** Format: uuid */
+                            machine_id: string;
+                            nickname?: string | null;
+                            /** Format: date-time */
+                            occurred_at: string;
+                            /** @enum {string|null} */
+                            severity?: "low" | "medium" | "high" | "safety" | null;
+                            /** @enum {string|null} */
+                            symptom?: "noise" | "not_starting" | "broken_part" | "leak" | "electrical" | "display" | "cleanliness" | "other" | null;
+                            usable?: boolean | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                        /** InventoryMachine */
+                        machine: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            brand?: string | null;
+                            /** @enum {string} */
+                            category: "training" | "appliance";
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            last_serviced_on?: string | null;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            model?: string | null;
+                            name: string;
+                            /** Format: date */
+                            next_service_on?: string | null;
+                            notes?: string | null;
+                            purchase_price_cents?: number | null;
+                            /** Format: date */
+                            purchased_on?: string | null;
+                            quantity: number;
+                            serial_number?: string | null;
+                            service_contact?: string | null;
+                            service_due?: boolean;
+                            service_interval_days?: number | null;
+                            /** @enum {string} */
+                            status: "working" | "needs_attention" | "out_of_order" | "retired";
+                            /** Format: date */
+                            warranty_until?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.OwnerOrganizationController.transfer": {
         parameters: {
             query?: never;
@@ -17731,6 +18616,154 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.InventoryController.supply_reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reports */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        reports: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            level: "running_low" | "empty";
+                            nickname?: string | null;
+                            note?: string | null;
+                            place?: string | null;
+                            /** Format: date-time */
+                            reported_at: string;
+                            /** Format: date-time */
+                            resolved_at?: string | null;
+                            resolved_by?: string | null;
+                            /** Format: uuid */
+                            resolved_by_id?: string | null;
+                            seen_quantity?: number | null;
+                            /** Format: uuid */
+                            supply_id: string;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.InventoryController.report_low": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    level?: "running_low" | "empty";
+                    note?: string | null;
+                    place?: string | null;
+                    seen_quantity?: number | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Reported */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** InventoryLowReport */
+                        report: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            level: "running_low" | "empty";
+                            nickname?: string | null;
+                            note?: string | null;
+                            place?: string | null;
+                            /** Format: date-time */
+                            reported_at: string;
+                            /** Format: date-time */
+                            resolved_at?: string | null;
+                            resolved_by?: string | null;
+                            /** Format: uuid */
+                            resolved_by_id?: string | null;
+                            seen_quantity?: number | null;
+                            /** Format: uuid */
+                            supply_id: string;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                        /** InventorySupply */
+                        supply: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            brand?: string | null;
+                            /** @enum {string} */
+                            consumption_speed: "fast" | "regular" | "slow";
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            open_reports?: {
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                level: "running_low" | "empty";
+                                nickname?: string | null;
+                                note?: string | null;
+                                place?: string | null;
+                                /** Format: date-time */
+                                reported_at: string;
+                                /** Format: date-time */
+                                resolved_at?: string | null;
+                                resolved_by?: string | null;
+                                /** Format: uuid */
+                                resolved_by_id?: string | null;
+                                seen_quantity?: number | null;
+                                /** Format: uuid */
+                                supply_id: string;
+                                /** Format: uuid */
+                                user_id?: string | null;
+                            }[];
+                            quantity: number;
+                            reorder_level?: number | null;
+                            shop?: string | null;
+                            stock?: {
+                                /** @enum {string} */
+                                basis: "observed" | "estimated";
+                                daily_use: number;
+                                days_left?: number | null;
+                                /** @enum {string} */
+                                status: "ok" | "low" | "critical" | "out";
+                            };
+                            /** @enum {string} */
+                            stock_status: "ok" | "low" | "critical" | "out";
+                            unit?: string | null;
+                            unit_price_cents?: number | null;
+                            url?: string | null;
+                        };
                     };
                 };
             };
@@ -18708,6 +19741,150 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.InventoryController.movements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Movements */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        movements: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "restock" | "consume" | "adjust";
+                            nickname?: string | null;
+                            note?: string | null;
+                            /** Format: date-time */
+                            occurred_at: string;
+                            quantity: number;
+                            /** Format: uuid */
+                            supply_id: string;
+                            total_cents?: number | null;
+                            unit_price_cents?: number | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.InventoryController.record_movement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    kind: "restock" | "consume" | "adjust";
+                    note?: string | null;
+                    /** Format: date-time */
+                    occurred_at?: string | null;
+                    /** @description Amount restocked or used; for adjust, the new count */
+                    quantity: number;
+                    total_cents?: number | null;
+                    unit_price_cents?: number | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Recorded */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** InventorySupplyMovement */
+                        movement: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "restock" | "consume" | "adjust";
+                            nickname?: string | null;
+                            note?: string | null;
+                            /** Format: date-time */
+                            occurred_at: string;
+                            quantity: number;
+                            /** Format: uuid */
+                            supply_id: string;
+                            total_cents?: number | null;
+                            unit_price_cents?: number | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                        /** InventorySupply */
+                        supply: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            brand?: string | null;
+                            /** @enum {string} */
+                            consumption_speed: "fast" | "regular" | "slow";
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            open_reports?: {
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                level: "running_low" | "empty";
+                                nickname?: string | null;
+                                note?: string | null;
+                                place?: string | null;
+                                /** Format: date-time */
+                                reported_at: string;
+                                /** Format: date-time */
+                                resolved_at?: string | null;
+                                resolved_by?: string | null;
+                                /** Format: uuid */
+                                resolved_by_id?: string | null;
+                                seen_quantity?: number | null;
+                                /** Format: uuid */
+                                supply_id: string;
+                                /** Format: uuid */
+                                user_id?: string | null;
+                            }[];
+                            quantity: number;
+                            reorder_level?: number | null;
+                            shop?: string | null;
+                            stock?: {
+                                /** @enum {string} */
+                                basis: "observed" | "estimated";
+                                daily_use: number;
+                                days_left?: number | null;
+                                /** @enum {string} */
+                                status: "ok" | "low" | "critical" | "out";
+                            };
+                            /** @enum {string} */
+                            stock_status: "ok" | "low" | "critical" | "out";
+                            unit?: string | null;
+                            unit_price_cents?: number | null;
+                            url?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AuthController.register_admin": {
         parameters: {
             query?: never;
@@ -19153,6 +20330,58 @@ export interface operations {
                         name: string;
                         /** Format: uuid */
                         parent_id?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.InventoryController.report": {
+        parameters: {
+            query?: {
+                months?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Report */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        expenses: {
+                            machines_cents: number;
+                            month: string;
+                            supplies_cents: number;
+                            total_cents: number;
+                        }[];
+                        /** Format: date */
+                        from: string;
+                        supplies: {
+                            consumed: number;
+                            consumed_per_month: number;
+                            monthly: {
+                                cents: number;
+                                month: string;
+                            }[];
+                            name: string;
+                            purchased?: number;
+                            spent_cents: number;
+                            spent_per_month_cents?: number;
+                            /** Format: uuid */
+                            supply_id: string;
+                            unit?: string | null;
+                        }[];
+                        /** Format: date */
+                        to: string;
+                        totals: {
+                            machines_cents: number;
+                            supplies_cents: number;
+                        };
                     };
                 };
             };
@@ -20441,6 +21670,133 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.InventoryController.machines": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Machines */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        machines: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            brand?: string | null;
+                            /** @enum {string} */
+                            category: "training" | "appliance";
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            last_serviced_on?: string | null;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            model?: string | null;
+                            name: string;
+                            /** Format: date */
+                            next_service_on?: string | null;
+                            notes?: string | null;
+                            purchase_price_cents?: number | null;
+                            /** Format: date */
+                            purchased_on?: string | null;
+                            quantity: number;
+                            serial_number?: string | null;
+                            service_contact?: string | null;
+                            service_due?: boolean;
+                            service_interval_days?: number | null;
+                            /** @enum {string} */
+                            status: "working" | "needs_attention" | "out_of_order" | "retired";
+                            /** Format: date */
+                            warranty_until?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.InventoryController.create_machine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    brand?: string | null;
+                    /** @enum {string} */
+                    category?: "training" | "appliance";
+                    /** Format: date */
+                    last_serviced_on?: string | null;
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    model?: string | null;
+                    name?: string;
+                    notes?: string | null;
+                    purchase_price_cents?: number | null;
+                    /** Format: date */
+                    purchased_on?: string | null;
+                    quantity?: number;
+                    serial_number?: string | null;
+                    service_contact?: string | null;
+                    service_interval_days?: number | null;
+                    /** Format: date */
+                    warranty_until?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Machine */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** InventoryMachine */
+                        machine: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            brand?: string | null;
+                            /** @enum {string} */
+                            category: "training" | "appliance";
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            last_serviced_on?: string | null;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            model?: string | null;
+                            name: string;
+                            /** Format: date */
+                            next_service_on?: string | null;
+                            notes?: string | null;
+                            purchase_price_cents?: number | null;
+                            /** Format: date */
+                            purchased_on?: string | null;
+                            quantity: number;
+                            serial_number?: string | null;
+                            service_contact?: string | null;
+                            service_due?: boolean;
+                            service_interval_days?: number | null;
+                            /** @enum {string} */
+                            status: "working" | "needs_attention" | "out_of_order" | "retired";
+                            /** Format: date */
+                            warranty_until?: string | null;
+                        };
                     };
                 };
             };

@@ -21,6 +21,11 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     coaching_note_reads
     housekeeping_areas
     housekeeping_entries
+    inventory_machines
+    inventory_machine_events
+    inventory_supplies
+    inventory_supply_movements
+    inventory_supply_reports
     review_questionnaires reviews review_answers
     messaging_threads
     messaging_participants messaging_messages seasonal_challenges

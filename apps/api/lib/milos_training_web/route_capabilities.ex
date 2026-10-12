@@ -29,6 +29,7 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     W.PaymentModelsController => [:manage_billing],
     W.CoachingRelationshipsController => [:assign_coaches, :manage_coaching],
     W.RoleAccessController => [:manage_settings],
+    W.InventoryController => [:manage_inventory],
     W.OwnerOrganizationController => [:manage_organization_lifecycle]
   }
 
@@ -156,7 +157,14 @@ defmodule MilosTrainingWeb.RouteCapabilities do
 
     # Invitations
     {W.OrganizationAccessController, :issue} => [:invite_clients],
-    {W.OrganizationAccessController, :revoke} => [:invite_clients]
+    {W.OrganizationAccessController, :revoke} => [:invite_clients],
+    # ADR-104: the whole team reports; front desk, admins and owners manage.
+    {W.InventoryController, :machines} => [:manage_inventory, :report_inventory],
+    {W.InventoryController, :machine_events} => [:manage_inventory, :report_inventory],
+    {W.InventoryController, :log_machine_event} => [:manage_inventory, :report_inventory],
+    {W.InventoryController, :supplies} => [:manage_inventory, :report_inventory],
+    {W.InventoryController, :report_low} => [:manage_inventory, :report_inventory],
+    {W.InventoryController, :supply_reports} => [:manage_inventory, :report_inventory]
   }
 
   @doc "Capabilities that each grant the route, or nil when unlisted."

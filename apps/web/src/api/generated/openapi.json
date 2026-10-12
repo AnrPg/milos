@@ -130,6 +130,65 @@
         "title": "StaffMember",
         "type": "object"
       },
+      "InventorySupplyMovement": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "restock",
+              "consume",
+              "adjust"
+            ],
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "note": {
+            "nullable": true,
+            "type": "string"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "supply_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "total_cents": {
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "unit_price_cents": {
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "user_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "supply_id",
+          "kind",
+          "quantity",
+          "occurred_at"
+        ],
+        "title": "InventorySupplyMovement",
+        "type": "object"
+      },
       "PRTimelineEntry": {
         "properties": {
           "beaten_on": {
@@ -483,6 +542,88 @@
           "source"
         ],
         "title": "WorkoutDslParseRequest",
+        "type": "object"
+      },
+      "InventoryMachineEvent": {
+        "properties": {
+          "body": {
+            "nullable": true,
+            "type": "string"
+          },
+          "cost_cents": {
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "note",
+              "issue",
+              "out_of_order",
+              "repair_requested",
+              "maintenance",
+              "repaired",
+              "retired"
+            ],
+            "type": "string"
+          },
+          "machine_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "severity": {
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "safety"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "symptom": {
+            "enum": [
+              "noise",
+              "not_starting",
+              "broken_part",
+              "leak",
+              "electrical",
+              "display",
+              "cleanliness",
+              "other"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "usable": {
+            "nullable": true,
+            "type": "boolean"
+          },
+          "user_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "machine_id",
+          "kind",
+          "occurred_at"
+        ],
+        "title": "InventoryMachineEvent",
         "type": "object"
       },
       "WorkoutDslDiagnosticResponse": {
@@ -1689,6 +1830,229 @@
         "title": "WorkoutDslPublishRequest",
         "type": "object"
       },
+      "InventoryReport": {
+        "properties": {
+          "expenses": {
+            "items": {
+              "properties": {
+                "machines_cents": {
+                  "type": "integer"
+                },
+                "month": {
+                  "type": "string"
+                },
+                "supplies_cents": {
+                  "type": "integer"
+                },
+                "total_cents": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "month",
+                "supplies_cents",
+                "machines_cents",
+                "total_cents"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "from": {
+            "format": "date",
+            "type": "string"
+          },
+          "supplies": {
+            "items": {
+              "properties": {
+                "consumed": {
+                  "type": "integer"
+                },
+                "consumed_per_month": {
+                  "type": "number"
+                },
+                "monthly": {
+                  "items": {
+                    "properties": {
+                      "cents": {
+                        "type": "integer"
+                      },
+                      "month": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "month",
+                      "cents"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "purchased": {
+                  "type": "integer"
+                },
+                "spent_cents": {
+                  "type": "integer"
+                },
+                "spent_per_month_cents": {
+                  "type": "integer"
+                },
+                "supply_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "unit": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "supply_id",
+                "name",
+                "consumed",
+                "consumed_per_month",
+                "spent_cents",
+                "monthly"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "to": {
+            "format": "date",
+            "type": "string"
+          },
+          "totals": {
+            "properties": {
+              "machines_cents": {
+                "type": "integer"
+              },
+              "supplies_cents": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "supplies_cents",
+              "machines_cents"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "supplies",
+          "expenses",
+          "totals"
+        ],
+        "title": "InventoryReport",
+        "type": "object"
+      },
+      "InventoryMachine": {
+        "properties": {
+          "archived_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "brand": {
+            "nullable": true,
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "training",
+              "appliance"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "last_serviced_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "model": {
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "next_service_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "notes": {
+            "nullable": true,
+            "type": "string"
+          },
+          "purchase_price_cents": {
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "purchased_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "serial_number": {
+            "nullable": true,
+            "type": "string"
+          },
+          "service_contact": {
+            "nullable": true,
+            "type": "string"
+          },
+          "service_due": {
+            "type": "boolean"
+          },
+          "service_interval_days": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "working",
+              "needs_attention",
+              "out_of_order",
+              "retired"
+            ],
+            "type": "string"
+          },
+          "warranty_until": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "category",
+          "quantity",
+          "status"
+        ],
+        "title": "InventoryMachine",
+        "type": "object"
+      },
       "WorkoutDslManualResponse": {
         "additionalProperties": false,
         "properties": {
@@ -1924,6 +2288,72 @@
         "title": "SubscriptionBeneficiary",
         "type": "object"
       },
+      "InventoryLowReport": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "level": {
+            "enum": [
+              "running_low",
+              "empty"
+            ],
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "note": {
+            "nullable": true,
+            "type": "string"
+          },
+          "place": {
+            "nullable": true,
+            "type": "string"
+          },
+          "reported_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "resolved_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "resolved_by": {
+            "nullable": true,
+            "type": "string"
+          },
+          "resolved_by_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "seen_quantity": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "supply_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "supply_id",
+          "level",
+          "reported_at"
+        ],
+        "title": "InventoryLowReport",
+        "type": "object"
+      },
       "CoachNote": {
         "properties": {
           "body": {
@@ -2087,6 +2517,182 @@
           "tasks_done"
         ],
         "title": "CleaningEntry",
+        "type": "object"
+      },
+      "InventorySupply": {
+        "properties": {
+          "archived_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "brand": {
+            "nullable": true,
+            "type": "string"
+          },
+          "consumption_speed": {
+            "enum": [
+              "fast",
+              "regular",
+              "slow"
+            ],
+            "type": "string"
+          },
+          "description": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "open_reports": {
+            "items": {
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "level": {
+                  "enum": [
+                    "running_low",
+                    "empty"
+                  ],
+                  "type": "string"
+                },
+                "nickname": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "note": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "place": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "reported_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "resolved_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "resolved_by": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "resolved_by_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "seen_quantity": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "supply_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "user_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "supply_id",
+                "level",
+                "reported_at"
+              ],
+              "title": "InventoryLowReport",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "reorder_level": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "shop": {
+            "nullable": true,
+            "type": "string"
+          },
+          "stock": {
+            "properties": {
+              "basis": {
+                "enum": [
+                  "observed",
+                  "estimated"
+                ],
+                "type": "string"
+              },
+              "daily_use": {
+                "type": "number"
+              },
+              "days_left": {
+                "nullable": true,
+                "type": "number"
+              },
+              "status": {
+                "enum": [
+                  "ok",
+                  "low",
+                  "critical",
+                  "out"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "status",
+              "daily_use",
+              "basis"
+            ],
+            "type": "object"
+          },
+          "stock_status": {
+            "enum": [
+              "ok",
+              "low",
+              "critical",
+              "out"
+            ],
+            "type": "string"
+          },
+          "unit": {
+            "nullable": true,
+            "type": "string"
+          },
+          "unit_price_cents": {
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "url": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "quantity",
+          "consumption_speed",
+          "stock_status"
+        ],
+        "title": "InventorySupply",
         "type": "object"
       },
       "NutritionPlan": {
@@ -28907,6 +29513,53 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/inventory/supplies/{id}/archive": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.InventoryController.archive_supply",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "supply": {
+                      "additionalProperties": true,
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "supply"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Supply"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Stop tracking a consumable (its history is kept)",
+        "tags": [
+          "Inventory"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/finance/invoices/{id}/issue": {
       "patch": {
         "callbacks": {},
@@ -31536,6 +32189,491 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/inventory/supplies": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.InventoryController.supplies",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "supplies": {
+                      "items": {
+                        "properties": {
+                          "archived_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "brand": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "consumption_speed": {
+                            "enum": [
+                              "fast",
+                              "regular",
+                              "slow"
+                            ],
+                            "type": "string"
+                          },
+                          "description": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "open_reports": {
+                            "items": {
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "level": {
+                                  "enum": [
+                                    "running_low",
+                                    "empty"
+                                  ],
+                                  "type": "string"
+                                },
+                                "nickname": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "note": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "place": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "reported_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "resolved_at": {
+                                  "format": "date-time",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "resolved_by": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "resolved_by_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "seen_quantity": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "supply_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "user_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "supply_id",
+                                "level",
+                                "reported_at"
+                              ],
+                              "title": "InventoryLowReport",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "quantity": {
+                            "type": "integer"
+                          },
+                          "reorder_level": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "shop": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "stock": {
+                            "properties": {
+                              "basis": {
+                                "enum": [
+                                  "observed",
+                                  "estimated"
+                                ],
+                                "type": "string"
+                              },
+                              "daily_use": {
+                                "type": "number"
+                              },
+                              "days_left": {
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "status": {
+                                "enum": [
+                                  "ok",
+                                  "low",
+                                  "critical",
+                                  "out"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "daily_use",
+                              "basis"
+                            ],
+                            "type": "object"
+                          },
+                          "stock_status": {
+                            "enum": [
+                              "ok",
+                              "low",
+                              "critical",
+                              "out"
+                            ],
+                            "type": "string"
+                          },
+                          "unit": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "unit_price_cents": {
+                            "minimum": 0,
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "url": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "quantity",
+                          "consumption_speed",
+                          "stock_status"
+                        ],
+                        "title": "InventorySupply",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "supplies"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Supplies"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Consumables with stock and how long it lasts",
+        "tags": [
+          "Inventory"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.InventoryController.create_supply",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "brand": {
+                    "maxLength": 120,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "consumption_speed": {
+                    "enum": [
+                      "fast",
+                      "regular",
+                      "slow"
+                    ],
+                    "type": "string"
+                  },
+                  "description": {
+                    "maxLength": 2000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 120,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "description": "Starting count (create only)",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "reorder_level": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "shop": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "unit": {
+                    "maxLength": 40,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "unit_price_cents": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "url": {
+                    "maxLength": 2048,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "supply": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "consumption_speed": {
+                          "enum": [
+                            "fast",
+                            "regular",
+                            "slow"
+                          ],
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "open_reports": {
+                          "items": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "level": {
+                                "enum": [
+                                  "running_low",
+                                  "empty"
+                                ],
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "note": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "place": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reported_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "resolved_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "resolved_by": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "resolved_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "seen_quantity": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "supply_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "supply_id",
+                              "level",
+                              "reported_at"
+                            ],
+                            "title": "InventoryLowReport",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "quantity": {
+                          "type": "integer"
+                        },
+                        "reorder_level": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "shop": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "stock": {
+                          "properties": {
+                            "basis": {
+                              "enum": [
+                                "observed",
+                                "estimated"
+                              ],
+                              "type": "string"
+                            },
+                            "daily_use": {
+                              "type": "number"
+                            },
+                            "days_left": {
+                              "nullable": true,
+                              "type": "number"
+                            },
+                            "status": {
+                              "enum": [
+                                "ok",
+                                "low",
+                                "critical",
+                                "out"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "status",
+                            "daily_use",
+                            "basis"
+                          ],
+                          "type": "object"
+                        },
+                        "stock_status": {
+                          "enum": [
+                            "ok",
+                            "low",
+                            "critical",
+                            "out"
+                          ],
+                          "type": "string"
+                        },
+                        "unit": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "unit_price_cents": {
+                          "minimum": 0,
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "url": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "quantity",
+                        "consumption_speed",
+                        "stock_status"
+                      ],
+                      "title": "InventorySupply",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "supply"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Supply"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Add a consumable",
+        "tags": [
+          "Inventory"
+        ]
+      }
+    },
     "/api/platform/organizations/{id}/invitations/email": {
       "post": {
         "callbacks": {},
@@ -31869,6 +33007,150 @@
         "summary": "Permanently delete an organization",
         "tags": [
           "Platform Organizations"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/inventory/machines/{id}/archive": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.InventoryController.archive_machine",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "machine": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "category": {
+                          "enum": [
+                            "training",
+                            "appliance"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_serviced_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "model": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "next_service_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "notes": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purchase_price_cents": {
+                          "minimum": 0,
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "purchased_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "quantity": {
+                          "type": "integer"
+                        },
+                        "serial_number": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "service_contact": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "service_due": {
+                          "type": "boolean"
+                        },
+                        "service_interval_days": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "working",
+                            "needs_attention",
+                            "out_of_order",
+                            "retired"
+                          ],
+                          "type": "string"
+                        },
+                        "warranty_until": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "category",
+                        "quantity",
+                        "status"
+                      ],
+                      "title": "InventoryMachine",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "machine"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Machine"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remove a machine from the list (its log is kept)",
+        "tags": [
+          "Inventory"
         ]
       }
     },
@@ -33701,6 +34983,291 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/inventory/supplies/{id}": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.InventoryController.update_supply",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "brand": {
+                    "maxLength": 120,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "consumption_speed": {
+                    "enum": [
+                      "fast",
+                      "regular",
+                      "slow"
+                    ],
+                    "type": "string"
+                  },
+                  "description": {
+                    "maxLength": 2000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 120,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "description": "Starting count (create only)",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "reorder_level": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "shop": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "unit": {
+                    "maxLength": 40,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "unit_price_cents": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "url": {
+                    "maxLength": 2048,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "supply": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "consumption_speed": {
+                          "enum": [
+                            "fast",
+                            "regular",
+                            "slow"
+                          ],
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "open_reports": {
+                          "items": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "level": {
+                                "enum": [
+                                  "running_low",
+                                  "empty"
+                                ],
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "note": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "place": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reported_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "resolved_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "resolved_by": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "resolved_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "seen_quantity": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "supply_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "supply_id",
+                              "level",
+                              "reported_at"
+                            ],
+                            "title": "InventoryLowReport",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "quantity": {
+                          "type": "integer"
+                        },
+                        "reorder_level": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "shop": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "stock": {
+                          "properties": {
+                            "basis": {
+                              "enum": [
+                                "observed",
+                                "estimated"
+                              ],
+                              "type": "string"
+                            },
+                            "daily_use": {
+                              "type": "number"
+                            },
+                            "days_left": {
+                              "nullable": true,
+                              "type": "number"
+                            },
+                            "status": {
+                              "enum": [
+                                "ok",
+                                "low",
+                                "critical",
+                                "out"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "status",
+                            "daily_use",
+                            "basis"
+                          ],
+                          "type": "object"
+                        },
+                        "stock_status": {
+                          "enum": [
+                            "ok",
+                            "low",
+                            "critical",
+                            "out"
+                          ],
+                          "type": "string"
+                        },
+                        "unit": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "unit_price_cents": {
+                          "minimum": 0,
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "url": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "quantity",
+                        "consumption_speed",
+                        "stock_status"
+                      ],
+                      "title": "InventorySupply",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "supply"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Supply"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Edit a consumable (use movements to change the count)",
+        "tags": [
+          "Inventory"
+        ]
+      }
+    },
     "/api/wellbeing/injuries/{id}/heal": {
       "patch": {
         "callbacks": {},
@@ -34262,6 +35829,234 @@
         "summary": "Inspect a one-time organization invitation",
         "tags": [
           "Organizations"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/inventory/machines/{id}": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.InventoryController.update_machine",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "brand": {
+                    "maxLength": 120,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "category": {
+                    "enum": [
+                      "training",
+                      "appliance"
+                    ],
+                    "type": "string"
+                  },
+                  "last_serviced_on": {
+                    "format": "date",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "location_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "model": {
+                    "maxLength": 120,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 120,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "notes": {
+                    "maxLength": 4000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "purchase_price_cents": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "purchased_on": {
+                    "format": "date",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "serial_number": {
+                    "maxLength": 120,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "service_contact": {
+                    "maxLength": 1000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "service_interval_days": {
+                    "minimum": 1,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "warranty_until": {
+                    "format": "date",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "machine": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "category": {
+                          "enum": [
+                            "training",
+                            "appliance"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_serviced_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "model": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "next_service_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "notes": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purchase_price_cents": {
+                          "minimum": 0,
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "purchased_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "quantity": {
+                          "type": "integer"
+                        },
+                        "serial_number": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "service_contact": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "service_due": {
+                          "type": "boolean"
+                        },
+                        "service_interval_days": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "working",
+                            "needs_attention",
+                            "out_of_order",
+                            "retired"
+                          ],
+                          "type": "string"
+                        },
+                        "warranty_until": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "category",
+                        "quantity",
+                        "status"
+                      ],
+                      "title": "InventoryMachine",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "machine"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Machine"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Edit a machine's details",
+        "tags": [
+          "Inventory"
         ]
       }
     },
@@ -36479,6 +38274,430 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/inventory/machines/{id}/events": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.InventoryController.machine_events",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "events": {
+                      "items": {
+                        "properties": {
+                          "body": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "cost_cents": {
+                            "minimum": 0,
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "note",
+                              "issue",
+                              "out_of_order",
+                              "repair_requested",
+                              "maintenance",
+                              "repaired",
+                              "retired"
+                            ],
+                            "type": "string"
+                          },
+                          "machine_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "occurred_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "severity": {
+                            "enum": [
+                              "low",
+                              "medium",
+                              "high",
+                              "safety"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "symptom": {
+                            "enum": [
+                              "noise",
+                              "not_starting",
+                              "broken_part",
+                              "leak",
+                              "electrical",
+                              "display",
+                              "cleanliness",
+                              "other"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "usable": {
+                            "nullable": true,
+                            "type": "boolean"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "machine_id",
+                          "kind",
+                          "occurred_at"
+                        ],
+                        "title": "InventoryMachineEvent",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "events"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Events"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A machine's log",
+        "tags": [
+          "Inventory"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.InventoryController.log_machine_event",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "body": {
+                    "maxLength": 4000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "cost_cents": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "kind": {
+                    "enum": [
+                      "note",
+                      "issue",
+                      "out_of_order",
+                      "repair_requested",
+                      "maintenance",
+                      "repaired",
+                      "retired"
+                    ],
+                    "type": "string"
+                  },
+                  "occurred_at": {
+                    "format": "date-time",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "severity": {
+                    "enum": [
+                      "low",
+                      "medium",
+                      "high",
+                      "safety"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "symptom": {
+                    "enum": [
+                      "noise",
+                      "not_starting",
+                      "broken_part",
+                      "leak",
+                      "electrical",
+                      "display",
+                      "cleanliness",
+                      "other"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "usable": {
+                    "nullable": true,
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "kind"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "event": {
+                      "properties": {
+                        "body": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "cost_cents": {
+                          "minimum": 0,
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "note",
+                            "issue",
+                            "out_of_order",
+                            "repair_requested",
+                            "maintenance",
+                            "repaired",
+                            "retired"
+                          ],
+                          "type": "string"
+                        },
+                        "machine_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "occurred_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "severity": {
+                          "enum": [
+                            "low",
+                            "medium",
+                            "high",
+                            "safety"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "symptom": {
+                          "enum": [
+                            "noise",
+                            "not_starting",
+                            "broken_part",
+                            "leak",
+                            "electrical",
+                            "display",
+                            "cleanliness",
+                            "other"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "usable": {
+                          "nullable": true,
+                          "type": "boolean"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "machine_id",
+                        "kind",
+                        "occurred_at"
+                      ],
+                      "title": "InventoryMachineEvent",
+                      "type": "object"
+                    },
+                    "machine": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "category": {
+                          "enum": [
+                            "training",
+                            "appliance"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_serviced_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "model": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "next_service_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "notes": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purchase_price_cents": {
+                          "minimum": 0,
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "purchased_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "quantity": {
+                          "type": "integer"
+                        },
+                        "serial_number": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "service_contact": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "service_due": {
+                          "type": "boolean"
+                        },
+                        "service_interval_days": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "working",
+                            "needs_attention",
+                            "out_of_order",
+                            "retired"
+                          ],
+                          "type": "string"
+                        },
+                        "warranty_until": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "category",
+                        "quantity",
+                        "status"
+                      ],
+                      "title": "InventoryMachine",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "machine",
+                    "event"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Logged"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Log a note, issue, outage, repair call, service or repair",
+        "tags": [
+          "Inventory"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/organization/transfer": {
       "post": {
         "callbacks": {},
@@ -36712,6 +38931,437 @@
         "summary": "Change organization lifecycle state",
         "tags": [
           "Platform Organizations"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/inventory/supplies/{id}/low-reports": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.InventoryController.supply_reports",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "reports": {
+                      "items": {
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "level": {
+                            "enum": [
+                              "running_low",
+                              "empty"
+                            ],
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "note": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "place": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "reported_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "resolved_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "resolved_by": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "resolved_by_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "seen_quantity": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "supply_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "supply_id",
+                          "level",
+                          "reported_at"
+                        ],
+                        "title": "InventoryLowReport",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "reports"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Reports"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Every \"running low\" report on a consumable: who, when, note, resolved",
+        "tags": [
+          "Inventory"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.InventoryController.report_low",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "level": {
+                    "enum": [
+                      "running_low",
+                      "empty"
+                    ],
+                    "type": "string"
+                  },
+                  "note": {
+                    "maxLength": 1000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "place": {
+                    "maxLength": 120,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "seen_quantity": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "report": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "level": {
+                          "enum": [
+                            "running_low",
+                            "empty"
+                          ],
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "place": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "reported_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "resolved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "resolved_by": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "resolved_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "seen_quantity": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "supply_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "supply_id",
+                        "level",
+                        "reported_at"
+                      ],
+                      "title": "InventoryLowReport",
+                      "type": "object"
+                    },
+                    "supply": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "consumption_speed": {
+                          "enum": [
+                            "fast",
+                            "regular",
+                            "slow"
+                          ],
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "open_reports": {
+                          "items": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "level": {
+                                "enum": [
+                                  "running_low",
+                                  "empty"
+                                ],
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "note": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "place": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reported_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "resolved_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "resolved_by": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "resolved_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "seen_quantity": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "supply_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "supply_id",
+                              "level",
+                              "reported_at"
+                            ],
+                            "title": "InventoryLowReport",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "quantity": {
+                          "type": "integer"
+                        },
+                        "reorder_level": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "shop": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "stock": {
+                          "properties": {
+                            "basis": {
+                              "enum": [
+                                "observed",
+                                "estimated"
+                              ],
+                              "type": "string"
+                            },
+                            "daily_use": {
+                              "type": "number"
+                            },
+                            "days_left": {
+                              "nullable": true,
+                              "type": "number"
+                            },
+                            "status": {
+                              "enum": [
+                                "ok",
+                                "low",
+                                "critical",
+                                "out"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "status",
+                            "daily_use",
+                            "basis"
+                          ],
+                          "type": "object"
+                        },
+                        "stock_status": {
+                          "enum": [
+                            "ok",
+                            "low",
+                            "critical",
+                            "out"
+                          ],
+                          "type": "string"
+                        },
+                        "unit": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "unit_price_cents": {
+                          "minimum": 0,
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "url": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "quantity",
+                        "consumption_speed",
+                        "stock_status"
+                      ],
+                      "title": "InventorySupply",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "report",
+                    "supply"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Reported"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Report a consumable running low or empty, with a note (anyone on the team)",
+        "tags": [
+          "Inventory"
         ]
       }
     },
@@ -38765,6 +41415,438 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/inventory/supplies/{id}/movements": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.InventoryController.movements",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "movements": {
+                      "items": {
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "restock",
+                              "consume",
+                              "adjust"
+                            ],
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "note": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "occurred_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "quantity": {
+                            "type": "integer"
+                          },
+                          "supply_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "total_cents": {
+                            "minimum": 0,
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "unit_price_cents": {
+                            "minimum": 0,
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "supply_id",
+                          "kind",
+                          "quantity",
+                          "occurred_at"
+                        ],
+                        "title": "InventorySupplyMovement",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "movements"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Movements"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A consumable's restocks, uses and recounts",
+        "tags": [
+          "Inventory"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.InventoryController.record_movement",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "restock",
+                      "consume",
+                      "adjust"
+                    ],
+                    "type": "string"
+                  },
+                  "note": {
+                    "maxLength": 1000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "occurred_at": {
+                    "format": "date-time",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "description": "Amount restocked or used; for adjust, the new count",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "total_cents": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "unit_price_cents": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "quantity"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "movement": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "restock",
+                            "consume",
+                            "adjust"
+                          ],
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "occurred_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "quantity": {
+                          "type": "integer"
+                        },
+                        "supply_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "total_cents": {
+                          "minimum": 0,
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "unit_price_cents": {
+                          "minimum": 0,
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "supply_id",
+                        "kind",
+                        "quantity",
+                        "occurred_at"
+                      ],
+                      "title": "InventorySupplyMovement",
+                      "type": "object"
+                    },
+                    "supply": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "consumption_speed": {
+                          "enum": [
+                            "fast",
+                            "regular",
+                            "slow"
+                          ],
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "open_reports": {
+                          "items": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "level": {
+                                "enum": [
+                                  "running_low",
+                                  "empty"
+                                ],
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "note": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "place": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reported_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "resolved_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "resolved_by": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "resolved_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "seen_quantity": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "supply_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "supply_id",
+                              "level",
+                              "reported_at"
+                            ],
+                            "title": "InventoryLowReport",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "quantity": {
+                          "type": "integer"
+                        },
+                        "reorder_level": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "shop": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "stock": {
+                          "properties": {
+                            "basis": {
+                              "enum": [
+                                "observed",
+                                "estimated"
+                              ],
+                              "type": "string"
+                            },
+                            "daily_use": {
+                              "type": "number"
+                            },
+                            "days_left": {
+                              "nullable": true,
+                              "type": "number"
+                            },
+                            "status": {
+                              "enum": [
+                                "ok",
+                                "low",
+                                "critical",
+                                "out"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "status",
+                            "daily_use",
+                            "basis"
+                          ],
+                          "type": "object"
+                        },
+                        "stock_status": {
+                          "enum": [
+                            "ok",
+                            "low",
+                            "critical",
+                            "out"
+                          ],
+                          "type": "string"
+                        },
+                        "unit": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "unit_price_cents": {
+                          "minimum": 0,
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "url": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "quantity",
+                        "consumption_speed",
+                        "stock_status"
+                      ],
+                      "title": "InventorySupply",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "supply",
+                    "movement"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Recorded"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Restock, use or recount a consumable",
+        "tags": [
+          "Inventory"
+        ]
+      }
+    },
     "/api/auth/register-admin": {
       "post": {
         "callbacks": {},
@@ -39629,6 +42711,164 @@
         "summary": "Create a workout-library folder",
         "tags": [
           "Admin Workouts"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/inventory/report": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.InventoryController.report",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "months",
+            "required": false,
+            "schema": {
+              "maximum": 36,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expenses": {
+                      "items": {
+                        "properties": {
+                          "machines_cents": {
+                            "type": "integer"
+                          },
+                          "month": {
+                            "type": "string"
+                          },
+                          "supplies_cents": {
+                            "type": "integer"
+                          },
+                          "total_cents": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "month",
+                          "supplies_cents",
+                          "machines_cents",
+                          "total_cents"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "from": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "supplies": {
+                      "items": {
+                        "properties": {
+                          "consumed": {
+                            "type": "integer"
+                          },
+                          "consumed_per_month": {
+                            "type": "number"
+                          },
+                          "monthly": {
+                            "items": {
+                              "properties": {
+                                "cents": {
+                                  "type": "integer"
+                                },
+                                "month": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "month",
+                                "cents"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "purchased": {
+                            "type": "integer"
+                          },
+                          "spent_cents": {
+                            "type": "integer"
+                          },
+                          "spent_per_month_cents": {
+                            "type": "integer"
+                          },
+                          "supply_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "unit": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "supply_id",
+                          "name",
+                          "consumed",
+                          "consumed_per_month",
+                          "spent_cents",
+                          "monthly"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "to": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "totals": {
+                      "properties": {
+                        "machines_cents": {
+                          "type": "integer"
+                        },
+                        "supplies_cents": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "supplies_cents",
+                        "machines_cents"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "from",
+                    "to",
+                    "supplies",
+                    "expenses",
+                    "totals"
+                  ],
+                  "title": "InventoryReport",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Report"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "How fast consumables go, what they cost, and monthly inventory expenses",
+        "tags": [
+          "Inventory"
         ]
       }
     },
@@ -43339,6 +46579,359 @@
         "summary": "Update referral event status",
         "tags": [
           "Admin Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/inventory/machines": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.InventoryController.machines",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "machines": {
+                      "items": {
+                        "properties": {
+                          "archived_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "brand": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "category": {
+                            "enum": [
+                              "training",
+                              "appliance"
+                            ],
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "last_serviced_on": {
+                            "format": "date",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "model": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "next_service_on": {
+                            "format": "date",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "notes": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "purchase_price_cents": {
+                            "minimum": 0,
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "purchased_on": {
+                            "format": "date",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "quantity": {
+                            "type": "integer"
+                          },
+                          "serial_number": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "service_contact": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "service_due": {
+                            "type": "boolean"
+                          },
+                          "service_interval_days": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "status": {
+                            "enum": [
+                              "working",
+                              "needs_attention",
+                              "out_of_order",
+                              "retired"
+                            ],
+                            "type": "string"
+                          },
+                          "warranty_until": {
+                            "format": "date",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "category",
+                          "quantity",
+                          "status"
+                        ],
+                        "title": "InventoryMachine",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "machines"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Machines"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Machines and appliances, with state and service due",
+        "tags": [
+          "Inventory"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.InventoryController.create_machine",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "brand": {
+                    "maxLength": 120,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "category": {
+                    "enum": [
+                      "training",
+                      "appliance"
+                    ],
+                    "type": "string"
+                  },
+                  "last_serviced_on": {
+                    "format": "date",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "location_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "model": {
+                    "maxLength": 120,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 120,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "notes": {
+                    "maxLength": 4000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "purchase_price_cents": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "purchased_on": {
+                    "format": "date",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "serial_number": {
+                    "maxLength": 120,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "service_contact": {
+                    "maxLength": 1000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "service_interval_days": {
+                    "minimum": 1,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "warranty_until": {
+                    "format": "date",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "machine": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "category": {
+                          "enum": [
+                            "training",
+                            "appliance"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_serviced_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "model": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "next_service_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "notes": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purchase_price_cents": {
+                          "minimum": 0,
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "purchased_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "quantity": {
+                          "type": "integer"
+                        },
+                        "serial_number": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "service_contact": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "service_due": {
+                          "type": "boolean"
+                        },
+                        "service_interval_days": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "working",
+                            "needs_attention",
+                            "out_of_order",
+                            "retired"
+                          ],
+                          "type": "string"
+                        },
+                        "warranty_until": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "category",
+                        "quantity",
+                        "status"
+                      ],
+                      "title": "InventoryMachine",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "machine"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Machine"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Add a machine or appliance",
+        "tags": [
+          "Inventory"
         ]
       }
     },

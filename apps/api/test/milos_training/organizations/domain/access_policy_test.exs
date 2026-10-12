@@ -69,7 +69,7 @@ defmodule MilosTraining.Organizations.Domain.AccessPolicyTest do
 
     janitor = caps([:janitor])
     assert AccessPolicy.can?(janitor, :record_cleaning)
-    assert Map.keys(janitor) |> Enum.sort() == [:record_cleaning]
+    assert Map.keys(janitor) |> Enum.sort() == [:record_cleaning, :report_inventory]
   end
 
   test "rights are the union of roles and the wider scope wins" do

@@ -296,6 +296,53 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  def build("inventory_repair_needed", payload, localize) do
+    %{
+      title: localize.("A machine needs attention", %{}),
+      body:
+        localize.("%{machine}: %{note}", %{
+          machine: payload["machine_name"] || "",
+          note: payload["body"] || ""
+        }),
+      url: payload["url"] || "/admin/inventory"
+    }
+  end
+
+  def build("inventory_stock_low", %{"status" => "reported"} = payload, localize) do
+    %{
+      title: localize.("Reported running low", %{}),
+      body:
+        localize.("%{item}: %{note}", %{
+          item: payload["supply_name"] || "",
+          note: payload["note"] || ""
+        }),
+      url: payload["url"] || "/admin/inventory"
+    }
+  end
+
+  def build("inventory_digest", payload, localize) do
+    %{
+      title: localize.("Inventory today", %{}),
+      body:
+        localize.("Needs attention: %{items}", %{
+          items: Enum.join(List.wrap(payload["highlights"]), ", ")
+        }),
+      url: payload["url"] || "/admin/inventory"
+    }
+  end
+
+  def build("inventory_stock_low", payload, localize) do
+    %{
+      title: localize.("Running low", %{}),
+      body:
+        localize.("%{item}: %{quantity} left.", %{
+          item: payload["supply_name"] || "",
+          quantity: payload["quantity"] || ""
+        }),
+      url: payload["url"] || "/admin/inventory"
+    }
+  end
+
   def build("coach_note_viewed", payload, localize) do
     %{
       title: localize.("An admin read your note", %{}),

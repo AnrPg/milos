@@ -44,14 +44,20 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { organizationTopic, subscribeToTopic } from "@/lib/realtime";
 import { useScheduleStore } from "@/stores/schedule";
 import { IntegerInput } from "@/components/integer-input";
+import { fetchGymStaff } from "@/api/staff";
+import { coachOptions } from "@/components/admin/staff-home";
+import { can } from "@/lib/role-navigation";
+
+/** A class may name its coach (ADR-100). */
+type ClassPayload = ScheduleSlotPayload & { coach_user_id?: string | null };
 
 type SlotEditorState = {
   slotId: string | null;
-  values: ScheduleSlotPayload;
+  values: ClassPayload;
 };
 
 type SeriesEditorState = {
-  values: Omit<ScheduleSlotPayload, "scheduled_at" | "master_workout_id">;
+  values: Omit<ClassPayload, "scheduled_at" | "master_workout_id">;
   startDate: string;
   endDate: string;
   time: string;
@@ -126,7 +132,8 @@ export function ScheduleConsole({
   const [schedulingDefaults, setSchedulingDefaults] = useState<SchedulingSettings | undefined>();
   const appliedMobileDefault = useRef(false);
   const initialOpenHandledRef = useRef(false);
-  const { role, isLoading: roleLoading } = useSelectedMembershipRole();
+  const { role, isLoading: roleLoading, membership } = useSelectedMembershipRole();
+  const canManageSchedule = can(membership, "manage_schedule");
 
   const isAdmin = role === "admin";
   // ADR-097: the class editors offer a location only when the gym has one.
@@ -136,6 +143,13 @@ export function ScheduleConsole({
     enabled: isAdmin && Boolean(tokens?.access_token),
   });
   const adminLocations = adminLocationsQuery.data ?? [];
+  const coachesQuery = useQuery({
+    queryKey: ["staff", "members"],
+    queryFn: () => fetchGymStaff(tokens!.access_token),
+    enabled: canManageSchedule && Boolean(tokens?.access_token),
+    staleTime: 60_000,
+  });
+  const coaches = coachOptions(coachesQuery.data ?? []);
   const isMemberSurface = !roleLoading && !isAdmin;
   const calendarWindow = useMemo(() => buildScheduleWindow(startDate, days), [days, startDate]);
   const title = pageTitle ?? t("title");
@@ -456,6 +470,7 @@ export function ScheduleConsole({
         auto_approve: slot.auto_approve,
         booking_timeout_minutes: slot.booking_timeout_minutes,
         location_id: slot.location_id ?? null,
+        ...(canManageSchedule ? { coach_user_id: (slot as ScheduleSlot & { coach_user_id?: string | null }).coach_user_id ?? null } : {}),
       },
     });
   }
@@ -787,6 +802,21 @@ export function ScheduleConsole({
               value={editor.values.location_id}
             />
 
+            {canManageSchedule ? (
+              <ClassCoachSelect
+                className="mt-4 block space-y-2 text-sm font-semibold"
+                coaches={coaches}
+                label={i18n("rhClassCoach")}
+                noneLabel={i18n("rhNoCoach")}
+                onChange={(coachUserId) =>
+                  setEditor((current) => (current ? { ...current, values: { ...current.values, coach_user_id: coachUserId } } : current))
+                }
+                selectClassName="w-full rounded-2xl px-4 py-3 outline-none"
+                selectStyle={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+                value={editor.values.coach_user_id}
+              />
+            ) : null}
+
             <div className="mt-6 flex flex-wrap justify-between gap-3">
               {editor.slotId ? (
                 <button
@@ -837,6 +867,7 @@ export function ScheduleConsole({
               <div className="text-sm font-semibold">{i18n("featureWeekdays")}<div className="mt-2 flex flex-wrap gap-2">{["featureMonday", "featureTuesday", "featureWednesday", "featureThursday", "featureFriday", "featureSaturday", "featureSunday"].map((key, index) => { const day = index + 1; return <button key={key} type="button" aria-pressed={seriesEditor.weekdays.includes(day)} className="rounded-full px-3 py-2 text-xs" style={{ background: seriesEditor.weekdays.includes(day) ? "var(--primary)" : "var(--panel-muted)", color: seriesEditor.weekdays.includes(day) ? "var(--primary-contrast)" : "var(--text-soft)" }} onClick={() => setSeriesEditor({ ...seriesEditor, weekdays: seriesEditor.weekdays.includes(day) ? seriesEditor.weekdays.filter((item) => item !== day) : [...seriesEditor.weekdays, day] })}>{i18n(key)}</button>; })}</div></div>
               <label className="text-sm font-semibold">{i18n("featureExcludedDates")}<input className="mt-2 w-full rounded-xl px-3 py-2" placeholder="2026-08-15, 2026-12-25" value={seriesEditor.excludedDates} onChange={(event) => setSeriesEditor({ ...seriesEditor, excludedDates: event.target.value })} /><span className="mt-1 block text-xs font-normal" style={{ color: "var(--dim)" }}>{i18n("featureCommaSeparatedDates")}</span></label>
               <SlotLocationSelect className="text-sm font-semibold" locations={adminLocations} onChange={(locationId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, location_id: locationId } })} selectClassName="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.location_id} />
+              {canManageSchedule ? <ClassCoachSelect className="text-sm font-semibold" coaches={coaches} label={i18n("rhClassCoach")} noneLabel={i18n("rhNoCoach")} onChange={(coachUserId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, coach_user_id: coachUserId } })} selectClassName="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.coach_user_id} /> : null}
               <label className="text-sm font-semibold">{i18n("featureTimezone")}<input className="mt-2 w-full rounded-xl px-3 py-2" readOnly value={seriesEditor.timezone} /></label>
             </div>
             <details className="mt-5 rounded-2xl p-4" style={{ background: "var(--panel-muted)" }}><summary className="cursor-pointer text-sm font-semibold">{i18n("featureOptionalClassSettings")}</summary><div className="mt-4 grid gap-3 sm:grid-cols-3"><label className="text-xs">{i18n("featureCapacity")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" min={1} value={seriesEditor.values.capacity} emptyValue={1} onValueChange={(capacity) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, capacity: capacity ?? 1 } })} /></label><label className="text-xs">{i18n("featureTimeoutMinutes")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" min={1} value={seriesEditor.values.booking_timeout_minutes} emptyValue={1} onValueChange={(timeoutMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, booking_timeout_minutes: timeoutMinutes ?? 1 } })} /></label><label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={seriesEditor.values.auto_approve} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, auto_approve: event.target.checked } })} />{i18n("featureAutoApprove")}</label></div></details>
@@ -845,5 +876,37 @@ export function ScheduleConsole({
         </div>
       ) : null}
     </main>
+  );
+}
+
+function ClassCoachSelect({
+  className,
+  coaches,
+  label,
+  noneLabel,
+  onChange,
+  selectClassName,
+  selectStyle,
+  value,
+}: {
+  className: string;
+  coaches: Array<{ user_id: string; nickname?: string | null }>;
+  label: string;
+  noneLabel: string;
+  onChange: (coachUserId: string | null) => void;
+  selectClassName: string;
+  selectStyle?: React.CSSProperties;
+  value: string | null | undefined;
+}) {
+  return (
+    <label className={className} style={selectStyle ? { color: "var(--muted)" } : undefined}>
+      <span>{label}</span>
+      <select className={selectClassName} style={selectStyle} value={value ?? ""} onChange={(event) => onChange(event.target.value || null)}>
+        <option value="">{noneLabel}</option>
+        {coaches.map((coach) => (
+          <option key={coach.user_id} value={coach.user_id}>{coach.nickname ?? coach.user_id}</option>
+        ))}
+      </select>
+    </label>
   );
 }
