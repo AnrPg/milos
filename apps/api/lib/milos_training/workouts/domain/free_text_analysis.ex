@@ -37,7 +37,7 @@ defmodule MilosTraining.Workouts.Domain.FreeTextAnalysis do
 
   @workout_fields ~w(title type subtitle description difficulty estimated_duration_seconds equipment tags)
   @section_fields ~w(name note timer_config)
-  @exercise_fields ~w(name sets prescription_value prescription_unit load_value load_mode rest_seconds tempo note)
+  @exercise_fields ~w(name sets interval_assignment prescription_value prescription_unit load_value load_mode rest_seconds tempo note)
 
   # Workout-level optional fields worth proposing even when the assistant had
   # no value: the coach can type one in from the suggestion card.
@@ -223,6 +223,7 @@ defmodule MilosTraining.Workouts.Domain.FreeTextAnalysis do
 
     section =
       %{"name" => name, "note" => note, "timer_config" => timer_config, "exercises" => exercises}
+      |> Map.merge(normalize_score(raw, timer_config))
 
     {section, name_issues ++ timer_issues ++ note_issues ++ exercise_issues}
   end
@@ -270,17 +271,42 @@ defmodule MilosTraining.Workouts.Domain.FreeTextAnalysis do
     allowed = format |> Vocabulary.allowed_timer_fields() |> Map.new(&{Atom.to_string(&1), &1})
 
     raw
-    |> list_value("timer")
-    |> Enum.reduce(%{}, fn entry, acc ->
-      key = entry |> map_value_raw("key") |> to_key()
+    |> timer_entries()
+    |> Enum.reduce(%{}, fn {key, value}, acc ->
+      key = to_key(key)
 
       with field when not is_nil(field) <- Map.get(allowed, key),
-           {:ok, value} <- coerce_timer_value(field, map_value_raw(entry, "value")) do
+           {:ok, value} <- coerce_timer_value(field, value) do
         Map.put(acc, key, value)
       else
         _ -> acc
       end
     end)
+  end
+
+  # Canonical shape is an object (`{"duration_seconds": 720}`); the older list
+  # of `{key, value}` entries is still accepted.
+  defp timer_entries(raw) do
+    case map_value_raw(raw, "timer") do
+      %{} = timer ->
+        Enum.to_list(timer)
+
+      entries when is_list(entries) ->
+        Enum.map(entries, &{map_value_raw(&1, "key"), map_value_raw(&1, "value")})
+
+      _other ->
+        []
+    end
+  end
+
+  # A score the format allows marks the section scoreable (ADR-101).
+  defp normalize_score(raw, timer_config) do
+    format = timer_config && Map.get(timer_config, "type")
+    score = raw |> map_value_raw("score") |> to_key()
+
+    if format && score && score in Vocabulary.allowed_score_types(format),
+      do: %{"scoreable" => true, "score_config" => %{"type" => score}},
+      else: %{}
   end
 
   defp coerce_timer_value(field, value) do
@@ -313,6 +339,7 @@ defmodule MilosTraining.Workouts.Domain.FreeTextAnalysis do
     {optional, optional_issues} =
       [
         {"sets", map_value_raw(raw, "sets")},
+        {"interval_assignment", map_value_raw(raw, "interval_assignment")},
         {"rest_seconds", map_value_raw(raw, "rest_seconds")},
         {"tempo", map_value_raw(raw, "tempo")},
         {"note", map_value_raw(raw, "note")}
@@ -584,6 +611,7 @@ defmodule MilosTraining.Workouts.Domain.FreeTextAnalysis do
 
   defp exercise_spec("name"), do: {:string, 160}
   defp exercise_spec("sets"), do: {:integer, 1}
+  defp exercise_spec("interval_assignment"), do: {:integer, 1}
   defp exercise_spec("prescription_value"), do: {:integer, 1}
   defp exercise_spec("prescription_unit"), do: {:enum, @prescription_units}
   defp exercise_spec("load_value"), do: {:integer, 0}

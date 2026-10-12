@@ -7,13 +7,16 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.Tools do
     * `lookup_exercises` – match names against the canonical exercise catalog
       (exact, alias, or closest spellings) and report what each movement
       supports (load, distance, calories...).
-    * `get_timer_format` – required/optional timer keys for a section format.
+    * `get_section_schema` – the canonical JSON Schema of one or more section
+      formats (timer, exercise structure, scoring, cross-field rules), from
+      `FormatSchema`, the same definition the server validates with.
+    * `get_timer_format` – just the timer keys of one format (narrow view).
     * `convert_units` – lb/kg, minutes/seconds, km/miles/meters.
     * `validate_draft` – run the strict contract check on a draft answer, so
       the agent can fix problems before replying.
   """
 
-  alias MilosTraining.Workouts.Domain.WorkoutAssistant.Contract
+  alias MilosTraining.Workouts.Domain.WorkoutAssistant.{Contract, FormatSchema}
   alias MilosTraining.Workouts.Domain.WorkoutDsl.{ExerciseCatalog, Vocabulary}
 
   @max_names 40
@@ -23,7 +26,8 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.Tools do
     Enum.map(names, &declaration/1)
   end
 
-  def names, do: ~w(lookup_exercises get_timer_format convert_units validate_draft)
+  def names,
+    do: ~w(lookup_exercises get_section_schema get_timer_format convert_units validate_draft)
 
   @doc "Executes a tool call. Always returns a JSON-encodable map."
   def call(name, args, context \\ %{})
@@ -37,6 +41,13 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.Tools do
       |> Enum.take(@max_names)
 
     %{"results" => Enum.map(names, &lookup/1)}
+  end
+
+  def call("get_section_schema", args, _context) do
+    args
+    |> arg("formats")
+    |> List.wrap()
+    |> FormatSchema.describe()
   end
 
   def call("get_timer_format", args, _context) do
@@ -196,6 +207,25 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.Tools do
         type: "OBJECT",
         properties: %{names: %{type: "ARRAY", items: %{type: "STRING"}}},
         required: ["names"]
+      }
+    }
+  end
+
+  defp declaration("get_section_schema") do
+    %{
+      name: "get_section_schema",
+      description:
+        "Return the canonical, verifiable definition of section formats: how each runs on the clock, required and optional timer keys, the exercise structure (e.g. complex_emom exercises need interval_assignment, ladder exercises carry no reps), allowed score types, cross-field rules, and the JSON Schema a section of that format must satisfy. Call it with every format the workout uses before writing those sections.",
+      parameters: %{
+        type: "OBJECT",
+        properties: %{
+          formats: %{
+            type: "ARRAY",
+            items: %{type: "STRING", enum: FormatSchema.formats()},
+            description: "Section formats to describe, e.g. [\"untimed\", \"emom\", \"tabata\"]"
+          }
+        },
+        required: ["formats"]
       }
     }
   end

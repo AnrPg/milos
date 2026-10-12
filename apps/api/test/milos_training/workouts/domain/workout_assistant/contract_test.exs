@@ -51,12 +51,12 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.ContractTest do
     assert "comment" in paths
   end
 
-  test "checks timer keys against the section format" do
+  test "checks timer keys against the section format's schema" do
     raw =
       put_in(valid(), ["sections", Access.at(0), "format"], "emom")
 
-    assert [{"sections.0.timer", problem}] = problems(raw)
-    assert problem =~ "interval_seconds"
+    assert [{"sections.0.timer.interval_seconds", problem}] = problems(raw)
+    assert problem =~ "is required for emom"
 
     raw =
       put_in(valid(), ["sections", Access.at(0), "timer"], [
@@ -64,11 +64,115 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.ContractTest do
         %{"key" => "duration_seconds", "value" => "720"}
       ])
 
-    assert [{"sections.0.timer.0", problem}] = problems(raw)
-    assert problem =~ "not valid for amrap"
+    assert [{"sections.0.timer.rounds", problem}] = problems(raw)
+    assert problem =~ "not part of the amrap schema"
 
     raw = put_in(valid(), ["sections", Access.at(0), "format"], "spin class")
     assert [{"sections.0.format", _}] = problems(raw)
+
+    raw = update_in(valid(), ["sections", Access.at(0)], &Map.delete(&1, "format"))
+    assert [{"sections.0.format", problem}] = problems(raw)
+    assert problem =~ "infer"
+  end
+
+  test "accepts the canonical object timer and format aliases" do
+    raw =
+      valid()
+      |> put_in(["sections", Access.at(0), "timer"], %{"duration_seconds" => 720})
+      |> put_in(["sections", Access.at(1), "format"], "circuit")
+
+    assert problems(raw) == []
+
+    raw = put_in(valid(), ["sections", Access.at(0), "timer"], %{"duration_seconds" => "720"})
+    assert [{"sections.0.timer.duration_seconds", "must be integer"}] = problems(raw)
+  end
+
+  test "enforces each format's exercise structure" do
+    complex = %{
+      "name" => "Rotating EMOM",
+      "format" => "complex_emom",
+      "timer" => %{"duration_seconds" => 720, "interval_seconds" => 60},
+      "exercises" => [
+        %{"name" => "Row", "calories" => 12, "interval_assignment" => 1},
+        %{"name" => "Burpee", "reps" => 10}
+      ]
+    }
+
+    raw = put_in(valid(), ["sections"], [complex])
+    assert [{"sections.0.exercises.1.interval_assignment", "is required"}] = problems(raw)
+
+    raw =
+      put_in(valid(), ["sections"], [
+        put_in(complex, ["exercises", Access.at(1), "interval_assignment"], 3)
+      ])
+
+    assert [{"sections.0.exercises", problem}] = problems(raw)
+    assert problem =~ "without gaps"
+
+    ladder = %{
+      "name" => "21-15-9",
+      "format" => "ladder_descending",
+      "timer" => %{"start_reps" => 21, "step_reps" => 6, "min_reps" => 9},
+      "exercises" => [%{"name" => "Thruster", "reps" => 21, "load_kg" => 43}]
+    }
+
+    raw = put_in(valid(), ["sections"], [ladder])
+    assert [{"sections.0.exercises.0.reps", problem}] = problems(raw)
+    assert problem =~ "ladder"
+
+    raw =
+      put_in(valid(), ["sections"], [
+        %{
+          "name" => "Rest",
+          "format" => "rest",
+          "score" => "time",
+          "exercises" => [%{"name" => "Walk"}]
+        }
+      ])
+
+    paths = Enum.map(problems(raw), &elem(&1, 0))
+    assert "sections.0.score" in paths
+    assert "sections.0.exercises" in paths
+  end
+
+  test "a workout can chain sections of different formats" do
+    raw =
+      put_in(valid(), ["sections"], [
+        %{
+          "name" => "Warm-up",
+          "format" => "untimed",
+          "exercises" => [%{"name" => "Air squat", "reps" => 20}]
+        },
+        %{
+          "name" => "EMOM",
+          "format" => "emom",
+          "timer" => %{"duration_seconds" => 600, "interval_seconds" => 60},
+          "score" => "rounds",
+          "exercises" => [%{"name" => "Power clean", "reps" => 3, "load_percent_1rm" => 70}]
+        },
+        %{
+          "name" => "Tabata",
+          "format" => "tabata",
+          "timer" => %{"work_seconds" => 20, "rest_seconds" => 10, "rounds" => 8},
+          "exercises" => [%{"name" => "Air squat"}]
+        },
+        %{
+          "name" => "Rest",
+          "format" => "rest",
+          "timer" => %{"duration_seconds" => 120},
+          "exercises" => []
+        },
+        %{
+          "name" => "Finisher",
+          "format" => "ladder_descending",
+          "timer" => %{"start_reps" => 21, "step_reps" => 6, "min_reps" => 9},
+          "score" => "time",
+          "exercises" => [%{"name" => "Thruster", "load_kg" => 43}, %{"name" => "Pull-up"}]
+        }
+      ])
+      |> Map.put("issues", [])
+
+    assert problems(raw) == []
   end
 
   test "allows one prescription and one load per exercise" do

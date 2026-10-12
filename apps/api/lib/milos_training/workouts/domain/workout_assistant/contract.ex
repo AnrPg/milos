@@ -6,9 +6,14 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.Contract do
   this module is strict and explains *why* an answer is not acceptable, in
   terms the model can act on. Violations feed the repair loop and the agents'
   `validate_draft` tool. Paths use the agent's own field names.
+
+  The workout and every section are validated against the canonical JSON
+  Schemas of `FormatSchema` (one per section format), so the agent, its
+  `get_section_schema` tool and this check share one definition.
   """
 
-  alias MilosTraining.Workouts.Domain.FreeTextAnalysis
+  alias MilosTraining.Workouts.Domain.JsonSchema
+  alias MilosTraining.Workouts.Domain.WorkoutAssistant.FormatSchema
   alias MilosTraining.Workouts.Domain.WorkoutDsl.Vocabulary
 
   @workout_keys ~w(title type subtitle description difficulty estimated_duration_minutes equipment tags)
@@ -57,36 +62,15 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.Contract do
 
   ## Workout
 
-  defp workout(%{} = workout) do
-    unknown_keys(workout, @workout_keys, "workout") ++
-      enum_check(workout, "type", FreeTextAnalysis.workout_types(), "workout.type") ++
-      enum_check(workout, "difficulty", FreeTextAnalysis.difficulties(), "workout.difficulty") ++
-      positive_number(workout, "estimated_duration_minutes", "workout") ++
-      string_list(workout, "equipment", "workout") ++
-      string_list(workout, "tags", "workout") ++
-      title(Map.get(workout, "title"))
-  end
+  defp workout(%{} = workout),
+    do: JsonSchema.validate_at(FormatSchema.workout_schema(), workout, "workout")
 
   defp workout(_workout), do: []
 
-  defp title(nil), do: []
-
-  defp title(title) when is_binary(title) do
-    length = String.length(String.trim(title))
-
-    if length >= 3 and length <= 160,
-      do: [],
-      else: [
-        violation(
-          "workout.title",
-          "must be 3 to 160 characters, or omitted if the text has no title"
-        )
-      ]
-  end
-
-  defp title(_title), do: [violation("workout.title", "must be a string")]
-
   ## Sections
+  #
+  # Every section is validated against the canonical JSON Schema of its own
+  # format (`FormatSchema`), then against the cross-field rules of that format.
 
   defp sections(sections) when is_list(sections) do
     sections
@@ -97,184 +81,129 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.Contract do
   defp sections(_sections), do: []
 
   defp section(%{} = section, path) do
-    unknown_keys(section, @section_keys, path) ++
-      required_string(section, "name", path) ++
-      format(section, path) ++
-      exercises(Map.get(section, "exercises"), path)
+    {section, entry_violations} = prepare_timer(section, path)
+
+    case Map.get(section, "format") do
+      nil ->
+        entry_violations ++
+          [
+            violation(
+              "#{path}.format",
+              "is required: infer the block's format (use \"untimed\" for a block without a clock)"
+            )
+          ]
+
+      format ->
+        case FormatSchema.canonical(format) do
+          nil ->
+            entry_violations ++
+              [
+                violation(
+                  "#{path}.format",
+                  "#{inspect(format)} is not a known format; use one of #{Enum.join(Vocabulary.section_formats(), ", ")}"
+                )
+              ]
+
+          canonical ->
+            section = Map.put(section, "format", canonical)
+
+            shape =
+              canonical
+              |> FormatSchema.section_schema()
+              |> JsonSchema.validate_at(section, path)
+              |> Enum.map(&explain(&1, canonical, path))
+
+            rules = if shape == [], do: FormatSchema.rule_violations(section, path), else: []
+            entry_violations ++ shape ++ exercises(Map.get(section, "exercises"), path) ++ rules
+        end
+    end
   end
 
   defp section(_section, path), do: [violation(path, "must be an object")]
 
-  defp format(section, path) do
-    case Map.get(section, "format") do
-      nil ->
-        timer_without_format(section, path)
-
-      format when is_binary(format) ->
-        case Vocabulary.resolve_format(format) do
-          {:ok, canonical, _composition} ->
-            timer(Map.get(section, "timer"), canonical, path)
-
-          {:error, _reason} ->
-            [
-              violation(
-                "#{path}.format",
-                "\"#{format}\" is not a known format; use one of #{Enum.join(Vocabulary.section_formats(), ", ")}"
-              )
-            ]
-        end
-
-      _other ->
-        [violation("#{path}.format", "must be a string")]
-    end
-  end
-
-  defp timer_without_format(section, path) do
+  # The timer may come as an object (canonical) or as the older list of
+  # {key, value} entries; numeric strings in the list form are accepted.
+  defp prepare_timer(section, path) do
     case Map.get(section, "timer") do
-      list when is_list(list) and list != [] ->
-        [violation("#{path}.format", "is required when timer keys are given")]
+      entries when is_list(entries) ->
+        {timer, violations} =
+          entries
+          |> Enum.with_index()
+          |> Enum.reduce({%{}, []}, fn {entry, index}, {timer, violations} ->
+            case entry do
+              %{"key" => key} when is_binary(key) ->
+                key = key |> String.trim() |> String.replace("-", "_")
+                {Map.put(timer, key, numeric(Map.get(entry, "value"))), violations}
+
+              _other ->
+                {timer,
+                 [
+                   violation("#{path}.timer.#{index}", "must be {\"key\": ..., \"value\": ...}")
+                   | violations
+                 ]}
+            end
+          end)
+
+        section =
+          if timer == %{},
+            do: Map.delete(section, "timer"),
+            else: Map.put(section, "timer", timer)
+
+        {section, Enum.reverse(violations)}
 
       _other ->
-        []
+        {section, []}
     end
   end
 
-  defp timer(nil, canonical, path), do: required_timer_keys(%{}, canonical, path)
-
-  defp timer(entries, canonical, path) when is_list(entries) do
-    allowed = canonical |> Vocabulary.allowed_timer_fields() |> Enum.map(&Atom.to_string/1)
-
-    {values, violations} =
-      entries
-      |> Enum.with_index()
-      |> Enum.reduce({%{}, []}, fn {entry, index}, {values, violations} ->
-        entry_path = "#{path}.timer.#{index}"
-        key = entry_key(entry)
-        value = if is_map(entry), do: Map.get(entry, "value")
-
-        cond do
-          is_nil(key) ->
-            {values,
-             [violation(entry_path, "must be {\"key\": ..., \"value\": ...}") | violations]}
-
-          key not in allowed ->
-            {values,
-             [
-               violation(
-                 entry_path,
-                 "key \"#{key}\" is not valid for #{canonical}; allowed: #{Enum.join(allowed, ", ")}"
-               )
-               | violations
-             ]}
-
-          not timer_value_ok?(key, value) ->
-            {values,
-             [
-               violation(entry_path, "value for \"#{key}\" must be #{timer_value_hint(key)}")
-               | violations
-             ]}
-
-          true ->
-            {Map.put(values, key, value), violations}
-        end
-      end)
-
-    Enum.reverse(violations) ++ required_timer_keys(values, canonical, path)
-  end
-
-  defp timer(_entries, _canonical, path),
-    do: [violation("#{path}.timer", "must be an array of {key, value}")]
-
-  defp required_timer_keys(values, canonical, path) do
-    missing =
-      canonical
-      |> Vocabulary.required_timer_fields()
-      |> Enum.map(&Atom.to_string/1)
-      |> Enum.reject(&Map.has_key?(values, &1))
-
-    case missing do
-      [] ->
-        []
-
-      keys ->
-        [
-          violation(
-            "#{path}.timer",
-            "#{canonical} needs #{Enum.join(keys, ", ")}. If the text does not say it, use format \"untimed\" and report an issue instead of inventing values"
-          )
-        ]
+  defp numeric(value) when is_binary(value) do
+    case Integer.parse(String.trim(value)) do
+      {number, ""} -> number
+      _other -> value
     end
   end
 
-  defp entry_key(%{"key" => key}) when is_binary(key),
-    do: String.replace(String.trim(key), "-", "_")
+  defp numeric(value), do: value
 
-  defp entry_key(_entry), do: nil
-
-  defp timer_value_ok?(key, value) do
-    case Vocabulary.timer_value_kind(String.to_existing_atom(key)) do
-      :enum -> to_string(value) in Vocabulary.timer_enum_values(String.to_existing_atom(key))
-      :string -> is_binary(value) or is_number(value)
-      _numeric -> positive_integer_like?(value)
+  defp explain(%{"path" => violation_path, "problem" => "is required"} = violation, format, path) do
+    if violation_path == "#{path}.timer" or String.starts_with?(violation_path, "#{path}.timer.") do
+      %{
+        violation
+        | "problem" =>
+            "is required for #{format} (needs #{Enum.join(FormatSchema.required_timer_keys(format), ", ")}). If the text does not say it, use format \"untimed\" and report an issue instead of inventing values"
+      }
+    else
+      violation
     end
-  rescue
-    ArgumentError -> false
   end
 
-  defp timer_value_hint(key) do
-    case Vocabulary.timer_value_kind(String.to_existing_atom(key)) do
-      :enum ->
-        "one of #{Enum.join(Vocabulary.timer_enum_values(String.to_existing_atom(key)), ", ")}"
+  defp explain(%{"problem" => "is not allowed here"} = violation, format, _path),
+    do: %{violation | "problem" => "is not part of the #{format} schema; remove it"}
 
-      :string ->
-        "text"
+  defp explain(violation, _format, _path), do: violation
 
-      :duration ->
-        "a whole number of seconds"
-
-      _numeric ->
-        "a whole positive number"
-    end
-  rescue
-    ArgumentError -> "valid"
-  end
-
-  ## Exercises
+  ## Exercises (rules JSON Schema cannot express)
 
   defp exercises(list, path) when is_list(list) do
     list
     |> Enum.with_index()
-    |> Enum.flat_map(fn {exercise, index} -> exercise(exercise, "#{path}.exercises.#{index}") end)
+    |> Enum.flat_map(fn
+      {%{} = exercise, index} -> exercise(exercise, "#{path}.exercises.#{index}")
+      _other -> []
+    end)
   end
 
-  defp exercises(nil, path),
-    do: [violation("#{path}.exercises", "is required (use [] for a block without exercises)")]
+  defp exercises(_list, _path), do: []
 
-  defp exercises(_list, path), do: [violation("#{path}.exercises", "must be an array")]
-
-  defp exercise(%{} = exercise, path) do
-    unknown_keys(exercise, @exercise_keys, path) ++
-      required_string(exercise, "name", path) ++
-      only_one(
-        exercise,
-        @prescription_keys,
-        path,
-        "prescription (reps, duration_seconds, calories or distance_meters)"
-      ) ++
-      only_one(exercise, @load_keys, path, "load (load_kg, load_percent_1rm or bodyweight)") ++
-      Enum.flat_map(
-        ~w(sets reps duration_seconds calories distance_meters),
-        &positive_number(exercise, &1, path)
-      ) ++
-      Enum.flat_map(
-        ~w(load_kg load_percent_1rm rest_seconds),
-        &non_negative_number(exercise, &1, path)
-      ) ++
-      percent(exercise, path) ++
-      bodyweight(exercise, path)
+  defp exercise(exercise, path) do
+    only_one(
+      exercise,
+      @prescription_keys,
+      path,
+      "prescription (reps, duration_seconds, calories or distance_meters)"
+    ) ++
+      only_one(exercise, @load_keys, path, "load (load_kg, load_percent_1rm or bodyweight)")
   end
-
-  defp exercise(_exercise, path), do: [violation(path, "must be an object")]
 
   defp only_one(map, keys, path, label) do
     present = Enum.filter(keys, &present?(Map.get(map, &1)))
@@ -287,22 +216,6 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.Contract do
         )
       ],
       else: []
-  end
-
-  defp percent(map, path) do
-    case Map.get(map, "load_percent_1rm") do
-      nil -> []
-      value when is_number(value) and value > 0 and value <= 150 -> []
-      _other -> [violation("#{path}.load_percent_1rm", "must be a percentage between 1 and 150")]
-    end
-  end
-
-  defp bodyweight(map, path) do
-    case Map.get(map, "bodyweight") do
-      nil -> []
-      value when is_boolean(value) -> []
-      _other -> [violation("#{path}.bodyweight", "must be true or omitted")]
-    end
   end
 
   ## Issues and missing fields
@@ -493,51 +406,6 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.Contract do
           else: [violation(path, "must be one of #{Enum.join(values, ", ")}")]
     end
   end
-
-  defp positive_number(map, key, path) do
-    case Map.get(map, key) do
-      nil -> []
-      value when is_number(value) and value > 0 -> []
-      _other -> [violation(join(path, key), "must be a positive number")]
-    end
-  end
-
-  defp non_negative_number(map, key, path) do
-    case Map.get(map, key) do
-      nil -> []
-      value when is_number(value) and value >= 0 -> []
-      _other -> [violation(join(path, key), "must be a number ≥ 0")]
-    end
-  end
-
-  defp string_list(map, key, path) do
-    case Map.get(map, key) do
-      nil ->
-        []
-
-      list when is_list(list) ->
-        if Enum.all?(list, &is_binary/1),
-          do: [],
-          else: [violation(join(path, key), "must contain only strings")]
-
-      _other ->
-        [violation(join(path, key), "must be an array of strings")]
-    end
-  end
-
-  defp positive_integer_like?(value) when is_integer(value), do: value > 0
-
-  defp positive_integer_like?(value) when is_float(value),
-    do: value > 0 and value == Float.round(value)
-
-  defp positive_integer_like?(value) when is_binary(value) do
-    case Integer.parse(String.trim(value)) do
-      {number, ""} -> number > 0
-      _other -> false
-    end
-  end
-
-  defp positive_integer_like?(_value), do: false
 
   defp present?(nil), do: false
   defp present?(""), do: false

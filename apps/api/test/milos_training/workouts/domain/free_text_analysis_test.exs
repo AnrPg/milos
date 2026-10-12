@@ -202,4 +202,44 @@ defmodule MilosTraining.Workouts.Domain.FreeTextAnalysisTest do
     assert FreeTextAnalysis.required_path?("sections.3.exercises.1.name")
     refute FreeTextAnalysis.required_path?("sections.3.exercises.1.tempo")
   end
+
+  test "reads the canonical object timer, the section score and interval slots" do
+    raw = %{
+      "workout" => %{"title" => "Rotating EMOM", "type" => "crossfit"},
+      "sections" => [
+        %{
+          "name" => "EMOM",
+          "format" => "complex_emom",
+          "timer" => %{"duration_seconds" => 720, "interval_seconds" => 60},
+          "score" => "rounds",
+          "exercises" => [
+            %{"name" => "Row", "calories" => 12, "interval_assignment" => 1},
+            %{"name" => "Burpee", "reps" => 10, "interval_assignment" => 2}
+          ]
+        },
+        %{
+          "name" => "Rest",
+          "format" => "rest",
+          "timer" => %{"duration_seconds" => 120},
+          "score" => "time",
+          "exercises" => []
+        }
+      ]
+    }
+
+    %{"workout" => %{"sections" => [emom, rest]}} = FreeTextAnalysis.normalize(raw, "EMOM")
+
+    assert emom["timer_config"] == %{
+             "type" => "complex_emom",
+             "duration_seconds" => 720,
+             "interval_seconds" => 60
+           }
+
+    assert emom["scoreable"] == true
+    assert emom["score_config"] == %{"type" => "rounds"}
+    assert Enum.map(emom["exercises"], & &1["interval_assignment"]) == [1, 2]
+
+    # A score the format does not allow is dropped.
+    refute Map.has_key?(rest, "scoreable")
+  end
 end
