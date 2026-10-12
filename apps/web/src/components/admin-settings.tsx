@@ -526,8 +526,47 @@ function LevelTaxonomySection({ token }: { token: string }) {
 function financeFormFromSettings(s: FinanceSettings) {
   return {
     paymentReminderIntervalDays: String(s.payment_reminder_interval_days),
+    expiryReminderDays: String(s.subscription_expiry_reminder_days ?? 5),
+    graceDays: String(s.subscription_grace_days ?? 3),
     documentMode: s.document_mode,
   };
+}
+
+function DaysField({
+  id,
+  label,
+  help,
+  min,
+  value,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  help: string;
+  min: number;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <label className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }} htmlFor={id}>
+        {label}
+      </label>
+      <p className="text-xs leading-5" style={{ color: "var(--dim)" }}>
+        {help}
+      </p>
+      <input
+        id={id}
+        type="number"
+        min={min}
+        max={60}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="w-28 rounded-xl px-4 py-2.5 text-sm outline-none"
+        style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+      />
+    </div>
+  );
 }
 
 function FinanceSection({ token }: { token: string }) {
@@ -535,6 +574,8 @@ function FinanceSection({ token }: { token: string }) {
   const queryClient = useQueryClient();
   const [form, setForm] = useState({
     paymentReminderIntervalDays: "7",
+    expiryReminderDays: "5",
+    graceDays: "3",
     documentMode: "invoice" as "invoice" | "receipt",
   });
   const [initialized, setInitialized] = useState(false);
@@ -556,6 +597,8 @@ function FinanceSection({ token }: { token: string }) {
         gamification: {},
         finance: {
           payment_reminder_interval_days: Number(form.paymentReminderIntervalDays),
+          subscription_expiry_reminder_days: Number(form.expiryReminderDays),
+          subscription_grace_days: Number(form.graceDays),
           document_mode: form.documentMode,
         },
       }),
@@ -568,9 +611,13 @@ function FinanceSection({ token }: { token: string }) {
     ? String(settingsQuery.data.finance.payment_reminder_interval_days)
     : "7";
   const serverMode = settingsQuery.data?.finance?.document_mode ?? "invoice";
+  const serverForm = settingsQuery.data?.finance ? financeFormFromSettings(settingsQuery.data.finance) : null;
   const dirty =
     initialized &&
-    (form.paymentReminderIntervalDays !== serverDays || form.documentMode !== serverMode);
+    (form.paymentReminderIntervalDays !== serverDays ||
+      form.documentMode !== serverMode ||
+      form.expiryReminderDays !== (serverForm?.expiryReminderDays ?? "5") ||
+      form.graceDays !== (serverForm?.graceDays ?? "3"));
 
   return (
     <div className="space-y-5">
@@ -600,6 +647,22 @@ function FinanceSection({ token }: { token: string }) {
           }}
         />
       </div>
+      <DaysField
+        id="expiry-reminder-days"
+        label={i18n("subscriptionExpiryReminderDays")}
+        help={i18n("subscriptionExpiryReminderDaysHelp")}
+        min={0}
+        value={form.expiryReminderDays}
+        onChange={(value) => setForm((current) => ({ ...current, expiryReminderDays: value }))}
+      />
+      <DaysField
+        id="grace-days"
+        label={i18n("subscriptionGraceDays")}
+        help={i18n("subscriptionGraceDaysHelp")}
+        min={0}
+        value={form.graceDays}
+        onChange={(value) => setForm((current) => ({ ...current, graceDays: value }))}
+      />
       <fieldset className="space-y-3">
         <legend className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
           {i18n("featureFinanceDocumentWorkflow")}
@@ -641,7 +704,7 @@ function FinanceSection({ token }: { token: string }) {
         success={saveMutation.isSuccess}
         error={saveMutation.error}
         onSave={() => saveMutation.mutate()}
-        onReset={() => setForm({ paymentReminderIntervalDays: serverDays, documentMode: serverMode })}
+        onReset={() => setForm(serverForm ?? { paymentReminderIntervalDays: serverDays, expiryReminderDays: "5", graceDays: "3", documentMode: serverMode })}
       />
 
       <FinanceCleanupSection token={token} />

@@ -2567,7 +2567,20 @@
     "featureFinanceCleanupSubmit": "Purga permanente",
     "anotherOrganization": "Outra organização",
     "emailAddress": "Endereço de e-mail",
-    "emailAddressPlaceholder": "voce@example.com"
+    "emailAddressPlaceholder": "voce@example.com",
+    "subscriptionExpiryReminderDays": "Aviso de fim (dias antes)",
+    "subscriptionExpiryReminderDaysHelp": "Os clientes recebem uma notificação estes dias antes do fim da subscrição. 0 desativa.",
+    "subscriptionGraceDays": "Período de tolerância (dias)",
+    "subscriptionGraceDaysHelp": "Após o fim da subscrição ou uma fatura em atraso, os clientes mantêm o acesso estes dias. Depois perdem-no, p. ex. deixam de poder reservar aulas.",
+    "accessGraceEnded": "A sua subscrição terminou. Mantém o acesso até {date}; renove antes disso para continuar a reservar aulas.",
+    "accessGraceOverdue": "Há um pagamento em atraso. Mantém o acesso até {date}; pague antes disso para continuar a reservar aulas.",
+    "accessBlockedOverdue": "O seu acesso está suspenso porque há um pagamento em atraso. Pague o saldo em dívida para voltar a reservar aulas.",
+    "accessEnded": "O seu acesso terminou. Renove a subscrição para voltar a reservar aulas.",
+    "subscriptionEndsSoonTitle": "A sua subscrição termina em breve",
+    "subscriptionEndedTitle": "A sua subscrição terminou",
+    "yourSubscription": "A sua subscrição",
+    "subscriptionEndsSoonBody": "{package} termina a {date} (daqui a {days} dias). Renove para continuar a reservar aulas.",
+    "subscriptionEndedBody": "{package} terminou. Mantém o acesso até {date}; renove antes disso para continuar a reservar aulas."
   },
   "WorkoutAssistant": {
     "title": "Assistente de treino",

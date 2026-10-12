@@ -2567,7 +2567,20 @@
     "featureFinanceCleanupSubmit": "تطهير دائم",
     "anotherOrganization": "مؤسسة أخرى",
     "emailAddress": "عنوان البريد الإلكتروني",
-    "emailAddressPlaceholder": "you@example.com"
+    "emailAddressPlaceholder": "you@example.com",
+    "subscriptionExpiryReminderDays": "تذكير الانتهاء (أيام قبل)",
+    "subscriptionExpiryReminderDaysHelp": "يتلقى العملاء إشعارًا قبل انتهاء اشتراكهم بهذا العدد من الأيام. القيمة 0 توقفه.",
+    "subscriptionGraceDays": "فترة السماح (أيام)",
+    "subscriptionGraceDaysHelp": "بعد انتهاء الاشتراك أو تأخر فاتورة، يحتفظ العملاء بالوصول هذا العدد من الأيام، ثم يفقدونه، مثلًا لا يمكنهم حجز الحصص.",
+    "accessGraceEnded": "انتهى اشتراكك. يبقى وصولك متاحًا حتى {date}؛ جدّد قبل ذلك لتواصل حجز الحصص.",
+    "accessGraceOverdue": "هناك دفعة متأخرة. يبقى وصولك متاحًا حتى {date}؛ ادفع قبل ذلك لتواصل حجز الحصص.",
+    "accessBlockedOverdue": "تم إيقاف وصولك مؤقتًا بسبب دفعة متأخرة. ادفع الرصيد المستحق لتحجز الحصص مجددًا.",
+    "accessEnded": "انتهى وصولك. جدّد اشتراكك لتحجز الحصص مجددًا.",
+    "subscriptionEndsSoonTitle": "اشتراكك ينتهي قريبًا",
+    "subscriptionEndedTitle": "انتهى اشتراكك",
+    "yourSubscription": "اشتراكك",
+    "subscriptionEndsSoonBody": "ينتهي {package} في {date} (بعد {days} أيام). جدّد لتواصل حجز الحصص.",
+    "subscriptionEndedBody": "انتهى {package}. يبقى وصولك متاحًا حتى {date}؛ جدّد قبل ذلك لتواصل حجز الحصص."
   },
   "WorkoutAssistant": {
     "title": "مساعد التمارين",

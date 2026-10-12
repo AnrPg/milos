@@ -2567,7 +2567,20 @@
     "featureFinanceCleanupSubmit": "Permanente zuivering",
     "anotherOrganization": "Andere organisatie",
     "emailAddress": "E-mailadres",
-    "emailAddressPlaceholder": "jij@example.com"
+    "emailAddressPlaceholder": "jij@example.com",
+    "subscriptionExpiryReminderDays": "Herinnering einde (dagen vooraf)",
+    "subscriptionExpiryReminderDaysHelp": "Klanten krijgen zoveel dagen vóór het einde van hun abonnement een melding. 0 zet dit uit.",
+    "subscriptionGraceDays": "Coulanceperiode (dagen)",
+    "subscriptionGraceDaysHelp": "Na het einde van een abonnement of een achterstallige factuur houden klanten zoveel dagen toegang. Daarna verliezen ze die, bijv. ze kunnen geen lessen meer boeken.",
+    "accessGraceEnded": "Je abonnement is afgelopen. Je houdt toegang tot {date}; verleng vóór die datum om lessen te blijven boeken.",
+    "accessGraceOverdue": "Er staat een betaling open. Je houdt toegang tot {date}; betaal vóór die datum om lessen te blijven boeken.",
+    "accessBlockedOverdue": "Je toegang is gepauzeerd omdat een betaling openstaat. Betaal het openstaande bedrag om weer lessen te boeken.",
+    "accessEnded": "Je toegang is afgelopen. Verleng je abonnement om weer lessen te boeken.",
+    "subscriptionEndsSoonTitle": "Je abonnement loopt binnenkort af",
+    "subscriptionEndedTitle": "Je abonnement is afgelopen",
+    "yourSubscription": "Je abonnement",
+    "subscriptionEndsSoonBody": "{package} loopt af op {date} (over {days} dagen). Verleng om lessen te blijven boeken.",
+    "subscriptionEndedBody": "{package} is afgelopen. Je houdt toegang tot {date}; verleng vóór die datum om lessen te blijven boeken."
   },
   "WorkoutAssistant": {
     "title": "Trainingsassistent",

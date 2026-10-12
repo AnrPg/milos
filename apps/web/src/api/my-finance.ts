@@ -15,6 +15,10 @@ export type AllowanceUsage = {
 
 export type EffectiveEntitlement = {
   status: string;
+  /** Why: e.g. membership_package, subscription_grace, overdue_grace, overdue_invoice. */
+  source?: string | null;
+  /** Last day of access during the grace slack after a subscription ended or an invoice fell overdue. */
+  grace_until?: string | null;
   enforcement_mode: string;
   plan: null | {
     entitlement_version: number;

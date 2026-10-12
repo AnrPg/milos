@@ -2567,7 +2567,20 @@
     "featureFinanceCleanupSubmit": "טיהור קבוע",
     "anotherOrganization": "ארגון אחר",
     "emailAddress": "כתובת דוא\"ל",
-    "emailAddressPlaceholder": "you@example.com"
+    "emailAddressPlaceholder": "you@example.com",
+    "subscriptionExpiryReminderDays": "תזכורת סיום (ימים לפני)",
+    "subscriptionExpiryReminderDaysHelp": "הלקוחות מקבלים התראה מספר ימים זה לפני סיום המנוי. 0 מבטל.",
+    "subscriptionGraceDays": "תקופת חסד (ימים)",
+    "subscriptionGraceDaysHelp": "לאחר סיום המנוי או חשבונית באיחור, הלקוחות שומרים על גישה מספר ימים זה. לאחר מכן הם מאבדים אותה, למשל לא יוכלו להזמין שיעורים.",
+    "accessGraceEnded": "המנוי שלך הסתיים. הגישה נשמרת עד {date}; חדשו עד אז כדי להמשיך להזמין שיעורים.",
+    "accessGraceOverdue": "יש תשלום באיחור. הגישה נשמרת עד {date}; שלמו עד אז כדי להמשיך להזמין שיעורים.",
+    "accessBlockedOverdue": "הגישה שלך מושהית בגלל תשלום באיחור. שלמו את היתרה כדי להזמין שיעורים שוב.",
+    "accessEnded": "הגישה שלך הסתיימה. חדשו את המנוי כדי להזמין שיעורים שוב.",
+    "subscriptionEndsSoonTitle": "המנוי שלך מסתיים בקרוב",
+    "subscriptionEndedTitle": "המנוי שלך הסתיים",
+    "yourSubscription": "המנוי שלך",
+    "subscriptionEndsSoonBody": "{package} מסתיים ב־{date} (בעוד {days} ימים). חדשו כדי להמשיך להזמין שיעורים.",
+    "subscriptionEndedBody": "{package} הסתיים. הגישה נשמרת עד {date}; חדשו עד אז כדי להמשיך להזמין שיעורים."
   },
   "WorkoutAssistant": {
     "title": "עוזר אימונים",

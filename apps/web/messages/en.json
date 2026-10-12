@@ -2567,7 +2567,20 @@
     "featureFinanceCleanupSubmit": "Permanent purge",
     "anotherOrganization": "Another organization",
     "emailAddress": "Email address",
-    "emailAddressPlaceholder": "you@example.com"
+    "emailAddressPlaceholder": "you@example.com",
+    "subscriptionExpiryReminderDays": "Expiry reminder (days before)",
+    "subscriptionExpiryReminderDaysHelp": "Clients get a notification this many days before their subscription ends. 0 turns it off.",
+    "subscriptionGraceDays": "Grace period (days)",
+    "subscriptionGraceDaysHelp": "After a subscription ends or an invoice is overdue, clients keep access this many days. After that they lose it, e.g. they can no longer book classes.",
+    "accessGraceEnded": "Your subscription has ended. You keep access until {date}; renew before then to keep booking classes.",
+    "accessGraceOverdue": "A payment is overdue. You keep access until {date}; pay before then to keep booking classes.",
+    "accessBlockedOverdue": "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again.",
+    "accessEnded": "Your access has ended. Renew your subscription to book classes again.",
+    "subscriptionEndsSoonTitle": "Your subscription ends soon",
+    "subscriptionEndedTitle": "Your subscription has ended",
+    "yourSubscription": "Your subscription",
+    "subscriptionEndsSoonBody": "{package} ends on {date} (in {days} days). Renew to keep booking classes.",
+    "subscriptionEndedBody": "{package} has ended. You keep access until {date}; renew before then to keep booking classes."
   },
   "WorkoutAssistant": {
     "title": "Workout assistant",

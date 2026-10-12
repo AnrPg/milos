@@ -2567,7 +2567,20 @@
     "featureFinanceCleanupSubmit": "Purge permanente",
     "anotherOrganization": "Autre organisation",
     "emailAddress": "Adresse e-mail",
-    "emailAddressPlaceholder": "vous@example.com"
+    "emailAddressPlaceholder": "vous@example.com",
+    "subscriptionExpiryReminderDays": "Rappel d'échéance (jours avant)",
+    "subscriptionExpiryReminderDaysHelp": "Les clients reçoivent une notification ce nombre de jours avant la fin de leur abonnement. 0 la désactive.",
+    "subscriptionGraceDays": "Délai de grâce (jours)",
+    "subscriptionGraceDaysHelp": "Après la fin de l'abonnement ou une facture en retard, les clients gardent l'accès pendant ce nombre de jours. Ensuite ils le perdent, p. ex. ils ne peuvent plus réserver de cours.",
+    "accessGraceEnded": "Votre abonnement est terminé. Vous gardez l'accès jusqu'au {date} ; renouvelez d'ici là pour continuer à réserver des cours.",
+    "accessGraceOverdue": "Un paiement est en retard. Vous gardez l'accès jusqu'au {date} ; payez d'ici là pour continuer à réserver des cours.",
+    "accessBlockedOverdue": "Votre accès est suspendu car un paiement est en retard. Réglez le solde dû pour réserver à nouveau des cours.",
+    "accessEnded": "Votre accès est terminé. Renouvelez votre abonnement pour réserver à nouveau des cours.",
+    "subscriptionEndsSoonTitle": "Votre abonnement se termine bientôt",
+    "subscriptionEndedTitle": "Votre abonnement est terminé",
+    "yourSubscription": "Votre abonnement",
+    "subscriptionEndsSoonBody": "{package} se termine le {date} (dans {days} jours). Renouvelez pour continuer à réserver des cours.",
+    "subscriptionEndedBody": "{package} est terminé. Vous gardez l'accès jusqu'au {date} ; renouvelez d'ici là pour continuer à réserver des cours."
   },
   "WorkoutAssistant": {
     "title": "Assistant d’entraînement",

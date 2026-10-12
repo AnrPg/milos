@@ -6049,6 +6049,10 @@ export interface operations {
                             /** Format: date-time */
                             inserted_at?: string | null;
                             payment_reminder_interval_days: number;
+                            /** @description Days before a subscription ends to remind the member (0 = no reminder) */
+                            subscription_expiry_reminder_days: number;
+                            /** @description Slack days after a subscription ends or an invoice falls overdue before the member loses access */
+                            subscription_grace_days: number;
                             /** Format: date-time */
                             updated_at?: string | null;
                         };
@@ -6107,6 +6111,10 @@ export interface operations {
                         /** @enum {string} */
                         document_mode?: "invoice" | "receipt";
                         payment_reminder_interval_days?: number;
+                        /** @description Days before a subscription ends to remind the member (0 = no reminder) */
+                        subscription_expiry_reminder_days?: number;
+                        /** @description Slack days after a subscription ends or an invoice falls overdue before the member loses access */
+                        subscription_grace_days?: number;
                     };
                     gamification?: {
                         leaderboard_enabled?: boolean;
@@ -6144,6 +6152,10 @@ export interface operations {
                             /** Format: date-time */
                             inserted_at?: string | null;
                             payment_reminder_interval_days: number;
+                            /** @description Days before a subscription ends to remind the member (0 = no reminder) */
+                            subscription_expiry_reminder_days: number;
+                            /** @description Slack days after a subscription ends or an invoice falls overdue before the member loses access */
+                            subscription_grace_days: number;
                             /** Format: date-time */
                             updated_at?: string | null;
                         };

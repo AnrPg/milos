@@ -8090,6 +8090,18 @@
                           "minimum": 1,
                           "type": "integer"
                         },
+                        "subscription_expiry_reminder_days": {
+                          "description": "Days before a subscription ends to remind the member (0 = no reminder)",
+                          "maximum": 60,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "subscription_grace_days": {
+                          "description": "Slack days after a subscription ends or an invoice falls overdue before the member loses access",
+                          "maximum": 60,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
                         "updated_at": {
                           "format": "date-time",
                           "nullable": true,
@@ -8098,6 +8110,8 @@
                       },
                       "required": [
                         "payment_reminder_interval_days",
+                        "subscription_expiry_reminder_days",
+                        "subscription_grace_days",
                         "document_mode"
                       ],
                       "type": "object"
@@ -8277,6 +8291,18 @@
                       "payment_reminder_interval_days": {
                         "minimum": 1,
                         "type": "integer"
+                      },
+                      "subscription_expiry_reminder_days": {
+                        "description": "Days before a subscription ends to remind the member (0 = no reminder)",
+                        "maximum": 60,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "subscription_grace_days": {
+                        "description": "Slack days after a subscription ends or an invoice falls overdue before the member loses access",
+                        "maximum": 60,
+                        "minimum": 0,
+                        "type": "integer"
                       }
                     },
                     "type": "object"
@@ -8386,6 +8412,18 @@
                           "minimum": 1,
                           "type": "integer"
                         },
+                        "subscription_expiry_reminder_days": {
+                          "description": "Days before a subscription ends to remind the member (0 = no reminder)",
+                          "maximum": 60,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "subscription_grace_days": {
+                          "description": "Slack days after a subscription ends or an invoice falls overdue before the member loses access",
+                          "maximum": 60,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
                         "updated_at": {
                           "format": "date-time",
                           "nullable": true,
@@ -8394,6 +8432,8 @@
                       },
                       "required": [
                         "payment_reminder_interval_days",
+                        "subscription_expiry_reminder_days",
+                        "subscription_grace_days",
                         "document_mode"
                       ],
                       "type": "object"

@@ -2567,7 +2567,20 @@
     "featureFinanceCleanupSubmit": "Epurazione permanente",
     "anotherOrganization": "Altra organizzazione",
     "emailAddress": "Indirizzo email",
-    "emailAddressPlaceholder": "tu@example.com"
+    "emailAddressPlaceholder": "tu@example.com",
+    "subscriptionExpiryReminderDays": "Promemoria scadenza (giorni prima)",
+    "subscriptionExpiryReminderDaysHelp": "I clienti ricevono una notifica questi giorni prima della scadenza dell'abbonamento. 0 la disattiva.",
+    "subscriptionGraceDays": "Periodo di tolleranza (giorni)",
+    "subscriptionGraceDaysHelp": "Dopo la scadenza dell'abbonamento o una fattura scaduta, i clienti mantengono l'accesso per questi giorni. Poi lo perdono, ad es. non possono più prenotare lezioni.",
+    "accessGraceEnded": "Il tuo abbonamento è scaduto. Mantieni l'accesso fino al {date}; rinnova entro quella data per continuare a prenotare le lezioni.",
+    "accessGraceOverdue": "Un pagamento è scaduto. Mantieni l'accesso fino al {date}; paga entro quella data per continuare a prenotare le lezioni.",
+    "accessBlockedOverdue": "Il tuo accesso è sospeso perché un pagamento è scaduto. Salda il dovuto per prenotare di nuovo le lezioni.",
+    "accessEnded": "Il tuo accesso è terminato. Rinnova l'abbonamento per prenotare di nuovo le lezioni.",
+    "subscriptionEndsSoonTitle": "Il tuo abbonamento sta per scadere",
+    "subscriptionEndedTitle": "Il tuo abbonamento è scaduto",
+    "yourSubscription": "Il tuo abbonamento",
+    "subscriptionEndsSoonBody": "{package} scade il {date} (tra {days} giorni). Rinnova per continuare a prenotare le lezioni.",
+    "subscriptionEndedBody": "{package} è scaduto. Mantieni l'accesso fino al {date}; rinnova entro quella data per continuare a prenotare le lezioni."
   },
   "WorkoutAssistant": {
     "title": "Assistente allenamento",

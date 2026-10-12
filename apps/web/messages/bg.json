@@ -2567,7 +2567,20 @@
     "featureFinanceCleanupSubmit": "Постоянно прочистване",
     "anotherOrganization": "Друга организация",
     "emailAddress": "Имейл адрес",
-    "emailAddressPlaceholder": "vie@example.com"
+    "emailAddressPlaceholder": "vie@example.com",
+    "subscriptionExpiryReminderDays": "Напомняне за изтичане (дни преди)",
+    "subscriptionExpiryReminderDaysHelp": "Клиентите получават известие толкова дни преди изтичане на абонамента. 0 го изключва.",
+    "subscriptionGraceDays": "Гратисен период (дни)",
+    "subscriptionGraceDaysHelp": "След изтичане на абонамента или просрочена фактура клиентите запазват достъп толкова дни. След това го губят, напр. не могат да записват часове.",
+    "accessGraceEnded": "Абонаментът ви изтече. Запазвате достъп до {date}; подновете дотогава, за да продължите да записвате часове.",
+    "accessGraceOverdue": "Има просрочено плащане. Запазвате достъп до {date}; платете дотогава, за да продължите да записвате часове.",
+    "accessBlockedOverdue": "Достъпът ви е спрян заради просрочено плащане. Платете дължимото, за да записвате отново часове.",
+    "accessEnded": "Достъпът ви изтече. Подновете абонамента си, за да записвате отново часове.",
+    "subscriptionEndsSoonTitle": "Абонаментът ви изтича скоро",
+    "subscriptionEndedTitle": "Абонаментът ви изтече",
+    "yourSubscription": "Абонаментът ви",
+    "subscriptionEndsSoonBody": "{package} изтича на {date} (след {days} дни). Подновете, за да продължите да записвате часове.",
+    "subscriptionEndedBody": "{package} изтече. Запазвате достъп до {date}; подновете дотогава, за да продължите да записвате часове."
   },
   "WorkoutAssistant": {
     "title": "Асистент за тренировки",

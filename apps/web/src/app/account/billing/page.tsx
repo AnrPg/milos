@@ -432,6 +432,7 @@ export default function BillingPage() {
               )}
             </div>
 
+            <AccessNotice entitlement={entitlement} />
             <EntitlementCard entitlement={entitlement} />
 
             {/* credits */}
@@ -573,6 +574,35 @@ export default function BillingPage() {
       )}
     </div>
   );
+}
+
+/** Grace slack or lost access, told plainly to the client. */
+function AccessNotice({ entitlement }: { entitlement: EffectiveEntitlement | null }) {
+  const uiLocale = useUiLocale();
+  const i18n = useUiTranslations();
+  if (!entitlement) return null;
+
+  if (entitlement.status === "grace" && entitlement.grace_until) {
+    const message =
+      entitlement.source === "overdue_grace"
+        ? i18n("accessGraceOverdue", { date: formatDate(uiLocale, entitlement.grace_until) })
+        : i18n("accessGraceEnded", { date: formatDate(uiLocale, entitlement.grace_until) });
+    return (
+      <p role="status" className="rounded-2xl p-4 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--warning, #d97706) 14%, transparent)", color: "var(--text)", border: "1px solid var(--warning, #d97706)" }}>
+        {message}
+      </p>
+    );
+  }
+
+  if (entitlement.status === "blocked" || (entitlement.status === "inactive" && entitlement.source !== "membership_status")) {
+    return (
+      <p role="alert" className="rounded-2xl p-4 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--danger) 12%, transparent)", color: "var(--text)", border: "1px solid var(--danger)" }}>
+        {entitlement.status === "blocked" ? i18n("accessBlockedOverdue") : i18n("accessEnded")}
+      </p>
+    );
+  }
+
+  return null;
 }
 
 function EntitlementCard({ entitlement }: { entitlement: EffectiveEntitlement | null }) {

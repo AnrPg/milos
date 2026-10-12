@@ -2567,7 +2567,20 @@
     "featureFinanceCleanupSubmit": "Οριστική εκκαθάριση",
     "anotherOrganization": "Άλλος οργανισμός",
     "emailAddress": "Διεύθυνση email",
-    "emailAddressPlaceholder": "esy@example.com"
+    "emailAddressPlaceholder": "esy@example.com",
+    "subscriptionExpiryReminderDays": "Υπενθύμιση λήξης (ημέρες πριν)",
+    "subscriptionExpiryReminderDaysHelp": "Οι πελάτες λαμβάνουν ειδοποίηση τόσες ημέρες πριν λήξει η συνδρομή τους. Το 0 την απενεργοποιεί.",
+    "subscriptionGraceDays": "Περίοδος χάριτος (ημέρες)",
+    "subscriptionGraceDaysHelp": "Μετά τη λήξη της συνδρομής ή όταν ένα τιμολόγιο καθυστερεί, οι πελάτες διατηρούν πρόσβαση για τόσες ημέρες. Μετά τη χάνουν, π.χ. δεν μπορούν να κλείσουν μαθήματα.",
+    "accessGraceEnded": "Η συνδρομή σας έληξε. Διατηρείτε πρόσβαση έως τις {date}· ανανεώστε μέχρι τότε για να συνεχίσετε να κλείνετε μαθήματα.",
+    "accessGraceOverdue": "Μια πληρωμή καθυστερεί. Διατηρείτε πρόσβαση έως τις {date}· πληρώστε μέχρι τότε για να συνεχίσετε να κλείνετε μαθήματα.",
+    "accessBlockedOverdue": "Η πρόσβασή σας έχει παγώσει επειδή μια πληρωμή καθυστερεί. Εξοφλήστε το υπόλοιπο για να κλείνετε ξανά μαθήματα.",
+    "accessEnded": "Η πρόσβασή σας έληξε. Ανανεώστε τη συνδρομή σας για να κλείνετε ξανά μαθήματα.",
+    "subscriptionEndsSoonTitle": "Η συνδρομή σας λήγει σύντομα",
+    "subscriptionEndedTitle": "Η συνδρομή σας έληξε",
+    "yourSubscription": "Η συνδρομή σας",
+    "subscriptionEndsSoonBody": "Η συνδρομή {package} λήγει στις {date} (σε {days} ημέρες). Ανανεώστε για να συνεχίσετε να κλείνετε μαθήματα.",
+    "subscriptionEndedBody": "Η συνδρομή {package} έληξε. Διατηρείτε πρόσβαση έως τις {date}· ανανεώστε μέχρι τότε για να συνεχίσετε να κλείνετε μαθήματα."
   },
   "WorkoutAssistant": {
     "title": "Βοηθός προπόνησης",

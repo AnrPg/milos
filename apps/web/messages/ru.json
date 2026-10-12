@@ -2567,7 +2567,20 @@
     "featureFinanceCleanupSubmit": "Постоянная чистка",
     "anotherOrganization": "Другая организация",
     "emailAddress": "Адрес электронной почты",
-    "emailAddressPlaceholder": "vy@example.com"
+    "emailAddressPlaceholder": "vy@example.com",
+    "subscriptionExpiryReminderDays": "Напоминание об окончании (за дней)",
+    "subscriptionExpiryReminderDaysHelp": "Клиенты получают уведомление за столько дней до окончания подписки. 0 — отключить.",
+    "subscriptionGraceDays": "Льготный период (дней)",
+    "subscriptionGraceDaysHelp": "После окончания подписки или просрочки счёта клиенты сохраняют доступ столько дней. Затем теряют его, например не могут записываться на занятия.",
+    "accessGraceEnded": "Ваша подписка закончилась. Доступ сохраняется до {date}; продлите до этой даты, чтобы и дальше записываться на занятия.",
+    "accessGraceOverdue": "Платёж просрочен. Доступ сохраняется до {date}; оплатите до этой даты, чтобы и дальше записываться на занятия.",
+    "accessBlockedOverdue": "Доступ приостановлен из-за просроченного платежа. Оплатите задолженность, чтобы снова записываться на занятия.",
+    "accessEnded": "Доступ закончился. Продлите подписку, чтобы снова записываться на занятия.",
+    "subscriptionEndsSoonTitle": "Ваша подписка скоро закончится",
+    "subscriptionEndedTitle": "Ваша подписка закончилась",
+    "yourSubscription": "Ваша подписка",
+    "subscriptionEndsSoonBody": "{package} заканчивается {date} (через {days} дн.). Продлите, чтобы и дальше записываться на занятия.",
+    "subscriptionEndedBody": "{package} закончилась. Доступ сохраняется до {date}; продлите до этой даты, чтобы и дальше записываться на занятия."
   },
   "WorkoutAssistant": {
     "title": "Помощник по тренировкам",

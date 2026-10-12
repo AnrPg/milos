@@ -2567,7 +2567,20 @@
     "featureFinanceCleanupSubmit": "Permanente Säuberung",
     "anotherOrganization": "Andere Organisation",
     "emailAddress": "E-Mail-Adresse",
-    "emailAddressPlaceholder": "du@example.com"
+    "emailAddressPlaceholder": "du@example.com",
+    "subscriptionExpiryReminderDays": "Ablauf-Erinnerung (Tage vorher)",
+    "subscriptionExpiryReminderDaysHelp": "Kunden erhalten so viele Tage vor Abo-Ende eine Benachrichtigung. 0 schaltet sie aus.",
+    "subscriptionGraceDays": "Kulanzzeit (Tage)",
+    "subscriptionGraceDaysHelp": "Nach Abo-Ende oder bei überfälliger Rechnung behalten Kunden so viele Tage Zugang. Danach verlieren sie ihn, z. B. können sie keine Kurse mehr buchen.",
+    "accessGraceEnded": "Ihr Abo ist abgelaufen. Sie haben noch bis {date} Zugang; verlängern Sie bis dahin, um weiter Kurse buchen zu können.",
+    "accessGraceOverdue": "Eine Zahlung ist überfällig. Sie haben noch bis {date} Zugang; zahlen Sie bis dahin, um weiter Kurse buchen zu können.",
+    "accessBlockedOverdue": "Ihr Zugang ist pausiert, weil eine Zahlung überfällig ist. Begleichen Sie den offenen Betrag, um wieder Kurse zu buchen.",
+    "accessEnded": "Ihr Zugang ist abgelaufen. Verlängern Sie Ihr Abo, um wieder Kurse zu buchen.",
+    "subscriptionEndsSoonTitle": "Ihr Abo endet bald",
+    "subscriptionEndedTitle": "Ihr Abo ist abgelaufen",
+    "yourSubscription": "Ihr Abo",
+    "subscriptionEndsSoonBody": "{package} endet am {date} (in {days} Tagen). Verlängern Sie, um weiter Kurse buchen zu können.",
+    "subscriptionEndedBody": "{package} ist abgelaufen. Sie haben noch bis {date} Zugang; verlängern Sie bis dahin, um weiter Kurse buchen zu können."
   },
   "WorkoutAssistant": {
     "title": "Trainingsassistent",
