@@ -1,5 +1,5 @@
 defmodule MilosTraining.Workouts do
-  alias MilosTraining.Workouts.Domain.{WorkoutDsl, WorkoutType}
+  alias MilosTraining.Workouts.Domain.{ExerciseDescriptors, WorkoutDsl, WorkoutType}
   alias MilosTraining.Workouts.Domain.WorkoutDsl.Preflight
   alias MilosTraining.Workouts.Domain.WorkoutDsl.{Manual, Templates, Vocabulary}
 
@@ -93,6 +93,9 @@ defmodule MilosTraining.Workouts do
 
   def preflight_dsl(workout, active_scale_slugs),
     do: Preflight.validate(workout, active_scale_slugs)
+
+  @doc "`%{name, exercise_ref, category}` per exercise of a normalized workout (ADR-106)."
+  def exercise_descriptors(workout), do: ExerciseDescriptors.from_workout(workout)
 
   def reject_assignment_for_athlete(assignment_id, athlete_id),
     do:
