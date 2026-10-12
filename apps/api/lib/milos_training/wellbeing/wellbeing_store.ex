@@ -16,6 +16,10 @@ defmodule MilosTraining.Wellbeing.WellbeingStore do
     do: adapter().get_injury_for_user(user_id, injury_report_id)
 
   def list_injuries_for_user(user_id), do: adapter().list_injuries_for_user(user_id)
+
+  def list_active_tenant_injuries_for_users(user_ids),
+    do: adapter().list_active_tenant_injuries_for_users(user_ids)
+
   def list_injuries(filters), do: adapter().list_injuries(filters)
   def injury_summary(filters), do: adapter().injury_summary(filters)
 
