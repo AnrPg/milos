@@ -50,3 +50,5 @@ config :milos_training, :meilisearch,
   api_key: System.get_env("MEILI_MASTER_KEY", "dev-meili-master-key"),
   admin_member_index: System.get_env("MEILI_ADMIN_MEMBER_INDEX", "admin_members"),
   log_failures: false
+
+config :milos_training, :workout_text_analyzer, MilosTraining.Test.FakeWorkoutTextAnalyzer

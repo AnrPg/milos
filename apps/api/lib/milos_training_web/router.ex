@@ -288,6 +288,7 @@ defmodule MilosTrainingWeb.Router do
     delete("/workout-folders/:id", AdminWorkoutFolderController, :delete)
     post("/workouts", AdminWorkoutController, :create)
     post("/workouts/dsl/parse", AdminWorkoutDslController, :parse)
+    post("/workouts/free-text/analyze", AdminWorkoutFreeTextController, :analyze)
     get("/workouts/dsl/manual", AdminWorkoutDslController, :manual)
     get("/workouts/:id/dsl", AdminWorkoutDslController, :show_authoring)
     post("/workouts/:id/dsl/publish", AdminWorkoutDslController, :publish)
