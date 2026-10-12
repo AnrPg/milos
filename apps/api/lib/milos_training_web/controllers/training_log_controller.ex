@@ -159,12 +159,7 @@ defmodule MilosTrainingWeb.TrainingLogController do
 
   defp param_id(params), do: params[:id] || params["id"]
 
-  defp body_params(conn) do
-    case conn.body_params do
-      %{} = body -> Map.drop(body, [:id, "id"])
-      _other -> %{}
-    end
-  end
+  defp body_params(conn), do: Map.drop(conn.body_params, [:id, "id"])
 
   defp tenant_context(conn), do: conn.assigns[:tenant_context]
   defp actor(conn), do: Guardian.Plug.current_resource(conn)
