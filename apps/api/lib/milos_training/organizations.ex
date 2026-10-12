@@ -13,6 +13,7 @@ defmodule MilosTraining.Organizations do
     ProvisionOrganization,
     RedeemInvitation,
     RenameOrganization,
+    RenameOrganizationSlug,
     ReplaceOrganizationLogo,
     RequestOrganizationPurge,
     RevokeInvitation,
@@ -29,6 +30,7 @@ defmodule MilosTraining.Organizations do
     FindOrganization,
     GetOrganizationBranding,
     GetOrganizationPurge,
+    GetSlugRenameImpact,
     InspectInvitation,
     ListActiveMembershipUserIds,
     ListDeletableOrganizationUserIds,
@@ -37,6 +39,7 @@ defmodule MilosTraining.Organizations do
     ListProvisionedOrganizations,
     ListStaffUserIds,
     ResolvePlatformContext,
+    ResolveSlugAlias,
     ResolveTenantContext
   }
 
@@ -124,6 +127,20 @@ defmodule MilosTraining.Organizations do
 
   def rename_organization(context, organization_id, name),
     do: RenameOrganization.call(context, organization_id, name)
+
+  # ADR-104 slug rename with retired-slug aliases.
+  def rename_organization_slug(
+        context,
+        organization_id,
+        params,
+        changed_at \\ DateTime.utc_now()
+      ),
+      do: RenameOrganizationSlug.call(context, organization_id, params, changed_at)
+
+  def slug_rename_impact(context, organization_id, now \\ DateTime.utc_now()),
+    do: GetSlugRenameImpact.call(context, organization_id, now)
+
+  def resolve_slug_alias(slug), do: ResolveSlugAlias.call(slug)
 
   def send_owner_invitation_email(context, organization_id, params),
     do: SendOwnerInvitationEmail.call(context, organization_id, params)

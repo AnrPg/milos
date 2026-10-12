@@ -4,6 +4,7 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
     OrganizationMembership,
     OrganizationPurge,
     OrganizationSetting,
+    OrganizationSlugAlias,
     RegistrationInvitation,
     Vendor
   }
@@ -21,6 +22,25 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   @callback get_organization_by_id(Ecto.UUID.t()) :: Organization.t() | nil
   @callback get_organization_by_slug(String.t()) :: Organization.t() | nil
   @callback get_organization_by_domain(String.t()) :: Organization.t() | nil
+  # ADR-104 retired slug aliases.
+  @callback get_organization_by_slug_alias(String.t()) :: Organization.t() | nil
+  @callback get_canonical_slug_for_alias(String.t()) :: String.t() | nil
+  @callback list_slug_aliases(Ecto.UUID.t()) :: [OrganizationSlugAlias.t()]
+  @callback count_pending_invitations(Ecto.UUID.t(), DateTime.t()) :: non_neg_integer()
+  @callback rename_organization_slug(
+              Ecto.UUID.t(),
+              String.t(),
+              String.t() | nil,
+              Ecto.UUID.t(),
+              DateTime.t()
+            ) ::
+              {:ok,
+               %{
+                 organization: Organization.t(),
+                 previous_slug: String.t(),
+                 aliases: [OrganizationSlugAlias.t()]
+               }}
+              | {:error, term()}
   @callback get_membership(Ecto.UUID.t(), Ecto.UUID.t()) :: OrganizationMembership.t() | nil
   @callback get_membership_by_id(Ecto.UUID.t(), Ecto.UUID.t()) :: OrganizationMembership.t() | nil
   @callback list_memberships(Ecto.UUID.t()) :: [map()]

@@ -4,7 +4,7 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   import Ecto.Query
 
   alias Ecto.Multi
-  alias MilosTraining.Organizations.Domain.{BrandLogoPolicy, InvitationPolicy}
+  alias MilosTraining.Organizations.Domain.{BrandLogoPolicy, InvitationPolicy, SlugRenamePolicy}
 
   alias MilosTraining.Organizations.{
     Organization,
@@ -13,6 +13,7 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     OrganizationProvisioningEvent,
     OrganizationPurge,
     OrganizationSetting,
+    OrganizationSlugAlias,
     RegistrationInvitation,
     Vendor
   }
@@ -21,8 +22,11 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
 
   @impl true
   def create_organization(params) do
+    changeset = Organization.changeset(params)
+
     Multi.new()
-    |> Multi.insert(:organization, Organization.changeset(params))
+    |> Multi.run(:slug_reservation, fn _repo, _changes -> reserve_new_slug(changeset) end)
+    |> Multi.insert(:organization, changeset)
     |> Multi.insert(:settings, fn %{organization: organization} ->
       OrganizationSetting.changeset(%{
         organization_id: organization.id,
@@ -119,6 +123,47 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
 
   @impl true
   def get_organization_by_slug(slug), do: Repo.get_by(Organization, slug: slug)
+
+  @impl true
+  def get_organization_by_slug_alias(slug) when is_binary(slug) do
+    Organization
+    |> join(:inner, [organization], slug_alias in OrganizationSlugAlias,
+      on: slug_alias.organization_id == organization.id
+    )
+    |> where([_organization, slug_alias], slug_alias.slug == ^slug)
+    |> select([organization, _slug_alias], organization)
+    |> Repo.one()
+  end
+
+  @impl true
+  def get_canonical_slug_for_alias(slug) when is_binary(slug) do
+    Organization
+    |> join(:inner, [organization], slug_alias in OrganizationSlugAlias,
+      on: slug_alias.organization_id == organization.id
+    )
+    |> where([_organization, slug_alias], slug_alias.slug == ^slug)
+    |> select([organization, _slug_alias], organization.slug)
+    |> Repo.one()
+  end
+
+  @impl true
+  def list_slug_aliases(organization_id) do
+    OrganizationSlugAlias
+    |> where([slug_alias], slug_alias.organization_id == ^organization_id)
+    |> order_by([slug_alias], desc: slug_alias.retired_at, asc: slug_alias.slug)
+    |> Repo.all()
+  end
+
+  @impl true
+  def count_pending_invitations(organization_id, now) do
+    RegistrationInvitation
+    |> where(
+      [invitation],
+      invitation.organization_id == ^organization_id and is_nil(invitation.redeemed_at) and
+        is_nil(invitation.revoked_at) and invitation.expires_at > ^now
+    )
+    |> Repo.aggregate(:count)
+  end
 
   @impl true
   def get_organization_by_domain(host) do
@@ -285,8 +330,11 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
 
   @impl true
   def provision_organization(organization_params, invitation_params, platform_user_id, issued_at) do
+    changeset = Organization.changeset(organization_params)
+
     Multi.new()
-    |> Multi.insert(:organization, Organization.changeset(organization_params))
+    |> Multi.run(:slug_reservation, fn _repo, _changes -> reserve_new_slug(changeset) end)
+    |> Multi.insert(:organization, changeset)
     |> Multi.insert(:settings, fn %{organization: organization} ->
       OrganizationSetting.changeset(%{
         organization_id: organization.id,
@@ -459,6 +507,91 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
       |> unwrap_or_rollback()
 
       updated
+    end)
+    |> flatten_transaction()
+  end
+
+  # ADR-104: slug rename + alias bookkeeping + audit event in one transaction.
+  # The organization row is locked first, then both the retired and the
+  # requested slug are serialized with transaction-scoped advisory locks so a
+  # concurrent provisioning or rename cannot claim either slug between the
+  # availability check and the commit.
+  @impl true
+  def rename_organization_slug(
+        organization_id,
+        requested_slug,
+        confirmation,
+        platform_user_id,
+        changed_at
+      ) do
+    Repo.transaction(fn ->
+      organization =
+        Organization
+        |> where([organization], organization.id == ^organization_id)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      if is_nil(organization), do: Repo.rollback(:not_found)
+
+      previous_slug = organization.slug
+
+      with :ok <- SlugRenamePolicy.verify_confirmation(previous_slug, confirmation),
+           :ok <- ensure_no_open_purge(organization_id),
+           :ok <- lock_slugs([previous_slug, requested_slug]),
+           {:ok, plan} <-
+             SlugRenamePolicy.plan(
+               organization_id,
+               previous_slug,
+               requested_slug,
+               slug_claim(requested_slug)
+             ) do
+        if plan.reclaim_alias do
+          from(slug_alias in OrganizationSlugAlias,
+            where:
+              slug_alias.organization_id == ^organization_id and slug_alias.slug == ^plan.slug
+          )
+          |> Repo.delete_all()
+        end
+
+        updated =
+          organization
+          |> Organization.changeset(%{slug: plan.slug})
+          |> Repo.update()
+          |> unwrap_or_rollback()
+
+        %OrganizationSlugAlias{}
+        |> OrganizationSlugAlias.changeset(%{
+          organization_id: organization_id,
+          slug: plan.retire,
+          retired_at: changed_at,
+          retired_by_user_id: platform_user_id
+        })
+        |> Repo.insert()
+        |> unwrap_or_rollback()
+
+        %OrganizationProvisioningEvent{}
+        |> OrganizationProvisioningEvent.changeset(%{
+          organization_id: organization_id,
+          vendor_user_id: platform_user_id,
+          event: "organization_slug_renamed",
+          metadata: %{
+            previous_slug: previous_slug,
+            slug: updated.slug,
+            reclaimed_alias: plan.reclaim_alias,
+            changed_at: DateTime.to_iso8601(changed_at)
+          }
+        })
+        |> Repo.insert()
+        |> unwrap_or_rollback()
+
+        %{
+          organization: updated,
+          previous_slug: previous_slug,
+          aliases: list_slug_aliases(organization_id)
+        }
+      else
+        {:error, reason} -> Repo.rollback(reason)
+      end
     end)
     |> flatten_transaction()
   end
@@ -746,6 +879,61 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
         |> OrganizationMembership.changeset(params)
         |> Repo.update()
         |> unwrap_or_rollback()
+    end
+  end
+
+  defp ensure_no_open_purge(organization_id) do
+    if get_open_purge(organization_id),
+      do: {:error, :slug_rename_blocked_by_purge},
+      else: :ok
+  end
+
+  defp slug_claim(slug) do
+    case Repo.get_by(Organization, slug: slug) do
+      %Organization{id: id} ->
+        {:organization, id}
+
+      nil ->
+        case Repo.get_by(OrganizationSlugAlias, slug: slug) do
+          %OrganizationSlugAlias{organization_id: id} -> {:alias, id}
+          nil -> nil
+        end
+    end
+  end
+
+  # Organization slugs and retired aliases share one namespace (ADR-104), but
+  # live in two tables, so no single unique index covers both. Provisioning
+  # and slug renames take the same advisory lock per slug before checking.
+  defp lock_slugs(slugs) do
+    slugs
+    |> Enum.uniq()
+    |> Enum.sort()
+    |> Enum.each(fn slug ->
+      Repo.query!("SELECT pg_advisory_xact_lock(hashtext($1))", ["organization_slug:" <> slug])
+    end)
+
+    :ok
+  end
+
+  defp reserve_new_slug(%Ecto.Changeset{} = changeset) do
+    case Ecto.Changeset.get_field(changeset, :slug) do
+      slug when is_binary(slug) and slug != "" ->
+        :ok = lock_slugs([slug])
+
+        if Repo.exists?(
+             from(slug_alias in OrganizationSlugAlias, where: slug_alias.slug == ^slug)
+           ),
+           do:
+             {:error,
+              Ecto.Changeset.add_error(changeset, :slug, "has already been taken",
+                validation: :unsafe_unique,
+                fields: [:slug]
+              )},
+           else: {:ok, slug}
+
+      _missing ->
+        # Let the insert step report the changeset's own validation errors.
+        {:ok, nil}
     end
   end
 

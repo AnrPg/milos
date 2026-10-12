@@ -22,6 +22,33 @@ defmodule MilosTraining.Organizations.OrganizationStore do
   @impl true
   def get_organization_by_domain(host), do: impl().get_organization_by_domain(host)
   @impl true
+  def get_organization_by_slug_alias(slug), do: impl().get_organization_by_slug_alias(slug)
+  @impl true
+  def get_canonical_slug_for_alias(slug), do: impl().get_canonical_slug_for_alias(slug)
+  @impl true
+  def list_slug_aliases(organization_id), do: impl().list_slug_aliases(organization_id)
+  @impl true
+  def count_pending_invitations(organization_id, now),
+    do: impl().count_pending_invitations(organization_id, now)
+
+  @impl true
+  def rename_organization_slug(
+        organization_id,
+        requested_slug,
+        confirmation,
+        platform_user_id,
+        changed_at
+      ),
+      do:
+        impl().rename_organization_slug(
+          organization_id,
+          requested_slug,
+          confirmation,
+          platform_user_id,
+          changed_at
+        )
+
+  @impl true
   def get_membership(organization_id, user_id),
     do: impl().get_membership(organization_id, user_id)
 
