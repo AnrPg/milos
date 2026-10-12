@@ -83,9 +83,6 @@ defmodule MilosTraining.Application.GetLandingPage do
 
         completions_remaining =
           cond do
-            target <= 0 ->
-              0
-
             current_progress >= target ->
               0
 

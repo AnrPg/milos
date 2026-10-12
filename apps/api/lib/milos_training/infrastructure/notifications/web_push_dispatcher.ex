@@ -29,7 +29,6 @@ defmodule MilosTraining.Infrastructure.Notifications.WebPushDispatcher do
 
   defp normalize_result({:ok, _response}), do: :ok
   defp normalize_result({:error, reason}), do: normalize_error(reason)
-  defp normalize_result(reason), do: normalize_error(reason)
 
   defp normalize_error(:expired), do: {:error, :expired}
   defp normalize_error(reason), do: {:error, reason}

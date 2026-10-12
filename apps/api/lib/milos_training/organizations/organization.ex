@@ -15,6 +15,8 @@ defmodule MilosTraining.Organizations.Organization do
     timestamps(type: :utc_datetime_usec)
   end
 
+  @type t :: %__MODULE__{}
+
   def changeset(organization \\ %__MODULE__{}, params) do
     organization
     |> cast(params, [:slug, :name, :status])

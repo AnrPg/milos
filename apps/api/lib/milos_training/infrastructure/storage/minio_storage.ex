@@ -237,7 +237,7 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
     secret_key = Application.get_env(:milos_training, :minio_secret_key, "minioadmin")
     bucket = Application.get_env(:milos_training, :minio_bucket, "milos-invoices")
 
-    {build_ex_aws_config(endpoint, access_key, secret_key),
+    {build_ex_aws_overrides(endpoint, access_key, secret_key),
      build_ex_aws_config(public_endpoint, access_key, secret_key), bucket}
   end
 
@@ -248,7 +248,7 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
     secret_key = Application.get_env(:milos_training, :minio_secret_key, "minioadmin")
     bucket = Application.get_env(:milos_training, :minio_avatar_bucket, "milos-avatars")
 
-    {build_ex_aws_config(endpoint, access_key, secret_key),
+    {build_ex_aws_overrides(endpoint, access_key, secret_key),
      build_ex_aws_config(public_endpoint, access_key, secret_key), bucket}
   end
 
@@ -296,18 +296,24 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
     end
   end
 
-  defp build_ex_aws_config(endpoint, access_key, secret_key) do
+  # Requests take keyword overrides (ExAws.request/2); presigning takes a
+  # resolved config map (ExAws.S3.presigned_*), so the public URL config is
+  # resolved eagerly while the storage config stays as overrides.
+  defp build_ex_aws_overrides(endpoint, access_key, secret_key) do
     uri = URI.parse(endpoint)
 
-    ExAws.Config.new(:s3,
+    [
       access_key_id: access_key,
       secret_access_key: secret_key,
       scheme: "#{uri.scheme}://",
       host: uri.host,
       port: uri.port,
       region: "us-east-1"
-    )
+    ]
   end
+
+  defp build_ex_aws_config(endpoint, access_key, secret_key),
+    do: ExAws.Config.new(:s3, build_ex_aws_overrides(endpoint, access_key, secret_key))
 
   defp avatar_public_url(bucket, key) do
     endpoint = Application.get_env(:milos_training, :minio_endpoint, "http://localhost:9000")

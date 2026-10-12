@@ -20,6 +20,8 @@ defmodule MilosTraining.Organizations.OrganizationSetting do
     timestamps(type: :utc_datetime_usec)
   end
 
+  @type t :: %__MODULE__{}
+
   def changeset(setting \\ %__MODULE__{}, params) do
     setting
     |> cast(params, [

@@ -19,6 +19,8 @@ defmodule MilosTraining.Messaging.Message do
     timestamps(updated_at: false)
   end
 
+  @type t :: %__MODULE__{}
+
   def changeset(message, attrs) do
     message
     |> cast(attrs, [

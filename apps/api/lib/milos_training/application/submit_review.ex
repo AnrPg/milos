@@ -150,7 +150,6 @@ defmodule MilosTraining.Application.SubmitReview do
 
   defp target_label("private_coaching"), do: "Private coaching"
   defp target_label(type) when is_binary(type), do: String.replace(type, "_", " ")
-  defp target_label(_type), do: "Review target"
 
   defp normalize_target_type("private_coaching"), do: "coaching_parameter"
   defp normalize_target_type(type), do: type

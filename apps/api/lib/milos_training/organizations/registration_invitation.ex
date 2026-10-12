@@ -22,6 +22,8 @@ defmodule MilosTraining.Organizations.RegistrationInvitation do
     timestamps(type: :utc_datetime_usec)
   end
 
+  @type t :: %__MODULE__{}
+
   def issue_changeset(invitation \\ %__MODULE__{}, params, issued_at) do
     invitation
     |> cast(params, [

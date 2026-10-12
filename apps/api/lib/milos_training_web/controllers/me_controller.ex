@@ -202,9 +202,15 @@ defmodule MilosTrainingWeb.MeController do
     end
   end
 
-  defp avatar_key_param(%{avatar_key: avatar_key}), do: {:ok, avatar_key}
-  defp avatar_key_param(%{"avatar_key" => avatar_key}), do: {:ok, avatar_key}
-  defp avatar_key_param(_params), do: {:error, :invalid_avatar_upload}
+  # OpenApiSpex casting replaces body_params with an atom-keyed map, which
+  # Plug's string-keyed body_params type does not model; Map.fetch/2 keeps
+  # both shapes reachable for Dialyzer.
+  defp avatar_key_param(params) do
+    with :error <- Map.fetch(params, :avatar_key),
+         :error <- Map.fetch(params, "avatar_key") do
+      {:error, :invalid_avatar_upload}
+    end
+  end
 
   def avatar_upload_url(conn, _params) do
     user = Guardian.Plug.current_resource(conn)
