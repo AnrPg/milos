@@ -9,11 +9,11 @@ import {
 } from "@/lib/role-navigation";
 
 const caps = (...names: string[]) => Object.fromEntries(names.map((name) => [name, "all"]));
-const ADMIN = caps("grant_staff_roles", "manage_settings", "manage_coaching", "manage_workouts", "check_in", "run_classes", "take_payments", "view_directory", "view_finance_reports", "record_cleaning", "manage_cleaning_areas");
-const COACH = caps("manage_coaching", "manage_workouts", "check_in", "run_classes", "view_directory");
-const DESK = caps("check_in", "run_classes", "take_payments", "view_directory", "review_cleaning");
+const ADMIN = caps("grant_staff_roles", "manage_settings", "manage_coaching", "manage_workouts", "check_in", "run_classes", "take_payments", "view_directory", "view_finance_reports", "record_cleaning", "manage_cleaning_areas", "manage_inventory");
+const COACH = caps("manage_coaching", "manage_workouts", "check_in", "run_classes", "view_directory", "report_inventory");
+const DESK = caps("check_in", "run_classes", "take_payments", "view_directory", "review_cleaning", "manage_inventory");
 const ACCOUNTANT = caps("take_payments", "view_billing_contacts", "view_finance_reports", "manage_billing");
-const JANITOR = caps("record_cleaning");
+const JANITOR = caps("record_cleaning", "report_inventory");
 
 const ids = (capabilities: Record<string, string>, roles = ["admin"]) =>
   staffNavItems({ role: roles[0], roles, capabilities }).map((item) => item.id);
@@ -28,7 +28,7 @@ describe("staffNavItems", () => {
   });
 
   it("gives front desk the desk links and accountants the money links", () => {
-    expect(ids(DESK, ["front_desk"])).toEqual(["home", "checkIn", "classes", "finance", "clients"]);
+    expect(ids(DESK, ["front_desk"])).toEqual(["home", "checkIn", "classes", "finance", "clients", "inventory"]);
     expect(ids(ACCOUNTANT, ["accountant"])).toEqual(["home", "finance", "clients", "reports"]);
   });
 
@@ -37,7 +37,7 @@ describe("staffNavItems", () => {
   });
 
   it("merges roles by union without duplicates", () => {
-    expect(ids({ ...COACH, ...DESK }, ["coach", "front_desk"])).toEqual(["home", "coaching", "finance"]);
+    expect(ids({ ...COACH, ...DESK }, ["coach", "front_desk"])).toEqual(["home", "coaching", "finance", "inventory"]);
     expect(ids({ ...DESK, ...ACCOUNTANT }, ["front_desk", "accountant"])).toEqual([
       "home",
       "checkIn",
@@ -45,6 +45,7 @@ describe("staffNavItems", () => {
       "finance",
       "clients",
       "reports",
+      "inventory",
     ]);
   });
 });

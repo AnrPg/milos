@@ -76,9 +76,10 @@ export function staffNavItems(membership: MembershipLike | null | undefined): Na
   const users = has("grant_staff_roles");
   const items: NavItem[] = [];
 
+  // A janitor also reports inventory (ADR-104); that alone does not earn a Home link.
   const onlyCleaning =
     has("record_cleaning") &&
-    Object.keys(membership?.capabilities ?? {}).every((capability) => capability === "record_cleaning");
+    Object.keys(membership?.capabilities ?? {}).every((capability) => capability === "record_cleaning" || capability === "report_inventory");
 
   if (!onlyCleaning) items.push({ id: "home", href: "/admin", labelKey: "home", match: ["/admin"], exact: true, scoped: true });
   if (coaching) {
@@ -98,6 +99,11 @@ export function staffNavItems(membership: MembershipLike | null | undefined): Na
   }
   if (has("record_cleaning") && !has("manage_cleaning_areas")) {
     items.push({ id: "cleaning", href: "/admin/cleaning", labelKey: "cleaningLog", match: ["/admin/cleaning"], scoped: true });
+  }
+  // ADR-104: front desk manages inventory from the bar (it lands in "More");
+  // owners and admins reach it from a dashboard tile.
+  if (has("manage_inventory") && !users) {
+    items.push({ id: "inventory", href: "/admin/inventory", labelKey: "inventory", match: ["/admin/inventory"], scoped: true });
   }
   return items;
 }

@@ -146,6 +146,7 @@ export function AdminDashboard() {
         { label: i18n("personalCoaching6accdcd"), href: "/admin/coaching-assignments" },
         { label: nav("appointments"), href: "/admin/appointments" },
         { label: nav("cleaningLog"), href: "/admin/cleaning" },
+        { label: nav("inventory"), href: "/admin/inventory" },
       ],
     },
     {

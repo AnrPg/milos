@@ -52,7 +52,14 @@ export function StaffHome() {
     );
   }
 
-  if (layout.kind === "cleaning") return <CleaningLog />;
+  if (layout.kind === "cleaning") {
+    return (
+      <>
+        {can(membership, "report_inventory") ? <InventoryShortcut /> : null}
+        <CleaningLog />
+      </>
+    );
+  }
 
   if (layout.kind === "admin") {
     return (
@@ -88,9 +95,36 @@ export function StaffHome() {
             <LinkList links={[{ label: i18n("rhOpenCleaningLog"), href: "/admin/cleaning" }]} />
           </HomeSection>
         ) : null}
-        {layout.sections.length === 0 ? <StatusText tone="muted">{i18n("rhNothingHere")}</StatusText> : null}
+        {can(membership, "report_inventory") || can(membership, "manage_inventory") ? (
+          <HomeSection id="home-inventory" title={i18n("invEyebrow")}>
+            <LinkList
+              links={[
+                { label: i18n("invTabMachines"), href: "/admin/inventory?tab=machines" },
+                { label: i18n("invTabSupplies"), href: "/admin/inventory?tab=supplies" },
+              ]}
+            />
+          </HomeSection>
+        ) : null}
+        {layout.sections.length === 0 && !can(membership, "report_inventory") && !can(membership, "manage_inventory") ? (
+          <StatusText tone="muted">{i18n("rhNothingHere")}</StatusText>
+        ) : null}
       </div>
     </main>
+  );
+}
+
+/** The janitor's home is the cleaning log; inventory sits one tap above it (ADR-104). */
+function InventoryShortcut() {
+  const i18n = useUiTranslations();
+  const organizationSlug = useOrganizationSlug();
+  return (
+    <div className="px-4 pt-6 md:px-10" style={{ background: "var(--bg)" }}>
+      <div className="mx-auto flex max-w-5xl justify-end">
+        <Link href={adminHref("/admin/inventory", organizationSlug)} className={secondaryButtonClass} style={secondaryButtonStyle}>
+          {i18n("invOpenInventory")}
+        </Link>
+      </div>
+    </div>
   );
 }
 
