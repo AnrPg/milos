@@ -11,6 +11,16 @@ defmodule MilosTraining.Test.FakeWorkoutTextAnalyzer do
     end
   end
 
+  # No structure step unless a test provides one: analysis then falls back to
+  # the single-step parse.
+  @impl true
+  def outline(text, options) do
+    case lookup(:fake_workout_text_outline) do
+      nil -> {:error, :analyzer_unavailable}
+      fun when is_function(fun, 2) -> fun.(text, options)
+    end
+  end
+
   @impl true
   def proofread(text, options) do
     case lookup(:fake_workout_text_proofreader) do

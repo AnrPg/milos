@@ -1,16 +1,19 @@
 defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
   @moduledoc """
   `WorkoutTextAnalyzer` adapter backed by the Google Gemini `generateContent`
-  API. Runs two agents:
+  API. Runs three agents:
 
-    * `parse/2` – reads free text into the canonical schema; may be called
-      again with `:repair` feedback (contract violations) by the caller;
+    * `outline/2` – step 1: splits the text into sections and infers each
+      section's format (no tools, one fast call);
+    * `parse/2` – step 2: reads free text into the canonical schema, given the
+      verified outline and the JSON Schema of each format it uses; may be
+      called again with `:repair` feedback (contract violations) by the caller;
     * `proofread/2` – proposes verbatim in-line text corrections.
 
   Both agents may call server-side tools (Gemini function calling), executed
   by `MilosTraining.Workouts.Domain.WorkoutAssistant.Tools`: exercise catalog
-  lookup, timer format specs, unit conversion and, for the parser, a
-  `validate_draft` self-check against the strict contract.
+  lookup, the canonical section schemas (`get_section_schema`), unit
+  conversion and a `validate_draft` self-check against the strict contract.
 
   Configuration (runtime):
 
@@ -41,12 +44,24 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
   # validate_draft stays available in Tools but is not offered by default: the
   # server runs the same contract on every answer and requests a repair, which
   # costs a round trip only when something is actually wrong.
-  @parser_tools ~w(lookup_exercises get_timer_format convert_units)
+  @parser_tools ~w(lookup_exercises get_section_schema convert_units)
   @proofreader_tools ~w(lookup_exercises convert_units)
+
+  @impl true
+  def outline(text, options) do
+    locale = Map.get(options, :locale, "en")
+
+    run(GeminiPrompts.structure(locale), [user_turn(text)], [], %{
+      source: text,
+      agent: "structure",
+      max_rounds: 0
+    })
+  end
 
   @impl true
   def parse(text, options) do
     locale = Map.get(options, :locale, "en")
+    outline = Map.get(options, :outline)
 
     turns =
       case Map.get(options, :repair) do
@@ -61,7 +76,7 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
           [user_turn(text)]
       end
 
-    run(GeminiPrompts.parser(locale), turns, @parser_tools, %{
+    run(GeminiPrompts.parser(locale, outline), turns, @parser_tools, %{
       source: text,
       agent: "parser",
       max_rounds: @parser_tool_rounds

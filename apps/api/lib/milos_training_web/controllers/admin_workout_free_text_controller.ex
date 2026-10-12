@@ -77,7 +77,7 @@ defmodule MilosTrainingWeb.AdminWorkoutFreeTextController do
         type: :object,
         additionalProperties: true,
         description:
-          "Canonical workout: title, type, subtitle, description, difficulty, estimated_duration_seconds, equipment, tags and sections[] with name, note, timer_config and exercises[]"
+          "Canonical workout: title, type, subtitle, description, difficulty, estimated_duration_seconds, equipment, tags and sections[] with name, note, timer_config (its own format per section), scoreable/score_config and exercises[] (interval_assignment for complex_emom / even_odd)"
       },
       issues: %Schema{type: :array, items: @issue_schema},
       suggestions: %Schema{type: :array, items: @missing_field_schema},
@@ -87,7 +87,12 @@ defmodule MilosTrainingWeb.AdminWorkoutFreeTextController do
         properties: %{
           repair_attempts: %Schema{type: :integer},
           remaining_violations: %Schema{type: :integer},
-          corrections: %Schema{type: :integer}
+          corrections: %Schema{type: :integer},
+          structure_inferred: %Schema{
+            type: :boolean,
+            description:
+              "Whether the structure step (sections and their formats) succeeded before parsing"
+          }
         }
       },
       summary: %Schema{

@@ -5,20 +5,27 @@ defmodule MilosTraining.Workouts.Queries.AnalyzeFreeText do
   proposal; nothing is persisted until the coach publishes.
 
   Flow:
-    1. the parser and proofreader agents run in parallel;
-    2. the parser's answer is checked by the strict `Contract`; on violations
-       the parser is asked to repair it (at most #{2} times) and the attempt
-       with the fewest violations wins;
-    3. verified proofreading corrections are merged into the issues;
-    4. `FreeTextAnalysis` normalizes everything into canonical data.
+    1. the proofreader starts in parallel with everything below;
+    2. structure first: the structure agent splits the text into sections and
+       infers each section's format; the server verifies the outline against
+       `FormatSchema` (known formats, verbatim evidence);
+    3. the parser fills the sections, given the outline and the canonical JSON
+       Schema of every format used. Without a valid outline it parses in one
+       step (it still has the `get_section_schema` tool);
+    4. the parser's answer is checked by the strict `Contract` (the same
+       per-format schemas); on violations the parser is asked to repair it (at
+       most #{2} times) and the attempt with the fewest violations wins;
+    5. verified proofreading corrections are merged into the issues;
+    6. `FreeTextAnalysis` normalizes everything into canonical data.
 
-  A proofreader failure never fails the analysis; a parser failure does.
+  Proofreader and structure failures never fail the analysis; a parser
+  failure does.
   """
 
   require Logger
 
   alias MilosTraining.Workouts.Domain.FreeTextAnalysis
-  alias MilosTraining.Workouts.Domain.WorkoutAssistant.{Contract, Proofreading}
+  alias MilosTraining.Workouts.Domain.WorkoutAssistant.{Contract, FormatSchema, Proofreading}
 
   @max_length 20_000
   @max_repairs 2
@@ -42,21 +49,43 @@ defmodule MilosTraining.Workouts.Queries.AnalyzeFreeText do
 
   defp analyze(text, options) do
     proofreading = Task.async(fn -> safely(fn -> analyzer().proofread(text, options) end) end)
+    outline = infer_structure(text, options)
+    options = if outline, do: Map.put(options, :outline, outline), else: options
 
     with {:ok, raw} <- analyzer().parse(text, options) do
       {raw, quality} = repair(text, options, raw, Contract.check(raw, text), 0)
       corrections = await_corrections(proofreading, text)
 
+      quality =
+        Map.merge(quality, %{
+          "corrections" => length(corrections),
+          "structure_inferred" => outline != nil
+        })
+
       result =
         raw
         |> FreeTextAnalysis.normalize(text, corrections)
-        |> Map.put("quality", Map.put(quality, "corrections", length(corrections)))
+        |> Map.put("quality", quality)
 
       {:ok, result}
     else
       error ->
         Task.shutdown(proofreading, :brutal_kill)
         error
+    end
+  end
+
+  defp infer_structure(text, options) do
+    with {:ok, raw} <- analyzer().outline(text, options),
+         {:ok, outline} <- FormatSchema.verify_outline(raw, text) do
+      outline
+    else
+      {:error, violations} when is_list(violations) ->
+        Logger.info("Workout structure rejected: #{length(violations)} violations")
+        nil
+
+      _failed ->
+        nil
     end
   end
 

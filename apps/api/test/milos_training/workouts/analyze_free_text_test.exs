@@ -91,4 +91,53 @@ defmodule MilosTraining.Workouts.AnalyzeFreeTextTest do
 
     assert {:error, :analyzer_unavailable} = AnalyzeFreeText.call(@text, %{locale: "en"})
   end
+
+  test "infers the structure first and parses against the formats it found" do
+    parent = self()
+
+    Process.put(:fake_workout_text_outline, fn _text, _options ->
+      {:ok,
+       %{
+         "sections" => [
+           %{"name" => "Metcon", "format" => "AMRAP", "evidence" => "AMRAP 12"},
+           %{"name" => "Extra", "format" => "rounds", "evidence" => "not in the text"}
+         ]
+       }}
+    end)
+
+    Process.put(:fake_workout_text_analyzer, fn _text, options ->
+      send(parent, {:outline, Map.get(options, :outline)})
+      {:ok, valid_answer()}
+    end)
+
+    assert {:ok, result} = AnalyzeFreeText.call(@text, %{locale: "en"})
+    assert result["quality"]["structure_inferred"] == true
+
+    assert_received {:outline,
+                     %{
+                       "sections" => [
+                         %{"name" => "Metcon", "format" => "amrap", "evidence" => "AMRAP 12"},
+                         %{"name" => "Extra", "format" => "untimed"} = extra
+                       ]
+                     }}
+
+    refute Map.has_key?(extra, "evidence")
+  end
+
+  test "falls back to a single-step parse when the structure is unusable" do
+    parent = self()
+
+    Process.put(:fake_workout_text_outline, fn _text, _options ->
+      {:ok, %{"sections" => [%{"name" => "Metcon", "format" => "zumba"}]}}
+    end)
+
+    Process.put(:fake_workout_text_analyzer, fn _text, options ->
+      send(parent, {:outline, Map.get(options, :outline)})
+      {:ok, valid_answer()}
+    end)
+
+    assert {:ok, result} = AnalyzeFreeText.call(@text, %{locale: "en"})
+    assert result["quality"]["structure_inferred"] == false
+    assert_received {:outline, nil}
+  end
 end
