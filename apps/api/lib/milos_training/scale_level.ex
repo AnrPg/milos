@@ -5,7 +5,10 @@ defmodule MilosTraining.ScaleLevel do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
+  # Tenant-owned since ADR-110: each organization has its own set, unique per
+  # organization by slug and (active) sort order, under forced RLS.
   schema "scale_levels" do
+    field :organization_id, :binary_id
     field :slug, :string
     field :label, :string
     field :sort_order, :integer
@@ -16,14 +19,15 @@ defmodule MilosTraining.ScaleLevel do
 
   def changeset(scale_level \\ %__MODULE__{}, params) do
     scale_level
-    |> cast(params, [:slug, :label, :sort_order, :is_active])
+    |> cast(params, [:organization_id, :slug, :label, :sort_order, :is_active])
     |> update_change(:slug, &normalize_slug/1)
     |> update_change(:label, &normalize_label/1)
-    |> validate_required([:slug, :label, :sort_order])
+    |> validate_required([:organization_id, :slug, :label, :sort_order])
     |> validate_format(:slug, ~r/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
     |> validate_number(:sort_order, greater_than_or_equal_to: 1)
-    |> unique_constraint(:slug)
-    |> unique_constraint(:sort_order)
+    |> foreign_key_constraint(:organization_id)
+    |> unique_constraint(:slug, name: :scale_levels_organization_id_slug_index)
+    |> unique_constraint(:sort_order, name: :scale_levels_organization_id_sort_order_index)
   end
 
   defp normalize_slug(nil), do: nil
