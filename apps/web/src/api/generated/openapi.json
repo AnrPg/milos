@@ -3547,6 +3547,124 @@
         ]
       }
     },
+    "/api/platform/organizations/{id}/slug-impact": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformOrganizationController.slug_impact",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "active_member_count": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "canonical_path": {
+                      "type": "string"
+                    },
+                    "organization": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "suspended",
+                            "archived"
+                          ],
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "slug",
+                        "name",
+                        "status"
+                      ],
+                      "type": "object"
+                    },
+                    "pending_invitation_count": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "previous_slugs": {
+                      "items": {
+                        "properties": {
+                          "retired_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "slug": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "slug",
+                          "retired_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "purge_open": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "organization",
+                    "canonical_path",
+                    "active_member_count",
+                    "pending_invitation_count",
+                    "purge_open",
+                    "previous_slugs"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Slug rename impact"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Summarize what renaming an organization's path slug affects (ADR-104)",
+        "tags": [
+          "Platform Organizations"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/class-types": {
       "get": {
         "callbacks": {},
@@ -4569,6 +4687,75 @@
         ]
       }
     },
+    "/api/organization-slug-aliases/{slug}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationSlugAliasController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "canonical_path": {
+                      "type": "string"
+                    },
+                    "canonical_slug": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "slug",
+                    "canonical_slug",
+                    "canonical_path"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Canonical slug for a retired alias"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not a retired alias"
+          }
+        },
+        "summary": "Resolve a retired organization slug to its current canonical slug",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/me/threads": {
       "get": {
         "callbacks": {},
@@ -5260,6 +5447,162 @@
         "summary": "Sign out the current browser session",
         "tags": [
           "Authentication"
+        ]
+      }
+    },
+    "/api/platform/organizations/{id}/slug": {
+      "patch": {
+        "callbacks": {},
+        "description": "Requires the current slug retyped as `confirmation`. The previous slug keeps resolving for API requests (with an `x-organization-canonical-slug` response header) and the web redirects `/org/<old>/...` to the new slug. Retired slugs stay reserved for the organization and can be reclaimed by it.",
+        "operationId": "MilosTrainingWeb.PlatformOrganizationController.rename_slug",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "confirmation": {
+                    "type": "string"
+                  },
+                  "slug": {
+                    "maxLength": 63,
+                    "minLength": 3,
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "slug",
+                  "confirmation"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "canonical_path": {
+                      "type": "string"
+                    },
+                    "organization": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "suspended",
+                            "archived"
+                          ],
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "slug",
+                        "name",
+                        "status"
+                      ],
+                      "type": "object"
+                    },
+                    "previous_slug": {
+                      "type": "string"
+                    },
+                    "previous_slugs": {
+                      "items": {
+                        "properties": {
+                          "retired_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "slug": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "slug",
+                          "retired_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "organization",
+                    "canonical_path",
+                    "previous_slug",
+                    "previous_slugs"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Renamed organization"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Slug taken or rename blocked"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid slug or confirmation"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Rename an organization's path slug, keeping the old slug as a redirecting alias",
+        "tags": [
+          "Platform Organizations"
         ]
       }
     },

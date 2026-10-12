@@ -142,6 +142,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/platform/organizations/{id}/slug-impact": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Summarize what renaming an organization's path slug affects (ADR-104) */
+        get: operations["MilosTrainingWeb.PlatformOrganizationController.slug_impact"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/class-types": {
         parameters: {
             query?: never;
@@ -280,6 +297,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/organization-slug-aliases/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Resolve a retired organization slug to its current canonical slug */
+        get: operations["MilosTrainingWeb.OrganizationSlugAliasController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/threads": {
         parameters: {
             query?: never;
@@ -365,6 +399,26 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/platform/organizations/{id}/slug": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Rename an organization's path slug, keeping the old slug as a redirecting alias
+         * @description Requires the current slug retyped as `confirmation`. The previous slug keeps resolving for API requests (with an `x-organization-canonical-slug` response header) and the web redirects `/org/<old>/...` to the new slug. Retired slugs stay reserved for the organization and can be reclaimed by it.
+         */
+        patch: operations["MilosTrainingWeb.PlatformOrganizationController.rename_slug"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/schedule/slots/{slot_id}/attendance/{user_id}": {
@@ -4108,6 +4162,50 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PlatformOrganizationController.slug_impact": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Slug rename impact */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        active_member_count: number;
+                        canonical_path: string;
+                        organization: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            name: string;
+                            slug: string;
+                            /** @enum {string} */
+                            status: "active" | "suspended" | "archived";
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                        pending_invitation_count: number;
+                        previous_slugs: {
+                            /** Format: date-time */
+                            retired_at: string;
+                            slug: string;
+                        }[];
+                        purge_open: boolean;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminClassTypeController.index": {
         parameters: {
             query?: never;
@@ -4543,6 +4641,44 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.OrganizationSlugAliasController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Canonical slug for a retired alias */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        canonical_path: string;
+                        canonical_slug: string;
+                        slug: string;
+                    };
+                };
+            };
+            /** @description Not a retired alias */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error?: string;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.MessagingController.list_threads": {
         parameters: {
             query?: {
@@ -4827,6 +4963,77 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformOrganizationController.rename_slug": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    confirmation: string;
+                    slug: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Renamed organization */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        canonical_path: string;
+                        organization: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            name: string;
+                            slug: string;
+                            /** @enum {string} */
+                            status: "active" | "suspended" | "archived";
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                        previous_slug: string;
+                        previous_slugs: {
+                            /** Format: date-time */
+                            retired_at: string;
+                            slug: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description Slug taken or rename blocked */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Invalid slug or confirmation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
             };
         };
     };
