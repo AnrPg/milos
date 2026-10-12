@@ -1,7 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 
+import { ApiError } from "@/api/client";
 import {
+  applyMessageDeliveryFailure,
   mergeMessagesWithPending,
+  operationToDisplayMessage,
+  prepareMessageRetry,
   reconcileQueuedMessages,
   type QueuedMessageOperation,
 } from "@/lib/offline-message-outbox";
@@ -95,5 +99,54 @@ describe("offline message outbox", () => {
     ).rejects.toThrow("network unavailable");
 
     expect(remove).not.toHaveBeenCalled();
+  });
+
+  it("keeps transient failures pending and parks permanent ones as failed", () => {
+    expect(applyMessageDeliveryFailure(queued(), new TypeError("offline"))).toMatchObject({
+      status: "pending",
+      attempts: 1,
+      failure: { category: "transient" },
+    });
+    expect(applyMessageDeliveryFailure(queued(), new ApiError(503, "down", {}))).toMatchObject({
+      status: "pending",
+    });
+    expect(applyMessageDeliveryFailure(queued(), new ApiError(401, "expired", {}))).toMatchObject({
+      status: "pending",
+    });
+    expect(
+      applyMessageDeliveryFailure(queued(), new ApiError(403, "forbidden", { code: "forbidden" })),
+    ).toMatchObject({
+      status: "failed",
+      failure: { category: "permanent", status: 403, code: "forbidden" },
+    });
+  });
+
+  it("retries a failed message with the same operation id", () => {
+    const failed = queued({
+      status: "failed",
+      attempts: 3,
+      lastError: "legacy",
+      failure: { category: "permanent", status: 422 },
+    });
+
+    expect(prepareMessageRetry(failed)).toMatchObject({
+      operationId: "op-1",
+      status: "pending",
+      attempts: 3,
+      failure: undefined,
+      lastError: undefined,
+    });
+  });
+
+  it("exposes the failure reason on the pending bubble", () => {
+    const display = operationToDisplayMessage(
+      queued({ status: "failed", failure: { category: "permanent", status: 403 } }),
+    );
+
+    expect(display).toMatchObject({
+      delivery_status: "failed",
+      client_operation_id: "op-1",
+      delivery_failure: { category: "permanent", status: 403 },
+    });
   });
 });

@@ -282,6 +282,11 @@ const API_ERROR_KEYS: Record<string, string> = {
   forbidden: "apiErrorForbidden",
   validation_failed: "apiErrorValidationFailed",
   offline: "apiErrorOffline",
+  idempotency_key_conflict: "apiErrorIdempotencyKeyConflict",
+  slot_full: "apiErrorSlotFull",
+  already_booked: "apiErrorAlreadyBooked",
+  slot_in_past: "apiErrorSlotInPast",
+  booking_not_pending: "apiErrorBookingNotPending",
 };
 
 const ADMIN_ASSIGNMENT_ERROR_KEYS: Record<string, string> = {
