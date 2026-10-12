@@ -10,6 +10,7 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
   """
 
   alias MilosTraining.{Organizations, Scheduling, Workouts}
+  alias MilosTraining.Workouts.Domain.AssignmentAudiencePolicy
   alias MilosTraining.Workouts.WorkoutStore
 
   def call(context, actor, workout_id, source, source_reference_id) do
@@ -62,17 +63,24 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
 
   defp may_self_select?(_actor, _organization_id), do: false
 
-  defp authorize_assignment(context, %{id: athlete_id} = actor, workout_id, assignment_id)
+  # ADR-107: an assignment may be addressed to an athlete or a member. The link
+  # alone is not enough - the assignee must still hold an active athlete or
+  # member membership in the assignment's organization.
+  defp authorize_assignment(context, %{id: assignee_id} = actor, workout_id, assignment_id)
        when is_binary(assignment_id) do
-    case assignment_execution_access(context, actor, workout_id, assignment_id, athlete_id) do
+    case assignment_execution_access(context, actor, workout_id, assignment_id, assignee_id) do
       %{master_workout_id: ^workout_id, athlete_status: status} = access
       when status in [nil, "accepted"] ->
-        {:ok,
-         %{
-           source: "assigned",
-           source_reference_id: assignment_id,
-           organization_id: access.organization_id
-         }}
+        if may_execute_assignment?(actor, access.organization_id) do
+          {:ok,
+           %{
+             source: "assigned",
+             source_reference_id: assignment_id,
+             organization_id: access.organization_id
+           }}
+        else
+          {:error, :execution_source_forbidden}
+        end
 
       %{master_workout_id: ^workout_id, athlete_status: "rejected"} ->
         {:error, :execution_source_forbidden}
@@ -87,6 +95,15 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
 
   defp authorize_assignment(_context, _actor, _workout_id, _assignment_id),
     do: {:error, :execution_source_forbidden}
+
+  defp may_execute_assignment?(%{id: user_id}, organization_id) do
+    user_id
+    |> Organizations.list_memberships()
+    |> Enum.any?(fn %{membership: membership, organization: organization} ->
+      organization.id == organization_id and membership.status == :active and
+        AssignmentAudiencePolicy.may_execute_assignment?(membership.role)
+    end)
+  end
 
   defp authorize_booking(%{organization_id: _} = context, %{id: user_id}, workout_id, booking_id)
        when is_binary(booking_id) do

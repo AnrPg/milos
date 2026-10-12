@@ -11,7 +11,9 @@ defmodule MilosTraining.Application.GetAssignedWorkoutWeek do
             Workouts.list_assigned_workouts_for_admin(context, start_date, end_date)
             |> attach_athletes()
 
-          :athlete ->
+          # ADR-107: members see the personal workouts and class variants
+          # addressed to them, exactly like athletes.
+          role when role in [:athlete, :member] ->
             Workouts.list_assigned_workouts_for_athlete(context, user.id, start_date, end_date)
             |> strip_admin_fields()
 

@@ -31,6 +31,11 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
   defp enrich_slots(slots, context, actor) do
     nickname_cache = booking_nickname_cache(slots, admin_role?(context, actor))
 
+    variants =
+      if admin_role?(context, actor),
+        do: slots |> class_variants(context, actor) |> attach_assignee_nicknames(nickname_cache),
+        else: class_variants(slots, context, actor)
+
     workout_cache =
       slots
       |> Enum.map(& &1.master_workout_id)
@@ -64,11 +69,75 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
       }
 
       if admin_role?(context, actor) do
-        Map.put(base, :bookings, Enum.map(slot.bookings, &enrich_booking(&1, nickname_cache)))
+        base
+        |> Map.put(:bookings, Enum.map(slot.bookings, &enrich_booking(&1, nickname_cache)))
+        |> Map.put(:member_versions, staff_versions(variants, slot.id))
       else
-        Map.put(base, :bookings, [])
+        base
+        |> Map.put(:bookings, [])
+        |> Map.put(:my_version, my_version(variants, slot.id))
       end
     end)
+  end
+
+  # ADR-107: per-member class variants. A member only ever receives their own
+  # variant (`assignee_id` = actor); staff receive every member's.
+  defp class_variants(slots, context, actor) do
+    slot_ids = Enum.map(slots, & &1.id)
+
+    if admin_role?(context, actor) do
+      Workouts.list_class_variants(context, slot_ids, nil)
+    else
+      Workouts.list_class_variants(context, slot_ids, actor.id)
+    end
+  end
+
+  defp my_version(variants, slot_id) do
+    case Enum.find(variants, &(&1.source_slot_id == slot_id)) do
+      nil ->
+        nil
+
+      variant ->
+        %{
+          assignment_id: variant.assignment_id,
+          master_workout_id: variant.master_workout_id,
+          scheduled_for: variant.scheduled_for,
+          status: variant.assignee_status,
+          execution_status: Map.get(variant, :execution_status),
+          # Same shape as a /my-workouts assignment workout.
+          workout: variant.workout
+        }
+    end
+  end
+
+  defp staff_versions(variants, slot_id) do
+    variants
+    |> Enum.filter(&(&1.source_slot_id == slot_id))
+    |> Enum.map(fn variant ->
+      %{
+        assignment_id: variant.assignment_id,
+        user_id: variant.assignee_id,
+        user_nickname: Map.get(variant, :assignee_nickname),
+        master_workout_id: variant.master_workout_id,
+        workout_title: variant.workout && variant.workout.title
+      }
+    end)
+  end
+
+  defp attach_assignee_nicknames(variants, nickname_cache) do
+    missing =
+      variants
+      |> Enum.map(& &1.assignee_id)
+      |> Enum.reject(&Map.has_key?(nickname_cache, &1))
+      |> Enum.uniq()
+
+    cache =
+      missing
+      |> Identity.list_by_ids()
+      |> Map.new(&{&1.id, &1.nickname})
+      |> Map.merge(nickname_cache)
+
+    Enum.map(variants, &Map.put(&1, :assignee_nickname, Map.get(cache, &1.assignee_id)))
   end
 
   defp admin_role?(context, _actor), do: context.role in [:owner, :admin, :coach]

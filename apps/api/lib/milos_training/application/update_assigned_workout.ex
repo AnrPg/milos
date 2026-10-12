@@ -1,6 +1,20 @@
 defmodule MilosTraining.Application.UpdateAssignedWorkout do
-  alias MilosTraining.Application.BroadcastUserSync
-  alias MilosTraining.{Identity, Organizations, Workouts}
+  @moduledoc """
+  Edits an assignment's assignees, date and notes. ADR-107: assignees may be
+  athletes or members (tenant membership roles); members newly added to the
+  assignment need the explicit personal-programming grant, and a class variant
+  keeps exactly one member who must still hold the class booking when the
+  member is changed.
+  """
+
+  alias MilosTraining.Application.{
+    AuthorizeMemberProgramming,
+    BroadcastUserSync,
+    TenantAssigneeRoles
+  }
+
+  alias MilosTraining.{Identity, Organizations, Scheduling, Workouts}
+  alias MilosTraining.Workouts.Domain.AssignmentAudiencePolicy
 
   def call(context, id, params) do
     update(context, id, params)
@@ -8,28 +22,38 @@ defmodule MilosTraining.Application.UpdateAssignedWorkout do
 
   def call(_id, _params), do: {:error, :organization_context_required}
 
-  defp update(context, id, params) do
-    with :ok <- reject_workout_reassignment(params) do
-      athlete_ids =
-        params
-        |> Map.get(:athlete_ids, Map.get(params, "athlete_ids", []))
-        |> List.wrap()
-        |> Enum.uniq()
+  defp update(%{organization_id: organization_id} = context, id, params)
+       when is_binary(organization_id) do
+    athlete_ids =
+      params
+      |> Map.get(:athlete_ids, Map.get(params, "athlete_ids", []))
+      |> List.wrap()
+      |> Enum.uniq()
 
-      with {:ok, athletes} <- fetch_athletes(context, athlete_ids) do
-        if valid_athletes?(context, athlete_ids, athletes) do
-          previous_assignment = get_assigned_workout(context, id)
+    previous_assignment = get_assigned_workout(context, id)
+    source_slot_id = previous_assignment && Map.get(previous_assignment, :source_slot_id)
+    previous_ids = (previous_assignment && Map.get(previous_assignment, :athlete_ids)) || []
 
-          with {:ok, assignment} <- update_assigned_workout(context, id, params) do
-            broadcast_assignment_refresh(context, previous_assignment, assignment)
-            {:ok, assignment}
-          end
-        else
-          {:error, :invalid_athletes}
+    with :ok <- reject_workout_reassignment(params),
+         {:ok, roles} <- TenantAssigneeRoles.call(context, athlete_ids),
+         {:ok, classified} <- AssignmentAudiencePolicy.classify(athlete_ids, roles),
+         :ok <- AssignmentAudiencePolicy.validate_class_variant(source_slot_id, classified),
+         :ok <- variant_member_booked(context, source_slot_id, classified, previous_ids),
+         :ok <- AuthorizeMemberProgramming.call(context, classified.members -- previous_ids) do
+      athletes = Identity.list_by_ids(athlete_ids)
+
+      if valid_athletes?(context, athlete_ids, athletes) do
+        with {:ok, assignment} <- update_assigned_workout(context, id, params) do
+          broadcast_assignment_refresh(context, previous_assignment, assignment)
+          {:ok, assignment}
         end
+      else
+        {:error, :invalid_athletes}
       end
     end
   end
+
+  defp update(_context, _id, _params), do: {:error, :organization_context_required}
 
   defp reject_workout_reassignment(params) do
     if Map.has_key?(params, :master_workout_id) or Map.has_key?(params, "master_workout_id") do
@@ -39,20 +63,24 @@ defmodule MilosTraining.Application.UpdateAssignedWorkout do
     end
   end
 
-  defp fetch_athletes(%{organization_id: organization_id}, athlete_ids) do
-    valid? =
-      Enum.all?(athlete_ids, fn user_id ->
-        user_id
-        |> Organizations.list_memberships()
-        |> Enum.any?(fn %{membership: membership, organization: organization} ->
-          organization.id == organization_id and membership.role == :athlete
-        end)
-      end)
+  defp variant_member_booked(_context, nil, _classified, _previous_ids), do: :ok
 
-    if valid?, do: {:ok, Identity.list_by_ids(athlete_ids)}, else: {:error, :invalid_athletes}
+  defp variant_member_booked(context, slot_id, %{members: [member_id]}, previous_ids) do
+    if member_id in previous_ids do
+      :ok
+    else
+      case Scheduling.get_slot(context, slot_id) do
+        %{scheduled_at: %DateTime{} = scheduled_at} ->
+          context
+          |> Scheduling.list_member_slots(member_id, scheduled_at, DateTime.add(scheduled_at, 1))
+          |> Enum.any?(&(&1.id == slot_id))
+          |> if(do: :ok, else: {:error, :slot_not_booked_by_member})
+
+        _missing ->
+          {:error, :slot_not_booked_by_member}
+      end
+    end
   end
-
-  defp fetch_athletes(_context, _athlete_ids), do: {:error, :organization_context_required}
 
   defp valid_athletes?(_context, athlete_ids, athletes) do
     MapSet.new(athlete_ids) == MapSet.new(Enum.map(athletes, & &1.id))
