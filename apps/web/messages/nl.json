@@ -2530,7 +2530,7 @@
     "freeTextEditorPlaceholder": "Schrijf de WOD precies zoals deze op het bord moet verschijnen...",
     "freeTextEditorLabel": "Trainingseditor met vrije tekst",
     "freeTextTitle": "Vrije tekst WOD",
-    "freeTextDescription": "Schrijf een snelle rich-text WOD. Het wordt opgeslagen en weergegeven als één ongestructureerde tekst.",
+    "freeTextDescription": "Schrijf de WOD zoals op het whiteboard. Sporters zien je tekst zoals je hem schrijft; de assistent zet hem om in gestructureerde gegevens.",
     "freeTextPreviewEmpty": "Het vrije-tekst WOD-voorbeeld verschijnt hier.",
     "timerFormatLabel": "Timer-formaat",
     "durationMinutesLabel": "Duur (minuten)",

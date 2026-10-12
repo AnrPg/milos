@@ -2530,7 +2530,7 @@
     "freeTextEditorPlaceholder": "Scrivi il WOD esattamente come dovrebbe apparire sulla lavagna...",
     "freeTextEditorLabel": "Editor di allenamenti a testo libero",
     "freeTextTitle": "WOD a testo libero",
-    "freeTextDescription": "Scrivi un WOD veloce e ricco di testo. Viene salvato e visualizzato come un unico corpo di testo non strutturato.",
+    "freeTextDescription": "Scrivi il WOD come sulla lavagna. Gli atleti vedono il testo così com’è; l’assistente lo trasforma in dati strutturati.",
     "freeTextPreviewEmpty": "L'anteprima del WOD a testo libero apparirà qui.",
     "timerFormatLabel": "Formato del timer",
     "durationMinutesLabel": "Durata (minuti)",

@@ -2530,7 +2530,7 @@
     "freeTextEditorPlaceholder": "اكتب WOD تمامًا كما يجب أن يظهر على السبورة...",
     "freeTextEditorLabel": "محرر تجريب النص الحر",
     "freeTextTitle": "نص مجاني WOD",
-    "freeTextDescription": "اكتب WOD نصًا سريعًا. يتم حفظه وإظهاره كنص نصي واحد غير منظم.",
+    "freeTextDescription": "اكتب تمرين اليوم كما على السبورة. يرى الرياضيون نصك كما كتبته، ويحوّله المساعد إلى بيانات منظّمة.",
     "freeTextPreviewEmpty": "ستظهر معاينة WOD للنص الحر هنا.",
     "timerFormatLabel": "تنسيق الموقت",
     "durationMinutesLabel": "المدة (بالدقائق)",

@@ -2530,7 +2530,7 @@
     "freeTextEditorPlaceholder": "Escribe el WOD exactamente como debe aparecer en la pizarra...",
     "freeTextEditorLabel": "Editor de ejercicios de texto libre",
     "freeTextTitle": "WOD de texto libre",
-    "freeTextDescription": "Escribe un WOD rápido de texto enriquecido. Se guarda y se muestra como un cuerpo de texto no estructurado.",
+    "freeTextDescription": "Escribe el WOD como en la pizarra. Los atletas ven tu texto tal cual; el asistente lo convierte en datos estructurados.",
     "freeTextPreviewEmpty": "La vista previa del WOD en texto libre aparecerá aquí.",
     "timerFormatLabel": "Formato del temporizador",
     "durationMinutesLabel": "Duración (minutos)",

@@ -2530,7 +2530,7 @@
     "freeTextEditorPlaceholder": "Écrivez le WOD exactement comme il doit apparaître au tableau...",
     "freeTextEditorLabel": "Éditeur d'entraînement en texte libre",
     "freeTextTitle": "WOD en texte libre",
-    "freeTextDescription": "Écrivez un WOD rapide en texte enrichi. Il est enregistré et affiché sous la forme d'un corps de texte non structuré.",
+    "freeTextDescription": "Écris le WOD comme au tableau. Les athlètes voient ton texte tel quel ; l’assistant le transforme en données structurées.",
     "freeTextPreviewEmpty": "L'aperçu WOD en texte libre apparaîtra ici.",
     "timerFormatLabel": "Format de minuterie",
     "durationMinutesLabel": "Durée (minutes)",

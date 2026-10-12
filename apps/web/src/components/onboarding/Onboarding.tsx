@@ -208,7 +208,7 @@ function AdminChecklistDialog({
         <div className="mt-4">
           <ChecklistView checklist={checklist} slug={slug} busy={busy} onAction={onAction} onNavigate={onLater} onTour={onTour} onInvite={onInvite} />
         </div>
-        <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
+        <div className="sticky bottom-0 -mx-5 -mb-5 mt-5 flex flex-col-reverse gap-2 px-5 pb-5 pt-3 sm:static sm:m-0 sm:mt-5 sm:flex-row sm:justify-between sm:p-0" style={{ background: "var(--panel)" }}>
           <button type="button" onClick={onDismiss} className="rounded-xl px-4 py-2 text-sm font-semibold" style={{ color: "var(--muted)" }}>
             {t("dontShow")}
           </button>

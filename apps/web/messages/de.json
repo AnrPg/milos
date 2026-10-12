@@ -2530,7 +2530,7 @@
     "freeTextEditorPlaceholder": "Schreiben Sie das WOD genau so, wie es an der Tafel erscheinen soll ...",
     "freeTextEditorLabel": "Freitext-Workout-Editor",
     "freeTextTitle": "Freitext-WOD",
-    "freeTextDescription": "Schreiben Sie ein schnelles Rich-Text-WOD. Es wird gespeichert und als ein unstrukturierter Textkörper angezeigt.",
+    "freeTextDescription": "Schreib das WOD wie an die Tafel. Athleten sehen deinen Text unverändert; der Assistent macht daraus strukturierte Daten.",
     "freeTextPreviewEmpty": "Hier erscheint die Freitext-WOD-Vorschau.",
     "timerFormatLabel": "Timer-Format",
     "durationMinutesLabel": "Dauer (Minuten)",
