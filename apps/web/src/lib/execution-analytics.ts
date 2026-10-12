@@ -2,7 +2,7 @@ import { ApiError, apiRequest } from "@/api/client";
 import type { paths } from "@/api/generated/schema";
 
 /**
- * Client-side execution analytics (ADR-105).
+ * Client-side execution analytics (ADR-113).
  *
  * Signals only the client can observe during a workout (pause sheet, manual
  * skip vs automatic advance, "+1 round", on-the-fly adjusts, ready screen and

@@ -59,7 +59,7 @@ defmodule MilosTrainingWeb.AdminScheduleController do
         format: :uuid,
         nullable: true,
         description:
-          "Stable client operation id (ADR-102). Replaying the operation that already " <>
+          "Stable client operation id (ADR-110). Replaying the operation that already " <>
             "resolved the booking returns it with 200 and no new notification."
       }
     },
@@ -179,7 +179,7 @@ defmodule MilosTrainingWeb.AdminScheduleController do
   operation(:approve_booking,
     summary: "Approve a booking",
     description:
-      "Booking resolution is never replayed blindly (ADR-102): a booking that is no longer " <>
+      "Booking resolution is never replayed blindly (ADR-110): a booking that is no longer " <>
         "pending returns 409 `booking_not_pending` unless it was resolved by this same " <>
         "`client_operation_id`, which returns the booking with 200.",
     parameters: [@id_param],
@@ -206,7 +206,7 @@ defmodule MilosTrainingWeb.AdminScheduleController do
   operation(:reject_booking,
     summary: "Reject a booking",
     description:
-      "Booking resolution is never replayed blindly (ADR-102): a booking that is no longer " <>
+      "Booking resolution is never replayed blindly (ADR-110): a booking that is no longer " <>
         "pending returns 409 `booking_not_pending` unless it was resolved by this same " <>
         "`client_operation_id`, which returns the booking with 200.",
     parameters: [@id_param],

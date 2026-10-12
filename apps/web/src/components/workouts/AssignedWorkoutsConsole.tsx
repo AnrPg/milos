@@ -426,7 +426,7 @@ export function AssignedWorkoutsConsole({
 
   const accessToken = tokens?.access_token;
 
-  // ADR-105: an athlete opening an assignment's detail is an analytics fact.
+  // ADR-113: an athlete opening an assignment's detail is an analytics fact.
   const panelAssignmentId = panelAssignment?.id ?? null;
   useEffect(() => {
     if (!panelAssignmentId || isAdmin || !accessToken) return;

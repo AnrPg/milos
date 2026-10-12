@@ -108,7 +108,7 @@ export function tenantBrandName(
   return membership?.settings?.brand_name?.trim() || membership?.organization.name.trim() || null;
 }
 
-/** ADR-103: the selected tenant's logo for the shell header, if any. */
+/** ADR-111: the selected tenant's logo for the shell header, if any. */
 export function tenantBrandLogoUrl(
   memberships: OrganizationMembershipSummary[],
   selectedSlug?: string | null,

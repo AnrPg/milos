@@ -511,7 +511,7 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     |> flatten_transaction()
   end
 
-  # ADR-104: slug rename + alias bookkeeping + audit event in one transaction.
+  # ADR-112: slug rename + alias bookkeeping + audit event in one transaction.
   # The organization row is locked first, then both the retired and the
   # requested slug are serialized with transaction-scoped advisory locks so a
   # concurrent provisioning or rename cannot claim either slug between the
@@ -901,7 +901,7 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     end
   end
 
-  # Organization slugs and retired aliases share one namespace (ADR-104), but
+  # Organization slugs and retired aliases share one namespace (ADR-112), but
   # live in two tables, so no single unique index covers both. Provisioning
   # and slug renames take the same advisory lock per slug before checking.
   defp lock_slugs(slugs) do

@@ -43,7 +43,7 @@ defmodule MilosTraining.Application.CompleteWorkout do
     account = Identity.find_by_id(user_id)
     settings = Gamification.get_settings()
 
-    # ADR-100: live standalone training-log entries count as completions next
+    # ADR-108: live standalone training-log entries count as completions next
     # to finished executions, so streaks, totals, badges and challenges see
     # class/offline workouts too. Voided entries are excluded here, which is
     # how a void stops counting on the next projection run.
@@ -93,7 +93,7 @@ defmodule MilosTraining.Application.CompleteWorkout do
 
   @doc """
   Runs the completion projection for a standalone training-log entry
-  (ADR-100). Voided entries are a no-op so a late job never crashes or
+  (ADR-108). Voided entries are a no-op so a late job never crashes or
   counts them.
   """
   def process_training_log_completion(entry) do

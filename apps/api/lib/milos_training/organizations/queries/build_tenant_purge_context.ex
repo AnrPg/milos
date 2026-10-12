@@ -1,7 +1,7 @@
 defmodule MilosTraining.Organizations.Queries.BuildTenantPurgeContext do
   @moduledoc """
   Builds the only tenant scope accepted by context export/purge functions
-  (ADR-099). It exists solely while the purge record is in a working stage
+  (ADR-107). It exists solely while the purge record is in a working stage
   (`exporting` or `purging`), so ordinary request/job contexts can never reach
   destructive tenant-wide operations.
   """

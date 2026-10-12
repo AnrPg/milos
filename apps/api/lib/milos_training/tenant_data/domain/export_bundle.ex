@@ -1,6 +1,6 @@
 defmodule MilosTraining.TenantData.Domain.ExportBundle do
   @moduledoc """
-  Builds the tenant export and retention archive bundles (ADR-099): in-memory
+  Builds the tenant export and retention archive bundles (ADR-107): in-memory
   ZIP files of pretty-printed JSON documents, one per bounded context, plus a
   manifest. Pure apart from OTP's in-memory `:zip`; callers pass timestamps.
   """

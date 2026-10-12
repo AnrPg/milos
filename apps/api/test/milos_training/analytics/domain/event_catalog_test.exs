@@ -8,7 +8,7 @@ defmodule MilosTraining.Analytics.Domain.EventCatalogTest do
   @subject "33333333-3333-3333-3333-333333333333"
   @at ~U[2026-10-12 08:30:00.000000Z]
 
-  test "registry keeps the Phase 8 events and adds the ADR-105 families" do
+  test "registry keeps the Phase 8 events and adds the ADR-113 families" do
     names = EventCatalog.event_names()
 
     for name <- ~w(payment_recorded review_submitted notification_clicked finance_invoice_created) do

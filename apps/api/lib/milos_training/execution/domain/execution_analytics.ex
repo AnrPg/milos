@@ -1,6 +1,6 @@
 defmodule MilosTraining.Execution.Domain.ExecutionAnalytics do
   @moduledoc """
-  Pure derivation of execution analytics facts (ADR-105), from an execution
+  Pure derivation of execution analytics facts (ADR-113), from an execution
   snapshot and its timer segments (`TimerSequenceBuilder.build/1`).
 
   These are the server-observable halves of the timer audit's §1.3 KPIs:

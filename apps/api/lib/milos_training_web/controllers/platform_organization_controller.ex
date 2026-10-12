@@ -129,7 +129,7 @@ defmodule MilosTrainingWeb.PlatformOrganizationController do
   }
 
   operation(:slug_impact,
-    summary: "Summarize what renaming an organization's path slug affects (ADR-104)",
+    summary: "Summarize what renaming an organization's path slug affects (ADR-112)",
     parameters: [@organization_id],
     responses: [
       ok:

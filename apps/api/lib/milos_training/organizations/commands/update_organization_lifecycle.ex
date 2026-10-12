@@ -8,7 +8,7 @@ defmodule MilosTraining.Organizations.Commands.UpdateOrganizationLifecycle do
   def call(%PlatformContext{} = context, organization_id, status, changed_at) do
     with {:ok, status} <- normalize_status(status) do
       RepoContext.run(%{user_id: context.user_id}, fn ->
-        # ADR-099: an open purge pins the lifecycle - approved/running purges
+        # ADR-107: an open purge pins the lifecycle - approved/running purges
         # cannot be interrupted, and reactivation needs an explicit cancel.
         with :ok <-
                organization_id

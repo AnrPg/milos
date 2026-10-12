@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.SchedulingAnalyticsInstrumentationTest do
-  @moduledoc "ADR-105: class slot, booking and attendance events."
+  @moduledoc "ADR-113: class slot, booking and attendance events."
   use MilosTraining.DataCase, async: false
 
   import MilosTraining.AnalyticsHelpers

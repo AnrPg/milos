@@ -1,6 +1,6 @@
 defmodule MilosTraining.Execution.Domain.TrainingLogPolicy do
   @moduledoc """
-  Pure rules for standalone training-log entries (ADR-100).
+  Pure rules for standalone training-log entries (ADR-108).
 
   The policy normalizes user-entered training details, decides whether a
   source may be logged without double counting an execution, and projects a
@@ -98,7 +98,7 @@ defmodule MilosTraining.Execution.Domain.TrainingLogPolicy do
   end
 
   @doc """
-  ADR-102 replay rule for a reused `idempotency_key`.
+  ADR-110 replay rule for a reused `idempotency_key`.
 
   A replay converges on the original entry only when it names the same source
   (type and reference). Reusing a key for a different source is a

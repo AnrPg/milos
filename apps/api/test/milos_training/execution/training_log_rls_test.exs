@@ -1,6 +1,6 @@
 defmodule MilosTraining.Execution.TrainingLogRlsTest do
   @moduledoc """
-  Proves the training_log_entries RLS policy (ADR-100) against a real
+  Proves the training_log_entries RLS policy (ADR-108) against a real
   non-superuser connection. See MilosTraining.RLSCase.
   """
   use MilosTraining.RLSCase, async: false

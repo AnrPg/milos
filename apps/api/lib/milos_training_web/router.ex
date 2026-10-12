@@ -156,7 +156,7 @@ defmodule MilosTrainingWeb.Router do
     get("/theme", MilosTrainingWeb.ThemeController, :show)
   end
 
-  # ADR-104: unauthenticated retired-slug lookup behind the web proxy's 308.
+  # ADR-112: unauthenticated retired-slug lookup behind the web proxy's 308.
   scope "/api" do
     pipe_through([:api, :slug_alias_rate_limited])
 
@@ -239,7 +239,7 @@ defmodule MilosTrainingWeb.Router do
     post("/threads/:id/read", MessagingController, :mark_read)
   end
 
-  # ADR-100: standalone training log (class / offline workouts).
+  # ADR-108: standalone training log (class / offline workouts).
   scope "/api/org/:organization_slug/me/training-log", MilosTrainingWeb do
     pipe_through([
       :api,
@@ -494,7 +494,7 @@ defmodule MilosTrainingWeb.Router do
 
     patch("/organizations/:id/lifecycle", PlatformOrganizationController, :lifecycle)
     patch("/organizations/:id/name", PlatformOrganizationController, :rename)
-    # ADR-104 slug rename with typed confirmation and retired-slug aliases.
+    # ADR-112 slug rename with typed confirmation and retired-slug aliases.
     get("/organizations/:id/slug-impact", PlatformOrganizationController, :slug_impact)
     patch("/organizations/:id/slug", PlatformOrganizationController, :rename_slug)
     patch("/organizations/:id/settings", PlatformOrganizationController, :settings)
@@ -517,7 +517,7 @@ defmodule MilosTrainingWeb.Router do
       :remove_logo
     )
 
-    # ADR-099 reviewed tenant export/purge workflow.
+    # ADR-107 reviewed tenant export/purge workflow.
     get("/organization-purges", PlatformOrganizationPurgeController, :index)
     post("/organizations/:id/purge", PlatformOrganizationPurgeController, :create)
     get("/organizations/:id/purge", PlatformOrganizationPurgeController, :show)
@@ -600,7 +600,7 @@ defmodule MilosTrainingWeb.Router do
     post("/:id/modifications", ExecutionController, :add_modifications)
   end
 
-  # ADR-105: batched client interaction analytics get their own bucket so a
+  # ADR-113: batched client interaction analytics get their own bucket so a
   # chatty client can never eat into the progress/complete budget above.
   scope "/api/executions", MilosTrainingWeb do
     pipe_through([

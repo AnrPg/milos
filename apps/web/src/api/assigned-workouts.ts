@@ -134,7 +134,7 @@ export async function deleteAssignedWorkout(token: string, assignmentId: string)
 }
 
 /**
- * Analytics (ADR-105): the athlete opened an assignment's detail. Recorded at
+ * Analytics (ADR-113): the athlete opened an assignment's detail. Recorded at
  * most once per athlete, assignment and day server-side; best effort, never
  * throws.
  */

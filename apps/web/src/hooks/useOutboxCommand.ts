@@ -13,7 +13,7 @@ import {
 } from "@/lib/offline-command-outbox";
 
 /**
- * Submits one of the explicitly registered ADR-102 commands through the
+ * Submits one of the explicitly registered ADR-110 commands through the
  * durable device outbox, pinned to the current user and organization.
  */
 export function useOutboxCommand() {

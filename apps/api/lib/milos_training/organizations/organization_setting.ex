@@ -14,7 +14,7 @@ defmodule MilosTraining.Organizations.OrganizationSetting do
     field :invitation_lifetime_seconds, :integer, default: 604_800
     field :brand_name, :string
     field :brand_logo_url, :string
-    # ADR-103: storage key of an uploaded logo; `brand_logo_url` then holds
+    # ADR-111: storage key of an uploaded logo; `brand_logo_url` then holds
     # its derived public URL. Only `logo_changeset/2` writes it.
     field :brand_logo_object_key, :string
     field :brand_primary_color, :string
@@ -63,7 +63,7 @@ defmodule MilosTraining.Organizations.OrganizationSetting do
   end
 
   @doc """
-  ADR-103: the only write path for an uploaded logo. Sets (or clears, with
+  ADR-111: the only write path for an uploaded logo. Sets (or clears, with
   nils) the object key and its derived public URL together.
   """
   def logo_changeset(%__MODULE__{} = setting, params) do

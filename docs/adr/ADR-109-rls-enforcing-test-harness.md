@@ -1,4 +1,4 @@
-# ADR-101: Controller Tests Run Under the RLS-Enforcing Runtime Role
+# ADR-109: Controller Tests Run Under the RLS-Enforcing Runtime Role
 Date: 2026-10-12
 Status: Accepted
 
@@ -45,7 +45,7 @@ enforced suite, while the old superuser mode stays green.
 - Any new controller test exercises RLS by default.
 - Channel tests still connect sockets as the superuser (sockets are not
   dispatched through `call/2`); the endpoint delegates PubSub functions.
-- Whole-suite DataCase enforcement remains future work (TD-063).
+- Whole-suite DataCase enforcement remains future work (TD-071).
 
 ## Implementation Notes
 Turning enforcement on surfaced these production defects, all fixed in this
@@ -67,7 +67,7 @@ change:
 - **System tenant resolution failed in jobs** (`:organization_not_found`). An
   additive read-only policy lets a session scoped to an organization read that
   organization's own row, and `FindOrganization.by_id` reads in that scope
-  (resolves TD-061).
+  (resolves TD-069).
 - **Missing `RepoContext.run/2` wraps:** invitation issue/revoke, membership
   role and status changes, active-member listing (admin directory, finance
   search, member user search), gamification preferences read/write, and
@@ -75,6 +75,6 @@ change:
   organization-less clicks are only marked read).
 - **Policy gap, not fixed:** staff cannot read members' PRs because
   `user_pr_records` is owner-only and ADR-055's sharing grants are not
-  implemented. The single affected dossier test opts out and points at TD-062.
+  implemented. The single affected dossier test opts out and points at TD-070.
 - **Harness bug fixed during development:** `use Phoenix.VerifiedRoutes`
   overwrites `@endpoint`, so ConnCase now assigns it after that `use`.

@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.TrainingLogEntryTest do
-  @moduledoc "ADR-100 integration tests: application services + Ecto store."
+  @moduledoc "ADR-108 integration tests: application services + Ecto store."
   use MilosTraining.DataCase, async: false
 
   import Ecto.Query
@@ -469,7 +469,7 @@ defmodule MilosTraining.Application.TrainingLogEntryTest do
     end
   end
 
-  describe "offline replay (ADR-102)" do
+  describe "offline replay (ADR-110)" do
     test "replays an accepted class log even after the source stopped authorizing" do
       owner = TestFixtures.admin_fixture()
       {organization, owner_context} = organization_fixture(owner)

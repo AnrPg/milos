@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.ApproveOrganizationPurge do
   @moduledoc """
-  ADR-099 stage 4: approves an exported purge after the typed slug
+  ADR-107 stage 4: approves an exported purge after the typed slug
   confirmation (recording whether a second vendor approved) and enqueues the
   purge job.
   """

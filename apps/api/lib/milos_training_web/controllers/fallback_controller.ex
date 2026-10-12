@@ -349,7 +349,7 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
-  # ADR-103 tenant logo upload.
+  # ADR-111 tenant logo upload.
   def call(conn, {:error, :invalid_brand_logo_upload}) do
     conn
     |> put_status(:unprocessable_entity)
@@ -1326,7 +1326,7 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
-  # ADR-099 reviewed tenant purge workflow.
+  # ADR-107 reviewed tenant purge workflow.
   def call(conn, {:error, :organization_purge_exists}) do
     conn
     |> put_status(:conflict)
@@ -1363,7 +1363,7 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
-  # ADR-104 organization slug rename.
+  # ADR-112 organization slug rename.
   def call(conn, {:error, :invalid_slug}) do
     conn
     |> put_status(:unprocessable_entity)

@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.LogTrainingEntry do
   @moduledoc """
-  Logs a workout performed outside a timer-backed execution (ADR-100).
+  Logs a workout performed outside a timer-backed execution (ADR-108).
 
   Orchestrates source authorization (Scheduling / Workouts public APIs),
   the no-double-counting check against the user's executions, persistence in
@@ -25,7 +25,7 @@ defmodule MilosTraining.Application.LogTrainingEntry do
     now = DateTime.utc_now()
 
     Execution.with_training_log_context(context, fn ->
-      # ADR-102: an offline replay of an already accepted submission returns
+      # ADR-110: an offline replay of an already accepted submission returns
       # the original entry before source authorization is re-evaluated, so a
       # source that has since closed (class over, assignment rejected, entry
       # already logged) cannot turn an acknowledged write into a failure.

@@ -1,4 +1,4 @@
-# ADR-104: Organization Name and Slug Editing
+# ADR-112: Organization Name and Slug Editing
 Date: 2026-10-12
 Status: Accepted
 
@@ -42,7 +42,7 @@ another tenant's sign-in context.
    organization exists - so no other organization can provision or rename into
    them. Renaming back to one of the organization's own aliases is allowed: that
    alias row is removed and the then-current slug becomes an alias. Aliases are
-   deleted with the organization (cascade, permanent delete, and the ADR-099
+   deleted with the organization (cascade, permanent delete, and the ADR-107
    purge), which is the only point at which a retired slug becomes claimable.
 
 4. **API resolution by a retired slug is transparent.** `ResolveTenantContext`
@@ -62,7 +62,7 @@ another tenant's sign-in context.
    proceeds unchanged, and decision 4 still keeps tenant API calls working.
 
 6. **Open purges block slug renames** (`slug_rename_blocked_by_purge`), because
-   the ADR-099 approval compares the typed confirmation with the slug snapshotted
+   the ADR-107 approval compares the typed confirmation with the slug snapshotted
    on the purge record.
 
 ## Rationale
@@ -81,7 +81,7 @@ resolve to a different tenant. Slugs are cheap (3-63 characters), renames are
 rare vendor operations, and the reservation ends exactly when the organization -
 and therefore the meaning of the old link - ends.
 
-Requiring the current slug retyped mirrors ADR-099's purge approval and makes the
+Requiring the current slug retyped mirrors ADR-107's purge approval and makes the
 vendor read the address that is about to change; the impact summary makes the
 blast radius explicit before commit.
 
@@ -109,7 +109,7 @@ blast radius explicit before commit.
 - `organization_slug_aliases` is a platform-administered root table: classified in
   `Tenancy.Audit`'s `@platform_administered_tables`, forced RLS mirroring
   `organization_domains`, and declared in Organizations' `TenantDataPolicy` so the
-  ADR-099 export carries it and `TenantTableCoverageTest` stays green.
+  ADR-107 export carries it and `TenantTableCoverageTest` stays green.
 - Provisioning (`provision_organization`, `create_organization`) now also rejects a
   slug that is a retired alias (`slug: has already been taken`). Organization
   slugs and aliases share one namespace across two tables, so both provisioning and

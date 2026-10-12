@@ -1,6 +1,6 @@
 defmodule MilosTraining.Infrastructure.Execution.EctoTrainingLogStore do
   @moduledoc """
-  Ecto adapter for standalone training-log entries (ADR-100).
+  Ecto adapter for standalone training-log entries (ADR-108).
 
   Ownership is always taken from the session GUCs opened by `RepoContext`,
   never from caller params: inserts stamp `organization_id` / `user_id` from

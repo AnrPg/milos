@@ -54,7 +54,7 @@ defmodule MilosTrainingWeb.MyWorkoutController do
   end
 
   operation(:open,
-    summary: "Athlete reports opening an assigned workout's detail (analytics, ADR-105)",
+    summary: "Athlete reports opening an assigned workout's detail (analytics, ADR-113)",
     description:
       "Records workout_assignment_opened once per athlete, assignment and UTC day. " <>
         "Repeated calls the same day are accepted and ignored.",

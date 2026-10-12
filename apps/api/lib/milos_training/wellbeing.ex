@@ -24,7 +24,7 @@ defmodule MilosTraining.Wellbeing do
   defdelegate list_injuries(filters \\ %{}), to: ListInjuries, as: :call
   defdelegate injury_summary(filters \\ %{}), to: InjurySummary, as: :call
 
-  # ADR-099 reviewed tenant export/purge. This context owns its table list and
+  # ADR-107 reviewed tenant export/purge. This context owns its table list and
   # retention policy; the shared executor only runs what this policy declares,
   # always inside a RepoContext session for the purge's tenant.
   def tenant_data_policy, do: MilosTraining.Wellbeing.Domain.TenantDataPolicy.policy()

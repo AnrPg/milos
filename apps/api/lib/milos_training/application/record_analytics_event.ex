@@ -47,7 +47,7 @@ defmodule MilosTraining.Application.RecordAnalyticsEvent do
       :ok
   end
 
-  # ADR-105: when the caller names the tenant explicitly, record inside that
+  # ADR-113: when the caller names the tenant explicitly, record inside that
   # tenant's session so the row satisfies the forced RLS policy even when the
   # surrounding code runs under a user-only or job session (executions,
   # notification jobs). Without an explicit organization the surrounding

@@ -138,7 +138,7 @@ function rememberOrganizationSlug(slug: string) {
   } catch {}
 }
 
-// ADR-104: the API resolves a retired organization slug transparently and
+// ADR-112: the API resolves a retired organization slug transparently and
 // names the current one in this header. A remembered selection that still
 // holds the retired slug is updated so later requests use the new one.
 export const CANONICAL_ORGANIZATION_SLUG_HEADER = "x-organization-canonical-slug";

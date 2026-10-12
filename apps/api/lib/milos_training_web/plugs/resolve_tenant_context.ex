@@ -41,7 +41,7 @@ defmodule MilosTrainingWeb.Plugs.ResolveTenantContext do
 
   def canonical_slug_header, do: @canonical_slug_header
 
-  # ADR-104: a retired slug resolves transparently to its organization; the
+  # ADR-112: a retired slug resolves transparently to its organization; the
   # response names the current slug so clients can update stored selections
   # and links without a failed request.
   defp signal_canonical_slug(conn, requested_slug, %{organization: %{slug: canonical}})

@@ -16,7 +16,7 @@ type OutboxFailureControlsProps = {
 
 /**
  * Failure reason plus explicit Retry (same idempotency key) and Discard
- * (two-step confirmation) for a permanently failed outbox operation (ADR-102).
+ * (two-step confirmation) for a permanently failed outbox operation (ADR-110).
  */
 export function OutboxFailureControls({
   failure,

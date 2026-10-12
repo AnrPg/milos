@@ -188,7 +188,7 @@ export function PlatformOrganizationsPage() {
       if (name !== editing.organization.name) {
         await renamePlatformOrganization(accessToken, editing.organization.id, name);
       }
-      // The logo is managed by its own upload/remove endpoints (ADR-103);
+      // The logo is managed by its own upload/remove endpoints (ADR-111);
       // never echo a possibly stale brand_logo_url back through settings.
       const editableSettings: Partial<OrganizationSettings> = { ...settings };
       delete editableSettings.brand_logo_url;

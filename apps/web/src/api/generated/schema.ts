@@ -149,7 +149,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Summarize what renaming an organization's path slug affects (ADR-104) */
+        /** Summarize what renaming an organization's path slug affects (ADR-112) */
         get: operations["MilosTrainingWeb.PlatformOrganizationController.slug_impact"];
         put?: never;
         post?: never;
@@ -1122,7 +1122,7 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Athlete reports opening an assigned workout's detail (analytics, ADR-105)
+         * Athlete reports opening an assigned workout's detail (analytics, ADR-113)
          * @description Records workout_assignment_opened once per athlete, assignment and UTC day. Repeated calls the same day are accepted and ignored.
          */
         post: operations["MilosTrainingWeb.MyWorkoutController.open"];
@@ -1949,7 +1949,7 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Report client-only execution interaction events (analytics, ADR-105)
+         * Report client-only execution interaction events (analytics, ADR-113)
          * @description Batched, idempotent ingestion of execution interaction signals the server cannot observe (pause sheet, manual skip, round taps, adjusts, ready screen, finish wizard, cast mode). Each event dedupes on its client_event_id; retries are accepted and counted as duplicates. Any invalid event rejects the batch.
          */
         post: operations["MilosTrainingWeb.ExecutionController.record_interactions"];
@@ -2331,7 +2331,7 @@ export interface paths {
         put?: never;
         /**
          * Log a class, assigned, library, or freeform workout
-         * @description Idempotent per `idempotency_key`: a replay returns the original entry with 200, before source authorization is re-evaluated (ADR-102). Reusing a key for a different source returns 409 `idempotency_key_conflict`. Logging feeds the same durable completion projection as workout executions.
+         * @description Idempotent per `idempotency_key`: a replay returns the original entry with 200, before source authorization is re-evaluated (ADR-110). Reusing a key for a different source returns 409 `idempotency_key_conflict`. Logging feeds the same durable completion projection as workout executions.
          */
         post: operations["MilosTrainingWeb.TrainingLogController.create"];
         delete?: never;
@@ -2665,7 +2665,7 @@ export interface paths {
         head?: never;
         /**
          * Reject a booking
-         * @description Booking resolution is never replayed blindly (ADR-102): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.
+         * @description Booking resolution is never replayed blindly (ADR-110): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.
          */
         patch: operations["MilosTrainingWeb.AdminScheduleController.reject_booking"];
         trace?: never;
@@ -2685,7 +2685,7 @@ export interface paths {
         head?: never;
         /**
          * Approve a booking
-         * @description Booking resolution is never replayed blindly (ADR-102): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.
+         * @description Booking resolution is never replayed blindly (ADR-110): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.
          */
         patch: operations["MilosTrainingWeb.AdminScheduleController.approve_booking"];
         trace?: never;
@@ -2942,7 +2942,7 @@ export interface paths {
         put?: never;
         /**
          * Book a schedule slot
-         * @description Optionally idempotent per `client_operation_id` (ADR-102): replaying the same id for the same slot returns the original booking with 200 and no new reservation, notification, or broadcast; reusing it for another slot returns 409 `idempotency_key_conflict`.
+         * @description Optionally idempotent per `client_operation_id` (ADR-110): replaying the same id for the same slot returns the original booking with 200 and no new reservation, notification, or broadcast; reusing it for another slot returns 409 `idempotency_key_conflict`.
          */
         post: operations["MilosTrainingWeb.ScheduleController.create_booking"];
         delete?: never;
@@ -3118,7 +3118,7 @@ export interface components {
                 client_event_id: string;
                 /** @enum {string} */
                 kind: "cast_mode_toggled" | "check_off_undone" | "cues_toggled" | "finish_wizard_abandoned" | "finish_wizard_opened" | "finish_wizard_saved" | "first_segment_started" | "pause" | "ready_screen_shown" | "resume" | "round_decremented" | "round_incremented" | "rounds_adjusted" | "segment_restarted" | "segment_skipped" | "time_adjusted" | "workout_launched";
-                /** @description Typed facts allowed for the interaction kind (see ADR-105). No free text; keys not allowed for the kind reject the batch. */
+                /** @description Typed facts allowed for the interaction kind (see ADR-113). No free text; keys not allowed for the kind reject the batch. */
                 metadata?: {
                     countdown_seconds?: number;
                     /** @enum {string} */
@@ -3155,7 +3155,7 @@ export interface components {
             client_event_id: string;
             /** @enum {string} */
             kind: "cast_mode_toggled" | "check_off_undone" | "cues_toggled" | "finish_wizard_abandoned" | "finish_wizard_opened" | "finish_wizard_saved" | "first_segment_started" | "pause" | "ready_screen_shown" | "resume" | "round_decremented" | "round_incremented" | "rounds_adjusted" | "segment_restarted" | "segment_skipped" | "time_adjusted" | "workout_launched";
-            /** @description Typed facts allowed for the interaction kind (see ADR-105). No free text; keys not allowed for the kind reject the batch. */
+            /** @description Typed facts allowed for the interaction kind (see ADR-113). No free text; keys not allowed for the kind reject the batch. */
             metadata?: {
                 countdown_seconds?: number;
                 /** @enum {string} */
@@ -3182,7 +3182,7 @@ export interface components {
         };
         /** OrganizationBranding */
         OrganizationBranding: {
-            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
+            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
             brand_logo_uploaded: boolean;
             brand_logo_url: string | null;
             brand_name?: string | null;
@@ -3194,7 +3194,7 @@ export interface components {
         OrganizationBrandingResponse: {
             /** OrganizationBranding */
             branding: {
-                /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
+                /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
                 brand_logo_uploaded: boolean;
                 brand_logo_url: string | null;
                 brand_name?: string | null;
@@ -9849,7 +9849,7 @@ export interface operations {
                     "application/json": {
                         /** OrganizationBranding */
                         branding: {
-                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
                             brand_logo_uploaded: boolean;
                             brand_logo_url: string | null;
                             brand_name?: string | null;
@@ -9882,7 +9882,7 @@ export interface operations {
                     "application/json": {
                         /** OrganizationBranding */
                         branding: {
-                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
                             brand_logo_uploaded: boolean;
                             brand_logo_url: string | null;
                             brand_name?: string | null;
@@ -12622,7 +12622,7 @@ export interface operations {
                     "application/json": {
                         /** OrganizationBranding */
                         branding: {
-                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
                             brand_logo_uploaded: boolean;
                             brand_logo_url: string | null;
                             brand_name?: string | null;
@@ -13086,7 +13086,7 @@ export interface operations {
                         client_event_id: string;
                         /** @enum {string} */
                         kind: "cast_mode_toggled" | "check_off_undone" | "cues_toggled" | "finish_wizard_abandoned" | "finish_wizard_opened" | "finish_wizard_saved" | "first_segment_started" | "pause" | "ready_screen_shown" | "resume" | "round_decremented" | "round_incremented" | "rounds_adjusted" | "segment_restarted" | "segment_skipped" | "time_adjusted" | "workout_launched";
-                        /** @description Typed facts allowed for the interaction kind (see ADR-105). No free text; keys not allowed for the kind reject the batch. */
+                        /** @description Typed facts allowed for the interaction kind (see ADR-113). No free text; keys not allowed for the kind reject the batch. */
                         metadata?: {
                             countdown_seconds?: number;
                             /** @enum {string} */
@@ -15314,7 +15314,7 @@ export interface operations {
                     "application/json": {
                         /** OrganizationBranding */
                         branding: {
-                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
                             brand_logo_uploaded: boolean;
                             brand_logo_url: string | null;
                             brand_name?: string | null;
@@ -15345,7 +15345,7 @@ export interface operations {
                     "application/json": {
                         /** OrganizationBranding */
                         branding: {
-                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-103). */
+                            /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-111). */
                             brand_logo_uploaded: boolean;
                             brand_logo_url: string | null;
                             brand_name?: string | null;
@@ -15555,7 +15555,7 @@ export interface operations {
                     admin_message?: string;
                     /**
                      * Format: uuid
-                     * @description Stable client operation id (ADR-102). Replaying the operation that already resolved the booking returns it with 200 and no new notification.
+                     * @description Stable client operation id (ADR-110). Replaying the operation that already resolved the booking returns it with 200 and no new notification.
                      */
                     client_operation_id?: string | null;
                 };
@@ -15628,7 +15628,7 @@ export interface operations {
                     admin_message?: string;
                     /**
                      * Format: uuid
-                     * @description Stable client operation id (ADR-102). Replaying the operation that already resolved the booking returns it with 200 and no new notification.
+                     * @description Stable client operation id (ADR-110). Replaying the operation that already resolved the booking returns it with 200 and no new notification.
                      */
                     client_operation_id?: string | null;
                 };

@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.TrackAnalyticsEventTest do
-  @moduledoc "ADR-105: best-effort, tenant-scoped instrumentation helper."
+  @moduledoc "ADR-113: best-effort, tenant-scoped instrumentation helper."
   use MilosTraining.DataCase, async: false
 
   import MilosTraining.AnalyticsHelpers

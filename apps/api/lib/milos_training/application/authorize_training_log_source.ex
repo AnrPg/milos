@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.AuthorizeTrainingLogSource do
   @moduledoc """
-  Resolves the trusted source of a standalone training-log entry (ADR-100).
+  Resolves the trusted source of a standalone training-log entry (ADR-108).
 
   Every branch derives the source facts (workout, booking, title) from the
   owning context's public API inside the caller's tenant context; nothing

@@ -190,7 +190,7 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     assert messages["summary"] == %{"thread_count" => 0, "unread_thread_count" => 0}
   end
 
-  # TD-062: user_pr_records is owner-only under RLS and ADR-055's explicit PR
+  # TD-070: user_pr_records is owner-only under RLS and ADR-055's explicit PR
   # sharing grants are not implemented, so the dossier PR tab is empty for
   # staff in production. Superuser dispatch keeps the composition covered.
   @tag rls_enforced: false

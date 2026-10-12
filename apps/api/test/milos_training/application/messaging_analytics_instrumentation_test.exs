@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.MessagingAnalyticsInstrumentationTest do
-  @moduledoc "ADR-105: thread created, message sent and first staff response events."
+  @moduledoc "ADR-113: thread created, message sent and first staff response events."
   use MilosTraining.DataCase, async: false
 
   import MilosTraining.AnalyticsHelpers

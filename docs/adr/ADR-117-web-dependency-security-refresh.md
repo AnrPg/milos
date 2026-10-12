@@ -1,4 +1,4 @@
-# ADR-109: Web Dependency Security Refresh and Patched OpenAPI Generator Chain
+# ADR-117: Web Dependency Security Refresh and Patched OpenAPI Generator Chain
 Date: 2026-10-12
 Status: Accepted
 
@@ -44,7 +44,7 @@ pins it.
 - The full audit still reports 5 high, dev-only findings in the
   `braces` → `micromatch` → `fast-glob` chain under the Next ESLint tooling.
   No patched `braces` release exists (the advisory covers every version), so
-  these are logged as TD-072 rather than forced.
+  these are logged as TD-080 rather than forced.
 
 ## Implementation Notes
 - npm 10.9.4 crashes (`Cannot read properties of null (reading 'edgesOut')`)

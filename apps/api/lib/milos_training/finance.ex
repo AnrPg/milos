@@ -385,7 +385,7 @@ defmodule MilosTraining.Finance do
   def count_pending_referral_approvals(context),
     do: scoped(context, fn -> count_pending_referral_approvals() end)
 
-  # ADR-099 reviewed tenant export/purge. This context owns its table list and
+  # ADR-107 reviewed tenant export/purge. This context owns its table list and
   # retention policy; the shared executor only runs what this policy declares,
   # always inside a RepoContext session for the purge's tenant.
   def tenant_data_policy, do: MilosTraining.Finance.Domain.TenantDataPolicy.policy()

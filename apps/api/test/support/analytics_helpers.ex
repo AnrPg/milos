@@ -1,6 +1,6 @@
 defmodule MilosTraining.AnalyticsHelpers do
   @moduledoc """
-  Test helpers for ADR-105 instrumentation tests: tenant fixtures and direct
+  Test helpers for ADR-113 instrumentation tests: tenant fixtures and direct
   reads of persisted `analytics_events` rows (the test DB role bypasses RLS,
   so rows are filtered by organization explicitly).
   """

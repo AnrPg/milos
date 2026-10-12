@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.ExportOrganizationTenantData do
   @moduledoc """
-  ADR-099 stage 2. Builds, under the tenant's object prefix:
+  ADR-107 stage 2. Builds, under the tenant's object prefix:
 
   * `purge/<purge_id>/tenant-export.zip` - one JSON file per bounded context,
     account records, the stored-objects manifest and the retention review;

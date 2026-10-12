@@ -1,6 +1,6 @@
 defmodule MilosTraining.Pantheon.Domain.TenantDataPolicy do
   @moduledoc """
-  Pantheon tenant data retention and purge policy (ADR-099).
+  Pantheon tenant data retention and purge policy (ADR-107).
 
   Declares the tables this context owns, in delete (dependency) order, and
   how they are treated when a tenant is purged.

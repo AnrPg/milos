@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.RecordPushDeliveryOutcome do
   @moduledoc """
-  Records the outcome of one push dispatch attempt (ADR-105) from the push
+  Records the outcome of one push dispatch attempt (ADR-113) from the push
   dispatch job, in the notification's tenant:
 
   * a `push_dispatch_attempts` fact row (status sent/expired/failed, the

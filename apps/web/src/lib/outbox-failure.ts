@@ -2,7 +2,7 @@ import { ApiError } from "@/api/client";
 import { localizeError, type UiTranslator } from "@/i18n/presentation";
 
 /**
- * Retry classification for durable outbox operations (ADR-067, ADR-102).
+ * Retry classification for durable outbox operations (ADR-067, ADR-110).
  *
  * - `transient`: network failures, expired sessions, throttling, and server
  *   errors. The operation stays pending and is replayed automatically with the

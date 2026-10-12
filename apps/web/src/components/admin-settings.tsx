@@ -256,7 +256,7 @@ function AppearanceSection({ token }: { token: string }) {
   );
 }
 
-// ── Branding section (ADR-103) ───────────────────────────────────────────────
+// ── Branding section (ADR-111) ───────────────────────────────────────────────
 
 function BrandingSection({ token }: { token: string }) {
   const i18n = useUiTranslations();

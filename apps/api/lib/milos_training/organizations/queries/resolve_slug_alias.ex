@@ -1,6 +1,6 @@
 defmodule MilosTraining.Organizations.Queries.ResolveSlugAlias do
   @moduledoc """
-  ADR-104: maps a retired organization slug to the organization's current
+  ADR-112: maps a retired organization slug to the organization's current
   canonical slug, for the web proxy's `/org/<old>/...` 308 redirect.
 
   Unauthenticated by design (the proxy has no session), so it answers only for

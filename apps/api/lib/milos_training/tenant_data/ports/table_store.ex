@@ -1,6 +1,6 @@
 defmodule MilosTraining.TenantData.Ports.TableStore do
   @moduledoc """
-  Generic executor for context-declared tenant table specs (ADR-099).
+  Generic executor for context-declared tenant table specs (ADR-107).
 
   Every call runs inside a `RepoContext` session opened by
   `MilosTraining.TenantData.TableStore`; `user_id` is `nil` for tables whose

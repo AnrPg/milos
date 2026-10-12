@@ -1,7 +1,7 @@
 defmodule MilosTraining.Notifications.Domain.PushDeliveryOutcome do
   @moduledoc """
   Classifies a push dispatcher result into an analytics outcome and a coarse,
-  PII-free reason class (ADR-105). Raw provider errors (which can echo the
+  PII-free reason class (ADR-113). Raw provider errors (which can echo the
   endpoint or response body) are never stored; only the class is.
   """
 

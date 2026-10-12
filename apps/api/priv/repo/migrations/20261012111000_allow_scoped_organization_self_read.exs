@@ -1,7 +1,7 @@
 defmodule MilosTraining.Repo.Migrations.AllowScopedOrganizationSelfRead do
   use Ecto.Migration
 
-  # TD-046 / TD-061: organizations RLS admitted only vendors, members (via
+  # TD-046 / TD-069: organizations RLS admitted only vendors, members (via
   # app.user_id), and invitation redemption, so a session scoped to an
   # organization without a user - every Oban job resolving its system tenant
   # context - could not read its own organization row and failed with

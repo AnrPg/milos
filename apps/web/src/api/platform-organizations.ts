@@ -25,7 +25,7 @@ export type OrganizationSettings = {
   invitation_lifetime_seconds: number;
   brand_name: string | null;
   brand_logo_url: string | null;
-  /** ADR-103: true when brand_logo_url is derived from an uploaded logo. */
+  /** ADR-111: true when brand_logo_url is derived from an uploaded logo. */
   brand_logo_uploaded?: boolean;
   brand_primary_color: string | null;
   settings: Record<string, unknown>;
@@ -115,7 +115,7 @@ export function renamePlatformOrganization(token: string, organizationId: string
   );
 }
 
-// ADR-104 slug rename: impact summary, then a typed-confirmation rename that
+// ADR-112 slug rename: impact summary, then a typed-confirmation rename that
 // keeps the previous slug as a redirecting alias.
 export type OrganizationSlugImpact =
   paths["/api/platform/organizations/{id}/slug-impact"]["get"]["responses"]["200"]["content"]["application/json"];
@@ -202,7 +202,7 @@ export function updatePlatformOrganizationMembershipRole(
   );
 }
 
-// ADR-099 reviewed tenant export/purge workflow.
+// ADR-107 reviewed tenant export/purge workflow.
 export type OrganizationPurgeStatus =
   | "requested"
   | "exporting"

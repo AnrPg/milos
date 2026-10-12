@@ -11,7 +11,7 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorageTest do
     assert operation.resource == "location"
   end
 
-  test "the public media bucket exposes only avatars and tenant logos (ADR-103)" do
+  test "the public media bucket exposes only avatars and tenant logos (ADR-111)" do
     %{Statement: [%{Action: action, Resource: resource}]} =
       MinioStorage.public_read_policy("milos-avatars")
 

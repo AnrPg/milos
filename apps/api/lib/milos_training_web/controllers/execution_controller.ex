@@ -390,13 +390,13 @@ defmodule MilosTrainingWeb.ExecutionController do
     ]
   )
 
-  # ADR-105: client-only execution interaction signals. The kind enum is the
+  # ADR-113: client-only execution interaction signals. The kind enum is the
   # Analytics allowlist itself, so the contract and validation cannot drift.
   @interaction_metadata_schema %Schema{
     type: :object,
     additionalProperties: false,
     description:
-      "Typed facts allowed for the interaction kind (see ADR-105). No free text; " <>
+      "Typed facts allowed for the interaction kind (see ADR-113). No free text; " <>
         "keys not allowed for the kind reject the batch.",
     properties: %{
       segment_index: %Schema{type: :integer, minimum: 0, maximum: 10_000},
@@ -435,7 +435,7 @@ defmodule MilosTrainingWeb.ExecutionController do
   def interaction_metadata_schema, do: @interaction_metadata_schema
 
   operation(:record_interactions,
-    summary: "Report client-only execution interaction events (analytics, ADR-105)",
+    summary: "Report client-only execution interaction events (analytics, ADR-113)",
     description:
       "Batched, idempotent ingestion of execution interaction signals the server cannot " <>
         "observe (pause sheet, manual skip, round taps, adjusts, ready screen, finish " <>

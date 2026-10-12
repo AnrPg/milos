@@ -120,7 +120,7 @@ defmodule MilosTrainingWeb.UserSocketTenantContextTest do
              )
   end
 
-  test "a socket connected before a slug rename keeps working, and the retired slug connects (ADR-104)" do
+  test "a socket connected before a slug rename keeps working, and the retired slug connects (ADR-112)" do
     user = user_fixture()
     vendor = user_fixture()
     {:ok, _vendor} = Organizations.grant_vendor(vendor.id)

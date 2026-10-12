@@ -1,5 +1,5 @@
 defmodule MilosTrainingWeb.Schemas.TrainingLog do
-  @moduledoc "OpenAPI schemas for standalone training-log entries (ADR-100)."
+  @moduledoc "OpenAPI schemas for standalone training-log entries (ADR-108)."
 
   alias OpenApiSpex.Schema
 

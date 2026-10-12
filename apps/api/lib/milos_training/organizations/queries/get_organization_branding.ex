@@ -1,5 +1,5 @@
 defmodule MilosTraining.Organizations.Queries.GetOrganizationBranding do
-  @moduledoc "ADR-103: an organization's branding settings for owners/admins and vendors."
+  @moduledoc "ADR-111: an organization's branding settings for owners/admins and vendors."
 
   alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Organizations.Commands.ReplaceOrganizationLogo

@@ -179,7 +179,7 @@ export async function archiveClassType(token: string, id: string, replacementCla
 }
 
 /**
- * Offline-replay options (ADR-102). `clientOperationId` makes the command
+ * Offline-replay options (ADR-110). `clientOperationId` makes the command
  * idempotent on the server; `organizationSlug` pins a replay to the tenant
  * the user acted in, even if they switched organizations meanwhile.
  */

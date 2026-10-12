@@ -128,7 +128,7 @@ defmodule MilosTraining.Organizations do
   def rename_organization(context, organization_id, name),
     do: RenameOrganization.call(context, organization_id, name)
 
-  # ADR-104 slug rename with retired-slug aliases.
+  # ADR-112 slug rename with retired-slug aliases.
   def rename_organization_slug(
         context,
         organization_id,
@@ -153,7 +153,7 @@ defmodule MilosTraining.Organizations do
       ),
       do: UpdateOrganizationSettings.call(context, organization_id, params, changed_at)
 
-  # ADR-103 first-class tenant logo upload. `context` is a tenant owner/admin
+  # ADR-111 first-class tenant logo upload. `context` is a tenant owner/admin
   # `TenantContext` (organization_id may be nil: their own organization) or a
   # vendor `PlatformContext` (organization_id required).
   def get_organization_branding(context, organization_id \\ nil),
@@ -187,7 +187,7 @@ defmodule MilosTraining.Organizations do
   def remove_organization_logo(context, organization_id, changed_at \\ DateTime.utc_now()),
     do: ReplaceOrganizationLogo.call(context, organization_id, nil, changed_at)
 
-  # ADR-099 reviewed tenant export/purge workflow. Purge records are
+  # ADR-107 reviewed tenant export/purge workflow. Purge records are
   # platform-level and survive the organization they describe.
   def request_organization_purge(context, organization_id, requested_at \\ DateTime.utc_now()),
     do: RequestOrganizationPurge.call(context, organization_id, requested_at)

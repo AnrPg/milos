@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.ExecutionAnalyticsInstrumentationTest do
-  @moduledoc "ADR-105: execution start/complete/abandon and training-log events."
+  @moduledoc "ADR-113: execution start/complete/abandon and training-log events."
   use MilosTraining.DataCase, async: false
 
   import Ecto.Query

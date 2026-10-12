@@ -1,7 +1,7 @@
 defmodule MilosTraining.Analytics.Domain.EventCatalog do
   @moduledoc """
   Registry of every analytics event name the platform may record (ADR-015,
-  ADR-105) and the pure builder that turns an application-boundary fact into
+  ADR-113) and the pure builder that turns an application-boundary fact into
   an `analytics_events` row.
 
   The registry is the allowlist: `Analytics.record_event/1` refuses names that
@@ -41,7 +41,7 @@ defmodule MilosTraining.Analytics.Domain.EventCatalog do
     "notification_clicked" => "notification"
   }
 
-  # ADR-105 instrumentation. Each entry: context_type, the subject keys copied
+  # ADR-113 instrumentation. Each entry: context_type, the subject keys copied
   # into metadata, and the dedupe strategy.
   #
   #   dedupe: nil            - every occurrence is recorded
@@ -114,7 +114,7 @@ defmodule MilosTraining.Analytics.Domain.EventCatalog do
     (Map.keys(@legacy_events) ++ Map.keys(@instrumented_events)) |> Enum.sort()
   end
 
-  @doc "Event names added by ADR-105 instrumentation, sorted."
+  @doc "Event names added by ADR-113 instrumentation, sorted."
   def instrumented_event_names, do: @instrumented_events |> Map.keys() |> Enum.sort()
 
   def registered?(name) when is_binary(name),

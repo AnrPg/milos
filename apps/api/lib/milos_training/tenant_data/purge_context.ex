@@ -1,6 +1,6 @@
 defmodule MilosTraining.TenantData.PurgeContext do
   @moduledoc """
-  Explicit tenant scope for the reviewed export/purge workflow (ADR-099).
+  Explicit tenant scope for the reviewed export/purge workflow (ADR-107).
 
   It is only ever built by `MilosTraining.Organizations.tenant_purge_context/2`
   for an organization with an open purge record, so a context's

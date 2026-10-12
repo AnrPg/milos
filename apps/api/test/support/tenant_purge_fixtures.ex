@@ -2,7 +2,7 @@ defmodule MilosTraining.TenantPurgeFixtures do
   @moduledoc """
   Seeds a tenant with data across bounded contexts - including the RESTRICT
   chains (scheduled class -> workout) that blocked the old permanent delete -
-  plus stored objects, for ADR-099 purge tests.
+  plus stored objects, for ADR-107 purge tests.
   """
 
   import MilosTraining.TestFixtures

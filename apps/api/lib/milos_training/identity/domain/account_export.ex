@@ -1,6 +1,6 @@
 defmodule MilosTraining.Identity.Domain.AccountExport do
   @moduledoc """
-  Export shape for accounts included in a tenant export (ADR-099). Secrets
+  Export shape for accounts included in a tenant export (ADR-107). Secrets
   (password hashes, token versions) are never exported.
   """
 
