@@ -2685,7 +2685,10 @@
     "publishFailed": "Publiceren is mislukt. Je concept is opgeslagen. Probeer het opnieuw.",
     "rejectTextHint": "Afwijzen laat je tekst zoals hij is.",
     "rejectedText": "gelaten zoals geschreven",
-    "editNotApplied": "‘{text}’ staat niet meer in de tekst, dus deze correctie is niet toegepast. Controleer opnieuw om de suggesties te vernieuwen."
+    "editNotApplied": "‘{text}’ staat niet meer in de tekst, dus deze correctie is niet toegepast. Controleer opnieuw om de suggesties te vernieuwen.",
+    "intervalSlot": "Interval {slot}",
+    "oddIntervals": "Oneven intervallen",
+    "evenIntervals": "Even intervallen"
   },
   "Invites": {
     "inviteClients": "Klanten uitnodigen",

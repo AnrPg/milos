@@ -2685,7 +2685,10 @@
     "publishFailed": "A publicação falhou. O rascunho está guardado. Tenta de novo.",
     "rejectTextHint": "Rejeitar mantém o teu texto tal como está.",
     "rejectedText": "mantido como escrito",
-    "editNotApplied": "«{text}» já não está no texto, por isso a correção não foi aplicada. Verifica novamente para atualizar as sugestões."
+    "editNotApplied": "«{text}» já não está no texto, por isso a correção não foi aplicada. Verifica novamente para atualizar as sugestões.",
+    "intervalSlot": "Intervalo {slot}",
+    "oddIntervals": "Intervalos ímpares",
+    "evenIntervals": "Intervalos pares"
   },
   "Invites": {
     "inviteClients": "Convidar clientes",

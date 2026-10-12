@@ -2685,7 +2685,10 @@
     "publishFailed": "No se pudo publicar. Tu borrador está guardado. Inténtalo de nuevo.",
     "rejectTextHint": "Rechazar mantiene tu texto tal cual.",
     "rejectedText": "se mantiene como está escrito",
-    "editNotApplied": "«{text}» ya no está en el texto, así que no se aplicó la corrección. Revisa de nuevo para actualizar las sugerencias."
+    "editNotApplied": "«{text}» ya no está en el texto, así que no se aplicó la corrección. Revisa de nuevo para actualizar las sugerencias.",
+    "intervalSlot": "Intervalo {slot}",
+    "oddIntervals": "Intervalos impares",
+    "evenIntervals": "Intervalos pares"
   },
   "Invites": {
     "inviteClients": "Invitar clientes",

@@ -399,6 +399,11 @@ function StructurePreview({ t, workout }: { t: Translate; workout: CanonicalWork
               <ul className="mt-1 space-y-0.5 ps-4 text-sm" style={{ color: "var(--text)" }}>
                 {section.exercises.map((exercise, exerciseIndex) => (
                   <li key={exerciseIndex} className="list-disc">
+                    {exercise.interval_assignment ? (
+                      <span className="me-1 font-bold" style={{ color: "var(--primary)" }}>
+                        {slotText(t, section.timer_config?.type, exercise.interval_assignment)} ·
+                      </span>
+                    ) : null}
                     <span className={exercise.name ? "" : "italic"} style={exercise.name ? undefined : { color: "var(--danger, #dc2626)" }}>
                       {exercise.name || t("unnamed")}
                     </span>
@@ -517,6 +522,12 @@ function timerText(config: Record<string, unknown>) {
     .map(([key, value]) => (key.endsWith("_seconds") && typeof value === "number" ? `${Math.round(value / 60)}′` : String(value)))
     .join(" · ");
   return details ? `${type} · ${details}` : type;
+}
+
+/** Which interval a complex_emom / even_odd exercise runs in. */
+function slotText(t: Translate, format: unknown, slot: number) {
+  if (format === "even_odd") return t(slot === 1 ? "oddIntervals" : "evenIntervals");
+  return t("intervalSlot", { slot });
 }
 
 function prescriptionText(t: Translate, exercise: CanonicalWorkout["sections"][number]["exercises"][number]) {

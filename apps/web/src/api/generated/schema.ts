@@ -2915,6 +2915,8 @@ export interface components {
                 corrections?: number;
                 remaining_violations?: number;
                 repair_attempts?: number;
+                /** @description Whether the structure step (sections and their formats) succeeded before parsing */
+                structure_inferred?: boolean;
             };
             suggestions: {
                 field: string;
@@ -2931,7 +2933,7 @@ export interface components {
                 sections: number;
                 warnings: number;
             };
-            /** @description Canonical workout: title, type, subtitle, description, difficulty, estimated_duration_seconds, equipment, tags and sections[] with name, note, timer_config and exercises[] */
+            /** @description Canonical workout: title, type, subtitle, description, difficulty, estimated_duration_seconds, equipment, tags and sections[] with name, note, timer_config (its own format per section), scoreable/score_config and exercises[] (interval_assignment for complex_emom / even_odd) */
             workout: {
                 [key: string]: unknown;
             };
@@ -10700,6 +10702,8 @@ export interface operations {
                             corrections?: number;
                             remaining_violations?: number;
                             repair_attempts?: number;
+                            /** @description Whether the structure step (sections and their formats) succeeded before parsing */
+                            structure_inferred?: boolean;
                         };
                         suggestions: {
                             field: string;
@@ -10716,7 +10720,7 @@ export interface operations {
                             sections: number;
                             warnings: number;
                         };
-                        /** @description Canonical workout: title, type, subtitle, description, difficulty, estimated_duration_seconds, equipment, tags and sections[] with name, note, timer_config and exercises[] */
+                        /** @description Canonical workout: title, type, subtitle, description, difficulty, estimated_duration_seconds, equipment, tags and sections[] with name, note, timer_config (its own format per section), scoreable/score_config and exercises[] (interval_assignment for complex_emom / even_odd) */
                         workout: {
                             [key: string]: unknown;
                         };

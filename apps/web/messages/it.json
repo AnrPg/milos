@@ -2685,7 +2685,10 @@
     "publishFailed": "Pubblicazione non riuscita. La bozza è salvata. Riprova.",
     "rejectTextHint": "Rifiutare lascia il testo così com’è.",
     "rejectedText": "lasciato com’era",
-    "editNotApplied": "«{text}» non è più nel testo, quindi la correzione non è stata applicata. Controlla di nuovo per aggiornare i suggerimenti."
+    "editNotApplied": "«{text}» non è più nel testo, quindi la correzione non è stata applicata. Controlla di nuovo per aggiornare i suggerimenti.",
+    "intervalSlot": "Intervallo {slot}",
+    "oddIntervals": "Intervalli dispari",
+    "evenIntervals": "Intervalli pari"
   },
   "Invites": {
     "inviteClients": "Invita clienti",

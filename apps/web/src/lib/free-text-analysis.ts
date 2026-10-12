@@ -7,6 +7,8 @@ export type CanonicalExercise = {
   name: string | null;
   item_type: "exercise";
   sets?: number | null;
+  /** complex_emom: the interval slot (1..N); even_odd: 1 = odd, 2 = even. */
+  interval_assignment?: number | null;
   prescription_value?: number | null;
   prescription_unit?: string | null;
   load_value?: number | null;
@@ -19,7 +21,10 @@ export type CanonicalExercise = {
 export type CanonicalSection = {
   name: string | null;
   note?: string | null;
+  /** Each section has its own format (`timer_config.type`). */
   timer_config?: Record<string, unknown> | null;
+  scoreable?: boolean;
+  score_config?: { type: string } | null;
   exercises: CanonicalExercise[];
 };
 

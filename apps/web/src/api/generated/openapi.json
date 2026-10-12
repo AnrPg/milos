@@ -162,6 +162,10 @@
               },
               "repair_attempts": {
                 "type": "integer"
+              },
+              "structure_inferred": {
+                "description": "Whether the structure step (sections and their formats) succeeded before parsing",
+                "type": "boolean"
               }
             },
             "type": "object"
@@ -228,7 +232,7 @@
           },
           "workout": {
             "additionalProperties": true,
-            "description": "Canonical workout: title, type, subtitle, description, difficulty, estimated_duration_seconds, equipment, tags and sections[] with name, note, timer_config and exercises[]",
+            "description": "Canonical workout: title, type, subtitle, description, difficulty, estimated_duration_seconds, equipment, tags and sections[] with name, note, timer_config (its own format per section), scoreable/score_config and exercises[] (interval_assignment for complex_emom / even_odd)",
             "type": "object"
           }
         },
@@ -21772,6 +21776,10 @@
                         },
                         "repair_attempts": {
                           "type": "integer"
+                        },
+                        "structure_inferred": {
+                          "description": "Whether the structure step (sections and their formats) succeeded before parsing",
+                          "type": "boolean"
                         }
                       },
                       "type": "object"
@@ -21838,7 +21846,7 @@
                     },
                     "workout": {
                       "additionalProperties": true,
-                      "description": "Canonical workout: title, type, subtitle, description, difficulty, estimated_duration_seconds, equipment, tags and sections[] with name, note, timer_config and exercises[]",
+                      "description": "Canonical workout: title, type, subtitle, description, difficulty, estimated_duration_seconds, equipment, tags and sections[] with name, note, timer_config (its own format per section), scoreable/score_config and exercises[] (interval_assignment for complex_emom / even_odd)",
                       "type": "object"
                     }
                   },

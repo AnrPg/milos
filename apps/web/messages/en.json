@@ -2685,7 +2685,10 @@
     "publishFailed": "Publishing failed. Your draft is saved. Try again.",
     "rejectTextHint": "Reject keeps your text as written.",
     "rejectedText": "kept as written",
-    "editNotApplied": "“{text}” is no longer in the text, so this fix was not applied. Check again to refresh the suggestions."
+    "editNotApplied": "“{text}” is no longer in the text, so this fix was not applied. Check again to refresh the suggestions.",
+    "intervalSlot": "Interval {slot}",
+    "oddIntervals": "Odd intervals",
+    "evenIntervals": "Even intervals"
   },
   "Invites": {
     "inviteClients": "Invite clients",

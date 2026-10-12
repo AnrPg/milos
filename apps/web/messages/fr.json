@@ -2685,7 +2685,10 @@
     "publishFailed": "La publication a échoué. Ton brouillon est enregistré. Réessaie.",
     "rejectTextHint": "Refuser garde ton texte tel quel.",
     "rejectedText": "laissé tel quel",
-    "editNotApplied": "« {text} » n’est plus dans le texte, donc cette correction n’a pas été appliquée. Vérifie à nouveau pour actualiser les suggestions."
+    "editNotApplied": "« {text} » n’est plus dans le texte, donc cette correction n’a pas été appliquée. Vérifie à nouveau pour actualiser les suggestions.",
+    "intervalSlot": "Intervalle {slot}",
+    "oddIntervals": "Intervalles impairs",
+    "evenIntervals": "Intervalles pairs"
   },
   "Invites": {
     "inviteClients": "Inviter des clients",

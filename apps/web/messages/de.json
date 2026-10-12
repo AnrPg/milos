@@ -2685,7 +2685,10 @@
     "publishFailed": "Veröffentlichen fehlgeschlagen. Dein Entwurf ist gespeichert. Versuch es erneut.",
     "rejectTextHint": "Ablehnen lässt deinen Text unverändert.",
     "rejectedText": "wie geschrieben belassen",
-    "editNotApplied": "„{text}“ steht nicht mehr im Text, daher wurde die Korrektur nicht übernommen. Prüfe erneut, um die Vorschläge zu aktualisieren."
+    "editNotApplied": "„{text}“ steht nicht mehr im Text, daher wurde die Korrektur nicht übernommen. Prüfe erneut, um die Vorschläge zu aktualisieren.",
+    "intervalSlot": "Intervall {slot}",
+    "oddIntervals": "Ungerade Intervalle",
+    "evenIntervals": "Gerade Intervalle"
   },
   "Invites": {
     "inviteClients": "Kunden einladen",
