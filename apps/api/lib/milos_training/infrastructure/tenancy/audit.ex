@@ -19,6 +19,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     communication_messages analytics_events notification_click_events
     push_dispatch_attempts
     user_pr_history
+    training_log_entries
   )
 
   @transitional_tenant_tables []
