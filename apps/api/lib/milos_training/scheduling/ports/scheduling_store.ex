@@ -40,6 +40,10 @@ defmodule MilosTraining.Scheduling.Ports.SchedulingStore do
   @callback get_booking(TenantContext.t(), Ecto.UUID.t()) :: map() | nil
   @callback get_booking_execution_access(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t()) ::
               map() | nil
+  @callback list_class_history(TenantContext.t(), Ecto.UUID.t(), map()) :: %{
+              entries: [map()],
+              total: non_neg_integer()
+            }
   @callback record_attendance(TenantContext.t(), map()) ::
               {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback get_attendance_for_user_class(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t()) ::

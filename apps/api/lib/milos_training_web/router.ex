@@ -200,6 +200,7 @@ defmodule MilosTrainingWeb.Router do
 
     get("/finance", MyFinanceController, :index)
     get("/entitlement", MyFinanceController, :entitlement)
+    get("/history", TrainingLogController, :mine)
     get("/invoices/:id/download-url", MyFinanceController, :invoice_download_url)
     get("/reviews", ReviewController, :index)
     post("/reviews", ReviewController, :create)
@@ -261,6 +262,7 @@ defmodule MilosTrainingWeb.Router do
     get("/users/:id", AdminUserController, :show)
     get("/users/:id/finance", AdminUserController, :finance)
     get("/users/:id/training-history", AdminUserController, :training_history)
+    get("/users/:id/history", TrainingLogController, :for_user)
     get("/users/:id/schedule", AdminUserController, :schedule)
     post("/users/:id/programming", AdminUserController, :program_workout)
     get("/users/:id/prs", AdminUserController, :prs)

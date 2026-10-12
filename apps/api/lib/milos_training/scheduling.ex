@@ -88,6 +88,10 @@ defmodule MilosTraining.Scheduling do
   defdelegate get_booking(context, id), to: GetBooking, as: :call
   defdelegate get_booking(id), to: GetBooking, as: :call
 
+  @doc "Past approved bookings of a user, newest first, with class, workout and attendance."
+  def list_class_history(context, user_id, opts),
+    do: MilosTraining.Scheduling.SchedulingStore.list_class_history(context, user_id, opts)
+
   def get_booking_execution_access(context, booking_id, user_id),
     do:
       MilosTraining.Scheduling.SchedulingStore.get_booking_execution_access(
