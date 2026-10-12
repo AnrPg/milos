@@ -2647,7 +2647,8 @@
       "load_value": "Carga",
       "load_mode": "Tipo de carga",
       "rest_seconds": "Descanso (segundos)",
-      "tempo": "Tempo"
+      "tempo": "Tempo",
+      "text": "Texto"
     },
     "why": {
       "difficulty": "Los atletas eligen antes cuando conocen el nivel.",
@@ -2681,7 +2682,10 @@
     "checkAndPublish": "Revisar y publicar",
     "reviewBeforePublish": "El asistente ha dejado algunas notas. Revísalas y pulsa Publicar otra vez.",
     "resolveErrorsFirst": "Resuelve los puntos marcados como «Hay que corregir» antes de publicar.",
-    "publishFailed": "No se pudo publicar. Tu borrador está guardado. Inténtalo de nuevo."
+    "publishFailed": "No se pudo publicar. Tu borrador está guardado. Inténtalo de nuevo.",
+    "rejectTextHint": "Rechazar mantiene tu texto tal cual.",
+    "rejectedText": "se mantiene como está escrito",
+    "editNotApplied": "«{text}» ya no está en el texto, así que no se aplicó la corrección. Revisa de nuevo para actualizar las sugerencias."
   },
   "Invites": {
     "inviteClients": "Invitar clientes",

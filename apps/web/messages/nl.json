@@ -2647,7 +2647,8 @@
       "load_value": "Gewicht",
       "load_mode": "Soort belasting",
       "rest_seconds": "Rust (seconden)",
-      "tempo": "Uitvoeringstempo"
+      "tempo": "Uitvoeringstempo",
+      "text": "Tekst"
     },
     "why": {
       "difficulty": "Sporters kiezen sneller als ze het niveau kennen.",
@@ -2681,7 +2682,10 @@
     "checkAndPublish": "Controleren en publiceren",
     "reviewBeforePublish": "De assistent heeft een paar opmerkingen. Bekijk ze en klik dan opnieuw op Publiceren.",
     "resolveErrorsFirst": "Los de punten met ‘Moet worden opgelost’ op voordat je publiceert.",
-    "publishFailed": "Publiceren is mislukt. Je concept is opgeslagen. Probeer het opnieuw."
+    "publishFailed": "Publiceren is mislukt. Je concept is opgeslagen. Probeer het opnieuw.",
+    "rejectTextHint": "Afwijzen laat je tekst zoals hij is.",
+    "rejectedText": "gelaten zoals geschreven",
+    "editNotApplied": "‘{text}’ staat niet meer in de tekst, dus deze correctie is niet toegepast. Controleer opnieuw om de suggesties te vernieuwen."
   },
   "Invites": {
     "inviteClients": "Klanten uitnodigen",

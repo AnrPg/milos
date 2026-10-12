@@ -2647,7 +2647,8 @@
       "load_value": "Last",
       "load_mode": "Lastart",
       "rest_seconds": "Pause (Sekunden)",
-      "tempo": "Tempo"
+      "tempo": "Tempo",
+      "text": "Text"
     },
     "why": {
       "difficulty": "Athleten wählen schneller, wenn sie das Niveau kennen.",
@@ -2681,7 +2682,10 @@
     "checkAndPublish": "Prüfen & veröffentlichen",
     "reviewBeforePublish": "Der Assistent hat ein paar Hinweise hinterlassen. Sieh sie dir an und klicke dann erneut auf Veröffentlichen.",
     "resolveErrorsFirst": "Kläre die mit „Muss behoben werden“ markierten Punkte vor dem Veröffentlichen.",
-    "publishFailed": "Veröffentlichen fehlgeschlagen. Dein Entwurf ist gespeichert. Versuch es erneut."
+    "publishFailed": "Veröffentlichen fehlgeschlagen. Dein Entwurf ist gespeichert. Versuch es erneut.",
+    "rejectTextHint": "Ablehnen lässt deinen Text unverändert.",
+    "rejectedText": "wie geschrieben belassen",
+    "editNotApplied": "„{text}“ steht nicht mehr im Text, daher wurde die Korrektur nicht übernommen. Prüfe erneut, um die Vorschläge zu aktualisieren."
   },
   "Invites": {
     "inviteClients": "Kunden einladen",

@@ -2647,7 +2647,8 @@
       "load_value": "Carga",
       "load_mode": "Tipo de carga",
       "rest_seconds": "Descanso (segundos)",
-      "tempo": "Cadência"
+      "tempo": "Cadência",
+      "text": "Texto"
     },
     "why": {
       "difficulty": "Os atletas escolhem mais depressa quando conhecem o nível.",
@@ -2681,7 +2682,10 @@
     "checkAndPublish": "Verificar e publicar",
     "reviewBeforePublish": "O assistente deixou algumas notas. Revê-as e carrega novamente em Publicar.",
     "resolveErrorsFirst": "Resolve os pontos marcados «Tem de ser corrigido» antes de publicar.",
-    "publishFailed": "A publicação falhou. O rascunho está guardado. Tenta de novo."
+    "publishFailed": "A publicação falhou. O rascunho está guardado. Tenta de novo.",
+    "rejectTextHint": "Rejeitar mantém o teu texto tal como está.",
+    "rejectedText": "mantido como escrito",
+    "editNotApplied": "«{text}» já não está no texto, por isso a correção não foi aplicada. Verifica novamente para atualizar as sugestões."
   },
   "Invites": {
     "inviteClients": "Convidar clientes",

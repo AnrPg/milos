@@ -2647,7 +2647,8 @@
       "load_value": "Charge",
       "load_mode": "Type de charge",
       "rest_seconds": "Repos (secondes)",
-      "tempo": "Tempo"
+      "tempo": "Tempo",
+      "text": "Texte"
     },
     "why": {
       "difficulty": "Les athlètes choisissent plus vite quand ils connaissent le niveau.",
@@ -2681,7 +2682,10 @@
     "checkAndPublish": "Vérifier et publier",
     "reviewBeforePublish": "L’assistant a laissé quelques remarques. Consulte-les, puis clique à nouveau sur Publier.",
     "resolveErrorsFirst": "Règle les points marqués « À corriger » avant de publier.",
-    "publishFailed": "La publication a échoué. Ton brouillon est enregistré. Réessaie."
+    "publishFailed": "La publication a échoué. Ton brouillon est enregistré. Réessaie.",
+    "rejectTextHint": "Refuser garde ton texte tel quel.",
+    "rejectedText": "laissé tel quel",
+    "editNotApplied": "« {text} » n’est plus dans le texte, donc cette correction n’a pas été appliquée. Vérifie à nouveau pour actualiser les suggestions."
   },
   "Invites": {
     "inviteClients": "Inviter des clients",

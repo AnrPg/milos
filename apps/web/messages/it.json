@@ -2647,7 +2647,8 @@
       "load_value": "Carico",
       "load_mode": "Tipo di carico",
       "rest_seconds": "Recupero (secondi)",
-      "tempo": "Tempo esecutivo"
+      "tempo": "Tempo esecutivo",
+      "text": "Testo"
     },
     "why": {
       "difficulty": "Gli atleti scelgono più in fretta se conoscono il livello.",
@@ -2681,7 +2682,10 @@
     "checkAndPublish": "Controlla e pubblica",
     "reviewBeforePublish": "L’assistente ha lasciato alcune note. Controllale e premi di nuovo Pubblica.",
     "resolveErrorsFirst": "Risolvi i punti segnati «Da correggere» prima di pubblicare.",
-    "publishFailed": "Pubblicazione non riuscita. La bozza è salvata. Riprova."
+    "publishFailed": "Pubblicazione non riuscita. La bozza è salvata. Riprova.",
+    "rejectTextHint": "Rifiutare lascia il testo così com’è.",
+    "rejectedText": "lasciato com’era",
+    "editNotApplied": "«{text}» non è più nel testo, quindi la correzione non è stata applicata. Controlla di nuovo per aggiornare i suggerimenti."
   },
   "Invites": {
     "inviteClients": "Invita clienti",

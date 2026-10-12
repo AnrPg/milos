@@ -8,6 +8,7 @@ import {
   fieldOf,
   formatFieldValue,
   getAtPath,
+  isTextCorrection,
   openIssues,
   openSuggestions,
   parseFieldInput,
@@ -43,7 +44,7 @@ type Translate = ReturnType<typeof useTranslations>;
 const KNOWN_FIELDS = new Set([
   "title", "type", "subtitle", "description", "difficulty", "estimated_duration_seconds", "equipment", "tags",
   "name", "note", "timer_config", "sets", "prescription_value", "prescription_unit", "load_value", "load_mode",
-  "rest_seconds", "tempo",
+  "rest_seconds", "tempo", "text",
 ]);
 
 export function FreeTextAnalysisPanel(props: Props) {
@@ -146,7 +147,9 @@ export function FreeTextAnalysisPanel(props: Props) {
                       {pathText(t, issue.path)} ·{" "}
                       {review.issues[issue.id] === "accepted"
                         ? t("accepted")
-                        : issue.required
+                        : isTextCorrection(issue)
+                          ? t("rejectedText")
+                          : issue.required
                           ? t("rejectedRequired")
                           : t("rejectedOptional")}
                     </span>
@@ -227,7 +230,7 @@ function IssueCard({
         </p>
       ) : null}
 
-      {!hasSuggestedValue && fieldOf(issue.path) !== "timer_config" ? (
+      {!hasSuggestedValue && !suggestion?.text_edit && fieldOf(issue.path) !== "timer_config" ? (
         <div className="mt-3">
           <label className="block text-xs font-bold" style={{ color: "var(--muted)" }}>
             {t("typeValue")}
@@ -263,13 +266,13 @@ function IssueCard({
           onClick={() => onReject(issue)}
           className="rounded-xl px-3 py-2 text-sm font-black"
           style={{ border: "1px solid var(--text)", color: "var(--text)" }}
-          title={issue.required ? t("rejectRequiredHint") : t("rejectOptionalHint")}
+          title={rejectHint(t, issue)}
         >
           {t("reject")}
         </button>
       </div>
       <p className="mt-2 text-[11px]" style={{ color: "var(--muted)" }}>
-        {issue.required ? t("rejectRequiredHint") : t("rejectOptionalHint")}
+        {rejectHint(t, issue)}
       </p>
     </article>
   );
@@ -467,6 +470,11 @@ function issueMessage(t: Translate, issue: AnalysisIssue) {
     default:
       return issue.message || t("codes.generic");
   }
+}
+
+function rejectHint(t: Translate, issue: AnalysisIssue) {
+  if (isTextCorrection(issue)) return t("rejectTextHint");
+  return issue.required ? t("rejectRequiredHint") : t("rejectOptionalHint");
 }
 
 function errorMessage(t: Translate, code: string) {

@@ -139,11 +139,19 @@ export function writeField(workout: CanonicalWorkout, path: string, value: unkno
 
 export function acceptIssue(state: ReviewState, issue: AnalysisIssue, value?: unknown): ReviewState {
   const nextValue = value !== undefined ? value : issue.suggestion?.value;
-  const workout = nextValue === undefined || nextValue === null ? state.workout : writeField(state.workout, issue.path, nextValue);
+  const writesField = issue.path !== "text" && nextValue !== undefined && nextValue !== null;
+  const workout = writesField ? writeField(state.workout, issue.path, nextValue) : state.workout;
   return { ...state, workout, issues: { ...state.issues, [issue.id]: "accepted" } };
 }
 
+/** Proofreader suggestions only propose wording; rejecting them keeps the coach's text. */
+export function isTextCorrection(issue: AnalysisIssue) {
+  return issue.code === "text_correction" || issue.path === "text";
+}
+
 export function rejectIssue(state: ReviewState, issue: AnalysisIssue): ReviewState {
+  if (isTextCorrection(issue)) return { ...state, issues: { ...state.issues, [issue.id]: "rejected" } };
+
   // Rejecting nullifies the field: optional fields are simply left out, while a
   // rejected required field blocks creation until the coach supplies a value.
   return {
@@ -157,6 +165,7 @@ export function undoIssue(state: ReviewState, issue: AnalysisIssue): ReviewState
   const original = getAtPath(state.analysis.workout, issue.path);
   const issues = { ...state.issues };
   delete issues[issue.id];
+  if (issue.path === "text") return { ...state, issues };
   return { ...state, workout: writeField(state.workout, issue.path, original ?? emptyValueFor(issue.path)), issues };
 }
 

@@ -122,6 +122,30 @@ describe("free text review state", () => {
     expect(publishFields(createReviewState(analysis(), "text")).workout_metadata).toEqual({ timer_inference: "complete" });
   });
 
+  it("rejecting a proofreading correction keeps the field; text-only fixes never touch fields", () => {
+    const base = analysis();
+    const nameFix = { ...base.issues[0], id: "c1", code: "text_correction" };
+    const textFix = {
+      ...base.issues[0],
+      id: "c2",
+      code: "text_correction",
+      path: "text",
+      required: false,
+      suggestion: { label: "Add min", value: null, text_edit: { find: "cap 12", replace: "cap 12 min" } },
+    };
+    base.issues = [nameFix, textFix];
+    const state = createReviewState(base, "text");
+
+    const rejected = rejectIssue(state, nameFix);
+    expect(rejected.workout.sections[0].exercises[0].name).toBe("pul ups");
+    expect(blockingProblems("Murph prep", "crossfit", rejected)).toEqual([]);
+
+    const accepted = acceptIssue(state, textFix);
+    expect(accepted.workout).toEqual(state.workout);
+    expect(accepted.issues.c2).toBe("accepted");
+    expect(undoIssue(accepted, textFix).workout).toEqual(state.workout);
+  });
+
   it("validates title and type without an analysis", () => {
     expect(blockingProblems(" ", "spinning", null)).toEqual([
       { path: "title", reason: "required" },

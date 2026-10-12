@@ -33,6 +33,7 @@ import {
   blockingProblems,
   createReviewState,
   dismissSuggestion,
+  isTextCorrection,
   openIssues,
   publishFields,
   rejectIssue,
@@ -247,9 +248,21 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
 
   function handleAccept(issue: AnalysisIssue, value?: unknown) {
     if (!review) return;
-    let next = acceptIssue(review, issue, value);
     const edit = issue.suggestion?.text_edit;
-    if (edit && value === undefined) next = applyTextEdit(next, edit.find, edit.replace);
+    let next = review;
+
+    if (edit && value === undefined) {
+      const edited = applyTextEdit(review, edit.find, edit.replace);
+      // The words were already changed by hand or by another fix: say so
+      // instead of silently doing nothing. A text-only fix stays open.
+      if (edited === review) {
+        setNotice(assistantT("editNotApplied", { text: edit.find }));
+        if (isTextCorrection(issue) && issue.path === "text") return;
+      }
+      next = edited;
+    }
+
+    next = acceptIssue(next, issue, value);
     syncWorkoutField(issue.path, value !== undefined ? value : issue.suggestion?.value);
     setReview(next);
     setShowBlocking(false);
@@ -258,6 +271,8 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
   function handleReject(issue: AnalysisIssue) {
     if (!review) return;
     setReview(rejectIssue(review, issue));
+    // Rejecting a wording suggestion keeps the coach's text and fields.
+    if (isTextCorrection(issue)) return;
     syncWorkoutField(issue.path, null);
     if (issue.required) setShowBlocking(true);
   }
