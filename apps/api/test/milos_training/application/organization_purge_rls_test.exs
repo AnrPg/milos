@@ -52,7 +52,7 @@ defmodule MilosTraining.Application.OrganizationPurgeRLSTest do
     # RLS really is enforced here: without session GUCs nothing is visible,
     # including the root organizations table an unwrapped query would read.
     assert %{rows: [[0]]} = Repo.query!("SELECT count(*) FROM notifications")
-    assert is_nil(Organizations.get_by_id(org_id))
+    assert is_nil(Repo.get(MilosTraining.Organizations.Organization, org_id))
 
     {:ok, platform} = Organizations.resolve_platform_context(ctx.vendor)
 

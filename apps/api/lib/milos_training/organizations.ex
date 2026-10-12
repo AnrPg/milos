@@ -32,6 +32,7 @@ defmodule MilosTraining.Organizations do
     ListMemberships,
     ListOrganizationMemberships,
     ListProvisionedOrganizations,
+    ListStaffUserIds,
     ResolvePlatformContext,
     ResolveTenantContext
   }
@@ -47,16 +48,14 @@ defmodule MilosTraining.Organizations do
   defdelegate get_by_domain(host), to: FindOrganization, as: :by_domain
   defdelegate list_memberships(user_id), to: ListMemberships, as: :call
 
-  def list_active_membership_user_ids(organization_id) when is_binary(organization_id),
-    do: OrganizationStore.list_active_membership_user_ids(organization_id)
-
-  def list_active_membership_user_ids(context), do: ListActiveMembershipUserIds.call(context)
+  defdelegate list_active_membership_user_ids(context_or_organization_id),
+    to: ListActiveMembershipUserIds,
+    as: :call
 
   def list_membership_organization_ids(user_ids),
     do: OrganizationStore.list_membership_organization_ids(user_ids)
 
-  def list_staff_user_ids(organization_id),
-    do: OrganizationStore.list_staff_user_ids(organization_id)
+  defdelegate list_staff_user_ids(organization_id), to: ListStaffUserIds, as: :call
 
   def issue_invitation(context, params, issued_at \\ DateTime.utc_now()),
     do: IssueInvitation.call(context, params, issued_at)

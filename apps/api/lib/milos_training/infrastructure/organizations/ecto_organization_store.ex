@@ -179,27 +179,29 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   end
 
   @impl true
-  def list_active_membership_user_ids(organization_id) do
-    OrganizationMembership
-    |> where(
-      [membership],
-      membership.organization_id == ^organization_id and membership.status == :active
-    )
-    |> select([membership], membership.user_id)
-    |> Repo.all()
-  end
+  def list_active_membership_user_ids(organization_id),
+    do: organization_user_ids(organization_id, nil)
 
   @impl true
   def list_staff_user_ids(nil), do: []
 
-  def list_staff_user_ids(organization_id) do
-    OrganizationMembership
-    |> where(
-      [membership],
-      membership.organization_id == ^organization_id and membership.status == :active and
-        membership.role in [:owner, :admin, :coach]
+  def list_staff_user_ids(organization_id),
+    do: organization_user_ids(organization_id, ["owner", "admin", "coach"])
+
+  # Co-member and staff lookups must resolve for any session that belongs to
+  # the organization - including a member whose own RLS view of
+  # organization_memberships is limited to their row - so they read through the
+  # narrow `milos_organization_user_ids/2` SECURITY DEFINER function (TD-046),
+  # which refuses sessions outside the organization.
+  defp organization_user_ids(organization_id, roles) do
+    from(
+      member in fragment(
+        "SELECT milos_organization_user_ids(?, ?) AS user_id",
+        type(^organization_id, :binary_id),
+        type(^roles, {:array, :string})
+      ),
+      select: type(member.user_id, :binary_id)
     )
-    |> select([membership], membership.user_id)
     |> Repo.all()
   end
 
