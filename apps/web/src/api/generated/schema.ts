@@ -402,6 +402,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/join/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Public: describe the organization behind a join link */
+        get: operations["MilosTrainingWeb.OrganizationAccessController.inspect_join_link"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/invitations/{id}": {
         parameters: {
             query?: never;
@@ -904,6 +921,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/join-link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the organization's public join link settings */
+        get: operations["MilosTrainingWeb.OrganizationAccessController.show_join_link"];
+        /** Enable, disable or change the role of the public join link */
+        put: operations["MilosTrainingWeb.OrganizationAccessController.update_join_link"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/reviews": {
         parameters: {
             query?: never;
@@ -1168,7 +1203,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** List pending invitations of the organization */
+        get: operations["MilosTrainingWeb.OrganizationAccessController.list_invitations"];
         put?: never;
         /** Issue a one-time organization invitation */
         post: operations["MilosTrainingWeb.OrganizationAccessController.issue"];
@@ -1670,6 +1706,23 @@ export interface paths {
         put?: never;
         /** Duplicate a workout as a new draft */
         post: operations["MilosTrainingWeb.AdminWorkoutController.duplicate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/memberships/join/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Join an organization through its public join link */
+        post: operations["MilosTrainingWeb.OrganizationAccessController.join"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4846,6 +4899,42 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.OrganizationAccessController.inspect_join_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Join link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        organization: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            slug: string;
+                        };
+                        /** @enum {string} */
+                        role: "member" | "athlete";
+                        settings?: {
+                            brand_logo_url?: string | null;
+                            brand_name?: string | null;
+                            brand_primary_color?: string | null;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.OrganizationAccessController.revoke": {
         parameters: {
             query?: never;
@@ -6730,6 +6819,66 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.OrganizationAccessController.show_join_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organization_slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Join link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        enabled: boolean;
+                        /** @enum {string} */
+                        role: "member" | "athlete";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.OrganizationAccessController.update_join_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organization_slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    enabled?: boolean;
+                    /** @enum {string} */
+                    role?: "member" | "athlete";
+                };
+            };
+        };
+        responses: {
+            /** @description Join link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        enabled: boolean;
+                        /** @enum {string} */
+                        role: "member" | "athlete";
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.ReviewController.index": {
         parameters: {
             query?: never;
@@ -8470,6 +8619,37 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.OrganizationAccessController.list_invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organization_slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pending invitations */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        email_bound: boolean;
+                        /** Format: date_time */
+                        expires_at: string;
+                        /** Format: uuid */
+                        id: string;
+                        /** Format: date_time */
+                        issued_at: string;
+                        role: string;
+                    }[];
                 };
             };
         };
@@ -11372,6 +11552,67 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.OrganizationAccessController.join": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Already a member */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        id: string;
+                        organization: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            slug: string;
+                        };
+                        role: string;
+                        settings?: {
+                            brand_logo_url?: string | null;
+                            brand_name?: string | null;
+                            brand_primary_color?: string | null;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Membership */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        id: string;
+                        organization: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            slug: string;
+                        };
+                        role: string;
+                        settings?: {
+                            brand_logo_url?: string | null;
+                            brand_name?: string | null;
+                            brand_primary_color?: string | null;
+                        } | null;
                     };
                 };
             };

@@ -5639,6 +5639,89 @@
         ]
       }
     },
+    "/api/auth/join/{slug}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.inspect_join_link",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "organization": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "slug"
+                      ],
+                      "type": "object"
+                    },
+                    "role": {
+                      "enum": [
+                        "member",
+                        "athlete"
+                      ],
+                      "type": "string"
+                    },
+                    "settings": {
+                      "nullable": true,
+                      "properties": {
+                        "brand_logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "organization",
+                    "role"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Join link"
+          }
+        },
+        "summary": "Public: describe the organization behind a join link",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/invitations/{id}": {
       "delete": {
         "callbacks": {},
@@ -10023,6 +10106,132 @@
         "summary": "Fetch an athlete coaching drill-down",
         "tags": [
           "Admin Coaching"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/join-link": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.show_join_link",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organization_slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "role": {
+                      "enum": [
+                        "member",
+                        "athlete"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "role"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Join link"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get the organization's public join link settings",
+        "tags": [
+          "Organizations"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.update_join_link",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organization_slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "role": {
+                    "enum": [
+                      "member",
+                      "athlete"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "role": {
+                      "enum": [
+                        "member",
+                        "athlete"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "role"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Join link"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Enable, disable or change the role of the public join link",
+        "tags": [
+          "Organizations"
         ]
       }
     },
@@ -15402,6 +15611,71 @@
       }
     },
     "/api/org/{organization_slug}/invitations": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.list_invitations",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organization_slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "email_bound": {
+                        "type": "boolean"
+                      },
+                      "expires_at": {
+                        "format": "date_time",
+                        "type": "string"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "issued_at": {
+                        "format": "date_time",
+                        "type": "string"
+                      },
+                      "role": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "role",
+                      "expires_at",
+                      "issued_at",
+                      "email_bound"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Pending invitations"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List pending invitations of the organization",
+        "tags": [
+          "Organizations"
+        ]
+      },
       "post": {
         "callbacks": {},
         "operationId": "MilosTrainingWeb.OrganizationAccessController.issue",
@@ -24072,6 +24346,157 @@
         "summary": "Duplicate a workout as a new draft",
         "tags": [
           "Admin Workouts"
+        ]
+      }
+    },
+    "/api/memberships/join/{slug}": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.join",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "organization": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "slug"
+                      ],
+                      "type": "object"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "settings": {
+                      "nullable": true,
+                      "properties": {
+                        "brand_logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "role",
+                    "organization"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Already a member"
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "organization": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "slug"
+                      ],
+                      "type": "object"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "settings": {
+                      "nullable": true,
+                      "properties": {
+                        "brand_logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "role",
+                    "organization"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Membership"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Join an organization through its public join link",
+        "tags": [
+          "Organizations"
         ]
       }
     },
