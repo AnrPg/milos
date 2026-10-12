@@ -22,6 +22,9 @@ type Props = {
   token: string;
   userId: string;
   role: "member" | "athlete" | "admin";
+  /** When set, opens the assignment dialog for this day (used by the profile's quick action). */
+  assignRequestDate?: string | null;
+  onAssignRequestHandled?: () => void;
 };
 
 function isoDate(date: Date) {
@@ -44,7 +47,7 @@ function itemTitle(item: Record<string, unknown>, fallback: string) {
   return fallback;
 }
 
-export function UserProgrammingSchedule({ token, userId, role }: Props) {
+export function UserProgrammingSchedule({ token, userId, role, assignRequestDate, onAssignRequestHandled }: Props) {
   const i18n = useUiTranslations();
   const [startDate, setStartDate] = useState(() => isoDate(new Date()));
   const [schedule, setSchedule] = useState<AdminUserSchedule | null>(null);
@@ -90,6 +93,17 @@ export function UserProgrammingSchedule({ token, userId, role }: Props) {
     return () => window.cancelAnimationFrame(frame);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, userId, startDate, endDate, i18n]);
+
+  useEffect(() => {
+    if (!assignRequestDate) return;
+    const frame = window.requestAnimationFrame(() => {
+      setSelectedDate(assignRequestDate);
+      setSelectedSlotId("");
+      setAssignmentModalOpen(true);
+      onAssignRequestHandled?.();
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [assignRequestDate, onAssignRequestHandled]);
 
   const dayItems = (schedule?.items ?? []).filter((item) => itemDate(item) === selectedDate);
   const selectedDaySlots = role === "member" ? dayItems : [];

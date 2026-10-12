@@ -1168,6 +1168,15 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  def call(conn, {:error, :class_placement_requires_member}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "class_placement_requires_member",
+      error: "Only active members of this organization can be placed in a class"
+    })
+  end
+
   def call(conn, {:error, :booking_not_pending}) do
     conn
     |> put_status(:conflict)

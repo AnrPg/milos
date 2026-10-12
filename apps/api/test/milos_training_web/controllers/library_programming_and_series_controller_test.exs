@@ -219,6 +219,94 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
              copied["id"]
   end
 
+  test "member profile can move a member from a booked class into another class",
+       %{conn: conn} do
+    admin = admin_fixture(%{nickname: "placement_admin"})
+    %{organization: organization, context: context} = tenant_fixture(admin, "Placement Gym")
+    member = user_fixture(%{nickname: "placement_member", role: :member})
+    athlete = user_fixture(%{nickname: "placement_athlete", role: :athlete})
+    add_membership(organization, member, :member)
+    add_membership(organization, athlete, :athlete)
+    workout = tenant_workout_fixture(admin, context, %{title: "Placement WOD"})
+    class_type = class_type_fixture(%{name: "Placement Class", tenant_context: context})
+    admin_conn = put_bearer_token(conn, admin)
+    scheduled_at = DateTime.utc_now() |> DateTime.add(86_400) |> DateTime.truncate(:second)
+
+    create_slot = fn name, at, auto_approve ->
+      admin_conn
+      |> recycle()
+      |> put_req_header("content-type", "application/json")
+      |> post(
+        "/api/org/#{organization.slug}/admin/schedule/slots",
+        Jason.encode!(%{
+          master_workout_id: workout.id,
+          class_type_id: class_type.id,
+          name: name,
+          duration_minutes: 60,
+          scheduled_at: at,
+          capacity: 10,
+          auto_approve: auto_approve,
+          booking_timeout_minutes: 30
+        })
+      )
+      |> json_response(201)
+      |> Map.fetch!("slot")
+    end
+
+    morning = create_slot.("Morning Class", scheduled_at, true)
+    evening = create_slot.("Evening Class", DateTime.add(scheduled_at, 3_600), false)
+
+    booking =
+      conn
+      |> put_bearer_token(member)
+      |> post(
+        "/api/org/#{organization.slug}/bookings",
+        Jason.encode!(%{slot_id: morning["id"]})
+      )
+      |> json_response(201)
+      |> Map.fetch!("booking")
+
+    placement =
+      admin_conn
+      |> recycle()
+      |> put_req_header("content-type", "application/json")
+      |> post(
+        "/api/org/#{organization.slug}/admin/users/#{member.id}/class-placement",
+        Jason.encode!(%{slot_id: evening["id"], from_booking_id: booking["id"]})
+      )
+      |> json_response(201)
+
+    assert placement["booking"]["status"] == "approved"
+    assert placement["booking"]["scheduled_class_id"] == evening["id"]
+    assert placement["previous_booking_id"] == booking["id"]
+
+    day = DateTime.to_date(scheduled_at) |> Date.to_iso8601()
+    next_day = DateTime.to_date(scheduled_at) |> Date.add(1) |> Date.to_iso8601()
+
+    schedule =
+      admin_conn
+      |> recycle()
+      |> get(
+        "/api/org/#{organization.slug}/admin/users/#{member.id}/schedule?start_date=#{day}&end_date=#{next_day}"
+      )
+      |> json_response(200)
+
+    assert [%{"id" => slot_id}] = schedule["items"]
+    assert slot_id == evening["id"]
+
+    rejected =
+      admin_conn
+      |> recycle()
+      |> put_req_header("content-type", "application/json")
+      |> post(
+        "/api/org/#{organization.slug}/admin/users/#{athlete.id}/class-placement",
+        Jason.encode!(%{slot_id: morning["id"]})
+      )
+      |> json_response(422)
+
+    assert rejected["code"] == "class_placement_requires_member"
+  end
+
   test "athlete profile can save a newly-created WOD in a folder and assign that same copy",
        %{conn: conn} do
     admin = admin_fixture(%{nickname: "athlete_program_admin"})

@@ -1420,6 +1420,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/users/{id}/class-placement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Book a member into a class, optionally moving them out of an existing booking */
+        post: operations["MilosTrainingWeb.AdminUserController.place_in_class"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/invoices/{id}/issue": {
         parameters: {
             query?: never;
@@ -10157,6 +10174,38 @@ export interface operations {
                             /** Format: uuid */
                             user_id: string;
                         } | null;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminUserController.place_in_class": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    from_booking_id?: string | null;
+                    /** Format: uuid */
+                    slot_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Class placement result */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };

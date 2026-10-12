@@ -20713,6 +20713,74 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/users/{id}/class-placement": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminUserController.place_in_class",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "from_booking_id": {
+                    "allOf": [
+                      {
+                        "format": "uuid",
+                        "type": "string"
+                      }
+                    ],
+                    "nullable": true
+                  },
+                  "slot_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "slot_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Class placement result"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Book a member into a class, optionally moving them out of an existing booking",
+        "tags": [
+          "Admin Users"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/finance/invoices/{id}/issue": {
       "patch": {
         "callbacks": {},

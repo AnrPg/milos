@@ -15,6 +15,7 @@ defmodule MilosTrainingWeb.AdminUserController do
     DeleteAdminUser,
     ListAdminUsers,
     ListAthletes,
+    PlaceMemberInClass,
     ProgramUserWorkout,
     RevokeUserAllowance
   }
@@ -143,9 +144,32 @@ defmodule MilosTrainingWeb.AdminUserController do
     }
   }
 
+  @class_placement_body %RequestBody{
+    required: true,
+    content: %{
+      "application/json" => %MediaType{
+        schema: %Schema{
+          type: :object,
+          additionalProperties: false,
+          properties: %{
+            slot_id: @user_id,
+            from_booking_id: %Schema{allOf: [@user_id], nullable: true}
+          },
+          required: [:slot_id]
+        }
+      }
+    }
+  }
+
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true]
-       when action in [:update_role, :grant_allowance, :revoke_allowance, :program_workout]
+       when action in [
+              :update_role,
+              :grant_allowance,
+              :revoke_allowance,
+              :program_workout,
+              :place_in_class
+            ]
 
   @allowance_grant_body %RequestBody{
     required: true,
@@ -274,6 +298,13 @@ defmodule MilosTrainingWeb.AdminUserController do
     parameters: [@id_parameter],
     request_body: @program_body,
     responses: [created: {"Programming result", "application/json", @summary_object}]
+  )
+
+  operation(:place_in_class,
+    summary: "Book a member into a class, optionally moving them out of an existing booking",
+    parameters: [@id_parameter],
+    request_body: @class_placement_body,
+    responses: [created: {"Class placement result", "application/json", @summary_object}]
   )
 
   operation(:prs,
@@ -581,6 +612,17 @@ defmodule MilosTrainingWeb.AdminUserController do
            ProgramUserWorkout.call(
              conn.assigns.tenant_context,
              admin,
+             params["id"] || params[:id],
+             conn.body_params
+           ) do
+      conn |> put_status(:created) |> json(payload)
+    end
+  end
+
+  def place_in_class(conn, params) do
+    with {:ok, payload} <-
+           PlaceMemberInClass.call(
+             conn.assigns.tenant_context,
              params["id"] || params[:id],
              conn.body_params
            ) do

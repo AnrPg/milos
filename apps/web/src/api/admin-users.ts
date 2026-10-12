@@ -158,6 +158,17 @@ export function programAdminUserWorkout(
   );
 }
 
+export function placeAdminUserInClass(
+  token: string,
+  userId: string,
+  body: { slot_id: string; from_booking_id?: string | null },
+) {
+  return apiRequest<{ booking: Record<string, unknown>; previous_booking_id: string | null }>(
+    `/admin/users/${userId}/class-placement`,
+    { token, method: "POST", body },
+  );
+}
+
 export function fetchAdminUserPRs(token: string, userId: string) {
   return apiRequest<{ user_id: string; prs: AdminUserPR[] }>(`/admin/users/${userId}/prs`, { token });
 }

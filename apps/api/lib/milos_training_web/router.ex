@@ -258,6 +258,7 @@ defmodule MilosTrainingWeb.Router do
     get("/users/:id/training-history", AdminUserController, :training_history)
     get("/users/:id/schedule", AdminUserController, :schedule)
     post("/users/:id/programming", AdminUserController, :program_workout)
+    post("/users/:id/class-placement", AdminUserController, :place_in_class)
     get("/users/:id/prs", AdminUserController, :prs)
     get("/users/:id/incidents", AdminUserController, :incidents)
     get("/users/:id/messages", AdminUserController, :messages)

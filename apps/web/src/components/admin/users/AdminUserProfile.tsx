@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
   deleteAdminUser,
@@ -29,8 +29,11 @@ import { shouldShowAllowanceQuota } from "@/app/account/billing/billing-entitlem
 import { packageSubscriptionLabel, visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
 import {
   ADMIN_PROFILE_SECTION_REQUEST,
+  openAdminProfileSection,
   type AdminProfileSectionRequest,
 } from "@/components/admin/users/admin-profile-navigation";
+import { MemberClassPlacementModal } from "@/components/admin/users/MemberClassPlacementModal";
+import { HoverHint } from "@/components/HelpTooltip";
 import { LocalizedScore } from "@/components/localized-score";
 import { formatPRCardDetails } from "@/components/pantheon/pr-card-details";
 import { SemanticLabel } from "@/components/semantic-label";
@@ -478,6 +481,10 @@ export function AdminUserProfile({ userId }: { userId: string }) {
       await queryClient.invalidateQueries({ queryKey: ["admin", "users", userId] });
     },
   });
+  const [assignRequestDate, setAssignRequestDate] = useState<string | null>(null);
+  const clearAssignRequest = useCallback(() => setAssignRequestDate(null), []);
+  const [placementOpen, setPlacementOpen] = useState(false);
+  const [scheduleVersion, setScheduleVersion] = useState(0);
   const deleteMutation = useMutation({
     mutationFn: () => deleteAdminUser(token!, userId),
     onSuccess: async () => {
@@ -548,14 +555,55 @@ export function AdminUserProfile({ userId }: { userId: string }) {
             <h1 className="mt-4 truncate text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>{profile.identity.nickname}</h1>
             <p className="mt-3 text-sm" style={{ color: "var(--muted)" }}><SemanticLabel value={profile.account_status} /> {i18n("joinedbbc56ef")} {date(profile.identity.joined_at)}</p>
           </div>
+          {token && profile.identity.role === "athlete" ? (
+            <HoverHint hint={i18n("featureAssignWorkoutHint")} align="end">
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold"
+                style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+                onClick={() => {
+                  setAssignRequestDate(new Date(Date.now() - new Date().getTimezoneOffset() * 60_000).toISOString().slice(0, 10));
+                  openAdminProfileSection("schedule");
+                }}
+              >
+                <span aria-hidden>🏋️</span>
+                {i18n("featureAssignWorkoutAction")}
+              </button>
+            </HoverHint>
+          ) : null}
+          {token && profile.identity.role === "member" ? (
+            <HoverHint hint={i18n("featureMoveToClassHint")} align="end">
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold"
+                style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+                onClick={() => setPlacementOpen(true)}
+              >
+                <span aria-hidden>🗓️</span>
+                {i18n("featureMoveToClassAction")}
+              </button>
+            </HoverHint>
+          ) : null}
         </section>
+        {placementOpen && token ? (
+          <MemberClassPlacementModal
+            token={token}
+            userId={userId}
+            nickname={profile.identity.nickname}
+            onClose={() => setPlacementOpen(false)}
+            onPlaced={() => {
+              setScheduleVersion((version) => version + 1);
+              void queryClient.invalidateQueries({ queryKey: ["admin", "users", userId] });
+            }}
+          />
+        ) : null}
 
         <section className="space-y-4">
           <Panel id="overview" title={i18n("overview0efc2e6")}>
             <StatGrid items={overviewItems} />
           </Panel>
 
-          {token && (profile.identity.role === "member" || profile.identity.role === "athlete") ? <Panel id="schedule" title={i18n("featureScheduleProgramming")}><UserProgrammingSchedule token={token} userId={userId} role={profile.identity.role} /></Panel> : null}
+          {token && (profile.identity.role === "member" || profile.identity.role === "athlete") ? <Panel id="schedule" title={i18n("featureScheduleProgramming")}><UserProgrammingSchedule key={scheduleVersion} token={token} userId={userId} role={profile.identity.role} assignRequestDate={assignRequestDate} onAssignRequestHandled={clearAssignRequest} /></Panel> : null}
 
           {sections.has("finance") ? <Panel id="finance" title={i18n("finance1b48d3f")}>{finance.data && token ? <FinanceDetails finance={finance.data} token={token} userId={userId} effectiveEntitlement={effectiveEntitlement} creditBalance={finance.data?.summary?.credit_balance ?? 0} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
 
