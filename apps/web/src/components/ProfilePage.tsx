@@ -29,6 +29,7 @@ import {
   type AppLocale,
 } from "@/i18n/locales";
 import { PageHeader } from "@/components/PageHeader";
+import { ReplayTourButton } from "@/components/onboarding/Onboarding";
 
 function CollapsibleSection({
   id,
@@ -310,7 +311,7 @@ export function ProfilePage() {
   return (
     <main className="min-h-screen px-6 py-10 md:px-10" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-3xl space-y-4">
-        <PageHeader title={tProfile("title")} />
+        <PageHeader title={tProfile("title")} actions={<ReplayTourButton />} />
 
         <div className="flex justify-end">
           <button

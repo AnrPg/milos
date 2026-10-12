@@ -30,6 +30,7 @@ import { ClassTypeSettings } from "@/components/admin/ClassTypeSettings";
 import { IntegerInput } from "@/components/integer-input";
 import { PageHeader } from "@/components/PageHeader";
 import { ClientAccessPanel } from "@/components/invites/InviteClients";
+import { AdminOnboardingPanel } from "@/components/onboarding/Onboarding";
 
 // ── Shared sub-components ────────────────────────────────────────────────────
 
@@ -1115,6 +1116,7 @@ export function AdminSettingsHub() {
       <div className="mx-auto max-w-5xl space-y-6">
 
         <PageHeader title={i18n("appConfigurationse0effaa")} />
+        <AdminOnboardingPanel />
         <ClientAccessPanel />
 
         {token ? (

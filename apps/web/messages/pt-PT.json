@@ -2777,5 +2777,140 @@
       "joined": "Data de adesão",
       "open": "Abrir perfil"
     }
+  },
+  "Onboarding": {
+    "popupEyebrow": "Configuração por concluir",
+    "popupTitle": "Bem-vindo! Vamos preparar o teu ginásio",
+    "popupIntro": "Seis passos curtos. Para quando quiseres: esta lista espera por ti em {path}.",
+    "progress": "{done} de {total} concluídos",
+    "later": "Lembrar-me mais tarde",
+    "dontShow": "Não mostrar novamente",
+    "takeTour": "Fazer a visita",
+    "panelTitle": "Lista de configuração",
+    "panelIntro": "Continua onde paraste. Os passos ficam marcados sozinhos quando a app os vê concluídos.",
+    "showPopupAgain": "Mostrar novamente as boas-vindas",
+    "showSteps": "Mostrar passos",
+    "hideSteps": "Ocultar passos",
+    "allDone": "Tudo pronto. A tua app está preparada para clientes.",
+    "markDone": "Marcar como feito",
+    "skip": "Saltar",
+    "reopen": "Anular",
+    "unskip": "Repor",
+    "doneAuto": "Feito. Detetado automaticamente.",
+    "statusDone": "(feito)",
+    "statusSkipped": "(saltado)",
+    "statusOpen": "(por fazer)",
+    "steps": {
+      "settings": {
+        "title": "Revê as regras da app",
+        "body": "Predefinições de reservas, pagamentos e notificações. Dois minutos.",
+        "cta": "Abrir definições"
+      },
+      "classes": {
+        "title": "Adiciona as tuas aulas",
+        "body": "Cria tipos de aula (ex. CrossFit, Yoga) para os clientes reservarem.",
+        "cta": "Configurar aulas"
+      },
+      "packages": {
+        "title": "Cria pacotes de adesão",
+        "body": "Planos e preços que os clientes compram ou que tu atribuis.",
+        "cta": "Criar pacote"
+      },
+      "workout": {
+        "title": "Escreve o teu primeiro treino",
+        "body": "Escreve-o como no quadro. O assistente trata do resto.",
+        "cta": "Escrever treino"
+      },
+      "invite": {
+        "title": "Convida os teus clientes",
+        "body": "Envia um link pessoal ou ativa o link de adesão do ginásio.",
+        "cta": "Convidar clientes"
+      },
+      "tour": {
+        "title": "Faz a visita de 1 minuto",
+        "body": "Vê onde está cada coisa.",
+        "cta": "Começar visita"
+      }
+    },
+    "tour": {
+      "roleDescription": "visita guiada",
+      "stepOf": "Passo {current} de {total}",
+      "skip": "Saltar visita",
+      "showMe": "Mostra-me",
+      "back": "Voltar",
+      "next": "Seguinte",
+      "done": "Percebi",
+      "replay": "Rever a visita da app",
+      "admin": {
+        "welcome": {
+          "title": "Bem-vindo à app do teu ginásio",
+          "body": "Um olhar de um minuto pelo essencial. Salta quando quiseres."
+        },
+        "dashboard": {
+          "title": "Painel",
+          "body": "O teu dia num relance: aulas, receitas e o que precisa de ti."
+        },
+        "classes": {
+          "title": "Aulas",
+          "body": "Cria tipos de aula, agenda sessões e aprova reservas."
+        },
+        "workouts": {
+          "title": "Treinos",
+          "body": "Escreve um treino em texto livre. O assistente estrutura-o e assinala erros."
+        },
+        "people": {
+          "title": "Pessoas e convites",
+          "body": "Convida clientes com um link e abre o perfil, os pagamentos e o progresso de qualquer pessoa."
+        },
+        "config": {
+          "title": "Configurações da aplicação",
+          "body": "Regras, notificações, acesso de clientes e esta lista estão em {path}."
+        }
+      },
+      "member": {
+        "welcome": {
+          "title": "Bem-vindo!",
+          "body": "Eis como tirar o máximo da app em menos de um minuto."
+        },
+        "schedule": {
+          "title": "Reserva aulas",
+          "body": "Abre {schedule}, escolhe uma aula e toca em Reservar. Lembramos-te antes de começar."
+        },
+        "train": {
+          "title": "Treina com o temporizador",
+          "body": "Começa um treino e segue-o passo a passo com o temporizador integrado."
+        },
+        "records": {
+          "title": "Acompanha o teu progresso",
+          "body": "Os teus recordes pessoais e sequências ficam no {pantheon}."
+        },
+        "account": {
+          "title": "Faturação e perfil",
+          "body": "Vê a tua adesão em {billing}. Muda o idioma e as notificações no teu perfil."
+        }
+      },
+      "athlete": {
+        "welcome": {
+          "title": "Bem-vindo!",
+          "body": "Eis como tirar o máximo da app em menos de um minuto."
+        },
+        "programme": {
+          "title": "O teu programa",
+          "body": "Os treinos do teu treinador aparecem em {myWorkouts}, dia a dia."
+        },
+        "train": {
+          "title": "Treina com o temporizador",
+          "body": "Abre um treino e carrega em Começar. O temporizador guia-te em cada bloco."
+        },
+        "records": {
+          "title": "Acompanha o teu progresso",
+          "body": "Os teus recordes pessoais e sequências ficam no {pantheon}."
+        },
+        "account": {
+          "title": "Faturação e perfil",
+          "body": "Vê a tua adesão em {billing}. Muda o idioma e as notificações no teu perfil."
+        }
+      }
+    }
   }
 }

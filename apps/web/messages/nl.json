@@ -2777,5 +2777,140 @@
       "joined": "Aangemeld",
       "open": "Profiel openen"
     }
+  },
+  "Onboarding": {
+    "popupEyebrow": "Instellen niet afgerond",
+    "popupTitle": "Welkom! Laten we je sportschool klaarzetten",
+    "popupIntro": "Zes korte stappen. Stop wanneer je wilt: deze lijst wacht op je in {path}.",
+    "progress": "{done} van {total} klaar",
+    "later": "Herinner me later",
+    "dontShow": "Niet meer tonen",
+    "takeTour": "Rondleiding volgen",
+    "panelTitle": "Instelchecklist",
+    "panelIntro": "Ga verder waar je gebleven was. Stappen vinken zichzelf af zodra de app ziet dat ze klaar zijn.",
+    "showPopupAgain": "Welkomstvenster opnieuw tonen",
+    "showSteps": "Stappen tonen",
+    "hideSteps": "Stappen verbergen",
+    "allDone": "Alles staat klaar. Je app is klaar voor klanten.",
+    "markDone": "Markeren als klaar",
+    "skip": "Overslaan",
+    "reopen": "Ongedaan maken",
+    "unskip": "Terugzetten",
+    "doneAuto": "Klaar. Automatisch herkend.",
+    "statusDone": "(klaar)",
+    "statusSkipped": "(overgeslagen)",
+    "statusOpen": "(te doen)",
+    "steps": {
+      "settings": {
+        "title": "Controleer je app-regels",
+        "body": "Standaarden voor boekingen, betalingen en meldingen. Twee minuten.",
+        "cta": "Instellingen openen"
+      },
+      "classes": {
+        "title": "Voeg je lessen toe",
+        "body": "Maak lestypes aan (bijv. CrossFit, Yoga) zodat klanten kunnen boeken.",
+        "cta": "Lessen instellen"
+      },
+      "packages": {
+        "title": "Maak lidmaatschapspakketten",
+        "body": "Abonnementen en prijzen die klanten kopen of die jij toewijst.",
+        "cta": "Pakket maken"
+      },
+      "workout": {
+        "title": "Schrijf je eerste training",
+        "body": "Schrijf hem zoals op het whiteboard. De assistent doet de rest.",
+        "cta": "Training schrijven"
+      },
+      "invite": {
+        "title": "Nodig je klanten uit",
+        "body": "Stuur een persoonlijke link of zet de aanmeldlink van je sportschool aan.",
+        "cta": "Klanten uitnodigen"
+      },
+      "tour": {
+        "title": "Volg de rondleiding van 1 minuut",
+        "body": "Zie waar alles staat.",
+        "cta": "Rondleiding starten"
+      }
+    },
+    "tour": {
+      "roleDescription": "rondleiding",
+      "stepOf": "Stap {current} van {total}",
+      "skip": "Rondleiding overslaan",
+      "showMe": "Laat zien",
+      "back": "Terug",
+      "next": "Volgende",
+      "done": "Begrepen",
+      "replay": "App-rondleiding opnieuw bekijken",
+      "admin": {
+        "welcome": {
+          "title": "Welkom in de app van je sportschool",
+          "body": "Een blik van één minuut op de basis. Sla over wanneer je wilt."
+        },
+        "dashboard": {
+          "title": "Dashboard",
+          "body": "Je dag in één oogopslag: lessen, omzet en wat jouw aandacht nodig heeft."
+        },
+        "classes": {
+          "title": "Lessen",
+          "body": "Maak lestypes aan, plan sessies en keur boekingen goed."
+        },
+        "workouts": {
+          "title": "Trainingen",
+          "body": "Schrijf een training als gewone tekst. De assistent structureert hem en markeert fouten."
+        },
+        "people": {
+          "title": "Mensen & uitnodigingen",
+          "body": "Nodig klanten uit met een link en open van iedereen het profiel, de betalingen en de voortgang."
+        },
+        "config": {
+          "title": "App-configuratie",
+          "body": "Regels, meldingen, klanttoegang en deze lijst vind je onder {path}."
+        }
+      },
+      "member": {
+        "welcome": {
+          "title": "Welkom!",
+          "body": "Zo haal je in minder dan een minuut het meeste uit de app."
+        },
+        "schedule": {
+          "title": "Lessen boeken",
+          "body": "Open {schedule}, kies een les en tik op Boeken. We herinneren je voordat hij begint."
+        },
+        "train": {
+          "title": "Train met de timer",
+          "body": "Start een training en volg hem stap voor stap met de ingebouwde timer."
+        },
+        "records": {
+          "title": "Volg je voortgang",
+          "body": "Je persoonlijke records en reeksen verzamelen zich in {pantheon}."
+        },
+        "account": {
+          "title": "Facturatie & profiel",
+          "body": "Bekijk je lidmaatschap onder {billing}. Wijzig taal en meldingen in je profiel."
+        }
+      },
+      "athlete": {
+        "welcome": {
+          "title": "Welkom!",
+          "body": "Zo haal je in minder dan een minuut het meeste uit de app."
+        },
+        "programme": {
+          "title": "Je programma",
+          "body": "De trainingen van je coach verschijnen onder {myWorkouts}, dag voor dag."
+        },
+        "train": {
+          "title": "Train met de timer",
+          "body": "Open een training en druk op Start. De timer leidt je door elk blok."
+        },
+        "records": {
+          "title": "Volg je voortgang",
+          "body": "Je persoonlijke records en reeksen verzamelen zich in {pantheon}."
+        },
+        "account": {
+          "title": "Facturatie & profiel",
+          "body": "Bekijk je lidmaatschap onder {billing}. Wijzig taal en meldingen in je profiel."
+        }
+      }
+    }
   }
 }

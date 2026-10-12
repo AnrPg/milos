@@ -2777,5 +2777,140 @@
       "joined": "Joined",
       "open": "Open profile"
     }
+  },
+  "Onboarding": {
+    "popupEyebrow": "Setup not finished",
+    "popupTitle": "Welcome! Let’s get your gym ready",
+    "popupIntro": "Six short steps. Stop anytime: this list waits for you in {path}.",
+    "progress": "{done} of {total} done",
+    "later": "Remind me later",
+    "dontShow": "Don’t show again",
+    "takeTour": "Take the tour",
+    "panelTitle": "Setup checklist",
+    "panelIntro": "Pick up where you left off. Steps tick themselves off when the app sees them done.",
+    "showPopupAgain": "Show welcome popup again",
+    "showSteps": "Show steps",
+    "hideSteps": "Hide steps",
+    "allDone": "All set. Your app is ready for clients.",
+    "markDone": "Mark done",
+    "skip": "Skip",
+    "reopen": "Undo",
+    "unskip": "Bring back",
+    "doneAuto": "Done. We spotted it automatically.",
+    "statusDone": "(done)",
+    "statusSkipped": "(skipped)",
+    "statusOpen": "(to do)",
+    "steps": {
+      "settings": {
+        "title": "Review your app rules",
+        "body": "Booking, payment and notification defaults. Two minutes.",
+        "cta": "Open settings"
+      },
+      "classes": {
+        "title": "Add your classes",
+        "body": "Create class types (e.g. CrossFit, Yoga) so clients can book.",
+        "cta": "Set up classes"
+      },
+      "packages": {
+        "title": "Create membership packages",
+        "body": "Plans and prices clients can buy or you can assign.",
+        "cta": "Create a package"
+      },
+      "workout": {
+        "title": "Write your first workout",
+        "body": "Type it like on the whiteboard. The assistant does the rest.",
+        "cta": "Write a workout"
+      },
+      "invite": {
+        "title": "Invite your clients",
+        "body": "Send a personal link or switch on your gym’s join link.",
+        "cta": "Invite clients"
+      },
+      "tour": {
+        "title": "Take the 1-minute tour",
+        "body": "See where everything lives.",
+        "cta": "Start tour"
+      }
+    },
+    "tour": {
+      "roleDescription": "guided tour",
+      "stepOf": "Step {current} of {total}",
+      "skip": "Skip tour",
+      "showMe": "Show me",
+      "back": "Back",
+      "next": "Next",
+      "done": "Got it",
+      "replay": "Replay app tour",
+      "admin": {
+        "welcome": {
+          "title": "Welcome to your gym app",
+          "body": "A one-minute look at the essentials. Skip whenever you like."
+        },
+        "dashboard": {
+          "title": "Dashboard",
+          "body": "Today at a glance: classes, revenue and anything that needs you."
+        },
+        "classes": {
+          "title": "Classes",
+          "body": "Create class types, schedule sessions and approve bookings."
+        },
+        "workouts": {
+          "title": "Workouts",
+          "body": "Write a workout as plain text. The assistant structures it and flags mistakes."
+        },
+        "people": {
+          "title": "People & invites",
+          "body": "Invite clients with a link, then open anyone’s profile, payments and progress."
+        },
+        "config": {
+          "title": "App configuration",
+          "body": "Rules, notifications, client access and this setup list live in {path}."
+        }
+      },
+      "member": {
+        "welcome": {
+          "title": "Welcome!",
+          "body": "Here’s how to get the most from the app in under a minute."
+        },
+        "schedule": {
+          "title": "Book classes",
+          "body": "Open {schedule}, pick a class and tap Book. We’ll remind you before it starts."
+        },
+        "train": {
+          "title": "Train with the timer",
+          "body": "Start a workout and follow it step by step with the built-in timer."
+        },
+        "records": {
+          "title": "Track your progress",
+          "body": "Your personal records and streaks collect in {pantheon}."
+        },
+        "account": {
+          "title": "Billing & profile",
+          "body": "See your membership in {billing}. Change language and notifications in your profile."
+        }
+      },
+      "athlete": {
+        "welcome": {
+          "title": "Welcome!",
+          "body": "Here’s how to get the most from the app in under a minute."
+        },
+        "programme": {
+          "title": "Your programme",
+          "body": "Your coach’s workouts appear in {myWorkouts}, day by day."
+        },
+        "train": {
+          "title": "Train with the timer",
+          "body": "Open a workout and press Start. The timer guides you through every block."
+        },
+        "records": {
+          "title": "Track your progress",
+          "body": "Your personal records and streaks collect in {pantheon}."
+        },
+        "account": {
+          "title": "Billing & profile",
+          "body": "See your membership in {billing}. Change language and notifications in your profile."
+        }
+      }
+    }
   }
 }

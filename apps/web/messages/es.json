@@ -2777,5 +2777,140 @@
       "joined": "Alta",
       "open": "Abrir perfil"
     }
+  },
+  "Onboarding": {
+    "popupEyebrow": "Configuración sin terminar",
+    "popupTitle": "¡Bienvenido! Preparemos tu gimnasio",
+    "popupIntro": "Seis pasos cortos. Para cuando quieras: esta lista te espera en {path}.",
+    "progress": "{done} de {total} hechos",
+    "later": "Recordármelo luego",
+    "dontShow": "No volver a mostrar",
+    "takeTour": "Hacer el recorrido",
+    "panelTitle": "Lista de configuración",
+    "panelIntro": "Sigue donde lo dejaste. Los pasos se marcan solos cuando la app detecta que están hechos.",
+    "showPopupAgain": "Volver a mostrar la bienvenida",
+    "showSteps": "Mostrar pasos",
+    "hideSteps": "Ocultar pasos",
+    "allDone": "Todo listo. Tu app está preparada para recibir clientes.",
+    "markDone": "Marcar como hecho",
+    "skip": "Omitir",
+    "reopen": "Deshacer",
+    "unskip": "Recuperar",
+    "doneAuto": "Hecho. Lo detectamos automáticamente.",
+    "statusDone": "(hecho)",
+    "statusSkipped": "(omitido)",
+    "statusOpen": "(pendiente)",
+    "steps": {
+      "settings": {
+        "title": "Revisa las reglas de la app",
+        "body": "Valores por defecto de reservas, pagos y avisos. Dos minutos.",
+        "cta": "Abrir ajustes"
+      },
+      "classes": {
+        "title": "Añade tus clases",
+        "body": "Crea tipos de clase (p. ej. CrossFit, Yoga) para que los clientes reserven.",
+        "cta": "Configurar clases"
+      },
+      "packages": {
+        "title": "Crea paquetes de membresía",
+        "body": "Planes y precios que los clientes compran o que tú asignas.",
+        "cta": "Crear paquete"
+      },
+      "workout": {
+        "title": "Escribe tu primer entrenamiento",
+        "body": "Escríbelo como en la pizarra. El asistente hace el resto.",
+        "cta": "Escribir entrenamiento"
+      },
+      "invite": {
+        "title": "Invita a tus clientes",
+        "body": "Envía un enlace personal o activa el enlace de alta del gimnasio.",
+        "cta": "Invitar clientes"
+      },
+      "tour": {
+        "title": "Haz el recorrido de 1 minuto",
+        "body": "Descubre dónde está cada cosa.",
+        "cta": "Empezar recorrido"
+      }
+    },
+    "tour": {
+      "roleDescription": "recorrido guiado",
+      "stepOf": "Paso {current} de {total}",
+      "skip": "Saltar recorrido",
+      "showMe": "Muéstramelo",
+      "back": "Atrás",
+      "next": "Siguiente",
+      "done": "Entendido",
+      "replay": "Repetir el recorrido",
+      "admin": {
+        "welcome": {
+          "title": "Bienvenido a la app de tu gimnasio",
+          "body": "Un vistazo de un minuto a lo esencial. Sáltalo cuando quieras."
+        },
+        "dashboard": {
+          "title": "Panel",
+          "body": "Tu día de un vistazo: clases, ingresos y lo que necesita tu atención."
+        },
+        "classes": {
+          "title": "Clases",
+          "body": "Crea tipos de clase, programa sesiones y aprueba reservas."
+        },
+        "workouts": {
+          "title": "Entrenamientos",
+          "body": "Escribe un entrenamiento en texto libre. El asistente lo estructura y señala errores."
+        },
+        "people": {
+          "title": "Personas e invitaciones",
+          "body": "Invita clientes con un enlace y abre el perfil, los pagos y el progreso de cualquiera."
+        },
+        "config": {
+          "title": "Configuración de la app",
+          "body": "Reglas, avisos, acceso de clientes y esta lista están en {path}."
+        }
+      },
+      "member": {
+        "welcome": {
+          "title": "¡Bienvenido!",
+          "body": "Así le sacas el máximo partido a la app en menos de un minuto."
+        },
+        "schedule": {
+          "title": "Reserva clases",
+          "body": "Abre {schedule}, elige una clase y pulsa Reservar. Te avisaremos antes de que empiece."
+        },
+        "train": {
+          "title": "Entrena con el temporizador",
+          "body": "Empieza un entrenamiento y síguelo paso a paso con el temporizador integrado."
+        },
+        "records": {
+          "title": "Sigue tu progreso",
+          "body": "Tus marcas personales y rachas se reúnen en {pantheon}."
+        },
+        "account": {
+          "title": "Facturación y perfil",
+          "body": "Consulta tu membresía en {billing}. Cambia el idioma y los avisos en tu perfil."
+        }
+      },
+      "athlete": {
+        "welcome": {
+          "title": "¡Bienvenido!",
+          "body": "Así le sacas el máximo partido a la app en menos de un minuto."
+        },
+        "programme": {
+          "title": "Tu programa",
+          "body": "Los entrenamientos de tu coach aparecen en {myWorkouts}, día a día."
+        },
+        "train": {
+          "title": "Entrena con el temporizador",
+          "body": "Abre un entrenamiento y pulsa Empezar. El temporizador te guía en cada bloque."
+        },
+        "records": {
+          "title": "Sigue tu progreso",
+          "body": "Tus marcas personales y rachas se reúnen en {pantheon}."
+        },
+        "account": {
+          "title": "Facturación y perfil",
+          "body": "Consulta tu membresía en {billing}. Cambia el idioma y los avisos en tu perfil."
+        }
+      }
+    }
   }
 }

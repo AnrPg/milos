@@ -2777,5 +2777,140 @@
       "joined": "Inscription",
       "open": "Ouvrir le profil"
     }
+  },
+  "Onboarding": {
+    "popupEyebrow": "Configuration inachevée",
+    "popupTitle": "Bienvenue ! Préparons ta salle",
+    "popupIntro": "Six étapes courtes. Arrête quand tu veux : cette liste t’attend dans {path}.",
+    "progress": "{done} sur {total} faites",
+    "later": "Me le rappeler plus tard",
+    "dontShow": "Ne plus afficher",
+    "takeTour": "Faire la visite",
+    "panelTitle": "Liste de configuration",
+    "panelIntro": "Reprends là où tu t’es arrêté. Les étapes se cochent seules quand l’app les voit terminées.",
+    "showPopupAgain": "Réafficher le message d’accueil",
+    "showSteps": "Afficher les étapes",
+    "hideSteps": "Masquer les étapes",
+    "allDone": "Tout est prêt. Ton app peut accueillir des clients.",
+    "markDone": "Marquer comme fait",
+    "skip": "Passer",
+    "reopen": "Annuler",
+    "unskip": "Remettre",
+    "doneAuto": "Fait. Détecté automatiquement.",
+    "statusDone": "(fait)",
+    "statusSkipped": "(passé)",
+    "statusOpen": "(à faire)",
+    "steps": {
+      "settings": {
+        "title": "Vérifie les règles de l’app",
+        "body": "Réglages par défaut des réservations, paiements et notifications. Deux minutes.",
+        "cta": "Ouvrir les réglages"
+      },
+      "classes": {
+        "title": "Ajoute tes cours",
+        "body": "Crée des types de cours (ex. CrossFit, Yoga) pour que les clients réservent.",
+        "cta": "Configurer les cours"
+      },
+      "packages": {
+        "title": "Crée des formules d’adhésion",
+        "body": "Offres et tarifs que les clients achètent ou que tu attribues.",
+        "cta": "Créer une formule"
+      },
+      "workout": {
+        "title": "Écris ta première séance",
+        "body": "Écris-la comme au tableau. L’assistant s’occupe du reste.",
+        "cta": "Écrire une séance"
+      },
+      "invite": {
+        "title": "Invite tes clients",
+        "body": "Envoie un lien personnel ou active le lien d’inscription de ta salle.",
+        "cta": "Inviter des clients"
+      },
+      "tour": {
+        "title": "Fais la visite d’une minute",
+        "body": "Découvre où se trouve chaque chose.",
+        "cta": "Commencer la visite"
+      }
+    },
+    "tour": {
+      "roleDescription": "visite guidée",
+      "stepOf": "Étape {current} sur {total}",
+      "skip": "Passer la visite",
+      "showMe": "Montre-moi",
+      "back": "Retour",
+      "next": "Suivant",
+      "done": "Compris",
+      "replay": "Revoir la visite de l’app",
+      "admin": {
+        "welcome": {
+          "title": "Bienvenue dans l’app de ta salle",
+          "body": "Un tour d’une minute de l’essentiel. Passe-le quand tu veux."
+        },
+        "dashboard": {
+          "title": "Tableau de bord",
+          "body": "Ta journée en un coup d’œil : cours, revenus et ce qui a besoin de toi."
+        },
+        "classes": {
+          "title": "Cours",
+          "body": "Crée des types de cours, planifie des séances et valide les réservations."
+        },
+        "workouts": {
+          "title": "Séances",
+          "body": "Écris une séance en texte libre. L’assistant la structure et signale les erreurs."
+        },
+        "people": {
+          "title": "Personnes et invitations",
+          "body": "Invite des clients avec un lien, puis ouvre le profil, les paiements et la progression de chacun."
+        },
+        "config": {
+          "title": "Configuration de l’app",
+          "body": "Règles, notifications, accès des clients et cette liste se trouvent dans {path}."
+        }
+      },
+      "member": {
+        "welcome": {
+          "title": "Bienvenue !",
+          "body": "Voici comment profiter au mieux de l’app en moins d’une minute."
+        },
+        "schedule": {
+          "title": "Réserve des cours",
+          "body": "Ouvre {schedule}, choisis un cours et touche Réserver. On te le rappelle avant le début."
+        },
+        "train": {
+          "title": "Entraîne-toi avec le minuteur",
+          "body": "Lance une séance et suis-la pas à pas avec le minuteur intégré."
+        },
+        "records": {
+          "title": "Suis tes progrès",
+          "body": "Tes records personnels et tes séries se retrouvent dans {pantheon}."
+        },
+        "account": {
+          "title": "Facturation et profil",
+          "body": "Consulte ton adhésion dans {billing}. Change la langue et les notifications dans ton profil."
+        }
+      },
+      "athlete": {
+        "welcome": {
+          "title": "Bienvenue !",
+          "body": "Voici comment profiter au mieux de l’app en moins d’une minute."
+        },
+        "programme": {
+          "title": "Ton programme",
+          "body": "Les séances de ton coach apparaissent dans {myWorkouts}, jour après jour."
+        },
+        "train": {
+          "title": "Entraîne-toi avec le minuteur",
+          "body": "Ouvre une séance et appuie sur Démarrer. Le minuteur te guide à chaque bloc."
+        },
+        "records": {
+          "title": "Suis tes progrès",
+          "body": "Tes records personnels et tes séries se retrouvent dans {pantheon}."
+        },
+        "account": {
+          "title": "Facturation et profil",
+          "body": "Consulte ton adhésion dans {billing}. Change la langue et les notifications dans ton profil."
+        }
+      }
+    }
   }
 }
