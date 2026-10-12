@@ -108,3 +108,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-100 | Coach client scope and head coaches | Accepted |
 | ADR-101 | Private coach notes and their access log | Accepted |
 | ADR-102 | Front desk, accountant and janitor roles; housekeeping log | Accepted |
+| ADR-103 | Workspaces, navigation and sitemap per role | Proposed |
