@@ -1,4 +1,5 @@
 defmodule MilosTrainingWeb.GamificationPreferencesControllerTest do
+  # TD-046: preferences are owner-only under RLS.
   use MilosTrainingWeb.ConnCase, async: true
 
   alias MilosTraining.TestFixtures
