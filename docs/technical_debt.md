@@ -39,7 +39,11 @@ the original wording and dates for traceability.
 | TD-045 | Open |
 | TD-046 | Open |
 | TD-047 | Open |
-| TD-048–TD-053 | Open |
+| TD-048 | Open |
+| TD-049–TD-050 | Resolved |
+| TD-051 | Open |
+| TD-052 | Resolved |
+| TD-053 | Open |
 
 ## Detailed Ledger
 
