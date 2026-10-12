@@ -175,4 +175,24 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilderTest do
     assert segment.kind == :manual
     assert segment.duration_seconds == nil
   end
+
+  test "complex_emom cycles the interval slots in order" do
+    s =
+      section(%{type: "complex_emom", duration_seconds: 360, interval_seconds: 60}, [
+        %{name: "Row", interval_assignment: 1},
+        %{name: "Burpee", interval_assignment: 2},
+        %{name: "Clean", interval_assignment: 3}
+      ])
+
+    segments = TimerSequenceBuilder.build(workout([s]))
+
+    assert Enum.map(segments, fn segment -> Enum.map(segment.exercises, & &1.name) end) == [
+             ["Row"],
+             ["Burpee"],
+             ["Clean"],
+             ["Row"],
+             ["Burpee"],
+             ["Clean"]
+           ]
+  end
 end

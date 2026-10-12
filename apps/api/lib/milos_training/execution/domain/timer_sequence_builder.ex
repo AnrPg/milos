@@ -176,20 +176,24 @@ defmodule MilosTraining.Execution.Domain.TimerSequenceBuilder do
     end
   end
 
-  defp round_exercises_for_emom(exercises, round, total_rounds) do
-    # For complex_emom / even_odd the exercises have interval_assignment.
+  defp round_exercises_for_emom(exercises, round, _total_rounds) do
+    # For complex_emom the exercises have interval_assignment (their slot);
+    # the slots repeat in order: with slots 1..3, minute 4 runs slot 1 again.
     # For plain emom, all exercises repeat every round.
-    has_assignment =
-      Enum.any?(exercises, &((&1[:interval_assignment] || &1["interval_assignment"]) != nil))
+    slots =
+      exercises
+      |> Enum.map(&(&1[:interval_assignment] || &1["interval_assignment"]))
+      |> Enum.filter(&(is_integer(&1) and &1 > 0))
 
-    if has_assignment do
+    if slots == [] do
+      exercises
+    else
+      slot = rem(round - 1, Enum.max(slots)) + 1
+
       Enum.filter(exercises, fn ex ->
         assignment = ex[:interval_assignment] || ex["interval_assignment"]
-        # cycle assignment through rounds when assignment > total_rounds
-        if assignment, do: rem(round - 1, total_rounds) + 1 == assignment, else: true
+        is_nil(assignment) or assignment == slot
       end)
-    else
-      exercises
     end
   end
 
