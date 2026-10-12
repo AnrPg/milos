@@ -32,7 +32,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
   @platform_administered_tables ~w(
     organizations organization_memberships organization_settings
     organization_domains registration_invitations vendors users
-    organization_provisioning_events
+    organization_provisioning_events organization_purges
   )
 
   # Materialized views carry denormalized tenant data but cannot have RLS
