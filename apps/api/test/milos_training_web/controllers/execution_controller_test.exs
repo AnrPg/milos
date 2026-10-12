@@ -525,7 +525,7 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
     } do
       admin = create_admin!("execution_adjust_admin")
       athlete_conn = authenticate_as_member(conn, "execution_adjust_athlete")
-      :ok = ensure_scale_level!("scaled", "Scaled")
+      :ok = ensure_scale_level!(legacy_context!(admin), "scaled", "Scaled")
 
       {:ok, workout} =
         Workouts.create_workout(legacy_context!(admin), admin, %{
