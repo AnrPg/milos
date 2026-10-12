@@ -102,3 +102,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-094 | Temporary clean slate production purge | Accepted |
 | ADR-095 | Align account role with membership | Accepted |
 | ADR-096 | Package types and entitlement catalog v2 | Accepted |
+| ADR-097 | Package Phase B: booking rules, perks and facility | Accepted |
