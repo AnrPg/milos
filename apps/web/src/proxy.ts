@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { retiredOrganizationSlugRedirect } from "@/lib/organization-slug-alias";
+
 type MediaOriginEnv = Record<string, string | undefined>;
 
 export function configuredMediaOrigins(env: MediaOriginEnv = process.env) {
@@ -10,7 +12,14 @@ export function configuredMediaOrigins(env: MediaOriginEnv = process.env) {
     .join(" ");
 }
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
+  // ADR-104: a retired organization slug permanently redirects to the
+  // canonical one, preserving the rest of the path and the query.
+  const retiredSlugTarget = await retiredOrganizationSlugRedirect(request.method, request.nextUrl);
+  if (retiredSlugTarget) {
+    return applySecurityHeaders(NextResponse.redirect(retiredSlugTarget, 308));
+  }
+
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const mediaOrigins = configuredMediaOrigins();
   const development = process.env.NODE_ENV !== "production";
@@ -44,6 +53,10 @@ export function proxy(request: NextRequest) {
       })
     : NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set("Content-Security-Policy", csp);
+  return applySecurityHeaders(response);
+}
+
+function applySecurityHeaders(response: NextResponse) {
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");

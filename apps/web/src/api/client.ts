@@ -133,6 +133,17 @@ function rememberOrganizationSlug(slug: string) {
   } catch {}
 }
 
+// ADR-104: the API resolves a retired organization slug transparently and
+// names the current one in this header. A remembered selection that still
+// holds the retired slug is updated so later requests use the new one.
+export const CANONICAL_ORGANIZATION_SLUG_HEADER = "x-organization-canonical-slug";
+
+function rememberCanonicalOrganizationSlug(response: Response, requestedSlug: string | null) {
+  const canonicalSlug = response.headers?.get?.(CANONICAL_ORGANIZATION_SLUG_HEADER);
+  if (!canonicalSlug || !requestedSlug || canonicalSlug === requestedSlug) return;
+  if (selectedOrganizationSlug() === requestedSlug) rememberOrganizationSlug(canonicalSlug);
+}
+
 let refreshPromise: Promise<string | null> | null = null;
 let sessionUser: unknown | null = null;
 let latestSharedAccessToken: string | null = null;
@@ -318,6 +329,8 @@ export async function apiRequest<T>(
     body: options.body ? JSON.stringify(options.body) : undefined,
     credentials: "same-origin",
   });
+
+  rememberCanonicalOrganizationSlug(response, organizationSlug);
 
   if (response.status === 401 && allowRefresh && token) {
     const refreshedToken = await refreshAccessToken();
