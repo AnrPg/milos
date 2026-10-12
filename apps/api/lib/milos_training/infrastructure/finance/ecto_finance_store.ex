@@ -3,6 +3,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   import Ecto.Query
 
+  alias MilosTraining.Finance.FinanceSubscriptionFreeze
+
   alias MilosTraining.Finance.{
     FinanceCreditLedgerEntry,
     FinanceEntitlementUsageEntry,
@@ -37,7 +39,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     ReferralLifecycle,
     ReferralPolicy,
     ReferralRewardFulfillment,
-    SubscriptionSelection
+    SubscriptionSelection,
+    SubscriptionTerms
   }
 
   alias MilosTraining.Repo
@@ -218,10 +221,15 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       |> derive_membership_status()
 
     Repo.transaction(fn ->
+      existing =
+        tenant_scope(Membership)
+        |> where([membership], membership.user_id == ^user_id)
+        |> Repo.one()
+
+      guard_commitment!(existing, params)
+
       membership =
-        case tenant_scope(Membership)
-             |> where([membership], membership.user_id == ^user_id)
-             |> Repo.one() do
+        case existing do
           nil ->
             %Membership{}
             |> Membership.changeset(params)
@@ -777,6 +785,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
     with %Membership{} = membership <- Membership |> tenant_scope() |> Repo.get(membership_id),
          {:ok, params} <- maybe_prefill_invoice_from_subscription(membership.id, params),
+         params = apply_member_discount(membership, params),
          :ok <- validate_invoice_subscription_link(membership.id, params),
          {:ok, line_params} <- invoice_line_params(params),
          :ok <- validate_invoice_line_subscription_links(membership.id, line_params),
@@ -1127,6 +1136,241 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     end)
   end
 
+  # ── Phase B: freezes, booking terms, expiry reminders (ADR-097) ──────────
+
+  @impl true
+  def create_freeze(user_id, admin_id, params) do
+    params = string_key_map(params)
+
+    Repo.transaction(fn ->
+      membership =
+        Repo.one(
+          from m in tenant_scope(Membership), where: m.user_id == ^user_id, lock: "FOR UPDATE"
+        ) || Repo.rollback(:finance_profile_missing)
+
+      today = Date.utc_today()
+      starts_on = parse_date(params["starts_on"], today)
+      ends_on = parse_date(params["ends_on"], nil) || Repo.rollback(:invalid_freeze_dates)
+
+      subscription =
+        effective_subscription(membership.id, starts_on) ||
+          Repo.rollback(:finance_entitlement_inactive)
+
+      terms = package_terms(subscription.params_snapshot)
+
+      used =
+        FinanceSubscriptionFreeze
+        |> tenant_scope()
+        |> where([freeze], freeze.membership_package_subscription_id == ^subscription.id)
+        |> where([freeze], is_nil(freeze.cancelled_at))
+        |> Repo.all()
+        |> Enum.map(&{&1.starts_on, &1.ends_on})
+
+      %{days: days} =
+        case SubscriptionTerms.validate_freeze(
+               starts_on,
+               ends_on,
+               terms[:freeze_days_per_year],
+               used,
+               today
+             ) do
+          {:ok, result} -> result
+          {:error, reason} -> Repo.rollback(reason)
+        end
+
+      extension_days = if subscription.ends_on, do: days, else: 0
+
+      freeze =
+        %FinanceSubscriptionFreeze{}
+        |> FinanceSubscriptionFreeze.changeset(%{
+          membership_id: membership.id,
+          membership_package_subscription_id: subscription.id,
+          starts_on: starts_on,
+          ends_on: ends_on,
+          extension_days: extension_days,
+          reason: params["reason"],
+          admin_id: admin_id
+        })
+        |> Repo.insert()
+        |> case do
+          {:ok, freeze} -> freeze
+          {:error, reason} -> Repo.rollback(reason)
+        end
+
+      shift_subscription_end!(subscription, extension_days)
+      refresh_entitlement_snapshot(membership.id)
+      normalize_freeze(freeze)
+    end)
+  end
+
+  @impl true
+  def cancel_freeze(user_id, freeze_id, params) do
+    params = string_key_map(params)
+
+    Repo.transaction(fn ->
+      membership =
+        Repo.one(
+          from m in tenant_scope(Membership), where: m.user_id == ^user_id, lock: "FOR UPDATE"
+        ) || Repo.rollback(:finance_profile_missing)
+
+      freeze =
+        FinanceSubscriptionFreeze
+        |> tenant_scope()
+        |> where([freeze], freeze.id == ^freeze_id and freeze.membership_id == ^membership.id)
+        |> lock("FOR UPDATE")
+        |> Repo.one() || Repo.rollback(:not_found)
+
+      if freeze.cancelled_at, do: Repo.rollback(:freeze_already_cancelled)
+
+      today = Date.utc_today()
+
+      # Unused freeze days are given back: the freeze ends yesterday (or is
+      # removed entirely when it has not started) and the extension shrinks.
+      {new_ends_on, unused} =
+        cond do
+          Date.compare(freeze.starts_on, today) != :lt ->
+            {freeze.starts_on, SubscriptionTerms.days(freeze.starts_on, freeze.ends_on)}
+
+          Date.compare(freeze.ends_on, today) == :lt ->
+            {freeze.ends_on, 0}
+
+          true ->
+            {Date.add(today, -1), SubscriptionTerms.days(today, freeze.ends_on)}
+        end
+
+      returned = min(unused, freeze.extension_days)
+
+      updated =
+        freeze
+        |> FinanceSubscriptionFreeze.cancel_changeset(%{
+          cancelled_at: DateTime.utc_now(),
+          cancel_reason: params["reason"],
+          ends_on: new_ends_on,
+          extension_days: freeze.extension_days - returned
+        })
+        |> Repo.update()
+        |> case do
+          {:ok, freeze} -> freeze
+          {:error, reason} -> Repo.rollback(reason)
+        end
+
+      subscription =
+        MembershipPackageSubscription |> Repo.get!(freeze.membership_package_subscription_id)
+
+      shift_subscription_end!(subscription, -returned)
+      refresh_entitlement_snapshot(membership.id)
+      normalize_freeze(updated)
+    end)
+  end
+
+  @impl true
+  def list_freezes(user_id) do
+    case tenant_scope(Membership) |> where([m], m.user_id == ^user_id) |> Repo.one() do
+      nil ->
+        []
+
+      membership ->
+        FinanceSubscriptionFreeze
+        |> tenant_scope()
+        |> where([freeze], freeze.membership_id == ^membership.id)
+        |> order_by([freeze], desc: freeze.starts_on)
+        |> Repo.all()
+        |> Enum.map(&normalize_freeze/1)
+    end
+  end
+
+  @impl true
+  def booking_terms(user_id, occurred_on) do
+    with %Membership{} = membership <-
+           tenant_scope(Membership) |> where([m], m.user_id == ^user_id) |> Repo.one(),
+         %MembershipPackageSubscription{} = subscription <-
+           effective_subscription(membership.id, occurred_on) do
+      terms = package_terms(subscription.params_snapshot)
+
+      Map.take(terms, [
+        :booking_window_days,
+        :cancellation_cutoff_hours,
+        :waitlist_priority,
+        :no_show_penalty_waived
+      ])
+    else
+      _ ->
+        %{
+          booking_window_days: nil,
+          cancellation_cutoff_hours: nil,
+          waitlist_priority: "normal",
+          no_show_penalty_waived: false
+        }
+    end
+  end
+
+  @impl true
+  def subscriptions_due_for_expiry_reminder(%Date{} = today) do
+    MembershipPackageSubscription
+    |> tenant_scope()
+    |> where([subscription], subscription.status == "active")
+    |> where([subscription], subscription.ends_on >= ^today)
+    |> where([subscription], subscription.ends_on <= ^Date.add(today, 30))
+    |> join(:inner, [subscription], membership in Membership,
+      on: membership.id == subscription.membership_id
+    )
+    |> select([subscription, membership], {subscription, membership.user_id})
+    |> Repo.all()
+    |> Enum.flat_map(fn {subscription, user_id} ->
+      days = package_terms(subscription.params_snapshot)[:expiry_reminder_days] || 0
+
+      if days > 0 and Date.diff(subscription.ends_on, today) == days do
+        [
+          %{
+            user_id: user_id,
+            subscription_id: subscription.id,
+            package_name: package_name(subscription),
+            ends_on: subscription.ends_on,
+            days: days
+          }
+        ]
+      else
+        []
+      end
+    end)
+  end
+
+  defp package_name(subscription) do
+    case MembershipPackage |> tenant_scope() |> Repo.get(subscription.membership_package_id) do
+      nil -> subscription.package_code_snapshot
+      package -> package.name
+    end
+  end
+
+  defp shift_subscription_end!(_subscription, 0), do: :ok
+  defp shift_subscription_end!(%{ends_on: nil}, _days), do: :ok
+
+  defp shift_subscription_end!(subscription, days) do
+    subscription
+    |> MembershipPackageSubscription.changeset(%{ends_on: Date.add(subscription.ends_on, days)})
+    |> Repo.update()
+    |> case do
+      {:ok, _} -> :ok
+      {:error, reason} -> Repo.rollback(reason)
+    end
+  end
+
+  defp normalize_freeze(freeze) do
+    %{
+      id: freeze.id,
+      membership_id: freeze.membership_id,
+      membership_package_subscription_id: freeze.membership_package_subscription_id,
+      starts_on: freeze.starts_on,
+      ends_on: freeze.ends_on,
+      extension_days: freeze.extension_days,
+      reason: freeze.reason,
+      admin_id: freeze.admin_id,
+      cancelled_at: freeze.cancelled_at,
+      cancel_reason: freeze.cancel_reason,
+      inserted_at: freeze.inserted_at
+    }
+  end
+
   @impl true
   def revoke_allowance_grant(user_id, admin_id, grant_id, params) do
     params = atom_key_map(params)
@@ -1248,9 +1492,14 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     occurred_on = Map.get(request, :occurred_on, Date.utc_today())
     base_entitlement = entitlement_for_membership(membership)
     mode = entitlement_enforcement_mode()
+    request = put_local_start(request)
 
     {subscription, request} =
       select_subscription(membership.id, base_entitlement, request, occurred_on)
+
+    if is_nil(subscription) and mode != :observe and Map.get(request, :actor_role) != :admin and
+         frozen_subscriptions(membership.id, occurred_on) != [],
+       do: Repo.rollback(:finance_membership_frozen)
 
     entitlement =
       if subscription do
@@ -1290,6 +1539,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
               metadata: Map.get(request, :metadata, %{})
             })
 
+          activate_on_first_use!(subscription, occurred_on)
           Map.put(entry, :decision, decision)
         else
           %{id: nil, decision: decision, observed?: true}
@@ -1384,8 +1634,21 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   end
 
   defp effective_entitlement(membership, occurred_on) do
-    base = entitlement_for_membership(membership)
-    subscription = effective_subscription(membership.id, occurred_on)
+    frozen = frozen_subscriptions(membership.id, occurred_on)
+
+    # A frozen subscription stays visible (marked frozen) while it is paused.
+    {subscription, base} =
+      case effective_subscription(membership.id, occurred_on) do
+        nil when frozen != [] ->
+          {MembershipPackageSubscription
+           |> Repo.get(hd(frozen).membership_package_subscription_id),
+           membership
+           |> entitlement_for_membership()
+           |> Map.put(:frozen_until, hd(frozen).ends_on)}
+
+        subscription ->
+          {subscription, entitlement_for_membership(membership)}
+      end
 
     case subscription && EntitlementPlan.parse(subscription.params_snapshot || %{}) do
       {:ok, plan} ->
@@ -1413,9 +1676,17 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
           |> Repo.all()
           |> Enum.map(&normalize_usage_entry/1)
 
+        stacked =
+          membership.id
+          |> effective_subscriptions(occurred_on)
+          |> Enum.reject(&(&1.id == subscription.id))
+          |> Enum.map(&normalize_subscription/1)
+
         base
         |> Map.put(:plan, serialize_entitlement_plan(plan))
         |> Map.put(:subscription, normalize_subscription(subscription))
+        |> Map.put(:stacked_subscriptions, stacked)
+        |> Map.put(:freezes, list_freezes(membership.user_id))
         |> Map.put(:allowances, allowances)
         |> Map.put(:usage_entries, entries)
         |> Map.put(:enforcement_mode, entitlement_enforcement_mode())
@@ -1456,9 +1727,48 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         |> Enum.reduce(0, &(&1.quantity_delta + &2))
         |> then(&max(-&1, 0))
 
-      {period_start, period_end, committed, extensions, limit}
+      carried = rollover_units(subscription, allowance, period, limit, occurred_on, plan)
+
+      {period_start, period_end, committed, extensions + carried, limit}
     else
       _ -> {occurred_on, occurred_on, 0, 0, nil}
+    end
+  end
+
+  # ADR-097: unused units of the previous calendar period, capped by rollover_max.
+  defp rollover_units(subscription, allowance, period, limit, occurred_on, plan) do
+    rollover_max = plan.terms[:rollover_max] || 0
+
+    with true <- rollover_max > 0 and is_integer(limit),
+         {previous_start, previous_end} <- AllowancePeriod.previous_bounds(period, occurred_on),
+         true <-
+           is_nil(subscription.starts_on) or
+             Date.compare(subscription.starts_on, previous_end) != :gt do
+      previous =
+        FinanceEntitlementUsageEntry
+        |> where([entry], entry.membership_package_subscription_id == ^subscription.id)
+        |> where([entry], entry.allowance_key == ^to_string(allowance))
+        |> where(
+          [entry],
+          entry.period_start == ^previous_start and entry.period_end == ^previous_end
+        )
+        |> Repo.all()
+
+      committed =
+        previous
+        |> Enum.reject(&(&1.event_type == "adjustment"))
+        |> Enum.reduce(0, &(&1.quantity_delta + &2))
+        |> max(0)
+
+      extensions =
+        previous
+        |> Enum.filter(&(&1.event_type == "adjustment"))
+        |> Enum.reduce(0, &(&1.quantity_delta + &2))
+        |> then(&max(-&1, 0))
+
+      SubscriptionTerms.carry_over(limit, extensions, committed, rollover_max)
+    else
+      _ -> 0
     end
   end
 
@@ -1479,8 +1789,63 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     )
     |> where([subscription], is_nil(subscription.ends_on) or subscription.ends_on >= ^occurred_on)
     |> Repo.all()
+    |> Enum.reject(&(&1.id in frozen_subscription_ids(membership_id, occurred_on)))
     |> SubscriptionSelection.order()
   end
+
+  defp frozen_subscription_ids(membership_id, occurred_on) do
+    membership_id
+    |> frozen_subscriptions(occurred_on)
+    |> Enum.map(& &1.membership_package_subscription_id)
+  end
+
+  # ADR-097: a subscription is unusable while one of its freezes covers the day.
+  defp frozen_subscriptions(membership_id, occurred_on) do
+    FinanceSubscriptionFreeze
+    |> tenant_scope()
+    |> where([freeze], freeze.membership_id == ^membership_id)
+    |> where([freeze], is_nil(freeze.cancelled_at))
+    |> where([freeze], freeze.starts_on <= ^occurred_on and freeze.ends_on >= ^occurred_on)
+    |> Repo.all()
+  end
+
+  defp put_local_start(%{starts_at: %DateTime{} = starts_at} = request) do
+    timezone = Map.get(get_finance_settings(), :entitlement_timezone) || "Etc/UTC"
+
+    local =
+      case DateTime.shift_zone(starts_at, timezone) do
+        {:ok, local} -> local
+        _ -> starts_at
+      end
+
+    request
+    |> Map.put(:local_weekday, Date.day_of_week(DateTime.to_date(local)))
+    |> Map.put(:local_time, DateTime.to_time(local))
+  end
+
+  defp put_local_start(request), do: request
+
+  defp activate_on_first_use!(
+         %MembershipPackageSubscription{activated_on: nil} = subscription,
+         occurred_on
+       ) do
+    with {:ok, plan} <- EntitlementPlan.parse(subscription.params_snapshot || %{}),
+         "first_use" <- plan.terms[:validity_starts],
+         ends_on when not is_nil(ends_on) <-
+           SubscriptionTerms.activation_ends_on(occurred_on, plan.terms[:validity]) do
+      subscription
+      |> MembershipPackageSubscription.changeset(%{activated_on: occurred_on, ends_on: ends_on})
+      |> Repo.update()
+      |> case do
+        {:ok, _} -> :ok
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    else
+      _ -> :ok
+    end
+  end
+
+  defp activate_on_first_use!(_subscription, _occurred_on), do: :ok
 
   # Picks the first stacked subscription that authorizes the request under
   # enforcement and resolves class-type allowances against its plan. When none
@@ -1594,7 +1959,9 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       entitlement_version: plan.version,
       channels: plan.channels |> MapSet.to_list() |> Enum.sort(),
       capabilities: plan.capabilities |> MapSet.to_list() |> Enum.sort(),
-      allowances: plan.allowances
+      allowances: plan.allowances,
+      terms: plan.terms,
+      time_windows: plan.time_windows
     }
   end
 
@@ -2476,23 +2843,84 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
            |> Map.put_new("line_type", "membership_package")
            |> Map.put_new("description", description)
            |> Map.put_new("notes", description)
-           |> Map.put("lines", [
-             %{
-               "membership_package_subscription_id" => subscription.id,
-               "line_type" => "membership_package",
-               "description" => description,
-               "quantity" => 1,
-               "unit_amount_cents" => amount_cents,
-               "discount_cents" => parse_integer(params["discount_cents"], 0),
-               "package_code_snapshot" => subscription.package_code_snapshot,
-               "package_family_snapshot" => subscription.package_family_snapshot
-             }
-           ])}
+           |> Map.put(
+             "lines",
+             [
+               %{
+                 "membership_package_subscription_id" => subscription.id,
+                 "line_type" => "membership_package",
+                 "description" => description,
+                 "quantity" => 1,
+                 "unit_amount_cents" => amount_cents,
+                 "discount_cents" => parse_integer(params["discount_cents"], 0),
+                 "package_code_snapshot" => subscription.package_code_snapshot,
+                 "package_family_snapshot" => subscription.package_family_snapshot
+               }
+             ] ++ joining_fee_lines(subscription)
+           )}
         end
     end
   end
 
   defp maybe_prefill_invoice_from_subscription(_membership_id, params), do: {:ok, params}
+
+  # ADR-097: the joining fee is charged once, on the first invoice of a
+  # member's first subscription to the package.
+  defp joining_fee_lines(subscription) do
+    fee = package_terms(subscription.params_snapshot)[:joining_fee_cents] || 0
+
+    first_invoice? =
+      not (FinanceInvoiceLine
+           |> where([line], line.membership_package_subscription_id == ^subscription.id)
+           |> Repo.exists?())
+
+    first_subscription? =
+      not (MembershipPackageSubscription
+           |> where([other], other.membership_id == ^subscription.membership_id)
+           |> where([other], other.membership_package_id == ^subscription.membership_package_id)
+           |> where([other], other.id != ^subscription.id)
+           |> where([other], other.inserted_at < ^subscription.inserted_at)
+           |> Repo.exists?())
+
+    if fee > 0 and first_invoice? and first_subscription? do
+      [
+        %{
+          "membership_package_subscription_id" => subscription.id,
+          "line_type" => "manual_charge",
+          "charge_category" => "other",
+          "description" => "Joining fee",
+          "quantity" => 1,
+          "unit_amount_cents" => fee,
+          "discount_cents" => 0
+        }
+      ]
+    else
+      []
+    end
+  end
+
+  # ADR-097: member discount for manual charges in the member's discount scope.
+  defp apply_member_discount(membership, %{"lines" => lines} = params) when is_list(lines) do
+    case effective_subscription(membership.id, Date.utc_today()) do
+      nil ->
+        params
+
+      subscription ->
+        terms = package_terms(subscription.params_snapshot)
+
+        Map.put(
+          params,
+          "lines",
+          SubscriptionTerms.apply_member_discount(
+            Enum.map(lines, &string_key_map/1),
+            terms[:member_discount_percent] || 0,
+            terms[:member_discount_scope] || []
+          )
+        )
+    end
+  end
+
+  defp apply_member_discount(_membership, params), do: params
 
   defp invoice_line_params(%{"lines" => lines}) when is_list(lines) and length(lines) > 0 do
     normalize_line_params(lines)
@@ -3712,6 +4140,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       price_cents_snapshot: subscription.price_cents_snapshot,
       params_snapshot: subscription.params_snapshot || %{},
       fields: PackageContract.fields_from_params(subscription.params_snapshot || %{}),
+      commitment_ends_on: subscription.commitment_ends_on,
+      activated_on: subscription.activated_on,
       referral_reward_applied: subscription.referral_reward_applied,
       inserted_at: subscription.inserted_at,
       updated_at: subscription.updated_at
@@ -4177,6 +4607,13 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     end
   end
 
+  defp package_terms(params) do
+    case EntitlementPlan.parse(params || %{}) do
+      {:ok, plan} -> plan.terms
+      _ -> %{}
+    end
+  end
+
   defp package_v2?(package),
     do: Map.get(package.params || %{}, "entitlement_version") == PackageContract.version()
 
@@ -4199,11 +4636,15 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   defp put_subscription_window(params, package) do
     starts_on = parse_date(params["starts_on"], Date.utc_today())
+    terms = package_terms(package.params)
 
     ends_on =
       case params["ends_on"] do
         value when value in [nil, ""] ->
-          SubscriptionSelection.ends_on(starts_on, package.params || %{})
+          # ADR-097: validity from first use starts on the first reservation.
+          if terms[:validity_starts] == "first_use",
+            do: nil,
+            else: SubscriptionSelection.ends_on(starts_on, package.params || %{})
 
         value ->
           value
@@ -4212,6 +4653,10 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     params
     |> Map.put("starts_on", starts_on)
     |> Map.put("ends_on", ends_on)
+    |> Map.put(
+      "commitment_ends_on",
+      SubscriptionTerms.commitment_ends_on(starts_on, terms[:minimum_commitment_months])
+    )
   end
 
   defp where_allowance_key(query, allowance) when allowance in [:class_visits, "class_visits"] do
@@ -4224,6 +4669,29 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   defp where_allowance_key(query, allowance),
     do: where(query, [entry], entry.allowance_key == ^to_string(allowance))
+
+  # ADR-097: ending a membership inside a minimum commitment needs an explicit reason.
+  defp guard_commitment!(%Membership{} = membership, %{"status" => status} = params)
+       when status in ["cancelled", "inactive"] do
+    commitment =
+      MembershipPackageSubscription
+      |> where([subscription], subscription.membership_id == ^membership.id)
+      |> where([subscription], subscription.status == "active")
+      |> where([subscription], not is_nil(subscription.commitment_ends_on))
+      |> select([subscription], max(subscription.commitment_ends_on))
+      |> Repo.one()
+
+    case SubscriptionTerms.cancellation_allowed?(
+           commitment,
+           Date.utc_today(),
+           params["commitment_override_reason"]
+         ) do
+      :ok -> :ok
+      {:error, reason} -> Repo.rollback({reason, %{commitment_ends_on: commitment}})
+    end
+  end
+
+  defp guard_commitment!(_membership, _params), do: :ok
 
   defp string_key_map(params) when is_map(params) do
     Map.new(params, fn {key, value} -> {to_string(key), value} end)

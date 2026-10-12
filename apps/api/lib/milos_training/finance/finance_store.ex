@@ -198,4 +198,21 @@ defmodule MilosTraining.Finance.FinanceStore do
 
   @impl true
   def count_pending_referral_approvals, do: adapter().count_pending_referral_approvals()
+
+  @impl true
+  def create_freeze(user_id, admin_id, params),
+    do: adapter().create_freeze(user_id, admin_id, params)
+
+  @impl true
+  def cancel_freeze(user_id, freeze_id, params),
+    do: adapter().cancel_freeze(user_id, freeze_id, params)
+
+  @impl true
+  def list_freezes(user_id), do: adapter().list_freezes(user_id)
+  @impl true
+  def booking_terms(user_id, occurred_on), do: adapter().booking_terms(user_id, occurred_on)
+
+  @impl true
+  def subscriptions_due_for_expiry_reminder(today),
+    do: adapter().subscriptions_due_for_expiry_reminder(today)
 end

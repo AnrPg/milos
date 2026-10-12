@@ -79,4 +79,10 @@ defmodule MilosTraining.Finance.Ports.FinanceStore do
   @callback memberships_needing_payment_reminder(non_neg_integer()) :: [map()]
   @callback total_outstanding_balance_cents() :: non_neg_integer()
   @callback count_pending_referral_approvals() :: non_neg_integer()
+
+  @callback create_freeze(binary(), binary() | nil, map()) :: {:ok, map()} | {:error, term()}
+  @callback cancel_freeze(binary(), binary(), map()) :: {:ok, map()} | {:error, term()}
+  @callback list_freezes(binary()) :: [map()]
+  @callback booking_terms(binary(), Date.t()) :: map()
+  @callback subscriptions_due_for_expiry_reminder(Date.t()) :: [map()]
 end

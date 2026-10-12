@@ -394,4 +394,26 @@ defmodule MilosTraining.Finance do
 
   def count_pending_referral_approvals(context),
     do: scoped(context, fn -> count_pending_referral_approvals() end)
+
+  # Phase B (ADR-097)
+  defdelegate create_freeze(user_id, admin_id, params), to: FinanceStore
+
+  def create_freeze(context, user_id, admin_id, params),
+    do: scoped(context, fn -> create_freeze(user_id, admin_id, params) end)
+
+  defdelegate cancel_freeze(user_id, freeze_id, params), to: FinanceStore
+
+  def cancel_freeze(context, user_id, freeze_id, params),
+    do: scoped(context, fn -> cancel_freeze(user_id, freeze_id, params) end)
+
+  defdelegate list_freezes(user_id), to: FinanceStore
+  def list_freezes(context, user_id), do: scoped(context, fn -> list_freezes(user_id) end)
+
+  defdelegate booking_terms(user_id, occurred_on), to: FinanceStore
+
+  def booking_terms(context, user_id, occurred_on),
+    do: scoped(context, fn -> booking_terms(user_id, occurred_on) end)
+
+  def subscriptions_due_for_expiry_reminder(context, today),
+    do: scoped(context, fn -> FinanceStore.subscriptions_due_for_expiry_reminder(today) end)
 end

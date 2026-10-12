@@ -18,6 +18,8 @@ defmodule MilosTraining.Finance.MembershipPackageSubscription do
     field :price_cents_snapshot, :integer, default: 0
     field :params_snapshot, :map, default: %{}
     field :referral_reward_applied, :boolean, default: false
+    field :commitment_ends_on, :date
+    field :activated_on, :date
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -35,7 +37,9 @@ defmodule MilosTraining.Finance.MembershipPackageSubscription do
       :billing_period_snapshot,
       :price_cents_snapshot,
       :params_snapshot,
-      :referral_reward_applied
+      :referral_reward_applied,
+      :commitment_ends_on,
+      :activated_on
     ])
     |> validate_required([
       :membership_id,
