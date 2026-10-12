@@ -11,6 +11,7 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     OrganizationDomain,
     OrganizationMembership,
     OrganizationProvisioningEvent,
+    OrganizationPurge,
     OrganizationSetting,
     RegistrationInvitation,
     Vendor
@@ -546,6 +547,130 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
 
       membership
       |> OrganizationMembership.changeset(%{status: status})
+      |> Repo.update()
+      |> unwrap_or_rollback()
+    end)
+    |> flatten_transaction()
+  end
+
+  @impl true
+  def request_organization_purge(
+        organization_id,
+        platform_user_id,
+        lifecycle_status,
+        requested_at
+      ) do
+    Repo.transaction(fn ->
+      organization =
+        Organization
+        |> where([organization], organization.id == ^organization_id)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      if is_nil(organization), do: Repo.rollback(:not_found)
+
+      purge =
+        %{
+          organization_id: organization.id,
+          organization_slug: organization.slug,
+          requested_by_user_id: platform_user_id,
+          requested_at: requested_at
+        }
+        |> OrganizationPurge.request_changeset()
+        |> Repo.insert()
+        |> case do
+          {:ok, purge} -> purge
+          {:error, %Ecto.Changeset{}} -> Repo.rollback(:organization_purge_exists)
+        end
+
+      organization =
+        if organization.status == lifecycle_status do
+          organization
+        else
+          organization
+          |> Organization.changeset(%{status: lifecycle_status})
+          |> Repo.update()
+          |> unwrap_or_rollback()
+        end
+
+      %OrganizationProvisioningEvent{}
+      |> OrganizationProvisioningEvent.changeset(%{
+        organization_id: organization.id,
+        vendor_user_id: platform_user_id,
+        event: "organization_purge_requested",
+        metadata: %{purge_id: purge.id, requested_at: DateTime.to_iso8601(requested_at)}
+      })
+      |> Repo.insert()
+      |> unwrap_or_rollback()
+
+      %{purge: purge, organization: organization}
+    end)
+    |> flatten_transaction()
+  end
+
+  @impl true
+  def get_purge(purge_id), do: Repo.get(OrganizationPurge, purge_id)
+
+  @impl true
+  def lock_purge(purge_id) do
+    OrganizationPurge
+    |> where([purge], purge.id == ^purge_id)
+    |> lock("FOR UPDATE")
+    |> Repo.one()
+  end
+
+  @impl true
+  def get_open_purge(organization_id) do
+    OrganizationPurge
+    |> where(
+      [purge],
+      purge.organization_id == ^organization_id and
+        purge.status not in ^[:completed, :cancelled]
+    )
+    |> limit(1)
+    |> Repo.one()
+  end
+
+  @impl true
+  def get_latest_purge(organization_id) do
+    OrganizationPurge
+    |> where([purge], purge.organization_id == ^organization_id)
+    |> order_by([purge], desc: purge.inserted_at, desc: purge.id)
+    |> limit(1)
+    |> Repo.one()
+  end
+
+  @impl true
+  def list_purges(limit) do
+    OrganizationPurge
+    |> order_by([purge], desc: purge.inserted_at, desc: purge.id)
+    |> limit(^limit)
+    |> Repo.all()
+  end
+
+  @impl true
+  def update_purge(%OrganizationPurge{} = purge, params) do
+    purge
+    |> OrganizationPurge.progress_changeset(params)
+    |> Repo.update()
+  end
+
+  # The organization row (and, by cascade, memberships, invitations, settings,
+  # domains and provisioning events) goes in the same transaction that marks
+  # the purge completed, so the platform record is the surviving audit trail.
+  @impl true
+  def finalize_purge(%OrganizationPurge{} = purge, params, _platform_user_id, _completed_at) do
+    Repo.transaction(fn ->
+      from(event in OrganizationProvisioningEvent,
+        where: event.organization_id == ^purge.organization_id
+      )
+      |> Repo.delete_all()
+
+      from(organization in Organization, where: organization.id == ^purge.organization_id)
+      |> Repo.delete_all()
+
+      purge
+      |> OrganizationPurge.progress_changeset(params)
       |> Repo.update()
       |> unwrap_or_rollback()
     end)

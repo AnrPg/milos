@@ -3,6 +3,8 @@ defmodule MilosTraining.Organizations do
 
   alias MilosTraining.Organizations.Commands.{
     AddMembership,
+    AdvanceOrganizationPurge,
+    CompleteOrganizationPurge,
     CreateOrganization,
     DeleteOrganization,
     IssueInvitation,
@@ -10,6 +12,7 @@ defmodule MilosTraining.Organizations do
     ProvisionOrganization,
     RedeemInvitation,
     RenameOrganization,
+    RequestOrganizationPurge,
     RevokeInvitation,
     SendOwnerInvitationEmail,
     SetMembershipRole,
@@ -20,7 +23,9 @@ defmodule MilosTraining.Organizations do
   }
 
   alias MilosTraining.Organizations.Queries.{
+    BuildTenantPurgeContext,
     FindOrganization,
+    GetOrganizationPurge,
     InspectInvitation,
     ListActiveMembershipUserIds,
     ListDeletableOrganizationUserIds,
@@ -128,6 +133,63 @@ defmodule MilosTraining.Organizations do
         changed_at \\ DateTime.utc_now()
       ),
       do: UpdateOrganizationSettings.call(context, organization_id, params, changed_at)
+
+  # ADR-099 reviewed tenant export/purge workflow. Purge records are
+  # platform-level and survive the organization they describe.
+  def request_organization_purge(context, organization_id, requested_at \\ DateTime.utc_now()),
+    do: RequestOrganizationPurge.call(context, organization_id, requested_at)
+
+  def advance_organization_purge(
+        context,
+        purge_id,
+        event,
+        attrs \\ %{},
+        at \\ DateTime.utc_now()
+      ),
+      do: AdvanceOrganizationPurge.call(context, purge_id, event, attrs, at)
+
+  def record_organization_purge_step(context, purge_id, step, result, at \\ DateTime.utc_now()),
+    do: AdvanceOrganizationPurge.call(context, purge_id, {:record_step, step, result}, %{}, at)
+
+  def approve_organization_purge(
+        context,
+        organization_id,
+        confirmation,
+        at \\ DateTime.utc_now()
+      ),
+      do: AdvanceOrganizationPurge.approve(context, organization_id, confirmation, at)
+
+  def cancel_organization_purge(context, organization_id, at \\ DateTime.utc_now()),
+    do: AdvanceOrganizationPurge.cancel(context, organization_id, at)
+
+  def complete_organization_purge(context, purge_id, completed_at \\ DateTime.utc_now()),
+    do: CompleteOrganizationPurge.call(context, purge_id, completed_at)
+
+  def get_organization_purge(context, organization_id),
+    do: GetOrganizationPurge.latest(context, organization_id)
+
+  def get_organization_purge_by_id(context, purge_id),
+    do: GetOrganizationPurge.by_id(context, purge_id)
+
+  def list_organization_purges(context), do: GetOrganizationPurge.list(context)
+
+  def tenant_purge_context(context, purge), do: BuildTenantPurgeContext.call(context, purge)
+
+  def purge_step_completed?(purge, step),
+    do: MilosTraining.Organizations.Domain.PurgePolicy.step_completed?(purge.steps, step)
+
+  def purge_resume_stage(purge),
+    do: MilosTraining.Organizations.Domain.PurgePolicy.resume_stage(purge)
+
+  # Organizations' own tenant rows are exported like every other context's;
+  # they are purged by `complete_organization_purge/3` (organization delete).
+  def tenant_data_policy, do: MilosTraining.Organizations.Domain.TenantDataPolicy.policy()
+
+  def tenant_data_inventory(context),
+    do: MilosTraining.TenantData.TableStore.inventory(tenant_data_policy(), context)
+
+  def export_tenant_data(context, mode \\ :full),
+    do: MilosTraining.TenantData.TableStore.export(tenant_data_policy(), context, mode)
 
   def resolve_system_tenant_context(organization_id, source, request_metadata \\ %{})
       when is_binary(organization_id) and is_atom(source) do

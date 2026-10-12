@@ -2,6 +2,7 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   alias MilosTraining.Organizations.{
     Organization,
     OrganizationMembership,
+    OrganizationPurge,
     OrganizationSetting,
     RegistrationInvitation,
     Vendor
@@ -57,4 +58,18 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   @callback update_membership_role(Ecto.UUID.t(), Ecto.UUID.t(), atom()) ::
               {:ok, OrganizationMembership.t()} | {:error, term()}
   @callback transaction((-> {:ok, term()} | {:error, term()})) :: {:ok, term()} | {:error, term()}
+
+  # ADR-099 reviewed tenant purge records (platform-level, survive the purge).
+  @callback request_organization_purge(Ecto.UUID.t(), Ecto.UUID.t(), atom(), DateTime.t()) ::
+              {:ok, %{purge: OrganizationPurge.t(), organization: Organization.t()}}
+              | {:error, term()}
+  @callback get_purge(Ecto.UUID.t()) :: OrganizationPurge.t() | nil
+  @callback lock_purge(Ecto.UUID.t()) :: OrganizationPurge.t() | nil
+  @callback get_open_purge(Ecto.UUID.t()) :: OrganizationPurge.t() | nil
+  @callback get_latest_purge(Ecto.UUID.t()) :: OrganizationPurge.t() | nil
+  @callback list_purges(pos_integer()) :: [OrganizationPurge.t()]
+  @callback update_purge(OrganizationPurge.t(), map()) ::
+              {:ok, OrganizationPurge.t()} | {:error, term()}
+  @callback finalize_purge(OrganizationPurge.t(), map(), Ecto.UUID.t(), DateTime.t()) ::
+              {:ok, OrganizationPurge.t()} | {:error, term()}
 end

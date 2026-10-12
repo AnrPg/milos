@@ -126,5 +126,42 @@ defmodule MilosTraining.Organizations.OrganizationStore do
   def update_membership_status(organization_id, membership_id, status),
     do: impl().update_membership_status(organization_id, membership_id, status)
 
+  @impl true
+  def request_organization_purge(
+        organization_id,
+        platform_user_id,
+        lifecycle_status,
+        requested_at
+      ),
+      do:
+        impl().request_organization_purge(
+          organization_id,
+          platform_user_id,
+          lifecycle_status,
+          requested_at
+        )
+
+  @impl true
+  def get_purge(purge_id), do: impl().get_purge(purge_id)
+
+  @impl true
+  def lock_purge(purge_id), do: impl().lock_purge(purge_id)
+
+  @impl true
+  def get_open_purge(organization_id), do: impl().get_open_purge(organization_id)
+
+  @impl true
+  def get_latest_purge(organization_id), do: impl().get_latest_purge(organization_id)
+
+  @impl true
+  def list_purges(limit), do: impl().list_purges(limit)
+
+  @impl true
+  def update_purge(purge, params), do: impl().update_purge(purge, params)
+
+  @impl true
+  def finalize_purge(purge, params, platform_user_id, completed_at),
+    do: impl().finalize_purge(purge, params, platform_user_id, completed_at)
+
   defp impl, do: Application.fetch_env!(:milos_training, :organization_store)
 end
