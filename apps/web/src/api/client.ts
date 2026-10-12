@@ -47,6 +47,8 @@ type ApiRequestOptions = {
   method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
   token?: string | null;
   body?: unknown;
+  /** "text" returns the raw body of a successful response (e.g. a printable HTML document). */
+  responseType?: "json" | "text";
 };
 
 function organizationSlugFromPath() {
@@ -97,6 +99,7 @@ const TENANT_SCOPED_PREFIXES = [
   "/me/entitlement",
   "/me/finance",
   "/me/invoices",
+  "/me/refund-receipts",
   "/me/reviews",
   "/me/search/users",
   "/me/threads",
@@ -351,6 +354,10 @@ export async function apiRequest<T>(
         false,
       );
     }
+  }
+
+  if (options.responseType === "text" && response.ok) {
+    return (await response.text()) as T;
   }
 
   const payload = (await response.json().catch(() => ({}))) as T | ApiErrorPayload;
