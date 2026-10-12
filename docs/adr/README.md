@@ -103,3 +103,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-095 | Align account role with membership | Accepted |
 | ADR-096 | Package types and entitlement catalog v2 | Accepted |
 | ADR-097 | Package Phase B: booking rules, perks and facility | Accepted |
+| ADR-098 | Package Phase C: new services and payment models | Accepted |
