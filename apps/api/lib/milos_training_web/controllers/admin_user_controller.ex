@@ -132,13 +132,13 @@ defmodule MilosTrainingWeb.AdminUserController do
           additionalProperties: false,
           properties: %{
             master_workout_id: @user_id,
-            folder_id: @user_id,
+            folder_id: %Schema{allOf: [@user_id], nullable: true},
             scheduled_for: %Schema{type: :string, format: :date},
             slot_id: %Schema{allOf: [@user_id], nullable: true},
             copy_source: %Schema{type: :boolean, default: true},
             admin_notes: %Schema{type: :string, nullable: true}
           },
-          required: [:master_workout_id, :folder_id, :scheduled_for, :copy_source]
+          required: [:master_workout_id, :scheduled_for, :copy_source]
         }
       }
     }
@@ -294,7 +294,7 @@ defmodule MilosTrainingWeb.AdminUserController do
 
   operation(:program_workout,
     summary:
-      "Copy or save a workout and associate it with this user's athlete assignment or booked class",
+      "Copy or save a workout and associate it with this user's athlete assignment or booked class (filed in the athlete's or class-day folder unless folder_id is given)",
     parameters: [@id_parameter],
     request_body: @program_body,
     responses: [created: {"Programming result", "application/json", @summary_object}]

@@ -23386,16 +23386,24 @@
                     "assignment": {
                       "additionalProperties": true,
                       "type": "object"
+                    },
+                    "assignments": {
+                      "items": {
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      "type": "array"
                     }
                   },
                   "required": [
-                    "assignment"
+                    "assignment",
+                    "assignments"
                   ],
                   "type": "object"
                 }
               }
             },
-            "description": "Assigned workout"
+            "description": "Assigned workouts (one per athlete)"
           }
         },
         "security": [
@@ -23403,7 +23411,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Assign a published workout to one or more athletes",
+        "summary": "Assign a published workout to one or more athletes; each athlete gets a copy filed in their library folder",
         "tags": [
           "Admin Assigned Workouts"
         ]
@@ -24222,6 +24230,24 @@
         "callbacks": {},
         "operationId": "MilosTrainingWeb.AdminWorkoutController.create",
         "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "folder_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": false
+        },
         "responses": {
           "201": {
             "content": {
@@ -24248,7 +24274,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Create an empty workout draft",
+        "summary": "Create an empty workout draft, optionally inside a library folder",
         "tags": [
           "Admin Workouts"
         ]
@@ -25986,6 +26012,71 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/workouts/{id}/copy": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminWorkoutController.copy",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "folder_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "workout": {
+                      "additionalProperties": true,
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "workout"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Copied workout"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Copy a workout into a library folder (published workouts stay published)",
+        "tags": [
+          "Admin Workouts"
+        ]
+      }
+    },
     "/api/platform/organizations/{id}/lifecycle": {
       "patch": {
         "callbacks": {},
@@ -26561,10 +26652,15 @@
                   "properties": {
                     "created_by_id": {
                       "format": "uuid",
+                      "nullable": true,
                       "type": "string"
                     },
                     "id": {
                       "format": "uuid",
+                      "type": "string"
+                    },
+                    "inserted_at": {
+                      "format": "date-time",
                       "type": "string"
                     },
                     "name": {
@@ -26574,12 +26670,20 @@
                       "format": "uuid",
                       "nullable": true,
                       "type": "string"
+                    },
+                    "system_key": {
+                      "description": "Set on folders the app maintains (athletes, athlete:<id>, classes, classes:<yyyy>, classes:<yyyy-mm>, classes:<yyyy-mm-dd>)",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "format": "date-time",
+                      "type": "string"
                     }
                   },
                   "required": [
                     "id",
-                    "name",
-                    "created_by_id"
+                    "name"
                   ],
                   "type": "object"
                 }
@@ -27930,10 +28034,15 @@
                         "properties": {
                           "created_by_id": {
                             "format": "uuid",
+                            "nullable": true,
                             "type": "string"
                           },
                           "id": {
                             "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
                             "type": "string"
                           },
                           "name": {
@@ -27943,12 +28052,20 @@
                             "format": "uuid",
                             "nullable": true,
                             "type": "string"
+                          },
+                          "system_key": {
+                            "description": "Set on folders the app maintains (athletes, athlete:<id>, classes, classes:<yyyy>, classes:<yyyy-mm>, classes:<yyyy-mm-dd>)",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
                           }
                         },
                         "required": [
                           "id",
-                          "name",
-                          "created_by_id"
+                          "name"
                         ],
                         "type": "object"
                       },
@@ -27970,7 +28087,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "List nested workout-library folders",
+        "summary": "List nested workout-library folders (system folders are created on demand)",
         "tags": [
           "Admin Workouts"
         ]
@@ -28014,10 +28131,15 @@
                   "properties": {
                     "created_by_id": {
                       "format": "uuid",
+                      "nullable": true,
                       "type": "string"
                     },
                     "id": {
                       "format": "uuid",
+                      "type": "string"
+                    },
+                    "inserted_at": {
+                      "format": "date-time",
                       "type": "string"
                     },
                     "name": {
@@ -28027,12 +28149,20 @@
                       "format": "uuid",
                       "nullable": true,
                       "type": "string"
+                    },
+                    "system_key": {
+                      "description": "Set on folders the app maintains (athletes, athlete:<id>, classes, classes:<yyyy>, classes:<yyyy-mm>, classes:<yyyy-mm-dd>)",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "format": "date-time",
+                      "type": "string"
                     }
                   },
                   "required": [
                     "id",
-                    "name",
-                    "created_by_id"
+                    "name"
                   ],
                   "type": "object"
                 }
@@ -28082,8 +28212,13 @@
                     "type": "boolean"
                   },
                   "folder_id": {
-                    "format": "uuid",
-                    "type": "string"
+                    "allOf": [
+                      {
+                        "format": "uuid",
+                        "type": "string"
+                      }
+                    ],
+                    "nullable": true
                   },
                   "master_workout_id": {
                     "format": "uuid",
@@ -28105,7 +28240,6 @@
                 },
                 "required": [
                   "master_workout_id",
-                  "folder_id",
                   "scheduled_for",
                   "copy_source"
                 ],
@@ -28133,7 +28267,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Copy or save a workout and associate it with this user's athlete assignment or booked class",
+        "summary": "Copy or save a workout and associate it with this user's athlete assignment or booked class (filed in the athlete's or class-day folder unless folder_id is given)",
         "tags": [
           "Admin Users"
         ]

@@ -298,6 +298,7 @@ defmodule MilosTrainingWeb.Router do
     post("/workouts/:id/publish", AdminWorkoutController, :publish)
     post("/workouts/:id/reopen", AdminWorkoutController, :reopen)
     post("/workouts/:id/duplicate", AdminWorkoutController, :duplicate)
+    post("/workouts/:id/copy", AdminWorkoutController, :copy)
     delete("/workouts/:id", AdminWorkoutController, :delete)
     post("/assigned-workouts", AdminAssignedWorkoutController, :create)
     patch("/assigned-workouts/:id", AdminAssignedWorkoutController, :update)

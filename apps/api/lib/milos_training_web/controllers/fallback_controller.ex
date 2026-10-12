@@ -1168,6 +1168,18 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  def call(conn, {:error, :folder_parent_not_found}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "folder_not_found", error: "The chosen library folder does not exist"})
+  end
+
+  def call(conn, {:error, :folder_cycle}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "folder_cycle", error: "A folder cannot be moved inside itself"})
+  end
+
   def call(conn, {:error, :class_placement_requires_member}) do
     conn
     |> put_status(:unprocessable_entity)

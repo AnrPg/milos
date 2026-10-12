@@ -20,6 +20,8 @@ export function WorkoutAuthoringModes() {
   const requestedMode = searchParams.get("mode");
   const mode = requestedMode === "quick-text" || requestedMode === "free-text" ? requestedMode : "structured";
   const draftId = searchParams.get("draft") ?? storeDraftId;
+  // New workouts started from inside a library folder are created in that folder.
+  const folderId = searchParams.get("folder");
   const [modeBarVisible, setModeBarVisible] = useState(false);
   const hideTimerRef = useRef<number | null>(null);
 
@@ -124,12 +126,14 @@ export function WorkoutAuthoringModes() {
         {mode === "quick-text" ? (
           <QuickTextWorkoutEditor
             draftId={draftId}
+            folderId={folderId}
             onDraftReady={(id) => selectMode("quick-text", id)}
             onSwitchToStructured={(id) => selectMode("structured", id)}
           />
         ) : mode === "free-text" ? (
           <FreeTextWorkoutEditor
             draftId={draftId}
+            folderId={folderId}
             onDraftReady={(id) => selectMode("free-text", id)}
           />
         ) : (

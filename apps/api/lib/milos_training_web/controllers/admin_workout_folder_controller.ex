@@ -3,6 +3,7 @@ defmodule MilosTrainingWeb.AdminWorkoutFolderController do
   use OpenApiSpex.ControllerSpecs
 
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
+  alias MilosTraining.Application.WorkoutLibraryFolders
   alias MilosTraining.Workouts
 
   action_fallback MilosTrainingWeb.FallbackController
@@ -16,9 +17,17 @@ defmodule MilosTrainingWeb.AdminWorkoutFolderController do
       id: %Schema{type: :string, format: :uuid},
       name: %Schema{type: :string},
       parent_id: %Schema{type: :string, format: :uuid, nullable: true},
-      created_by_id: %Schema{type: :string, format: :uuid}
+      created_by_id: %Schema{type: :string, format: :uuid, nullable: true},
+      system_key: %Schema{
+        type: :string,
+        nullable: true,
+        description:
+          "Set on folders the app maintains (athletes, athlete:<id>, classes, classes:<yyyy>, classes:<yyyy-mm>, classes:<yyyy-mm-dd>)"
+      },
+      inserted_at: %Schema{type: :string, format: :"date-time"},
+      updated_at: %Schema{type: :string, format: :"date-time"}
     },
-    required: [:id, :name, :created_by_id]
+    required: [:id, :name]
   }
   @body %RequestBody{
     required: true,
@@ -44,7 +53,7 @@ defmodule MilosTrainingWeb.AdminWorkoutFolderController do
   }
 
   operation(:index,
-    summary: "List nested workout-library folders",
+    summary: "List nested workout-library folders (system folders are created on demand)",
     responses: [
       ok:
         {"Folders", "application/json",
@@ -75,8 +84,11 @@ defmodule MilosTrainingWeb.AdminWorkoutFolderController do
     responses: [no_content: "Deleted"]
   )
 
-  def index(conn, _params),
-    do: json(conn, %{folders: Workouts.list_folders(conn.assigns.tenant_context)})
+  def index(conn, _params) do
+    with {:ok, folders} <- WorkoutLibraryFolders.list(conn.assigns.tenant_context) do
+      json(conn, %{folders: folders})
+    end
+  end
 
   def create(conn, _params) do
     admin = Guardian.Plug.current_resource(conn)

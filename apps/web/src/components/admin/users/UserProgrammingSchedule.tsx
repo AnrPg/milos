@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useLocale } from "next-intl";
 
 import {
   fetchAdminUserSchedule,
@@ -8,13 +9,13 @@ import {
   type AdminUserSchedule,
 } from "@/api/admin-users";
 import {
-  createWorkoutFolder,
   listAdminWorkouts,
   listWorkoutFolders,
   type WorkoutFolder,
   type WorkoutRecord,
 } from "@/api/workouts";
 import { WorkoutCreationCanvas } from "@/components/workouts/creation/WorkoutCreationCanvas";
+import { compareFolders, folderDisplayName } from "@/components/workouts/library/library-folders";
 import { useUiTranslations } from "@/i18n/ui";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 
@@ -49,6 +50,7 @@ function itemTitle(item: Record<string, unknown>, fallback: string) {
 
 export function UserProgrammingSchedule({ token, userId, role, assignRequestDate, onAssignRequestHandled }: Props) {
   const i18n = useUiTranslations();
+  const locale = useLocale();
   const [startDate, setStartDate] = useState(() => isoDate(new Date()));
   const [schedule, setSchedule] = useState<AdminUserSchedule | null>(null);
   const [workouts, setWorkouts] = useState<WorkoutRecord[]>([]);
@@ -108,19 +110,7 @@ export function UserProgrammingSchedule({ token, userId, role, assignRequestDate
   const dayItems = (schedule?.items ?? []).filter((item) => itemDate(item) === selectedDate);
   const selectedDaySlots = role === "member" ? dayItems : [];
 
-  async function createFolder() {
-    const name = window.prompt(i18n("featureFolderName"))?.trim();
-    if (!name) return;
-    const folder = await createWorkoutFolder(token, { name, parent_id: null });
-    setFolders((current) => [...current, folder]);
-    setSelectedFolderId(folder.id);
-  }
-
   async function program(masterWorkoutId: string, copySource: boolean) {
-    if (!selectedFolderId) {
-      setError(i18n("featureChooseLibraryFolder"));
-      return;
-    }
     if (role === "member" && !selectedSlotId) {
       setError(i18n("featureChooseBookedClass"));
       return;
@@ -131,7 +121,8 @@ export function UserProgrammingSchedule({ token, userId, role, assignRequestDate
     try {
       await programAdminUserWorkout(token, userId, {
         master_workout_id: masterWorkoutId,
-        folder_id: selectedFolderId,
+        // Empty = file automatically in the athlete's folder or the class-day folder.
+        folder_id: selectedFolderId || null,
         scheduled_for: selectedDate,
         slot_id: role === "member" ? selectedSlotId : undefined,
         copy_source: copySource,
@@ -148,10 +139,6 @@ export function UserProgrammingSchedule({ token, userId, role, assignRequestDate
   }
 
   function openCreator() {
-    if (!selectedFolderId) {
-      setError(i18n("featureChooseFolderBeforeCreating"));
-      return;
-    }
     useWorkoutCreationStore.getState().resetDraft();
     setCreating(true);
   }
@@ -198,8 +185,12 @@ export function UserProgrammingSchedule({ token, userId, role, assignRequestDate
         <div className="grid gap-3 md:grid-cols-3">
           <label className="text-xs font-semibold">{i18n("featureSaveInFolder")}
             <select className="mt-2 w-full rounded-xl px-3 py-2" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} value={selectedFolderId} onChange={(event) => setSelectedFolderId(event.target.value)}>
-              <option value="">{i18n("featureChooseFolder")}</option>
-              {folders.map((folder) => <option key={folder.id} value={folder.id}>{folder.name}</option>)}
+              <option value="">{role === "member" ? i18n("featureAutoClassFolder") : i18n("featureAutoAthleteFolder")}</option>
+              {[...folders].sort(compareFolders).map((folder) => (
+                <option key={folder.id} value={folder.id}>
+                  {folderDisplayName(folder, { athletes: i18n("featureAthletesFolder"), classes: i18n("featureClassesFolder") }, locale)}
+                </option>
+              ))}
             </select>
           </label>
           <label className="text-xs font-semibold">{i18n("featureExistingWod")}
@@ -218,7 +209,6 @@ export function UserProgrammingSchedule({ token, userId, role, assignRequestDate
         <div className="mt-4 flex flex-wrap gap-2">
           <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }} disabled={busy || !selectedWorkoutId} onClick={() => void program(selectedWorkoutId, true)}>{i18n("featureCopyAndAssign")}</button>
           <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--text)", color: "var(--bg)" }} onClick={openCreator}>{i18n("featureCreateNewWod")}</button>
-          <button type="button" className="rounded-full px-4 py-2 text-sm" style={{ background: "var(--panel)" }} onClick={() => void createFolder()}>{i18n("featureNewFolder")}</button>
         </div>
         {message ? <p className="mt-3 text-sm" style={{ color: "var(--success)" }}>{message}</p> : null}
         {error ? <p className="mt-3 text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}

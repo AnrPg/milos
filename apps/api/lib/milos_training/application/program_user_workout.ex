@@ -1,12 +1,13 @@
 defmodule MilosTraining.Application.ProgramUserWorkout do
-  alias MilosTraining.Application.{AssignWorkout, DuplicateWorkout}
+  alias MilosTraining.Application.{AssignWorkout, FileWorkoutCopy, WorkoutLibraryFolders}
   alias MilosTraining.{Identity, Organizations, Scheduling, Workouts}
 
-  def call(context, admin, user_id, params) do
+  def call(context, _admin, user_id, params) do
     with %{} = user <- Identity.find_by_id(user_id) || {:error, :not_found},
          {:ok, role} <- tenant_role(context, user.id),
          :ok <- validate_target(context, role, user, params),
-         {:ok, workout} <- prepare_workout(context, admin, user, params),
+         {:ok, folder_id} <- target_folder_id(context, role, user, params),
+         {:ok, workout} <- prepare_workout(context, role, folder_id, params),
          {:ok, association} <- associate(context, role, user, workout.id, params) do
       {:ok, %{workout: workout, association: association}}
     end
@@ -33,20 +34,35 @@ defmodule MilosTraining.Application.ProgramUserWorkout do
   defp validate_target(_context, :athlete, _user, _params), do: :ok
   defp validate_target(_context, _role, _user, _params), do: {:error, :unsupported_role}
 
-  defp prepare_workout(context, _admin, user, params) do
+  # Without an explicit folder the workout is filed automatically: in the
+  # athlete's own folder, or in the class's Classes/<year>/<month>/<date> folder.
+  defp target_folder_id(context, role, user, params) do
+    case value(params, :folder_id) do
+      folder_id when is_binary(folder_id) and folder_id != "" -> {:ok, folder_id}
+      _automatic -> default_folder_id(context, role, user, params)
+    end
+  end
+
+  defp default_folder_id(context, :athlete, user, _params) do
+    with {:ok, folder} <- WorkoutLibraryFolders.athlete_folder(context, user),
+         do: {:ok, folder.id}
+  end
+
+  defp default_folder_id(context, :member, _user, params) do
+    with %{scheduled_at: scheduled_at} <-
+           Scheduling.get_slot(context, value(params, :slot_id)) || {:error, :not_found},
+         {:ok, folder} <- WorkoutLibraryFolders.class_day_folder(context, scheduled_at) do
+      {:ok, folder.id}
+    end
+  end
+
+  defp prepare_workout(context, role, folder_id, params) do
     source_id = value(params, :master_workout_id)
-    folder_id = value(params, :folder_id)
     copy? = value(params, :copy_source) != false
 
     if copy? do
-      suffix = "(#{user.nickname} #{value(params, :scheduled_for)})"
-
-      with {:ok, draft} <-
-             DuplicateWorkout.call(context, source_id, folder_id: folder_id, title_suffix: suffix),
-           {:ok, published} <-
-             Workouts.publish_workout(context, draft.id, %{expected_source_revision: 0}) do
-        {:ok, published}
-      end
+      # Classes on the same day share one filed copy; athletes each get their own.
+      FileWorkoutCopy.ensure_in_folder(context, source_id, folder_id, reuse_copy: role == :member)
     else
       with %{} = workout <-
              Workouts.get_workout(context, source_id) || {:error, :workout_not_found},

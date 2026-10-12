@@ -40,6 +40,12 @@ defmodule MilosTraining.Workouts.WorkoutStore do
   def update_folder(context, id, params),
     do: within_tenant(context, fn -> update_folder(id, params) end)
 
+  def find_filed_copy(context, source_id, folder_id),
+    do: within_tenant(context, fn -> find_filed_copy(source_id, folder_id) end)
+
+  def ensure_system_folder(context, system_key, name, parent_id),
+    do: within_tenant(context, fn -> ensure_system_folder(system_key, name, parent_id) end)
+
   def delete_folder(context, id), do: within_tenant(context, fn -> delete_folder(id) end)
 
   def update_library_metadata(context, id, params),
@@ -146,6 +152,13 @@ defmodule MilosTraining.Workouts.WorkoutStore do
 
   @impl true
   def update_folder(id, params), do: adapter().update_folder(id, params)
+
+  @impl true
+  def find_filed_copy(source_id, folder_id), do: adapter().find_filed_copy(source_id, folder_id)
+
+  @impl true
+  def ensure_system_folder(system_key, name, parent_id),
+    do: adapter().ensure_system_folder(system_key, name, parent_id)
 
   @impl true
   def delete_folder(id), do: adapter().delete_folder(id)

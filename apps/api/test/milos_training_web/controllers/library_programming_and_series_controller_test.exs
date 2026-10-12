@@ -193,7 +193,13 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
       |> json_response(422)
 
     assert rejected["code"] == "slot_not_booked_by_member"
-    assert MilosTraining.Scheduling.get_slot(context, slot["id"]).master_workout_id == source.id
+
+    # The class got its own copy of the template, filed under Classes/<year>/<month>/<date>.
+    class_copy_id = slot["master_workout_id"]
+    refute class_copy_id == source.id
+
+    assert MilosTraining.Scheduling.get_slot(context, slot["id"]).master_workout_id ==
+             class_copy_id
 
     programmed =
       admin_conn
@@ -354,6 +360,220 @@ defmodule MilosTrainingWeb.LibraryProgrammingAndSeriesControllerTest do
 
     assert [%{"kind" => "assignment", "workout" => %{"id" => workout_id}}] = schedule["items"]
     assert workout_id == workout.id
+  end
+
+  describe "self-organising library folders" do
+    test "every gym gets Athletes and Classes folders plus one folder per athlete",
+         %{conn: conn} do
+      admin = admin_fixture(%{nickname: "folders_admin"})
+      %{organization: organization} = tenant_fixture(admin, "Folders Gym")
+      athlete = user_fixture(%{nickname: "folders_athlete", role: :athlete})
+      add_membership(organization, athlete, :athlete)
+
+      other_admin = admin_fixture(%{nickname: "folders_other_admin"})
+      %{organization: other_organization} = tenant_fixture(other_admin, "Other Folders Gym")
+
+      folders = list_folders(conn, admin, organization)
+      athletes = Enum.find(folders, &(&1["system_key"] == "athletes"))
+      classes = Enum.find(folders, &(&1["system_key"] == "classes"))
+      athlete_folder = Enum.find(folders, &(&1["system_key"] == "athlete:#{athlete.id}"))
+
+      assert athletes["name"] == "Athletes" and athletes["parent_id"] == nil
+      assert classes["name"] == "Classes" and classes["parent_id"] == nil
+      assert athlete_folder["name"] == "folders_athlete"
+      assert athlete_folder["parent_id"] == athletes["id"]
+
+      # Root names are unique per gym, so a second gym gets its own system folders.
+      other_folders = list_folders(conn, other_admin, other_organization)
+      assert Enum.any?(other_folders, &(&1["system_key"] == "athletes"))
+      refute Enum.any?(other_folders, &(&1["id"] == athletes["id"]))
+
+      # Coaches can rename system folders; they are found by key, not recreated.
+      conn
+      |> put_bearer_token(admin)
+      |> put_req_header("content-type", "application/json")
+      |> patch(
+        "/api/org/#{organization.slug}/admin/workout-folders/#{athletes["id"]}",
+        Jason.encode!(%{name: "Clients", parent_id: nil})
+      )
+      |> json_response(200)
+
+      renamed = list_folders(conn, admin, organization)
+      assert Enum.count(renamed, &(&1["system_key"] == "athletes")) == 1
+      assert Enum.find(renamed, &(&1["system_key"] == "athletes"))["name"] == "Clients"
+      assert length(renamed) == length(folders)
+    end
+
+    test "class workouts are filed by date and same-day classes share one copy",
+         %{conn: conn} do
+      admin = admin_fixture(%{nickname: "class_filing_admin"})
+      %{organization: organization, context: context} = tenant_fixture(admin, "Class Filing Gym")
+      template = tenant_workout_fixture(admin, context, %{title: "Daily Template"})
+      class_type = class_type_fixture(%{name: "Filing Class", tenant_context: context})
+      scheduled_at = ~U[2031-03-04 09:00:00Z]
+
+      morning = create_slot(conn, admin, organization, template.id, class_type.id, scheduled_at)
+
+      evening =
+        create_slot(
+          conn,
+          admin,
+          organization,
+          template.id,
+          class_type.id,
+          DateTime.add(scheduled_at, 8 * 3_600)
+        )
+
+      refute morning["master_workout_id"] == template.id
+      assert evening["master_workout_id"] == morning["master_workout_id"]
+
+      folders = list_folders(conn, admin, organization)
+      by_key = Map.new(folders, &{&1["system_key"], &1})
+
+      assert by_key["classes:2031"]["parent_id"] == by_key["classes"]["id"]
+      assert by_key["classes:2031-03"]["name"] == "03"
+      assert by_key["classes:2031-03"]["parent_id"] == by_key["classes:2031"]["id"]
+      assert by_key["classes:2031-03-04"]["parent_id"] == by_key["classes:2031-03"]["id"]
+
+      copy = workout_by_id(conn, admin, organization, morning["master_workout_id"])
+      assert copy["folder_id"] == by_key["classes:2031-03-04"]["id"]
+      assert copy["source_workout_id"] == template.id
+      assert copy["title"] == "Daily Template"
+      assert copy["status"] == "published"
+    end
+
+    test "new drafts can start inside a folder and workouts can be copied between folders",
+         %{conn: conn} do
+      admin = admin_fixture(%{nickname: "copy_admin"})
+      %{organization: organization, context: context} = tenant_fixture(admin, "Copy Gym")
+      workout = tenant_workout_fixture(admin, context, %{title: "Benchmark"})
+      admin_conn = put_bearer_token(conn, admin)
+
+      folder =
+        admin_conn
+        |> post("/api/org/#{organization.slug}/admin/workout-folders", %{name: "Benchmarks"})
+        |> json_response(201)
+
+      draft =
+        admin_conn
+        |> recycle()
+        |> put_bearer_token(admin)
+        |> put_req_header("content-type", "application/json")
+        |> post(
+          "/api/org/#{organization.slug}/admin/workouts",
+          Jason.encode!(%{folder_id: folder["id"]})
+        )
+        |> json_response(201)
+        |> Map.fetch!("draft")
+
+      assert workout_by_id(conn, admin, organization, draft["id"])["folder_id"] == folder["id"]
+
+      copied =
+        admin_conn
+        |> recycle()
+        |> put_bearer_token(admin)
+        |> put_req_header("content-type", "application/json")
+        |> post(
+          "/api/org/#{organization.slug}/admin/workouts/#{workout.id}/copy",
+          Jason.encode!(%{folder_id: folder["id"]})
+        )
+        |> json_response(201)
+        |> Map.fetch!("workout")
+
+      assert copied["title"] == "Benchmark"
+      assert copied["status"] == "published"
+      assert copied["folder_id"] == folder["id"]
+
+      # A copy next to its original is labelled so the two can be told apart.
+      same_folder =
+        admin_conn
+        |> recycle()
+        |> put_bearer_token(admin)
+        |> put_req_header("content-type", "application/json")
+        |> post(
+          "/api/org/#{organization.slug}/admin/workouts/#{workout.id}/copy",
+          Jason.encode!(%{folder_id: nil})
+        )
+        |> json_response(201)
+        |> Map.fetch!("workout")
+
+      assert same_folder["title"] == "Benchmark (copy)"
+      assert same_folder["folder_id"] == nil
+    end
+
+    test "athlete profile programming files the workout in the athlete's folder by default",
+         %{conn: conn} do
+      admin = admin_fixture(%{nickname: "auto_folder_admin"})
+      %{organization: organization, context: context} = tenant_fixture(admin, "Auto Folder Gym")
+      athlete = user_fixture(%{nickname: "auto_folder_athlete", role: :athlete})
+      add_membership(organization, athlete, :athlete)
+      provision_programming_entitlement(context, athlete)
+      template = tenant_workout_fixture(admin, context, %{title: "Engine"})
+
+      programmed =
+        conn
+        |> put_bearer_token(admin)
+        |> put_req_header("content-type", "application/json")
+        |> post(
+          "/api/org/#{organization.slug}/admin/users/#{athlete.id}/programming",
+          Jason.encode!(%{
+            master_workout_id: template.id,
+            scheduled_for: Date.utc_today() |> Date.to_iso8601(),
+            copy_source: true
+          })
+        )
+        |> json_response(201)
+
+      athlete_folder =
+        conn
+        |> list_folders(admin, organization)
+        |> Enum.find(&(&1["system_key"] == "athlete:#{athlete.id}"))
+
+      assert programmed["workout"]["folder_id"] == athlete_folder["id"]
+      assert programmed["workout"]["source_workout_id"] == template.id
+      assert programmed["workout"]["title"] == "Engine"
+    end
+  end
+
+  defp list_folders(conn, admin, organization) do
+    conn
+    |> recycle()
+    |> put_bearer_token(admin)
+    |> get("/api/org/#{organization.slug}/admin/workout-folders")
+    |> json_response(200)
+    |> Map.fetch!("folders")
+  end
+
+  defp workout_by_id(conn, admin, organization, id) do
+    conn
+    |> recycle()
+    |> put_bearer_token(admin)
+    |> get("/api/org/#{organization.slug}/admin/workouts")
+    |> json_response(200)
+    |> Map.fetch!("workouts")
+    |> Enum.find(&(&1["id"] == id))
+  end
+
+  defp create_slot(conn, admin, organization, workout_id, class_type_id, scheduled_at) do
+    conn
+    |> recycle()
+    |> put_bearer_token(admin)
+    |> put_req_header("content-type", "application/json")
+    |> post(
+      "/api/org/#{organization.slug}/admin/schedule/slots",
+      Jason.encode!(%{
+        master_workout_id: workout_id,
+        class_type_id: class_type_id,
+        name: "Filed Class",
+        duration_minutes: 60,
+        scheduled_at: scheduled_at,
+        capacity: 10,
+        auto_approve: true,
+        booking_timeout_minutes: 30
+      })
+    )
+    |> json_response(201)
+    |> Map.fetch!("slot")
   end
 
   defp tenant_fixture(admin, name) do

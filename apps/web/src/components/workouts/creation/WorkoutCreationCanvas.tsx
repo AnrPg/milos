@@ -157,6 +157,7 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
   const organizationSlug = useOrganizationSlug();
   const searchParams = useSearchParams();
   const urlDraftId = embedded ? null : searchParams.get("draft");
+  const targetFolderId = embedded ? null : searchParams.get("folder");
   const draftId = useWorkoutCreationStore((state) => state.draftId);
   const initDraft = useWorkoutCreationStore((state) => state.initDraft);
   const resetDraft = useWorkoutCreationStore((state) => state.resetDraft);
@@ -269,7 +270,7 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
         })
         .catch(() => { draftLoadedRef.current = true; });
     } else {
-      createDraftWorkout(tokens.access_token)
+      createDraftWorkout(tokens.access_token, targetFolderId)
         .then((draft) => {
           initDraft(draft.id, draft.dsl_source_revision ?? 0);
           draftLoadedRef.current = true;
@@ -281,7 +282,7 @@ export function WorkoutCreationCanvas({ embedded = false, onCancel, onPublished 
           setSaveStatus("error");
         });
     }
-  }, [draftId, embedded, initDraft, loadFromDraftData, organizationSlug, router, setSaveStatus, tokens?.access_token, urlDraftId]);
+  }, [draftId, embedded, initDraft, loadFromDraftData, organizationSlug, router, setSaveStatus, targetFolderId, tokens?.access_token, urlDraftId]);
 
   // On remount (navigated away and back to the same draft URL), draftId is already set in
   // the Zustand store but draftLoadedRef is false (refs reset on unmount). Re-fetch to

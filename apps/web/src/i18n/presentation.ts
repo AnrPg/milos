@@ -267,6 +267,8 @@ const API_ERROR_KEYS: Record<string, string> = {
   slot_in_past: "apiErrorSlotInPast",
   already_booked: "apiErrorAlreadyBooked",
   class_placement_requires_member: "apiErrorClassPlacementRequiresMember",
+  folder_not_found: "apiErrorFolderNotFound",
+  folder_cycle: "apiErrorFolderCycle",
   invalid_athletes: "apiErrorInvalidAthletes",
   workout_not_published: "apiErrorWorkoutNotPublished",
   unauthorized: "apiErrorUnauthorized",

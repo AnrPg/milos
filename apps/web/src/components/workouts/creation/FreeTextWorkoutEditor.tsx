@@ -29,6 +29,7 @@ import type { WorkoutType } from "@/types/workout";
 
 type Props = {
   draftId: string | null;
+  folderId?: string | null;
   onDraftReady: (id: string) => void;
 };
 
@@ -44,7 +45,7 @@ const WORKOUT_TYPES: WorkoutType[] = [
   "recovery",
 ];
 
-export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
+export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady }: Props) {
   const i18n = useUiTranslations();
   const router = useRouter();
   const organizationSlug = useOrganizationSlug();
@@ -108,7 +109,7 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
     if (!accessToken || draftId || loadedDraftRef.current === "creating") return;
 
     loadedDraftRef.current = "creating";
-    createDraftWorkout(accessToken)
+    createDraftWorkout(accessToken, folderId)
       .then((draft) => {
         revisionRef.current = draft.dsl_source_revision ?? 0;
         onDraftReady(draft.id);
@@ -117,7 +118,7 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
         loadedDraftRef.current = null;
         setSaveStatus("error");
       });
-  }, [accessToken, draftId, onDraftReady]);
+  }, [accessToken, draftId, folderId, onDraftReady]);
 
   useEffect(() => {
     if (!accessToken || !draftId || loadedDraftRef.current === draftId || !editor) return;

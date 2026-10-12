@@ -125,6 +125,13 @@ defmodule MilosTraining.Workouts do
 
   def update_folder(id, params), do: MilosTraining.Workouts.WorkoutStore.update_folder(id, params)
   def update_folder(context, id, params), do: WorkoutStore.update_folder(context, id, params)
+
+  def find_filed_copy(context, source_id, folder_id),
+    do: WorkoutStore.find_filed_copy(context, source_id, folder_id)
+
+  def ensure_system_folder(context, system_key, name, parent_id),
+    do: WorkoutStore.ensure_system_folder(context, system_key, name, parent_id)
+
   def delete_folder(id), do: MilosTraining.Workouts.WorkoutStore.delete_folder(id)
   def delete_folder(context, id), do: WorkoutStore.delete_folder(context, id)
 

@@ -1599,7 +1599,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Assign a published workout to one or more athletes */
+        /** Assign a published workout to one or more athletes; each athlete gets a copy filed in their library folder */
         post: operations["MilosTrainingWeb.AdminAssignedWorkoutController.create"];
         delete?: never;
         options?: never;
@@ -1754,7 +1754,7 @@ export interface paths {
         /** List master workouts */
         get: operations["MilosTrainingWeb.AdminWorkoutController.index"];
         put?: never;
-        /** Create an empty workout draft */
+        /** Create an empty workout draft, optionally inside a library folder */
         post: operations["MilosTrainingWeb.AdminWorkoutController.create"];
         delete?: never;
         options?: never;
@@ -2098,6 +2098,23 @@ export interface paths {
         get: operations["MilosTrainingWeb.CalendarFeedController.links"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/workouts/{id}/copy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Copy a workout into a library folder (published workouts stay published) */
+        post: operations["MilosTrainingWeb.AdminWorkoutController.copy"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2506,7 +2523,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List nested workout-library folders */
+        /** List nested workout-library folders (system folders are created on demand) */
         get: operations["MilosTrainingWeb.AdminWorkoutFolderController.index"];
         put?: never;
         /** Create a workout-library folder */
@@ -2526,7 +2543,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Copy or save a workout and associate it with this user's athlete assignment or booked class */
+        /** Copy or save a workout and associate it with this user's athlete assignment or booked class (filed in the athlete's or class-day folder unless folder_id is given) */
         post: operations["MilosTrainingWeb.AdminUserController.program_workout"];
         delete?: never;
         options?: never;
@@ -11082,7 +11099,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Assigned workout */
+            /** @description Assigned workouts (one per athlete) */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -11092,6 +11109,9 @@ export interface operations {
                         assignment: {
                             [key: string]: unknown;
                         };
+                        assignments: {
+                            [key: string]: unknown;
+                        }[];
                     };
                 };
             };
@@ -11488,7 +11508,14 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    folder_id?: string | null;
+                };
+            };
+        };
         responses: {
             /** @description Draft */
             201: {
@@ -12329,6 +12356,39 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminWorkoutController.copy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    folder_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Copied workout */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        workout: {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.PlatformOrganizationController.lifecycle": {
         parameters: {
             query?: never;
@@ -12631,12 +12691,18 @@ export interface operations {
                 content: {
                     "application/json": {
                         /** Format: uuid */
-                        created_by_id: string;
+                        created_by_id?: string | null;
                         /** Format: uuid */
                         id: string;
+                        /** Format: date-time */
+                        inserted_at?: string;
                         name: string;
                         /** Format: uuid */
                         parent_id?: string | null;
+                        /** @description Set on folders the app maintains (athletes, athlete:<id>, classes, classes:<yyyy>, classes:<yyyy-mm>, classes:<yyyy-mm-dd>) */
+                        system_key?: string | null;
+                        /** Format: date-time */
+                        updated_at?: string;
                     };
                 };
             };
@@ -13316,12 +13382,18 @@ export interface operations {
                     "application/json": {
                         folders: {
                             /** Format: uuid */
-                            created_by_id: string;
+                            created_by_id?: string | null;
                             /** Format: uuid */
                             id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
                             name: string;
                             /** Format: uuid */
                             parent_id?: string | null;
+                            /** @description Set on folders the app maintains (athletes, athlete:<id>, classes, classes:<yyyy>, classes:<yyyy-mm>, classes:<yyyy-mm-dd>) */
+                            system_key?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
                         }[];
                     };
                 };
@@ -13353,12 +13425,18 @@ export interface operations {
                 content: {
                     "application/json": {
                         /** Format: uuid */
-                        created_by_id: string;
+                        created_by_id?: string | null;
                         /** Format: uuid */
                         id: string;
+                        /** Format: date-time */
+                        inserted_at?: string;
                         name: string;
                         /** Format: uuid */
                         parent_id?: string | null;
+                        /** @description Set on folders the app maintains (athletes, athlete:<id>, classes, classes:<yyyy>, classes:<yyyy-mm>, classes:<yyyy-mm-dd>) */
+                        system_key?: string | null;
+                        /** Format: date-time */
+                        updated_at?: string;
                     };
                 };
             };
@@ -13379,8 +13457,7 @@ export interface operations {
                     admin_notes?: string | null;
                     /** @default true */
                     copy_source: boolean;
-                    /** Format: uuid */
-                    folder_id: string;
+                    folder_id?: string | null;
                     /** Format: uuid */
                     master_workout_id: string;
                     /** Format: date */

@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.UpdateScheduledSlot do
-  alias MilosTraining.Application.ScheduleRealtime
+  alias MilosTraining.Application.{ClassWorkoutFiling, ScheduleRealtime}
   alias MilosTraining.Scheduling
   alias MilosTraining.Workouts
 
@@ -9,7 +9,13 @@ defmodule MilosTraining.Application.UpdateScheduledSlot do
 
     with {:ok, _workout} <- fetch_workout(context, master_workout_id),
          {:ok, _class_type} <- fetch_class_type(context, class_type_id),
-         {:ok, slot} <- update_slot(context, id, params) do
+         {:ok, slot} <-
+           ClassWorkoutFiling.with_filed_workout(
+             context,
+             params,
+             &update_slot(&1, id, &2),
+             current_workout_id(context, id)
+           ) do
       broadcast_slot_updated(slot)
       {:ok, slot}
     else
@@ -20,6 +26,13 @@ defmodule MilosTraining.Application.UpdateScheduledSlot do
   def call(_id, _params), do: {:error, :organization_context_required}
 
   defp update_slot(context, id, params), do: Scheduling.update_slot(context, id, params)
+
+  defp current_workout_id(context, id) do
+    case Scheduling.get_slot(context, id) do
+      %{master_workout_id: workout_id} -> workout_id
+      _missing -> nil
+    end
+  end
 
   defp fetch_workout(context, id) do
     case Workouts.get_workout(context, id) do

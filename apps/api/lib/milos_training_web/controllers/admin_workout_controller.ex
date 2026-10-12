@@ -8,6 +8,7 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
     CreateDraftWorkout,
     DeleteWorkout,
     DuplicateWorkout,
+    FileWorkoutCopy,
     GetAdminWorkout,
     ListAdminWorkouts,
     PublishWorkout,
@@ -24,7 +25,22 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
   security([%{"bearerAuth" => []}])
 
   plug OpenApiSpex.Plug.CastAndValidate,
-       [json_render_error_v2: true] when action in [:create, :update_draft, :publish]
+       [json_render_error_v2: true] when action in [:create, :update_draft, :publish, :copy]
+
+  @folder_target_body %RequestBody{
+    required: false,
+    content: %{
+      "application/json" => %MediaType{
+        schema: %Schema{
+          type: :object,
+          additionalProperties: false,
+          properties: %{
+            folder_id: %Schema{type: :string, format: :uuid, nullable: true}
+          }
+        }
+      }
+    }
+  }
 
   @id_param %Parameter{
     name: :id,
@@ -58,7 +74,8 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
   )
 
   operation(:create,
-    summary: "Create an empty workout draft",
+    summary: "Create an empty workout draft, optionally inside a library folder",
+    request_body: @folder_target_body,
     responses: [
       created:
         {"Draft", "application/json",
@@ -176,7 +193,7 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
   def create(conn, _params) do
     admin = GuardianPlug.current_resource(conn)
 
-    case CreateDraftWorkout.call(conn.assigns.tenant_context, admin) do
+    case CreateDraftWorkout.call(conn.assigns.tenant_context, admin, folder_id(conn)) do
       {:ok, draft} ->
         conn
         |> put_status(:created)
@@ -275,6 +292,39 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
          %Schema{type: :object, properties: %{error: %Schema{type: :string}}, required: [:error]}}
     ]
   )
+
+  operation(:copy,
+    summary: "Copy a workout into a library folder (published workouts stay published)",
+    parameters: [@id_param],
+    request_body: @folder_target_body,
+    responses: [
+      created:
+        {"Copied workout", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{workout: %Schema{type: :object, additionalProperties: true}},
+           required: [:workout]
+         }}
+    ]
+  )
+
+  def copy(conn, params) do
+    id = Map.get(params, "id") || Map.get(params, :id)
+
+    with {:ok, workout} <- FileWorkoutCopy.copy(conn.assigns.tenant_context, id, folder_id(conn)) do
+      conn
+      |> put_status(:created)
+      |> json(%{workout: workout})
+    end
+  end
+
+  defp folder_id(conn) do
+    case conn.body_params do
+      %{folder_id: folder_id} -> folder_id
+      %{"folder_id" => folder_id} -> folder_id
+      _none -> nil
+    end
+  end
 
   def duplicate(conn, params) do
     id = Map.get(params, "id") || Map.get(params, :id)

@@ -50,6 +50,14 @@ defmodule MilosTraining.Organizations do
   def list_membership_organization_ids(user_ids),
     do: OrganizationStore.list_membership_organization_ids(user_ids)
 
+  @doc "IANA timezone the organization operates in (defaults to UTC)."
+  def organization_timezone(organization_id) when is_binary(organization_id) do
+    case OrganizationStore.get_organization_settings(organization_id) do
+      %{timezone: timezone} when is_binary(timezone) and timezone != "" -> timezone
+      _missing -> "Etc/UTC"
+    end
+  end
+
   def list_staff_user_ids(organization_id),
     do: OrganizationStore.list_staff_user_ids(organization_id)
 
