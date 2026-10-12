@@ -28,6 +28,7 @@ import {
   deleteAssignedWorkout,
   fetchAssignedWorkoutWeek,
   listAthletes,
+  reportAssignmentOpened,
   requestWorkoutAssignment,
   rescheduleAssignment,
   updateAssignedWorkout,
@@ -424,6 +425,13 @@ export function AssignedWorkoutsConsole({
   }, [refDate, viewMode]);
 
   const accessToken = tokens?.access_token;
+
+  // ADR-105: an athlete opening an assignment's detail is an analytics fact.
+  const panelAssignmentId = panelAssignment?.id ?? null;
+  useEffect(() => {
+    if (!panelAssignmentId || isAdmin || !accessToken) return;
+    void reportAssignmentOpened(accessToken, panelAssignmentId);
+  }, [panelAssignmentId, isAdmin, accessToken]);
 
   const loadAssignments = useCallback(async () => {
     if (!accessToken) return;
