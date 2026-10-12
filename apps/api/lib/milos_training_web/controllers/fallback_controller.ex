@@ -35,18 +35,24 @@ defmodule MilosTrainingWeb.FallbackController do
   end
 
   def call(conn, {:error, :invalid_credentials}) do
+    emit_auth_anomaly(:invalid_credentials)
+
     conn
     |> put_status(:unauthorized)
     |> json(%{code: "invalid_credentials", error: "Invalid credentials"})
   end
 
   def call(conn, {:error, :invalid_refresh_token}) do
+    emit_auth_anomaly(:invalid_refresh_token)
+
     conn
     |> put_status(:unauthorized)
     |> json(%{code: "invalid_refresh_token", error: "Invalid refresh token"})
   end
 
   def call(conn, {:error, :invalid_token}) do
+    emit_auth_anomaly(:invalid_token)
+
     conn
     |> put_status(:unauthorized)
     |> json(%{code: "invalid_token", error: "Invalid token"})
@@ -1275,6 +1281,12 @@ defmodule MilosTrainingWeb.FallbackController do
     Enum.reduce(opts, msg, fn {key, value}, acc ->
       String.replace(acc, "%{#{key}}", to_string(value))
     end)
+  end
+
+  # Credential failures use a bounded reason set; ops/observability alert rules
+  # watch their rate for brute force and refresh-token reuse.
+  defp emit_auth_anomaly(reason) do
+    :telemetry.execute([:milos, :auth, :anomaly], %{count: 1}, %{reason: Atom.to_string(reason)})
   end
 
   defp emit_upload_rejection(reason) do
