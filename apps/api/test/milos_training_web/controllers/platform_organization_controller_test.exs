@@ -1,4 +1,7 @@
 defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
+  # TD-046: requests run as the RLS-enforcing runtime role, so a platform
+  # command that reads or writes a root tenant table without RepoContext.run/2
+  # fails here instead of silently returning nothing in production.
   use MilosTrainingWeb.ConnCase, async: false
   import Swoosh.TestAssertions
 
