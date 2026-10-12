@@ -1,4 +1,5 @@
 defmodule MilosTraining.Application.AdminRecordAttendance do
+  alias MilosTraining.Application.TrackAnalyticsEvent
   alias MilosTraining.Scheduling.Domain.AttendancePolicy
   alias MilosTraining.{Finance, Scheduling}
 
@@ -18,6 +19,10 @@ defmodule MilosTraining.Application.AdminRecordAttendance do
 
       with {:ok, attendance} <- Scheduling.record_attendance(context, attendance_params),
            {:ok, _transition} <- reconcile_visit(attendance) do
+        TrackAnalyticsEvent.call("class_attendance_recorded", context, attendance, %{
+          metadata: %{member_id: user_id}
+        })
+
         {:ok, attendance}
       end
     end

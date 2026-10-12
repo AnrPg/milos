@@ -1,6 +1,7 @@
 defmodule MilosTraining.Application.SubmitBooking do
   require Logger
 
+  alias MilosTraining.Application.TrackAnalyticsEvent
   alias MilosTraining.{Finance, Identity, Scheduling}
   alias MilosTraining.Scheduling.Domain.{BookingOperationPolicy, BookingPolicy}
 
@@ -38,6 +39,12 @@ defmodule MilosTraining.Application.SubmitBooking do
           dispatch_booking_notification(slot, booking)
           broadcast_booking_event(slot, booking)
           broadcast_entitlement_change(user_id)
+
+          TrackAnalyticsEvent.call("class_booking_requested", context, booking, %{
+            user_id: user_id,
+            metadata: %{auto_approved: slot.auto_approve == true}
+          })
+
           {:ok, booking, :created}
 
         {:error, reason} ->

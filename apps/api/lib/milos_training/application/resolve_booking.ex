@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.ResolveBooking do
-  alias MilosTraining.Application.ScheduleRealtime
+  alias MilosTraining.Application.{ScheduleRealtime, TrackAnalyticsEvent}
   alias MilosTraining.{Finance, Scheduling}
   alias MilosTraining.Scheduling.Domain.BookingOperationPolicy
 
@@ -33,7 +33,7 @@ defmodule MilosTraining.Application.ResolveBooking do
              },
              reconciliation_for(status, booking)
            ) do
-      if outcome == :resolved, do: announce(status, updated_booking)
+      if outcome == :resolved, do: announce(context, status, updated_booking, admin_message)
       {:ok, updated_booking, outcome}
     else
       nil -> {:error, :not_found}
@@ -48,7 +48,10 @@ defmodule MilosTraining.Application.ResolveBooking do
   defp requested_status(action) when action in [:reject, "reject"], do: {:ok, :rejected}
   defp requested_status(_action), do: :error
 
-  defp announce(status, booking) do
+  defp resolution_event(:approved), do: "class_booking_approved"
+  defp resolution_event(:rejected), do: "class_booking_rejected"
+
+  defp announce(context, status, booking, admin_message) do
     maybe_reconcile_now(status, booking)
 
     notification_payload =
@@ -58,6 +61,13 @@ defmodule MilosTraining.Application.ResolveBooking do
 
     MilosTraining.Notifications.dispatch_event(:booking_resolved, notification_payload)
     broadcast_resolution(booking)
+
+    TrackAnalyticsEvent.call(resolution_event(status), context, booking, %{
+      metadata: %{
+        member_id: booking.user_id,
+        has_admin_message: admin_message not in [nil, ""]
+      }
+    })
   end
 
   defp reconciliation_for(:rejected, booking),
