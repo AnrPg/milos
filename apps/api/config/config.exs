@@ -32,7 +32,8 @@ config :milos_training, Oban,
        {"*/15 * * * *", MilosTraining.Workers.RefreshCoachingAggregatesJob},
        {"0 2 * * *", MilosTraining.Workers.MarkOverdueInvoicesJob},
        {"17 * * * *", MilosTraining.Workers.ReconcileEntitlementReservationsJob},
-       {"0 9 * * *", MilosTraining.Workers.PaymentReminderJob}
+       {"0 9 * * *", MilosTraining.Workers.PaymentReminderJob},
+       {"41 * * * *", MilosTraining.Workers.ExecutionAbandonmentSweepJob}
      ]}
   ],
   queues: [
@@ -49,6 +50,9 @@ config :milos_training, MilosTraining.Infrastructure.Auth.Guardian,
 
 config :milos_training, :start_redix, true
 config :milos_training, :start_oban, true
+# ADR-105: a started execution not completed within this many hours is recorded
+# as workout_execution_abandoned by ExecutionAbandonmentSweepJob.
+config :milos_training, :execution_abandonment_hours, 6
 config :milos_training, :redis_url, System.get_env("REDIS_URL", "redis://localhost:6379")
 config :milos_training, :readiness_checker, MilosTraining.Infrastructure.Readiness.Live
 config :milos_training, :identity_user_store, MilosTraining.Infrastructure.Identity.EctoUserStore

@@ -2,7 +2,8 @@ defmodule MilosTraining.Application.CompleteWorkout do
   alias MilosTraining.Application.{
     BroadcastUserSync,
     InvalidateLandingPages,
-    TenantStaffRecipients
+    TenantStaffRecipients,
+    TrackAnalyticsEvent
   }
 
   alias MilosTraining.{Execution, Gamification, Identity, Notifications, Workouts}
@@ -28,6 +29,12 @@ defmodule MilosTraining.Application.CompleteWorkout do
            ),
          :ok <- process_inline_if_needed(execution) do
       broadcast_completion(execution)
+
+      TrackAnalyticsEvent.call("workout_execution_completed", nil, execution, %{
+        user_id: user_id,
+        metadata: Execution.completion_analytics_facts(execution, segments)
+      })
+
       {:ok, execution}
     end
   end

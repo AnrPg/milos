@@ -12,7 +12,12 @@ defmodule MilosTraining.Application.LogTrainingEntry do
   never re-enqueues projection work.
   """
 
-  alias MilosTraining.Application.{AuthorizeTrainingLogSource, CompleteWorkout}
+  alias MilosTraining.Application.{
+    AuthorizeTrainingLogSource,
+    CompleteWorkout,
+    TrackAnalyticsEvent
+  }
+
   alias MilosTraining.Execution
   alias MilosTraining.Workers.ProcessWorkoutCompletionJob
 
@@ -51,6 +56,10 @@ defmodule MilosTraining.Application.LogTrainingEntry do
              job_builder: job_builder()
            ),
          :ok <- process_inline_if_needed(entry, outcome) do
+      TrackAnalyticsEvent.call("training_log_entry_logged", context, entry, %{
+        metadata: %{section_score_count: length(entry.section_scores || [])}
+      })
+
       {:ok, entry, outcome}
     end
   end

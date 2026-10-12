@@ -75,8 +75,14 @@ defmodule MilosTraining.Analytics.Domain.EventCatalog do
     "execution_interaction" => {"workout_execution", [], :explicit},
     "training_log_entry_logged" =>
       {"training_log_entry",
-       [:source_type, :master_workout_id, :workout_type, :duration_seconds, :perceived_effort],
-       :subject},
+       [
+         :source_type,
+         :master_workout_id,
+         :workout_type,
+         :scale_level_slug,
+         :duration_seconds,
+         :perceived_effort
+       ], :subject},
     "training_log_entry_voided" => {"training_log_entry", [:source_type], :subject},
     # Scheduling
     "class_booking_requested" => {"class_booking", [:scheduled_class_id, :status], :subject},
