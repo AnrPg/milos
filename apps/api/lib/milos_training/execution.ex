@@ -9,7 +9,12 @@ defmodule MilosTraining.Execution do
     VoidTrainingLogEntry
   }
 
-  alias MilosTraining.Execution.Domain.{TimerSequenceBuilder, TrainingLogPolicy}
+  alias MilosTraining.Execution.Domain.{
+    ExecutionAnalytics,
+    TimerSequenceBuilder,
+    TrainingLogPolicy
+  }
+
   alias MilosTraining.Execution.Queries.{GetExecution, GetTrainingLogEntries}
   alias MilosTraining.Execution.{ExecutionStore, TrainingLogStore}
 
@@ -30,6 +35,27 @@ defmodule MilosTraining.Execution do
     do: ExecutionStore.list_executions_for_coaching(user_id)
 
   defdelegate build_timer_sequence(workout), to: TimerSequenceBuilder, as: :build
+
+  # -- Analytics facts (ADR-105) ----------------------------------------------
+
+  def with_execution_context(context, fun), do: ExecutionStore.with_user_context(context, fun)
+
+  def list_stale_executions(started_before, started_after, limit),
+    do: ExecutionStore.list_stale_executions(started_before, started_after, limit)
+
+  def last_progress_at(execution_id), do: ExecutionStore.last_progress_at(execution_id)
+
+  defdelegate completion_analytics_facts(execution, segments),
+    to: ExecutionAnalytics,
+    as: :completion_facts
+
+  defdelegate abandonment_analytics_facts(execution, segments, now),
+    to: ExecutionAnalytics,
+    as: :abandonment_facts
+
+  defdelegate execution_abandoned?(execution, now, threshold_hours),
+    to: ExecutionAnalytics,
+    as: :abandoned?
 
   # -- Standalone training log (ADR-100) -------------------------------------
 
