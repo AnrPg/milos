@@ -3,6 +3,7 @@ defmodule MilosTraining.Workers.PushDispatchJob do
 
   require Logger
 
+  alias MilosTraining.Application.RecordPushDeliveryOutcome
   alias MilosTraining.Notifications
   alias MilosTraining.Notifications.Domain.PushMessageBuilder
   alias MilosTraining.Notifications.PushSubscriptionStore
@@ -17,15 +18,17 @@ defmodule MilosTraining.Workers.PushDispatchJob do
   end
 
   @impl Oban.Worker
-  def perform(%Oban.Job{
-        args:
-          %{
-            "user_id" => user_id,
-            "endpoint" => endpoint,
-            "type" => type,
-            "payload" => payload
-          } = args
-      }) do
+  def perform(
+        %Oban.Job{
+          args:
+            %{
+              "user_id" => user_id,
+              "endpoint" => endpoint,
+              "type" => type,
+              "payload" => payload
+            } = args
+        } = job
+      ) do
     notification_id = Map.get(args, "notification_id")
 
     case PushSubscriptionStore.with_user_context(%{user_id: user_id}, fn ->
@@ -45,7 +48,10 @@ defmodule MilosTraining.Workers.PushDispatchJob do
           |> fallback_message(type, payload)
           |> Map.put(:notification_id, notification_id)
 
-        case dispatcher().send_push(subscription, message) do
+        result = dispatcher().send_push(subscription, message)
+        RecordPushDeliveryOutcome.call(args, result, job.attempt || 1, job.max_attempts || 1)
+
+        case result do
           :ok ->
             :ok
 

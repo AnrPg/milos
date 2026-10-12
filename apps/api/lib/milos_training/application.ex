@@ -30,6 +30,8 @@ defmodule MilosTraining.Application do
     case Supervisor.start_link(children, opts) do
       {:ok, pid} ->
         MilosTraining.Infrastructure.Tenancy.PrivilegeGuard.check!()
+        # ADR-105: in-app notification deliveries -> analytics events.
+        MilosTraining.Application.RecordNotificationDelivered.attach()
         {:ok, pid}
 
       error ->
