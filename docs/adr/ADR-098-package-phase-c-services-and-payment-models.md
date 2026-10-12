@@ -226,6 +226,20 @@ recorded in the technical debt ledger when the phase is complete.
   (`add_on_base_ended`); corporate seats never get member invoices or joining
   fees. Members enroll through `POST /me/corporate-enrollment` with a code, or
   without one for email-domain plans.
+- **Corporate invoicing** (migration `20261012240000`): clients gain
+  `payment_terms_days` and `auto_invoice`; invoices gain `invoice_number`,
+  `due_on`, `overdue` status and reminder tracking; payments live in
+  `finance_corporate_payments` (reversible, never deleted).
+  `CorporateInvoicePolicy` decides the period to invoice, the status after
+  payments, voiding and reminder timing. `CorporateInvoicingJob` runs daily
+  (`41 6 * * *`) through `Application.CorporateInvoicing`, which emails the
+  billing contact (`Finance.Emails.CorporateInvoiceEmail`, gettext domain
+  `corporate_invoices`, gym default locale) after the database work.
+- **Staff and progress extras**: `GET /staff/members` lists owners, admins and
+  coaches by their role in the gym for coach pickers; offered slots carry the
+  coach's nickname, beneficiaries their nickname. `/me/progress` adds
+  `pr_timeline` (each time a PR was beaten, with the score it replaced), which
+  the web opens in the Pantheon's PR history overlay.
 - **API**: every new denial has a stable code in `FallbackController`. The
   OpenAPI spec is now cached once per spec module (`MilosTrainingWeb.ApiSpecCache`)
   because the default cache copied the whole spec into persistent terms for
