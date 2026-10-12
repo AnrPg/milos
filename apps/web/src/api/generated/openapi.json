@@ -2473,6 +2473,11 @@
                             "format": "date-time",
                             "type": "string"
                           },
+                          "organization_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "params": {
                             "additionalProperties": true,
                             "type": "object"
@@ -9051,6 +9056,11 @@
                             "format": "date-time",
                             "type": "string"
                           },
+                          "organization_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "params": {
                             "additionalProperties": true,
                             "type": "object"
@@ -9236,6 +9246,11 @@
                         },
                         "inserted_at": {
                           "format": "date-time",
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
                           "type": "string"
                         },
                         "params": {
@@ -15453,6 +15468,11 @@
                         },
                         "inserted_at": {
                           "format": "date-time",
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
                           "type": "string"
                         },
                         "params": {
@@ -23927,6 +23947,11 @@
                           "format": "date-time",
                           "type": "string"
                         },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "params": {
                           "additionalProperties": true,
                           "type": "object"
@@ -30702,6 +30727,11 @@
                         },
                         "inserted_at": {
                           "format": "date-time",
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
                           "type": "string"
                         },
                         "params": {

@@ -3766,6 +3766,8 @@ export interface operations {
                             id: string;
                             /** Format: date-time */
                             inserted_at: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
                             params: {
                                 [key: string]: unknown;
                             };
@@ -6376,6 +6378,8 @@ export interface operations {
                             id: string;
                             /** Format: date-time */
                             inserted_at: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
                             params: {
                                 [key: string]: unknown;
                             };
@@ -6444,6 +6448,8 @@ export interface operations {
                             id: string;
                             /** Format: date-time */
                             inserted_at: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
                             params: {
                                 [key: string]: unknown;
                             };
@@ -8496,6 +8502,8 @@ export interface operations {
                             id: string;
                             /** Format: date-time */
                             inserted_at: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
                             params: {
                                 [key: string]: unknown;
                             };
@@ -11331,6 +11339,8 @@ export interface operations {
                             id: string;
                             /** Format: date-time */
                             inserted_at: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
                             params: {
                                 [key: string]: unknown;
                             };
@@ -14215,6 +14225,8 @@ export interface operations {
                             id: string;
                             /** Format: date-time */
                             inserted_at: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
                             params: {
                                 [key: string]: unknown;
                             };

@@ -145,6 +145,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
   defp normalize_injury(%InjuryReport{} = injury_report) do
     %{
       id: injury_report.id,
+      organization_id: injury_report.organization_id,
       user_id: injury_report.user_id,
       reported_by_id: injury_report.reported_by_id,
       reported_by_role: injury_report.reported_by_role,
