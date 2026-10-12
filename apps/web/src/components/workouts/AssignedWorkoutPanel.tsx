@@ -35,6 +35,8 @@ type Props = {
   onEditWorkout?: (assignment: AssignedWorkoutRecord) => void;
   onRescheduled?: (updated: AssignedWorkoutRecord) => void;
   launching?: boolean;
+  /** ADR-107: members may reject but not reschedule their assignments. */
+  allowReschedule?: boolean;
 };
 
 export function AssignedWorkoutPanel({
@@ -48,6 +50,7 @@ export function AssignedWorkoutPanel({
   onEditWorkout,
   onRescheduled,
   launching,
+  allowReschedule = true,
 }: Props) {
   const i18n = useUiTranslations();
   const [activeSection, setActiveSection] = useState<"details" | "conversation">("details");
@@ -363,17 +366,19 @@ export function AssignedWorkoutPanel({
                         >
                           {rejecting ? i18n("rejecting812b8d2") : i18n("rejectWorkouta584840")}
                         </button>
-                        <button
-                          className="flex-1 rounded-full px-4 py-2 text-sm font-semibold"
-                          style={{ background: "var(--border)", color: "var(--text-soft)" }}
-                          onClick={() => {
-                            setRescheduleDate(assignment.scheduled_for);
-                            setRescheduling(true);
-                          }}
-                          type="button"
-                        >
-                          {i18n("reschedule34b2dc9")}
-                        </button>
+                        {allowReschedule ? (
+                          <button
+                            className="flex-1 rounded-full px-4 py-2 text-sm font-semibold"
+                            style={{ background: "var(--border)", color: "var(--text-soft)" }}
+                            onClick={() => {
+                              setRescheduleDate(assignment.scheduled_for);
+                              setRescheduling(true);
+                            }}
+                            type="button"
+                          >
+                            {i18n("reschedule34b2dc9")}
+                          </button>
+                        ) : null}
                       </div>
                     ) : (
                       <div className="space-y-2">

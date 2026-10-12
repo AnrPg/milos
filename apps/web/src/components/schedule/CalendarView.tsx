@@ -255,6 +255,11 @@ function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact
         <p className="truncate text-[10px] uppercase tracking-[0.14em]" style={{ color: isUnavailable ? "var(--dim)" : typeColor }}>
           {classType.name}
         </p>
+        {slot.my_version ? (
+          <p className="truncate text-[9px] font-bold" style={{ color: "var(--primary)" }}>
+            {i18n("memberProgrammingYourVersion")}
+          </p>
+        ) : null}
       </button>
     );
   }
@@ -277,6 +282,14 @@ function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact
           <p className="mt-1 text-sm" style={{ color: isUnavailable ? "var(--border-strong)" : "var(--muted)" }}>
           {slot.workout?.title ?? i18n("workoutPreviewUnavailable473ec36")}
           </p>
+          {slot.my_version ? (
+            <span
+              className="mt-2 inline-block rounded-full px-2 py-0.5 text-[10px] font-bold"
+              style={{ background: "color-mix(in srgb, var(--primary) 14%, transparent)", color: "var(--primary)" }}
+            >
+              {i18n("memberProgrammingYourVersion")}
+            </span>
+          ) : null}
         </div>
         <span
           className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]"

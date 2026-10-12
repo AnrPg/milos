@@ -74,6 +74,24 @@ describe("workoutCta", () => {
     });
   });
 
+  it("offers logging for a member's personal workout due today (ADR-107)", () => {
+    expect(
+      workoutCta({
+        role: "member",
+        now,
+        executions: [],
+        scheduleSlots: [],
+        assignments: [
+          { id: "rejected", scheduled_for: "2026-07-17", my_athlete_status: "rejected" },
+          { id: "assignment-2", scheduled_for: "2026-07-17", execution_status: null },
+        ],
+      }),
+    ).toEqual({
+      href: "/my-workouts?open_assignment=assignment-2&date=2026-07-17",
+      label: "log",
+    });
+  });
+
   it("hides the CTA without a qualifying trigger", () => {
     expect(
       workoutCta({

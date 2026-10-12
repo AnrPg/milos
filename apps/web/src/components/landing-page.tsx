@@ -473,7 +473,7 @@ export function LandingPage() {
 
   const ctaAssignmentsQuery = useQuery({
     queryKey: ["landing", "workout-cta", "assignments", formatLocalIsoDate(ctaNow)],
-    enabled: Boolean(tokens?.access_token) && role === "athlete",
+    enabled: Boolean(tokens?.access_token) && (role === "athlete" || role === "member"),
     queryFn: () => fetchAssignedWorkoutWeek(tokens!.access_token, formatLocalIsoDate(ctaNow)),
     staleTime: 60_000,
   });
