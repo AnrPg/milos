@@ -267,6 +267,7 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
         tags: [],
         subtitle: nil,
         description: nil,
+        workout_metadata: %{timer_inference: "complete"},
         authoring_mode: "free_text",
         expected_source_revision: 0,
         free_text_body: body,
@@ -343,6 +344,7 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
       assert workout["free_text_body"] == body
       assert workout["difficulty"] == "intermediate"
       assert workout["equipment"] == ["pull-up bar", "barbell"]
+      assert workout["workout_metadata"]["timer_inference"] == "complete"
       assert [main, strength] = workout["sections"]
       assert main["timer_config"]["time_cap_seconds"] == 1200
       assert length(main["exercises"]) == 2
